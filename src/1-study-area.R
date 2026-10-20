@@ -95,6 +95,10 @@ summ <- rbindlist(lapply(list(list(P, "Primary", "Stratum"), list(S, "Secondary"
   f <- as.data.table(freq(lv[[1]]))[, .(Id = as.integer(value), Cells = as.integer(count))]
   l <- stsim_list(lv[[3]]); f[, Name := l$Name[match(Id, as.integer(l$Id))]]; f[, Level := lv[[2]]]; f[, .(Level, Name, Id, Cells)] }))
 write_ds(summ, "OutputStrataSummary")
+# units of each list with no cell: expected for a regional build, a warning sign for a CONUS one (the 2026-10-19 bounding-box bug
+# dropped 18 northern-border counties this way)
+for (lv in list(c("Secondary", "SecondaryStratum"), c("Tertiary", "TertiaryStratum"))) { l <- stsim_list(lv[2])
+  say("%s: %d of %d %s units have cells", lv[1], summ[Level == lv[1], .N], nrow(l), ss[Level == lv[1]]$Preset) }
 progressBar()
 finish_checks()
 progressBar(type = "end")
