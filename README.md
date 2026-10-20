@@ -32,7 +32,8 @@ project-scope sheets that a stage saves during a run.
 | 1 - Study Area and Strata | `src/1-study-area.R` | Done: model lattice; primary = FIA ecodivisions (fixed); secondary and tertiary from Stratum Sources |
 | 2 - Fit Growth Curves | `src/2-growth-curves.R`, `src/growth.R` | Done: 551 merchantable volume curves (forest state class x ecodivision), parameters, PDF report |
 | 3 - Carbon Flows | `src/3-carbon-flows.R`, `src/flows.R`, `src/dom.R`, `src/calibrate.R` | Done: net growth and its split, turnover, DOM decay at PRISM temperature calibrated to FIA dead carbon (snags, down wood, litter) and gSSURGO soil; non-forest and event flows from LUCAS defaults |
-| 4-9 | | Planned |
+| 4 - Spin-up and Initial Stocks | `src/4-initial-stocks.R`, `src/dom.R` | Done: CBM spin-up as a fixed point with the calibrated stage 3 rates; all 14 pools by age for a last disturbance of high-severity fire or clearcut |
+| 5-9 | | Planned |
 
 Every stage ends with validation checks (`lucasCore_OutputValidation`); a check that cannot be computed fails.
 
@@ -43,4 +44,5 @@ Rscript tests/phaseA-smoke.R
 ```
 
 Builds a scratch library in `dev/libs`, runs stage 1 for California and compares the strata with the CONUS 1km model.
-`Rscript tests/phaseB-growth.R` runs stage 2 in a new library.
+`Rscript tests/phaseB-growth.R` runs stage 2 in a new library; `Rscript tests/phaseB-flows.R` runs stages 2-4 (about 21 minutes).
+A newly added stage is not visible to an existing library while the package version is unchanged: test it in a new library.

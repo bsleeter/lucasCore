@@ -135,6 +135,29 @@
 		<column name="SoilSource" displayName="Soil Multiplier Source" dataType="String"/>
 	</dataSheet>
 
+	<dataSheet name="InitialStockCurve" displayName="Initial Stock Curves (spin-up)">
+		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" allowDbNull="False"/>
+		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass" allowDbNull="False"/>
+		<column name="TransitionGroupId" displayName="Last Disturbance" dataType="Integer" validationType="Datasheet" formula1="stsim_TransitionGroup" allowDbNull="False"/>
+		<column name="Age" dataType="Integer"/>
+		<column name="Merchantable" displayName="Merchantable (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="Other" displayName="Other Wood (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="Foliage" displayName="Foliage (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="FineRoots" displayName="Fine Roots (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="CoarseRoots" displayName="Coarse Roots (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="AGVF" displayName="DOM AG Very Fast (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="BGVF" displayName="DOM BG Very Fast (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="AGF" displayName="DOM AG Fast (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="BGF" displayName="DOM BG Fast (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="AGM" displayName="DOM AG Medium (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="AGS" displayName="DOM AG Slow (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="BGS" displayName="DOM BG Slow (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="SnagStem" displayName="Snag Stem (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="SnagBranch" displayName="Snag Branch (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="TotalLive" displayName="Total Live (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="TotalDOM" displayName="Total DOM (Mg C/ha)" dataType="Double" format="0.00"/>
+	</dataSheet>
+
 	<dataSheet name="OutputGrowthReport" displayName="Growth Curve Report" isSingleRow="True">
 		<column name="FileName" displayName="Report (PDF)" dataType="String" isExternalFile="True" isRaster="False" externalFileFilter="PDF Files (*.pdf)|*.pdf"/>
 	</dataSheet>
@@ -184,6 +207,14 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
+	<transformer name="InitialStocks" displayName="4 - Spin-up and Initial Stocks" isRunnable="True" programName="Rscript" programArguments="src/4-initial-stocks.R" condaEnv="lucasCore.yml" condaEnvVersion="1">
+		<dataSheet name="CarbonCurve" type="Input"/>
+		<dataSheet name="OutputDecayCalibration" type="Input"/>
+		<dataSheet name="stsim_FlowMultiplier" type="Input"/>
+		<dataSheet name="InitialStockCurve" type="Output"/>
+		<dataSheet name="OutputValidation" type="Output"/>
+	</transformer>
+
 	<!-- =================================================================================================== -->
 	<!-- LAYOUTS                                                                                             -->
 	<!-- =================================================================================================== -->
@@ -201,6 +232,7 @@
 			<item name="GrowthOptions"/>
 			<item name="MerchantableVolumeCurve"/>
 			<item name="CarbonCurve"/>
+			<item name="InitialStockCurve"/>
 			<group name="lucasCoreResults" displayName="Build Results">
 				<item name="OutputStrataSummary"/>
 				<item name="OutputGrowthParameter"/>
