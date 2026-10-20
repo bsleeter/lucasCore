@@ -16,3 +16,5 @@ dev/libs/
 dev/**/*.tif
 dev/**/*.png
 *.ssimpkg
+dev/growth/*.rds
+dev/growth/out_*.csv
