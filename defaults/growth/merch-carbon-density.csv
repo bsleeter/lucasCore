@@ -1,30 +1,30 @@
-StateClassId,StateClassName,FiaGroupsUsed,MgCPerM3,WoodSG,BarkCarbonShare,Species,TopSpecies,VolumeBillionFt3
-100,White/Red/Jack Pine Group,100,0.229,0.389,0.147,100,eastern white pine; red pine; eastern hemlock,34.2
-120,Spruce/Fir Group,120,0.2056,0.363,0.13,62,northern white-cedar; red spruce; balsam fir,22.03
-140,Longleaf/Slash Pine Group,140,0.297,0.533,0.108,79,slash pine; longleaf pine; loblolly pine,19.4
-160,Loblolly/Shortleaf Pine Group,160,0.2538,0.475,0.11,148,loblolly pine; shortleaf pine; sweetgum,153.7
-180,Pinyon/Juniper Group,180,0.2465,0.397,0.176,48,ponderosa pine; Douglas-fir; white fir,2.01
-200,Douglas-fir Coastal Group,200,0.2616,0.437,0.145,74,Douglas-fir; western hemlock; ponderosa pine,146.75
-201,Douglas-fir Inland Group,200,0.2616,0.437,0.145,74,Douglas-fir; western hemlock; ponderosa pine,146.75
-220,Ponderosa Pine Group,220,0.2415,0.385,0.184,70,ponderosa pine; Douglas-fir; Jeffrey pine,40.49
-240,Western White Pine Group,240,0.2067,0.367,0.134,21,western white pine; lodgepole pine; California red fir,0.46
-260,Fir/Spruce/Mountain Hemlock Group,260,0.2092,0.365,0.142,59,Engelmann spruce; subalpine fir; grand fir,95.03
-280,Lodgepole Pine Group,280,0.2101,0.38,0.093,36,lodgepole pine; Douglas-fir; subalpine fir,21.44
-300,Hemlock/Sitka Spruce Group,300,0.2316,0.392,0.147,36,western hemlock; western redcedar; Douglas-fir,35.91
-320,Western Larch Group,320,0.2388,0.439,0.107,20,western larch; Douglas-fir; lodgepole pine,5.03
-340,Redwood Group,340,0.2408,0.382,0.171,20,redwood; Douglas-fir; tanoak,9.18
-360,Other Western Softwood Group,360,0.231,0.416,0.125,52,western juniper; whitebark pine; limber pine,4.96
-370,California Mixed Conifer Group,370,0.2419,0.4,0.155,41,Douglas-fir; white fir; ponderosa pine,33.88
-380,Exotic Softwoods Group,380,0.2236,0.407,0.126,58,Norway spruce; Scotch pine; larch spp.,1.78
-400,Oak/Pine Group,400,0.2672,0.483,0.133,185,loblolly pine; eastern white pine; sweetgum,56.54
-500,Oak/Hickory Group,500,0.2944,0.53,0.144,226,yellow-poplar; white oak; northern red oak,326.73
-600,Oak/Gum/Cypress Group,600,0.2729,0.494,0.144,156,baldcypress; sweetgum; swamp tupelo,63.82
-700,Elm/Ash/Cottonwood Group,700,0.2519,0.461,0.127,208,silver maple; eastern cottonwood; red maple,47.66
-800,Maple/Beech/Birch Group,800,0.2745,0.498,0.123,133,sugar maple; red maple; eastern hemlock,111.5
-900,Aspen/Birch Group,900,0.2181,0.378,0.158,120,quaking aspen; bigtooth aspen; paper birch,30.74
-910,Alder/Maple Group,910,0.2308,0.399,0.141,40,red alder; Douglas-fir; bigleaf maple,9.87
-920,Western Oak Group,920,0.2978,0.526,0.15,50,Douglas-fir; canyon live oak; California black oak,10.92
-940,Tanoak/Laurel Group,940,0.2884,0.495,0.155,40,Douglas-fir; tanoak; redwood,9.24
-950,Other Western Hardwoods Group,970,0.2458,0.4,0.171,38,ponderosa pine; Douglas-fir; white fir,1.11
-980,Tropical Hardwoods Group,980,0.2969,0.547,0.126,51,cabbage palmetto; live oak; laurel oak,0.86
-990,Exotic Hardwoods Group,990,0.2696,0.501,0.127,120,Chinese tallow; Siberian elm; ailanthus,1.17
+StateClassId,StateClassName,FiaGroupsUsed,MgCPerM3,WoodSG,BarkCarbonShare,DeciduousShare,Species,TopSpecies,VolumeBillionFt3
+100,White/Red/Jack Pine Group,100,0.229,0.389,0.147,0.15,100,eastern white pine; red pine; eastern hemlock,34.2
+120,Spruce/Fir Group,120,0.2056,0.363,0.13,0.197,62,northern white-cedar; red spruce; balsam fir,22.03
+140,Longleaf/Slash Pine Group,140,0.297,0.533,0.108,0.072,79,slash pine; longleaf pine; loblolly pine,19.4
+160,Loblolly/Shortleaf Pine Group,160,0.2538,0.475,0.11,0.112,148,loblolly pine; shortleaf pine; sweetgum,153.7
+180,Pinyon/Juniper Group,180,0.2465,0.397,0.176,0.022,48,ponderosa pine; Douglas-fir; white fir,2.01
+200,Douglas-fir Coastal Group,200,0.2616,0.437,0.145,0.033,74,Douglas-fir; western hemlock; ponderosa pine,146.75
+201,Douglas-fir Inland Group,200,0.2616,0.437,0.145,0.033,74,Douglas-fir; western hemlock; ponderosa pine,146.75
+220,Ponderosa Pine Group,220,0.2415,0.385,0.184,0.011,70,ponderosa pine; Douglas-fir; Jeffrey pine,40.49
+240,Western White Pine Group,240,0.2067,0.367,0.134,0.01,21,western white pine; lodgepole pine; California red fir,0.46
+260,Fir/Spruce/Mountain Hemlock Group,260,0.2092,0.365,0.142,0.026,59,Engelmann spruce; subalpine fir; grand fir,95.03
+280,Lodgepole Pine Group,280,0.2101,0.38,0.093,0.022,36,lodgepole pine; Douglas-fir; subalpine fir,21.44
+300,Hemlock/Sitka Spruce Group,300,0.2316,0.392,0.147,0.035,36,western hemlock; western redcedar; Douglas-fir,35.91
+320,Western Larch Group,320,0.2388,0.439,0.107,0.584,20,western larch; Douglas-fir; lodgepole pine,5.03
+340,Redwood Group,340,0.2408,0.382,0.171,0.007,20,redwood; Douglas-fir; tanoak,9.18
+360,Other Western Softwood Group,360,0.231,0.416,0.125,0.023,52,western juniper; whitebark pine; limber pine,4.96
+370,California Mixed Conifer Group,370,0.2419,0.4,0.155,0.02,41,Douglas-fir; white fir; ponderosa pine,33.88
+380,Exotic Softwoods Group,380,0.2236,0.407,0.126,0.212,58,Norway spruce; Scotch pine; larch spp.,1.78
+400,Oak/Pine Group,400,0.2672,0.483,0.133,0.498,185,loblolly pine; eastern white pine; sweetgum,56.54
+500,Oak/Hickory Group,500,0.2944,0.53,0.144,0.945,226,yellow-poplar; white oak; northern red oak,326.73
+600,Oak/Gum/Cypress Group,600,0.2729,0.494,0.144,0.922,156,baldcypress; sweetgum; swamp tupelo,63.82
+700,Elm/Ash/Cottonwood Group,700,0.2519,0.461,0.127,0.955,208,silver maple; eastern cottonwood; red maple,47.66
+800,Maple/Beech/Birch Group,800,0.2745,0.498,0.123,0.864,133,sugar maple; red maple; eastern hemlock,111.5
+900,Aspen/Birch Group,900,0.2181,0.378,0.158,0.784,120,quaking aspen; bigtooth aspen; paper birch,30.74
+910,Alder/Maple Group,910,0.2308,0.399,0.141,0.599,40,red alder; Douglas-fir; bigleaf maple,9.87
+920,Western Oak Group,920,0.2978,0.526,0.15,0.314,50,Douglas-fir; canyon live oak; California black oak,10.92
+940,Tanoak/Laurel Group,940,0.2884,0.495,0.155,0.026,40,Douglas-fir; tanoak; redwood,9.24
+950,Other Western Hardwoods Group,970,0.2458,0.4,0.171,0.061,38,ponderosa pine; Douglas-fir; white fir,1.11
+980,Tropical Hardwoods Group,980,0.2969,0.547,0.126,0.22,51,cabbage palmetto; live oak; laurel oak,0.86
+990,Exotic Hardwoods Group,990,0.2696,0.501,0.127,0.934,120,Chinese tallow; Siberian elm; ailanthus,1.17

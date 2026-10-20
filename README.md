@@ -21,7 +21,8 @@ Rscript tools/new-library.R "F:/path/My Model.ssim"
 Creates the library with stsim + lucasCore, writes the stsim project definitions from `defaults/stsim` (state classes, strata
 lists, transition, stock and flow types), and turns multiprocessing and conda off. Secondary and tertiary strata are chosen
 here from `defaults/strata/presets.csv` (States, Counties, HUC6, HUC8, EPA Level III Ecoregions, Pyromes, Federal Lands, GAP
-Status): `--secondary=Counties --tertiary="GAP Status"`. Defaults: States and Federal Lands (the CONUS 1km model). This is not a stage: SyncroSim discards
+Status): `--secondary=Counties --tertiary="GAP Status"`. Defaults: States and Federal Lands (the CONUS 1km model). It also creates the
+"Stock-Flow Definitions" scenario (flow diagram, order, groups, output options) that stage 3 scenarios depend on. This is not a stage: SyncroSim discards
 project-scope sheets that a stage saves during a run.
 
 ## Stages
@@ -30,7 +31,8 @@ project-scope sheets that a stage saves during a run.
 |---|---|---|
 | 1 - Study Area and Strata | `src/1-study-area.R` | Done: model lattice; primary = FIA ecodivisions (fixed); secondary and tertiary from Stratum Sources |
 | 2 - Fit Growth Curves | `src/2-growth-curves.R`, `src/growth.R` | Done: 551 merchantable volume curves (forest state class x ecodivision), parameters, PDF report |
-| 3-9 | | Planned |
+| 3 - Carbon Flows | `src/3-carbon-flows.R`, `src/flows.R` | 3a done: net growth and its split, turnover, DOM decay at PRISM temperature; non-forest and event flows from LUCAS defaults. 3b (decay calibrated to FIA dead carbon) next |
+| 4-9 | | Planned |
 
 Every stage ends with validation checks (`lucasCore_OutputValidation`); a check that cannot be computed fails.
 

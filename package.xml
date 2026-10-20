@@ -159,6 +159,15 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
+	<transformer name="CarbonFlows" displayName="3 - Carbon Flows" isRunnable="True" programName="Rscript" programArguments="src/3-carbon-flows.R" condaEnv="lucasCore.yml" condaEnvVersion="1">
+		<dataSheet name="CarbonCurve" type="Input"/>
+		<dataSheet name="stsim_FlowPathwayDiagram" type="Input"/>
+		<dataSheet name="stsim_FlowPathway" type="Output"/>
+		<dataSheet name="stsim_FlowMultiplier" type="Output"/>
+		<dataSheet name="stsim_StateAttributeValue" type="Output"/>
+		<dataSheet name="OutputValidation" type="Output"/>
+	</transformer>
+
 	<!-- =================================================================================================== -->
 	<!-- LAYOUTS                                                                                             -->
 	<!-- =================================================================================================== -->

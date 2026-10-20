@@ -85,3 +85,19 @@ for (lv in c("Secondary", "Tertiary")) {
 }
 cat("strata: primary = FIA ecodivisions; secondary =", src[Level == "Secondary"]$Preset, "; tertiary =", src[Level == "Tertiary"]$Preset, "\n")
 cat("library ready:", f, "\n")
+
+# ---- the Stock-Flow Definitions scenario ------------------------------------------------------------------------------
+# Fixed LUCAS stock-flow definitions (flow pathway diagram, flow order, type-group memberships, output options) in a scenario that
+# stage 3 scenarios depend on. Not a stage output: SyncroSim imports a stage's output sheets in alphabetical order, so flow pathways
+# (computed by stage 3) would be refused before the diagram they need had been imported.
+sfd <- rsyncrosim::scenario(P, "Stock-Flow Definitions")
+if (!nrow(suppressWarnings(datasheet(sfd, "stsim_FlowPathwayDiagram", optional = TRUE)))) {
+  for (sh in c("stsim_FlowPathwayDiagram", "stsim_FlowOrder", "stsim_FlowTypeGroupMembership", "stsim_StockTypeGroupMembership",
+               "stsim_OutputOptionsStockFlow", "stsim_OutputFilterFlows", "stsim_OutputFilterStocks")) {
+    x <- rd("stockflow", paste0(sh, ".csv")); x <- x[, setdiff(names(x), c("Iteration", "Timestep")), with = FALSE]
+    x <- x[, which(vapply(x, function(v) any(!is.na(v) & nzchar(v)), TRUE)), with = FALSE]
+    saveDatasheet(sfd, as.data.frame(x), sh) }
+  saveDatasheet(sfd, data.frame(ApplyBeforeTransitions = FALSE, ApplyEquallyRankedSimultaneously = TRUE), "stsim_FlowOrderOptions")
+  cat("Stock-Flow Definitions scenario created (id", scenarioId(sfd), ")\n")
+} else cat("Stock-Flow Definitions scenario kept (id", scenarioId(sfd), ")\n")
+cat("library ready:", f, "\n")

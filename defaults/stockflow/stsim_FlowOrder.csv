@@ -1,0 +1,55 @@
+Iteration,Timestep,FlowTypeId,Order
+,,Biomass Turnover: Coarse Roots -> AG Fast,6
+,,Biomass Turnover: Coarse Roots -> BG Fast,6
+,,Biomass Turnover: Fine Roots -> AG Very Fast,6
+,,Biomass Turnover: Fine Roots -> BG Very Fast,6
+,,Biomass Turnover: Foliage -> AG Very Fast,6
+,,Biomass Turnover: Merchantable -> Snag Stems,6
+,,Biomass Turnover: Other Wood -> AG Fast,6
+,,Biomass Turnover: Other Wood -> Snag Branches,6
+,,Decay: AG Fast -> AG Slow,6.5
+,,Decay: AG Medium -> AG Slow,4
+,,Decay: AG Very Fast -> AG Slow,6.5
+,,Decay: AG Very Fast -> BG Slow,6.5
+,,Decay: BG Fast -> BG Slow,6.5
+,,Decay: BG Very Fast -> BG Slow,6.5
+,,Decay: Snag Branch -> AG Slow,4
+,,Decay: Snag Stem -> AG Slow,4
+,,Emission: AG Fast -> Atmosphere,6.5
+,,Emission: AG Medium -> Atmosphere,4
+,,Emission: AG Slow -> Atmosphere,6.6
+,,Emission: AG Very Fast -> Atmosphere,6.5
+,,Emission: BG Fast -> Atmosphere,6.5
+,,Emission: BG Slow -> Atmosphere,5
+,,Emission: BG Very Fast -> Atmosphere,6.5
+,,Emission: Snag Branch -> Atmosphere,4
+,,Emission: Snag Stem -> Atmosphere,4
+,,Lateral Transport: AG Very Fast -> Aquatic,6.5
+,,Lateral Transport: BG Slow -> Aquatic,6.6
+,,Lateral Transport: BG Very Fast -> Aquatic,6.5
+,,LULC: Emission DOM CH4,10
+,,LULC: Emission DOM CO,10
+,,LULC: Emission DOM CO2,10
+,,LULC: Emission Live CH4,11
+,,LULC: Emission Live CO,11
+,,LULC: Emission Live CO2,11
+,,LULC: Harvest DOM,10
+,,LULC: Harvest Live,11
+,,LULC: Mortality Live,11
+,,LULC: Transfer DOM,10
+,,Net Growth Forest: Atmosphere -> Coarse Roots,7
+,,Net Growth Forest: Atmosphere -> Fine Roots,7
+,,Net Growth Forest: Atmosphere -> Foliage,7
+,,Net Growth Forest: Atmosphere -> Merchantable,7
+,,Net Growth Forest: Atmosphere -> Other Wood,7
+,,Net Growth Non Forest: Atmosphere -> Coarse Roots,7
+,,Net Growth Non Forest: Atmosphere -> Fine Roots,7
+,,Net Growth Non Forest: Atmosphere -> Foliage,7
+,,Net Growth Non Forest: Atmosphere -> Merchantable,7
+,,Net Growth Non Forest: Atmosphere -> Other Wood,7
+,,Net Growth Wetland Emergent: Atmosphere -> Fine Roots,1
+,,Net Growth Wetland Emergent: Atmosphere -> Foliage,1
+,,Stabilization: BG Slow -> Deep Soil,6.6
+,,Transfer: AG Slow -> BG Slow,6.7
+,,Transfer: Snag Branch -> AG Fast,3
+,,Transfer: Snag Stem -> AG Medium,3

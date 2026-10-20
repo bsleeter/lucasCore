@@ -7,7 +7,7 @@
 #                     live-tree carbon ratio, per species
 #   EVALIDator_netmerchvol_foresttypegroup_x_species.json   net merchantable bole volume of live trees on forest land (snum 574171)
 #                     by forest type group x species, most recent evaluation of the 48 CONUS states
-# Output: defaults/growth/merch-carbon-density.csv - Mg C per m3 = sum over species of volume share x (wood SG + bark SG x bark%/100)
+# Output: defaults/growth/merch-carbon-density.csv (with DeciduousShare: volume share of deciduous species, for stage 3) - Mg C per m3 = sum over species of volume share x (wood SG + bark SG x bark%/100)
 #   x carbon ratio (SG x 1 t/m3 water = dry t/m3). FIA merchantable volume runs from a 1-ft stump to a 4-in top, inside bark,
 #   so it already matches CBM's merchantable pool (stem without stump and top); bark is added here, as CBM includes it.
 # =============================================================================
@@ -25,6 +25,12 @@ miss <- d[is.na(WOOD_SG) | is.na(CRATIO), .(vol = sum(vol_ft3)), by = .(SPCD, CO
 if (nrow(miss)) cat(sprintf("species without wood properties (%.3f%% of volume, left out): %s\n", 100 * sum(miss$vol) / sum(d$vol_ft3), paste(head(miss$SPCD, 10), collapse = ", ")))
 d <- d[!is.na(WOOD_SG) & !is.na(CRATIO)][is.na(BARK_SG), BARK_SG := 0][is.na(BARK_PCT), BARK_PCT := 0]
 d[, c_per_m3 := (WOOD_SG + BARK_SG * BARK_PCT / 100) * CRATIO]
+# leaf habit, for stage 3 foliage turnover: softwoods evergreen except larches and bald/pond cypress; hardwoods deciduous except live
+# oaks and evergreen broadleaf genera (tanoak, madrone, California laurel, chinkapin, holly, redbay, eucalyptus, palms, magnolia/sweetbay)
+d[, GENUS := fread(file.path(ref, "REF_SPECIES.csv"))[match(d$SPCD, SPCD), GENUS]]
+d[, evergreen_hw := GENUS %in% c("Notholithocarpus", "Lithocarpus", "Arbutus", "Umbellularia", "Chrysolepis", "Ilex", "Persea", "Eucalyptus", "Sabal", "Cinnamomum") |
+    grepl("live oak", COMMON_NAME, ignore.case = TRUE) | SPCD %in% c(652L, 653L)]
+d[, deciduous := (SFTWD_HRDWD == "H" & !evergreen_hw) | (SFTWD_HRDWD == "S" & GENUS %in% c("Larix", "Taxodium"))]
 grp <- d[, .(c_per_m3 = sum(vol_ft3 * c_per_m3) / sum(vol_ft3), wood_sg = sum(vol_ft3 * WOOD_SG) / sum(vol_ft3),
              bark_share = sum(vol_ft3 * BARK_SG * BARK_PCT / 100) / sum(vol_ft3 * (WOOD_SG + BARK_SG * BARK_PCT / 100)),
              species = .N, top_species = paste(head(COMMON_NAME[order(-vol_ft3)], 3), collapse = "; "), volume_bcf = sum(vol_ft3) / 1e9), by = fortyp_grp]
@@ -37,7 +43,7 @@ out <- rbindlist(lapply(seq_len(nrow(cw)), function(i) { g <- as.integer(strspli
   data.table(StateClassId = cw$StateClassId[i], StateClassName = cw$StateClassName[i], FiaGroupsUsed = paste(use, collapse = ";"),
              MgCPerM3 = round(sum(x$vol_ft3 * x$c_per_m3) / sum(x$vol_ft3), 4), WoodSG = round(sum(x$vol_ft3 * x$WOOD_SG) / sum(x$vol_ft3), 3),
              BarkCarbonShare = round(sum(x$vol_ft3 * x$BARK_SG * x$BARK_PCT / 100) / sum(x$vol_ft3 * (x$WOOD_SG + x$BARK_SG * x$BARK_PCT / 100)), 3),
-             Species = uniqueN(x$SPCD), TopSpecies = paste(head(x[, .(v = sum(vol_ft3)), by = COMMON_NAME][order(-v), COMMON_NAME], 3), collapse = "; "),
+             DeciduousShare = round(sum(x$vol_ft3 * x$deciduous) / sum(x$vol_ft3), 3), Species = uniqueN(x$SPCD), TopSpecies = paste(head(x[, .(v = sum(vol_ft3)), by = COMMON_NAME][order(-v), COMMON_NAME], 3), collapse = "; "),
              VolumeBillionFt3 = round(sum(x$vol_ft3) / 1e9, 2)) }))
 fwrite(out, file.path(pkg, "defaults", "growth", "merch-carbon-density.csv"))
-options(width = 200); print(out[, .(StateClassName, FiaGroupsUsed, MgCPerM3, WoodSG, BarkCarbonShare, Species, TopSpecies)])
+options(width = 200); print(out[, .(StateClassName, MgCPerM3, DeciduousShare, TopSpecies)])
