@@ -1181,7 +1181,7 @@ Talbot Maryland,24041
 Washington Maryland,24043
 Wicomico Maryland,24045
 Worcester Maryland,24047
-Baltimore Maryland.1,24510
+Baltimore city Maryland,24510
 Barnstable Massachusetts,25001
 Berkshire Massachusetts,25003
 Bristol Massachusetts,25005
@@ -1562,7 +1562,7 @@ Wayne Missouri,29223
 Webster Missouri,29225
 Worth Missouri,29227
 Wright Missouri,29229
-St. Louis Missouri.1,29510
+St. Louis city Missouri,29510
 Beaverhead Montana,30001
 Big Horn Montana,30003
 Blaine Montana,30005
@@ -2889,9 +2889,9 @@ Colonial Heights Virginia,51570
 Covington Virginia,51580
 Danville Virginia,51590
 Emporia Virginia,51595
-Fairfax Virginia.1,51600
+Fairfax city Virginia,51600
 Falls Church Virginia,51610
-Franklin Virginia.1,51620
+Franklin city Virginia,51620
 Fredericksburg Virginia,51630
 Galax Virginia,51640
 Hampton Virginia,51650
@@ -2909,8 +2909,8 @@ Petersburg Virginia,51730
 Poquoson Virginia,51735
 Portsmouth Virginia,51740
 Radford Virginia,51750
-Richmond Virginia.1,51760
-Roanoke Virginia.1,51770
+Richmond city Virginia,51760
+Roanoke city Virginia,51770
 Salem Virginia,51775
 Staunton Virginia,51790
 Suffolk Virginia,51800

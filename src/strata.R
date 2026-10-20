@@ -49,7 +49,8 @@ strata_polygons <- function(s, pkgdir, bbox = NULL) {
   args <- list(dsn = f, quiet = TRUE); if (!is.na(s$Layer)) args$layer <- s$Layer
   if (!is.null(bbox)) { crs0 <- sf::st_crs(do.call(sf::read_sf, c(args, list(query = sprintf("SELECT * FROM \"%s\" LIMIT 0",
       if (!is.na(s$Layer)) s$Layer else tools::file_path_sans_ext(basename(f)))))))
-    args$wkt_filter <- sf::st_as_text(sf::st_transform(sf::st_as_sfc(bbox), crs0)) }
+    # densified first: an Albers rectangle's edges are curves in lon/lat, and a 4-corner polygon cuts off the northern border
+    args$wkt_filter <- sf::st_as_text(sf::st_transform(sf::st_segmentize(sf::st_as_sfc(bbox), 5000), crs0)) }
   p <- suppressWarnings(sf::st_transform(do.call(sf::read_sf, args), "EPSG:5070"))
   if (!is.na(s$ValueField)) {
     if (!s$ValueField %in% names(p)) stop(sprintf("%s has no field %s", basename(f), s$ValueField), call. = FALSE)
