@@ -29,7 +29,8 @@ project-scope sheets that a stage saves during a run.
 | Stage | Script | Status |
 |---|---|---|
 | 1 - Study Area and Strata | `src/1-study-area.R` | Done: model lattice; primary = FIA ecodivisions (fixed); secondary and tertiary from Stratum Sources |
-| 2-9 | | Planned |
+| 2 - Fit Growth Curves | `src/2-growth-curves.R`, `src/growth.R` | Done: 551 merchantable volume curves (forest state class x ecodivision), parameters, PDF report |
+| 3-9 | | Planned |
 
 Every stage ends with validation checks (`lucasCore_OutputValidation`); a check that cannot be computed fails.
 
@@ -40,3 +41,4 @@ Rscript tests/phaseA-smoke.R
 ```
 
 Builds a scratch library in `dev/libs`, runs stage 1 for California and compares the strata with the CONUS 1km model.
+`Rscript tests/phaseB-growth.R` runs stage 2 in a new library.

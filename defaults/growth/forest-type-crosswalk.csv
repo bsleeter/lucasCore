@@ -7,7 +7,7 @@ StateClassId,StateClassName,FiaTypeGroups,Note
 200,Douglas-fir Coastal Group,200,FIA has one Douglas-fir group; coastal vs inland is carried by the ecodivision
 201,Douglas-fir Inland Group,200,same curves as 200; the state class map merges 201 into 200
 220,Ponderosa Pine Group,220,
-240,Western White Pine Group,240,
+240,Western White Pine Group,180;200;220;240;260;280;300;320;340;360;370;390,too few plots (about 80) for its own model: fitted on all western softwood groups pooled (user decision 2026-10-19)
 260,Fir/Spruce/Mountain Hemlock Group,260,
 280,Lodgepole Pine Group,280,
 300,Hemlock/Sitka Spruce Group,300,
@@ -25,6 +25,6 @@ StateClassId,StateClassName,FiaTypeGroups,Note
 910,Alder/Maple Group,910,
 920,Western Oak Group,920,
 940,Tanoak/Laurel Group,940,
-950,Other Western Hardwoods Group,970,FIADB 9 has no 950; western woodland hardwoods are 970 (TO CONFIRM)
+950,Other Western Hardwoods Group,970,FIADB 9 has no 950: western woodland hardwoods are 970 (user decision 2026-10-19)
 980,Tropical Hardwoods Group,980,
 990,Exotic Hardwoods Group,990,

@@ -58,6 +58,38 @@
 		<column name="EndYear" displayName="Historical End Year" dataType="Integer" defaultValue="2023" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1985"/>
 			</dataSheet>
 
+	<dataSheet name="GrowthOptions" displayName="Growth Curve Options" isSingleRow="True">
+		<column name="LagYears" displayName="Lag Before Merchantable Volume (yr)" dataType="Integer" defaultValue="10" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="Penalty" displayName="Pull Toward the Type's CONUS Curve (lambda)" dataType="Double" defaultValue="0.01" validationType="Decimal" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="MinPlotsEcodivision" displayName="Minimum Plots for an Ecodivision's Own Parameters" dataType="Integer" defaultValue="5" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1"/>
+		<column name="MaximumAge" displayName="Maximum Age (yr)" dataType="Integer" defaultValue="300" validationType="WholeNumber" validationCondition="Greater" formula1="10"/>
+		<column name="MinInventoryYear" displayName="First FIA Inventory Year" dataType="Integer" defaultValue="1997"/>
+		<column name="VolumeCapQuantile" displayName="Volume Outlier Cap (quantile within type group)" dataType="Double" defaultValue="0.999"/>
+	</dataSheet>
+
+	<dataSheet name="MerchantableVolumeCurve" displayName="Merchantable Volume Curves">
+		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" allowDbNull="False"/>
+		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass" allowDbNull="False"/>
+		<column name="Age" dataType="Integer"/>
+		<column name="MerchantableVolume" displayName="Merchantable Volume (m3/ha)" dataType="Double" format="0.0"/>
+	</dataSheet>
+
+	<dataSheet name="OutputGrowthParameter" displayName="Growth Curve Parameters">
+		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum"/>
+		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="Method" dataType="String"/>
+		<column name="Plots" dataType="Integer"/>
+		<column name="A" displayName="A (m3/ha)" dataType="Double" format="0.0"/>
+		<column name="k" dataType="Double"/>
+		<column name="c" dataType="Double" format="0.000"/>
+		<column name="VolumeAtMaxAge" displayName="Volume at Maximum Age (m3/ha)" dataType="Double" format="0.0"/>
+		<column name="FiaTypeGroups" displayName="FIA Type Groups" dataType="String"/>
+	</dataSheet>
+
+	<dataSheet name="OutputGrowthReport" displayName="Growth Curve Report" isSingleRow="True">
+		<column name="FileName" displayName="Report (PDF)" dataType="String" isExternalFile="True" isRaster="False" externalFileFilter="PDF Files (*.pdf)|*.pdf"/>
+	</dataSheet>
+
 	<dataSheet name="OutputStrataSummary" displayName="Strata Summary">
 		<column name="Level" dataType="String"/>
 		<column name="Name" dataType="String"/>
@@ -83,6 +115,14 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
+	<transformer name="GrowthCurves" displayName="2 - Fit Growth Curves" isRunnable="True" programName="Rscript" programArguments="src/2-growth-curves.R" condaEnv="lucasCore.yml" condaEnvVersion="1">
+		<dataSheet name="GrowthOptions" type="Input"/>
+		<dataSheet name="MerchantableVolumeCurve" type="Output"/>
+		<dataSheet name="OutputGrowthParameter" type="Output"/>
+		<dataSheet name="OutputGrowthReport" type="Output"/>
+		<dataSheet name="OutputValidation" type="Output"/>
+	</transformer>
+
 	<!-- =================================================================================================== -->
 	<!-- LAYOUTS                                                                                             -->
 	<!-- =================================================================================================== -->
@@ -97,8 +137,12 @@
 	<layout type="Scenario" appendTo="stsim_Advanced">
 		<group name="lucasCoreGroup" displayName="LUCAS Core">
 			<item name="BuildOptions"/>
+			<item name="GrowthOptions"/>
+			<item name="MerchantableVolumeCurve"/>
 			<group name="lucasCoreResults" displayName="Build Results">
 				<item name="OutputStrataSummary"/>
+				<item name="OutputGrowthParameter"/>
+				<item name="OutputGrowthReport"/>
 				<item name="OutputValidation"/>
 			</group>
 		</group>

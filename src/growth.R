@@ -1,0 +1,90 @@
+# =============================================================================
+# growth.R - merchantable volume growth curves from FIA (stage 2); no SyncroSim calls, so dev scripts and tests can use it
+# =============================================================================
+# The method came out of experiments 1-7 (dev/growth, plan doc tab "Growth curves", 2026-10-19):
+#   form      V(t) = A (1 - exp(-k (t - L)^c)) for t > L, else 0; lag L = 10 years. Five forms tied on cross-validation; this one
+#             had the most plausible behaviour outside the data (peak mean annual increment ~44 yr).
+#   data      FIA conditions: latest visit of each plot-condition, undisturbed (dstrbcd1 = 0), untreated (trtcd1 = 0), age 1-400,
+#             volume below the type group's 99.9th percentile; plot id = state + unit + county + plot. Fitted to plot volumes
+#             (mean), not age medians (medians ran ~11% low; the old recipe ~10% low at age 100).
+#   pooling   one model per forest type: A and k for each ecodivision with plots, c shared, penalty lambda toward the type's
+#             CONUS-wide curve. As good as per-cell fits where data are rich, much better where they are sparse.
+#   empty     ecodivisions with no plots of the type: A and log k from a plot-weighted regression on ecodivision climate
+#             (PRISM normals: mean temperature, log precipitation); fewer than 3 ecodivisions with plots: the CONUS-wide curve.
+# =============================================================================
+
+wb_curve <- function(t, A, k, c, lag) ifelse(t <= lag, 0, A * (1 - exp(-k * pmax(t - lag, 0)^c)))
+
+# FIA conditions -> fitting data (one row per plot-condition, latest visit)
+growth_data <- function(cond_file, dist_file, opt) {
+  x <- data.table::as.data.table(readRDS(cond_file)); d <- data.table::as.data.table(readRDS(dist_file))
+  x <- merge(x, d, by = c("plt_cn", "condid"), all.x = TRUE)
+  x[, pid := sprintf("%02d-%d-%03d-%05d", statecd, unitcd, countycd, plot)]
+  x[, vol := net_merchantable_bole_wood_vol_live_trees_cuft_per_acre * 0.0699725]   # ft3/ac -> m3/ha
+  x[, ecodiv := as.character(ecodiv)]
+  x <- x[!is.na(stdage) & !is.na(vol) & !is.na(fortyp_grp) & invyr >= opt$MinInventoryYear & invyr <= 2100 &
+         dstrbcd1 %in% 0 & trtcd1 %in% 0 & stdage >= 1 & stdage <= 400]
+  x[, vcap := stats::quantile(vol, opt$VolumeCapQuantile), by = fortyp_grp]; x <- x[vol <= vcap]
+  data.table::setorder(x, pid, condid, -invyr); x <- x[!duplicated(paste(pid, condid))]
+  x[, .(pid, ecodiv, fortyp_grp, stdage, vol)] }
+
+# least squares fit of the single (CONUS-wide) curve, several starts
+fit_single <- function(t, v, lag) {
+  A0 <- max(stats::quantile(v, 0.95), 5); best <- NULL
+  for (s in list(c(A0, 0.01, 0.8), c(A0, 0.001, 1.3), c(A0 * 1.3, 0.03, 0.6))) {
+    o <- tryCatch(stats::optim(s, function(p) sum((v - wb_curve(t, p[1], p[2], p[3], lag))^2), method = "L-BFGS-B",
+                               lower = c(1, 1e-6, 0.1), upper = c(5000, 1, 4), control = list(maxit = 2000)), error = function(e) NULL)
+    if (!is.null(o) && is.finite(o$value) && (is.null(best) || o$value < best$value)) best <- o }
+  if (is.null(best)) return(NULL)
+  c(A = best$par[1], k = best$par[2], c = best$par[3]) }
+
+# pooled fit: A_e and k_e per ecodivision, c shared; relative deviations from the CONUS-wide p0 penalised (lambda)
+fit_type <- function(d, p0, lambda, lag) {
+  eco <- sort(unique(d$ecodiv)); ie <- match(d$ecodiv, eco); E <- length(eco); pen <- lambda * nrow(d) * stats::var(d$vol)
+  obj <- function(par) { A <- par[1:E]; k <- par[E + 1:E]
+    sum((d$vol - wb_curve(d$stdage, A[ie], k[ie], par[2 * E + 1], lag))^2) +
+      pen * (mean(((A - p0[["A"]]) / p0[["A"]])^2) + mean(log(k / p0[["k"]])^2)) }
+  o <- stats::optim(c(rep(p0[["A"]], E), rep(p0[["k"]], E), p0[["c"]]), obj, method = "L-BFGS-B",
+                    lower = c(rep(1, E), rep(1e-6, E), 0.1), upper = c(rep(5000, E), rep(1, E), 4),
+                    control = list(maxit = 20000, parscale = c(rep(p0[["A"]], E), rep(p0[["k"]], E), p0[["c"]])))   # A ~ 100s, k ~ 0.001: rescaled so L-BFGS-B converges
+  data.table::data.table(ecodiv = eco, A = o$par[1:E], k = o$par[E + 1:E], c = o$par[2 * E + 1],
+                         Plots = d[, .N, by = ecodiv][match(eco, ecodiv), N], converged = o$convergence == 0) }
+
+# curves for every ecodivision in `all_eco` (with climate table clim: ecodiv, z_t, z_p) for one forest type's data
+fit_forest_type <- function(d, all_eco, clim, opt) {
+  lag <- opt$LagYears
+  p0 <- fit_single(d$stdage, d$vol, lag); if (is.null(p0)) stop("the CONUS-wide fit failed", call. = FALSE)
+  cells <- d[, .N, by = ecodiv][N >= opt$MinPlotsEcodivision]$ecodiv
+  m <- if (length(cells)) fit_type(d[ecodiv %in% cells], p0, opt$Penalty, lag) else NULL
+  out <- data.table::data.table(ecodiv = all_eco)
+  if (!is.null(m)) out <- merge(out, m, by = "ecodiv", all.x = TRUE)
+  else out[, `:=`(A = NA_real_, k = NA_real_, c = NA_real_, Plots = NA_integer_, converged = NA)]
+  out[!is.na(A), Method := "Fitted"]
+  cshape <- if (!is.null(m)) m$c[1] else p0[["c"]]
+  empty <- out[is.na(A), ecodiv]
+  if (length(empty)) {
+    if (!is.null(m) && nrow(m) >= 3) {
+      mm <- merge(m, clim, by = "ecodiv")
+      fa <- stats::lm(A ~ z_t + z_p, data = mm, weights = Plots); fk <- stats::lm(log(k) ~ z_t + z_p, data = mm, weights = Plots)
+      ce <- clim[match(empty, clim$ecodiv)]
+      Ae <- pmin(pmax(stats::predict(fa, ce), 0.25 * min(mm$A)), 1.5 * max(mm$A))
+      ke <- pmin(pmax(exp(stats::predict(fk, ce)), min(mm$k) / 1.5), max(mm$k) * 1.5)
+      out[match(empty, ecodiv), `:=`(A = Ae, k = ke, c = cshape, Method = "Climate")]
+    } else out[match(empty, ecodiv), `:=`(A = p0[["A"]], k = p0[["k"]], c = p0[["c"]], Method = "CONUS")]
+  }
+  out[is.na(Plots), Plots := 0L]
+  out[, `:=`(TotalPlots = nrow(d), ConusA = p0[["A"]], ConusK = p0[["k"]], ConusC = p0[["c"]])]
+  out[] }
+
+# ecodivision climate: PRISM normals averaged over each ecodivision polygon, standardised
+ecodiv_climate <- function(eco_file, prism_folder) {
+  f_t <- Sys.glob(file.path(prism_folder, "normals", "PRISM_tmean_30yr_normal_*_annual_bil", "*.bil"))[1]
+  f_p <- Sys.glob(file.path(prism_folder, "normals", "PRISM_ppt_30yr_normal_*_annual_bil", "*.bil"))[1]
+  if (is.na(f_t) || is.na(f_p)) stop("PRISM annual tmean/ppt normals not found under ", prism_folder, "/normals", call. = FALSE)
+  tm <- terra::rast(f_t); pp <- terra::rast(f_p)
+  eco <- terra::vect(sf::st_transform(sf::read_sf(eco_file), terra::crs(tm)))
+  cl <- data.table::data.table(ecodiv = eco$ecodiv, mat = terra::extract(tm, eco, fun = mean, na.rm = TRUE)[, 2],
+                               map = terra::extract(pp, eco, fun = mean, na.rm = TRUE)[, 2])
+  cl <- cl[, .(mat = mean(mat), map = mean(map)), by = ecodiv]
+  cl[, `:=`(z_t = (mat - mean(mat)) / stats::sd(mat), z_p = (log(map) - mean(log(map))) / stats::sd(log(map)))]
+  cl[] }
