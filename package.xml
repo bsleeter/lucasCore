@@ -76,6 +76,36 @@
 		<column name="MerchantableVolume" displayName="Merchantable Volume (m3/ha)" dataType="Double" format="0.0"/>
 	</dataSheet>
 
+	<dataSheet name="CarbonCurve" displayName="Live-Tree Carbon Curves (CBM pools)">
+		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" allowDbNull="False"/>
+		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass" allowDbNull="False"/>
+		<column name="Age" dataType="Integer"/>
+		<column name="Merchantable" displayName="Merchantable (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="Foliage" displayName="Foliage (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="Other" displayName="Other Wood (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="CoarseRoots" displayName="Coarse Roots (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="FineRoots" displayName="Fine Roots (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="TotalLive" displayName="Total Live (Mg C/ha)" dataType="Double" format="0.00"/>
+	</dataSheet>
+
+	<dataSheet name="OutputCarbonParameter" displayName="Carbon Curve Parameters">
+		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum"/>
+		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="Method" dataType="String"/>
+		<column name="Plots" dataType="Integer"/>
+		<column name="A" displayName="A (Mg C/ha)" dataType="Double" format="0.0"/>
+		<column name="k" dataType="Double"/>
+		<column name="c" dataType="Double" format="0.000"/>
+		<column name="FoliageShare0" displayName="Foliage Share, Young" dataType="Double" format="0.000"/>
+		<column name="FoliageShareMature" displayName="Foliage Share, Mature" dataType="Double" format="0.000"/>
+		<column name="FoliageShareTau" displayName="Foliage Share Time Constant (yr)" dataType="Double" format="0.0"/>
+		<column name="RootShare0" displayName="Root Share, Young" dataType="Double" format="0.000"/>
+		<column name="RootShareMature" displayName="Root Share, Mature" dataType="Double" format="0.000"/>
+		<column name="RootShareTau" displayName="Root Share Time Constant (yr)" dataType="Double" format="0.0"/>
+		<column name="MerchCarbonDensity" displayName="Merchantable Carbon Density (Mg C/m3; FIA wood + bark)" dataType="Double" format="0.000"/>
+		<column name="MerchCappedAges" displayName="Ages Where Merchantable Was Capped" dataType="Integer"/>
+	</dataSheet>
+
 	<dataSheet name="OutputGrowthParameter" displayName="Growth Curve Parameters">
 		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum"/>
 		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
@@ -122,7 +152,9 @@
 	<transformer name="GrowthCurves" displayName="2 - Fit Growth Curves" isRunnable="True" programName="Rscript" programArguments="src/2-growth-curves.R" condaEnv="lucasCore.yml" condaEnvVersion="1">
 		<dataSheet name="GrowthOptions" type="Input"/>
 		<dataSheet name="MerchantableVolumeCurve" type="Output"/>
+		<dataSheet name="CarbonCurve" type="Output"/>
 		<dataSheet name="OutputGrowthParameter" type="Output"/>
+		<dataSheet name="OutputCarbonParameter" type="Output"/>
 		<dataSheet name="OutputGrowthReport" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
@@ -143,9 +175,11 @@
 			<item name="BuildOptions"/>
 			<item name="GrowthOptions"/>
 			<item name="MerchantableVolumeCurve"/>
+			<item name="CarbonCurve"/>
 			<group name="lucasCoreResults" displayName="Build Results">
 				<item name="OutputStrataSummary"/>
 				<item name="OutputGrowthParameter"/>
+				<item name="OutputCarbonParameter"/>
 				<item name="OutputGrowthReport"/>
 				<item name="OutputValidation"/>
 			</group>

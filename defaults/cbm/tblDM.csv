@@ -1,0 +1,253 @@
+"DMID","Name","Description","DMStructureID"
+2,"Stand Replacing Matrix #2","Wildfire Matrix #2 (Stand Replacing).  Used for simulations pre-fall 2006 in the Taiga Plains, Taiga Shield West, and Taiga Shield East ecozones",2
+3,"Stand Replacing Matrix #3","Wildfire Matrix #3 (Stand Replacing).  Used for simulations pre-fall 2006 in the Boreal Shield West and Boreal Plains ecozones",2
+4,"Stand Replacing Matrix #4","Wildfire Matrix #4 (Stand Replacing).  Used for simulations pre-fall 2006 in the Atlantic Maritime and Mixedwood Plains ecozones",2
+5,"Stand Replacing Matrix #5","Wildfire Matrix #5 (Stand Replacing).  Used for simulations pre-fall 2006 in the Prairies ecozone",2
+6,"Stand Replacing Matrix #6","Wildfire Matrix #6 (Stand Replacing).  Used for simulations pre-fall 2006 in the Taiga Cordillera ecozone",2
+7,"Stand Replacing Matrix #7","Wildfire Matrix #7 (Stand Replacing).  Used for simulations pre-fall 2006 in the Boreal Cordillera and Montane Cordillera ecozones",2
+8,"Stand Replacing Matrix #8","Wildfire Matrix #8 (Stand Replacing).  Used for simulations pre-fall 2006 in the Pacific Maritime ecozone",2
+9,"Stand Replacing Matrix #9","Wildfire Matrix #9 (Stand Replacing).  Used for simulations pre-fall 2006 in the Hudson Plains and Boreal Shield East ecozones",2
+10,"Stand Replacing Matrix #10","Insect Matrix #1 (Stand Replacing). Traditionally used for all ecozones across Canada.",2
+16,"Stand Replacing Matrix #16","Clear-cutting with Salvage Matrix  #1 (Stand Replacing).  Traditionally used for all ecozones across Canada.",2
+18,"Stand Replacing Matrix #18","Wildfire followed by Salvage Logging Matrix #2 (Stand Replacing). Traditionally used in the Taiga Plains, Taiga Shield West, and Taiga Shield East ecozones.",2
+19,"Stand Replacing Matrix #19","Wildfire followed by Salvage Logging Matrix #3 (Stand Replacing). Traditionally used in the Boreal Shield West and Boreal Plains ecozones.",2
+20,"Stand Replacing Matrix #20","Wildfire followed by Salvage Logging Matrix #4 (Stand Replacing). Traditionally used in the Atlantic Maritime and Mixedwood plains ecozones.",2
+21,"Stand Replacing Matrix #21","Wildfire followed by Salvage Logging Matrix #5 (Stand Replacing). Traditionally used in the Prairies and Taiga Cordillera ecozones.",2
+22,"Stand Replacing Matrix #22","Wildfire followed by Salvage Logging Matrix #6 (Stand Replacing). Traditionally used in the Boreal Cordillera and Montane Cordillera ecozones.",2
+23,"Stand Replacing Matrix #23","Wildfire followed by Salvage Logging Matrix #7 (Stand Replacing). Traditionally used in the Pacific Maritime ecozone.",2
+24,"Stand Replacing Matrix #24","Wildfire followed by Salvage Logging Matrix #8 (Stand Replacing). Traditionally used in the Hudson Plains and Boreal Shield East ecozones.",2
+25,"Stand Replacing Matrix #25","Insects followed by Salvage Logging Matrix #1 (Stand Replacing). Traditionally used for all ecozones across Canada.",2
+26,"Stand Replacing Matrix #26","Deforestation Matrix #1 (Stand Replacing). Traditionally used for all ecozones across Canada.",2
+27,"No Stock Change Matrix #1","No Stock Change Matrix #1. Traditionally used for activities that have no immediate stock change impacts (such as Afforestation, conversion of nonforest to forest land, etc.) in all ecozones across Canada.",2
+28,"Partial Disturbance Matrix #1","Partial Cutting Matrix #1. Traditionally used for all ecozones across Canada.",2
+29,"Partial Disturbance Matrix #2","Western Jack Pine Budworm Year 1 Matrix. Traditionally used for Boreal Shield West, Boreal Plains, Pairies, and Taiga Shield West ecozones.",2
+30,"Partial Disturbance Matrix #3","Western Jack Pine Budworm Year 2 Matrix. Traditionally used for Boreal Shield West, Boreal Plains, Pairies, and Taiga Shield West ecozones.",2
+31,"Partial Disturbance Matrix #4","Western Jack Pine Bud Worm Year 3 Matrix. Traditionally used for Boreal Shield West, Boreal Plains, Pairies, and Taiga Shield West ecozones.",2
+32,"Partial Disturbance Matrix #5","Western Jack Pine Bud Worm Year 4 Matrix. Traditionally used for Boreal Shield West, Boreal Plains, Pairies, and Taiga Shield West ecozones.",2
+33,"Partial Disturbance Matrix #6","Aspen Defoliators Type A Matrix. Traditionally used for Boreal Shield West, Boreal Plains, Prairies, and Taiga Shield West ecozones.",2
+34,"Partial Disturbance Matrix #7","Aspen Defoliators Type B Matrix. Traditionally used for Boreal Shield West, Boreal Plains, Prairies, and Taiga Shield West ecozones.",2
+35,"Partial Disturbance Matrix #8","Aspen Defoliators Type C Matrix. Traditionally used for Boreal Shield West, Boreal Plains, Prairies, and Taiga Shield West ecozones.",2
+36,"Partial Disturbance Matrix #9","Aspen Defoliators Type D Matrix. Traditionally used for Boreal Shield West, Boreal Plains, Prairies, and Taiga Shield West ecozones.",2
+37,"Partial Disturbance Matrix #10","Aspen Defoliators Type E Matrix. Traditionally used for Boreal Shield West, Boreal Plains, Prairies, and Taiga Shield West ecozones.",2
+38,"Partial Disturbance Matrix #11","Aspen Defoliators Type F Matrix. Traditionally used for Boreal Shield West, Boreal Plains, Prairies, and Taiga Shield West ecozones.",2
+43,"2 % mortality disturbance matrix","Generic 2 % mortality disturbance matrix",2
+67,"20 % mortality disturbance matrix","Generic 20 % mortality disturbance matrix",2
+78,"Salvage after fire matrix","Stand replacing salvage with 55% of fire killed stem snag C recovery to products. (Traditionally used anywhere in Canada)",2
+79,"Salvage after insects matrix","Stand replacing salvage with 72% of insect killed stem snag C recovery to products, and clearcut of green wood. (Traditionally used anywhere in Canada)",2
+80,"Generic 7% SW mortality disturbance matrix","Generic 7% SW mortality disturbance matrix",2
+81,"Generic 15% SW mortality disturbance matrix","Generic 15% SW mortality disturbance matrix",2
+83,"Hemlock Looper - 4% mortality","Hemlock looper - Light defoliation with 4% softwood mortality",2
+84,"Hemlock Looper - 32% mortality","Hemlock looper - Moderate defoliation with 32% softwood mortality",2
+85,"Hemlock Looper - 32% mortality","Hemlock looper - Severe defoliation with 32% softwood mortality",2
+86,"Hemlock Looper - 70% mortality","Hemlock looper - Severe cumulative defoliation with 70% softwood mortality",2
+87,"Generic 10% SW Mortality","Generic 10% softwood mortality",2
+88,"Generic 5% mortality","Generic 5% mortality",2
+89,"Generic 10% mortality","Generic 10% mortality",2
+90,"Generic 15% mortality","Generic 15% mortality",2
+91,"Generic 20% mortality","Generic 20% mortality",2
+92,"Generic 25% mortality","Generic 25% mortality",2
+93,"Generic 30% mortality","Generic 30% mortality",2
+94,"Generic 35% mortality","Generic 35% mortality",2
+95,"Generic 40% mortality","Generic 40% mortality",2
+96,"Generic 45% mortality","Generic 45% mortality",2
+97,"Generic 50% mortality","Generic 50% mortality",2
+98,"Generic 55% mortality","Generic 55% mortality",2
+99,"Generic 60% mortality","Generic 60% mortality",2
+100,"Generic 65% mortality","Generic 65% mortality",2
+101,"Generic 70% mortality","Generic 70% mortality",2
+102,"Generic 75% mortality","Generic 75% mortality",2
+103,"Generic 80% mortality","Generic 80% mortality",2
+104,"Generic 85% mortality","Generic 85% mortality",2
+105,"Generic 90% mortality","Generic 90% mortality",2
+106,"Generic 95% mortality","Generic 95% mortality",2
+107,"25% Commercial thinning","25% Commercial thinning",2
+108,"30% Commercial thinning","30% Commercial thinning",2
+109,"35% Commercial thinning","35% Commercial thinning",2
+110,"40% Commercial thinning","40% Commercial thinning",2
+111,"45% Commercial thinning","45% Commercial thinning",2
+112,"50% Commercial thinning","50% Commercial thinning",2
+113,"55% Commercial thinning","55% Commercial thinning",2
+114,"60% Commercial thinning","60% Commercial thinning",2
+115,"65% Commercial thinning","65% Commercial thinning",2
+116,"70% Commercial thinning","70% Commercial thinning",2
+117,"75% Commercial thinning","75% Commercial thinning",2
+135,"97% clearcut","Sylva II CPRS clearcut 97%",2
+136,"85% precommercial thinning","Sylva II EPC precommercial thinning 85%",2
+137,"Roads and landings","Temporary road and landing construction",2
+138,"Planting","Planting (forest management activity, not afforestation!)",2
+142,"Clearcut with slash-burn - Taiga Plains DM","Default Clearcut with slash-burn Disturbance Matrix for Taiga Plains ecozone",2
+143,"Clearcut with slash-burn - Taiga Shield West DM","Default Clearcut with slash-burn Disturbance Matrix for Taiga Shield West ecozone",2
+144,"Clearcut with slash-burn - Taiga Shield East DM","Default Clearcut with slash-burn Disturbance Matrix for Taiga Shield East ecozone",2
+145,"Clearcut with slash-burn - Boreal Shield West DM","Default Clearcut with slash-burn Disturbance Matrix for Boreal Shield West ecozone",2
+146,"Clearcut with slash-burn - Boreal plains DM","Default Clearcut with slash-burn Disturbance Matrix for Boreal plains ecozone",2
+147,"Clearcut with slash-burn - Atlantic Maritime DM","Default Clearcut with slash-burn Disturbance Matrix for Atlantic Maritime ecozone",2
+148,"Clearcut with slash-burn - Mixedwood Plains DM","Default Clearcut with slash-burn Disturbance Matrix for Mixedwood Plains ecozone",2
+149,"Clearcut with slash-burn - Subhumid Prairies DM","Default Clearcut with slash-burn Disturbance Matrix for Subhumid Prairies ecozone",2
+150,"Clearcut with slash-burn - Taiga Cordillera DM","Default Clearcut with slash-burn Disturbance Matrix for Taiga Cordillera ecozone",2
+151,"Clearcut with slash-burn - Boreal Cordillera DM","Default Clearcut with slash-burn Disturbance Matrix for Boreal Cordillera ecozone",2
+152,"Clearcut with slash-burn - Montane Cordillera DM","Default Clearcut with slash-burn Disturbance Matrix for Montane Cordillera ecozone",2
+153,"Clearcut with slash-burn - Pacific Maritime DM","Default Clearcut with slash-burn Disturbance Matrix for Pacific Maritime ecozone",2
+154,"Clearcut with slash-burn - Hudson Plains DM","Default Clearcut with slash-burn Disturbance Matrix for Hudson Plains ecozone",2
+155,"Clearcut with slash-burn - Boreal Shield East DM","Default Clearcut with slash-burn Disturbance Matrix for Boreal Shield East ecozone",2
+156,"Stand Replacing Natural Succession","Stand Replacing Natural Succession",2
+157,"20% Commercial thinning","20% Commercial thinning",2
+158,"15% Commercial thinning","15% Commercial thinning",2
+159,"10% Commercial thinning","10% Commercial thinning",2
+160,"Stand Replacing Matrix for Clearcut Harvest without Salvage","Default Stand Replacing Matrix for Clearcut Harvest without Salvage",2
+209,"Salvage, uprooting and decay for All Eco Boundaries","Salvage, uprooting and decay for All Eco Boundaries",2
+210,"Salvage, uprooting and burn for Taiga Plains","Salvage, uprooting and burn for Taiga Plains",2
+211,"Salvage, uprooting and burn for Taiga Shield West","Salvage, uprooting and burn for Taiga Shield West",2
+212,"Salvage, uprooting and burn for Taiga Shield East","Salvage, uprooting and burn for Taiga Shield East",2
+213,"Salvage, uprooting and burn for Boreal Shield West","Salvage, uprooting and burn for Boreal Shield West",2
+214,"Salvage, uprooting and burn for Boreal Plains","Salvage, uprooting and burn for Boreal Plains",2
+215,"Salvage, uprooting and burn for Atlantic Maritime","Salvage, uprooting and burn for Atlantic Maritime",2
+216,"Salvage, uprooting and burn for Mixedwood Plains","Salvage, uprooting and burn for Mixedwood Plains",2
+217,"Salvage, uprooting and burn for Subhumid Prairies","Salvage, uprooting and burn for Subhumid Prairies",2
+218,"Salvage, uprooting and burn for Taiga Cordillera","Salvage, uprooting and burn for Taiga Cordillera",2
+219,"Salvage, uprooting and burn for Boreal Cordillera","Salvage, uprooting and burn for Boreal Cordillera",2
+220,"Salvage, uprooting and burn for Montane Cordillera","Salvage, uprooting and burn for Montane Cordillera",2
+221,"Salvage, uprooting and burn for Pacific Maritime","Salvage uprooting and burn for Pacific Maritime",2
+222,"Salvage, uprooting and burn for Hudson Plains","Salvage, uprooting and burn for Hudson Plains",2
+223,"Salvage, uprooting and burn for Boreal Shield East","Salvage, uprooting and burn for Boreal Shield East",2
+224,"Salvage, uprooting and burn for Semiarid Prairies","Salvage, uprooting and burn for Semiarid Prairies",2
+225,"Flooding for All Eco Boundaries","Flooding for All Eco Boundaries",2
+226,"Burn only for All Eco Boundaries","This matrix is used to represent forest removal practices associated with reservoirs in northern Quebec.",2
+227,"Uprooting and decay for All Eco Boundaries","Uprooting and decay for All Eco Boundaries",2
+228,"Deforestation by Ice Storm for All Eco Boundaries","Deforestation by Ice Storm for All Eco Boundaries",2
+229,"Uprooting and burn for All Eco Boundaries","Uprooting and burn for All Eco Boundaries",2
+281,"Wildfire - Taiga Plains DM","Wildfire - Taiga Plains DM",2
+282,"Wildfire - Taiga Shield West DM","Wildfire - Taiga Shield West DM",2
+283,"Wildfire - Taiga Shield East DM","Wildfire - Taiga Shield East DM",2
+284,"Wildfire - Boreal Shield West DM","Wildfire - Boreal Shield West DM",2
+285,"Wildfire - Boreal Plains DM","Wildfire - Boreal Plains DM",2
+286,"Wildfire - Atlantic Maritime DM","Wildfire - Atlantic Maritime DM",2
+287,"Wildfire - Mixedwood Plains DM","Wildfire - Mixedwood Plains DM",2
+288,"Wildfire - Prairies DM","Wildfire - Prairies DM",2
+289,"Wildfire - Taiga Cordillera DM","Wildfire - Taiga Cordillera DM",2
+290,"Wildfire - Boreal Cordillera DM","Wildfire - Boreal Cordillera DM",2
+291,"Wildfire - Montane Cordillera DM","Wildfire - Montane Cordillera DM",2
+292,"Wildfire - Pacific Maritime DM","Wildfire - Pacific Maritime DM",2
+293,"Wildfire - Hudson Plains DM","Wildfire - Hudson Plains DM",2
+294,"Wildfire - Boreal Shield East DM","Wildfire - Boreal Shield East DM",2
+295,"Deforestation - Hydro reservoir - Salvage and decay","Fixed deforestation - Hydro reservoir - salvage and decay (moves Fine Roots to BGVF, AGVF, and AGF to BG)",2
+296,"Deforestation - Hydro reservoir - No salvage or burn","Fixed deforestation - Hydro reservoir - no salvage or burn (moves roots to BG, and VF, F to BG)",2
+297,"Deforestation - Hydro reservoir - Burn","Fixed deforestation - Hydro reservoir - Burn (moves roots to BG, and VF and F to BG)",2
+298,"Deforestation - Hydro reservoir - Salvage and burn","Fixed deforestation - Hydro reservoir - Salvage and burn (moved roots to BG, and VF and F to BG)",2
+299,"Deforestation - Hydro reservoir - Salvage and burn","Fixed deforestation - Hydro reservoir - Salvage and burn (moves roots to BG, and VF and F to BG)",2
+300,"Deforestation - Hydro reservoir - Salvage and burn","Fixed deforestation - Hydro reservoir - Salvage and burn (moves roots to BG, and VF and F to BG)",2
+301,"Deforestation - Hydro reservoir - Salvage and burn","Fixed deforestation - Hydro reservoir - Salvage and burn (moves roots to BG, and VF and F to BG)",2
+302,"Deforestation - Hydro reservoir - Salvage and burn","Fixed deforestation - Hydro reservoir - Salvage and burn (moves roots to BG, and VF and F to BG)",2
+303,"Deforestation - Hydro reservoir - Salvage and burn","Fixed deforestation - Hydro reservoir - Salvage and burn (moves roots to BG, and VF and F to BG)",2
+304,"Deforestation - Hydro reservoir - Salvage and burn","Fixed deforestation - Hydro reservoir - Salvage and burn (moves roots to BG, and VF and F to BG)",2
+305,"Deforestation - Hydro reservoir - Salvage and burn","Fixed deforestation - Hydro reservoir - Salvage and burn (moves roots to BG, and VF and F to BG)",2
+306,"Deforestation - Hydro reservoir - Salvage and burn","Fixed deforestation - Hydro reservoir - Salvage and burn (moves roots to BG, and VF and F to BG)",2
+307,"Deforestation - Hydro reservoir - Salvage and burn","Fixed deforestation - Hydro reservoir - Salvage and burn (moves roots to BG, and VFand F to BG)",2
+308,"Deforestation - Hydro reservoir - Salvage and burn","Fixed deforestation - Hydro reservoir - Salvage and burn (moves roots to BG, and VF and F to BG)",2
+309,"Deforestation - Hydro reservoir - Salvage and burn","Fixed deforestation - Hydro reservoir - Salvage and burn (moves roots to BG, and VF and F to BG)",2
+310,"Deforestation - Hydro reservoir - Salvage and burn","Fixed deforestation - Hydro reservoir - Salvage and burn (moves roots to BG, and VF and F to BG)",2
+311,"Deforestation - Hydro reservoir - Salvage and burn","Fixed deforestation - Hydro reservoir - Salvage and burn (moves roots to BG, and VF and F to BG)",2
+361,"Wildfire for New Brunswick - Atlantic Maritimes (NIR2011)","Wildfire for New Brunswick - Atlantic Maritimes (NIR2011)",2
+362,"Wildfire for Nova Scotia - Atlantic Maritimes (NIR2011)","Wildfire for Nova Scotia - Atlantic Maritimes (NIR2011)",2
+363,"Wildfire for Quebec - Atlantic Maritimes (NIR2011)","Wildfire for Quebec - Atlantic Maritimes (NIR2011)",2
+364,"Wildfire for British Columbia - Boreal Cordillera (NIR2011)","Wildfire for British Columbia - Boreal Cordillera (NIR2011)",2
+365,"Wildfire for Northwest Territories - Boreal Cordillera (NIR2011)","Wildfire for Northwest Territories - Boreal Cordillera (NIR2011)",2
+366,"Wildfire for Yukon Territory - Boreal Cordillera (NIR2011)","Wildfire for Yukon Territory - Boreal Cordillera (NIR2011)",2
+367,"Wildfire for Alberta - Boreal Plains (NIR2011)","Wildfire for Alberta - Boreal Plains (NIR2011)",2
+368,"Wildfire for British Columbia - Boreal Plains (NIR2011)","Wildfire for British Columbia - Boreal Plains (NIR2011)",2
+369,"Wildfire for Manitoba - Boreal Plains (NIR2011)","Wildfire for Manitoba - Boreal Plains (NIR2011)",2
+370,"Wildfire for Northwest Territories - Boreal Plains (NIR2011)","Wildfire for Northwest Territories - Boreal Plains (NIR2011)",2
+371,"Wildfire for Saskatchewan - Boreal Plains (NIR2011)","Wildfire for Saskatchewan - Boreal Plains (NIR2011)",2
+372,"Wildfire for Newfoundland - Boreal Shield East (NIR2011)","Wildfire for Newfoundland - Boreal Shield East (NIR2011)",2
+373,"Wildfire for Ontario - Boreal Shield East (NIR2011)","Wildfire for Ontario - Boreal Shield East (NIR2011)",2
+374,"Wildfire for Quebec - Boreal Shield East (NIR2011)","Wildfire for Quebec - Boreal Shield East (NIR2011)",2
+375,"Wildfire for Alberta - Boreal Shield West (NIR2011)","Wildfire for Alberta - Boreal Shield West (NIR2011)",2
+376,"Wildfire for Manitoba - Boreal Shield West (NIR2011)","Wildfire for Manitoba - Boreal Shield West (NIR2011)",2
+377,"Wildfire for Ontario - Boreal Shield West (NIR2011)","Wildfire for Ontario - Boreal Shield West (NIR2011)",2
+378,"Wildfire for Saskatchewan - Boreal Shield West (NIR2011)","Wildfire for Saskatchewan - Boreal Shield West (NIR2011)",2
+379,"Wildfire for Alberta - Montane Cordillera (NIR2011)","Wildfire for Alberta - Montane Cordillera (NIR2011)",2
+380,"Wildfire for British Columbia - Montane Cordillera (NIR2011)","Wildfire for British Columbia - Montane Cordillera (NIR2011)",2
+381,"Wildfire for British Columbia - Pacific Maritime (NIR2011)","Wildfire for British Columbia - Pacific Maritime (NIR2011)",2
+382,"Wildfire for Northwest Territories - Taiga Cordillera (NIR2011)","Wildfire for Northwest Territories - Taiga Cordillera (NIR2011)",2
+383,"Wildfire for Yukon Territory - Taiga Cordillera (NIR2011)","Wildfire for Yukon Territory - Taiga Cordillera (NIR2011)",2
+384,"Wildfire for Alberta - Taiga Plains (NIR2011)","Wildfire for Alberta - Taiga Plains (NIR2011)",2
+385,"Wildfire for British Columbia - Taiga Plains (NIR2011)","Wildfire for British Columbia - Taiga Plains (NIR2011)",2
+386,"Wildfire for Northwest Territories - Taiga Plains (NIR2011)","Wildfire for Northwest Territories - Taiga Plains (NIR2011)",2
+387,"Wildfire for Yukon Territory - Taiga Plains (NIR2011)","Wildfire for Yukon Territory - Taiga Plains (NIR2011)",2
+388,"Wildfire for Quebec - Taiga Shield East (NIR2011)","Wildfire for Quebec - Taiga Shield East (NIR2011)",2
+389,"Wildfire for Alberta - Taiga Shield West (NIR2011)","Wildfire for Alberta - Taiga Shield West (NIR2011)",2
+390,"Wildfire for Northwest Territories - Taiga Shield West (NIR2011)","Wildfire for Northwest Territories - Taiga Shield West (NIR2011)",2
+391,"Wildfire for Alberta - Semi Arid Prairies (NIR2011)","Wildfire for Alberta - Semi Arid Prairies (NIR2011)",2
+392,"Wildfire for Saskatchewan - Semi Arid Prairies (NIR2011)","Wildfire for Saskatchewan - Semi Arid Prairies (NIR2011)",2
+393,"Wildfire for Alberta - Sub Humid Prairies (NIR2011)","Wildfire for Alberta - Sub Humid Prairies (NIR2011)",2
+394,"Wildfire for Manitoba - Sub Humid Prairies (NIR2011)","Wildfire for Manitoba - Sub Humid Prairies (NIR2011)",2
+395,"Wildfire for Saskatchewan - Sub Humid Prairies (NIR2011)","Wildfire for Saskatchewan - Sub Humid Prairies (NIR2011)",2
+396,"Wildfire for Yukon - Pacific Maritime (NIR2011)","Wildfire for Yukon - Pacific Maritime (NIR2011)",2
+397,"Wildfire for Ontario - Hudson Plains (NIR2011)","Wildfire for Ontario - Hudson Plains (NIR2011)",2
+398,"Wildfire for Quebec - Hudson Plains (NIR2011)","Wildfire for Quebec - Hudson Plains (NIR2011)",2
+399,"Wildfire for Manitoba - Hudson Plains (NIR2011)","Wildfire for Manitoba - Hudson Plains (NIR2011)",2
+400,"Wildfire for Nunavut - Hudson Plains (NIR2011)","Wildfire for Nunavut - Hudson Plains (NIR2011)",2
+401,"Wildfire for Labrador - Boreal Shield East (NIR2011)","Wildfire for Labrador - Boreal Shield East (NIR2011)",2
+402,"Wildfire for Ontario - Mixedwood Plains (NIR2011)","Wildfire for Ontario - Mixedwood Plains (NIR2011)",2
+403,"Wildfire for Quebec - Mixedwood Plains (NIR2011)","Wildfire for Quebec - Mixedwood Plains (NIR2011)",2
+404,"Wildfire for Prince Edward Island - Atlantic Maritime (NIR2011)","Wildfire for Prince Edward Island - Atlantic Maritime (NIR2011)",2
+405,"Wildfire for Saskatchewan - Taiga Shield West (NIR2011)","Wildfire for Saskatchewan - Taiga Shield West (NIR2011)",2
+406,"Wildfire for Manitoba - Taiga Shield West (NIR2011)","Wildfire for Manitoba - Taiga Shield West (NIR2011)",2
+407,"Wildfire for Labrador - Taiga Shield East (NIR2011)","Wildfire for Labrador - Taiga Shield East (NIR2011)",2
+408,"Wildfire for Nunavut - Taiga Shield West (NIR2011)","Wildfire for Nunavut - Taiga Shield West (NIR2011)",2
+424,"Firewood Collection-SW","SW firewood collection (live biomass)",2
+425,"Firewood Collection-HW","HW firewood collection (live biomass)",2
+426,"DOM Firewood Collection","Firewood collection from post-disturbance sites",2
+427,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation > 85%","Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation > 85%",2
+428,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 76-85%","Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 76-85%",2
+429,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 66-75%","Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 66-75%",2
+430,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 56-65%","Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 56-65%",2
+431,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 46-55%","Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 46-55%",2
+432,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 36-45%","Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 36-45%",2
+433,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 0-35%","Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 0-35%",2
+434,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation > 85%","Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation > 85%",2
+435,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 76-85%","Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 76-85%",2
+436,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 66-75%","Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 66-75%",2
+437,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 56-65%","Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 56-65%",2
+438,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 46-55%","Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 46-55%",2
+439,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 36-45%","Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 36-45%",2
+440,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 0-35%","Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 0-35%",2
+441,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation > 85%","Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation > 85%",2
+442,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 76-85%","Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 76-85%",2
+443,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 66-75%","Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 66-75%",2
+444,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 56-65%","Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 56-65%",2
+445,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 46-55%","Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 46-55%",2
+446,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 36-45%","Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 36-45%",2
+447,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 0-35%","Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 0-35%",2
+448,"Balsam bark beetle in BC, Very Severe","Balsam bark beetle in BC, Very Severe",2
+449,"Balsam bark beetle in BC, Severe","Balsam bark beetle in BC, Severe",2
+450,"Balsam bark beetle in BC, Moderate","Balsam bark beetle in BC, Moderate",2
+451,"Balsam bark beetle in BC, Light","Balsam bark beetle in BC, Light",2
+452,"Douglas Fir Beetle in BC, Very Severe","Douglas Fir Beetle in BC, Very Severe",2
+453,"Douglas Fir Beetle in BC, Severe","Douglas Fir Beetle in BC, Severe",2
+454,"Douglas Fir Beetle in BC, Moderate","Douglas Fir Beetle in BC, Moderate",2
+455,"Douglas Fir Beetle in BC, Light","Douglas Fir Beetle in BC, Light",2
+456,"Spruce Beetle in BC, Very Severe","Spruce Beetle in BC, Very Severe",2
+457,"Spruce Beetle in BC, Severe","Spruce Beetle in BC, Severe",2
+458,"Spruce Beetle in BC, Moderate","Spruce Beetle in BC, Moderate",2
+459,"Spruce Beetle in BC, Light","Spruce Beetle in BC, Light",2
+460,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation > 85%","Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation > 85%",2
+461,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 76-85%","Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 76-85%",2
+462,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 66-75%","Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 66-75%",2
+463,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 56-65%","Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 56-65%",2
+464,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 46-55%","Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 46-55%",2
+465,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 36-45%","Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 36-45%",2
+466,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 0-35%","Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 0-35%",2
+467,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation > 85%","Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation > 85%",2
+468,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 76-85%","Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 76-85%",2
+469,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 66-75%","Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 66-75%",2
+470,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 56-65%","Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 56-65%",2
+471,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 46-55%","Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 46-55%",2
+472,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 36-45%","Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 36-45%",2
+473,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 0-35%","Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 0-35%",2
+474,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation > 85%","Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation > 85%",2
+475,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 76-85%","Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 76-85%",2
+476,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 66-75%","Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 66-75%",2
+477,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 56-65%","Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 56-65%",2
+478,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 46-55%","Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 46-55%",2
+479,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 36-45%","Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 36-45%",2
+480,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 0-35%","Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 0-35%",2

@@ -1,0 +1,174 @@
+"DistTypeID","DistTypeName","OnOffSwitch","Description","IsStandReplacing","IsMultiYear","MultiYearCount"
+0,"Unknown",0,"Unknown disturbance type.",0,0,0
+1,"Wildfire",0,"Wildfire causing stand mortality.",1,0,0
+2,"Insect disturbance",0,"Insect infestations resulting in stand mortality.",1,0,0
+3,"Clear-cut with slash-burn",0,"Applies to areas that were clearcut and slash–burned in the same year.  It is assumed that this will remain as ""forestry"" land use.",1,0,0
+4,"Clearcut harvesting with salvage",0,"Applies to areas where clearcut logging occurs. Salvage moves 50% of stem snags to the forest products sector.",1,0,0
+5,"Fire with salvage logging",0,"Applies to areas where a non stand–replacing fire occurred followed by salvage logging.  This sequence of events is assumed to have occurred in the same year.  Also, it is assumed that this will remain as ""forestry"" land use.",1,0,0
+6,"Insect disturbance with salvage logging",0,"Applies to areas where an insect infestation has/may occur and is subsequently salvage logged.  This sequence of events is assumed to have occurred in the same year.  Also, it is assumed that this will remain as ""forestry"" land use.",1,0,0
+7,"Deforestation",0,"The conversion of forested land to a nonforest land use, for example, forest to agricultural land.",1,0,0
+8,"Afforestation",0,"The conversion of land that has been nonforest for at least 50 years to forested land.",0,0,0
+9,"Natural nonforest rehabilitation",0,"Natural conversion of land from nonforest to forest. This will not cause immediate C stock changes.",0,0,0
+10,"Partial cutting",0,"Partial cutting removes 50% of the merchantable biomass from a stand.",0,0,0
+11,"Natural succession",0,"For users who explicitly model natural succession in stands as events. No stock changes are associatied with this disturbance type.",0,0,0
+12,"WJPBW — Year 1 of outbreak",0,"Western jack pine budworm — Year 1 of outbreak",0,0,0
+13,"WJPBW — Year 2 of outbreak",0,"Western jack pine budworm — Year 2 of outbreak",0,0,0
+14,"WJPBW — Year 3 of outbreak",0,"Western jack pine budworm — Year 3 of outbreak",0,0,0
+15,"WJPBW — Year 4 of outbreak",0,"Western jack pine budworm — Year 4 of outbreak",0,0,0
+16,"Aspen Defoliators — Type A",0,"Aspen defoliators — Type A",0,0,0
+17,"Aspen Defoliators — Type B",0,"Aspen defoliators — Type B",0,0,0
+18,"Aspen Defoliators — Type C",0,"Aspen defoliators — Type C",0,0,0
+19,"Aspen Defoliators — Type D",0,"Aspen defoliators — Type D",0,0,0
+20,"Aspen Defoliators — Type E",0,"Aspen defoliators — Type E",0,0,0
+21,"Aspen Defoliators — Type F",0,"Aspen defoliators — Type F",0,0,0
+130,"Salvage logging after fire",0,"Salvage logging on areas burned by fire.",1,0,0
+131,"Salvage logging after insects",0,"Salvage logging on areas with significant insect mortality. Note that this salvage also involves clearcut of green wood as part of the salvage operation.",1,0,0
+132,"Eastern hemlock looper — Light defoliation",0,"Eastern hemlock looper — Light defoliation 1",0,0,0
+133,"Eastern hemlock looper — Moderate defoliation",0,"Eastern hemlock looper — Moderate defoliation 1",0,0,0
+134,"Eastern hemlock looper — Severe defoliation",0,"Eastern hemlock looper — Severe defoliation 1",0,0,0
+135,"Eastern hemlock looper — Severe cumulative defoliation",0,"Eastern hemlock looper — Severe cumulative defoliation 1",0,0,0
+136,"Mountain pine beetle — Low impact",0,"Low impact (5% softwood mortality)",0,0,0
+137,"Mountain pine beetle — Moderate impact",0,"Moderate impact (10% softwood mortality)",0,0,0
+138,"Mountain pine beetle — Very severe impact",0,"Very severe impact (50% softwood mortality)",0,0,0
+139,"Mountain pine beetle — Severe impact",0,"Severe impact (30% softwood mortality)",0,0,0
+140,"Spruce beetle — 20% mortality",0,"Spruce beetle — 20% mortality 1",1,0,0
+141,"Spruce beetle — 10% mortality",0,"Spruce beetle — 10% mortality 1",1,0,0
+142,"Spruce beetle — 2% mortality",0,"Spruce beetle — 2% mortality 1",1,0,0
+149,"Deforestation — Hydro — Right-of-way — Salvage and burn",0,"Deforestation — Hydro — Right-of-way — Salvage and burn 1",1,0,0
+150,"Deforestation — Hydro — Right-of-way — Salvage and decay",0,"Deforestation — Hydro — Right-of-way — Salvage and decay 1",1,0,0
+151,"Deforestation — Hydro reservoir — Salvage and decay",0,"Deforestation — Hydro reservoir — Salvage and decay 1",1,0,0
+152,"Deforestation — Hydro reservoir — No salvage or burn",0,"Deforestation — Hydro reservoir — No salvage or burn 1",1,0,0
+155,"Deforestation — Oil and gas — Salvage and burn",0,"Deforestation — Oil and gas — Salvage and burn 1",1,0,0
+156,"Deforestation — Oil and gas — Salvage and decay",0,"Deforestation — Oil and gas — Salvage and decay 1",1,0,0
+165,"Generic 5% mortality",0,"This disturbance type can be used to simulate a 5% reduction in biomass carbon.  The carbon removed from the biomass pool is transferred to the respective DOM pools.",0,0,0
+166,"Generic 10% mortality",0,"This disturbance type can be used to simulate a 10% reduction in biomass carbon.  The carbon removed from the biomass pool is transferred to the respective DOM pools.",0,0,0
+167,"Generic 15% mortality",0,"This disturbance type can be used to simulate a 15% reduction in biomass carbon.  The carbon removed from the biomass pool is transferred to the respective DOM pools.",0,0,0
+168,"Generic 20% mortality",0,"This disturbance type can be used to simulate a 20% reduction in biomass carbon.  The carbon removed from the biomass pool is transferred to the respective DOM pools.",0,0,0
+169,"Generic 25% mortality",0,"This disturbance type can be used to simulate a 25% reduction in biomass carbon.  The carbon removed from the biomass pool is transferred to the respective DOM pools.",0,0,0
+170,"Generic 30% mortality",0,"This disturbance type can be used to simulate a 30% reduction in biomass carbon.  The carbon removed from the biomass pool is transferred to the respective DOM pools.",0,0,0
+171,"Generic 35% mortality",0,"This disturbance type can be used to simulate a 35% reduction in biomass carbon.  The carbon removed from the biomass pool is transferred to the respective DOM pools.",0,0,0
+172,"Generic 40% mortality",0,"This disturbance type can be used to simulate a 40% reduction in biomass carbon.  The carbon removed from the biomass pool is transferred to the respective DOM pools.",0,0,0
+173,"Generic 45% mortality",0,"This disturbance type can be used to simulate a 45% reduction in biomass carbon.  The carbon removed from the biomass pool is transferred to the respective DOM pools.",0,0,0
+174,"Generic 50% mortality",0,"This disturbance type can be used to simulate a 50% reduction in biomass carbon.  The carbon removed from the biomass pool is transferred to the respective DOM pools.",0,0,0
+175,"Generic 55% mortality",0,"This disturbance type can be used to simulate a 55% reduction in biomass carbon.  The carbon removed from the biomass pool is transferred to the respective DOM pools.",0,0,0
+176,"Generic 60% mortality",0,"This disturbance type can be used to simulate a 60% reduction in biomass carbon.  The carbon removed from the biomass pool is transferred to the respective DOM pools.",0,0,0
+177,"Generic 65% mortality",0,"This disturbance type can be used to simulate a 65% reduction in biomass carbon.  The carbon removed from the biomass pool is transferred to the respective DOM pools.",0,0,0
+178,"Generic 70% mortality",0,"This disturbance type can be used to simulate a 70% reduction in biomass carbon.  The carbon removed from the biomass pool is transferred to the respective DOM pools.",0,0,0
+179,"Generic 75% mortality",0,"This disturbance type can be used to simulate a 75% reduction in biomass carbon.  The carbon removed from the biomass pool is transferred to the respective DOM pools.",0,0,0
+180,"Generic 80% mortality",0,"This disturbance type can be used to simulate a 80% reduction in biomass carbon.  The carbon removed from the biomass pool is transferred to the respective DOM pools.",0,0,0
+181,"Generic 85% mortality",0,"This disturbance type can be used to simulate a 85% reduction in biomass carbon.  The carbon removed from the biomass pool is transferred to the respective DOM pools.",0,0,0
+182,"Generic 90% mortality",0,"This disturbance type can be used to simulate a 90% reduction in biomass carbon.  The carbon removed from the biomass pool is transferred to the respective DOM pools.",0,0,0
+183,"Generic 95% mortality",0,"This disturbance type can be used to simulate a 95% reduction in biomass carbon.  The carbon removed from the biomass pool is transferred to the respective DOM pools.",0,0,0
+184,"25% commercial thinning",0,"This disturbance type can be used to simulate a 25% reduction in biomass carbon and a transfer of the merchantable C to the forest product sector (FPS).  The remaining carbon removed from the biomass pools is transferred to the respective DOM pools.",0,0,0
+185,"30% commercial thinning",0,"This disturbance type can be used to simulate a 30% reduction in biomass carbon and a transfer of the merchantable C to the forest product sector (FPS).  The remaining carbon removed from the biomass pools is transferred to the respective DOM pools.",0,0,0
+186,"35% commercial thinning",0,"This disturbance type can be used to simulate a 35% reduction in biomass carbon and a transfer of the merchantable C to the forest product sector (FPS).  The remaining carbon removed from the biomass pools is transferred to the respective DOM pools.",0,0,0
+187,"40% commercial thinning",0,"This disturbance type can be used to simulate a 40% reduction in biomass carbon and a transfer of the merchantable C to the forest product sector (FPS).  The remaining carbon removed from the biomass pools is transferred to the respective DOM pools.",0,0,0
+188,"45% commercial thinning",0,"This disturbance type can be used to simulate a 45% reduction in biomass carbon and a transfer of the merchantable C to the forest product sector (FPS).  The remaining carbon removed from the biomass pools is transferred to the respective DOM pools.",0,0,0
+189,"50% commercial thinning",0,"This disturbance type can be used to simulate a 50% reduction in biomass carbon and a transfer of the merchantable C to the forest product sector (FPS).  The remaining carbon removed from the biomass pools is transferred to the respective DOM pools.",0,0,0
+190,"55% commercial thinning",0,"This disturbance type can be used to simulate a 55% reduction in biomass carbon and a transfer of the merchantable C to the forest product sector (FPS).  The remaining carbon removed from the biomass pools is transferred to the respective DOM pools.",0,0,0
+191,"60% commercial thinning",0,"This disturbance type can be used to simulate a 60% reduction in biomass carbon and a transfer of the merchantable C to the forest product sector (FPS).  The remaining carbon removed from the biomass pools is transferred to the respective DOM pools.",0,0,0
+192,"65% commercial thinning",0,"This disturbance type can be used to simulate a 65% reduction in biomass carbon and a transfer of the merchantable C to the forest product sector (FPS).  The remaining carbon removed from the biomass pools is transferred to the respective DOM pools.",0,0,0
+193,"70% commercial thinning",0,"This disturbance type can be used to simulate a 70% reduction in biomass carbon and a transfer of the merchantable C to the forest product sector (FPS).  The remaining carbon removed from the biomass pools is transferred to the respective DOM pools.",0,0,0
+194,"75% commercial thinning",0,"This disturbance type can be used to simulate a 75% reduction in biomass carbon and a transfer of the merchantable C to the forest product sector (FPS).  The remaining carbon removed from the biomass pools is transferred to the respective DOM pools.",0,0,0
+195,"Old default fire",0,"This disturbance type links to the old default fire disturbance matrices (May 2005)",1,0,0
+196,"97% clear-cut",0,"Sylva Cutting with Protection and Regeneration of Soils (CPRS) (97% clear-cut)",1,0,0
+197,"85% precommercial thinning",0,"Sylva 85% precommercial thinning (Éclaircie précommerciale)",0,0,0
+198,"Roads and landings",0,"Temporary road and landing construction",1,0,0
+199,"Planting",0,"Planting (forest management activity, not afforestation!)",1,0,0
+200,"Stand–replacing natural succession",0,"Stand–replacing natural succession 1",1,0,0
+201,"20% commercial thinning",0,"This disturbance type can be used to simulate a 20% reduction in biomass carbon and a transfer of the merchantable C to the forest product sector (FPS).  The remaining carbon removed from the biomass pools is transferred to the respective DOM pools.",0,0,0
+202,"15% commercial thinning",0,"This disturbance type can be used to simulate a 15% reduction in biomass carbon and a transfer of the merchantable C to the forest product sector (FPS).  The remaining carbon removed from the biomass pools is transferred to the respective DOM pools.",0,0,0
+203,"10% commercial thinning",0,"This disturbance type can be used to simulate a 10% reduction in biomass carbon and a transfer of the merchantable C to the forest product sector (FPS).  The remaining carbon removed from the biomass pools is transferred to the respective DOM pools.",0,0,0
+204,"Clearcut harvesting without salvage",0,"Same as the default Clearcut harvesting disturbance type, except all snags are transferred to the Medium pool",1,0,0
+205,"Deforestation — Agriculture — Salvage, uprooting and decay",0,"Deforestation — Agriculture — Salvage, uprooting and decay 1",1,0,0
+206,"Deforestation — Agriculture — Salvage, uprooting and burn",0,"Deforestation — Agriculture — Salvage, uprooting and burn 1",1,0,0
+207,"Deforestation — Forestry — Salvage, uprooting and decay",0,"Deforestation — Forestry — Salvage, uprooting and decay 1",1,0,0
+208,"Deforestation — Forestry — Salvage, uprooting and burn",0,"Deforestation — Forestry — Salvage, uprooting and burn 1",1,0,0
+209,"Deforestation — Hydro reservoir — Burn",0,"Deforestation — Hydro reservoir — Burn 1",1,0,0
+210,"Deforestation — Industry — Salvage, uprooting and decay",0,"Deforestation — Industry — Salvage, uprooting and decay 1",1,0,0
+211,"Deforestation — Industry — Salvage, uprooting and burn",0,"Deforestation — Industry — Salvage, uprooting and burn 1",1,0,0
+212,"Deforestation — Oil and gas — Salvage, uprooting and decay",0,"Deforestation — Oil and gas — Salvage, uprooting and decay 1",1,0,0
+213,"Deforestation — Oil and gas — Salvage, uprooting and burn",0,"Deforestation — Oil and gas — Salvage, uprooting and burn 1",1,0,0
+223,"Deforestation — Mining — Salvage, uprooting and decay",1,"Deforestation — Mining — Salvage, uprooting and decay 1",1,0,0
+224,"Deforestation — Mining — Salvage, uprooting and burn",1,"Deforestation — Mining — Salvage, uprooting and burn 1",1,0,0
+225,"Deforestation — Municipal — Salvage, uprooting and decay",1,"Deforestation — Municipal — Salvage, uprooting and decay 1",1,0,0
+226,"Deforestation — Municipal — Salvage, uprooting and burn",1,"Deforestation — Municipal — Salvage, uprooting and burn 1",1,0,0
+227,"Deforestation — Peat mining — Uprooting and decay",1,"Deforestation — Peat mining — Uprooting and decay 1",1,0,0
+228,"Deforestation — Peat mining — Uprooting and burn",1,"Deforestation — Peat mining — Uprooting and burn 1",1,0,0
+229,"Deforestation — Recreation — Salvage and burn",1,"Deforestation — Recreation — Salvage and burn 1",1,0,0
+230,"Deforestation — Recreation — Salvage and decay",1,"Deforestation — Recreation — Salvage and decay 1",1,0,0
+231,"Deforestation — Recreation — Salvage, uprooting and decay",1,"Deforestation — Recreation — Salvage, uprooting and decay 1",1,0,0
+232,"Deforestation — Recreation — Salvage, uprooting and burn",1,"Deforestation — Recreation — Salvage, uprooting and burn 1",1,0,0
+233,"Deforestation — Transportation — Salvage, uprooting and decay",1,"Deforestation — Transportation — Salvage, uprooting and decay 1",1,0,0
+234,"Deforestation — Transportation — Salvage, uprooting and burn",1,"Deforestation — Transportation — Salvage, uprooting and burn 1",1,0,0
+235,"Deforestation — Hydro reservoir — salvage and burn",1,"Deforestation — Hydro reservoir — salvage and burn 1",1,0,0
+236,"Firewood Collection - SW",1,"SW firewood collection from small private woodlots-live biomass",0,0,0
+237,"Firewood Collection - HW",1,"HW firewood collection from small private woodlots- live biomass",0,0,0
+238,"Firewood Collection - post logging",1,"Firewood collection from DOM following commercial logging",0,0,0
+239,"Firewood Collection - post natural disturbance ",1,"Firewood collection from DOM following natural disturbance",0,0,0
+240,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation > 85%",1,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation > 85%",0,0,0
+241,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 76-85%",1,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 76-85%",0,0,0
+242,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 66-75%",1,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 66-75%",0,0,0
+243,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 56-65%",1,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 56-65%",0,0,0
+244,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 46-55%",1,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 46-55%",0,0,0
+245,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 36-45%",1,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 36-45%",0,0,0
+246,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 26-35%",1,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 26-35%",0,0,0
+247,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 16-25%",1,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation 16-25%",0,0,0
+248,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation < 16%",1,"Spruce Budworm in QC, Severe annual defoliation, 6yr cumulative defoliation < 16%",0,0,0
+249,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation > 85%",1,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation > 85%",0,0,0
+250,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 76-85%",1,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 76-85%",0,0,0
+251,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 66-75%",1,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 66-75%",0,0,0
+252,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 56-65%",1,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 56-65%",0,0,0
+253,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 46-55%",1,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 46-55%",0,0,0
+254,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 36-45%",1,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 36-45%",0,0,0
+255,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 26-35%",1,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 26-35%",0,0,0
+256,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 16-25%",1,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation 16-25%",0,0,0
+257,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation < 16%",1,"Spruce Budworm in QC, Moderate annual defoliation, 6yr cumulative defoliation < 16%",0,0,0
+258,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation > 85%",1,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation > 85%",0,0,0
+259,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 76-85%",1,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 76-85%",0,0,0
+260,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 66-75%",1,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 66-75%",0,0,0
+261,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 56-65%",1,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 56-65%",0,0,0
+262,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 46-55%",1,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 46-55%",0,0,0
+263,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 36-45%",1,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 36-45%",0,0,0
+264,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 26-35%",1,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 26-35%",0,0,0
+265,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 16-25%",1,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation 16-25%",0,0,0
+266,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation < 16%",1,"Spruce Budworm in QC, Light annual defoliation, 6yr cumulative defoliation < 16%",0,0,0
+268,"Balsam bark beetle in BC, Very Severe",1,"Balsam bark beetle in BC, Very Severe",0,0,0
+269,"Balsam bark beetle in BC, Severe",1,"Balsam bark beetle in BC, Severe",0,0,0
+270,"Balsam bark beetle in BC, Moderate",1,"Balsam bark beetle in BC, Moderate",0,0,0
+271,"Balsam bark beetle in BC, Light",1,"Balsam bark beetle in BC, Light",0,0,0
+272,"Douglas Fir Beetle in BC, Very Severe",1,"Douglas Fir Beetle in BC, Very Severe",0,0,0
+273,"Douglas Fir Beetle in BC, Severe",1,"Douglas Fir Beetle in BC, Severe",0,0,0
+274,"Douglas Fir Beetle in BC, Moderate",1,"Douglas Fir Beetle in BC, Moderate",0,0,0
+275,"Douglas Fir Beetle in BC, Light",1,"Douglas Fir Beetle in BC, Light",0,0,0
+276,"Spruce Beetle in BC, Very Severe",1,"Spruce Beetle in BC, Very Severe",0,0,0
+277,"Spruce Beetle in BC, Severe",1,"Spruce Beetle in BC, Severe",0,0,0
+278,"Spruce Beetle in BC, Moderate",1,"Spruce Beetle in BC, Moderate",0,0,0
+279,"Spruce Beetle in BC, Light",1,"Spruce Beetle in BC, Light",0,0,0
+280,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation > 85%",1,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation > 85%",0,0,0
+281,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 76-85%",1,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 76-85%",0,0,0
+282,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 66-75%",1,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 66-75%",0,0,0
+283,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 56-65%",1,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 56-65%",0,0,0
+284,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 46-55%",1,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 46-55%",0,0,0
+285,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 36-45%",1,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 36-45%",0,0,0
+286,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 26-35%",1,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 26-35%",0,0,0
+287,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 16-25%",1,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation 16-25%",0,0,0
+288,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation < 16%",1,"Spruce Budworm in AB, SK, MB, NWT, Severe annual defoliation, 6yr cumulative defoliation < 16%",0,0,0
+289,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation > 85%",1,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation > 85%",0,0,0
+290,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 76-85%",1,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 76-85%",0,0,0
+291,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 66-75%",1,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 66-75%",0,0,0
+292,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 56-65%",1,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 56-65%",0,0,0
+293,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 46-55%",1,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 46-55%",0,0,0
+294,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 36-45%",1,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 36-45%",0,0,0
+295,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 26-35%",1,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 26-35%",0,0,0
+296,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 16-25%",1,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation 16-25%",0,0,0
+297,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation < 16%",1,"Spruce Budworm in AB, SK, MB, NWT, Moderate annual defoliation, 6yr cumulative defoliation < 16%",0,0,0
+298,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation > 85%",1,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation > 85%",0,0,0
+299,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 76-85%",1,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 76-85%",0,0,0
+300,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 66-75%",1,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 66-75%",0,0,0
+301,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 56-65%",1,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 56-65%",0,0,0
+302,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 46-55%",1,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 46-55%",0,0,0
+303,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 36-45%",1,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 36-45%",0,0,0
+304,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 26-35%",1,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 26-35%",0,0,0
+305,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 16-25%",1,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation 16-25%",0,0,0
+306,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation < 16%",1,"Spruce Budworm in AB, SK, MB, NWT, Light annual defoliation, 6yr cumulative defoliation < 16%",0,0,0

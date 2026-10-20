@@ -1,0 +1,35 @@
+FromStockTypeID,ToStockTypeID,FlowTypeID
+Biomass: Coarse Root,DOM: Aboveground Fast,LULC: Mortality Live
+Biomass: Coarse Root,DOM: Belowground Fast,LULC: Mortality Live
+Biomass: Fine Root,Atmosphere: CH4,LULC: Emission Live CH4
+Biomass: Fine Root,Atmosphere: CO,LULC: Emission Live CO
+Biomass: Fine Root,Atmosphere: CO2,LULC: Emission Live CO2
+Biomass: Fine Root,DOM: Aboveground Very Fast,LULC: Mortality Live
+Biomass: Fine Root,DOM: Belowground Very Fast,LULC: Mortality Live
+Biomass: Foliage,Atmosphere: CH4,LULC: Emission Live CH4
+Biomass: Foliage,Atmosphere: CO,LULC: Emission Live CO
+Biomass: Foliage,Atmosphere: CO2,LULC: Emission Live CO2
+Biomass: Foliage,DOM: Aboveground Very Fast,LULC: Mortality Live
+Biomass: Merchantable,DOM: Aboveground Medium,LULC: Mortality Live
+Biomass: Merchantable,DOM: Snag Stem,LULC: Mortality Live
+Biomass: Merchantable,Forestry Sector,LULC: Harvest Live
+Biomass: Other Wood,Atmosphere: CH4,LULC: Emission Live CH4
+Biomass: Other Wood,Atmosphere: CO,LULC: Emission Live CO
+Biomass: Other Wood,Atmosphere: CO2,LULC: Emission Live CO2
+Biomass: Other Wood,DOM: Aboveground Fast,LULC: Mortality Live
+Biomass: Other Wood,DOM: Snag Branch,LULC: Mortality Live
+DOM: Aboveground Fast,Atmosphere: CH4,LULC: Emission DOM CH4
+DOM: Aboveground Fast,Atmosphere: CO,LULC: Emission DOM CO
+DOM: Aboveground Fast,Atmosphere: CO2,LULC: Emission DOM CO2
+DOM: Aboveground Medium,Atmosphere: CH4,LULC: Emission DOM CH4
+DOM: Aboveground Medium,Atmosphere: CO,LULC: Emission DOM CO
+DOM: Aboveground Medium,Atmosphere: CO2,LULC: Emission DOM CO2
+DOM: Aboveground Slow,Atmosphere: CH4,LULC: Emission DOM CH4
+DOM: Aboveground Slow,Atmosphere: CO,LULC: Emission DOM CO
+DOM: Aboveground Slow,Atmosphere: CO2,LULC: Emission DOM CO2
+DOM: Aboveground Very Fast,Atmosphere: CH4,LULC: Emission DOM CH4
+DOM: Aboveground Very Fast,Atmosphere: CO,LULC: Emission DOM CO
+DOM: Aboveground Very Fast,Atmosphere: CO2,LULC: Emission DOM CO2
+DOM: Snag Branch,DOM: Aboveground Fast,LULC: Transfer DOM
+DOM: Snag Stem,DOM: Aboveground Medium,LULC: Transfer DOM
+DOM: Snag Stem,Forestry Sector,LULC: Harvest DOM

@@ -1,0 +1,30 @@
+StateClassId,EcoBoundaryId,AdminBoundaryId,SpeciesTypeId,Source
+Forest: Alder/Maple Group,Pacific Maritime,British Columbia,Alder,lucasbuilder FIA update crosswalk
+Forest: Aspen/Birch Group,Boreal Shield West,Ontario,Birch,lucasbuilder FIA update crosswalk
+Forest: California Mixed Conifer Group,Montane Cordillera,British Columbia,Other softwoods,lucasbuilder FIA update crosswalk
+Forest: Douglas-fir Coastal Group,Pacific Maritime,British Columbia,Douglas-fir - Genus type,lucasbuilder FIA update crosswalk
+Forest: Douglas-fir Inland Group,Montane Cordillera,Alberta,Douglas-fir and Rocky Mountain Douglas-fir,lucasbuilder original crosswalk
+Forest: Elm/Ash/Cottonwood Group,Mixedwood Plains,Ontario,Ash,lucasbuilder FIA update crosswalk
+Forest: Exotic Hardwoods Group,Mixedwood Plains,Ontario,Other hardwoods,lucasbuilder FIA update crosswalk
+Forest: Exotic Softwoods Group,Mixedwood Plains,Ontario,Other softwoods,no prior mapping: eastern other softwoods (2026-10-20)
+Forest: Fir/Spruce/Mountain Hemlock Group,Montane Cordillera,British Columbia,Mountain hemlock,lucasbuilder FIA update crosswalk
+Forest: Hemlock/Sitka Spruce Group,Pacific Maritime,British Columbia,Sitka spruce,lucasbuilder FIA update crosswalk
+Forest: Loblolly/Shortleaf Pine Group,Mixedwood Plains,Ontario,Pine - Genus type,lucasbuilder FIA update crosswalk
+Forest: Lodgepole Pine Group,Montane Cordillera,British Columbia,Lodgepole pine,lucasbuilder FIA update crosswalk
+Forest: Longleaf/Slash Pine Group,Mixedwood Plains,Ontario,Pine - Genus type,lucasbuilder FIA update crosswalk
+Forest: Maple/Beech/Birch Group,Atlantic Maritime,Quebec,Maple,lucasbuilder FIA update crosswalk
+Forest: Oak/Gum/Cypress Group,Mixedwood Plains,Ontario,Cypress,lucasbuilder FIA update crosswalk
+Forest: Oak/Hickory Group,Mixedwood Plains,Ontario,Hickory,lucasbuilder FIA update crosswalk
+Forest: Oak/Pine Group,Mixedwood Plains,Ontario,Oak,lucasbuilder FIA update crosswalk
+Forest: Other Western Hardwoods Group,Montane Cordillera,British Columbia,Other hardwoods,lucasbuilder original crosswalk
+Forest: Other Western Softwood Group,Montane Cordillera,British Columbia,Other softwoods,lucasbuilder original crosswalk
+Forest: Pinyon/Juniper Group,Montane Cordillera,British Columbia,Other softwoods,lucasbuilder original crosswalk
+Forest: Ponderosa Pine Group,Montane Cordillera,British Columbia,Ponderosa pine,lucasbuilder FIA update crosswalk
+Forest: Redwood Group,Pacific Maritime,British Columbia,Other softwoods,lucasbuilder FIA update crosswalk
+Forest: Spruce/Fir Group,Atlantic Maritime,Quebec,Spruce - Genus type,lucasbuilder FIA update crosswalk
+Forest: Tanoak/Laurel Group,Pacific Maritime,British Columbia,Other hardwoods,lucasbuilder FIA update crosswalk
+Forest: Tropical Hardwoods Group,Mixedwood Plains,Ontario,Other hardwoods,lucasbuilder FIA update crosswalk
+Forest: Western Larch Group,Montane Cordillera,British Columbia,Western larch,lucasbuilder FIA update crosswalk
+Forest: Western Oak Group,Montane Cordillera,British Columbia,Oak,lucasbuilder FIA update crosswalk
+Forest: Western White Pine Group,Pacific Maritime,British Columbia,Western white pine,lucasbuilder original crosswalk
+Forest: White/Red/Jack Pine Group,Mixedwood Plains,Ontario,Jack pine,lucasbuilder FIA update crosswalk
