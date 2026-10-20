@@ -9,12 +9,13 @@
 # Needs the Live-Tree Carbon Curves of stage 2 (same pipeline, or a dependency on a stage 2 result).
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
-source(pkg_file("src", "growth.R")); source(pkg_file("src", "flows.R"))
+source(pkg_file("src", "growth.R")); source(pkg_file("src", "flows.R")); source(pkg_file("src", "dom.R")); source(pkg_file("src", "calibrate.R"))
 suppressPackageStartupMessages({ library(terra); library(sf) })
 STAGE <- "3 Carbon Flows"
-progressBar(type = "begin", totalSteps = 5)
+progressBar(type = "begin", totalSteps = 6)
 
-src <- read_data_sources(c("EcodivisionFile", "PrismFolder"))
+src <- read_data_sources(c("EcodivisionFile", "PrismFolder", "FiaConditionFile", "FiaDisturbanceFile"))
+gopt <- as.list(read_ds("GrowthOptions"))
 cbm <- pkg_file("defaults", "cbm")
 if (!nrow(datasheet(scn, "stsim_FlowPathwayDiagram", optional = TRUE)))
   fail("no Flow Pathway Diagram: make this scenario depend on the 'Stock-Flow Definitions' scenario that tools/new-library.R creates")
@@ -37,9 +38,52 @@ eco <- eco[!is.na(Stratum)]
 say("Ecodivision mean annual temperature (PRISM): %s", paste(sprintf("%s %.1f C", eco$ecodiv, eco$temp), collapse = ", "))
 progressBar()
 
-# ---- forest: net growth, growth split, turnover and decay per cell ----------------------------------------------------
+# ---- 3b: calibrate DOM decay (src/calibrate.R): snags, down wood, forest floor to FIA; soil to gSSURGO ----------------------
+MIN_PLOTS_CELL <- 200
 cells <- unique(cc[, .(Stratum, StateClass)])
 miss <- setdiff(cells$StateClass, cw$StateClass); if (length(miss)) fail("carbon curves for state classes not in the forest crosswalk: %s", paste(miss, collapse = ", "))
+cells[, sc := cw$StateClassId[match(StateClass, cw$StateClass)]][, ecodiv := eco$ecodiv[match(Stratum, eco$Stratum)]][, temp := eco$temp[match(Stratum, eco$Stratum)]]
+ri_tab <- read_default("spinup", "return-interval.csv"); soil_t <- read_default("spinup", "soil-targets.csv")
+cells[, ri := as.numeric(ri_tab$ReturnInterval)[match(paste(Stratum, StateClass), paste(ri_tab$Stratum, ri_tab$StateClass))]]
+cells[is.na(ri), ri := median(as.numeric(ri_tab[StateClass == .BY$StateClass, ReturnInterval])), by = StateClass]
+cells[is.na(ri), ri := median(as.numeric(ri_tab$ReturnInterval))][, ri := as.integer(round(ri))]
+cells[, soil_target := as.numeric(soil_t$SoilTarget)[match(paste(Stratum, StateClass), paste(soil_t$Stratum, soil_t$StateClass))]]
+dat <- fia_dom_data(src$FiaConditionFile, src$FiaDisturbanceFile, gopt, cw)
+cells[, plots := dat$obs[, .(n = sum(n)), by = .(sc, ecodiv)][cells, on = c("sc", "ecodiv"), n]][is.na(plots), plots := 0L]
+say("Decay calibration: %d cells, %d with >= %d FIA plots (own fit), %d with a gSSURGO soil target; return intervals %d-%d yr",
+    nrow(cells), cells[plots >= MIN_PLOTS_CELL, .N], MIN_PLOTS_CELL, cells[!is.na(soil_target), .N], min(cells$ri), max(cells$ri))
+ctx <- list(cc = cc, cw = cw, dens = dens, cbm = cbm, fo = fread(pkg_file("defaults", "stockflow", "stsim_FlowOrder.csv")),
+            ev = fread(pkg_file("defaults", "stockflow", "event-pathways.csv"), na.strings = ""))
+t0 <- Sys.time(); cl <- parallel::makeCluster(max(1, min(30, parallel::detectCores() - 1)))
+parallel::clusterExport(cl, c("ctx", "dat", "cells"), envir = environment())
+pkgdir <- env$PackageDirectory; parallel::clusterExport(cl, "pkgdir", envir = environment())
+invisible(parallel::clusterEvalQ(cl, { library(data.table); for (f in c("flows.R", "dom.R", "calibrate.R")) source(file.path(pkgdir, "src", f)) }))
+own <- which(cells$plots >= MIN_PLOTS_CELL); types <- unique(cells[plots > 0, sc])
+fc <- parallel::parLapply(cl, own, function(i) cal_fit(cells[i], ctx, dat))
+ft <- stats::setNames(parallel::parLapply(cl, types, function(s) cal_fit(cells[sc == s & plots > 0], ctx, dat)), types)
+cells[, `:=`(Level = NA_character_, m_snag = NA_real_, m_cwd = NA_real_, m_floor = NA_real_, clearcut = NA_real_)]
+for (j in seq_along(own)) cells[own[j], `:=`(Level = "Cell", m_snag = fc[[j]]$snag, m_cwd = fc[[j]]$cwd, m_floor = fc[[j]]$floor, clearcut = fc[[j]]$clearcut)]
+for (s in types) cells[is.na(Level) & sc == s, `:=`(Level = "Forest type", m_snag = ft[[s]]$snag, m_cwd = ft[[s]]$cwd, m_floor = ft[[s]]$floor, clearcut = ft[[s]]$clearcut)]
+if (anyNA(cells$Level)) fail("no FIA dead-carbon plots for state classes %s", paste(unique(cells[is.na(Level), StateClass]), collapse = ", "))
+parallel::clusterExport(cl, "cells", envir = environment())
+cells[, m_soil := unlist(parallel::parLapply(cl, seq_len(nrow(cells)), function(i) cal_soil(cells[i], ctx, list(snag = cells$m_snag[i], cwd = cells$m_cwd[i], floor = cells$m_floor[i]), cells$clearcut[i])))]
+parallel::stopCluster(cl)
+cells[, SoilSource := ifelse(is.na(m_soil), ifelse(is.na(soil_target), "Forest type median (no gSSURGO target)", "Forest type median (target unreachable)"), "gSSURGO target")]
+cells[is.na(m_soil), m_soil := median(cells[sc == .BY$sc, m_soil], na.rm = TRUE), by = sc]
+cells[is.na(m_soil), m_soil := median(cells$m_soil, na.rm = TRUE)]
+red <- c(sapply(fc, function(f) 1 - f$loss1 / f$loss0), sapply(ft, function(f) 1 - f$loss1 / f$loss0))
+say("Decay calibration took %.1f min; median misfit reduction %.0f%%; median multipliers snag %.2f, down wood %.2f, forest floor %.2f, soil %.2f; clearcut share %.2f",
+    as.numeric(Sys.time() - t0, units = "mins"), 100 * median(red), median(cells$m_snag), median(cells$m_cwd), median(cells$m_floor), median(cells$m_soil), median(cells$clearcut))
+check(STAGE, "decay multipliers are finite and inside [0.05, 20] (soil [0.02, 50])",
+      all(is.finite(as.matrix(cells[, .(m_snag, m_cwd, m_floor, m_soil)]))) && all(cells[, c(m_snag, m_cwd, m_floor)] >= 0.05 - 1e-9 & cells[, c(m_snag, m_cwd, m_floor)] <= 20 + 1e-9) &&
+        all(cells$m_soil >= 0.02 - 1e-9 & cells$m_soil <= 50 + 1e-9))
+check(STAGE, "calibration reduces the FIA dead-carbon misfit in every fit", all(red > 0), sprintf("smallest reduction %.0f%%", 100 * min(red)))
+write_ds(cells[, .(StratumId = Stratum, StateClassId = StateClass, Level, Plots = plots, ReturnInterval = ri, SnagDecayMultiplier = round(m_snag, 4),
+                   DownWoodDecayMultiplier = round(m_cwd, 4), ForestFloorDecayMultiplier = round(m_floor, 4), SoilDecayMultiplier = round(m_soil, 4),
+                   ClearcutShare = round(clearcut, 3), SoilTarget = round(soil_target, 2), SoilSource)], "OutputDecayCalibration")
+progressBar()
+
+# ---- forest: net growth, growth split, turnover and decay per cell ----------------------------------------------------
 rates <- setNames(lapply(cw$StateClass, function(s) { k <- cw[StateClass == s]; turnover_rates(s, k$softwood, k$deciduous, cbm) }), cw$StateClass)
 ng <- list(); fm_g <- list(); fm_d <- list(); err <- 0; nneg <- 0
 for (i in seq_len(nrow(cells))) { s <- cells$Stratum[i]; c0 <- cells$StateClass[i]; r <- rates[[c0]]; k <- cw[StateClass == c0]
@@ -54,7 +98,8 @@ for (i in seq_len(nrow(cells))) { s <- cells$Stratum[i]; c0 <- cells$StateClass[
   ng[[i]] <- data.table(StratumId = s, StateClassId = c0, StateAttributeTypeId = "Net Growth", AgeMin = g$Age, AgeMax = amax, Value = g$Total)
   fm_g[[i]] <- rbindlist(lapply(names(LIVE_POOLS), function(pl) data.table(StratumId = s, StateClassId = c0, AgeMin = g$Age, AgeMax = amax,
                                                                            FlowGroupId = paste(GROWTH_FLOW[[pl]], "[Type]"), Value = sh[[pl]])))
-  dv <- dom_flow_values(r, k$softwood, eco[Stratum == s, temp], cbm)
+  cm <- cells[Stratum == s & StateClass == c0]
+  dv <- scale_decay(dom_flow_values(r, k$softwood, eco[Stratum == s, temp], cbm), list(snag = cm$m_snag, cwd = cm$m_cwd, floor = cm$m_floor, soil = cm$m_soil))
   fm_d[[i]] <- data.table(StratumId = s, StateClassId = c0, AgeMin = NA_integer_, AgeMax = NA_integer_, FlowGroupId = paste(names(dv), "[Type]"), Value = unname(dv)) }
 ng <- rbindlist(ng); fm_g <- rbindlist(fm_g); fm_d <- rbindlist(fm_d)
 say("Forest: %d net growth rows, %d growth-split rows (%d negative shares), %d turnover/decay rows", nrow(ng), nrow(fm_g), nneg, nrow(fm_d))
@@ -67,7 +112,7 @@ check(STAGE, "net growth is positive", all(ng$Value > 0), sprintf("smallest %.4f
 check(STAGE, "growth shares add to 1", fm_g[, abs(sum(Value) - 1), by = .(StratumId, StateClassId, AgeMin)][, max(V1)] < 1e-9)
 check(STAGE, "turnover then growth reproduces the stage 2 carbon curves", err < 1e-6, sprintf("max error %.2e Mg C/ha", err))
 dsum <- fm_d[, .(Value = sum(Value)), by = .(StratumId, StateClassId, from = sub(" -> .*", "", sub("^[^:]+: ", "", sub(" \\[Type\\]$", "", FlowGroupId))))]
-check(STAGE, "flows out of each pool take at most its whole stock each year", all(fm_d$Value >= 0) && max(dsum$Value) <= 1, sprintf("largest total rate %.3f", max(dsum$Value)))
+check(STAGE, "flows out of each pool take at most its whole stock each year", all(fm_d$Value >= 0) && max(dsum$Value) <= 1 + 1e-9, sprintf("largest total rate %.3f; pools at the 1.0 cap: %d cells", max(dsum$Value), dsum[Value > 1 - 1e-9, uniqueN(paste(StratumId, StateClassId))]))
 
 # ---- assemble the stock-flow configuration (forest built here + LUCAS defaults) ---------------------------------------
 rd <- function(f) { x <- fread(pkg_file("defaults", "stockflow", f), colClasses = "character", na.strings = "")

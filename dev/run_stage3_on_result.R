@@ -1,0 +1,12 @@
+# Run stage 3 alone on the latest stage 2 result of a library (depends on Stock-Flow Definitions and that result)
+suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
+a <- commandArgs(TRUE); f <- if (length(a)) a[1] else "F:/lucasCore/dev/libs/lucasCore-flows.ssim"
+L <- ssimLibrary(f); P <- rsyncrosim::project(L, "Definitions"); sc <- as.data.table(scenario(L, summary = TRUE))
+sfd <- sc[Name == "Stock-Flow Definitions" & IsResult == "No", ScenarioId]; g2 <- max(sc[IsResult == "Yes" & grepl("Growth", Name), ScenarioId])
+S <- rsyncrosim::scenario(P, sprintf("Carbon flows on result %d", g2)); dependency(S) <- c(sfd, g2)
+saveDatasheet(S, data.frame(StageNameId = "3 - Carbon Flows", RunOrder = 1), "core_Pipeline")
+t0 <- Sys.time(); R <- run(S); cat(sprintf("run took %.1f min\n", as.numeric(Sys.time() - t0, units = "mins")))
+lg <- trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]])
+cat(paste(unique(lg[grepl("^3 Carbon|Writing|Decay calibration|Failure|rror", lg)]), collapse = "\n"), "\n")
+for (sh in c("stsim_FlowPathway", "stsim_FlowMultiplier", "stsim_StateAttributeValue", "lucasCore_OutputDecayCalibration")) cat(sprintf("%-34s %8d rows\n", sh, nrow(datasheet(R, sh))))
+fwrite(as.data.table(datasheet(R, "lucasCore_OutputDecayCalibration", lookupsAsFactors = FALSE)), paste0(tools::file_path_sans_ext(f), "-decay-calibration.csv"))

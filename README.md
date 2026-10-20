@@ -31,7 +31,7 @@ project-scope sheets that a stage saves during a run.
 |---|---|---|
 | 1 - Study Area and Strata | `src/1-study-area.R` | Done: model lattice; primary = FIA ecodivisions (fixed); secondary and tertiary from Stratum Sources |
 | 2 - Fit Growth Curves | `src/2-growth-curves.R`, `src/growth.R` | Done: 551 merchantable volume curves (forest state class x ecodivision), parameters, PDF report |
-| 3 - Carbon Flows | `src/3-carbon-flows.R`, `src/flows.R` | 3a done: net growth and its split, turnover, DOM decay at PRISM temperature; non-forest and event flows from LUCAS defaults. 3b (decay calibrated to FIA dead carbon) next |
+| 3 - Carbon Flows | `src/3-carbon-flows.R`, `src/flows.R`, `src/dom.R`, `src/calibrate.R` | Done: net growth and its split, turnover, DOM decay at PRISM temperature calibrated to FIA dead carbon (snags, down wood, litter) and gSSURGO soil; non-forest and event flows from LUCAS defaults |
 | 4-9 | | Planned |
 
 Every stage ends with validation checks (`lucasCore_OutputValidation`); a check that cannot be computed fails.

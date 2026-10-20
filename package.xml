@@ -120,6 +120,21 @@
 		<column name="FiaTypeGroups" displayName="FIA Type Groups" dataType="String"/>
 	</dataSheet>
 
+	<dataSheet name="OutputDecayCalibration" displayName="Decay Calibration">
+		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum"/>
+		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="Level" displayName="Fitted At" dataType="String"/>
+		<column name="Plots" displayName="FIA Plots" dataType="Integer"/>
+		<column name="ReturnInterval" displayName="Spin-up Return Interval (yr)" dataType="Integer"/>
+		<column name="SnagDecayMultiplier" displayName="Snag Decay Multiplier" dataType="Double" format="0.000"/>
+		<column name="DownWoodDecayMultiplier" displayName="Down Wood Decay Multiplier" dataType="Double" format="0.000"/>
+		<column name="ForestFloorDecayMultiplier" displayName="Forest Floor Decay Multiplier" dataType="Double" format="0.000"/>
+		<column name="SoilDecayMultiplier" displayName="Soil Decay Multiplier" dataType="Double" format="0.000"/>
+		<column name="ClearcutShare" displayName="Last Disturbance Clearcut Share" dataType="Double" format="0.00"/>
+		<column name="SoilTarget" displayName="gSSURGO Soil Target (Mg C/ha)" dataType="Double" format="0.0" isOptional="True"/>
+		<column name="SoilSource" displayName="Soil Multiplier Source" dataType="String"/>
+	</dataSheet>
+
 	<dataSheet name="OutputGrowthReport" displayName="Growth Curve Report" isSingleRow="True">
 		<column name="FileName" displayName="Report (PDF)" dataType="String" isExternalFile="True" isRaster="False" externalFileFilter="PDF Files (*.pdf)|*.pdf"/>
 	</dataSheet>
@@ -165,6 +180,7 @@
 		<dataSheet name="stsim_FlowPathway" type="Output"/>
 		<dataSheet name="stsim_FlowMultiplier" type="Output"/>
 		<dataSheet name="stsim_StateAttributeValue" type="Output"/>
+		<dataSheet name="OutputDecayCalibration" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
@@ -189,6 +205,7 @@
 				<item name="OutputStrataSummary"/>
 				<item name="OutputGrowthParameter"/>
 				<item name="OutputCarbonParameter"/>
+				<item name="OutputDecayCalibration"/>
 				<item name="OutputGrowthReport"/>
 				<item name="OutputValidation"/>
 			</group>
