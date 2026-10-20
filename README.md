@@ -19,16 +19,17 @@ Rscript tools/new-library.R "F:/path/My Model.ssim"
 ```
 
 Creates the library with stsim + lucasCore, writes the stsim project definitions from `defaults/stsim` (state classes, strata
-lists, transition, stock and flow types), and turns multiprocessing and conda off. This is not a stage: SyncroSim discards
+lists, transition, stock and flow types), and turns multiprocessing and conda off. Secondary and tertiary strata are chosen
+here from `defaults/strata/presets.csv` (States, Counties, HUC6, HUC8, EPA Level III Ecoregions, Pyromes, Federal Lands, GAP
+Status): `--secondary=Counties --tertiary="GAP Status"`. Defaults: States and Federal Lands (the CONUS 1km model). This is not a stage: SyncroSim discards
 project-scope sheets that a stage saves during a run.
 
 ## Stages
 
 | Stage | Script | Status |
 |---|---|---|
-| 1 - Study Area and Strata | `src/1-study-area.R` | Done: model lattice, primary (ecodivision), secondary (state), tertiary (federal land) strata |
+| 1 - Study Area and Strata | `src/1-study-area.R` | Done: model lattice; primary = FIA ecodivisions (fixed); secondary and tertiary from Stratum Sources |
 | 2-9 | | Planned |
-| U - Spike (development) | `src/u-spike.R` | Phase A spike only; removed before release |
 
 Every stage ends with validation checks (`lucasCore_OutputValidation`); a check that cannot be computed fails.
 

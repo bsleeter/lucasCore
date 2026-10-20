@@ -1,8 +1,6 @@
 Order,Datasheet,Scope,Note
 1,stsim_Terminology,Project,
 2,stsim_Stratum,Project,FIA ecodivisions; Id = ecodivision StratumId (mountain divisions = division x 10 + 1)
-3,stsim_SecondaryStratum,Project,CONUS states; Id = state FIPS
-4,stsim_TertiaryStratum,Project,National Atlas federal land managers; 9 = Non Federal
 5,stsim_StateLabelX,Project,
 6,stsim_StateLabelY,Project,
 7,stsim_StateClass,Project,Forest Ids = FIA forest type group codes

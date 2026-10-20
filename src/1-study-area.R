@@ -4,44 +4,46 @@
 # Replaces the strata chunk of "Build LUCAS Model CONUS Annual NLCD FIA Update.Rmd" (L107-203), with the land mask the CONUS 1km
 # model actually used (found by reproducing its rasters, 2026-10-19):
 #   lattice    rast(vect(ecodivisions), res): EPSG:5070, anchored at the ecodivision bounding box (shared.R, model_lattice)
-#   primary    ecodivision StratumId, masked by the start-year Annual NLCD aggregated to the cell size (modal) -> land cells
-#   secondary  state FIPS; cells off the state polygons (coast) take the modal state of a 59 x 59 window; masked by primary
-#   tertiary   federal land manager (National Atlas ADMIN1 matched to the Tertiary Strata names); everything else 9 (Non Federal)
-# A state build uses the same lattice and the same NLCD aggregation blocks as a CONUS build, then keeps the cells of its states.
+#   primary    FIA ecodivision StratumId (fixed: the growth curves are fitted on it), masked by the start-year Annual NLCD
+#              aggregated to the cell size (modal) -> land cells
+#   secondary  from the project's Stratum Sources row (any polygon source; States in the CONUS 1km model), masked by primary
+#   tertiary   likewise (Federal Lands in the CONUS 1km model); uncovered land takes the row's fill rule
+# The study area is a set of secondary strata units (blank = all). It uses the same lattice and the same NLCD aggregation
+# blocks as a CONUS build, so a regional build lands on the same cells.
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
+source(pkg_file("src", "strata.R"))
 suppressPackageStartupMessages({ library(terra); library(sf) })
 STAGE <- "1 Study Area"
 progressBar(type = "begin", totalSteps = 6)
 
-src <- read_data_sources(c("EcodivisionFile", "StatesFile", "FederalLandsFile", "NlcdFolder"))
+src <- read_data_sources(c("EcodivisionFile", "NlcdFolder"))
 opt <- read_ds("BuildOptions")
-res_m <- opt$Resolution[1]; y0 <- opt$StartYear[1]; win <- opt$SecondaryFillWindow[1]; if (win %% 2 == 0) win <- win + 1
+res_m <- opt$Resolution[1]; y0 <- opt$StartYear[1]
 for (k in c("Stratum", "SecondaryStratum", "TertiaryStratum"))
-  if (!nrow(stsim_list(k))) fail("stsim %s is empty: run stage 0 (Initialize Definitions) first", k)
-
-# ---- inputs, all in EPSG:5070 -------------------------------------------------------------------------------------
-eco <- st_transform(read_sf(src$EcodivisionFile), MODEL_CRS)
-if (!all(c("StrtmId") %in% names(eco))) fail("%s has no StrtmId field", basename(src$EcodivisionFile))
-states <- st_transform(read_sf(src$StatesFile), MODEL_CRS)
-if (!all(c("NAME", "STATEFP") %in% names(states))) fail("%s needs fields NAME and STATEFP", basename(src$StatesFile))
-states$SecondaryId <- as.integer(states$STATEFP)
-fed <- st_transform(read_sf(src$FederalLandsFile), MODEL_CRS)
-if (!"ADMIN1" %in% names(fed)) fail("%s has no ADMIN1 field", basename(src$FederalLandsFile))
-progressBar()
+  if (!nrow(stsim_list(k))) fail("stsim %s is empty: create the library with tools/new-library.R", k)
+ss <- as.data.table(datasheet(prj, ds("StratumSource"), optional = TRUE, lookupsAsFactors = FALSE))
+for (lv in c("Secondary", "Tertiary")) if (!lv %in% ss$Level) fail("Stratum Sources has no %s row: run tools/new-library.R", lv)
+sec <- strata_row(ss[Level == "Secondary"]); ter <- strata_row(ss[Level == "Tertiary"])
+say("Strata: primary = FIA ecodivisions; secondary = %s; tertiary = %s", sec$Preset, ter$Preset)
 
 # ---- the study area on the model lattice ---------------------------------------------------------------------------
+eco <- st_transform(read_sf(src$EcodivisionFile), MODEL_CRS)
+if (!"StrtmId" %in% names(eco)) fail("%s has no StrtmId field", basename(src$EcodivisionFile))
 L <- model_lattice(eco, res_m)
-want <- trimws(strsplit(ifelse(is.na(opt$StudyAreaStates[1]), "", opt$StudyAreaStates[1]), ",")[[1]]); want <- want[nzchar(want)]
+sl <- stsim_list("SecondaryStratum")
+want <- trimws(strsplit(ifelse(is.na(opt$StudyAreaUnits[1]), "", opt$StudyAreaUnits[1]), ",")[[1]]); want <- want[nzchar(want)]
 if (length(want)) {
-  bad <- setdiff(want, states$NAME); if (length(bad)) fail("Study Area States not in %s: %s", basename(src$StatesFile), paste(bad, collapse = ", "))
-  keep_ids <- states$SecondaryId[states$NAME %in% want]
-  # the states' extent, grown by the gap-fill window so coastal fill sees the same neighbours, snapped out to the lattice
-  e <- ext(vect(states[states$NAME %in% want, ])) + win * res_m
-  R <- crop(L, align(intersect(e, ext(L)), L, snap = "out"))
+  bad <- setdiff(want, sl$Name); if (length(bad)) fail("Study Area names not in the Secondary Strata list (%s): %s", sec$Preset, paste(bad, collapse = ", "))
+  keep_ids <- as.integer(sl$Id[match(want, sl$Name)])
+  sp <- strata_polygons(sec, env$PackageDirectory); sp <- sp[sp$StratumId %in% keep_ids, ]
+  if (!nrow(sp)) fail("no %s polygons for the study area", sec$Preset)
+  # the units' extent, grown by the modal fill distance so coastal fill sees the same neighbours, snapped out to the lattice
+  pad <- res_m + if (tolower(sec$Fill) == "modal") as.numeric(sec$FillDistance) else 0
+  R <- crop(L, align(intersect(ext(vect(sp)) + pad, ext(L)), L, snap = "out"))
   say("Study area: %s (%d x %d cells of %d m)", paste(want, collapse = ", "), ncol(R), nrow(R), res_m)
-} else { R <- L; keep_ids <- states$SecondaryId; say("Study area: CONUS (%d x %d cells of %d m)", ncol(R), nrow(R), res_m) }
-
+} else { R <- L; keep_ids <- as.integer(sl$Id); say("Study area: all of CONUS (%d x %d cells of %d m)", ncol(R), nrow(R), res_m) }
+progressBar()
 # ---- land mask: start-year Annual NLCD, modal-aggregated ------------------------------------------------------------
 # The aggregation blocks are fixed to the CONUS crop the original build used (lattice extent + one block, snapped to the NLCD
 # 30 m grid), so a state build aggregates exactly the same 30 m pixels into each cell as a CONUS build does.
@@ -62,19 +64,15 @@ progressBar()
 
 # ---- strata ---------------------------------------------------------------------------------------------------------
 P <- mask(rasterize(vect(eco), R, "StrtmId"), n)
-S <- rasterize(vect(states), R, "SecondaryId")
-S <- mask(cover(S, focal(S, w = matrix(1, win, win), fun = "modal", na.policy = "only", na.rm = TRUE)), P)
+S <- strata_raster(sec, env$PackageDirectory, R, P); um_s <- attr(S, "unmatched")
+if (attr(S, "filled") > 0) say("Secondary: %d land cells outside the %s polygons filled (%s)", attr(S, "filled"), sec$Preset, sec$Fill)
 S[!(S %in% keep_ids)] <- NA
 P <- mask(P, S)
 progressBar()
-
-tl <- stsim_list("TertiaryStratum")
-fed$TertiaryId <- as.integer(tl$Id[match(fed$ADMIN1, tl$Name)])
-unmatched <- sort(unique(fed$ADMIN1[is.na(fed$TertiaryId)]))
-if (length(unmatched)) say("Federal lands with no Tertiary Strata name (counted as Non Federal): %s", paste(unmatched, collapse = ", "))
-non_fed <- as.integer(tl$Id[tl$Name == "Non Federal"]); if (length(non_fed) != 1) fail("Tertiary Strata has no single 'Non Federal' row")
-Tr <- rasterize(vect(fed[!is.na(fed$TertiaryId), ]), R, "TertiaryId")
-Tr <- mask(cover(Tr, init(R, non_fed)), P)
+Tr <- strata_raster(ter, env$PackageDirectory, R, P); um_t <- attr(Tr, "unmatched")
+if (attr(Tr, "filled") > 0) say("Tertiary: %d land cells outside the %s polygons filled (%s)", attr(Tr, "filled"), ter$Preset, ter$Fill)
+for (u in list(list(um_s, "Secondary"), list(um_t, "Tertiary"))) if (length(u[[1]]))
+  say("%s: source values with no crosswalk id (treated as uncovered): %s", u[[2]], paste(u[[1]], collapse = ", "))
 progressBar()
 
 # ---- checks and outputs ---------------------------------------------------------------------------------------------

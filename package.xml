@@ -10,8 +10,6 @@
 	<dataSheet name="DataSource" displayName="Data Sources (national data on disk)" dataScope="Project" isSingleRow="True">
 		<!-- plain paths: these files are GBs and are read, never copied into the library; an empty sheet uses the defaults -->
 		<column name="EcodivisionFile" displayName="FIA Ecodivisions (dissolved; fields StrtmId, StrtmNm) - primary strata and model lattice" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FIA/EcoDivision_map/EcoDivisions_Dissolve.shp"/>
-		<column name="StatesFile" displayName="US States (fields NAME, STATEFP) - secondary strata" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Study Areas/States/tl_2009_us_state_conus.shp"/>
-		<column name="FederalLandsFile" displayName="Federal Lands (National Atlas, field ADMIN1) - tertiary strata" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/PADUS/Federal Lands/fedlanp010g.shp"/>
 		<column name="FiaConditionFile" displayName="FIA Condition Carbon and Merchantable Volume (USGS .Rds)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FIA/USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds"/>
 		<column name="FiaDisturbanceFile" displayName="FIA Condition Disturbance and Treatment Codes (USGS .Rds)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FIA/USGS_forest_conditions_dstrbcd_and_trtcd_20240213.Rds"/>
 		<column name="NlcdFolder" displayName="Annual NLCD Folder (Annual_NLCD_LndCov_year_CU_C1V0.tif)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/NLCD/Annual NLCD"/>
@@ -29,17 +27,36 @@
 		<column name="FirePerimeterHistoryFile" displayName="Interagency Fire Perimeter History" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/NIFS/InterAgencyFirePerimeterHistory_All_Years_View/InterAgencyFirePerimeterHistory_All_Years_View.shp"/>
 	</dataSheet>
 
+	<dataSheet name="StratumSource" displayName="Stratum Sources (secondary and tertiary strata)" dataScope="Project">
+		<!-- written by tools/new-library.R from a preset (defaults/strata/presets.csv); edit a row and run new-library.R with the rebuild-strata flag to
+		     change it. The stsim Secondary and Tertiary Strata lists are made from these rows; stages cannot write project lists. -->
+		<column name="Level" dataType="String"/>
+		<column name="Preset" displayName="Preset or Name" dataType="String"/>
+		<column name="File" displayName="Polygon File" dataType="String"/>
+		<column name="Layer" dataType="String" isOptional="True"/>
+		<column name="IdField" displayName="Id Field (numeric)" dataType="String" isOptional="True"/>
+		<column name="NameTemplate" displayName="Name Template ({field})" dataType="String" isOptional="True"/>
+		<column name="ValueField" displayName="Value Field (with crosswalk)" dataType="String" isOptional="True"/>
+		<column name="CrosswalkFile" displayName="Crosswalk File (Value, Id)" dataType="String" isOptional="True"/>
+		<column name="ListFile" displayName="List File (Name, Id)" dataType="String" isOptional="True"/>
+		<column name="Dissolve" dataType="Boolean" isOptional="True"/>
+		<column name="Overlap" displayName="Overlap Rule" dataType="String" isOptional="True"/>
+		<column name="Fill" displayName="Fill Uncovered Land" dataType="String" isOptional="True"/>
+		<column name="FillDistance" displayName="Modal Fill Distance (m)" dataType="Double" isOptional="True"/>
+		<column name="DefaultId" displayName="Default Id" dataType="Integer" isOptional="True"/>
+		<validation validationType="Unique" columns="Level"/>
+	</dataSheet>
+
 	<!-- =================================================================================================== -->
 	<!-- SCENARIO DATASHEETS                                                                                 -->
 	<!-- =================================================================================================== -->
 
 	<dataSheet name="BuildOptions" displayName="Build Options" isSingleRow="True">
 		<column name="Resolution" displayName="Cell Size (m)" dataType="Integer" defaultValue="1000" validationType="WholeNumber" validationCondition="Greater" formula1="0"/>
-		<column name="StudyAreaStates" displayName="Study Area States (comma-separated names; blank = CONUS)" dataType="String" isOptional="True"/>
+		<column name="StudyAreaUnits" displayName="Study Area (secondary strata names, comma-separated; blank = all)" dataType="String" isOptional="True"/>
 		<column name="StartYear" displayName="Historical Start Year" dataType="Integer" defaultValue="1985" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1985"/>
 		<column name="EndYear" displayName="Historical End Year" dataType="Integer" defaultValue="2023" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1985"/>
-		<column name="SecondaryFillWindow" displayName="Secondary Strata Gap-Fill Window (cells)" dataType="Integer" defaultValue="59" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="3"/>
-	</dataSheet>
+			</dataSheet>
 
 	<dataSheet name="OutputStrataSummary" displayName="Strata Summary">
 		<column name="Level" dataType="String"/>
@@ -66,11 +83,6 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
-	<!-- development only (Phase A spike); removed before release -->
-	<transformer name="Spike" displayName="U - Spike (development)" isRunnable="True" programName="Rscript" programArguments="src/u-spike.R" condaEnv="lucasCore.yml" condaEnvVersion="1">
-		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
-	</transformer>
-
 	<!-- =================================================================================================== -->
 	<!-- LAYOUTS                                                                                             -->
 	<!-- =================================================================================================== -->
@@ -78,6 +90,7 @@
 	<layout type="Project" appendTo="stsim_Advanced">
 		<group name="lucasCoreGroup" displayName="LUCAS Core">
 			<item name="DataSource"/>
+			<item name="StratumSource"/>
 		</group>
 	</layout>
 
