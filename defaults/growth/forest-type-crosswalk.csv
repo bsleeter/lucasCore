@@ -1,30 +1,30 @@
-StateClassId,StateClassName,FiaTypeGroups,Note
-100,White/Red/Jack Pine Group,100,
-120,Spruce/Fir Group,120,
-140,Longleaf/Slash Pine Group,140,
-160,Loblolly/Shortleaf Pine Group,160,
-180,Pinyon/Juniper Group,180,
-200,Douglas-fir Coastal Group,200,FIA has one Douglas-fir group; coastal vs inland is carried by the ecodivision
-201,Douglas-fir Inland Group,200,same curves as 200; the state class map merges 201 into 200
-220,Ponderosa Pine Group,220,
-240,Western White Pine Group,180;200;220;240;260;280;300;320;340;360;370;390,too few plots (about 80) for its own model: fitted on all western softwood groups pooled (user decision 2026-10-19)
-260,Fir/Spruce/Mountain Hemlock Group,260,
-280,Lodgepole Pine Group,280,
-300,Hemlock/Sitka Spruce Group,300,
-320,Western Larch Group,320,
-340,Redwood Group,340,
-360,Other Western Softwood Group,360,
-370,California Mixed Conifer Group,370,
-380,Exotic Softwoods Group,380,
-400,Oak/Pine Group,400,
-500,Oak/Hickory Group,500,
-600,Oak/Gum/Cypress Group,600,
-700,Elm/Ash/Cottonwood Group,700,
-800,Maple/Beech/Birch Group,800,
-900,Aspen/Birch Group,900,
-910,Alder/Maple Group,910,
-920,Western Oak Group,920,
-940,Tanoak/Laurel Group,940,
-950,Other Western Hardwoods Group,970,FIADB 9 has no 950: western woodland hardwoods are 970 (user decision 2026-10-19)
-980,Tropical Hardwoods Group,980,
-990,Exotic Hardwoods Group,990,
+StateClassId,StateClassName,FiaTypeGroups,LagClass,Note
+100,White/Red/Jack Pine Group,100,EastSoftwood,""
+120,Spruce/Fir Group,120,EastSoftwood,""
+140,Longleaf/Slash Pine Group,140,EastSoftwood,""
+160,Loblolly/Shortleaf Pine Group,160,EastSoftwood,""
+180,Pinyon/Juniper Group,180,WestSoftwood,""
+200,Douglas-fir Coastal Group,200,WestSoftwood,FIA has one Douglas-fir group; coastal vs inland is carried by the ecodivision
+201,Douglas-fir Inland Group,200,WestSoftwood,same curves as 200; the state class map merges 201 into 200
+220,Ponderosa Pine Group,220,WestSoftwood,""
+240,Western White Pine Group,180;200;220;240;260;280;300;320;340;360;370;390,WestSoftwood,too few plots (about 80) for its own model: fitted on all western softwood groups pooled (user decision 2026-10-19)
+260,Fir/Spruce/Mountain Hemlock Group,260,WestSoftwood,""
+280,Lodgepole Pine Group,280,WestSoftwood,""
+300,Hemlock/Sitka Spruce Group,300,WestSoftwood,""
+320,Western Larch Group,320,WestSoftwood,""
+340,Redwood Group,340,WestSoftwood,""
+360,Other Western Softwood Group,360,WestSoftwood,""
+370,California Mixed Conifer Group,370,WestSoftwood,""
+380,Exotic Softwoods Group,380,EastSoftwood,""
+400,Oak/Pine Group,400,EastHardwood,""
+500,Oak/Hickory Group,500,EastHardwood,""
+600,Oak/Gum/Cypress Group,600,EastHardwood,""
+700,Elm/Ash/Cottonwood Group,700,EastHardwood,""
+800,Maple/Beech/Birch Group,800,EastHardwood,""
+900,Aspen/Birch Group,900,EastHardwood,""
+910,Alder/Maple Group,910,WestHardwood,""
+920,Western Oak Group,920,WestHardwood,""
+940,Tanoak/Laurel Group,940,WestHardwood,""
+950,Other Western Hardwoods Group,970,WestHardwood,FIADB 9 has no 950: western woodland hardwoods are 970 (user decision 2026-10-19)
+980,Tropical Hardwoods Group,980,EastHardwood,""
+990,Exotic Hardwoods Group,990,EastHardwood,""

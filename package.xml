@@ -59,7 +59,9 @@
 			</dataSheet>
 
 	<dataSheet name="GrowthOptions" displayName="Growth Curve Options" isSingleRow="True">
-		<column name="LagYears" displayName="Lag Before Merchantable Volume (yr)" dataType="Integer" defaultValue="10" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="LagYears" displayName="Fixed Lag Before Merchantable Volume (yr; blank = fitted per forest type)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="MinPlotsLag" displayName="Minimum Plots to Fit a Forest Type's Own Lag (else its class lag)" dataType="Integer" defaultValue="2000" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1"/>
+		<column name="MaximumLag" displayName="Maximum Fitted Lag (yr)" dataType="Double" defaultValue="40" validationType="Decimal" validationCondition="Greater" formula1="0"/>
 		<column name="Penalty" displayName="Pull Toward the Type's CONUS Curve (lambda)" dataType="Double" defaultValue="0.01" validationType="Decimal" validationCondition="GreaterEqual" formula1="0"/>
 		<column name="MinPlotsEcodivision" displayName="Minimum Plots for an Ecodivision's Own Parameters" dataType="Integer" defaultValue="5" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1"/>
 		<column name="MaximumAge" displayName="Maximum Age (yr)" dataType="Integer" defaultValue="300" validationType="WholeNumber" validationCondition="Greater" formula1="10"/>
@@ -79,6 +81,8 @@
 		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
 		<column name="Method" dataType="String"/>
 		<column name="Plots" dataType="Integer"/>
+		<column name="Lag" displayName="Lag (yr)" dataType="Double" format="0.0"/>
+		<column name="LagSource" displayName="Lag Source" dataType="String"/>
 		<column name="A" displayName="A (m3/ha)" dataType="Double" format="0.0"/>
 		<column name="k" dataType="Double"/>
 		<column name="c" dataType="Double" format="0.000"/>

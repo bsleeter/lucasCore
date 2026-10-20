@@ -2,8 +2,13 @@
 # growth.R - merchantable volume growth curves from FIA (stage 2); no SyncroSim calls, so dev scripts and tests can use it
 # =============================================================================
 # The method came out of experiments 1-7 (dev/growth, plan doc tab "Growth curves", 2026-10-19):
-#   form      V(t) = A (1 - exp(-k (t - L)^c)) for t > L, else 0; lag L = 10 years. Five forms tied on cross-validation; this one
-#             had the most plausible behaviour outside the data (peak mean annual increment ~44 yr).
+#   form      V(t) = A (1 - exp(-k (t - L)^c)) for t > L, else 0. Five forms tied on cross-validation; this one had the most
+#             plausible behaviour outside the data (peak mean annual increment ~44 yr).
+#   lag       L = the age merchantable volume starts (FIA counts trees >= 5 in dbh), fitted per forest type (experiment 10,
+#             2026-10-20: 0-2 yr for most hardwoods, 5-9 for southern and eastern pines, 16-24 for slow western conifers). It
+#             halved the young-stand bias of the old universal 10 yr (-22 -> -9 m3/ha at 1-10 yr, +10 -> +6 at 21-30).
+#             Types with fewer than MinPlotsLag plots take the lag of their class (east/west x softwood/hardwood), fitted on the
+#             class's pooled plots: their own lag swung by 10-20 yr between cross-validation folds.
 #   data      FIA conditions: latest visit of each plot-condition, undisturbed (dstrbcd1 = 0), untreated (trtcd1 = 0), age 1-400,
 #             volume below the type group's 99.9th percentile; plot id = state + unit + county + plot. Fitted to plot volumes
 #             (mean), not age medians (medians ran ~11% low; the old recipe ~10% low at age 100).
@@ -28,31 +33,41 @@ growth_data <- function(cond_file, dist_file, opt) {
   data.table::setorder(x, pid, condid, -invyr); x <- x[!duplicated(paste(pid, condid))]
   x[, .(pid, ecodiv, fortyp_grp, stdage, vol)] }
 
-# least squares fit of the single (CONUS-wide) curve, several starts
-fit_single <- function(t, v, lag) {
-  A0 <- max(stats::quantile(v, 0.95), 5); best <- NULL
+# least squares fit of the single (CONUS-wide) curve, several starts; lag = NULL fits the lag too (0 to max_lag)
+fit_single <- function(t, v, lag, max_lag = 40) {
+  A0 <- max(stats::quantile(v, 0.95), 5); best <- NULL; free <- is.null(lag)
   for (s in list(c(A0, 0.01, 0.8), c(A0, 0.001, 1.3), c(A0 * 1.3, 0.03, 0.6))) {
-    o <- tryCatch(stats::optim(s, function(p) sum((v - wb_curve(t, p[1], p[2], p[3], lag))^2), method = "L-BFGS-B",
-                               lower = c(1, 1e-6, 0.1), upper = c(5000, 1, 4), control = list(maxit = 2000)), error = function(e) NULL)
+    if (free) s <- c(s, 8)
+    o <- tryCatch(stats::optim(s, function(p) sum((v - wb_curve(t, p[1], p[2], p[3], if (free) p[4] else lag))^2), method = "L-BFGS-B",
+                               lower = c(1, 1e-6, 0.1, 0)[seq_along(s)], upper = c(5000, 1, 4, max_lag)[seq_along(s)],
+                               control = list(maxit = 5000, parscale = c(A0, 0.01, 1, 10)[seq_along(s)])), error = function(e) NULL)
     if (!is.null(o) && is.finite(o$value) && (is.null(best) || o$value < best$value)) best <- o }
   if (is.null(best)) return(NULL)
-  c(A = best$par[1], k = best$par[2], c = best$par[3]) }
+  c(A = best$par[1], k = best$par[2], c = best$par[3], L = if (free) best$par[4] else lag) }
 
-# pooled fit: A_e and k_e per ecodivision, c shared; relative deviations from the CONUS-wide p0 penalised (lambda)
-fit_type <- function(d, p0, lambda, lag) {
+# pooled fit: A_e and k_e per ecodivision, c shared; relative deviations from the CONUS-wide p0 penalised (lambda).
+# lag = NULL fits one lag for the type (column L)
+fit_type <- function(d, p0, lambda, lag, max_lag = 40) {
   eco <- sort(unique(d$ecodiv)); ie <- match(d$ecodiv, eco); E <- length(eco); pen <- lambda * nrow(d) * stats::var(d$vol)
+  free <- is.null(lag)
   obj <- function(par) { A <- par[1:E]; k <- par[E + 1:E]
-    sum((d$vol - wb_curve(d$stdage, A[ie], k[ie], par[2 * E + 1], lag))^2) +
+    sum((d$vol - wb_curve(d$stdage, A[ie], k[ie], par[2 * E + 1], if (free) par[2 * E + 2] else lag))^2) +
       pen * (mean(((A - p0[["A"]]) / p0[["A"]])^2) + mean(log(k / p0[["k"]])^2)) }
-  o <- stats::optim(c(rep(p0[["A"]], E), rep(p0[["k"]], E), p0[["c"]]), obj, method = "L-BFGS-B",
-                    lower = c(rep(1, E), rep(1e-6, E), 0.1), upper = c(rep(5000, E), rep(1, E), 4),
-                    control = list(maxit = 20000, parscale = c(rep(p0[["A"]], E), rep(p0[["k"]], E), p0[["c"]])))   # A ~ 100s, k ~ 0.001: rescaled so L-BFGS-B converges
-  data.table::data.table(ecodiv = eco, A = o$par[1:E], k = o$par[E + 1:E], c = o$par[2 * E + 1],
+  o <- stats::optim(c(rep(p0[["A"]], E), rep(p0[["k"]], E), p0[["c"]], if (free) p0[["L"]]), obj, method = "L-BFGS-B",
+                    lower = c(rep(1, E), rep(1e-6, E), 0.1, if (free) 0), upper = c(rep(5000, E), rep(1, E), 4, if (free) max_lag),
+                    # A ~ 100s, k ~ 0.001, L ~ 10: rescaled so L-BFGS-B converges
+                    control = list(maxit = 20000, parscale = c(rep(p0[["A"]], E), rep(p0[["k"]], E), p0[["c"]], if (free) 10)))
+  data.table::data.table(ecodiv = eco, A = o$par[1:E], k = o$par[E + 1:E], c = o$par[2 * E + 1], L = if (free) o$par[2 * E + 2] else lag,
                          Plots = d[, .N, by = ecodiv][match(eco, ecodiv), N], converged = o$convergence == 0) }
 
-# curves for every ecodivision in `all_eco` (with climate table clim: ecodiv, z_t, z_p) for one forest type's data
-fit_forest_type <- function(d, all_eco, clim, opt) {
-  lag <- opt$LagYears
+# the lag of a forest type (or of a class of types): the pooled model with the lag free, on ecodivisions with enough plots
+fit_lag <- function(d, opt) {
+  cells <- d[, .N, by = ecodiv][N >= opt$MinPlotsEcodivision]$ecodiv
+  p0 <- fit_single(d$stdage, d$vol, NULL, opt$MaximumLag); if (is.null(p0)) stop("the lag fit failed", call. = FALSE)
+  fit_type(d[ecodiv %in% cells], p0, opt$Penalty, NULL, opt$MaximumLag)$L[1] }
+
+# curves for every ecodivision in `all_eco` (with climate table clim: ecodiv, z_t, z_p) for one forest type's data, given its lag
+fit_forest_type <- function(d, all_eco, clim, opt, lag) {
   p0 <- fit_single(d$stdage, d$vol, lag); if (is.null(p0)) stop("the CONUS-wide fit failed", call. = FALSE)
   cells <- d[, .N, by = ecodiv][N >= opt$MinPlotsEcodivision]$ecodiv
   m <- if (length(cells)) fit_type(d[ecodiv %in% cells], p0, opt$Penalty, lag) else NULL
@@ -73,7 +88,7 @@ fit_forest_type <- function(d, all_eco, clim, opt) {
     } else out[match(empty, ecodiv), `:=`(A = p0[["A"]], k = p0[["k"]], c = p0[["c"]], Method = "CONUS")]
   }
   out[is.na(Plots), Plots := 0L]
-  out[, `:=`(TotalPlots = nrow(d), ConusA = p0[["A"]], ConusK = p0[["k"]], ConusC = p0[["c"]])]
+  out[, `:=`(L = lag, TotalPlots = nrow(d), ConusA = p0[["A"]], ConusK = p0[["k"]], ConusC = p0[["c"]])]
   out[] }
 
 # ecodivision climate: PRISM normals averaged over each ecodivision polygon, standardised
