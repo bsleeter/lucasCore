@@ -1,0 +1,18 @@
+# SyncroSim libraries and run data
+*.ssim
+*.ssim.data/
+*.ssim.temp/
+*.ssim.input/
+*.ssim.output/
+*.ssim.backup
+# R / OS
+.Rhistory
+.RData
+.Rproj.user/
+Thumbs.db
+*.log
+# development libraries and outputs
+dev/libs/
+dev/**/*.tif
+dev/**/*.png
+*.ssimpkg

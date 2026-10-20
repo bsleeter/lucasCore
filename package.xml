@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package name="lucasCore" displayName="LUCAS Core (model builder)" description="Builds LUCAS land-use and carbon models in ST-Sim from national datasets: FIA growth curves, CBM carbon parameters, spatial initial conditions, historical transitions and projections" version="1.0.0" url="https://github.com/bsleeter/lucasCore" minSyncroSimVersion="3.1.9">
+
+	<builtFor package="stsim" version="4.5.4"/>
+
+	<!-- =================================================================================================== -->
+	<!-- PROJECT DATASHEETS                                                                                  -->
+	<!-- =================================================================================================== -->
+
+	<dataSheet name="DataSource" displayName="Data Sources (national data on disk)" dataScope="Project" isSingleRow="True">
+		<!-- plain paths: these files are GBs and are read, never copied into the library; an empty sheet uses the defaults -->
+		<column name="EcodivisionFile" displayName="FIA Ecodivisions (dissolved; fields StrtmId, StrtmNm) - primary strata and model lattice" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FIA/EcoDivision_map/EcoDivisions_Dissolve.shp"/>
+		<column name="StatesFile" displayName="US States (fields NAME, STATEFP) - secondary strata" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Study Areas/States/tl_2009_us_state_conus.shp"/>
+		<column name="FederalLandsFile" displayName="Federal Lands (National Atlas, field ADMIN1) - tertiary strata" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/PADUS/Federal Lands/fedlanp010g.shp"/>
+		<column name="FiaConditionFile" displayName="FIA Condition Carbon and Merchantable Volume (USGS .Rds)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FIA/USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds"/>
+		<column name="FiaDisturbanceFile" displayName="FIA Condition Disturbance and Treatment Codes (USGS .Rds)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FIA/USGS_forest_conditions_dstrbcd_and_trtcd_20240213.Rds"/>
+		<column name="NlcdFolder" displayName="Annual NLCD Folder (Annual_NLCD_LndCov_year_CU_C1V0.tif)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/NLCD/Annual NLCD"/>
+		<column name="Evt2001File" displayName="LANDFIRE EVT 2001 (LF 1.0.5)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/EVT/US_105_EVT/US_105_EVT/Tif/us_105evt.tif"/>
+		<column name="Evt2016File" displayName="LANDFIRE EVT 2016 (LF 2.0.0)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/EVT/LF2016_EVT_200_CONUS/LF2016_EVT_200_CONUS/Tif/LC16_EVT_200.tif"/>
+		<column name="RcmapFile" displayName="RCMAP Vegetation Class" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/RCMAP/2001_test2_full_wtih_tree.img"/>
+		<column name="CcapFile" displayName="C-CAP Land Cover 2001" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/CCAP/conus_2001_ccap_landcover_20200311.tif"/>
+		<column name="StandAgeFile" displayName="NASA CMS Forest Age 1990" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Stand Age/cms_age_1990.tif"/>
+		<column name="MtbsSeverityFolder" displayName="MTBS Burn Severity Folder (mtbs_CONUS_year.tif)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/MTBS/Burn Severity"/>
+		<column name="LandfireDisturbanceFolder" displayName="LANDFIRE Disturbance Folder (US_DISTyear)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Landfire Disturbance"/>
+		<column name="FriFile" displayName="LANDFIRE Mean Fire Return Interval" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FRI/Tif/LC16_FRI_200.tif"/>
+		<column name="PrismFolder" displayName="PRISM Folder (annual and normals)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Climate/prism"/>
+		<column name="Loca2Folder" displayName="LOCA2 Folder (gcm/r1i1p1f1/ssp)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Climate/LOCA2"/>
+		<column name="SoilCarbonFile" displayName="gSSURGO Soil Organic Carbon" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/gSSURGO/gssurgo_soc_0_999.tif"/>
+		<column name="FirePerimeterHistoryFile" displayName="Interagency Fire Perimeter History" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/NIFS/InterAgencyFirePerimeterHistory_All_Years_View/InterAgencyFirePerimeterHistory_All_Years_View.shp"/>
+	</dataSheet>
+
+	<!-- =================================================================================================== -->
+	<!-- SCENARIO DATASHEETS                                                                                 -->
+	<!-- =================================================================================================== -->
+
+	<dataSheet name="BuildOptions" displayName="Build Options" isSingleRow="True">
+		<column name="Resolution" displayName="Cell Size (m)" dataType="Integer" defaultValue="1000" validationType="WholeNumber" validationCondition="Greater" formula1="0"/>
+		<column name="StudyAreaStates" displayName="Study Area States (comma-separated names; blank = CONUS)" dataType="String" isOptional="True"/>
+		<column name="StartYear" displayName="Historical Start Year" dataType="Integer" defaultValue="1985" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1985"/>
+		<column name="EndYear" displayName="Historical End Year" dataType="Integer" defaultValue="2023" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1985"/>
+		<column name="SecondaryFillWindow" displayName="Secondary Strata Gap-Fill Window (cells)" dataType="Integer" defaultValue="59" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="3"/>
+	</dataSheet>
+
+	<dataSheet name="OutputStrataSummary" displayName="Strata Summary">
+		<column name="Level" dataType="String"/>
+		<column name="Name" dataType="String"/>
+		<column name="Id" dataType="Integer"/>
+		<column name="Cells" dataType="Integer"/>
+	</dataSheet>
+
+	<dataSheet name="OutputValidation" displayName="Validation">
+		<column name="Stage" dataType="String"/>
+		<column name="Check" dataType="String"/>
+		<column name="Status" dataType="String"/>
+		<column name="Detail" dataType="String" isOptional="True"/>
+	</dataSheet>
+
+	<!-- =================================================================================================== -->
+	<!-- TRANSFORMERS                                                                                        -->
+	<!-- =================================================================================================== -->
+
+	<transformer name="StudyArea" displayName="1 - Study Area and Strata" isRunnable="True" programName="Rscript" programArguments="src/1-study-area.R" condaEnv="lucasCore.yml" condaEnvVersion="1">
+		<dataSheet name="BuildOptions" type="Input"/>
+		<dataSheet name="stsim_InitialConditionsSpatial" type="Both"/>
+		<dataSheet name="OutputStrataSummary" type="Output"/>
+		<dataSheet name="OutputValidation" type="Output"/>
+	</transformer>
+
+	<!-- development only (Phase A spike); removed before release -->
+	<transformer name="Spike" displayName="U - Spike (development)" isRunnable="True" programName="Rscript" programArguments="src/u-spike.R" condaEnv="lucasCore.yml" condaEnvVersion="1">
+		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
+	</transformer>
+
+	<!-- =================================================================================================== -->
+	<!-- LAYOUTS                                                                                             -->
+	<!-- =================================================================================================== -->
+
+	<layout type="Project" appendTo="stsim_Advanced">
+		<group name="lucasCoreGroup" displayName="LUCAS Core">
+			<item name="DataSource"/>
+		</group>
+	</layout>
+
+	<layout type="Scenario" appendTo="stsim_Advanced">
+		<group name="lucasCoreGroup" displayName="LUCAS Core">
+			<item name="BuildOptions"/>
+			<group name="lucasCoreResults" displayName="Build Results">
+				<item name="OutputStrataSummary"/>
+				<item name="OutputValidation"/>
+			</group>
+		</group>
+	</layout>
+
+	<updateProvider className="SyncroSim.Core.XMLUpdateProvider" classAssembly="SyncroSim.Core"/>
+</package>

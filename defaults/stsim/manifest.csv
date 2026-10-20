@@ -1,0 +1,23 @@
+Order,Datasheet,Scope,Note
+1,stsim_Terminology,Project,
+2,stsim_Stratum,Project,FIA ecodivisions; Id = ecodivision StratumId (mountain divisions = division x 10 + 1)
+3,stsim_SecondaryStratum,Project,CONUS states; Id = state FIPS
+4,stsim_TertiaryStratum,Project,National Atlas federal land managers; 9 = Non Federal
+5,stsim_StateLabelX,Project,
+6,stsim_StateLabelY,Project,
+7,stsim_StateClass,Project,Forest Ids = FIA forest type group codes
+8,stsim_TransitionType,Project,
+9,stsim_TransitionGroup,Project,
+10,stsim_TransitionTypeGroup,Project,
+11,stsim_TransitionSimulationGroup,Project,
+12,stsim_AgeType,Project,
+13,stsim_AgeGroup,Project,
+14,stsim_AttributeGroup,Project,
+15,stsim_StateAttributeType,Project,
+16,core_DistributionType,Project,
+17,core_ExternalVariableType,Project,
+18,stsim_StockType,Project,
+19,stsim_StockGroup,Project,
+20,stsim_FlowType,Project,
+21,stsim_FlowGroup,Project,
+22,stsim_FlowMultiplierType,Project,

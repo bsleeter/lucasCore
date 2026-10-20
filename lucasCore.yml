@@ -1,0 +1,10 @@
+name: lucasCore_env
+channels:
+  - conda-forge
+dependencies:
+  - r-base=4.4
+  - r-rsyncrosim
+  - r-data.table
+  - r-terra
+  - r-sf
+# Phase A: versions float. The stages run with system Rscript (library option UseConda = No), as lucasFireC2F does.
