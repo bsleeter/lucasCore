@@ -18,3 +18,18 @@ the most climate-sensitive part of growth and ITRDB sites were chosen for climat
 the sensitivity of total growth. FIA remeasurement could not test annual sensitivity: every design failed a placebo test (dev/climate/01-04).
 
 Tree rings say nothing about grassland and shrubland growth, which keeps Miami NPP.
+
+## Projections (LOCA2)
+
+Climate Options also names a Projection Scenario (SSP), Climate Model (GCM) and Replicate (ensemble member); blank scenario = historical
+only, blank replicate = the model's lowest-numbered member with a run of that scenario. The three drop-down lists are project sheets
+written by `tools/new-library.R` from the folders under the LOCA2 folder (`<gcm>/<member>/<historical|ssp>/{pr,tasmax,tasmin}/*.monthly.nc`;
+rerun it with `--rebuild-climate` after adding runs). SyncroSim cannot filter one drop-down by another, so stage 7 checks the
+combination and, when it does not exist, stops with the models or replicates that have the scenario.
+
+For each projected year (historical end year + 1 to the Projection End Year, at most 2100) stage 7 builds annual temperature (mean of
+monthly (tasmax + tasmin) / 2) and precipitation (sum of monthly totals) from the monthly files (`src/loca2.R`) and applies the same
+models as the historical years, against the climate model's OWN 1991-2020 normal (historical run 1991-2014 + the SSP run 2015-2020).
+This delta method removes the model's bias against PRISM (ACCESS-CM2 over California: 11.7 C and 446 mm vs PRISM 11.9 C and 478 mm),
+so the historical and projected series join at the end year on the same meaning of 1.0. The precomputed LOCA2 rasters in the LOCA2
+folders (x100 integers, 6 km grid, 1981-2010 normal) are not used.

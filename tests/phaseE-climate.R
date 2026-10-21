@@ -14,7 +14,7 @@ if (system2(file.path(R.home("bin"), "Rscript.exe"), c("tools/new-library.R", sh
 L <- ssimLibrary(f); P <- rsyncrosim::project(L, "Definitions")
 report <- function(R, label) {
   lg <- trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]])
-  cat(sprintf("\n==== %s\n", label)); cat(paste(unique(lg[grepl("^7 Clim|Climate Options|Tree-ring coef|PRISM:|study-area mean|Rasters:|gap fill|every climate effect|Failure|rror", lg)]), collapse = "\n"), "\n")
+  cat(sprintf("\n==== %s\n", label)); cat(paste(unique(lg[grepl("^7 Clim|Climate Options|Tree-ring coef|PRISM:|Projection|Replicate|Join|LOCA2|study-area mean|projection:|Rasters:|gap fill|every climate effect|Failure|rror", lg)]), collapse = "\n"), "\n")
   v <- datasheet(R, "lucasCore_OutputValidation"); ok <- nrow(v) > 0 && all(v$Status == "Pass") && !any(grepl("[Failure]", lg, fixed = TRUE))
   n <- nrow(datasheet(R, "stsim_FlowSpatialMultiplier")); cat("stsim_FlowSpatialMultiplier", n, "rows\n")
   cs <- as.data.table(datasheet(R, "lucasCore_OutputClimateSummary"))
@@ -37,6 +37,15 @@ r2 <- variant("Miami forest growth", data.frame(ForestGrowthModel = 2L),
               "Stage 7 alone (tests/phaseE-climate.R) on the defaults result, with forest growth = Miami NPP (the CONUS 1km build's model).")
 r3 <- variant("No climate effects", data.frame(ForestGrowthModel = 1L, NonForestGrowthModel = 1L, DecompositionModel = 1L),
               "Stage 7 alone (tests/phaseE-climate.R) on the defaults result, with every climate effect None: no climate multipliers.")
-ok <- r1$ok && r2$ok && r3$rows == 0 && r1$rows == 160
-cat(sprintf("\nrows: defaults %d (expect 160), Miami %d, None %d (expect 0)\n", r1$rows, r2$rows, r3$rows))
+r4 <- variant("ACCESS-CM2 SSP2-4.5", data.frame(ClimateScenarioId = "SSP2-4.5", ClimateModelId = "ACCESS-CM2", ProjectionEndYear = 2100L),
+              "Stage 7 alone (tests/phaseE-climate.R) on the defaults result: LOCA2 ACCESS-CM2, SSP2-4.5, replicate blank (expect r1i1p1f1), 2024-2100.")
+r5 <- variant("EC-Earth3-Veg r4 SSP3-7.0", data.frame(ClimateScenarioId = "SSP3-7.0", ClimateModelId = "EC-Earth3-Veg", ClimateReplicateId = "r4i1p1f1", ProjectionEndYear = 2050L),
+              "Stage 7 alone (tests/phaseE-climate.R) on the defaults result: LOCA2 EC-Earth3-Veg replicate r4i1p1f1, SSP3-7.0, 2024-2050.")
+r6 <- variant("EC-Earth3-Veg r4 SSP2-4.5 (no such run)", data.frame(ClimateScenarioId = "SSP2-4.5", ClimateModelId = "EC-Earth3-Veg", ClimateReplicateId = "r4i1p1f1"),
+              "Stage 7 alone (tests/phaseE-climate.R): EC-Earth3-Veg r4i1p1f1 has no SSP2-4.5 run, so the stage must stop and list the replicates that have one.")
+r7 <- variant("HadGEM3 SSP2-4.5 (no such run)", data.frame(ClimateScenarioId = "SSP2-4.5", ClimateModelId = "HadGEM3-GC31-LL"),
+              "Stage 7 alone (tests/phaseE-climate.R): HadGEM3-GC31-LL has no SSP2-4.5 run, so the stage must stop and list the models that have one.")
+ok <- r1$ok && r2$ok && r3$rows == 0 && r1$rows == 160 && r4$ok && r4$rows == 4 * (39 + 77) + 4 && r5$ok && r5$rows == 4 * (39 + 27) + 4 && !r6$ok && !r7$ok
+cat(sprintf("\nrows: defaults %d (expect 160), Miami %d, None %d (expect 0), ACCESS-CM2 %d (expect %d), EC-Earth3-Veg r4 %d (expect %d); refused: EC-Earth3-Veg r4 SSP2-4.5 %s, HadGEM3 %s\n",
+            r1$rows, r2$rows, r3$rows, r4$rows, 4 * (39 + 77) + 4, r5$rows, 4 * (39 + 27) + 4, !r6$ok, !r7$ok))
 cat(if (ok) "CLIMATE OK\n" else "CLIMATE FAILED\n")

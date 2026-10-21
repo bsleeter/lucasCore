@@ -2,12 +2,14 @@
 # new-library.R - create a lucasCore library: stsim + lucasCore, the stsim project definitions, strata lists, library settings
 # =============================================================================
 # Usage: Rscript tools/new-library.R <library.ssim> [--project=Definitions] [--secondary=States] [--tertiary="Federal Lands"]
-#                                    [--rebuild-strata]
+#                                    [--rebuild-strata] [--rebuild-climate] [--loca2=<folder>]
 #   --secondary / --tertiary   a preset name from defaults/strata/presets.csv (States, Counties, HUC6, HUC8,
 #                              EPA Level III Ecoregions, Pyromes, Federal Lands, GAP Status). Defaults: States, Federal Lands
 #                              (the CONUS 1km model). A custom source: edit the row in Stratum Sources, then --rebuild-strata.
 #   --rebuild-strata           rewrite the stsim Secondary/Tertiary Strata lists from Stratum Sources (replaces the lists:
 #                              scenario data keyed by the old strata becomes invalid)
+#   --rebuild-climate          rewrite the LOCA2 Climate Scenario and Climate Model lists from the LOCA2 folder (after adding runs)
+#   --loca2                    LOCA2 folder to scan (default: the project's Data Sources value, else the package default)
 #
 # Why this is not a stage: SyncroSim keeps only a run's scenario-scope output; project-scope sheets a stage saves during a run
 # are discarded (Phase A spike, 2026-10-19: stage 0 saved 21 definition sheets and none persisted). The definitions are the
@@ -84,6 +86,32 @@ for (lv in c("Secondary", "Tertiary")) {
   cat(sprintf("%-34s %4d rows written from %s\n", sheet, nrow(suppressWarnings(datasheet(P, sheet))), s$Preset))
 }
 cat("strata: primary = FIA ecodivisions; secondary =", src[Level == "Secondary"]$Preset, "; tertiary =", src[Level == "Tertiary"]$Preset, "\n")
+
+# ---- LOCA2 climate scenario and model lists (Climate Options drop-downs), from the folders under the LOCA2 folder ---------------
+# <gcm>/<member>/<ssp>/{pr,tasmax,tasmin}/*.monthly.nc; a model is listed when it has a historical run and at least one SSP with all
+# three variables. Existing lists are kept unless --rebuild-climate (scenarios that chose a model keep pointing at its row).
+loca2 <- { d <- as.data.table(datasheet(P, "lucasCore_DataSource", optional = TRUE, lookupsAsFactors = FALSE)); v <- if (nrow(d) && "Loca2Folder" %in% names(d)) d$Loca2Folder[1] else NA
+  if (is.na(v) || !nzchar(v)) { xml <- paste(readLines(file.path(pkgdir, "package.xml"), warn = FALSE), collapse = "\n")
+    v <- sub('.*name="Loca2Folder"[^>]*defaultValue="([^"]*)".*', "\\1", xml) }
+  opt("loca2", v) }
+ssp_names <- c(ssp126 = "SSP1-2.6", ssp245 = "SSP2-4.5", ssp370 = "SSP3-7.0", ssp585 = "SSP5-8.5")
+has_run <- function(d) all(vapply(c("pr", "tasmax", "tasmin"), function(v) length(Sys.glob(file.path(d, v, "*.monthly.nc"))) > 0, TRUE))
+runs <- if (dir.exists(loca2)) rbindlist(lapply(list.dirs(loca2, recursive = FALSE), function(g) rbindlist(lapply(list.dirs(g, recursive = FALSE), function(m) {
+  s <- basename(list.dirs(m, recursive = FALSE)); s <- s[s != "historical" & vapply(file.path(m, s), has_run, TRUE)]
+  if (!has_run(file.path(m, "historical")) || !length(s)) return(NULL)
+  data.table(Gcm = basename(g), Member = basename(m), Ssp = s) })))) else data.table()
+have_s <- suppressWarnings(as.data.table(datasheet(P, "lucasCore_ClimateScenario", optional = TRUE)))
+if (!nrow(runs)) cat("LOCA2: no model runs found under", loca2, "- climate lists left empty\n") else if (nrow(have_s) && !"--rebuild-climate" %in% a) {
+  cat(sprintf("%-34s kept (%d rows)\n", "lucasCore_ClimateScenario / Model", nrow(have_s)))
+} else {
+  sc <- unique(runs$Ssp); sc <- sc[order(sc)]
+  saveDatasheet(P, data.frame(Name = ifelse(sc %in% names(ssp_names), ssp_names[sc], sc), Code = sc), "lucasCore_ClimateScenario", append = FALSE, force = TRUE)
+  runs[, SspName := ifelse(Ssp %in% names(ssp_names), ssp_names[Ssp], Ssp)]
+  md <- runs[order(Ssp, Member), .(r = paste(Member, collapse = ", ")), by = .(Gcm, SspName)][, .(Runs = paste(sprintf("%s: %s", SspName, r), collapse = "; ")), by = Gcm][order(Gcm)]
+  saveDatasheet(P, as.data.frame(md[, .(Name = Gcm, Runs)]), "lucasCore_ClimateModel", append = FALSE, force = TRUE)
+  rp <- runs[order(Gcm, Ssp), .(s = paste(SspName, collapse = ", ")), by = .(Member, Gcm)][, .(Runs = paste(sprintf("%s (%s)", Gcm, s), collapse = "; ")), by = Member][order(Member)]
+  saveDatasheet(P, as.data.frame(rp[, .(Name = Member, Runs)]), "lucasCore_ClimateReplicate", append = FALSE, force = TRUE)
+  cat(sprintf("%-34s %4d scenarios, %d models, %d replicates (%d runs) from %s\n", "lucasCore_ClimateScenario/Model/Rep", length(sc), nrow(md), nrow(rp), nrow(runs), loca2)) }
 cat("library ready:", f, "\n")
 
 # ---- the Stock-Flow Definitions scenario ------------------------------------------------------------------------------

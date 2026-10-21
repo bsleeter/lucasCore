@@ -27,6 +27,25 @@
 		<column name="FirePerimeterHistoryFile" displayName="Interagency Fire Perimeter History" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/NIFS/InterAgencyFirePerimeterHistory_All_Years_View/InterAgencyFirePerimeterHistory_All_Years_View.shp"/>
 	</dataSheet>
 
+	<dataSheet name="ClimateScenario" displayName="Climate Scenarios (LOCA2)" dataScope="Project" displayMember="Name">
+		<!-- written by tools/new-library.R from the SSP folders found under the LOCA2 folder -->
+		<column name="Name" dataType="String"/>
+		<column name="Code" displayName="Folder" dataType="String"/>
+		<column name="Description" dataType="String" isOptional="True"/>
+	</dataSheet>
+
+	<dataSheet name="ClimateModel" displayName="Climate Models (LOCA2)" dataScope="Project" displayMember="Name">
+		<!-- written by tools/new-library.R: one row per GCM found under the LOCA2 folder -->
+		<column name="Name" displayName="GCM" dataType="String"/>
+		<column name="Runs" displayName="Replicates by Scenario" dataType="String" isOptional="True"/>
+	</dataSheet>
+
+	<dataSheet name="ClimateReplicate" displayName="Climate Replicates (LOCA2 ensemble members)" dataScope="Project" displayMember="Name">
+		<!-- written by tools/new-library.R: every ensemble member found under the LOCA2 folder -->
+		<column name="Name" displayName="Ensemble Member" dataType="String"/>
+		<column name="Runs" displayName="Models and Scenarios" dataType="String" isOptional="True"/>
+	</dataSheet>
+
 	<dataSheet name="StratumSource" displayName="Stratum Sources (secondary and tertiary strata)" dataScope="Project">
 		<!-- written by tools/new-library.R from a preset (defaults/strata/presets.csv); edit a row and run new-library.R with the rebuild-strata flag to
 		     change it. The stsim Secondary and Tertiary Strata lists are made from these rows; stages cannot write project lists. -->
@@ -62,6 +81,10 @@
 		<column name="ForestGrowthModel" displayName="Forest Growth (None = normal climate every year)" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP|3:Tree ring" defaultValue="3"/>
 		<column name="NonForestGrowthModel" displayName="Non-Forest Growth" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP" defaultValue="2"/>
 		<column name="DecompositionModel" displayName="Decomposition" dataType="Integer" validationType="List" formula1="1:None|2:Q10" defaultValue="2"/>
+		<column name="ClimateScenarioId" displayName="Projection Scenario (blank = historical only)" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="lucasCore_ClimateScenario"/>
+		<column name="ClimateModelId" displayName="Projection Climate Model" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="lucasCore_ClimateModel"/>
+		<column name="ClimateReplicateId" displayName="Projection Replicate (blank = lowest-numbered with the scenario)" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="lucasCore_ClimateReplicate"/>
+		<column name="ProjectionEndYear" displayName="Projection End Year" dataType="Integer" defaultValue="2100" validationType="WholeNumber" validationCondition="LessEqual" formula1="2100"/>
 	</dataSheet>
 
 	<dataSheet name="GrowthOptions" displayName="Growth Curve Options" isSingleRow="True">
@@ -210,6 +233,7 @@
 		<column name="Timestep" dataType="Integer"/>
 		<column name="FlowGroup" displayName="Flow Group" dataType="String"/>
 		<column name="Model" dataType="String"/>
+		<column name="Climate" displayName="Climate Data" dataType="String"/>
 		<column name="Mean" displayName="Study-Area Mean" dataType="Double" format="0.000"/>
 		<column name="Min" displayName="Cell Minimum" dataType="Double" format="0.000"/>
 		<column name="Max" displayName="Cell Maximum" dataType="Double" format="0.000"/>
@@ -314,6 +338,9 @@
 		<group name="lucasCoreGroup" displayName="LUCAS Core">
 			<item name="DataSource"/>
 			<item name="StratumSource"/>
+			<item name="ClimateScenario"/>
+			<item name="ClimateModel"/>
+			<item name="ClimateReplicate"/>
 		</group>
 	</layout>
 
