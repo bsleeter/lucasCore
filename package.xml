@@ -158,6 +158,38 @@
 		<column name="TotalDOM" displayName="Total DOM (Mg C/ha)" dataType="Double" format="0.00"/>
 	</dataSheet>
 
+	<dataSheet name="OutputNlcdAnnual" displayName="Annual NLCD (model grid)">
+		<column name="Year" dataType="Integer"/>
+		<column name="FileName" displayName="NLCD Land Cover" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
+	</dataSheet>
+
+	<dataSheet name="OutputLandCoverLayers" displayName="Land Cover Layers" isSingleRow="True">
+		<column name="ForestTypeFileName" displayName="Forest Type (EVT)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
+		<column name="GrassShrubFileName" displayName="Grassland/Shrubland Type (RCMAP)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
+		<column name="WetlandFileName" displayName="Wetland Type (C-CAP)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
+		<column name="EverForestFileName" displayName="Forest in Any Year (NLCD)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
+	</dataSheet>
+
+	<dataSheet name="OutputReturnInterval" displayName="Spin-up Return Intervals">
+		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum"/>
+		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="ReturnInterval" displayName="Replacement-Fire Return Interval (yr)" dataType="Integer"/>
+		<column name="Cells" dataType="Integer"/>
+	</dataSheet>
+
+	<dataSheet name="OutputSoilTarget" displayName="Soil Carbon Targets (gSSURGO)">
+		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum"/>
+		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="SoilTarget" displayName="Mean Soil Organic Carbon (Mg C/ha)" dataType="Double" format="0.0"/>
+		<column name="Cells" dataType="Integer"/>
+	</dataSheet>
+
+	<dataSheet name="OutputStateClassSummary" displayName="State Class Summary">
+		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="Cells" dataType="Integer"/>
+		<column name="MeanAge" displayName="Mean Age (yr)" dataType="Double" format="0.0"/>
+	</dataSheet>
+
 	<dataSheet name="OutputGrowthReport" displayName="Growth Curve Report" isSingleRow="True">
 		<column name="FileName" displayName="Report (PDF)" dataType="String" isExternalFile="True" isRaster="False" externalFileFilter="PDF Files (*.pdf)|*.pdf"/>
 	</dataSheet>
@@ -200,6 +232,8 @@
 	<transformer name="CarbonFlows" displayName="3 - Carbon Flows" isRunnable="True" programName="Rscript" programArguments="src/3-carbon-flows.R" condaEnv="lucasCore.yml" condaEnvVersion="1">
 		<dataSheet name="CarbonCurve" type="Input"/>
 		<dataSheet name="stsim_FlowPathwayDiagram" type="Input"/>
+		<dataSheet name="OutputReturnInterval" type="Input"/>
+		<dataSheet name="OutputSoilTarget" type="Input"/>
 		<dataSheet name="stsim_FlowPathway" type="Output"/>
 		<dataSheet name="stsim_FlowMultiplier" type="Output"/>
 		<dataSheet name="stsim_StateAttributeValue" type="Output"/>
@@ -212,6 +246,17 @@
 		<dataSheet name="OutputDecayCalibration" type="Input"/>
 		<dataSheet name="stsim_FlowMultiplier" type="Input"/>
 		<dataSheet name="InitialStockCurve" type="Output"/>
+		<dataSheet name="OutputValidation" type="Output"/>
+	</transformer>
+
+	<transformer name="InitialConditions" displayName="5 - Initial Conditions" isRunnable="True" programName="Rscript" programArguments="src/5-initial-conditions.R" condaEnv="lucasCore.yml" condaEnvVersion="1">
+		<dataSheet name="BuildOptions" type="Input"/>
+		<dataSheet name="stsim_InitialConditionsSpatial" type="Both"/>
+		<dataSheet name="OutputNlcdAnnual" type="Output"/>
+		<dataSheet name="OutputLandCoverLayers" type="Output"/>
+		<dataSheet name="OutputReturnInterval" type="Output"/>
+		<dataSheet name="OutputSoilTarget" type="Output"/>
+		<dataSheet name="OutputStateClassSummary" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
@@ -235,6 +280,11 @@
 			<item name="InitialStockCurve"/>
 			<group name="lucasCoreResults" displayName="Build Results">
 				<item name="OutputStrataSummary"/>
+				<item name="OutputStateClassSummary"/>
+				<item name="OutputLandCoverLayers"/>
+				<item name="OutputNlcdAnnual"/>
+				<item name="OutputReturnInterval"/>
+				<item name="OutputSoilTarget"/>
 				<item name="OutputGrowthParameter"/>
 				<item name="OutputCarbonParameter"/>
 				<item name="OutputDecayCalibration"/>

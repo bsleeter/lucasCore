@@ -43,7 +43,13 @@ MIN_PLOTS_CELL <- 200
 cells <- unique(cc[, .(Stratum, StateClass)])
 miss <- setdiff(cells$StateClass, cw$StateClass); if (length(miss)) fail("carbon curves for state classes not in the forest crosswalk: %s", paste(miss, collapse = ", "))
 cells[, sc := cw$StateClassId[match(StateClass, cw$StateClass)]][, ecodiv := eco$ecodiv[match(Stratum, eco$Stratum)]][, temp := eco$temp[match(Stratum, eco$Stratum)]]
-ri_tab <- read_default("spinup", "return-interval.csv"); soil_t <- read_default("spinup", "soil-targets.csv")
+# return intervals and soil targets from stage 5 when this scenario has them (a stage 5 result upstream), else the provisional defaults
+ri5 <- as.data.table(datasheet(scn, ds("OutputReturnInterval"), optional = TRUE, lookupsAsFactors = FALSE))
+so5 <- as.data.table(datasheet(scn, ds("OutputSoilTarget"), optional = TRUE, lookupsAsFactors = FALSE))
+ri_tab <- if (nrow(ri5)) ri5[, .(Stratum = StratumId, StateClass = StateClassId, ReturnInterval)] else read_default("spinup", "return-interval.csv")
+soil_t <- if (nrow(so5)) so5[, .(Stratum = StratumId, StateClass = StateClassId, SoilTarget)] else read_default("spinup", "soil-targets.csv")
+say("Return intervals: %s; soil targets: %s", if (nrow(ri5)) sprintf("stage 5 (%d cells)", nrow(ri5)) else "provisional defaults",
+    if (nrow(so5)) sprintf("stage 5 (%d cells)", nrow(so5)) else "provisional defaults")
 cells[, ri := as.numeric(ri_tab$ReturnInterval)[match(paste(Stratum, StateClass), paste(ri_tab$Stratum, ri_tab$StateClass))]]
 cells[is.na(ri), ri := median(as.numeric(ri_tab[StateClass == .BY$StateClass, ReturnInterval])), by = StateClass]
 cells[is.na(ri), ri := median(as.numeric(ri_tab$ReturnInterval))][, ri := as.integer(round(ri))]

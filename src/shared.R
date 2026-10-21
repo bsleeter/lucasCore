@@ -5,7 +5,9 @@ suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
 
 # SyncroSim Studio points PROJ at its own bundled database, which terra's newer PROJ cannot read (every projection then fails
 # with "Cannot find coordinate operations"). The console does not set it. Same fix as lucasFireC2F.
-for (v in c("PROJ_LIB", "PROJ_DATA", "GDAL_DATA")) if (grepl("SyncroSim", Sys.getenv(v), fixed = TRUE)) Sys.unsetenv(v)
+# (the path may be the 8.3 short form, C:/PROGRA~1/SYNCRO~1, so match case-insensitively on "syncro"). Parallel workers call it too.
+clear_syncrosim_proj <- function() for (v in c("PROJ_LIB", "PROJ_DATA", "GDAL_DATA")) if (grepl("syncro", tolower(Sys.getenv(v)), fixed = TRUE)) Sys.unsetenv(v)
+clear_syncrosim_proj()
 
 PKG <- "lucasCore"
 ds  <- function(name) paste0(PKG, "_", name)
@@ -99,6 +101,28 @@ write_raster <- function(r, file, datatype = "INT4S", NAflag = NA) {
   if (!is.na(NAflag)) args$NAflag <- NAflag
   do.call(terra::writeRaster, args)
   p }
+
+# Annual NLCD on the model grid R (a crop of lattice L): modal aggregation of the 30 m classes. The aggregation blocks are fixed to the
+# CONUS crop the CONUS 1km build used (lattice extent + one block, snapped to the NLCD 30 m grid), so a regional build aggregates the
+# same 30 m pixels into each cell as a CONUS build. NLCD's Albers WKT differs from EPSG:5070 only in naming, so extents are used as is.
+nlcd_on_grid <- function(nf, L, R) {
+  n30 <- terra::rast(nf); res_m <- terra::res(R)[1]; fact <- round(res_m / terra::res(n30)[1]); blk <- fact * terra::res(n30)[1]
+  conus <- terra::ext(terra::crop(n30, terra::ext(L) + blk)); want <- terra::ext(R) + blk
+  x0 <- terra::xmin(conus) + floor((terra::xmin(want) - terra::xmin(conus)) / blk) * blk
+  y0 <- terra::ymin(conus) + floor((terra::ymin(want) - terra::ymin(conus)) / blk) * blk
+  x1 <- min(terra::xmax(conus), terra::xmin(conus) + ceiling((terra::xmax(want) - terra::xmin(conus)) / blk) * blk)
+  y1 <- min(terra::ymax(conus), terra::ymin(conus) + ceiling((terra::ymax(want) - terra::ymin(conus)) / blk) * blk)
+  n <- terra::crop(n30, terra::ext(max(x0, terra::xmin(conus)), x1, max(y0, terra::ymin(conus)), y1))
+  n <- terra::aggregate(n, fact = fact, fun = "modal", na.rm = TRUE)
+  terra::project(n, R, method = "near") }
+
+# fill NA cells of r (inside mask m) with the modal value of their neighbours, repeating until none is left (the CONUS 1km build's
+# iterative focal fill, run at twice the cell size for speed); `default` everywhere when r has no values at all
+fill_modal <- function(r, m, default) {
+  if (all(is.na(terra::values(r, mat = FALSE)))) return(terra::mask(terra::init(m, default), m))
+  ra <- terra::aggregate(r, 2, "modal", na.rm = TRUE)
+  while (terra::global(is.na(ra), "sum")[[1]] > 0) ra <- terra::focal(ra, 9, "modal", na.policy = "only", na.rm = TRUE)
+  terra::mask(terra::cover(r, terra::project(ra, r, method = "near")), m) }
 
 # ---- validation -----------------------------------------------------------------------------------------------------
 # Checks never pass silently on NA: a check that cannot be computed is a failure (see memory: checks must not return NA).

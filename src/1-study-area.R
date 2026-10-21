@@ -44,22 +44,10 @@ if (length(want)) {
   say("Study area: %s (%d x %d cells of %d m)", paste(want, collapse = ", "), ncol(R), nrow(R), res_m)
 } else { R <- L; keep_ids <- as.integer(sl$Id); say("Study area: all of CONUS (%d x %d cells of %d m)", ncol(R), nrow(R), res_m) }
 progressBar()
-# ---- land mask: start-year Annual NLCD, modal-aggregated ------------------------------------------------------------
-# The aggregation blocks are fixed to the CONUS crop the original build used (lattice extent + one block, snapped to the NLCD
-# 30 m grid), so a state build aggregates exactly the same 30 m pixels into each cell as a CONUS build does.
+# ---- land mask: start-year Annual NLCD, modal-aggregated (shared.R, nlcd_on_grid: same blocks as a CONUS build) --------
 nf <- file.path(src$NlcdFolder, sprintf("Annual_NLCD_LndCov_%d_CU_C1V0.tif", y0))
 if (!file.exists(nf)) fail("Annual NLCD %d not found: %s", y0, nf)
-n30 <- rast(nf); fact <- round(res_m / res(n30)[1]); blk <- fact * res(n30)[1]
-# NLCD's Albers WKT differs from EPSG:5070 only in naming, so extents are used as they are (as the original build did)
-conus <- ext(crop(n30, ext(L) + blk))
-want_e <- ext(R) + blk
-x0 <- xmin(conus) + floor((xmin(want_e) - xmin(conus)) / blk) * blk; y0e <- ymin(conus) + floor((ymin(want_e) - ymin(conus)) / blk) * blk
-x1 <- min(xmax(conus), xmin(conus) + ceiling((xmax(want_e) - xmin(conus)) / blk) * blk)
-y1 <- min(ymax(conus), ymin(conus) + ceiling((ymax(want_e) - ymin(conus)) / blk) * blk)
-n <- crop(n30, ext(max(x0, xmin(conus)), x1, max(y0e, ymin(conus)), y1))
-say("NLCD %d: aggregating %d x %d pixels by %d (modal)", y0, ncol(n), nrow(n), fact)
-n <- aggregate(n, fact = fact, fun = "modal", na.rm = TRUE)
-n <- project(n, R, method = "near")
+n <- nlcd_on_grid(nf, L, R); say("NLCD %d: modal aggregation to %d m", y0, res_m)
 progressBar()
 
 # ---- strata ---------------------------------------------------------------------------------------------------------
