@@ -376,13 +376,15 @@
 
 	<layout type="Scenario" appendTo="stsim_Advanced">
 		<group name="lucasCoreGroup" displayName="LUCAS Core">
-			<item name="BuildOptions"/>
 			<item name="StudyArea"/>
-			<item name="GrowthOptions"/>
+			<item name="BuildOptions"/>
 			<item name="ClimateOptions"/>
-			<item name="MerchantableVolumeCurve"/>
-			<item name="CarbonCurve"/>
-			<item name="InitialStockCurve"/>
+			<item name="GrowthOptions"/>
+			<group name="lucasCoreCurves" displayName="Fitted Curves (written by the build)">
+				<item name="MerchantableVolumeCurve"/>
+				<item name="CarbonCurve"/>
+				<item name="InitialStockCurve"/>
+			</group>
 			<group name="lucasCoreResults" displayName="Build Results">
 				<item name="OutputStrataSummary"/>
 				<item name="OutputStateClassSummary"/>
