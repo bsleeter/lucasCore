@@ -4,11 +4,11 @@
 # Strata and initial conditions first (so stage 3 calibrates with stage 5's return intervals and gSSURGO targets), then growth curves,
 # carbon flows, spin-up, historical transitions, climate multipliers and initial stock maps. The result scenario holds every input an
 # ST-Sim historical run needs except Run Control.
-# Usage: Rscript tests/phaseF-pipeline.R [--units=California] [--dir=dev/libs]
+# Usage: Rscript tests/phaseF-pipeline.R [--units="State: California"]  (Study Area units, comma-separated) [--dir=dev/libs]
 # =============================================================================
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
 a <- commandArgs(TRUE); opt <- function(k, d) { m <- grep(sprintf("^--%s=", k), a, value = TRUE); if (length(m)) sub(sprintf("^--%s=", k), "", m[1]) else d }
-D <- opt("dir", "F:/lucasCore/dev/libs"); UNITS <- opt("units", "California"); dir.create(D, showWarnings = FALSE, recursive = TRUE)
+D <- opt("dir", "F:/lucasCore/dev/libs"); UNITS <- opt("units", "State: California"); dir.create(D, showWarnings = FALSE, recursive = TRUE)
 f <- file.path(D, sprintf("lucasCore-pipeline-%s.ssim", gsub("[^A-Za-z0-9]+", "-", substr(UNITS, 1, 30))))
 unlink(c(f, paste0(f, c(".data", ".temp", ".backup"))), recursive = TRUE)
 if (system2(file.path(R.home("bin"), "Rscript.exe"), c("tools/new-library.R", shQuote(f)), stdout = FALSE)) stop("new-library.R failed")
@@ -17,7 +17,7 @@ S <- rsyncrosim::scenario(P, paste("Build:", UNITS)); dependency(S) <- sc$Scenar
 description(S) <- paste("Full build pipeline (tests/phaseF-pipeline.R) for", UNITS, "with package defaults: stages 1 (strata), 5 (initial conditions),",
                         "2 (growth curves), 3 (carbon flows, calibrated with stage 5's return intervals and gSSURGO targets), 4 (spin-up), 6 (historical",
                         "transitions), 7 (climate multipliers, historical PRISM, tree-ring forest growth) and 8 (initial stock maps). Depends on Stock-Flow Definitions.")
-saveDatasheet(S, data.frame(StudyAreaUnits = UNITS), "lucasCore_BuildOptions")
+saveDatasheet(S, data.frame(UnitId = trimws(strsplit(UNITS, ",")[[1]])), "lucasCore_StudyArea")
 stages <- c("1 - Study Area and Strata", "5 - Initial Conditions", "2 - Fit Growth Curves", "3 - Carbon Flows", "4 - Spin-up and Initial Stocks",
             "6 - Historical Transitions", "7 - Climate Multipliers", "8 - Initial Stock Maps")
 saveDatasheet(S, data.frame(StageNameId = stages, RunOrder = seq_along(stages)), "core_Pipeline")

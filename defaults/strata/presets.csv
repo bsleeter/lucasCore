@@ -1,9 +1,10 @@
-Preset,Description,File,Layer,IdField,NameTemplate,ValueField,CrosswalkFile,ListFile,Dissolve,Overlap,Fill,FillDistance,DefaultId
-States,US states (TIGER 2009); Id = state FIPS. The CONUS 1km secondary strata,F:/lucas-master/Data Sources/Study Areas/States/tl_2009_us_state_conus.shp,,STATEFP,,,,states-list.csv,,Last,Modal,29000,
-Counties,US counties (TIGER 2022); Id = county GEOID,F:/lucas-master/Data Sources/Study Areas/Counties/tl_rd22_us_county.shp,,GEOID,,,,counties-list.csv,,Last,Modal,29000,
-HUC6,Watershed basins (WBD HU6); Id = HUC6 code,F:/lucas-master/Data Sources/NHD/WBD_National_GDB.gdb,WBDHU6,huc6,{name} ({huc6}),,,,,Last,Nearest,,
-HUC8,Watershed subbasins (WBD HU8); Id = HUC8 code,F:/lucas-master/Data Sources/NHD/WBD_National_GDB.gdb,WBDHU8,huc8,{name} ({huc8}),,,,,Last,Nearest,,
-EPA Level III Ecoregions,EPA Level III ecoregions (dissolved from Level IV); Id = L3 code,F:/lucas-master/Data Sources/Ecoregions/us_eco_l4_no_st.shp,,US_L3CODE,{US_L3NAME},,,,TRUE,Last,Nearest,,
-Pyromes,FSim / WRC pyromes (RDS-2020-0020); Id = pyrome number,F:/lucas-master/Data Sources/Pyromes/Data/Pyromes_CONUS_20200206.shp,,PYROME,P{PYROME} {NAME},,,,,Last,Nearest,,
-Federal Lands,Federal land manager (National Atlas fedlanp010g ADMIN1); other land = Non Federal. The CONUS 1km tertiary strata,F:/lucas-master/Data Sources/PADUS/Federal Lands/fedlanp010g.shp,,,,ADMIN1,federal-lands-crosswalk.csv,federal-lands-list.csv,,Last,Default,,9
-GAP Status,PAD-US GAP status (most protected wins where areas overlap); other land = Not in PAD-US,F:/lucas-master/Data Sources/PADUS/padus_gapstatus.shp,,,,GAP_Sts,gap-status-crosswalk.csv,gap-status-list.csv,,Min,Default,,9
+Preset,Number,Prefix,Description,File,Layer,IdField,NameTemplate,ValueField,CrosswalkFile,ListFile,Dissolve,Overlap,Fill,FillDistance,DefaultId
+FIA Ecodivisions,1,Ecodivision,FIA ecodivisions (the primary strata); Id = StrtmId,F:/lucas-master/Data Sources/FIA/EcoDivision_map/EcoDivisions_Dissolve.shp,,StrtmId,,,,ecodivisions-list.csv,,Last,Nearest,,
+States,2,State,US states (TIGER 2009); Id = state FIPS. The CONUS 1km secondary strata,F:/lucas-master/Data Sources/Study Areas/States/tl_2009_us_state_conus.shp,,STATEFP,,,,states-list.csv,,Last,Modal,29000,
+Counties,3,County,US counties (TIGER 2022); Id = county GEOID,F:/lucas-master/Data Sources/Study Areas/Counties/tl_rd22_us_county.shp,,GEOID,,,,counties-list.csv,,Last,Modal,29000,
+HUC6,4,HUC6,Watershed basins (WBD HU6); Id = HUC6 code,F:/lucas-master/Data Sources/NHD/WBD_National_GDB.gdb,WBDHU6,huc6,{name} ({huc6}),,,,,Last,Nearest,,
+HUC8,5,HUC8,Watershed subbasins (WBD HU8); Id = HUC8 code,F:/lucas-master/Data Sources/NHD/WBD_National_GDB.gdb,WBDHU8,huc8,{name} ({huc8}),,,,,Last,Nearest,,
+EPA Level III Ecoregions,6,EPA L3,EPA Level III ecoregions (dissolved from Level IV); Id = L3 code,F:/lucas-master/Data Sources/Ecoregions/us_eco_l4_no_st.shp,,US_L3CODE,{US_L3NAME},,,,TRUE,Last,Nearest,,
+Pyromes,7,Pyrome,FSim / WRC pyromes (RDS-2020-0020); Id = pyrome number,F:/lucas-master/Data Sources/Pyromes/Data/Pyromes_CONUS_20200206.shp,,PYROME,P{PYROME} {NAME},,,,,Last,Nearest,,
+Federal Lands,8,Federal,Federal land manager (National Atlas fedlanp010g ADMIN1); other land = Non Federal. The CONUS 1km tertiary strata,F:/lucas-master/Data Sources/PADUS/Federal Lands/fedlanp010g.shp,,,,ADMIN1,federal-lands-crosswalk.csv,federal-lands-list.csv,,Last,Default,,9
+GAP Status,9,GAP,PAD-US GAP status (most protected wins where areas overlap); other land = Not in PAD-US,F:/lucas-master/Data Sources/PADUS/padus_gapstatus.shp,,,,GAP_Sts,gap-status-crosswalk.csv,gap-status-list.csv,,Min,Default,,9

@@ -21,8 +21,9 @@ Tree rings say nothing about grassland and shrubland growth, which keeps Miami N
 
 ## Projections (LOCA2)
 
-Climate Options also names a Projection Scenario (SSP), Climate Model (GCM) and Replicate (ensemble member); blank scenario = historical
-only, blank replicate = the model's lowest-numbered member with a run of that scenario. The three drop-down lists are project sheets
+A projection runs when Build Options sets a Projection End Year (it starts the year after Historical End). Climate Options then names
+the Projection Scenario (SSP), Climate Model (GCM) and Replicate (ensemble member), needed unless every climate effect is None; a blank
+replicate = the model's lowest-numbered member with a run of that scenario. The three drop-down lists are project sheets
 written by `tools/new-library.R` from the folders under the LOCA2 folder (`<gcm>/<member>/<historical|ssp>/{pr,tasmax,tasmin}/*.monthly.nc`;
 rerun it with `--rebuild-climate` after adding runs). SyncroSim cannot filter one drop-down by another, so stage 7 checks the
 combination and, when it does not exist, stops with the models or replicates that have the scenario.

@@ -46,11 +46,13 @@
 		<column name="Runs" displayName="Models and Scenarios" dataType="String" isOptional="True"/>
 	</dataSheet>
 
-	<dataSheet name="StratumSource" displayName="Stratum Sources (secondary and tertiary strata)" dataScope="Project">
-		<!-- written by tools/new-library.R from a preset (defaults/strata/presets.csv); edit a row and run new-library.R with the rebuild-strata flag to
-		     change it. The stsim Secondary and Tertiary Strata lists are made from these rows; stages cannot write project lists. -->
-		<column name="Level" dataType="String"/>
-		<column name="Preset" displayName="Preset or Name" dataType="String"/>
+	<dataSheet name="StratumSource" displayName="Stratum Sources (study areas, secondary and tertiary strata)" dataScope="Project" displayMember="Name">
+		<!-- written by tools/new-library.R from defaults/strata/presets.csv; add a custom row and run new-library.R with the rebuild-strata flag.
+		     The stsim Secondary and Tertiary Strata lists hold every unit of every row (stages cannot write project lists). -->
+		<column name="Name" displayName="Source" dataType="String"/>
+		<column name="Number" displayName="Number (unit Id = Number x 100,000,000 + id)" dataType="Integer"/>
+		<column name="Prefix" displayName="Unit Name Prefix" dataType="String"/>
+		<column name="Description" dataType="String" isOptional="True"/>
 		<column name="File" displayName="Polygon File" dataType="String"/>
 		<column name="Layer" dataType="String" isOptional="True"/>
 		<column name="IdField" displayName="Id Field (numeric)" dataType="String" isOptional="True"/>
@@ -63,7 +65,7 @@
 		<column name="Fill" displayName="Fill Uncovered Land" dataType="String" isOptional="True"/>
 		<column name="FillDistance" displayName="Modal Fill Distance (m)" dataType="Double" isOptional="True"/>
 		<column name="DefaultId" displayName="Default Id" dataType="Integer" isOptional="True"/>
-		<validation validationType="Unique" columns="Level"/>
+		<validation validationType="Unique" columns="Number"/>
 	</dataSheet>
 
 	<!-- =================================================================================================== -->
@@ -72,19 +74,26 @@
 
 	<dataSheet name="BuildOptions" displayName="Build Options" isSingleRow="True">
 		<column name="Resolution" displayName="Cell Size (m)" dataType="Integer" defaultValue="1000" validationType="WholeNumber" validationCondition="Greater" formula1="0"/>
-		<column name="StudyAreaUnits" displayName="Study Area (secondary strata names, comma-separated; blank = all)" dataType="String" isOptional="True"/>
+		<column name="SecondarySourceId" displayName="Secondary Strata (blank = States)" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="lucasCore_StratumSource"/>
+		<column name="TertiarySourceId" displayName="Tertiary Strata (blank = Federal Lands)" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="lucasCore_StratumSource"/>
 		<column name="StartYear" displayName="Historical Start Year" dataType="Integer" defaultValue="1985" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1985"/>
 		<column name="EndYear" displayName="Historical End Year" dataType="Integer" defaultValue="2023" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1985"/>
-			</dataSheet>
+		<column name="ProjectionEndYear" displayName="Projection End Year (blank = no projection; starts the year after Historical End)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="LessEqual" formula1="2100"/>
+	</dataSheet>
+
+	<dataSheet name="StudyArea" displayName="Study Area (blank = all of CONUS)">
+		<!-- one row per unit, from any source (ecodivision, state, county, HUC, pyrome, ...): the universal unit list is stsim's Secondary Strata list -->
+		<column name="UnitId" displayName="Unit" dataType="Integer" validationType="Datasheet" formula1="stsim_SecondaryStratum" allowDbNull="False"/>
+		<validation validationType="Unique" columns="UnitId"/>
+	</dataSheet>
 
 	<dataSheet name="ClimateOptions" displayName="Climate Options" isSingleRow="True">
 		<column name="ForestGrowthModel" displayName="Forest Growth (None = normal climate every year)" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP|3:Tree ring" defaultValue="3"/>
 		<column name="NonForestGrowthModel" displayName="Non-Forest Growth" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP" defaultValue="2"/>
 		<column name="DecompositionModel" displayName="Decomposition" dataType="Integer" validationType="List" formula1="1:None|2:Q10" defaultValue="2"/>
-		<column name="ClimateScenarioId" displayName="Projection Scenario (blank = historical only)" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="lucasCore_ClimateScenario"/>
+		<column name="ClimateScenarioId" displayName="Projection Scenario (needed when Build Options sets a projection)" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="lucasCore_ClimateScenario"/>
 		<column name="ClimateModelId" displayName="Projection Climate Model" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="lucasCore_ClimateModel"/>
 		<column name="ClimateReplicateId" displayName="Projection Replicate (blank = lowest-numbered with the scenario)" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="lucasCore_ClimateReplicate"/>
-		<column name="ProjectionEndYear" displayName="Projection End Year" dataType="Integer" defaultValue="2100" validationType="WholeNumber" validationCondition="LessEqual" formula1="2100"/>
 	</dataSheet>
 
 	<dataSheet name="GrowthOptions" displayName="Growth Curve Options" isSingleRow="True">
@@ -274,6 +283,7 @@
 
 	<transformer name="StudyArea" displayName="1 - Study Area and Strata" isRunnable="True" programName="Rscript" programArguments="src/1-study-area.R" condaEnv="lucasCore.yml" condaEnvVersion="1">
 		<dataSheet name="BuildOptions" type="Input"/>
+		<dataSheet name="StudyArea" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Both"/>
 		<dataSheet name="OutputStrataSummary" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
@@ -367,6 +377,7 @@
 	<layout type="Scenario" appendTo="stsim_Advanced">
 		<group name="lucasCoreGroup" displayName="LUCAS Core">
 			<item name="BuildOptions"/>
+			<item name="StudyArea"/>
 			<item name="GrowthOptions"/>
 			<item name="ClimateOptions"/>
 			<item name="MerchantableVolumeCurve"/>

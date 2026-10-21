@@ -1,8 +1,12 @@
 # =============================================================================
-# strata.R - secondary and tertiary strata from any polygon source (shared by tools/new-library.R and stage 1)
+# strata.R - study areas and secondary / tertiary strata from any polygon source (shared by tools/new-library.R and stage 1)
 # =============================================================================
-# The primary stratum is fixed: the FIA ecodivisions the growth curves are fitted on. Secondary and tertiary strata are chosen per
-# library from a preset (defaults/strata/presets.csv) or any polygon file, described by one row of these columns:
+# The primary stratum is fixed: the FIA ecodivisions the growth curves are fitted on. The project's Stratum Sources sheet lists every
+# polygon source (the presets in defaults/strata/presets.csv, plus any custom row); each scenario picks its secondary and tertiary
+# source in Build Options and its study area (units of any source) in Study Area. Because stages cannot write project lists, the stsim
+# Secondary and Tertiary Strata lists are "universal": every unit of every source (tools/new-library.R), named "<Prefix>: <name>" with
+# Id = Number x UNIT_OFFSET + the source's own id. One row per source, these columns:
+#   Number, Prefix       the source's number (the Id offset; never reuse one) and the prefix of its unit names
 #   File, Layer          polygon source (Layer for a geodatabase or GeoPackage; blank for a shapefile)
 #   IdField              numeric id field: the stsim Id (states: STATEFP, counties: GEOID, HUC8: huc8, pyromes: PYROME)
 #   NameTemplate         stsim Name from fields, e.g. "{name} ({huc8})"; blank when ListFile names the ids
@@ -14,12 +18,23 @@
 #   Fill                 land cells no polygon covers: Modal (most common id within FillDistance) | Nearest | Default
 #   FillDistance         metres, for Modal (states: 29000 m = the 59-cell window of the CONUS 1km build)
 #   DefaultId            the id of uncovered cells for Fill = Default (federal lands: 9 Non Federal)
-# Ids must fit stsim's 32-bit integers, so HUC10 and HUC12 codes cannot be ids.
-# Files named in a row are read relative to defaults/strata when they are not absolute.
+# A source's own ids must be below UNIT_OFFSET (1e8) and Number x 1e8 must fit stsim's 32-bit integers (Number <= 20), so HUC10 and
+# HUC12 codes cannot be ids. Files named in a row are read relative to defaults/strata when they are not absolute.
 # =============================================================================
 
-STRATA_COLS <- c("Preset", "File", "Layer", "IdField", "NameTemplate", "ValueField", "CrosswalkFile", "ListFile",
+STRATA_COLS <- c("Preset", "Number", "Prefix", "File", "Layer", "IdField", "NameTemplate", "ValueField", "CrosswalkFile", "ListFile",
                  "Dissolve", "Overlap", "Fill", "FillDistance", "DefaultId")
+UNIT_OFFSET <- 1e8
+unit_id <- function(number, id) as.integer(as.numeric(number) * UNIT_OFFSET + as.numeric(id))
+unit_source <- function(uid) as.integer(as.numeric(uid) %/% UNIT_OFFSET)
+unit_native <- function(uid) as.integer(as.numeric(uid) %% UNIT_OFFSET)
+
+# the universal unit list (Name, Id) over every source row: "<Prefix>: <name>", Number x 1e8 + id
+universal_list <- function(rows, pkgdir) data.table::rbindlist(lapply(rows, function(s) {
+  if (is.na(s$Number) || is.na(s$Prefix)) stop(sprintf("strata source %s needs a Number and a Prefix", s$Preset), call. = FALSE)
+  l <- strata_list(s, pkgdir)
+  if (any(l$Id >= UNIT_OFFSET)) stop(sprintf("%s: ids must be below %.0f", s$Preset, UNIT_OFFSET), call. = FALSE)
+  data.table::data.table(Name = paste0(s$Prefix, ": ", l$Name), Id = unit_id(s$Number, l$Id)) }))
 
 # a strata source row (list) with blanks as NA
 strata_row <- function(x) { x <- as.list(x); for (k in STRATA_COLS) { v <- x[[k]]
@@ -27,7 +42,11 @@ strata_row <- function(x) { x <- as.list(x); for (k in STRATA_COLS) { v <- x[[k]
     x[[k]] <- v[1] }
   x$Dissolve <- isTRUE(as.logical(x$Dissolve)) || identical(toupper(as.character(x$Dissolve)), "YES")
   if (is.na(x$Overlap)) x$Overlap <- "Last"; if (is.na(x$Fill)) x$Fill <- "Nearest"
+  x$Number <- suppressWarnings(as.integer(x$Number))
   x }
+# the project's Stratum Sources sheet (Name = the preset name) as source rows keyed by name
+sources_from_sheet <- function(ss) { ss <- data.table::as.data.table(ss); if ("Name" %in% names(ss)) data.table::setnames(ss, "Name", "Preset")
+  setNames(lapply(seq_len(nrow(ss)), function(i) strata_row(ss[i])), ss$Preset) }
 
 # the presets shipped with the package, keyed by name
 strata_presets <- function(pkgdir) {

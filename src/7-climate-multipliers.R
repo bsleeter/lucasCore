@@ -13,8 +13,8 @@
 #               1895-2023). Out of sample it predicts annual ring growth better than Miami, which predicts it worse than a constant
 #   Q10         Q10 ^ ((T - Tn) / 10), Q10 read from the CBM DOM table for the listed pools (the same values stage 3 uses)
 #   None        no multiplier: the flow runs at normal climate every year
-# Historical years (start-end year): PRISM, current release (annual-us25m). Projection years (end year + 1 to the Projection End Year),
-# when Climate Options names a Projection Scenario and Climate Model: LOCA2 monthly files of that model (src/loca2.R).
+# Historical years (start-end year): PRISM, current release (annual-us25m). Projection years (end year + 1 to Build Options' Projection
+# End Year; blank = no projection): LOCA2 monthly files of the Climate Options scenario, model and replicate (src/loca2.R).
 # Every multiplier is an anomaly against the 1991-2020 normal of its own data (PRISM for PRISM years; the climate model's own
 # 1991-2020, historical run + SSP run, for its years: the delta method), so 1.0 means "the climate the curves and decay rates
 # were fitted to" in both periods and the series joins at the end year without a step from model bias.
@@ -55,8 +55,12 @@ say("Climate Options: forest growth = %s; non-forest growth = %s; decomposition 
 proj <- NULL
 gv <- function(k) if (k %in% names(co)) co[[k]][1] else NA
 sc_name <- gv("ClimateScenarioId"); gcm <- gv("ClimateModelId"); rep_name <- gv("ClimateReplicateId")
+pend <- if ("ProjectionEndYear" %in% names(opt)) opt$ProjectionEndYear[1] else NA     # Build Options: blank = no projection
+if (is.na(pend)) { if (!is.na(sc_name) || !is.na(gcm)) say("Climate Options names a projection scenario or model, but Build Options sets no Projection End Year: historical only")
+  sc_name <- gcm <- NA }
+if (!is.na(pend) && (is.na(sc_name) || is.na(gcm)) && any(model != "None"))
+  fail("Build Options sets a projection to %d: choose a Projection Scenario and Projection Climate Model in Climate Options (or set every climate effect to None)", pend)
 if (!is.na(sc_name) || !is.na(gcm)) {
-  if (is.na(sc_name) || is.na(gcm)) fail("Climate Options: choose both a Projection Scenario and a Projection Climate Model (or neither, for historical only)")
   src <- c(src, read_data_sources(c("Loca2Folder")))
   sl <- as.data.table(datasheet(prj, ds("ClimateScenario"), optional = TRUE, lookupsAsFactors = FALSE)); s <- sl[Name == sc_name]
   if (!nrow(s)) fail("Climate Options: projection scenario '%s' is not in the project's Climate Scenarios list", sc_name)
@@ -71,8 +75,7 @@ if (!is.na(sc_name) || !is.na(gcm)) {
   if (is.na(rep_name)) { member <- have[1]; say("Replicate: blank, so %s (the lowest-numbered of %s with %s)", member, paste(have, collapse = ", "), sc_name)
   } else if (!rep_name %in% have) { fail("LOCA2 has no %s run of %s replicate %s. Replicates with %s: %s", sc_name, gcm, rep_name, sc_name, paste(have, collapse = ", "))
   } else member <- rep_name
-  pend <- if (!is.na(gv("ProjectionEndYear"))) gv("ProjectionEndYear") else 2100
-  if (pend <= y1 || pend > 2100) fail("Climate Options: Projection End Year must be after the historical end year (%d) and at most 2100", y1)
+  if (pend <= y1 || pend > 2100) fail("Build Options: Projection End Year must be after the historical end year (%d) and at most 2100", y1)
   proj <- list(gcm = gcm, member = member, ssp = s$Code, label = sprintf("LOCA2 %s %s %s", gcm, member, sc_name), years = (y1 + 1):pend)
   say("Projection: %s, %d-%d", proj$label, y1 + 1, pend)
 } else say("Projection: none (historical only)")

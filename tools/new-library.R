@@ -1,13 +1,12 @@
 # =============================================================================
 # new-library.R - create a lucasCore library: stsim + lucasCore, the stsim project definitions, strata lists, library settings
 # =============================================================================
-# Usage: Rscript tools/new-library.R <library.ssim> [--project=Definitions] [--secondary=States] [--tertiary="Federal Lands"]
-#                                    [--rebuild-strata] [--rebuild-climate] [--loca2=<folder>]
-#   --secondary / --tertiary   a preset name from defaults/strata/presets.csv (States, Counties, HUC6, HUC8,
-#                              EPA Level III Ecoregions, Pyromes, Federal Lands, GAP Status). Defaults: States, Federal Lands
-#                              (the CONUS 1km model). A custom source: edit the row in Stratum Sources, then --rebuild-strata.
-#   --rebuild-strata           rewrite the stsim Secondary/Tertiary Strata lists from Stratum Sources (replaces the lists:
-#                              scenario data keyed by the old strata becomes invalid)
+# Usage: Rscript tools/new-library.R <library.ssim> [--project=Definitions] [--rebuild-strata] [--rebuild-climate] [--loca2=<folder>]
+#   Strata sources: every preset in defaults/strata/presets.csv (FIA Ecodivisions, States, Counties, HUC6, HUC8, EPA Level III
+#                              Ecoregions, Pyromes, Federal Lands, GAP Status) becomes a Stratum Sources row, and the stsim Secondary
+#                              and Tertiary Strata lists hold every unit of every source. Scenarios pick their sources in Build Options.
+#   --rebuild-strata           rewrite Stratum Sources and the unit lists (after adding a custom source row with a new Number;
+#                              existing unit ids keep their meaning, so scenario data stays valid)
 #   --rebuild-climate          rewrite the LOCA2 Climate Scenario and Climate Model lists from the LOCA2 folder (after adding runs)
 #   --loca2                    LOCA2 folder to scan (default: the project's Data Sources value, else the package default)
 #
@@ -19,7 +18,7 @@
 # =============================================================================
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
 a <- commandArgs(TRUE); opt <- function(k, d) { m <- grep(sprintf("^--%s=", k), a, value = TRUE); if (length(m)) sub(sprintf("^--%s=", k), "", m[1]) else d }
-pos <- a[!grepl("^--", a)]; if (!length(pos)) stop("usage: Rscript tools/new-library.R <library.ssim> [--secondary=<preset>] [--tertiary=<preset>]")
+pos <- a[!grepl("^--", a)]; if (!length(pos)) stop("usage: Rscript tools/new-library.R <library.ssim> [--rebuild-strata] [--rebuild-climate]")
 f <- normalizePath(pos[1], winslash = "/", mustWork = FALSE); pname <- opt("project", "Definitions")
 here <- tryCatch(dirname(normalizePath(sub("--file=", "", grep("--file=", commandArgs(FALSE), value = TRUE)))), error = function(e) "tools")
 pkgdir <- normalizePath(file.path(here, ".."), winslash = "/")
@@ -63,29 +62,37 @@ for (i in seq_len(nrow(man))) {
 }
 if (bad) stop(bad, " default names are missing from sheets that were already filled")
 
-# ---- secondary and tertiary strata: Stratum Sources rows (from presets unless already set), then the stsim lists -----------
-presets <- strata_presets(pkgdir)
-src <- as.data.table(datasheet(P, "lucasCore_StratumSource", optional = TRUE, lookupsAsFactors = FALSE))
-want <- c(Secondary = opt("secondary", NA), Tertiary = opt("tertiary", NA))
-for (lv in names(want)) {
-  if (is.na(want[[lv]]) && nrow(src) && lv %in% src$Level) next                         # keep a row the user already has
-  pn <- if (is.na(want[[lv]])) c(Secondary = "States", Tertiary = "Federal Lands")[[lv]] else want[[lv]]
-  if (!pn %in% names(presets)) stop(sprintf("unknown strata preset '%s'; presets: %s", pn, paste(names(presets), collapse = ", ")))
-  row <- as.data.table(presets[[pn]][STRATA_COLS]); row[, Level := lv]
-  src <- rbind(src[Level != lv], row, fill = TRUE)
+# ---- Stratum Sources (every polygon source) and the universal unit lists -------------------------------------------------
+# Every preset is a row; rows the user added (a custom source with its own Number) are kept. The stsim Secondary and Tertiary Strata
+# lists both hold every unit of every source ("<Prefix>: <name>", Id = Number x 1e8 + id), so each scenario picks its study area
+# (Study Area sheet) and its secondary and tertiary source (Build Options) without changing project data.
+presets <- strata_presets(pkgdir); rebuild <- "--rebuild-strata" %in% a
+if (!is.na(opt("secondary", NA)) || !is.na(opt("tertiary", NA))) cat("note: --secondary / --tertiary are no longer used: pick the sources in each scenario's Build Options\n")
+have_src <- as.data.table(datasheet(P, "lucasCore_StratumSource", optional = TRUE, lookupsAsFactors = FALSE))
+if (nrow(have_src) && !"Number" %in% names(have_src)) have_src <- have_src[0]      # a library made before universal lists: replace
+custom <- if (nrow(have_src)) have_src[!Name %in% names(presets)] else data.table()
+src <- rbind(rbindlist(lapply(presets, function(s) as.data.table(s[STRATA_COLS]))), if (nrow(custom)) setnames(copy(custom), "Name", "Preset"), fill = TRUE)
+dup <- src[duplicated(Number), Preset]; if (length(dup)) stop("Stratum Sources: Number used twice (", paste(dup, collapse = ", "), ")")
+desc <- rd("strata", "presets.csv")[, .(Preset, Description)]
+out_src <- merge(src, desc, by = "Preset", all.x = TRUE, suffixes = c("", ".p"))
+if ("Description.p" %in% names(out_src)) { out_src[is.na(Description), Description := Description.p]; out_src[, Description.p := NULL] }
+setnames(out_src, "Preset", "Name"); out_src <- out_src[order(Number)]
+if (!nrow(have_src) || rebuild) { saveDatasheet(P, as.data.frame(out_src[, intersect(c("Name", "Description", STRATA_COLS[-1]), names(out_src)), with = FALSE]),
+                                               "lucasCore_StratumSource", append = FALSE, force = TRUE)
+  cat(sprintf("%-34s %4d sources written\n", "lucasCore_StratumSource", nrow(out_src)))
+} else cat(sprintf("%-34s kept (%d sources)\n", "lucasCore_StratumSource", nrow(have_src)))
+rows <- sources_from_sheet(as.data.table(datasheet(P, "lucasCore_StratumSource", lookupsAsFactors = FALSE)))
+have_l <- suppressWarnings(as.data.table(datasheet(P, "stsim_SecondaryStratum", optional = TRUE)))
+if (nrow(have_l) && !rebuild && all(as.integer(have_l$Id) >= UNIT_OFFSET)) {
+  cat(sprintf("%-34s kept (%d units)\n", "stsim_Secondary/TertiaryStratum", nrow(have_l)))
+} else {
+  t0 <- Sys.time(); ul <- universal_list(rows, pkgdir)
+  if (anyDuplicated(ul$Name)) stop("universal unit list: duplicate names ", paste(head(ul$Name[duplicated(ul$Name)], 3), collapse = "; "))
+  for (sheet in c("stsim_SecondaryStratum", "stsim_TertiaryStratum")) saveDatasheet(P, as.data.frame(ul), sheet, append = FALSE, force = TRUE)
+  cat(sprintf("%-34s %4d units from %d sources (%s) in %.1f min\n", "stsim_Secondary/TertiaryStratum", nrow(ul), length(rows),
+              paste(sprintf("%s %d", names(rows), vapply(rows, function(s) sum(unit_source(ul$Id) == s$Number), 0L)), collapse = ", "),
+              as.numeric(Sys.time() - t0, units = "mins")))
 }
-keepc <- intersect(c("Level", STRATA_COLS), names(src))
-saveDatasheet(P, as.data.frame(src[, ..keepc]), "lucasCore_StratumSource", append = FALSE, force = TRUE)
-rebuild <- "--rebuild-strata" %in% a || !is.na(want[["Secondary"]]) || !is.na(want[["Tertiary"]])
-for (lv in c("Secondary", "Tertiary")) {
-  sheet <- paste0("stsim_", lv, "Stratum"); s <- strata_row(src[Level == lv])
-  have <- suppressWarnings(as.data.table(datasheet(P, sheet, optional = TRUE)))
-  if (nrow(have) && !rebuild) { cat(sprintf("%-34s kept (%d rows; source %s)\n", sheet, nrow(have), s$Preset)); next }
-  l <- strata_list(s, pkgdir)
-  saveDatasheet(P, as.data.frame(l), sheet, append = FALSE, force = TRUE)
-  cat(sprintf("%-34s %4d rows written from %s\n", sheet, nrow(suppressWarnings(datasheet(P, sheet))), s$Preset))
-}
-cat("strata: primary = FIA ecodivisions; secondary =", src[Level == "Secondary"]$Preset, "; tertiary =", src[Level == "Tertiary"]$Preset, "\n")
 
 # ---- LOCA2 climate scenario and model lists (Climate Options drop-downs), from the folders under the LOCA2 folder ---------------
 # <gcm>/<member>/<ssp>/{pr,tasmax,tasmin}/*.monthly.nc; a model is listed when it has a historical run and at least one SSP with all
