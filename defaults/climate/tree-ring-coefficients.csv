@@ -1,0 +1,20 @@
+StratumId,Id,Sites,Source,PrecipCoef,PrecipLagCoef,TempCoef,MiamiBeta
+Hot Continental,220,79,ecodivision,0.361,0.2362,-0.0394,0.5382
+Hot Continental Mountains,2201,64,ecodivision,0.1742,0.2512,0.0052,0.3128
+Marine,240,3,CONUS pooled,0.3237,0.3079,-0.0316,0.5098
+Marine Mountains,2401,93,ecodivision,-0.0061,0.0275,0.0087,0.1429
+Mediterranean,260,50,ecodivision,0.3731,0.2546,-0.028,0.4658
+Mediterranean Mountains,2601,148,ecodivision,0.1587,0.1607,0.0142,0.274
+Prairie,250,50,ecodivision,0.3934,0.3083,-0.0493,0.5335
+Savanna,410,0,CONUS pooled,0.3237,0.3079,-0.0316,0.5098
+Subtropical,230,64,ecodivision,0.6128,0.253,-0.022,0.9297
+Subtropical Mountains,2301,18,ecodivision,0.398,0.1634,-0.0295,0.6991
+Temperate Desert,340,57,ecodivision,0.4434,0.3916,-0.0511,0.5212
+Temperate Desert Mountains,3401,28,ecodivision,0.395,0.3395,-0.07,0.5873
+Temperate Steppe,330,54,ecodivision,0.509,0.4157,-0.0618,0.6487
+Temperate Steppe Mountains,3301,243,ecodivision,0.3885,0.3849,-0.0286,0.5391
+Tropical/Subtropical Desert,320,69,ecodivision,0.2296,0.2854,-0.0954,0.4553
+Tropical/Subtropical Steppe,310,109,ecodivision,0.5869,0.6256,-0.0921,0.6874
+Tropical/Subtropical Steppe Mountains,3101,88,ecodivision,0.4032,0.5786,-0.1309,0.6051
+Warm Continental,210,40,ecodivision,0.2578,0.2409,0.0042,0.4189
+Warm Continental Mountains,2101,23,ecodivision,-0.016,0.1491,0.0189,0.4868

@@ -58,6 +58,12 @@
 		<column name="EndYear" displayName="Historical End Year" dataType="Integer" defaultValue="2023" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1985"/>
 			</dataSheet>
 
+	<dataSheet name="ClimateOptions" displayName="Climate Options" isSingleRow="True">
+		<column name="ForestGrowthModel" displayName="Forest Growth (None = normal climate every year)" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP|3:Tree ring" defaultValue="3"/>
+		<column name="NonForestGrowthModel" displayName="Non-Forest Growth" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP" defaultValue="2"/>
+		<column name="DecompositionModel" displayName="Decomposition" dataType="Integer" validationType="List" formula1="1:None|2:Q10" defaultValue="2"/>
+	</dataSheet>
+
 	<dataSheet name="GrowthOptions" displayName="Growth Curve Options" isSingleRow="True">
 		<column name="LagYears" displayName="Fixed Lag Before Merchantable Volume (yr; blank = fitted per forest type)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="GreaterEqual" formula1="0"/>
 		<column name="MinPlotsLag" displayName="Minimum Plots to Fit a Forest Type's Own Lag (else its class lag)" dataType="Integer" defaultValue="2000" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1"/>
@@ -293,6 +299,7 @@
 
 	<transformer name="ClimateMultipliers" displayName="7 - Climate Multipliers" isRunnable="True" programName="Rscript" programArguments="src/7-climate-multipliers.R" condaEnv="lucasCore.yml" condaEnvVersion="1">
 		<dataSheet name="BuildOptions" type="Input"/>
+		<dataSheet name="ClimateOptions" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
 		<dataSheet name="stsim_FlowSpatialMultiplier" type="Output"/>
 		<dataSheet name="OutputClimateSummary" type="Output"/>
@@ -314,6 +321,7 @@
 		<group name="lucasCoreGroup" displayName="LUCAS Core">
 			<item name="BuildOptions"/>
 			<item name="GrowthOptions"/>
+			<item name="ClimateOptions"/>
 			<item name="MerchantableVolumeCurve"/>
 			<item name="CarbonCurve"/>
 			<item name="InitialStockCurve"/>

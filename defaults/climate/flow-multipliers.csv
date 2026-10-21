@@ -1,5 +1,5 @@
-FlowGroupId,Model,CbmPools,Note
-Net Growth Forest: Total,MiamiForest,,forest NPP = min(f(MAT) and f(MAP)) of the Miami model; multiplier = year / 1991-2020 normal
-Net Growth Non Forest: Total,MiamiNonForest,,non-forest NPP = f(MAP) of the Miami model; multiplier = year / normal
-Q10 Fast Flows,Q10,0|5,"Q10 of CBM pools 0 (AG very fast) and 5 (AG slow), 2.65"
-Q10 Slow Flows,Q10,1|2|3|4|7|8|9|10,"Q10 of CBM pools 1-4 (very fast BG, fast, medium) and 7-10 (snags), 2.0"
+FlowGroupId,Role,CbmPools,Note
+Net Growth Forest: Total,ForestGrowth,,Climate Options: Forest Growth (None / Miami NPP / Tree ring)
+Net Growth Non Forest: Total,NonForestGrowth,,Climate Options: Non-Forest Growth (None / Miami NPP)
+Q10 Fast Flows,Decomposition,0|5,"Q10 of CBM pools 0 (AG very fast) and 5 (AG slow), 2.65"
+Q10 Slow Flows,Decomposition,1|2|3|4|7|8|9|10,"Q10 of CBM pools 1-4 (very fast BG, fast, medium) and 7-10 (snags), 2.0"
