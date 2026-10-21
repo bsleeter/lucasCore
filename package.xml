@@ -97,6 +97,9 @@
 	</dataSheet>
 
 	<dataSheet name="GrowthOptions" displayName="Growth Curve Options" isSingleRow="True">
+		<column name="CurveSource" displayName="Growth Curves" dataType="Integer" validationType="List" formula1="1:Fit new curves|2:Copy from another library" defaultValue="1"/>
+		<column name="CurveLibrary" displayName="Source Library (.ssim path; when copying)" dataType="String" isOptional="True"/>
+		<column name="CurveScenarioId" displayName="Source Result Scenario Id (blank = the latest with curves; when copying)" dataType="Integer" isOptional="True"/>
 		<column name="LagYears" displayName="Fixed Lag Before Merchantable Volume (yr; blank = fitted per forest type)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="GreaterEqual" formula1="0"/>
 		<column name="MinPlotsLag" displayName="Minimum Plots to Fit a Forest Type's Own Lag (else its class lag)" dataType="Integer" defaultValue="2000" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1"/>
 		<column name="MaximumLag" displayName="Maximum Fitted Lag (yr)" dataType="Double" defaultValue="40" validationType="Decimal" validationCondition="Greater" formula1="0"/>

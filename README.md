@@ -33,6 +33,11 @@ lucasCore ships a starter library. An Empty Library does not work: it has no def
 
 To make several models, copy the starter again, or add scenarios to one library (each scenario has its own study area and strata).
 
+Growth curves come three ways (Growth Curve Options): fit in the Build (default; stage 2 in the pipeline, about 13 minutes, CONUS);
+fit once in the starter's optional Growth Curves scenario and shared by Builds as a dependency (remove stage 2 from their pipelines);
+or copied from a result scenario of another lucasCore library (Growth Curves = Copy from another library, with the Source
+Library path and, optionally, the Source Result Scenario Id; seconds instead of minutes).
+
 The starter is made by `tools/new-library.R`, which can also make or update any library directly:
 
 ```
@@ -72,4 +77,6 @@ is unchanged). `--units` takes Study Area units, comma-separated (default "Count
 | `tests/phaseB-growth.R`, `tests/phaseB-flows.R` | stage 2; stages 2-4 | 13, 21 min |
 | `tests/phaseC-initial.R`, `tests/phaseD-transitions.R` | stages 1 + 5; 1 + 5 + 6 | 17, 30 min |
 | `tests/phaseE-climate.R` | stages 1 + 7, then stage 7 with Miami, None, two projections and three refused setups | 25 min |
-| `tests/phaseF-pipeline.R` | the whole build: stages 1, 5, 2, 3, 4, 6, 7, 8 | 51 min |
+| `tests/phaseF-pipeline.R` | the whole build: stages 1, 5, 2, 3, 4, 6, 7, 8 | 51 min (California) |
+| `tests/phaseG-starter.R` | the starter: Growth Curves, then Build depending on it | 35 min |
+| `tests/phaseH-copy-curves.R` | stages 1-4 with curves copied from another library, and three refused sources | 10 min |

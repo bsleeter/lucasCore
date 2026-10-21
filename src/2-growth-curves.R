@@ -4,6 +4,7 @@
 # Replaces "Calculate Growth Curves - Weibull.R" (one interactive fit per type group x ecodivision, fitted to age medians, 68 of
 # the 551 cells) with the method in src/growth.R. Writes the Merchantable Volume Curves (ages 0 to Maximum Age) that stage 3
 # turns into carbon parameters, the fitted parameters with the method used for each cell, and a PDF of every curve over its data.
+# Growth Curve Options can instead copy all of these from a result scenario of another lucasCore library (src/growth-copy.R).
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
 source(pkg_file("src", "growth.R")); source(pkg_file("src", "carbon.R"))
@@ -11,8 +12,15 @@ suppressPackageStartupMessages({ library(terra); library(sf); library(parallel) 
 STAGE <- "2 Growth Curves"
 progressBar(type = "begin", totalSteps = 6)
 
-src <- read_data_sources(c("FiaConditionFile", "FiaDisturbanceFile", "EcodivisionFile", "PrismFolder"))
 opt <- as.list(read_ds("GrowthOptions"))
+# Growth Curve Options: copy the curves of another library's result scenario instead of fitting (src/growth-copy.R)
+src_choice <- if (is.null(opt$CurveSource) || is.na(opt$CurveSource)) "Fit new curves" else if (is.numeric(opt$CurveSource))
+  c("Fit new curves", "Copy from another library")[opt$CurveSource] else as.character(opt$CurveSource)
+if (identical(src_choice, "Copy from another library")) {
+  source(pkg_file("src", "growth-copy.R")); copy_curves(opt)
+  finish_checks(); progressBar(type = "end"); quit(save = "no") }
+
+src <- read_data_sources(c("FiaConditionFile", "FiaDisturbanceFile", "EcodivisionFile", "PrismFolder"))
 fixed_lag <- !is.null(opt$LagYears) && !is.na(opt$LagYears)
 say("Growth options: lag %s, penalty %g, min plots per ecodivision %d, ages 0-%d, inventories from %d, volume cap q%.3f",
     if (fixed_lag) sprintf("fixed at %g yr", opt$LagYears) else sprintf("fitted per forest type (0-%g yr; class lag below %d plots)", opt$MaximumLag, opt$MinPlotsLag),
