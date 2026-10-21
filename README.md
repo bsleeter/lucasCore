@@ -1,8 +1,8 @@
 # lucasCore
 
 SyncroSim 3 add-on to ST-Sim (stsim 4.5.x) that builds LUCAS land-use and carbon models from national datasets: FIA growth
-curves, CBM carbon parameters, spatial initial conditions, historical transitions and projections. Version 1.0.0 (development,
-Phase A). Plan: https://claude.ai/code/artifact/b04aa2f8-a1c2-4a73-99dc-672c8918139d
+curves, CBM carbon parameters, spatial initial conditions, historical transitions, climate multipliers and initial stocks.
+Version 1.0.0 (development). Plan: https://claude.ai/code/artifact/b04aa2f8-a1c2-4a73-99dc-672c8918139d
 
 ## Install (development)
 
@@ -10,43 +10,66 @@ Phase A). Plan: https://claude.ai/code/artifact/b04aa2f8-a1c2-4a73-99dc-672c8918
 "C:\Program Files\SyncroSim\SyncroSim.PackageManager.exe" --xinstall="F:\lucasCore"
 ```
 
-`--xinstall` registers the folder, so SyncroSim runs the scripts in `src/` where they are. Close SyncroSim Studio first.
+`--xinstall` registers the folder, so SyncroSim runs the scripts in `src/` where they are. Close SyncroSim Studio first. In Studio,
+tick lucasCore under File > Local Packages. lucasCore runs on the installed R; it needs no conda environment.
 
-## Make a library
+## Start a model
+
+SyncroSim 3 has no local templates (File > New offers only Empty Library and the online templates of the central package index), so
+lucasCore ships a starter library. An Empty Library does not work: it has no definitions, strata lists or Stock-Flow Definitions.
+
+1. Copy `Starter/LUCAS Core (CONUS).ssim` to where the model will live and rename it (build it first with
+   `Rscript tools/build_starter.R` if it is missing: it is not in git).
+2. In SyncroSim Studio, File > Open the copy.
+3. Open the **Build** scenario's properties and set, under LUCAS Core:
+   - **Build Options**: cell size; secondary and tertiary strata (blank = States, Federal Lands); historical start and end years;
+     projection end year (blank = no projection; it starts the year after the historical end)
+   - **Study Area**: one row per unit, from any source ("State: California", "Ecodivision: Mediterranean Mountains", "Pyrome: ...",
+     "HUC8: ..."); blank = all of CONUS
+   - **Climate Options**: forest growth (None / Miami NPP / Tree ring), non-forest growth, decomposition; when projecting, the
+     scenario (SSP), climate model and replicate
+4. Run **Build**. Its dependency (Stock-Flow Definitions) and pipeline (stages 1, 5, 2, 3, 4, 6, 7, 8) are already set. California at
+   1 km takes about 50 minutes; the result scenario holds every input an ST-Sim historical run needs except Run Control.
+
+To make several models, copy the starter again, or add scenarios to one library (each scenario has its own study area and strata).
+
+The starter is made by `tools/new-library.R`, which can also make or update any library directly:
 
 ```
-Rscript tools/new-library.R "F:/path/My Model.ssim"
+Rscript tools/new-library.R "F:/path/My Model.ssim" [--rebuild-strata] [--rebuild-climate]
 ```
 
-Creates the library with stsim + lucasCore, writes the stsim project definitions from `defaults/stsim` (state classes, strata
-lists, transition, stock and flow types), and turns multiprocessing and conda off. Secondary and tertiary strata are chosen
-here from `defaults/strata/presets.csv` (States, Counties, HUC6, HUC8, EPA Level III Ecoregions, Pyromes, Federal Lands, GAP
-Status): `--secondary=Counties --tertiary="GAP Status"`. Defaults: States and Federal Lands (the CONUS 1km model). It also creates the
-"Stock-Flow Definitions" scenario (flow diagram, order, groups, output options) that stage 3 scenarios depend on. This is not a stage: SyncroSim discards
-project-scope sheets that a stage saves during a run.
+It writes the stsim definitions from `defaults/stsim`; every polygon source in `defaults/strata/presets.csv` as a Stratum Sources row,
+with the stsim Secondary and Tertiary Strata lists holding every unit of every source (6,221 units; `defaults/strata/README.md`); the
+LOCA2 scenario, model and replicate lists from the LOCA2 folder; and the "Stock-Flow Definitions" scenario. None of this can be a
+stage: SyncroSim discards project-scope sheets that a stage saves during a run.
 
 ## Stages
 
-| Stage | Script | Status |
+| Stage | Script | What it does |
 |---|---|---|
-| 1 - Study Area and Strata | `src/1-study-area.R` | Done: model lattice; primary = FIA ecodivisions (fixed); secondary and tertiary from Stratum Sources |
-| 2 - Fit Growth Curves | `src/2-growth-curves.R`, `src/growth.R` | Done: 551 merchantable volume curves (forest state class x ecodivision), parameters, PDF report |
-| 3 - Carbon Flows | `src/3-carbon-flows.R`, `src/flows.R`, `src/dom.R`, `src/calibrate.R` | Done: net growth and its split, turnover, DOM decay at PRISM temperature calibrated to FIA dead carbon (snags, down wood, litter) and gSSURGO soil; non-forest and event flows from LUCAS defaults |
-| 4 - Spin-up and Initial Stocks | `src/4-initial-stocks.R`, `src/dom.R` | Done: CBM spin-up as a fixed point with the calibrated stage 3 rates; all 14 pools by age for a last disturbance of high-severity fire or clearcut |
-| 5 - Initial Conditions | `src/5-initial-conditions.R` | Done: annual NLCD on the model grid, forest type (EVT), grass/shrub (RCMAP), wetland (C-CAP), state class and stand age (CMS) maps; per-cell return intervals (LANDFIRE FRI) and gSSURGO soil targets for stage 3 |
-| 6-9 | | Planned |
+| 1 - Study Area and Strata | `src/1-study-area.R`, `src/strata.R` | Model lattice; study area from any source; primary = FIA ecodivisions (fixed); secondary and tertiary from Build Options |
+| 2 - Fit Growth Curves | `src/2-growth-curves.R`, `src/growth.R`, `src/carbon.R` | Merchantable volume and live-tree carbon curves by forest type x ecodivision, fitted to FIA |
+| 3 - Carbon Flows | `src/3-carbon-flows.R`, `src/flows.R`, `src/dom.R`, `src/calibrate.R` | Net growth, turnover, DOM decay calibrated to FIA dead carbon and gSSURGO soil; non-forest and event flows |
+| 4 - Spin-up and Initial Stocks | `src/4-initial-stocks.R` | CBM spin-up: all 14 pools by age after high-severity fire or clearcut |
+| 5 - Initial Conditions | `src/5-initial-conditions.R` | Annual NLCD on the grid; state class and stand age maps; return intervals and soil targets for stage 3 |
+| 6 - Historical Transitions | `src/6-historical-transitions.R` | Transition pathways and annual spatial multipliers (NLCD land use and clearcut, MTBS fire, LANDFIRE thinning) |
+| 7 - Climate Multipliers | `src/7-climate-multipliers.R`, `src/loca2.R` | Growth and decomposition multipliers: PRISM historical, LOCA2 projections (Climate Options) |
+| 8 - Initial Stock Maps | `src/8-initial-stocks-spatial.R` | The 14 carbon pools of every cell as ST-Sim initial stocks |
+| 9 - Projections | | Planned |
 
-Pipeline order: 1, 5, 2, 3, 4 (stage 3 calibrates with stage 5's return intervals and soil targets; without them it uses provisional defaults).
-
-Every stage ends with validation checks (`lucasCore_OutputValidation`); a check that cannot be computed fails.
+Pipeline order: 1, 5, 2, 3, 4, 6, 7, 8. Every stage ends with validation checks (`lucasCore_OutputValidation`); a check that cannot be
+computed fails.
 
 ## Test
 
-```
-Rscript tests/phaseA-smoke.R
-```
+Each test builds a new library in `dev/libs` (a newly added stage is not visible to an existing library while the package version
+is unchanged). `--units` takes Study Area units, comma-separated (default "State: California").
 
-Builds a scratch library in `dev/libs`, runs stage 1 for California and compares the strata with the CONUS 1km model.
-`Rscript tests/phaseB-growth.R` runs stage 2 in a new library; `Rscript tests/phaseB-flows.R` runs stages 2-4 (about 21 minutes);
-`Rscript tests/phaseC-initial.R --units=California` runs stages 1 and 5 (about 17 minutes for California at 1 km).
-A newly added stage is not visible to an existing library while the package version is unchanged: test it in a new library.
+| Test | Runs | Time (California, 1 km) |
+|---|---|---|
+| `tests/phaseA-smoke.R [--units=] [--secondary=] [--tertiary=]` | stage 1; with States strata, compares with the CONUS 1km model | 4 min |
+| `tests/phaseB-growth.R`, `tests/phaseB-flows.R` | stage 2; stages 2-4 | 13, 21 min |
+| `tests/phaseC-initial.R`, `tests/phaseD-transitions.R` | stages 1 + 5; 1 + 5 + 6 | 17, 30 min |
+| `tests/phaseE-climate.R` | stages 1 + 7, then stage 7 with Miami, None, two projections and three refused setups | 25 min |
+| `tests/phaseF-pipeline.R` | the whole build: stages 1, 5, 2, 3, 4, 6, 7, 8 | 51 min |
