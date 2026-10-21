@@ -1,0 +1,15 @@
+StockTypeId,Attribute,CurveColumn
+Biomass: Merchantable,Carbon Initial Conditions: Merchantable,Merchantable
+Biomass: Other Wood,Carbon Initial Conditions: Other Wood,Other
+Biomass: Foliage,Carbon Initial Conditions: Foliage,Foliage
+Biomass: Fine Root,Carbon Initial Conditions: Fine Roots,FineRoots
+Biomass: Coarse Root,Carbon Initial Conditions: Coarse Roots,CoarseRoots
+DOM: Aboveground Very Fast,Carbon Initial Conditions: Aboveground Very Fast,AGVF
+DOM: Belowground Very Fast,Carbon Initial Conditions: Belowground Very Fast,BGVF
+DOM: Aboveground Fast,Carbon Initial Conditions: Aboveground Fast,AGF
+DOM: Belowground Fast,Carbon Initial Conditions: Belowground Fast,BGF
+DOM: Aboveground Medium,Carbon Initial Conditions: Aboveground Medium,AGM
+DOM: Aboveground Slow,Carbon Initial Conditions: Aboveground Slow,AGS
+DOM: Belowground Slow,Carbon Initial Conditions: Belowground Slow,BGS
+DOM: Snag Stem,Carbon Initial Conditions: Snag Stem,SnagStem
+DOM: Snag Branch,Carbon Initial Conditions: Snag Branch,SnagBranch

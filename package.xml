@@ -239,6 +239,17 @@
 		<column name="Max" displayName="Cell Maximum" dataType="Double" format="0.000"/>
 	</dataSheet>
 
+	<dataSheet name="OutputInitialStockSummary" displayName="Initial Stock Summary">
+		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="Cells" dataType="Integer"/>
+		<column name="PostFire" displayName="Share Post-Fire" dataType="Double" format="0.000"/>
+		<column name="Live" displayName="Mean Live (Mg C/ha)" dataType="Double" format="0.0"/>
+		<column name="Dom" displayName="Mean Dead Organic Matter excl. Soil (Mg C/ha)" dataType="Double" format="0.0"/>
+		<column name="Soil" displayName="Mean Soil, BG Slow (Mg C/ha)" dataType="Double" format="0.0"/>
+		<column name="TotalTg" displayName="Total Carbon (Tg C)" dataType="Double" format="0.00"/>
+		<column name="Source" dataType="String"/>
+	</dataSheet>
+
 	<dataSheet name="OutputGrowthReport" displayName="Growth Curve Report" isSingleRow="True">
 		<column name="FileName" displayName="Report (PDF)" dataType="String" isExternalFile="True" isRaster="False" externalFileFilter="PDF Files (*.pdf)|*.pdf"/>
 	</dataSheet>
@@ -330,6 +341,15 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
+	<transformer name="InitialStocksSpatial" displayName="8 - Initial Stock Maps" isRunnable="True" programName="Rscript" programArguments="src/8-initial-stocks-spatial.R" condaEnv="lucasCore.yml" condaEnvVersion="1">
+		<dataSheet name="BuildOptions" type="Input"/>
+		<dataSheet name="InitialStockCurve" type="Input"/>
+		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
+		<dataSheet name="stsim_InitialStockSpatial" type="Output"/>
+		<dataSheet name="OutputInitialStockSummary" type="Output"/>
+		<dataSheet name="OutputValidation" type="Output"/>
+	</transformer>
+
 	<!-- =================================================================================================== -->
 	<!-- LAYOUTS                                                                                             -->
 	<!-- =================================================================================================== -->
@@ -359,6 +379,7 @@
 				<item name="OutputNlcdAnnual"/>
 				<item name="OutputTransitionSummary"/>
 				<item name="OutputClimateSummary"/>
+				<item name="OutputInitialStockSummary"/>
 				<item name="OutputReturnInterval"/>
 				<item name="OutputSoilTarget"/>
 				<item name="OutputGrowthParameter"/>
