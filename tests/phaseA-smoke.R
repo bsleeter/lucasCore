@@ -1,14 +1,14 @@
 # =============================================================================
 # phaseA-smoke.R - a library is created, stage 1 runs, and (for state / federal lands strata) matches the CONUS 1km strata
 # =============================================================================
-# Usage: Rscript tests/phaseA-smoke.R [--units="State: California"] [--secondary=States] [--tertiary="Federal Lands"] [--dir=dev/libs]
+# Usage: Rscript tests/phaseA-smoke.R [--units="County: Placer California"] [--secondary=States] [--tertiary="Federal Lands"] [--dir=dev/libs]
 #   --units      Study Area units of any source, comma-separated (blank = all of CONUS), e.g. "Pyrome: P26 ..." or "Ecodivision: Marine"
 #   --secondary / --tertiary   Stratum Sources names for Build Options
 #   With --secondary=States the strata are compared with the CONUS 1km model on the same cells (universal ids less their offset).
 # =============================================================================
 suppressPackageStartupMessages({ library(rsyncrosim); library(terra) })
 a <- commandArgs(TRUE); opt <- function(k, d) { m <- grep(sprintf("^--%s=", k), a, value = TRUE); if (length(m)) sub(sprintf("^--%s=", k), "", m[1]) else d }
-D <- opt("dir", "F:/lucasCore/dev/libs"); UNITS <- opt("units", "State: California")
+D <- opt("dir", "F:/lucasCore/dev/libs"); UNITS <- opt("units", "County: Placer California")
 SEC <- opt("secondary", "States"); TER <- opt("tertiary", "Federal Lands")
 REF <- "F:/lucas-master/Models/CONUS 1km/Data/Initial Conditions"; OFF <- 1e8
 dir.create(D, showWarnings = FALSE, recursive = TRUE)

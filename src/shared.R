@@ -144,6 +144,14 @@ finish_checks <- function() {
   if (nrow(bad)) fail("%d validation check(s) failed: %s", nrow(bad), paste(bad$Check, collapse = "; "))
   invisible() }
 
+# the primary strata (ecodivision) names of the study area: the values of stage 1's primary strata raster, or NULL when no stage 1
+# result is in the scenario (then a stage works on all of CONUS)
+study_ecodivisions <- function() {
+  ic <- as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", optional = TRUE, lookupsAsFactors = FALSE))
+  if (!nrow(ic) || is.na(ic$StratumFileName[1])) return(NULL)
+  v <- terra::unique(terra::rast(ic$StratumFileName[1]))[[1]]; l <- stsim_list("Stratum")
+  l$Name[match(v[!is.na(v)], as.integer(l$Id))] }
+
 # every value of a raster must be an Id in the stsim list (NA cells excluded); returns the values not in the list
 raster_ids_in_list <- function(r, list_name) {
   v <- terra::unique(r)[[1]]; v <- v[!is.na(v)]

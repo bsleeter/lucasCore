@@ -39,6 +39,15 @@ defaults_of <- function(sheet) { blk <- regmatches(xml, regexpr(sprintf('(?s)<da
 bo <- defaults_of("BuildOptions"); bo$SecondarySourceId <- "States"; bo$TertiarySourceId <- "Federal Lands"
 saveDatasheet(B, bo, "lucasCore_BuildOptions")
 for (sh in c("ClimateOptions", "GrowthOptions")) saveDatasheet(B, defaults_of(sh), paste0("lucasCore_", sh))
+# optional: growth curves fitted once (stage 2 alone, CONUS) and shared by many builds. Build keeps stage 2 in its pipeline by default
+# (curves refitted per library, following FIA updates); to share instead, run this, make Build depend on its result, and remove stage 2
+# from Build's pipeline - stage 3 reads the curves from the dependency.
+G <- rsyncrosim::scenario(P, "Growth Curves")
+description(G) <- paste("Optional. Fits the FIA growth and live-tree carbon curves for all of CONUS (stage 2, about 13 minutes). Run it once,",
+  "then make Build scenarios depend on its result and remove stage 2 from their pipelines, so every build uses the same curves.",
+  "Without it, Build fits the curves itself (stage 2 in its pipeline). Growth Curve Options here set the fit.")
+saveDatasheet(G, data.frame(StageNameId = "2 - Fit Growth Curves", RunOrder = 1L), "core_Pipeline")
+saveDatasheet(G, defaults_of("GrowthOptions"), "lucasCore_GrowthOptions")
 for (sh in c("BuildOptions", "ClimateOptions", "GrowthOptions")) { cat(sh, ": "); x <- datasheet(B, paste0("lucasCore_", sh), lookupsAsFactors = FALSE)
   cat(paste(names(x), unlist(lapply(x[1, ], as.character)), sep = " = ", collapse = "; "), "\n") }
 unlink(paste0(f, c(".temp", ".backup")), recursive = TRUE)

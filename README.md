@@ -64,7 +64,7 @@ computed fails.
 ## Test
 
 Each test builds a new library in `dev/libs` (a newly added stage is not visible to an existing library while the package version
-is unchanged). `--units` takes Study Area units, comma-separated (default "State: California").
+is unchanged). `--units` takes Study Area units, comma-separated (default "County: Placer California", about 3,900 km2 over two ecodivisions; tests run in minutes).
 
 | Test | Runs | Time (California, 1 km) |
 |---|---|---|

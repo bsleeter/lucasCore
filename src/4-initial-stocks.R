@@ -25,7 +25,8 @@ if (!nrow(fm)) fail("no forest turnover and decay flow multipliers: run stage 3 
 setnames(cc, c("StratumId", "StateClassId"), c("Stratum", "StateClass"))
 fo <- fread(pkg_file("defaults", "stockflow", "stsim_FlowOrder.csv")); ev <- fread(pkg_file("defaults", "stockflow", "event-pathways.csv"), na.strings = "")
 LAST <- c(Fire = "Fire: High Severity [Type]", Clearcut = "Forest Harvest: Forest Clearcut [Type]")
-cells <- unique(cc[, .(Stratum, StateClass)])
+# the cells stage 3 calibrated: the study area's ecodivisions x every forest type (all of CONUS when stage 3 ran without a study area)
+cells <- unique(cc[, .(Stratum, StateClass)])[paste(Stratum, StateClass) %in% paste(dc$StratumId, dc$StateClassId)]
 cells[, ri := as.integer(dc$ReturnInterval[match(paste(Stratum, StateClass), paste(dc$StratumId, dc$StateClassId))])]
 if (anyNA(cells$ri)) fail("Decay Calibration has no return interval for %d cells", cells[is.na(ri), .N])
 say("Spin-up: %d cells, return intervals %d-%d yr; last disturbance: %s", nrow(cells), min(cells$ri), max(cells$ri), paste(names(LAST), collapse = ", "))

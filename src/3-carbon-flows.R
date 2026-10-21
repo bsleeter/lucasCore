@@ -56,17 +56,25 @@ cells[is.na(ri), ri := median(as.numeric(ri_tab$ReturnInterval))][, ri := as.int
 cells[, soil_target := as.numeric(soil_t$SoilTarget)[match(paste(Stratum, StateClass), paste(soil_t$Stratum, soil_t$StateClass))]]
 dat <- fia_dom_data(src$FiaConditionFile, src$FiaDisturbanceFile, gopt, cw)
 cells[, plots := dat$obs[, .(n = sum(n)), by = .(sc, ecodiv)][cells, on = c("sc", "ecodiv"), n]][is.na(plots), plots := 0L]
+# the study area: calibrate and write flows only for its ecodivisions (every forest type in them, so a cell that changes type during a
+# run still has flows). Each ecodivision x type is calibrated on its own FIA plots, so these values are the same as a CONUS build's;
+# the forest-type fallback for cells with few plots stays pooled over every ecodivision of the type (all_cells). Only the soil
+# multiplier of a cell with no gSSURGO target (a median over its type's cells) now comes from the study area's cells.
+all_cells <- cells; study <- study_ecodivisions()
+if (!is.null(study)) { cells <- cells[Stratum %in% study]
+  say("Study area: %d of %d ecodivisions (%s): %d of %d ecodivision x forest type cells", length(study), uniqueN(all_cells$Stratum),
+      paste(study, collapse = ", "), nrow(cells), nrow(all_cells)) }
 say("Decay calibration: %d cells, %d with >= %d FIA plots (own fit), %d with a gSSURGO soil target; return intervals %d-%d yr",
     nrow(cells), cells[plots >= MIN_PLOTS_CELL, .N], MIN_PLOTS_CELL, cells[!is.na(soil_target), .N], min(cells$ri), max(cells$ri))
 ctx <- list(cc = cc, cw = cw, dens = dens, cbm = cbm, fo = fread(pkg_file("defaults", "stockflow", "stsim_FlowOrder.csv")),
             ev = fread(pkg_file("defaults", "stockflow", "event-pathways.csv"), na.strings = ""))
 t0 <- Sys.time(); cl <- parallel::makeCluster(max(1, min(30, parallel::detectCores() - 1)))
-parallel::clusterExport(cl, c("ctx", "dat", "cells"), envir = environment())
+parallel::clusterExport(cl, c("ctx", "dat", "cells", "all_cells"), envir = environment())
 pkgdir <- env$PackageDirectory; parallel::clusterExport(cl, "pkgdir", envir = environment())
 invisible(parallel::clusterEvalQ(cl, { library(data.table); for (f in c("flows.R", "dom.R", "calibrate.R")) source(file.path(pkgdir, "src", f)) }))
-own <- which(cells$plots >= MIN_PLOTS_CELL); types <- unique(cells[plots > 0, sc])
+own <- which(cells$plots >= MIN_PLOTS_CELL); types <- intersect(unique(cells[plots < MIN_PLOTS_CELL, sc]), unique(all_cells[plots > 0, sc]))
 fc <- parallel::parLapply(cl, own, function(i) cal_fit(cells[i], ctx, dat))
-ft <- stats::setNames(parallel::parLapply(cl, types, function(s) cal_fit(cells[sc == s & plots > 0], ctx, dat)), types)
+ft <- stats::setNames(parallel::parLapply(cl, types, function(s) cal_fit(all_cells[sc == s & plots > 0], ctx, dat)), types)
 cells[, `:=`(Level = NA_character_, m_snag = NA_real_, m_cwd = NA_real_, m_floor = NA_real_, clearcut = NA_real_)]
 for (j in seq_along(own)) cells[own[j], `:=`(Level = "Cell", m_snag = fc[[j]]$snag, m_cwd = fc[[j]]$cwd, m_floor = fc[[j]]$floor, clearcut = fc[[j]]$clearcut)]
 for (s in types) cells[is.na(Level) & sc == s, `:=`(Level = "Forest type", m_snag = ft[[s]]$snag, m_cwd = ft[[s]]$cwd, m_floor = ft[[s]]$floor, clearcut = ft[[s]]$clearcut)]
