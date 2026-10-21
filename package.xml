@@ -190,6 +190,16 @@
 		<column name="MeanAge" displayName="Mean Age (yr)" dataType="Double" format="0.0"/>
 	</dataSheet>
 
+	<dataSheet name="OutputTransitionSummary" displayName="Historical Transition Summary">
+		<column name="Timestep" dataType="Integer"/>
+		<column name="TransitionGroup" displayName="Transition Group" dataType="String"/>
+		<column name="Source" dataType="String"/>
+		<column name="Area" displayName="Expected Area (km2)" dataType="Double" format="0.00"/>
+		<column name="Cells" displayName="Cells with a Multiplier above 0" dataType="Integer"/>
+		<column name="IneligibleArea" displayName="Area on Start-Year Classes with no Pathway (km2)" dataType="Double" format="0.00"/>
+		<column name="AgeBlockedArea" displayName="Area below the Pathway Minimum Age (km2)" dataType="Double" format="0.00"/>
+	</dataSheet>
+
 	<dataSheet name="OutputGrowthReport" displayName="Growth Curve Report" isSingleRow="True">
 		<column name="FileName" displayName="Report (PDF)" dataType="String" isExternalFile="True" isRaster="False" externalFileFilter="PDF Files (*.pdf)|*.pdf"/>
 	</dataSheet>
@@ -260,6 +270,18 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
+	<transformer name="HistoricalTransitions" displayName="6 - Historical Transitions" isRunnable="True" programName="Rscript" programArguments="src/6-historical-transitions.R" condaEnv="lucasCore.yml" condaEnvVersion="1">
+		<dataSheet name="BuildOptions" type="Input"/>
+		<dataSheet name="OutputNlcdAnnual" type="Input"/>
+		<dataSheet name="stsim_InitialConditionsSpatial" type="Both"/>
+		<dataSheet name="stsim_Transition" type="Output"/>
+		<dataSheet name="stsim_DeterministicTransition" type="Output"/>
+		<dataSheet name="stsim_TransitionSpatialMultiplier" type="Output"/>
+		<dataSheet name="stsim_TransitionTarget" type="Output"/>
+		<dataSheet name="OutputTransitionSummary" type="Output"/>
+		<dataSheet name="OutputValidation" type="Output"/>
+	</transformer>
+
 	<!-- =================================================================================================== -->
 	<!-- LAYOUTS                                                                                             -->
 	<!-- =================================================================================================== -->
@@ -283,6 +305,7 @@
 				<item name="OutputStateClassSummary"/>
 				<item name="OutputLandCoverLayers"/>
 				<item name="OutputNlcdAnnual"/>
+				<item name="OutputTransitionSummary"/>
 				<item name="OutputReturnInterval"/>
 				<item name="OutputSoilTarget"/>
 				<item name="OutputGrowthParameter"/>

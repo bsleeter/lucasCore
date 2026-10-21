@@ -1,0 +1,21 @@
+TransitionGroupId,Source,Classes,Note
+Urbanization: Open [Type],NlcdGain,21,modal NLCD cell becomes 21
+Urbanization: Low [Type],NlcdGain,22,
+Urbanization: Medium [Type],NlcdGain,23,
+Urbanization: High [Type],NlcdGain,24,
+Intensification: Open to Low [Type],NlcdGain,22,pathways restrict the source class to developed
+Intensification: Open to Medium [Type],NlcdGain,23,
+Intensification: Open to High [Type],NlcdGain,24,
+Intensification: Low to Medium [Type],NlcdGain,23,
+Intensification: Low to High [Type],NlcdGain,24,
+Intensification: Medium to High [Type],NlcdGain,24,
+Ag Expansion: Cropland [Type],NlcdGain,82,
+Ag Expansion: Pasture [Type],NlcdGain,81,
+Ag Contraction: Cropland,NlcdLoss,82,modal NLCD cell stops being 82
+Ag Contraction: Pasture,NlcdLoss,81,
+Ag Contraction,NaturalVeg,,each type's destination class is gated to the nearest natural class of the start year
+Fire: Low Severity [Type],Mtbs,1|2,MTBS 1 = unburned to low (kept as low; the CONUS 1km build did the same)
+Fire: Medium Severity [Type],Mtbs,3,
+Fire: High Severity [Type],Mtbs,4,
+Forest Harvest: Forest Clearcut [Type],NlcdClearcut,41|42|43>52|71,modal NLCD cell goes from forest to shrub or grass and less than half of it burned (MTBS) that year or the year before
+Forest Harvest: Forest Selection [Type],Landfire,Thinning,LANDFIRE disturbance type (by each year's attribute table)

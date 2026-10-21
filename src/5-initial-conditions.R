@@ -37,7 +37,7 @@ years <- y0:y1; nfs <- file.path(src$NlcdFolder, sprintf("Annual_NLCD_LndCov_%d_
 miss <- years[!file.exists(nfs)]; if (length(miss)) fail("Annual NLCD missing for %s", paste(miss, collapse = ", "))
 td <- TD(); pf <- ic$StratumFileName[1]; Lw <- wrap(L)
 cl <- makeCluster(max(1, min(length(years), 20, detectCores() - 1)))
-clusterExport(cl, c("nlcd_on_grid", "clear_syncrosim_proj", "td", "pf", "Lw"), envir = environment())
+clusterExport(cl, c("nlcd_on_grid", "grid_blocks", "clear_syncrosim_proj", "td", "pf", "Lw"), envir = environment())
 invisible(clusterEvalQ(cl, clear_syncrosim_proj()))
 nl_files <- parLapply(cl, seq_along(years), function(i, years, nfs) { library(terra); P <- rast(pf); L <- unwrap(Lw)
   n <- mask(nlcd_on_grid(nfs[i], L, rast(P)), P); f <- file.path(td, sprintf("NLCD_%d.tif", years[i]))

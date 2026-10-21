@@ -106,15 +106,19 @@ write_raster <- function(r, file, datatype = "INT4S", NAflag = NA) {
 # CONUS crop the CONUS 1km build used (lattice extent + one block, snapped to the NLCD 30 m grid), so a regional build aggregates the
 # same 30 m pixels into each cell as a CONUS build. NLCD's Albers WKT differs from EPSG:5070 only in naming, so extents are used as is.
 nlcd_on_grid <- function(nf, L, R) {
-  n30 <- terra::rast(nf); res_m <- terra::res(R)[1]; fact <- round(res_m / terra::res(n30)[1]); blk <- fact * terra::res(n30)[1]
+  n30 <- terra::rast(nf); b <- grid_blocks(n30, L, R)
+  n <- terra::aggregate(terra::crop(n30, b$ext), fact = b$fact, fun = "modal", na.rm = TRUE)
+  terra::project(n, R, method = "near") }
+# the 30 m extent of those aggregation blocks and the aggregation factor (MTBS and LANDFIRE disturbance sit on the same 30 m grid,
+# so stage 6 aggregates them over the same blocks)
+grid_blocks <- function(n30, L, R) {
+  res_m <- terra::res(R)[1]; fact <- round(res_m / terra::res(n30)[1]); blk <- fact * terra::res(n30)[1]
   conus <- terra::ext(terra::crop(n30, terra::ext(L) + blk)); want <- terra::ext(R) + blk
   x0 <- terra::xmin(conus) + floor((terra::xmin(want) - terra::xmin(conus)) / blk) * blk
   y0 <- terra::ymin(conus) + floor((terra::ymin(want) - terra::ymin(conus)) / blk) * blk
   x1 <- min(terra::xmax(conus), terra::xmin(conus) + ceiling((terra::xmax(want) - terra::xmin(conus)) / blk) * blk)
   y1 <- min(terra::ymax(conus), terra::ymin(conus) + ceiling((terra::ymax(want) - terra::ymin(conus)) / blk) * blk)
-  n <- terra::crop(n30, terra::ext(max(x0, terra::xmin(conus)), x1, max(y0, terra::ymin(conus)), y1))
-  n <- terra::aggregate(n, fact = fact, fun = "modal", na.rm = TRUE)
-  terra::project(n, R, method = "near") }
+  list(ext = terra::ext(max(x0, terra::xmin(conus)), x1, max(y0, terra::ymin(conus)), y1), fact = fact) }
 
 # fill NA cells of r (inside mask m) with the modal value of their neighbours, repeating until none is left (the CONUS 1km build's
 # iterative focal fill, run at twice the cell size for speed); `default` everywhere when r has no values at all
