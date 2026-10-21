@@ -200,6 +200,15 @@
 		<column name="AgeBlockedArea" displayName="Area below the Pathway Minimum Age (km2)" dataType="Double" format="0.00"/>
 	</dataSheet>
 
+	<dataSheet name="OutputClimateSummary" displayName="Climate Multiplier Summary">
+		<column name="Timestep" dataType="Integer"/>
+		<column name="FlowGroup" displayName="Flow Group" dataType="String"/>
+		<column name="Model" dataType="String"/>
+		<column name="Mean" displayName="Study-Area Mean" dataType="Double" format="0.000"/>
+		<column name="Min" displayName="Cell Minimum" dataType="Double" format="0.000"/>
+		<column name="Max" displayName="Cell Maximum" dataType="Double" format="0.000"/>
+	</dataSheet>
+
 	<dataSheet name="OutputGrowthReport" displayName="Growth Curve Report" isSingleRow="True">
 		<column name="FileName" displayName="Report (PDF)" dataType="String" isExternalFile="True" isRaster="False" externalFileFilter="PDF Files (*.pdf)|*.pdf"/>
 	</dataSheet>
@@ -282,6 +291,14 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
+	<transformer name="ClimateMultipliers" displayName="7 - Climate Multipliers" isRunnable="True" programName="Rscript" programArguments="src/7-climate-multipliers.R" condaEnv="lucasCore.yml" condaEnvVersion="1">
+		<dataSheet name="BuildOptions" type="Input"/>
+		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
+		<dataSheet name="stsim_FlowSpatialMultiplier" type="Output"/>
+		<dataSheet name="OutputClimateSummary" type="Output"/>
+		<dataSheet name="OutputValidation" type="Output"/>
+	</transformer>
+
 	<!-- =================================================================================================== -->
 	<!-- LAYOUTS                                                                                             -->
 	<!-- =================================================================================================== -->
@@ -306,6 +323,7 @@
 				<item name="OutputLandCoverLayers"/>
 				<item name="OutputNlcdAnnual"/>
 				<item name="OutputTransitionSummary"/>
+				<item name="OutputClimateSummary"/>
 				<item name="OutputReturnInterval"/>
 				<item name="OutputSoilTarget"/>
 				<item name="OutputGrowthParameter"/>

@@ -97,7 +97,7 @@ model_lattice <- function(ecodiv, res) {
 TD <- function() env$TransferDirectory
 write_raster <- function(r, file, datatype = "INT4S", NAflag = NA) {
   p <- file.path(TD(), file)
-  args <- list(r, p, overwrite = TRUE, datatype = datatype, gdal = c("COMPRESS=DEFLATE", "TILED=YES"))
+  args <- list(r, p, overwrite = TRUE, datatype = datatype, gdal = c("COMPRESS=DEFLATE", "TILED=YES", if (startsWith(datatype, "FLT")) "PREDICTOR=3"))
   if (!is.na(NAflag)) args$NAflag <- NAflag
   do.call(terra::writeRaster, args)
   p }

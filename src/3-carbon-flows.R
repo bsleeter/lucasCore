@@ -127,7 +127,9 @@ fp_forest <- rbindlist(lapply(cw$StateClass, function(c0) FOREST_PATHWAYS[, .(Fr
                                                                                 StateAttributeTypeId = Attribute, FlowTypeId = FlowType, Multiplier = 1)]))
 fp <- rbind(fp_forest, rd("nonforest-pathways.csv"), rd("event-pathways.csv"), fill = TRUE)
 fm <- rbind(fm_g, fm_d, rd("nonforest-multipliers-grassland-shrubland.csv"), rd("nonforest-multipliers-wetland.csv"),
-            rd("nonforest-multipliers-other.csv"), rd("scalar-multipliers.csv"), fill = TRUE)
+            rd("nonforest-multipliers-other.csv"), fill = TRUE)
+# (the CONUS 1km build also had 0.01 "scalar" multipliers on the four climate flow groups, undoing climate rasters stored as
+# integers x 100; stage 7 writes true multipliers, so there are none: a run without climate multipliers runs at normal climate)
 sav <- rbind(ng, rd("nonforest-net-growth.csv"), fill = TRUE)
 for (k in c("Iteration", "Timestep")) for (x in list(fp, fm, sav)) if (k %in% names(x)) x[, (k) := NULL]
 
