@@ -281,7 +281,7 @@
 	<!-- TRANSFORMERS                                                                                        -->
 	<!-- =================================================================================================== -->
 
-	<transformer name="StudyArea" displayName="1 - Study Area and Strata" isRunnable="True" programName="Rscript" programArguments="src/1-study-area.R" condaEnv="lucasCore.yml" condaEnvVersion="1">
+	<transformer name="StudyArea" displayName="1 - Study Area and Strata" isRunnable="True" programName="Rscript" programArguments="src/1-study-area.R">
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="StudyArea" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Both"/>
@@ -289,7 +289,7 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
-	<transformer name="GrowthCurves" displayName="2 - Fit Growth Curves" isRunnable="True" programName="Rscript" programArguments="src/2-growth-curves.R" condaEnv="lucasCore.yml" condaEnvVersion="1">
+	<transformer name="GrowthCurves" displayName="2 - Fit Growth Curves" isRunnable="True" programName="Rscript" programArguments="src/2-growth-curves.R">
 		<dataSheet name="GrowthOptions" type="Input"/>
 		<dataSheet name="MerchantableVolumeCurve" type="Output"/>
 		<dataSheet name="CarbonCurve" type="Output"/>
@@ -299,7 +299,7 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
-	<transformer name="CarbonFlows" displayName="3 - Carbon Flows" isRunnable="True" programName="Rscript" programArguments="src/3-carbon-flows.R" condaEnv="lucasCore.yml" condaEnvVersion="1">
+	<transformer name="CarbonFlows" displayName="3 - Carbon Flows" isRunnable="True" programName="Rscript" programArguments="src/3-carbon-flows.R">
 		<dataSheet name="CarbonCurve" type="Input"/>
 		<dataSheet name="stsim_FlowPathwayDiagram" type="Input"/>
 		<dataSheet name="OutputReturnInterval" type="Input"/>
@@ -311,7 +311,7 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
-	<transformer name="InitialStocks" displayName="4 - Spin-up and Initial Stocks" isRunnable="True" programName="Rscript" programArguments="src/4-initial-stocks.R" condaEnv="lucasCore.yml" condaEnvVersion="1">
+	<transformer name="InitialStocks" displayName="4 - Spin-up and Initial Stocks" isRunnable="True" programName="Rscript" programArguments="src/4-initial-stocks.R">
 		<dataSheet name="CarbonCurve" type="Input"/>
 		<dataSheet name="OutputDecayCalibration" type="Input"/>
 		<dataSheet name="stsim_FlowMultiplier" type="Input"/>
@@ -319,7 +319,7 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
-	<transformer name="InitialConditions" displayName="5 - Initial Conditions" isRunnable="True" programName="Rscript" programArguments="src/5-initial-conditions.R" condaEnv="lucasCore.yml" condaEnvVersion="1">
+	<transformer name="InitialConditions" displayName="5 - Initial Conditions" isRunnable="True" programName="Rscript" programArguments="src/5-initial-conditions.R">
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Both"/>
 		<dataSheet name="OutputNlcdAnnual" type="Output"/>
@@ -330,7 +330,7 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
-	<transformer name="HistoricalTransitions" displayName="6 - Historical Transitions" isRunnable="True" programName="Rscript" programArguments="src/6-historical-transitions.R" condaEnv="lucasCore.yml" condaEnvVersion="1">
+	<transformer name="HistoricalTransitions" displayName="6 - Historical Transitions" isRunnable="True" programName="Rscript" programArguments="src/6-historical-transitions.R">
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="OutputNlcdAnnual" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Both"/>
@@ -342,7 +342,7 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
-	<transformer name="ClimateMultipliers" displayName="7 - Climate Multipliers" isRunnable="True" programName="Rscript" programArguments="src/7-climate-multipliers.R" condaEnv="lucasCore.yml" condaEnvVersion="1">
+	<transformer name="ClimateMultipliers" displayName="7 - Climate Multipliers" isRunnable="True" programName="Rscript" programArguments="src/7-climate-multipliers.R">
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="ClimateOptions" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
@@ -351,7 +351,7 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
-	<transformer name="InitialStocksSpatial" displayName="8 - Initial Stock Maps" isRunnable="True" programName="Rscript" programArguments="src/8-initial-stocks-spatial.R" condaEnv="lucasCore.yml" condaEnvVersion="1">
+	<transformer name="InitialStocksSpatial" displayName="8 - Initial Stock Maps" isRunnable="True" programName="Rscript" programArguments="src/8-initial-stocks-spatial.R">
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="InitialStockCurve" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
