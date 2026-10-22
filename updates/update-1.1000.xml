@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<update comment="1.1.0: Study Area page (custom view on a data feed) - new single-row Study Area Type sheet holding the kind of unit chosen.">
+  <action code="Exec" condition="TableNotExists" criteria="lucasCore_StudyAreaOptions">
+    <item>CREATE TABLE lucasCore_StudyAreaOptions(StudyAreaOptionsId INTEGER PRIMARY KEY, ScenarioId INTEGER, SourceId INTEGER)</item>
+  </action>
+</update>
