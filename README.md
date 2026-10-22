@@ -38,6 +38,11 @@ fit once in the starter's optional Growth Curves scenario and shared by Builds a
 or copied from a result scenario of another lucasCore library (Growth Curves = Copy from another library, with the Source
 Library path and, optionally, the Source Result Scenario Id; seconds instead of minutes).
 
+Two more choices sit beside them. **Carbon Options**: dead organic matter decay calibrated (default: snags, down wood and forest floor to
+FIA, soil to gSSURGO), FIA dead pools with CBM-default soil, or CBM defaults throughout (the CONUS 1km model's way); stage 3 logs
+spin-up soil against gSSURGO for each. **Land Cover Crosswalks** (Crosswalks group): the EVT 2016, EVT 2001, RCMAP and C-CAP
+crosswalks stage 5 uses, editable per scenario ().
+
 The starter is made by `tools/new-library.R`, which can also make or update any library directly:
 
 ```
@@ -80,3 +85,4 @@ is unchanged). `--units` takes Study Area units, comma-separated (default "Count
 | `tests/phaseF-pipeline.R` | the whole build: stages 1, 5, 2, 3, 4, 6, 7, 8 | 51 min (California) |
 | `tests/phaseG-starter.R` | the starter: Growth Curves, then Build depending on it | 35 min |
 | `tests/phaseH-copy-curves.R` | stages 1-4 with curves copied from another library, and three refused sources | 10 min |
+| `tests/phaseI-options.R` | the three dead organic matter options and an edited crosswalk row, on a starter copy | 35 min |

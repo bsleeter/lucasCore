@@ -6,6 +6,8 @@
 # wetland, developed) and the transition-triggered event flows are the LUCAS defaults in defaults/stockflow (from the CONUS 1km
 # model). The fixed definitions (flow pathway diagram, flow order, groups, output options) come from the 'Stock-Flow Definitions'
 # scenario that tools/new-library.R creates: a stage 3 scenario depends on it (and on a stage 2 result, or runs after stage 2).
+# Carbon Options picks the dead organic matter decay: calibrated (default: snags, down wood, floor to FIA; soil to gSSURGO), FIA dead
+# pools with CBM-default soil, or CBM defaults throughout (the CONUS 1km build's way). Every option logs spin-up soil against gSSURGO.
 # Needs the Live-Tree Carbon Curves of stage 2 (same pipeline, or a dependency on a stage 2 result).
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
@@ -72,26 +74,48 @@ t0 <- Sys.time(); cl <- parallel::makeCluster(max(1, min(30, parallel::detectCor
 parallel::clusterExport(cl, c("ctx", "dat", "cells", "all_cells"), envir = environment())
 pkgdir <- env$PackageDirectory; parallel::clusterExport(cl, "pkgdir", envir = environment())
 invisible(parallel::clusterEvalQ(cl, { library(data.table); for (f in c("flows.R", "dom.R", "calibrate.R")) source(file.path(pkgdir, "src", f)) }))
-own <- which(cells$plots >= MIN_PLOTS_CELL); types <- intersect(unique(cells[plots < MIN_PLOTS_CELL, sc]), unique(all_cells[plots > 0, sc]))
-fc <- parallel::parLapply(cl, own, function(i) cal_fit(cells[i], ctx, dat))
-ft <- stats::setNames(parallel::parLapply(cl, types, function(s) cal_fit(all_cells[sc == s & plots > 0], ctx, dat)), types)
-cells[, `:=`(Level = NA_character_, m_snag = NA_real_, m_cwd = NA_real_, m_floor = NA_real_, clearcut = NA_real_)]
-for (j in seq_along(own)) cells[own[j], `:=`(Level = "Cell", m_snag = fc[[j]]$snag, m_cwd = fc[[j]]$cwd, m_floor = fc[[j]]$floor, clearcut = fc[[j]]$clearcut)]
-for (s in types) cells[is.na(Level) & sc == s, `:=`(Level = "Forest type", m_snag = ft[[s]]$snag, m_cwd = ft[[s]]$cwd, m_floor = ft[[s]]$floor, clearcut = ft[[s]]$clearcut)]
-if (anyNA(cells$Level)) fail("no FIA dead-carbon plots for state classes %s", paste(unique(cells[is.na(Level), StateClass]), collapse = ", "))
+# Carbon Options: which dead-pool decay rates are calibrated (1: snags, down wood and floor to FIA, soil to gSSURGO; 2: FIA dead pools,
+# CBM-default soil; 3: CBM defaults, no calibration - the CONUS 1km build's way). A pool that is not calibrated keeps multiplier 1.
+copt <- read_ds("CarbonOptions"); dm <- copt$DeadOrganicMatterModel[1]
+dom_mode <- if (is.null(dm) || is.na(dm)) 1L else if (is.numeric(dm)) as.integer(dm) else if (grepl("^Calibrated", dm)) 1L else if (grepl("^FIA dead", dm)) 2L else if (grepl("^CBM default", dm)) 3L else NA_integer_
+if (is.na(dom_mode)) fail("Carbon Options: unrecognised Dead Organic Matter Decay choice '%s'", dm)
+say("Carbon Options: dead organic matter decay = %s", c("calibrated (snags, down wood, floor to FIA; soil to gSSURGO)", "FIA dead pools, CBM-default soil", "CBM defaults (no calibration)")[dom_mode])
+fc <- ft <- list(); red <- numeric()
+if (dom_mode %in% 1:2) {
+  own <- which(cells$plots >= MIN_PLOTS_CELL); types <- intersect(unique(cells[plots < MIN_PLOTS_CELL, sc]), unique(all_cells[plots > 0, sc]))
+  fc <- parallel::parLapply(cl, own, function(i) cal_fit(cells[i], ctx, dat))
+  ft <- stats::setNames(parallel::parLapply(cl, types, function(s) cal_fit(all_cells[sc == s & plots > 0], ctx, dat)), types)
+  cells[, `:=`(Level = NA_character_, m_snag = NA_real_, m_cwd = NA_real_, m_floor = NA_real_, clearcut = NA_real_)]
+  for (j in seq_along(own)) cells[own[j], `:=`(Level = "Cell", m_snag = fc[[j]]$snag, m_cwd = fc[[j]]$cwd, m_floor = fc[[j]]$floor, clearcut = fc[[j]]$clearcut)]
+  for (s in types) cells[is.na(Level) & sc == s, `:=`(Level = "Forest type", m_snag = ft[[s]]$snag, m_cwd = ft[[s]]$cwd, m_floor = ft[[s]]$floor, clearcut = ft[[s]]$clearcut)]
+  if (anyNA(cells$Level)) fail("no FIA dead-carbon plots for state classes %s", paste(unique(cells[is.na(Level), StateClass]), collapse = ", "))
+  red <- c(sapply(fc, function(f) 1 - f$loss1 / f$loss0), sapply(ft, function(f) 1 - f$loss1 / f$loss0))
+} else cells[, `:=`(Level = "CBM default", m_snag = 1, m_cwd = 1, m_floor = 1, clearcut = NA_real_)]
+mult_i <- function(i) list(snag = cells$m_snag[i], cwd = cells$m_cwd[i], floor = cells$m_floor[i])
+w_i <- function(i) if (is.na(cells$clearcut[i])) 0 else cells$clearcut[i]     # uncalibrated: cycles of high-severity fire only
+parallel::clusterExport(cl, c("cells", "mult_i", "w_i"), envir = environment())
+if (dom_mode == 1L) {
+  cells[, m_soil := unlist(parallel::parLapply(cl, seq_len(nrow(cells)), function(i) cal_soil(cells[i], ctx, mult_i(i), w_i(i))))]
+  cells[, SoilSource := ifelse(is.na(m_soil), ifelse(is.na(soil_target), "Forest type median (no gSSURGO target)", "Forest type median (target unreachable)"), "gSSURGO target")]
+  cells[is.na(m_soil), m_soil := median(cells[sc == .BY$sc, m_soil], na.rm = TRUE), by = sc]
+  cells[is.na(m_soil), m_soil := median(cells$m_soil, na.rm = TRUE)]
+} else cells[, `:=`(m_soil = 1, SoilSource = "CBM default")]
 parallel::clusterExport(cl, "cells", envir = environment())
-cells[, m_soil := unlist(parallel::parLapply(cl, seq_len(nrow(cells)), function(i) cal_soil(cells[i], ctx, list(snag = cells$m_snag[i], cwd = cells$m_cwd[i], floor = cells$m_floor[i]), cells$clearcut[i])))]
+# how far spin-up soil sits from gSSURGO: cycle-averaged belowground carbon (BG very fast + fast + slow) vs the cell's gSSURGO mean
+cells[, eq_bg := unlist(parallel::parLapply(cl, seq_len(nrow(cells)), function(i) cal_bg(cells[i], ctx, c(mult_i(i), list(soil = cells$m_soil[i])), w_i(i))))]
 parallel::stopCluster(cl)
-cells[, SoilSource := ifelse(is.na(m_soil), ifelse(is.na(soil_target), "Forest type median (no gSSURGO target)", "Forest type median (target unreachable)"), "gSSURGO target")]
-cells[is.na(m_soil), m_soil := median(cells[sc == .BY$sc, m_soil], na.rm = TRUE), by = sc]
-cells[is.na(m_soil), m_soil := median(cells$m_soil, na.rm = TRUE)]
-red <- c(sapply(fc, function(f) 1 - f$loss1 / f$loss0), sapply(ft, function(f) 1 - f$loss1 / f$loss0))
-say("Decay calibration took %.1f min; median misfit reduction %.0f%%; median multipliers snag %.2f, down wood %.2f, forest floor %.2f, soil %.2f; clearcut share %.2f",
-    as.numeric(Sys.time() - t0, units = "mins"), 100 * median(red), median(cells$m_snag), median(cells$m_cwd), median(cells$m_floor), median(cells$m_soil), median(cells$clearcut))
+gs <- cells[!is.na(soil_target)]
+if (nrow(gs)) say("Soil vs gSSURGO: spin-up belowground carbon %.0f vs gSSURGO %.0f Mg C/ha (medians over %d cells; ratio median %.2f, range %.2f-%.2f)",
+                  median(gs$eq_bg), median(gs$soil_target), nrow(gs), median(gs$eq_bg / gs$soil_target), min(gs$eq_bg / gs$soil_target), max(gs$eq_bg / gs$soil_target))
+say("Decay calibration took %.1f min%s; median multipliers snag %.2f, down wood %.2f, forest floor %.2f, soil %.2f%s",
+    as.numeric(Sys.time() - t0, units = "mins"), if (length(red)) sprintf("; median misfit reduction %.0f%%", 100 * median(red)) else "",
+    median(cells$m_snag), median(cells$m_cwd), median(cells$m_floor), median(cells$m_soil),
+    if (all(is.na(cells$clearcut))) "" else sprintf("; clearcut share %.2f", median(cells$clearcut, na.rm = TRUE)))
 check(STAGE, "decay multipliers are finite and inside [0.05, 20] (soil [0.02, 50])",
       all(is.finite(as.matrix(cells[, .(m_snag, m_cwd, m_floor, m_soil)]))) && all(cells[, c(m_snag, m_cwd, m_floor)] >= 0.05 - 1e-9 & cells[, c(m_snag, m_cwd, m_floor)] <= 20 + 1e-9) &&
         all(cells$m_soil >= 0.02 - 1e-9 & cells$m_soil <= 50 + 1e-9))
-check(STAGE, "calibration reduces the FIA dead-carbon misfit in every fit", all(red > 0), sprintf("smallest reduction %.0f%%", 100 * min(red)))
+if (length(red)) check(STAGE, "calibration reduces the FIA dead-carbon misfit in every fit", all(red > 0), sprintf("smallest reduction %.0f%%", 100 * min(red)))
+check(STAGE, "spin-up soil is finite and positive in every cell", all(is.finite(cells$eq_bg) & cells$eq_bg > 0), sprintf("range %.1f-%.1f Mg C/ha", min(cells$eq_bg), max(cells$eq_bg)))
 write_ds(cells[, .(StratumId = Stratum, StateClassId = StateClass, Level, Plots = plots, ReturnInterval = ri, SnagDecayMultiplier = round(m_snag, 4),
                    DownWoodDecayMultiplier = round(m_cwd, 4), ForestFloorDecayMultiplier = round(m_floor, 4), SoilDecayMultiplier = round(m_soil, 4),
                    ClearcutShare = round(clearcut, 3), SoilTarget = round(soil_target, 2), SoilSource)], "OutputDecayCalibration")

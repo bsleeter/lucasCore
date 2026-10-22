@@ -38,7 +38,11 @@ defaults_of <- function(sheet) { blk <- regmatches(xml, regexpr(sprintf('(?s)<da
   names(v) <- vapply(cols, att, "", a = "name"); as.data.frame(v[!vapply(v, is.null, TRUE)]) }
 bo <- defaults_of("BuildOptions"); bo$SecondarySourceId <- "States"; bo$TertiarySourceId <- "Federal Lands"
 saveDatasheet(B, bo, "lucasCore_BuildOptions")
-for (sh in c("ClimateOptions", "GrowthOptions")) saveDatasheet(B, defaults_of(sh), paste0("lucasCore_", sh))
+for (sh in c("ClimateOptions", "GrowthOptions", "CarbonOptions")) saveDatasheet(B, defaults_of(sh), paste0("lucasCore_", sh))
+# the land cover crosswalks, editable per scenario (stage 5 logs any row that differs from this package default)
+xw <- data.table::fread(file.path(pkg, "defaults", "landcover", "land-cover-crosswalks.csv"), na.strings = "")
+saveDatasheet(B, as.data.frame(xw[, .(Source, Code, Description, StateClassId, Note)]), "lucasCore_LandCoverCrosswalk")
+cat("Land Cover Crosswalks:", nrow(datasheet(B, "lucasCore_LandCoverCrosswalk")), "rows\n")
 # optional: growth curves fitted once (stage 2 alone, CONUS) and shared by many builds. Build keeps stage 2 in its pipeline by default
 # (curves refitted per library, following FIA updates); to share instead, run this, make Build depend on its result, and remove stage 2
 # from Build's pipeline - stage 3 reads the curves from the dependency.
@@ -48,7 +52,7 @@ description(G) <- paste("Optional. Fits the FIA growth and live-tree carbon curv
   "Without it, Build fits the curves itself (stage 2 in its pipeline). Growth Curve Options here set the fit.")
 saveDatasheet(G, data.frame(StageNameId = "2 - Fit Growth Curves", RunOrder = 1L), "core_Pipeline")
 saveDatasheet(G, defaults_of("GrowthOptions"), "lucasCore_GrowthOptions")
-for (sh in c("BuildOptions", "ClimateOptions", "GrowthOptions")) { cat(sh, ": "); x <- datasheet(B, paste0("lucasCore_", sh), lookupsAsFactors = FALSE)
+for (sh in c("BuildOptions", "ClimateOptions", "GrowthOptions", "CarbonOptions")) { cat(sh, ": "); x <- datasheet(B, paste0("lucasCore_", sh), lookupsAsFactors = FALSE)
   cat(paste(names(x), unlist(lapply(x[1, ], as.character)), sep = " = ", collapse = "; "), "\n") }
 unlink(paste0(f, c(".temp", ".backup")), recursive = TRUE)
 cat("starter:", f, "\n"); print(as.data.table(scenario(L, summary = TRUE))[, .(ScenarioId, Name, IsResult)])

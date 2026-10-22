@@ -58,6 +58,10 @@ cal_fit <- function(rows, ctx, dat) {
                     lower = c(rep(log(0.05), 3), -6), upper = c(rep(log(20), 3), 6), control = list(maxit = 300))
   list(snag = exp(o$par[1]), cwd = exp(o$par[2]), floor = exp(o$par[3]), clearcut = stats::plogis(o$par[4]), loss0 = l0, loss1 = o$value) }
 
+# cycle-averaged belowground carbon (BG very fast + fast + slow, the quantity matched to gSSURGO) of one cell for given multipliers
+cal_bg <- function(k, ctx, mult, w) { S <- cal_setup(k, ctx); d <- cal_dom(S, ctx$fo, mult, w)
+  mean(rowSums(d[1:min(S$k$ri, nrow(d)), c("BGVF", "BGF", "BGS"), drop = FALSE])) }
+
 # soil multiplier of one cell so the cycle-averaged belowground carbon equals the target (NA when it cannot be reached)
 cal_soil <- function(k, ctx, mult, w) {
   if (is.na(k$soil_target)) return(NA_real_)

@@ -30,6 +30,29 @@ scl <- stsim_list("StateClass"); stl <- stsim_list("Stratum")
 say("Grid: %d x %d cells of %d m, %d land cells; years %d-%d", ncol(R), nrow(R), res_m, global(m, "sum", na.rm = TRUE)[[1]], y0, y1)
 crop_to <- function(x, buf = 3000) crop(x, project(as.polygons(ext(R) + buf, crs = crs(R)), crs(x)))
 lc <- function(f) fread(pkg_file("defaults", "landcover", f))
+
+# ---- Land Cover Crosswalks: the scenario's sheet (users may edit it), else the package default ------------------------------
+# One row per Source (EVT 2016, EVT 2001, RCMAP, C-CAP) x Code -> stsim State Class. Stage 5 takes forest types (100-999) from EVT,
+# grassland and shrubland types from RCMAP and wetland types (90-96) from C-CAP; any other mapping is not used.
+XW_SOURCES <- c("EVT 2016", "EVT 2001", "RCMAP", "C-CAP")
+xw_def <- read_default("landcover", "land-cover-crosswalks.csv")[, .(Source, Code = as.integer(Code), Description, StateClassId)]
+xw <- as.data.table(datasheet(scn, ds("LandCoverCrosswalk"), optional = TRUE, lookupsAsFactors = FALSE))
+if (nrow(xw)) {
+  if (is.numeric(xw$Source)) xw[, Source := XW_SOURCES[Source]]
+  xw <- xw[, .(Source = as.character(Source), Code = as.integer(Code), Description = as.character(Description), StateClassId = as.character(StateClassId))]
+  cmp <- merge(xw[, in_sheet := TRUE], xw_def[, in_def := TRUE], by = c("Source", "Code"), all = TRUE, suffixes = c("", ".def"))
+  xw[, in_sheet := NULL]; xw_def[, in_def := NULL]
+  same <- function(a, b) (is.na(a) & is.na(b)) | (!is.na(a) & !is.na(b) & a == b)
+  chg <- cmp[in_sheet %in% TRUE & in_def %in% TRUE & !same(StateClassId, StateClassId.def)]
+  chg[is.na(Description), Description := Description.def]
+  add <- cmp[in_sheet %in% TRUE & !in_def %in% TRUE]; gone <- cmp[!in_sheet %in% TRUE & in_def %in% TRUE]
+  say("Land Cover Crosswalks: the scenario's sheet (%d rows): %d changed from the package default, %d added, %d removed", nrow(xw), nrow(chg), nrow(add), nrow(gone))
+  for (i in seq_len(min(nrow(chg), 25))) with(chg[i], say("  %s %d %s: %s -> %s", Source, Code, Description, ifelse(is.na(StateClassId.def), "(none)", StateClassId.def),
+                                                         ifelse(is.na(StateClassId), "(none)", StateClassId)))
+  if (nrow(chg) > 25) say("  ... and %d more changes", nrow(chg) - 25)
+} else { xw <- xw_def; say("Land Cover Crosswalks: the sheet is empty, so the package default (%d rows)", nrow(xw)) }
+xw[, Id := as.integer(scl$Id[match(StateClassId, scl$Name)])]
+xsrc <- function(s) xw[Source == s & !is.na(Code)]
 progressBar()
 
 # ---- annual NLCD on the model grid (parallel over years) --------------------------------------------------------------
@@ -47,23 +70,28 @@ N <- rast(nl_files); names(N) <- years; n0 <- N[[1]]
 say("Annual NLCD: %d years written", length(years))
 progressBar()
 
-# ---- forest type: EVT 2016, EVT 2001 where 2016 is "Recently ..."; most common forest type group of the 30 m pixels -----
-x16 <- lc("evt2016-crosswalk-CONUS-v2.csv"); x01 <- lc("evt2001-crosswalk-CONUS-v2.csv")
-recent <- as.integer(x16[grepl("Recently", EVT_NAME), VALUE])
+# ---- forest type: EVT 2016, else EVT 2001 where 2016 is not forest (incl. "Recently ..."); most common forest type of the 30 m pixels
+x16 <- xsrc("EVT 2016"); x01 <- xsrc("EVT 2001")
+recent <- x16[grepl("Recently", Description), Code]
 ftg <- function(v) { v <- suppressWarnings(as.integer(v)); ifelse(!is.na(v) & v >= 100 & v <= 999, v, NA_integer_) }
-e16 <- crop_to(rast(src$Evt2016File)); e01 <- crop_to(rast(src$Evt2001File))
-f16 <- classify(e16, cbind(as.integer(x16$VALUE), ftg(x16$ID)), others = NA); f16[e16 %in% recent] <- NA
-f01 <- classify(e01, cbind(as.integer(x01$Value), ftg(x01$ID)), others = NA)
+e16 <- crop_to(rast(src$Evt2016File)); e01 <- crop_to(rast(src$Evt2001File)); levels(e16) <- NULL; levels(e01) <- NULL
+f16 <- classify(e16, cbind(x16$Code, ftg(x16$Id)), others = NA); f16[e16 %in% recent] <- NA
+f01 <- classify(e01, cbind(x01$Code, ftg(x01$Id)), others = NA)
 f30 <- cover(f16, project(f01, f16, method = "near"))
 Fz <- project(f30, R, method = "mode"); Fz <- fill_modal(mask(Fz, m), m, 500)
 progressBar()
 
 # ---- grassland / shrubland (RCMAP 2001) and wetland (C-CAP 2001) types, filled from NLCD then from neighbours -------------
-rc <- lc("rcmap-state-class.csv")
-G <- project(classify(crop_to(rast(src$RcmapFile)), as.matrix(rc[, .(RcmapValue, StateClassId)]), others = NA), R, method = "mode")
+rc <- xsrc("RCMAP")[!is.na(Id)]; rcr <- crop_to(rast(src$RcmapFile)); levels(rcr) <- NULL
+G <- project(classify(rcr, cbind(rc$Code, rc$Id), others = NA), R, method = "mode")
 G <- cover(G, classify(n0, rbind(c(71, 72), c(52, 54)), others = NA)); G <- fill_modal(mask(G, m), m, 54)
-cx <- lc("ccap-state-class-crosswalk.csv")[stateClassId >= 90]
-W <- project(classify(crop_to(rast(src$CcapFile)), as.matrix(cx[, .(ccapClassId, stateClassId)]), others = NA), R, method = "mode")
+cx <- xsrc("C-CAP")[!is.na(Id) & Id >= 90]; ccr <- crop_to(rast(src$CcapFile)); levels(ccr) <- NULL
+# every code found in the study area window needs a crosswalk row (a missing row would silently count as unmapped)
+miss_codes <- rbindlist(lapply(list(list("EVT 2016", e16), list("EVT 2001", e01), list("RCMAP", rcr), list("C-CAP", ccr)), function(z) {
+  v <- terra::unique(z[[2]])[[1]]; v <- v[!is.na(v)]; data.table(Source = z[[1]], Code = setdiff(as.integer(v), xsrc(z[[1]])$Code)) }))
+check(STAGE, "every land cover code in the study area has a crosswalk row", !nrow(miss_codes),
+      if (nrow(miss_codes)) paste(head(paste(miss_codes$Source, miss_codes$Code), 10), collapse = "; ") else "")
+W <- project(classify(ccr, cbind(cx$Code, cx$Id), others = NA), R, method = "mode")
 W <- cover(W, classify(n0, cbind(90:99, 90:99), others = NA)); W <- fill_modal(mask(W, m), m, 90)
 progressBar()
 
@@ -90,7 +118,8 @@ progressBar()
 fri <- lc("LF16_FRI_200.csv")
 Fr <- classify(crop_to(rast(src$FriFile)), cbind(as.integer(fri$Value), ifelse(fri$FRI_REPLAC > 0, as.numeric(fri$FRI_REPLAC), NA)), others = NA)
 Fr <- project(Fr, R, method = "average")
-So <- crop_to(rast(src$SoilCarbonFile)); NAflag(So) <- 0; So <- project(So, R, method = "average") * 0.01
+# gSSURGO soc 0-999 (g C/m2): 0 and its undeclared no-data value (-1920, the CONUS median: ocean and unmapped areas) are missing
+So <- crop_to(rast(src$SoilCarbonFile)); So <- classify(So, cbind(-Inf, 0, NA), include.lowest = TRUE); So <- project(So, R, method = "average") * 0.01
 z <- data.table(P = values(P, mat = FALSE), S = values(S, mat = FALSE), fri = values(Fr, mat = FALSE), soil = values(So, mat = FALSE))[!is.na(P) & S >= 100]
 z[, `:=`(StratumId = stl$Name[match(P, as.integer(stl$Id))], StateClassId = scl$Name[match(S, as.integer(scl$Id))])]
 ri <- z[!is.na(fri), .(ReturnInterval = as.integer(round(mean(fri))), Cells = .N), by = .(StratumId, StateClassId)]

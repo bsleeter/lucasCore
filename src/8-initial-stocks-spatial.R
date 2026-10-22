@@ -83,7 +83,8 @@ progressBar()
 
 # ---- soil: gSSURGO where the class's belowground slow is 0 -----------------------------------------------------------------
 So <- crop(rast(src$SoilCarbonFile), project(as.polygons(ext(P) + 3000, crs = crs(P)), crs(rast(src$SoilCarbonFile))))
-NAflag(So) <- 0; vSo <- values(project(So, P, method = "average") * 0.01, mat = FALSE)
+So <- classify(So, cbind(-Inf, 0, NA), include.lowest = TRUE)   # 0 and the undeclared -1920 no-data value are missing (as stage 5)
+vSo <- values(project(So, P, method = "average") * 0.01, mat = FALSE)
 bgs <- which(st$StockTypeId == "DOM: Belowground Slow"); sub_ <- land & out[, bgs] == 0 & !is.na(vSo)
 out[sub_, bgs] <- vSo[sub_]
 say("Soil: gSSURGO used for %d cells whose class has no belowground slow carbon (%s)", sum(sub_), paste(names(table(src_of[sub_])), collapse = ", "))
