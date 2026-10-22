@@ -31,6 +31,7 @@ namespace lucasCoreUI
         private readonly Label m_runs = new Label { AutoSize = true, MaximumSize = new Size(640, 0), ForeColor = SystemColors.GrayText, Margin = new Padding(3, 6, 3, 3) };
         private GroupBox m_gProj;
         private List<Item> m_scenarios = new List<Item>(), m_models = new List<Item>(), m_replicates = new List<Item>();
+        private object m_projectionEnd = DBNull.Value;   // Build Options ProjectionEndYear, read when the page opens
 
         public ClimateOptionsView()
         {
@@ -86,7 +87,19 @@ namespace lucasCoreUI
             m_scenarios = Read(p, "lucasCore_ClimateScenario", "ClimateScenarioId", false);
             m_models = Read(p, "lucasCore_ClimateModel", "ClimateModelId", true);
             m_replicates = Read(p, "lucasCore_ClimateReplicate", "ClimateReplicateId", false);
+            m_projectionEnd = ProjectionEnd();
             RefreshControls();
+        }
+
+        // Build Options is another sheet of this scenario: read its rows when the page opens (re-reading it after this page
+        // writes came back empty, which greyed the projection group out)
+        private object ProjectionEnd()
+        {
+            Scenario s = this.DataFeed.Scenario;
+            if (s == null) return DBNull.Value;
+            DataTable dt = s.GetDataSheet("lucasCore_BuildOptions").GetData();
+            DataRow r = dt.Rows.Cast<DataRow>().FirstOrDefault(x => x.RowState != DataRowState.Deleted);
+            return r == null ? DBNull.Value : r["ProjectionEndYear"];
         }
 
         // a model's runs by scenario name: "SSP2-4.5: r1i1p1f1, r2i1p1f1; SSP3-7.0: r1i1p1f1"
@@ -116,8 +129,7 @@ namespace lucasCoreUI
         {
             ShowChoice(m_forest); ShowChoice(m_nonForest); ShowChoice(m_decomp);
 
-            DataSheet bo = this.DataFeed.Scenario == null ? null : this.DataFeed.Scenario.GetDataSheet("lucasCore_BuildOptions");
-            object pend = Value(bo, "ProjectionEndYear");
+            object pend = m_projectionEnd;
             bool projecting = pend != DBNull.Value;
             m_projState.Text = projecting
                 ? string.Format("Build Options projects to {0}. Choose the LOCA2 run whose climate drives it.", pend)
