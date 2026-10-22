@@ -98,7 +98,7 @@
 		<validation validationType="Unique" columns="UnitId"/>
 	</dataSheet>
 
-	<dataSheet name="ClimateOptions" displayName="Climate Options" isSingleRow="True">
+	<dataSheet name="ClimateOptions" displayName="Climate Options" isSingleRow="True" viewClassName="lucasCoreUI.ClimateOptionsView" viewClassAssembly="lucasCoreUI">
 		<column name="ForestGrowthModel" displayName="Forest Growth (None = normal climate every year)" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP|3:Tree ring" defaultValue="3"/>
 		<column name="NonForestGrowthModel" displayName="Non-Forest Growth" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP" defaultValue="2"/>
 		<column name="DecompositionModel" displayName="Decomposition" dataType="Integer" validationType="List" formula1="1:None|2:Q10" defaultValue="2"/>
@@ -107,7 +107,7 @@
 		<column name="ClimateReplicateId" displayName="Projection Replicate (blank = lowest-numbered with the scenario)" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="lucasCore_ClimateReplicate"/>
 	</dataSheet>
 
-	<dataSheet name="CarbonOptions" displayName="Carbon Options" isSingleRow="True">
+	<dataSheet name="CarbonOptions" displayName="Carbon Options" isSingleRow="True" viewClassName="lucasCoreUI.CarbonOptionsView" viewClassAssembly="lucasCoreUI">
 		<column name="DeadOrganicMatterModel" displayName="Dead Organic Matter Decay" dataType="Integer" validationType="List" formula1="1:Calibrated (snags, down wood, floor to FIA; soil to gSSURGO)|2:FIA dead pools, CBM-default soil|3:CBM defaults (no calibration)" defaultValue="1"/>
 	</dataSheet>
 
@@ -121,7 +121,7 @@
 		<validation validationType="Unique" columns="Source|Code"/>
 	</dataSheet>
 
-	<dataSheet name="GrowthOptions" displayName="Growth Curve Options" isSingleRow="True">
+	<dataSheet name="GrowthOptions" displayName="Growth Curve Options" isSingleRow="True" viewClassName="lucasCoreUI.GrowthOptionsView" viewClassAssembly="lucasCoreUI">
 		<column name="CurveSource" displayName="Growth Curves" dataType="Integer" validationType="List" formula1="1:Fit new curves|2:Copy from another library" defaultValue="1"/>
 		<column name="CurveLibrary" displayName="Source Library (.ssim path; when copying)" dataType="String" isOptional="True"/>
 		<column name="CurveScenarioId" displayName="Source Result Scenario Id (blank = the latest with curves; when copying)" dataType="Integer" isOptional="True"/>
