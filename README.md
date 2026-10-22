@@ -41,7 +41,7 @@ Library path and, optionally, the Source Result Scenario Id; seconds instead of 
 Two more choices sit beside them. **Carbon Options**: dead organic matter decay calibrated (default: snags, down wood and forest floor to
 FIA, soil to gSSURGO), FIA dead pools with CBM-default soil, or CBM defaults throughout (the CONUS 1km model's way); stage 3 logs
 spin-up soil against gSSURGO for each. **Land Cover Crosswalks** (Crosswalks group): the EVT 2016, EVT 2001, RCMAP and C-CAP
-crosswalks stage 5 uses, editable per scenario ().
+crosswalks stage 5 uses, editable per scenario (`defaults/landcover/README.md`).
 
 The starter is made by `tools/new-library.R`, which can also make or update any library directly:
 
