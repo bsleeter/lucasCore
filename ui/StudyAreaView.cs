@@ -91,13 +91,10 @@ namespace lucasCoreUI
         public override void LoadDataFeed(DataFeed dataFeed)
         {
             base.LoadDataFeed(dataFeed);
+            // the lists are read when the page opens: SyncroSim's sheet monitors read a single row, so they cannot watch multi-row lists
             LoadLists();
-            this.MonitorDataSheet(UNITS, OnListsChanged, false);
-            this.MonitorDataSheet(SOURCES, OnListsChanged, false);
             RefreshControls();
         }
-
-        private void OnListsChanged(DataSheetMonitorEventArgs e) { LoadLists(); RefreshControls(); }
 
         private DataSheet Sheet { get { return this.DataFeed.GetDataSheet(SHEET); } }
         private DataSheet Options { get { return this.DataFeed.GetDataSheet(OPTIONS); } }
