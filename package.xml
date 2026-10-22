@@ -18,6 +18,7 @@
 		<column name="RcmapFile" displayName="RCMAP Vegetation Class" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/RCMAP/2001_test2_full_wtih_tree.img"/>
 		<column name="CcapFile" displayName="C-CAP Land Cover 2001" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/CCAP/conus_2001_ccap_landcover_20200311.tif"/>
 		<column name="StandAgeFile" displayName="NASA CMS Forest Age 1990" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Stand Age/cms_age_1990.tif"/>
+		<column name="ForestTypeGroupFolder" displayName="USFS Forest Type Group Map Folder (NFCMS regional *_ForestType.tif)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/NFCMS/Forest Type"/>
 		<column name="MtbsSeverityFolder" displayName="MTBS Burn Severity Folder (mtbs_CONUS_year.tif)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/MTBS/Burn Severity"/>
 		<column name="LandfireDisturbanceFolder" displayName="LANDFIRE Disturbance Folder (US_DISTyear)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Landfire Disturbance"/>
 		<column name="FriFile" displayName="LANDFIRE Mean Fire Return Interval" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FRI/Tif/LC16_FRI_200.tif"/>
@@ -79,6 +80,7 @@
 		<column name="StartYear" displayName="Historical Start Year" dataType="Integer" defaultValue="1985" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1985"/>
 		<column name="EndYear" displayName="Historical End Year" dataType="Integer" defaultValue="2023" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1985"/>
 		<column name="ProjectionEndYear" displayName="Projection End Year (blank = no projection; starts the year after Historical End)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="LessEqual" formula1="2100"/>
+		<column name="ForestTypeMap" displayName="Forest Type Map" dataType="Integer" validationType="List" formula1="1:LANDFIRE EVT|2:USFS forest type groups" defaultValue="1"/>
 	</dataSheet>
 
 	<dataSheet name="StudyArea" displayName="Study Area (blank = all of CONUS)">
@@ -102,7 +104,7 @@
 
 	<dataSheet name="LandCoverCrosswalk" displayName="Land Cover Crosswalks (blank = package defaults)">
 		<!-- stage 5: forest types (state classes 100-999) from EVT, grassland and shrubland types from RCMAP, wetland types (90-96) from C-CAP -->
-		<column name="Source" dataType="Integer" validationType="List" formula1="1:EVT 2016|2:EVT 2001|3:RCMAP|4:C-CAP"/>
+		<column name="Source" dataType="Integer" validationType="List" formula1="1:EVT 2016|2:EVT 2001|3:RCMAP|4:C-CAP|5:USFS Forest Type Group"/>
 		<column name="Code" dataType="Integer"/>
 		<column name="Description" dataType="String" isOptional="True"/>
 		<column name="StateClassId" displayName="State Class" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="stsim_StateClass"/>

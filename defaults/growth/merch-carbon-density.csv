@@ -4,8 +4,7 @@ StateClassId,StateClassName,FiaGroupsUsed,MgCPerM3,WoodSG,BarkCarbonShare,Decidu
 140,Longleaf/Slash Pine Group,140,0.297,0.533,0.108,0.072,79,slash pine; longleaf pine; loblolly pine,19.4
 160,Loblolly/Shortleaf Pine Group,160,0.2538,0.475,0.11,0.112,148,loblolly pine; shortleaf pine; sweetgum,153.7
 180,Pinyon/Juniper Group,180,0.2465,0.397,0.176,0.022,48,ponderosa pine; Douglas-fir; white fir,2.01
-200,Douglas-fir Coastal Group,200,0.2616,0.437,0.145,0.033,74,Douglas-fir; western hemlock; ponderosa pine,146.75
-201,Douglas-fir Inland Group,200,0.2616,0.437,0.145,0.033,74,Douglas-fir; western hemlock; ponderosa pine,146.75
+200,Douglas-fir Group,200,0.2616,0.437,0.145,0.033,74,Douglas-fir; western hemlock; ponderosa pine,146.75
 220,Ponderosa Pine Group,220,0.2415,0.385,0.184,0.011,70,ponderosa pine; Douglas-fir; Jeffrey pine,40.49
 240,Western White Pine Group,240,0.2067,0.367,0.134,0.01,21,western white pine; lodgepole pine; California red fir,0.46
 260,Fir/Spruce/Mountain Hemlock Group,260,0.2092,0.365,0.142,0.026,59,Engelmann spruce; subalpine fir; grand fir,95.03

@@ -25,3 +25,13 @@ Edits to the source crosswalks:
   a row. That check found RCMAP 1, 10, 11, 12 and C-CAP 0 missing from the source crosswalks (silently unmapped before); they are now
   listed, still unmapped. Source values that are not ST-Sim state classes (EVT 61, 83, 84, 1000, 1001; C-CAP 10-80) are blank with a
   Note; stage 5 never uses them.
+- 2026-10-21, **Forest Type Map** (Build Options): forest types come from LANDFIRE EVT (default, as above) or from the USFS forest
+  type group map (NFCMS regional tiles `*_ForestType.tif`, 30 m, Data Source `ForestTypeGroupFolder`). The USFS values are FIA forest
+  type group codes, the same numbers as the ST-Sim forest state classes, so its crosswalk rows (Source "USFS Forest Type Group") map
+  each code to itself; 0 is non-forest. Either map only sets the type of cells that are forest; forest cells with no typed pixel take
+  their neighbours' type (modal fill). Placer County: EVT 2,558 forest cells typed as mixed conifer 1,313 / western oak 626 / fir-spruce
+  591; USFS 1,217 / 769 / 510, forest carbon 52.4 vs 50.6 Tg (tests/phaseJ-forest-map.R; dev/crosswalk/03-usfs-vs-evt.R for P26).
+- 2026-10-21, **one Douglas-fir class** (user decision): "Douglas-fir Coastal Group" (200) is renamed "Douglas-fir Group" and
+  "Douglas-fir Inland Group" (201) removed, in every method; EVTs that mapped to 201 map to 200. Its growth curve still varies by
+  ecodivision. Applied to the defaults by `tools/merge_douglas_fir.R`. Libraries built before this keep the two classes, and their
+  fitted curves cannot be copied into a new build (the class names differ).

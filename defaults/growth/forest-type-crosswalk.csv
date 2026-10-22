@@ -4,8 +4,7 @@ StateClassId,StateClassName,FiaTypeGroups,LagClass,Note
 140,Longleaf/Slash Pine Group,140,EastSoftwood,""
 160,Loblolly/Shortleaf Pine Group,160,EastSoftwood,""
 180,Pinyon/Juniper Group,180,WestSoftwood,""
-200,Douglas-fir Coastal Group,200,WestSoftwood,FIA has one Douglas-fir group; coastal vs inland is carried by the ecodivision
-201,Douglas-fir Inland Group,200,WestSoftwood,same curves as 200; the state class map merges 201 into 200
+200,Douglas-fir Group,200,WestSoftwood,FIA has one Douglas-fir group; coastal vs inland is carried by the ecodivision
 220,Ponderosa Pine Group,220,WestSoftwood,""
 240,Western White Pine Group,180;200;220;240;260;280;300;320;340;360;370;390,WestSoftwood,too few plots (about 80) for its own model: fitted on all western softwood groups pooled (user decision 2026-10-19)
 260,Fir/Spruce/Mountain Hemlock Group,260,WestSoftwood,""

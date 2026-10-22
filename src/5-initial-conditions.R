@@ -9,7 +9,7 @@
 #     30 m pixel per cell)
 #   * start-year developed (21-24), agriculture (81, 82), water (11) and ice (12) keep their class; the "forest in any year" rule
 #     applies only to natural cells (user decision 2026-10-20: the build turned 69,895 developed/ag cells of 1985 into forest)
-#   * Douglas-fir Inland (201) stays a class of its own (its curves are Douglas-fir's)
+#   * one Douglas-fir class (200; user decision 2026-10-21): coastal vs inland is carried by the ecodivision of its curves
 #   * the clearcut minimum-age rule needs the clearcut maps and moves to stage 6
 # Also writes the annual NLCD at the model's resolution (stage 6 builds the transitions from it), and per ecodivision x forest class
 # the replacement-fire return interval (LANDFIRE FRI_REPLAC) and the mean gSSURGO soil carbon that stage 3 calibrates with.
@@ -32,9 +32,9 @@ crop_to <- function(x, buf = 3000) crop(x, project(as.polygons(ext(R) + buf, crs
 lc <- function(f) fread(pkg_file("defaults", "landcover", f))
 
 # ---- Land Cover Crosswalks: the scenario's sheet (users may edit it), else the package default ------------------------------
-# One row per Source (EVT 2016, EVT 2001, RCMAP, C-CAP) x Code -> stsim State Class. Stage 5 takes forest types (100-999) from EVT,
-# grassland and shrubland types from RCMAP and wetland types (90-96) from C-CAP; any other mapping is not used.
-XW_SOURCES <- c("EVT 2016", "EVT 2001", "RCMAP", "C-CAP")
+# One row per Source (EVT 2016, EVT 2001, RCMAP, C-CAP, USFS Forest Type Group) x Code -> stsim State Class. Forest types (100-999) come
+# from EVT or the USFS map (Build Options), grassland and shrubland types from RCMAP, wetland types (90-96) from C-CAP; nothing else is used.
+XW_SOURCES <- c("EVT 2016", "EVT 2001", "RCMAP", "C-CAP", "USFS Forest Type Group")
 xw_def <- read_default("landcover", "land-cover-crosswalks.csv")[, .(Source, Code = as.integer(Code), Description, StateClassId)]
 xw <- as.data.table(datasheet(scn, ds("LandCoverCrosswalk"), optional = TRUE, lookupsAsFactors = FALSE))
 if (nrow(xw)) {
@@ -70,15 +70,36 @@ N <- rast(nl_files); names(N) <- years; n0 <- N[[1]]
 say("Annual NLCD: %d years written", length(years))
 progressBar()
 
-# ---- forest type: EVT 2016, else EVT 2001 where 2016 is not forest (incl. "Recently ..."); most common forest type of the 30 m pixels
-x16 <- xsrc("EVT 2016"); x01 <- xsrc("EVT 2001")
-recent <- x16[grepl("Recently", Description), Code]
+# ---- forest type (Build Options: Forest Type Map); most common forest type group of the 30 m pixels; cells with none from neighbours
+#   LANDFIRE EVT (default)   EVT 2016, else EVT 2001 where 2016 is not forest (incl. "Recently ...")
+#   USFS forest type groups  the NFCMS regional tiles (FIA forest type group codes) that touch the study area, mosaicked
 ftg <- function(v) { v <- suppressWarnings(as.integer(v)); ifelse(!is.na(v) & v >= 100 & v <= 999, v, NA_integer_) }
-e16 <- crop_to(rast(src$Evt2016File)); e01 <- crop_to(rast(src$Evt2001File)); levels(e16) <- NULL; levels(e01) <- NULL
-f16 <- classify(e16, cbind(x16$Code, ftg(x16$Id)), others = NA); f16[e16 %in% recent] <- NA
-f01 <- classify(e01, cbind(x01$Code, ftg(x01$Id)), others = NA)
-f30 <- cover(f16, project(f01, f16, method = "near"))
-Fz <- project(f30, R, method = "mode"); Fz <- fill_modal(mask(Fz, m), m, 500)
+fmap <- opt$ForestTypeMap[1]
+fmap <- if (is.null(fmap) || is.na(fmap)) "LANDFIRE EVT" else if (is.numeric(fmap)) c("LANDFIRE EVT", "USFS forest type groups")[fmap] else as.character(fmap)
+if (identical(fmap, "USFS forest type groups")) {
+  ftf <- read_data_sources("ForestTypeGroupFolder")$ForestTypeGroupFolder
+  tiles <- list.files(ftf, "_ForestType[.]tif$", full.names = TRUE); if (!length(tiles)) fail("no *_ForestType.tif tiles in %s", ftf)
+  win <- function(r) project(as.polygons(ext(R) + 3000, crs = crs(R)), crs(r))
+  hit <- Filter(function(f) { r <- rast(f); !is.null(intersect(ext(r), ext(win(r)))) }, tiles)
+  if (!length(hit)) fail("no USFS forest type group tile covers the study area (%s)", ftf)
+  us <- lapply(hit, function(f) { r <- rast(f); levels(r) <- NULL; crop(r, win(r)) })
+  usfs30 <- if (length(us) == 1) us[[1]] else do.call(merge, us)
+  xu <- xsrc("USFS Forest Type Group")
+  f30 <- classify(usfs30, cbind(xu$Code, ftg(xu$Id)), others = NA)
+  say("Forest type map: USFS forest type groups (%s)", paste(sub("_ForestType[.]tif$", "", basename(hit)), collapse = ", "))
+} else {
+  x16 <- xsrc("EVT 2016"); x01 <- xsrc("EVT 2001")
+  recent <- x16[grepl("Recently", Description), Code]
+  e16 <- crop_to(rast(src$Evt2016File)); e01 <- crop_to(rast(src$Evt2001File)); levels(e16) <- NULL; levels(e01) <- NULL
+  f16 <- classify(e16, cbind(x16$Code, ftg(x16$Id)), others = NA); f16[e16 %in% recent] <- NA
+  f01 <- classify(e01, cbind(x01$Code, ftg(x01$Id)), others = NA)
+  f30 <- cover(f16, project(f01, f16, method = "near"))
+  say("Forest type map: LANDFIRE EVT 2016 (EVT 2001 where 2016 is not forest)")
+}
+Fz <- project(f30, R, method = "mode")
+no_type <- global(mask(is.na(Fz), m), "sum", na.rm = TRUE)[[1]]
+Fz <- fill_modal(mask(Fz, m), m, 500)
+say("Forest type: %d land cells have no forest type pixel in the map and take their neighbours' (only those that are forest matter)", no_type)
 progressBar()
 
 # ---- grassland / shrubland (RCMAP 2001) and wetland (C-CAP 2001) types, filled from NLCD then from neighbours -------------
@@ -87,7 +108,8 @@ G <- project(classify(rcr, cbind(rc$Code, rc$Id), others = NA), R, method = "mod
 G <- cover(G, classify(n0, rbind(c(71, 72), c(52, 54)), others = NA)); G <- fill_modal(mask(G, m), m, 54)
 cx <- xsrc("C-CAP")[!is.na(Id) & Id >= 90]; ccr <- crop_to(rast(src$CcapFile)); levels(ccr) <- NULL
 # every code found in the study area window needs a crosswalk row (a missing row would silently count as unmapped)
-miss_codes <- rbindlist(lapply(list(list("EVT 2016", e16), list("EVT 2001", e01), list("RCMAP", rcr), list("C-CAP", ccr)), function(z) {
+maps <- if (exists("usfs30")) list(list("USFS Forest Type Group", usfs30)) else list(list("EVT 2016", e16), list("EVT 2001", e01))
+miss_codes <- rbindlist(lapply(c(maps, list(list("RCMAP", rcr), list("C-CAP", ccr))), function(z) {
   v <- terra::unique(z[[2]])[[1]]; v <- v[!is.na(v)]; data.table(Source = z[[1]], Code = setdiff(as.integer(v), xsrc(z[[1]])$Code)) }))
 check(STAGE, "every land cover code in the study area has a crosswalk row", !nrow(miss_codes),
       if (nrow(miss_codes)) paste(head(paste(miss_codes$Source, miss_codes$Code), 10), collapse = "; ") else "")

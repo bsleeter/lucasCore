@@ -2,8 +2,7 @@ StateClassId,EcoBoundaryId,AdminBoundaryId,SpeciesTypeId,Source
 Forest: Alder/Maple Group,Pacific Maritime,British Columbia,Alder,lucasbuilder FIA update crosswalk
 Forest: Aspen/Birch Group,Boreal Shield West,Ontario,Birch,lucasbuilder FIA update crosswalk
 Forest: California Mixed Conifer Group,Montane Cordillera,British Columbia,Other softwoods,lucasbuilder FIA update crosswalk
-Forest: Douglas-fir Coastal Group,Pacific Maritime,British Columbia,Douglas-fir - Genus type,lucasbuilder FIA update crosswalk
-Forest: Douglas-fir Inland Group,Montane Cordillera,Alberta,Douglas-fir and Rocky Mountain Douglas-fir,lucasbuilder original crosswalk
+Forest: Douglas-fir Group,Pacific Maritime,British Columbia,Douglas-fir - Genus type,lucasbuilder FIA update crosswalk
 Forest: Elm/Ash/Cottonwood Group,Mixedwood Plains,Ontario,Ash,lucasbuilder FIA update crosswalk
 Forest: Exotic Hardwoods Group,Mixedwood Plains,Ontario,Other hardwoods,lucasbuilder FIA update crosswalk
 Forest: Exotic Softwoods Group,Mixedwood Plains,Ontario,Other softwoods,no prior mapping: eastern other softwoods (2026-10-20)

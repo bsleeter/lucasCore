@@ -22,13 +22,18 @@ out <- rbind(x16[, .(Source = "EVT 2016", Code = VALUE, Description = EVT_NAME, 
              cc[, .(Source = "C-CAP", Code = ccapClassId, Description = ccapClassName, StateClassId = nm(stateClassId), Note = note(stateClassId))])
 # codes in the rasters that the source crosswalks never listed (found by stage 5's coverage check, Placer County 2026-10-21): they were
 # unmapped in the CONUS 1km build too, and stay unmapped, but are listed so every code in the data has a row
-extra <- data.table(Source = c("RCMAP", "RCMAP", "RCMAP", "RCMAP", "C-CAP"), Code = c(1L, 10L, 11L, 12L, 0L),
+extra <- data.table(Source = c("RCMAP", "RCMAP", "RCMAP", "RCMAP", "C-CAP", "USFS Forest Type Group"), Code = c(1L, 10L, 11L, 12L, 0L, 0L),
                     Description = c("RCMAP value 1 (not a grassland or shrubland type of this RCMAP product)", "RCMAP value 10 (not a grassland or shrubland type; tree classes of the 'with tree' product)",
                                     "RCMAP value 11 (not a grassland or shrubland type; tree classes of the 'with tree' product)", "RCMAP value 12 (not a grassland or shrubland type; tree classes of the 'with tree' product)",
-                                    "Background / no data"),
-                    StateClassId = NA_character_, Note = "not in the source crosswalk; unmapped as in the CONUS 1km build (not used)")
+                                    "Background / no data", "Non-forest / no data"),
+                    StateClassId = NA_character_, Note = c(rep("not in the source crosswalk; unmapped as in the CONUS 1km build (not used)", 5), "non-forest in the USFS map (not used)"))
 out <- rbind(out, extra[!paste(Source, Code) %in% paste(out$Source, out$Code)])
-out <- out[!is.na(Code)][order(match(Source, c("EVT 2016", "EVT 2001", "RCMAP", "C-CAP")), Code)]
+# the USFS forest type group map (NFCMS regional tiles): its values are FIA forest type group codes, the same numbers as the stsim
+# forest state classes, so each maps to itself (200 is the one Douglas-fir class). Codes found in the nine tiles 2026-10-21.
+usfs <- c(100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320, 340, 360, 370, 380, 400, 500, 600, 700, 800, 900, 910, 920, 940, 950, 980, 990)
+out <- rbind(out, data.table(Source = "USFS Forest Type Group", Code = as.integer(usfs), Description = sub("^Forest: ", "", nm(usfs)), StateClassId = nm(usfs),
+                             Note = ifelse(is.na(nm(usfs)), "not an ST-Sim state class (not used)", NA_character_)))
+out <- out[!is.na(Code)][order(match(Source, c("EVT 2016", "EVT 2001", "RCMAP", "C-CAP", "USFS Forest Type Group")), Code)]
 dup <- out[duplicated(out[, .(Source, Code)])]; if (nrow(dup)) stop("duplicate Source x Code: ", paste(head(paste(dup$Source, dup$Code), 5), collapse = "; "))
 fwrite(out, file.path(d, "landcover", "land-cover-crosswalks.csv"))
 print(out[, .(rows = .N, mapped = sum(!is.na(StateClassId)), forest = sum(grepl("^Forest", StateClassId))), by = Source])

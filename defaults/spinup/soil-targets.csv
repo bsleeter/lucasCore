@@ -2,20 +2,17 @@ Stratum,StateClass,SoilTarget,Cells1km
 Marine,Forest: Alder/Maple Group,146.93,2662
 Marine,Forest: Elm/Ash/Cottonwood Group,185.08,644
 Marine,Forest: Fir/Spruce/Mountain Hemlock Group,156.39,23583
-Marine,Forest: Douglas-fir Coastal Group,160.89,4836
+Marine,Forest: Douglas-fir Group,160.89,4836
 Marine Mountains,Forest: Fir/Spruce/Mountain Hemlock Group,149.41,62412
 Marine Mountains,Forest: Hemlock/Sitka Spruce Group,253.77,8647
-Marine Mountains,Forest: Douglas-fir Coastal Group,167.88,3246
+Marine Mountains,Forest: Douglas-fir Group,167.88,3246
 Marine Mountains,Forest: Alder/Maple Group,188.73,2716
 Marine Mountains,Forest: Elm/Ash/Cottonwood Group,199.09,580
 Marine Mountains,Forest: Spruce/Fir Group,62.38,11720
 Marine Mountains,Forest: White/Red/Jack Pine Group,40.53,994
-Marine Mountains,Forest: Douglas-fir Inland Group,43.68,6314
 Marine Mountains,Forest: Lodgepole Pine Group,53.5,812
 Temperate Desert,Forest: Lodgepole Pine Group,41.86,19893
-Temperate Desert,Forest: Douglas-fir Inland Group,55.51,77735
 Marine Mountains,Forest: Aspen/Birch Group,63.94,4
-Temperate Steppe Mountains,Forest: Douglas-fir Inland Group,76.59,176765
 Marine Mountains,Forest: Western Larch Group,63.04,52
 Temperate Steppe Mountains,Forest: Spruce/Fir Group,77.38,160023
 Temperate Steppe Mountains,Forest: Lodgepole Pine Group,74.84,48821
@@ -34,7 +31,6 @@ Temperate Steppe,Forest: Spruce/Fir Group,116.03,4848
 Temperate Steppe,Forest: Elm/Ash/Cottonwood Group,123.65,332984
 Warm Continental Mountains,Forest: Spruce/Fir Group,209.34,35813
 Warm Continental Mountains,Forest: Maple/Beech/Birch Group,207.97,53645
-Temperate Steppe,Forest: Douglas-fir Inland Group,86.06,48867
 Temperate Steppe,Forest: White/Red/Jack Pine Group,103.55,157
 Warm Continental Mountains,Forest: Elm/Ash/Cottonwood Group,313.82,1145
 Temperate Steppe,Forest: Oak/Pine Group,73.66,33710
@@ -79,7 +75,7 @@ Marine Mountains,Forest: California Mixed Conifer Group,146.13,2662
 Mediterranean Mountains,Forest: Fir/Spruce/Mountain Hemlock Group,66.6,16625
 Mediterranean Mountains,Forest: California Mixed Conifer Group,61.39,96963
 Marine,Forest: California Mixed Conifer Group,150.74,2
-Mediterranean Mountains,Forest: Douglas-fir Coastal Group,56.61,484
+Mediterranean Mountains,Forest: Douglas-fir Group,56.61,484
 Temperate Desert,Forest: Aspen/Birch Group,58.93,45281
 Mediterranean Mountains,Forest: Western Oak Group,47.39,46466
 Marine Mountains,Forest: Oak/Pine Group,178.69,50
@@ -97,7 +93,6 @@ Mediterranean,Forest: California Mixed Conifer Group,113.44,12819
 Mediterranean,Forest: Redwood Group,110.74,10003
 Temperate Desert,Forest: California Mixed Conifer Group,61.57,1265
 Mediterranean,Forest: Elm/Ash/Cottonwood Group,37.66,1649
-Mediterranean Mountains,Forest: Douglas-fir Inland Group,101.42,4
 Prairie,Forest: Western Oak Group,153.62,3026
 Mediterranean Mountains,Forest: Lodgepole Pine Group,39.29,4050
 Temperate Desert,Forest: Fir/Spruce/Mountain Hemlock Group,48.53,5881
@@ -109,14 +104,13 @@ Hot Continental Mountains,Forest: Maple/Beech/Birch Group,77.89,10077
 Mediterranean,Forest: Ponderosa Pine Group,160.18,2
 Hot Continental Mountains,Forest: Oak/Hickory Group,55.5,164403
 Hot Continental Mountains,Forest: Oak/Pine Group,49.97,8469
-Mediterranean,Forest: Douglas-fir Coastal Group,54.92,3
+Mediterranean,Forest: Douglas-fir Group,54.92,3
 Temperate Desert Mountains,Forest: Pinyon/Juniper Group,42.14,106045
 Hot Continental Mountains,Forest: White/Red/Jack Pine Group,39.9,1308
 Temperate Desert Mountains,Forest: Aspen/Birch Group,92.42,6057
 Temperate Desert Mountains,Forest: Oak/Pine Group,86.52,867
 Subtropical,Forest: Oak/Pine Group,94.08,117742
 Subtropical,Forest: Oak/Hickory Group,102.99,376222
-Temperate Desert Mountains,Forest: Douglas-fir Inland Group,72.69,1153
 Mediterranean Mountains,Forest: Other Western Softwood Group,51.9,782
 Temperate Desert Mountains,Forest: Spruce/Fir Group,68.29,4556
 Hot Continental Mountains,Forest: Elm/Ash/Cottonwood Group,35.72,4
@@ -134,13 +128,11 @@ Tropical/Subtropical Desert,Forest: Oak/Pine Group,58.42,43576
 Tropical/Subtropical Steppe,Forest: Ponderosa Pine Group,54.03,16540
 Tropical/Subtropical Steppe,Forest: Spruce/Fir Group,111.29,898
 Subtropical,Forest: Oak/Gum/Cypress Group,525.92,16938
-Tropical/Subtropical Steppe,Forest: Douglas-fir Inland Group,88.48,313
 Tropical/Subtropical Desert,Forest: Lodgepole Pine Group,18.66,463
 Tropical/Subtropical Desert,Forest: Fir/Spruce/Mountain Hemlock Group,17.13,64
 Subtropical,Forest: White/Red/Jack Pine Group,61.19,613
 Tropical/Subtropical Steppe,Forest: Maple/Beech/Birch Group,104.8,344
 Tropical/Subtropical Steppe,Forest: Aspen/Birch Group,120.53,755
-Tropical/Subtropical Desert,Forest: Douglas-fir Inland Group,27.88,790
 Tropical/Subtropical Desert,Forest: Ponderosa Pine Group,17.14,476
 Tropical/Subtropical Desert,Forest: Spruce/Fir Group,26.11,8
 Tropical/Subtropical Desert,Forest: California Mixed Conifer Group,17.81,5991
@@ -151,7 +143,6 @@ Mediterranean,Forest: Pinyon/Juniper Group,31.24,84
 Tropical/Subtropical Steppe,Forest: Oak/Hickory Group,82.08,178538
 Tropical/Subtropical Steppe Mountains,Forest: Pinyon/Juniper Group,34.04,47263
 Tropical/Subtropical Steppe Mountains,Forest: Ponderosa Pine Group,58.61,10714
-Tropical/Subtropical Steppe Mountains,Forest: Douglas-fir Inland Group,42.45,105
 Tropical/Subtropical Steppe,Forest: Western Oak Group,52.61,9915
 Tropical/Subtropical Steppe Mountains,Forest: Western Oak Group,48.5,433
 Hot Continental Mountains,Forest: Loblolly/Shortleaf Pine Group,41.94,464

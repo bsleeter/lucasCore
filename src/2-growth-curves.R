@@ -71,7 +71,7 @@ if (fixed_lag) { sets[, `:=`(Lag = opt$LagYears, LagSource = "Fixed")]
   say("Type lags: %s", paste(sets[, sprintf("%s %.1f (%s)", FiaTypeGroups, Lag, LagSource)], collapse = "; "))
 }
 
-# ---- fit each distinct set of FIA type groups once (201 shares 200's) -----------------------------------------------
+# ---- fit each distinct set of FIA type groups once ---------------------------------------------------------------
 fit_set <- function(i) { s <- sets$FiaTypeGroups[i]; d <- x[fortyp_grp %in% grp_of(s)]
   if (nrow(d) < 30) return(list(error = sprintf("only %d plots", nrow(d))))
   r <- tryCatch(fit_forest_type(d, eco$ecodiv, clim, opt, sets$Lag[i]), error = function(e) conditionMessage(e))
