@@ -1,5 +1,5 @@
 # =============================================================================
-# new-historical.R - add a historical ST-Sim run scenario on top of a Build result (Option B: the run is its own scenario)
+# new-historical.R - add an ST-Sim run scenario on top of a Build result: historical, or historical + projection when the build ran stage 9
 # =============================================================================
 # The Build result holds everything the run needs: initial conditions and strata maps (stages 1, 5, 6), transition pathways and annual
 # spatial multipliers (6), flow pathways and multipliers (3), climate flow multipliers (7) and initial stock maps (8). The new scenario
@@ -37,14 +37,21 @@ if (!n("stsim_FlowSpatialMultiplier")) cat("note: the build has no climate flow 
 # the years the build used (a blank Build Options sheet means the package defaults): stage 5's annual NLCD covers StartYear-EndYear
 ny <- as.data.table(datasheet(B, "lucasCore_OutputNlcdAnnual"))$Year
 if (!length(ny)) stop(sprintf("Build result %d has no annual NLCD table: run stage 5 in it", bid)); y0 <- min(ny); y1 <- max(ny)
+# mode 1: when the build ran stage 9 (a projection), the run continues through the projection end with the schedule's iterations
+ps <- suppressWarnings(as.data.table(datasheet(B, "lucasCore_OutputProjectionSchedule", optional = TRUE)))
+yh <- y1; pit <- NA_integer_
+if (nrow(ps)) { y1 <- max(ps$Timestep); pit <- max(ps$Iteration) }
+kind <- if (nrow(ps)) "Historical and Projection" else "Historical"
 
-nm <- opt("name", sprintf("Historical %d-%d", y0, y1))
+nm <- opt("name", sprintf("%s %d-%d", kind, y0, y1))
 if (nrow(sc[Name == nm & IsResult == "No"])) { if (!"--replace" %in% a) stop(sprintf("scenario '%s' exists (use --replace)", nm))
   for (i in sc[Name == nm & IsResult == "No", ScenarioId]) delete(L, scenario = i, force = TRUE) }
 # the build first: a dependency supplies whole data feeds, and Flow Pathways (diagram + pathways) is one feed that both scenarios hold;
 # with Stock-Flow Definitions first, its diagram-only feed wins and the run has no flow pathways (no flows at all; found 2026-10-21)
 S <- rsyncrosim::scenario(P, nm); dependency(S) <- c(bid, sfd)
-it <- as.integer(opt("iterations", 1)); ev <- as.integer(opt("raster-every", 1))
+it <- as.integer(opt("iterations", if (is.na(pit)) 1L else pit))
+if (!is.na(pit) && it > pit) stop(sprintf("the build's projection schedule has %d iterations: run at most that many (Projection Options sets it)", pit))
+ ev <- as.integer(opt("raster-every", 1))
 bookends <- "--bookend-maps" %in% a; if (bookends) ev <- y1 - y0
 saveDatasheet(S, data.frame(MinimumTimestep = y0, MaximumTimestep = y1, MinimumIteration = 1L, MaximumIteration = it, IsSpatial = TRUE), "stsim_RunControl")
 # yearly state class and transition tables (by stratum); maps every --raster-every years
@@ -59,7 +66,7 @@ if (bookends) saveDatasheet(S, data.frame(SummaryOutputST = TRUE, SummaryOutputS
 stages <- levels(datasheet(S, "core_Pipeline", lookupsAsFactors = TRUE, optional = TRUE)$StageNameId)
 st <- grep("ST-Sim|stsim", stages, value = TRUE, ignore.case = TRUE)[1]; if (is.na(st)) stop("no ST-Sim stage among: ", paste(stages, collapse = "; "))
 saveDatasheet(S, data.frame(StageNameId = st, RunOrder = 1L), "core_Pipeline")
-description(S) <- paste0(sprintf("Historical ST-Sim run %d-%d (transitions from %d), %d iteration(s), spatial. ", y0, y1, y0 + 1, it),
+description(S) <- paste0(if (kind == "Historical") sprintf("Historical ST-Sim run %d-%d (transitions from %d), %d iteration(s), spatial. ", y0, y1, y0 + 1, it) else sprintf("Historical (%d-%d) and projection (%d-%d) ST-Sim run, %d iteration(s), spatial; projection transitions from stage 9 (whole historical years drawn per Projection Transitions). ", y0 + 1, yh, yh + 1, y1, it),
   sprintf("Depends on Stock-Flow Definitions (%d) and the Build result '%s' (%d), which holds the initial conditions, transition pathways and ", sfd, sc[ScenarioId == bid, Name], bid),
   "annual spatial multipliers, flow pathways, climate flow multipliers and initial stock maps. ",
   sprintf("Adds Run Control and ST-Sim output options (yearly state class and transition tables%s). Made by tools/new-historical.R.",

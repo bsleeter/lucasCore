@@ -23,9 +23,9 @@ description(B) <- paste(
   "historical start and end years, projection end year (blank = no projection); (2) Study Area - one row per unit of any source (blank = all",
   "of CONUS); (3) Climate Options - climate methods, and the projection scenario, climate model and replicate when projecting.",
   "Depends on Stock-Flow Definitions. Pipeline: 1 Study Area and Strata, 5 Initial Conditions, 2 Growth Curves, 3 Carbon Flows,",
-  "4 Spin-up, 6 Historical Transitions, 7 Climate Multipliers, 8 Initial Stock Maps. California at 1 km takes about 50 minutes.")
+  "4 Spin-up, 6 Historical Transitions, 7 Climate Multipliers, 8 Initial Stock Maps, 9 Projection Transitions (only with a projection). California at 1 km takes about 50 minutes.")
 stages <- c("1 - Study Area and Strata", "5 - Initial Conditions", "2 - Fit Growth Curves", "3 - Carbon Flows", "4 - Spin-up and Initial Stocks",
-            "6 - Historical Transitions", "7 - Climate Multipliers", "8 - Initial Stock Maps")
+            "6 - Historical Transitions", "7 - Climate Multipliers", "8 - Initial Stock Maps", "9 - Projection Transitions")
 saveDatasheet(B, data.frame(StageNameId = stages, RunOrder = seq_along(stages)), "core_Pipeline")
 # the option sheets show their values: one row of package.xml's defaultValues (a blank optional column stays blank; the stages use the
 # same defaults for anything left empty). Strata sources are spelled out so the drop-downs show them.

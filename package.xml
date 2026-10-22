@@ -98,6 +98,26 @@
 		<validation validationType="Unique" columns="UnitId"/>
 	</dataSheet>
 
+	<dataSheet name="ProjectionOptions" displayName="Projection Options" isSingleRow="True">
+		<!-- stage 9: projection transitions resample whole historical years (Build Options sets the projection end year) -->
+		<column name="ReferenceStartYear" displayName="Reference Period Start (blank = first historical transition year)" dataType="Integer" isOptional="True"/>
+		<column name="ReferenceEndYear" displayName="Reference Period End (blank = historical end)" dataType="Integer" isOptional="True"/>
+		<column name="Iterations" displayName="Iterations (Monte Carlo)" dataType="Integer" defaultValue="10" validationType="WholeNumber" validationCondition="Greater" formula1="0"/>
+		<column name="RandomSeed" displayName="Random Seed (draws of historical years)" dataType="Integer" defaultValue="1"/>
+		<column name="SpatialTiles" displayName="Spatial Multiprocessing Tiles (blank = none; tiles are whole units of the target strata)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1"/>
+	</dataSheet>
+
+	<dataSheet name="ProjectionTransition" displayName="Projection Transitions">
+		<!-- one row per transition group; an empty sheet uses defaults/projection/transitions.csv -->
+		<column name="TransitionGroupId" displayName="Transition Group" dataType="Integer" validationType="Datasheet" formula1="stsim_TransitionGroup"/>
+		<column name="Method" dataType="Integer" validationType="List" formula1="1:Target (area by strata)|2:Probability (rate map by unit)|3:None (off in the projection)" defaultValue="1"/>
+		<column name="StrataLevel" displayName="Target Strata (Target)" dataType="Integer" validationType="List" formula1="1:Primary|2:Secondary|3:Tertiary" isOptional="True"/>
+		<column name="UnitSourceId" displayName="Rate Units (Probability)" dataType="Integer" validationType="Datasheet" formula1="lucasCore_StratumSource" isOptional="True"/>
+		<column name="SamplingSet" displayName="Sampling Set (groups in a set draw the same historical year)" dataType="String"/>
+		<column name="ExcludeGap" displayName="Excluded GAP Status (e.g. 1|2|3)" dataType="String" isOptional="True"/>
+		<validation validationType="Unique" columns="TransitionGroupId"/>
+	</dataSheet>
+
 	<dataSheet name="ClimateOptions" displayName="Climate Options" isSingleRow="True" viewClassName="lucasCoreUI.ClimateOptionsView" viewClassAssembly="lucasCoreUI">
 		<column name="ForestGrowthModel" displayName="Forest Growth (None = normal climate every year)" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP|3:Tree ring" defaultValue="3"/>
 		<column name="NonForestGrowthModel" displayName="Non-Forest Growth" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP" defaultValue="2"/>
@@ -266,6 +286,23 @@
 		<column name="AgeBlockedArea" displayName="Area below the Pathway Minimum Age (km2)" dataType="Double" format="0.00"/>
 	</dataSheet>
 
+	<dataSheet name="OutputProjectionSchedule" displayName="Projection Schedule (historical year drawn)">
+		<column name="Iteration" dataType="Integer"/>
+		<column name="Timestep" dataType="Integer"/>
+		<column name="SamplingSet" displayName="Sampling Set" dataType="String"/>
+		<column name="HistoricalYear" displayName="Historical Year Drawn" dataType="Integer"/>
+	</dataSheet>
+
+	<dataSheet name="OutputProjectionRate" displayName="Projection Rates (historical, by unit)">
+		<column name="TransitionGroup" displayName="Transition Group" dataType="String"/>
+		<column name="Method" dataType="String"/>
+		<column name="Unit" dataType="String"/>
+		<column name="MeanArea" displayName="Mean Annual Area (km2)" dataType="Double" format="0.000"/>
+		<column name="MinArea" displayName="Min (km2)" dataType="Double" format="0.000"/>
+		<column name="MaxArea" displayName="Max (km2)" dataType="Double" format="0.000"/>
+		<column name="AllowedShare" displayName="Share of Eligible Area Allowed (GAP)" dataType="Double" format="0.000"/>
+	</dataSheet>
+
 	<dataSheet name="OutputClimateSummary" displayName="Climate Multiplier Summary">
 		<column name="Timestep" dataType="Integer"/>
 		<column name="FlowGroup" displayName="Flow Group" dataType="String"/>
@@ -390,6 +427,19 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
+	<transformer name="ProjectionTransitions" displayName="9 - Projection Transitions" isRunnable="True" programName="Rscript" programArguments="src/9-projection-transitions.R">
+		<dataSheet name="BuildOptions" type="Input"/>
+		<dataSheet name="ProjectionOptions" type="Input"/>
+		<dataSheet name="ProjectionTransition" type="Input"/>
+		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
+		<dataSheet name="stsim_TransitionSpatialMultiplier" type="Both"/>
+		<dataSheet name="stsim_TransitionTarget" type="Both"/>
+		<dataSheet name="core_SpatialMultiprocessing" type="Output"/>
+		<dataSheet name="OutputProjectionSchedule" type="Output"/>
+		<dataSheet name="OutputProjectionRate" type="Output"/>
+		<dataSheet name="OutputValidation" type="Output"/>
+	</transformer>
+
 	<!-- =================================================================================================== -->
 	<!-- LAYOUTS                                                                                             -->
 	<!-- =================================================================================================== -->
@@ -411,6 +461,10 @@
 			<item name="ClimateOptions"/>
 			<item name="CarbonOptions"/>
 			<item name="GrowthOptions"/>
+			<group name="lucasCoreProjection" displayName="Projection">
+				<item name="ProjectionOptions"/>
+				<item name="ProjectionTransition"/>
+			</group>
 			<group name="lucasCoreCrosswalks" displayName="Crosswalks">
 				<item name="LandCoverCrosswalk"/>
 			</group>
@@ -425,6 +479,8 @@
 				<item name="OutputLandCoverLayers"/>
 				<item name="OutputNlcdAnnual"/>
 				<item name="OutputTransitionSummary"/>
+				<item name="OutputProjectionRate"/>
+				<item name="OutputProjectionSchedule"/>
 				<item name="OutputClimateSummary"/>
 				<item name="OutputInitialStockSummary"/>
 				<item name="OutputReturnInterval"/>

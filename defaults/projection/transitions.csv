@@ -1,0 +1,20 @@
+TransitionGroupId,Method,StrataLevel,UnitSource,SamplingSet,ExcludeGap,Note
+Urbanization: Open [Type],Target,Secondary,,Land use,1|2|3,area by county (secondary); not on protected land (GAP 1-3)
+Urbanization: Low [Type],Target,Secondary,,Land use,1|2|3,
+Urbanization: Medium [Type],Target,Secondary,,Land use,1|2|3,
+Urbanization: High [Type],Target,Secondary,,Land use,1|2|3,
+Intensification: Open to Low [Type],Target,Secondary,,Land use,,developed land only (pathways)
+Intensification: Open to Medium [Type],Target,Secondary,,Land use,,
+Intensification: Open to High [Type],Target,Secondary,,Land use,,
+Intensification: Low to Medium [Type],Target,Secondary,,Land use,,
+Intensification: Low to High [Type],Target,Secondary,,Land use,,
+Intensification: Medium to High [Type],Target,Secondary,,Land use,,
+Ag Expansion: Cropland [Type],Target,Secondary,,Land use,1|2|3,
+Ag Expansion: Pasture [Type],Target,Secondary,,Land use,1|2|3,
+Ag Contraction: Cropland,Target,Secondary,,Land use,,destination class: the stage 6 nearest-natural-class gates stay on
+Ag Contraction: Pasture,Target,Secondary,,Land use,,
+Forest Harvest: Forest Clearcut [Type],Target,Secondary,,Harvest,1|2,harvest draws its own years; not on GAP 1-2
+Forest Harvest: Forest Selection [Type],Target,Secondary,,Harvest,1|2,
+Fire: Low Severity [Type],Probability,,Pyromes,Fire,,burned fraction of the pyrome's burnable area in the year drawn; fire crosses county lines
+Fire: Medium Severity [Type],Probability,,Pyromes,Fire,,
+Fire: High Severity [Type],Probability,,Pyromes,Fire,,
