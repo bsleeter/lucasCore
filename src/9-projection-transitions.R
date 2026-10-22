@@ -52,6 +52,35 @@ ic <- as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", optional = 
 if (!nrow(ic) || is.na(ic$StateClassFileName[1])) fail("no state class map: run stages 1, 5 and 6 first")
 P <- rast(ic$StratumFileName[1]); S2 <- rast(ic$SecondaryStratumFileName[1]); S3 <- rast(ic$TertiaryStratumFileName[1]); S <- rast(ic$StateClassFileName[1])
 land <- !is.na(values(P, mat = FALSE)); vS <- values(S, mat = FALSE)
+
+# ---- mode 2: a stand-alone projection starts from a historical run's final maps (Projection Start) ----------------------------
+# The historical run (a result scenario in this library, made with tools/new-historical.R --historical-only --bookend-maps) gives the
+# state class and age of its first iteration in the historical end year, and one map per stock type ("<type> [Type]" stock groups);
+# they replace the build's initial conditions and initial stocks, so ST-Sim continues from that state.
+pst <- read_ds("ProjectionStart"); hid <- if (nrow(pst) && "HistoricalScenarioId" %in% names(pst)) pst$HistoricalScenarioId[1] else NA
+if (!is.na(hid)) {
+  ys <- if ("StartYear" %in% names(pst) && !is.na(pst$StartYear[1])) pst$StartYear[1] else y1
+  if (ys != y1) fail("Projection Start: the start year must be the historical end (%d); the projection draws start in %d", y1, y1 + 1)
+  hd <- file.path(paste0(env$LibraryFilePath, ".data"), sprintf("Scenario-%d", hid))
+  scf <- file.path(hd, "stsim_OutputSpatialState", sprintf("sc.it1.ts%d.tif", ys)); agf <- file.path(hd, "stsim_OutputSpatialAge", sprintf("age.it1.ts%d.tif", ys))
+  if (!file.exists(scf) || !file.exists(agf)) fail("Projection Start: historical run %d has no state class and age maps for %d (make it with tools/new-historical.R --historical-only --bookend-maps)", hid, ys)
+  sg <- as.data.table(datasheet(prj, "stsim_StockGroup", includeKey = TRUE))
+  ist <- as.data.table(datasheet(scn, "stsim_InitialStockSpatial", optional = TRUE, lookupsAsFactors = FALSE))
+  if (!nrow(ist)) fail("Projection Start: the build has no initial stocks (stage 8) to know the stock types")
+  stf <- vapply(ist$StockTypeId, function(t) { id <- sg[Name == paste0(t, " [Type]"), StockGroupId]
+    f <- if (length(id)) file.path(hd, "stsim_OutputAverageSpatialStockGroup", sprintf("avgstkg_%d.it0.ts%d.tif", id[1], ys)) else NA_character_
+    if (is.na(f) || !file.exists(f)) NA_character_ else f }, "")
+  if (anyNA(stf)) fail("Projection Start: historical run %d has no %d map for %s (its Stock-Flow output must map every stock type)", hid, ys, paste(ist$StockTypeId[is.na(stf)], collapse = ", "))
+  S <- mask(rast(scf), P); A <- mask(rast(agf), P)
+  check(STAGE, "the historical run's maps are on the build's grid", compareGeom(S, P, stopOnError = FALSE), sprintf("run %d", hid))
+  row <- ic[1]; row$StateClassFileName <- write_raster(S, sprintf("Start-StateClass_%d.tif", ys)); row$AgeFileName <- write_raster(A, sprintf("Start-Age_%d.tif", ys))
+  saveDatasheet(scn, as.data.frame(row), "stsim_InitialConditionsSpatial")
+  sfiles <- vapply(seq_along(stf), function(j) write_raster(mask(rast(stf[j]), P), sprintf("Start-%s_%d.tif", gsub("[^A-Za-z0-9]+", "-", ist$StockTypeId[j]), ys), "FLT4S"), "")
+  write_stsim(data.table(StockTypeId = ist$StockTypeId, RasterFileName = sfiles), "InitialStockSpatial")
+  vS <- values(S, mat = FALSE)
+  tot <- sum(vapply(stf, function(f) global(mask(rast(f), P), "sum", na.rm = TRUE)[[1]], 0)) * prod(res(P)) / 1e4 / 1e6
+  say("Projection Start: state class, age and %d stock maps of historical run %d in %d (%.2f Tg C in the stock types)", length(stf), hid, ys, tot)
+}
 sm <- as.data.table(datasheet(scn, "stsim_TransitionSpatialMultiplier", optional = TRUE, lookupsAsFactors = FALSE))
 if (!nrow(sm)) fail("no transition spatial multipliers: run stage 6 first")
 if (!"Iteration" %in% names(sm)) sm[, Iteration := NA_integer_]
@@ -66,8 +95,22 @@ known <- unique(sm$TransitionGroupId)
 miss <- pt[Method != "None" & !TransitionGroupId %in% known, TransitionGroupId]
 if (length(miss)) { say("No historical multiplier maps for %s: off in the projection", paste(miss, collapse = "; ")); pt[TransitionGroupId %in% miss, Method := "None"] }
 # a group's historical map for year y (stage 6 writes one row per group and year; Off.tif = nothing happened)
-hist_file <- function(g, y) { f <- sm[TransitionGroupId == g & Timestep == y & is.na(Iteration), MultiplierFileName]; if (length(f)) f[1] else NA_character_ }
+# (a build that already ran stage 9 holds Probability groups' historical rows per iteration instead: take iteration 1's, which are
+# copies of the shared row)
+hist_file <- function(g, y) { f <- sm[TransitionGroupId == g & Timestep == y & is.na(Iteration), MultiplierFileName]
+  if (!length(f)) f <- sm[TransitionGroupId == g & Timestep == y & Iteration %in% 1L, MultiplierFileName]
+  if (length(f)) f[1] else NA_character_ }
 hist_vals <- function(g, y) { f <- hist_file(g, y); if (is.na(f)) return(numeric(length(land))); v <- values(rast(f), mat = FALSE); v[is.na(v)] <- 0; v }
+# several groups share one NLCD gain map (gain to Medium: Urbanization: Medium, Intensification: Open to Medium and Low to Medium), and the
+# pathways split its cells by their class the year before; a group's own area counts only the cells whose prior-year modal NLCD class
+# fits its source classes: one of the group's developed (21-24) or agriculture (81, 82) source classes, or - when the group also starts
+# from natural classes - neither developed nor agriculture (found 2026-10-22: without this every sharing group got the whole map, and projected urbanization was 2-3x)
+LU <- c(21:24, 81L, 82L)
+nl <- read_ds("OutputNlcdAnnual"); if (!nrow(nl)) fail("no annual NLCD table: run stage 5 first")
+nlcd_prev <- function(y) { f <- nl$FileName[nl$Year == y - 1]; if (!length(f)) fail("annual NLCD for %d is missing", y - 1); values(rast(f), mat = FALSE) }
+src_ids <- function(g) as.integer(scl$Id[match(unique(pw[TransitionTypeId %in% grp_types(g), StateClassIdSource]), scl$Name)])
+fits_prev <- function(g, y) { s <- src_ids(g); lu <- intersect(s, LU); n <- nlcd_prev(y)
+  (n %in% lu) | (any(!s %in% LU) & !(n %in% LU)) }
 progressBar()
 
 # eligibility: the start-year classes a group's pathways can leave (as stage 6)
@@ -101,7 +144,7 @@ say("Sampling sets: %s", paste(sprintf("%s (%s)", sets, vapply(sets, function(s)
 tg <- pt[Method == "Target"]; new_tt <- list(); new_sm <- list(); rates <- list(); allow_files <- list()
 for (i in seq_len(nrow(tg))) { g <- tg$TransitionGroupId[i]; L <- tg$StrataLevel[i]; u <- lev[[L]]; units <- sort(unique(u[land]))
   # area per unit and historical year, in the target's amount units
-  a <- vapply(ref, function(y) { v <- hist_vals(g, y); vapply(units, function(k) sum(v[land & u == k]), 0) }, numeric(length(units)))
+  a <- vapply(ref, function(y) { v <- hist_vals(g, y) * fits_prev(g, y); vapply(units, function(k) sum(v[land & u == k]), 0) }, numeric(length(units)))
   a <- matrix(a, nrow = length(units), dimnames = list(units, ref)) * cell_amt
   dr <- sched[SamplingSet == tg$SamplingSet[i]]
   nm <- lev_list[[L]]$Name[match(units, as.integer(lev_list[[L]]$Id))]
@@ -162,6 +205,8 @@ if (tiles > 1) {
 handled <- pt[Method != "None", TransitionGroupId]
 sm_out <- rbind(sm[!(TransitionGroupId %in% handled & (Timestep > y1 | TransitionGroupId %in% pg$TransitionGroupId)),
                    .(Iteration, Timestep, TransitionGroupId, MultiplierFileName)], rbindlist(new_sm), fill = TRUE)
+# earlier projection targets (stage 9 run again on a build that already has them) are replaced
+if (nrow(tt) && "Timestep" %in% names(tt)) tt <- tt[!(TransitionGroupId %in% handled & !is.na(Timestep) & Timestep > y1)]
 tt_out <- rbind(tt, rbindlist(new_tt, fill = TRUE), fill = TRUE)
 nexp <- nit * length(pyrs)
 cov <- if (length(new_tt)) rbindlist(new_tt, fill = TRUE)[, .(n = uniqueN(paste(Iteration, Timestep))), by = TransitionGroupId] else data.table(TransitionGroupId = character(), n = integer())

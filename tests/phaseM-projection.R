@@ -4,7 +4,7 @@
 # In a fresh starter copy (dev/libs/lucasCore-projection.ssim): the Build scenario with a projection to 2050 (stages 1, 5, 2, 3, 4, 6, 7, 8,
 # 9; growth curves copied from the phaseJ library's Growth Curves result 4; LOCA2 SSP2-4.5 CanESM5; 2 iterations), then tools/new-historical.R makes the 1985-2050 run scenario and runs it.
 # Compares projected transition areas with the historical years drawn (OutputProjectionSchedule) and reports the carbon trajectory.
-# Usage: Rscript tests/phaseM-projection.R [--units="County: Placer California"] [--end=2050] [--build=<existing result id>]
+# Usage: Rscript tests/phaseM-projection.R [--units="County: Placer California"] [--end=2050] [--build=<existing result id> [--stage9-again]]
 # =============================================================================
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
 a <- commandArgs(TRUE); opt <- function(k, d) { m <- grep(sprintf("^--%s=", k), a, value = TRUE); if (length(m)) sub(sprintf("^--%s=", k), "", m[1]) else d }
@@ -35,6 +35,14 @@ if (is.na(bid)) {
   if (!nrow(v) || any(v$Status != "Pass")) { print(v[Status != "Pass"]); stop("build failed its checks") }
   bid <- scenarioId(RB)
 }
+# --stage9-again: rerun only stage 9 on that build (a scenario that depends on the build result, pipeline = stage 9)
+if ("--stage9-again" %in% a) {
+  nm <- "Build: stage 9 again"; for (i in sc[Name == nm, ScenarioId]) delete(L, scenario = i, force = TRUE)
+  S9 <- rsyncrosim::scenario(P, nm); dependency(S9) <- bid
+  description(S9) <- sprintf("tests/phaseM-projection.R: stage 9 alone on build result %d (after a stage 9 change).", bid)
+  saveDatasheet(S9, data.frame(StageNameId = "9 - Projection Transitions", RunOrder = 1L), "core_Pipeline")
+  R9 <- run(S9); lg <- logl(R9); cat(unique(lg[grepl("target by|rate by|Projection inputs|rror", lg)]), sep = "
+"); bid <- scenarioId(R9) }
 RB <- scenario(L, bid)
 
 out <- system2(RS, c("F:/lucasCore/tools/new-historical.R", shQuote(f), sprintf("--build=%d", bid), "--bookend-maps", "--replace"), stdout = TRUE, stderr = TRUE)
@@ -56,6 +64,13 @@ pj <- merge(pj, sch, by = c("Iteration", "Timestep", "SamplingSet"))
 pj <- merge(pj, hist, by = c("HistoricalYear", "TransitionGroupId"), all.x = TRUE)[is.na(Hist), Hist := 0]
 cat(sprintf("\nprojected vs drawn historical area, %d-%d (km2, summed over years, mean of iterations):\n", yh + 1, max(tr$Timestep)))
 print(merge(pj[, .(Projected = sum(Run) / uniqueN(Iteration), DrawnHistorical = sum(Hist) / uniqueN(Iteration)), by = TransitionGroupId], rules, by = "TransitionGroupId")[order(-DrawnHistorical)])
+# the check that matters: each group's mean annual area in the projection vs in the historical years of the same run
+yrs_all <- CJ(Iteration = unique(tr$Iteration), Timestep = 1986:max(tr$Timestep), TransitionGroupId = unique(tr$TransitionGroupId))
+ta <- tr[yrs_all, on = .(Iteration, Timestep, TransitionGroupId)][is.na(Run), Run := 0]
+cmp <- ta[, .(Historical = mean(Run[Timestep <= yh]), Projected = mean(Run[Timestep > yh])), by = TransitionGroupId][Historical + Projected > 0][, Ratio := round(Projected / Historical, 2)]
+cat("
+mean annual area in the same run, historical years vs projection (km2/yr):
+"); print(cmp[order(-Historical)])
 cat("\nfire by iteration (km2/yr, projection):\n"); print(pj[grepl("^Fire", TransitionGroupId), .(Projected = sum(Run) / uniqueN(Timestep), Drawn = sum(Hist) / uniqueN(Timestep)), by = Iteration])
 stk <- ds(RH, "stsim_OutputStock")[StockGroupId == "Total Ecosystem", .(Tg = sum(Amount) / 1e6), by = .(Iteration, Timestep)]
 cat("\nTotal Ecosystem carbon (Tg):\n"); print(dcast(stk[Timestep %in% c(1985, yh, 2035, max(Timestep))], Timestep ~ Iteration, value.var = "Tg"))

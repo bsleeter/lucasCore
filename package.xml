@@ -107,6 +107,12 @@
 		<column name="SpatialTiles" displayName="Spatial Multiprocessing Tiles (blank = none; tiles are whole units of the target strata)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1"/>
 	</dataSheet>
 
+	<dataSheet name="ProjectionStart" displayName="Projection Start (from a historical run)" isSingleRow="True">
+		<!-- mode 2: stage 9 also writes the initial conditions and stocks of a stand-alone projection from a historical run's final maps -->
+		<column name="HistoricalScenarioId" displayName="Historical Run (result scenario Id in this library; blank = a continuous run)" dataType="Integer" isOptional="True"/>
+		<column name="StartYear" displayName="Start Year (blank = the historical end)" dataType="Integer" isOptional="True"/>
+	</dataSheet>
+
 	<dataSheet name="ProjectionTransition" displayName="Projection Transitions">
 		<!-- one row per transition group; an empty sheet uses defaults/projection/transitions.csv -->
 		<column name="TransitionGroupId" displayName="Transition Group" dataType="Integer" validationType="Datasheet" formula1="stsim_TransitionGroup"/>
@@ -430,9 +436,12 @@
 	<transformer name="ProjectionTransitions" displayName="9 - Projection Transitions" isRunnable="True" programName="Rscript" programArguments="src/9-projection-transitions.R">
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="ProjectionOptions" type="Input"/>
+		<dataSheet name="ProjectionStart" type="Input"/>
 		<dataSheet name="ProjectionTransition" type="Input"/>
-		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
+		<dataSheet name="OutputNlcdAnnual" type="Input"/>
+		<dataSheet name="stsim_InitialConditionsSpatial" type="Both"/>
 		<dataSheet name="stsim_TransitionSpatialMultiplier" type="Both"/>
+		<dataSheet name="stsim_InitialStockSpatial" type="Output"/>
 		<dataSheet name="stsim_TransitionTarget" type="Both"/>
 		<dataSheet name="core_SpatialMultiprocessing" type="Output"/>
 		<dataSheet name="OutputProjectionSchedule" type="Output"/>
@@ -463,6 +472,7 @@
 			<item name="GrowthOptions"/>
 			<group name="lucasCoreProjection" displayName="Projection">
 				<item name="ProjectionOptions"/>
+				<item name="ProjectionStart"/>
 				<item name="ProjectionTransition"/>
 			</group>
 			<group name="lucasCoreCrosswalks" displayName="Crosswalks">

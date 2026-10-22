@@ -40,6 +40,10 @@ lucasCore ships a starter library. An Empty Library does not work: it has no def
    excluded GAP statuses; empty = defaults/projection/transitions.csv). Stage 9 draws a whole historical year per projection year and
    iteration (groups in a sampling set share the draw) and writes targets and multiplier maps; the same new-historical.R then makes
    "Historical and Projection <start>-<end>". Placer County, 1 km, 1985-2050, 2 iterations: build 25 min, run 41 min.
+7. Projections from a historical run (mode 2): make the historical run once with `tools/new-historical.R "<library>" --historical-only
+   --bookend-maps`, then `Rscript tools/new-projection.R "<library>" --historical=<its result id> [--years=10]` for each projection.
+   The projection scenario depends on the Build result, names the run in Projection Start, and runs stage 9 (which hands over the
+   run's final state class, age and 14 carbon pool maps) then ST-Sim. Placer: historical run 12 min once; 10 years x 2 iterations 8 min.
 
 To make several models, copy the starter again, or add scenarios to one library (each scenario has its own study area and strata).
 
@@ -76,8 +80,8 @@ stage: SyncroSim discards project-scope sheets that a stage saves during a run.
 | 6 - Historical Transitions | `src/6-historical-transitions.R` | Transition pathways and annual spatial multipliers (NLCD land use and clearcut, MTBS fire, LANDFIRE thinning) |
 | 7 - Climate Multipliers | `src/7-climate-multipliers.R`, `src/loca2.R` | Growth and decomposition multipliers: PRISM historical, LOCA2 projections (Climate Options) |
 | 8 - Initial Stock Maps | `src/8-initial-stocks-spatial.R` | The 14 carbon pools of every cell as ST-Sim initial stocks |
-| 9 - Projection Transitions | `src/9-projection-transitions.R` | Projection targets and multiplier maps that resample whole historical years (only with a projection) |
-| 10 - Projection Start | | Planned: stand-alone projections from a historical run (mode 2) |
+| 9 - Projection Transitions | `src/9-projection-transitions.R` | Projection targets and multiplier maps that resample whole historical years (only with a projection); with Projection Start, the starting maps of a stand-alone projection |
+
 
 Pipeline order: 1, 5, 2, 3, 4, 6, 7, 8. Every stage ends with validation checks (`lucasCore_OutputValidation`); a check that cannot be
 computed fails.

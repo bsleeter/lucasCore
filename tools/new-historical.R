@@ -15,6 +15,8 @@
 #   --bookend-maps  all maps (state class, age, transitions, stock groups) in the first and last year only, no flow maps: for fine
 #                   resolutions, where yearly maps of every group run to many GB
 #   --replace       delete an existing scenario of the same name first
+#   --historical-only  stop at the historical end even when the build has a projection (the run that seeds stand-alone projections;
+#                   with --bookend-maps it maps the historical end year, which tools/new-projection.R starts from)
 # Prints the new scenario id on the last line.
 # =============================================================================
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
@@ -40,6 +42,7 @@ if (!length(ny)) stop(sprintf("Build result %d has no annual NLCD table: run sta
 # mode 1: when the build ran stage 9 (a projection), the run continues through the projection end with the schedule's iterations
 ps <- suppressWarnings(as.data.table(datasheet(B, "lucasCore_OutputProjectionSchedule", optional = TRUE)))
 yh <- y1; pit <- NA_integer_
+if ("--historical-only" %in% a) ps <- ps[0]   # mode 2: only the historical years, to seed stand-alone projections (tools/new-projection.R)
 if (nrow(ps)) { y1 <- max(ps$Timestep); pit <- max(ps$Iteration) }
 kind <- if (nrow(ps)) "Historical and Projection" else "Historical"
 
