@@ -73,7 +73,7 @@
 	<!-- SCENARIO DATASHEETS                                                                                 -->
 	<!-- =================================================================================================== -->
 
-	<dataSheet name="BuildOptions" displayName="Build Options" isSingleRow="True">
+	<dataSheet name="BuildOptions" displayName="Build Options" isSingleRow="True" viewClassName="lucasCoreUI.BuildOptionsView" viewClassAssembly="lucasCoreUI">
 		<column name="Resolution" displayName="Cell Size (m)" dataType="Integer" defaultValue="1000" validationType="WholeNumber" validationCondition="Greater" formula1="0"/>
 		<column name="SecondarySourceId" displayName="Secondary Strata (blank = States)" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="lucasCore_StratumSource"/>
 		<column name="TertiarySourceId" displayName="Tertiary Strata (blank = Federal Lands)" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="lucasCore_StratumSource"/>
