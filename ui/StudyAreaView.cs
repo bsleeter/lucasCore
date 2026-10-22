@@ -20,11 +20,12 @@ namespace lucasCoreUI
     public class StudyAreaView : DataFeedView
     {
         private const string SHEET = "lucasCore_StudyArea";
+        private const string OPTIONS = "lucasCore_StudyAreaOptions";   // single row: SourceId, the kind chosen (blank = all of CONUS)
         private const string UNITS = "stsim_SecondaryStratum";
         private const string SOURCES = "lucasCore_StratumSource";
         private const double OFFSET = 1e8;
 
-        private class Source { public int Number; public string Name; public string Prefix; }
+        private class Source { public int Key; public int Number; public string Name; public string Prefix; }
         private class Unit
         {
             public int Key; public long Id; public string Name; public string Short;
@@ -99,6 +100,27 @@ namespace lucasCoreUI
         private void OnListsChanged(DataSheetMonitorEventArgs e) { LoadLists(); RefreshControls(); }
 
         private DataSheet Sheet { get { return this.DataFeed.GetDataSheet(SHEET); } }
+        private DataSheet Options { get { return this.DataFeed.GetDataSheet(OPTIONS); } }
+
+        // the kind saved in Study Area Type (its Stratum Sources Number), 0 when blank
+        private int SavedKind()
+        {
+            DataSheet o = Options;
+            if (!o.HasData()) return 0;
+            DataRow r = o.GetDataRow();
+            if (r == null || r["SourceId"] == DBNull.Value) return 0;
+            int key = Convert.ToInt32(r["SourceId"]);
+            Source s = m_sources.FirstOrDefault(x => x.Key == key);
+            return s == null ? 0 : s.Number;
+        }
+
+        private void SaveKind(int number)
+        {
+            Source s = m_sources.FirstOrDefault(x => x.Number == number);
+            object v = s == null ? (object)DBNull.Value : s.Key;
+            if (SavedKind() == number) return;
+            Options.SetSingleRowData("SourceId", v);
+        }
 
         private static IEnumerable<DataRow> Live(DataTable dt) { return dt.Rows.Cast<DataRow>().Where(r => r.RowState != DataRowState.Deleted); }
 
@@ -112,7 +134,7 @@ namespace lucasCoreUI
             foreach (DataRow r in Live(src))
             {
                 if (r["Number"] == DBNull.Value) continue;
-                m_sources.Add(new Source { Number = Convert.ToInt32(r["Number"]), Name = Convert.ToString(r["Name"]),
+                m_sources.Add(new Source { Key = Convert.ToInt32(r["StratumSourceId"]), Number = Convert.ToInt32(r["Number"]), Name = Convert.ToString(r["Name"]),
                     Prefix = r["Prefix"] == DBNull.Value ? null : Convert.ToString(r["Prefix"]) });
             }
             m_sources = m_sources.OrderBy(s => s.Number).ToList();
@@ -161,9 +183,8 @@ namespace lucasCoreUI
             {
                 List<Unit> sel = SelectedUnits();
                 List<int> kinds = sel.Select(SourceOf).Distinct().ToList();
-                // the chosen kind follows the data when there is any; otherwise it stays where the user put it
-                if (sel.Count > 0) m_current = kinds[0];
-                else if (m_current < 0) m_current = 0;
+                // the chosen kind follows the units when there are any, else the saved Study Area Type
+                m_current = sel.Count > 0 ? kinds[0] : SavedKind();
                 foreach (RadioButton rb in m_radios.Controls.OfType<RadioButton>()) rb.Checked = (int)rb.Tag == m_current;
 
                 Source s = m_sources.FirstOrDefault(x => x.Number == m_current);
@@ -220,6 +241,7 @@ namespace lucasCoreUI
                 DeleteAll();
             }
             m_current = number;
+            SaveKind(number);
             RefreshControls();
         }
 

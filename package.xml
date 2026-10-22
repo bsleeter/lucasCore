@@ -83,7 +83,16 @@
 		<column name="ForestTypeMap" displayName="Forest Type Map" dataType="Integer" validationType="List" formula1="1:LANDFIRE EVT|2:USFS forest type groups" defaultValue="1"/>
 	</dataSheet>
 
-	<dataSheet name="StudyArea" displayName="Study Area (blank = all of CONUS)" viewClassName="lucasCoreUI.StudyAreaView" viewClassAssembly="lucasCoreUI">
+	<!-- the Study Area page (ui/StudyAreaView.cs): a custom view on a feed, as ST-Sim does for multi-row sheets (a view on the dataSheet itself requires a single-row sheet) -->
+	<dataFeed name="StudyArea" displayName="Study Area" viewClassName="lucasCoreUI.StudyAreaView" viewClassAssembly="lucasCoreUI">
+		<dataSheet name="StudyAreaOptions"/>
+		<dataSheet name="StudyArea"/>
+	</dataFeed>
+	<dataSheet name="StudyAreaOptions" displayName="Study Area Type" isSingleRow="True">
+		<!-- the kind of unit chosen on the Study Area page; stage 1 reads only the units (StudyArea) -->
+		<column name="SourceId" displayName="Define the study area by (blank = all of CONUS)" dataType="Integer" validationType="Datasheet" formula1="lucasCore_StratumSource" isOptional="True"/>
+	</dataSheet>
+	<dataSheet name="StudyArea" displayName="Study Area (blank = all of CONUS)">
 		<!-- one row per unit, from any source (ecodivision, state, county, HUC, pyrome, ...): the universal unit list is stsim's Secondary Strata list -->
 		<column name="UnitId" displayName="Unit" dataType="Integer" validationType="Datasheet" formula1="stsim_SecondaryStratum" allowDbNull="False"/>
 		<validation validationType="Unique" columns="UnitId"/>
