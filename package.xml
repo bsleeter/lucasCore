@@ -83,7 +83,7 @@
 		<column name="ForestTypeMap" displayName="Forest Type Map" dataType="Integer" validationType="List" formula1="1:LANDFIRE EVT|2:USFS forest type groups" defaultValue="1"/>
 	</dataSheet>
 
-	<dataSheet name="StudyArea" displayName="Study Area (blank = all of CONUS)">
+	<dataSheet name="StudyArea" displayName="Study Area (blank = all of CONUS)" viewClassName="lucasCoreUI.StudyAreaView" viewClassAssembly="lucasCoreUI">
 		<!-- one row per unit, from any source (ecodivision, state, county, HUC, pyrome, ...): the universal unit list is stsim's Secondary Strata list -->
 		<column name="UnitId" displayName="Unit" dataType="Integer" validationType="Datasheet" formula1="stsim_SecondaryStratum" allowDbNull="False"/>
 		<validation validationType="Unique" columns="UnitId"/>
