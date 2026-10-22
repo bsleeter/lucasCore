@@ -82,8 +82,7 @@ stage: SyncroSim discards project-scope sheets that a stage saves during a run.
 | 8 - Initial Stock Maps | `src/8-initial-stocks-spatial.R` | The 14 carbon pools of every cell as ST-Sim initial stocks |
 | 9 - Projection Transitions | `src/9-projection-transitions.R` | Projection targets and multiplier maps that resample whole historical years (only with a projection); with Projection Start, the starting maps of a stand-alone projection |
 
-
-Pipeline order: 1, 5, 2, 3, 4, 6, 7, 8. Every stage ends with validation checks (`lucasCore_OutputValidation`); a check that cannot be
+Pipeline order: 1, 5, 2, 3, 4, 6, 7, 8, 9. Every stage ends with validation checks (`lucasCore_OutputValidation`); a check that cannot be
 computed fails.
 
 ## Test
