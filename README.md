@@ -30,6 +30,10 @@ lucasCore ships a starter library. An Empty Library does not work: it has no def
      scenario (SSP), climate model and replicate
 4. Run **Build**. Its dependency (Stock-Flow Definitions) and pipeline (stages 1, 5, 2, 3, 4, 6, 7, 8) are already set. California at
    1 km takes about 50 minutes; the result scenario holds every input an ST-Sim historical run needs except Run Control.
+5. Make the historical run: `Rscript tools/new-historical.R "<library.ssim>" [--build=<result id>] [--iterations=1]` adds
+   "Historical <start>-<end>", or in Studio: a new scenario with dependencies **the Build result first, then Stock-Flow
+   Definitions** (the order matters: the first one supplies the whole Flow Pathways feed, and Stock-Flow Definitions has the diagram
+   but no pathways), Run Control = start to end year, spatial, and Pipeline = ST-Sim. Placer County at 1 km: 12 minutes, one iteration.
 
 To make several models, copy the starter again, or add scenarios to one library (each scenario has its own study area and strata).
 
