@@ -12,6 +12,8 @@
 #   --build         the Build result to run from (default: the newest result scenario whose name starts with "Build")
 #   --iterations    Monte Carlo iterations (transitions are probabilistic where a multiplier is a fraction of the cell)
 #   --raster-every  state class, age and transition maps every n years (0 = none); stock maps follow Stock-Flow Definitions
+#   --bookend-maps  all maps (state class, age, transitions, stock groups) in the first and last year only, no flow maps: for fine
+#                   resolutions, where yearly maps of every group run to many GB
 #   --replace       delete an existing scenario of the same name first
 # Prints the new scenario id on the last line.
 # =============================================================================
@@ -43,12 +45,17 @@ if (nrow(sc[Name == nm & IsResult == "No"])) { if (!"--replace" %in% a) stop(spr
 # with Stock-Flow Definitions first, its diagram-only feed wins and the run has no flow pathways (no flows at all; found 2026-10-21)
 S <- rsyncrosim::scenario(P, nm); dependency(S) <- c(bid, sfd)
 it <- as.integer(opt("iterations", 1)); ev <- as.integer(opt("raster-every", 1))
+bookends <- "--bookend-maps" %in% a; if (bookends) ev <- y1 - y0
 saveDatasheet(S, data.frame(MinimumTimestep = y0, MaximumTimestep = y1, MinimumIteration = 1L, MaximumIteration = it, IsSpatial = TRUE), "stsim_RunControl")
 # yearly state class and transition tables (by stratum); maps every --raster-every years
 saveDatasheet(S, data.frame(SummaryOutputSC = TRUE, SummaryOutputSCTimesteps = 1L, SummaryOutputSCZeroValues = FALSE,
                             SummaryOutputTR = TRUE, SummaryOutputTRTimesteps = 1L, SummaryOutputTRIntervalMean = FALSE), "stsim_OutputOptions")
 if (ev > 0) saveDatasheet(S, data.frame(RasterOutputSC = TRUE, RasterOutputSCTimesteps = ev, RasterOutputAge = TRUE, RasterOutputAgeTimesteps = ev,
                                         RasterOutputTR = TRUE, RasterOutputTRTimesteps = ev), "stsim_OutputOptionsSpatial")
+# bookend maps: stock group maps (the groups Stock-Flow Definitions' filter maps) only in the first and last year, no flow maps; the
+# yearly stock and flow tables stay. A scenario's own Stock-Flow Output sheet replaces the dependency's (it is a feed of its own).
+if (bookends) saveDatasheet(S, data.frame(SummaryOutputST = TRUE, SummaryOutputSTTimesteps = 1L, SummaryOutputFL = TRUE, SummaryOutputFLTimesteps = 1L,
+                                          AvgSpatialOutputST = TRUE, AvgSpatialOutputSTTimesteps = ev, AvgSpatialOutputFL = FALSE), "stsim_OutputOptionsStockFlow")
 stages <- levels(datasheet(S, "core_Pipeline", lookupsAsFactors = TRUE, optional = TRUE)$StageNameId)
 st <- grep("ST-Sim|stsim", stages, value = TRUE, ignore.case = TRUE)[1]; if (is.na(st)) stop("no ST-Sim stage among: ", paste(stages, collapse = "; "))
 saveDatasheet(S, data.frame(StageNameId = st, RunOrder = 1L), "core_Pipeline")
