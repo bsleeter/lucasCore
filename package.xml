@@ -22,6 +22,8 @@
 		<column name="MtbsSeverityFolder" displayName="MTBS Burn Severity Folder (mtbs_CONUS_year.tif)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/MTBS/Burn Severity"/>
 		<column name="LandfireDisturbanceFolder" displayName="LANDFIRE Disturbance Folder (US_DISTyear)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Landfire Disturbance"/>
 		<column name="LcmsFolder" displayName="USFS LCMS annual Change folder (year/*Change_year.tif; harvest, stages 6 and 10)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/LCMS/v2025-11/Change_Annual"/>
+		<column name="BurnProbabilityFile" displayName="Burn probability raster (fire method 2 default; FSim CONUS LF2020 270 m)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FSim/Data/I_FSim_CONUS_LF2020_270m/CONUS_BP.tif"/>
+		<column name="FpaFodFile" displayName="FPA-FOD fire occurrence geopackage (ignition density, fire method 2)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FPA-FOD/7th/Data/FPA_FOD_20260615.gpkg"/>
 		<column name="FriFile" displayName="LANDFIRE Mean Fire Return Interval" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FRI/Tif/LC16_FRI_200.tif"/>
 		<column name="PrismFolder" displayName="PRISM Folder (annual and normals)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Climate/prism"/>
 		<column name="Loca2Folder" displayName="LOCA2 Folder (gcm/r1i1p1f1/ssp)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Climate/LOCA2"/>
@@ -127,9 +129,10 @@
 		     a burn probability; 3 = whole lucasFireC2F seasons (later). Dynamic coupling comes after these are tested -->
 		<column name="TransitionGroupId" displayName="Fire Group (blank = Fire)" dataType="Integer" validationType="Datasheet" formula1="stsim_TransitionGroup" isOptional="True"/>
 		<column name="FireMethod" displayName="Fire Method" dataType="Integer" validationType="List" formula1="1:Historical rates|2:Burn probability|3:lucasFireC2F seasons" defaultValue="1"/>
-		<column name="SlopeSelectivity" displayName="Slope Selectivity (burned share by slope, from the fire record)" dataType="Boolean" defaultValue="-1"/>
-		<column name="BurnProbabilityFile" displayName="Burn Probability Raster (method 2; blank = FSim CONUS 270 m)" dataType="String" isOptional="True"/>
+		<column name="SlopeSelectivity" displayName="Slope Selectivity (method 1: burned share by slope, from the fire record; method 2 uses the burn probability instead)" dataType="Boolean" defaultValue="-1"/>
+		<column name="BurnProbabilityFile" displayName="Burn Probability Raster (method 2; blank = Data Sources: FSim CONUS 270 m)" dataType="String" isOptional="True"/>
 		<column name="IgnitionSource" displayName="Ignitions (method 2)" dataType="Integer" validationType="List" formula1="1:Burn probability|2:FPA-FOD ignition density" defaultValue="1" isOptional="True"/>
+		<column name="IgnitionBandwidth" displayName="Ignition Density Smoothing (m, FPA-FOD; blank = 5000)" dataType="Double" isOptional="True"/>
 	</dataSheet>
 
 	<dataSheet name="ProjectionOptions" displayName="Projection Options" isSingleRow="True">
@@ -578,6 +581,7 @@
 		<dataSheet name="OutputFireSlope" type="Output"/>
 		<dataSheet name="stsim_TransitionSizeDistribution" type="Both"/>
 		<dataSheet name="stsim_TransitionSizePrioritization" type="Both"/>
+		<dataSheet name="stsim_TransitionSpatialInitiationMultiplier" type="Both"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 

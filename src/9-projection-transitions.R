@@ -124,7 +124,8 @@ if (anyDuplicated(tm)) fail("Projection Transitions: %s would be targeted twice 
 fo <- read_ds("FireOptions"); fire_g <- nz(fo$TransitionGroupId, "Fire")
 fire_m <- c(Historical = 1L, Burn = 2L, lucasFireC2F = 3L)[sub(" .*", "", as.character(nz(fo$FireMethod, "Historical")))]; if (is.na(fire_m)) fire_m <- 1L
 slope_on <- { v <- nz(fo$SlopeSelectivity, TRUE); isTRUE(as.logical(v)) || identical(v, -1L) || identical(v, 1L) }
-if (fire_m > 1) fail("Fire Options: method %d is not built yet (only 1, Historical rates)", fire_m)
+if (fire_m > 2) fail("Fire Options: method %d is not built yet (1 Historical rates and 2 Burn probability are)", fire_m)
+ign_src <- c(Burn = 1L, `FPA-FOD` = 2L)[sub(" .*", "", as.character(nz(fo$IgnitionSource, "Burn")))]; if (is.na(ign_src)) ign_src <- 1L
 pr <- pt[Method == "Probability" & !TransitionGroupId %in% ann & TransitionGroupId != fire_g]
 if (nrow(pr)) { say("Probability named groups split into their members: %s", paste(vapply(pr$TransitionGroupId, function(g) sprintf("%s (%s)", g, paste(mem[[g]], collapse = ", ")), ""), collapse = "; "))
   pt <- rbind(pt[!TransitionGroupId %in% pr$TransitionGroupId], pr[, .(TransitionGroupId = mem[[TransitionGroupId]]), by = setdiff(names(pr), "TransitionGroupId")], use.names = TRUE)
@@ -221,7 +222,27 @@ if (nrow(fire_rows)) { g <- fire_g; ms <- mem[[g]]; u <- unit_map(fire_rows$Unit
     matrix(a, nrow = length(units), dimnames = list(units, ref)) })
   tot <- Reduce(`+`, A); fr <- tot / pmax(den, 1)
   # slope selectivity: burned fraction per year by 30 m slope (averaged to the model grid) relative to the average, shrunk to 1 where few cells
-  w <- rep(1, length(land))
+  w <- rep(1, length(land)); ign_file <- NA_character_
+  # method 2: an FSim-type burn probability guides where fire goes (it already holds terrain and fuels, so it replaces slope
+  # selectivity), and the ignitions follow it or the FPA-FOD ignition density (Fire Options, user decision 2026-10-23)
+  if (fire_m == 2) { bpf <- nz(fo$BurnProbabilityFile, NA_character_); if (is.na(bpf) || !nzchar(bpf)) bpf <- read_data_sources("BurnProbabilityFile")$BurnProbabilityFile
+    if (!file.exists(bpf)) fail("Fire Options: burn probability raster not found (%s)", bpf)
+    bp_r <- rast(bpf); bpm <- values(project(crop(bp_r, project(as.polygons(ext(P), crs = crs(P)), crs(bp_r)), snap = "out"), P, method = "average"), mat = FALSE)
+    bpm[is.na(bpm) | bpm < 0] <- 0
+    if (!any(bpm[el] > 0)) fail("Fire Options: the burn probability raster (%s) is 0 or missing over the burnable land", bpf)
+    w <- bpm; slope_on <- FALSE
+    say("%s: burn probability %s; mean %.4f/yr on burnable cells (slope selectivity off: the burn probability holds terrain)", g, basename(bpf), mean(bpm[el]))
+    ig <- if (ign_src == 1) bpm else {
+      ff <- read_data_sources("FpaFodFile")$FpaFodFile; bw <- nz(fo$IgnitionBandwidth, 5000)
+      box <- st_as_sfc(st_bbox(st_buffer(st_as_sfc(st_bbox(ext(P) , crs = st_crs(crs(P)))), 3 * bw)))
+      pts <- st_read(ff, layer = "Fires", wkt_filter = st_as_text(st_transform(box, st_crs(st_read(ff, layer = "Fires", query = "SELECT * FROM Fires LIMIT 0", quiet = TRUE)))), quiet = TRUE)
+      pts <- st_transform(pts, crs(P)); n <- rasterize(vect(pts), rast(P), fun = "count", background = 0)
+      sg <- bw / res(P)[1]; k <- max(1, ceiling(3 * sg)); gw <- outer(-k:k, -k:k, function(a, b) exp(-(a^2 + b^2) / (2 * sg^2))); gw <- gw / sum(gw)
+      dv <- values(focal(n, w = gw, fun = "sum", na.rm = TRUE), mat = FALSE); dv[is.na(dv)] <- 0
+      say("%s ignitions: FPA-FOD density from %d fire origins %s, smoothed over %g m", g, nrow(pts), basename(ff), bw); dv }
+    iv <- rep(NA_real_, length(land)); iv[land] <- 0; for (k in units) { i <- el & u == k; iv[i] <- if (any(ig[i] > 0)) ig[i] / mean(ig[i]) else 1 }
+    ign_file <- write_raster(setValues(rast(P), iv), sprintf("Projection-%s-Ignition.tif", gsub("[^A-Za-z0-9]+", "-", g)), "FLT4S")
+    say("%s ignitions: %s (Spatial Initiation Multiplier, mean 1 within each %s unit)", g, if (ign_src == 1) "the burn probability" else "FPA-FOD ignition density", fire_rows$UnitSource[1]) }
   if (slope_on) { dem <- rast(read_data_sources("ElevationFile")$ElevationFile)
     d <- crop(dem, project(as.polygons(ext(P), crs = crs(P)), crs(dem)), snap = "out"); sl <- values(project(terrain(d, "slope", unit = "degrees"), P, method = "average"), mat = FALSE)
     b <- Reduce(`+`, lapply(ms, function(m) Reduce(`+`, lapply(ref, function(y) hist_vals(m, y))))) / length(ref)
@@ -232,7 +253,8 @@ if (nrow(fire_rows)) { g <- fire_g; ms <- mem[[g]]; u <- unit_map(fire_rows$Unit
     w[ok] <- if (nrow(st) > 1) approx(mid, st$Ratio, sl[ok], rule = 2)$y else 1
     fire_out$slope <- st[, .(SlopeFrom, SlopeTo, Cells, BurnedPerYear, Ratio)]
     say("%s slope selectivity (burned share by slope, %d-%d): %s", g, rs, re, paste(sprintf("%g-%g deg %.2f", st$SlopeFrom, st$SlopeTo, st$Ratio), collapse = "; ")) }
-  wn <- rep(0, length(land)); for (k in units) { i <- el & u == k; wn[i] <- w[i] / mean(w[i]) }
+  wn <- rep(0, length(land)); for (k in units) { i <- el & u == k; wn[i] <- if (any(w[i] > 0)) w[i] / mean(w[i]) else 1 }
+  fire_out$ign <- ign_file
   # severity shares: the drawn year's mix in the unit; a unit and year without fire takes its long-term mix (no fire burns then anyway)
   lt <- matrix(vapply(A, rowSums, numeric(length(units))), nrow = length(units)); all_sh <- colSums(lt) / max(sum(lt), 1e-12)
   lt <- lt / pmax(rowSums(lt), 1e-12); lt[rowSums(lt) == 0, ] <- matrix(all_sh, sum(rowSums(lt) == 0), length(ms), byrow = TRUE)
@@ -324,7 +346,12 @@ check(STAGE, "every Probability group has a map in every iteration and projectio
 write_stsim(sm_out, "TransitionSpatialMultiplier")
 if (nrow(fire_rows)) {
   write_size_dist(fire_sd, data.table(TransitionGroupId = fire_g, Priority = "Largest", MaximizeFidelityToDistribution = TRUE, MaximizeFidelityToTotalArea = TRUE), fire_g, y1 + 1L)
-  write_ds(fire_out$size, "OutputFireSize"); if (!is.null(fire_out$slope)) write_ds(fire_out$slope, "OutputFireSlope") }
+  write_ds(fire_out$size, "OutputFireSize"); if (!is.null(fire_out$slope)) write_ds(fire_out$slope, "OutputFireSlope")
+  # ignitions (method 2): the fire group's initiation multiplier from the historical end + 1, other groups' rows kept
+  im <- as.data.table(datasheet(scn, "stsim_TransitionSpatialInitiationMultiplier", optional = TRUE, lookupsAsFactors = FALSE))
+  if (nrow(im)) im <- im[TransitionGroupId != fire_g, setdiff(names(im), c("TransitionSpatialInitiationMultiplierId", "ScenarioId")), with = FALSE]
+  if (!is.na(fire_out$ign)) im <- rbind(im, data.table(Timestep = y1 + 1L, TransitionGroupId = fire_g, MultiplierFileName = fire_out$ign), fill = TRUE)
+  if (nrow(im)) write_stsim(im, "TransitionSpatialInitiationMultiplier") }
 if (nrow(tt_out)) write_stsim(tt_out[, setdiff(names(tt_out), c("TransitionTargetId", "ScenarioId")), with = FALSE], "TransitionTarget")
 write_ds(sched[order(SamplingSet, Iteration, Timestep), .(Iteration, Timestep, SamplingSet, HistoricalYear)], "OutputProjectionSchedule")
 if (length(rates)) write_ds(rbindlist(rates), "OutputProjectionRate")
