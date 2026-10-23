@@ -27,7 +27,7 @@ yr <- parLapply(cl, YRS, function(y, CA, LF) { library(terra); library(data.tabl
   # codes -> a small type number before projecting (codes go above 255 and project keeps the source's 8-bit type)
   types <- setdiff(unique(at$DIST_TYPE), c(NA, "NA", "Fill-NoData", "Fill-Not Mapped", "Water"))
   rcl <- cbind(at$VALUE, match(at$DIST_TYPE, types)); rcl <- rcl[!is.na(rcl[, 2]), , drop = FALSE]
-  r <- classify(r, rcl, others = NA); r <- project(r, G, method = "near"); x <- v(r); i <- which(!is.na(rg) & !is.na(x) & x > 0)
+  r <- classify(r, rcl, others = NA); r <- project(r, G, method = "near"); x <- values(r, mat = FALSE); i <- which(!is.na(rg) & !is.na(x) & x > 0)
   ty <- types[x[i]]; keep <- !is.na(ty)
   list(y = y, nl = nl, lf = data.table(cell = i[keep], type = ty[keep], forest = p[i[keep]] %in% 41:43)) }, CA = CA, LF = LF)
 names(yr) <- YRS
