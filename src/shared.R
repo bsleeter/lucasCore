@@ -78,11 +78,13 @@ write_stsim <- function(x, name, target = scn, ...) saveDatasheet(target, int_co
 # their own groups'; a later stage, or stage 9 rerun in a projection, must not drop the others). Rows carry Timestep = the historical
 # end + 1 so a continuous run's historical years keep their exact maps (found 2026-10-23).
 write_size_dist <- function(sd, pri, groups, ts) {
-  keep <- function(name) { x <- as.data.table(datasheet(scn, paste0("stsim_", name), optional = TRUE, lookupsAsFactors = FALSE))
+  had <- c(); keep <- function(name) { x <- as.data.table(datasheet(scn, paste0("stsim_", name), optional = TRUE, lookupsAsFactors = FALSE)); had[name] <<- nrow(x) > 0
     if (nrow(x)) x <- x[!TransitionGroupId %in% groups]; x[, setdiff(names(x), c(paste0(name, "Id"), "ScenarioId")), with = FALSE] }
   if (nrow(sd)) sd[, Timestep := as.integer(ts)]; if (nrow(pri)) pri[, Timestep := as.integer(ts)]
   a <- rbind(keep("TransitionSizeDistribution"), sd, fill = TRUE); b <- rbind(keep("TransitionSizePrioritization"), pri, fill = TRUE)
-  if (nrow(a)) write_stsim(a, "TransitionSizeDistribution"); if (nrow(b)) write_stsim(b, "TransitionSizePrioritization")
+  # an emptied sheet is written empty too, or the result would keep the dependency's rows
+  if (nrow(a) || had[["TransitionSizeDistribution"]]) write_stsim(a, "TransitionSizeDistribution")
+  if (nrow(b) || had[["TransitionSizePrioritization"]]) write_stsim(b, "TransitionSizePrioritization")
   invisible(nrow(a)) }
 
 # a package file (defaults/...) as a data.table, every column as read

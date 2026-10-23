@@ -124,7 +124,6 @@ if (anyDuplicated(tm)) fail("Projection Transitions: %s would be targeted twice 
 fo <- read_ds("FireOptions"); fire_g <- nz(fo$TransitionGroupId, "Fire")
 fire_m <- c(Historical = 1L, Burn = 2L, lucasFireC2F = 3L)[sub(" .*", "", as.character(nz(fo$FireMethod, "Historical")))]; if (is.na(fire_m)) fire_m <- 1L
 slope_on <- { v <- nz(fo$SlopeSelectivity, TRUE); isTRUE(as.logical(v)) || identical(v, -1L) || identical(v, 1L) }
-if (fire_m > 2) fail("Fire Options: method %d is not built yet (1 Historical rates and 2 Burn probability are)", fire_m)
 ign_src <- c(Burn = 1L, `FPA-FOD` = 2L)[sub(" .*", "", as.character(nz(fo$IgnitionSource, "Burn")))]; if (is.na(ign_src)) ign_src <- 1L
 pr <- pt[Method == "Probability" & !TransitionGroupId %in% ann & TransitionGroupId != fire_g]
 if (nrow(pr)) { say("Probability named groups split into their members: %s", paste(vapply(pr$TransitionGroupId, function(g) sprintf("%s (%s)", g, paste(mem[[g]], collapse = ", ")), ""), collapse = "; "))
@@ -214,8 +213,42 @@ for (i in seq_len(nrow(tg))) { g <- tg$TransitionGroupId[i]; L <- tg$StrataLevel
 progressBar()
 
 # ---- fire (method 1): the pyrome's burned fraction x slope selectivity, the drawn year's severity mix, perimeter fire sizes -----------
-fire_rows <- pt[Method == "Probability" & TransitionGroupId == fire_g]; fire_sd <- data.table(); fire_out <- list()
-if (nrow(fire_rows)) { g <- fire_g; ms <- mem[[g]]; u <- unit_map(fire_rows$UnitSource[1]); el <- elig(g); units <- sort(unique(u[el]))
+fire_rows <- pt[Method == "Probability" & TransitionGroupId == fire_g]; fire_sd <- data.table(); fire_out <- list(ign = NA_character_)
+# ---- fire method 3: whole lucasFireC2F seasons, one-way (user decision 2026-10-23). Each projection year and iteration draws a
+# season of a C2F run (its per-burn effects table: season, 1-based cell of the C2F grid, MTBS-style class 1-4); each severity type
+# gets the season's burned fraction of every model cell (classes 1-2 low, 3 medium, 4 high; a cell burned twice in a season keeps
+# its worst class), the fire group itself 1. C2F gives the fires' shape, so no size distribution, slope or ignition surface.
+if (nrow(fire_rows) && fire_m == 3) { g <- fire_g; ms <- mem[[g]]
+  lib <- nz(fo$C2FLibrary, NA_character_); rid <- nz(fo$C2FScenarioId, NA_integer_)
+  if (is.na(lib) || is.na(rid)) fail("Fire Options: method 3 needs the lucasFireC2F library and result scenario id")
+  D <- file.path(paste0(lib, ".data"), sprintf("Scenario-%d", rid))
+  bef <- file.path(D, "lucasFireC2F_OutputBurnEffects", "burn_effects.parquet"); gf <- file.path(D, "lucasFireC2F_LandscapeRasters", "fire_zone.tif")
+  if (!file.exists(bef) || !file.exists(gf)) fail("Fire Options: C2F result %d of %s has no per-burn effects table or landscape grid (run its stage 8 with the burn effects table on)", rid, basename(lib))
+  g2 <- rast(gf); box <- project(as.polygons(ext(P), crs = crs(P)), crs(g2)); cidx <- cells(g2, ext(box))
+  zv <- values(g2, mat = FALSE)[cidx]; cidx <- cidx[!is.na(zv)]
+  mc <- cellFromXY(P, project(vect(xyFromCell(g2, cidx), crs = crs(g2)), crs(P)) |> crds()); keep <- !is.na(mc) & land[mc]; cidx <- cidx[keep]; mc <- mc[keep]
+  covered <- mean(which(land) %in% mc)
+  if (covered < 0.95) say("%s: the C2F grid covers %.0f%% of the land cells: the rest gets no fire from C2F seasons", g, 100 * covered)
+  ev <- as.data.table(arrow::read_parquet(bef, col_select = c("Season", "Cell", "SeverityClass")))[Cell %in% cidx][, .(Sev = max(SeverityClass)), by = .(Season, Cell)]
+  NS <- max(as.data.table(arrow::read_parquet(bef, col_select = "Season"))$Season)
+  dr <- sched[SamplingSet == fire_rows$SamplingSet[1]]; set.seed(seed * 1000L + 99L); dr[, HistoricalYear := sample.int(NS, .N, replace = TRUE)]
+  sched[SamplingSet == fire_rows$SamplingSet[1], HistoricalYear := dr$HistoricalYear]
+  frac <- prod(res(g2)) / prod(res(P)); sev_of <- function(m) if (grepl("High", m)) 4L else if (grepl("Medium|Moderate", m)) 3L else 1:2
+  ones <- write_raster(setValues(rast(P), ifelse(land, 1L, NA)), "Projection-Allowed-All.tif", "INT1U"); sfile <- list(); burned <- c()
+  for (s in sort(unique(dr$HistoricalYear))) { e <- ev[Season == s]; burned[as.character(s)] <- nrow(e) * prod(res(g2)) / 1e6
+    for (m in ms) { v <- rep(NA_real_, length(land)); v[land] <- 0; x <- e[Sev %in% sev_of(m)]
+      if (nrow(x)) { cnt <- tabulate(mc[match(x$Cell, cidx)], nbins = length(land)); v[land] <- pmin(1, cnt[land] * frac) }
+      sfile[[paste(m, s)]] <- write_raster(setValues(rast(P), v), sprintf("Projection-%s-C2F_%d.tif", gsub("[^A-Za-z0-9]+", "-", sub(TYPE_SUFFIX, "", m, fixed = TRUE)), s), "FLT4S") } }
+  new_sm[[g]] <- dr[, .(Iteration, Timestep, TransitionGroupId = g, MultiplierFileName = ones)]
+  for (m in ms) { h <- sm[TransitionGroupId == m & is.na(Iteration) & Timestep <= y1]; if (!nrow(h)) h <- sm[TransitionGroupId == m & Iteration %in% 1L & Timestep <= y1]
+    new_sm[[m]] <- rbind(h[, .(Iteration = rep(seq_len(nit), each = .N), Timestep = rep(Timestep, nit), TransitionGroupId = m, MultiplierFileName = rep(MultiplierFileName, nit))],
+                         dr[, .(Iteration, Timestep, TransitionGroupId = m, MultiplierFileName = unlist(sfile[paste(m, HistoricalYear)]))]) }
+  hb <- Reduce(`+`, lapply(ms, function(m) vapply(ref, function(y) sum(hist_vals(m, y)[land]), 0))) * cell_km2
+  rates[[g]] <- data.table(TransitionGroup = g, Method = "lucasFireC2F seasons", Unit = sprintf("C2F result %d (%d seasons)", rid, NS), MeanArea = mean(burned[as.character(dr$HistoricalYear)]),
+                           MinArea = min(burned), MaxArea = max(burned), AllowedShare = covered)
+  say("%s: %d lucasFireC2F seasons of result %d (%s); drawn seasons burn %.2f km2/yr on the study area's C2F cells (mean), the fire record %.2f km2/yr (%d-%d)",
+      g, NS, rid, basename(lib), mean(burned[as.character(dr$HistoricalYear)]), mean(hb), rs, re) }
+if (nrow(fire_rows) && fire_m < 3) { g <- fire_g; ms <- mem[[g]]; u <- unit_map(fire_rows$UnitSource[1]); el <- elig(g); units <- sort(unique(u[el]))
   den <- vapply(units, function(k) sum(el & u == k), 0); dr <- sched[SamplingSet == fire_rows$SamplingSet[1]]
   # burned cells by severity member, unit and year
   A <- lapply(ms, function(m) { a <- vapply(ref, function(y) { v <- hist_vals(m, y); vapply(units, function(k) sum(v[el & u == k]), 0) }, numeric(length(units)))
@@ -345,8 +378,10 @@ check(STAGE, "every Probability group has a map in every iteration and projectio
       all(vapply(c(pg$TransitionGroupId, fire_all), function(g) nrow(sm_out[TransitionGroupId == g & Timestep > y1 & !is.na(MultiplierFileName)]) == nexp, TRUE)))
 write_stsim(sm_out, "TransitionSpatialMultiplier")
 if (nrow(fire_rows)) {
-  write_size_dist(fire_sd, data.table(TransitionGroupId = fire_g, Priority = "Largest", MaximizeFidelityToDistribution = TRUE, MaximizeFidelityToTotalArea = TRUE), fire_g, y1 + 1L)
-  write_ds(fire_out$size, "OutputFireSize"); if (!is.null(fire_out$slope)) write_ds(fire_out$slope, "OutputFireSlope")
+  # (method 3: no size distribution - an earlier one for the fire group is removed)
+  write_size_dist(fire_sd, if (nrow(fire_sd)) data.table(TransitionGroupId = fire_g, Priority = "Largest", MaximizeFidelityToDistribution = TRUE, MaximizeFidelityToTotalArea = TRUE) else data.table(),
+                  fire_g, y1 + 1L)
+  if (!is.null(fire_out$size)) write_ds(fire_out$size, "OutputFireSize"); if (!is.null(fire_out$slope)) write_ds(fire_out$slope, "OutputFireSlope")
   # ignitions (method 2): the fire group's initiation multiplier from the historical end + 1, other groups' rows kept
   im <- as.data.table(datasheet(scn, "stsim_TransitionSpatialInitiationMultiplier", optional = TRUE, lookupsAsFactors = FALSE))
   if (nrow(im)) im <- im[TransitionGroupId != fire_g, setdiff(names(im), c("TransitionSpatialInitiationMultiplierId", "ScenarioId")), with = FALSE]

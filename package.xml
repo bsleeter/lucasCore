@@ -133,6 +133,8 @@
 		<column name="BurnProbabilityFile" displayName="Burn Probability Raster (method 2; blank = Data Sources: FSim CONUS 270 m)" dataType="String" isOptional="True"/>
 		<column name="IgnitionSource" displayName="Ignitions (method 2)" dataType="Integer" validationType="List" formula1="1:Burn probability|2:FPA-FOD ignition density" defaultValue="1" isOptional="True"/>
 		<column name="IgnitionBandwidth" displayName="Ignition Density Smoothing (m, FPA-FOD; blank = 5000)" dataType="Double" isOptional="True"/>
+		<column name="C2FLibrary" displayName="lucasFireC2F Library (method 3; .ssim path)" dataType="String" isOptional="True"/>
+		<column name="C2FScenarioId" displayName="lucasFireC2F Result Scenario Id (method 3; a run or merge with the per-burn effects table)" dataType="Integer" isOptional="True"/>
 	</dataSheet>
 
 	<dataSheet name="ProjectionOptions" displayName="Projection Options" isSingleRow="True">
