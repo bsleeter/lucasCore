@@ -48,7 +48,11 @@ adj_r <- nz(so$AdjacencyRadius, 3 * res_m)
 sm <- as.data.table(datasheet(scn, "stsim_TransitionSpatialMultiplier", optional = TRUE, lookupsAsFactors = FALSE)); if (!"Iteration" %in% names(sm)) sm[, Iteration := NA_integer_]
 pt <- read_ds("ProjectionTransition"); if (!nrow(pt)) pt <- read_default("projection", "transitions.csv")
 pt[, Method := sub(" .*", "", Method)]
-notT <- setdiff(al$TransitionGroupId, pt[Method == "Target", TransitionGroupId])
+# a Target group's surface, or one of its members' (a type group of the named group Urbanization: the spatial allocation decides the type)
+ttg <- stsim_list("TransitionTypeGroup")
+grp_types <- function(g) if (endsWith(g, " [Type]")) substr(g, 1, nchar(g) - 7) else ttg[TransitionGroupId == g, TransitionTypeId]
+t_types <- unlist(lapply(pt[Method == "Target", TransitionGroupId], grp_types))
+notT <- al$TransitionGroupId[!vapply(al$TransitionGroupId, function(g) { ty <- grp_types(g); length(ty) > 0 && all(ty %in% t_types) }, TRUE)]
 if (length(notT)) { say("Not Target groups in Projection Transitions (allocation applies to Target groups only): %s - skipped", paste(notT, collapse = "; ")); al <- al[!TransitionGroupId %in% notT] }
 src <- read_data_sources(c("NlcdFolder", "FirePerimeterHistoryFile", "RoadsFile", "ElevationFile", "WuiFolder"))
 rows <- sources_from_sheet(as.data.table(datasheet(prj, ds("StratumSource"), optional = TRUE, lookupsAsFactors = FALSE)))

@@ -10,6 +10,9 @@
 #     maps), as Transition Targets; the group's spatial multiplier becomes 1 where it may happen (0 on excluded GAP status). Every unit
 #     gets a row for every iteration and year, zeros included, because without a target the multiplier alone would let every eligible
 #     cell transition
+#   * named groups (the default rules, 2026-10-22): a Target named group (Urbanization) gets one area per unit and year, its members'
+#     areas summed, and the spatial allocation decides which member type each cell gets; Historical Type Shares (Projection Options)
+#     weights the members by their historical shares instead. A Probability named group (Fire) is split into its members
 #   * Probability: the group's burned (or changed) fraction of the eligible area of each unit of any Stratum Source in the drawn year,
 #     as a per-cell multiplier map; it does not depend on the strata, so fire can use pyromes while land use uses counties
 #   * None: the group stays off after the historical end (stage 6's Off rows)
@@ -91,9 +94,32 @@ au <- if (nrow(term) && !is.na(term$AmountUnits[1])) tolower(term$AmountUnits[1]
 if (!au %in% names(units_per_ha)) fail("stsim Terminology amount units '%s' are not known", au)
 cell_amt <- prod(res(P)) / 1e4 * units_per_ha[[au]]; cell_km2 <- prod(res(P)) / 1e6
 say("Grid: %d land cells of %g m; target amounts in %s (%.4g per cell)", sum(land), res(P)[1], au, cell_amt)
-known <- unique(sm$TransitionGroupId)
-miss <- pt[Method != "None" & !TransitionGroupId %in% known, TransitionGroupId]
+# eligibility: the start-year classes a group's pathways can leave (as stage 6)
+scl <- stsim_list("StateClass"); ttg <- stsim_list("TransitionTypeGroup")
+pf <- list.files(pkg_file("defaults", "transitions", "pathways"), "[.]csv$", full.names = TRUE)
+pw <- rbindlist(lapply(pf, function(f) fread(f, colClasses = "character", na.strings = "")), fill = TRUE)
+TYPE_SUFFIX <- " [Type]"
+grp_types <- function(g) if (endsWith(g, TYPE_SUFFIX)) substr(g, 1, nchar(g) - nchar(TYPE_SUFFIX)) else ttg[TransitionGroupId == g, TransitionTypeId]
+elig <- function(g) land & vS %in% as.integer(scl$Id[match(unique(pw[TransitionTypeId %in% grp_types(g), StateClassIdSource]), scl$Name)])
+
+# named groups (user decision 2026-10-22): stage 6 maps the history per type group ("Urbanization: Low [Type]") or per sub-group
+# ("Ag Contraction: Cropland"); a named group (Urbanization) without maps of its own works through its members - the groups with
+# annual maps whose types all belong to it. A Target named group gets one area per unit and year, the sum of its members' areas, and the
+# spatial allocation decides which member type each cell gets (Projection Options: Historical Type Shares weights them by their
+# historical shares instead); a Probability named group is split into its members, each with its own rate map (fire per severity), all
+# drawing the same year. Stage 6's static gate rows (Ag Contraction's nearest natural class) are not annual, so they stay as they are.
+ann <- unique(sm[Timestep > y0 & Timestep <= y1, TransitionGroupId])
+members <- function(g) { if (g %in% ann) return(g); ty <- grp_types(g); ann[vapply(ann, function(m) length(grp_types(m)) > 0 && all(grp_types(m) %in% ty), TRUE)] }
+mem <- setNames(lapply(pt$TransitionGroupId, members), pt$TransitionGroupId)
+miss <- pt[Method != "None" & lengths(mem[TransitionGroupId]) == 0, TransitionGroupId]
 if (length(miss)) { say("No historical multiplier maps for %s: off in the projection", paste(miss, collapse = "; ")); pt[TransitionGroupId %in% miss, Method := "None"] }
+tm <- unlist(mem[pt[Method == "Target", TransitionGroupId]], use.names = FALSE)
+if (anyDuplicated(tm)) fail("Projection Transitions: %s would be targeted twice (a group and its own members, or two groups sharing members, are both Target)", paste(unique(tm[duplicated(tm)]), collapse = "; "))
+pr <- pt[Method == "Probability" & !TransitionGroupId %in% ann]
+if (nrow(pr)) { say("Probability named groups split into their members: %s", paste(vapply(pr$TransitionGroupId, function(g) sprintf("%s (%s)", g, paste(mem[[g]], collapse = ", ")), ""), collapse = "; "))
+  pt <- rbind(pt[!TransitionGroupId %in% pr$TransitionGroupId], pr[, .(TransitionGroupId = mem[[TransitionGroupId]]), by = setdiff(names(pr), "TransitionGroupId")], use.names = TRUE)
+  for (g in pt$TransitionGroupId) if (is.null(mem[[g]])) mem[[g]] <- g }
+type_shares <- isTRUE(as.logical(nz(po$HistoricalTypeShares, FALSE)))
 # a group's historical map for year y (stage 6 writes one row per group and year; Off.tif = nothing happened)
 # (a build that already ran stage 9 holds Probability groups' historical rows per iteration instead: take iteration 1's, which are
 # copies of the shared row)
@@ -112,14 +138,6 @@ src_ids <- function(g) as.integer(scl$Id[match(unique(pw[TransitionTypeId %in% g
 fits_prev <- function(g, y) { s <- src_ids(g); lu <- intersect(s, LU); n <- nlcd_prev(y)
   (n %in% lu) | (any(!s %in% LU) & !(n %in% LU)) }
 progressBar()
-
-# eligibility: the start-year classes a group's pathways can leave (as stage 6)
-scl <- stsim_list("StateClass"); ttg <- stsim_list("TransitionTypeGroup")
-pf <- list.files(pkg_file("defaults", "transitions", "pathways"), "[.]csv$", full.names = TRUE)
-pw <- rbindlist(lapply(pf, function(f) fread(f, colClasses = "character", na.strings = "")), fill = TRUE)
-TYPE_SUFFIX <- " [Type]"
-grp_types <- function(g) if (endsWith(g, TYPE_SUFFIX)) substr(g, 1, nchar(g) - nchar(TYPE_SUFFIX)) else ttg[TransitionGroupId == g, TransitionTypeId]
-elig <- function(g) land & vS %in% as.integer(scl$Id[match(unique(pw[TransitionTypeId %in% grp_types(g), StateClassIdSource]), scl$Name)])
 
 # strata for targets, units for rates, GAP status
 lev <- list(Primary = values(P, mat = FALSE), Secondary = values(S2, mat = FALSE), Tertiary = values(S3, mat = FALSE))
@@ -142,10 +160,11 @@ say("Sampling sets: %s", paste(sprintf("%s (%s)", sets, vapply(sets, function(s)
 
 # ---- targets ------------------------------------------------------------------------------------------------------------
 tg <- pt[Method == "Target"]; new_tt <- list(); new_sm <- list(); rates <- list(); allow_files <- list()
-for (i in seq_len(nrow(tg))) { g <- tg$TransitionGroupId[i]; L <- tg$StrataLevel[i]; u <- lev[[L]]; units <- sort(unique(u[land]))
-  # area per unit and historical year, in the target's amount units
-  a <- vapply(ref, function(y) { v <- hist_vals(g, y) * fits_prev(g, y); vapply(units, function(k) sum(v[land & u == k]), 0) }, numeric(length(units)))
-  a <- matrix(a, nrow = length(units), dimnames = list(units, ref)) * cell_amt
+for (i in seq_len(nrow(tg))) { g <- tg$TransitionGroupId[i]; L <- tg$StrataLevel[i]; u <- lev[[L]]; units <- sort(unique(u[land])); ms <- mem[[g]]
+  # area per unit and historical year, in the target's amount units: the sum of the members' areas
+  am <- lapply(ms, function(m) { a <- vapply(ref, function(y) { v <- hist_vals(m, y) * fits_prev(m, y); vapply(units, function(k) sum(v[land & u == k]), 0) }, numeric(length(units)))
+    matrix(a, nrow = length(units), dimnames = list(units, ref)) * cell_amt })
+  a <- Reduce(`+`, am)
   dr <- sched[SamplingSet == tg$SamplingSet[i]]
   nm <- lev_list[[L]]$Name[match(units, as.integer(lev_list[[L]]$Id))]
   if (anyNA(nm)) fail("%s: %d %s units are not in the stsim list", g, sum(is.na(nm)), L)
@@ -159,9 +178,22 @@ for (i in seq_len(nrow(tg))) { g <- tg$TransitionGroupId[i]; L <- tg$StrataLevel
   if (is.null(allow_files[[key]])) { ok <- land & !(if (length(ex)) gap %in% ex else FALSE)
     allow_files[[key]] <- write_raster(setValues(rast(P), ifelse(land, as.integer(ok), NA)), sprintf("Projection-Allowed-%s.tif", if (length(ex)) paste0("NotGap", key) else "All"), "INT1U") }
   new_sm[[g]] <- data.table(Iteration = NA_integer_, Timestep = y1 + 1L, TransitionGroupId = g, MultiplierFileName = allow_files[[key]])
-  # a Projection Setup result already holds stage 10's surface for the group (projections rerun stage 9 for the hand-over): keep it
-  sf10 <- sm[TransitionGroupId == g & Timestep == y1 + 1 & is.na(Iteration) & grepl("^Suitability-", basename(MultiplierFileName)), MultiplierFileName]
-  if (length(sf10)) new_sm[[g]][, MultiplierFileName := sf10[1]]
+  # the members of a named group: on everywhere (the group's map carries the GAP exclusion) or, with Historical Type Shares, each at its
+  # share of the group's reference-period area in its unit relative to the largest member's (a unit without history: all at 1)
+  if (is.null(allow_files[["all"]])) allow_files[["all"]] <- write_raster(setValues(rast(P), ifelse(land, 1L, NA)), "Projection-Allowed-All.tif", "INT1U")
+  tot <- rowSums(a); shr <- vapply(am, function(x) ifelse(tot > 0, rowSums(x) / pmax(tot, 1e-12), 1), numeric(length(units)))
+  shr <- matrix(shr, nrow = length(units)); rel <- shr / pmax(apply(shr, 1, max), 1e-12); rel[tot <= 0, ] <- 1
+  for (j in seq_along(ms)) { m <- ms[j]; if (m == g) next
+    f <- allow_files[["all"]]
+    if (type_shares) { v <- rep(NA_real_, length(land)); v[land] <- rel[match(u[land], units), j]
+      f <- write_raster(setValues(rast(P), v), sprintf("Projection-Share-%s.tif", gsub("[^A-Za-z0-9]+", "-", sub(TYPE_SUFFIX, "", m, fixed = TRUE))), "FLT4S") }
+    new_sm[[m]] <- data.table(Iteration = NA_integer_, Timestep = y1 + 1L, TransitionGroupId = m, MultiplierFileName = f) }
+  # a Projection Setup result already holds stage 10's surfaces for the group or its members (projections rerun stage 9 for the hand-over): keep them
+  for (m in unique(c(g, ms))) { sf10 <- sm[TransitionGroupId == m & Timestep == y1 + 1 & is.na(Iteration) & grepl("^Suitability-", basename(MultiplierFileName)), MultiplierFileName]
+    if (length(sf10) && !is.null(new_sm[[m]])) new_sm[[m]][, MultiplierFileName := sf10[1]] }
+  if (length(ms) > 1 || ms[1] != g) say("%s: members %s; their historical shares %s (%s)", g, paste(ms, collapse = ", "),
+      paste(sprintf("%.0f%%", 100 * colSums(matrix(vapply(am, rowSums, numeric(length(units))), nrow = length(units))) / max(sum(a), 1e-12)), collapse = " / "),
+      if (type_shares) "used: Historical Type Shares" else "not used: the spatial allocation decides the type")
   el <- elig(g); share <- if (length(ex)) sum(el & !(gap %in% ex)) / max(1, sum(el)) else 1
   rates[[g]] <- data.table(TransitionGroup = g, Method = "Target", Unit = nm, MeanArea = rowMeans(a) / cell_amt * cell_km2,
                            MinArea = apply(a, 1, min) / cell_amt * cell_km2, MaxArea = apply(a, 1, max) / cell_amt * cell_km2, AllowedShare = share)
@@ -208,7 +240,7 @@ if (tiles > 1) {
 }
 
 # ---- outputs ----------------------------------------------------------------------------------------------------------
-handled <- pt[Method != "None", TransitionGroupId]
+handled <- unique(c(pt[Method != "None", TransitionGroupId], unlist(mem[tg$TransitionGroupId], use.names = FALSE)))
 sm_out <- rbind(sm[!(TransitionGroupId %in% handled & (Timestep > y1 | TransitionGroupId %in% pg$TransitionGroupId)),
                    .(Iteration, Timestep, TransitionGroupId, MultiplierFileName)], rbindlist(new_sm), fill = TRUE)
 # earlier projection targets (stage 9 run again on a build that already has them) are replaced
