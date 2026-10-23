@@ -73,7 +73,8 @@ tr_df <- data.frame(TransitionGroupId = tr$TransitionGroupId, Method = list_labe
                     StrataLevel = list_label("ProjectionTransition", "StrataLevel", tr$StrataLevel), UnitSourceId = tr$UnitSource,
                     SamplingSet = tr$SamplingSet, ExcludeGap = tr$ExcludeGap)
 al_df <- data.frame(TransitionGroupId = al$TransitionGroupId, Method = list_label("ProjectionAllocation", "Method", al$Method), Surface = al$Surface,
-                    SourceClasses = al$SourceClasses, EventClasses = al$EventClasses, Adjacency = toupper(al$Adjacency) == "YES")
+                    SourceClasses = al$SourceClasses, EventClasses = al$EventClasses, Adjacency = toupper(al$Adjacency) == "YES",
+                    SizeDistribution = list_label("ProjectionAllocation", "SizeDistribution", al$SizeDistribution))
 for (S in list(B, PS)) { saveDatasheet(S, tr_df, "lucasCore_ProjectionTransition"); saveDatasheet(S, al_df, "lucasCore_ProjectionAllocation") }
 saveDatasheet(B, defaults_of("ProjectionOptions"), "lucasCore_ProjectionOptions")
 saveDatasheet(PS, defaults_of("SuitabilityOptions"), "lucasCore_SuitabilityOptions")

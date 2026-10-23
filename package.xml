@@ -140,6 +140,7 @@
 		<column name="SourceClasses" displayName="Source Classes (NLCD codes a cell has the year before, e.g. 41|42|43; blank = not developed, water or ice)" dataType="String" isOptional="True"/>
 		<column name="EventClasses" displayName="Event Classes (NLCD codes the change goes to, e.g. 22|23|24; or LCMS:standrep, LCMS:partial, LANDFIRE:type)" dataType="String" isOptional="True"/>
 		<column name="Adjacency" displayName="Adjacency (more likely next to developed land, or to agriculture for agriculture events; updated in the run)" dataType="Boolean" defaultValue="-1"/>
+		<column name="SizeDistribution" displayName="Size Distribution (historical patch sizes in ST-Sim; Auto = when patches span several model cells)" dataType="Integer" validationType="List" formula1="1:Auto|2:On|3:Off" defaultValue="1" isOptional="True"/>
 		<validation validationType="Unique" columns="TransitionGroupId"/>
 	</dataSheet>
 
@@ -151,7 +152,7 @@
 		<column name="AdjacencyRadius" displayName="Adjacency Neighborhood Radius (m; blank = 3 cells)" dataType="Double" isOptional="True"/>
 		<column name="AdjacencyUpdate" displayName="Adjacency Update Frequency (years)" dataType="Integer" defaultValue="5" validationType="WholeNumber" validationCondition="Greater" formula1="0"/>
 		<column name="RegionSourceId" displayName="Fitting Region Kind (Spatial Allocation page; blank = the study area)" dataType="Integer" validationType="Datasheet" formula1="lucasCore_StratumSource" isOptional="True"/>
-		<column name="PatchSizes" displayName="Patch Sizes (historical event sizes as ST-Sim size distributions)" dataType="Boolean" defaultValue="-1"/>
+		<column name="PatchSizes" displayName="Patch Sizes (master switch for the Size Distribution of each allocated group; off = none)" dataType="Boolean" defaultValue="-1"/>
 		<column name="FlickerYears" displayName="Agriculture Flicker Window (years; drops events that undo a change of the last N years; 0 = off)" dataType="Integer" defaultValue="5" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
 	</dataSheet>
 
@@ -191,6 +192,16 @@
 		<column name="Covariate" dataType="String"/>
 		<column name="X" dataType="Double" format="0.000"/>
 		<column name="Effect" displayName="Effect on Log-Odds (0 = the covariate's best value)" dataType="Double" format="0.000"/>
+	</dataSheet>
+
+	<dataSheet name="OutputPatchSize" displayName="Historical Patch Sizes (per Target group, model cells)">
+		<!-- stage 10: the patches of each year's events (8-connected pixels of the fitting grid) by size class, whether or not a size distribution is written -->
+		<column name="TransitionGroup" dataType="String"/>
+		<column name="MaximumCells" displayName="Size Class (up to N model cells)" dataType="Integer"/>
+		<column name="MaximumArea" displayName="Size Class (up to, amount units)" dataType="Double" format="0.00"/>
+		<column name="Patches" dataType="Integer"/>
+		<column name="Share" displayName="Share of Patches" dataType="Double" format="0.000"/>
+		<column name="Written" displayName="Written as a Size Distribution" dataType="Boolean"/>
 	</dataSheet>
 
 	<dataSheet name="OutputSuitabilityMap" displayName="Suitability Maps">
@@ -561,6 +572,7 @@
 		<dataSheet name="OutputSuitability" type="Output"/>
 		<dataSheet name="OutputSuitabilityCurve" type="Output"/>
 		<dataSheet name="OutputSuitabilityMap" type="Output"/>
+		<dataSheet name="OutputPatchSize" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
@@ -609,6 +621,7 @@
 				<item name="OutputSuitability"/>
 				<item name="OutputSuitabilityCurve"/>
 				<item name="OutputSuitabilityMap"/>
+				<item name="OutputPatchSize"/>
 				<item name="OutputClimateSummary"/>
 				<item name="OutputInitialStockSummary"/>
 				<item name="OutputReturnInterval"/>

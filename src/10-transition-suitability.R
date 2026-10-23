@@ -401,10 +401,17 @@ if (length(adj_set)) {
 
 # ---- patch sizes: each Target group's historical event sizes as an ST-Sim size distribution ------------------------------------
 # A patch's area in model cells (at least 1); size classes of 1, 2, 3, 5, 10, 20, 50, ... cells up to the largest patch; relative
-# amount = the number of patches in the class (ST-Sim samples event sizes from it until they sum to the target). Groups whose
-# patches are nearly all one model cell get none (placement stays cell by cell).
+# amount = the number of patches in the class (ST-Sim samples event sizes from it until they sum to the target). The classes are
+# always written to Historical Patch Sizes; the ST-Sim size distribution follows the group's Size Distribution setting (user
+# decision 2026-10-23): Auto = only when at least 5% of patches span several model cells (a 1 km model gains nothing from it and
+# event-based simulation costs time), On = always, Off = never; Suitability Options Patch Sizes off = none at all.
 psz <- nz(so$PatchSizes, TRUE); psz <- isTRUE(as.logical(psz)) || identical(psz, -1L) || identical(psz, 1L)
-if (psz && length(patches)) {
+if (!"SizeDistribution" %in% names(al)) al[, SizeDistribution := NA_character_]
+al[, SizeMode := { m <- sub(" .*", "", as.character(SizeDistribution)); m[is.na(m) | !nzchar(m)] <- "Auto"; m }]
+# a Target group's setting from its rows: Off wins, then On, else Auto
+size_mode <- function(t) { m <- al[Target == t, SizeMode]; if ("Off" %in% m) "Off" else if ("On" %in% m) "On" else "Auto" }
+ps_rows <- list()
+if (length(patches)) {
   term <- as.data.table(datasheet(prj, "stsim_Terminology", optional = TRUE, lookupsAsFactors = FALSE))
   au <- if (nrow(term) && !is.na(term$AmountUnits[1])) tolower(term$AmountUnits[1]) else "hectares"
   per_ha <- c(acres = 2.4710538, hectares = 1, `square kilometers` = 0.01, `square meters` = 1e4, `square miles` = 0.003861022)[[au]]
@@ -419,9 +426,13 @@ if (psz && length(patches)) {
     one <- mean(n == 1)
     out_sum[[length(out_sum) + 1]] <- data.table(Surface = t, Item = c("Historical patches", "Patches of one model cell (share)", "Largest patch (model cells)", "Median patch (ha)"),
       Value = c(length(n), one, max(n), median(p$Cells) * fit_ha), Note = sprintf("%d m model cells; 8-connected event pixels of %d m, one year", res_m, res_f))
-    if (one >= 0.95) { say("%s: %.0f%% of %d historical patches are one model cell - no size distribution", t, 100 * one, length(n)); next }
+    mode <- size_mode(t); write <- psz && (mode == "On" || (mode == "Auto" && one < 0.95))
+    ps_rows[[t]] <- data.table(TransitionGroup = t, MaximumCells = as.integer(br), MaximumArea = br * cell_ha * per_ha, Patches = as.integer(cnt), Share = cnt / sum(cnt), Written = write)
+    if (!write) { say("%s: no size distribution (%s; %.0f%% of %d historical patches are one model cell)", t,
+                      if (!psz) "Patch Sizes off" else if (mode == "Off") "Size Distribution Off" else "Auto", 100 * one, length(n)); next }
     sd_rows[[t]] <- data.table(TransitionGroupId = t, MaximumArea = br * cell_ha * per_ha, RelativeAmount = cnt)[RelativeAmount > 0]
-    say("%s: size distribution from %d historical patches (median %.1f ha, largest %d cells; %.0f%% one cell)", t, length(n), median(p$Cells) * fit_ha, max(n), 100 * one) }
+    say("%s: size distribution (%s) from %d historical patches (median %.1f ha, largest %d cells; %.0f%% one cell)", t, mode, length(n), median(p$Cells) * fit_ha, max(n), 100 * one) }
+  if (length(ps_rows)) write_ds(rbindlist(ps_rows), "OutputPatchSize")
   if (length(sd_rows)) {
     write_stsim(rbindlist(sd_rows), "TransitionSizeDistribution")
     write_stsim(data.table(TransitionGroupId = names(sd_rows), Priority = "None", MaximizeFidelityToDistribution = TRUE, MaximizeFidelityToTotalArea = TRUE), "TransitionSizePrioritization") }
