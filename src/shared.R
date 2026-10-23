@@ -29,7 +29,7 @@ fail <- function(...) stop(sprintf(...), call. = FALSE)
 say  <- function(...) updateRunLog(sprintf(...))
 
 # a datasheet of this package as a data.table; an empty option sheet comes back as one row of the package defaults
-DEFAULTED_SHEETS <- c("BuildOptions", "GrowthOptions", "ClimateOptions", "CarbonOptions", "ProjectionOptions")
+DEFAULTED_SHEETS <- c("BuildOptions", "GrowthOptions", "ClimateOptions", "CarbonOptions", "ProjectionOptions", "SuitabilityOptions")
 read_ds <- function(name, ...) { x <- as.data.table(datasheet(scn, ds(name), optional = TRUE, lookupsAsFactors = FALSE, ...))
   if (!nrow(x) && name %in% DEFAULTED_SHEETS) { d <- sheet_defaults(name); if (!is.null(d)) x <- d }
   # a single-row sheet saved with some columns blank takes the default for those columns

@@ -23,6 +23,12 @@ bid <- as.integer(opt("build", NA))
 if (is.na(bid)) { d <- as.data.table(dependency(H)); b <- d[grepl("^Build", Name), ScenarioId]; if (!length(b)) stop("pass --build: the historical run has no Build dependency"); bid <- b[1] }
 sfd <- sc[Name == "Stock-Flow Definitions" & IsResult == "No", ScenarioId]
 B <- scenario(L, bid)
+# a Projection Setup result (stages 9 and 10) keeps only the sheets of its own stages: the projection also needs the Build result its
+# setup was made on (initial stocks, flow pathways, ...), as the second dependency
+setup <- nrow(suppressWarnings(as.data.table(datasheet(B, "lucasCore_OutputSuitability", optional = TRUE)))) > 0 || grepl("^Projection Setup", sc[ScenarioId == bid, Name])
+build_of <- NA_integer_
+if (setup) { par <- sc[ScenarioId == bid, ParentId]; d <- as.data.table(dependency(scenario(L, if (is.na(par)) bid else par)))
+  build_of <- d[grepl("^Build", Name), ScenarioId][1]; if (is.na(build_of)) stop("cannot find the Build result the Projection Setup was made on") }
 yh <- max(as.data.table(datasheet(B, "lucasCore_OutputNlcdAnnual"))$Year)
 ps <- suppressWarnings(as.data.table(datasheet(B, "lucasCore_OutputProjectionSchedule", optional = TRUE)))
 if (!nrow(ps)) stop(sprintf("Build result %d has no projection (tick Run a projection in Build Options and run stage 9)", bid))
@@ -32,7 +38,9 @@ if (it > pit) stop(sprintf("the build's projection schedule has %d iterations", 
 nm <- opt("name", sprintf("Projection %d-%d from %s", yh + 1, ye, sc[ScenarioId == hid, sub(" \\(\\[.*", "", Name)]))
 if (nrow(sc[Name == nm & IsResult == "No"])) { if (!"--replace" %in% a) stop(sprintf("scenario '%s' exists (use --replace)", nm))
   for (i in sc[Name == nm & IsResult == "No", ScenarioId]) delete(L, scenario = i, force = TRUE) }
-S <- rsyncrosim::scenario(P, nm); dependency(S) <- c(bid, sfd)   # the build first: it supplies the whole Flow Pathways feed
+S <- rsyncrosim::scenario(P, nm)
+# the setup (its multipliers, adjacency and state attributes win), then the build (it supplies the whole Flow Pathways feed), then the definitions
+dependency(S) <- if (setup) c(bid, build_of, sfd) else c(bid, sfd)
 saveDatasheet(S, data.frame(HistoricalScenarioId = hid), "lucasCore_ProjectionStart")
 saveDatasheet(S, data.frame(MinimumTimestep = yh, MaximumTimestep = ye, MinimumIteration = 1L, MaximumIteration = it, IsSpatial = TRUE), "stsim_RunControl")
 saveDatasheet(S, data.frame(SummaryOutputSC = TRUE, SummaryOutputSCTimesteps = 1L, SummaryOutputSCZeroValues = FALSE,

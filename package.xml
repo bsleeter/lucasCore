@@ -26,6 +26,9 @@
 		<column name="Loca2Folder" displayName="LOCA2 Folder (gcm/r1i1p1f1/ssp)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Climate/LOCA2"/>
 		<column name="SoilCarbonFile" displayName="gSSURGO Soil Organic Carbon" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/gSSURGO/gssurgo_soc_0_999.tif"/>
 		<column name="FirePerimeterHistoryFile" displayName="Interagency Fire Perimeter History" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/NIFS/InterAgencyFirePerimeterHistory_All_Years_View/InterAgencyFirePerimeterHistory_All_Years_View.shp"/>
+		<column name="RoadsFile" displayName="Roads (LANDFIRE 30 m raster; stage 10)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Roads/LF2023_Roads_CONUS/Tif/LF2023_Roads_CONUS.tif"/>
+		<column name="ElevationFile" displayName="Elevation (LANDFIRE 30 m DEM; stage 10)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/DEM/LF2020_Elev_220_CONUS/Tif/LC20_Elev_220.tif"/>
+		<column name="WuiFolder" displayName="SILVIS WUI v4 blocks (folder of state .gdb; stage 10)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/WUI/2020"/>
 	</dataSheet>
 
 	<dataSheet name="ClimateScenario" displayName="Climate Scenarios (LOCA2)" dataScope="Project" displayMember="Name">
@@ -105,6 +108,66 @@
 		<column name="Iterations" displayName="Iterations (Monte Carlo)" dataType="Integer" defaultValue="10" validationType="WholeNumber" validationCondition="Greater" formula1="0"/>
 		<column name="RandomSeed" displayName="Random Seed (draws of historical years)" dataType="Integer" defaultValue="1"/>
 		<column name="SpatialTiles" displayName="Spatial Multiprocessing Tiles (blank = none; tiles are whole units of the target strata)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1"/>
+	</dataSheet>
+
+	<!-- stage 10: where projected transitions go (user decisions 2026-10-22: fitted regression or the old rules, chosen per group) -->
+	<dataSheet name="ProjectionAllocation" displayName="Projection Allocation (where transitions go)">
+		<!-- one row per transition group; a group without a row is placed at random within its strata. An empty sheet uses defaults/projection/allocation.csv -->
+		<column name="TransitionGroupId" displayName="Transition Group" dataType="Integer" validationType="Datasheet" formula1="stsim_TransitionGroup"/>
+		<column name="Method" dataType="Integer" validationType="List" formula1="1:Fitted (regression on the historical record)|2:Rules (WUI and PAD weights)|3:None (random within its strata)" defaultValue="1"/>
+		<column name="Surface" displayName="Surface (groups with the same name share one)" dataType="String"/>
+		<column name="EventClasses" displayName="Event Classes (NLCD codes the change goes to, e.g. 22|23|24)" dataType="String" isOptional="True"/>
+		<column name="Adjacency" displayName="Adjacency (more likely next to developed land, updated in the run)" dataType="Boolean" defaultValue="-1"/>
+		<validation validationType="Unique" columns="TransitionGroupId"/>
+	</dataSheet>
+
+	<dataSheet name="SuitabilityOptions" displayName="Suitability Options" isSingleRow="True">
+		<column name="FitResolution" displayName="Fitting Resolution (m; 30 = native NLCD, coarser is faster)" dataType="Integer" defaultValue="30" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="30"/>
+		<column name="BurnWindow" displayName="Leave Out Pixels Burned in the Last N Years (post-fire relabelling)" dataType="Integer" defaultValue="3" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="ControlsPerYear" displayName="Unchanged Pixels Sampled per Year" dataType="Integer" defaultValue="25000" validationType="WholeNumber" validationCondition="Greater" formula1="0"/>
+		<column name="TestYears" displayName="Out-of-Sample Test Years (last N historical years; 0 = no test)" dataType="Integer" defaultValue="11" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="AdjacencyRadius" displayName="Adjacency Neighborhood Radius (m; blank = 3 cells)" dataType="Double" isOptional="True"/>
+		<column name="AdjacencyUpdate" displayName="Adjacency Update Frequency (years)" dataType="Integer" defaultValue="5" validationType="WholeNumber" validationCondition="Greater" formula1="0"/>
+	</dataSheet>
+
+	<dataSheet name="SuitabilityRegion" displayName="Suitability Fitting Region (blank = the study area)">
+		<!-- the units whose historical record the regression is fitted on: adjacent counties, the pyrome, an ecoregion, a state - any Stratum Source -->
+		<column name="UnitId" displayName="Unit" dataType="Integer" validationType="Datasheet" formula1="stsim_SecondaryStratum" allowDbNull="False"/>
+		<validation validationType="Unique" columns="UnitId"/>
+	</dataSheet>
+
+	<dataSheet name="SuitabilityCovariate" displayName="Suitability Covariates (empty = all built-in)">
+		<column name="Covariate" dataType="Integer" validationType="List" formula1="1:Distance to developed land|2:Developed share within 1 km|3:Housing density (census decade)|4:Distance to roads|5:Slope|6:Elevation|7:Land cover|8:GAP status|9:County|10:Custom raster"/>
+		<column name="Include" dataType="Boolean" defaultValue="-1"/>
+		<column name="Name" displayName="Name (custom raster)" dataType="String" isOptional="True"/>
+		<column name="File" displayName="Raster File (custom; resampled to the fitting grid)" dataType="String" isOptional="True"/>
+	</dataSheet>
+
+	<dataSheet name="RuleWeight" displayName="Allocation Rule Weights (Rules method)">
+		<!-- the old LUCAS rules: a weight per WUI class and per GAP status; the surface is their product. An empty sheet uses defaults/projection/rule-weights.csv -->
+		<column name="Surface" dataType="String"/>
+		<column name="Layer" dataType="Integer" validationType="List" formula1="1:WUI class (2020)|2:GAP status"/>
+		<column name="Class" dataType="String"/>
+		<column name="Weight" dataType="Double" validationType="Decimal" validationCondition="GreaterEqual" formula1="0"/>
+	</dataSheet>
+
+	<dataSheet name="OutputSuitability" displayName="Suitability Summary">
+		<column name="Surface" dataType="String"/>
+		<column name="Item" dataType="String"/>
+		<column name="Value" dataType="Double" format="0.000"/>
+		<column name="Note" dataType="String" isOptional="True"/>
+	</dataSheet>
+
+	<dataSheet name="OutputSuitabilityCurve" displayName="Suitability Response Curves">
+		<column name="Surface" dataType="String"/>
+		<column name="Covariate" dataType="String"/>
+		<column name="X" dataType="Double" format="0.000"/>
+		<column name="Effect" displayName="Effect on Log-Odds (0 = the covariate's best value)" dataType="Double" format="0.000"/>
+	</dataSheet>
+
+	<dataSheet name="OutputSuitabilityMap" displayName="Suitability Maps">
+		<column name="Surface" dataType="String"/>
+		<column name="FileName" displayName="Multiplier (model grid, 0-1)" dataType="String" isExternalFile="True" isRaster="True"/>
 	</dataSheet>
 
 	<dataSheet name="ProjectionStart" displayName="Projection Start (from a historical run)" isSingleRow="True">
@@ -449,6 +512,28 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
+	<transformer name="TransitionSuitability" displayName="10 - Transition Suitability" isRunnable="True" programName="Rscript" programArguments="src/10-transition-suitability.R">
+		<dataSheet name="BuildOptions" type="Input"/>
+		<dataSheet name="StudyArea" type="Input"/>
+		<dataSheet name="ProjectionTransition" type="Input"/>
+		<dataSheet name="ProjectionAllocation" type="Input"/>
+		<dataSheet name="SuitabilityOptions" type="Input"/>
+		<dataSheet name="SuitabilityRegion" type="Input"/>
+		<dataSheet name="SuitabilityCovariate" type="Input"/>
+		<dataSheet name="RuleWeight" type="Input"/>
+		<dataSheet name="OutputNlcdAnnual" type="Input"/>
+		<dataSheet name="OutputProjectionSchedule" type="Input"/>
+		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
+		<dataSheet name="stsim_TransitionSpatialMultiplier" type="Both"/>
+		<dataSheet name="stsim_StateAttributeValue" type="Both"/>
+		<dataSheet name="stsim_TransitionAdjacencySetting" type="Output"/>
+		<dataSheet name="stsim_TransitionAdjacencyMultiplier" type="Output"/>
+		<dataSheet name="OutputSuitability" type="Output"/>
+		<dataSheet name="OutputSuitabilityCurve" type="Output"/>
+		<dataSheet name="OutputSuitabilityMap" type="Output"/>
+		<dataSheet name="OutputValidation" type="Output"/>
+	</transformer>
+
 	<!-- =================================================================================================== -->
 	<!-- LAYOUTS                                                                                             -->
 	<!-- =================================================================================================== -->
@@ -474,6 +559,11 @@
 				<item name="ProjectionOptions"/>
 				<item name="ProjectionStart"/>
 				<item name="ProjectionTransition"/>
+				<item name="ProjectionAllocation"/>
+				<item name="SuitabilityOptions"/>
+				<item name="SuitabilityRegion"/>
+				<item name="SuitabilityCovariate"/>
+				<item name="RuleWeight"/>
 			</group>
 			<group name="lucasCoreCrosswalks" displayName="Crosswalks">
 				<item name="LandCoverCrosswalk"/>
@@ -491,6 +581,9 @@
 				<item name="OutputTransitionSummary"/>
 				<item name="OutputProjectionRate"/>
 				<item name="OutputProjectionSchedule"/>
+				<item name="OutputSuitability"/>
+				<item name="OutputSuitabilityCurve"/>
+				<item name="OutputSuitabilityMap"/>
 				<item name="OutputClimateSummary"/>
 				<item name="OutputInitialStockSummary"/>
 				<item name="OutputReturnInterval"/>

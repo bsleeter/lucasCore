@@ -1,0 +1,5 @@
+TransitionGroupId,Method,Surface,EventClasses,Adjacency,Note
+Urbanization: Low [Type],Fitted,Urbanization,22|23|24,Yes,"undeveloped -> Developed Low, Medium or High (NLCD 22-24): one surface for the three"
+Urbanization: Medium [Type],Fitted,Urbanization,22|23|24,Yes,
+Urbanization: High [Type],Fitted,Urbanization,22|23|24,Yes,
+Urbanization: Open [Type],Fitted,Open Space,21,Yes,undeveloped -> Developed Open Space (NLCD 21): roads and rural lots

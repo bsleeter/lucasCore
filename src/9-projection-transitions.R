@@ -159,6 +159,9 @@ for (i in seq_len(nrow(tg))) { g <- tg$TransitionGroupId[i]; L <- tg$StrataLevel
   if (is.null(allow_files[[key]])) { ok <- land & !(if (length(ex)) gap %in% ex else FALSE)
     allow_files[[key]] <- write_raster(setValues(rast(P), ifelse(land, as.integer(ok), NA)), sprintf("Projection-Allowed-%s.tif", if (length(ex)) paste0("NotGap", key) else "All"), "INT1U") }
   new_sm[[g]] <- data.table(Iteration = NA_integer_, Timestep = y1 + 1L, TransitionGroupId = g, MultiplierFileName = allow_files[[key]])
+  # a Projection Setup result already holds stage 10's surface for the group (projections rerun stage 9 for the hand-over): keep it
+  sf10 <- sm[TransitionGroupId == g & Timestep == y1 + 1 & is.na(Iteration) & grepl("^Suitability-", basename(MultiplierFileName)), MultiplierFileName]
+  if (length(sf10)) new_sm[[g]][, MultiplierFileName := sf10[1]]
   el <- elig(g); share <- if (length(ex)) sum(el & !(gap %in% ex)) / max(1, sum(el)) else 1
   rates[[g]] <- data.table(TransitionGroup = g, Method = "Target", Unit = nm, MeanArea = rowMeans(a) / cell_amt * cell_km2,
                            MinArea = apply(a, 1, min) / cell_amt * cell_km2, MaxArea = apply(a, 1, max) / cell_amt * cell_km2, AllowedShare = share)
@@ -180,6 +183,9 @@ for (i in seq_len(nrow(pg))) { g <- pg$TransitionGroupId[i]; u <- unit_map(pg$Un
                                  else hist_file(g, y) }
   # the group's historical rows copied to every iteration, so ST-Sim never has to fall back from iteration rows to shared ones
   h <- sm[TransitionGroupId == g & is.na(Iteration) & Timestep <= y1]
+  # (a build or setup that already ran stage 9 holds them per iteration: take iteration 1's, copies of the shared rows - without this a
+  # Projection Setup on such a build lost fire's historical maps and projections from it had no fire, found 2026-10-22)
+  if (!nrow(h)) h <- sm[TransitionGroupId == g & Iteration %in% 1L & Timestep <= y1]
   new_sm[[g]] <- rbind(h[, .(Iteration = rep(seq_len(nit), each = .N), Timestep = rep(Timestep, nit), TransitionGroupId = g, MultiplierFileName = rep(MultiplierFileName, nit))],
                        dr[, .(Iteration, Timestep, TransitionGroupId = g, MultiplierFileName = unlist(prob_files[paste(g, HistoricalYear)]))])
   ua <- fr * den * cell_km2

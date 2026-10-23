@@ -52,6 +52,13 @@ description(G) <- paste("Optional. Fits the FIA growth and live-tree carbon curv
   "Without it, Build fits the curves itself (stage 2 in its pipeline). Growth Curve Options here set the fit.")
 saveDatasheet(G, data.frame(StageNameId = "2 - Fit Growth Curves", RunOrder = 1L), "core_Pipeline")
 saveDatasheet(G, defaults_of("GrowthOptions"), "lucasCore_GrowthOptions")
+# Projection Setup: projection rules (stage 9) and where transitions go (stage 10), run once on a Build result; projections depend on it
+PS <- rsyncrosim::scenario(P, "Projection Setup")
+description(PS) <- paste("Run once a Build with a projection (Run a projection ticked) has run: add the Build result as this scenario's dependency.",
+  "Stage 9 sets the projection transitions (Projection Options, Projection Transitions); stage 10 makes the surfaces that place them",
+  "(Projection Allocation: fitted regression or WUI/PAD rules; Suitability Options, Fitting Region, Covariates; Rule Weights). Projections",
+  "(tools/new-projection.R, or a scenario with this result as its first dependency) use its result. Change a covariate and rerun this alone.")
+saveDatasheet(PS, data.frame(StageNameId = c("9 - Projection Transitions", "10 - Transition Suitability"), RunOrder = 1:2), "core_Pipeline")
 for (sh in c("BuildOptions", "ClimateOptions", "GrowthOptions", "CarbonOptions")) { cat(sh, ": "); x <- datasheet(B, paste0("lucasCore_", sh), lookupsAsFactors = FALSE)
   cat(paste(names(x), unlist(lapply(x[1, ], as.character)), sep = " = ", collapse = "; "), "\n") }
 unlink(paste0(f, c(".temp", ".backup")), recursive = TRUE)

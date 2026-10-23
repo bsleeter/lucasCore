@@ -1,0 +1,55 @@
+# =============================================================================
+# sync-library.R - bring a library made with an earlier lucasCore up to date with the current package (columns, stages, definitions)
+# =============================================================================
+# SyncroSim adds a new datasheet's table when a library opens, but not a new column in an existing table (the library then fails to
+# open: "no such column"), and it lists only the stages that existed when the library was made. Without a package version bump and
+# its update XML, this does both from the current starter (Starter/LUCAS Core (CONUS).ssim, built by tools/build_starter.R from this
+# package), which is the reference schema:
+#   1. a copy of the library first (<library>.ssim.bak-<date-time>)
+#   2. every column of a lucasCore_ / stsim_ / core_ table in the starter that the library's table lacks: ALTER TABLE ADD COLUMN
+#   3. every lucasCore transformer and stage name the library lacks: new ids from the library's own id counter (core_Sequence)
+#   4. project definitions the package defaults gained (stsim State Attribute Types): added through rsyncrosim
+# Close the library in SyncroSim Studio first. Usage: Rscript tools/sync-library.R <library.ssim> [--dry-run]
+# =============================================================================
+suppressPackageStartupMessages({ library(DBI); library(RSQLite); library(data.table) })
+a <- commandArgs(TRUE); pos <- a[!grepl("^--", a)]; dry <- "--dry-run" %in% a
+if (!length(pos)) stop("usage: Rscript tools/sync-library.R <library.ssim> [--dry-run]")
+here <- tryCatch(dirname(normalizePath(sub("--file=", "", grep("--file=", commandArgs(FALSE), value = TRUE)))), error = function(e) "tools")
+pkg <- normalizePath(file.path(here, ".."), winslash = "/"); ref_f <- file.path(pkg, "Starter", "LUCAS Core (CONUS).ssim")
+f <- normalizePath(pos[1], winslash = "/"); if (!file.exists(ref_f)) stop("build the starter first: Rscript tools/build_starter.R")
+if (!dry) { bak <- sprintf("%s.bak-%s", f, format(Sys.time(), "%Y%m%d-%H%M")); file.copy(f, bak); cat("backup:", bak, "\n") }
+ref <- dbConnect(SQLite(), ref_f, flags = SQLITE_RO); con <- dbConnect(SQLite(), f)
+on.exit({ dbDisconnect(ref); dbDisconnect(con) })
+cols <- function(cn, t) as.data.table(dbGetQuery(cn, sprintf("PRAGMA table_info('%s')", t)))
+
+# ---- 2. missing columns ---------------------------------------------------------------------------------------------------
+tl <- intersect(grep("^(lucasCore|stsim|core)_", dbListTables(ref), value = TRUE), dbListTables(con)); added <- 0
+dbBegin(con)
+for (t in tl) { rc <- cols(ref, t); lc <- cols(con, t); miss <- rc[!tolower(name) %in% tolower(lc$name)]
+  for (i in seq_len(nrow(miss))) { sql <- sprintf('ALTER TABLE "%s" ADD COLUMN "%s" %s', t, miss$name[i], if (nzchar(miss$type[i])) miss$type[i] else "")
+    cat(if (dry) "would add" else "add", t, ".", miss$name[i], miss$type[i], "\n"); if (!dry) dbExecute(con, sql); added <- added + 1 } }
+
+# ---- 3. missing transformers and stage names -----------------------------------------------------------------------------
+rt <- as.data.table(dbGetQuery(ref, "SELECT * FROM core_Transformer WHERE PackageName = 'lucasCore'")); lt <- as.data.table(dbGetQuery(con, "SELECT * FROM core_Transformer"))
+rs <- as.data.table(dbGetQuery(ref, "SELECT * FROM core_StageName")); proj <- dbGetQuery(con, "SELECT ProjectId FROM core_Project")$ProjectId
+new_id <- function() { dbExecute(con, "INSERT INTO core_Sequence (Value) VALUES (0)"); dbGetQuery(con, "SELECT last_insert_rowid() AS id")$id }
+nst <- 0
+for (i in which(!rt$Name %in% lt$Name)) for (p in proj) {
+  cat(if (dry) "would add stage" else "add stage", rt$DisplayName[i], "(project", p, ")\n"); if (dry) next
+  tr <- rt[i]; tr$TransformerId <- new_id(); tr$ProjectId <- p; dbWriteTable(con, "core_Transformer", as.data.frame(tr), append = TRUE)
+  sn <- rs[TransformerId == rt$TransformerId[i]]
+  if (nrow(sn)) { sn$StageNameId <- new_id(); sn$ProjectId <- p; sn$TransformerId <- tr$TransformerId; dbWriteTable(con, "core_StageName", as.data.frame(sn), append = TRUE) }
+  nst <- nst + 1 }
+if (dry) dbRollback(con) else dbCommit(con)
+cat(sprintf("%s %d column(s) and %d stage(s)\n", if (dry) "would add" else "added", added, nst))
+
+# ---- 4. project definitions the package defaults gained --------------------------------------------------------------------
+if (!dry) { dbDisconnect(con); on.exit(dbDisconnect(ref))
+  suppressPackageStartupMessages(library(rsyncrosim))
+  L <- ssimLibrary(f); P <- rsyncrosim::project(L, "Definitions")
+  sat <- as.data.table(datasheet(P, "stsim_StateAttributeType")); want <- fread(file.path(pkg, "defaults", "stsim", "stsim_StateAttributeType.csv"), na.strings = "")
+  miss <- want[!Name %in% sat$Name]
+  if (nrow(miss)) { saveDatasheet(P, as.data.frame(miss[, intersect(names(miss), names(sat)), with = FALSE]), "stsim_StateAttributeType", append = TRUE)
+    cat("added State Attribute Types:", paste(miss$Name, collapse = ", "), "\n") } else cat("State Attribute Types up to date\n")
+  st <- levels(datasheet(scenario(L, as.data.table(scenario(L, summary = TRUE))$ScenarioId[1]), "core_Pipeline", lookupsAsFactors = TRUE, optional = TRUE)$StageNameId)
+  cat("stages now:", paste(st, collapse = " | "), "\n") }
