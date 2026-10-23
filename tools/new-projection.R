@@ -42,6 +42,11 @@ S <- rsyncrosim::scenario(P, nm)
 # the setup (its multipliers, adjacency and state attributes win), then the build (it supplies the whole Flow Pathways feed), then the definitions
 dependency(S) <- if (setup) c(bid, build_of, sfd) else c(bid, sfd)
 saveDatasheet(S, data.frame(HistoricalScenarioId = hid), "lucasCore_ProjectionStart")
+# Projection Start shares a feed (Run Settings) with Projection Options, and a dependency supplies whole feeds: copy the setup's (or
+# build's) options so stage 9 draws with the same iterations, seed and type-mix setting
+po <- suppressWarnings(as.data.frame(datasheet(B, "lucasCore_ProjectionOptions", lookupsAsFactors = FALSE)))
+po <- po[, setdiff(names(po), c("ProjectionOptionsId", "ScenarioId")), drop = FALSE]
+if (nrow(po)) saveDatasheet(S, po, "lucasCore_ProjectionOptions")
 saveDatasheet(S, data.frame(MinimumTimestep = yh, MaximumTimestep = ye, MinimumIteration = 1L, MaximumIteration = it, IsSpatial = TRUE), "stsim_RunControl")
 saveDatasheet(S, data.frame(SummaryOutputSC = TRUE, SummaryOutputSCTimesteps = 1L, SummaryOutputSCZeroValues = FALSE,
                             SummaryOutputTR = TRUE, SummaryOutputTRTimesteps = 1L, SummaryOutputTRIntervalMean = FALSE), "stsim_OutputOptions")

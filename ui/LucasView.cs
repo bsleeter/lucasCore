@@ -67,11 +67,38 @@ namespace lucasCoreUI
         protected object Value(string column) { return Value(Sheet, column); }
         protected int IntValue(string column, int blank) { object v = Value(column); return v == DBNull.Value ? blank : Convert.ToInt32(v); }
 
-        protected void Write(string column, object value)
+        protected void Write(string column, object value) { Write(Sheet, column, value); }
+        protected void Write(DataSheet ds, string column, object value)
         {
-            object now = Value(column);
+            object now = Value(ds, column);
             if (Equals(now, value) || (now != DBNull.Value && value != DBNull.Value && value != null && Convert.ToString(now) == Convert.ToString(value))) return;
-            Sheet.SetSingleRowData(column, value ?? DBNull.Value);
+            ds.SetSingleRowData(column, value ?? DBNull.Value);
+        }
+
+        // a number box written to an Integer/Double column on leaving it (blank = DBNull); a bad entry is put back
+        protected void BindNumber(TextBox t, Func<DataSheet> ds, string column, bool integer)
+        {
+            t.Validated += (s, e) =>
+            {
+                if (Refreshing) return;
+                string v = t.Text.Trim(); double d;
+                if (v.Length == 0) Write(ds(), column, DBNull.Value);
+                else if (double.TryParse(v, out d) && (!integer || d == Math.Floor(d))) Write(ds(), column, integer ? (object)Convert.ToInt32(d) : d);
+                RefreshControls();
+            };
+        }
+        protected static string Show(object v) { return v == DBNull.Value || v == null ? "" : Convert.ToString(v); }
+
+        // SyncroSim's own grid for one multi-row sheet of this feed, in a fixed-height panel of the page (made in LoadDataFeed:
+        // the session and scenario are not known in the constructor)
+        protected static Panel GridHost(int height) { return new Panel { Height = height, Dock = DockStyle.Top, Margin = new Padding(0, 3, 0, 3), MinimumSize = new Size(200, height) }; }
+        protected void LoadGrid(Panel host, string sheet)
+        {
+            host.Controls.Clear();
+            MultiRowDataFeedView v = this.Session.CreateMultiRowDataFeedView(this.Scenario, this.ControllingScenario);
+            v.LoadDataFeed(this.DataFeed, sheet);
+            v.Dock = DockStyle.Fill;
+            host.Controls.Add(v);
         }
 
         // a radio choice for an Integer list column: one button per value, the column's default when blank

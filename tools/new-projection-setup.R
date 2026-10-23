@@ -32,7 +32,12 @@ saveDatasheet(S, data.frame(FitResolution = as.integer(opt("resolution", 30))), 
 me <- opt("method", NA)
 if (!is.na(me)) { al <- fread(file.path(dirname(dirname(normalizePath(sub("--file=", "", grep("--file=", commandArgs(FALSE), value = TRUE))))), "defaults", "projection", "allocation.csv"))
   lab <- c(Fitted = "Fitted (regression on the historical record)", Rules = "Rules (WUI and PAD weights)", None = "None (random within its strata)")[me]
-  saveDatasheet(S, data.frame(TransitionGroupId = al$TransitionGroupId, Method = lab, Surface = al$Surface, EventClasses = al$EventClasses, Adjacency = toupper(al$Adjacency) == "YES"), "lucasCore_ProjectionAllocation") }
+  saveDatasheet(S, data.frame(TransitionGroupId = al$TransitionGroupId, Method = lab, Surface = al$Surface, EventClasses = al$EventClasses, Adjacency = toupper(al$Adjacency) == "YES"), "lucasCore_ProjectionAllocation")
+  # Projection Allocation shares a feed (Transitions) with Projection Transitions, and a dependency supplies whole feeds: keep the
+  # build's transitions rows (empty = the stage 9 defaults either way)
+  pt <- suppressWarnings(as.data.frame(datasheet(B, "lucasCore_ProjectionTransition", lookupsAsFactors = TRUE)))
+  pt <- pt[, setdiff(names(pt), c("ProjectionTransitionId", "ScenarioId")), drop = FALSE]
+  if (nrow(pt)) { for (k in names(pt)) if (is.factor(pt[[k]])) pt[[k]] <- as.character(pt[[k]]); saveDatasheet(S, pt, "lucasCore_ProjectionTransition") } }
 description(S) <- sprintf(paste0("Projection Setup on Build result %d (made by tools/new-projection-setup.R): stage 9 projection transitions and stage 10 surfaces. ",
   "Fitting region: %s; fitting resolution %s m; allocation: %s. Projections: tools/new-projection.R --build=<this result>."),
   bid, if (length(reg)) paste(reg, collapse = ", ") else "the study area", opt("resolution", 30), if (is.na(me)) "defaults/projection/allocation.csv" else paste(me, "for every allocated group"))

@@ -59,6 +59,30 @@ description(PS) <- paste("Run once a Build with a projection (Run a projection t
   "(Projection Allocation: fitted regression or WUI/PAD rules; Suitability Options, Fitting Region, Covariates; Rule Weights). Projections",
   "(tools/new-projection.R, or a scenario with this result as its first dependency) use its result. Change a covariate and rerun this alone.")
 saveDatasheet(PS, data.frame(StageNameId = c("9 - Projection Transitions", "10 - Transition Suitability"), RunOrder = 1:2), "core_Pipeline")
+# the Projection pages open filled in with the package defaults (the same CSVs the stages use for an empty sheet; Reset to defaults on
+# the pages reloads them). A list column takes its full label ("Target" -> "Target (area by strata)"). Build gets the Transitions feed
+# too (stage 9 runs there for a continuous run); the Setup's own copy wins for the Setup, since a dependency supplies whole feeds.
+list_label <- function(sheet, col, v) { blk <- regmatches(xml, regexpr(sprintf('(?s)<dataSheet name="%s"[^>]*(?<!/)>.*?</dataSheet>', sheet), xml, perl = TRUE))
+  tg <- regmatches(blk, regexpr(sprintf('<column name="%s"[^>]*>', col), blk)); f1 <- sub('.*formula1="([^"]*)".*', "\\1", tg)
+  labs <- sub("^[0-9]+:", "", strsplit(f1, "|", fixed = TRUE)[[1]])
+  out <- vapply(v, function(x) { if (is.na(x) || !nzchar(x)) return(NA_character_); m <- labs[labs == x | startsWith(labs, paste0(x, " "))]
+    if (!length(m)) stop(sprintf("%s.%s: '%s' is not a list value", sheet, col, x)); m[1] }, ""); unname(out) }
+csv <- function(...) data.table::fread(file.path(pkg, "defaults", "projection", ...), na.strings = "", colClasses = "character")
+tr <- csv("transitions.csv"); al <- csv("allocation.csv"); rw <- csv("rule-weights.csv")
+tr_df <- data.frame(TransitionGroupId = tr$TransitionGroupId, Method = list_label("ProjectionTransition", "Method", tr$Method),
+                    StrataLevel = list_label("ProjectionTransition", "StrataLevel", tr$StrataLevel), UnitSourceId = tr$UnitSource,
+                    SamplingSet = tr$SamplingSet, ExcludeGap = tr$ExcludeGap)
+al_df <- data.frame(TransitionGroupId = al$TransitionGroupId, Method = list_label("ProjectionAllocation", "Method", al$Method), Surface = al$Surface,
+                    EventClasses = al$EventClasses, Adjacency = toupper(al$Adjacency) == "YES")
+for (S in list(B, PS)) { saveDatasheet(S, tr_df, "lucasCore_ProjectionTransition"); saveDatasheet(S, al_df, "lucasCore_ProjectionAllocation") }
+saveDatasheet(B, defaults_of("ProjectionOptions"), "lucasCore_ProjectionOptions")
+saveDatasheet(PS, defaults_of("SuitabilityOptions"), "lucasCore_SuitabilityOptions")
+builtin <- c("Distance to developed land", "Developed share within 1 km", "Housing density (census decade)", "Distance to roads", "Slope", "Elevation", "Land cover", "GAP status", "County")
+saveDatasheet(PS, data.frame(Covariate = builtin, Include = TRUE), "lucasCore_SuitabilityCovariate")
+saveDatasheet(PS, data.frame(Surface = rw$Surface, Layer = list_label("RuleWeight", "Layer", rw$Layer), Class = rw$Class, Weight = as.numeric(rw$Weight)), "lucasCore_RuleWeight")
+cat(sprintf("Projection defaults: %d transitions, %d allocation rows, %d covariates, %d rule weights\n",
+            nrow(datasheet(PS, "lucasCore_ProjectionTransition")), nrow(datasheet(PS, "lucasCore_ProjectionAllocation")),
+            nrow(datasheet(PS, "lucasCore_SuitabilityCovariate")), nrow(datasheet(PS, "lucasCore_RuleWeight"))))
 for (sh in c("BuildOptions", "ClimateOptions", "GrowthOptions", "CarbonOptions")) { cat(sh, ": "); x <- datasheet(B, paste0("lucasCore_", sh), lookupsAsFactors = FALSE)
   cat(paste(names(x), unlist(lapply(x[1, ], as.character)), sep = " = ", collapse = "; "), "\n") }
 unlink(paste0(f, c(".temp", ".backup")), recursive = TRUE)

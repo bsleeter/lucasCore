@@ -101,6 +101,23 @@
 		<validation validationType="Unique" columns="UnitId"/>
 	</dataSheet>
 
+	<!-- the three Projection pages (ui/ProjectionRunView.cs, ProjectionTransitionsView.cs, SpatialAllocationView.cs). A dependency supplies
+	     whole feeds: a scenario with its own rows in one sheet of a feed does not see the other sheets of that feed from its dependencies -->
+	<dataFeed name="ProjectionRun" displayName="Run Settings" viewClassName="lucasCoreUI.ProjectionRunView" viewClassAssembly="lucasCoreUI">
+		<dataSheet name="ProjectionOptions"/>
+		<dataSheet name="ProjectionStart"/>
+	</dataFeed>
+	<dataFeed name="ProjectionTransitions" displayName="Transitions" viewClassName="lucasCoreUI.ProjectionTransitionsView" viewClassAssembly="lucasCoreUI">
+		<dataSheet name="ProjectionTransition"/>
+		<dataSheet name="ProjectionAllocation"/>
+	</dataFeed>
+	<dataFeed name="SpatialAllocation" displayName="Spatial Allocation" viewClassName="lucasCoreUI.SpatialAllocationView" viewClassAssembly="lucasCoreUI">
+		<dataSheet name="SuitabilityOptions"/>
+		<dataSheet name="SuitabilityRegion"/>
+		<dataSheet name="SuitabilityCovariate"/>
+		<dataSheet name="RuleWeight"/>
+	</dataFeed>
+
 	<dataSheet name="ProjectionOptions" displayName="Projection Options" isSingleRow="True">
 		<!-- stage 9: projection transitions resample whole historical years (Build Options sets the projection end year) -->
 		<column name="ReferenceStartYear" displayName="Reference Period Start (blank = first historical transition year)" dataType="Integer" isOptional="True"/>
@@ -129,6 +146,7 @@
 		<column name="TestYears" displayName="Out-of-Sample Test Years (last N historical years; 0 = no test)" dataType="Integer" defaultValue="11" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
 		<column name="AdjacencyRadius" displayName="Adjacency Neighborhood Radius (m; blank = 3 cells)" dataType="Double" isOptional="True"/>
 		<column name="AdjacencyUpdate" displayName="Adjacency Update Frequency (years)" dataType="Integer" defaultValue="5" validationType="WholeNumber" validationCondition="Greater" formula1="0"/>
+		<column name="RegionSourceId" displayName="Fitting Region Kind (Spatial Allocation page; blank = the study area)" dataType="Integer" validationType="Datasheet" formula1="lucasCore_StratumSource" isOptional="True"/>
 	</dataSheet>
 
 	<dataSheet name="SuitabilityRegion" displayName="Suitability Fitting Region (blank = the study area)">
@@ -557,14 +575,9 @@
 			<item name="CarbonOptions"/>
 			<item name="GrowthOptions"/>
 			<group name="lucasCoreProjection" displayName="Projection">
-				<item name="ProjectionOptions"/>
-				<item name="ProjectionStart"/>
-				<item name="ProjectionTransition"/>
-				<item name="ProjectionAllocation"/>
-				<item name="SuitabilityOptions"/>
-				<item name="SuitabilityRegion"/>
-				<item name="SuitabilityCovariate"/>
-				<item name="RuleWeight"/>
+				<item name="ProjectionRun"/>
+				<item name="ProjectionTransitions"/>
+				<item name="SpatialAllocation"/>
 			</group>
 			<group name="lucasCoreCrosswalks" displayName="Crosswalks">
 				<item name="LandCoverCrosswalk"/>
