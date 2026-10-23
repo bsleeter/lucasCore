@@ -69,7 +69,7 @@ pst <- read_ds("ProjectionStart"); hid <- if (nrow(pst) && "HistoricalScenarioId
 if (!is.na(hid)) {
   ys <- if ("StartYear" %in% names(pst) && !is.na(pst$StartYear[1])) pst$StartYear[1] else y1
   if (ys != y1) fail("Projection Start: the start year must be the historical end (%d); the projection draws start in %d", y1, y1 + 1)
-  hd <- file.path(paste0(env$LibraryFilePath, ".data"), sprintf("Scenario-%d", hid))
+  hd <- file.path(paste0(main_library(), ".data"), sprintf("Scenario-%d", hid))
   scf <- file.path(hd, "stsim_OutputSpatialState", sprintf("sc.it1.ts%d.tif", ys)); agf <- file.path(hd, "stsim_OutputSpatialAge", sprintf("age.it1.ts%d.tif", ys))
   if (!file.exists(scf) || !file.exists(agf)) fail("Projection Start: historical run %d has no state class and age maps for %d (make it with tools/new-historical.R --historical-only --bookend-maps)", hid, ys)
   sg <- as.data.table(datasheet(prj, "stsim_StockGroup", includeKey = TRUE))

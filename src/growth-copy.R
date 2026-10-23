@@ -17,7 +17,7 @@ copy_curves <- function(opt) {
   if (is.null(lp) || is.na(lp) || !nzchar(lp)) fail("Growth Curve Options: Copy from another library needs a Source Library (.ssim path)")
   lp <- normalizePath(lp, winslash = "/", mustWork = FALSE)
   if (!file.exists(lp)) fail("Source Library not found: %s", lp)
-  if (identical(tolower(lp), tolower(normalizePath(env$LibraryFilePath, winslash = "/", mustWork = FALSE))))
+  if (identical(tolower(lp), tolower(main_library())))
     fail("Source Library is this library: use a Growth Curves scenario as a dependency instead")
   con <- DBI::dbConnect(RSQLite::SQLite(), lp, flags = RSQLite::SQLITE_RO); on.exit(DBI::dbDisconnect(con), add = TRUE)
   tb <- DBI::dbListTables(con); q <- function(sql) as.data.table(DBI::dbGetQuery(con, sql))

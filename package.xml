@@ -560,7 +560,7 @@
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="InitialStockCurve" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
-		<dataSheet name="stsim_InitialStockSpatial" type="Output"/>
+		<dataSheet name="stsim_InitialStockSpatial" type="Both"/>
 		<dataSheet name="OutputInitialStockSummary" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
@@ -574,7 +574,7 @@
 		<dataSheet name="OutputNlcdAnnual" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Both"/>
 		<dataSheet name="stsim_TransitionSpatialMultiplier" type="Both"/>
-		<dataSheet name="stsim_InitialStockSpatial" type="Output"/>
+		<dataSheet name="stsim_InitialStockSpatial" type="Both"/>
 		<dataSheet name="stsim_TransitionTarget" type="Both"/>
 		<dataSheet name="core_SpatialMultiprocessing" type="Output"/>
 		<dataSheet name="OutputProjectionSchedule" type="Output"/>
@@ -603,8 +603,8 @@
 		<dataSheet name="stsim_StateAttributeValue" type="Both"/>
 		<dataSheet name="stsim_TransitionAdjacencySetting" type="Output"/>
 		<dataSheet name="stsim_TransitionAdjacencyMultiplier" type="Output"/>
-		<dataSheet name="stsim_TransitionSizeDistribution" type="Output"/>
-		<dataSheet name="stsim_TransitionSizePrioritization" type="Output"/>
+		<dataSheet name="stsim_TransitionSizeDistribution" type="Both"/>
+		<dataSheet name="stsim_TransitionSizePrioritization" type="Both"/>
 		<dataSheet name="OutputSuitability" type="Output"/>
 		<dataSheet name="OutputSuitabilityCurve" type="Output"/>
 		<dataSheet name="OutputSuitabilityMap" type="Output"/>

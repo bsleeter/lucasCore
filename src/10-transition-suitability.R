@@ -116,7 +116,7 @@ ref <- rast(nl_file(y1)); both <- st_transform(st_union(c(st_transform(region, c
 E30 <- align(ext(vect(both)) + 2000, ref, snap = "out"); fact <- res_f / 30
 G <- if (fact > 1) aggregate(rast(crop(ref, E30)), fact) else rast(crop(ref, E30))
 key <- sprintf("r%d_%d_%d_%d_%d_%d-%d", res_f, round(xmin(G)), round(ymin(G)), ncol(G), nrow(G), y0, y1)
-CA <- file.path(paste0(env$LibraryFilePath, ".data"), "lucasCore-suitability", key); dir.create(CA, recursive = TRUE, showWarnings = FALSE)
+CA <- file.path(paste0(main_library(), ".data"), "lucasCore-suitability", key); dir.create(CA, recursive = TRUE, showWarnings = FALSE)
 cf <- function(k) file.path(CA, paste0(k, ".tif"))
 # masks: "region" = every surface's region together (a grid template too), "study", and one per region set (rewritten each run:
 # the same grid can come with other units)

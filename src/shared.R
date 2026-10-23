@@ -74,6 +74,11 @@ int_cols <- function(x) { x <- as.data.frame(x)
 write_ds   <- function(x, name, ...) saveDatasheet(scn, int_cols(x), ds(name), ...)
 write_stsim <- function(x, name, target = scn, ...) saveDatasheet(target, int_cols(x), paste0("stsim_", name), ...)
 
+# the library the user opened. With multiprocessing on, SyncroSim runs a stage in a copy of it
+# (<library>.temp/MultiProc/Scenario-N/tK/Job-1.ssim), whose .data folder holds no other scenario's files (found 2026-10-23:
+# Projection Start could not find the historical run's maps)
+main_library <- function() sub("\\.temp[/\\\\]MultiProc[/\\\\].*$", "", normalizePath(env$LibraryFilePath, winslash = "/", mustWork = FALSE))
+
 # Transition Size Distribution / Size Prioritization rows for some groups, keeping every other group's rows (stages 9 and 10 each write
 # their own groups'; a later stage, or stage 9 rerun in a projection, must not drop the others). Rows carry Timestep = the historical
 # end + 1 so a continuous run's historical years keep their exact maps (found 2026-10-23).
