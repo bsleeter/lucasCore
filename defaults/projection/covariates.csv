@@ -1,0 +1,17 @@
+Surface,Covariate,Include,Name,File,Note
+,Distance to developed land,Yes,,,"blank Surface = every surface; a surface's own row adds a covariate or (Include No) drops one"
+,Developed share within 1 km,Yes,,,
+,Housing density (census decade),Yes,,,
+,Distance to roads,Yes,,,
+,Slope,Yes,,,
+,Elevation,Yes,,,
+,Land cover,Yes,,,
+,GAP status,Yes,,,
+,County,Yes,,,
+Ag Expansion,Distance to agriculture,Yes,,,
+Ag Expansion,Agriculture share within 1 km,Yes,,,
+Ag Expansion,Crop productivity (NCCPI),Yes,,,
+Ag Contraction,Agriculture share within 1 km,Yes,,,
+Ag Contraction,Crop productivity (NCCPI),Yes,,,
+Clearcut,Forest owner type,Yes,,,
+Selection,Forest owner type,Yes,,,

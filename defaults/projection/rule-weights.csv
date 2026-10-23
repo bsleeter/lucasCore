@@ -56,8 +56,13 @@ Ag Expansion,GAP status,2,0,
 Ag Expansion,GAP status,3,0,
 Ag Expansion,GAP status,4,1,
 Ag Expansion,GAP status,9,1,
-Forest Harvest,GAP status,1,0,"harvest: 0 on GAP 1-2, 1 on GAP 3-4, 10 outside PAD-US"
-Forest Harvest,GAP status,2,0,
-Forest Harvest,GAP status,3,1,
-Forest Harvest,GAP status,4,1,
-Forest Harvest,GAP status,9,10,
+Clearcut,GAP status,1,0,"harvest: 0 on GAP 1-2, 1 on GAP 3-4, 10 outside PAD-US"
+Clearcut,GAP status,2,0,
+Clearcut,GAP status,3,1,
+Clearcut,GAP status,4,1,
+Clearcut,GAP status,9,10,
+Selection,GAP status,1,0,"harvest: 0 on GAP 1-2, 1 on GAP 3-4, 10 outside PAD-US"
+Selection,GAP status,2,0,
+Selection,GAP status,3,1,
+Selection,GAP status,4,1,
+Selection,GAP status,9,10,

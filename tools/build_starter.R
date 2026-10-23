@@ -73,12 +73,12 @@ tr_df <- data.frame(TransitionGroupId = tr$TransitionGroupId, Method = list_labe
                     StrataLevel = list_label("ProjectionTransition", "StrataLevel", tr$StrataLevel), UnitSourceId = tr$UnitSource,
                     SamplingSet = tr$SamplingSet, ExcludeGap = tr$ExcludeGap)
 al_df <- data.frame(TransitionGroupId = al$TransitionGroupId, Method = list_label("ProjectionAllocation", "Method", al$Method), Surface = al$Surface,
-                    EventClasses = al$EventClasses, Adjacency = toupper(al$Adjacency) == "YES")
+                    SourceClasses = al$SourceClasses, EventClasses = al$EventClasses, Adjacency = toupper(al$Adjacency) == "YES")
 for (S in list(B, PS)) { saveDatasheet(S, tr_df, "lucasCore_ProjectionTransition"); saveDatasheet(S, al_df, "lucasCore_ProjectionAllocation") }
 saveDatasheet(B, defaults_of("ProjectionOptions"), "lucasCore_ProjectionOptions")
 saveDatasheet(PS, defaults_of("SuitabilityOptions"), "lucasCore_SuitabilityOptions")
-builtin <- c("Distance to developed land", "Developed share within 1 km", "Housing density (census decade)", "Distance to roads", "Slope", "Elevation", "Land cover", "GAP status", "County")
-saveDatasheet(PS, data.frame(Covariate = builtin, Include = TRUE), "lucasCore_SuitabilityCovariate")
+cvd <- csv("covariates.csv")
+saveDatasheet(PS, data.frame(Surface = cvd$Surface, Covariate = list_label("SuitabilityCovariate", "Covariate", cvd$Covariate), Include = toupper(cvd$Include) == "YES"), "lucasCore_SuitabilityCovariate")
 saveDatasheet(PS, data.frame(Surface = rw$Surface, Layer = list_label("RuleWeight", "Layer", rw$Layer), Class = rw$Class, Weight = as.numeric(rw$Weight)), "lucasCore_RuleWeight")
 cat(sprintf("Projection defaults: %d transitions, %d allocation rows, %d covariates, %d rule weights\n",
             nrow(datasheet(PS, "lucasCore_ProjectionTransition")), nrow(datasheet(PS, "lucasCore_ProjectionAllocation")),

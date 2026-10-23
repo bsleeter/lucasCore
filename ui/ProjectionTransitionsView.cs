@@ -41,7 +41,7 @@ namespace lucasCoreUI
             AddGroup(Group("Where it goes (stage 10, Projection Setup)", Stack(
                 Note("One row per group or member type to place. Rows with the same Surface share one fitted surface; a group without a row is placed at random in its units."),
                 m_place,
-                Wrapped("Fitted: a regression on the historical record (Spatial Allocation page).  Rules: WUI and GAP weights.  Event Classes: the NLCD codes the change goes to, for fitting.  Adjacency: more likely next to developed land, updated during the run.", 720))));
+                Wrapped("Fitted: a regression on the historical record (Spatial Allocation page).  Rules: WUI and GAP weights.  Source Classes: the NLCD codes a cell has the year before (blank = not developed, water or ice).  Event Classes: the codes it changes to, or LANDFIRE:Thinning.  Adjacency: more likely next to developed land (agriculture, for agriculture events), updated during the run.", 720))));
             var r = Row(); r.Controls.Add(m_reset); r.Controls.Add(m_state);
             AddGroup(Group("Defaults", r));
             EndGroups();

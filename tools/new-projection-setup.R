@@ -30,9 +30,10 @@ reg <- trimws(strsplit(opt("region", ""), ",")[[1]]); reg <- reg[nzchar(reg)]
 if (length(reg)) saveDatasheet(S, data.frame(UnitId = reg), "lucasCore_SuitabilityRegion")
 saveDatasheet(S, data.frame(FitResolution = as.integer(opt("resolution", 30))), "lucasCore_SuitabilityOptions")
 me <- opt("method", NA)
-if (!is.na(me)) { al <- fread(file.path(dirname(dirname(normalizePath(sub("--file=", "", grep("--file=", commandArgs(FALSE), value = TRUE))))), "defaults", "projection", "allocation.csv"))
+if (!is.na(me)) { al <- fread(file.path(dirname(dirname(normalizePath(sub("--file=", "", grep("--file=", commandArgs(FALSE), value = TRUE))))), "defaults", "projection", "allocation.csv"), colClasses = "character", na.strings = "")
   lab <- c(Fitted = "Fitted (regression on the historical record)", Rules = "Rules (WUI and PAD weights)", None = "None (random within its strata)")[me]
-  saveDatasheet(S, data.frame(TransitionGroupId = al$TransitionGroupId, Method = lab, Surface = al$Surface, EventClasses = al$EventClasses, Adjacency = toupper(al$Adjacency) == "YES"), "lucasCore_ProjectionAllocation")
+  saveDatasheet(S, data.frame(TransitionGroupId = al$TransitionGroupId, Method = lab, Surface = al$Surface, SourceClasses = al$SourceClasses, EventClasses = al$EventClasses,
+                              Adjacency = toupper(al$Adjacency) == "YES"), "lucasCore_ProjectionAllocation")
   # Projection Allocation shares a feed (Transitions) with Projection Transitions, and a dependency supplies whole feeds: keep the
   # build's transitions rows (empty = the stage 9 defaults either way)
   pt <- suppressWarnings(as.data.frame(datasheet(B, "lucasCore_ProjectionTransition", lookupsAsFactors = TRUE)))
