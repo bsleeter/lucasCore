@@ -21,6 +21,7 @@
 		<column name="ForestTypeGroupFolder" displayName="USFS Forest Type Group Map Folder (NFCMS regional *_ForestType.tif)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/NFCMS/Forest Type"/>
 		<column name="MtbsSeverityFolder" displayName="MTBS Burn Severity Folder (mtbs_CONUS_year.tif)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/MTBS/Burn Severity"/>
 		<column name="LandfireDisturbanceFolder" displayName="LANDFIRE Disturbance Folder (US_DISTyear)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Landfire Disturbance"/>
+		<column name="LcmsFolder" displayName="USFS LCMS annual Change folder (year/*Change_year.tif; harvest, stages 6 and 10)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/LCMS/v2025-11/Change_Annual"/>
 		<column name="FriFile" displayName="LANDFIRE Mean Fire Return Interval" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FRI/Tif/LC16_FRI_200.tif"/>
 		<column name="PrismFolder" displayName="PRISM Folder (annual and normals)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Climate/prism"/>
 		<column name="Loca2Folder" displayName="LOCA2 Folder (gcm/r1i1p1f1/ssp)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Climate/LOCA2"/>
@@ -137,7 +138,7 @@
 		<column name="Method" dataType="Integer" validationType="List" formula1="1:Fitted (regression on the historical record)|2:Rules (WUI and PAD weights)|3:None (random within its strata)" defaultValue="1"/>
 		<column name="Surface" displayName="Surface (groups with the same name share one)" dataType="String"/>
 		<column name="SourceClasses" displayName="Source Classes (NLCD codes a cell has the year before, e.g. 41|42|43; blank = not developed, water or ice)" dataType="String" isOptional="True"/>
-		<column name="EventClasses" displayName="Event Classes (NLCD codes the change goes to, e.g. 22|23|24; or LANDFIRE:Thinning)" dataType="String" isOptional="True"/>
+		<column name="EventClasses" displayName="Event Classes (NLCD codes the change goes to, e.g. 22|23|24; or LCMS:standrep, LCMS:partial, LANDFIRE:type)" dataType="String" isOptional="True"/>
 		<column name="Adjacency" displayName="Adjacency (more likely next to developed land, or to agriculture for agriculture events; updated in the run)" dataType="Boolean" defaultValue="-1"/>
 		<validation validationType="Unique" columns="TransitionGroupId"/>
 	</dataSheet>

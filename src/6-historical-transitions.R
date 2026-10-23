@@ -13,13 +13,19 @@
 #                        the year before. Same 1 km NLCD as the state class map, so every clearcut cell is a forest class (user
 #                        decision 2026-10-20: coherence between the maps comes before matching the 30 m area)
 #   Landfire             LANDFIRE annual disturbance, by the disturbance type of each year's attribute table
+#   Lcms                 USFS LCMS annual cause of change (user decision 2026-10-23: one harvest record for 1985 on; LANDFIRE starts
+#                        in 1999): Tree Removal (class 9) on a pixel that was forest (NLCD 41-43) the year before, split by what NLCD
+#                        shows next - "standrep" (shrub or grass that year or within the two after: clearcut) or "partial" (still forest:
+#                        selection). Classes "9>standrep" / "9>partial"; fractions of 30 m pixels, as for LANDFIRE
 # Changes from the CONUS 1km build:
 #   * MTBS and LANDFIRE give each cell the fraction of its 30 m pixels that had the disturbance, so the expected area equals the 30 m
 #     area (the build sampled one 30 m pixel per cell). Both have pathways on every class they occur on, so this keeps the maps coherent.
 #     The cell's whole burned fraction goes to its most common severity, so the severities never compete for a cell (ST-Sim allows one
 #     transition per cell per timestep)
-#   * selection uses LANDFIRE's Thinning type in every year; the build's code ranges (441-443, 741-743, 941) missed codes 940 and 942-948
-#     and do not apply to the 4-digit codes LANDFIRE uses from 2024
+#   * clearcut and selection come from LCMS Tree Removal (sources.csv; 2026-10-23). In P26 it is ~63 km2/yr with no break at 1999,
+#     where the NLCD clearcut rule was half fire, drought and pixel noise and LANDFIRE Thinning (fuels treatments, mostly invisible to
+#     Landsat) overlapped LCMS on 9% of its area (dev/harvest). If LANDFIRE is used, its type names cover codes the build's ranges
+#     (441-443, 741-743, 941) missed (940, 942-948, the 4-digit codes from 2024)
 #   * clearcut cells get at least the clearcut pathway's minimum age in their first clearcut year (the build
 #     required the minimum age in the start year)
 #   * every pathway type with no spatial multiplier gets a zero target, so no type runs everywhere by default
@@ -30,7 +36,7 @@ suppressPackageStartupMessages({ library(terra); library(sf); library(parallel) 
 STAGE <- "6 Historical Transitions"
 progressBar(type = "begin", totalSteps = 8)
 
-src <- read_data_sources(c("EcodivisionFile", "NlcdFolder", "MtbsSeverityFolder", "LandfireDisturbanceFolder"))
+src <- read_data_sources(c("EcodivisionFile", "NlcdFolder", "MtbsSeverityFolder", "LandfireDisturbanceFolder", "LcmsFolder"))
 opt <- read_ds("BuildOptions"); y0 <- opt$StartYear[1]; y1 <- opt$EndYear[1]; yrs <- (y0 + 1):y1
 ic <- as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", optional = TRUE, lookupsAsFactors = FALSE))
 if (!nrow(ic) || is.na(ic$StateClassFileName[1]) || is.na(ic$AgeFileName[1])) fail("no state class or age map: run stage 5 first (same pipeline, or depend on a stage 5 result)")
@@ -88,9 +94,15 @@ say("Land-use change: %d groups from the modal NLCD", nrow(lu))
 progressBar()
 
 # ---- 30 m disturbances: fraction of each cell's 30 m pixels, one year per worker ------------------------------------------
-fire <- so[Source == "Mtbs"]; ccs <- so[Source == "NlcdClearcut"]; lfg <- so[Source == "Landfire"]
-if (nrow(ccs) > 1) fail("sources.csv: only one NlcdClearcut group is supported")
-cc_ft <- if (nrow(ccs)) lapply(strsplit(ccs$Classes, ">", fixed = TRUE)[[1]], codes) else list(integer(), integer())
+fire <- so[Source == "Mtbs"]; ncc <- so[Source == "NlcdClearcut"]; lfg <- so[Source == "Landfire"]; lcg <- so[Source == "Lcms"]
+# the clearcut group (for the minimum-age rule): the NLCD clearcut source, or LCMS stand-replacing tree removal
+ccs <- rbind(ncc, lcg[grepl("standrep", Classes)])
+if (nrow(ccs) > 1) fail("sources.csv: only one clearcut group (NlcdClearcut or Lcms standrep) is supported")
+cc_ft <- if (nrow(ncc)) lapply(strsplit(ncc$Classes, ">", fixed = TRUE)[[1]], codes) else list(integer(), integer())
+lc_code <- as.integer(sub(">.*", "", lcg$Classes)); lc_kind <- sub(".*>", "", lcg$Classes)
+if (any(!lc_kind %in% c("standrep", "partial"))) fail("sources.csv: Lcms classes must be <code>>standrep or <code>>partial")
+lc <- setNames(vapply(yrs, function(y) { f <- Sys.glob(file.path(src$LcmsFolder, y, sprintf("*Change_%d.tif", y))); if (length(f)) f[1] else NA_character_ }, ""), yrs)
+if (nrow(lcg) && anyNA(lc)) say("LCMS missing for %s: no %s in those years", paste(yrs[is.na(lc)], collapse = ", "), paste(lcg$TransitionGroupId, collapse = ", "))
 lf_types <- strsplit(lfg$Classes, "|", fixed = TRUE)
 nf <- setNames(file.path(src$NlcdFolder, sprintf("Annual_NLCD_LndCov_%d_CU_C1V0.tif", (y0):y1)), y0:y1)
 mt <- setNames(vapply((y0):y1, function(y) { f <- file.path(src$MtbsSeverityFolder, sprintf("mtbs_CONUS_%d.tif", y)); if (file.exists(f)) f else NA_character_ }, ""), y0:y1)
@@ -115,33 +127,41 @@ year_layers <- function(y, a) {
   f <- a$mt[[as.character(y)]]; if (!is.na(f)) { lay[[length(lay) + 1]] <- rd(f, ref); col["m"] <- length(lay) }
   li <- a$lf[[as.character(y)]]
   if (!is.null(li)) { lay[[length(lay) + 1]] <- rd(li$tif, ref); col["lf"] <- length(lay) }
+  # LCMS: the change layer, last year's NLCD (forest?) and this and the next two years' (shrub or grass?)
+  lci <- if (length(a$lc_groups) && y > a$y0) a$lc[[as.character(y)]] else NA_character_
+  has_lc <- !is.na(lci)
+  if (has_lc) { lay[[length(lay) + 1]] <- rd(lci, ref); col["lc"] <- length(lay); lay[[length(lay) + 1]] <- rd(a$nf[[as.character(y - 1)]], ref); col["p"] <- length(lay)
+    nk <- c(); for (k in y:min(y + 2, a$y1)) { lay[[length(lay) + 1]] <- if (k == y) ref else rd(a$nf[[as.character(k)]], ref); nk <- c(nk, length(lay)) } }
   has_fire <- length(a$fire_groups) && "m" %in% names(col)
-  grp <- c(if (has_fire) a$fire_groups, if (!is.null(li)) a$lf_groups)
-  part <- c(if (has_fire) rep("fire", length(a$fire_groups)), if (!is.null(li)) rep("lf", length(a$lf_groups)))
+  grp <- c(if (has_fire) a$fire_groups, if (!is.null(li)) a$lf_groups, if (has_lc) a$lc_groups)
+  part <- c(if (has_fire) rep("fire", length(a$fire_groups)), if (!is.null(li)) rep("lf", length(a$lf_groups)), if (has_lc) rep("lc", length(a$lc_groups)))
   if (!length(grp)) return(NULL)
   flag <- function(v) { v <- as.matrix(v); out <- matrix(0L, nrow(v), length(grp)); j <- 0
     if (has_fire) for (cc in a$fire_codes) { j <- j + 1; out[, j] <- v[, col[["m"]]] %in% cc }
     if (!is.null(li)) for (cc in li$codes) { j <- j + 1; out[, j] <- v[, col[["lf"]]] %in% cc }
+    if (has_lc) { sr <- rowSums(matrix(v[, nk] %in% c(52, 71), nrow(v))) > 0; fo <- v[, col[["p"]]] %in% 41:43
+      for (i in seq_along(a$lc_groups)) { j <- j + 1; t <- v[, col[["lc"]]] %in% a$lc_code[i] & fo; out[, j] <- if (a$lc_kind[i] == "standrep") t & sr else t & !sr } }
     out }
   ind <- app(rast(lay), flag, wopt = list(datatype = "INT1U", gdal = "COMPRESS=DEFLATE"))
   fr <- mask(project(aggregate(ind, a$fact, "mean"), P, method = "near"), P)
   # within a source with several groups (fire severities), the cell's total fraction goes to its most common group
-  for (p in unique(part)) { i <- which(part == p); if (length(i) < 2) next
+  for (p in intersect(unique(part), "fire")) { i <- which(part == p); if (length(i) < 2) next   # (LCMS clearcut and selection are disjoint already)
     tot <- sum(fr[[i]]); w <- which.max(fr[[i]]); for (j in seq_along(i)) fr[[i[j]]] <- ifel(w == j, tot, 0) }
   out <- rbindlist(lapply(seq_along(grp), function(j) { r <- fr[[j]]; s <- global(r, "sum", na.rm = TRUE)[[1]]
     f <- if (s > 0) { p <- file.path(a$td, sprintf("%s_%d.tif", gsub("[^A-Za-z0-9]+", "-", sub(" [Type]", "", grp[j], fixed = TRUE)), y))
       writeRaster(r, p, overwrite = TRUE, datatype = "FLT4S", gdal = c("COMPRESS=DEFLATE", "TILED=YES")); p } else NA_character_
-    data.table(Timestep = y, TransitionGroupId = grp[j], Source = c(fire = "Mtbs", lf = "Landfire")[[part[j]]], File = f,
+    data.table(Timestep = y, TransitionGroupId = grp[j], Source = c(fire = "Mtbs", lf = "Landfire", lc = "Lcms")[[part[j]]], File = f,
                Max = global(r, "max", na.rm = TRUE)[[1]]) }))
   tmpFiles(remove = TRUE); out }
 
 dl <- data.table(Timestep = integer(), TransitionGroupId = character(), Source = character(), File = character(), Max = numeric())
-if (nrow(fire) || nrow(lfg)) {
+if (nrow(fire) || nrow(lfg) || nrow(lcg)) {
   b <- grid_blocks(rast(nf[[1]]), L, P)
   wy <- c(y0, yrs)   # the start year's fire is needed for the first year's clearcut burn test
   ncl <- max(1, min(length(wy), 40, detectCores() - 2))
   args <- list(clear = clear_syncrosim_proj, memfrac = 0.6 / ncl, pf = ic$StratumFileName[1], E = as.vector(b$ext), fact = b$fact, td = TD(),
-               nf = as.list(nf), mt = as.list(mt), lf = lf, fire_groups = fire$TransitionGroupId, fire_codes = lapply(fire$Classes, codes), lf_groups = lfg$TransitionGroupId)
+               nf = as.list(nf), mt = as.list(mt), lf = lf, fire_groups = fire$TransitionGroupId, fire_codes = lapply(fire$Classes, codes), lf_groups = lfg$TransitionGroupId,
+               lc = as.list(lc), lc_groups = lcg$TransitionGroupId, lc_code = lc_code, lc_kind = lc_kind, y0 = y0, y1 = y1)
   say("30 m disturbances: %d years on %d workers (blocks of %d x %d pixels)", length(wy), ncl, b$fact, b$fact)
   t0 <- Sys.time(); cl <- makeCluster(ncl)
   res <- tryCatch(parLapply(cl, wy, year_layers, a = args), finally = stopCluster(cl))
@@ -156,11 +176,11 @@ if (nrow(fire) || nrow(lfg)) {
 # the any-year forest rule has made it a forest class: only the pathway minimum age can stop it.
 burn_frac <- function(y) { f <- dl[Timestep == y & Source == "Mtbs" & !is.na(File), File]
   if (!length(f)) return(init(P, 0)); sum(rast(f)) }   # one severity layer holds each cell's total burned fraction, the rest are 0
-if (nrow(ccs)) {
+if (nrow(ncc)) {
   for (y in yrs) { r <- (N[[as.character(y - 1)]] %in% cc_ft[[1]]) & (N[[as.character(y)]] %in% cc_ft[[2]]) & (burn_frac(y - 1) < 0.5) & (burn_frac(y) < 0.5)
     r <- mask(r, P)
     f <- if (global(r, "sum", na.rm = TRUE)[[1]] > 0) write_raster(r, sprintf("NlcdClearcut_%d.tif", y), "INT1U") else NA_character_
-    layers[[length(layers) + 1]] <- data.table(Timestep = y, TransitionGroupId = ccs$TransitionGroupId, Source = "NlcdClearcut", File = f) }
+    layers[[length(layers) + 1]] <- data.table(Timestep = y, TransitionGroupId = ncc$TransitionGroupId, Source = "NlcdClearcut", File = f) }
 }
 layers <- rbindlist(layers)
 progressBar()
@@ -171,9 +191,10 @@ if (nrow(ccs)) {
   am <- pw[TransitionTypeId %in% grp_types(ccs$TransitionGroupId) & !is.na(AgeMin), .(AgeMin = max(as.integer(AgeMin))), by = StateClassIdSource]
   vMin <- am$AgeMin[match(vS, sid(am$StateClassIdSource))]
   req <- rep(NA_real_, length(vS)); ccl <- layers[TransitionGroupId == ccs$TransitionGroupId & !is.na(File)]
-  # ST-Sim ages cells at the end of each timestep, so a cell has aged (y - y0 - 1) years when the year-y transitions run
+  # ST-Sim ages cells at the end of each timestep, so a cell has aged (y - y0 - 1) years when the year-y transitions run. Any cut counts
+  # (LCMS gives fractions of 30 m pixels: on a 1 km grid few cells are half cut, and at >= 0.5 43% of Placer's clearcut was age-blocked)
   for (i in order(ccl$Timestep)) { v <- values(rast(ccl$File[i]), mat = FALSE); y <- ccl$Timestep[i]
-    hit <- !is.na(v) & v >= 0.5 & is.na(req) & !is.na(vMin); req[hit] <- vMin[hit] - (y - y0 - 1) }
+    hit <- !is.na(v) & v > 0 & is.na(req) & !is.na(vMin); req[hit] <- vMin[hit] - (y - y0 - 1) }
   raise <- !is.na(req) & !is.na(vA) & vA < req
   vA2 <- vA; vA2[raise] <- req[raise]
   say("Clearcut minimum age: %d cells cut; %d raised, by %.0f years on average", sum(!is.na(req)), sum(raise), if (any(raise)) mean(req[raise] - vA[raise]) else 0)

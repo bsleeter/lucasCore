@@ -85,6 +85,8 @@ fitted_s <- unique(al[Method == "Fitted", Surface])
 need <- unique(unlist(lapply(fitted_s, function(s) cov_for(s)$Covariate)))
 custom <- unique(cv[Include == TRUE & Covariate == "Custom raster", .(Name, File)])
 lf_types <- unique(sub("^LANDFIRE:\\s*", "", grep("^LANDFIRE:", al[Method == "Fitted", EventClasses], value = TRUE)))
+lc_kinds <- unique(sub("^LCMS:\\s*", "", grep("^LCMS:", al[Method == "Fitted", EventClasses], value = TRUE)))
+if (any(!lc_kinds %in% c("standrep", "partial"))) fail("Projection Allocation: LCMS events are LCMS:standrep or LCMS:partial")
 ag_ev <- function(e) { k <- suppressWarnings(codes_of(e)); length(k) > 0 && all(k %in% 81:82) }
 need_ag <- any(c("Distance to agriculture", "Agriculture share within 1 km") %in% need) || any(al[Method == "Fitted" & Adjacency == TRUE, vapply(EventClasses, ag_ev, TRUE)])
 rows <- sources_from_sheet(as.data.table(datasheet(prj, ds("StratumSource"), optional = TRUE, lookupsAsFactors = FALSE)))
@@ -193,11 +195,24 @@ for (t in lf_types) { todo <- YRS[-1][!file.exists(vapply(YRS[-1], lf_c, "", t =
     r <- rast(a$f[[i]]$tif); r <- crop(r, project(as.polygons(ext(a$E), crs = crs(g)), crs(r)), snap = "out"); levels(r) <- NULL
     e <- r %in% a$f[[i]]$codes; e <- project(e, rast(ext(a$E), res = 30, crs = crs(g)), method = "near"); if (a$fact > 1) e <- aggregate(e, a$fact, "mean", na.rm = TRUE)
     writeRaster(resample(e, g, method = "near") >= 0.5, a$out[i], datatype = "INT1U", gdal = "COMPRESS=DEFLATE", overwrite = TRUE); NULL }, a = a); stopCluster(cl) }
+# LCMS Tree Removal (class 9) by year on the fitting grid (an event when >= half the cell's pixels); stand-replacing or partial is
+# decided per surface from the NLCD of the following years, as in stage 6
+lc_c <- function(y) cf(sprintf("lcms9_%d", y))
+if (length(lc_kinds)) { todo <- YRS[-1][!file.exists(vapply(YRS[-1], lc_c, ""))]
+  if (length(todo)) { lcd <- read_data_sources("LcmsFolder")$LcmsFolder
+    files <- vapply(todo, function(y) { f <- Sys.glob(file.path(lcd, y, sprintf("*Change_%d.tif", y))); if (length(f)) f[1] else NA_character_ }, "")
+    if (anyNA(files)) say("LCMS missing for %s: no harvest events in those years", paste(todo[is.na(files)], collapse = ", "))
+    cl <- makeCluster(min(10, length(todo))); a <- list(f = files, out = vapply(todo, lc_c, ""), E = as.vector(E30), fact = fact, G = cf("region"), clear = clear_syncrosim_proj)
+    parLapply(cl, seq_along(todo), function(i, a) { library(terra); a$clear(); terraOptions(progress = 0, memfrac = 0.04); g <- rast(a$G)
+      if (is.na(a$f[i])) { writeRaster(init(g, 0), a$out[i], datatype = "INT1U", gdal = "COMPRESS=DEFLATE", overwrite = TRUE); return(NULL) }
+      r <- rast(a$f[i]); r <- crop(r, project(as.polygons(ext(a$E), crs = crs(g)), crs(r)), snap = "out"); levels(r) <- NULL
+      e <- r == 9; e <- project(e, rast(ext(a$E), res = 30, crs = crs(g)), method = "near"); if (a$fact > 1) e <- aggregate(e, a$fact, "mean", na.rm = TRUE)
+      writeRaster(resample(e, g, method = "near") >= 0.5, a$out[i], datatype = "INT1U", gdal = "COMPRESS=DEFLATE", overwrite = TRUE); NULL }, a = a); stopCluster(cl) } }
 for (i in seq_len(nrow(custom))) { k <- make.names(custom$Name[i]); if (is.na(custom$File[i]) || !file.exists(custom$File[i])) fail("Suitability Covariates: custom raster %s not found (%s)", custom$Name[i], custom$File[i])
   f <- cf(paste0("custom_", k)); if (!file.exists(f)) writeRaster(resample(rast(custom$File[i]), G, method = "bilinear"), f, overwrite = TRUE) }
-say("Fitting layers ready: annual NLCD %d-%d, developed%s distance and share (epochs %s), roads, terrain, GAP, county, housing density 1990-2020, fire perimeters%s%s%s",
+say("Fitting layers ready: annual NLCD %d-%d, developed%s distance and share (epochs %s), roads, terrain, GAP, county, housing density 1990-2020, fire perimeters%s%s%s%s",
     y0, y1, if (need_ag) " and agriculture" else "", paste(EPOCHS, collapse = ", "), if (file.exists(cf("nccpi"))) ", NCCPI" else "",
-    if (file.exists(cf("owner"))) ", forest owner" else "", if (length(lf_types)) paste0(", LANDFIRE ", paste(lf_types, collapse = ", ")) else "")
+    if (file.exists(cf("owner"))) ", forest owner" else "", if (length(lf_types)) paste0(", LANDFIRE ", paste(lf_types, collapse = ", ")) else "", if (length(lc_kinds)) ", LCMS Tree Removal" else "")
 say("Covariates (%s): %s", cv_src, paste(vapply(fitted_s, function(s) sprintf("%s = %s", s, paste(cov_for(s)[, ifelse(Covariate == "Custom raster", Name, Covariate)], collapse = ", ")), ""), collapse = "; "))
 progressBar()
 lc_group <- function(n) data.table::fcase(n %in% 41:43, "Forest", n == 52, "Shrub", n == 71, "Grass", n %in% 81:82, "Agriculture", n %in% c(90, 95), "Wetland", n == 31, "Barren", default = NA_character_)
@@ -234,8 +249,9 @@ for (sname in unique(al$Surface)) {
   # who is eligible (Source Classes, the Target group's excluded GAP status) and what an event is (Event Classes)
   sc <- codes_of(gs$SourceClasses[1]); exg <- codes_of(gs$ExGap[1]); inS <- function(x) if (length(sc)) x %in% sc else !(x %in% NOT_SOURCE)
   lft <- if (grepl("^LANDFIRE:", gs$EventClasses[1])) sub("^LANDFIRE:\\s*", "", gs$EventClasses[1]) else NA_character_
-  to <- if (is.na(lft)) suppressWarnings(codes_of(gs$EventClasses[1])) else integer()
-  if (meth == "Fitted" && is.na(lft) && (!length(to) || anyNA(to))) fail("Projection Allocation: surface %s needs Event Classes (NLCD codes or LANDFIRE:<type>)", sname)
+  lck <- if (grepl("^LCMS:", gs$EventClasses[1])) sub("^LCMS:\\s*", "", gs$EventClasses[1]) else NA_character_
+  to <- if (is.na(lft) && is.na(lck)) suppressWarnings(codes_of(gs$EventClasses[1])) else integer()
+  if (meth == "Fitted" && is.na(lft) && is.na(lck) && (!length(to) || anyNA(to))) fail("Projection Allocation: surface %s needs Event Classes (NLCD codes, LANDFIRE:<type> or LCMS:standrep|partial)", sname)
   # adjacency in the run: developed share for developed events, agriculture share for agriculture events
   attr_k <- if (length(to) && all(to %in% DEV)) "Developed" else if (length(to) && all(to %in% 81:82)) "Agriculture" else NA_character_
   if (adj && is.na(attr_k)) { say("%s: adjacency applies to developed or agriculture events only - off", sname); adj <- FALSE }
@@ -244,14 +260,20 @@ for (sname in unique(al$Surface)) {
     terms <- terms_for(sname); if (!length(terms)) fail("Suitability Covariates: no covariate is switched on for surface %s", sname)
     a <- list(nl = setNames(vapply(YRS, nl_c, ""), YRS), lp = lapply(setNames(YRS[-1], YRS[-1]), function(y) layer_paths(y - 1)), bf = setNames(vapply((y0 - burn_w):y1, bf, ""), (y0 - burn_w):y1),
               lf = if (!is.na(lft)) setNames(vapply(YRS[-1], lf_c, "", t = lft), YRS[-1]) else NULL, reg = cf("region"), gap = cf("gap"), sc = sc, nots = NOT_SOURCE, exg = exg,
+              lc = if (!is.na(lck)) setNames(vapply(YRS[-1], lc_c, ""), YRS[-1]) else NULL, kind = lck, y1 = y1,
               to = to, nctrl = nctrl, bw = burn_w, nc = ncol(G), patch = patch_sizes, clear = clear_syncrosim_proj)
     res_y <- parLapply(cl, YRS[-1], function(y, a) { a$clear(); terraOptions(progress = 0, memfrac = 0.04)
       v <- function(f) values(rast(f), mat = FALSE); inS <- function(x) if (length(a$sc)) x %in% a$sc else !(x %in% a$nots)
       p <- v(a$nl[[as.character(y - 1)]]); q <- v(a$nl[[as.character(y)]]); g <- v(a$gap); rg <- v(a$reg)
       burn <- Reduce(`|`, lapply((y - a$bw):y, function(k) { b <- v(a$bf[[as.character(k)]]); !is.na(b) & b > 0 }))
       el <- which(!is.na(rg) & !is.na(p) & inS(p) & !(g %in% a$exg) & !burn)
-      isev <- if (!is.null(a$lf)) { e <- v(a$lf[[as.character(y)]])[el]; !is.na(e) & e > 0 } else q[el] %in% a$to
-      ev <- el[isev]; ne <- el[!isev & inS(q[el])]   # controls: eligible cells that stayed within the source classes
+      # LCMS: Tree Removal, stand-replacing when NLCD shows shrub or grass that year or within two; no tree removal is a control
+      tr <- if (!is.null(a$lc)) { e <- v(a$lc[[as.character(y)]])[el]; !is.na(e) & e > 0 } else rep(FALSE, length(el))
+      isev <- if (!is.null(a$lf)) { e <- v(a$lf[[as.character(y)]])[el]; !is.na(e) & e > 0
+      } else if (!is.null(a$lc)) { sr <- Reduce(`|`, lapply(y:min(y + 2, a$y1), function(k) v(a$nl[[as.character(k)]])[el] %in% c(52, 71)))
+        if (a$kind == "standrep") tr & sr else tr & !sr
+      } else q[el] %in% a$to
+      ev <- el[isev]; ne <- el[!isev & !tr & inS(q[el])]   # controls: eligible cells that stayed within the source classes
       set.seed(y); ctrl <- if (length(ne)) sample(ne, min(a$nctrl, length(ne))) else integer(); cells <- c(ev, ctrl)
       d <- data.table(Year = y, Event = rep(c(1L, 0L), c(length(ev), length(ctrl))), W = rep(c(1, length(ne) / max(1, length(ctrl))), c(length(ev), length(ctrl))), LC = lc_group(p[cells]))
       for (k in names(a$lp[[as.character(y)]])) d[[k]] <- v(a$lp[[as.character(y)]][[k]])[cells]
@@ -280,7 +302,10 @@ for (sname in unique(al$Surface)) {
     if (test_y > 0 && y1 - test_y > y0 + 5) { ty <- y1 - test_y
       m1 <- fitm(smp[Year <= ty]); cells <- which(!is.na(reg_m))
       pr <- pred_g(m1, ty, cells); a0 <- values(rast(nl_c(ty)), mat = FALSE)[cells]
-      hit <- if (!is.na(lft)) Reduce(`|`, lapply((ty + 1):y1, function(k) { e <- values(rast(lf_c(lft, k)), mat = FALSE)[cells]; !is.na(e) & e > 0 })) else values(rast(nl_c(y1)), mat = FALSE)[cells] %in% to
+      hit <- if (!is.na(lft)) Reduce(`|`, lapply((ty + 1):y1, function(k) { e <- values(rast(lf_c(lft, k)), mat = FALSE)[cells]; !is.na(e) & e > 0 }))
+        else if (!is.na(lck)) Reduce(`|`, lapply((ty + 1):y1, function(k) { e <- values(rast(lc_c(k)), mat = FALSE)[cells]; t <- !is.na(e) & e > 0
+          sr <- Reduce(`|`, lapply(k:min(k + 2, y1), function(j) values(rast(nl_c(j)), mat = FALSE)[cells] %in% c(52, 71))); if (lck == "standrep") t & sr else t & !sr }))
+        else values(rast(nl_c(y1)), mat = FALSE)[cells] %in% to
       burn <- Reduce(`|`, lapply((ty - burn_w):y1, function(k) { b <- values(rast(bf(k)), mat = FALSE)[cells]; !is.na(b) & b > 0 }))
       el <- !is.na(a0) & inS(a0) & !(gapv[cells] %in% exg) & !burn
       v <- data.table(p = pr[el], n = hit[el])[order(-p)][, `:=`(land = seq_len(.N) / .N, got = cumsum(n) / max(1, sum(n)))]

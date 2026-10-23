@@ -17,5 +17,5 @@ Ag Contraction,NaturalVeg,,each type's destination class is gated to the nearest
 Fire: Low Severity [Type],Mtbs,1|2,MTBS 1 = unburned to low (kept as low; the CONUS 1km build did the same)
 Fire: Medium Severity [Type],Mtbs,3,
 Fire: High Severity [Type],Mtbs,4,
-Forest Harvest: Forest Clearcut [Type],NlcdClearcut,41|42|43>52|71,modal NLCD cell goes from forest to shrub or grass and less than half of it burned (MTBS) that year or the year before
-Forest Harvest: Forest Selection [Type],Landfire,Thinning,LANDFIRE disturbance type (by each year's attribute table)
+Forest Harvest: Forest Clearcut [Type],Lcms,9>standrep,"LCMS Tree Removal on last year's forest that NLCD shows as shrub or grass that year or within two (user decision 2026-10-23; was the NLCD rule 41|42|43>52|71)"
+Forest Harvest: Forest Selection [Type],Lcms,9>partial,"LCMS Tree Removal on last year's forest that stays forest (was LANDFIRE Thinning, 1999 on only)"

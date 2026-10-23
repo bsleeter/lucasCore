@@ -1,8 +1,8 @@
 # Run stage 6 alone on the latest stage 5 result of a library (tests/phaseD-transitions.R builds one)
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
-a <- commandArgs(TRUE); f <- if (length(a)) a[1] else "F:/lucasCore/dev/libs/lucasCore-transitions-California.ssim"
+a <- commandArgs(TRUE); f <- if (length(a)) a[1] else "F:/lucasCore/dev/libs/lucasCore-transitions-California.ssim"   # [library] [result id with stage 5]
 L <- ssimLibrary(f); P <- rsyncrosim::project(L, "Definitions"); sc <- as.data.table(scenario(L, summary = TRUE))
-r5 <- max(sc[IsResult == "Yes", ScenarioId])
+r5 <- if (length(a) > 1) as.integer(a[2]) else max(sc[IsResult == "Yes", ScenarioId])
 S <- rsyncrosim::scenario(P, sprintf("Historical transitions on result %d", r5)); dependency(S) <- r5
 description(S) <- sprintf("Stage 6 alone (dev/run_stage6_on_result.R) on the stage 1 + 5 result %d: historical transition pathways and annual spatial multipliers.", r5)
 saveDatasheet(S, data.frame(StageNameId = "6 - Historical Transitions", RunOrder = 1), "core_Pipeline")

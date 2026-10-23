@@ -7,5 +7,5 @@ Ag Expansion: Cropland [Type],Fitted,Ag Expansion,31|41|42|43|52|71|90|95,81|82,
 Ag Expansion: Pasture [Type],Fitted,Ag Expansion,31|41|42|43|52|71|90|95,81|82,Yes,
 Ag Contraction: Cropland,Fitted,Ag Contraction,81|82,31|41|42|43|52|71|90|95,No,"pasture or cropland -> natural (to developed is urbanization); the stage 6 gates pick the natural class"
 Ag Contraction: Pasture,Fitted,Ag Contraction,81|82,31|41|42|43|52|71|90|95,No,
-Forest Harvest: Forest Clearcut [Type],Fitted,Clearcut,41|42|43,52|71,No,"forest -> shrub or grass, not burned (the stage 6 clearcut rule)"
-Forest Harvest: Forest Selection [Type],Fitted,Selection,41|42|43,LANDFIRE:Thinning,No,LANDFIRE disturbance type Thinning on forest
+Forest Harvest: Forest Clearcut [Type],Fitted,Clearcut,41|42|43,LCMS:standrep,No,"LCMS Tree Removal on forest that becomes shrub or grass (the stage 6 clearcut source)"
+Forest Harvest: Forest Selection [Type],Fitted,Selection,41|42|43,LCMS:partial,No,LCMS Tree Removal on forest that stays forest (the stage 6 selection source)
