@@ -123,7 +123,7 @@
 		<dataSheet name="RuleWeight"/>
 	</dataFeed>
 
-	<dataSheet name="FireOptions" displayName="Fire Options (projection)" isSingleRow="True">
+	<dataSheet name="FireOptions" displayName="Fire" isSingleRow="True" viewClassName="lucasCoreUI.FireOptionsView" viewClassAssembly="lucasCoreUI">
 		<!-- stage 9 (user decisions 2026-10-23): how projected fire works. 1 = the drawn historical year's burned fraction per pyrome, fires
 		     sized from the interagency perimeters, the drawn year's severity mix, slope selectivity; 2 = as 1, spread and ignitions guided by
 		     a burn probability; 3 = whole lucasFireC2F seasons (later). Dynamic coupling comes after these are tested -->
