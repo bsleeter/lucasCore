@@ -119,7 +119,8 @@ pr <- pt[Method == "Probability" & !TransitionGroupId %in% ann]
 if (nrow(pr)) { say("Probability named groups split into their members: %s", paste(vapply(pr$TransitionGroupId, function(g) sprintf("%s (%s)", g, paste(mem[[g]], collapse = ", ")), ""), collapse = "; "))
   pt <- rbind(pt[!TransitionGroupId %in% pr$TransitionGroupId], pr[, .(TransitionGroupId = mem[[TransitionGroupId]]), by = setdiff(names(pr), "TransitionGroupId")], use.names = TRUE)
   for (g in pt$TransitionGroupId) if (is.null(mem[[g]])) mem[[g]] <- g }
-type_shares <- isTRUE(as.logical(nz(po$HistoricalTypeShares, FALSE)))
+# default on (user decision 2026-10-22): a blank setting weights the types by their historical shares
+type_shares <- { v <- nz(po$HistoricalTypeShares, TRUE); isTRUE(as.logical(v)) || identical(v, -1L) || identical(v, 1L) }
 # a group's historical map for year y (stage 6 writes one row per group and year; Off.tif = nothing happened)
 # (a build that already ran stage 9 holds Probability groups' historical rows per iteration instead: take iteration 1's, which are
 # copies of the shared row)

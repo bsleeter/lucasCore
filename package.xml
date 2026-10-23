@@ -127,7 +127,7 @@
 		<column name="Iterations" displayName="Iterations (Monte Carlo)" dataType="Integer" defaultValue="10" validationType="WholeNumber" validationCondition="Greater" formula1="0"/>
 		<column name="RandomSeed" displayName="Random Seed (draws of historical years)" dataType="Integer" defaultValue="1"/>
 		<column name="SpatialTiles" displayName="Spatial Multiprocessing Tiles (blank = none; tiles are whole units of the target strata)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1"/>
-		<column name="HistoricalTypeShares" displayName="Weight a named group's types by their historical shares (off = the spatial allocation decides)" dataType="Boolean" defaultValue="0" isOptional="True"/>
+		<column name="HistoricalTypeShares" displayName="Weight a named group's types by their historical shares (default; off = the spatial allocation decides)" dataType="Boolean" defaultValue="-1" isOptional="True"/>
 	</dataSheet>
 
 	<!-- stage 10: where projected transitions go (user decisions 2026-10-22: fitted regression or the old rules, chosen per group) -->

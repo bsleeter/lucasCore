@@ -27,8 +27,8 @@ namespace lucasCoreUI
         private readonly CheckBox m_allYears = new CheckBox { Text = "All historical transition years", AutoSize = true, Margin = new Padding(3, 5, 18, 3) };
         private readonly TextBox m_from = Box(60), m_to = Box(60);
         private readonly TextBox m_iter = Box(60), m_seed = Box(60);
-        private readonly RadioButton m_spatial = new RadioButton { Text = "The spatial allocation decides (default)", AutoSize = true, Margin = new Padding(3, 3, 18, 3) };
-        private readonly RadioButton m_shares = new RadioButton { Text = "Weight each type by its historical share", AutoSize = true };
+        private readonly RadioButton m_spatial = new RadioButton { Text = "The spatial allocation decides", AutoSize = true, Margin = new Padding(3, 3, 18, 3) };
+        private readonly RadioButton m_shares = new RadioButton { Text = "Weight each type by its historical share (default)", AutoSize = true };
         private readonly CheckBox m_tiled = new CheckBox { Text = "Split the landscape into tiles:", AutoSize = true, Margin = new Padding(3, 5, 6, 3) };
         private readonly TextBox m_tiles = Box(50);
         private List<Item> m_runs = new List<Item>();
@@ -109,7 +109,7 @@ namespace lucasCoreUI
 
             m_iter.Text = Show(Value("Iterations")); m_seed.Text = Show(Value("RandomSeed"));
             object sh = Value("HistoricalTypeShares");
-            bool shares = sh != DBNull.Value && Convert.ToBoolean(sh);
+            bool shares = sh == DBNull.Value || Convert.ToBoolean(sh);   // blank = historical shares (the default)
             m_shares.Checked = shares; m_spatial.Checked = !shares;
             object tiles = Value("SpatialTiles");
             m_tiled.Checked = tiles != DBNull.Value && Convert.ToInt32(tiles) > 1; m_tiles.Enabled = m_tiled.Checked; m_tiles.Text = Show(tiles);
