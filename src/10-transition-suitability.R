@@ -433,9 +433,9 @@ if (length(patches)) {
     sd_rows[[t]] <- data.table(TransitionGroupId = t, MaximumArea = br * cell_ha * per_ha, RelativeAmount = cnt)[RelativeAmount > 0]
     say("%s: size distribution (%s) from %d historical patches (median %.1f ha, largest %d cells; %.0f%% one cell)", t, mode, length(n), median(p$Cells) * fit_ha, max(n), 100 * one) }
   if (length(ps_rows)) write_ds(rbindlist(ps_rows), "OutputPatchSize")
-  if (length(sd_rows)) {
-    write_stsim(rbindlist(sd_rows), "TransitionSizeDistribution")
-    write_stsim(data.table(TransitionGroupId = names(sd_rows), Priority = "None", MaximizeFidelityToDistribution = TRUE, MaximizeFidelityToTotalArea = TRUE), "TransitionSizePrioritization") }
+  # from the historical end + 1, replacing only these groups' rows (stage 9 writes fire's)
+  pri <- if (length(sd_rows)) data.table(TransitionGroupId = names(sd_rows), Priority = "None", MaximizeFidelityToDistribution = TRUE, MaximizeFidelityToTotalArea = TRUE) else data.table()
+  write_size_dist(rbindlist(sd_rows), pri, unique(al$Target), y1 + 1L)
 }
 check(STAGE, "every allocated group has a multiplier from the historical end + 1", all(al$TransitionGroupId %in% names(new_rows)))
 write_ds(rbindlist(out_sum, fill = TRUE), "OutputSuitability")

@@ -121,6 +121,17 @@
 		<dataSheet name="RuleWeight"/>
 	</dataFeed>
 
+	<dataSheet name="FireOptions" displayName="Fire Options (projection)" isSingleRow="True">
+		<!-- stage 9 (user decisions 2026-10-23): how projected fire works. 1 = the drawn historical year's burned fraction per pyrome, fires
+		     sized from the interagency perimeters, the drawn year's severity mix, slope selectivity; 2 = as 1, spread and ignitions guided by
+		     a burn probability; 3 = whole lucasFireC2F seasons (later). Dynamic coupling comes after these are tested -->
+		<column name="TransitionGroupId" displayName="Fire Group (blank = Fire)" dataType="Integer" validationType="Datasheet" formula1="stsim_TransitionGroup" isOptional="True"/>
+		<column name="FireMethod" displayName="Fire Method" dataType="Integer" validationType="List" formula1="1:Historical rates|2:Burn probability|3:lucasFireC2F seasons" defaultValue="1"/>
+		<column name="SlopeSelectivity" displayName="Slope Selectivity (burned share by slope, from the fire record)" dataType="Boolean" defaultValue="-1"/>
+		<column name="BurnProbabilityFile" displayName="Burn Probability Raster (method 2; blank = FSim CONUS 270 m)" dataType="String" isOptional="True"/>
+		<column name="IgnitionSource" displayName="Ignitions (method 2)" dataType="Integer" validationType="List" formula1="1:Burn probability|2:FPA-FOD ignition density" defaultValue="1" isOptional="True"/>
+	</dataSheet>
+
 	<dataSheet name="ProjectionOptions" displayName="Projection Options" isSingleRow="True">
 		<!-- stage 9: projection transitions resample whole historical years (Build Options sets the projection end year) -->
 		<column name="ReferenceStartYear" displayName="Reference Period Start (blank = first historical transition year)" dataType="Integer" isOptional="True"/>
@@ -394,6 +405,20 @@
 		<column name="AgeBlockedArea" displayName="Area below the Pathway Minimum Age (km2)" dataType="Double" format="0.00"/>
 	</dataSheet>
 
+	<dataSheet name="OutputFireSize" displayName="Historical Fire Sizes (interagency perimeters, model cells)">
+		<column name="MaximumCells" displayName="Size Class (up to N model cells)" dataType="Integer"/>
+		<column name="MaximumArea" displayName="Size Class (up to, amount units)" dataType="Double" format="0.00"/>
+		<column name="Fires" dataType="Integer"/>
+		<column name="Share" displayName="Share of Fires" dataType="Double" format="0.000"/>
+	</dataSheet>
+	<dataSheet name="OutputFireSlope" displayName="Fire Slope Selectivity (burned share by slope)">
+		<column name="SlopeFrom" displayName="Slope From (degrees)" dataType="Double"/>
+		<column name="SlopeTo" displayName="Slope To (degrees)" dataType="Double"/>
+		<column name="Cells" dataType="Integer"/>
+		<column name="BurnedPerYear" displayName="Burned Fraction per Year" dataType="Double" format="0.00000"/>
+		<column name="Ratio" displayName="Selectivity (1 = average)" dataType="Double" format="0.000"/>
+	</dataSheet>
+
 	<dataSheet name="OutputProjectionSchedule" displayName="Projection Schedule (historical year drawn)">
 		<column name="Iteration" dataType="Integer"/>
 		<column name="Timestep" dataType="Integer"/>
@@ -537,6 +562,7 @@
 
 	<transformer name="ProjectionTransitions" displayName="9 - Projection Transitions" isRunnable="True" programName="Rscript" programArguments="src/9-projection-transitions.R">
 		<dataSheet name="BuildOptions" type="Input"/>
+		<dataSheet name="FireOptions" type="Input"/>
 		<dataSheet name="ProjectionOptions" type="Input"/>
 		<dataSheet name="ProjectionStart" type="Input"/>
 		<dataSheet name="ProjectionTransition" type="Input"/>
@@ -548,6 +574,10 @@
 		<dataSheet name="core_SpatialMultiprocessing" type="Output"/>
 		<dataSheet name="OutputProjectionSchedule" type="Output"/>
 		<dataSheet name="OutputProjectionRate" type="Output"/>
+		<dataSheet name="OutputFireSize" type="Output"/>
+		<dataSheet name="OutputFireSlope" type="Output"/>
+		<dataSheet name="stsim_TransitionSizeDistribution" type="Both"/>
+		<dataSheet name="stsim_TransitionSizePrioritization" type="Both"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
@@ -601,6 +631,7 @@
 				<item name="ProjectionRun"/>
 				<item name="ProjectionTransitions"/>
 				<item name="SpatialAllocation"/>
+				<item name="FireOptions"/>
 			</group>
 			<group name="lucasCoreCrosswalks" displayName="Crosswalks">
 				<item name="LandCoverCrosswalk"/>
@@ -618,6 +649,8 @@
 				<item name="OutputTransitionSummary"/>
 				<item name="OutputProjectionRate"/>
 				<item name="OutputProjectionSchedule"/>
+				<item name="OutputFireSize"/>
+				<item name="OutputFireSlope"/>
 				<item name="OutputSuitability"/>
 				<item name="OutputSuitabilityCurve"/>
 				<item name="OutputSuitabilityMap"/>

@@ -13,6 +13,11 @@
 #   * named groups (the default rules, 2026-10-22): a Target named group (Urbanization) gets one area per unit and year, its members'
 #     areas summed, and the spatial allocation decides which member type each cell gets; Historical Type Shares (Projection Options)
 #     weights the members by their historical shares instead. A Probability named group (Fire) is split into its members
+#   * fire (Fire Options; user decisions 2026-10-23): the fire group stays one group. Method 1: each drawn year gives every pyrome its
+#     burned fraction of the burnable land (the group's map, times a slope selectivity fitted as the burned share by slope in the
+#     historical fire maps, rescaled within the pyrome so its total holds); each severity type gets the drawn year's own share of
+#     that pyrome's burned area; fires are sized from the interagency perimeters (wildfire, one per incident and year) as an ST-Sim
+#     size distribution from the historical end + 1. Methods 2 (burn probability) and 3 (lucasFireC2F seasons) come next
 #   * Probability: the group's burned (or changed) fraction of the eligible area of each unit of any Stratum Source in the drawn year,
 #     as a per-cell multiplier map; it does not depend on the strata, so fire can use pyromes while land use uses counties
 #   * None: the group stays off after the historical end (stage 6's Off rows)
@@ -22,7 +27,7 @@
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
 source(pkg_file("src", "strata.R"))
-suppressPackageStartupMessages({ library(terra) })
+suppressPackageStartupMessages({ library(terra); library(sf) })
 STAGE <- "9 Projection Transitions"
 progressBar(type = "begin", totalSteps = 6)
 
@@ -115,7 +120,12 @@ miss <- pt[Method != "None" & lengths(mem[TransitionGroupId]) == 0, TransitionGr
 if (length(miss)) { say("No historical multiplier maps for %s: off in the projection", paste(miss, collapse = "; ")); pt[TransitionGroupId %in% miss, Method := "None"] }
 tm <- unlist(mem[pt[Method == "Target", TransitionGroupId]], use.names = FALSE)
 if (anyDuplicated(tm)) fail("Projection Transitions: %s would be targeted twice (a group and its own members, or two groups sharing members, are both Target)", paste(unique(tm[duplicated(tm)]), collapse = "; "))
-pr <- pt[Method == "Probability" & !TransitionGroupId %in% ann]
+# the fire group (Fire Options) is not split: its severity members get the drawn year's shares (below)
+fo <- read_ds("FireOptions"); fire_g <- nz(fo$TransitionGroupId, "Fire")
+fire_m <- c(Historical = 1L, Burn = 2L, lucasFireC2F = 3L)[sub(" .*", "", as.character(nz(fo$FireMethod, "Historical")))]; if (is.na(fire_m)) fire_m <- 1L
+slope_on <- { v <- nz(fo$SlopeSelectivity, TRUE); isTRUE(as.logical(v)) || identical(v, -1L) || identical(v, 1L) }
+if (fire_m > 1) fail("Fire Options: method %d is not built yet (only 1, Historical rates)", fire_m)
+pr <- pt[Method == "Probability" & !TransitionGroupId %in% ann & TransitionGroupId != fire_g]
 if (nrow(pr)) { say("Probability named groups split into their members: %s", paste(vapply(pr$TransitionGroupId, function(g) sprintf("%s (%s)", g, paste(mem[[g]], collapse = ", ")), ""), collapse = "; "))
   pt <- rbind(pt[!TransitionGroupId %in% pr$TransitionGroupId], pr[, .(TransitionGroupId = mem[[TransitionGroupId]]), by = setdiff(names(pr), "TransitionGroupId")], use.names = TRUE)
   for (g in pt$TransitionGroupId) if (is.null(mem[[g]])) mem[[g]] <- g }
@@ -202,8 +212,66 @@ for (i in seq_len(nrow(tg))) { g <- tg$TransitionGroupId[i]; L <- tg$StrataLevel
       if (length(ex)) sprintf("; %.0f%% of eligible land allowed (not GAP %s)", 100 * share, paste(ex, collapse = ", ")) else "") }
 progressBar()
 
+# ---- fire (method 1): the pyrome's burned fraction x slope selectivity, the drawn year's severity mix, perimeter fire sizes -----------
+fire_rows <- pt[Method == "Probability" & TransitionGroupId == fire_g]; fire_sd <- data.table(); fire_out <- list()
+if (nrow(fire_rows)) { g <- fire_g; ms <- mem[[g]]; u <- unit_map(fire_rows$UnitSource[1]); el <- elig(g); units <- sort(unique(u[el]))
+  den <- vapply(units, function(k) sum(el & u == k), 0); dr <- sched[SamplingSet == fire_rows$SamplingSet[1]]
+  # burned cells by severity member, unit and year
+  A <- lapply(ms, function(m) { a <- vapply(ref, function(y) { v <- hist_vals(m, y); vapply(units, function(k) sum(v[el & u == k]), 0) }, numeric(length(units)))
+    matrix(a, nrow = length(units), dimnames = list(units, ref)) })
+  tot <- Reduce(`+`, A); fr <- tot / pmax(den, 1)
+  # slope selectivity: burned fraction per year by 30 m slope (averaged to the model grid) relative to the average, shrunk to 1 where few cells
+  w <- rep(1, length(land))
+  if (slope_on) { dem <- rast(read_data_sources("ElevationFile")$ElevationFile)
+    d <- crop(dem, project(as.polygons(ext(P), crs = crs(P)), crs(dem)), snap = "out"); sl <- values(project(terrain(d, "slope", unit = "degrees"), P, method = "average"), mat = FALSE)
+    b <- Reduce(`+`, lapply(ms, function(m) Reduce(`+`, lapply(ref, function(y) hist_vals(m, y))))) / length(ref)
+    ok <- el & !is.na(sl); brk <- c(0, 5, 10, 15, 20, 25, 30, 35, 90); bin <- findInterval(sl[ok], brk, rightmost.closed = TRUE); mb <- mean(b[ok]); K <- 30
+    st <- data.table(bin = bin, b = b[ok])[, .(Cells = .N, B = sum(b)), by = bin][order(bin)]
+    st[, `:=`(SlopeFrom = brk[bin], SlopeTo = brk[bin + 1], BurnedPerYear = B / Cells, Ratio = ((B + K * mb) / (Cells + K)) / max(mb, 1e-12))]
+    mid <- (st$SlopeFrom + pmin(st$SlopeTo, 45)) / 2
+    w[ok] <- if (nrow(st) > 1) approx(mid, st$Ratio, sl[ok], rule = 2)$y else 1
+    fire_out$slope <- st[, .(SlopeFrom, SlopeTo, Cells, BurnedPerYear, Ratio)]
+    say("%s slope selectivity (burned share by slope, %d-%d): %s", g, rs, re, paste(sprintf("%g-%g deg %.2f", st$SlopeFrom, st$SlopeTo, st$Ratio), collapse = "; ")) }
+  wn <- rep(0, length(land)); for (k in units) { i <- el & u == k; wn[i] <- w[i] / mean(w[i]) }
+  # severity shares: the drawn year's mix in the unit; a unit and year without fire takes its long-term mix (no fire burns then anyway)
+  lt <- matrix(vapply(A, rowSums, numeric(length(units))), nrow = length(units)); all_sh <- colSums(lt) / max(sum(lt), 1e-12)
+  lt <- lt / pmax(rowSums(lt), 1e-12); lt[rowSums(lt) == 0, ] <- matrix(all_sh, sum(rowSums(lt) == 0), length(ms), byrow = TRUE)
+  ffile <- list(); sfile <- list(); lost <- 0; tot_p <- 0; nm_g <- gsub("[^A-Za-z0-9]+", "-", sub(TYPE_SUFFIX, "", g, fixed = TRUE))
+  for (y in sort(unique(dr$HistoricalYear))) { yc <- as.character(y); m <- rep(NA_real_, length(land)); m[land] <- 0
+    p <- fr[match(u[el], units), yc] * wn[el]; lost <- lost + sum(pmax(p - 1, 0)); tot_p <- tot_p + sum(p); m[el] <- pmin(1, p)
+    ffile[[yc]] <- write_raster(setValues(rast(P), m), sprintf("Projection-%s_%d.tif", nm_g, y), "FLT4S")
+    for (j in seq_along(ms)) { s <- ifelse(tot[, yc] > 0, A[[j]][, yc] / pmax(tot[, yc], 1e-12), lt[, j]); v <- rep(NA_real_, length(land)); v[land] <- 0
+      v[el] <- s[match(u[el], units)]
+      sfile[[paste(ms[j], yc)]] <- write_raster(setValues(rast(P), v), sprintf("Projection-%s-Share_%d.tif", gsub("[^A-Za-z0-9]+", "-", sub(TYPE_SUFFIX, "", ms[j], fixed = TRUE)), y), "FLT4S") } }
+  new_sm[[g]] <- dr[, .(Iteration, Timestep, TransitionGroupId = g, MultiplierFileName = unlist(ffile[as.character(HistoricalYear)]))]
+  for (m in ms) { h <- sm[TransitionGroupId == m & is.na(Iteration) & Timestep <= y1]; if (!nrow(h)) h <- sm[TransitionGroupId == m & Iteration %in% 1L & Timestep <= y1]
+    new_sm[[m]] <- rbind(h[, .(Iteration = rep(seq_len(nit), each = .N), Timestep = rep(Timestep, nit), TransitionGroupId = m, MultiplierFileName = rep(MultiplierFileName, nit))],
+                         dr[, .(Iteration, Timestep, TransitionGroupId = m, MultiplierFileName = unlist(sfile[paste(m, HistoricalYear)]))]) }
+  ua <- fr * den * cell_km2
+  rates[[g]] <- data.table(TransitionGroup = g, Method = "Probability (fire)", Unit = sprintf("%s %s", fire_rows$UnitSource[1], units), MeanArea = rowMeans(ua),
+                           MinArea = apply(ua, 1, min), MaxArea = apply(ua, 1, max), AllowedShare = 1)
+  say("%s: rate by %s (%d units), mean %.2f km2/yr over %d-%d; severity %s; %d distinct years drawn%s", g, fire_rows$UnitSource[1], length(units), sum(rowMeans(ua)), rs, re,
+      paste(sprintf("%s %.0f%%", sub(".*: | \\[Type\\]", "", ms), 100 * all_sh), collapse = " / "), uniqueN(dr$HistoricalYear),
+      if (lost > 0) sprintf("; %.2f%% of the drawn area above probability 1 after slope selectivity (cut)", 100 * lost / max(tot_p, 1e-12)) else "")
+  # fire sizes: interagency perimeters (wildfire; daily perimeters and prescribed fire left out; one per incident and year, its
+  # largest record) touching the units, in model cells, as the fire group's size distribution
+  fp_src <- read_data_sources("FirePerimeterHistoryFile")$FirePerimeterHistoryFile; lay <- tools::file_path_sans_ext(basename(fp_src))
+  fp <- st_read(fp_src, query = sprintf("SELECT FIRE_YEAR_, INCIDENT, FEATURE_CA, GIS_ACRES FROM \"%s\" WHERE FIRE_YEAR_ >= %d AND FIRE_YEAR_ <= %d", lay, rs, re), quiet = TRUE)
+  fp <- fp[fp$FEATURE_CA %in% c("Wildfire", "Wildfire Final Fire Perimeter", "Wildfire for Resource Benefit") & !is.na(fp$GIS_ACRES) & fp$GIS_ACRES > 0, ]
+  upoly <- strata_polygons(rows[[fire_rows$UnitSource[1]]], env$PackageDirectory); upoly <- st_union(upoly[upoly$StratumId %in% units, ])
+  fp <- st_transform(st_make_valid(fp), st_crs(upoly)); fp <- fp[lengths(st_intersects(fp, upoly)) > 0, ]
+  fd <- as.data.table(st_drop_geometry(fp))[, .(Acres = max(as.numeric(GIS_ACRES))), by = .(FIRE_YEAR_, Incident = toupper(trimws(INCIDENT)))]
+  cell_ha <- prod(res(P)) / 1e4; n <- pmax(1, round(fd$Acres * 0.40468564224 / cell_ha))
+  brk <- c(1, 2, 3, 5, 10, 20, 50, 100, 200, 500, 1e3, 2e3, 5e3, 1e4, 2e4, 5e4, 1e5, 2e5, 5e5, 1e6); br <- brk[brk <= brk[min(which(brk >= max(n)))]]
+  cnt <- as.numeric(table(factor(findInterval(n, c(0, br), left.open = TRUE), levels = seq_along(br))))
+  fire_out$size <- data.table(MaximumCells = as.integer(br), MaximumArea = br * cell_amt, Fires = as.integer(cnt), Share = cnt / sum(cnt))
+  fire_sd <- data.table(TransitionGroupId = g, MaximumArea = br * cell_amt, RelativeAmount = cnt)[RelativeAmount > 0]
+  say("%s sizes: %d wildfires %d-%d touching the %s units; median %.0f ha, largest %.0f ha (%d model cells); %.0f%% one model cell",
+      g, nrow(fd), rs, re, fire_rows$UnitSource[1], median(fd$Acres) * 0.40468564224, max(fd$Acres) * 0.40468564224, max(n), 100 * mean(n == 1)) }
+progressBar()
+
 # ---- probabilities --------------------------------------------------------------------------------------------------------
-pg <- pt[Method == "Probability"]; prob_files <- list()
+pg <- pt[Method == "Probability" & TransitionGroupId != fire_g]; prob_files <- list()
 for (i in seq_len(nrow(pg))) { g <- pg$TransitionGroupId[i]; u <- unit_map(pg$UnitSource[i]); el <- elig(g); units <- sort(unique(u[el]))
   den <- vapply(units, function(k) sum(el & u == k), 0)
   dr <- sched[SamplingSet == pg$SamplingSet[i]]
@@ -241,8 +309,9 @@ if (tiles > 1) {
 }
 
 # ---- outputs ----------------------------------------------------------------------------------------------------------
-handled <- unique(c(pt[Method != "None", TransitionGroupId], unlist(mem[tg$TransitionGroupId], use.names = FALSE)))
-sm_out <- rbind(sm[!(TransitionGroupId %in% handled & (Timestep > y1 | TransitionGroupId %in% pg$TransitionGroupId)),
+fire_all <- if (nrow(fire_rows)) c(fire_g, mem[[fire_g]]) else character()   # fire group and members: all rows rewritten (per iteration)
+handled <- unique(c(pt[Method != "None", TransitionGroupId], unlist(mem[tg$TransitionGroupId], use.names = FALSE), fire_all))
+sm_out <- rbind(sm[!(TransitionGroupId %in% handled & (Timestep > y1 | TransitionGroupId %in% c(pg$TransitionGroupId, fire_all))),
                    .(Iteration, Timestep, TransitionGroupId, MultiplierFileName)], rbindlist(new_sm), fill = TRUE)
 # earlier projection targets (stage 9 run again on a build that already has them) are replaced
 if (nrow(tt) && "Timestep" %in% names(tt)) tt <- tt[!(TransitionGroupId %in% handled & !is.na(Timestep) & Timestep > y1)]
@@ -251,8 +320,11 @@ nexp <- nit * length(pyrs)
 cov <- if (length(new_tt)) rbindlist(new_tt, fill = TRUE)[, .(n = uniqueN(paste(Iteration, Timestep))), by = TransitionGroupId] else data.table(TransitionGroupId = character(), n = integer())
 check(STAGE, "every Target group has a target in every iteration and projection year", all(cov$n == nexp), paste(cov[n != nexp, TransitionGroupId], collapse = "; "))
 check(STAGE, "every Probability group has a map in every iteration and projection year",
-      all(vapply(pg$TransitionGroupId, function(g) nrow(sm_out[TransitionGroupId == g & Timestep > y1 & !is.na(MultiplierFileName)]) == nexp, TRUE)))
+      all(vapply(c(pg$TransitionGroupId, fire_all), function(g) nrow(sm_out[TransitionGroupId == g & Timestep > y1 & !is.na(MultiplierFileName)]) == nexp, TRUE)))
 write_stsim(sm_out, "TransitionSpatialMultiplier")
+if (nrow(fire_rows)) {
+  write_size_dist(fire_sd, data.table(TransitionGroupId = fire_g, Priority = "Largest", MaximizeFidelityToDistribution = TRUE, MaximizeFidelityToTotalArea = TRUE), fire_g, y1 + 1L)
+  write_ds(fire_out$size, "OutputFireSize"); if (!is.null(fire_out$slope)) write_ds(fire_out$slope, "OutputFireSlope") }
 if (nrow(tt_out)) write_stsim(tt_out[, setdiff(names(tt_out), c("TransitionTargetId", "ScenarioId")), with = FALSE], "TransitionTarget")
 write_ds(sched[order(SamplingSet, Iteration, Timestep), .(Iteration, Timestep, SamplingSet, HistoricalYear)], "OutputProjectionSchedule")
 if (length(rates)) write_ds(rbindlist(rates), "OutputProjectionRate")
