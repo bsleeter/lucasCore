@@ -45,6 +45,8 @@ namespace lucasCoreUI
         public string AllSummary = "all of CONUS";   // ... and with no units: "<Subject>: all of CONUS."
         public string Confirm = "Study Area";        // message box title
         public Action Changed;                       // after the host's sheets change
+        public Func<DataRow, bool> RowFilter = r => true;   // the rows this picker shows and edits (e.g. one surface's)
+        public Action<DataRow> NewRow = r => { };           // fills the other columns of a row it adds
 
         private readonly FlowLayoutPanel m_radios = new FlowLayoutPanel();
         private readonly ComboBox m_unitBox = new ComboBox();
@@ -157,7 +159,7 @@ namespace lucasCoreUI
         private List<Unit> SelectedUnits()
         {
             var res = new List<Unit>();
-            foreach (DataRow r in Live(UnitSheet().GetData()))
+            foreach (DataRow r in Live(UnitSheet().GetData()).Where(RowFilter))
             {
                 if (r["UnitId"] == DBNull.Value) continue;
                 Unit u; if (m_unitsByKey.TryGetValue(Convert.ToInt32(r["UnitId"]), out u)) res.Add(u);
@@ -214,7 +216,7 @@ namespace lucasCoreUI
             {
                 string msg = string.Format("Changing the kind of unit removes the {0} unit{1} already chosen. Continue?", sel.Count, sel.Count == 1 ? "" : "s");
                 if (MessageBox.Show(this, msg, Confirm, MessageBoxButtons.OKCancel, MessageBoxIcon.Question) != DialogResult.OK) { Changed(); return; }
-                DataSheet ds = UnitSheet(); ds.DeleteRows(Live(ds.GetData()).ToList());
+                DataSheet ds = UnitSheet(); ds.DeleteRows(Live(ds.GetData()).Where(RowFilter).ToList());
             }
             m_current = number;
             SaveKind(number);
@@ -231,10 +233,10 @@ namespace lucasCoreUI
             }
             if (u == null) return;
             DataSheet ds = UnitSheet(); DataTable dt = ds.GetData();
-            if (Live(dt).Any(r => r["UnitId"] != DBNull.Value && Convert.ToInt32(r["UnitId"]) == u.Key)) return;
+            if (Live(dt).Where(RowFilter).Any(r => r["UnitId"] != DBNull.Value && Convert.ToInt32(r["UnitId"]) == u.Key)) return;
             ds.BeginAddRows();
             DataRow row = dt.NewRow();
-            row["UnitId"] = u.Key;
+            row["UnitId"] = u.Key; NewRow(row);
             dt.Rows.Add(row);
             ds.EndAddRows();
             Changed();
@@ -246,7 +248,7 @@ namespace lucasCoreUI
             var keys = new HashSet<int>(m_list.SelectedItems.Cast<ListItem>().Select(x => x.Unit.Key));
             if (keys.Count == 0) return;
             DataSheet ds = UnitSheet();
-            ds.DeleteRows(Live(ds.GetData()).Where(r => r["UnitId"] != DBNull.Value && keys.Contains(Convert.ToInt32(r["UnitId"]))).ToList());
+            ds.DeleteRows(Live(ds.GetData()).Where(RowFilter).Where(r => r["UnitId"] != DBNull.Value && keys.Contains(Convert.ToInt32(r["UnitId"]))).ToList());
             Changed();
         }
     }

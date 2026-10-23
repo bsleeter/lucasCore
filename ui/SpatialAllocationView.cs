@@ -31,7 +31,8 @@ namespace lucasCoreUI
 
         private readonly UnitPicker m_region = new UnitPicker("Fit the regression on", 70);
         private readonly ComboBox m_res = new ComboBox { Width = 80, DropDownStyle = ComboBoxStyle.DropDown, Margin = new Padding(3, 3, 12, 3) };
-        private readonly TextBox m_test = Box(50), m_burn = Box(50), m_controls = Box(70), m_radius = Box(70), m_update = Box(50);
+        private readonly TextBox m_test = Box(50), m_burn = Box(50), m_controls = Box(70), m_radius = Box(70), m_update = Box(50), m_flicker = Box(50);
+        private readonly Label m_regionState = new Label { AutoSize = true, ForeColor = SystemColors.GrayText, Margin = new Padding(3, 3, 3, 6) };
         private readonly CheckBox m_patches = new CheckBox { Text = "Place patches: historical event sizes become ST-Sim size distributions", AutoSize = true };
         private readonly ComboBox m_surface = List(220);
         private readonly Label m_covState = new Label { AutoSize = true, ForeColor = SystemColors.GrayText, Margin = new Padding(8, 7, 3, 3) };
@@ -56,8 +57,14 @@ namespace lucasCoreUI
             m_region.AllText = "The study area"; m_region.AllSummary = "the study area"; m_region.Subject = "Fitting region"; m_region.Confirm = "Fitting Region";
             m_region.AllNote = "A small study area has few change events: fit on a larger region (its pyrome, neighbouring counties, the state) instead.";
             m_region.Changed = RefreshControls;
+            // the picker shows and edits the rows of the surface chosen at the top (blank Surface = every surface)
+            m_region.RowFilter = r => string.Equals(r["Surface"] == DBNull.Value ? "" : Convert.ToString(r["Surface"]), Sel, StringComparison.OrdinalIgnoreCase);
+            m_region.NewRow = r => { r["Surface"] = Sel.Length > 0 ? (object)Sel : DBNull.Value; };
+            var top = Row(); top.Controls.Add(Caption("Settings for:")); top.Controls.Add(m_surface);
+            top.Controls.Add(Note("the fitting region and covariates below apply to this surface; Every surface = the default the others inherit"));
+            AddGroup(Group("Surface", top));
             var regionHost = GridHost(260); m_region.Dock = DockStyle.Fill; regionHost.Controls.Add(m_region);
-            AddGroup(Group("Fitting region", ProjectionTransitionsView.Stack(regionHost)));
+            AddGroup(Group("Fitting region", ProjectionTransitionsView.Stack(m_regionState, regionHost)));
 
             foreach (int r in new[] { 30, 60, 90, 150, 300, 990 }) m_res.Items.Add(r.ToString());
             var fit = Form();
@@ -65,12 +72,13 @@ namespace lucasCoreUI
             FormRow(fit, "Out-of-sample test years:", m_test, "the last N historical years are held out to score the surface (0 = no test)");
             FormRow(fit, "Leave out burned pixels (years):", m_burn, "NLCD relabels burned forest as developed open space for a few years");
             FormRow(fit, "Unchanged pixels per year:", m_controls, "the controls sampled against the change events");
+            FormRow(fit, "Agriculture flicker window (years):", m_flicker, "ag events that undo a change of the last N years are NLCD flicker, not change (0 = off)");
             var fitCol = Column(); fitCol.Controls.Add(fit); fitCol.Controls.Add(m_patches);
             fitCol.Controls.Add(Wrapped("Patches: the change events of each historical year are joined into patches; each group's patch sizes, in model cells, decide how big its projected events are. Skipped where nearly all patches fit in one model cell (1 km models).", 640));
             AddGroup(Group("Fitting", fitCol));
 
             var cov = Column();
-            var sr = Row(); sr.Controls.Add(Caption("Covariates of:")); sr.Controls.Add(m_surface); sr.Controls.Add(m_covState); cov.Controls.Add(sr);
+            cov.Controls.Add(m_covState);
             var boxes = new FlowLayoutPanel { AutoSize = true, WrapContents = true, MaximumSize = new Size(760, 0), Margin = new Padding(0) };
             for (int i = 0; i < CODES.Length; i++)
             {
@@ -99,6 +107,7 @@ namespace lucasCoreUI
             m_res.SelectionChangeCommitted += (s, e) => { if (!Refreshing && m_res.SelectedItem != null) Write("FitResolution", int.Parse((string)m_res.SelectedItem)); };
             BindNumber(m_test, () => Sheet, "TestYears", true); BindNumber(m_burn, () => Sheet, "BurnWindow", true); BindNumber(m_controls, () => Sheet, "ControlsPerYear", true);
             BindNumber(m_radius, () => Sheet, "AdjacencyRadius", false); BindNumber(m_update, () => Sheet, "AdjacencyUpdate", true);
+            BindNumber(m_flicker, () => Sheet, "FlickerYears", true);
             m_patches.CheckedChanged += (s, e) => { if (!Refreshing) Write("PatchSizes", m_patches.Checked); };
             m_surface.SelectionChangeCommitted += (s, e) => RefreshControls();
             m_addCustom.Click += (s, e) => AddCustom();
@@ -127,6 +136,7 @@ namespace lucasCoreUI
                 if (File.Exists(f)) { List<string[]> rows = Defaults.ReadCsv(f); int j = Array.IndexOf(rows[0], "Surface"); if (j >= 0) names.AddRange(rows.Skip(1).Where(r => r.Length > j).Select(r => r[j])); }
             }
             names.AddRange(Rows().Select(c => c.Surface));
+            names.AddRange(Live(this.DataFeed.GetDataSheet(REGION).GetData()).Where(r => r["Surface"] != DBNull.Value).Select(r => Convert.ToString(r["Surface"])));
             m_surfaces = names.Where(n => !string.IsNullOrEmpty(n)).Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(n => n).ToList();
             m_surface.Items.Clear(); m_surface.Items.Add(EVERY); foreach (string n in m_surfaces) m_surface.Items.Add(n); m_surface.SelectedIndex = 0;
             RefreshControls();
@@ -226,7 +236,13 @@ namespace lucasCoreUI
             m_region.ShowData(editable);
             m_res.Text = Show(Value("FitResolution"));
             m_test.Text = Show(Value("TestYears")); m_burn.Text = Show(Value("BurnWindow")); m_controls.Text = Show(Value("ControlsPerYear"));
-            m_radius.Text = Show(Value("AdjacencyRadius")); m_update.Text = Show(Value("AdjacencyUpdate"));
+            m_radius.Text = Show(Value("AdjacencyRadius")); m_update.Text = Show(Value("AdjacencyUpdate")); m_flicker.Text = Show(Value("FlickerYears"));
+            List<DataRow> rrows = Live(this.DataFeed.GetDataSheet(REGION).GetData()).ToList();
+            Func<DataRow, string> rs = r => r["Surface"] == DBNull.Value ? "" : Convert.ToString(r["Surface"]);
+            int ownR = rrows.Count(r => string.Equals(rs(r), Sel, StringComparison.OrdinalIgnoreCase)), allR = rrows.Count(r => rs(r).Length == 0);
+            m_regionState.Text = Sel.Length == 0 ? "The region every surface without units of its own is fitted on." : ownR > 0 ? string.Format("{0} fits on its own {1} unit{2}.", Sel, ownR, ownR == 1 ? "" : "Sel")
+                : allR > 0 ? string.Format("{0} has no units of its own: it fits on the every-surface region ({1} unit{2}). Add units here to give it its own.", Sel, allR, allR == 1 ? "" : "Sel")
+                : string.Format("{0} has no units of its own: it fits on the study area. Add units here to give it its own.", Sel);
             object ps = Value("PatchSizes"); m_patches.Checked = ps == DBNull.Value || Convert.ToBoolean(ps);
             List<Cov> rows = Rows(); string s = Sel;
             foreach (CheckBox cb in m_cov) cb.Checked = Effective(rows, (int)cb.Tag, s);

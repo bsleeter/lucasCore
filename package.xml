@@ -152,12 +152,15 @@
 		<column name="AdjacencyUpdate" displayName="Adjacency Update Frequency (years)" dataType="Integer" defaultValue="5" validationType="WholeNumber" validationCondition="Greater" formula1="0"/>
 		<column name="RegionSourceId" displayName="Fitting Region Kind (Spatial Allocation page; blank = the study area)" dataType="Integer" validationType="Datasheet" formula1="lucasCore_StratumSource" isOptional="True"/>
 		<column name="PatchSizes" displayName="Patch Sizes (historical event sizes as ST-Sim size distributions)" dataType="Boolean" defaultValue="-1"/>
+		<column name="FlickerYears" displayName="Agriculture Flicker Window (years; drops events that undo a change of the last N years; 0 = off)" dataType="Integer" defaultValue="5" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
 	</dataSheet>
 
 	<dataSheet name="SuitabilityRegion" displayName="Suitability Fitting Region (blank = the study area)">
-		<!-- the units whose historical record the regression is fitted on: adjacent counties, the pyrome, an ecoregion, a state - any Stratum Source -->
+		<!-- the units whose historical record the regression is fitted on: adjacent counties, the pyrome, an ecoregion, a state - any Stratum Source.
+		     Per surface (user decision 2026-10-23): rows with a Surface fit that surface; rows without one fit every surface without rows of its own -->
 		<column name="UnitId" displayName="Unit" dataType="Integer" validationType="Datasheet" formula1="stsim_SecondaryStratum" allowDbNull="False"/>
-		<validation validationType="Unique" columns="UnitId"/>
+		<column name="Surface" displayName="Surface (blank = every surface without rows of its own)" dataType="String" isOptional="True"/>
+		<validation validationType="Unique" columns="UnitId|Surface"/>
 	</dataSheet>
 
 	<dataSheet name="SuitabilityCovariate" displayName="Suitability Covariates (empty = defaults/projection/covariates.csv)">

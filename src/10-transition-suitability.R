@@ -99,9 +99,16 @@ units_poly <- function(names) { uid <- ul$Id[match(names, ul$Name)]; if (anyNA(u
   parts <- split(unit_native(uid), unit_source(uid))
   do.call(rbind, lapply(names(parts), function(k) { s <- by_num[[k]]; p <- strata_polygons(s, env$PackageDirectory); p <- p[p$StratumId %in% parts[[k]], ]; st_sf(geometry = st_union(st_geometry(p))) })) }
 sa <- read_ds("StudyArea"); sr <- read_ds("SuitabilityRegion")
+if (!"Surface" %in% names(sr)) sr[, Surface := NA_character_]; sr[is.na(Surface), Surface := ""]
 study <- if (nrow(sa)) st_union(units_poly(as.character(sa$UnitId))) else st_as_sfc(st_bbox(ext(P), crs = st_crs(crs(P))))
-region <- if (nrow(sr)) st_union(units_poly(as.character(sr$UnitId))) else study
-say("Fitting region: %s; study area: %s", if (nrow(sr)) paste(sr$UnitId, collapse = ", ") else "the study area", if (nrow(sa)) paste(sa$UnitId, collapse = ", ") else "all")
+# each surface's fitting region (user decision 2026-10-23: agriculture fits where there is agriculture): its own rows, else the rows
+# for every surface, else the study area. The fitting grid covers all of them and the study area.
+reg_units <- function(s) { u <- sr[Surface == s, UnitId]; if (!length(u)) u <- sr[Surface == "", UnitId]; sort(as.character(u)) }
+reg_sets <- unique(lapply(unique(al$Surface), reg_units)); reg_key <- function(u) if (!length(u)) "study" else substr(gsub("[^A-Za-z0-9]+", "", paste(u, collapse = "")), 1, 60)
+reg_poly <- lapply(reg_sets, function(u) if (length(u)) st_union(units_poly(u)) else study); names(reg_poly) <- vapply(reg_sets, reg_key, "")
+region <- st_union(do.call(c, unname(reg_poly)))
+for (s in unique(al$Surface)) { u <- reg_units(s); say("Fitting region of %s: %s", s, if (length(u)) paste(u, collapse = ", ") else "the study area") }
+say("Study area: %s", if (nrow(sa)) paste(sa$UnitId, collapse = ", ") else "all")
 
 # ---- the fitting grid (NLCD 30 m lattice, aggregated to the fitting resolution) and its layer cache ---------------------------
 nl_file <- function(y) file.path(src$NlcdFolder, sprintf("Annual_NLCD_LndCov_%d_CU_C1V0.tif", y))
@@ -111,8 +118,12 @@ G <- if (fact > 1) aggregate(rast(crop(ref, E30)), fact) else rast(crop(ref, E30
 key <- sprintf("r%d_%d_%d_%d_%d_%d-%d", res_f, round(xmin(G)), round(ymin(G)), ncol(G), nrow(G), y0, y1)
 CA <- file.path(paste0(env$LibraryFilePath, ".data"), "lucasCore-suitability", key); dir.create(CA, recursive = TRUE, showWarnings = FALSE)
 cf <- function(k) file.path(CA, paste0(k, ".tif"))
-if (!file.exists(cf("region"))) { writeRaster(rasterize(vect(st_transform(region, crs(G))), G, 1), cf("region"), datatype = "INT1U", gdal = "COMPRESS=DEFLATE")
-  writeRaster(rasterize(vect(st_transform(study, crs(G))), G, 1), cf("study"), datatype = "INT1U", gdal = "COMPRESS=DEFLATE") }
+# masks: "region" = every surface's region together (a grid template too), "study", and one per region set (rewritten each run:
+# the same grid can come with other units)
+writeRaster(rasterize(vect(st_transform(region, crs(G))), G, 1), cf("region"), datatype = "INT1U", gdal = "COMPRESS=DEFLATE", overwrite = TRUE)
+if (!file.exists(cf("study"))) writeRaster(rasterize(vect(st_transform(study, crs(G))), G, 1), cf("study"), datatype = "INT1U", gdal = "COMPRESS=DEFLATE")
+for (k in names(reg_poly)) writeRaster(rasterize(vect(st_transform(reg_poly[[k]], crs(G))), G, 1), cf(paste0("region_", k)), datatype = "INT1U", gdal = "COMPRESS=DEFLATE", overwrite = TRUE)
+reg_file <- function(s) cf(paste0("region_", reg_key(reg_units(s))))
 say("Fitting grid: %d x %d cells of %d m (cache %s)", ncol(G), nrow(G), res_f, key)
 DEV <- 21:24; YRS <- y0:y1; EPOCHS <- unique(c(seq(y0, y1, 5), y1)); nl_c <- function(y) cf(sprintf("nlcd_%d", y))
 todo <- YRS[!file.exists(vapply(YRS, nl_c, ""))]
@@ -241,7 +252,8 @@ patch_sizes <- function(ev, nc) { if (!length(ev)) return(integer()); ev <- sort
 cl <- makeCluster(10); on.exit(stopCluster(cl), add = TRUE)
 clusterExport(cl, c("lc_group"), envir = environment()); invisible(clusterEvalQ(cl, { library(terra); library(data.table) }))
 out_sum <- list(); out_curve <- list(); out_map <- list(); adj_set <- list(); adj_mult <- list(); surf_file <- list(); patches <- list()
-reg_m <- values(rast(cf("region")), mat = FALSE); std_m <- values(rast(cf("study")), mat = FALSE); gapv <- values(rast(cf("gap")), mat = FALSE)
+std_m <- values(rast(cf("study")), mat = FALSE); gapv <- values(rast(cf("gap")), mat = FALSE)
+flick_n <- nz(so$FlickerYears, 5L)
 to_model <- function(r) { a <- project(r, P, method = "average"); mask(a, P) }
 for (sname in unique(al$Surface)) {
   gs <- al[Surface == sname]; meth <- gs$Method[1]; adj <- any(gs$Adjacency)
@@ -256,11 +268,16 @@ for (sname in unique(al$Surface)) {
   attr_k <- if (length(to) && all(to %in% DEV)) "Developed" else if (length(to) && all(to %in% 81:82)) "Agriculture" else NA_character_
   if (adj && is.na(attr_k)) { say("%s: adjacency applies to developed or agriculture events only - off", sname); adj <- FALSE }
   share_k <- c(Developed = "DevShare", Agriculture = "AgShare")[attr_k]
+  # NLCD agriculture flicker (pasture <-> grass or wetland: 45% of P26's ag expansion pixels were agriculture within 5 years): an
+  # expansion event on a pixel that was in the event classes in the last N years, or a contraction event whose pixel is back in its
+  # source classes within N years, is no event (and no control)
+  fk <- if (length(to) && all(to %in% 81:82)) "return" else if (length(sc) && all(sc %in% 81:82)) "bounce" else NA_character_
+  if (!is.na(fk) && flick_n > 0) say("%s: agriculture flicker filter - %s within %d years dropped", sname, if (fk == "return") "re-expansion onto recent agriculture" else "contraction that reverts", flick_n)
   if (meth == "Fitted") {
     terms <- terms_for(sname); if (!length(terms)) fail("Suitability Covariates: no covariate is switched on for surface %s", sname)
     a <- list(nl = setNames(vapply(YRS, nl_c, ""), YRS), lp = lapply(setNames(YRS[-1], YRS[-1]), function(y) layer_paths(y - 1)), bf = setNames(vapply((y0 - burn_w):y1, bf, ""), (y0 - burn_w):y1),
-              lf = if (!is.na(lft)) setNames(vapply(YRS[-1], lf_c, "", t = lft), YRS[-1]) else NULL, reg = cf("region"), gap = cf("gap"), sc = sc, nots = NOT_SOURCE, exg = exg,
-              lc = if (!is.na(lck)) setNames(vapply(YRS[-1], lc_c, ""), YRS[-1]) else NULL, kind = lck, y1 = y1,
+              lf = if (!is.na(lft)) setNames(vapply(YRS[-1], lf_c, "", t = lft), YRS[-1]) else NULL, reg = reg_file(sname), gap = cf("gap"), sc = sc, nots = NOT_SOURCE, exg = exg,
+              lc = if (!is.na(lck)) setNames(vapply(YRS[-1], lc_c, ""), YRS[-1]) else NULL, kind = lck, y0 = y0, y1 = y1, fk = if (flick_n > 0) fk else NA_character_, fn = flick_n,
               to = to, nctrl = nctrl, bw = burn_w, nc = ncol(G), patch = patch_sizes, clear = clear_syncrosim_proj)
     res_y <- parLapply(cl, YRS[-1], function(y, a) { a$clear(); terraOptions(progress = 0, memfrac = 0.04)
       v <- function(f) values(rast(f), mat = FALSE); inS <- function(x) if (length(a$sc)) x %in% a$sc else !(x %in% a$nots)
@@ -273,7 +290,10 @@ for (sname in unique(al$Surface)) {
       } else if (!is.null(a$lc)) { sr <- Reduce(`|`, lapply(y:min(y + 2, a$y1), function(k) v(a$nl[[as.character(k)]])[el] %in% c(52, 71)))
         if (a$kind == "standrep") tr & sr else tr & !sr
       } else q[el] %in% a$to
-      ev <- el[isev]; ne <- el[!isev & !tr & inS(q[el])]   # controls: eligible cells that stayed within the source classes
+      ks <- if (is.na(a$fk)) integer() else if (a$fk == "return") max(a$y0, y - 1 - a$fn):(y - 2) else if (y < a$y1) (y + 1):min(y + a$fn, a$y1) else integer()
+      ks <- ks[ks >= a$y0 & ks <= a$y1 & (a$fk != "return" | ks <= y - 2)]
+      fl <- if (length(ks)) Reduce(`|`, lapply(ks, function(k) v(a$nl[[as.character(k)]])[el] %in% (if (a$fk == "return") a$to else a$sc))) else rep(FALSE, length(el))
+      ev <- el[isev & !fl]; ne <- el[!isev & !tr & inS(q[el])]   # controls: eligible cells that stayed within the source classes
       set.seed(y); ctrl <- if (length(ne)) sample(ne, min(a$nctrl, length(ne))) else integer(); cells <- c(ev, ctrl)
       d <- data.table(Year = y, Event = rep(c(1L, 0L), c(length(ev), length(ctrl))), W = rep(c(1, length(ne) / max(1, length(ctrl))), c(length(ev), length(ctrl))), LC = lc_group(p[cells]))
       for (k in names(a$lp[[as.character(y)]])) d[[k]] <- v(a$lp[[as.character(y)]][[k]])[cells]
@@ -300,7 +320,7 @@ for (sname in unique(al$Surface)) {
       if ("Owner" %in% names(d)) d[, Owner := factor(Owner, lev$Owner)]
       if (nrow(d)) p[ok] <- predict(m, d, type = "response", block.size = 5e5); p[is.na(p)] <- 0; p }
     if (test_y > 0 && y1 - test_y > y0 + 5) { ty <- y1 - test_y
-      m1 <- fitm(smp[Year <= ty]); cells <- which(!is.na(reg_m))
+      m1 <- fitm(smp[Year <= ty]); cells <- which(!is.na(values(rast(reg_file(sname)), mat = FALSE)))
       pr <- pred_g(m1, ty, cells); a0 <- values(rast(nl_c(ty)), mat = FALSE)[cells]
       hit <- if (!is.na(lft)) Reduce(`|`, lapply((ty + 1):y1, function(k) { e <- values(rast(lf_c(lft, k)), mat = FALSE)[cells]; !is.na(e) & e > 0 }))
         else if (!is.na(lck)) Reduce(`|`, lapply((ty + 1):y1, function(k) { e <- values(rast(lc_c(k)), mat = FALSE)[cells]; t <- !is.na(e) & e > 0
