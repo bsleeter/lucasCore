@@ -120,6 +120,9 @@ namespace lucasCoreUI
         {
             base.LoadDataFeed(dataFeed);
             m_region.LoadLists(dataFeed.Project);
+            // open filled in: empty sheets this scenario may edit take the package defaults
+            FillIfEmpty(RULES, Defaults.PackageFile("defaults", "projection", "rule-weights.csv"), null);
+            FillIfEmpty(COVARIATES, Defaults.PackageFile("defaults", "projection", "covariates.csv"), null);
             LoadGrid(m_rules, RULES);
             // the surfaces: this scenario's Projection Allocation (read once: another feed), else the package defaults, plus any in the covariates
             var names = new List<string>();

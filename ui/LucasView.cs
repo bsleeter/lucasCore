@@ -99,6 +99,17 @@ namespace lucasCoreUI
         }
         protected static string Show(object v) { return v == DBNull.Value || v == null ? "" : Convert.ToString(v); }
 
+        // a page opens filled in: an empty multi-row sheet this scenario may edit takes the package defaults CSV (the same file the
+        // stages fall back to). A sheet a dependency supplies is not editable here, so it is left to the dependency. Returns the rows
+        // that could not be matched, or null when nothing was loaded.
+        protected List<string> FillIfEmpty(string sheet, string file, Dictionary<string, string> rename)
+        {
+            if (this.Scenario == null || this.Scenario.IsResult || !this.ShouldEnableView()) return null;
+            DataSheet ds = this.DataFeed.GetDataSheet(sheet);
+            if (ds == null || ds.HasData()) return null;
+            return Defaults.Load(ds, file, rename);
+        }
+
         // SyncroSim's own grid for one multi-row sheet of this feed, in a fixed-height panel of the page (made in LoadDataFeed:
         // the session and scenario are not known in the constructor)
         protected static Panel GridHost(int height) { return new Panel { Height = height, Dock = DockStyle.Top, Margin = new Padding(0, 3, 0, 3), MinimumSize = new Size(200, height) }; }

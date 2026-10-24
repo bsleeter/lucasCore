@@ -52,6 +52,9 @@ namespace lucasCoreUI
         public override void LoadDataFeed(DataFeed dataFeed)
         {
             base.LoadDataFeed(dataFeed);
+            // open filled in: empty sheets this scenario may edit take the package defaults
+            FillIfEmpty(SheetName, Defaults.PackageFile("defaults", "projection", "transitions.csv"), new Dictionary<string, string> { { "UnitSource", "UnitSourceId" } });
+            FillIfEmpty(ALLOCATION, Defaults.PackageFile("defaults", "projection", "allocation.csv"), null);
             LoadGrid(m_amount, SheetName);
             LoadGrid(m_place, ALLOCATION);
             RefreshControls();

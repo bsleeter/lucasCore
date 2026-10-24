@@ -279,7 +279,7 @@
 		<column name="DeadOrganicMatterModel" displayName="Dead Organic Matter Decay" dataType="Integer" validationType="List" formula1="1:Calibrated (snags, down wood, floor to FIA; soil to gSSURGO)|2:FIA dead pools, CBM-default soil|3:CBM defaults (no calibration)" defaultValue="1"/>
 	</dataSheet>
 
-	<dataSheet name="LandCoverCrosswalk" displayName="Land Cover Crosswalks (blank = package defaults)">
+	<dataSheet name="LandCoverCrosswalk" displayName="Land Cover Crosswalks" viewClassName="lucasCoreUI.LandCoverCrosswalkView" viewClassAssembly="lucasCoreUI">
 		<!-- stage 5: forest types (state classes 100-999) from EVT, grassland and shrubland types from RCMAP, wetland types (90-96) from C-CAP -->
 		<column name="Source" dataType="Integer" validationType="List" formula1="1:EVT 2016|2:EVT 2001|3:RCMAP|4:C-CAP|5:USFS Forest Type Group"/>
 		<column name="Code" dataType="Integer"/>
