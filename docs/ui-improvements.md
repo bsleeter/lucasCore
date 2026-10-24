@@ -12,3 +12,8 @@ Ideas for the lucasCore pages in SyncroSim Studio, collected during the P26 user
    write the defaults into the sheet when LibrarySetup fills a new project. (2026-10-23) **Done for new libraries** (2026-10-23):
    LibrarySetup writes the package's default paths (defaults/library/project/lucasCore_DataSource.csv); a path check or browse
    button per field is still open.
+3. **Build Options: rename "Run a projection".** It runs nothing in the Build; it prepares the Build for projections (stage 7's
+   LOCA2 multipliers, and the horizon the Projection Setup reads). Something like "Prepare for projections, to year". (2026-10-23)
+4. **Model design, not just UI: a projection's climate is fixed in the Build.** Stage 7 computes the LOCA2 multipliers in the Build,
+   so each SSP / climate model needs its own Build. Moving the LOCA2 part of stage 7 into the Projection Setup would let one Build
+   serve several climate futures. (2026-10-23)
