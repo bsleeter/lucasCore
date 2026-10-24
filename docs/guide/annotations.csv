@@ -71,3 +71,14 @@ File,Step,X,Y,W,H
 4.2a-run-monitor.png,3,1871,246,26,28
 4.2a-run-monitor.png,4,1916,246,92,28
 4.2b-status-bar.png,5,4,1803,695,28
+4.4a-build-figures-scenario.png,1,106,350,160,26
+4.4a-build-figures-scenario.png,2,128,380,472,56
+4.4b-inherited-pipeline.png,3,636,276,246,26
+4.4b-inherited-pipeline.png,4,904,278,1006,296
+4.4b-inherited-pipeline.png,5,624,1360,668,26
+4.4c-data-options.png,6,40,122,112,36
+4.4d-stage-12.png,7,964,279,774,28
+4.4d-stage-12.png,8,1746,279,164,28
+4.4e-export.png,9,178,810,80,32
+4.4e-export.png,10,106,936,166,28
+4.4e-export.png,11,500,848,82,30

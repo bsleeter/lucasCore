@@ -26,3 +26,7 @@ File,X,Y,W,H
 4.1b-run-toolbar.png,0,40,720,260
 4.2a-run-monitor.png,520,150,1516,135
 4.2b-status-bar.png,0,1770,760,63
+4.4a-build-figures-scenario.png,0,150,610,300
+4.4b-inherited-pipeline.png,620,160,1310,1240
+4.4d-stage-12.png,620,160,1310,200
+4.4e-export.png,0,800,610,300
