@@ -17,3 +17,7 @@ Ideas for the lucasCore pages in SyncroSim Studio, collected during the P26 user
 4. **Model design, not just UI: a projection's climate is fixed in the Build.** Stage 7 computes the LOCA2 multipliers in the Build,
    so each SSP / climate model needs its own Build. Moving the LOCA2 part of stage 7 into the Projection Setup would let one Build
    serve several climate futures. (2026-10-23)
+5. **Every custom page: wrap and scroll.** Text and controls should wrap to the window width so Studio does not have to be stretched
+   wide, and every page should scroll vertically when it is taller than the window. Applies to all views in ui/ (Build Options,
+   Study Area, Climate, Carbon, Growth Curve Options, Run Settings, Transitions, Spatial Allocation, Fire). Long notes are
+   fixed-width labels today; flow panels and grids set widths in pixels. (2026-10-23)
