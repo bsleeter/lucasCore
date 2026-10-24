@@ -23,7 +23,7 @@ L <- ssimLibrary(f); P <- rsyncrosim::project(L, "Definitions")
 st <- as.data.table(datasheet(P, "lucasCore_LibrarySetup")); cat("Library Setup:", st$Status, "\n")
 S0 <- rsyncrosim::project(ssimLibrary(starter), "Definitions")
 norm <- function(x) { x <- as.data.table(lapply(as.data.frame(x), function(v) { v <- as.character(v); v[is.na(v) | v == ""] <- "<NA>"; v })); if (ncol(x)) setorderv(x, names(x)); x }
-man <- rbind(fread("F:/lucasCore/defaults/stsim/manifest.csv"), fread("F:/lucasCore/defaults/library/project/manifest.csv"), fill = TRUE)[Scope == "Project"]
+man <- rbind(fread("F:/lucasCore/defaults/stsim/manifest.csv"), fread("F:/lucasCore/defaults/library/project/manifest.csv"), fill = TRUE)[Scope == "Project" & Datasheet != "lucasCore_DataSource"]   # the starter leaves Data Sources blank
 same <- vapply(man$Datasheet, function(sh) isTRUE(all.equal(norm(suppressWarnings(datasheet(P, sh, lookupsAsFactors = FALSE))),
                                                             norm(suppressWarnings(datasheet(S0, sh, lookupsAsFactors = FALSE))), check.attributes = FALSE)), TRUE)
 cat(sprintf("project sheets identical to the starter: %d of %d%s\n", sum(same), length(same), if (all(same)) "" else paste(":", paste(names(same)[!same], collapse = ", "))))

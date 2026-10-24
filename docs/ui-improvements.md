@@ -9,4 +9,6 @@ Ideas for the lucasCore pages in SyncroSim Studio, collected during the P26 user
    in a defaults table. (2026-10-23)
 2. **Data Sources: show the default paths.** A blank field means "use the package default" (the column's defaultValue in
    package.xml), but the page shows nothing, so a new library looks unconfigured. Show the default greyed in each blank field, or
-   write the defaults into the sheet when LibrarySetup fills a new project. (2026-10-23)
+   write the defaults into the sheet when LibrarySetup fills a new project. (2026-10-23) **Done for new libraries** (2026-10-23):
+   LibrarySetup writes the package's default paths (defaults/library/project/lucasCore_DataSource.csv); a path check or browse
+   button per field is still open.

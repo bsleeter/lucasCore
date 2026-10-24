@@ -1,7 +1,8 @@
 Order,Datasheet,Scope
-1,lucasCore_StratumSource,Project
-2,stsim_SecondaryStratum,Project
-3,stsim_TertiaryStratum,Project
-4,lucasCore_ClimateScenario,Project
-5,lucasCore_ClimateModel,Project
-6,lucasCore_ClimateReplicate,Project
+1,lucasCore_DataSource,Project
+2,lucasCore_StratumSource,Project
+3,stsim_SecondaryStratum,Project
+4,stsim_TertiaryStratum,Project
+5,lucasCore_ClimateScenario,Project
+6,lucasCore_ClimateModel,Project
+7,lucasCore_ClimateReplicate,Project

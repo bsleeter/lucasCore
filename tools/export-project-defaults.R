@@ -19,5 +19,12 @@ for (s in sheets) {
   x <- as.data.table(datasheet(P, s, lookupsAsFactors = FALSE)); if (!nrow(x)) stop(s, " is empty in ", f)
   fwrite(x, file.path(out, paste0(s, ".csv")), na = "")
   cat(sprintf("%-28s %5d rows\n", s, nrow(x))) }
+# Data Sources: the package's default paths, written into a new project so the page shows every path (each must exist on the user's
+# machine); a blank defaultValue (NCCPI: fetched when blank) stays blank
+xml <- xml2::read_xml(file.path(pkgdir, "package.xml"))
+cols <- xml2::xml_find_all(xml, ".//dataSheet[@name='DataSource']/column")
+dsrc <- as.data.table(setNames(as.list(ifelse(is.na(xml2::xml_attr(cols, "defaultValue")), "", xml2::xml_attr(cols, "defaultValue"))), xml2::xml_attr(cols, "name")))
+fwrite(dsrc, file.path(out, "lucasCore_DataSource.csv")); cat(sprintf("%-28s %5d paths\n", "lucasCore_DataSource", sum(nzchar(unlist(dsrc)))))
+sheets <- c("lucasCore_DataSource", sheets)
 fwrite(data.table(Order = seq_along(sheets), Datasheet = sheets, Scope = "Project"), file.path(out, "manifest.csv"))
 cat("wrote", out, "\n")
