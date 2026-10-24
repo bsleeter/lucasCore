@@ -5,3 +5,13 @@ File,Step,X,Y,W,H
 1.1c-choose-ssimpkg.png,4,397,421,746,28
 1.1c-choose-ssimpkg.png,5,1224,836,110,33
 1.1d-package-listed.png,,23,423,1576,27
+1.2a-file-new-empty-library.png,1,10,45,44,28
+1.2a-file-new-empty-library.png,2,12,76,306,26
+1.2a-file-new-empty-library.png,3,322,78,246,26
+1.3a-library-packages.png,1,469,253,247,25
+1.3a-library-packages.png,2,743,1306,90,26
+1.3b-add-stsim.png,3,18,494,1072,27
+1.3b-add-stsim.png,4,919,622,90,29
+1.3c-add-lucascore.png,6,18,439,1072,27
+1.3c-add-lucascore.png,7,919,622,90,29
+1.3d-packages-added.png,,641,241,824,54
