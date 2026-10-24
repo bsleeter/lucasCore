@@ -16,3 +16,9 @@ Ideas for the lucasCore pages in SyncroSim Studio, collected during the P26 user
 5. **Every custom page: wrap and scroll** - DONE 2026-10-24. `Fit` (ui/LucasView.cs) sets every wrapping label and row to the width the
    window leaves it, on every resize; pages scroll vertically. Build Options and Data Sources use it too. The Study Area unit picker
    already filled its window.
+6. **Build Figures in Studio's Images viewer** - TO DO. Stage 12's PNGs are only a table of files (Build Results > Build Figures) plus a
+   folder export. SyncroSim 3.1 has an Images viewer (Add Image, side by side, across scenarios) fed by a package `<layout type="Image">`;
+   no installed package uses it, so the shape comes from the Map layout and SyncroSim's own strings. Likely needs: a project lookup
+   "Build Figure" (the 17 titles, as package `<record>`s), a BuildFigureId filter column plus Iteration/Timestep on OutputBuildFigure
+   (stage 12 writes 1 and the start year), the Image layout with one filtered item, and sync-library filling the lookup in existing
+   libraries (stages cannot write project sheets). Verify in Studio on the Placer test library: layout errors do not show in the console.
