@@ -22,3 +22,17 @@ Ideas for the lucasCore pages in SyncroSim Studio, collected during the P26 user
    "Build Figure" (the 17 titles, as package `<record>`s), a BuildFigureId filter column plus Iteration/Timestep on OutputBuildFigure
    (stage 12 writes 1 and the start year), the Image layout with one filtered item, and sync-library filling the lookup in existing
    libraries (stages cannot write project sheets). Verify in Studio on the Placer test library: layout errors do not show in the console.
+7. **Spatial multiprocessing chosen in the Build** - TO DO (design from the user, 2026-10-24; not started). A spatial run is split
+   only by System > Spatial Multiprocessing, a tile mask raster (ST-Sim's "Split by Secondary Strata" is for non-spatial runs). Today
+   a user must find a mask in the Build result's `.data` folder or rely on stage 9's projection tiles. Planned:
+   - Build Options: a checkbox **Enable spatial multiprocessing**, then a selector of the strata level the tiles follow (Primary,
+     Secondary or Tertiary, from the Build's own strata; P26 would use Secondary = Counties).
+   - The Build writes the mask (whole units of that level) into its result's core_SpatialMultiprocessing, so the historical run and
+     every projection on the Build inherit it with nothing to browse to.
+   - **Rule: Transition Targets must use the same strata level**, or a target unit split between tiles no longer adds up. The Build
+     records the level; stage 9 (Projection Setup) sets every Target group's strata to it, as its Spatial Tiles option already does,
+     and the Projection Transitions page shows the level as fixed when tiles are on. Historical runs use spatial multipliers, not
+     targets, so they are unaffected.
+   - Open: one tile per unit (simple; 17 uneven county jobs for P26) or units packed into N tiles of about equal area (stage 9's
+     balancing code, moved to shared.R). Projection Options' Spatial Tiles fields would then default to the Build's choice.
+   - Guide: section 1.4 says to leave library multiprocessing off (right for Builds); tiled runs need it on, with jobs ~ tiles.
