@@ -1,11 +1,12 @@
 # =============================================================================
 # 12-build-figures.R - stage 12: publication figures (PNG) of a Build result
 # =============================================================================
-# Draws src/figures.R's maps and charts from the Build's own outputs and saves one row per PNG to Build Figures (Figure, Title, Caption,
-# FileName): strata, initial state class, stand age, forest types, initial carbon maps (over a hillshade of Data Sources' ElevationFile
-# when it is set), and charts of area by class, growth curves, decay calibration, carbon by class, land-use change, disturbance,
-# climate multipliers and the build's checks. Each figure is drawn only when its inputs are present, so it can run after any part of
-# the Build. Export > LUCAS Core > Build Figures saves them all to a folder.
+# Draws src/figures.R's report figures (lucasFireC2F's format: "Figure N" headers, lettered panels) from the Build's own outputs and saves
+# one row per PNG to Build Figures (Figure, Title, Caption, FileName): maps of the strata, the initial land cover (state class, forest
+# type, stand age) and the initial carbon (on shaded relief of Data Sources' ElevationFile when it is set), and charts of area and carbon
+# by class, growth curves, decay calibration, land-use change, disturbance, climate multipliers and the build's checks. Each figure is
+# drawn only when its inputs are present, so it can run after any part of the Build. Export > LUCAS Core > Build Figures saves them all
+# to a folder.
 # Needs stage 5 (state classes); the rest is optional: last in the Build pipeline, or its own scenario depending on a Build result.
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
@@ -38,7 +39,8 @@ I <- list(strata = list(prim, opt_rast(ic$SecondaryStratumFileName[1]), opt_rast
           stocks = if (nrow(st)) setNames(lapply(st$RasterFileName, rast), st$StockTypeId) else NULL,
           stock_summary = sheet("OutputInitialStockSummary"), trans = sheet("OutputTransitionSummary"),
           climate = sheet("OutputClimateSummary"), validation = sheet("OutputValidation"), dem = dem,
-          label = if (nrow(sa)) paste(sub("^[^:]*: ", "", sa$UnitId), collapse = ", ") else "CONUS", years = c(opt$StartYear[1], opt$EndYear[1]))
+          label = if (nrow(sa)) paste(sub("^[^:]*: ", "", sa$UnitId), collapse = ", ") else "CONUS", years = c(opt$StartYear[1], opt$EndYear[1]),
+          result = rsyncrosim::scenarioId(scn))
 progressBar()
 
 out <- file.path(TD(), "BuildFigures")
