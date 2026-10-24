@@ -23,9 +23,6 @@ File,Step,X,Y,W,H
 1.4a-multiprocessing.png,3,773,272,198,24
 1.4b-tools-r.png,4,419,454,308,28
 1.4b-tools-r.png,5,757,262,1230,62
-1.5a-data-sources.png,1,488,208,208,26
-1.5a-data-sources.png,2,419,276,310,26
-1.5a-data-sources.png,3,1591,246,407,821
 3.1a-build-general.png,1,110,262,356,23
 3.1a-build-general.png,2,838,295,1143,28
 3.1a-build-general.png,3,838,447,1138,112
@@ -51,3 +48,9 @@ File,Step,X,Y,W,H
 3.6a-growth-options.png,1,650,396,387,25
 3.6a-growth-options.png,2,1092,296,140,25
 3.6a-growth-options.png,3,1265,296,207,25
+1.5a-data-sources.png,1,578,209,209,24
+1.5a-data-sources.png,2,510,276,297,26
+1.5a-data-sources.png,3,1393,407,412,30
+1.5a-data-sources.png,4,1818,407,108,32
+1.5a-data-sources.png,5,1940,415,30,30
+1.5a-data-sources.png,6,862,450,500,20
