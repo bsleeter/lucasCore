@@ -77,8 +77,8 @@ namespace lucasCoreUI
         private void AddEntry(TableLayoutPanel t, Entry e, string displayName)
         {
             int r = t.RowCount; t.RowCount = r + 2; t.RowStyles.Add(new RowStyle(SizeType.AutoSize)); t.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-            var name = new Label { Text = displayName, AutoSize = true, MaximumSize = new Size(360, 0), Anchor = AnchorStyles.Left, Margin = new Padding(3, 7, 9, 0) };
-            e.Path = new TextBox { Anchor = AnchorStyles.Left | AnchorStyles.Right, MinimumSize = new Size(220, 0), Margin = new Padding(3, 4, 3, 0) };
+            var name = new Label { Text = displayName, AutoSize = true, MaximumSize = new Size(360, 0), Tag = Fit.Fixed, Anchor = AnchorStyles.Left, Margin = new Padding(3, 7, 9, 0) };
+            e.Path = new TextBox { Dock = DockStyle.Fill, Margin = new Padding(3, 4, 3, 0) };
             var browse = new Button { Text = "Browse...", AutoSize = true, Margin = new Padding(3, 3, 3, 0) };
             e.State = new Label { AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(6, 7, 3, 0), Font = new Font(this.Font, FontStyle.Bold) };
             t.Controls.Add(name, 0, r); t.Controls.Add(e.Path, 1, r); t.Controls.Add(browse, 2, r); t.Controls.Add(e.State, 3, r);

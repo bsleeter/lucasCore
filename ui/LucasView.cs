@@ -153,9 +153,12 @@ namespace lucasCoreUI
 
     // Pages wrap to the window instead of needing a wide window: every wrapping label (AutoSize with a MaximumSize width) and every
     // wrapping row (an AutoSize FlowLayoutPanel with WrapContents) gets the width left between its left edge and the page's right edge,
-    // again whenever the page is resized. The page itself scrolls (AutoScroll) when it is taller than the window.
+    // again whenever the page is resized. The page itself scrolls (AutoScroll) when it is taller than the window. A control tagged
+    // Fit.Fixed keeps its own width (a label in a table column, which would otherwise take the whole row).
     internal static class Fit
     {
+        public const string Fixed = "lucasCore.Fit.Fixed";
+
         public static void Attach(ScrollableControl root)
         {
             root.Resize += (s, e) => Apply(root);
@@ -176,8 +179,8 @@ namespace lucasCoreUI
             foreach (Control c in parent.Controls)
             {
                 var flow = c as FlowLayoutPanel;
-                bool wraps = (c is Label && ((Label)c).AutoSize && c.MaximumSize.Width > 0)
-                          || (flow != null && flow.WrapContents && flow.AutoSize && flow.Dock == DockStyle.None);
+                bool wraps = !Fixed.Equals(c.Tag) && ((c is Label && ((Label)c).AutoSize && c.MaximumSize.Width > 0)
+                          || (flow != null && flow.WrapContents && flow.AutoSize && flow.Dock == DockStyle.None));
                 if (wraps && c.Parent != null && c.Parent.IsHandleCreated)
                 {
                     int left = root.PointToClient(c.Parent.PointToScreen(c.Location)).X;
