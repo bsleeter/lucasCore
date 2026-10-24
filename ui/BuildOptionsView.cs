@@ -47,11 +47,17 @@ namespace lucasCoreUI
         private static Label Note(string text) { return new Label { Text = text, AutoSize = true, MaximumSize = new Size(640, 0), ForeColor = SystemColors.GrayText, Anchor = AnchorStyles.Left, Margin = new Padding(3, 7, 3, 3) }; }
         private static TextBox Number(TextBox t, int width) { t.Width = width; t.TextAlign = HorizontalAlignment.Right; t.Anchor = AnchorStyles.Left; t.Margin = new Padding(3, 3, 12, 3); return t; }
 
-        private static GroupBox Group(string title, out FlowLayoutPanel row)
+        // a framed group: a flowing row of fields, then any long notes each on a row of their own (a wrapped note inside the flowing
+        // row did not give the row its wrapped height, and was cut off)
+        private static GroupBox Group(string title, out FlowLayoutPanel row, params Control[] below)
         {
             var gb = new GroupBox { Text = title, Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink, Padding = new Padding(10, 6, 10, 8), Margin = new Padding(3, 3, 3, 8) };
-            row = new FlowLayoutPanel { Dock = DockStyle.Top, AutoSize = true, WrapContents = true, FlowDirection = FlowDirection.LeftToRight };
-            gb.Controls.Add(row);
+            var col = new TableLayoutPanel { Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink, ColumnCount = 1 };
+            col.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            row = new FlowLayoutPanel { AutoSize = true, WrapContents = true, FlowDirection = FlowDirection.LeftToRight, Margin = new Padding(0) };
+            col.RowStyles.Add(new RowStyle(SizeType.AutoSize)); col.Controls.Add(row);
+            foreach (Control c in below) { col.RowStyles.Add(new RowStyle(SizeType.AutoSize)); col.Controls.Add(c); }
+            gb.Controls.Add(col);
             return gb;
         }
 
@@ -67,18 +73,17 @@ namespace lucasCoreUI
             r.Controls.Add(Caption("Cell size (m):")); r.Controls.Add(Number(m_resolution, 70));
             r.Controls.Add(Note("1000 = 1 km. Finer cells take longer: a 150 m pyrome runs about 12 minutes per simulated year."));
 
-            GroupBox gHist = Group("Historical period", out r);
+            GroupBox gHist = Group("Historical period", out r,
+                Note("Land use, disturbance and climate are taken from these years' data. Projections start the year after the end year; their end year is set in Projection > Run Settings, and their climate in a Projection Climate scenario."));
             r.Controls.Add(Caption("Start year:")); r.Controls.Add(Number(m_start, 60));
             r.Controls.Add(Caption("End year:")); r.Controls.Add(Number(m_end, 60));
-            r.Controls.Add(Note("Land use, disturbance and climate are taken from these years' data. Projections start the year after the end year; their end year is set in Projection > Run Settings, and their climate in a Projection Climate scenario."));
 
-            GroupBox gStrata = Group("Strata", out r);
+            var mp = new Label { Text = "Spatial multiprocessing: projections can be split into tiles of whole units of one of these three strata (chosen in Projection > Run Settings), and every target then uses that level. If you will use it, set the secondary or tertiary strata here to a layer that suits tiles (counties, HUCs) - it cannot be changed later in the projection settings.",
+                                 AutoSize = true, MaximumSize = new Size(680, 0), ForeColor = Color.DarkGoldenrod, Margin = new Padding(3, 7, 3, 3) };
+            GroupBox gStrata = Group("Strata", out r, mp);
             r.Controls.Add(Caption("Secondary:")); r.Controls.Add(List(m_secondary, 200));
             r.Controls.Add(Caption("Tertiary:")); r.Controls.Add(List(m_tertiary, 200));
             r.Controls.Add(Note("Primary strata are always the FIA ecodivisions."));
-            var mp = new Label { Text = "Spatial multiprocessing: projections can be split into tiles of whole units of one of these three strata (chosen in Projection > Run Settings), and every target then uses that level. If you will use it, set the secondary or tertiary strata here to a layer that suits tiles (counties, HUCs) - it cannot be changed later in the projection settings.",
-                                 AutoSize = true, MaximumSize = new Size(680, 0), ForeColor = Color.DarkGoldenrod, Margin = new Padding(3, 7, 3, 3) };
-            r.SetFlowBreak(r.Controls[r.Controls.Count - 1], true); r.Controls.Add(mp);
             m_secondary.SelectionChangeCommitted += (s, e) => WriteSource(m_secondary, "SecondarySourceId");
             m_tertiary.SelectionChangeCommitted += (s, e) => WriteSource(m_tertiary, "TertiarySourceId");
 
