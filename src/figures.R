@@ -65,7 +65,11 @@ build_figures <- function(I, outdir) {
   classed <- function(v, brk) cut(v, brk, include.lowest = TRUE, right = FALSE, labels = FALSE)
   # breaks for a continuous map: pretty steps between its 1st and 99.5th percentiles, both end classes open; each class is labelled
   # with its lower edge, as lucasFireC2F's strips are
-  steps <- function(v) { q <- quantile(v[inz], c(0.01, 0.995), na.rm = TRUE); b <- pretty(q, n = 8); b <- b[b > q[1] & b < q[2]]
+  # equal = FALSE: equal-area classes instead (breaks at the 2nd, 10th, 20th ... 90th and 98th percentiles, rounded), for a map whose
+  # values bunch, like soil carbon, where forest cells start at their type's calibrated mean
+  steps <- function(v, equal = TRUE) { q <- quantile(v[inz], c(0.01, 0.995), na.rm = TRUE)
+    b <- if (equal) pretty(q, n = 8) else { p <- quantile(v[inz], c(.02, seq(.1, .9, .1), .98), na.rm = TRUE); unique(ifelse(p >= 10, round(p), signif(p, 2))) }
+    b <- b[b > q[1] & b < q[2]]
     if (!length(b)) b <- unique(signif(q, 2)); fm <- function(x) format(x, big.mark = ",", trim = TRUE)
     list(brk = c(-Inf, b, Inf), lab = c(paste0("<", fm(b[1])), if (length(b) > 1) fm(b[-length(b)]), paste0(">", fm(b[length(b)])))) }
   # a categorical map: the n largest classes of r named by lst (Id, Name), the rest "Other"; colours by name or a qualitative set
@@ -150,12 +154,12 @@ build_figures <- function(I, outdir) {
     sum_of <- function(k) { r <- Reduce(`+`, lapply(I$stocks[k], function(r) { r[is.na(r)] <- 0; r })); mask(r, I$sc) }
     pools <- grp(names(I$stocks)); tot <- sum_of(names(I$stocks))
     totTg <- global(tot * cell_km2 * 100, "sum", na.rm = TRUE)[[1]] / 1e6
-    mp <- function(r, ramp, title, sub) { v <- cv(r); s <- steps(v); list(k = classed(v, s$brk), cols = ramp(length(s$brk) - 1), lab = s$lab, title = title, sub = sub) }
+    mp <- function(r, ramp, title, sub, equal = TRUE) { v <- cv(r); s <- steps(v, equal); list(k = classed(v, s$brk), cols = ramp(length(s$brk) - 1), lab = s$lab, title = title, sub = sub) }
     P <- list(mp(tot, RAMP_C, "Total ecosystem carbon (Mg C/ha)", sprintf("the 14 CBM pools; %.1f Tg C", totTg)))
     if (any(pools == "Live biomass")) P[[2]] <- mp(sum_of(names(I$stocks)[pools == "Live biomass"]), RAMP_C, "Live biomass carbon (Mg C/ha)", "stem, foliage, other wood and roots")
-    if (any(pools == "Soil")) P[[length(P) + 1]] <- mp(sum_of(names(I$stocks)[pools == "Soil"]), RAMP_SOIL, "Soil carbon (Mg C/ha)", "slow belowground pool, calibrated to gSSURGO")
+    if (any(pools == "Soil")) P[[length(P) + 1]] <- mp(sum_of(names(I$stocks)[pools == "Soil"]), RAMP_SOIL, "Soil carbon (Mg C/ha)", "belowground pools; classes of equal area", equal = FALSE)
     map_figure("initial_carbon", sprintf("Initial carbon stocks, %s", I$years[1]), P,
-      sprintf("Carbon in the start year (%s): %.1f Tg C in the study area. Classes run to the 99.5th percentile of each map; the last is open.%s", I$years[1], totTg, relief)) }
+      sprintf("Carbon in the start year (%s): %.1f Tg C in the study area. (a, b) Classes in even steps between each map's 1st and 99.5th percentiles; the end classes are open. (c) Classes of roughly equal area: forest soil starts at its type's gSSURGO mean (stage 3 calibrates decay to it), so it varies little within a type, and other land takes gSSURGO directly.%s", I$years[1], totTg, relief)) }
 
   # ---- charts: area and carbon by state class ----------------------------------------------------------------------------------
   fq <- as.data.table(freq(I$sc))[, .(Id = value, km2 = count * cell_km2)][, Class := scn$Name[match(Id, scn$Id)]][order(-km2)]
