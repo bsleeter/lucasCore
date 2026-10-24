@@ -33,3 +33,6 @@ File,X,Y,W,H
 4.4f-run-done.png,620,160,1310,130
 5.1b-historical-dependency.png,0,150,610,330
 5.1c-stsim-pipeline.png,620,160,1310,200
+5.2a-run-control.png,540,155,930,290
+5.2b-tabular-output.png,540,235,1270,400
+5.2c-stock-flow-output.png,540,235,1215,740

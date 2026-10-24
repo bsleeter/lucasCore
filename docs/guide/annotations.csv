@@ -89,3 +89,12 @@ File,Step,X,Y,W,H
 5.1b-historical-dependency.png,3,128,410,472,56
 5.1c-stsim-pipeline.png,4,964,279,774,28
 5.1c-stsim-pipeline.png,5,1746,279,164,28
+5.2a-run-control.png,6,626,206,70,32
+5.2a-run-control.png,7,593,246,260,28
+5.2a-run-control.png,8,1163,250,182,112
+5.2a-run-control.png,9,1163,374,177,26
+5.2b-tabular-output.png,10,618,397,234,26
+5.2b-tabular-output.png,11,890,271,410,28
+5.2b-tabular-output.png,12,890,307,410,28
+5.2c-stock-flow-output.png,13,664,845,188,26
+5.2c-stock-flow-output.png,14,874,805,868,150
