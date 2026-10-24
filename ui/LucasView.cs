@@ -16,27 +16,34 @@ namespace lucasCoreUI
     {
         protected readonly TableLayoutPanel Root = new TableLayoutPanel();
         protected bool Refreshing;
+        // the page scrolls in this panel: a TableLayoutPanel's own AutoScroll does not scroll when its last row stretches, so Root is
+        // docked to the top of a plain scrolling panel and grows to its content
+        private readonly Panel m_scroll = new Panel { Dock = DockStyle.Fill, AutoScroll = true };
 
         protected abstract string SheetName { get; }
         protected DataSheet Sheet { get { return this.DataFeed.GetDataSheet(SheetName); } }
 
         protected LucasView()
         {
-            Root.Dock = DockStyle.Fill; Root.ColumnCount = 1; Root.Padding = new Padding(8); Root.AutoScroll = true;
+            Root.Dock = DockStyle.Top; Root.ColumnCount = 1; Root.Padding = new Padding(8);
+            Root.AutoSize = true; Root.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             Root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            Fit.Attach(Root);
-            this.Controls.Add(Root);
+            m_scroll.Controls.Add(Root);
+            Fit.Attach(m_scroll);
+            this.Controls.Add(m_scroll);
         }
 
         // ---- layout ---------------------------------------------------------------------------------------------------------
         protected void AddGroup(GroupBox g) { Root.RowStyles.Add(new RowStyle(SizeType.AutoSize)); Root.Controls.Add(g); }
-        protected void EndGroups() { Root.RowStyles.Add(new RowStyle(SizeType.Percent, 100)); Root.Controls.Add(new Panel { Height = 1 }); }
+        protected void EndGroups() { }
 
+        // content docks to the top of the frame, so the frame grows to the content's wrapped height (docked to fill, the frame
+        // never learned it and cut the content off)
         protected static GroupBox Group(string title, Control content)
         {
             var gb = new GroupBox { Text = title, Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink,
                                     Padding = new Padding(10, 6, 10, 8), Margin = new Padding(3, 3, 3, 8) };
-            content.Dock = DockStyle.Fill;
+            content.Dock = DockStyle.Top;
             gb.Controls.Add(content);
             return gb;
         }
@@ -136,7 +143,7 @@ namespace lucasCoreUI
             Refreshing = true;
             try { ShowData(); Root.Enabled = this.ShouldEnableView(); }
             finally { Refreshing = false; }
-            Fit.Apply(Root);
+            Fit.Apply(m_scroll);
         }
 
         protected override void OnRowsAdded(object sender, DataSheetRowEventArgs e) { base.OnRowsAdded(sender, e); if (!Refreshing) RefreshControls(); }

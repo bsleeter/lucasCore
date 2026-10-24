@@ -1,5 +1,5 @@
 // =============================================================================
-// UnitPicker.cs - pick a kind of unit (radio buttons from Stratum Sources), then units of that kind (type-ahead drop-down + list)
+// UnitPicker.cs - pick a kind of unit (a drop-down of Stratum Sources), then units of that kind (type-ahead drop-down + list)
 // =============================================================================
 // Shared by the Study Area page and the Suitability Fitting Region on the Spatial Allocation page. The host gives the multi-row
 // sheet of units (UnitId = a stsim_SecondaryStratum row) and where the chosen kind is saved (a StratumSource key in a single-row
@@ -48,7 +48,8 @@ namespace lucasCoreUI
         public Func<DataRow, bool> RowFilter = r => true;   // the rows this picker shows and edits (e.g. one surface's)
         public Action<DataRow> NewRow = r => { };           // fills the other columns of a row it adds
 
-        private readonly FlowLayoutPanel m_radios = new FlowLayoutPanel();
+        private class KindItem { public int Number; public string Name; public override string ToString() { return Name; } }
+        private readonly ComboBox m_kind = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = 320, MaxDropDownItems = 20, Margin = new Padding(3, 3, 3, 3) };
         private readonly ComboBox m_unitBox = new ComboBox();
         private readonly Button m_add = new Button();
         private readonly ListBox m_list = new ListBox();
@@ -69,9 +70,12 @@ namespace lucasCoreUI
             root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
-            var gbKind = new GroupBox { Text = kindTitle, Dock = DockStyle.Top, AutoSize = true, Padding = new Padding(10, 6, 10, 8) };
-            m_radios.Dock = DockStyle.Fill; m_radios.AutoSize = true; m_radios.WrapContents = true; m_radios.FlowDirection = FlowDirection.LeftToRight;
-            gbKind.Controls.Add(m_radios);
+            // the kind of unit: a drop-down (a row of radio buttons ran off the page with nine or more kinds)
+            var gbKind = new GroupBox { Text = kindTitle, Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink, Padding = new Padding(10, 6, 10, 8) };
+            var kindRow = new FlowLayoutPanel { Dock = DockStyle.Top, AutoSize = true, WrapContents = true };
+            kindRow.Controls.Add(m_kind);
+            gbKind.Controls.Add(kindRow);
+            m_kind.SelectionChangeCommitted += OnKindChanged;
 
             m_gbUnits.Text = "Units"; m_gbUnits.Dock = DockStyle.Fill; m_gbUnits.Padding = new Padding(10, 6, 10, 8);
             var grid = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 3 };
@@ -123,17 +127,11 @@ namespace lucasCoreUI
                 m_unitsByKey[unit.Key] = unit;
             }
             m_refreshing = true;
-            m_radios.Controls.Clear();
-            m_radios.Controls.Add(MakeRadio(AllText, 0));
-            foreach (Source s in m_sources) m_radios.Controls.Add(MakeRadio(s.Name, s.Number));
+            m_kind.BeginUpdate(); m_kind.Items.Clear();
+            m_kind.Items.Add(new KindItem { Number = 0, Name = AllText });
+            foreach (Source s in m_sources) m_kind.Items.Add(new KindItem { Number = s.Number, Name = s.Name });
+            m_kind.EndUpdate();
             m_refreshing = false;
-        }
-
-        private RadioButton MakeRadio(string text, int number)
-        {
-            var rb = new RadioButton { Text = text, Tag = number, AutoSize = true, Margin = new Padding(3, 3, 18, 3) };
-            rb.CheckedChanged += OnRadioChanged;
-            return rb;
         }
 
         private static int SourceOf(Unit u) { return (int)Math.Floor(u.Id / OFFSET); }
@@ -176,7 +174,9 @@ namespace lucasCoreUI
                 List<int> kinds = sel.Select(SourceOf).Distinct().ToList();
                 // the chosen kind follows the units when there are any, else the saved kind
                 m_current = sel.Count > 0 ? kinds[0] : SavedKind();
-                foreach (RadioButton rb in m_radios.Controls.OfType<RadioButton>()) rb.Checked = (int)rb.Tag == m_current;
+                int idx = 0;
+                for (int k = 0; k < m_kind.Items.Count; k++) if (((KindItem)m_kind.Items[k]).Number == m_current) idx = k;
+                if (m_kind.Items.Count > 0) m_kind.SelectedIndex = idx;
 
                 Source s = m_sources.FirstOrDefault(x => x.Number == m_current);
                 bool all = m_current == 0 || s == null;
@@ -200,16 +200,16 @@ namespace lucasCoreUI
                 m_summary.Text = sel.Count == 0 ? Subject + ": " + AllSummary + "."
                     : kinds.Count > 1 ? string.Format("{0}: {1} units of {2} kinds (choose one kind to tidy it up).", Subject, sel.Count, kinds.Count)
                     : string.Format("{0}: {1} {2}.", Subject, sel.Count, sel.Count == 1 ? "unit" : "units");
-                m_radios.Enabled = editable; m_add.Enabled = editable; m_remove.Enabled = editable; m_unitBox.Enabled = editable;
+                m_kind.Enabled = editable; m_add.Enabled = editable; m_remove.Enabled = editable; m_unitBox.Enabled = editable;
             }
             finally { m_refreshing = false; }
         }
 
-        private void OnRadioChanged(object sender, EventArgs e)
+        private void OnKindChanged(object sender, EventArgs e)
         {
-            var rb = (RadioButton)sender;
-            if (m_refreshing || !rb.Checked) return;
-            int number = (int)rb.Tag;
+            var item = m_kind.SelectedItem as KindItem;
+            if (m_refreshing || item == null) return;
+            int number = item.Number;
             if (number == m_current) return;
             List<Unit> sel = SelectedUnits();
             if (sel.Count > 0)

@@ -37,6 +37,7 @@ namespace lucasCoreUI
         private readonly ComboBox m_tertiary = new ComboBox();
         private readonly ComboBox m_forest = new ComboBox();
         private readonly TableLayoutPanel m_root = new TableLayoutPanel();
+        private readonly Panel m_scroll = new Panel { Dock = DockStyle.Fill, AutoScroll = true };   // the page scrolls here (see LucasView)
         private bool m_refreshing;
 
         public BuildOptionsView() { BuildUi(); }
@@ -49,7 +50,7 @@ namespace lucasCoreUI
         private static GroupBox Group(string title, out FlowLayoutPanel row)
         {
             var gb = new GroupBox { Text = title, Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink, Padding = new Padding(10, 6, 10, 8), Margin = new Padding(3, 3, 3, 8) };
-            row = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, WrapContents = true, FlowDirection = FlowDirection.LeftToRight };
+            row = new FlowLayoutPanel { Dock = DockStyle.Top, AutoSize = true, WrapContents = true, FlowDirection = FlowDirection.LeftToRight };
             gb.Controls.Add(row);
             return gb;
         }
@@ -57,9 +58,9 @@ namespace lucasCoreUI
         private void BuildUi()
         {
             this.SuspendLayout();
-            m_root.Dock = DockStyle.Fill; m_root.ColumnCount = 1; m_root.Padding = new Padding(8); m_root.AutoScroll = true;
+            m_root.Dock = DockStyle.Top; m_root.ColumnCount = 1; m_root.Padding = new Padding(8); m_root.AutoSize = true; m_root.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             m_root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            Fit.Attach(m_root);
+            Fit.Attach(m_scroll);
             FlowLayoutPanel r;
 
             GroupBox gGrid = Group("Model grid", out r);
@@ -86,8 +87,8 @@ namespace lucasCoreUI
             r.Controls.Add(Note("Assigns the forest type of forest cells; other cover comes from NLCD, RCMAP and C-CAP."));
 
             foreach (GroupBox g in new[] { gGrid, gHist, gStrata, gCover }) { m_root.RowStyles.Add(new RowStyle(SizeType.AutoSize)); m_root.Controls.Add(g); }
-            m_root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-            this.Controls.Add(m_root);
+
+            m_scroll.Controls.Add(m_root); this.Controls.Add(m_scroll);
             this.ResumeLayout(false);
         }
 
@@ -157,7 +158,7 @@ namespace lucasCoreUI
                 m_root.Enabled = this.ShouldEnableView();
             }
             finally { m_refreshing = false; }
-            Fit.Apply(m_root);
+            Fit.Apply(m_scroll);
         }
 
         protected override void OnRowsAdded(object sender, DataSheetRowEventArgs e) { base.OnRowsAdded(sender, e); if (!m_refreshing) RefreshControls(); }
