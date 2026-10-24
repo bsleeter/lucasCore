@@ -82,3 +82,10 @@ File,Step,X,Y,W,H
 4.4e-export.png,9,178,810,80,32
 4.4e-export.png,10,106,936,166,28
 4.4e-export.png,11,500,848,82,30
+4.4f-run-done.png,,1652,246,120,28
+4.4f-run-done.png,,1826,246,84,28
+5.1a-new-scenario.png,1,16,84,840,30
+5.1b-historical-dependency.png,2,106,380,392,26
+5.1b-historical-dependency.png,3,128,410,472,56
+5.1c-stsim-pipeline.png,4,964,279,774,28
+5.1c-stsim-pipeline.png,5,1746,279,164,28
