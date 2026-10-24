@@ -23,6 +23,8 @@ namespace lucasCoreUI
         protected LucasView()
         {
             Root.Dock = DockStyle.Fill; Root.ColumnCount = 1; Root.Padding = new Padding(8); Root.AutoScroll = true;
+            Root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            Fit.Attach(Root);
             this.Controls.Add(Root);
         }
 
@@ -52,7 +54,8 @@ namespace lucasCoreUI
         }
 
         protected static Label Caption(string text) { return new Label { Text = text, AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(3, 7, 6, 3) }; }
-        protected static Label Note(string text) { return new Label { Text = text, AutoSize = true, ForeColor = SystemColors.GrayText, Anchor = AnchorStyles.Left, Margin = new Padding(3, 7, 3, 3) }; }
+        // notes wrap: Fit sets their width to what the window leaves them
+        protected static Label Note(string text) { return new Label { Text = text, AutoSize = true, MaximumSize = new Size(640, 0), ForeColor = SystemColors.GrayText, Anchor = AnchorStyles.Left, Margin = new Padding(3, 7, 3, 3) }; }
         protected static Label Wrapped(string text, int width) { return new Label { Text = text, AutoSize = true, MaximumSize = new Size(width, 0), ForeColor = SystemColors.GrayText, Margin = new Padding(22, 0, 3, 6) }; }
         protected static TextBox Box(int width) { return new TextBox { Width = width, TextAlign = HorizontalAlignment.Right, Anchor = AnchorStyles.Left, Margin = new Padding(3, 3, 12, 3) }; }
         protected static ComboBox List(int width) { return new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = width, Anchor = AnchorStyles.Left, Margin = new Padding(3, 3, 12, 3) }; }
@@ -133,10 +136,49 @@ namespace lucasCoreUI
             Refreshing = true;
             try { ShowData(); Root.Enabled = this.ShouldEnableView(); }
             finally { Refreshing = false; }
+            Fit.Apply(Root);
         }
 
         protected override void OnRowsAdded(object sender, DataSheetRowEventArgs e) { base.OnRowsAdded(sender, e); if (!Refreshing) RefreshControls(); }
         protected override void OnRowsModified(object sender, DataSheetRowEventArgs e) { base.OnRowsModified(sender, e); if (!Refreshing) RefreshControls(); }
         protected override void OnRowsDeleted(object sender, DataSheetRowEventArgs e) { base.OnRowsDeleted(sender, e); if (!Refreshing) RefreshControls(); }
+    }
+
+    // Pages wrap to the window instead of needing a wide window: every wrapping label (AutoSize with a MaximumSize width) and every
+    // wrapping row (an AutoSize FlowLayoutPanel with WrapContents) gets the width left between its left edge and the page's right edge,
+    // again whenever the page is resized. The page itself scrolls (AutoScroll) when it is taller than the window.
+    internal static class Fit
+    {
+        public static void Attach(ScrollableControl root)
+        {
+            root.Resize += (s, e) => Apply(root);
+            root.HandleCreated += (s, e) => Apply(root);
+        }
+
+        public static void Apply(Control root)
+        {
+            if (root == null || !root.IsHandleCreated || root.ClientSize.Width <= 0) return;
+            int right = root.ClientSize.Width - root.Padding.Right - SystemInformation.VerticalScrollBarWidth - 6;
+            root.SuspendLayout();
+            try { Walk(root, root, right); }
+            finally { root.ResumeLayout(true); }
+        }
+
+        private static void Walk(Control root, Control parent, int right)
+        {
+            foreach (Control c in parent.Controls)
+            {
+                var flow = c as FlowLayoutPanel;
+                bool wraps = (c is Label && ((Label)c).AutoSize && c.MaximumSize.Width > 0)
+                          || (flow != null && flow.WrapContents && flow.AutoSize && flow.Dock == DockStyle.None);
+                if (wraps && c.Parent != null && c.Parent.IsHandleCreated)
+                {
+                    int left = root.PointToClient(c.Parent.PointToScreen(c.Location)).X;
+                    int w = Math.Max(160, right - left - c.Margin.Right);
+                    if (c.MaximumSize.Width != w) c.MaximumSize = new Size(w, 0);
+                }
+                Walk(root, c, right);
+            }
+        }
     }
 }

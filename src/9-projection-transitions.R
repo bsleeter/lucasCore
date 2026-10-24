@@ -23,7 +23,7 @@
 #   * None: the group stays off after the historical end (stage 6's Off rows)
 #   * Spatial multiprocessing (Projection Options: Spatial Tiles): targets only add up if no target unit is split between tiles, so
 #     every Target group must use one strata level and the tiles are made of whole units of it; Probability groups are exempt
-# Needs stage 6 (same pipeline, or a dependency on its result). Writes nothing without a projection end year.
+# Needs stage 6 (same pipeline, or a dependency on its result). Projects to Run Settings' end year (blank = 2100).
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
 source(pkg_file("src", "strata.R"))
@@ -32,9 +32,8 @@ STAGE <- "9 Projection Transitions"
 progressBar(type = "begin", totalSteps = 6)
 
 opt <- read_ds("BuildOptions"); y0 <- opt$StartYear[1]; y1 <- opt$EndYear[1]
-pend <- if ("ProjectionEndYear" %in% names(opt)) opt$ProjectionEndYear[1] else NA
-if (is.na(pend)) { say("No projection in Build Options: stage 9 has nothing to do"); progressBar(type = "end"); quit(save = "no") }
-if (pend <= y1) fail("Build Options: the projection end year (%d) must be after the historical end (%d)", pend, y1)
+pend <- projection_end()   # Run Settings (blank = 2100); legacy libraries: Build Options
+if (pend <= y1) fail("Run Settings: the projection end year (%d) must be after the historical end (%d)", pend, y1)
 pyrs <- (y1 + 1):pend
 po <- read_ds("ProjectionOptions")
 nz <- function(v, d) if (is.null(v) || !length(v) || is.na(v[1])) d else v[1]

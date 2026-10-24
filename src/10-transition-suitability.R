@@ -35,8 +35,7 @@ STAGE <- "10 Transition Suitability"
 progressBar(type = "begin", totalSteps = 8)
 nz <- function(v, d) if (is.null(v) || !length(v) || is.na(v[1])) d else v[1]
 
-opt <- read_ds("BuildOptions"); pend <- nz(opt$ProjectionEndYear, NA)
-if (is.na(pend)) { say("No projection in Build Options: stage 10 has nothing to do"); progressBar(type = "end"); quit(save = "no") }
+opt <- read_ds("BuildOptions"); pend <- projection_end()
 nl <- read_ds("OutputNlcdAnnual"); if (!nrow(nl)) fail("no annual NLCD table: run stage 5 first")
 y0 <- min(nl$Year); y1 <- max(nl$Year)
 sched <- read_ds("OutputProjectionSchedule"); if (!nrow(sched)) fail("no projection schedule: run stage 9 first")

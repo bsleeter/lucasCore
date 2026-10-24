@@ -25,7 +25,7 @@ pos <- a[!grepl("^--", a)]; if (!length(pos)) stop("usage: Rscript tools/new-his
 L <- ssimLibrary(normalizePath(pos[1], winslash = "/")); P <- rsyncrosim::project(L, "Definitions")
 sc <- as.data.table(scenario(L, summary = TRUE))
 bid <- as.integer(opt("build", NA))
-if (is.na(bid)) { b <- sc[IsResult == "Yes" & grepl("^Build", Name)]; if (!nrow(b)) stop("no Build result in the library: run a Build scenario first"); bid <- max(b$ScenarioId) }
+if (is.na(bid)) { b <- sc[IsResult == "Yes" & grepl("Build", Name, fixed = TRUE)]; if (!nrow(b)) stop("no Build result in the library: run a Build scenario first"); bid <- max(b$ScenarioId) }
 if (!bid %in% sc[IsResult == "Yes", ScenarioId]) stop(sprintf("scenario %d is not a result scenario", bid))
 B <- scenario(L, bid); n <- function(s) nrow(suppressWarnings(datasheet(B, s, optional = TRUE)))
 # the stock-flow definitions: in the Build result when its pipeline ran stage 0 (a library made in Studio), else the Stock-Flow

@@ -1,0 +1,26 @@
+Column,Category,Source,Url
+EcodivisionFile,Study area and strata,USFS ECOMAP ecological subregions (divisions dissolved),https://data.fs.usda.gov/geodata/edw/datasets.php
+NlcdFolder,Land cover,USGS Annual NLCD (Collection 1),https://www.mrlc.gov/data
+Evt2001File,Land cover,LANDFIRE Existing Vegetation Type (LF 1.0.5),https://landfire.gov/data
+Evt2016File,Land cover,LANDFIRE Existing Vegetation Type (LF 2.0.0),https://landfire.gov/data
+RcmapFile,Land cover,USGS RCMAP rangeland fractional components,https://www.mrlc.gov/data
+CcapFile,Land cover,NOAA C-CAP Regional Land Cover,https://coast.noaa.gov/digitalcoast/data/ccapregional.html
+ForestTypeGroupFolder,Land cover,USFS Forest Type Groups (raster gateway),https://data.fs.usda.gov/geodata/rastergateway/forest_type/
+FiaConditionFile,Forest inventory and age,"USGS carbon density and merchantable volume on FIA conditions (USGS data release, from FIA)",https://apps.fs.usda.gov/fia/datamart/
+FiaDisturbanceFile,Forest inventory and age,"USGS FIA condition disturbance and treatment codes (USGS data release, from FIA)",https://apps.fs.usda.gov/fia/datamart/
+StandAgeFile,Forest inventory and age,NASA Carbon Monitoring System forest age (ORNL DAAC),https://daac.ornl.gov/
+MtbsSeverityFolder,Disturbance and fire,MTBS burn severity mosaics,https://www.mtbs.gov/direct-download
+LandfireDisturbanceFolder,Disturbance and fire,LANDFIRE Annual Disturbance,https://landfire.gov/data
+LcmsFolder,Disturbance and fire,USFS Landscape Change Monitoring System (LCMS),https://data.fs.usda.gov/geodata/rastergateway/LCMS/
+FirePerimeterHistoryFile,Disturbance and fire,NIFC Interagency Fire Perimeter History,https://data-nifc.opendata.arcgis.com/
+FriFile,Disturbance and fire,LANDFIRE Mean Fire Return Interval,https://landfire.gov/data
+BurnProbabilityFile,Disturbance and fire,"FSim burn probability (USFS Research Data Archive, RDS-2020-0016)",https://www.fs.usda.gov/rds/archive/
+FpaFodFile,Disturbance and fire,"FPA-FOD wildfire occurrence (USFS Research Data Archive, RDS-2013-0009)",https://www.fs.usda.gov/rds/archive/
+PrismFolder,Climate,PRISM annual and normals,https://prism.oregonstate.edu/
+Loca2Folder,Climate,LOCA2 downscaled CMIP6 projections,https://loca.ucsd.edu/
+SoilCarbonFile,Soils and terrain,NRCS gSSURGO,https://www.nrcs.usda.gov/resources/data-and-reports/gridded-soil-survey-geographic-gssurgo-database
+ElevationFile,Soils and terrain,LANDFIRE Elevation,https://landfire.gov/data
+NccpiFile,Soils and terrain,gNATSGO NCCPI (Microsoft Planetary Computer),https://planetarycomputer.microsoft.com/dataset/gnatsgo-rasters
+RoadsFile,Infrastructure and ownership,LANDFIRE Roads,https://landfire.gov/data
+WuiFolder,Infrastructure and ownership,SILVIS Lab wildland-urban interface,https://silvis.forest.wisc.edu/data/wui-change/
+ForestOwnerFile,Infrastructure and ownership,"USFS forest ownership circa 2017 (USFS Research Data Archive, RDS-2020-0044)",https://www.fs.usda.gov/rds/archive/

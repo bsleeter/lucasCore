@@ -27,6 +27,7 @@ namespace lucasCoreUI
         private readonly CheckBox m_allYears = new CheckBox { Text = "All historical transition years", AutoSize = true, Margin = new Padding(3, 5, 18, 3) };
         private readonly TextBox m_from = Box(60), m_to = Box(60);
         private readonly TextBox m_iter = Box(60), m_seed = Box(60);
+        private readonly TextBox m_endYear = Box(60);
         private readonly RadioButton m_spatial = new RadioButton { Text = "The spatial allocation decides", AutoSize = true, Margin = new Padding(3, 3, 18, 3) };
         private readonly RadioButton m_shares = new RadioButton { Text = "Weight each type by its historical share (default)", AutoSize = true };
         private readonly CheckBox m_tiled = new CheckBox { Text = "Split the landscape into tiles:", AutoSize = true, Margin = new Padding(3, 5, 6, 3) };
@@ -41,6 +42,10 @@ namespace lucasCoreUI
         public ProjectionRunView()
         {
             this.SuspendLayout();
+            var span = Form();
+            FormRow(span, "End year:", m_endYear, "blank = 2100. Projections start the year after the Build's historical end; their climate comes from a Projection Climate scenario.");
+            AddGroup(Group("Projection years", span));
+
             var start = Column();
             start.Controls.Add(m_continuous);
             var r = Row(); m_standAlone.Margin = new Padding(3, 6, 6, 3); r.Controls.Add(m_standAlone); r.Controls.Add(m_hist); start.Controls.Add(r);
@@ -76,6 +81,7 @@ namespace lucasCoreUI
             m_allYears.CheckedChanged += (s, e) => { if (Refreshing) return; m_customYears = !m_allYears.Checked; if (m_allYears.Checked) { Write("ReferenceStartYear", DBNull.Value); Write("ReferenceEndYear", DBNull.Value); } RefreshControls(); };
             BindNumber(m_from, () => Sheet, "ReferenceStartYear", true); BindNumber(m_to, () => Sheet, "ReferenceEndYear", true);
             BindNumber(m_iter, () => Sheet, "Iterations", true); BindNumber(m_seed, () => Sheet, "RandomSeed", true);
+            BindNumber(m_endYear, () => Sheet, "ProjectionEndYear", true);
             m_spatial.CheckedChanged += (s, e) => { if (!Refreshing && m_spatial.Checked) Write("HistoricalTypeShares", false); };
             m_shares.CheckedChanged += (s, e) => { if (!Refreshing && m_shares.Checked) Write("HistoricalTypeShares", true); };
             m_tiled.CheckedChanged += (s, e) => { if (Refreshing) return; Write("SpatialTiles", m_tiled.Checked ? (object)4 : DBNull.Value); if (m_tiled.Checked) SetTileLevel(TileLevel()); RefreshControls(); };
@@ -141,6 +147,7 @@ namespace lucasCoreUI
             m_from.Text = Show(rs); m_to.Text = Show(re);
 
             m_iter.Text = Show(Value("Iterations")); m_seed.Text = Show(Value("RandomSeed"));
+            m_endYear.Text = Show(Value("ProjectionEndYear"));
             object sh = Value("HistoricalTypeShares");
             bool shares = sh == DBNull.Value || Convert.ToBoolean(sh);   // blank = historical shares (the default)
             m_shares.Checked = shares; m_spatial.Checked = !shares;

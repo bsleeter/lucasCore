@@ -7,7 +7,8 @@
 # become the setup's initial conditions, so projections are ST-Sim-only scenarios on this result (user decision 2026-10-23: real
 # runs stand alone, their dependencies supply the inputs; one setup per starting historical run).
 # Usage: Rscript tools/new-projection-setup.R <library.ssim> [--build=<Build result id>] [--historical=<result id>] [--region="Pyrome: P26 Northern Sierra Nevada,..."]
-#                                             [--resolution=30] [--method=Fitted|Rules|None] [--name="Projection Setup"] [--replace]
+#                                             [--resolution=30] [--method=Fitted|Rules|None] [--end=2100] [--name="Projection Setup"] [--replace]
+#   --end         the projection end year (Run Settings; blank = 2100, or a legacy Build Options value)
 #   --historical  the historical run projections start from (made with tools/new-historical.R --historical-only --bookend-maps)
 #   --region      Suitability Fitting Region units (any Stratum Source; blank = the study area)
 #   --resolution  fitting resolution in m (30 = native NLCD)
@@ -20,9 +21,8 @@ pos <- a[!grepl("^--", a)]; if (!length(pos)) stop("usage: Rscript tools/new-pro
 L <- ssimLibrary(normalizePath(pos[1], winslash = "/")); P <- rsyncrosim::project(L, "Definitions")
 sc <- as.data.table(scenario(L, summary = TRUE))
 bid <- as.integer(opt("build", NA))
-if (is.na(bid)) { b <- sc[IsResult == "Yes" & grepl("^Build", Name)]; if (!nrow(b)) stop("no Build result in the library"); bid <- max(b$ScenarioId) }
+if (is.na(bid)) { b <- sc[IsResult == "Yes" & grepl("Build", Name, fixed = TRUE)]; if (!nrow(b)) stop("no Build result in the library"); bid <- max(b$ScenarioId) }
 B <- scenario(L, bid)
-if (is.na(suppressWarnings(as.data.table(datasheet(B, "lucasCore_BuildOptions")))$ProjectionEndYear[1])) stop(sprintf("Build result %d has no projection (tick Run a projection in Build Options)", bid))
 nm <- opt("name", "Projection Setup")
 if (nrow(sc[Name == nm & IsResult == "No"])) { if (!"--replace" %in% a) stop(sprintf("scenario '%s' exists (use --replace)", nm))
   for (i in sc[Name == nm & IsResult == "No", ScenarioId]) delete(L, scenario = i, force = TRUE) }
@@ -37,7 +37,13 @@ if (!is.na(hid)) { if (!hid %in% sc[IsResult == "Yes", ScenarioId]) stop("--hist
   po <- suppressWarnings(as.data.frame(datasheet(B, "lucasCore_ProjectionOptions", lookupsAsFactors = FALSE)))
   po <- po[, setdiff(names(po), c("ProjectionOptionsId", "ScenarioId")), drop = FALSE]
   if (nrow(po)) saveDatasheet(S, po, "lucasCore_ProjectionOptions") }
-reg <- trimws(strsplit(opt("region", ""), ",")[[1]]); reg <- reg[nzchar(reg)]
+# the projection end year (Run Settings; blank = 2100)
+endy <- as.integer(opt("end", NA))
+if (!is.na(endy)) { po <- suppressWarnings(as.data.frame(datasheet(S, "lucasCore_ProjectionOptions", lookupsAsFactors = FALSE)))
+  po <- po[, setdiff(names(po), c("ProjectionOptionsId", "ScenarioId")), drop = FALSE]
+  if (nrow(po)) po$ProjectionEndYear <- endy else po <- data.frame(ProjectionEndYear = endy)
+  saveDatasheet(S, po, "lucasCore_ProjectionOptions") }
+reg <-trimws(strsplit(opt("region", ""), ",")[[1]]); reg <- reg[nzchar(reg)]
 if (length(reg)) saveDatasheet(S, data.frame(UnitId = reg), "lucasCore_SuitabilityRegion")
 saveDatasheet(S, data.frame(FitResolution = as.integer(opt("resolution", 30))), "lucasCore_SuitabilityOptions")
 me <- opt("method", NA)

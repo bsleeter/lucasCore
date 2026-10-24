@@ -1,23 +1,18 @@
-# UI improvements (to do later)
+# UI improvements
 
 Ideas for the lucasCore pages in SyncroSim Studio, collected during the P26 user-guide walkthrough. Newest last.
 
-1. **Data Sources page** (Project properties > Advanced > LUCAS Core > Data Sources). Group the fields by data category (land
-   cover, forest inventory, disturbance and fire, climate, soils and terrain, ownership and infrastructure, study-area polygons)
-   instead of one long list, and give each source a link to where the data can be downloaded. Needs a custom view
-   (`ui/DataSourcesView.cs`, like BuildOptionsView) over the single-row `lucasCore_DataSource` sheet; the URLs can live in the view or
-   in a defaults table. (2026-10-23)
-2. **Data Sources: show the default paths.** A blank field means "use the package default" (the column's defaultValue in
-   package.xml), but the page shows nothing, so a new library looks unconfigured. Show the default greyed in each blank field, or
-   write the defaults into the sheet when LibrarySetup fills a new project. (2026-10-23) **Done for new libraries** (2026-10-23):
-   LibrarySetup writes the package's default paths (defaults/library/project/lucasCore_DataSource.csv); a path check or browse
-   button per field is still open.
-3. **Build Options: rename "Run a projection".** It runs nothing in the Build; it prepares the Build for projections (stage 7's
-   LOCA2 multipliers, and the horizon the Projection Setup reads). Something like "Prepare for projections, to year". (2026-10-23)
-4. **Model design, not just UI: a projection's climate is fixed in the Build.** Stage 7 computes the LOCA2 multipliers in the Build,
-   so each SSP / climate model needs its own Build. Moving the LOCA2 part of stage 7 into the Projection Setup would let one Build
-   serve several climate futures. (2026-10-23)
-5. **Every custom page: wrap and scroll.** Text and controls should wrap to the window width so Studio does not have to be stretched
-   wide, and every page should scroll vertically when it is taller than the window. Applies to all views in ui/ (Build Options,
-   Study Area, Climate, Carbon, Growth Curve Options, Run Settings, Transitions, Spatial Allocation, Fire). Long notes are
-   fixed-width labels today; flow panels and grids set widths in pixels. (2026-10-23)
+1. **Data Sources page** - DONE 2026-10-24. Custom view (`ui/DataSourcesView.cs`) groups the paths by category (study area, land
+   cover, forest inventory, disturbance and fire, climate, soils and terrain, infrastructure and ownership), links each to its download
+   page, adds a Browse button and a found/missing mark per path. Categories, dataset names and links: `defaults/library/data-sources.csv`.
+   Datasets in the USFS Research Data Archive link to the archive and name their RDS id; deep links still to add.
+2. **Data Sources: show the default paths** - DONE 2026-10-23. LibrarySetup writes the package's default paths into a new project
+   (`defaults/library/project/lucasCore_DataSource.csv`).
+3. **Build Options: rename "Run a projection"** - DONE 2026-10-24, by removing it: the projection end year is in Projection > Run
+   Settings, and the Build no longer knows about projections.
+4. **A projection's climate was fixed in the Build** - DONE 2026-10-24. Stage 7 is historical only; stage 11 (Projection Climate)
+   makes the LOCA2 multipliers in its own scenario on the Build result, and projections depend on it after the Projection Setup
+   (`tools/new-projection-climate.R`, `tools/new-projection.R --climate`).
+5. **Every custom page: wrap and scroll** - DONE 2026-10-24. `Fit` (ui/LucasView.cs) sets every wrapping label and row to the width the
+   window leaves it, on every resize; pages scroll vertically. Build Options and Data Sources use it too. The Study Area unit picker
+   already filled its window.

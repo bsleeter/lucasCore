@@ -7,7 +7,7 @@
 	<!-- PROJECT DATASHEETS                                                                                  -->
 	<!-- =================================================================================================== -->
 
-	<dataSheet name="DataSource" displayName="Data Sources (national data on disk)" dataScope="Project" isSingleRow="True">
+	<dataSheet name="DataSource" displayName="Data Sources (national data on disk)" dataScope="Project" isSingleRow="True" viewClassName="lucasCoreUI.DataSourcesView" viewClassAssembly="lucasCoreUI">
 		<!-- plain paths: these files are GBs and are read, never copied into the library; an empty sheet uses the defaults -->
 		<column name="EcodivisionFile" displayName="FIA Ecodivisions (dissolved; fields StrtmId, StrtmNm) - primary strata and model lattice" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FIA/EcoDivision_map/EcoDivisions_Dissolve.shp"/>
 		<column name="FiaConditionFile" displayName="FIA Condition Carbon and Merchantable Volume (USGS .Rds)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FIA/USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds"/>
@@ -97,7 +97,8 @@
 		<column name="TertiarySourceId" displayName="Tertiary Strata (blank = Federal Lands)" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="lucasCore_StratumSource"/>
 		<column name="StartYear" displayName="Historical Start Year" dataType="Integer" defaultValue="1985" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1985"/>
 		<column name="EndYear" displayName="Historical End Year" dataType="Integer" defaultValue="2023" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1985"/>
-		<column name="ProjectionEndYear" displayName="Projection End Year (blank = no projection; starts the year after Historical End)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="LessEqual" formula1="2100"/>
+		<!-- legacy (libraries made before 2026-10-24): the projection end year is now in Projection Options (Run Settings); stages 9 and 10 still read this one when that is blank -->
+		<column name="ProjectionEndYear" displayName="Projection End Year (legacy: now in Projection > Run Settings)" dataType="Integer" isOptional="True" isVisible="False"/>
 		<column name="ForestTypeMap" displayName="Forest Type Map" dataType="Integer" validationType="List" formula1="1:LANDFIRE EVT|2:USFS forest type groups" defaultValue="1"/>
 	</dataSheet>
 
@@ -148,7 +149,8 @@
 	</dataSheet>
 
 	<dataSheet name="ProjectionOptions" displayName="Projection Options" isSingleRow="True">
-		<!-- stage 9: projection transitions resample whole historical years (Build Options sets the projection end year) -->
+		<!-- stage 9: projection transitions resample whole historical years, from the historical end to ProjectionEndYear -->
+		<column name="ProjectionEndYear" displayName="Projection End Year (blank = 2100)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="LessEqual" formula1="2100"/>
 		<column name="ReferenceStartYear" displayName="Reference Period Start (blank = first historical transition year)" dataType="Integer" isOptional="True"/>
 		<column name="ReferenceEndYear" displayName="Reference Period End (blank = historical end)" dataType="Integer" isOptional="True"/>
 		<column name="Iterations" displayName="Iterations (Monte Carlo)" dataType="Integer" defaultValue="10" validationType="WholeNumber" validationCondition="Greater" formula1="0"/>
@@ -257,9 +259,20 @@
 		<column name="ForestGrowthModel" displayName="Forest Growth (None = normal climate every year)" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP|3:Tree ring" defaultValue="3"/>
 		<column name="NonForestGrowthModel" displayName="Non-Forest Growth" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP" defaultValue="2"/>
 		<column name="DecompositionModel" displayName="Decomposition" dataType="Integer" validationType="List" formula1="1:None|2:Q10" defaultValue="2"/>
-		<column name="ClimateScenarioId" displayName="Projection Scenario (needed when Build Options sets a projection)" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="lucasCore_ClimateScenario"/>
-		<column name="ClimateModelId" displayName="Projection Climate Model" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="lucasCore_ClimateModel"/>
-		<column name="ClimateReplicateId" displayName="Projection Replicate (blank = lowest-numbered with the scenario)" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="lucasCore_ClimateReplicate"/>
+		<!-- legacy (libraries made before 2026-10-24): the LOCA2 run is now chosen in a Projection Climate scenario (stage 11); stage 7 no longer reads these -->
+		<column name="ClimateScenarioId" displayName="Projection Scenario (legacy)" dataType="Integer" isOptional="True" isVisible="False" validationType="Datasheet" formula1="lucasCore_ClimateScenario"/>
+		<column name="ClimateModelId" displayName="Projection Climate Model (legacy)" dataType="Integer" isOptional="True" isVisible="False" validationType="Datasheet" formula1="lucasCore_ClimateModel"/>
+		<column name="ClimateReplicateId" displayName="Projection Replicate (legacy)" dataType="Integer" isOptional="True" isVisible="False" validationType="Datasheet" formula1="lucasCore_ClimateReplicate"/>
+	</dataSheet>
+
+	<!-- stage 11: the LOCA2 run whose climate drives projections. A Projection Climate scenario depends on a Build result (strata, the
+	     historical end year and the Climate Options effects) and writes the flow multipliers of the projection years; projections
+	     depend on it after the Projection Setup, so one Build and one Projection Setup serve any number of climate futures -->
+	<dataSheet name="ProjectionClimate" displayName="Climate" isSingleRow="True" viewClassName="lucasCoreUI.ProjectionClimateView" viewClassAssembly="lucasCoreUI">
+		<column name="ClimateScenarioId" displayName="Scenario (SSP)" dataType="Integer" validationType="Datasheet" formula1="lucasCore_ClimateScenario"/>
+		<column name="ClimateModelId" displayName="Climate Model" dataType="Integer" validationType="Datasheet" formula1="lucasCore_ClimateModel"/>
+		<column name="ClimateReplicateId" displayName="Replicate (blank = lowest-numbered with the scenario)" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="lucasCore_ClimateReplicate"/>
+		<column name="EndYear" displayName="Last Year (blank = 2100)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="LessEqual" formula1="2100"/>
 	</dataSheet>
 
 	<dataSheet name="CarbonOptions" displayName="Carbon Options" isSingleRow="True" viewClassName="lucasCoreUI.CarbonOptionsView" viewClassAssembly="lucasCoreUI">
@@ -633,10 +646,21 @@
 		<dataSheet name="OutputSuitabilityMap" type="Output"/>
 		<dataSheet name="OutputPatchSize" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
+		<dataSheet name="ProjectionOptions" type="Input"/>
+	</transformer>
+
+	<transformer name="ProjectionClimate" displayName="11 - Projection Climate" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/11-projection-climate.R">
+		<dataSheet name="BuildOptions" type="Input"/>
+		<dataSheet name="ClimateOptions" type="Input"/>
+		<dataSheet name="ProjectionClimate" type="Input"/>
+		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
+		<dataSheet name="stsim_FlowSpatialMultiplier" type="Output"/>
+		<dataSheet name="OutputClimateSummary" type="Both"/>
+		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
 	<!-- =================================================================================================== -->
-	<!-- LAYOUTS                                                                                             -->
+	<!-- LAYOUTS                                                                                           -->
 	<!-- =================================================================================================== -->
 
 	<layout type="Project" appendTo="stsim_Advanced">
@@ -661,6 +685,7 @@
 				<item name="ProjectionTransitions"/>
 				<item name="SpatialAllocation"/>
 				<item name="FireOptions"/>
+				<item name="ProjectionClimate"/>
 			</group>
 			<group name="lucasCoreCrosswalks" displayName="Crosswalks">
 				<item name="LandCoverCrosswalk"/>

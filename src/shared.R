@@ -37,6 +37,15 @@ read_ds <- function(name, ...) { x <- as.data.table(datasheet(scn, ds(name), opt
     for (k in names(d)) if (k %in% names(x) && is.na(x[[k]][1]) && !is.na(d[[k]][1])) x[[k]] <- d[[k]] }
   x }
 
+# the last projection year: Projection Options (Run Settings), else Build Options' legacy column (libraries made before 2026-10-24),
+# else 2100
+projection_end <- function() {
+  po <- as.data.table(datasheet(scn, ds("ProjectionOptions"), optional = TRUE, lookupsAsFactors = FALSE))
+  v <- if (nrow(po) && "ProjectionEndYear" %in% names(po)) po$ProjectionEndYear[1] else NA
+  if (is.na(v)) { b <- as.data.table(datasheet(scn, ds("BuildOptions"), optional = TRUE, lookupsAsFactors = FALSE))
+    v <- if (nrow(b) && "ProjectionEndYear" %in% names(b)) b$ProjectionEndYear[1] else NA }
+  if (is.na(v)) 2100L else as.integer(v) }
+
 # the defaultValue of each column of a sheet in package.xml, as one row
 .defaults_said <- new.env()
 sheet_defaults <- function(name, quiet = FALSE) {

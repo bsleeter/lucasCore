@@ -20,12 +20,13 @@ L <- ssimLibrary(f); P <- rsyncrosim::project(L, "Definitions"); sc <- as.data.t
 B <- rsyncrosim::scenario(P, "Build"); dependency(B) <- sc[Name == "Stock-Flow Definitions", ScenarioId]
 description(B) <- paste(
   "Builds a LUCAS model. Before running, set: (1) Build Options - cell size, secondary and tertiary strata (blank = States, Federal Lands),",
-  "historical start and end years, projection end year (blank = no projection); (2) Study Area - one row per unit of any source (blank = all",
-  "of CONUS); (3) Climate Options - climate methods, and the projection scenario, climate model and replicate when projecting.",
-  "Depends on Stock-Flow Definitions. Pipeline: 1 Study Area and Strata, 5 Initial Conditions, 2 Growth Curves, 3 Carbon Flows,",
-  "4 Spin-up, 6 Historical Transitions, 7 Climate Multipliers, 8 Initial Stock Maps, 9 Projection Transitions (only with a projection). California at 1 km takes about 50 minutes.")
-stages <- c("1 - Study Area and Strata", "5 - Initial Conditions", "2 - Fit Growth Curves", "3 - Carbon Flows", "4 - Spin-up and Initial Stocks",
-            "6 - Historical Transitions", "7 - Climate Multipliers", "8 - Initial Stock Maps", "9 - Projection Transitions")
+  "historical start and end years; (2) Study Area - one row per unit of any source (blank = all of CONUS); (3) Climate Options - climate methods.",
+  "Projections are set up afterwards on this Build's result: a Projection Setup (stages 9-10, end year in Run Settings) and one Projection",
+  "Climate scenario per LOCA2 run (stage 11). Depends on Stock-Flow Definitions. Pipeline: 0 Stock-Flow Definitions (writes nothing here: the",
+  "dependency has them), 1 Study Area and Strata, 5 Initial Conditions, 2 Growth Curves, 3 Carbon Flows, 4 Spin-up, 6 Historical Transitions,",
+  "7 Climate Multipliers, 8 Initial Stock Maps. California at 1 km takes about 50 minutes.")
+stages <- c("0 - Stock-Flow Definitions", "1 - Study Area and Strata", "5 - Initial Conditions", "2 - Fit Growth Curves", "3 - Carbon Flows",
+            "4 - Spin-up and Initial Stocks", "6 - Historical Transitions", "7 - Climate Multipliers", "8 - Initial Stock Maps")
 saveDatasheet(B, data.frame(StageNameId = stages, RunOrder = seq_along(stages)), "core_Pipeline")
 # the option sheets show their values: one row of package.xml's defaultValues (a blank optional column stays blank; the stages use the
 # same defaults for anything left empty). Strata sources are spelled out so the drop-downs show them.
@@ -54,11 +55,17 @@ saveDatasheet(G, data.frame(StageNameId = "2 - Fit Growth Curves", RunOrder = 1L
 saveDatasheet(G, defaults_of("GrowthOptions"), "lucasCore_GrowthOptions")
 # Projection Setup: projection rules (stage 9) and where transitions go (stage 10), run once on a Build result; projections depend on it
 PS <- rsyncrosim::scenario(P, "Projection Setup")
-description(PS) <- paste("Run once a Build with a projection (Run a projection ticked) has run: add the Build result as this scenario's dependency.",
+description(PS) <- paste("Run once the Build has run: add the Build result as this scenario's dependency, and set the projection end year in Run Settings (blank = 2100).",
   "Stage 9 sets the projection transitions (Projection Options, Projection Transitions); stage 10 makes the surfaces that place them",
   "(Projection Allocation: fitted regression or WUI/PAD rules; Suitability Options, Fitting Region, Covariates; Rule Weights). Projections",
   "(tools/new-projection.R, or a scenario with this result as its first dependency) use its result. Change a covariate and rerun this alone.")
 saveDatasheet(PS, data.frame(StageNameId = c("9 - Projection Transitions", "10 - Transition Suitability"), RunOrder = 1:2), "core_Pipeline")
+# Projection Climate: one per LOCA2 run (stage 11), on the Build result; projections depend on its result after the Projection Setup
+PC <- rsyncrosim::scenario(P, "Projection Climate")
+description(PC) <- paste("Run once the Build has run: add the Build result as this scenario's dependency and choose the LOCA2 scenario, climate model",
+  "and replicate on the Projection > Climate page. Stage 11 writes the climate flow multipliers of the projection years (the Build's historical",
+  "end + 1 to 2100) with the Build's Climate Options effects. Copy it for each climate future; projections depend on its result after the Projection Setup.")
+saveDatasheet(PC, data.frame(StageNameId = "11 - Projection Climate", RunOrder = 1L), "core_Pipeline")
 # the Projection pages open filled in with the package defaults (the same CSVs the stages use for an empty sheet; Reset to defaults on
 # the pages reloads them). A list column takes its full label ("Target" -> "Target (area by strata)"). Build gets the Transitions feed
 # too (stage 9 runs there for a continuous run); the Setup's own copy wins for the Setup, since a dependency supplies whole feeds.

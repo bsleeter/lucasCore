@@ -8,10 +8,13 @@
 # --years years. ST-Sim-only scenarios can also run side by side (library multiprocessing, multi-scenario).
 # A setup made without the hand-over still works with --stage9: the projection then runs stage 9 itself (names the historical run in
 # Projection Start) before ST-Sim, as before - but such scenarios cannot run under multi-scenario multiprocessing.
-# Usage: Rscript tools/new-projection.R <library.ssim> --build=<Projection Setup result> [--years=10] [--iterations=<n>] [--name="..."] [--replace]
+# Usage: Rscript tools/new-projection.R <library.ssim> --build=<Projection Setup result> [--climate=<Projection Climate result>] [--years=10]
+#                                       [--iterations=<n>] [--name="..."] [--replace]
 #        Rscript tools/new-projection.R <library.ssim> --build=<result> --historical=<result id> --stage9 [...]   (legacy)
 #   --years       projection years to run (default 10; at most to the projection end)
 #   --iterations  Monte Carlo iterations (default: the setup's, the draws stage 9 made)
+#   --climate     the Projection Climate result (tools/new-projection-climate.R) whose LOCA2 run drives the projection years; without
+#                 it they run at normal climate
 # Prints the new scenario id on the last line.
 # =============================================================================
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
@@ -27,7 +30,7 @@ sfd <- if (is.na(sfd)) integer(0) else sfd
 setup <- nrow(suppressWarnings(as.data.table(datasheet(B, "lucasCore_OutputSuitability", optional = TRUE)))) > 0 || grepl("^Projection Setup", sc[ScenarioId == bid, Name])
 build_of <- NA_integer_
 if (setup) { par <- sc[ScenarioId == bid, ParentId]; d <- as.data.table(dependency(scenario(L, if (is.na(par)) bid else par)))
-  build_of <- d[grepl("^Build", Name), ScenarioId][1]; if (is.na(build_of)) stop("cannot find the Build result the Projection Setup was made on") }
+  build_of <- d[grepl("Build", Name, fixed = TRUE), ScenarioId][1]; if (is.na(build_of)) stop("cannot find the Build result the Projection Setup was made on") }
 # the hand-over the setup made (its Projection Start)
 pst <- suppressWarnings(as.data.table(datasheet(B, "lucasCore_ProjectionStart", optional = TRUE)))
 hid_setup <- if (nrow(pst) && "HistoricalScenarioId" %in% names(pst)) pst$HistoricalScenarioId[1] else NA
@@ -47,9 +50,18 @@ nm <- opt("name", sprintf("Projection %d-%d from %s", yh + 1, ye, sc[ScenarioId 
 if (nrow(sc[Name == nm & IsResult == "No"])) { if (!"--replace" %in% a) stop(sprintf("scenario '%s' exists (use --replace)", nm))
   for (i in sc[Name == nm & IsResult == "No", ScenarioId]) delete(L, scenario = i, force = TRUE) }
 S <- rsyncrosim::scenario(P, nm)
-# the setup (its multipliers, adjacency, state attributes and initial conditions win), then the build (it supplies the whole Flow
-# Pathways feed), then the definitions
-dependency(S) <- if (setup) c(bid, build_of, sfd) else c(bid, sfd)
+# the setup first (its multipliers, adjacency, state attributes and initial conditions - the hand-over - win), then the Projection
+# Climate result (the setup has no flow spatial multipliers, so its projection-year multipliers win that feed over the Build's
+# PRISM ones; it must come after the setup: its result also carries the Build's start-year initial conditions map, a stage 11 input,
+# which would replace the hand-over and break ST-Sim), then the build (it supplies the whole Flow Pathways feed), then the
+# definitions. Without a climate result the projection years run at normal climate (the Build's PRISM multipliers end with 1.0 the
+# year after the historical end).
+clim <- as.integer(opt("climate", NA))
+if (!is.na(clim)) { if (!clim %in% sc[IsResult == "Yes", ScenarioId]) stop("--climate must be a result scenario id (a Projection Climate result)")
+  if (!nrow(suppressWarnings(as.data.table(datasheet(scenario(L, clim), "stsim_FlowSpatialMultiplier", optional = TRUE))))) stop(sprintf("result %d has no flow multipliers: run its stage 11 first", clim))
+} else cat("note: no --climate: the projection years run at normal climate (make a Projection Climate scenario with tools/new-projection-climate.R)\n")
+cl <- if (!is.na(clim)) clim else integer(0)
+dependency(S) <- if (setup) c(bid, cl, build_of, sfd) else c(cl, bid, sfd)   # legacy (a Build result, stage 9 in the pipeline): its multipliers would win, so climate first
 if (legacy) { saveDatasheet(S, data.frame(HistoricalScenarioId = hid), "lucasCore_ProjectionStart")
   # Projection Start shares a feed with Projection Options, and a dependency supplies whole feeds: copy the options
   po <- suppressWarnings(as.data.frame(datasheet(B, "lucasCore_ProjectionOptions", lookupsAsFactors = FALSE)))
@@ -67,9 +79,10 @@ st <- grep("ST-Sim|stsim", stages, value = TRUE, ignore.case = TRUE)[1]
 if (legacy && !"9 - Projection Transitions" %in% stages) stop("this library has no stage 9 (made before it existed): make the library from a current starter")
 saveDatasheet(S, data.frame(StageNameId = if (legacy) c("9 - Projection Transitions", st) else st, RunOrder = if (legacy) 1:2 else 1L), "core_Pipeline")
 description(S) <- sprintf(paste0("Stand-alone projection %d-%d, %d iteration(s), spatial (made by tools/new-projection.R). Starts from historical run %d's %d state class, ",
-  "age and stock maps. %s Depends on result %d%s%s. Maps in %d and %d."), yh + 1, ye, it, hid, yh,
+  "age and stock maps. %s Depends on %sresult %d%s%s. Maps in %d and %d."), yh + 1, ye, it, hid, yh,
   if (legacy) "Pipeline: stage 9 (writes the starting maps and the draws) then ST-Sim." else "Pipeline: ST-Sim alone; the Projection Setup made the hand-over, the draws and the surfaces.",
-  bid, if (setup) sprintf(", its Build result %d", build_of) else "", if (length(sfd)) sprintf(" and Stock-Flow Definitions (%d)", sfd) else "", yh, ye)
+  "", bid, paste0(if (!is.na(clim)) sprintf(", the Projection Climate result '%s' (%d)", sc[ScenarioId == clim, Name], clim) else " (no Projection Climate: normal climate in the projection years)",
+                  if (setup) sprintf(", its Build result %d", build_of) else ""), if (length(sfd)) sprintf(" and Stock-Flow Definitions (%d)", sfd) else "", yh, ye)
 cat(sprintf("scenario '%s': from historical run %d (%d), %s %d, %d-%d, %d iteration(s), %s\n", nm, hid, yh, if (setup) "setup" else "build", bid, yh + 1, ye, it,
             if (legacy) "stage 9 + ST-Sim" else "ST-Sim only"))
 cat(scenarioId(S), "\n")
