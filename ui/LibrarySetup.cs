@@ -32,6 +32,11 @@ namespace lucasCoreUI
             LibrarySetup.Trace(string.Format("AddDefaultRecords: project {0}, process {1}", this.Project == null ? "none" : this.Project.Id.ToString(), System.Diagnostics.Process.GetCurrentProcess().ProcessName));
             try { base.AddDefaultRecords(store); }
             catch (Exception ex) { LibrarySetup.Trace("base AddDefaultRecords failed: " + ex); throw; }
+            // a multiprocessing job library (<library>.temp\MultiProc\...\Job-N.ssim) is made empty and then filled by SyncroSim with the
+            // main library's project; filling it here first made that copy fail on duplicate ids (UNIQUE constraint failed:
+            // core_ExternalVariableType, found 2026-10-24 with spatial multiprocessing), so a job library is left alone
+            string where = LibrarySetup.Location(this.Library);
+            if (LibrarySetup.IsJobLibrary(where)) { LibrarySetup.Trace("Skipped: multiprocessing job library " + where); return; }
             string status, detail;
             try
             {
@@ -47,6 +52,18 @@ namespace lucasCoreUI
 
     public static class LibrarySetup
     {
+        // the library's file, from its connection string ("Data Source=...;"), or "" when it cannot be read
+        public static string Location(Library lib)
+        {
+            try { return lib == null || lib.Connection == null ? "" : (lib.Connection.ConnectionString ?? ""); }
+            catch { return ""; }
+        }
+
+        public static bool IsJobLibrary(string where)
+        {
+            return where.Replace('/', '\\').ToLowerInvariant().Contains(".temp\\multiproc\\");
+        }
+
         public static string PackageDirectory()
         {
             string dir = Path.GetDirectoryName(typeof(LibrarySetup).Assembly.Location);
