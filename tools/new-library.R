@@ -135,4 +135,10 @@ if (!nrow(suppressWarnings(datasheet(sfd, "stsim_FlowPathwayDiagram", optional =
   saveDatasheet(sfd, data.frame(ApplyBeforeTransitions = FALSE, ApplyEquallyRankedSimultaneously = TRUE), "stsim_FlowOrderOptions")
   cat("Stock-Flow Definitions scenario created (id", scenarioId(sfd), ")\n")
 } else cat("Stock-Flow Definitions scenario kept (id", scenarioId(sfd), ")\n")
+# the transition group output filter: summaries for every group, maps for the main groups only (src/transition-filter.R)
+if (!nrow(suppressWarnings(datasheet(sfd, "stsim_OutputFilterTransitionGroups", optional = TRUE)))) {
+  source(file.path(pkgdir, "src", "transition-filter.R"))
+  tf <- transition_filter(as.data.table(datasheet(P, "stsim_TransitionGroup", lookupsAsFactors = FALSE))$Name, rd("stockflow", "main-transition-groups.csv"))
+  saveDatasheet(sfd, tf, "stsim_OutputFilterTransitionGroups")
+  cat(sprintf("transition group output filter: %d groups, maps for %d\n", nrow(tf), sum(tf$Spatial == "Yes"))) }
 cat("library ready:", f, "\n")

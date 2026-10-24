@@ -525,6 +525,7 @@
 		<dataSheet name="stsim_OutputOptionsStockFlow" type="Output"/>
 		<dataSheet name="stsim_OutputFilterFlows" type="Output"/>
 		<dataSheet name="stsim_OutputFilterStocks" type="Output"/>
+		<dataSheet name="stsim_OutputFilterTransitionGroups" type="Both"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 

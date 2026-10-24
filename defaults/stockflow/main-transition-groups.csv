@@ -1,0 +1,8 @@
+TransitionGroupId,Spatial,SpatialProbability
+Urbanization,Yes,Yes
+Intensification,Yes,Yes
+Ag Expansion,Yes,Yes
+Ag Contraction,Yes,Yes
+Fire,Yes,Yes
+Forest Harvest,Yes,Yes
+Insect,Yes,Yes

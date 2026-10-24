@@ -6,7 +6,9 @@
 # (File > New > Empty Library, then add lucasCore) has no such scenario, so the Build writes them itself and every run that depends on
 # the Build result gets them. Its own stage: SyncroSim imports one stage's outputs in alphabetical order, so stage 3's flow pathways
 # need the diagram imported by an earlier stage (or supplied by a dependency).
-# When the scenario already has a flow pathway diagram (a Stock-Flow Definitions dependency), the stage writes nothing.
+# When the scenario already has a flow pathway diagram (a Stock-Flow Definitions dependency), the stage writes none of these.
+# It also writes the transition group output filter (src/transition-filter.R: summaries for every group, maps only for the main groups
+# of defaults/stockflow/main-transition-groups.csv) whenever the scenario has no filter, dependency or not.
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
 STAGE <- "0 Stock-Flow Definitions"
@@ -28,6 +30,15 @@ if (nrow(have)) {
   }
   saveDatasheet(scn, data.frame(ApplyBeforeTransitions = FALSE, ApplyEquallyRankedSimultaneously = TRUE), "stsim_FlowOrderOptions")
   updateRunLog(sprintf("%s: wrote %s", STAGE, paste(SHEETS, collapse = ", ")))
+}
+# the transition group output filter, written whenever the scenario has none (a Stock-Flow Definitions dependency made before
+# 2026-10-24 has none): summaries for every group, maps for the main groups only (src/transition-filter.R)
+if (!nrow(as.data.table(datasheet(scn, "stsim_OutputFilterTransitionGroups", optional = TRUE, lookupsAsFactors = FALSE)))) {
+  source(pkg_file("src", "transition-filter.R"))
+  f <- transition_filter(stsim_list("TransitionGroup")$Name, read_default("stockflow", "main-transition-groups.csv"))
+  saveDatasheet(scn, f, "stsim_OutputFilterTransitionGroups")
+  check(STAGE, "transition group output filter written", nrow(f) > 0 && any(f$Spatial == "Yes"),
+        sprintf("%d groups; maps for %s", nrow(f), paste(f$TransitionGroupId[f$Spatial == "Yes"], collapse = ", ")))
 }
 progressBar()
 finish_checks()
