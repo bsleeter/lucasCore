@@ -19,3 +19,8 @@ dev/**/*.png
 dev/growth/*.rds
 dev/growth/out_*.csv
 dev/climate/*.csv
+
+# guide screen captures and annotated figures (published in the guide doc, not the repo)
+docs/guide/captures/
+docs/guide/figures/
+Starter/*.bak-*

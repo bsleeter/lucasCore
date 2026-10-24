@@ -21,7 +21,8 @@ L <- ssimLibrary(normalizePath(pos[1], winslash = "/")); P <- rsyncrosim::projec
 sc <- as.data.table(scenario(L, summary = TRUE)); legacy <- "--stage9" %in% a
 bid <- as.integer(opt("build", NA)); if (is.na(bid) || !bid %in% sc[IsResult == "Yes", ScenarioId]) stop("--build must be a result scenario id (a Projection Setup result)")
 B <- scenario(L, bid)
-sfd <- sc[Name == "Stock-Flow Definitions" & IsResult == "No", ScenarioId]
+sfd <- sc[Name == "Stock-Flow Definitions" & IsResult == "No", ScenarioId][1]   # absent in a library made in Studio (stage 0 put them in the Build)
+sfd <- if (is.na(sfd)) integer(0) else sfd
 # a Projection Setup result keeps only the sheets of its own stages: the projection also needs the Build result its setup was made on
 setup <- nrow(suppressWarnings(as.data.table(datasheet(B, "lucasCore_OutputSuitability", optional = TRUE)))) > 0 || grepl("^Projection Setup", sc[ScenarioId == bid, Name])
 build_of <- NA_integer_
@@ -66,9 +67,9 @@ st <- grep("ST-Sim|stsim", stages, value = TRUE, ignore.case = TRUE)[1]
 if (legacy && !"9 - Projection Transitions" %in% stages) stop("this library has no stage 9 (made before it existed): make the library from a current starter")
 saveDatasheet(S, data.frame(StageNameId = if (legacy) c("9 - Projection Transitions", st) else st, RunOrder = if (legacy) 1:2 else 1L), "core_Pipeline")
 description(S) <- sprintf(paste0("Stand-alone projection %d-%d, %d iteration(s), spatial (made by tools/new-projection.R). Starts from historical run %d's %d state class, ",
-  "age and stock maps. %s Depends on result %d%s and Stock-Flow Definitions (%d). Maps in %d and %d."), yh + 1, ye, it, hid, yh,
+  "age and stock maps. %s Depends on result %d%s%s. Maps in %d and %d."), yh + 1, ye, it, hid, yh,
   if (legacy) "Pipeline: stage 9 (writes the starting maps and the draws) then ST-Sim." else "Pipeline: ST-Sim alone; the Projection Setup made the hand-over, the draws and the surfaces.",
-  bid, if (setup) sprintf(", its Build result %d", build_of) else "", sfd, yh, ye)
+  bid, if (setup) sprintf(", its Build result %d", build_of) else "", if (length(sfd)) sprintf(" and Stock-Flow Definitions (%d)", sfd) else "", yh, ye)
 cat(sprintf("scenario '%s': from historical run %d (%d), %s %d, %d-%d, %d iteration(s), %s\n", nm, hid, yh, if (setup) "setup" else "build", bid, yh + 1, ye, it,
             if (legacy) "stage 9 + ST-Sim" else "ST-Sim only"))
 cat(scenarioId(S), "\n")

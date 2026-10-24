@@ -81,6 +81,16 @@
 	<!-- SCENARIO DATASHEETS                                                                                 -->
 	<!-- =================================================================================================== -->
 
+	<!-- Not shown in any layout, and declared after the other project sheets. Its class fills a new project (an Empty Library with
+	     lucasCore added, or a new project) with the ST-Sim definitions, Stratum Sources, strata unit lists and LOCA2 lists from defaults/
+	     (ui/LibrarySetup.cs), and records the outcome here. -->
+	<dataSheet name="LibrarySetup" displayName="Library Setup" dataScope="Project" isSingleRow="True" className="lucasCoreUI.LibrarySetupDataSheet" classAssembly="lucasCoreUI">
+		<column name="PackageVersion" displayName="Package Version" dataType="String" isOptional="True"/>
+		<column name="Status" dataType="String" isOptional="True"/>
+		<column name="Detail" dataType="String" isOptional="True"/>
+		<record columns="Status" values="Pending"/>
+	</dataSheet>
+
 	<dataSheet name="BuildOptions" displayName="Build Options" isSingleRow="True" viewClassName="lucasCoreUI.BuildOptionsView" viewClassAssembly="lucasCoreUI">
 		<column name="Resolution" displayName="Cell Size (m)" dataType="Integer" defaultValue="1000" validationType="WholeNumber" validationCondition="Greater" formula1="0"/>
 		<column name="SecondarySourceId" displayName="Secondary Strata (blank = States)" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="lucasCore_StratumSource"/>
@@ -484,6 +494,18 @@
 	<!-- =================================================================================================== -->
 	<!-- TRANSFORMERS                                                                                        -->
 	<!-- =================================================================================================== -->
+
+	<transformer name="StockFlowDefinitions" displayName="0 - Stock-Flow Definitions" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/0-stock-flow-definitions.R">
+		<dataSheet name="stsim_FlowPathwayDiagram" type="Both"/>
+		<dataSheet name="stsim_FlowOrder" type="Output"/>
+		<dataSheet name="stsim_FlowOrderOptions" type="Output"/>
+		<dataSheet name="stsim_FlowTypeGroupMembership" type="Output"/>
+		<dataSheet name="stsim_StockTypeGroupMembership" type="Output"/>
+		<dataSheet name="stsim_OutputOptionsStockFlow" type="Output"/>
+		<dataSheet name="stsim_OutputFilterFlows" type="Output"/>
+		<dataSheet name="stsim_OutputFilterStocks" type="Output"/>
+		<dataSheet name="OutputValidation" type="Output"/>
+	</transformer>
 
 	<transformer name="StudyArea" displayName="1 - Study Area and Strata" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/1-study-area.R">
 		<dataSheet name="BuildOptions" type="Input"/>

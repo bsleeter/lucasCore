@@ -27,8 +27,12 @@ sc <- as.data.table(scenario(L, summary = TRUE))
 bid <- as.integer(opt("build", NA))
 if (is.na(bid)) { b <- sc[IsResult == "Yes" & grepl("^Build", Name)]; if (!nrow(b)) stop("no Build result in the library: run a Build scenario first"); bid <- max(b$ScenarioId) }
 if (!bid %in% sc[IsResult == "Yes", ScenarioId]) stop(sprintf("scenario %d is not a result scenario", bid))
-sfd <- sc[Name == "Stock-Flow Definitions" & IsResult == "No", ScenarioId]; if (length(sfd) != 1) stop("no Stock-Flow Definitions scenario (tools/new-library.R makes it)")
 B <- scenario(L, bid); n <- function(s) nrow(suppressWarnings(datasheet(B, s, optional = TRUE)))
+# the stock-flow definitions: in the Build result when its pipeline ran stage 0 (a library made in Studio), else the Stock-Flow
+# Definitions scenario of a starter copy or new-library.R library, as a second dependency
+sfd <- sc[Name == "Stock-Flow Definitions" & IsResult == "No", ScenarioId][1]
+if (n("stsim_FlowOrder") > 0) sfd <- integer(0) else if (is.na(sfd)) stop(sprintf("Build result %d has no stock-flow definitions and the library has no Stock-Flow Definitions scenario: put stage 0 first in the Build's pipeline", bid))
+dep_txt <- if (length(sfd)) sprintf("Stock-Flow Definitions (%d) and ", sfd) else ""
 
 # the build must have run the stages the run needs; climate multipliers are optional (all-None Climate Options writes none)
 need <- c(stsim_InitialConditionsSpatial = "1 and 5", stsim_Transition = "6", stsim_TransitionSpatialMultiplier = "6",
@@ -70,9 +74,9 @@ stages <- levels(datasheet(S, "core_Pipeline", lookupsAsFactors = TRUE, optional
 st <- grep("ST-Sim|stsim", stages, value = TRUE, ignore.case = TRUE)[1]; if (is.na(st)) stop("no ST-Sim stage among: ", paste(stages, collapse = "; "))
 saveDatasheet(S, data.frame(StageNameId = st, RunOrder = 1L), "core_Pipeline")
 description(S) <- paste0(if (kind == "Historical") sprintf("Historical ST-Sim run %d-%d (transitions from %d), %d iteration(s), spatial. ", y0, y1, y0 + 1, it) else sprintf("Historical (%d-%d) and projection (%d-%d) ST-Sim run, %d iteration(s), spatial; projection transitions from stage 9 (whole historical years drawn per Projection Transitions). ", y0 + 1, yh, yh + 1, y1, it),
-  sprintf("Depends on Stock-Flow Definitions (%d) and the Build result '%s' (%d), which holds the initial conditions, transition pathways and ", sfd, sc[ScenarioId == bid, Name], bid),
+  sprintf("Depends on %sthe Build result '%s' (%d), which holds the initial conditions, transition pathways and ", dep_txt, sc[ScenarioId == bid, Name], bid),
   "annual spatial multipliers, flow pathways, climate flow multipliers and initial stock maps. ",
   sprintf("Adds Run Control and ST-Sim output options (yearly state class and transition tables%s). Made by tools/new-historical.R.",
           if (ev > 0) sprintf("; state class, age and transition maps every %d year(s)", ev) else ""))
-cat(sprintf("scenario '%s' created: depends on Stock-Flow Definitions (%d) and Build result %d; %d-%d, %d iteration(s); stage '%s'\n", nm, sfd, bid, y0, y1, it, st))
+cat(sprintf("scenario '%s' created: depends on %sBuild result %d; %d-%d, %d iteration(s); stage '%s'\n", nm, dep_txt, bid, y0, y1, it, st))
 cat(scenarioId(S), "\n")
