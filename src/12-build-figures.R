@@ -19,6 +19,7 @@ if (!nrow(ic) || is.na(ic$StateClassFileName[1])) fail("no state class map: run 
 opt_rast <- function(f) if (length(f) && !is.na(f) && nzchar(f) && file.exists(f)) rast(f) else NULL
 named <- function(name) stsim_list(name)[, .(Id = as.numeric(Id), Name)]
 sheet <- function(name) read_ds(name)
+source_name <- function(v, blank) if (length(v) && !is.na(v) && nzchar(v)) as.character(v) else blank   # Build Options: blank = the default source
 prim <- rast(ic$StratumFileName[1]); scr <- rast(ic$StateClassFileName[1])
 scl <- stsim_list("StateClass"); stl <- named("Stratum")
 present_eco <- stl$Name[stl$Id %in% unique(values(prim, mat = FALSE))]
@@ -30,6 +31,7 @@ sa <- sheet("StudyArea")
 dem <- tryCatch(read_data_sources("ElevationFile")$ElevationFile, error = function(e) { say("No hillshade: %s", conditionMessage(e)); NULL })
 I <- list(strata = list(prim, opt_rast(ic$SecondaryStratumFileName[1]), opt_rast(ic$TertiaryStratumFileName[1])),
           strata_names = list(stl, named("SecondaryStratum"), named("TertiaryStratum")),
+          strata_sources = c(source_name(opt$SecondarySourceId[1], "States"), source_name(opt$TertiarySourceId[1], "Federal Lands")),
           sc = scr, sc_list = scl, age = opt_rast(ic$AgeFileName[1]),
           carbon_curves = in_study(sheet("CarbonCurve")), volume_curves = in_study(sheet("MerchantableVolumeCurve")),
           decay = in_study(sheet("OutputDecayCalibration")),

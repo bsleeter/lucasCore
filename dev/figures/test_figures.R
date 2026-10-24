@@ -24,6 +24,7 @@ dc <- ds("lucasCore_OutputDecayCalibration")[StratumId %in% present_eco & StateC
 st <- ds("stsim_InitialStockSpatial"); stocks <- setNames(lapply(st$RasterFileName, rast), st$StockTypeId)
 I <- list(strata = list(prim, rast(ic$SecondaryStratumFileName[1]), rast(ic$TertiaryStratumFileName[1])),
           strata_names = list(eco, lst("stsim_SecondaryStratum"), lst("stsim_TertiaryStratum")),
+          strata_sources = c(if (is.na(bo$SecondarySourceId[1])) "States" else bo$SecondarySourceId[1], if (is.na(bo$TertiarySourceId[1])) "Federal Lands" else bo$TertiarySourceId[1]),
           sc = scr, sc_list = ds("stsim_StateClass", P), age = rast(ic$AgeFileName[1]),
           carbon_curves = cc, volume_curves = vc, decay = dc, stocks = stocks,
           stock_summary = ds("lucasCore_OutputInitialStockSummary"), trans = ds("lucasCore_OutputTransitionSummary"),

@@ -117,7 +117,9 @@ build_figures <- function(I, outdir) {
 
   # ---- maps -----------------------------------------------------------------------------------------------------------------
   if (!is.null(I$strata)) {
-    lv <- c("Primary strata: FIA ecodivisions", "Secondary strata", "Tertiary strata"); sl <- c("primary", "secondary", "tertiary")
+    src <- I$strata_sources %||% c(NA, NA)        # the Build Options' secondary and tertiary sources (Counties, Federal Lands, ...)
+    lv <- c("Primary strata: FIA ecodivisions", if (is.na(src[1])) "Secondary strata" else paste("Secondary strata:", src[1]),
+            if (is.na(src[2])) "Tertiary strata" else paste("Tertiary strata:", src[2])); sl <- c("primary", "secondary", "tertiary")
     for (j in seq_along(I$strata)) { r <- I$strata[[j]]; if (is.null(r) || nrow(unique(r)) < 2) next
       map(cat_map(r, I$strata_names[[j]], o, H, lv[j], n = 10, strip = "^[^:]*: ") + labs(subtitle = sub), paste0("strata-", sl[j]), lv[j],
           sprintf("%s. %s of the model grid; the largest ten units are named, the rest grouped as Other.%s", sub, lv[j], relief)) } }
@@ -138,14 +140,15 @@ build_figures <- function(I, outdir) {
                         ifelse(grepl("Aboveground (Very Fast|Fast|Slow)", s), "Litter", "Soil")))
     sum_of <- function(k) { r <- Reduce(`+`, lapply(I$stocks[k], function(r) { r[is.na(r)] <- 0; r })); mask(r, I$sc) }
     tot <- sum_of(names(I$stocks)); totTg <- global(tot * km2(tot) * 100, "sum", na.rm = TRUE)[[1]] / 1e6
-    lim <- c(0, quantile(values(tot, mat = FALSE), 0.995, na.rm = TRUE))
-    map(num_map(tot, o, H, "Initial total ecosystem carbon", "Mg C/ha", limits = lim) + labs(subtitle = sprintf("%.1f Tg C, %s", totTg, I$years[1])),
+    # colours stop at the 99.5th percentile: a few extreme cells otherwise squeeze everything else into the bottom of the scale
+    cap <- function(r) c(0, unname(quantile(values(r, mat = FALSE), 0.995, na.rm = TRUE)))
+    map(num_map(tot, o, H, "Initial total ecosystem carbon", "Mg C/ha", limits = cap(tot)) + labs(subtitle = sprintf("%.1f Tg C, %s", totTg, I$years[1])),
         "carbon-total", "Initial total ecosystem carbon", sprintf("Carbon in the 14 CBM pools at the start (%s): %.1f Tg C in the study area. Colours stop at the 99.5th percentile.%s", I$years[1], totTg, relief))
     live <- names(I$stocks)[grp(names(I$stocks)) == "Live biomass"]; soil <- names(I$stocks)[grp(names(I$stocks)) == "Soil"]
-    if (length(live)) map(num_map(sum_of(live), o, H, "Initial live biomass carbon", "Mg C/ha", option = "viridis"), "carbon-live", "Initial live biomass carbon",
-                          sprintf("Carbon in the live biomass pools (merchantable, foliage, other wood, coarse and fine roots) at the start (%s).%s", I$years[1], relief))
-    if (length(soil)) map(num_map(sum_of(soil), o, H, "Initial soil carbon", "Mg C/ha", option = "cividis"), "carbon-soil", "Initial soil carbon",
-                          sprintf("Carbon in the slow soil pools at the start (%s), calibrated to gSSURGO.%s", I$years[1], relief)) }
+    if (length(live)) { r <- sum_of(live); map(num_map(r, o, H, "Initial live biomass carbon", "Mg C/ha", option = "viridis", limits = cap(r)), "carbon-live", "Initial live biomass carbon",
+                          sprintf("Carbon in the live biomass pools (merchantable, foliage, other wood, coarse and fine roots) at the start (%s). Colours stop at the 99.5th percentile.%s", I$years[1], relief)) }
+    if (length(soil)) { r <- sum_of(soil); map(num_map(r, o, H, "Initial soil carbon", "Mg C/ha", option = "cividis", limits = cap(r)), "carbon-soil", "Initial soil carbon",
+                          sprintf("Carbon in the slow soil pools at the start (%s), calibrated to gSSURGO. Colours stop at the 99.5th percentile.%s", I$years[1], relief)) } }
 
   # ---- charts ---------------------------------------------------------------------------------------------------------------
   top <- head(ar, 20)
