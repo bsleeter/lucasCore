@@ -23,7 +23,7 @@ runit <- function(id) { t0 <- Sys.time(); R <- tryCatch(run(scenario(L, id)), er
 
 if (is.na(hid)) { RH <- runit(tool("new-historical.R", c(sprintf("--build=%d", bid), "--historical-only", "--bookend-maps", "--iterations=1", "--replace"))); hid <- scenarioId(RH)
 } else RH <- scenario(L, hid)
-RP <- runit(tool("new-projection.R", c(sprintf("--historical=%d", hid), sprintf("--build=%d", bid), sprintf("--years=%s", YRS), "--replace")))
+RP <- runit(tool("new-projection.R", c(sprintf("--historical=%d", hid), "--stage9", sprintf("--build=%d", bid), sprintf("--years=%s", YRS), "--replace")))
 lg <- logl(RP); cat(unique(lg[grepl("Projection Start|target by|rate by|Projection inputs|FAIL|rror", lg)]), sep = "\n")
 
 # the hand-over: stocks in the historical end year, historical run vs the projection's first timestep

@@ -42,7 +42,7 @@ for (me in c("Fitted", "Rules")) {
   RS1 <- runit(tool("new-projection-setup.R", args)); lg <- logl(RS1)
   cat(unique(lg[grepl("^Fitting|Covariates|events|out of sample|Adjacency|Projection Allocation|rror|FAIL", lg)]), sep = "\n")
   print(ds(RS1, "lucasCore_OutputSuitability")[, .(Surface, Item, Value = round(Value, 3))])
-  RP <- runit(tool("new-projection.R", c(sprintf("--historical=%d", hid), sprintf("--build=%d", scenarioId(RS1)), sprintf("--years=%s", YRS), "--replace", sprintf("--name=Projection from setup (%s)", me))))
+  RP <- runit(tool("new-projection.R", c(sprintf("--historical=%d", hid), "--stage9", sprintf("--build=%d", scenarioId(RS1)), sprintf("--years=%s", YRS), "--replace", sprintf("--name=Projection from setup (%s)", me))))
   # where projected urbanization (Low-High) went: the 1985 land cover of the cells and their surface value
   D <- file.path(paste0(f, ".data"), sprintf("Scenario-%d", scenarioId(RP)))
   y0 <- max(ds(RH <- scenario(L, hid), "stsim_OutputStock")$Timestep); y9 <- max(ds(RP, "stsim_OutputStock")$Timestep)

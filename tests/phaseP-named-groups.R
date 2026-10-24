@@ -36,7 +36,7 @@ for (sh in c(FALSE, TRUE)) { lab <- if (sh) "shares on" else "shares off"
   saveDatasheet(S, po, "lucasCore_ProjectionOptions")
   RS1 <- runit(sid); lg <- logl(RS1)
   cat(unique(lg[grepl("members|split|target by|rate by|Projection Allocation|Not Target|rror|FAIL", lg)]), sep = "\n")
-  pid <- tool("new-projection.R", c(sprintf("--historical=%d", hid), sprintf("--build=%d", scenarioId(RS1)), sprintf("--years=%s", YRS), "--replace", sprintf("--name=Projection (named, %s)", lab)))
+  pid <- tool("new-projection.R", c(sprintf("--historical=%d", hid), "--stage9", sprintf("--build=%d", scenarioId(RS1)), sprintf("--years=%s", YRS), "--replace", sprintf("--name=Projection (named, %s)", lab)))
   RP <- runit(pid)
   tt <- ds(RP, "stsim_TransitionTarget"); y1 <- max(hy)
   cat("projection targets (mean per year, iteration 1):\n"); print(tt[Timestep > y1 & Iteration %in% 1L, .(MeanAmount = sum(Amount) / uniqueN(Timestep)), by = TransitionGroupId])

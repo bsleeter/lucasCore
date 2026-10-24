@@ -170,6 +170,14 @@ check(STAGE, "every draw is a reference year", all(sched$HistoricalYear %in% ref
 say("Sampling sets: %s", paste(sprintf("%s (%s)", sets, vapply(sets, function(s) paste(pt[SamplingSet == s, .N], "groups"), "")), collapse = "; "))
 
 # ---- targets ------------------------------------------------------------------------------------------------------------
+# spatial multiprocessing (user decision 2026-10-23): tiles are whole units of one of the build's three strata levels (Projection
+# Options, Spatial Tiles Strata; the layer itself is chosen in Build Options), and a target must not be split between tiles, so every
+# Target group uses that level - the Run Settings page sets it on the Transitions rows, and this enforces it for inherited rows too
+tl_v <- as.character(nz(po$SpatialTilesStrata, "Secondary"))
+tile_lvl <- c("Primary", "Secondary", "Tertiary")[if (grepl("^[123]$", tl_v)) as.integer(tl_v) else nz(match(sub(" .*", "", tl_v), c("Primary", "Secondary", "Tertiary")), 2L)]
+if (tiles > 1) { chg <- pt[Method == "Target" & StrataLevel != tile_lvl, TransitionGroupId]
+  if (length(chg)) say("Spatial tiles of %s units: Target Strata set to %s for %s", tile_lvl, tile_lvl, paste(chg, collapse = "; "))
+  pt[Method == "Target", StrataLevel := tile_lvl] }
 tg <- pt[Method == "Target"]; new_tt <- list(); new_sm <- list(); rates <- list(); allow_files <- list()
 for (i in seq_len(nrow(tg))) { g <- tg$TransitionGroupId[i]; L <- tg$StrataLevel[i]; u <- lev[[L]]; units <- sort(unique(u[land])); ms <- mem[[g]]
   # area per unit and historical year, in the target's amount units: the sum of the members' areas
@@ -350,11 +358,12 @@ for (i in seq_len(nrow(pg))) { g <- pg$TransitionGroupId[i]; u <- unit_map(pg$Un
   say("%s: rate by %s (%d units), mean %.2f km2/yr over %d-%d; %d distinct years drawn", g, pg$UnitSource[i], length(units), sum(rowMeans(ua)), rs, re, uniqueN(dr$HistoricalYear)) }
 progressBar()
 
-# ---- spatial multiprocessing tiles: whole units of the one target strata level ----------------------------------------------
+# ---- spatial multiprocessing tiles: whole units of the tile strata level (every Target group uses it, enforced above) -----------
 if (tiles > 1) {
-  lvls <- unique(tg$StrataLevel)
-  check(STAGE, "with spatial tiles, every Target group uses one strata level", length(lvls) <= 1, paste(lvls, collapse = ", "))
+  lvls <- unique(c(tile_lvl, tg$StrataLevel))
+  check(STAGE, "with spatial tiles, every Target group uses the tile strata level", length(lvls) == 1, paste(lvls, collapse = ", "))
   if (length(lvls) == 1) { u <- lev[[lvls]]; ua <- table(u[land]); ua <- sort(ua, decreasing = TRUE)
+    if (length(ua) < tiles) say("Spatial tiles: only %d %s units for %d tiles - some tiles stay empty", length(ua), lvls, tiles)
     load <- numeric(tiles); tile_of <- integer(length(ua))
     for (j in seq_along(ua)) { k <- which.min(load); tile_of[j] <- k; load[k] <- load[k] + ua[[j]] }
     tv <- rep(NA_integer_, length(land)); tv[land] <- tile_of[match(as.character(u[land]), names(ua))]

@@ -89,6 +89,9 @@ namespace lucasCoreUI
             r.Controls.Add(Caption("Secondary:")); r.Controls.Add(List(m_secondary, 200));
             r.Controls.Add(Caption("Tertiary:")); r.Controls.Add(List(m_tertiary, 200));
             r.Controls.Add(Note("Primary strata are always the FIA ecodivisions."));
+            var mp = new Label { Text = "Spatial multiprocessing: projections can be split into tiles of whole units of one of these three strata (chosen in Projection > Run Settings), and every target then uses that level. If you will use it, set the secondary or tertiary strata here to a layer that suits tiles (counties, HUCs) - it cannot be changed later in the projection settings.",
+                                 AutoSize = true, MaximumSize = new Size(680, 0), ForeColor = Color.DarkGoldenrod, Margin = new Padding(3, 7, 3, 3) };
+            r.SetFlowBreak(r.Controls[r.Controls.Count - 1], true); r.Controls.Add(mp);
             m_secondary.SelectionChangeCommitted += (s, e) => WriteSource(m_secondary, "SecondarySourceId");
             m_tertiary.SelectionChangeCommitted += (s, e) => WriteSource(m_tertiary, "TertiarySourceId");
 

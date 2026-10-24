@@ -29,7 +29,7 @@ cat(unique(lg[grepl("Covariates|events|out of sample|Adjacency|size distribution
 print(ds(RS1, "lucasCore_OutputSuitability")[, .(Surface, Item, Value = round(Value, 3))], nrows = 200)
 print(ds(RS1, "stsim_TransitionSizeDistribution"))
 
-pid <- tool("new-projection.R", c(sprintf("--historical=%d", hid), sprintf("--build=%d", scenarioId(RS1)), sprintf("--years=%s", YRS), "--replace", "--name=Projection (all groups)"))
+pid <- tool("new-projection.R", c(sprintf("--historical=%d", hid), "--stage9", sprintf("--build=%d", scenarioId(RS1)), sprintf("--years=%s", YRS), "--replace", "--name=Projection (all groups)"))
 RP <- runit(pid)
 # where each group's projected change went: the 2023 class of the cells each transition group changed (spatial transition maps, iteration 1)
 P <- rsyncrosim::project(L, "Definitions"); scl <- as.data.table(datasheet(P, "stsim_StateClass", includeKey = TRUE))

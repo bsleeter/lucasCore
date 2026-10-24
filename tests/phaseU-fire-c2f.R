@@ -14,7 +14,7 @@ C2F <- "F:/lucas-master/Models/lucasFireC2F Dev/lucasFireC2F Sierra Nevada & Foo
 L <- ssimLibrary(f)
 logl <- function(R) trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]])
 ds <- function(R, s) as.data.table(datasheet(R, s, lookupsAsFactors = FALSE))
-out <- system2(RS, c("F:/lucasCore/tools/new-projection.R", shQuote(f), shQuote(c(sprintf("--historical=%d", hid), sprintf("--build=%d", sid), sprintf("--years=%s", YRS),
+out <- system2(RS, c("F:/lucasCore/tools/new-projection.R", shQuote(f), shQuote(c(sprintf("--historical=%d", hid), "--stage9", sprintf("--build=%d", sid), sprintf("--years=%s", YRS),
                "--replace", "--name=Projection (fire C2F seasons)"))), stdout = TRUE, stderr = TRUE)
 pid <- as.integer(tail(out[!grepl("Warning|undetermined|^In ssimLibrary", out)], 1)); if (is.na(pid)) { cat(out, sep = "\n"); stop("new-projection.R failed") }
 S <- scenario(L, pid)

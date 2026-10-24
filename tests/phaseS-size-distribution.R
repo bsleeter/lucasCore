@@ -31,7 +31,7 @@ RS1 <- runit(sid)
 cat(unique(logl(RS1)[grepl("size distribution|rror", logl(RS1))]), sep = "\n")
 cat("\nHistorical Patch Sizes:\n"); print(ds(RS1, "lucasCore_OutputPatchSize"), nrows = 100)
 cat("\nST-Sim size distribution / prioritization:\n"); print(ds(RS1, "stsim_TransitionSizeDistribution")); print(ds(RS1, "stsim_TransitionSizePrioritization"))
-pid <- tool("new-projection.R", c(sprintf("--historical=%d", hid), sprintf("--build=%d", scenarioId(RS1)), sprintf("--years=%s", YRS), "--replace", "--name=Projection (size distribution)"))
+pid <- tool("new-projection.R", c(sprintf("--historical=%d", hid), "--stage9", sprintf("--build=%d", scenarioId(RS1)), sprintf("--years=%s", YRS), "--replace", "--name=Projection (size distribution)"))
 RP <- runit(pid)
 y0 <- max(ds(RP, "stsim_OutputStock")$Timestep) - as.integer(YRS)
 tt <- ds(RP, "stsim_TransitionTarget")[Timestep > y0 & grepl("^Forest Harvest", TransitionGroupId), .(Target = sum(Amount)), by = .(Timestep, TransitionGroupId)]

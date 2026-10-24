@@ -31,6 +31,9 @@ namespace lucasCoreUI
         private readonly RadioButton m_shares = new RadioButton { Text = "Weight each type by its historical share (default)", AutoSize = true };
         private readonly CheckBox m_tiled = new CheckBox { Text = "Split the landscape into tiles:", AutoSize = true, Margin = new Padding(3, 5, 6, 3) };
         private readonly TextBox m_tiles = Box(50);
+        private readonly ComboBox m_tileLevel = List(240);
+        private readonly Label m_tileState = new Label { AutoSize = true, ForeColor = SystemColors.GrayText, Margin = new Padding(3, 3, 3, 3) };
+        private int m_synced;
         private List<Item> m_runs = new List<Item>();
         private bool m_wantStandAlone;   // the stand-alone radio is on but no run is chosen yet
         private bool m_customYears;      // all years unticked, the years not typed yet
@@ -61,8 +64,9 @@ namespace lucasCoreUI
             AddGroup(Group("Transition types within a named group", mix));
 
             var tl = Column();
-            var t = Row(); t.Controls.Add(m_tiled); t.Controls.Add(m_tiles); tl.Controls.Add(t);
-            tl.Controls.Add(Wrapped("ST-Sim runs the tiles in parallel. Tiles are whole units of the target strata, so every Target group must use the same strata level.", 640));
+            var t = Row(); t.Controls.Add(m_tiled); t.Controls.Add(m_tiles); t.Controls.Add(Caption("of whole units of")); t.Controls.Add(m_tileLevel); tl.Controls.Add(t);
+            tl.Controls.Add(m_tileState);
+            tl.Controls.Add(Wrapped("ST-Sim runs the tiles in parallel and merges them. A target must not be split between tiles, so every Target group uses the tile strata level: choosing it here sets the Target Strata of this scenario's Target rows (Transitions page), and stage 9 enforces it. The levels are the strata set in Build Options; set one there to a layer that suits tiles before building.", 640));
             AddGroup(Group("Spatial multiprocessing", tl));
             EndGroups();
 
@@ -74,9 +78,26 @@ namespace lucasCoreUI
             BindNumber(m_iter, () => Sheet, "Iterations", true); BindNumber(m_seed, () => Sheet, "RandomSeed", true);
             m_spatial.CheckedChanged += (s, e) => { if (!Refreshing && m_spatial.Checked) Write("HistoricalTypeShares", false); };
             m_shares.CheckedChanged += (s, e) => { if (!Refreshing && m_shares.Checked) Write("HistoricalTypeShares", true); };
-            m_tiled.CheckedChanged += (s, e) => { if (Refreshing) return; Write("SpatialTiles", m_tiled.Checked ? (object)4 : DBNull.Value); RefreshControls(); };
+            m_tiled.CheckedChanged += (s, e) => { if (Refreshing) return; Write("SpatialTiles", m_tiled.Checked ? (object)4 : DBNull.Value); if (m_tiled.Checked) SetTileLevel(TileLevel()); RefreshControls(); };
             BindNumber(m_tiles, () => Sheet, "SpatialTiles", true);
+            m_tileLevel.SelectionChangeCommitted += (s, e) => { SetTileLevel(m_tileLevel.SelectedIndex + 1); RefreshControls(); };
             this.ResumeLayout(false);
+        }
+
+        private int TileLevel() { return IntValue("SpatialTilesStrata", 2); }
+
+        // the tile level, and the Target Strata of this scenario's Target rows (Projection Transitions) to match
+        private void SetTileLevel(int level)
+        {
+            Write("SpatialTilesStrata", level);
+            DataSheet pt = this.DataFeed.Scenario == null ? null : this.DataFeed.Scenario.GetDataSheet("lucasCore_ProjectionTransition");
+            m_synced = 0; if (pt == null) return;
+            DataTable dt = pt.GetData();
+            List<DataRow> rows = dt.Rows.Cast<DataRow>().Where(r => r.RowState != DataRowState.Deleted && r["Method"] != DBNull.Value && Convert.ToInt32(r["Method"]) == 1).ToList();
+            List<DataRow> change = rows.Where(r => r["StrataLevel"] == DBNull.Value || Convert.ToInt32(r["StrataLevel"]) != level).ToList();
+            if (change.Count == 0) return;
+            pt.BeginModifyRows(); foreach (DataRow r in change) r["StrataLevel"] = level; pt.EndModifyRows();
+            m_synced = change.Count;
         }
 
         public override void LoadDataFeed(DataFeed dataFeed)
@@ -85,6 +106,18 @@ namespace lucasCoreUI
             // result scenarios of this project, newest first: a historical run is one of them
             m_runs = this.DataFeed.Project.Scenarios.Cast<Scenario>().Where(s => s.IsResult)
                 .OrderByDescending(s => s.Id).Select(s => new Item { Key = s.Id, Name = string.Format("[{0}] {1}", s.Id, s.DisplayName) }).ToList();
+            // the strata levels by what the build put in them (Build Options' sources; blank = the defaults), read once
+            string sec = "States", ter = "Federal Lands";
+            try
+            {
+                Scenario sc = this.DataFeed.Scenario;
+                DataRow bo = sc == null ? null : sc.GetDataSheet("lucasCore_BuildOptions").GetData().Rows.Cast<DataRow>().FirstOrDefault(x => x.RowState != DataRowState.Deleted);
+                DataTable src = this.DataFeed.Project.GetDataSheet("lucasCore_StratumSource").GetData();
+                Func<object, string, string> name = (k, d) => { if (k == null || k == DBNull.Value) return d; DataRow r = src.Rows.Cast<DataRow>().FirstOrDefault(x => x.RowState != DataRowState.Deleted && Convert.ToInt32(x["StratumSourceId"]) == Convert.ToInt32(k)); return r == null ? d : Convert.ToString(r["Name"]); };
+                if (bo != null) { sec = name(bo["SecondarySourceId"], sec); ter = name(bo["TertiarySourceId"], ter); }
+            }
+            catch (Exception) { }
+            m_tileLevel.Items.Clear(); m_tileLevel.Items.Add("Primary: FIA ecodivisions"); m_tileLevel.Items.Add("Secondary: " + sec); m_tileLevel.Items.Add("Tertiary: " + ter);
             RefreshControls();
         }
 
@@ -112,7 +145,10 @@ namespace lucasCoreUI
             bool shares = sh == DBNull.Value || Convert.ToBoolean(sh);   // blank = historical shares (the default)
             m_shares.Checked = shares; m_spatial.Checked = !shares;
             object tiles = Value("SpatialTiles");
-            m_tiled.Checked = tiles != DBNull.Value && Convert.ToInt32(tiles) > 1; m_tiles.Enabled = m_tiled.Checked; m_tiles.Text = Show(tiles);
+            m_tiled.Checked = tiles != DBNull.Value && Convert.ToInt32(tiles) > 1; m_tiles.Enabled = m_tileLevel.Enabled = m_tiled.Checked; m_tiles.Text = Show(tiles);
+            if (m_tileLevel.Items.Count == 3) m_tileLevel.SelectedIndex = Math.Max(0, Math.Min(2, TileLevel() - 1));
+            m_tileState.Text = !m_tiled.Checked ? "" : m_synced > 0 ? string.Format("{0} Target row{1} set to this level on the Transitions page.", m_synced, m_synced == 1 ? "" : "s")
+                : "Target rows use this level (rows inherited from the Build are set by stage 9 when it runs).";
         }
     }
 }

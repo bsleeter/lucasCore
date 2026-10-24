@@ -25,7 +25,7 @@ if (!is.na(opt("run", NA))) { R <- run(scenario(L, as.integer(opt("run", NA))));
 # --create: make the three scenarios and list them; the caller runs them (--run) and then draws (--reuse)
 if ("--create" %in% a) {
   ids <- rbindlist(lapply(methods, function(m) {
-    out <- system2(RS, c("F:/lucasCore/tools/new-projection.R", shQuote(f), shQuote(c(sprintf("--historical=%d", hist), sprintf("--build=%d", setup), sprintf("--years=%d", YRS),
+    out <- system2(RS, c("F:/lucasCore/tools/new-projection.R", shQuote(f), shQuote(c(sprintf("--historical=%d", hist), "--stage9", sprintf("--build=%d", setup), sprintf("--years=%d", YRS),
                    "--iterations=1", "--replace", sprintf("--name=Fire maps (%s)", m$key)))), stdout = TRUE, stderr = TRUE)
     pid <- as.integer(tail(out[!grepl("Warning|undetermined|^In ssimLibrary", out)], 1)); if (is.na(pid)) { cat(out, sep = "\n"); stop("new-projection.R failed") }
     S <- scenario(L, pid); saveDatasheet(S, m$fo, "lucasCore_FireOptions")
@@ -36,7 +36,7 @@ if ("--create" %in% a) {
   fwrite(ids, file.path(OUT, "projections.csv")); cat("PARENTS", ids$parent, "\n"); quit(save = "no") }
 if (FALSE) {
   ids <- rbindlist(lapply(methods, function(m) {
-    out <- system2(RS, c("F:/lucasCore/tools/new-projection.R", shQuote(f), shQuote(c(sprintf("--historical=%d", hist), sprintf("--build=%d", setup), sprintf("--years=%d", YRS),
+    out <- system2(RS, c("F:/lucasCore/tools/new-projection.R", shQuote(f), shQuote(c(sprintf("--historical=%d", hist), "--stage9", sprintf("--build=%d", setup), sprintf("--years=%d", YRS),
                    "--iterations=1", "--replace", sprintf("--name=Fire maps (%s)", m$key)))), stdout = TRUE, stderr = TRUE)
     pid <- as.integer(tail(out[!grepl("Warning|undetermined|^In ssimLibrary", out)], 1)); if (is.na(pid)) { cat(out, sep = "\n"); stop("new-projection.R failed") }
     S <- scenario(L, pid); saveDatasheet(S, m$fo, "lucasCore_FireOptions")

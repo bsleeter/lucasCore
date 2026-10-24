@@ -13,7 +13,7 @@ sid <- as.integer(opt("setup", 58)); hid <- as.integer(opt("historical", 49)); Y
 L <- ssimLibrary(f)
 logl <- function(R) trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]])
 ds <- function(R, s) as.data.table(datasheet(R, s, lookupsAsFactors = FALSE))
-out <- system2(RS, c("F:/lucasCore/tools/new-projection.R", shQuote(f), shQuote(c(sprintf("--historical=%d", hid), sprintf("--build=%d", sid), sprintf("--years=%s", YRS),
+out <- system2(RS, c("F:/lucasCore/tools/new-projection.R", shQuote(f), shQuote(c(sprintf("--historical=%d", hid), "--stage9", sprintf("--build=%d", sid), sprintf("--years=%s", YRS),
                "--replace", sprintf("--name=Projection (fire BP, %s ignitions)", ign)))), stdout = TRUE, stderr = TRUE)
 pid <- as.integer(tail(out[!grepl("Warning|undetermined|^In ssimLibrary", out)], 1)); if (is.na(pid)) { cat(out, sep = "\n"); stop("new-projection.R failed") }
 S <- scenario(L, pid)

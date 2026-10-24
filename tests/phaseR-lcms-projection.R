@@ -33,7 +33,7 @@ saveDatasheet(scenario(L, sid), data.frame(UnitId = c("Pyrome: P26 Northern Sier
               "lucasCore_SuitabilityRegion")
 RS1 <- runit(sid)
 cat(unique(logl(RS1)[grepl("Fitting region of|events \\(|out of sample|flicker|size distribution|one model cell|rror", logl(RS1))]), sep = "\n")
-pid <- tool("new-projection.R", c(sprintf("--historical=%d", hid), sprintf("--build=%d", scenarioId(RS1)), sprintf("--years=%s", YRS), "--replace", "--name=Projection (LCMS harvest)"))
+pid <- tool("new-projection.R", c(sprintf("--historical=%d", hid), "--stage9", sprintf("--build=%d", scenarioId(RS1)), sprintf("--years=%s", YRS), "--replace", "--name=Projection (LCMS harvest)"))
 RP <- runit(pid)
 
 # harvest per year (km2): historical runs and projections, old vs new
