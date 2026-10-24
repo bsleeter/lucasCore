@@ -27,7 +27,7 @@ I <- list(strata = list(prim, rast(ic$SecondaryStratumFileName[1]), rast(ic$Tert
           sc = scr, sc_list = ds("stsim_StateClass", P), age = rast(ic$AgeFileName[1]),
           carbon_curves = cc, volume_curves = vc, decay = dc, stocks = stocks,
           stock_summary = ds("lucasCore_OutputInitialStockSummary"), trans = ds("lucasCore_OutputTransitionSummary"),
-          climate = ds("lucasCore_OutputClimateSummary"), validation = ds("lucasCore_OutputValidation"),
+          climate = ds("lucasCore_OutputClimateSummary"), validation = ds("lucasCore_OutputValidation"), dem = ds("lucasCore_DataSource", P)$ElevationFile[1],
           label = if (nrow(sa)) paste(sub("^[^:]*: ", "", sa$UnitId), collapse = ", ") else "CONUS", years = c(bo$StartYear[1], bo$EndYear[1]))
 t0 <- Sys.time(); res <- build_figures(I, out)
 print(res[, .(Figure, Title, File = basename(FileName))]); cat(sprintf("%.1f s\n", as.numeric(Sys.time() - t0, units = "secs")))
