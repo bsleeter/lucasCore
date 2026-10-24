@@ -1,6 +1,6 @@
 # =============================================================================
-# figures.R - publication figures of a Build result (sourced by stage 12; no SyncroSim calls, so it can be tested on a result's
-# files and tables directly: dev/figures/test_figures.R)
+# figures.R - publication figures of a Build result (sourced by stage 12, src/12-build-figures.R; no SyncroSim calls, so it can be
+# tested on a result's files and tables directly: dev/figures/test_figures.R)
 # =============================================================================
 # build_figures(I, outdir) draws each figure whose inputs are present, one map or chart per PNG, and returns one row per PNG
 # (Figure, Title, Caption, FileName), numbered in this order:

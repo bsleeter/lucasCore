@@ -490,6 +490,14 @@
 		<column name="FileName" displayName="Report (PDF)" dataType="String" isExternalFile="True" isRaster="False" externalFileFilter="PDF Files (*.pdf)|*.pdf"/>
 	</dataSheet>
 
+	<dataSheet name="OutputBuildFigure" displayName="Build Figures (PNG)">
+		<!-- stage 12: one row per publication figure (src/figures.R); Export > LUCAS Core > Build Figures saves them all to a folder -->
+		<column name="Figure" dataType="Integer"/>
+		<column name="Title" dataType="String"/>
+		<column name="Caption" dataType="String"/>
+		<column name="FileName" displayName="Figure (PNG)" dataType="String" isExternalFile="True" isRaster="False" externalFileFilter="PNG Files (*.png)|*.png"/>
+	</dataSheet>
+
 	<dataSheet name="OutputStrataSummary" displayName="Strata Summary">
 		<column name="Level" dataType="String"/>
 		<column name="Name" dataType="String"/>
@@ -659,6 +667,24 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
+	<transformer name="BuildFigures" displayName="12 - Build Figures" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/12-build-figures.R">
+		<dataSheet name="BuildOptions" type="Input"/>
+		<dataSheet name="StudyArea" type="Input"/>
+		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
+		<dataSheet name="stsim_InitialStockSpatial" type="Input"/>
+		<dataSheet name="MerchantableVolumeCurve" type="Input"/>
+		<dataSheet name="CarbonCurve" type="Input"/>
+		<dataSheet name="OutputDecayCalibration" type="Input"/>
+		<dataSheet name="OutputInitialStockSummary" type="Input"/>
+		<dataSheet name="OutputTransitionSummary" type="Input"/>
+		<dataSheet name="OutputClimateSummary" type="Input"/>
+		<dataSheet name="OutputBuildFigure" type="Output"/>
+		<dataSheet name="OutputValidation" type="Both"/>
+	</transformer>
+
+	<!-- export: every Build figure to a folder -->
+	<transformer name="BuildFiguresExport" displayName="Build Figures" dataSheet="OutputBuildFigure" column="FileName" isFolderExport="True"/>
+
 	<!-- =================================================================================================== -->
 	<!-- LAYOUTS                                                                                           -->
 	<!-- =================================================================================================== -->
@@ -717,8 +743,15 @@
 				<item name="OutputCarbonParameter"/>
 				<item name="OutputDecayCalibration"/>
 				<item name="OutputGrowthReport"/>
+				<item name="OutputBuildFigure"/>
 				<item name="OutputValidation"/>
 			</group>
+		</group>
+	</layout>
+
+	<layout type="Export">
+		<group name="lucasCoreExport" displayName="LUCAS Core">
+			<item name="BuildFiguresExport" displayName="Build Figures (PNG)"/>
 		</group>
 	</layout>
 

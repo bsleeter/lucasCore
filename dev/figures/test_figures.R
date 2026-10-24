@@ -8,7 +8,7 @@ suppressPackageStartupMessages({ library(rsyncrosim); library(data.table); libra
 a <- commandArgs(TRUE)
 f <- if (length(a) >= 1) a[1] else "F:/lucasCore/dev/libs/lucasCore-studio-library.ssim"
 out <- if (length(a) >= 3) a[3] else "F:/lucasCore/dev/figures/out"
-source("F:/lucasCore/dev/figures/figures.R")
+source("F:/lucasCore/src/figures.R")
 L <- ssimLibrary(f); P <- rsyncrosim::project(L, "Definitions"); sc <- as.data.table(rsyncrosim::scenario(L, summary = TRUE))
 rid <- if (length(a) >= 2) as.integer(a[2]) else max(sc[IsResult == "Yes" & grepl("Build", Name, fixed = TRUE), ScenarioId])
 R <- rsyncrosim::scenario(L, rid); ds <- function(s, sc = R) suppressWarnings(as.data.table(datasheet(sc, s, lookupsAsFactors = FALSE, optional = TRUE)))

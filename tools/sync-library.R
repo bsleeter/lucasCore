@@ -7,7 +7,8 @@
 # package), which is the reference schema:
 #   1. a copy of the library first (<library>.ssim.bak-<date-time>)
 #   2. every column of a lucasCore_ / stsim_ / core_ table in the starter that the library's table lacks: ALTER TABLE ADD COLUMN
-#   3. every lucasCore transformer and stage name the library lacks: new ids from the library's own id counter (core_Sequence)
+#   3. every lucasCore transformer and stage name the library lacks, with its stage value: new ids from the library's own id counter
+#      (core_Sequence)
 #   4. project definitions the package defaults gained (stsim State Attribute Types): added through rsyncrosim
 # Close the library in SyncroSim Studio first. Usage: Rscript tools/sync-library.R <library.ssim> [--dry-run]
 # =============================================================================
@@ -40,6 +41,14 @@ for (i in which(!rt$Name %in% lt$Name)) for (p in proj) {
   sn <- rs[TransformerId == rt$TransformerId[i]]
   if (nrow(sn)) { sn$StageNameId <- new_id(); sn$ProjectId <- p; sn$TransformerId <- tr$TransformerId; dbWriteTable(con, "core_StageName", as.data.frame(sn), append = TRUE) }
   nst <- nst + 1 }
+# every stage also needs its core_StageValue row, or SyncroSim skips it silently when it is in a pipeline (the run completes in 0 s
+# doing nothing); this also repairs stages added by earlier versions of this script, which wrote none
+miss_sv <- as.data.table(dbGetQuery(con, "SELECT s.StageNameId, s.ProjectId, s.TransformerId, s.IsAuto, s.Name FROM core_StageName s
+  JOIN core_Transformer t ON t.TransformerId = s.TransformerId WHERE t.PackageName = 'lucasCore'
+  AND NOT EXISTS (SELECT 1 FROM core_StageValue v WHERE v.StageNameId = s.StageNameId)"))
+for (i in seq_len(nrow(miss_sv))) { cat(if (dry) "would add stage value for" else "add stage value for", miss_sv$Name[i], "\n"); if (dry) next
+  dbWriteTable(con, "core_StageValue", data.frame(StageValueId = new_id(), ProjectId = miss_sv$ProjectId[i], StageNameId = miss_sv$StageNameId[i],
+                                                  TransformerId = miss_sv$TransformerId[i], RunOrder = NA_integer_, IsAuto = miss_sv$IsAuto[i]), append = TRUE) }
 if (dry) dbRollback(con) else dbCommit(con)
 cat(sprintf("%s %d column(s) and %d stage(s)\n", if (dry) "would add" else "added", added, nst))
 

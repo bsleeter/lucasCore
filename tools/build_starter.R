@@ -4,7 +4,7 @@
 # SyncroSim 3 has no local templates (File > New offers Empty Library and the online templates of the central package index), so
 # lucasCore ships a starter library to copy and open instead. Made by tools/new-library.R, it holds the stsim definitions, every
 # Stratum Source with the universal unit lists, the LOCA2 lists of this machine's LOCA2 folder and the Stock-Flow Definitions
-# scenario, plus a ready "Build" scenario: depends on Stock-Flow Definitions, pipeline stages 1, 5, 2, 3, 4, 6, 7, 8. A user copies
+# scenario, plus a ready "Build" scenario: depends on Stock-Flow Definitions, pipeline stages 1, 5, 2, 3, 4, 6, 7, 8, 12. A user copies
 # the file, opens it (File > Open), fills in the Build scenario's Build Options, Study Area and Climate Options, and runs it.
 # Rebuild after changing defaults/ or package.xml.
 # Usage: Rscript tools/build_starter.R
@@ -26,7 +26,7 @@ description(B) <- paste(
   "dependency has them), 1 Study Area and Strata, 5 Initial Conditions, 2 Growth Curves, 3 Carbon Flows, 4 Spin-up, 6 Historical Transitions,",
   "7 Climate Multipliers, 8 Initial Stock Maps. California at 1 km takes about 50 minutes.")
 stages <- c("0 - Stock-Flow Definitions", "1 - Study Area and Strata", "5 - Initial Conditions", "2 - Fit Growth Curves", "3 - Carbon Flows",
-            "4 - Spin-up and Initial Stocks", "6 - Historical Transitions", "7 - Climate Multipliers", "8 - Initial Stock Maps")
+            "4 - Spin-up and Initial Stocks", "6 - Historical Transitions", "7 - Climate Multipliers", "8 - Initial Stock Maps", "12 - Build Figures")
 saveDatasheet(B, data.frame(StageNameId = stages, RunOrder = seq_along(stages)), "core_Pipeline")
 # the option sheets show their values: one row of package.xml's defaultValues (a blank optional column stays blank; the stages use the
 # same defaults for anything left empty). Strata sources are spelled out so the drop-downs show them.
