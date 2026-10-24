@@ -29,7 +29,9 @@ namespace lucasCoreUI
     {
         protected override void AddDefaultRecords(DataStore store)
         {
-            base.AddDefaultRecords(store);
+            LibrarySetup.Trace(string.Format("AddDefaultRecords: project {0}, process {1}", this.Project == null ? "none" : this.Project.Id.ToString(), System.Diagnostics.Process.GetCurrentProcess().ProcessName));
+            try { base.AddDefaultRecords(store); }
+            catch (Exception ex) { LibrarySetup.Trace("base AddDefaultRecords failed: " + ex); throw; }
             string status, detail;
             try
             {
@@ -92,7 +94,7 @@ namespace lucasCoreUI
                 DataTable gt = groups.GetData(store);
                 var have = new HashSet<string>(Live(gt).Select(r => Convert.ToString(r["Name"], CultureInfo.InvariantCulture)), StringComparer.OrdinalIgnoreCase);
                 var made = new List<KeyValuePair<object, object>>();   // type id, group id
-                groups.BeginAddRows();
+
                 foreach (DataRow t in Live(types.GetData(store)))
                 {
                     string name = Convert.ToString(t["Name"], CultureInfo.InvariantCulture) + " [Type]";
@@ -100,13 +102,13 @@ namespace lucasCoreUI
                     DataRow row = NewRow(groups, store, gt); row["Name"] = name; row["IsAuto"] = -1;
                     made.Add(new KeyValuePair<object, object>(t[types.PrimaryKeyColumn.Name], row[groups.PrimaryKeyColumn.Name]));
                 }
-                EndAdd(groups); Save(groups, store);
+                Save(groups, store);
                 log.AppendFormat("{0} [Type]: {1} rows; ", g[1], made.Count);
                 if (g[2] == null || made.Count == 0) continue;
                 DataSheet members = p.GetDataSheet(g[2]); DataTable mt = members.GetData(store);
-                members.BeginAddRows();
+
                 foreach (var kv in made) { DataRow row = NewRow(members, store, mt); row[g[3]] = kv.Key; row[g[4]] = kv.Value; row["IsAuto"] = -1; }
-                EndAdd(members); Save(members, store);
+                Save(members, store);
                 log.AppendFormat("{0} [Type]: {1} rows; ", g[2], made.Count);
             }
             return log.ToString();
@@ -128,22 +130,14 @@ namespace lucasCoreUI
             try { File.AppendAllText(Path.Combine(Path.GetTempPath(), "lucasCore-library-setup.log"), DateTime.Now.ToString("s") + " " + s + Environment.NewLine); } catch (Exception) { }
         }
 
-        // SyncroSim saves each sheet right after its own package records, so sheets of packages handled before lucasCore (ST-Sim's) are
-        // already saved when this runs: save them again. DataSheet.Save(DataStore) is internal, hence reflection.
-        private static readonly System.Reflection.MethodInfo SaveMethod = typeof(DataSheet).GetMethod("Save",
-            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public, null, new[] { typeof(DataStore) }, null);
+        // Write the sheet's added and changed rows through the package-add store, raising no events. SyncroSim saves each sheet right
+        // after its own package records, so ST-Sim's sheets are already saved when this runs; and DataSheet.EndAddRows would raise
+        // RowsAdded, whose listeners (Studio's open windows, ST-Sim's handlers) read on Studio's own connection and fail with "database
+        // is locked" while the package add holds the write lock - which rolls the whole add back.
         private static void Save(DataSheet ds, DataStore store)
         {
-            if (SaveMethod == null) throw new MissingMethodException("DataSheet.Save(DataStore) not found in this SyncroSim version");
-            try { SaveMethod.Invoke(ds, new object[] { store }); }
-            catch (System.Reflection.TargetInvocationException ex) { throw new InvalidOperationException("saving " + ds.Name + ": " + ex.InnerException.Message, ex.InnerException); }
-        }
-
-        // EndAddRows marks the sheet changed, then raises RowsAdded; a package's own handler may fail outside Studio's editing context
-        private static void EndAdd(DataSheet ds)
-        {
-            try { ds.EndAddRows(); }
-            catch (Exception ex) { Trace(ds.Name + " RowsAdded handler: " + ex.GetType().Name + " " + ex.Message); }
+            try { store.Update(ds); }
+            catch (Exception ex) { throw new InvalidOperationException("saving " + ds.Name + ": " + ex.Message, ex); }
         }
 
         private static IEnumerable<DataRow> Live(DataTable dt) { return dt.Rows.Cast<DataRow>().Where(r => r.RowState != DataRowState.Deleted); }
@@ -180,17 +174,15 @@ namespace lucasCoreUI
             if (ds.IsSingleRow)
             {
                 if (rows.Count < 2) return "no row";
-                if (have.Any()) ds.BeginModifyRows(); else ds.BeginAddRows();
                 DataRow row = have.FirstOrDefault() ?? NewRow(ds, store, dt);
                 for (int k = 0; k < cols.Count; k++) row[cols[k].Name] = idx[k] < rows[1].Length ? Value(cols[k], rows[1][idx[k]], lookups, name) : DBNull.Value;
-                if (have.Any()) ds.EndModifyRows(); else EndAdd(ds);
                 return have.Any() ? "updated" : "1 row";
             }
             DataSheetColumn named = string.IsNullOrEmpty(ds.DisplayMember) ? null : cols.FirstOrDefault(c => c.Name == ds.DisplayMember);
             if (have.Any() && named == null) return string.Format("kept {0} rows", have.Count);
             var exists = new HashSet<string>(named == null ? new string[0] : have.Select(r => Convert.ToString(r[named.Name], CultureInfo.InvariantCulture)), StringComparer.OrdinalIgnoreCase);
             int n = 0, skipped = 0;
-            ds.BeginAddRows();
+
             foreach (string[] r in rows.Skip(1))
             {
                 if (r.Length == 1 && r[0] == "") continue;
@@ -199,7 +191,7 @@ namespace lucasCoreUI
                 for (int k = 0; k < cols.Count; k++) row[cols[k].Name] = idx[k] < r.Length ? Value(cols[k], r[idx[k]], lookups, name) : DBNull.Value;
                 n++;
             }
-            EndAdd(ds);
+
             return skipped > 0 ? string.Format("{0} rows ({1} already there)", n, skipped) : string.Format("{0} rows", n);
         }
 
