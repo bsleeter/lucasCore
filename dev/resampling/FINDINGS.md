@@ -66,3 +66,31 @@ The rest keeps modal's bias toward each area's dominant class, since only develo
 (modal 105%), shrub/scrub 95% (97%), grassland 79% (80%), woody wetlands 59% (61%), deciduous forest 60% (60%), barren 91% (91%).
 Matching every class per county (allocation to class totals, developed with additions only) would remove most of the remaining
 501 km²; woody wetlands (294 Mg C/ha) matter most for carbon. Not tested yet.
+
+## All classes matched (05-class-counts.R, 06-match-all.R, 07-carbon-all.R; match-all.csv, match-all-classes.csv)
+
+Each year starts from the year before (1985 from the modal map). Developed land is placed first, additions only, to each county's 30 m
+area; then every other class is balanced to its county 30 m area by moving cells from classes over their target to classes under it,
+largest gain in 30 m share first, and only to a class the cell has pixels of.
+
+| P26 | Modal | All classes matched |
+| --- | --- | --- |
+| Area in the wrong class, 1985 (km² of 27,339) | 997 | 28 |
+| Area in the wrong class, 2023 | 920 | 65 |
+| Area in the wrong class, mean of 1985-2023 | 1,078 | 47 |
+| Developed 1985 -> 2023 (30 m: 876 -> 1,108) | 275 -> 422 | 876 -> 1,121 |
+| First-time development / developed lost to flicker | 295 / 230 | 245 / 0 |
+| A->B->A reversals, 1986-2023 | 917 | 183 |
+| Gross change, cells changing class, 1986-2023 (30 m pixels: 21,553) | 22,275 | 12,987 |
+
+- Every class is within 0-2% of its 30 m area in 1985 and 2023 (modal: evergreen forest 105%, grassland 80%, woody wetlands 61%,
+  deciduous forest 60%), except developed high (63-72%, 3-5 km²) and the 2023 split of developed low and medium (about 113% each).
+  Cells a class could not be filled for: about 14 km² a year.
+- Gross change is lower than at 30 m because matching follows each county's net change: changes that offset within a county (A to B
+  here, B to A there) cancel. Right for urbanization (no reversion); it would undercount agriculture's gross gains and losses (tiny in
+  P26). Fire and harvest transitions come from MTBS / LANDFIRE / LCMS, not from these maps, so they are unaffected.
+- Initial carbon (first order, each changed cell given its new class's mean density in its county): 1,088 km² change class and P26's
+  1985 total ecosystem carbon drops 8.0 Tg C of 486 (-1.65%): forest to developed -5.2, forest to shrubland -1.9, forest to grassland
+  -0.7. That is modal's forest surplus (990 km²) removed.
+- Not yet covered: the state class splits within NLCD classes (forest type from EVT, shrub and grass types from RCMAP, wetland types
+  from C-CAP) are still each cell's most common type; they could be matched the same way within each NLCD class.
