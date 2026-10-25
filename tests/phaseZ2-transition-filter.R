@@ -3,7 +3,8 @@
 # =============================================================================
 # On the library tests/phaseX-studio-library.R made: a scenario with stage 0 alone and no dependencies (so it writes the stock-flow
 # definitions and the filter). Passes when the filter lists every transition group of the project, all with Summary, and Spatial and
-# Spatial Probability are on for exactly the groups of defaults/stockflow/main-transition-groups.csv.
+# Spatial Probability are on for exactly the groups of defaults/stockflow/main-transition-groups.csv; and the spatial output options
+# have state class, age and transition maps every year.
 # Usage: Rscript tests/phaseZ2-transition-filter.R
 # =============================================================================
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
@@ -22,4 +23,8 @@ cat(sprintf("%d of %d groups listed, %d summarised; maps for: %s\n", nrow(f), le
 ok <- setequal(f$TransitionGroupId, g) && all(yes(f$Summary)) && setequal(mapped, intersect(main, g)) &&
   setequal(f[yes(SpatialProbability), TransitionGroupId], intersect(main, g)) && !any(yes(f$SpatialEvents) | yes(f$TimeSinceTransition))
 cat(if (ok) "TRANSITION FILTER OK\n" else "TRANSITION FILTER FAILED\n")
+# and the spatial output options: state class, age and transition maps every year
+o <- as.data.table(datasheet(R, "stsim_OutputOptionsSpatial", lookupsAsFactors = FALSE))
+ok2 <- nrow(o) == 1 && yes(o$RasterOutputSC) && yes(o$RasterOutputAge) && yes(o$RasterOutputTR) && o$RasterOutputAgeTimesteps == 1
+cat(if (ok2) "SPATIAL OUTPUT OPTIONS OK (age maps on)\n" else "SPATIAL OUTPUT OPTIONS FAILED\n"); if (!ok2) print(o)
 delete(L, scenario = scenarioId(S), force = TRUE)

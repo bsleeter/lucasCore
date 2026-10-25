@@ -8,7 +8,8 @@
 # need the diagram imported by an earlier stage (or supplied by a dependency).
 # When the scenario already has a flow pathway diagram (a Stock-Flow Definitions dependency), the stage writes none of these.
 # It also writes the transition group output filter (src/transition-filter.R: summaries for every group, maps only for the main groups
-# of defaults/stockflow/main-transition-groups.csv) whenever the scenario has no filter, dependency or not.
+# of defaults/stockflow/main-transition-groups.csv) and the spatial output options (state class, age and transition maps every year)
+# whenever the scenario has none, dependency or not.
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
 STAGE <- "0 Stock-Flow Definitions"
@@ -39,6 +40,16 @@ if (!nrow(as.data.table(datasheet(scn, "stsim_OutputFilterTransitionGroups", opt
   saveDatasheet(scn, f, "stsim_OutputFilterTransitionGroups")
   check(STAGE, "transition group output filter written", nrow(f) > 0 && any(f$Spatial == "Yes"),
         sprintf("%d groups; maps for %s", nrow(f), paste(f$TransitionGroupId[f$Spatial == "Yes"], collapse = ", ")))
+}
+# the spatial output options, written whenever the scenario has none: state class, age and transition maps every year
+# (defaults/stockflow/stsim_OutputOptionsSpatial.csv). A Projection Setup starts from a historical run's final state class AND age
+# maps (stage 9's Projection Start), so a run without age maps cannot be projected from. A run scenario that sets its own Spatial
+# output replaces these whole, so it must keep Age on itself.
+if (!nrow(as.data.table(datasheet(scn, "stsim_OutputOptionsSpatial", optional = TRUE, lookupsAsFactors = FALSE)))) {
+  o <- read_default("stockflow", "stsim_OutputOptionsSpatial.csv")
+  saveDatasheet(scn, as.data.frame(o), "stsim_OutputOptionsSpatial")
+  check(STAGE, "spatial output options written (age maps on)", identical(o$RasterOutputAge[1], "Yes"),
+        sprintf("state class every %s yr, age every %s yr, transitions every %s yr", o$RasterOutputSCTimesteps, o$RasterOutputAgeTimesteps, o$RasterOutputTRTimesteps))
 }
 progressBar()
 finish_checks()

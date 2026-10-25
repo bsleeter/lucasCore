@@ -148,4 +148,8 @@ if (!nrow(suppressWarnings(datasheet(sfd, "stsim_OutputFilterTransitionGroups", 
   tf <- transition_filter(as.data.table(datasheet(P, "stsim_TransitionGroup", lookupsAsFactors = FALSE))$Name, rd("stockflow", "main-transition-groups.csv"))
   saveDatasheet(sfd, tf, "stsim_OutputFilterTransitionGroups")
   cat(sprintf("transition group output filter: %d groups, maps for %d\n", nrow(tf), sum(tf$Spatial == "Yes"))) }
+# the spatial output options: state class, age and transition maps every year (a Projection Setup needs the run's final age map)
+if (!nrow(suppressWarnings(datasheet(sfd, "stsim_OutputOptionsSpatial", optional = TRUE)))) {
+  saveDatasheet(sfd, as.data.frame(rd("stockflow", "stsim_OutputOptionsSpatial.csv")), "stsim_OutputOptionsSpatial")
+  cat("spatial output options: state class, age and transition maps every year\n") }
 cat("library ready:", f, "\n")
