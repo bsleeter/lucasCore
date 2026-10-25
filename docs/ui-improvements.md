@@ -55,7 +55,7 @@ Ideas for the lucasCore pages in SyncroSim Studio, collected during the P26 user
    option and as a stand age source, so type and age come from one consistent map. Needs: a Data Sources path for the TreeMap raster
    and its attribute table, a FORTYPCD -> forest type group crosswalk (defaults/growth/forest-type-crosswalk.csv may cover it), the
    vintage (TreeMap 2016 / 2020 / 2022) set against the Build's start year, and a comparison with EVT/NFCMS and CMS age on P26.
-11. **LOCA2 climate: scan the user's folder, or download** - TO DO (user, 2026-10-25). The project's Climate Scenarios, Models and
+11. **LOCA2 climate: scan the user's folder, or download** - TO DO (user, 2026-10-25; the download part moves to item 12). The project's Climate Scenarios, Models and
    Replicates lists in a Studio library come from fixed CSVs (defaults/library/project/lucasCore_Climate*.csv, exported from the
    developer's LOCA2 folder: 3 SSPs, 10 models, 6 members), so the Projection Climate page can offer runs a user lacks and hides runs
    they add. tools/new-library.R already scans `<gcm>/<member>/<ssp>/{pr,tasmax,tasmin}/*.monthly.nc`; stage 11 already fails with
@@ -64,3 +64,33 @@ Ideas for the lucasCore pages in SyncroSim Studio, collected during the P26 user
    used by default"), it fetches only the monthly pr/tasmax/tasmin files for the study area's extent from the LOCA2 archive (UCSD; URL and access
    method to confirm), writes them in that folder layout, then refreshes the lists. Size, resumable downloads and a checksum matter;
    the full CONUS monthly set is large.
+12. **Data Download stage: fetch the Data Sources for a region** - TO DO (design agreed with the user, 2026-10-25; not started).
+   Supersedes the download half of item 11 (LOCA2 becomes one dataset here; 11's list scan/refresh stays). Today the Data Sources page
+   (ui/DataSourcesView.cs) links each dataset's download PAGE (defaults/library/data-sources.csv: landfire.gov/data, mrlc.gov/data,
+   the USFS archive index, ...), and the user fetches and points to every file by hand.
+   - **Its own stage in its own scenario** ("Data Download"), not part of the Build pipeline: SyncroSim's run machinery gives progress,
+     run log, Stop and the Run Monitor for downloads that take hours, and it does not tie up Studio. Run once per region; one download
+     serves many Builds (download California, build P26, P29, ...). Rerunning skips complete datasets and resumes partial files.
+   - **Region**: reuse the Study Area page (kind of unit + units) on the download scenario, plus a buffer (Data Download option, e.g.
+     5-10 km) for neighbourhood and edge effects (adjacency, distance to roads, perimeters crossing the boundary). The download region
+     does NOT have to match a Build's study area, only contain it.
+   - **Containment check**: the stage writes a manifest in the home folder (download extent, per-dataset source, vintage, clipped or
+     national, date, size/checksum). Stage 1 checks the Build's study area, and stage 10 its Suitability Fitting Region, and the fire
+     stages (6, 9) the pyromes they use, against it, and fail with a clear message ("the download covers California; P26's fitting
+     region extends into Nevada"). Datasets downloaded whole (national) always pass.
+   - **Paths: home folder convention** (chosen over a dependency-supplied paths sheet, because stages cannot write project sheets and
+     Data Sources is a project sheet): Data Sources gains a **Data Sources Home** field; a blank path resolves to `<home>\<standard
+     subfolder>` (read_data_sources and the view's found/missing marks), and the stage writes exactly that layout. No paths need filling
+     in; the red crosses turn green when the files exist. (Alternative kept in reserve: the stage writes a scenario-level paths sheet
+     into its result and a Build that depends on it uses those paths over the project's - more flexible, but a dependency on every Build.)
+   - **Per-dataset download method** (a manifest replacing the page links): direct file/zip (MTBS mosaics, FPA-FOD, FSim, forest
+     ownership, FIA DataMart tables); web service clipped to the region (LANDFIRE LFPS for EVT, disturbance, FRI, elevation, roads; NIFC
+     perimeters via ArcGIS REST; PRISM web service; gNATSGO NCCPI via the Planetary Computer STAC; LOCA2 with a picker for SSPs, models
+     and members - pr/tasmax/tasmin monthly only); login required (NASA CMS stand age at ORNL DAAC needs an Earthdata account: the user
+     signs in, the stage never handles credentials); manual (gSSURGO, the USFS forest type raster gateway may stay links). URLs and
+     access methods to confirm for each.
+   - **Output table** (Data Download result): dataset, source, vintage, clipped or national, extent, files, size, status (done / skipped /
+     needs a manual step and where).
+   - **Robustness**: resumable downloads, size or checksum checks so a half-finished file never counts as present, clear messages for
+     login/manual datasets. CONUS-wide sets are tens to hundreds of GB; clipping is the default wherever a service allows it.
+   - Downloads and clipping in R (terra, as the stages already do), so it is an ordinary Rscript stage.
