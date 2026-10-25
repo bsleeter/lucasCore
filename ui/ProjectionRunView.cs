@@ -125,7 +125,10 @@ namespace lucasCoreUI
             try
             {
                 Scenario sc = this.DataFeed.Scenario;
-                DataRow bo = sc == null ? null : sc.GetDataSheet("lucasCore_BuildOptions").GetData().Rows.Cast<DataRow>().FirstOrDefault(x => x.RowState != DataRowState.Deleted);
+                // this scenario's Build Options, else its dependencies' (a Projection Setup takes them from its Build result)
+                Func<Scenario, DataRow> opts = s => s == null ? null : s.GetDataSheet("lucasCore_BuildOptions").GetData().Rows.Cast<DataRow>().FirstOrDefault(x => x.RowState != DataRowState.Deleted);
+                DataRow bo = opts(sc);
+                if (bo == null && sc != null) foreach (Scenario d in sc.Dependencies) { bo = opts(d); if (bo != null) break; }
                 DataTable src = this.DataFeed.Project.GetDataSheet("lucasCore_StratumSource").GetData();
                 Func<object, string, string> name = (k, d) => { if (k == null || k == DBNull.Value) return d; DataRow r = src.Rows.Cast<DataRow>().FirstOrDefault(x => x.RowState != DataRowState.Deleted && Convert.ToInt32(x["StratumSourceId"]) == Convert.ToInt32(k)); return r == null ? d : Convert.ToString(r["Name"]); };
                 if (bo != null) { sec = name(bo["SecondarySourceId"], sec); ter = name(bo["TertiarySourceId"], ter); }
