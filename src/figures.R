@@ -31,15 +31,16 @@ distinct <- function(n) { t20 <- c("#4e79a7", "#f28e2b", "#e15759", "#59a14f", "
 argb <- function(s) vapply(strsplit(s, ","), function(v) { v <- as.integer(v); if (length(v) == 4) rgb(v[2], v[3], v[4], maxColorValue = 255) else "#999999" }, "")
 short_class <- function(x) sub(" Group$", "", sub("^Forest: ", "", x))      # "Forest: Western Oak Group" -> "Western Oak"
 
-build_figures <- function(I, outdir) {
+# the figure toolkit shared by the Build figures (build_figures) and the run figures (src/run-figures.R): the map frame and relief of a
+# model grid (sc), map_figure and chart_figure (numbered PNGs with the "Figure N" header and note), and their helpers. Returns its
+# environment: the figures it has drawn are in $rows.
+figure_kit <- function(sc, dem, outdir, NOTE) {
+  I <- list(sc = sc, dem = dem)
   dir.create(outdir, showWarnings = FALSE, recursive = TRUE)
   rows <- list(); n <- 0L
   done <- function(f, title, caption) rows[[length(rows) + 1]] <<- data.table(Figure = n, Title = title, Caption = caption, FileName = f)
   file_of <- function(slug) file.path(outdir, sprintf("Fig%02d_%s.png", n, slug))
-  scn <- I$sc_list; scol <- setNames(argb(scn$Color), scn$Name)
-  cell_km2 <- prod(res(I$sc)) / 1e6; area <- cell_km2 * sum(!is.na(values(I$sc, mat = FALSE)))
-  NOTE <- sprintf("%s, %s km2 on a %g m grid; Build %s-%s%s.", I$label %||% "Study area", format(round(area), big.mark = ","), res(I$sc)[1],
-                  I$years[1], I$years[2], if (is.null(I$result)) "" else sprintf(" (result %s)", I$result))
+  cell_km2 <- prod(res(I$sc)) / 1e6
 
   # ---- the map frame: the study area plus 3% on each side, on a grid of ~1600 cells along its long side ------------------------
   zone <- { o <- as.polygons(!is.na(I$sc) * 1, dissolve = TRUE); st_as_sf(o[values(o)[[1]] == 1]) }
@@ -126,6 +127,16 @@ build_figures <- function(I, outdir) {
   hgrid <- function() abline(h = axTicks(2), col = GRID, lwd = .6)
   # a legend in one row just above the plot's top right corner, clear of the data
   top_legend <- function(...) legend("bottomright", ..., horiz = TRUE, inset = c(0, 1.01), xpd = NA, bty = "n", cex = .72, border = NA)
+  environment() }
+# the kit's functions and frame values into the calling function's environment (the functions keep counting figures in the kit)
+use_kit <- function(K, into) for (nm in setdiff(ls(K), c("I", "rows", "n"))) assign(nm, get(nm, envir = K), envir = into)
+
+build_figures <- function(I, outdir) {
+  scn <- I$sc_list; scol <- setNames(argb(scn$Color), scn$Name)
+  cell_km2 <- prod(res(I$sc)) / 1e6; area <- cell_km2 * sum(!is.na(values(I$sc, mat = FALSE)))
+  NOTE <- sprintf("%s, %s km2 on a %g m grid; Build %s-%s%s.", I$label %||% "Study area", format(round(area), big.mark = ","), res(I$sc)[1],
+                  I$years[1], I$years[2], if (is.null(I$result)) "" else sprintf(" (result %s)", I$result))
+  K <- figure_kit(I$sc, I$dem, outdir, NOTE); use_kit(K, environment())
 
   relief <- if (dem_ok) " Shaded relief from the elevation data source." else ""
   vS <- cv(I$sc)
@@ -259,4 +270,4 @@ build_figures <- function(I, outdir) {
         ptitle(1, sprintf("%d checks, %d failed", sum(v$Checks), sum(v$Failed)))
         legend("bottomright", c("Passed", "Failed"), fill = c("#2b8152", "#a81d1a"), border = NA, bty = "n", cex = .75) }) }
 
-  rbindlist(rows) }
+  rbindlist(K$rows) }

@@ -490,6 +490,20 @@
 		<column name="FileName" displayName="Report (PDF)" dataType="String" isExternalFile="True" isRaster="False" externalFileFilter="PDF Files (*.pdf)|*.pdf"/>
 	</dataSheet>
 
+	<dataSheet name="RunFigureOptions" displayName="Run Figures" isSingleRow="True">
+		<!-- stage 13: which ST-Sim run (a historical run or a projection) to draw; the scenario depends on the run's Build result -->
+		<column name="RunScenarioId" displayName="Run (result scenario Id in this library; blank = the newest ST-Sim result)" dataType="Integer" isOptional="True"/>
+	</dataSheet>
+
+	<dataSheet name="OutputRunFigure" displayName="Run Figures (PNG)">
+		<!-- stage 13: one row per figure of the run (src/run-figures.R); Export > LUCAS Core > Run Figures saves them all to a folder -->
+		<column name="Figure" dataType="Integer"/>
+		<column name="Title" dataType="String"/>
+		<column name="Caption" dataType="String"/>
+		<column name="FileName" displayName="Figure (PNG)" dataType="String" isExternalFile="True" isRaster="False" externalFileFilter="PNG Files (*.png)|*.png"/>
+		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer" isOptional="True"/>
+	</dataSheet>
+
 	<dataSheet name="OutputBuildFigure" displayName="Build Figures (PNG)">
 		<!-- stage 12: one row per publication figure (src/figures.R); Export > LUCAS Core > Build Figures saves them all to a folder -->
 		<column name="Figure" dataType="Integer"/>
@@ -686,6 +700,18 @@
 	<!-- export: every Build figure to a folder -->
 	<transformer name="BuildFiguresExport" displayName="Build Figures" dataSheet="OutputBuildFigure" column="FileName" isFolderExport="True"/>
 
+	<transformer name="RunFigures" displayName="13 - Run Figures" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/13-run-figures.R">
+		<dataSheet name="RunFigureOptions" type="Input"/>
+		<dataSheet name="StudyArea" type="Input"/>
+		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
+		<dataSheet name="OutputTransitionSummary" type="Input"/>
+		<dataSheet name="OutputRunFigure" type="Output"/>
+		<dataSheet name="OutputValidation" type="Both"/>
+	</transformer>
+
+	<!-- export: every run figure to a folder -->
+	<transformer name="RunFiguresExport" displayName="Run Figures" dataSheet="OutputRunFigure" column="FileName" isFolderExport="True"/>
+
 	<!-- =================================================================================================== -->
 	<!-- LAYOUTS                                                                                           -->
 	<!-- =================================================================================================== -->
@@ -714,6 +740,7 @@
 				<item name="FireOptions"/>
 				<item name="ProjectionClimate"/>
 			</group>
+			<item name="RunFigureOptions"/>
 			<group name="lucasCoreCrosswalks" displayName="Crosswalks">
 				<item name="LandCoverCrosswalk"/>
 			</group>
@@ -745,6 +772,7 @@
 				<item name="OutputDecayCalibration"/>
 				<item name="OutputGrowthReport"/>
 				<item name="OutputBuildFigure"/>
+				<item name="OutputRunFigure"/>
 				<item name="OutputValidation"/>
 			</group>
 		</group>
@@ -753,6 +781,7 @@
 	<layout type="Export">
 		<group name="lucasCoreExport" displayName="LUCAS Core">
 			<item name="BuildFiguresExport" displayName="Build Figures (PNG)"/>
+			<item name="RunFiguresExport" displayName="Run Figures (PNG)"/>
 		</group>
 	</layout>
 
