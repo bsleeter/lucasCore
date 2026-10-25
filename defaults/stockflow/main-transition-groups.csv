@@ -5,4 +5,6 @@ Ag Expansion,Yes,Yes
 Ag Contraction,Yes,Yes
 Fire,Yes,Yes
 Forest Harvest,Yes,Yes
+Forest Harvest: Forest Clearcut [Type],Yes,Yes
+Forest Harvest: Forest Selection [Type],Yes,Yes
 Insect,Yes,Yes
