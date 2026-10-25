@@ -61,7 +61,11 @@ figures, which are redone once after the P26 rerun.
    its 30 m area is met; later years add the next-largest shares, never remove). P26: developed 876 km2 in 1985 (100% of 30 m; modal
    31%), net growth 105% of 30 m, no flicker (modal loses 230 km2), intensity classes close to 30 m; initial carbon -4.4 Tg C (-0.9%);
    urbanization rate 6.4 km2/yr instead of 7.8. Every year-by-year threshold flickers; "stays developed" variants inflate growth.
-   Next: choose the matching unit (strata level, see item 7), decide on agriculture, then a full P26 Build + historical run test.
+   **All classes matched** (user, 2026-10-25: match every class): developed as above, then every other class balanced to its county
+   30 m area, each year from the year before. Area in the wrong class 997 -> 28 km2 (1985), mean 1,078 -> 47 km2 over 1985-2023; every
+   class within 0-2% of 30 m; reversals 917 -> 183 km2; initial carbon -8.0 Tg C (-1.65%, modal's 990 km2 forest surplus removed).
+   Gross change follows county net change (offsetting changes cancel). Next: decide; match the state class splits (EVT forest type,
+   RCMAP, C-CAP) within each NLCD class the same way; choose the matching unit (item 7); then a full P26 Build + historical run test.
    Original note (user, 2026-10-24: accept the modal undercount for now). The 150 m modal
    NLCD keeps 31% of P26's 30 m developed area (22% of open space 21, 49% of low 22, 72% of medium/high): 79% of developed pixels lie in
    cells under half developed, mostly single-pixel roads (5 of a cell's 25 pixels). It also makes developed cells flicker year to year.
