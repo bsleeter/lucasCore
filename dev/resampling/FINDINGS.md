@@ -57,3 +57,12 @@ area matching with additions gives 245 km² (6.4 km²/yr), the 30 m growth.
 - Only developed land is matched. Agriculture also flickers (stage 10 has an agriculture flicker window); the same rule could apply.
 - Stage 5 would need the years processed in order (each year depends on the last), which is fast: the comparison ran in minutes.
 - A full test: a P26 Build and historical run with this method, compared on carbon, transitions against the record, and figures.
+
+## Every class, 1985 (04-class-areas-1985.R, class-areas-1985.csv)
+
+Area match fixes developed land, which was most of modal's error: the area in the wrong class drops from 997 km² (3.6% of P26's
+27,339 km²) to 501 km² (1.8%). Developed open 600 km² at 30 m: modal 132, area match 574; low 240: 118 and 267; medium 33: 24 and 33.
+The rest keeps modal's bias toward each area's dominant class, since only developed land is matched: evergreen forest 103% of 30 m
+(modal 105%), shrub/scrub 95% (97%), grassland 79% (80%), woody wetlands 59% (61%), deciduous forest 60% (60%), barren 91% (91%).
+Matching every class per county (allocation to class totals, developed with additions only) would remove most of the remaining
+501 km²; woody wetlands (294 Mg C/ha) matter most for carbon. Not tested yet.

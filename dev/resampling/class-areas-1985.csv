@@ -1,0 +1,18 @@
+code,class,km2_30m,km2_modal,km2_areamatch,modal_pct,areamatch_pct
+11,Open water,713.9,718.2,716.2,101,100
+12,Ice/snow,0.3,0,0,0,0
+21,Developed open,600.2,131.7,574.2,22,96
+22,Developed low,240.2,118.3,266.6,49,111
+23,Developed medium,32.5,23.6,33.3,73,102
+24,Developed high,2.7,1.6,1.7,59,63
+31,Barren,152,139,139,91,91
+41,Deciduous forest,97.7,58.7,58.3,60,60
+42,Evergreen forest,18800.3,19790.8,19271.6,105,103
+43,Mixed forest,2.2,0.8,0.8,36,36
+52,Shrub/scrub,6022.2,5812.6,5742.5,97,95
+71,Grassland,397.3,317.9,313.4,80,79
+81,Pasture/hay,49.8,51.7,49.8,104,100
+82,Cultivated crops,0.1,0,0,0,0
+90,Woody wetlands,131.6,79.8,78.1,61,59
+95,Herbaceous wetlands,96.2,94.7,93.9,98,98
+,Total,27339.2,27339.4,27339.4,,
