@@ -42,3 +42,25 @@ Ideas for the lucasCore pages in SyncroSim Studio, collected during the P26 user
    Options to test: class-priority or threshold rules (a cell is developed above some fraction), area-matching allocation (rank cells by
    fraction until the 30 m area is met), or a finer grid. Each must keep the state class map and the transitions derived from the same
    maps ([[coherence over area]]), and be judged on carbon as well as area.
+9. **FIA plot data instead of the prebuilt USGS tables** - TO DO (user, 2026-10-25). Stages 2-4 fit growth curves, carbon parameters
+   and decay calibration from two condition-level tables the user supplied (Data Sources: FIA Condition Carbon and Merchantable Volume,
+   `USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds`, and FIA Condition Disturbance and Treatment Codes,
+   `USGS_forest_conditions_dstrbcd_and_trtcd_20240213.Rds`). Another user has no such files. Planned: read the FIA DataMart directly
+   (the state COND, PLOT and TREE tables, or FIADB SQLite), filtered to the study area's states and the inventory years, and derive the
+   same fields the .Rds tables carry (condition carbon by pool, merchantable volume, stand age, forest type group, DSTRBCD/TRTCD). Keep the
+   .Rds route as an option, and check that the derived tables reproduce its P26 and CONUS curves before switching the default.
+10. **TreeMap for forest type group and stand age** - TO DO (user, 2026-10-25). Today the forest type comes from LANDFIRE EVT or the USFS
+   NFCMS forest type group maps (Build Options: Forest Type Map), and stand age from NASA CMS Forest Age 1990 (Data Sources:
+   StandAgeFile). Add TreeMap (USFS, 30 m imputed FIA plots; its plot IDs carry FORTYPCD and stand age) as a third Forest Type Map
+   option and as a stand age source, so type and age come from one consistent map. Needs: a Data Sources path for the TreeMap raster
+   and its attribute table, a FORTYPCD -> forest type group crosswalk (defaults/growth/forest-type-crosswalk.csv may cover it), the
+   vintage (TreeMap 2016 / 2020 / 2022) set against the Build's start year, and a comparison with EVT/NFCMS and CMS age on P26.
+11. **LOCA2 climate: scan the user's folder, or download** - TO DO (user, 2026-10-25). The project's Climate Scenarios, Models and
+   Replicates lists in a Studio library come from fixed CSVs (defaults/library/project/lucasCore_Climate*.csv, exported from the
+   developer's LOCA2 folder: 3 SSPs, 10 models, 6 members), so the Projection Climate page can offer runs a user lacks and hides runs
+   they add. tools/new-library.R already scans `<gcm>/<member>/<ssp>/{pr,tasmax,tasmin}/*.monthly.nc`; stage 11 already fails with
+   the runs that do exist. Planned: (a) LibrarySetup scans Data Sources: LOCA2 Folder when the library is made (fallback: the shipped
+   CSVs) and a "Refresh LOCA2 lists" action rescans later; (b) a download tool: the user picks SSPs, models and members (or "the 10
+   used by default"), it fetches only the monthly pr/tasmax/tasmin files for the study area's extent from the LOCA2 archive (UCSD /
+   cirrus.ucsd.edu), writes them in that folder layout, then refreshes the lists. Size, resumable downloads and a checksum matter;
+   the full CONUS monthly set is large.
