@@ -147,6 +147,22 @@ nlcd_prev <- function(y) { f <- nl$FileName[nl$Year == y - 1]; if (!length(f)) f
 src_ids <- function(g) as.integer(scl$Id[match(unique(pw[TransitionTypeId %in% grp_types(g), StateClassIdSource]), scl$Name)])
 fits_prev <- function(g, y) { s <- src_ids(g); lu <- intersect(s, LU); n <- nlcd_prev(y)
   (n %in% lu) | (any(!s %in% LU) & !(n %in% LU)) }
+# first-time gains only (user decision 2026-10-24): the modal NLCD flickers (a developed or agricultural cell reverts to forest, shrub or
+# grass and comes back), and the model has no pathway for the reversion, so counting the return as new change inflates the targets (P26:
+# 22% of urbanization 1986-2023, 32% after 2010). A gain in year y does not count when the cell already had it in an earlier year:
+# developed land returning (any developed level before, onto a non-developed cell), a developed level the cell already reached
+# (intensification), or agriculture returning. Applies to stage 6's NLCD gain maps only (NlcdGain-*.tif).
+DEV <- 21:24
+nlcd_year <- function(y) { f <- nl$FileName[nl$Year == y]; if (!length(f)) fail("annual NLCD for %d is missing", y); values(rast(f), mat = FALSE) }
+before <- new.env()
+had_before <- function(y) { k <- as.character(y); if (!is.null(before[[k]])) return(before[[k]])
+  yrs_b <- sort(nl$Year[nl$Year < y]); dev_ever <- rep(FALSE, length(land)); lev_max <- integer(length(land)); ag_ever <- rep(FALSE, length(land))
+  for (yy in yrs_b) { n <- nlcd_year(yy); dv <- match(n, DEV); dev_ever <- dev_ever | !is.na(dv); lev_max <- pmax(lev_max, ifelse(is.na(dv), 0L, dv)); ag_ever <- ag_ever | n %in% c(81L, 82L) }
+  before[[k]] <- list(dev = dev_ever, lev = lev_max, ag = ag_ever); before[[k]] }
+first_time <- function(g, y) { f <- hist_file(g, y); if (is.na(f) || !grepl("^NlcdGain", basename(f))) return(rep(TRUE, length(land)))
+  n <- nlcd_year(y); p <- nlcd_prev(y); h <- had_before(y); lv <- match(n, DEV)
+  again <- (!is.na(lv) & !(p %in% DEV) & h$dev) | (!is.na(lv) & p %in% DEV & h$lev >= lv) | (n %in% c(81L, 82L) & h$ag)
+  !again }
 progressBar()
 
 # strata for targets, units for rates, GAP status
@@ -180,7 +196,7 @@ if (tiles > 1) { chg <- pt[Method == "Target" & StrataLevel != tile_lvl, Transit
 tg <- pt[Method == "Target"]; new_tt <- list(); new_sm <- list(); rates <- list(); allow_files <- list()
 for (i in seq_len(nrow(tg))) { g <- tg$TransitionGroupId[i]; L <- tg$StrataLevel[i]; u <- lev[[L]]; units <- sort(unique(u[land])); ms <- mem[[g]]
   # area per unit and historical year, in the target's amount units: the sum of the members' areas
-  am <- lapply(ms, function(m) { a <- vapply(ref, function(y) { v <- hist_vals(m, y) * fits_prev(m, y); vapply(units, function(k) sum(v[land & u == k]), 0) }, numeric(length(units)))
+  am <- lapply(ms, function(m) { a <- vapply(ref, function(y) { v <- hist_vals(m, y) * fits_prev(m, y) * first_time(m, y); vapply(units, function(k) sum(v[land & u == k]), 0) }, numeric(length(units)))
     matrix(a, nrow = length(units), dimnames = list(units, ref)) * cell_amt })
   a <- Reduce(`+`, am)
   dr <- sched[SamplingSet == tg$SamplingSet[i]]
