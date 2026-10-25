@@ -94,3 +94,22 @@ Ideas for the lucasCore pages in SyncroSim Studio, collected during the P26 user
    - **Robustness**: resumable downloads, size or checksum checks so a half-finished file never counts as present, clear messages for
      login/manual datasets. CONUS-wide sets are tens to hundreds of GB; clipping is the default wherever a service allows it.
    - Downloads and clipping in R (terra, as the stages already do), so it is an ordinary Rscript stage.
+13. **P26 demo data bundle** - TO DO (user, 2026-10-25). A stand-alone, shippable set of the input data for the P26 Northern Sierra
+   Nevada example, so a new user can install lucasCore, unzip the bundle and follow the guide end to end without downloading anything.
+   A one-off for a reproducible example, not part of the model or the package.
+   - **Contents**: every Data Sources input the P26 Build, historical run, Projection Setup and Projection Climate read, clipped to P26
+     plus a buffer (the same rule as item 12, so the fitting region, pyrome and edge effects are covered): Annual NLCD, LANDFIRE EVT /
+     disturbance / FRI / elevation / roads, RCMAP, C-CAP, forest type groups, CMS stand age, MTBS, LCMS, NIFC perimeters, FSim, FPA-FOD,
+     PRISM, gSSURGO soil carbon, NCCPI, WUI, forest ownership, the strata layers (ecodivisions, counties, federal lands, pyromes), and the
+     FIA condition tables cut to the plots P26's curves use (CA/NV, or the ecodivisions it touches). LOCA2: a small set (e.g. one or two
+     models, SSP2-4.5 and SSP3-7.0, one member) rather than all ten.
+   - **Layout**: the item 12 home-folder layout and manifest, so the bundle drops in as the Data Sources Home and every path resolves
+     with nothing to browse to. If item 12 is not built yet, ship with a short script or a library already pointing at the folder.
+   - **Built by a script** (e.g. tools/make-demo-bundle.R, outside the package's stages): reads the P26 extent, clips each source from the
+     developer's national copies, writes the layout + manifest, a README (what each file is, source, vintage, citation, licence/terms),
+     and checks that a fresh library built from the bundle alone reproduces the P26 Build (same state class areas and initial carbon).
+   - **Optional extras**: the finished P26 Demo Library (Build, historical run, figures) for users who only want to explore results;
+     the guide's screenshots refer to it.
+   - **Packaging and hosting**: one zip (or a few), size to measure; GitHub release assets are capped at 2 GB per file, so a larger bundle
+     goes to a data repository (Zenodo, ScienceBase) with a DOI, linked from the README and the guide's chapter 1. Check each dataset's
+     terms allow redistribution of a clip, with attribution.
