@@ -113,3 +113,23 @@ Ideas for the lucasCore pages in SyncroSim Studio, collected during the P26 user
    - **Packaging and hosting**: one zip (or a few), size to measure; GitHub release assets are capped at 2 GB per file, so a larger bundle
      goes to a data repository (Zenodo, ScienceBase) with a DOI, linked from the README and the guide's chapter 1. Check each dataset's
      terms allow redistribution of a clip, with attribution.
+14. **FGDC metadata for the model and its outputs** - TO DO (user, 2026-10-25). Completed runs need FGDC-compliant metadata (CSDGM,
+   FGDC-STD-001-1998, as USGS data releases use; XML), in two layers:
+   - **Model metadata** (thorough, one record per model): what the model is and how it was built. Identification (title, abstract,
+     purpose, originators, citation, keywords, use constraints), extent and time period (study area bounding coordinates, 1985-2023
+     and the projection years), spatial reference and resolution, **lineage**: every input dataset as a source citation (from the Data
+     Sources page and item 12's manifest: source, vintage, URL, clipped or national) and every stage as a process step (what it does,
+     its key options, the date it ran, the result scenario id), software versions (SyncroSim, stsim, lucasCore), and the entity and
+     attribute definitions of the model's classifications (state classes, transition groups and types, stock and flow groups, strata).
+     Could be written by the Build (a stage or a step of stage 12) or by the outputs stage below from the Build result.
+   - **Output metadata stage** (its own scenario, like Run Figures): accepts one or more result scenario ids (historical runs,
+     projections, Run Figures), exports the delivered products and writes one metadata record per product: tabular outputs (state class,
+     transition, stock and flow tables as CSV, with every column defined: units, domains, the iteration/timestep meaning) and spatial
+     outputs (state class, age, transition and stock maps as GeoTIFF: raster info, bounding coordinates, value attributes and the class
+     lookup). Each record cites the model metadata as its lineage source and adds the run's own settings (years, iterations, climate
+     run, Projection Setup, multiprocessing tiles).
+   - **User fields** on a Metadata Options page (project or scenario level): originator, point of contact, publisher, distribution and
+     access constraints, citation/DOI, keywords (with thesauri), so the stage fills everything else automatically.
+   - **Validation**: run the USGS metadata parser (mp) on every record and report errors in the stage's checks; consider an ISO 19115
+     export later from the same content.
+   - Fits with item 13: the P26 demo bundle and a data release of P26 results would ship with these records.
