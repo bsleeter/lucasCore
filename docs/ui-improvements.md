@@ -2,6 +2,26 @@
 
 Ideas for the lucasCore pages in SyncroSim Studio, collected during the P26 user-guide walkthrough. Newest last.
 
+## Priorities (2026-10-25)
+
+The open items (6-14) in order. What drives the order: some items change the model itself (its inputs or its results), and anything
+built on P26 (the guide's numbers and figures, the demo bundle, metadata) should come after those are settled.
+
+| Order | Item | Why here | Depends on |
+| --- | --- | --- | --- |
+| 1 | 11 LOCA2 list scan (the scan part) | Small; the guide's Projection Climate step is next, and its lists should match the user's folder | - |
+| 2 | 7 Spatial multiprocessing in the Build | Needed now for projections and guide chapter 8; fixes the tile/target strata rule before projection runs | - |
+| 3 | 8 Area-preserving resampling (explore, then decide) | Changes every Build result and P26 number; decide before results are frozen | - |
+| 4 | 9 FIA plot data | Largest change to the model's inputs (curves, carbon); must reproduce the .Rds results before it becomes the default | - |
+| 5 | 10 TreeMap option | Same domain as 9 (FIA plots, forest type, age); an option, so it changes results only if made the default | 9 helps (FIA plot ids) |
+| 6 | 12 Data Download stage | Needs the final dataset list (9 and 10 add or replace sources); its LOCA2 download refreshes the lists through 11 | 9, 10, 11 |
+| 7 | 13 P26 demo bundle | Needs 12's layout and manifest, and a frozen P26 rerun after 8, 9 and 10 | 12; 8, 9, 10 |
+| 8 | 14 FGDC metadata | The model record needs the final input list and 12's manifest, and ships with 13 and P26 data releases; the output-metadata stage can start earlier | 12, 13 |
+| any | 6 Images viewer for figures | UI convenience, independent of the rest | - |
+
+While 8-10 are open, the guide's procedures (chapters 6-10) can still be written: the steps do not change, only the P26 numbers and
+figures, which are redone once after the P26 rerun.
+
 1. **Data Sources page** - DONE 2026-10-24. Custom view (`ui/DataSourcesView.cs`) groups the paths by category (study area, land
    cover, forest inventory, disturbance and fire, climate, soils and terrain, infrastructure and ownership), links each to its download
    page, adds a Browse button and a found/missing mark per path. Categories, dataset names and links: `defaults/library/data-sources.csv`.
