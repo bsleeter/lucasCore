@@ -169,7 +169,7 @@ figures, which are redone once after the P26 rerun.
    from the scenario's own sheet, so a Projection Setup (Build Options from its Build dependency) shows the defaults ("Secondary:
    States") instead of the Build's ("Secondary: Counties" for P26): read the dependency's Build Options, or the strata names the Build
    wrote. Also note: the page has no Start Year (ProjectionStart.StartYear exists but is not shown; blank = the historical end).
-16. **Run Settings: small text fixes** - TO DO (2026-10-25). The run list shows the id twice ("[14] [14] P26 ... Historical Run ([5] @
+16. **Run Settings: small text fixes** - FIXED 2026-10-25. The run list shows the id twice ("[14] [14] P26 ... Historical Run ([5] @
    ...)"): a result's DisplayName already starts with its id, so list DisplayName alone. The stand-alone hint still says to make the run
    with tools/new-historical.R --historical-only --bookend-maps; say instead that the run needs state class, age and stock maps for
    its last year (age maps are on by default from 25 October 2026).

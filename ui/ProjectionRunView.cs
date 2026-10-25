@@ -49,7 +49,7 @@ namespace lucasCoreUI
             var start = Column();
             start.Controls.Add(m_continuous);
             var r = Row(); m_standAlone.Margin = new Padding(3, 6, 6, 3); r.Controls.Add(m_standAlone); r.Controls.Add(m_hist); start.Controls.Add(r);
-            start.Controls.Add(Wrapped("Stand-alone: stage 9 starts from that run's state class, age and carbon stock maps in its last year (run it with tools/new-historical.R --historical-only --bookend-maps), so the history is run once and many projections share it.", 640));
+            start.Controls.Add(Wrapped("Stand-alone: stage 9 starts from that run's state class, age and carbon stock maps in its last year, so the history is run once and many projections share it. The run must have written age maps (on by default for Builds from 25 October 2026; otherwise tick Ages on its Spatial output page).", 640));
             AddGroup(Group("How the projection starts", start));
 
             var years = Column();
@@ -113,7 +113,7 @@ namespace lucasCoreUI
         private void LoadRuns()
         {
             m_runs = this.DataFeed.Project.Results.Cast<Scenario>()
-                .OrderByDescending(s => s.Id).Select(s => new Item { Key = s.Id, Name = string.Format("[{0}] {1}", s.Id, s.DisplayName) }).ToList();
+                .OrderByDescending(s => s.Id).Select(s => new Item { Key = s.Id, Name = s.DisplayName.StartsWith("[" + s.Id + "]") ? s.DisplayName : string.Format("[{0}] {1}", s.Id, s.DisplayName) }).ToList();   // a result's DisplayName already starts with its id
         }
 
         public override void LoadDataFeed(DataFeed dataFeed)
