@@ -36,3 +36,9 @@ Ideas for the lucasCore pages in SyncroSim Studio, collected during the P26 user
    - Open: one tile per unit (simple; 17 uneven county jobs for P26) or units packed into N tiles of about equal area (stage 9's
      balancing code, moved to shared.R). Projection Options' Spatial Tiles fields would then default to the Build's choice.
    - Guide: section 1.4 says to leave library multiprocessing off (right for Builds); tiled runs need it on, with jobs ~ tiles.
+8. **Area-preserving resampling of land cover** - TO EXPLORE (user, 2026-10-24: accept the modal undercount for now). The 150 m modal
+   NLCD keeps 31% of P26's 30 m developed area (22% of open space 21, 49% of low 22, 72% of medium/high): 79% of developed pixels lie in
+   cells under half developed, mostly single-pixel roads (5 of a cell's 25 pixels). It also makes developed cells flicker year to year.
+   Options to test: class-priority or threshold rules (a cell is developed above some fraction), area-matching allocation (rank cells by
+   fraction until the 30 m area is met), or a finer grid. Each must keep the state class map and the transitions derived from the same
+   maps ([[coherence over area]]), and be judged on carbon as well as area.
