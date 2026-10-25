@@ -159,3 +159,9 @@ figures, which are redone once after the P26 rerun.
    - **Validation**: run the USGS metadata parser (mp) on every record and report errors in the stage's checks; consider an ISO 19115
      export later from the same content.
    - Fits with item 13: the P26 demo bundle and a data release of P26 results would ship with these records.
+15. **Run Settings page: two bugs** - TO FIX (found 2026-10-25 setting up the P26 Projection Setup). (a) The stand-alone run list is
+   built once when the page loads (ProjectionRunView.LoadDataFeed), so a historical run that finishes while the scenario is open is
+   missing until the tab is closed and reopened: rebuild the list when the drop-down opens. (b) The tile strata labels read Build Options
+   from the scenario's own sheet, so a Projection Setup (Build Options from its Build dependency) shows the defaults ("Secondary:
+   States") instead of the Build's ("Secondary: Counties" for P26): read the dependency's Build Options, or the strata names the Build
+   wrote. Also note: the page has no Start Year (ProjectionStart.StartYear exists but is not shown; blank = the historical end).
