@@ -3,12 +3,15 @@
 # (src/13-run-figures.R), and testable outside a run (dev/figures/test_run_figures.R)
 # =============================================================================
 # Same format as the Build figures (src/figures.R, figure_kit): "Figure N" headers, lettered panels, maps on shaded relief.
-#   maps    land cover in the first and last year and the land-use change between them | fire: times burned, highest severity, last
-#           burn | total ecosystem carbon in the first and last year and its change
+#   maps    land cover in the first and last year and the land-use change between them, harvest included | fire: times burned,
+#           highest severity, last burn | harvest: times harvested, type, last harvest | total ecosystem carbon in the first and last
+#           year and its change
 #   charts  land area by cover group | transitions per year, simulated against the Build's record | carbon stocks | carbon fluxes |
 #           carbon by secondary stratum (counties)
 # load_run(lib, rid, ...) reads the run: its tables summed in SQL (iterations averaged) and its first-iteration maps by path; maps the
-# run did not write (state class, fire transitions, total ecosystem carbon) leave their figure or panel out.
+# run did not write (state class, fire or harvest transitions, total ecosystem carbon) leave their figure or panel out. Harvest is
+# read from every mapped group named "Forest Harvest..." (the clearcut and selection [Type] groups by default), its cells classed by
+# transition type name.
 # =============================================================================
 suppressPackageStartupMessages({ library(DBI); library(RSQLite) })
 
@@ -47,10 +50,13 @@ load_run <- function(lib, rid) {
   ssm <- q("SELECT Timestep, Filename FROM stsim_OutputSpatialState WHERE ScenarioId = %d AND Iteration = 1", rid)
   fire_id <- q("SELECT TransitionGroupId FROM stsim_TransitionGroup WHERE Name = 'Fire'")$TransitionGroupId
   fm <- if (length(fire_id)) q("SELECT Timestep, Filename FROM stsim_OutputSpatialTransition WHERE ScenarioId = %d AND Iteration = 1 AND TransitionGroupId = %d", rid, fire_id[1]) else data.table()
+  hm <- q("SELECT o.Timestep, o.Filename FROM stsim_OutputSpatialTransition o JOIN stsim_TransitionGroup g ON g.TransitionGroupId = o.TransitionGroupId
+           WHERE o.ScenarioId = %d AND o.Iteration = 1 AND g.Name LIKE 'Forest Harvest%%'", rid)
   te <- q("SELECT o.Timestep, o.Filename FROM stsim_OutputAverageSpatialStockGroup o JOIN stsim_StockGroup g ON g.StockGroupId = o.StockGroupId WHERE o.ScenarioId = %d AND g.Name = 'Total Ecosystem'", rid)
   list(rid = rid, nit = nit, years = yrs, sc_list = sc, tt_list = tt, area = area, trans = trans, stocks = stocks, flows = flows, unit_c = unit_c, unit_a = unit_a,
        sc0 = path("stsim_OutputSpatialState", ssm[Timestep == yrs[1], Filename]), sc1 = path("stsim_OutputSpatialState", ssm[Timestep == yrs[2], Filename]),
        fire = if (nrow(fm)) setNames(vapply(fm$Filename, function(f) path("stsim_OutputSpatialTransition", f), ""), fm$Timestep) else character(),
+       harvest = if (nrow(hm)) setNames(vapply(hm$Filename, function(f) path("stsim_OutputSpatialTransition", f), ""), hm$Timestep) else character(),
        carbon0 = path("stsim_OutputAverageSpatialStockGroup", te[Timestep == yrs[1], Filename]), carbon1 = path("stsim_OutputAverageSpatialStockGroup", te[Timestep == yrs[2], Filename]))
 }
 
@@ -68,6 +74,15 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
   low <- function() par(mar = c(8, 5, 3, 1))
   scn <- X$sc_list
 
+  # ---- harvest per cell (iteration 1): times harvested, most intensive type (1 selection, 2 salvage, 3 clearcut), last year --------
+  n_harv <- integer(length(inz)); hkind <- integer(length(inz)); last_h <- rep(NA_integer_, length(inz))
+  kind_of <- function(id) { nm <- X$tt_list$Name[match(id, X$tt_list$Id)]; ifelse(grepl("Clearcut", nm), 3L, ifelse(grepl("Salvage", nm), 2L, 1L)) }
+  for (y in unique(names(X$harvest))) { hit <- logical(length(inz))
+    for (f in X$harvest[names(X$harvest) == y]) { r <- rd(f); if (is.null(r)) next; v <- cv(r); h <- !is.na(v) & v > 0
+      hkind[h] <- pmax(hkind[h], kind_of(v[h])); hit <- hit | h }
+    n_harv[hit] <- n_harv[hit] + 1L; last_h[hit] <- as.integer(y) }
+  HARV_LAB <- c("Selection harvest", "Salvage logging", "Clearcut"); HARV_COLS <- c("#e0b43a", "#6b6b6b", "#7a4419")
+
   # ---- maps: land cover change ---------------------------------------------------------------------------------------------
   r0 <- rd(X$sc0); r1 <- rd(X$sc1)
   if (!is.null(r0) && !is.null(r1)) {
@@ -79,17 +94,20 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
     ch[ok & ga == "Developed" & gb == "Developed" & dv(b) > dv(a)] <- 3L
     ch[ok & gb == "Agriculture" & ga != "Agriculture"] <- 4L
     ch[ok & ga == "Agriculture" & gb != "Agriculture" & gb != "Developed"] <- 5L
-    ch[ok & ch == 1L & a != b] <- 6L
-    cl <- c("No change", "Urbanized", "Intensified", "To agriculture", "From agriculture", "Other change")
-    cc <- c("#f1eee6", "#c0392b", "#7b1f1f", "#d98b3a", "#6fae74", "#7a76b8")
+    ch[ok & ch == 1L & a != b] <- 9L
+    # harvest on land whose use did not change (forest stays forest): its most intensive type in the run, over any class change
+    hv <- ok & ch %in% c(1L, 9L) & hkind > 0; ch[hv] <- 5L + hkind[hv]
+    cl <- c("No change", "Urbanized", "Intensified", "To agriculture", "From agriculture", HARV_LAB, "Other change")
+    cc <- c("#f1eee6", "#c0392b", "#7b1f1f", "#d98b3a", "#6fae74", HARV_COLS, "#7a76b8")
     pres <- sort(unique(ch[!is.na(ch)]))
-    km2 <- function(k) sum(ch == k, na.rm = TRUE) * prod(res(el)) / 1e6
+    km2 <- function(k) sum(ch %in% k, na.rm = TRUE) * prod(res(el)) / 1e6
     P <- list(c(cats(r0, scn, n = 12, colours = sc_colours, label = short_class), list(title = sprintf("State class, %d", y0), sub = "the run's initial conditions")),
               c(cats(r1, scn, n = 12, colours = sc_colours, label = short_class), list(title = sprintf("State class, %d", y1), sub = "iteration 1")),
               list(k = match(ch, pres), cols = cc[pres], lab = cl[pres], key = TRUE, title = sprintf("Land-use change, %d-%d", y0, y1),
-                   sub = sprintf("urbanized %.0f km2; first year against last", km2(2))))
+                   sub = sprintf("urbanized %.0f km2%s; first year against last", km2(2), if (any(hv)) sprintf(", harvested %.0f km2", km2(6:8)) else "")))
     map_figure("land_cover_change", "Land cover change", P,
-      sprintf("(a, b) State class in the first and last year of the run (the twelve largest named). (c) What changed between them: development of non-developed land, a higher development intensity, gain or loss of agriculture, or another class change. A cell that changed and changed back counts as no change.%s", relief)) }
+      sprintf("(a, b) State class in the first and last year of the run (the twelve largest named). (c) What changed between them: development of non-developed land, a higher development intensity, gain or loss of agriculture, %sor another class change. A cell that changed and changed back counts as no change.%s",
+              if (any(hv)) "forest harvested at least once during the run (its most intensive harvest type, from the yearly harvest transition maps of iteration 1), " else "", relief)) }
 
   # ---- maps: fire --------------------------------------------------------------------------------------------------------------
   if (length(X$fire)) {
@@ -106,6 +124,17 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
       list(k = ifelse(is.na(last), NA, findInterval(last, yb, rightmost.closed = TRUE)), cols = colorRampPalette(c("#fde7b0", "#e0702b", "#6b1a10"))(length(yb) - 1), lab = ylab,
            title = "Year of the last fire", sub = "grey: not burned")),
       sprintf("Fire in the run (iteration 1), from its yearly fire transition maps: how often each cell burned, its highest severity, and when it last burned.%s", relief)) }
+
+  # ---- maps: harvest -----------------------------------------------------------------------------------------------------------
+  if (any(n_harv > 0)) {
+    yb <- c(y0, 1995, 2005, 2015, y1 + 1); yb <- unique(yb[yb >= y0 & yb <= y1 + 1]); ylab <- sprintf("%d-%d", head(yb, -1) + c(1, rep(0, length(yb) - 2)), tail(yb, -1) - 1)
+    harv_km2 <- sum(n_harv > 0 & inz) * prod(res(el)) / 1e6; pk <- sort(unique(hkind[hkind > 0]))
+    map_figure("harvest", sprintf("Forest harvest, %d-%d", y0 + 1, y1), list(
+      list(k = ifelse(n_harv == 0, NA, pmin(n_harv, 3L)), cols = c("#e0b43a", "#a0612a", "#3d230b"), lab = c("1", "2", "3+"), title = "Times harvested", sub = sprintf("%.0f km2 harvested at least once; grey: not harvested", harv_km2)),
+      list(k = ifelse(hkind == 0, NA, match(hkind, pk)), cols = HARV_COLS[pk], lab = HARV_LAB[pk], key = TRUE, title = "Most intensive harvest", sub = "clearcut over salvage over selection"),
+      list(k = ifelse(is.na(last_h), NA, findInterval(last_h, yb, rightmost.closed = TRUE)), cols = colorRampPalette(c("#efe3bd", "#b8894a", "#4a2c10"))(length(yb) - 1), lab = ylab,
+           title = "Year of the last harvest", sub = "grey: not harvested")),
+      sprintf("Forest harvest in the run (iteration 1), from its yearly harvest transition maps (the Forest Harvest groups mapped by the transition group output filter): how often each cell was harvested, its most intensive harvest type, and when it was last harvested.%s", relief)) }
 
   # ---- maps: carbon ------------------------------------------------------------------------------------------------------------
   c0 <- rd(X$carbon0); c1 <- rd(X$carbon1)
