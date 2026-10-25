@@ -56,7 +56,13 @@ figures, which are redone once after the P26 rerun.
    - Open: one tile per unit (simple; 17 uneven county jobs for P26) or units packed into N tiles of about equal area (stage 9's
      balancing code, moved to shared.R). Projection Options' Spatial Tiles fields would then default to the Build's choice.
    - Guide: section 1.4 says to leave library multiprocessing off (right for Builds); tiled runs need it on, with jobs ~ tiles.
-8. **Area-preserving resampling of land cover** - TO EXPLORE (user, 2026-10-24: accept the modal undercount for now). The 150 m modal
+8. **Area-preserving resampling of land cover** - EXPLORED 2026-10-25 (dev/resampling, FINDINGS.md); decision pending. Best method:
+   **area matching per county with additions only** (1985: each county's cells with the largest developed shares become developed until
+   its 30 m area is met; later years add the next-largest shares, never remove). P26: developed 876 km2 in 1985 (100% of 30 m; modal
+   31%), net growth 105% of 30 m, no flicker (modal loses 230 km2), intensity classes close to 30 m; initial carbon -4.4 Tg C (-0.9%);
+   urbanization rate 6.4 km2/yr instead of 7.8. Every year-by-year threshold flickers; "stays developed" variants inflate growth.
+   Next: choose the matching unit (strata level, see item 7), decide on agriculture, then a full P26 Build + historical run test.
+   Original note (user, 2026-10-24: accept the modal undercount for now). The 150 m modal
    NLCD keeps 31% of P26's 30 m developed area (22% of open space 21, 49% of low 22, 72% of medium/high): 79% of developed pixels lie in
    cells under half developed, mostly single-pixel roads (5 of a cell's 25 pixels). It also makes developed cells flicker year to year.
    Options to test: class-priority or threshold rules (a cell is developed above some fraction), area-matching allocation (rank cells by
