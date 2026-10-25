@@ -242,7 +242,16 @@ check(STAGE, "every pathway type has a time-varying multiplier or a zero target"
 # expected area per group and year; the area on start-year classes no type of the group can leave (land use moves on, so later-year
 # figures are indicative)
 el <- setNames(lapply(dyn, elig_cells), dyn)
+# several land-use groups share one NLCD map (a cell becoming 22 is Urbanization: Low from natural or agricultural land, Intensification:
+# Open to Low from 21), and the pathways split its cells by their class the year before; a group's area counts only the cells whose
+# prior-year modal NLCD class fits its source classes, as stage 9 does (found 2026-10-24: each sharing group was given the whole map, so
+# the summary's urbanization and intensification overstated the change by up to 3x)
+LU <- c(21:24, 81L, 82L)
+src_ids <- function(g) sid(unique(pw[TransitionTypeId %in% grp_types(g), StateClassIdSource]))
+fits_prev <- function(g, y) { s <- src_ids(g); lu <- intersect(s, LU); n <- values(N[[as.character(y - 1)]], mat = FALSE)
+  (n %in% lu) | (any(!s %in% LU) & !(n %in% LU)) }
 summ <- layers[!is.na(File), { v <- values(rast(File), mat = FALSE); v[is.na(v)] <- 0
+  if (Source %in% c("NlcdGain", "NlcdLoss")) v[!fits_prev(TransitionGroupId, Timestep)] <- 0
   .(Area = sum(v) * cell_km2, Cells = sum(v > 0), IneligibleArea = sum(v[!el[[TransitionGroupId]]]) * cell_km2) }, by = .(Timestep, TransitionGroupId, Source)]
 if (!is.null(age_blocked)) summ <- merge(summ, age_blocked, by = c("Timestep", "TransitionGroupId"), all.x = TRUE) else summ[, AgeBlockedArea := NA_real_]
 tot <- summ[, .(Area = sum(Area), Inel = sum(IneligibleArea), Blocked = sum(AgeBlockedArea, na.rm = TRUE), Years = .N), by = .(TransitionGroupId, Source)][order(Source, TransitionGroupId)]
