@@ -95,6 +95,14 @@ namespace lucasCoreUI
                 }
             }
             log.Append(AutoGroups(p, store));
+            // transition simulation groups that are automatic "[Type]" groups (forest clearcut and selection, which ST-Sim must simulate and map
+            // as separate groups, not as the Forest Harvest family) can only be named once AutoGroups has made them
+            string simTypes = Path.Combine(dir, "defaults", "stsim", "stsim_TransitionSimulationGroup-types.csv");
+            if (File.Exists(simTypes))
+            {
+                log.AppendFormat("stsim_TransitionSimulationGroup [Type]: {0}; ", LoadSheet(p, store, "stsim_TransitionSimulationGroup", simTypes, "TransitionGroupId"));
+                Save(p.GetDataSheet("stsim_TransitionSimulationGroup"), store);
+            }
             return log.ToString();
         }
 
@@ -172,7 +180,8 @@ namespace lucasCoreUI
             return row;
         }
 
-        private static string LoadSheet(Project p, DataStore store, string name, string file)
+        // key: a column to match existing rows on (its stored value, after the lookup), so only missing rows are added to a filled sheet
+        private static string LoadSheet(Project p, DataStore store, string name, string file, string key = null)
         {
             DataSheet ds = p.GetDataSheet(name);
             if (ds == null) throw new InvalidDataException(name + " is not a sheet of this library");
@@ -195,7 +204,7 @@ namespace lucasCoreUI
                 for (int k = 0; k < cols.Count; k++) row[cols[k].Name] = idx[k] < rows[1].Length ? Value(cols[k], rows[1][idx[k]], lookups, name) : DBNull.Value;
                 return have.Any() ? "updated" : "1 row";
             }
-            DataSheetColumn named = string.IsNullOrEmpty(ds.DisplayMember) ? null : cols.FirstOrDefault(c => c.Name == ds.DisplayMember);
+            DataSheetColumn named = key != null ? cols.FirstOrDefault(c => c.Name == key) : string.IsNullOrEmpty(ds.DisplayMember) ? null : cols.FirstOrDefault(c => c.Name == ds.DisplayMember);
             if (have.Any() && named == null) return string.Format("kept {0} rows", have.Count);
             var exists = new HashSet<string>(named == null ? new string[0] : have.Select(r => Convert.ToString(r[named.Name], CultureInfo.InvariantCulture)), StringComparer.OrdinalIgnoreCase);
             int n = 0, skipped = 0;
@@ -203,7 +212,7 @@ namespace lucasCoreUI
             foreach (string[] r in rows.Skip(1))
             {
                 if (r.Length == 1 && r[0] == "") continue;
-                if (named != null && exists.Contains(r[idx[cols.IndexOf(named)]])) { skipped++; continue; }
+                if (named != null && exists.Contains(key != null ? Convert.ToString(Value(named, r[idx[cols.IndexOf(named)]], lookups, name), CultureInfo.InvariantCulture) : r[idx[cols.IndexOf(named)]])) { skipped++; continue; }
                 DataRow row = NewRow(ds, store, dt);
                 for (int k = 0; k < cols.Count; k++) row[cols[k].Name] = idx[k] < r.Length ? Value(cols[k], r[idx[k]], lookups, name) : DBNull.Value;
                 n++;

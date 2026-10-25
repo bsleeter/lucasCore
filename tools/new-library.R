@@ -61,6 +61,13 @@ for (i in seq_len(nrow(man))) {
     bad <- bad + length(miss) }
 }
 if (bad) stop(bad, " default names are missing from sheets that were already filled")
+# transition simulation groups that are automatic "[Type]" groups (forest clearcut and selection: simulated and mapped as separate
+# groups, not as the Forest Harvest family); SyncroSim makes the "[Type]" groups when the transition types are saved, above
+sgt <- rd("stsim", "stsim_TransitionSimulationGroup-types.csv")
+have <- suppressWarnings(as.data.table(datasheet(P, "stsim_TransitionSimulationGroup", optional = TRUE, lookupsAsFactors = FALSE)))
+add <- setdiff(sgt$TransitionGroupId, have$TransitionGroupId)
+if (length(add)) saveDatasheet(P, data.frame(TransitionGroupId = add), "stsim_TransitionSimulationGroup", append = TRUE)
+cat(sprintf("%-34s %4d [Type] rows added\n", "stsim_TransitionSimulationGroup", length(add)))
 
 # ---- Stratum Sources (every polygon source) and the universal unit lists -------------------------------------------------
 # Every preset is a row; rows the user added (a custom source with its own Number) are kept. The stsim Secondary and Tertiary Strata
