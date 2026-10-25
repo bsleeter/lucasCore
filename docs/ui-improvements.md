@@ -61,6 +61,6 @@ Ideas for the lucasCore pages in SyncroSim Studio, collected during the P26 user
    they add. tools/new-library.R already scans `<gcm>/<member>/<ssp>/{pr,tasmax,tasmin}/*.monthly.nc`; stage 11 already fails with
    the runs that do exist. Planned: (a) LibrarySetup scans Data Sources: LOCA2 Folder when the library is made (fallback: the shipped
    CSVs) and a "Refresh LOCA2 lists" action rescans later; (b) a download tool: the user picks SSPs, models and members (or "the 10
-   used by default"), it fetches only the monthly pr/tasmax/tasmin files for the study area's extent from the LOCA2 archive (UCSD /
-   cirrus.ucsd.edu), writes them in that folder layout, then refreshes the lists. Size, resumable downloads and a checksum matter;
+   used by default"), it fetches only the monthly pr/tasmax/tasmin files for the study area's extent from the LOCA2 archive (UCSD; URL and access
+   method to confirm), writes them in that folder layout, then refreshes the lists. Size, resumable downloads and a checksum matter;
    the full CONUS monthly set is large.
