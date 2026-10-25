@@ -77,6 +77,7 @@ namespace lucasCoreUI
 
             m_continuous.CheckedChanged += (s, e) => { if (!Refreshing && m_continuous.Checked) { m_wantStandAlone = false; Write(Start, "HistoricalScenarioId", DBNull.Value); RefreshControls(); } };
             m_standAlone.CheckedChanged += (s, e) => { if (!Refreshing && m_standAlone.Checked) { m_wantStandAlone = true; RefreshControls(); } };
+            m_hist.DropDown += (s, e) => { int n = m_runs.Count; LoadRuns(); if (m_runs.Count != n) RefreshControls(); };
             m_hist.SelectionChangeCommitted += (s, e) => { var i = m_hist.SelectedItem as Item; Write(Start, "HistoricalScenarioId", i == null ? DBNull.Value : i.Key); RefreshControls(); };
             m_allYears.CheckedChanged += (s, e) => { if (Refreshing) return; m_customYears = !m_allYears.Checked; if (m_allYears.Checked) { Write("ReferenceStartYear", DBNull.Value); Write("ReferenceEndYear", DBNull.Value); } RefreshControls(); };
             BindNumber(m_from, () => Sheet, "ReferenceStartYear", true); BindNumber(m_to, () => Sheet, "ReferenceEndYear", true);
@@ -106,12 +107,19 @@ namespace lucasCoreUI
             m_synced = change.Count;
         }
 
+        // result scenarios of this project, newest first: a historical run is one of them. Results are in Project.Results, not in
+        // Project.Scenarios (which holds only the scenarios you edit); reread whenever the drop-down opens, so a run that finished
+        // while this page was open is listed
+        private void LoadRuns()
+        {
+            m_runs = this.DataFeed.Project.Results.Cast<Scenario>()
+                .OrderByDescending(s => s.Id).Select(s => new Item { Key = s.Id, Name = string.Format("[{0}] {1}", s.Id, s.DisplayName) }).ToList();
+        }
+
         public override void LoadDataFeed(DataFeed dataFeed)
         {
             base.LoadDataFeed(dataFeed);
-            // result scenarios of this project, newest first: a historical run is one of them
-            m_runs = this.DataFeed.Project.Scenarios.Cast<Scenario>().Where(s => s.IsResult)
-                .OrderByDescending(s => s.Id).Select(s => new Item { Key = s.Id, Name = string.Format("[{0}] {1}", s.Id, s.DisplayName) }).ToList();
+            LoadRuns();
             // the strata levels by what the build put in them (Build Options' sources; blank = the defaults), read once
             string sec = "States", ter = "Federal Lands";
             try
