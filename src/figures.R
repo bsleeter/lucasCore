@@ -23,6 +23,11 @@ RAMP_AGE <- colorRampPalette(c("#f5efe3", "#e9dfa6", "#b9cf86", "#6fae74", "#2f8
 RAMP_C <- colorRampPalette(c("#f5efe3", "#dfe6b4", "#a9cf86", "#62ab68", "#2b8152", "#195c3f", "#0f3a2b"))
 RAMP_SOIL <- colorRampPalette(c("#f5efe3", "#ead7ab", "#d4ae73", "#b07f45", "#85572b", "#5a3a1c", "#33210f"))
 QUAL <- c("#4e79a7", "#f28e2b", "#59a14f", "#e15759", "#b07aa1", "#76b7b2", "#edc948", "#9c755f", "#ff9da7", "#86bcb6", "#8cd17d", "#d4a6c8")
+# n distinct colours for named units (counties, ...): Tableau's 20, the strong ten first and then their light tints (rotated, so unit k
+# and unit k + 10 never share a hue), then generated hues
+distinct <- function(n) { t20 <- c("#4e79a7", "#f28e2b", "#e15759", "#59a14f", "#b07aa1", "#9c755f", "#edc948", "#499894", "#d37295", "#79706e",
+                                   "#8cd17d", "#d4a6c8", "#d7b5a6", "#f1ce63", "#86bcb6", "#fabfd2", "#bab0ac", "#a0cbe8", "#ffbe7d", "#ff9d9a")
+  if (n <= 20) t20[seq_len(n)] else c(t20, hcl.colors(n - 20, "Dynamic")) }
 argb <- function(s) vapply(strsplit(s, ","), function(v) { v <- as.integer(v); if (length(v) == 4) rgb(v[2], v[3], v[4], maxColorValue = 255) else "#999999" }, "")
 short_class <- function(x) sub(" Group$", "", sub("^Forest: ", "", x))      # "Forest: Western Oak Group" -> "Western Oak"
 
@@ -77,7 +82,7 @@ build_figures <- function(I, outdir) {
     v <- cv(r); tab <- sort(table(v[inz & !is.na(v)]), decreasing = TRUE); top <- as.numeric(names(tab))[seq_len(min(n, length(tab)))]
     nm <- lst$Name[match(top, lst$Id)]; nm[is.na(nm)] <- paste("Id", top[is.na(nm)])
     other <- length(tab) > length(top); k <- match(v, top); if (other) k[!is.na(v) & is.na(k)] <- length(top) + 1L
-    cols <- if (!is.null(colours)) unname(colours[nm]) else QUAL[(seq_along(top) - 1) %% length(QUAL) + 1]; cols[is.na(cols)] <- "#9a9a9a"
+    cols <- if (!is.null(colours)) unname(colours[nm]) else distinct(length(top)); cols[is.na(cols)] <- "#9a9a9a"
     list(k = k, cols = c(cols, if (other) "#bdbdbd"), lab = c(label(nm), if (other) "Other"), key = TRUE) }
 
   # ---- a map figure: panels = list(list(k, cols, lab, key, title, sub)) -----------------------------------------------------
@@ -132,10 +137,10 @@ build_figures <- function(I, outdir) {
     tl <- c("FIA ecodivisions (primary strata)", sprintf("%s (secondary strata)", src[1] %||% "Secondary"), sprintf("%s (tertiary strata)", src[2] %||% "Tertiary"))
     P <- list()
     for (j in seq_along(I$strata)) { r <- I$strata[[j]]; if (is.null(r) || nrow(unique(r)) < 2) next
-      p <- cats(r, I$strata_names[[j]], n = 10, label = function(x) sub("^[^:]*: ", "", x)); p$title <- tl[j]
-      p$sub <- sprintf("%d units%s", nrow(unique(r)), if ("Other" %in% p$lab) "; the ten largest named" else ""); P[[length(P) + 1]] <- p }
+      p <- cats(r, I$strata_names[[j]], n = 40, label = function(x) sub("^[^:]*: ", "", x)); p$title <- tl[j]
+      p$sub <- sprintf("%d units%s", nrow(unique(r)), if ("Other" %in% p$lab) "; the 40 largest named" else ""); P[[length(P) + 1]] <- p }
     if (length(P)) map_figure("strata", "Study area and strata", P,
-      sprintf("The strata levels of the model grid; a level with a single unit is not mapped. The largest units of each are named, the rest grouped as Other.%s", relief)) }
+      sprintf("The strata levels of the model grid; a level with a single unit is not mapped. Each unit has its own colour; past 40 units a level's smallest are grouped as Other.%s", relief)) }
 
   # ---- maps: initial land cover ------------------------------------------------------------------------------------------------
   P <- list(c(cats(I$sc, scn, n = 12, colours = scol, label = short_class), list(title = sprintf("Initial state class, %s", I$years[1]), sub = "annual NLCD with forest, grassland, shrubland and wetland types")))
