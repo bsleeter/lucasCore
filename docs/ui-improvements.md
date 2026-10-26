@@ -111,6 +111,21 @@ figures, which are redone once after the P26 rerun.
    biomass/height and Landsat disturbance history, with 20 realizations (an uncertainty range for initial age). GFZ's server refused
    connections on 2026-10-26; file list and sizes still to get. Next: a three-way P26 comparison (CMS, TreeMap, GAMI) and the first-order
    change in 1985 carbon from each, then the Build Options choice in stage 5.
+   **Fourth option, stand age inferred from biomass + disturbance history (user's idea, 2026-10-26).** Invert each cell's live carbon
+   curve (stage 2, forest type x ecodivision) at its mapped live carbon at the map date T, then shift to the start year; cells disturbed
+   between the start year and T (MTBS stand-replacing fire, LCMS / LANDFIRE harvest and clearing) are young at T because of a
+   disturbance the model simulates itself, so their start-year age comes from elsewhere (undisturbed neighbours, or FIA's age
+   distribution for the type). Limits: near the curve's asymptote carbon no longer identifies age (cap and draw old ages from FIA's
+   distribution); the curves are type x ecodivision means, so inferred age partly measures site productivity (for a carbon model
+   partly a feature: the start-year live carbon matches the map by construction); per-pixel biomass errors of 30-50% become large age
+   errors on the steep part of the curve; TreeMap's carbon layer is not independent of its age. Candidate map: **NBCD 2000** (NACP
+   Aboveground Biomass and Carbon Baseline Data V2, Kellndorfer et al. 2013, ORNL DAAC doi 10.3334/ORNLDAAC/1161): CONUS circa 2000 at
+   30 m (canopy height, live aboveground dry biomass, carbon stock), 66 mapping zones of six GeoTIFFs each plus a 240 m CONUS biomass
+   mosaic and a zone shapefile; V2 adds shrubland (NLCD 52). T = 2000 keeps the shift to 1985 at 15 years. The data folder needs a NASA
+   Earthdata login (the user downloads the P26 zones; file sizes and P26's zone numbers still to find from the zone shapefile).
+   Alternatives: ESA CCI Biomass (100 m, 2010, 2017-2021, with per-pixel uncertainty). Test on P26 in dev/: inferred ages against CMS,
+   TreeMap, GAMI and, most usefully, FIA plot ages at the plots' (fuzzed) locations from the DataMart files; if it holds up, it becomes
+   Stand Age Source = Inferred from biomass.
 11. **LOCA2 climate: scan the user's folder, or download** - (a) DONE 2026-10-26, verified in Studio by the user; (b) the download part moves to
    item 12. `ui/Loca2Lists.cs` scans Data Sources: LOCA2 Folder by new-library.R's rule (a member counts when its historical folder
    and at least one SSP folder each hold pr, tasmax and tasmin `*.monthly.nc`). LibrarySetup fills a new project's three lists from
