@@ -37,20 +37,20 @@
 	</dataSheet>
 
 	<dataSheet name="ClimateScenario" displayName="Climate Scenarios (LOCA2)" dataScope="Project" displayMember="Name">
-		<!-- written by tools/new-library.R from the SSP folders found under the LOCA2 folder -->
+		<!-- the SSP folders found under Data Sources: LOCA2 Folder (ui/Loca2Lists.cs at library setup and Projection Climate > Rescan; tools/new-library.R) -->
 		<column name="Name" dataType="String"/>
 		<column name="Code" displayName="Folder" dataType="String"/>
 		<column name="Description" dataType="String" isOptional="True"/>
 	</dataSheet>
 
 	<dataSheet name="ClimateModel" displayName="Climate Models (LOCA2)" dataScope="Project" displayMember="Name">
-		<!-- written by tools/new-library.R: one row per GCM found under the LOCA2 folder -->
+		<!-- one row per GCM found under the LOCA2 folder (ui/Loca2Lists.cs; tools/new-library.R) -->
 		<column name="Name" displayName="GCM" dataType="String"/>
 		<column name="Runs" displayName="Replicates by Scenario" dataType="String" isOptional="True"/>
 	</dataSheet>
 
 	<dataSheet name="ClimateReplicate" displayName="Climate Replicates (LOCA2 ensemble members)" dataScope="Project" displayMember="Name">
-		<!-- written by tools/new-library.R: every ensemble member found under the LOCA2 folder -->
+		<!-- every ensemble member found under the LOCA2 folder (ui/Loca2Lists.cs; tools/new-library.R) -->
 		<column name="Name" displayName="Ensemble Member" dataType="String"/>
 		<column name="Runs" displayName="Models and Scenarios" dataType="String" isOptional="True"/>
 	</dataSheet>

@@ -3,7 +3,8 @@
 // =============================================================================
 // Single-row sheet lucasCore_ProjectionClimate, read by stage 11. The model list keeps the models that have a run for the chosen
 // scenario, and the replicate list the ensemble members of that model and scenario (from the Runs column of Climate Models:
-// "SSP2-4.5: r1i1p1f1, r2i1p1f1; SSP3-7.0: ..."). The climate effects (which flows respond, and how) come from the Build's
+// "SSP2-4.5: r1i1p1f1, r2i1p1f1; SSP3-7.0: ..."). The lists come from Data Sources: LOCA2 Folder; Rescan updates them
+// after runs are added or removed there (Loca2Lists.cs). The climate effects (which flows respond, and how) come from the Build's
 // Climate Options through the scenario's dependency on the Build result.
 // =============================================================================
 using System;
@@ -27,6 +28,8 @@ namespace lucasCoreUI
         private readonly ComboBox m_replicate = List(220);
         private readonly TextBox m_last = Box(60);
         private readonly Label m_runs = new Label { AutoSize = true, MaximumSize = new Size(640, 0), ForeColor = SystemColors.GrayText, Margin = new Padding(3, 6, 3, 3) };
+        private readonly Button m_rescan = new Button { Text = "Rescan LOCA2 folder", AutoSize = true, Margin = new Padding(3, 6, 12, 3) };
+        private readonly Label m_scan = new Label { AutoSize = true, MaximumSize = new Size(560, 0), ForeColor = SystemColors.GrayText, Margin = new Padding(3, 10, 3, 3) };
         private List<Item> m_scenarios = new List<Item>(), m_models = new List<Item>(), m_replicates = new List<Item>();
 
         public ProjectionClimateView()
@@ -44,11 +47,13 @@ namespace lucasCoreUI
             FormRow(f, "Last year:", m_last, "blank = 2100");
             run.Controls.Add(f);
             run.Controls.Add(m_runs);
+            var scan = Row(); scan.Controls.Add(m_rescan); scan.Controls.Add(m_scan); run.Controls.Add(scan);
             AddGroup(Group("LOCA2 run", run));
             EndGroups();
             m_scenario.SelectionChangeCommitted += (s, e) => { Write("ClimateScenarioId", Key(m_scenario)); RefreshControls(); };
             m_model.SelectionChangeCommitted += (s, e) => { Write("ClimateModelId", Key(m_model)); RefreshControls(); };
             m_replicate.SelectionChangeCommitted += (s, e) => { Write("ClimateReplicateId", Key(m_replicate)); RefreshControls(); };
+            m_rescan.Click += (s, e) => Rescan();
             BindNumber(m_last, () => Sheet, "EndYear", true);
             this.ResumeLayout(false);
         }
@@ -66,11 +71,29 @@ namespace lucasCoreUI
         public override void LoadDataFeed(DataFeed dataFeed)
         {
             base.LoadDataFeed(dataFeed);
+            LoadLists();
+            m_scan.Text = "The lists show the runs in Data Sources: LOCA2 Folder when the library was made. After adding or removing runs there, rescan.";
+            RefreshControls();
+        }
+
+        private void LoadLists()
+        {
             Project p = this.DataFeed.Project;
             m_scenarios = Read(p, "lucasCore_ClimateScenario", "ClimateScenarioId", false);
             m_models = Read(p, "lucasCore_ClimateModel", "ClimateModelId", true);
             m_replicates = Read(p, "lucasCore_ClimateReplicate", "ClimateReplicateId", false);
-            RefreshControls();
+        }
+
+        // the project's three LOCA2 lists from the runs now in the LOCA2 folder (Loca2Lists.cs); rows are kept, so chosen runs stay valid
+        private void Rescan()
+        {
+            string folder = Loca2Lists.FolderOf(this.DataFeed.Project, null);
+            Loca2Lists L;
+            try { L = Loca2Lists.Scan(folder); }
+            catch (Exception ex) { m_scan.Text = "Scan failed: " + ex.Message; m_scan.ForeColor = Color.Firebrick; return; }
+            if (L == null) { m_scan.Text = string.Format("No complete LOCA2 runs in \"{0}\" (expected <model>/<member>/historical and <ssp> folders, each with pr, tasmax and tasmin *.monthly.nc). Lists unchanged; check Data Sources: LOCA2 Folder.", folder); m_scan.ForeColor = Color.Firebrick; return; }
+            m_scan.Text = L.Apply(this.DataFeed.Project); m_scan.ForeColor = SystemColors.GrayText;
+            LoadLists(); RefreshControls();
         }
 
         // a model's runs by scenario name: "SSP2-4.5: r1i1p1f1, r2i1p1f1; SSP3-7.0: r1i1p1f1"
@@ -109,6 +132,7 @@ namespace lucasCoreUI
             IEnumerable<Item> reps = members == null ? m_replicates : m_replicates.Where(r => members.Contains(r.Name, StringComparer.OrdinalIgnoreCase) || (rid != DBNull.Value && Convert.ToInt32(r.Key) == Convert.ToInt32(rid)));
             Fill(m_replicate, members != null && members.Count > 0 ? string.Format("Lowest-numbered ({0})", members.OrderBy(x => x, StringComparer.Ordinal).First()) : "Lowest-numbered (default)", reps, rid);
             m_last.Text = Show(Value("EndYear"));
+            m_rescan.Enabled = !(this.Scenario != null && this.Scenario.IsResult) && this.ShouldEnableView();
 
             if (model == null) m_runs.Text = m_models.Count == 0 ? "No LOCA2 runs are listed in this library (Climate Models is empty)." : "";
             else if (scen != null && members == null) m_runs.Text = string.Format("{0} has no {1} run. It has: {2}.", model.Name, scen.Name, model.Runs);

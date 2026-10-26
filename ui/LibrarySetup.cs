@@ -5,7 +5,8 @@
 // AddDefaultRecords for each project sheet with records when the package is added to a library (File > New > Empty Library, then
 // Library Properties > Packages > Add) and when a project is created, so a new project gets:
 //   defaults/stsim/manifest.csv            the ST-Sim definitions (strata, state classes, transition types and groups, stocks, flows...)
-//   defaults/library/project/manifest.csv  Stratum Sources, the Secondary and Tertiary unit lists and the LOCA2 lists
+//   defaults/library/project/manifest.csv  Stratum Sources, the Secondary and Tertiary unit lists and the LOCA2 lists (the LOCA2 lists
+//                                          from a scan of Data Sources: LOCA2 Folder when it holds runs, Loca2Lists.cs)
 //                                          (tools/export-project-defaults.R writes them from the starter)
 // A project that already has state classes is left alone (a starter copy, or a library made by new-library.R). The outcome is written to
 // the sheet's own row (Status, Detail). The stock-flow definitions are scenario data: stage 0 writes them into the Build result.
@@ -82,6 +83,7 @@ namespace lucasCoreUI
             if (p == null) throw new InvalidOperationException("no project");
             if (Live(p.GetDataSheet("stsim_StateClass").GetData(store)).Any()) return null;
             var log = new StringBuilder();
+            string scanned = null; bool tried = false;   // the LOCA2 lists from a scan of Data Sources: LOCA2 Folder (loaded first), else the shipped CSVs
             foreach (string manifest in new[] { Path.Combine(dir, "defaults", "stsim", "manifest.csv"), Path.Combine(dir, "defaults", "library", "project", "manifest.csv") })
             {
                 List<string[]> m = Csv.Read(manifest); string[] h = m[0];
@@ -90,6 +92,11 @@ namespace lucasCoreUI
                 {
                     if (r.Length <= iSheet || r[iSheet] == "" || (iScope >= 0 && r[iScope] != "Project")) continue;
                     string file = Path.Combine(Path.GetDirectoryName(manifest), r[iSheet] + ".csv");
+                    if (r[iSheet].StartsWith("lucasCore_Climate", StringComparison.Ordinal))
+                    {
+                        if (!tried) { tried = true; scanned = ScanLoca2(p, store, log); }
+                        if (scanned != null) file = Path.Combine(scanned, r[iSheet] + ".csv");
+                    }
                     log.AppendFormat("{0}: {1}; ", r[iSheet], LoadSheet(p, store, r[iSheet], file));
                     Save(p.GetDataSheet(r[iSheet]), store);
                 }
@@ -104,6 +111,22 @@ namespace lucasCoreUI
                 Save(p.GetDataSheet("stsim_TransitionSimulationGroup"), store);
             }
             return log.ToString();
+        }
+
+        // the folder holding the scanned LOCA2 lists as CSVs, or null (folder missing, no runs, or the scan failed: the shipped CSVs are used)
+        private static string ScanLoca2(Project p, DataStore store, StringBuilder log)
+        {
+            string folder = Loca2Lists.FolderOf(p, store);
+            try
+            {
+                Loca2Lists L = Loca2Lists.Scan(folder);
+                if (L == null) { log.AppendFormat("LOCA2: no runs in '{0}', shipped lists used; ", folder); return null; }
+                string dir = Path.Combine(Path.GetTempPath(), "lucasCore-loca2-" + Guid.NewGuid().ToString("N"));
+                Directory.CreateDirectory(dir); L.WriteCsv(dir);
+                log.AppendFormat("LOCA2: {0}; ", L.Summary());
+                return dir;
+            }
+            catch (Exception ex) { log.AppendFormat("LOCA2: scan of '{0}' failed ({1}), shipped lists used; ", folder, ex.Message); return null; }
         }
 
         // ST-Sim's "<type> [Type]" group for every transition, stock and flow type (IsAuto). ST-Sim's own RowsAdded handlers make them in
