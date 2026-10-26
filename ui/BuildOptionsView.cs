@@ -75,19 +75,17 @@ namespace lucasCoreUI
             Fit.Attach(m_scroll);
             FlowLayoutPanel r;
 
-            GroupBox gGrid = Group("Model grid", out r);
+            GroupBox gGrid = Group("Model grid", out r, Note("1000 = 1 km. Finer cells take longer: a 150 m pyrome runs about 12 minutes per simulated year."));
             r.Controls.Add(Caption("Cell size (m):")); r.Controls.Add(Number(m_resolution, 70));
-            r.Controls.Add(Note("1000 = 1 km. Finer cells take longer: a 150 m pyrome runs about 12 minutes per simulated year."));
 
             GroupBox gHist = Group("Historical period", out r,
                 Note("Land use, disturbance and climate are taken from these years' data. Projections start the year after the end year; their end year is set in Projection > Run Settings, and their climate in a Projection Climate scenario."));
             r.Controls.Add(Caption("Start year:")); r.Controls.Add(Number(m_start, 60));
             r.Controls.Add(Caption("End year:")); r.Controls.Add(Number(m_end, 60));
 
-            GroupBox gStrata = Group("Strata", out r);
+            GroupBox gStrata = Group("Strata", out r, Note("Primary strata are always the FIA ecodivisions."));
             r.Controls.Add(Caption("Secondary:")); r.Controls.Add(List(m_secondary, 200));
             r.Controls.Add(Caption("Tertiary:")); r.Controls.Add(List(m_tertiary, 200));
-            r.Controls.Add(Note("Primary strata are always the FIA ecodivisions."));
             m_secondary.SelectionChangeCommitted += (s, e) => WriteSource(m_secondary, "SecondarySourceId");
             m_tertiary.SelectionChangeCommitted += (s, e) => WriteSource(m_tertiary, "TertiarySourceId");
 

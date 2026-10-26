@@ -11,7 +11,7 @@ built on P26 (the guide's numbers and figures, the demo bundle, metadata) should
 | --- | --- | --- | --- |
 | ~~1~~ | ~~11 LOCA2 list scan (the scan part)~~ | DONE 2026-10-26, verified in Studio | - |
 | ~~2~~ | ~~7 Spatial multiprocessing in the Build~~ | DONE 2026-10-26 | - |
-| 3 | 8 Area-preserving resampling | BUILT 2026-10-26 as a Build Options choice; a full P26 Area-matched Build is still to run and compare | - |
+| ~~3~~ | ~~8 Area-preserving resampling~~ | DONE 2026-10-26 (Build Options choice; a P26 Area-matched comparison run is optional) | - |
 | 4 | 9 FIA plot data | Largest change to the model's inputs (curves, carbon); must reproduce the .Rds results before it becomes the default | - |
 | 5 | 10 TreeMap option | Same domain as 9 (FIA plots, forest type, age); an option, so it changes results only if made the default | 9 helps (FIA plot ids) |
 | 6 | 12 Data Download stage | Needs the final dataset list (9 and 10 add or replace sources); its LOCA2 download refreshes the lists through 11 | 9, 10, 11 |
@@ -63,7 +63,7 @@ figures, which are redone once after the P26 rerun.
    - Open: one tile per unit (simple; 17 uneven county jobs for P26) or units packed into N tiles of about equal area (stage 9's
      balancing code, moved to shared.R). Projection Options' Spatial Tiles fields would then default to the Build's choice.
    - Guide: section 1.4 says to leave library multiprocessing off (right for Builds); tiled runs need it on, with jobs ~ tiles.
-8. **Area-preserving resampling of land cover** - BUILT 2026-10-26 as a choice (page checked in Studio by the user) (user: "pick either method from the Build menu").
+8. **Area-preserving resampling of land cover** - DONE 2026-10-26 (marked complete by the user), built as a choice (page checked in Studio) (user: "pick either method from the Build menu").
    Build Options: Land Cover Resampling = Modal (default; blank in older Builds) or Area-matched (every class matched to its 30 m area
    per secondary stratum unit, developed additions only: 06-match-all.R's method, now `src/landcover-match.R`; reproduces its P26
    maps cell for cell, 1.7 min for 39 years). Stage 5 counts each class's 30 m pixels per cell (parallel over years), matches the
