@@ -25,3 +25,4 @@ dev/climate/*.csv
 docs/guide/captures/
 docs/guide/figures/
 Starter/*.bak-*
+dev/treemap/out/*.tif
