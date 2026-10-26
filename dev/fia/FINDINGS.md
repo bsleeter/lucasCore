@@ -17,3 +17,23 @@ FIADB_REFERENCE (REF_FOREST_TYPE, REF_SPECIES), in Data Sources/FIA/DataMart. Co
   FIA dead pools, so this matters for carbon.
 - DataMart has more conditions: 3,062 from 1994 (California's periodic inventory, not in the USGS table, which starts in 2001), and
   3,215 from 2021-2024 (inventories after the USGS snapshot). Stages 2-4 filter by Growth Options' minimum inventory year anyway.
+
+## FIADB carbon pool definitions and the down dead factor (2026-10-26)
+
+FIADB user guide, database description, COND table - identical wording in v9.2 (April 2024) and v9.4 (August 2025):
+- **CARBON_DOWN_DEAD**: woody material **> 3 in (7.6 cm)** in diameter on the ground, **and stumps and their roots > 3 in**. Modelled
+  from geographic area, forest type and live tree carbon density (Smith and Heath 2008); not a sum of plot measurements.
+- **CARBON_LITTER**: organic material on the forest floor, **including fine woody debris, humus, and fine roots in the organic forest
+  floor layer** above mineral soil. Modelled from litter measurements on a subset of plots, area, elevation, forest type group, live tree
+  carbon and climate (Domke et al. 2016).
+- **CARBON_SOIL_ORG**: fine organic material below the soil surface to 1 m; **does not include roots**. Modelled from soil measurements
+  on a subset of plots, with soil order and surficial geology (Domke et al. 2017).
+- v9.4's change notes mention no carbon changes. The DataMart files are FIADB 9.5 (April 2026), newer than any guide found.
+
+**The down dead factor is one constant per state, not 0.7** (03-down-dead-by-state.R): current FIADB / USGS table = CA 1.4286, NY 1.4706,
+ME 1.2048, CO 1.1111, MN 1.0309, AZ 0.8000, MT 0.7634, GA 4.0000 - the same for every condition in a state (5th = 95th percentile). Litter
+and soil also changed in some states (unchanged in only 4-6% of conditions in ME, MN, NY; 86-100% in CA, CO, GA). So FIADB's down dead
+estimates were rescaled state by state after February 2024 (and litter and soil revised in some states), undocumented in the v9.4 guide.
+A per-state constant looks like the Smith and Heath model being scaled to field measurements (FIA's down woody material plots) state by
+state - a hypothesis to confirm from the 9.5 release notes or FIA. Since down dead is modelled from live tree carbon, its rise with stand
+age is built into the model, not observed.
