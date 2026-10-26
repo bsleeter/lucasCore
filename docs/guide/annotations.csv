@@ -159,3 +159,14 @@ File,Step,X,Y,W,H
 6.6g-projection-tiles.png,36,937,305,792,30
 6.6h-setup-validation.png,37,628,664,266,27
 6.6h-setup-validation.png,38,973,276,1022,394
+7.1a-projection-name.png,1,18,84,836,30
+7.1b-projection-dependencies.png,2,110,530,401,24
+7.1b-projection-dependencies.png,3,152,589,564,57
+7.1c-projection-pipeline.png,4,628,276,266,27
+7.1c-projection-pipeline.png,5,973,278,843,28
+7.1d-projection-tabular.png,6,691,396,203,25
+7.1d-projection-tabular.png,7,941,272,396,63
+7.1e-projection-spatial.png,8,691,427,203,25
+7.1e-projection-spatial.png,9,941,272,417,136
+7.1f-projection-filter.png,10,835,516,158,25
+7.1f-projection-filter.png,11,1073,677,904,26
