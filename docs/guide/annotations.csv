@@ -51,11 +51,6 @@ File,Step,X,Y,W,H
 3.2c-study-area.png,4,860,419,1009,28
 3.2c-study-area.png,5,1882,419,108,30
 3.2c-study-area.png,,860,462,1009,22
-3.3a-build-options.png,1,510,306,297,26
-3.3a-build-options.png,2,970,295,105,30
-3.3a-build-options.png,3,956,423,294,30
-3.3a-build-options.png,4,964,576,705,30
-3.3a-build-options.png,5,999,782,301,30
 3.4a-climate-options.png,1,510,336,297,26
 3.4a-climate-options.png,2,1051,328,422,175
 3.4a-climate-options.png,3,855,577,1143,54
@@ -186,3 +181,10 @@ File,Step,X,Y,W,H
 7.3e-parallel-scenarios.png,23,1040,305,280,28
 7.3f-run-both.png,24,14,440,700,60
 7.3f-run-both.png,25,470,679,272,32
+3.3a-build-options.png,1,620,305,330,27
+3.3a-build-options.png,2,1114,295,105,29
+3.3a-build-options.png,3,1099,426,292,29
+3.3a-build-options.png,4,1106,574,706,32
+3.3a-build-options.png,5,1143,817,300,29
+3.3a-build-options.png,6,1188,857,496,29
+3.3a-build-options.png,7,1001,1025,782,33
