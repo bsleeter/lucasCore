@@ -102,6 +102,18 @@ row <- if (nrow(ic)) ic[1] else data.table(StratumFileName = NA_character_)
 row$StratumFileName <- fp; row$SecondaryStratumFileName <- fs; row$TertiaryStratumFileName <- ft
 saveDatasheet(scn, as.data.frame(row), "stsim_InitialConditionsSpatial")
 
+# spatial multiprocessing (Build Options): the tile mask goes into this result, so the historical run and every projection that depend
+# on the Build are split the same way (a projection may set its own in Run Settings; stage 9 then writes that one)
+tiles <- if ("SpatialTiles" %in% names(opt) && !is.na(opt$SpatialTiles[1])) as.integer(opt$SpatialTiles[1]) else 1L
+if (tiles > 1) {
+  lvl <- tile_level(if ("SpatialTilesStrata" %in% names(opt)) opt$SpatialTilesStrata[1] else NA)
+  tl <- pack_tiles(values(list(Primary = P, Secondary = S, Tertiary = Tr)[[lvl]], mat = FALSE), !na_p, tiles)
+  if (tl$units < tiles) say("Spatial tiles: only %d %s units for %d tiles - some tiles stay empty", tl$units, lvl, tiles)
+  saveDatasheet(scn, data.frame(MaskFileName = write_raster(setValues(rast(P), tl$values), "Build-Tiles.tif", "INT2U")), "core_SpatialMultiprocessing")
+  say("Spatial multiprocessing: %s", tile_summary(tl, tiles, lvl))
+  check(STAGE, "every land cell is in a tile", !any(is.na(tl$values[!na_p])), sprintf("%d cells without a tile", sum(is.na(tl$values[!na_p]))))
+}
+
 summ <- rbindlist(lapply(list(list(P, "Primary", "Stratum"), list(S, "Secondary", "SecondaryStratum"), list(Tr, "Tertiary", "TertiaryStratum")), function(lv) {
   f <- as.data.table(freq(lv[[1]]))[, .(Id = as.integer(value), Cells = as.integer(count))]
   l <- stsim_list(lv[[3]]); f[, Name := l$Name[match(Id, as.integer(l$Id))]]; f[, Level := lv[[2]]]; f[, .(Level, Name, Id, Cells)] }))

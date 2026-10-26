@@ -17,12 +17,14 @@
 #     burned fraction of the burnable land (the group's map, times a slope selectivity fitted as the burned share by slope in the
 #     historical fire maps, rescaled within the pyrome so its total holds); each severity type gets the drawn year's own share of
 #     that pyrome's burned area; fires are sized from the interagency perimeters (wildfire, one per incident and year) as an ST-Sim
-#     size distribution from the historical end + 1. Methods 2 (burn probability) and 3 (lucasFireC2F seasons) come next
+#     size distribution from the historical end + 1. Method 2 spreads the drawn year's burned share by the FSim burn
+#     probability (also the ignition surface); method 3 draws whole lucasFireC2F seasons (both below)
 #   * Probability: the group's burned (or changed) fraction of the eligible area of each unit of any Stratum Source in the drawn year,
 #     as a per-cell multiplier map; it does not depend on the strata, so fire can use pyromes while land use uses counties
 #   * None: the group stays off after the historical end (stage 6's Off rows)
-#   * Spatial multiprocessing (Projection Options: Spatial Tiles): targets only add up if no target unit is split between tiles, so
-#     every Target group must use one strata level and the tiles are made of whole units of it; Probability groups are exempt
+#   * Spatial multiprocessing (Run Settings' Spatial Tiles, blank = the Build's from Build Options): targets only add up if no target
+#     unit is split between tiles, so every Target group must use one strata level and the tiles are made of whole units of it;
+#     Probability groups are exempt
 # Needs stage 6 (same pipeline, or a dependency on its result). Projects to Run Settings' end year (blank = 2100).
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
@@ -39,7 +41,12 @@ po <- read_ds("ProjectionOptions")
 nz <- function(v, d) if (is.null(v) || !length(v) || is.na(v[1])) d else v[1]
 rs <- nz(po$ReferenceStartYear, y0 + 1); re <- nz(po$ReferenceEndYear, y1)
 if (rs < y0 + 1 || re > y1 || rs > re) fail("Projection Options: reference period %d-%d must lie within the historical transition years %d-%d", rs, re, y0 + 1, y1)
-ref <- rs:re; nit <- nz(po$Iterations, 10L); seed <- nz(po$RandomSeed, 1L); tiles <- nz(po$SpatialTiles, 1L)
+ref <- rs:re; nit <- nz(po$Iterations, 10L); seed <- nz(po$RandomSeed, 1L)
+# spatial tiles: Run Settings' own, else the Build's (Build Options; stage 1 wrote its mask into the Build result). 1 = one job, even
+# when the Build has tiles: the setup then writes a one-tile mask, which the projection takes before the Build's
+build_tiles <- if ("SpatialTiles" %in% names(opt)) nz(opt$SpatialTiles, 1L) else 1L
+own_tiles <- "SpatialTiles" %in% names(po) && !is.na(nz(po$SpatialTiles, NA))
+tiles <- if (own_tiles) nz(po$SpatialTiles, 1L) else build_tiles
 say("Projection %d-%d, %d iterations; each year draws a historical year from %d-%d (seed %d)", min(pyrs), pend, nit, rs, re, seed)
 
 # ---- the rules ----------------------------------------------------------------------------------------------------------
@@ -188,8 +195,8 @@ say("Sampling sets: %s", paste(sprintf("%s (%s)", sets, vapply(sets, function(s)
 # spatial multiprocessing (user decision 2026-10-23): tiles are whole units of one of the build's three strata levels (Projection
 # Options, Spatial Tiles Strata; the layer itself is chosen in Build Options), and a target must not be split between tiles, so every
 # Target group uses that level - the Run Settings page sets it on the Transitions rows, and this enforces it for inherited rows too
-tl_v <- as.character(nz(po$SpatialTilesStrata, "Secondary"))
-tile_lvl <- c("Primary", "Secondary", "Tertiary")[if (grepl("^[123]$", tl_v)) as.integer(tl_v) else nz(match(sub(" .*", "", tl_v), c("Primary", "Secondary", "Tertiary")), 2L)]
+tile_lvl <- tile_level(if (own_tiles) nz(po$SpatialTilesStrata, NA) else if ("SpatialTilesStrata" %in% names(opt)) nz(opt$SpatialTilesStrata, NA) else NA)
+if (tiles > 1) say("Spatial tiles: %d of whole %s units, from %s", tiles, tile_lvl, if (own_tiles) "Run Settings" else "the Build (Build Options)")
 if (tiles > 1) { chg <- pt[Method == "Target" & StrataLevel != tile_lvl, TransitionGroupId]
   if (length(chg)) say("Spatial tiles of %s units: Target Strata set to %s for %s", tile_lvl, tile_lvl, paste(chg, collapse = "; "))
   pt[Method == "Target", StrataLevel := tile_lvl] }
@@ -377,14 +384,15 @@ progressBar()
 if (tiles > 1) {
   lvls <- unique(c(tile_lvl, tg$StrataLevel))
   check(STAGE, "with spatial tiles, every Target group uses the tile strata level", length(lvls) == 1, paste(lvls, collapse = ", "))
-  if (length(lvls) == 1) { u <- lev[[lvls]]; ua <- table(u[land]); ua <- sort(ua, decreasing = TRUE)
-    if (length(ua) < tiles) say("Spatial tiles: only %d %s units for %d tiles - some tiles stay empty", length(ua), lvls, tiles)
-    load <- numeric(tiles); tile_of <- integer(length(ua))
-    for (j in seq_along(ua)) { k <- which.min(load); tile_of[j] <- k; load[k] <- load[k] + ua[[j]] }
-    tv <- rep(NA_integer_, length(land)); tv[land] <- tile_of[match(as.character(u[land]), names(ua))]
-    tf <- write_raster(setValues(rast(P), tv), "Projection-Tiles.tif", "INT2U")
+  if (length(lvls) == 1) { tl <- pack_tiles(lev[[lvls]], land, tiles)
+    if (tl$units < tiles) say("Spatial tiles: only %d %s units for %d tiles - some tiles stay empty", tl$units, lvls, tiles)
+    tf <- write_raster(setValues(rast(P), tl$values), "Projection-Tiles.tif", "INT2U")
     saveDatasheet(scn, data.frame(MaskFileName = tf), "core_SpatialMultiprocessing")
-    say("Spatial tiles: %d tiles of whole %s units (largest %.0f%%, smallest %.0f%% of the land)", tiles, lvls, 100 * max(load) / sum(load), 100 * min(load) / sum(load)) }
+    say("Spatial tiles: %s", tile_summary(tl, tiles, lvls)) }
+} else if (build_tiles > 1) {   # Run Settings asks for one job: a one-tile mask, so the Build's tiles are not inherited
+  tf <- write_raster(setValues(rast(P), ifelse(land, 1L, NA_integer_)), "Projection-Tiles.tif", "INT2U")
+  saveDatasheet(scn, data.frame(MaskFileName = tf), "core_SpatialMultiprocessing")
+  say("Spatial tiles: one job (Run Settings), replacing the Build's %d tiles", build_tiles)
 }
 
 # ---- outputs ----------------------------------------------------------------------------------------------------------

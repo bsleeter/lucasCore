@@ -100,6 +100,9 @@
 		<!-- legacy (libraries made before 2026-10-24): the projection end year is now in Projection Options (Run Settings); stages 9 and 10 still read this one when that is blank -->
 		<column name="ProjectionEndYear" displayName="Projection End Year (legacy: now in Projection > Run Settings)" dataType="Integer" isOptional="True" isVisible="False"/>
 		<column name="ForestTypeMap" displayName="Forest Type Map" dataType="Integer" validationType="List" formula1="1:LANDFIRE EVT|2:USFS forest type groups" defaultValue="1"/>
+		<!-- spatial multiprocessing (stage 1 writes the tile mask into the Build result; runs on the Build inherit it, a projection may set its own in Run Settings) -->
+		<column name="SpatialTiles" displayName="Spatial Multiprocessing Tiles (blank = none)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1"/>
+		<column name="SpatialTilesStrata" displayName="Spatial Tiles Strata (tiles are whole units of this level; every projection Target group uses it)" dataType="Integer" validationType="List" formula1="1:Primary|2:Secondary|3:Tertiary" defaultValue="2" isOptional="True"/>
 	</dataSheet>
 
 	<!-- the Study Area page (ui/StudyAreaView.cs): a custom view on a feed, as ST-Sim does for multi-row sheets (a view on the dataSheet itself requires a single-row sheet) -->
@@ -155,7 +158,7 @@
 		<column name="ReferenceEndYear" displayName="Reference Period End (blank = historical end)" dataType="Integer" isOptional="True"/>
 		<column name="Iterations" displayName="Iterations (Monte Carlo)" dataType="Integer" defaultValue="10" validationType="WholeNumber" validationCondition="Greater" formula1="0"/>
 		<column name="RandomSeed" displayName="Random Seed (draws of historical years)" dataType="Integer" defaultValue="1"/>
-		<column name="SpatialTiles" displayName="Spatial Multiprocessing Tiles (blank = none)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1"/>
+		<column name="SpatialTiles" displayName="Spatial Multiprocessing Tiles (blank = the Build's; 1 = one job)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1"/>
 		<column name="SpatialTilesStrata" displayName="Spatial Tiles Strata (tiles are whole units of this Build Options strata level; every Target group uses it)" dataType="Integer" validationType="List" formula1="1:Primary|2:Secondary|3:Tertiary" defaultValue="2" isOptional="True"/>
 		<column name="HistoricalTypeShares" displayName="Weight a named group's types by their historical shares (default; off = the spatial allocation decides)" dataType="Boolean" defaultValue="-1" isOptional="True"/>
 	</dataSheet>
@@ -549,6 +552,7 @@
 		<dataSheet name="StudyArea" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Both"/>
 		<dataSheet name="OutputStrataSummary" type="Output"/>
+		<dataSheet name="core_SpatialMultiprocessing" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 

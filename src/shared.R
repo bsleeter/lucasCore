@@ -129,6 +129,20 @@ write_raster <- function(r, file, datatype = "INT4S", NAflag = NA) {
   do.call(terra::writeRaster, args)
   p }
 
+# Spatial multiprocessing tiles: whole units of one strata level packed into n tiles of about equal land area (largest unit first, each
+# into the emptiest tile), so no unit - and no target on that level - is split between tiles. u: each cell's unit, land: the study area's
+# cells. Stage 1 writes the Build's tiles from Build Options; stage 9 writes a projection's when Run Settings sets its own.
+TILE_LEVELS <- c("Primary", "Secondary", "Tertiary")
+tile_level <- function(v) { v <- as.character(v[1]); if (!length(v) || is.na(v) || !nzchar(v)) return("Secondary")
+  TILE_LEVELS[if (grepl("^[123]$", v)) as.integer(v) else { k <- match(sub("[: ].*", "", v), TILE_LEVELS); if (is.na(k)) 2L else k }] }
+pack_tiles <- function(u, land, n) {
+  ua <- sort(table(u[land]), decreasing = TRUE); load <- numeric(n); tile_of <- integer(length(ua))
+  for (j in seq_along(ua)) { k <- which.min(load); tile_of[j] <- k; load[k] <- load[k] + ua[[j]] }
+  tv <- rep(NA_integer_, length(u)); tv[land] <- tile_of[match(as.character(u[land]), names(ua))]
+  list(values = tv, load = load, units = length(ua)) }
+tile_summary <- function(tl, n, lvl) sprintf("%d tiles of whole %s units (%d units; largest tile %.0f%%, smallest %.0f%% of the land)",
+                                              n, lvl, tl$units, 100 * max(tl$load) / sum(tl$load), 100 * min(tl$load) / sum(tl$load))
+
 # Annual NLCD on the model grid R (a crop of lattice L): modal aggregation of the 30 m classes. The aggregation blocks are fixed to the
 # CONUS crop the CONUS 1km build used (lattice extent + one block, snapped to the NLCD 30 m grid), so a regional build aggregates the
 # same 30 m pixels into each cell as a CONUS build. NLCD's Albers WKT differs from EPSG:5070 only in naming, so extents are used as is.

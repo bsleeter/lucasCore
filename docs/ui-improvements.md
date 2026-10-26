@@ -10,7 +10,7 @@ built on P26 (the guide's numbers and figures, the demo bundle, metadata) should
 | Order | Item | Why here | Depends on |
 | --- | --- | --- | --- |
 | ~~1~~ | ~~11 LOCA2 list scan (the scan part)~~ | DONE 2026-10-26, verified in Studio | - |
-| 2 | 7 Spatial multiprocessing in the Build | Needed now for projections and guide chapter 8; fixes the tile/target strata rule before projection runs | - |
+| ~~2~~ | ~~7 Spatial multiprocessing in the Build~~ | DONE 2026-10-26 | - |
 | 3 | 8 Area-preserving resampling (explore, then decide) | Changes every Build result and P26 number; decide before results are frozen | - |
 | 4 | 9 FIA plot data | Largest change to the model's inputs (curves, carbon); must reproduce the .Rds results before it becomes the default | - |
 | 5 | 10 TreeMap option | Same domain as 9 (FIA plots, forest type, age); an option, so it changes results only if made the default | 9 helps (FIA plot ids) |
@@ -42,7 +42,14 @@ figures, which are redone once after the P26 rerun.
    "Build Figure" (the 17 titles, as package `<record>`s), a BuildFigureId filter column plus Iteration/Timestep on OutputBuildFigure
    (stage 12 writes 1 and the start year), the Image layout with one filtered item, and sync-library filling the lookup in existing
    libraries (stages cannot write project sheets). Verify in Studio on the Placer test library: layout errors do not show in the console.
-7. **Spatial multiprocessing chosen in the Build** - TO DO (design from the user, 2026-10-24; not started). A spatial run is split
+7. **Spatial multiprocessing chosen in the Build** - DONE 2026-10-26 (user chose stage 9's packing: units packed into N tiles of
+   about equal area). Build Options has Spatial Tiles (count) and Spatial Tiles Strata (level), on the Build Options page's "Spatial
+   multiprocessing" group; stage 1 writes the mask (Build-Tiles.tif) into the Build result's core_SpatialMultiprocessing, so the
+   historical run and projections inherit it. Packing is `pack_tiles` in shared.R (stage 9 uses it too; it reproduces P26 Setup
+   [17]'s 5-tile mask exactly). Run Settings: blank tiles follow the Build (stage 9 sets Target strata to the Build's level and
+   writes the same mask); its own count/level override; unticked with a tiled Build = 1 = a one-tile mask, so the projection runs as
+   one job. Existing Builds get tiles by re-running the Build (stage 1 writes them; a result holds only what its run wrote), or keep using Run Settings' own tiles. Test:
+   tests/phaseW2-build-tiles.R. Guide 1.4 still to update. Original design note: A spatial run is split
    only by System > Spatial Multiprocessing, a tile mask raster (ST-Sim's "Split by Secondary Strata" is for non-spatial runs). Today
    a user must find a mask in the Build result's `.data` folder or rely on stage 9's projection tiles. Planned:
    - Build Options: a checkbox **Enable spatial multiprocessing**, then a selector of the strata level the tiles follow (Primary,

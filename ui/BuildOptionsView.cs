@@ -3,7 +3,8 @@
 // =============================================================================
 // Single-row sheet lucasCore_BuildOptions. The projection end year is no longer set here (its column is kept, hidden, for older
 // libraries): it is in Projection > Run Settings, and the climate of the projection years comes from a Projection Climate scenario
-// (stage 11). Text fields and the forest type list use SyncroSim's bindings; the strata lists are set by hand because they write
+// (stage 11). Spatial multiprocessing: a tile count and strata level that stage 1 turns into the Build result's tile mask. Text fields and
+// the forest type list use SyncroSim's bindings; the strata and tile lists are set by hand because they write
 // blanks (the default sources). The page wraps to the window and scrolls (Fit, in LucasView.cs).
 // Built by tools/build_ui.ps1 into lucasCoreUI.dll.
 // =============================================================================
@@ -36,6 +37,10 @@ namespace lucasCoreUI
         private readonly ComboBox m_secondary = new ComboBox();
         private readonly ComboBox m_tertiary = new ComboBox();
         private readonly ComboBox m_forest = new ComboBox();
+        private readonly CheckBox m_tiled = new CheckBox { Text = "Split runs into tiles:", AutoSize = true, Margin = new Padding(3, 5, 6, 3) };
+        private readonly TextBox m_tiles = new TextBox();
+        private readonly ComboBox m_tileLevel = new ComboBox();
+        private readonly Label m_tileState = new Label { AutoSize = true, MaximumSize = new Size(680, 0), ForeColor = SystemColors.GrayText, Margin = new Padding(3, 3, 3, 3) };
         private readonly TableLayoutPanel m_root = new TableLayoutPanel();
         private readonly Panel m_scroll = new Panel { Dock = DockStyle.Fill, AutoScroll = true };   // the page scrolls here (see LucasView)
         private bool m_refreshing;
@@ -78,24 +83,47 @@ namespace lucasCoreUI
             r.Controls.Add(Caption("Start year:")); r.Controls.Add(Number(m_start, 60));
             r.Controls.Add(Caption("End year:")); r.Controls.Add(Number(m_end, 60));
 
-            var mp = new Label { Text = "Spatial multiprocessing: projections can be split into tiles of whole units of one of these three strata (chosen in Projection > Run Settings), and every target then uses that level. If you will use it, set the secondary or tertiary strata here to a layer that suits tiles (counties, HUCs) - it cannot be changed later in the projection settings.",
-                                 AutoSize = true, MaximumSize = new Size(680, 0), ForeColor = Color.DarkGoldenrod, Margin = new Padding(3, 7, 3, 3) };
-            GroupBox gStrata = Group("Strata", out r, mp);
+            GroupBox gStrata = Group("Strata", out r);
             r.Controls.Add(Caption("Secondary:")); r.Controls.Add(List(m_secondary, 200));
             r.Controls.Add(Caption("Tertiary:")); r.Controls.Add(List(m_tertiary, 200));
             r.Controls.Add(Note("Primary strata are always the FIA ecodivisions."));
             m_secondary.SelectionChangeCommitted += (s, e) => WriteSource(m_secondary, "SecondarySourceId");
             m_tertiary.SelectionChangeCommitted += (s, e) => WriteSource(m_tertiary, "TertiarySourceId");
 
+            GroupBox gTiles = Group("Spatial multiprocessing", out r, m_tileState,
+                Note("ST-Sim runs the tiles of a spatial run in parallel and merges them. Stage 1 writes the tile map into the Build result, so the historical run and every projection on this Build are split the same way (a projection can set its own in Run Settings). Units are packed into tiles of about equal area, largest first, so no unit is split. A projection target must not be split between tiles, so every Target group uses this strata level. Tiled runs also need Library > Properties > Multiprocessing on, with about as many jobs as tiles. A change takes effect the next time the Build runs."));
+            r.Controls.Add(m_tiled); r.Controls.Add(Number(m_tiles, 50)); r.Controls.Add(Caption("of whole units of")); r.Controls.Add(List(m_tileLevel, 240));
+            m_tiled.CheckedChanged += (s, e) => { if (m_refreshing) return; Sheet.SetSingleRowData("SpatialTiles", m_tiled.Checked ? (object)Math.Max(2, Math.Min(8, Environment.ProcessorCount)) : DBNull.Value); RefreshControls(); };
+            m_tiles.Validated += (s, e) => { if (m_refreshing) return; int n; string v = m_tiles.Text.Trim(); if (v.Length == 0) Sheet.SetSingleRowData("SpatialTiles", DBNull.Value); else if (int.TryParse(v, out n) && n >= 1) Sheet.SetSingleRowData("SpatialTiles", n); RefreshControls(); };
+            m_tileLevel.SelectionChangeCommitted += (s, e) => { if (!m_refreshing) Sheet.SetSingleRowData("SpatialTilesStrata", m_tileLevel.SelectedIndex + 1); };
+            m_secondary.SelectionChangeCommitted += (s, e) => TileLevelNames();
+            m_tertiary.SelectionChangeCommitted += (s, e) => TileLevelNames();
+
             GroupBox gCover = Group("Land cover", out r);
             r.Controls.Add(Caption("Forest type map:")); r.Controls.Add(List(m_forest, 200));
             r.Controls.Add(Note("Assigns the forest type of forest cells; other cover comes from NLCD, RCMAP and C-CAP."));
 
-            foreach (GroupBox g in new[] { gGrid, gHist, gStrata, gCover }) { m_root.RowStyles.Add(new RowStyle(SizeType.AutoSize)); m_root.Controls.Add(g); }
+            foreach (GroupBox g in new[] { gGrid, gHist, gStrata, gCover, gTiles }) { m_root.RowStyles.Add(new RowStyle(SizeType.AutoSize)); m_root.Controls.Add(g); }
 
             m_scroll.Controls.Add(m_root); this.Controls.Add(m_scroll);
             this.ResumeLayout(false);
         }
+
+        // the tile level list, named by the strata chosen above
+        private void TileLevelNames()
+        {
+            bool was = m_refreshing; m_refreshing = true;
+            try
+            {
+                int k = m_tileLevel.SelectedIndex;
+                m_tileLevel.Items.Clear();
+                m_tileLevel.Items.Add("Primary: FIA ecodivisions"); m_tileLevel.Items.Add("Secondary: " + Bare(m_secondary)); m_tileLevel.Items.Add("Tertiary: " + Bare(m_tertiary));
+                m_tileLevel.SelectedIndex = k >= 0 && k < 3 ? k : 1;
+            }
+            finally { m_refreshing = was; }
+            if (!was) RefreshControls();
+        }
+        private static string Bare(ComboBox c) { return c.SelectedItem == null ? "" : c.SelectedItem.ToString().Replace(" (default)", ""); }
 
         private static ComboBox List(ComboBox c, int width) { c.DropDownStyle = ComboBoxStyle.DropDownList; c.Width = width; c.Anchor = AnchorStyles.Left; c.Margin = new Padding(3, 3, 12, 3); return c; }
 
@@ -116,6 +144,7 @@ namespace lucasCoreUI
                 .OrderBy(x => Convert.ToInt32(x["Number"])).Select(x => new Item { Value = Convert.ToInt32(x["StratumSourceId"]), Name = Convert.ToString(x["Name"]) }).ToList();
             FillSources(m_secondary, items, "States (default)");
             FillSources(m_tertiary, items, "Federal Lands (default)");
+            RefreshControls(); TileLevelNames();
             RefreshControls();
         }
 
@@ -160,6 +189,10 @@ namespace lucasCoreUI
             {
                 Select(m_secondary, Value("SecondarySourceId"));
                 Select(m_tertiary, Value("TertiarySourceId"));
+                object tiles = Value("SpatialTiles"); bool on = tiles != DBNull.Value && Convert.ToInt32(tiles) > 1;
+                m_tiled.Checked = on; m_tiles.Enabled = m_tileLevel.Enabled = on; m_tiles.Text = tiles == DBNull.Value ? "" : Convert.ToString(tiles);
+                object lvl = Value("SpatialTilesStrata"); if (m_tileLevel.Items.Count == 3) m_tileLevel.SelectedIndex = lvl == DBNull.Value ? 1 : Math.Max(0, Math.Min(2, Convert.ToInt32(lvl) - 1));
+                m_tileState.Text = on ? string.Format("{0} tiles of whole {1} units: written by stage 1.", tiles, m_tileLevel.SelectedItem) : "Off: runs on this Build are one job (unless a projection sets its own tiles in Run Settings).";
                 m_root.Enabled = this.ShouldEnableView();
             }
             finally { m_refreshing = false; }
