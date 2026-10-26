@@ -42,7 +42,7 @@ figures, which are redone once after the P26 rerun.
    "Build Figure" (the 17 titles, as package `<record>`s), a BuildFigureId filter column plus Iteration/Timestep on OutputBuildFigure
    (stage 12 writes 1 and the start year), the Image layout with one filtered item, and sync-library filling the lookup in existing
    libraries (stages cannot write project sheets). Verify in Studio on the Placer test library: layout errors do not show in the console.
-7. **Spatial multiprocessing chosen in the Build** - DONE 2026-10-26 (user chose stage 9's packing: units packed into N tiles of
+7. **Spatial multiprocessing chosen in the Build** - DONE 2026-10-26, pages checked in Studio (user chose stage 9's packing: units packed into N tiles of
    about equal area). Build Options has Spatial Tiles (count) and Spatial Tiles Strata (level), on the Build Options page's "Spatial
    multiprocessing" group; stage 1 writes the mask (Build-Tiles.tif) into the Build result's core_SpatialMultiprocessing, so the
    historical run and projections inherit it. Packing is `pack_tiles` in shared.R (stage 9 uses it too; it reproduces P26 Setup
@@ -63,7 +63,7 @@ figures, which are redone once after the P26 rerun.
    - Open: one tile per unit (simple; 17 uneven county jobs for P26) or units packed into N tiles of about equal area (stage 9's
      balancing code, moved to shared.R). Projection Options' Spatial Tiles fields would then default to the Build's choice.
    - Guide: section 1.4 says to leave library multiprocessing off (right for Builds); tiled runs need it on, with jobs ~ tiles.
-8. **Area-preserving resampling of land cover** - BUILT 2026-10-26 as a choice (user: "pick either method from the Build menu").
+8. **Area-preserving resampling of land cover** - BUILT 2026-10-26 as a choice (page checked in Studio by the user) (user: "pick either method from the Build menu").
    Build Options: Land Cover Resampling = Modal (default; blank in older Builds) or Area-matched (every class matched to its 30 m area
    per secondary stratum unit, developed additions only: 06-match-all.R's method, now `src/landcover-match.R`; reproduces its P26
    maps cell for cell, 1.7 min for 39 years). Stage 5 counts each class's 30 m pixels per cell (parallel over years), matches the
