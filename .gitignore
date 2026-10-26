@@ -26,3 +26,4 @@ docs/guide/captures/
 docs/guide/figures/
 Starter/*.bak-*
 dev/treemap/out/*.tif
+dev/nfcms/out/*.tif
