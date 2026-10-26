@@ -6,7 +6,9 @@
 #             plot-condition from 2001: wood = c_ag (live aboveground, no foliage), foliage, roots = c_bg (coarse roots; FIA has no
 #             fine roots), standing dead (aboveground), down dead, litter, soil organic, understory
 #   lucasCore result 14's 2020 average stock maps on its 2020 forest cells: wood = Merchantable + Other Wood, foliage, roots =
-#             Coarse + Fine Root, standing dead = Snag Stem + Snag Branch, down dead = DOM: Deadwood - standing, litter, soil
+#             Coarse + Fine Root; dead pools as stage 3 matches them to FIA (src/dom.R FIA_DOM): standing = Snag Stem + Snag Branch, down =
+#             AG Medium + AG Fast, litter (forest floor) = AG Very Fast + AG Slow, soil = BG Slow + BG Very Fast + Deep Soil (mineral soil;
+#             the LUCAS stock groups differ: DOM: Litter = AG Fast + AG Very Fast, DOM: Soil includes AG Slow). BG Fast (dead coarse roots) is in none
 #   NFCMS     3.0 2020 (01-p26-2020.R's rasters): wood = AbovegroundBiomass, roots + foliage = LiveBiomass - AbovegroundBiomass, dead +
 #             litter = TotalEcosystemCarbon - LiveBiomass - SoilCarbon
 # Writes dev/nfcms/out/pools-by-type.csv. Read-only.
@@ -25,8 +27,8 @@ fp <- function(f) list.files(file.path(dd, sprintf("Scenario-%d", rid)), paste0(
 g <- function(nm) Reduce(`+`, lapply(avg[Name %in% nm, Filename], function(x) rast(fp(x))))
 S <- rast(fp(scf))
 L <- list(wood = g(c("Biomass: Merchantable [Type]", "Biomass: Other Wood [Type]")), foliage = g("Biomass: Foliage [Type]"), roots = g(c("Biomass: Coarse Root [Type]", "Biomass: Fine Root [Type]")),
-          standing = g(c("DOM: Snag Stem [Type]", "DOM: Snag Branch [Type]")), dead = g("DOM: Deadwood"), litter = g("DOM: Litter"), soil = g("DOM: Soil"))
-L$down <- L$dead - L$standing
+          standing = g(c("DOM: Snag Stem [Type]", "DOM: Snag Branch [Type]")), down = g(c("DOM: Aboveground Medium [Type]", "DOM: Aboveground Fast [Type]")),
+          litter = g(c("DOM: Aboveground Very Fast [Type]", "DOM: Aboveground Slow [Type]")), soil = g(c("DOM: Belowground Slow [Type]", "DOM: Belowground Very Fast [Type]", "Deep Soil [Type]")))
 nf <- function(k) rast(file.path(out, sprintf("%s-%d-lucas-nfcms-diff.tif", k, yr)))[["nfcms"]]
 N <- list(wood = nf("agb"), live = nf("live"), soil = nf("soil"), tec = nf("tec"))
 v <- data.table(sc = values(S, mat = FALSE))

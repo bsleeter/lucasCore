@@ -3,8 +3,9 @@
 # in the run's starting stocks (1985) and in 2020, against FIA plots in P26's counties
 # =============================================================================
 # FIA: the USGS condition table (the calibration target; down dead as in it), latest visit per plot-condition from 2001, stand age
-# bands of stage 3's calibration (calibrate.R CAL_BANDS). lucasCore: result 14's average stock maps (Snag Stem + Snag Branch =
-# standing; DOM: Deadwood - standing = down; DOM: Litter) and its age and state class maps in 1985 and 2020. Mg C/ha.
+# bands of stage 3's calibration (calibrate.R CAL_BANDS). lucasCore: result 14's average stock maps, pooled as stage 3 matches them to
+# FIA (src/dom.R FIA_DOM: standing = Snag Stem + Snag Branch; down = AG Medium + AG Fast; litter = AG Very Fast + AG Slow; the LUCAS stock
+# groups differ: DOM: Down Deadwood holds BG Fast, DOM: Litter holds AG Fast, AG Slow is in DOM: Soil) and its age and state class maps in 1985 and 2020. Mg C/ha.
 # Writes dev/nfcms/out/dead-by-age.csv. Read-only.
 # Usage: Rscript dev/nfcms/03-dead-by-age.R
 # =============================================================================
@@ -25,7 +26,8 @@ lucas <- rbindlist(lapply(c(1985L, 2020L), function(y) {
   g <- function(nm) Reduce(`+`, lapply(avg[Timestep == y & Name %in% nm, Filename], function(x) rast(fp(x))))
   st <- g(c("DOM: Snag Stem [Type]", "DOM: Snag Branch [Type]"))
   v <- data.table(sc = values(rast(fp(scf[Timestep == y, Filename])), mat = FALSE), age = values(rast(fp(agf[Timestep == y, Filename])), mat = FALSE),
-                  standing = values(st, mat = FALSE), down = values(g("DOM: Deadwood") - st, mat = FALSE), litter = values(g("DOM: Litter"), mat = FALSE))
+                  standing = values(st, mat = FALSE), down = values(g(c("DOM: Aboveground Medium [Type]", "DOM: Aboveground Fast [Type]")), mat = FALSE),
+                  litter = values(g(c("DOM: Aboveground Very Fast [Type]", "DOM: Aboveground Slow [Type]")), mat = FALSE))
   v[sc %in% TYPES][, band := cut(age, BANDS)][!is.na(band), .(source = sprintf("lucas %d", y), n = .N, standing = mean(standing), down = mean(down), litter = mean(litter)), by = .(sc, band)] }))
 f <- 2.2417
 x <- as.data.table(readRDS("F:/lucas-master/Data Sources/FIA/USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds"))[(statecd * 1000 + countycd) %in% fips & invyr >= 2001 & invyr < 9999 & fortyp_grp %in% TYPES & !is.na(stdage)]

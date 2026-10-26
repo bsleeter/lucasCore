@@ -1,0 +1,15 @@
+unit,km2,live_ratio,tec_ratio,tec_l,tec_n,County
+300006063,4371,0.78,0.82,231.9,281.3,Plumas California
+300006017,2856,0.75,0.78,227.4,290.7,El Dorado California
+300006109,2235,0.74,0.78,217,279.1,Tuolumne California
+300006061,2160,0.71,0.74,219.3,294.5,Placer California
+300006091,1876,0.79,0.8,237.2,296.4,Sierra California
+300006057,1587,0.72,0.75,213.5,285.6,Nevada California
+300006007,1140,0.62,0.76,201.5,266.9,Butte California
+300006009,1103,0.69,0.74,195.7,265.1,Calaveras California
+300006003,918,0.86,0.87,220.1,253.4,Alpine California
+300006043,582,0.67,0.84,152.5,181.1,Mariposa California
+300006005,559,0.72,0.75,208.8,276.5,Amador California
+300006035,504,0.91,0.94,220.6,234.3,Lassen California
+300006115,411,0.71,0.75,243.3,325.6,Yuba California
+300006051,120,0.71,0.75,174.2,231.5,Mono California
