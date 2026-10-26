@@ -100,6 +100,17 @@ figures, which are redone once after the P26 rerun.
    option and as a stand age source, so type and age come from one consistent map. Needs: a Data Sources path for the TreeMap raster
    and its attribute table, a FORTYPCD -> forest type group crosswalk (defaults/growth/forest-type-crosswalk.csv may cover it), the
    vintage (TreeMap 2016 / 2020 / 2022) set against the Build's start year, and a comparison with EVT/NFCMS and CMS age on P26.
+   **Progress 2026-10-26:** TreeMap 2016 (RDS-2021-0074) is in Data Sources/TreeMap/Data. Its attribute table has the plot visit (CN =
+   FIA PLT_CN) and FORTYPCD but **no stand age**: age comes from FIA DataMart COND (item 9's files) by PLT_CN, the forested condition
+   matching TreeMap's FORTYPCD, else the largest. dev/treemap/01-p26-compare.R on P26 (with 31 states' COND joined, 82% of pixels):
+   forest type agrees with the Build's USFS forest type groups on 61% of forest cells (EVT 69%; TreeMap = EVT 74%); TreeMap adds a
+   Douglas-fir group (4% of P26 forest) that neither has. 1985 age: median 81 vs CMS 73, mean 89 vs 81, but cell-by-cell correlation
+   0.07. The user expects initial age to be an important source of uncertainty, so stand age becomes a **Stand Age Source** choice:
+   NASA CMS 1990 (today), TreeMap, and **GAMI** (user's choice for the third option, 2026-10-26): Global Age Mapping Integration v2.0,
+   Besnard et al., GFZ Data Services doi 10.5880/GFZ.1.4.2023.006, 100 m forest age for 2010 and 2020 from >40,000 inventory plots,
+   biomass/height and Landsat disturbance history, with 20 realizations (an uncertainty range for initial age). GFZ's server refused
+   connections on 2026-10-26; file list and sizes still to get. Next: a three-way P26 comparison (CMS, TreeMap, GAMI) and the first-order
+   change in 1985 carbon from each, then the Build Options choice in stage 5.
 11. **LOCA2 climate: scan the user's folder, or download** - (a) DONE 2026-10-26, verified in Studio by the user; (b) the download part moves to
    item 12. `ui/Loca2Lists.cs` scans Data Sources: LOCA2 Folder by new-library.R's rule (a member counts when its historical folder
    and at least one SSP folder each hold pr, tasmax and tasmin `*.monthly.nc`). LibrarySetup fills a new project's three lists from
