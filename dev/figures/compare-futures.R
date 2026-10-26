@@ -42,16 +42,19 @@ chart_figure("compare_futures", "Climate futures compared",
 # cumulative fluxes from the projection start: each year's flow added up, 0 in the year the history ends
 cum <- function(X, groups) { s <- X$flows[FlowGroup %in% groups & Timestep > ys, .(v = sum(Mg) / 1e6), by = Timestep][order(Timestep)]
   data.table(Timestep = c(ys, s$Timestep), v = c(0, cumsum(s$v))) }
-cpanel <- function(i, groups, ttl) {
-  cc <- lapply(P, cum, groups = groups); rng <- range(c(0, unlist(lapply(cc, `[[`, "v"))))
-  plot(NA, xlim = c(ys, P[[1]]$years[2]), ylim = rng + c(-.04, .04) * diff(rng), xlab = "", ylab = "Tg C since the projection start", bty = "l"); hgrid()
+cpanel <- function(i, groups, ttl, rel = FALSE) {   # rel: each future less the first listed, so a small gap between two large totals shows
+  cc <- lapply(P, cum, groups = groups); tot <- vapply(cc, function(s) s[.N, v], 1)
+  if (rel) { b <- cc[[1]]$v; cc <- lapply(cc, function(s) s[, .(Timestep, v = v - b)]) }
+  rng <- range(c(0, unlist(lapply(cc, `[[`, "v"))))
+  plot(NA, xlim = c(ys, P[[1]]$years[2]), ylim = rng + c(-.04, .04) * diff(rng), xlab = "",
+       ylab = if (rel) sprintf("Tg C more than %s", lab[1]) else "Tg C since the projection start", bty = "l"); hgrid()
   abline(h = 0, col = MUTED, lty = 3); for (k in seq_along(cc)) lines(cc[[k]]$Timestep, cc[[k]]$v, lwd = 2, col = cols[k])
-  tot <- vapply(cc, function(s) s[.N, v], 1)
   ptitle(i, ttl); legend("topleft", sprintf("%s: %.1f (%+.1f)", lab, tot, tot - tot[1]), col = cols, lwd = 2, bty = "n", cex = .75, inset = c(0, .02)) }
 chart_figure("compare_futures_cumulative", "Climate futures compared: cumulative fluxes",
-  sprintf("Carbon fluxes added up year by year from %d (0) to %d (Tg C): (a) net primary productivity, (b) heterotrophic respiration, (c) losses to fire emissions and harvest, (d) net biome productivity (a less b and c). Legend: the %d total, and in brackets its difference from the first projection listed. The projections share the drawn land-use, harvest and fire years, so differences in (c) come only from the carbon there was to burn or cut.", ys, P[[1]]$years[2], P[[1]]$years[2]),
+  sprintf("Carbon fluxes added up year by year from %d (0) to %d (Tg C): (a) net primary productivity and (b) heterotrophic respiration, each drawn as its difference from the first projection listed, (c) losses to fire emissions and harvest, (d) net biome productivity (a less b and c). Legend: the %d total, and in brackets its difference from the first projection listed. The projections share the drawn land-use, harvest and fire years, so differences in (c) come only from the carbon there was to burn or cut.", ys, P[[1]]$years[2], P[[1]]$years[2]),
   2, 2, h = 1700, note = sprintf("P26 Northern Sierra Nevada; %d projections from historical run %d, %d-%d, one iteration each.", length(rid), hid, ys + 1, P[[1]]$years[2]), draw = function() { par(mar = c(4, 5, 3, 1))
-    cpanel(1, "Net Primary Productivity", "Cumulative net primary productivity"); cpanel(2, "Emission: Total Rh", "Cumulative heterotrophic respiration")
+    cpanel(1, "Net Primary Productivity", sprintf("Cumulative net primary productivity, difference from %s", lab[1]), rel = TRUE)
+    cpanel(2, "Emission: Total Rh", sprintf("Cumulative heterotrophic respiration, difference from %s", lab[1]), rel = TRUE)
     cpanel(3, c("LULC: Emission", "LULC: Harvest"), "Cumulative fire and harvest losses"); cpanel(4, "Net Biome Productivity", "Cumulative net biome productivity") })
 for (k in seq_along(P)) { s <- series(P[[k]], "te"); n <- series(P[[k]], "npp"); b <- series(P[[k]], "nbp")
   cat(sprintf("%-16s carbon 2050 %.1f Tg C; NPP %d-%d mean %.2f Tg C/yr (sd %.2f); NBP mean %+.2f\n", lab[k], s[.N, v], ys + 1, P[[k]]$years[2],
