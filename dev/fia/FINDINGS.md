@@ -50,3 +50,18 @@ MN 0.97, AZ 1.25, MT 1.31. If so the USGS down dead is the better calibration ta
 field adjustments (not a single 0.7). To confirm: compute California's field/model ratio from DataMart's down woody material tables
 (COND_DWM_CALC) and compare with 0.70. Litter and soil differences in the northern states are probably the November 2023 model update and
 the added soil lab data (the USGS table may predate them).
+
+## CONUS comparison (02-compare-conus.R, all 48 states; compare-conus.csv) and the state down dead factors
+
+- DataMart (FIADB 9.5): 897,304 forest conditions in 48 states (inventories 1968-2026); **536,037 of the USGS table's 536,082 conditions
+  found (99.99%)**. Within 1%: plot ids, inventory year, ecodivision, stand age 100%; forest type group 99.99%; live aboveground carbon
+  and merchantable volume 100%, roots 99.9%, foliage and total live 99.3-99.7%, standing dead 99.9%, understory 99.96%; litter 84% and
+  soil 94% (FIA's November 2023 model updates and added soil data); down dead differs by the state factors below.
+- Stage 2's fitting data: USGS 185,161 plot-conditions, DataMart 195,786; 138,355 identical (plot, type, age). The rest are newer visits
+  (2021-2026) replacing a plot-condition's latest visit, so DataMart curves fit newer data. Reproducing the USGS route exactly would need
+  a last-inventory-year setting.
+- **Down dead: USGS / FIADB is one constant in every one of the 48 states** (down-dead-state-factors.csv), range 0.17 (NJ) to 2.05 (TN),
+  given to two decimals (CA 0.70, GA 0.25, TX 1.93; NV, NM and WY share 1.136). Round, published-looking state values, three western states
+  sharing one: consistent with the national GHG inventory's state field/model adjustment (Domke et al. 2013), with a regional value where
+  a state's down woody material sample is small. So item 9's DataMart route should apply these per-state factors (shipped as a package
+  default) rather than a single 0.7, to reproduce the USGS route; confirm against COND_DWM_CALC for one state.
