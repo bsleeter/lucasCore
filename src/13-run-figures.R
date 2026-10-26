@@ -6,7 +6,8 @@
 # area, transitions (simulated against the Build's record), carbon stocks and fluxes, carbon by secondary stratum. Same format as the
 # Build figures (stage 12). Export > LUCAS Core > Run Figures saves them all to a folder.
 # Its own scenario: depends on the run's Build result (the grid, strata, state class colours and the transition record), with Run
-# Figures naming the run (blank = the newest result scenario with ST-Sim output). The run's tables are read from the library by SQL
+# Figures naming the run (blank = the newest result scenario with ST-Sim output). A stand-alone projection gets its historical run (its
+# Projection Setup's Projection Start) joined in front, checked on total ecosystem carbon in the year the projection starts from. The run's tables are read from the library by SQL
 # and its maps from its data folder, so the run's own outputs set what can be drawn: a figure whose maps the run did not write is left
 # out (state class maps for the land cover figure, Fire transition maps, Total Ecosystem average stock maps).
 # =============================================================================
@@ -26,6 +27,19 @@ con <- DBI::dbConnect(RSQLite::SQLite(), lib_file, flags = RSQLite::SQLITE_RO)
 rn <- DBI::dbGetQuery(con, sprintf("SELECT Name FROM core_Scenario WHERE ScenarioId = %d", rid))$Name; DBI::dbDisconnect(con)
 rn <- if (length(rn)) sub(" \\(\\[.*$", "", rn) else sprintf("result %d", rid)
 say("Run %d (%s): %d-%d, %d iteration(s)", rid, rn, X$years[1], X$years[2], X$nit)
+# a stand-alone projection: its historical run (the setup's Projection Start) goes in front, so the figures run from the start of the
+# history to the end of the projection; the hand-over is checked on total ecosystem carbon in the year the projection starts from
+hid <- find_history(lib_file, rid)
+if (!is.na(hid)) {
+  H <- tryCatch(load_run(lib_file, hid), error = function(e) { say("Historical run %d not readable (%s): the projection alone is drawn", hid, conditionMessage(e)); NULL })
+  if (!is.null(H) && H$years[2] == X$years[1]) {
+    X <- join_runs(H, X); d <- unname(X$join["projection"] - X$join["history"])
+    say("Projection joined to historical run %d: %d-%d; total ecosystem carbon in %d %.2f Tg C at the end of the history, %.2f at the projection's start (%+.2f%%)",
+        hid, X$years[1], X$years[2], X$proj_start, X$join["history"], X$join["projection"], 100 * d / X$join["history"])
+    check(STAGE, "the projection starts from its historical run's final carbon (within 0.5%)", !anyNA(X$join) && abs(d) <= 0.005 * X$join["history"],
+          sprintf("%.2f vs %.2f Tg C in %d", X$join["history"], X$join["projection"], X$proj_start))
+  } else if (!is.null(H)) say("Historical run %d ends in %d, not in %d where the projection starts: the projection alone is drawn", hid, H$years[2], X$years[1])
+}
 
 ic <- as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", optional = TRUE, lookupsAsFactors = FALSE))
 if (!nrow(ic) || is.na(ic$StateClassFileName[1])) fail("no state class map: this scenario must depend on the run's Build result")

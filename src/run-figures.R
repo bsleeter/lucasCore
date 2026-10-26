@@ -8,6 +8,8 @@
 #           year and its change
 #   charts  land area by cover group | transitions per year, simulated against the Build's record | carbon stocks | carbon fluxes |
 #           carbon by secondary stratum (counties)
+# A stand-alone projection is drawn with its historical run in front (find_history, join_runs): one set of figures from the start of the
+# history to the end of the projection, a dashed line where the projection starts.
 # load_run(lib, rid, ...) reads the run: its tables summed in SQL (iterations averaged) and its first-iteration maps by path; maps the
 # run did not write (state class, fire or harvest transitions, total ecosystem carbon) leave their figure or panel out. Harvest is
 # read from every mapped group named "Forest Harvest..." (the clearcut and selection [Type] groups by default), its cells classed by
@@ -46,6 +48,8 @@ load_run <- function(lib, rid) {
               GROUP BY s.Name, o.Timestep", nit, rid, yrs[1], yrs[2]) else NULL
   unit_a <- q("SELECT s.Name AS Unit, SUM(o.Amount) / %d AS ha FROM stsim_OutputStratumState o JOIN stsim_SecondaryStratum s ON s.SecondaryStratumId = o.SecondaryStratumId
               WHERE o.ScenarioId = %d AND o.Timestep = %d GROUP BY s.Name", nit, rid, yrs[1])
+  te_it <- if (nit > 1 && dbExistsTable(con, "stsim_OutputStock")) q("SELECT o.Iteration, o.Timestep, SUM(o.Amount) / 1e6 AS Tg FROM stsim_OutputStock o JOIN stsim_StockGroup g ON g.StockGroupId = o.StockGroupId
+              WHERE o.ScenarioId = %d AND g.Name = 'Total Ecosystem' GROUP BY o.Iteration, o.Timestep", rid) else NULL
   path <- function(folder, f) if (length(f) && !is.na(f[1])) file.path(dd, folder, basename(f[1])) else NA_character_
   ssm <- q("SELECT Timestep, Filename FROM stsim_OutputSpatialState WHERE ScenarioId = %d AND Iteration = 1", rid)
   fire_id <- q("SELECT TransitionGroupId FROM stsim_TransitionGroup WHERE Name = 'Fire'")$TransitionGroupId
@@ -53,25 +57,60 @@ load_run <- function(lib, rid) {
   hm <- q("SELECT o.Timestep, o.Filename FROM stsim_OutputSpatialTransition o JOIN stsim_TransitionGroup g ON g.TransitionGroupId = o.TransitionGroupId
            WHERE o.ScenarioId = %d AND o.Iteration = 1 AND g.Name LIKE 'Forest Harvest%%'", rid)
   te <- q("SELECT o.Timestep, o.Filename FROM stsim_OutputAverageSpatialStockGroup o JOIN stsim_StockGroup g ON g.StockGroupId = o.StockGroupId WHERE o.ScenarioId = %d AND g.Name = 'Total Ecosystem'", rid)
-  list(rid = rid, nit = nit, years = yrs, sc_list = sc, tt_list = tt, area = area, trans = trans, stocks = stocks, flows = flows, unit_c = unit_c, unit_a = unit_a,
+  list(rid = rid, nit = nit, years = yrs, sc_list = sc, tt_list = tt, area = area, trans = trans, stocks = stocks, flows = flows, unit_c = unit_c, unit_a = unit_a, te_it = te_it,
        sc0 = path("stsim_OutputSpatialState", ssm[Timestep == yrs[1], Filename]), sc1 = path("stsim_OutputSpatialState", ssm[Timestep == yrs[2], Filename]),
        fire = if (nrow(fm)) setNames(vapply(fm$Filename, function(f) path("stsim_OutputSpatialTransition", f), ""), fm$Timestep) else character(),
        harvest = if (nrow(hm)) setNames(vapply(hm$Filename, function(f) path("stsim_OutputSpatialTransition", f), ""), hm$Timestep) else character(),
        carbon0 = path("stsim_OutputAverageSpatialStockGroup", te[Timestep == yrs[1], Filename]), carbon1 = path("stsim_OutputAverageSpatialStockGroup", te[Timestep == yrs[2], Filename]))
 }
 
+# ---- a projection's historical run, and the two joined -------------------------------------------------------------------
+# A stand-alone projection starts from a historical run's final year (stage 9's Projection Start, in its Projection Setup result).
+# find_history: that run's id for result scenario rid (its own, its parent's or its parent's dependencies' Projection Start), or NA.
+find_history <- function(lib, rid) {
+  con <- dbConnect(SQLite(), lib, flags = SQLITE_RO); on.exit(dbDisconnect(con))
+  q <- function(s, ...) dbGetQuery(con, sprintf(s, ...))
+  if (!dbExistsTable(con, "lucasCore_ProjectionStart")) return(NA_integer_)
+  par <- q("SELECT ScenarioId FROM core_ScenarioResult WHERE ResultId = %d", rid)$ScenarioId
+  ids <- c(rid, par, if (length(par)) q("SELECT DependencyId FROM core_ScenarioDependency WHERE ScenarioId = %d ORDER BY Priority", par[1])$DependencyId)
+  for (i in ids) { h <- q("SELECT HistoricalScenarioId FROM lucasCore_ProjectionStart WHERE ScenarioId = %d", i)$HistoricalScenarioId
+    if (length(h) && !is.na(h[1])) return(as.integer(h[1])) }
+  NA_integer_ }
+# join_runs: one run from the historical run's start to the projection's end. Tables: the historical run up to the projection's
+# start year (its final year, which the projection starts from), the projection after it; maps: the first year from the historical
+# run, the last from the projection; fire and harvest maps of both. `join` holds total ecosystem carbon in the start year in each
+# (the hand-over check); `proj_start` marks the join in the charts.
+join_runs <- function(H, P) {
+  ys <- P$years[1]
+  cut <- function(a, b) if (is.null(a) || is.null(b)) NULL else rbind(a[Timestep <= ys], b[Timestep > ys])
+  J <- P; J$years <- c(H$years[1], P$years[2])
+  for (k in c("area", "trans", "stocks", "flows")) J[k] <- list(cut(H[[k]], P[[k]]))
+  J$unit_c <- if (!is.null(H$unit_c) && !is.null(P$unit_c)) rbind(H$unit_c[Timestep == H$years[1]], P$unit_c[Timestep == P$years[2]]) else NULL
+  J$unit_a <- H$unit_a; J$sc0 <- H$sc0; J$carbon0 <- H$carbon0
+  late <- function(m) m[as.integer(names(m)) > ys]
+  J$fire <- c(H$fire, late(P$fire)); J$harvest <- c(H$harvest, late(P$harvest))
+  te <- function(X) { s <- X$stocks; if (is.null(s)) NA_real_ else s[StockGroup == "Total Ecosystem" & Timestep == ys, sum(Mg)] / 1e6 }
+  J$join <- c(history = te(H), projection = te(P)); J$proj_start <- ys; J$hist <- list(rid = H$rid, years = H$years)
+  J }
+
 # ---- the figures -----------------------------------------------------------------------------------------------------------
 # X: load_run(); grid: the Build's state class map (the model grid); sc_colours: state class Name -> colour; dem; label; observed: the
 # Build's transition summary (Timestep, TransitionGroup, Area km2) or NULL; run_name
 run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_name = sprintf("result %d", X$rid)) {
   y0 <- X$years[1]; y1 <- X$years[2]; ha_cell <- prod(res(grid)) / 1e4
-  NOTE <- sprintf("%s; %s, %d-%d, %d iteration%s, %g m grid.", label, run_name, y0, y1, X$nit, if (X$nit > 1) "s (tables averaged; maps of iteration 1)" else "", res(grid)[1])
+  NOTE <- if (is.null(X$hist)) sprintf("%s; %s, %d-%d, %d iteration%s, %g m grid.", label, run_name, y0, y1, X$nit, if (X$nit > 1) "s (tables averaged; maps of iteration 1)" else "", res(grid)[1]) else
+    sprintf("%s; historical run %d, %d-%d, then %s, %d-%d (dashed line), %d iteration%s, %g m grid.", label, X$hist$rid, y0, X$proj_start, run_name, X$proj_start + 1, y1, X$nit, if (X$nit > 1) "s (tables averaged; maps of iteration 1)" else "", res(grid)[1])
   K <- figure_kit(grid, dem, outdir, NOTE); use_kit(K, environment())
   relief <- if (dem_ok) " Shaded relief from the elevation data source." else ""
   rd <- function(f) if (!is.na(f) && file.exists(f)) rast(f) else NULL
   # a legend in rows under the plot (for panels whose legends are too long for the line above them); the panel needs mar[1] >= 7
   under_legend <- function(...) { n <- length(list(...)[[1]]); legend("top", ..., ncol = if (max(nchar(list(...)[[1]])) > 20) min(n, 2) else min(n, 3), inset = c(0, 1.12), xpd = NA, bty = "n", cex = .75, border = NA) }
   low <- function() par(mar = c(8, 5, 3, 1))
+  # the join of a historical run and its projection (join_runs): a dashed line at the projection's start year, on year axes or between bars
+  ps <- X$proj_start
+  mark_at <- function(x) { abline(v = x, col = MUTED, lty = 2); mtext("projection", side = 3, at = x, adj = -0.05, line = -1.1, cex = .6, col = MUTED) }
+  mark_line <- function() if (!is.null(ps)) mark_at(ps)
+  mark_bar <- function(b, yrs) if (!is.null(ps)) { i <- match(ps, yrs); if (!is.na(i) && i < length(b)) mark_at((b[i] + b[i + 1]) / 2) }
   scn <- X$sc_list
 
   # ---- harvest per cell (iteration 1): times harvested, most intensive type (1 selection, 2 salvage, 3 clearcut), last year --------
@@ -157,10 +196,10 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
   chart_figure("land_area", "Land area by cover group", sprintf("(a) Area of each land cover group, %d-%d. (b) Its change since %d.", y0, y1, y0), 1, 2, h = 1150, draw = function() {
     low(); cs <- t(apply(M, 1, cumsum)); plot(NA, xlim = range(yy), ylim = c(0, max(cs) * 1.02), xlab = "", ylab = "Area (km2)", bty = "l", yaxt = "n")
     axis(2, at = axTicks(2), labels = format(axTicks(2), big.mark = ",", scientific = FALSE)); hgrid()
-    for (j in rev(seq_along(gr))) polygon(c(yy, rev(yy)), c(cs[, j], rev(if (j > 1) cs[, j - 1] else rep(0, length(yy)))), col = COVER_COLS[gr[j]], border = NA)
+    for (j in rev(seq_along(gr))) polygon(c(yy, rev(yy)), c(cs[, j], rev(if (j > 1) cs[, j - 1] else rep(0, length(yy)))), col = COVER_COLS[gr[j]], border = NA); mark_line()
     ptitle(1, "Area by cover group"); under_legend(gr, fill = COVER_COLS[gr])
     low(); D <- sweep(M, 2, M[1, ]); plot(NA, xlim = range(yy), ylim = range(D), xlab = "", ylab = sprintf("Change since %d (km2)", y0), bty = "l"); hgrid(); abline(h = 0, col = MUTED, lty = 2)
-    for (g in gr) lines(yy, D[, g], col = COVER_COLS[g], lwd = 2); ptitle(2, sprintf("Change since %d", y0)); under_legend(gr, col = COVER_COLS[gr], lwd = 2) })
+    for (g in gr) lines(yy, D[, g], col = COVER_COLS[g], lwd = 2); mark_line(); ptitle(2, sprintf("Change since %d", y0)); under_legend(gr, col = COVER_COLS[gr], lwd = 2) })
 
   # ---- charts: transitions, simulated and recorded ---------------------------------------------------------------------------
   tr <- X$trans[TransitionGroup %in% FAMILIES, .(km2 = sum(ha) / 100), by = .(Timestep, Family = TransitionGroup)]
@@ -168,14 +207,15 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
   if (length(fams)) {
     ob <- if (!is.null(observed) && nrow(observed)) { o <- copy(observed); o[, Family := sub(":.*$", "", trimws(sub(" \\[Type\\]$", "", TransitionGroup)))]; o[Family %in% fams, .(km2 = sum(Area)), by = .(Timestep, Family)] } else NULL
     nc <- min(3, length(fams)); nr <- ceiling(length(fams) / nc); yrs <- (y0 + 1):y1
-    chart_figure("transitions", "Transitions per year", sprintf("Area of each transition family per year in the run (bars)%s.", if (is.null(ob)) "" else ", and in the Build's historical record (points; the Build's transition summary, which double counted urbanization and intensification in Builds run before 24 October 2026: rerun stage 6)"),
+    chart_figure("transitions", "Transitions per year", sprintf("Area of each transition family per year in the run (bars)%s%s.", if (is.null(ps)) "" else sprintf("; titles give the area simulated to %d + the area projected after it, and the record (to %d) in brackets", ps, ps), if (is.null(ob)) "" else ", and in the Build's historical record (points; the Build's transition summary, which double counted urbanization and intensification in Builds run before 24 October 2026: rerun stage 6)"),
       nr, nc, draw = function() for (i in seq_along(fams)) { s <- tr[Family == fams[i]][match(yrs, Timestep), km2]; s[is.na(s)] <- 0
         o <- if (!is.null(ob)) ob[Family == fams[i]][match(yrs, Timestep), km2] else NULL
         top <- max(c(s, o), 0.01, na.rm = TRUE) * 1.1
         b <- barplot(s, col = "#8da9c4", border = NA, space = .15, ylim = c(0, top), ylab = "km2 per year"); hgrid(); barplot(s, col = "#8da9c4", border = NA, space = .15, add = TRUE, axes = FALSE)
         at <- which(yrs %% 5 == 0); axis(1, at = b[at], labels = yrs[at], cex.axis = .75)
-        if (!is.null(o)) points(b, o, pch = 16, cex = .6, col = INK)
-        ptitle(i, sprintf("%s: %.0f km2 simulated%s", fams[i], sum(s), if (!is.null(o)) sprintf(", %.0f recorded", sum(o, na.rm = TRUE)) else "")) }) }
+        if (!is.null(o)) points(b, o, pch = 16, cex = .6, col = INK); mark_bar(b, yrs)
+        ptitle(i, if (is.null(ps)) sprintf("%s: %.0f km2 simulated%s", fams[i], sum(s), if (!is.null(o)) sprintf(", %.0f recorded", sum(o, na.rm = TRUE)) else "") else
+          sprintf("%s: %.0f + %.0f km2%s", fams[i], sum(s[yrs <= ps]), sum(s[yrs > ps]), if (!is.null(o)) sprintf(" (%.0f recorded)", sum(o, na.rm = TRUE)) else "")) }) }
 
   # ---- charts: carbon stocks -------------------------------------------------------------------------------------------------
   if (!is.null(X$stocks) && nrow(X$stocks)) {
@@ -187,9 +227,11 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
     chart_figure("carbon_stocks", "Carbon stocks", sprintf("(a) Carbon by pool, %d-%d. (b) The year-to-year change in total ecosystem carbon: the net ecosystem carbon balance, gain above zero.", y0, y1), 1, 2, h = 1150, draw = function() {
       low(); cs <- t(apply(M, 1, cumsum)); plot(NA, xlim = range(yy), ylim = c(0, max(cs, te, na.rm = TRUE) * 1.05), xlab = "", ylab = "Tg C", bty = "l"); hgrid()
       for (j in rev(seq_len(ncol(M)))) polygon(c(yy, rev(yy)), c(cs[, j], rev(if (j > 1) cs[, j - 1] else rep(0, length(yy)))), col = pc[j], border = NA)
-      lines(yy, te, lwd = 2, col = INK); ptitle(1, sprintf("Carbon stocks: %.0f to %.0f Tg C", te[1], te[length(te)])); under_legend(c(names(pc), "Total"), fill = c(pc, NA), lty = c(rep(NA, 4), 1), col = c(rep(NA, 4), INK))
+      if (!is.null(X$te_it) && !is.null(ps)) { r <- X$te_it[Timestep >= ps, .(lo = min(Tg), hi = max(Tg)), by = Timestep][order(Timestep)]
+        polygon(c(r$Timestep, rev(r$Timestep)), c(r$lo, rev(r$hi)), col = adjustcolor(INK, .18), border = NA) }   # Monte Carlo range of the projection
+      lines(yy, te, lwd = 2, col = INK); mark_line(); ptitle(1, sprintf("Carbon stocks: %.0f to %.0f Tg C", te[1], te[length(te)])); under_legend(c(names(pc), "Total"), fill = c(pc, NA), lty = c(rep(NA, 4), 1), col = c(rep(NA, 4), INK))
       low(); d <- diff(te); b <- barplot(d, col = ifelse(d >= 0, "#2b8152", "#a81d1a"), border = NA, ylab = "Tg C per year"); hgrid(); abline(h = 0, col = MUTED)
-      at <- which(yy[-1] %% 5 == 0); axis(1, at = b[at], labels = yy[-1][at], cex.axis = .75); ptitle(2, sprintf("Net ecosystem carbon balance (mean %+.2f Tg C/yr)", mean(d))) }) }
+      at <- which(yy[-1] %% 5 == 0); axis(1, at = b[at], labels = yy[-1][at], cex.axis = .75); mark_bar(b, yy[-1]); ptitle(2, sprintf("Net ecosystem carbon balance (mean %+.2f Tg C/yr)", mean(d))) }) }
 
   # ---- charts: carbon fluxes -------------------------------------------------------------------------------------------------
   if (!is.null(X$flows) && nrow(X$flows)) {
@@ -198,11 +240,11 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
     chart_figure("carbon_fluxes", "Carbon fluxes", "(a) Net primary productivity, heterotrophic respiration and net ecosystem productivity. (b) Losses to fire emissions and harvest, and net biome productivity (net ecosystem productivity less those losses).", 1, 2, h = 1150, draw = function() {
       low(); a <- cbind(NPP = g("Net Primary Productivity"), Rh = g("Emission: Total Rh"), NEP = g("Net Ecosystem Productivity"))
       plot(NA, xlim = range(yy), ylim = range(c(0, a)), xlab = "", ylab = "Tg C per year", bty = "l"); hgrid(); abline(h = 0, col = MUTED, lty = 2)
-      fc <- c(NPP = "#2b8152", Rh = "#a6611a", NEP = "#3b6ea8"); for (k in colnames(a)) lines(yy, a[, k], col = fc[k], lwd = 2)
+      fc <- c(NPP = "#2b8152", Rh = "#a6611a", NEP = "#3b6ea8"); for (k in colnames(a)) lines(yy, a[, k], col = fc[k], lwd = 2); mark_line()
       ptitle(1, "Productivity and respiration"); under_legend(c("Net primary productivity", "Heterotrophic respiration", "Net ecosystem productivity"), col = fc, lwd = 2)
       low(); L <- rbind(Fire = g("LULC: Emission"), Harvest = g("LULC: Harvest")); nbp <- g("Net Biome Productivity")
       b <- barplot(-L, col = c("#c93a1d", "#6b6b6b"), border = NA, ylim = range(c(-colSums(L), nbp, 0)) * 1.1, ylab = "Tg C per year"); hgrid(); abline(h = 0, col = MUTED)
-      lines(b, nbp, lwd = 2, col = "#3b6ea8"); at <- which(yy %% 5 == 0); axis(1, at = b[at], labels = yy[at], cex.axis = .75)
+      lines(b, nbp, lwd = 2, col = "#3b6ea8"); at <- which(yy %% 5 == 0); axis(1, at = b[at], labels = yy[at], cex.axis = .75); mark_bar(b, yy)
       ptitle(2, sprintf("Losses and net biome productivity (mean %+.2f Tg C/yr)", mean(nbp)))
       under_legend(c("Fire emissions", "Harvest", "Net biome productivity"), fill = c("#c93a1d", "#6b6b6b", NA), lty = c(NA, NA, 1), col = c(NA, NA, "#3b6ea8")) }) }
 

@@ -15,6 +15,9 @@ if (!nrow(sa)) sa <- q("SELECT u.Name FROM lucasCore_StudyArea s JOIN stsim_Seco
 obs <- q("SELECT Timestep, TransitionGroup, Area FROM lucasCore_OutputTransitionSummary WHERE ScenarioId = %d", bid)
 rn <- q("SELECT Name FROM core_Scenario WHERE ScenarioId = %d", rid)$Name; dbDisconnect(con)
 t0 <- Sys.time(); X <- load_run(lib, rid); cat(sprintf("loaded in %.0f s\n", as.numeric(Sys.time() - t0, units = "secs")))
+hid <- find_history(lib, rid)   # a projection: join its historical run in front, as stage 13 does
+if (!is.na(hid)) { H <- load_run(lib, hid); if (H$years[2] == X$years[1]) { X <- join_runs(H, X); cat(sprintf("joined to historical run %d: %d-%d; carbon %d: %.2f vs %.2f Tg C\n",
+  hid, X$years[1], X$years[2], X$proj_start, X$join[1], X$join[2])) } }
 res <- run_figures(X, grid, setNames(argb(scl$Color), scl$Name), dem, if (nrow(sa)) paste(sub("^[^:]*: ", "", sa$Name), collapse = ", ") else "Study area", obs, out,
                    run_name = sub(" \\(\\[.*$", "", rn))
 print(res[, .(Figure, Title, File = basename(FileName))]); cat(sprintf("%.0f s\n", as.numeric(Sys.time() - t0, units = "secs")))
