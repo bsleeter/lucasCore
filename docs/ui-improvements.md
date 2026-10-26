@@ -9,7 +9,7 @@ built on P26 (the guide's numbers and figures, the demo bundle, metadata) should
 
 | Order | Item | Why here | Depends on |
 | --- | --- | --- | --- |
-| ~~1~~ | ~~11 LOCA2 list scan (the scan part)~~ | DONE 2026-10-26 (to verify in Studio) | - |
+| ~~1~~ | ~~11 LOCA2 list scan (the scan part)~~ | DONE 2026-10-26, verified in Studio | - |
 | 2 | 7 Spatial multiprocessing in the Build | Needed now for projections and guide chapter 8; fixes the tile/target strata rule before projection runs | - |
 | 3 | 8 Area-preserving resampling (explore, then decide) | Changes every Build result and P26 number; decide before results are frozen | - |
 | 4 | 9 FIA plot data | Largest change to the model's inputs (curves, carbon); must reproduce the .Rds results before it becomes the default | - |
@@ -85,7 +85,7 @@ figures, which are redone once after the P26 rerun.
    option and as a stand age source, so type and age come from one consistent map. Needs: a Data Sources path for the TreeMap raster
    and its attribute table, a FORTYPCD -> forest type group crosswalk (defaults/growth/forest-type-crosswalk.csv may cover it), the
    vintage (TreeMap 2016 / 2020 / 2022) set against the Build's start year, and a comparison with EVT/NFCMS and CMS age on P26.
-11. **LOCA2 climate: scan the user's folder, or download** - (a) DONE 2026-10-26, to verify in Studio; (b) the download part moves to
+11. **LOCA2 climate: scan the user's folder, or download** - (a) DONE 2026-10-26, verified in Studio by the user; (b) the download part moves to
    item 12. `ui/Loca2Lists.cs` scans Data Sources: LOCA2 Folder by new-library.R's rule (a member counts when its historical folder
    and at least one SSP folder each hold pr, tasmax and tasmin `*.monthly.nc`). LibrarySetup fills a new project's three lists from
    the scan, falling back to the shipped CSVs when the folder is missing or empty (its Detail says which). Projection Climate has a
