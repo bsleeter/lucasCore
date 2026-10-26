@@ -37,3 +37,16 @@ estimates were rescaled state by state after February 2024 (and litter and soil 
 A per-state constant looks like the Smith and Heath model being scaled to field measurements (FIA's down woody material plots) state by
 state - a hypothesis to confirm from the 9.5 release notes or FIA. Since down dead is modelled from live tree carbon, its rise with stand
 age is built into the model, not observed.
+
+### Correction (2026-10-26, later): the per-state factor is more likely in the USGS table, not a FIADB change
+
+No FIADB 9.5 release notes were found. FIA's FIADB update history (apps.fs.usda.gov/fiadb-api/fiadb_update_history) logs no change to
+down dead since at least 2017; it does log the NSVB reprocessing (September 2023), litter and soil carbon model updates for 47 states in
+November 2023 (not California), and soil lab data added in 2025-2026 for 24 northern states. Domke et al. (2013, PLOS ONE) describe the
+national GHG inventory's adjustment of modelled down dead wood by a **state-level ratio of field-measured (P3 down woody material) to
+modelled carbon density** - exactly one constant per state. So the likelier reading: **the USGS table holds the field-adjusted values and
+current FIADB the raw Smith and Heath model**; USGS / FIADB = the state's field/model ratio: GA 0.25, NY 0.68, CA 0.70, ME 0.83, CO 0.90,
+MN 0.97, AZ 1.25, MT 1.31. If so the USGS down dead is the better calibration target, and item 9's DataMart setting should apply per-state
+field adjustments (not a single 0.7). To confirm: compute California's field/model ratio from DataMart's down woody material tables
+(COND_DWM_CALC) and compare with 0.70. Litter and soil differences in the northern states are probably the November 2023 model update and
+the added soil lab data (the USGS table may predate them).
