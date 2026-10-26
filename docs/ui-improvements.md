@@ -173,3 +173,12 @@ figures, which are redone once after the P26 rerun.
    ...)"): a result's DisplayName already starts with its id, so list DisplayName alone. The stand-alone hint still says to make the run
    with tools/new-historical.R --historical-only --bookend-maps; say instead that the run needs state class, age and stock maps for
    its last year (age maps are on by default from 25 October 2026).
+17. **Run Figures: a comparison set for several futures** - TO DO (user, 2026-10-25). Today's Run Figures describe one run (a projection
+   is joined to its historical run). Comparing futures (normal climate, SSP2-4.5, SSP5-8.5, or different land-use rules) needs its own
+   set, built on dev/figures/compare-futures.R. Planned, in stage 13: the Run Figures page takes several runs, each with a label, plus a
+   reference run (default: the first); one run = today's set, several = the comparison set. Contents: (1) total ecosystem carbon and its
+   cumulative change since the projection start, one line per future, history once; (2) NPP, Rh and NBP per year plus cumulative NBP;
+   (3) carbon by pool at the end year, grouped bars; (4) transitions per year by family per future (a check: identical when futures
+   share a Projection Setup); (5) end-year carbon difference maps against the reference; (6) mean NPP difference maps over the last
+   decade; (7) a summary table per future (end carbon, cumulative NBP, NPP mean and spread, burned and harvested area, differences from
+   the reference). With Monte Carlo iterations: means with bands, and maps of the mean difference with its sign agreement.
