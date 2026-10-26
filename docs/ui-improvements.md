@@ -126,6 +126,17 @@ figures, which are redone once after the P26 rerun.
    Alternatives: ESA CCI Biomass (100 m, 2010, 2017-2021, with per-pixel uncertainty). Test on P26 in dev/: inferred ages against CMS,
    TreeMap, GAMI and, most usefully, FIA plot ages at the plots' (fuzzed) locations from the DataMart files; if it holds up, it becomes
    Stand Age Source = Inferred from biomass.
+   **NFCMS carbon products** (the source of the NFCMS forest type and productivity tiles and the CMS age maps already in Data
+   Sources): (a) NFCMS 1990-2010, ORNL DAAC doi 10.3334/ORNLDAAC/1829 (Williams, Hasler et al.): 30 m aboveground woody biomass, total
+   live biomass, total ecosystem carbon, coarse woody debris and NEP for 1990, 2000, 2010, plus its inputs (disturbance year and type
+   from NAFD and MTBS, years since stand-replacing disturbance = its stand age, NBCD 2000 biomass, forest type group, productivity
+   class); carbon from an inventory-constrained CASA model starting from NBCD 2000. 207 GeoTIFFs, 118.9 GB CONUS (only the PSW region's
+   1990 layers needed for P26); NASA-hosted, probably an Earthdata login. (b) NFCMS v3.0, USFS RDS-2025-0019: 30 m forest extent,
+   type and carbon stocks with a 2020 baseline (t CO2e/acre), 1990-2020 conversion, projections to 2050 and 2070; regional maps plus a
+   CONUS mosaic, no login. Uses: NFCMS 1990 total live biomass / total ecosystem carbon as an **independent check of the Build's initial
+   carbon** (cell by cell and in total, whatever the age source), and a 1990 biomass map for the inference above (5-year shift). Since
+   NFCMS itself already combines NBCD biomass with disturbance history, inverting lucasCore's own curves mainly buys consistency with
+   the model's curves; the P26 test shows how much the ages change.
 11. **LOCA2 climate: scan the user's folder, or download** - (a) DONE 2026-10-26, verified in Studio by the user; (b) the download part moves to
    item 12. `ui/Loca2Lists.cs` scans Data Sources: LOCA2 Folder by new-library.R's rule (a member counts when its historical folder
    and at least one SSP folder each hold pr, tasmax and tasmin `*.monthly.nc`). LibrarySetup fills a new project's three lists from
