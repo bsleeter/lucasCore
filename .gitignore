@@ -17,6 +17,7 @@ dev/**/*.tif
 dev/**/*.png
 *.ssimpkg
 dev/growth/*.rds
+dev/fia/*.rds
 dev/growth/out_*.csv
 dev/climate/*.csv
 
