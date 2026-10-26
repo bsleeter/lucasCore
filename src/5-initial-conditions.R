@@ -66,8 +66,46 @@ nl_files <- parLapply(cl, seq_along(years), function(i, years, nfs) { library(te
   n <- mask(nlcd_on_grid(nfs[i], L, rast(P)), P); f <- file.path(td, sprintf("NLCD_%d.tif", years[i]))
   writeRaster(n, f, overwrite = TRUE, datatype = "INT1U", gdal = c("COMPRESS=DEFLATE", "TILED=YES")); f }, years = years, nfs = nfs)
 stopCluster(cl); nl_files <- unlist(nl_files)
+say("Annual NLCD: %d years written (modal: each cell's most common 30 m class)", length(years))
+# Build Options: Land Cover Resampling. Area-matched replaces the modal maps with maps whose class areas equal the 30 m areas in each
+# secondary stratum unit, year by year (src/landcover-match.R); everything downstream reads these maps
+lcr <- if ("LandCoverResampling" %in% names(opt) && !is.na(opt$LandCoverResampling[1])) as.character(opt$LandCoverResampling[1]) else "1"
+if (lcr == "2" || grepl("^Area", lcr)) {
+  source(pkg_file("src", "landcover-match.R"))
+  t0 <- Sys.time(); cd <- file.path(td, "lc-counts"); dir.create(cd, showWarnings = FALSE)
+  cl <- makeCluster(max(1, min(length(years), 20, detectCores() - 1)))
+  clusterExport(cl, c("nlcd_counts_on_grid", "grid_blocks", "clear_syncrosim_proj", "LC_CLASSES", "cd", "pf", "Lw"), envir = environment())
+  invisible(clusterEvalQ(cl, clear_syncrosim_proj()))
+  cfs <- unlist(parLapply(cl, seq_along(years), function(i, years, nfs) { library(terra); P <- rast(pf); L <- unwrap(Lw)
+    s <- mask(nlcd_counts_on_grid(nfs[i], L, rast(P)), P); f <- file.path(cd, sprintf("counts_%d.tif", years[i]))
+    writeRaster(s, f, overwrite = TRUE, datatype = "INT2U", gdal = c("COMPRESS=DEFLATE", "TILED=YES")); f }, years = years, nfs = nfs))
+  stopCluster(cl)
+  land <- !is.na(values(P, mat = FALSE)); cell_km2 <- (res_m / 1000)^2
+  match_step <- lc_matcher(values(rast(ic$SecondaryStratumFileName[1]), mat = FALSE)[land])
+  DEVI <- which(LC_CLASSES %in% 21:24); prev <- NULL; pp <- NULL; short <- 0; nrev <- 0; lost <- 0; wrong <- list(); a30 <- list()
+  for (i in seq_along(years)) {
+    K <- values(rast(cfs[i]), mat = TRUE)[land, , drop = FALSE]; K[is.na(K)] <- 0
+    first <- is.null(prev)
+    if (first) { M <- match(values(rast(nl_files[i]), mat = FALSE)[land], LC_CLASSES); prev <- ifelse(is.na(M), max.col(K, ties.method = "first"), M) }   # the first year starts from the modal map
+    r <- match_step(prev, K, first); A <- r$cur; short <- short + r$short
+    if (!first) { lost <- lost + sum(prev %in% DEVI & !(A %in% DEVI)); if (!is.null(pp)) nrev <- nrev + sum(A == pp & A != prev) }
+    px <- colSums(K); a30[[i]] <- px / sum(px) * sum(land) * cell_km2   # the 30 m class areas, scaled to the land cells' area
+    wrong[[i]] <- c(modal = sum(abs(tabulate(match(values(rast(nl_files[i]), mat = FALSE)[land], LC_CLASSES), 16) * cell_km2 - a30[[i]])) / 2,
+                    matched = sum(abs(tabulate(A, 16) * cell_km2 - a30[[i]])) / 2)
+    v <- rep(NA_integer_, ncell(P)); v[land] <- LC_CLASSES[A]   # replaces the year's modal map
+    writeRaster(setValues(rast(P), v), nl_files[i], overwrite = TRUE, datatype = "INT1U", gdal = c("COMPRESS=DEFLATE", "TILED=YES"))
+    pp <- prev; prev <- A }
+  unlink(cd, recursive = TRUE); W <- do.call(rbind, wrong); d30 <- vapply(a30, function(a) sum(a[DEVI]), 0)
+  dev_km2 <- function(f) sum(values(rast(f), mat = FALSE) %in% 21:24, na.rm = TRUE) * cell_km2
+  say("Land cover resampling: area-matched per secondary stratum unit (%.1f min). Area in the wrong class vs the 30 m areas: %d %.0f km2 (modal %.0f), %d %.0f km2 (modal %.0f), mean %.0f km2 (modal %.0f)",
+      as.numeric(Sys.time() - t0, units = "mins"), y0, W[1, "matched"], W[1, "modal"], y1, W[nrow(W), "matched"], W[nrow(W), "modal"], mean(W[, "matched"]), mean(W[, "modal"]))
+  say("Developed land: 30 m %.0f -> %.0f km2, matched %.0f -> %.0f km2; developed cells lost %d; A->B->A reversals %.0f km2; cells a class could not be filled for %.0f (sum over years)",
+      d30[1], d30[length(d30)], dev_km2(nl_files[1]), dev_km2(nl_files[length(nl_files)]), lost, nrev * cell_km2, short)
+  check(STAGE, "area matching: developed land never reverts", lost == 0, sprintf("%d cells", lost))
+  check(STAGE, "area matching: less area in the wrong class than modal in every year", all(W[, "matched"] <= W[, "modal"]),
+        sprintf("%d years worse", sum(W[, "matched"] > W[, "modal"])))
+}
 N <- rast(nl_files); names(N) <- years; n0 <- N[[1]]
-say("Annual NLCD: %d years written", length(years))
 progressBar()
 
 # ---- forest type (Build Options: Forest Type Map); most common forest type group of the 30 m pixels; cells with none from neighbours

@@ -100,6 +100,8 @@
 		<!-- legacy (libraries made before 2026-10-24): the projection end year is now in Projection Options (Run Settings); stages 9 and 10 still read this one when that is blank -->
 		<column name="ProjectionEndYear" displayName="Projection End Year (legacy: now in Projection > Run Settings)" dataType="Integer" isOptional="True" isVisible="False"/>
 		<column name="ForestTypeMap" displayName="Forest Type Map" dataType="Integer" validationType="List" formula1="1:LANDFIRE EVT|2:USFS forest type groups" defaultValue="1"/>
+		<!-- stage 5: how the 30 m Annual NLCD becomes the model grid (src/landcover-match.R; blank = modal, as Builds before 2026-10-26) -->
+		<column name="LandCoverResampling" displayName="Land Cover Resampling" dataType="Integer" validationType="List" formula1="1:Modal (most common 30 m class)|2:Area-matched (30 m class areas per secondary stratum unit)" defaultValue="1" isOptional="True"/>
 		<!-- spatial multiprocessing (stage 1 writes the tile mask into the Build result; runs on the Build inherit it, a projection may set its own in Run Settings) -->
 		<column name="SpatialTiles" displayName="Spatial Multiprocessing Tiles (blank = none)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1"/>
 		<column name="SpatialTilesStrata" displayName="Spatial Tiles Strata (tiles are whole units of this level; every projection Target group uses it)" dataType="Integer" validationType="List" formula1="1:Primary|2:Secondary|3:Tertiary" defaultValue="2" isOptional="True"/>

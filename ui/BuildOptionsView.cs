@@ -37,6 +37,7 @@ namespace lucasCoreUI
         private readonly ComboBox m_secondary = new ComboBox();
         private readonly ComboBox m_tertiary = new ComboBox();
         private readonly ComboBox m_forest = new ComboBox();
+        private readonly ComboBox m_resample = new ComboBox();
         private readonly CheckBox m_tiled = new CheckBox { Text = "Split runs into tiles:", AutoSize = true, Margin = new Padding(3, 5, 6, 3) };
         private readonly TextBox m_tiles = new TextBox();
         private readonly ComboBox m_tileLevel = new ComboBox();
@@ -99,9 +100,11 @@ namespace lucasCoreUI
             m_secondary.SelectionChangeCommitted += (s, e) => TileLevelNames();
             m_tertiary.SelectionChangeCommitted += (s, e) => TileLevelNames();
 
-            GroupBox gCover = Group("Land cover", out r);
+            GroupBox gCover = Group("Land cover", out r,
+                Note("Resampling: Modal gives each cell its most common 30 m Annual NLCD class; it under-counts minority classes (in P26 it keeps a third of the developed area) and cells flicker between classes from year to year. Area-matched makes every class's area in each secondary stratum unit equal its 30 m area, year by year, changing cells only where the 30 m totals move; developed land is only added, never removed. State classes and land-use transitions both come from the resampled maps."));
             r.Controls.Add(Caption("Forest type map:")); r.Controls.Add(List(m_forest, 200));
             r.Controls.Add(Note("Assigns the forest type of forest cells; other cover comes from NLCD, RCMAP and C-CAP."));
+            r.Controls.Add(Caption("Resampling to the grid:")); r.Controls.Add(List(m_resample, 330));
 
             foreach (GroupBox g in new[] { gGrid, gHist, gStrata, gCover, gTiles }) { m_root.RowStyles.Add(new RowStyle(SizeType.AutoSize)); m_root.Controls.Add(g); }
 
@@ -135,6 +138,9 @@ namespace lucasCoreUI
             m_forest.DisplayMember = "Name"; m_forest.ValueMember = "Value";
             m_forest.DataSource = new List<Item> { new Item { Value = 1, Name = "LANDFIRE EVT" }, new Item { Value = 2, Name = "USFS forest type groups" } };
             this.SetComboBoxBinding(m_forest, "ForestTypeMap");
+            m_resample.DisplayMember = "Name"; m_resample.ValueMember = "Value";
+            m_resample.DataSource = new List<Item> { new Item { Value = 1, Name = "Modal (most common 30 m class)" }, new Item { Value = 2, Name = "Area-matched (30 m class areas per secondary unit)" } };
+            this.SetComboBoxBinding(m_resample, "LandCoverResampling");
             this.SetTextBoxBinding(m_resolution, "Resolution");
             this.SetTextBoxBinding(m_start, "StartYear");
             this.SetTextBoxBinding(m_end, "EndYear");

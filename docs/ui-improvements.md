@@ -11,7 +11,7 @@ built on P26 (the guide's numbers and figures, the demo bundle, metadata) should
 | --- | --- | --- | --- |
 | ~~1~~ | ~~11 LOCA2 list scan (the scan part)~~ | DONE 2026-10-26, verified in Studio | - |
 | ~~2~~ | ~~7 Spatial multiprocessing in the Build~~ | DONE 2026-10-26 | - |
-| 3 | 8 Area-preserving resampling (explore, then decide) | Changes every Build result and P26 number; decide before results are frozen | - |
+| 3 | 8 Area-preserving resampling | BUILT 2026-10-26 as a Build Options choice; a full P26 Area-matched Build is still to run and compare | - |
 | 4 | 9 FIA plot data | Largest change to the model's inputs (curves, carbon); must reproduce the .Rds results before it becomes the default | - |
 | 5 | 10 TreeMap option | Same domain as 9 (FIA plots, forest type, age); an option, so it changes results only if made the default | 9 helps (FIA plot ids) |
 | 6 | 12 Data Download stage | Needs the final dataset list (9 and 10 add or replace sources); its LOCA2 download refreshes the lists through 11 | 9, 10, 11 |
@@ -63,7 +63,15 @@ figures, which are redone once after the P26 rerun.
    - Open: one tile per unit (simple; 17 uneven county jobs for P26) or units packed into N tiles of about equal area (stage 9's
      balancing code, moved to shared.R). Projection Options' Spatial Tiles fields would then default to the Build's choice.
    - Guide: section 1.4 says to leave library multiprocessing off (right for Builds); tiled runs need it on, with jobs ~ tiles.
-8. **Area-preserving resampling of land cover** - EXPLORED 2026-10-25 (dev/resampling, FINDINGS.md); decision pending. Best method:
+8. **Area-preserving resampling of land cover** - BUILT 2026-10-26 as a choice (user: "pick either method from the Build menu").
+   Build Options: Land Cover Resampling = Modal (default; blank in older Builds) or Area-matched (every class matched to its 30 m area
+   per secondary stratum unit, developed additions only: 06-match-all.R's method, now `src/landcover-match.R`; reproduces its P26
+   maps cell for cell, 1.7 min for 39 years). Stage 5 counts each class's 30 m pixels per cell (parallel over years), matches the
+   years in order and writes the matched maps as the annual NLCD, so state classes and stage 6/9/10 transitions all follow them; it
+   logs the area in the wrong class (matched vs modal) and checks that developed land never reverts. Test:
+   tests/phaseZ4-landcover-resampling.R. Still open: a full P26 Build + historical run with Area-matched to compare carbon,
+   transitions and figures; the state class splits within NLCD classes (forest type, shrub/grass, wetland types) are still modal.
+   Exploration notes (2026-10-25): Best method:
    **area matching per county with additions only** (1985: each county's cells with the largest developed shares become developed until
    its 30 m area is met; later years add the next-largest shares, never remove). P26: developed 876 km2 in 1985 (100% of 30 m; modal
    31%), net growth 105% of 30 m, no flicker (modal loses 230 km2), intensity classes close to 30 m; initial carbon -4.4 Tg C (-0.9%);
