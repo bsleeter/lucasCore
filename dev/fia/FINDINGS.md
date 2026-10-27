@@ -245,3 +245,18 @@ branch snags scaled alike), the snag multiplier fitting only snag decay and emis
   before/after pairs gave 0.46 of the wood to snags and its 0-5 year snags (38 of a pre-fire 136) suggest about 0.3, against the pooled
   0.54 used. A per-type fire snag share is the remaining lever.
 - Keep the measured fall rates regardless: they are observed, and they make snag decay a small, separately fitted term.
+
+## High-severity fire snag share fitted per type (14-fire-snag-share.R, fire-snag-share.csv, out-cal-share/)
+
+Share of the live aboveground wood a high-severity fire leaves standing as snags (the rest burned; stem : branch split as before), fitted
+to FIA's snags 0-20 years after high-severity fire, with snag fall at the measured rates: **Mixed Conifer 0.28, Ponderosa 0.36, Western
+Oak 0.40, Fir/Spruce 0.42** (pooled pairs gave 0.54). Then the mature-stand calibration and young-stand check rerun with it:
+
+- Post-fire snags now match (measured / model, Mg C/ha at 0-5 / 5-10 / 10-20 yr): Mixed Conifer 38/43, 49/31, 22/22; Fir/Spruce 61/63,
+  59/45, 32/31; Western Oak 27/26, 10/15, 7/8; Ponderosa 23/22 at 0-5. Post-fire down logs close too (Mixed Conifer 9/12, 14/17, 21/21).
+- Forest floor after fire stays matched (Mixed Conifer 6.5/5.6, 6.6/5.7, 7.6/6.7).
+- Mature stands: Mixed Conifer fits in every pool (old down logs 12.4 vs 13.5, was 9.3 before snag fall was fixed); Ponderosa and
+  Western Oak fit; Fir/Spruce's old snags run short (13 vs 22 at 150-300 yr).
+- Still off: down logs after clearcut (Mixed Conifer 21 vs 7 at 0-5 yr) - the pre-harvest down logs and felled snags the model leaves on
+  site; and Fir/Spruce old-stand snags. Decay multipliers: snag decay ~0 (0.05-0.14), down logs 0.74-0.96, fine woody debris 1.8-2.3,
+  litter 0.22-0.72, duff 3.2-7.1 (x CBM).

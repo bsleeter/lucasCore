@@ -36,6 +36,17 @@ if (nzchar(snag_file)) {
     if (length(r)) { f <- r / S$vals[["Transfer: Snag Stem -> AG Medium"]]; S$vals[FALLS] <- S$vals[FALLS] * f }
     S }
 }
+# LUCAS_FIRE_SNAG (dev, 14-fire-snag-share.R): a csv of high-severity fire snag shares per FIA forest type group (Group, Share): the
+# share of live aboveground wood left standing as snags, split as the fitted event table does (merchantable 0.65 : other wood 0.30 of a
+# 0.545 total, the rest burned)
+fire_file <- Sys.getenv("LUCAS_FIRE_SNAG", "")
+if (nzchar(fire_file)) {
+  FIRE_SNAG <- fread(fire_file); cat("fire snag share from", fire_file, ":", paste(sprintf("%d %.2f", FIRE_SNAG$Group, FIRE_SNAG$Share), collapse = ", "), "\n")
+  cal_setup1 <- cal_setup
+  cal_setup <- function(k, ctx) { S <- cal_setup1(k, ctx); s <- FIRE_SNAG[Group == k$sc, Share]
+    if (length(s)) { S$hist$Dl["SnagStem", "Merchantable"] <- s * 0.65 / 0.545; S$hist$Dl["SnagBranch", "Other"] <- s * 0.30 / 0.545 }
+    S }
+}
 lib <- file.path(pkg, "dev/libs/LUCAS P26 Demo Library.ssim"); MIN_AGE <- 60L; RECENT <- 30L
 TYPES <- c(`370` = "California Mixed Conifer Group", `260` = "Fir/Spruce/Mountain Hemlock Group", `220` = "Ponderosa Pine Group", `920` = "Western Oak Group")
 STRATUM <- "Mediterranean Mountains"; ECODIV <- "M260"
