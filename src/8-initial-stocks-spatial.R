@@ -11,7 +11,8 @@
 #                           also uses)
 #   everything else         0 (developed, agriculture, barren, water, ice)
 #   last disturbance        high-severity fire where an interagency fire perimeter of 1900 to the start year covers the cell, otherwise
-#                           clearcut (the build's rule; with few early perimeters in the East, eastern forest is mostly post-harvest)
+#                           clearcut (the build's rule; with few early perimeters in the East, eastern forest is mostly post-harvest), or
+#                           high-severity fire for the forest types Carbon Assumptions: Spin-up sets so
 #   soil (BG slow)          gSSURGO wherever the class's value is 0 (the build's rule). Forest keeps its spin-up value: stage 3
 #                           calibrated soil decay to each ecodivision x class's mean gSSURGO, so forest cells start at the class's
 #                           gSSURGO mean and in balance with their decay rates
@@ -46,9 +47,23 @@ fp <- st_make_valid(st_transform(fp, crs(P)))
 bb <- st_as_sfc(st_bbox(c(xmin = xmin(P), ymin = ymin(P), xmax = xmax(P), ymax = ymax(P)), crs = st_crs(crs(P))))
 fp <- fp[lengths(st_intersects(fp, bb)) > 0, ]
 burned <- if (nrow(fp)) !is.na(values(rasterize(vect(fp), P, field = 1), mat = FALSE)) else rep(FALSE, ncell(P))
-last <- ifelse(burned, "Fire: High Severity [Type]", "Forest Harvest: Forest Clearcut [Type]")
-say("Last disturbance: %d fire perimeters of 1900-%d intersect the study area; %.1f%% of land cells post-fire, the rest post-clearcut",
+say("Last disturbance: %d fire perimeters of 1900-%d intersect the study area; %.1f%% of land cells inside one",
     nrow(fp), y0, 100 * mean(burned[land]))
+# outside the perimeters: clearcut, unless Carbon Assumptions: Spin-up sets high-severity fire for the cell's forest type (the
+# ecodivision row's choice, else the type's all-ecodivisions row's)
+postfire <- burned
+sp <- as.data.table(datasheet(scn, ds("Spinup"), optional = TRUE, lookupsAsFactors = FALSE))
+if (nrow(sp) && "LastDisturbanceUnburned" %in% names(sp) && any(!is.na(sp$LastDisturbanceUnburned))) {
+  sp <- sp[!is.na(LastDisturbanceUnburned)][, `:=`(StratumId = as.character(StratumId), fire = LastDisturbanceUnburned %in% c(2L, "2", "High-severity fire"))]   # a list column reads as its label
+  ch <- data.table(sname, cname)
+  own <- sp[!is.na(StratumId)][ch, on = .(StratumId = sname, StateClassId = cname), fire, mult = "first"]
+  all <- sp[is.na(StratumId)][ch, on = .(StateClassId = cname), fire, mult = "first"]
+  uf <- data.table::fcoalesce(own, all); postfire <- burned | (!is.na(uf) & uf)
+  say("Spin-up (Carbon Assumptions): high-severity fire as the last disturbance outside the perimeters for %d land cells of %s", sum(land & postfire & !burned),
+      paste(sub("^Forest: ", "", unique(sp[fire == TRUE, paste0(ifelse(is.na(StratumId), "", paste0(StratumId, " / ")), StateClassId)])), collapse = ", "))
+}
+last <- ifelse(postfire, "Fire: High Severity [Type]", "Forest Harvest: Forest Clearcut [Type]")
+say("Last disturbance: %.1f%% of land cells post-fire, the rest post-clearcut", 100 * mean(postfire[land]))
 progressBar()
 
 # ---- pools by class -----------------------------------------------------------------------------------------------------
@@ -74,8 +89,8 @@ fill_class <- function(tab, cells, by_age = FALSE, label) {
   src_of[cells] <<- label }
 wf_cls <- unique(lt("wetland-forested-fire.csv")$StateClassId)
 isWF <- land & cname %in% wf_cls
-fill_class(lt("wetland-forested-fire.csv"), isWF & burned, TRUE, "forested wetland (post-fire)")
-fill_class(lt("wetland-forested-harvest.csv"), isWF & !burned, TRUE, "forested wetland (post-harvest)")
+fill_class(lt("wetland-forested-fire.csv"), isWF & postfire, TRUE, "forested wetland (post-fire)")
+fill_class(lt("wetland-forested-harvest.csv"), isWF & !postfire, TRUE, "forested wetland (post-harvest)")
 gs <- lt("grassland-shrubland.csv"); fill_class(gs, land & cname %in% unique(gs$StateClassId), FALSE, "grassland/shrubland")
 ew <- lt("emergent-wetland.csv"); fill_class(ew, land & cname %in% unique(ew$StateClassId), FALSE, "emergent wetland")
 src_of[land & is.na(src_of)] <- "zero (developed, agriculture, barren, water, ice)"
@@ -94,7 +109,7 @@ progressBar()
 # ---- checks, summary, outputs -----------------------------------------------------------------------------------------
 check(STAGE, "every land cell has every pool, none negative", !anyNA(out[land, ]) && all(out[land, ] >= 0), sprintf("%d NA, %d negative", sum(is.na(out[land, ])), sum(out[land, ] < 0, na.rm = TRUE)))
 live <- grep("^Biomass", st$StockTypeId); dom <- setdiff(seq_len(nrow(st)), c(live, bgs))
-d <- data.table(S = vS, src = src_of, fire = burned, live = rowSums(out[, live]), dom = rowSums(out[, dom]), soil = out[, bgs])[land]
+d <- data.table(S = vS, src = src_of, fire = postfire, live = rowSums(out[, live]), dom = rowSums(out[, dom]), soil = out[, bgs])[land]
 summ <- d[, .(Cells = .N, PostFire = round(mean(fire), 3), Live = round(mean(live), 1), Dom = round(mean(dom), 1), Soil = round(mean(soil), 1),
               TotalTg = round(sum(live + dom + soil) * cell_ha / 1e6, 2), Source = src[1]), by = S][order(-TotalTg)]
 summ[, StateClassId := scl$Name[match(S, as.integer(scl$Id))]]

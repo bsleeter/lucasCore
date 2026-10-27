@@ -50,7 +50,10 @@ Dead pool decay, Carbon Options 4 "Measured dead wood" (default):
 
 Repeated growth cycles ended by high-severity fire at the cell's return interval (LANDFIRE, stage 5), solved directly for the stable
 state; then the last disturbance (fire or clearcut); then growth to every age. Uses exactly the rates and event flows stage 3 wrote.
-Stage 8 maps these curves to initial stock rasters with the fire and harvest history.
+Stage 8 maps these curves to initial stock rasters with the fire and harvest history: post-fire inside an interagency perimeter of
+1900 to the start year, post-clearcut elsewhere. Carbon Assumptions: Spin-up can set, per forest type (optionally per ecodivision),
+the return interval, a share of the historical cycles ended by clearcut (the average cycle is solved), and fire instead of clearcut
+outside the perimeters.
 
 ## How well it works
 
@@ -62,7 +65,7 @@ plots): snags 0.85, down logs 0.86, fine woody debris 0.90, litter 0.99, duff 0.
 - Snags short in 96 cells even with snag decay at its minimum (inputs or fall rate; not diagnosed).
 - Duff multiplier at its upper bound (20) in 19 cells.
 - Fire/clearcut transfers and the four fire snag shares come from California plots but apply everywhere.
-- Hard-coded, not exposed (to-do 18): mature age 60, 30-year exclusion, spin-up fire return interval.
+- Hard-coded, not exposed (to-do 18): mature age 60, 30-year exclusion. (The spin-up return interval is on the Spin-up sheet.)
 - Live turnover not fitted; users cannot view or override rates (to-do 20 rate sheet not built).
 - Waiting on Studio closed: DLL rebuild (Carbon Options page), P26 sync, then a P26 Build rerun (changes stages 3-4).
 - The guide's carbon chapter still describes the old calibration.

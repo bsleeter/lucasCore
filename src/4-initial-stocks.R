@@ -2,7 +2,8 @@
 # 4-initial-stocks.R - stage 4: spin-up and initial carbon stocks by age and last disturbance, per ecodivision x forest state class
 # =============================================================================
 # Replaces lucasbuilder's spin-up (3-spinup-pre.R, an stsim run, 4-spinup-post.R) with the CBM dead-carbon dynamics of src/dom.R:
-# repeated cycles of growth to the return interval ended by high-severity fire, solved directly as their limit (fixed point), then
+# repeated cycles of growth to the return interval ended by high-severity fire (or, per Carbon Assumptions: Spin-up, a share of them
+# by clearcut), solved directly as their limit (fixed point), then
 # the most recent disturbance - high-severity fire or clearcut - then growth to every age 0..MaximumAge. Live pools come from the
 # stage 2 carbon curves; turnover and decay are the flow multipliers stage 3 wrote (read back here, so the spin-up uses exactly the
 # calibrated rates the model runs with); disturbances are the LUCAS event flows. The return interval of each cell is the one stage 3
@@ -32,7 +33,11 @@ LAST <- c(Fire = "Fire: High Severity [Type]", Clearcut = "Forest Harvest: Fores
 cells <- unique(cc[, .(Stratum, StateClass)])[paste(Stratum, StateClass) %in% paste(dc$StratumId, dc$StateClassId)]
 cells[, ri := as.integer(dc$ReturnInterval[match(paste(Stratum, StateClass), paste(dc$StratumId, dc$StateClassId))])]
 if (anyNA(cells$ri)) fail("Decay Calibration has no return interval for %d cells", cells[is.na(ri), .N])
-say("Spin-up: %d cells, return intervals %d-%d yr; last disturbance: %s", nrow(cells), min(cells$ri), max(cells$ri), paste(names(LAST), collapse = ", "))
+# the share of historical cycles ended by clearcut (Carbon Assumptions: Spin-up) stage 3 calibrated with; none in older results = 0
+cells[, hist_cc := if ("HistoricalClearcutShare" %in% names(dc)) as.numeric(dc$HistoricalClearcutShare)[match(paste(Stratum, StateClass), paste(dc$StratumId, dc$StateClassId))] else 0]
+cells[is.na(hist_cc), hist_cc := 0]
+say("Spin-up: %d cells, return intervals %d-%d yr; historical cycles ended by clearcut in %d cells (share %.2f-%.2f); last disturbance: %s", nrow(cells), min(cells$ri), max(cells$ri),
+    cells[hist_cc > 0, .N], min(cells$hist_cc), max(cells$hist_cc), paste(names(LAST), collapse = ", "))
 progressBar()
 
 # ---- spin-up per cell -----------------------------------------------------------------------------------------------
@@ -44,7 +49,7 @@ for (i in seq_len(nrow(cells))) { s <- cells$Stratum[i]; c0 <- cells$StateClass[
   m <- dom_matrices(vals, fo)                                   # already calibrated: no further multipliers
   live <- as.matrix(cc[Stratum == s & StateClass == c0][order(Age), names(LIVE_POOLS), with = FALSE])
   ages <- cc[Stratum == s & StateClass == c0][order(Age), Age]
-  hist <- disturbance_matrices(ev, LAST[["Fire"]], c0, ri)
+  hist <- spinup_history(ev, c0, ri, cells$hist_cc[i])
   res[[i]] <- rbindlist(lapply(names(LAST), function(d) {
     dom <- dom_by_age(m, live, ri, hist, disturbance_matrices(ev, LAST[[d]], c0, ri))
     # one more check of the dynamics: a year of decay and turnover from age a lands on age a + 1

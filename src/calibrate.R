@@ -39,10 +39,11 @@ cal_setup <- function(k, ctx) {
   fixed <- character()
   if (!is.null(k$snag_fall) && !is.na(k$snag_fall)) { vals <- set_snag_fall(vals, k$snag_fall); fixed <- SNAG_FALL_FLOWS }   # measured snag fall
   list(k = k, live = live, vals = vals, fixed = fixed,
-       hist = disturbance_matrices(ctx$ev, "Fire: High Severity [Type]", k$StateClass, k$ri),
-       harv = disturbance_matrices(ctx$ev, "Forest Harvest: Forest Clearcut [Type]", k$StateClass, k$ri)) }
+       hist = spinup_history(ctx$ev, k$StateClass, k$ri, k$hist_cc),   # historical cycles (Spin-up: share ended by clearcut)
+       fire = disturbance_matrices(ctx$ev, FIRE_GROUP, k$StateClass, k$ri),
+       harv = disturbance_matrices(ctx$ev, CLEARCUT_GROUP, k$StateClass, k$ri)) }
 cal_dom <- function(S, fo, mult, w) { m <- dom_matrices(S$vals, fo, mult, S$fixed)
-  (1 - w) * dom_by_age(m, S$live, S$k$ri, S$hist, S$hist) + w * dom_by_age(m, S$live, S$k$ri, S$hist, S$harv) }
+  (1 - w) * dom_by_age(m, S$live, S$k$ri, S$hist, S$fire) + w * dom_by_age(m, S$live, S$k$ri, S$hist, S$harv) }
 
 cal_loss <- function(par, SS, OB, AG, scale, fo) {
   mult <- list(snag = exp(par[1]), cwd = exp(par[2]), floor = exp(par[3])); w <- stats::plogis(par[4]); tot <- 0

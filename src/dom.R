@@ -89,6 +89,15 @@ disturbance_matrices <- function(events, group, state_class, age) {
     else if (fr %in% LIVE_POOLS) { j <- names(LIVE_POOLS)[match(fr, LIVE_POOLS)]; if (!is.na(to)) Dl[to, j] <- Dl[to, j] + v } }
   list(Dd = Dd, Dl = Dl) }
 
+# the disturbance that ends the spin-up's historical cycles (Carbon Assumptions: Spin-up): high-severity fire, or a share of clearcuts.
+# The dynamics are linear, so the average over cycles ended at random by fire or clearcut is the fixed point of the averaged matrices.
+FIRE_GROUP <- "Fire: High Severity [Type]"; CLEARCUT_GROUP <- "Forest Harvest: Forest Clearcut [Type]"
+spinup_history <- function(events, state_class, age, clearcut_share = 0) {
+  f <- disturbance_matrices(events, FIRE_GROUP, state_class, age)
+  if (is.null(clearcut_share) || is.na(clearcut_share) || clearcut_share == 0) return(f)
+  h <- disturbance_matrices(events, CLEARCUT_GROUP, state_class, age); s <- clearcut_share
+  list(Dd = (1 - s) * f$Dd + s * h$Dd, Dl = (1 - s) * f$Dl + s * h$Dl) }
+
 # DOM by age since the last disturbance for one cell. live: matrix (ages 0..MaxAge) x 5 live pools; ri: return interval (yr)
 dom_by_age <- function(mats, live, ri, hist, last, max_age = nrow(live) - 1) {
   la <- function(a) live[min(a, nrow(live) - 1) + 1, ]

@@ -330,6 +330,20 @@
 		<column name="BranchSnagFall" displayName="Branch Snag Fall (/yr, to AG Fast)" dataType="Double" format="0.0000" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
 	</dataSheet>
 
+	<!-- Carbon Assumptions: Spin-up - per forest type, optionally per ecodivision (each blank value takes the forest type's all-ecodivisions
+	     row, then the default). Return interval of the spin-up cycles: blank = stage 5's LANDFIRE fire return interval of the cell (stage 3
+	     calibrates with it, stage 4 spins up with it). Historical clearcut share: the share of past cycles that ended in a clearcut rather
+	     than high-severity fire (the spin-up solves the average cycle); blank = 0, all fire. Last disturbance where no fire perimeter: stage 8
+	     gives a forest cell the curves after high-severity fire where an interagency perimeter of 1900 to the start year covers it, and this
+	     disturbance elsewhere; blank = clearcut. Stage 4 always builds curves for both last disturbances. Empty sheet = all defaults. -->
+	<dataSheet name="Spinup" displayName="Spin-up">
+		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
+		<column name="StateClassId" displayName="Forest Type" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="ReturnInterval" displayName="Return Interval (yr, blank = LANDFIRE)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="1" formula2="5000"/>
+		<column name="HistoricalClearcutShare" displayName="Historical Cycles: Share Ended by Clearcut (blank = 0, all fire)" dataType="Double" format="0.00" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+		<column name="LastDisturbanceUnburned" displayName="Last Disturbance Where No Fire Perimeter (blank = clearcut)" dataType="Integer" validationType="List" formula1="1:Clearcut|2:High-severity fire" isOptional="True"/>
+	</dataSheet>
+
 	<dataSheet name="DomParameter" displayName="Dead Organic Matter Parameters">
 		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
 		<column name="Pool" displayName="Dead Pool" dataType="Integer" validationType="List" formula1="1:AG Very Fast|2:BG Very Fast|3:AG Fast|4:BG Fast|5:AG Medium|6:AG Slow|7:BG Slow|8:Snag Stem|9:Snag Branch"/>
@@ -442,6 +456,8 @@
 		<column name="MeasuredPlots" displayName="FIA Down Woody Material Conditions (mature)" dataType="Integer" isOptional="True"/>
 		<column name="SoilTarget" displayName="gSSURGO Soil Target (Mg C/ha)" dataType="Double" format="0.0" isOptional="True"/>
 		<column name="SoilSource" displayName="Soil Multiplier Source" dataType="String"/>
+		<column name="ReturnIntervalSource" displayName="Return Interval Source" dataType="String" isOptional="True"/>
+		<column name="HistoricalClearcutShare" displayName="Spin-up Cycles Ended by Clearcut (share)" dataType="Double" format="0.00" isOptional="True"/>
 	</dataSheet>
 
 	<dataSheet name="InitialStockCurve" displayName="Initial Stock Curves (spin-up)">
@@ -640,6 +656,7 @@
 
 	<transformer name="CarbonFlows" displayName="3 - Carbon Flows" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/3-carbon-flows.R">
 		<dataSheet name="LiveTurnover" type="Input"/>
+		<dataSheet name="Spinup" type="Input"/>
 		<dataSheet name="DomParameter" type="Input"/>
 		<dataSheet name="CarbonCurve" type="Input"/>
 		<dataSheet name="CarbonOptions" type="Input"/>
@@ -698,6 +715,7 @@
 
 	<transformer name="InitialStocksSpatial" displayName="8 - Initial Stock Maps" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/8-initial-stocks-spatial.R">
 		<dataSheet name="BuildOptions" type="Input"/>
+		<dataSheet name="Spinup" type="Input"/>
 		<dataSheet name="InitialStockCurve" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
 		<dataSheet name="stsim_InitialStockSpatial" type="Both"/>
@@ -821,6 +839,7 @@
 				<item name="CbmCrosswalk"/>
 				<item name="LiveTurnover"/>
 				<item name="DomParameter"/>
+				<item name="Spinup"/>
 			</group>
 			<group name="lucasCoreProjection" displayName="Projection">
 				<item name="ProjectionRun"/>

@@ -92,6 +92,20 @@ say("Return intervals: %s; soil targets: %s", if (nrow(ri5)) sprintf("stage 5 (%
 cells[, ri := as.numeric(ri_tab$ReturnInterval)[match(paste(Stratum, StateClass), paste(ri_tab$Stratum, ri_tab$StateClass))]]
 cells[is.na(ri), ri := median(as.numeric(ri_tab[StateClass == .BY$StateClass, ReturnInterval])), by = StateClass]
 cells[is.na(ri), ri := median(as.numeric(ri_tab$ReturnInterval))][, ri := as.integer(round(ri))]
+cells[, ri_src := if (nrow(ri5)) "Stage 5 (LANDFIRE)" else "Provisional default"]
+# Carbon Assumptions - Spin-up: return interval and the share of historical cycles ended by clearcut, per cell - the ecodivision row's
+# value, else the forest type's all-ecodivisions row's (blank = the LANDFIRE interval above; share 0, all high-severity fire)
+sp <- as.data.table(datasheet(scn, ds("Spinup"), optional = TRUE, lookupsAsFactors = FALSE)); SPC <- c("ReturnInterval", "HistoricalClearcutShare")
+cells[, hist_cc := 0]
+if (nrow(sp)) {
+  sp[, StratumId := as.character(StratumId)]; for (k in SPC) sp[, (k) := if (k %in% names(sp)) as.numeric(get(k)) else NA_real_]
+  dup <- sp[duplicated(sp[, .(StratumId, StateClassId)])]; if (nrow(dup)) fail("Spin-up: more than one row for %s", paste(unique(paste(dup$StratumId, dup$StateClassId)), collapse = "; "))
+  own <- sp[!is.na(StratumId)][cells, on = .(StratumId = Stratum, StateClassId = StateClass), ..SPC]; all <- sp[is.na(StratumId)][cells, on = .(StateClassId = StateClass), ..SPC]
+  u_ri <- data.table::fcoalesce(own$ReturnInterval, all$ReturnInterval); u_cc <- data.table::fcoalesce(own$HistoricalClearcutShare, all$HistoricalClearcutShare)
+  cells[!is.na(u_ri), `:=`(ri = as.integer(round(u_ri[!is.na(u_ri)])), ri_src = "User (Carbon Assumptions: Spin-up)")]
+  cells[!is.na(u_cc), hist_cc := u_cc[!is.na(u_cc)]]
+  say("Spin-up: %d rows from Carbon Assumptions; return interval set for %d cells, historical clearcut share for %d cells", nrow(sp), sum(!is.na(u_ri)), sum(!is.na(u_cc)))
+} else say("Spin-up: no rows - return intervals from %s, historical cycles all high-severity fire", cells$ri_src[1])
 cells[, soil_target := as.numeric(soil_t$SoilTarget)[match(paste(Stratum, StateClass), paste(soil_t$Stratum, soil_t$StateClass))]]
 fx <- fia_tables(gopt, src$EcodivisionFile)   # Growth Curve Options: FIA Data (src/fia.R)
 dat <- fia_dom_data(fx$cond, fx$dist, gopt, cw); rm(fx)
@@ -217,7 +231,7 @@ write_ds(cells[, .(StratumId = Stratum, StateClassId = StateClass, Level, Plots 
                    DownWoodDecayMultiplier = round(m_cwd, 4), FineWoodyDecayMultiplier = round(m_fwd, 4), LitterDecayMultiplier = round(m_litter, 4),
                    DuffDecayMultiplier = round(m_duff, 4), ForestFloorDecayMultiplier = round(m_floor, 4), SoilDecayMultiplier = round(m_soil, 4),
                    ClearcutShare = round(clearcut, 3), SnagFallRate = round(snag_fall, 4), SnagFallSource, FireSnagShare, MeasuredPlots = mplots,
-                   SoilTarget = round(soil_target, 2), SoilSource)], "OutputDecayCalibration")
+                   SoilTarget = round(soil_target, 2), SoilSource, ReturnIntervalSource = ri_src, HistoricalClearcutShare = hist_cc)], "OutputDecayCalibration")
 progressBar()
 
 # ---- forest: net growth, growth split, turnover and decay per cell ----------------------------------------------------

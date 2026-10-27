@@ -102,3 +102,11 @@ calibrated, measured, user).
   Crosswalk (root splits 0.5). A stem snag fall set by the user is used as given in every Carbon Options mode, ahead of the measured
   rate; a blank branch snag fall follows it in proportion. Empty by default (everything from CBM). Test: tests/phaseZ10-live-turnover.R;
   phaseZ7 still passes.
+- 2026-10-28 **Spin-up done**: scenario sheet in Carbon Assumptions, per forest type (ecodivision optional; each blank value takes the
+  forest type's all-ecodivisions row): return interval (blank = stage 5's LANDFIRE value), share of the historical cycles ended by
+  clearcut (blank = 0, all high-severity fire), and the last disturbance outside the 1900-start year fire perimeters (blank = clearcut).
+  The dynamics are linear, so stage 3 and 4 solve the average cycle with the fire and clearcut event matrices mixed by the share (a
+  Monte Carlo of 20,000 random cycles agrees within 0.1%). Stage 3 writes the interval, its source and the share to Decay Calibration;
+  stage 4 spins up with them; stage 8 applies the last disturbance. Stage 4 still builds curves for both last disturbances. Empty by
+  default. Test: tests/phaseZ11-spinup.R (Placer: mixed conifer age-100 dead carbon after fire 101 -> 116 Mg C/ha at 300 yr with half
+  clearcut cycles, 112 -> 92 at 60 yr; Western Oak post-fire share 0.20 -> 1.0; every other type unchanged).
