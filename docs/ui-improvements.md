@@ -275,3 +275,9 @@ figures, which are redone once after the P26 rerun.
    the others). Tables: dev/fia/out-cal-clearcut/rate-table-{region,type,events}.csv (16-rate-table.R).
    DECIDED 2026-10-27 (user): regional decay for snags, down logs and fine woody debris; leaf litter and duff decay per forest type
    (hybrid fit: 3.0% of CBM's misfit left vs 2.5% per type, 7.1% fully regional). The sheet lists litter and duff decay with the type.
+21. **Carbon assumptions a user can see and change** - TO DO (user, 2026-10-27): "a user needs the ability to change or specify any of
+   the assumptions made which allow us to run the carbon calibration steps", starting with the CBM crosswalk (today a package file,
+   one row per forest type, not editable, not regional). Inventory of every assumption, where it lives, and the proposed Carbon
+   Assumptions sheets (CBM Crosswalk as in lucasBuilder 2.0.4, Live Turnover, DOM Parameters, Decay Calibration Settings, Disturbance
+   Flows, Spin-up, Growth inputs; filled with package defaults like the Land Cover Crosswalks): docs/carbon-assumptions.md. Takes in
+   items 18 and 20.
