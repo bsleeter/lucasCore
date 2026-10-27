@@ -240,3 +240,13 @@ figures, which are redone once after the P26 rerun.
    share a Projection Setup); (5) end-year carbon difference maps against the reference; (6) mean NPP difference maps over the last
    decade; (7) a summary table per future (end carbon, cumulative NBP, NPP mean and spread, burned and harvested area, differences from
    the reference). With Monte Carlo iterations: means with bands, and maps of the mean difference with its sign agreement.
+18. **Spin-up and decay calibration choices in the UI** - TO DO (user, 2026-10-26). The dead-matter calibration (stage 3) and spin-up
+   (stage 4) rest on assumptions a user should be able to see and set, in a Carbon Options group (or its own page): (a) the calibration
+   targets - FIA's measured down woody material pools (coarse and fine woody debris, litter, duff, standing dead) or the condition
+   table's modelled down dead and litter; (b) the stand ages fitted - mature stands only, from a minimum age (60 years by default; the
+   user expects it to vary by forest type eventually), excluding conditions with a recorded fire or harvest in the past N years; (c) the
+   spin-up's last disturbance - high-severity fire (default, as the old LUCAS spin-up), clearcut, or a mix; (d) the **fire return
+   interval** of the spin-up cycles - today each cell's LANDFIRE FRI_REPLAC (stage 5), to be shown and overridable (per forest type or
+   a single value); (e) the pool groupings matched to FIA (src/dom.R FIA_DOM), at least documented on the page. Young stands are a
+   check on the disturbance flows (fire and harvest event flows), not a calibration target. Design and dev results: dev/nfcms and
+   dev/fia FINDINGS.md.
