@@ -3,9 +3,11 @@
 # =============================================================================
 # Targets: FIA standing dead (measured), down dead and litter (FIA's national model estimates) by stand age band; soil to gSSURGO
 # (user 2026-10-20: FIA soil carbon is not reliable). Parameters per cell (>= MinPlots FIA plots) or per forest type (its cells with
-# plots pooled): decay multipliers for snags (decay, emission and fall), down wood (AG medium + fast), forest floor (AG very fast + slow),
-# on a log scale within [0.05, 20], and the share of stands whose last disturbance was a clearcut rather than high-severity fire. Then
-# one soil multiplier per cell so the belowground pools, averaged over the disturbance cycle, match the cell's mean gSSURGO carbon.
+# plots pooled): decay multipliers for snags (decay, emission and fall), down wood (AG medium + BG fast), forest floor (AG very fast +
+# fast + slow) - the pools grouped as FIADB defines its pools (src/dom.R FIA_DOM, 2026-10-26; before, AG fast counted as down wood and
+# BG fast as soil) - on a log scale within [0.05, 20], and the share of stands whose last disturbance was a clearcut rather than
+# high-severity fire. Then one soil multiplier per cell so mineral soil (BG very fast + slow), averaged over the disturbance cycle,
+# matches the cell's mean gSSURGO carbon.
 # Known limitation (accepted 2026-10-20): down dead cannot match at every age - after a clearcut the model drops all branches and tops
 # into down wood (too much in young stands) while mature stands get too little; the fitted clearcut share sits near 1.
 # =============================================================================
@@ -58,15 +60,15 @@ cal_fit <- function(rows, ctx, dat) {
                     lower = c(rep(log(0.05), 3), -6), upper = c(rep(log(20), 3), 6), control = list(maxit = 300))
   list(snag = exp(o$par[1]), cwd = exp(o$par[2]), floor = exp(o$par[3]), clearcut = stats::plogis(o$par[4]), loss0 = l0, loss1 = o$value) }
 
-# cycle-averaged belowground carbon (BG very fast + fast + slow, the quantity matched to gSSURGO) of one cell for given multipliers
+# cycle-averaged mineral soil carbon (FIA_DOM$soil: BG very fast + slow; dead coarse roots are down dead), the quantity matched to gSSURGO, of one cell for given multipliers
 cal_bg <- function(k, ctx, mult, w) { S <- cal_setup(k, ctx); d <- cal_dom(S, ctx$fo, mult, w)
-  mean(rowSums(d[1:min(S$k$ri, nrow(d)), c("BGVF", "BGF", "BGS"), drop = FALSE])) }
+  mean(rowSums(d[1:min(S$k$ri, nrow(d)), FIA_DOM$soil, drop = FALSE])) }
 
-# soil multiplier of one cell so the cycle-averaged belowground carbon equals the target (NA when it cannot be reached)
+# soil multiplier of one cell so the cycle-averaged mineral soil carbon equals the target (NA when it cannot be reached)
 cal_soil <- function(k, ctx, mult, w) {
   if (is.na(k$soil_target)) return(NA_real_)
   S <- cal_setup(k, ctx)
   bg <- function(ms) { d <- cal_dom(S, ctx$fo, utils::modifyList(mult, list(soil = ms)), w)
-    mean(rowSums(d[1:min(S$k$ri, nrow(d)), c("BGVF", "BGF", "BGS"), drop = FALSE])) }
+    mean(rowSums(d[1:min(S$k$ri, nrow(d)), FIA_DOM$soil, drop = FALSE])) }
   r <- tryCatch(stats::uniroot(function(lm) log(bg(exp(lm))) - log(k$soil_target), c(log(0.02), log(50)))$root, error = function(e) NA_real_)
   exp(r) }

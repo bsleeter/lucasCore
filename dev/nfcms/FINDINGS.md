@@ -88,3 +88,19 @@ wood decay multipliers 0.5-0.6 in the conifers, forest floor decay 1.3-2.7, snag
 - Candidate fixes (dev first): fire rather than clearcut as the spin-up's last disturbance where fire is the regime (trims the young-stand
   residue that pushes the fit); separate snag fall from snag decay (one multiplier moves both, and the oak fit sits at its bound);
   look at Fir/Spruce and Lodgepole's mid-age down wood. The down dead target is uncertain: current FIADB is 1/0.7 x the calibrated values.
+
+## Stage 3 recalibrated with the FIA-consistent grouping (tests/phaseZ6-dom-grouping.R, out/grouping-test.csv)
+
+Suitability test library, stages 3-4 on Build result 47's inputs, against result 47 (old grouping). Spin-up dead pools by stand age band,
+pooled the FIA way, against FIA (USGS table), plot-weighted RMSE over every cell x band with >= 10 plots: **down dead 13.4 -> 9.0 Mg C/ha,
+forest floor 11.8 -> 2.9, standing dead 3.2 -> 3.0.**
+
+- Multipliers: down wood decay halves (Mediterranean Mountains conifers 0.5-0.6 -> 0.24-0.37) to build AG Medium + dead coarse roots;
+  forest floor decay rises (1.3-2.0 -> 1.7-2.4); soil a little slower. **Western Oak's snag multiplier comes off its bound (20 -> 1.27)**:
+  its standing dead goes from about 0.5 to 1.7-4.7 Mg C/ha against FIA's 1.1-6.6. Tanoak stays at the bound.
+- Forest floor now matches FIA by age (Mixed Conifer 14-23 vs 13-19; Ponderosa 10-13 vs 8-12).
+- Down dead in mature stands is much closer (Mixed Conifer 100-300 yr: 19.5-23 vs FIA 27-28, was 8.5-12), but young stands are now far
+  above FIA (0-20 yr: 38-45 vs 11-13): the clearcut share stays near 1 (0.84-0.99), so the spin-up's last disturbance leaves all
+  branches, tops and stumps on site, and the slower down wood decay keeps them longer. The young-stand residue is the remaining misfit;
+  the next lever is the spin-up's last disturbance (fire where fire is the regime, or a clearcut share bounded by the observed harvest
+  share), then separating snag fall from snag decay.

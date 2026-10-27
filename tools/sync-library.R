@@ -10,6 +10,7 @@
 #   3. every lucasCore transformer and stage name the library lacks, with its stage value: new ids from the library's own id counter
 #      (core_Sequence)
 #   4. project definitions the package defaults gained (stsim State Attribute Types): added through rsyncrosim
+#   5. the stock group memberships of non-result scenarios (the Stock-Flow Definitions scenario), set to the package defaults
 # Close the library in SyncroSim Studio first. Usage: Rscript tools/sync-library.R <library.ssim> [--dry-run]
 # =============================================================================
 suppressPackageStartupMessages({ library(DBI); library(RSQLite); library(data.table) })
@@ -60,5 +61,16 @@ if (!dry) { dbDisconnect(con); on.exit(dbDisconnect(ref))
   miss <- want[!Name %in% sat$Name]
   if (nrow(miss)) { saveDatasheet(P, as.data.frame(miss[, intersect(names(miss), names(sat)), with = FALSE]), "stsim_StateAttributeType", append = TRUE)
     cat("added State Attribute Types:", paste(miss$Name, collapse = ", "), "\n") } else cat("State Attribute Types up to date\n")
+  # ---- 5. stock group memberships of non-result scenarios (the Stock-Flow Definitions scenario) -----------------------------------
+  # stage 0 writes the package's memberships only into a Build without them; a library made by new-library.R carries its own copy in the
+  # Stock-Flow Definitions scenario, so a change of the package's groups (2026-10-26: DOM: Litter = the forest floor incl. AG Slow, as
+  # FIADB) is copied here. Results keep the groups they ran with until re-run.
+  sm <- as.data.table(scenario(L, summary = TRUE)); want_m <- fread(file.path(pkg, "defaults", "stockflow", "stsim_StockTypeGroupMembership.csv"), na.strings = "")
+  key <- function(d) sort(paste(d$StockTypeId, d$StockGroupId))
+  for (sid in sm[IsResult == "No", ScenarioId]) { S <- scenario(L, sid)
+    have_m <- as.data.table(datasheet(S, "stsim_StockTypeGroupMembership", lookupsAsFactors = FALSE, optional = TRUE))
+    if (!nrow(have_m) || identical(key(have_m), key(want_m))) next
+    saveDatasheet(S, as.data.frame(want_m[, .(StockTypeId, StockGroupId)]), "stsim_StockTypeGroupMembership", append = FALSE)
+    cat(sprintf("stock group memberships of scenario %d (%s) updated to the package's (%d rows)\n", sid, sm[ScenarioId == sid, Name], nrow(want_m))) }
   st <- levels(datasheet(scenario(L, as.data.table(scenario(L, summary = TRUE))$ScenarioId[1]), "core_Pipeline", lookupsAsFactors = TRUE, optional = TRUE)$StageNameId)
   cat("stages now:", paste(st, collapse = " | "), "\n") }

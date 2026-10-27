@@ -14,10 +14,15 @@
 DOM_POOLS <- c(AGVF = "DOM: Aboveground Very Fast", BGVF = "DOM: Belowground Very Fast", AGF = "DOM: Aboveground Fast", BGF = "DOM: Belowground Fast",
                AGM = "DOM: Aboveground Medium", AGS = "DOM: Aboveground Slow", BGS = "DOM: Belowground Slow", SnagStem = "DOM: Snag Stem",
                SnagBranch = "DOM: Snag Branch")
-# FIA dead-carbon pools and the DOM pools they are compared with
-FIA_DOM <- list(standing_dead = c("SnagStem", "SnagBranch"), down_dead = c("AGM", "AGF"), litter = c("AGVF", "AGS"), soil = c("BGVF", "BGF", "BGS"))
-# calibration groups: which pools' outflows (decay, emission and snag fall) each multiplier scales
-DECAY_GROUPS <- list(snag = c("SnagStem", "SnagBranch"), cwd = c("AGM", "AGF"), floor = c("AGVF", "AGS"), soil = c("BGVF", "BGF", "BGS"))
+# FIA dead-carbon pools and the DOM pools they are compared with, by FIADB's definitions (user decision 2026-10-26; dev/nfcms/FINDINGS.md):
+#   standing dead  CARBON_AG of standing dead trees                                        Snag Stem + Snag Branch
+#   down dead      CARBON_DOWN_DEAD: wood > 3 in on the ground, stumps and their roots     AG Medium (down stems) + BG Fast (dead coarse roots)
+#   litter         CARBON_LITTER: the forest floor - litter, fine woody debris, humus       AG Very Fast + AG Fast (branch litter) + AG Slow (humus)
+#   soil           mineral soil, no roots (matched to gSSURGO, not FIA)                     BG Very Fast + BG Slow
+# The LUCAS stock groups pool the same way (DOM: Standing Deadwood, DOM: Down Deadwood, DOM: Litter, DOM: Soil + Deep Soil).
+FIA_DOM <- list(standing_dead = c("SnagStem", "SnagBranch"), down_dead = c("AGM", "BGF"), litter = c("AGVF", "AGF", "AGS"), soil = c("BGVF", "BGS"))
+# calibration groups: which pools' outflows (decay, emission and snag fall) each multiplier scales - the same pools as the FIA targets
+DECAY_GROUPS <- list(snag = c("SnagStem", "SnagBranch"), cwd = c("AGM", "BGF"), floor = c("AGVF", "AGF", "AGS"), soil = c("BGVF", "BGS"))
 
 # scale the DOM outflows (decay, emission, snag fall) of each decay group by its multiplier; AG Slow -> BG Slow keeps the CBM rate.
 # A pool cannot lose more than its stock in a year: if a pool's outflows exceed 1 they are scaled down together. Used both in calibration
