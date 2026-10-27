@@ -172,3 +172,16 @@ Rerun (decay refitted to mature stands with the new spin-up fire; multipliers ba
 - Forest floor after fire stays high (15-18 vs 4-7): the fire now burns 80% of the humus, so the excess comes from what falls in right
   after (killed foliage and fine roots go to leaf litter, branch snags to fine woody debris) - to check next.
 - Samples are small (11 clearcut pairs; the fire pairs mostly Western Oak): these values are a first fit for P26's region, not CONUS.
+
+## Post-fire forest floor: a spin-up bug (10-postfire-floor.R; fixed in src/dom.R 2026-10-26)
+
+Tracing California Mixed Conifer's forest floor through a high-severity fire showed the fire burned none of it (leaf litter 9.4 -> 9.4,
+humus 9.0 -> 9.0). disturbance_matrices() took the largest FromAgeMin over the whole event, so from age 11 a fire kept only its age-11
+live-pool rows and dropped every blank-age row - all dead-pool burning (forest floor, fine woody debris, down logs, snags) and the fine
+root mortality. ST-Sim applies blank-age rows at every age, so runs burned dead pools while the spin-up and the decay calibration (stages
+3 and 4) never did. Fixed: the age row is chosen per from -> to stock pair. Only the three fire events have age-specific rows.
+
+With the fix and the fitted event table, the floor just after a fire is 5.1 Mg C/ha (humus left 1.8, killed foliage and fine roots 3.3),
+and against the plots, 0-5 / 5-10 / 10-20 years after high-severity fire (measured / model): Mixed Conifer 6.5/6.3, 6.6/7.3, 7.6/8.4;
+Ponderosa 4.0/4.9; Fir/Spruce 3.1/5.2; Western Oak 4.8/3.6. The mature-stand calibration is essentially unchanged (mature stands are far
+from the spin-up fire). Every Build's stage 3-4 results change with the fix: young stands' initial dead pools were overstated.

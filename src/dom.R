@@ -58,12 +58,14 @@ dom_matrices <- function(vals, flow_order, mult = NULL) {
   list(A = Apost %*% Apre, Apost = Apost, Tm = Tm) }
 
 # disturbance as matrices from the LUCAS event flows of one transition group (rows with no state class, or this class), for a stand
-# of the given age: event flows can depend on age (fire: one set for ages 0-10, another from 11), so the rows with the largest
-# FromAgeMin not above the age apply
+# of the given age: event flows can depend on age (fire: one set of live-pool rows for ages 0-10, another from 11), so for each
+# from -> to stock pair the row with the largest FromAgeMin not above the age applies; a pair with only a blank age applies at every age.
+# (Fixed 2026-10-26: the largest FromAgeMin was taken over the whole event, so from age 11 fire dropped every dead-pool row - the
+# spin-up's fires never burned forest floor, woody debris or snags, while ST-Sim's runs did.)
 disturbance_matrices <- function(events, group, state_class, age) {
   e <- events[TransitionGroupId == group & (is.na(FromStateClassId) | FromStateClassId == state_class)]
-  amin <- suppressWarnings(as.numeric(e$FromAgeMin)); amin[is.na(amin)] <- 0
-  e <- e[amin == max(amin[amin <= age])]
+  e[, amin := suppressWarnings(as.numeric(FromAgeMin))][is.na(amin), amin := 0]
+  e <- e[amin <= age][, .SD[amin == max(amin)], by = .(FromStockTypeId, ToStockTypeId)]
   if (!nrow(e)) stop("no event flows for ", group, call. = FALSE)
   P <- names(DOM_POOLS); code <- function(s) names(DOM_POOLS)[match(s, DOM_POOLS)]
   Dd <- diag(length(P)); dimnames(Dd) <- list(P, P); Dl <- matrix(0, length(P), length(LIVE_POOLS), dimnames = list(P, names(LIVE_POOLS)))
