@@ -14,7 +14,10 @@
 # Usage: Rscript dev/fia/06-calibrate-measured.R
 # =============================================================================
 suppressPackageStartupMessages({ library(data.table); library(sf); library(terra); library(DBI) })
-pkg <- "F:/lucasCore"; dm <- "F:/lucas-master/Data Sources/FIA/DataMart"; out <- file.path(pkg, "dev/fia/out-cal"); dir.create(out, showWarnings = FALSE)
+pkg <- "F:/lucasCore"; dm <- "F:/lucas-master/Data Sources/FIA/DataMart"
+# dev variants (09-fit-events.R): LUCAS_CAL_OUT = output folder, LUCAS_EVENT_FILE = event flow table in place of the package's
+out <- Sys.getenv("LUCAS_CAL_OUT", file.path(pkg, "dev/fia/out-cal")); dir.create(out, showWarnings = FALSE)
+event_file <- Sys.getenv("LUCAS_EVENT_FILE", file.path(pkg, "defaults/stockflow/event-pathways.csv")); cat("event flows:", event_file, "\n")
 for (f in c("growth.R", "flows.R", "dom.R", "calibrate.R")) source(file.path(pkg, "src", f))
 lib <- file.path(pkg, "dev/libs/LUCAS P26 Demo Library.ssim"); MIN_AGE <- 60L; RECENT <- 30L
 TYPES <- c(`370` = "California Mixed Conifer Group", `260` = "Fir/Spruce/Mountain Hemlock Group", `220` = "Ponderosa Pine Group", `920` = "Western Oak Group")
@@ -31,7 +34,7 @@ cw <- fread(file.path(pkg, "defaults/growth/forest-type-crosswalk.csv")); dens <
 cw[, StateClass := scl$Name[match(StateClassId, scl$Id)]]
 clim <- ecodiv_climate(ds$EcodivisionFile, ds$PrismFolder)
 ctx <- list(cc = cc, cw = cw, dens = dens, cbm = file.path(pkg, "defaults/cbm"), fo = fread(file.path(pkg, "defaults/stockflow/stsim_FlowOrder.csv")),
-            ev = fread(file.path(pkg, "defaults/stockflow/event-pathways.csv"), na.strings = ""))
+            ev = fread(event_file, na.strings = ""))
 cells <- data.table(sc = as.integer(names(TYPES)), StateClass = paste0("Forest: ", TYPES), Stratum = STRATUM, ecodiv = ECODIV, temp = clim$mat[match(ECODIV, clim$ecodiv)])
 cells[, ri := as.integer(round(as.numeric(ri5$ReturnInterval[match(paste(STRATUM, StateClass), paste(nm(ri5$StratumId, stl), nm(ri5$StateClassId, scl)))])))]
 cells[, soil_target := as.numeric(so5$SoilTarget[match(paste(STRATUM, StateClass), paste(nm(so5$StratumId, stl), nm(so5$StateClassId, scl)))])]

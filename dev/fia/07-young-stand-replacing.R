@@ -11,7 +11,7 @@
 # Usage: Rscript dev/fia/07-young-stand-replacing.R
 # =============================================================================
 suppressPackageStartupMessages(library(data.table))
-pkg <- "F:/lucasCore"; dm <- "F:/lucas-master/Data Sources/FIA/DataMart"; out <- file.path(pkg, "dev/fia/out-cal")
+pkg <- "F:/lucasCore"; dm <- "F:/lucas-master/Data Sources/FIA/DataMart"; out <- Sys.getenv("LUCAS_CAL_OUT", file.path(pkg, "dev/fia/out-cal"))
 r <- readRDS(file.path(out, "calibration.rds")); ECODIV <- "M260"
 TYPES <- c(`370` = "California Mixed Conifer", `260` = "Fir/Spruce/Mountain Hemlock", `220` = "Ponderosa Pine", `920` = "Western Oak")
 LB <- 0.000453592 * 2.471

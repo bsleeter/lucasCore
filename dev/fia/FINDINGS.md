@@ -145,3 +145,30 @@ Western Oak. Against the model's fire-last and clearcut-last curves (decay calib
 - So after decay is fitted to mature stands, the young-stand misfit belongs to the LUCAS disturbance flows (defaults/stockflow/
   event-pathways.csv): high-severity fire's share killed to snags vs consumed, and its forest floor consumption; clearcut's share of
   branches and tops left on site. These are the next things to compare with the plots.
+
+## Event flows fitted to FIA before/after pairs (08-event-shares.R, 09-fit-events.R, event-pathways-fitted.csv, out-cal-events/)
+
+Pairs: a DWM visit 0-5 years after a stand-replacing event and the same condition at the previous visit, before it; stand-replacing =
+live aboveground wood after <= 20% of before. Shares of the live aboveground wood before (ratio of sums):
+
+| | FIA pairs | LUCAS today |
+| --- | --- | --- |
+| High-severity fire (65 pairs: 53 Western Oak, 8 Mixed Conifer, 2 Fir/Spruce, 2 Ponderosa): snags | 0.54 | 0.97 |
+| ... down logs added within 5 years | ~0 | 0 |
+| ... forest floor kept | 0.18 | 0.46 |
+| Clearcut (11 pairs, 8 Mixed Conifer): slash (fine woody debris + down logs added) | 0.04 | 0.32 |
+| ... snags | ~0 | 0 |
+| ... forest floor kept | 0.71 | 1.00 |
+
+Fitted values (stands >= 11 yr), in a dev copy of the event table: fire - merchantable -> snag 0.65 (emitted 0.35), other wood -> snag
+0.30 (emitted 0.70), humus (AG Slow) emitted 0.80 (was 0.08); clearcut - other wood and foliage left on site 0.13 (the rest emitted, as
+pile burning: an assumption, it could be removed instead), leaf litter and humus 29% emitted.
+
+Rerun (decay refitted to mature stands with the new spin-up fire; multipliers barely move: down logs 0.60-0.78, the rest within 0.05):
+- Clearcut now matches: Mixed Conifer 0-5 yr fine woody debris 10.8 vs 5.9 (was 27.6), forest floor 14 vs 13-15 (was 27).
+- Fire snags halve but stay above the plots: Mixed Conifer 0-5 yr 79 vs 38 (was 128), Fir/Spruce 90 vs 61, Western Oak 36 vs 27,
+  Ponderosa 33 vs 23. With the share now matched, the rest is the size of the stand that burned: the model burns its spin-up stand at the
+  return interval (154-200 yr), larger than the average stand FIA saw burn.
+- Forest floor after fire stays high (15-18 vs 4-7): the fire now burns 80% of the humus, so the excess comes from what falls in right
+  after (killed foliage and fine roots go to leaf litter, branch snags to fine woody debris) - to check next.
+- Samples are small (11 clearcut pairs; the fire pairs mostly Western Oak): these values are a first fit for P26's region, not CONUS.
