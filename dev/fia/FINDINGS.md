@@ -185,3 +185,23 @@ With the fix and the fitted event table, the floor just after a fire is 5.1 Mg C
 and against the plots, 0-5 / 5-10 / 10-20 years after high-severity fire (measured / model): Mixed Conifer 6.5/6.3, 6.6/7.3, 7.6/8.4;
 Ponderosa 4.0/4.9; Fir/Spruce 3.1/5.2; Western Oak 4.8/3.6. The mature-stand calibration is essentially unchanged (mature stands are far
 from the spin-up fire). Every Build's stage 3-4 results change with the fix: young stands' initial dead pools were overstated.
+
+## Size of the stand that burns (11-burned-stand-size.R, out-cal-events/burned-stand-size.csv)
+
+High-severity fire plots in Mediterranean Mountains with a visit before the fire (237 of 327): live aboveground wood and stand age at
+that visit, against the model's spin-up stand at the return interval (P26 carbon curves), Mg C/ha:
+
+| Type | FIA before fire: mean (median) | FIA stand age before: mean (median) | Model at the return interval | Return interval |
+| --- | --- | --- | --- | --- |
+| California Mixed Conifer (52) | 136 (114) | 125 (105) | 150 | 154 |
+| Fir/Spruce/Mountain Hemlock (21) | 148 (131) | 140 (130) | 161 | 200 |
+| Ponderosa Pine (18) | 89 (62) | 116 (105) | 82 | 168 |
+| Western Oak (146) | 55 (32) | 85 (75) | 77 | 164 |
+
+- For the conifers the model burns a stand close to FIA's average burned stand (within about 10%; larger than the median, since the
+  distribution is skewed). Western Oak burns at 40% more wood than FIA's burned oak stands, which were younger (85 vs the 164-year cycle).
+- So stand size explains only part of the snag excess after fire (Mixed Conifer: model 77 vs measured 38 Mg C/ha at 0-5 years). The rest
+  is the snag share and how fast fire-killed snags come down: the 0.54 share is pooled over pairs that are mostly Western Oak (Mixed Conifer's
+  own 8 pairs give 0.46), and the measured snags fall faster in the first decade than the model's (Mixed Conifer 38 -> 49 -> 22 vs 77 ->
+  55 -> 38 at 0-5, 5-10, 10-20 yr). Next: type-specific snag shares where pairs allow, and a check of post-fire snag fall rates from
+  remeasured fire-killed trees.
