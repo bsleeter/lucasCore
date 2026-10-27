@@ -39,9 +39,9 @@ cal_setup <- function(k, ctx) {
   fixed <- character()
   if (!is.null(k$snag_fall) && !is.na(k$snag_fall)) { vals <- set_snag_fall(vals, k$snag_fall); fixed <- SNAG_FALL_FLOWS }   # measured snag fall
   list(k = k, live = live, vals = vals, fixed = fixed,
-       hist = spinup_history(ctx$ev, k$StateClass, k$ri, k$hist_cc),   # historical cycles (Spin-up: share ended by clearcut)
-       fire = disturbance_matrices(ctx$ev, FIRE_GROUP, k$StateClass, k$ri),
-       harv = disturbance_matrices(ctx$ev, CLEARCUT_GROUP, k$StateClass, k$ri)) }
+       hist = spinup_history(ctx$ev, k$StateClass, k$ri, k$hist_cc, k$Stratum),   # historical cycles (Spin-up: share ended by clearcut)
+       fire = disturbance_matrices(ctx$ev, FIRE_GROUP, k$StateClass, k$ri, k$Stratum),   # the cell's own event rows (Disturbance Flows)
+       harv = disturbance_matrices(ctx$ev, CLEARCUT_GROUP, k$StateClass, k$ri, k$Stratum)) }
 cal_dom <- function(S, fo, mult, w) { m <- dom_matrices(S$vals, fo, mult, S$fixed)
   (1 - w) * dom_by_age(m, S$live, S$k$ri, S$hist, S$fire) + w * dom_by_age(m, S$live, S$k$ri, S$hist, S$harv) }
 

@@ -40,10 +40,10 @@ return interval, number of cycles, maximum age), Disturbance (CBM disturbance ty
 | Calibration settings: mature age 60, no fire/cut in 30 yr, 30 plots for own litter/duff fit, 200 snags for own fall rate, multiplier range 0.05-20, regional vs per-type scope | 3 | src/3-carbon-flows.R, src/calibrate.R | no (to-do 18) |
 | The fitted decay multipliers and snag fall rates | 3 | Decay Calibration output | no override (to-do 20) |
 | Soil targets (gSSURGO per cell) | 3 | stage 5 output, else defaults/spinup/soil-targets.csv | no |
-| Disturbance transfers (each event: share of each pool to each pool / atmosphere / harvest) | 3, 4, runs | defaults/stockflow/event-pathways.csv | no |
-| High-severity fire snag share per forest type | 3, 4 | defaults/spinup/fire-snag-share.csv | no |
-| Spin-up historical disturbance (high-severity fire) and last disturbances (fire, clearcut) | 4 | src/4-initial-stocks.R | no |
-| Spin-up return interval per cell | 3, 4 | stage 5 (LANDFIRE FRI), else defaults/spinup/return-interval.csv | no |
+| Disturbance transfers (each event: share of each pool to each pool / atmosphere / harvest) | 3, 4, runs | defaults/stockflow/event-pathways.csv | Carbon Assumptions: Disturbance Flows (fire, clearcut; 2026-10-28) |
+| High-severity fire snag share per forest type | 3, 4 | defaults/spinup/fire-snag-share.csv | Carbon Assumptions: Fire Snag Share (2026-10-28) |
+| Spin-up historical disturbance (high-severity fire) and last disturbances (fire, clearcut) | 4 | src/4-initial-stocks.R | Carbon Assumptions: Spin-up (2026-10-28) |
+| Spin-up return interval per cell | 3, 4 | stage 5 (LANDFIRE FRI), else defaults/spinup/return-interval.csv | Carbon Assumptions: Spin-up (2026-10-28) |
 | Flow order, stock groups, flow groups | all | Stock-Flow Definitions scenario | yes (ST-Sim sheets) |
 
 ## Proposal: "Carbon Assumptions" sheets, filled with the package defaults
@@ -110,3 +110,15 @@ calibrated, measured, user).
   stage 4 spins up with them; stage 8 applies the last disturbance. Stage 4 still builds curves for both last disturbances. Empty by
   default. Test: tests/phaseZ11-spinup.R (Placer: mixed conifer age-100 dead carbon after fire 101 -> 116 Mg C/ha at 300 yr with half
   clearcut cycles, 112 -> 92 at 60 yr; Western Oak post-fire share 0.20 -> 1.0; every other type unchanged).
+- 2026-10-28 **Disturbance Flows and Fire Snag Share done**: two scenario sheets in Carbon Assumptions, filled from the package
+  defaults (39 and 4 rows). Disturbance Flows: high-severity fire and clearcut only (user decision; the other events keep
+  defaults/stockflow/event-pathways.csv), one row per flow - ecodivision and forest type optional, disturbance, from stand age, from
+  pool, to pool, share. To = Atmosphere is the carbon burned, written as 90% CO2 / 9% CO / 1% CH4 (the split of every default row, so
+  merging the gas rows loses nothing); the flow type follows the destination. Precedence per from -> to pair is ST-Sim's, measured in
+  dev/stsim/02-stratum-row-precedence.R: ecodivision + forest type, then ecodivision, then forest type, then blank, each hiding the less
+  specific rows at every age. Stage 3 expands an ecodivision row with a blank forest type to every class (so the untested ecodivision-only
+  vs forest-type-only order never arises), gives every specific row set the younger age rows it would hide, and checks that each pool's
+  shares add to at most 1 (stops the run otherwise). Fire Snag Share: per forest type (ecodivision optional), applied on top of the cell's
+  flows; a Disturbance Flows row for an ecodivision + forest type wins for its pool. The spin-up (stages 3, 4) resolves rows per
+  ecodivision too. Test: tests/phaseZ12-disturbance-flows.R (default-filled sheets reproduce phaseZ11's base exactly; clearcut merch to
+  dead wood 0.03 -> 0.15 raises median AG Medium at age 0 from 4.1 to 11.4 Mg C/ha; an over-full row stops stage 3).

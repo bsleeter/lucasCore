@@ -336,6 +336,33 @@
 	     than high-severity fire (the spin-up solves the average cycle); blank = 0, all fire. Last disturbance where no fire perimeter: stage 8
 	     gives a forest cell the curves after high-severity fire where an interagency perimeter of 1900 to the start year covers it, and this
 	     disturbance elsewhere; blank = clearcut. Stage 4 always builds curves for both last disturbances. Empty sheet = all defaults. -->
+	<!-- Carbon Assumptions: Disturbance Flows - the carbon flows of high-severity fire and clearcut (the other events keep the package's
+	     LUCAS defaults, defaults/stockflow/event-pathways.csv). One row per flow: the share of the From pool that goes to the To pool when
+	     the event happens, from the minimum stand age up (blank = 0; a later row for the same flow takes over from its age). To = Atmosphere
+	     is the carbon burned, written as 90% CO2, 9% CO and 1% CH4 (the split of every LUCAS default row); To = Forestry Sector is harvested
+	     wood. A row for a forest type and/or an ecodivision replaces the less specific rows of the same From -> To flow at every age (as
+	     ST-Sim does): ecodivision + forest type, then ecodivision, then forest type, then blank. Each pool's shares must add to at most 1.
+	     Empty = the package defaults. -->
+	<dataSheet name="DisturbanceFlow" displayName="Disturbance Flows">
+		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
+		<column name="StateClassId" displayName="Forest Type (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass" isOptional="True"/>
+		<column name="Disturbance" displayName="Disturbance" dataType="Integer" validationType="List" formula1="1:High-severity fire|2:Clearcut"/>
+		<column name="AgeMin" displayName="From Stand Age (blank = 0)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="FromStockTypeId" displayName="From Pool" dataType="Integer" validationType="Datasheet" formula1="stsim_StockType"/>
+		<column name="ToStockTypeId" displayName="To Pool (Atmosphere = burned)" dataType="Integer" validationType="Datasheet" formula1="stsim_StockType"/>
+		<column name="Share" displayName="Share of the From Pool" dataType="Double" format="0.0000" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+	</dataSheet>
+
+	<!-- Carbon Assumptions: Fire Snag Share - per forest type (optionally per ecodivision): the share of live aboveground wood (stands 11
+	     years and older) high-severity fire leaves standing as snags, split between stems and branches as the blank fire rows split them;
+	     the rest of that wood burns. Applied on top of the Disturbance Flows rows of the cell; a Disturbance Flows row for an ecodivision
+	     names a more specific level and wins for its pool. Empty = defaults/spinup/fire-snag-share.csv (fitted to FIA plots after fire). -->
+	<dataSheet name="FireSnagShare" displayName="Fire Snag Share">
+		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
+		<column name="StateClassId" displayName="Forest Type" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="Share" displayName="Share of Live Aboveground Wood Left as Snags" dataType="Double" format="0.00" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+	</dataSheet>
+
 	<dataSheet name="Spinup" displayName="Spin-up">
 		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
 		<column name="StateClassId" displayName="Forest Type" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
@@ -657,6 +684,8 @@
 	<transformer name="CarbonFlows" displayName="3 - Carbon Flows" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/3-carbon-flows.R">
 		<dataSheet name="LiveTurnover" type="Input"/>
 		<dataSheet name="Spinup" type="Input"/>
+		<dataSheet name="DisturbanceFlow" type="Input"/>
+		<dataSheet name="FireSnagShare" type="Input"/>
 		<dataSheet name="DomParameter" type="Input"/>
 		<dataSheet name="CarbonCurve" type="Input"/>
 		<dataSheet name="CarbonOptions" type="Input"/>
@@ -840,6 +869,8 @@
 				<item name="LiveTurnover"/>
 				<item name="DomParameter"/>
 				<item name="Spinup"/>
+				<item name="DisturbanceFlow"/>
+				<item name="FireSnagShare"/>
 			</group>
 			<group name="lucasCoreProjection" displayName="Projection">
 				<item name="ProjectionRun"/>

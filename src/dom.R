@@ -74,11 +74,19 @@ dom_matrices <- function(vals, flow_order, mult = NULL, fixed = character()) {
 # from -> to stock pair the row with the largest FromAgeMin not above the age applies; a pair with only a blank age applies at every age.
 # (Fixed 2026-10-26: the largest FromAgeMin was taken over the whole event, so from age 11 fire dropped every dead-pool row - the
 # spin-up's fires never burned forest floor, woody debris or snags, while ST-Sim's runs did.)
-# As in ST-Sim (dev/stsim/01-flow-row-precedence.R, 2026-10-27): where a pair has rows for this state class, they replace that pair's
-# blank-class rows at every age; the blank rows of the other pairs still apply.
-disturbance_matrices <- function(events, group, state_class, age) {
-  e <- data.table::copy(events[TransitionGroupId == group & (is.na(FromStateClassId) | FromStateClassId == state_class)])
-  e <- e[, if (any(!is.na(FromStateClassId))) .SD[!is.na(FromStateClassId)] else .SD, by = .(FromStockTypeId, ToStockTypeId)]
+# As in ST-Sim (dev/stsim/01-flow-row-precedence.R, 02-stratum-row-precedence.R, 2026-10-27/28): for each from -> to pair the most
+# specific rows present apply - ecodivision + state class, then ecodivision, then state class, then blank - and hide that pair's less
+# specific rows at every age; the other pairs keep their own rows. (Stage 3 expands ecodivision rows with a blank class to every class,
+# so the untested ecodivision-only vs class-only order never arises.)
+event_rows <- function(events, group, state_class, stratum = NA) {
+  e <- data.table::copy(events[TransitionGroupId == group])
+  if (!"FromStratumId" %in% names(e)) e[, FromStratumId := NA_character_]
+  e <- e[(is.na(FromStateClassId) | FromStateClassId == state_class) & (is.na(FromStratumId) | (!is.na(stratum) & FromStratumId == stratum))]
+  e[, lvl := 2L * (!is.na(FromStratumId)) + (!is.na(FromStateClassId))]
+  e <- e[, .SD[lvl == max(lvl)], by = .(FromStockTypeId, ToStockTypeId)]
+  e[, lvl := NULL][] }
+disturbance_matrices <- function(events, group, state_class, age, stratum = NA) {
+  e <- event_rows(events, group, state_class, stratum)
   e[, amin := suppressWarnings(as.numeric(FromAgeMin))][is.na(amin), amin := 0]
   e <- e[amin <= age][, .SD[amin == max(amin)], by = .(FromStockTypeId, ToStockTypeId)]
   if (!nrow(e)) stop("no event flows for ", group, call. = FALSE)
@@ -92,10 +100,10 @@ disturbance_matrices <- function(events, group, state_class, age) {
 # the disturbance that ends the spin-up's historical cycles (Carbon Assumptions: Spin-up): high-severity fire, or a share of clearcuts.
 # The dynamics are linear, so the average over cycles ended at random by fire or clearcut is the fixed point of the averaged matrices.
 FIRE_GROUP <- "Fire: High Severity [Type]"; CLEARCUT_GROUP <- "Forest Harvest: Forest Clearcut [Type]"
-spinup_history <- function(events, state_class, age, clearcut_share = 0) {
-  f <- disturbance_matrices(events, FIRE_GROUP, state_class, age)
+spinup_history <- function(events, state_class, age, clearcut_share = 0, stratum = NA) {
+  f <- disturbance_matrices(events, FIRE_GROUP, state_class, age, stratum)
   if (is.null(clearcut_share) || is.na(clearcut_share) || clearcut_share == 0) return(f)
-  h <- disturbance_matrices(events, CLEARCUT_GROUP, state_class, age); s <- clearcut_share
+  h <- disturbance_matrices(events, CLEARCUT_GROUP, state_class, age, stratum); s <- clearcut_share
   list(Dd = (1 - s) * f$Dd + s * h$Dd, Dl = (1 - s) * f$Dl + s * h$Dl) }
 
 # DOM by age since the last disturbance for one cell. live: matrix (ages 0..MaxAge) x 5 live pools; ri: return interval (yr)
@@ -114,17 +122,22 @@ dom_by_age <- function(mats, live, ri, hist, last, max_age = nrow(live) - 1) {
 # the FIA-comparable sums of a DOM-by-age matrix
 fia_dom_sums <- function(dom) sapply(FIA_DOM, function(p) rowSums(dom[, p, drop = FALSE]))
 
-# state-class rows for high-severity fire's live wood pairs from the per-forest-type snag shares (defaults/spinup/fire-snag-share.csv):
-# share = the part of live aboveground wood left standing (stems share x 0.65 / 0.545, branches share x 0.30 / 0.545 of the pool, the
-# blank rows' split), the rest of the pool burned (emission rows rescaled together). Every age row of each changed pair is repeated
-# for the class - older stands (FromAgeMin >= 11) get the share, younger ones keep the blank rows' values - because in ST-Sim a class
-# row hides the blank rows of its pair at every age. events: the event flow table (text columns); shares: state class name, Share.
+# rows for high-severity fire's live wood pairs from the per-forest-type snag shares (Carbon Assumptions: Fire Snag Share, else
+# defaults/spinup/fire-snag-share.csv): share = the part of live aboveground wood left standing (stems share x 0.65 / 0.545, branches
+# share x 0.30 / 0.545 of the pool, the blank rows' split), the rest of the pool burned (emission rows rescaled together). The rows
+# start from what the cell's wood pairs resolve to without the share and are written for its class (and ecodivision, when the share row
+# names one), at every age row - older stands (FromAgeMin >= 11) get the share, younger ones keep their values - because in ST-Sim a
+# more specific row hides the less specific rows of its pair at every age. events: the event flow table (text columns); shares:
+# StateClass name, Share, optional Stratum name. Returns the events with those rows in place of any at the same level.
 FIRE_HS <- "Fire: High Severity [Type]"
 fire_snag_rows <- function(events, shares) {
   WOOD <- c(`Biomass: Merchantable` = "DOM: Snag Stem", `Biomass: Other Wood` = "DOM: Snag Branch"); SPLIT <- c(`Biomass: Merchantable` = 0.65, `Biomass: Other Wood` = 0.30)
-  b <- events[TransitionGroupId == FIRE_HS & is.na(FromStateClassId) & FromStockTypeId %in% names(WOOD)]
-  if (!nrow(b) || !nrow(shares)) return(events[0])
-  data.table::rbindlist(lapply(seq_len(nrow(shares)), function(j) { x <- data.table::copy(b)[, FromStateClassId := shares$StateClass[j]]
+  events <- data.table::copy(events); if (!"FromStratumId" %in% names(events)) events[, FromStratumId := NA_character_]
+  if (!nrow(shares)) return(events)
+  if (!"Stratum" %in% names(shares)) shares[, Stratum := NA_character_]
+  new <- data.table::rbindlist(lapply(seq_len(nrow(shares)), function(j) { s <- shares$Stratum[j]; c0 <- shares$StateClass[j]
+    x <- event_rows(events, FIRE_HS, c0, s)[FromStockTypeId %in% names(WOOD)][, `:=`(FromStratumId = s, FromStateClassId = c0)]
+    if (!nrow(x)) return(NULL)
     old <- suppressWarnings(as.numeric(x$FromAgeMin)) >= 11 & !is.na(x$FromAgeMin)
     for (fr in names(WOOD)) { k <- old & x$FromStockTypeId == fr
       snag <- shares$Share[j] * SPLIT[[fr]] / 0.545
@@ -132,4 +145,66 @@ fire_snag_rows <- function(events, shares) {
       em <- k & grepl("^Atmosphere", x$ToStockTypeId); other <- k & !em & x$ToStockTypeId != WOOD[[fr]]
       rest <- 1 - snag - sum(as.numeric(x$Multiplier[other])); v <- as.numeric(x$Multiplier[em])
       if (sum(v) > 0) x[em, Multiplier := as.character(round(v / sum(v) * rest, 6))] }
-    x })) }
+    x }), use.names = TRUE)
+  if (!nrow(new)) return(events)
+  same <- paste(events$TransitionGroupId, events$FromStratumId, events$FromStateClassId, events$FromStockTypeId) %in%
+    unique(paste(new$TransitionGroupId, new$FromStratumId, new$FromStateClassId, new$FromStockTypeId))
+  rbind(events[!same], new, fill = TRUE) }
+
+# ---- Carbon Assumptions: Disturbance Flows (high-severity fire and clearcut) ------------------------------------------------------
+# A sheet row (ecodivision and forest type optional, disturbance, minimum stand age, from pool, to pool, share) is one event flow; a
+# row to "Atmosphere" is the carbon burned, written as ST-Sim's three gas rows (GAS_SPLIT, the shares of every LUCAS default row). The
+# flow type follows the destination: DOM or live pools = mortality, Atmosphere = emission of each gas, Forestry Sector = harvest.
+DF_GROUPS <- c(`High-severity fire` = "Fire: High Severity [Type]", Clearcut = "Forest Harvest: Forest Clearcut [Type]")
+GAS_SPLIT <- c(CO2 = 0.9, CO = 0.09, CH4 = 0.01)
+# the default event rows of the two disturbances as sheet rows (gas rows merged into one Atmosphere row)
+events_to_sheet <- function(events) {
+  e <- data.table::copy(events[TransitionGroupId %in% DF_GROUPS])
+  if (!"FromStratumId" %in% names(e)) e[, FromStratumId := NA_character_]
+  e[, To := ifelse(grepl("^Atmosphere: ", ToStockTypeId), "Atmosphere", ToStockTypeId)]
+  e[, .(Share = round(sum(as.numeric(Multiplier)), 6)), by = .(StratumId = FromStratumId, StateClassId = FromStateClassId,
+       Disturbance = names(DF_GROUPS)[match(TransitionGroupId, DF_GROUPS)], AgeMin = suppressWarnings(as.integer(FromAgeMin)), FromStockTypeId, ToStockTypeId = To)] }
+# sheet rows -> event rows in the event table's columns (template: an event table); classes: every state class name, for ecodivision
+# rows with a blank forest type (expanded to each class, so they rank above class-only rows as in event_rows)
+sheet_to_events <- function(x, template, classes) {
+  x <- data.table::copy(x)
+  x[, grp := ifelse(as.character(Disturbance) %in% c("High-severity fire", "1"), DF_GROUPS[[1]], ifelse(as.character(Disturbance) %in% c("Clearcut", "2"), DF_GROUPS[[2]], NA_character_))]
+  if (anyNA(x$grp)) stop("Disturbance Flows: unknown disturbance ", paste(unique(x$Disturbance[is.na(x$grp)]), collapse = ", "), call. = FALSE)
+  eco <- x[!is.na(StratumId) & is.na(StateClassId)]
+  if (nrow(eco)) { exp <- eco[rep(seq_len(nrow(eco)), each = length(classes))][, StateClassId := rep(classes, nrow(eco))]
+    own <- paste(x$grp, x$StratumId, x$StateClassId, x$FromStockTypeId, x$ToStockTypeId)
+    exp <- exp[!paste(grp, StratumId, StateClassId, FromStockTypeId, ToStockTypeId) %in% own]   # an explicit ecodivision + class row wins
+    x <- rbind(x[!(!is.na(StratumId) & is.na(StateClassId))], exp) }
+  atm <- x$ToStockTypeId == "Atmosphere"; n <- sum(atm)
+  gas <- x[atm][rep(seq_len(n), each = 3)][, `:=`(to = rep(paste0("Atmosphere: ", names(GAS_SPLIT)), n), ft = rep(paste0("LULC: Emission Live ", names(GAS_SPLIT)), n),
+                                                     v = Share * rep(GAS_SPLIT, n))]
+  rows <- rbind(x[!atm][, `:=`(to = ToStockTypeId, ft = ifelse(ToStockTypeId == "Forestry Sector", "LULC: Harvest Live", "LULC: Mortality Live"), v = Share)], gas)
+  out <- template[rep(1L, nrow(rows))]; for (k in names(out)) data.table::set(out, j = k, value = NA_character_)
+  out[, `:=`(FromStratumId = as.character(rows$StratumId), FromStateClassId = as.character(rows$StateClassId), FromAgeMin = as.character(rows$AgeMin),
+             FromStockTypeId = rows$FromStockTypeId, ToStockTypeId = rows$to, TransitionGroupId = rows$grp, FlowTypeId = rows$ft, Multiplier = as.character(round(rows$v, 8)))]
+  out }
+# every row set more specific than blank (class, ecodivision + class) gets the age rows of the next less specific level that start below
+# its own youngest row - in ST-Sim it hides those rows at every age, so stands younger than its first age would otherwise have no flow
+complete_ages <- function(events) {
+  e <- data.table::copy(events); if (!"FromStratumId" %in% names(e)) e[, FromStratumId := NA_character_]
+  e[, `:=`(lvl = 2L * (!is.na(FromStratumId)) + (!is.na(FromStateClassId)), amin = suppressWarnings(as.numeric(FromAgeMin)))][is.na(amin), amin := 0]
+  for (L in c(1L, 3L)) {
+    keys <- unique(e[lvl == L, .(TransitionGroupId, FromStratumId, FromStateClassId, FromStockTypeId, ToStockTypeId)])
+    add <- data.table::rbindlist(lapply(seq_len(nrow(keys)), function(i) { k <- keys[i]
+      own <- e[lvl == L & TransitionGroupId == k$TransitionGroupId & FromStockTypeId == k$FromStockTypeId & ToStockTypeId == k$ToStockTypeId &
+               FromStateClassId == k$FromStateClassId & (is.na(FromStratumId) & is.na(k$FromStratumId) | FromStratumId %in% k$FromStratumId)]
+      low <- e[lvl < L & TransitionGroupId == k$TransitionGroupId & FromStockTypeId == k$FromStockTypeId & ToStockTypeId == k$ToStockTypeId &
+               (is.na(FromStateClassId) | FromStateClassId == k$FromStateClassId) & (is.na(FromStratumId) | FromStratumId %in% k$FromStratumId)]
+      if (!nrow(low)) return(NULL)
+      low <- low[lvl == max(lvl) & amin < min(own$amin)]
+      if (nrow(low)) low[, `:=`(FromStratumId = k$FromStratumId, FromStateClassId = k$FromStateClassId, lvl = L)] }), use.names = TRUE)
+    if (nrow(add)) e <- rbind(e, add) }
+  e[, c("lvl", "amin") := NULL][] }
+# the largest share of any pool that one event moves, over every cell (stratum, state class) and age row: each pool's rows must add to <= 1
+event_balance <- function(events, cells) {
+  worst <- list(v = 0, what = "")
+  for (g in DF_GROUPS) for (i in seq_len(nrow(cells))) { e <- event_rows(events, g, cells$StateClass[i], cells$Stratum[i])
+    e[, amin := suppressWarnings(as.numeric(FromAgeMin))][is.na(amin), amin := 0]
+    for (a in unique(e$amin)) { s <- e[amin <= a][, .SD[amin == max(amin)], by = .(FromStockTypeId, ToStockTypeId)][, .(t = sum(as.numeric(Multiplier))), by = FromStockTypeId]
+      j <- which.max(s$t); if (s$t[j] > worst$v) worst <- list(v = s$t[j], what = sprintf("%s, %s / %s, age %g+, %s", sub(" \\[Type\\]$", "", g), cells$Stratum[i], cells$StateClass[i], a, s$FromStockTypeId[j])) } }
+  worst }

@@ -10,8 +10,9 @@
 # proposal.md: FIA down woody material in mature stands, regional snag / down log / fine woody debris decay, litter and duff per forest
 # type, snag fall from remeasured dead trees, fire as the spin-up's last disturbance), calibrated to FIA condition pools (snags, down
 # wood, floor; the earlier default), FIA condition pools with CBM-default soil, or CBM defaults throughout (the CONUS 1km build's way).
-# The measured and condition-pool calibrations fit soil to gSSURGO; every option logs spin-up soil against it. High-severity fire's snag share
-# per forest type (defaults/spinup/fire-snag-share.csv) is written as state-class event rows whatever the option.
+# The measured and condition-pool calibrations fit soil to gSSURGO; every option logs spin-up soil against it. High-severity fire and
+# clearcut flows come from Carbon Assumptions: Disturbance Flows, and fire's snag share per forest type from Fire Snag Share (else the
+# package defaults), written as event rows whatever the option.
 # Needs the Live-Tree Carbon Curves of stage 2 (same pipeline, or a dependency on a stage 2 result).
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
@@ -120,12 +121,38 @@ if (!is.null(study)) { cells <- cells[Stratum %in% study]
       paste(study, collapse = ", "), nrow(cells), nrow(all_cells)) }
 say("Decay calibration: %d cells, %d with >= %d FIA plots (own fit), %d with a gSSURGO soil target; return intervals %d-%d yr",
     nrow(cells), cells[plots >= MIN_PLOTS_CELL, .N], MIN_PLOTS_CELL, cells[!is.na(soil_target), .N], min(cells$ri), max(cells$ri))
-# event flows: the LUCAS defaults plus state-class rows for high-severity fire's per-forest-type snag share (defaults/spinup/
-# fire-snag-share.csv, src/dom.R fire_snag_rows); the spin-up uses the same table stage 3 writes to stsim_FlowPathway
-ev_all <- fread(pkg_file("defaults", "stockflow", "event-pathways.csv"), colClasses = "character", na.strings = "")
-fss <- read_default("spinup", "fire-snag-share.csv")[, `:=`(StateClass = scl$Name[match(StateClassId, scl$Id)], Share = as.numeric(Share))][!is.na(StateClass)]
-ev_all <- rbind(ev_all, fire_snag_rows(ev_all, fss))
-say("High-severity fire snag share by forest type: %s", if (nrow(fss)) paste(sprintf("%s %.2f", sub("^Forest: ", "", fss$StateClass), fss$Share), collapse = ", ") else "none (the event table's rows for every type)")
+# event flows: the LUCAS defaults (defaults/stockflow/event-pathways.csv), with high-severity fire and clearcut from Carbon Assumptions:
+# Disturbance Flows when the scenario has rows (src/dom.R sheet_to_events: ecodivision rows expanded to every class, every specific row
+# set given the younger age rows it hides), then each forest type's fire snag share (Carbon Assumptions: Fire Snag Share, else
+# defaults/spinup/fire-snag-share.csv; src/dom.R fire_snag_rows). The spin-up uses the same table stage 3 writes to stsim_FlowPathway.
+ev_def <- fread(pkg_file("defaults", "stockflow", "event-pathways.csv"), colClasses = "character", na.strings = "")[, FromStratumId := as.character(FromStratumId)]
+dfl <- as.data.table(datasheet(scn, ds("DisturbanceFlow"), optional = TRUE, lookupsAsFactors = FALSE))
+if (nrow(dfl)) {
+  dfl[, `:=`(StratumId = as.character(StratumId), StateClassId = as.character(StateClassId), Disturbance = as.character(Disturbance),
+             AgeMin = suppressWarnings(as.integer(AgeMin)), Share = as.numeric(Share))]
+  dfl[Disturbance %in% c("1", "2"), Disturbance := names(DF_GROUPS)[as.integer(Disturbance)]]
+  dup <- dfl[duplicated(dfl[, .(StratumId, StateClassId, Disturbance, AgeMin, FromStockTypeId, ToStockTypeId)])]
+  if (nrow(dup)) fail("Disturbance Flows: more than one row for %s", paste(unique(dup[, sprintf("%s %s -> %s%s", Disturbance, FromStockTypeId, ToStockTypeId,
+                                                                                               ifelse(is.na(StateClassId), "", paste0(" (", StateClassId, ")")))]), collapse = "; "))
+  ev_all <- rbind(ev_def[!TransitionGroupId %in% DF_GROUPS], complete_ages(sheet_to_events(dfl, ev_def, scl$Name)), fill = TRUE)
+  ky <- function(x) x[, paste(StratumId, StateClassId, Disturbance, AgeMin, FromStockTypeId, ToStockTypeId)]
+  d0 <- events_to_sheet(ev_def); k0 <- ky(d0); k1 <- ky(dfl)
+  diff_row <- (!k1 %in% k0) | abs(dfl$Share - d0$Share[match(k1, k0)]) > 1e-9; diff_row[is.na(diff_row)] <- TRUE
+  lab <- dfl[diff_row, sprintf("%s%s%s%s %s -> %s %.4f", ifelse(k1[diff_row] %in% k0, "", "+ "), ifelse(is.na(StratumId), "", paste0(StratumId, " / ")),
+                               ifelse(is.na(StateClassId), "", paste0(sub("^Forest: ", "", StateClassId), " ")), Disturbance, FromStockTypeId, ToStockTypeId, Share)]
+  say("Disturbance Flows: %d rows from Carbon Assumptions; vs the package defaults %d changed or added (+), %d removed%s", nrow(dfl), sum(diff_row), sum(!k0 %in% k1),
+      if (length(lab)) paste0(": ", paste(head(lab, 12), collapse = "; "), if (length(lab) > 12) "; ..." else "") else "")
+} else { ev_all <- copy(ev_def); say("Disturbance Flows: no rows - high-severity fire and clearcut flows from the package defaults") }
+fsh <- as.data.table(datasheet(scn, ds("FireSnagShare"), optional = TRUE, lookupsAsFactors = FALSE))
+fss <- if (nrow(fsh)) fsh[, .(Stratum = as.character(StratumId), StateClass = as.character(StateClassId), Share = as.numeric(Share))] else
+  read_default("spinup", "fire-snag-share.csv")[, .(Stratum = NA_character_, StateClass = scl$Name[match(StateClassId, scl$Id)], Share = as.numeric(Share))][!is.na(StateClass)]
+if (anyDuplicated(fss[, .(Stratum, StateClass)])) fail("Fire Snag Share: more than one row for a forest type and ecodivision")
+ev_all <- fire_snag_rows(ev_all, fss)
+say("High-severity fire snag share by forest type (%s): %s", if (nrow(fsh)) "Carbon Assumptions" else "package defaults",
+    if (nrow(fss)) paste(sprintf("%s%s %.2f", ifelse(is.na(fss$Stratum), "", paste0(fss$Stratum, " / ")), sub("^Forest: ", "", fss$StateClass), fss$Share), collapse = ", ") else "none (the event table's rows for every type)")
+eb <- event_balance(ev_all, cells)
+check(STAGE, "high-severity fire and clearcut move at most each pool's whole stock", eb$v <= 1 + 1e-4, sprintf("largest share %.4f (%s)", eb$v, eb$what))
+if (eb$v > 1 + 1e-4) finish_checks()   # rows are stored to 6 decimals
 dpt <- read_dom_parameters()   # Carbon Assumptions: Dead Organic Matter Parameters (each cell resolves its ecodivision rows, src/flows.R dom_parameters)
 ctx <- list(cc = cc, cw = cw, dens = dens, cbm = cbm, fo = fread(pkg_file("defaults", "stockflow", "stsim_FlowOrder.csv")), ev = ev_all, dpt = dpt)
 t0 <- Sys.time(); cl <- parallel::makeCluster(max(1, min(30, parallel::detectCores() - 1)))

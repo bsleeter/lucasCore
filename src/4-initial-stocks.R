@@ -49,9 +49,9 @@ for (i in seq_len(nrow(cells))) { s <- cells$Stratum[i]; c0 <- cells$StateClass[
   m <- dom_matrices(vals, fo)                                   # already calibrated: no further multipliers
   live <- as.matrix(cc[Stratum == s & StateClass == c0][order(Age), names(LIVE_POOLS), with = FALSE])
   ages <- cc[Stratum == s & StateClass == c0][order(Age), Age]
-  hist <- spinup_history(ev, c0, ri, cells$hist_cc[i])
+  hist <- spinup_history(ev, c0, ri, cells$hist_cc[i], s)
   res[[i]] <- rbindlist(lapply(names(LAST), function(d) {
-    dom <- dom_by_age(m, live, ri, hist, disturbance_matrices(ev, LAST[[d]], c0, ri))
+    dom <- dom_by_age(m, live, ri, hist, disturbance_matrices(ev, LAST[[d]], c0, ri, s))
     # one more check of the dynamics: a year of decay and turnover from age a lands on age a + 1
     a <- min(50L, nrow(dom) - 2L); nxt <- m$A %*% dom[a + 1, ] + m$Apost %*% (m$Tm %*% live[a + 1, ])
     bal <<- max(bal, max(abs(nxt - dom[a + 2, ])))
