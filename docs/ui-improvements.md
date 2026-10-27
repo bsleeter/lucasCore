@@ -254,3 +254,10 @@ figures, which are redone once after the P26 rerun.
    measured down woody material pools in mature stands, fix snag fall from remeasured dead trees, use fire as the spin-up's last
    disturbance, and fit the high-severity fire and clearcut event flows to plots after those events. Proposal, results on P26 and
    implementation plan: docs/dom-calibration-proposal.md; evidence: dev/fia (scripts 05-15) and dev/nfcms. UI choices: item 18.
+20. **Turnover and DOM rate table a user can view and override** - TO DO (user, 2026-10-27). Pick a region (ecodivision) and forest
+   type from lists and see the rates the model runs with, laid out by pool: each live pool's turnover rate and its split (foliage -> AG
+   very fast; branch -> snag branch / AG fast; stem -> snag stem; fine root -> AG / BG very fast; coarse root -> AG / BG fast), and each
+   DOM pool's total loss rate with its split between the next pool and emission to the atmosphere (snags: fall, decay, emission). Show
+   the source of each value (CBM default, calibrated, measured) and let the user enter their own. First populated for P26
+   (dev/fia/16-rate-table.R -> dev/fia/out-cal-clearcut/rate-table.csv: CBM, current stage 3 and proposed calibration per type). Live
+   turnover is not calibrated today (CBM ecozone x species defaults). Related: items 18, 19.

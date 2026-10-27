@@ -1,0 +1,109 @@
+Ecodivision,Stratum,ForestType,TempC,From,To,FlowType,CBM,Current,Proposed
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,Biomass: Merchantable,DOM: Snag Stem,Biomass Turnover: Merchantable -> Snag Stems,0.0044999998062849,0.0044999998062849,0.0044999998062849
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,Biomass: Other Wood,DOM: Snag Branch,Biomass Turnover: Other Wood -> Snag Branches,0.00999999977648257,0.00999999977648257,0.00999999977648257
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,Biomass: Other Wood,DOM: Aboveground Fast,Biomass Turnover: Other Wood -> AG Fast,0.0299999993294477,0.0299999993294477,0.0299999993294477
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,Biomass: Foliage,DOM: Aboveground Very Fast,Biomass Turnover: Foliage -> AG Very Fast,0.117000001221895,0.117000001221895,0.117000001221895
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,Biomass: Fine Root,DOM: Aboveground Very Fast,Biomass Turnover: Fine Roots -> AG Very Fast,0.320499986410141,0.320499986410141,0.320499986410141
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,Biomass: Fine Root,DOM: Belowground Very Fast,Biomass Turnover: Fine Roots -> BG Very Fast,0.320499986410141,0.320499986410141,0.320499986410141
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,Biomass: Coarse Root,DOM: Aboveground Fast,Biomass Turnover: Coarse Roots -> AG Fast,0.0099999997764826,0.0099999997764826,0.0099999997764826
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,Biomass: Coarse Root,DOM: Belowground Fast,Biomass Turnover: Coarse Roots -> BG Fast,0.0099999997764826,0.0099999997764826,0.0099999997764826
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,DOM: Aboveground Very Fast,DOM: Aboveground Slow,Decay: AG Very Fast -> AG Slow,0.0904307378476756,0.148611081397907,0.0278905458612353
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,DOM: Aboveground Very Fast,Atmosphere,Emission: AG Very Fast -> Atmosphere,0.398384055029352,0.65469205094092,0.122869159553879
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,DOM: Belowground Very Fast,DOM: Belowground Slow,Decay: BG Very Fast -> BG Slow,0.106714093090866,0.106714093090866,0.106714093090866
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,DOM: Belowground Very Fast,Atmosphere,Emission: BG Very Fast -> Atmosphere,0.521015804641444,0.521015804641444,0.521015804641444
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,DOM: Aboveground Fast,DOM: Aboveground Slow,Decay: AG Fast -> AG Slow,0.0306269447679638,0.0503313750413911,0.0673473987935412
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,DOM: Aboveground Fast,Atmosphere,Emission: AG Fast -> Atmosphere,0.149531536180535,0.245735507901208,0.328813731688158
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,DOM: Belowground Fast,DOM: Belowground Slow,Decay: BG Fast -> BG Slow,0.0306269447679638,0.0102322328207077,0.0228069360542616
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,DOM: Belowground Fast,Atmosphere,Emission: BG Fast -> Atmosphere,0.149531536180535,0.0499573660980298,0.111351498153098
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,DOM: Aboveground Medium,DOM: Aboveground Slow,Decay: AG Medium -> AG Slow,0.00798221411994431,0.00266679794275284,0.00594410733372987
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,DOM: Aboveground Medium,Atmosphere,Emission: AG Medium -> Atmosphere,0.0389719819760063,0.0130202472392884,0.0290212264908754
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,DOM: Aboveground Slow,Atmosphere,Emission: AG Slow -> Atmosphere,0.0206541463404576,0.0339423861406095,0.0671977437362629
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,DOM: Aboveground Slow,DOM: Belowground Slow,Transfer: AG Slow -> BG Slow,0.006,0.006,0.006
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,DOM: Belowground Slow,Atmosphere,Emission: BG Slow -> Atmosphere,0.00329999998211861,0.00329999998211861,0.00329999998211861
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,DOM: Snag Stem,DOM: Aboveground Slow,Decay: Snag Stem -> AG Slow,0.00399110705997215,0.000199555352998608,0.000199555352998608
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,DOM: Snag Stem,Atmosphere,Emission: Snag Stem -> Atmosphere,0.0194859909880031,0.000974299549400156,0.000974299549400156
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,DOM: Snag Stem,DOM: Aboveground Medium,Transfer: Snag Stem -> AG Medium,0.0320000015199184,0.00160000007599592,0.047
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,DOM: Snag Branch,DOM: Aboveground Slow,Decay: Snag Branch -> AG Slow,0.0153134723839819,0.000765673619199094,0.000765673619199094
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,DOM: Snag Branch,Atmosphere,Emission: Snag Branch -> Atmosphere,0.0747657680902671,0.00373828840451335,0.00373828840451335
+M260,Mediterranean Mountains,California Mixed Conifer Group,13.3,DOM: Snag Branch,DOM: Aboveground Fast,Transfer: Snag Branch -> AG Fast,0.100000001490116,0.0050000000745058,0.14687499521242
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,Biomass: Merchantable,DOM: Snag Stem,Biomass Turnover: Merchantable -> Snag Stems,0.0044999998062849,0.0044999998062849,0.0044999998062849
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,Biomass: Other Wood,DOM: Snag Branch,Biomass Turnover: Other Wood -> Snag Branches,0.00999999977648257,0.00999999977648257,0.00999999977648257
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,Biomass: Other Wood,DOM: Aboveground Fast,Biomass Turnover: Other Wood -> AG Fast,0.0299999993294477,0.0299999993294477,0.0299999993294477
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,Biomass: Foliage,DOM: Aboveground Very Fast,Biomass Turnover: Foliage -> AG Very Fast,0.122100001141429,0.122100001141429,0.122100001141429
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,Biomass: Fine Root,DOM: Aboveground Very Fast,Biomass Turnover: Fine Roots -> AG Very Fast,0.320499986410141,0.320499986410141,0.320499986410141
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,Biomass: Fine Root,DOM: Belowground Very Fast,Biomass Turnover: Fine Roots -> BG Very Fast,0.320499986410141,0.320499986410141,0.320499986410141
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,Biomass: Coarse Root,DOM: Aboveground Fast,Biomass Turnover: Coarse Roots -> AG Fast,0.0099999997764826,0.0099999997764826,0.0099999997764826
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,Biomass: Coarse Root,DOM: Belowground Fast,Biomass Turnover: Coarse Roots -> BG Fast,0.0099999997764826,0.0099999997764826,0.0099999997764826
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,DOM: Aboveground Very Fast,DOM: Aboveground Slow,Decay: AG Very Fast -> AG Slow,0.0904307378476756,0.185000002384186,0.0648566574588726
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,DOM: Aboveground Very Fast,Atmosphere,Emission: AG Very Fast -> Atmosphere,0.398384055029352,0.814999997615814,0.285719864827792
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,DOM: Belowground Very Fast,DOM: Belowground Slow,Decay: BG Very Fast -> BG Slow,0.106714093090866,0.106714093090866,0.106714093090866
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,DOM: Belowground Very Fast,Atmosphere,Emission: BG Very Fast -> Atmosphere,0.521015804641444,0.521015804641444,0.521015804641444
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,DOM: Aboveground Fast,DOM: Aboveground Slow,Decay: AG Fast -> AG Slow,0.0306269447679638,0.0725802192942708,0.0697078551073441
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,DOM: Aboveground Fast,Atmosphere,Emission: AG Fast -> Atmosphere,0.149531536180535,0.354362205228671,0.340338311151245
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,DOM: Belowground Fast,DOM: Belowground Slow,Decay: BG Fast -> BG Slow,0.0306269447679638,0.00857970154922449,0.0235417581780147
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,DOM: Belowground Fast,Atmosphere,Emission: BG Fast -> Atmosphere,0.149531536180535,0.0418891261386286,0.114939158685897
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,DOM: Aboveground Medium,DOM: Aboveground Slow,Decay: AG Medium -> AG Slow,0.00798221411994431,0.00223610338445394,0.0061356219485995
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,DOM: Aboveground Medium,Atmosphere,Emission: AG Medium -> Atmosphere,0.0389719819760063,0.0109174446445485,0.0299562683234657
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,DOM: Aboveground Slow,Atmosphere,Emission: AG Slow -> Atmosphere,0.0206541463404576,0.0489465234643461,0.146915706866862
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,DOM: Aboveground Slow,DOM: Belowground Slow,Transfer: AG Slow -> BG Slow,0.006,0.006,0.006
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,DOM: Belowground Slow,Atmosphere,Emission: BG Slow -> Atmosphere,0.00329999998211861,0.00329999998211861,0.00329999998211861
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,DOM: Snag Stem,DOM: Aboveground Slow,Decay: Snag Stem -> AG Slow,0.00399110705997215,0.000199555352998608,0.000199555352998608
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,DOM: Snag Stem,Atmosphere,Emission: Snag Stem -> Atmosphere,0.0194859909880031,0.000974299549400156,0.000974299549400156
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,DOM: Snag Stem,DOM: Aboveground Medium,Transfer: Snag Stem -> AG Medium,0.0320000015199184,0.00160000007599592,0.045
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,DOM: Snag Branch,DOM: Aboveground Slow,Decay: Snag Branch -> AG Slow,0.0153134723839819,0.000765673619199094,0.000765673619199094
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,DOM: Snag Branch,Atmosphere,Emission: Snag Branch -> Atmosphere,0.0747657680902671,0.00373828840451335,0.00373828840451335
+M260,Mediterranean Mountains,Fir/Spruce/Mountain Hemlock Group,13.3,DOM: Snag Branch,DOM: Aboveground Fast,Transfer: Snag Branch -> AG Fast,0.100000001490116,0.0050000000745058,0.140624995416147
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,Biomass: Merchantable,DOM: Snag Stem,Biomass Turnover: Merchantable -> Snag Stems,0.0044999998062849,0.0044999998062849,0.0044999998062849
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,Biomass: Other Wood,DOM: Snag Branch,Biomass Turnover: Other Wood -> Snag Branches,0.00999999977648257,0.00999999977648257,0.00999999977648257
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,Biomass: Other Wood,DOM: Aboveground Fast,Biomass Turnover: Other Wood -> AG Fast,0.0299999993294477,0.0299999993294477,0.0299999993294477
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,Biomass: Foliage,DOM: Aboveground Very Fast,Biomass Turnover: Foliage -> AG Very Fast,0.109350001342595,0.109350001342595,0.109350001342595
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,Biomass: Fine Root,DOM: Aboveground Very Fast,Biomass Turnover: Fine Roots -> AG Very Fast,0.320499986410141,0.320499986410141,0.320499986410141
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,Biomass: Fine Root,DOM: Belowground Very Fast,Biomass Turnover: Fine Roots -> BG Very Fast,0.320499986410141,0.320499986410141,0.320499986410141
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,Biomass: Coarse Root,DOM: Aboveground Fast,Biomass Turnover: Coarse Roots -> AG Fast,0.0099999997764826,0.0099999997764826,0.0099999997764826
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,Biomass: Coarse Root,DOM: Belowground Fast,Biomass Turnover: Coarse Roots -> BG Fast,0.0099999997764826,0.0099999997764826,0.0099999997764826
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,DOM: Aboveground Very Fast,DOM: Aboveground Slow,Decay: AG Very Fast -> AG Slow,0.0904307378476756,0.146161789595845,0.0198802629613773
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,DOM: Aboveground Very Fast,Atmosphere,Emission: AG Very Fast -> Atmosphere,0.398384055029352,0.643901927767324,0.0875806165260313
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,DOM: Belowground Very Fast,DOM: Belowground Slow,Decay: BG Very Fast -> BG Slow,0.106714093090866,0.106714093090866,0.106714093090866
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,DOM: Belowground Very Fast,Atmosphere,Emission: BG Very Fast -> Atmosphere,0.521015804641444,0.521015804641444,0.521015804641444
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,DOM: Aboveground Fast,DOM: Aboveground Slow,Decay: AG Fast -> AG Slow,0.0306269447679638,0.0495018526187306,0.0715904542102433
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,DOM: Aboveground Fast,Atmosphere,Emission: AG Fast -> Atmosphere,0.149531536180535,0.241685487140196,0.34952982333117
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,DOM: Belowground Fast,DOM: Belowground Slow,Decay: BG Fast -> BG Slow,0.0306269447679638,0.00772558088395526,0.0243092716370397
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,DOM: Belowground Fast,Atmosphere,Emission: BG Fast -> Atmosphere,0.149531536180535,0.0377190080896732,0.118686429836733
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,DOM: Aboveground Medium,DOM: Aboveground Slow,Decay: AG Medium -> AG Slow,0.00798221411994431,0.00201349632762535,0.00633565681385596
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,DOM: Aboveground Medium,Atmosphere,Emission: AG Medium -> Atmosphere,0.0389719819760063,0.0098305985544669,0.0309329090206714
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,DOM: Aboveground Slow,Atmosphere,Emission: AG Slow -> Atmosphere,0.0206541463404576,0.0333829742358268,0.0653510489630539
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,DOM: Aboveground Slow,DOM: Belowground Slow,Transfer: AG Slow -> BG Slow,0.006,0.006,0.006
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,DOM: Belowground Slow,Atmosphere,Emission: BG Slow -> Atmosphere,0.00329999998211861,0.00329999998211861,0.00329999998211861
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,DOM: Snag Stem,DOM: Aboveground Slow,Decay: Snag Stem -> AG Slow,0.00399110705997215,0.000199555352998608,0.000574733294436473
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,DOM: Snag Stem,Atmosphere,Emission: Snag Stem -> Atmosphere,0.0194859909880031,0.000974299549400156,0.00280605045858444
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,DOM: Snag Stem,DOM: Aboveground Medium,Transfer: Snag Stem -> AG Medium,0.0320000015199184,0.00160000007599592,0.11
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,DOM: Snag Branch,DOM: Aboveground Slow,Decay: Snag Branch -> AG Slow,0.0153134723839819,0.000765673619199094,0.00220519327100418
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,DOM: Snag Branch,Atmosphere,Emission: Snag Branch -> Atmosphere,0.0747657680902671,0.00373828840451335,0.0107665305790851
+M260,Mediterranean Mountains,Ponderosa Pine Group,13.3,DOM: Snag Branch,DOM: Aboveground Fast,Transfer: Snag Branch -> AG Fast,0.100000001490116,0.0050000000745058,0.343749988795026
+M260,Mediterranean Mountains,Western Oak Group,13.3,Biomass: Merchantable,DOM: Snag Stem,Biomass Turnover: Merchantable -> Snag Stems,0.0044999998062849,0.0044999998062849,0.0044999998062849
+M260,Mediterranean Mountains,Western Oak Group,13.3,Biomass: Other Wood,DOM: Snag Branch,Biomass Turnover: Other Wood -> Snag Branches,0.00999999977648257,0.00999999977648257,0.00999999977648257
+M260,Mediterranean Mountains,Western Oak Group,13.3,Biomass: Other Wood,DOM: Aboveground Fast,Biomass Turnover: Other Wood -> AG Fast,0.0299999993294477,0.0299999993294477,0.0299999993294477
+M260,Mediterranean Mountains,Western Oak Group,13.3,Biomass: Foliage,DOM: Aboveground Very Fast,Biomass Turnover: Foliage -> AG Very Fast,0.366899997279048,0.366899997279048,0.366899997279048
+M260,Mediterranean Mountains,Western Oak Group,13.3,Biomass: Fine Root,DOM: Aboveground Very Fast,Biomass Turnover: Fine Roots -> AG Very Fast,0.320499986410141,0.320499986410141,0.320499986410141
+M260,Mediterranean Mountains,Western Oak Group,13.3,Biomass: Fine Root,DOM: Belowground Very Fast,Biomass Turnover: Fine Roots -> BG Very Fast,0.320499986410141,0.320499986410141,0.320499986410141
+M260,Mediterranean Mountains,Western Oak Group,13.3,Biomass: Coarse Root,DOM: Aboveground Fast,Biomass Turnover: Coarse Roots -> AG Fast,0.0099999997764826,0.0099999997764826,0.0099999997764826
+M260,Mediterranean Mountains,Western Oak Group,13.3,Biomass: Coarse Root,DOM: Belowground Fast,Biomass Turnover: Coarse Roots -> BG Fast,0.0099999997764826,0.0099999997764826,0.0099999997764826
+M260,Mediterranean Mountains,Western Oak Group,13.3,DOM: Aboveground Very Fast,DOM: Aboveground Slow,Decay: AG Very Fast -> AG Slow,0.0904307378476756,0.185000002384186,0.0255983429576031
+M260,Mediterranean Mountains,Western Oak Group,13.3,DOM: Aboveground Very Fast,Atmosphere,Emission: AG Very Fast -> Atmosphere,0.398384055029352,0.814999997615814,0.112771076651611
+M260,Mediterranean Mountains,Western Oak Group,13.3,DOM: Belowground Very Fast,DOM: Belowground Slow,Decay: BG Very Fast -> BG Slow,0.106714093090866,0.106714093090866,0.106714093090866
+M260,Mediterranean Mountains,Western Oak Group,13.3,DOM: Belowground Very Fast,Atmosphere,Emission: BG Very Fast -> Atmosphere,0.521015804641444,0.521015804641444,0.521015804641444
+M260,Mediterranean Mountains,Western Oak Group,13.3,DOM: Aboveground Fast,DOM: Aboveground Slow,Decay: AG Fast -> AG Slow,0.0306269447679638,0.0912318431550156,0.0540527230076179
+M260,Mediterranean Mountains,Western Oak Group,13.3,DOM: Aboveground Fast,Atmosphere,Emission: AG Fast -> Atmosphere,0.149531536180535,0.445426005071874,0.263904439940236
+M260,Mediterranean Mountains,Western Oak Group,13.3,DOM: Belowground Fast,DOM: Belowground Slow,Decay: BG Fast -> BG Slow,0.0306269447679638,0.02258207785323,0.0294432663968839
+M260,Mediterranean Mountains,Western Oak Group,13.3,DOM: Belowground Fast,Atmosphere,Emission: BG Fast -> Atmosphere,0.149531536180535,0.110253661183796,0.143752401287641
+M260,Mediterranean Mountains,Western Oak Group,13.3,DOM: Aboveground Medium,DOM: Aboveground Slow,Decay: AG Medium -> AG Slow,0.00798221411994431,0.00588550317582715,0.00767371536896899
+M260,Mediterranean Mountains,Western Oak Group,13.3,DOM: Aboveground Medium,Atmosphere,Emission: AG Medium -> Atmosphere,0.0389719819760063,0.0287351003420168,0.0374657823699859
+M260,Mediterranean Mountains,Western Oak Group,13.3,DOM: Aboveground Slow,Atmosphere,Emission: AG Slow -> Atmosphere,0.0206541463404576,0.0615247734865277,0.0695023544736626
+M260,Mediterranean Mountains,Western Oak Group,13.3,DOM: Aboveground Slow,DOM: Belowground Slow,Transfer: AG Slow -> BG Slow,0.006,0.006,0.006
+M260,Mediterranean Mountains,Western Oak Group,13.3,DOM: Belowground Slow,Atmosphere,Emission: BG Slow -> Atmosphere,0.00329999998211861,0.00329999998211861,0.00329999998211861
+M260,Mediterranean Mountains,Western Oak Group,13.3,DOM: Snag Stem,DOM: Aboveground Slow,Decay: Snag Stem -> AG Slow,0.00399110705997215,0.000199555352998608,0.000199555352998608
+M260,Mediterranean Mountains,Western Oak Group,13.3,DOM: Snag Stem,Atmosphere,Emission: Snag Stem -> Atmosphere,0.0194859909880031,0.000974299549400156,0.000974299549400156
+M260,Mediterranean Mountains,Western Oak Group,13.3,DOM: Snag Stem,DOM: Aboveground Medium,Transfer: Snag Stem -> AG Medium,0.0320000015199184,0.00160000007599592,0.079
+M260,Mediterranean Mountains,Western Oak Group,13.3,DOM: Snag Branch,DOM: Aboveground Slow,Decay: Snag Branch -> AG Slow,0.0153134723839819,0.000765673619199094,0.000765673619199094
+M260,Mediterranean Mountains,Western Oak Group,13.3,DOM: Snag Branch,Atmosphere,Emission: Snag Branch -> Atmosphere,0.0747657680902671,0.00373828840451335,0.00373828840451335
+M260,Mediterranean Mountains,Western Oak Group,13.3,DOM: Snag Branch,DOM: Aboveground Fast,Transfer: Snag Branch -> AG Fast,0.100000001490116,0.0050000000745058,0.246874991952791
