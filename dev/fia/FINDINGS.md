@@ -119,3 +119,29 @@ disturbance, five multipliers (snags; down logs = AG Medium + BG Fast; fine wood
   ground fires and its cutting code (TRTCD 10) includes partial cuts, while the model's are stand-replacing; and slash is often piled or
   burned. Next: restrict the chronosequences to crown fire (32) and to clearcuts where they can be identified, and compare the LUCAS
   event flows (share of the stand killed, left standing, consumed; slash left) with what the plots show.
+
+## Young stands after stand-replacing events only (07-young-stand-replacing.R, out-cal/young-stand-replacing.*)
+
+High-severity fire = a recorded crown fire, or a recorded fire after which the stand age reset; clearcut = a recorded cutting after which
+the stand age reset (FIA has no clearcut code). Mediterranean Mountains DWM conditions within 30 years: high-severity fire Mixed Conifer
+124 (of 482 with any fire), Western Oak 243, Ponderosa 33, Fir/Spruce 35; clearcut Mixed Conifer 44, Ponderosa 28, none for Fir/Spruce or
+Western Oak. Against the model's fire-last and clearcut-last curves (decay calibrated to mature stands), Mg C/ha, 0-5 years after:
+
+| | Snags | Down logs | Fine woody debris | Forest floor |
+| --- | --- | --- | --- | --- |
+| Mixed Conifer, high-severity fire | 38 / 128 | 9 / 14 | 2.0 / 4.5 | 6.5 / 19 |
+| Fir/Spruce, high-severity fire | 61 / 147 | 8 / 11 | 2.7 / 4.6 | 3.1 / 10 |
+| Western Oak, high-severity fire | 27 / 58 | 4 / 8 | 1.5 / 3.6 | 4.8 / 16 |
+| Mixed Conifer, clearcut | 4 / 0 | 7 / 17 | 5.9 / 28 | 13 / 27 |
+| Ponderosa, clearcut | 5 / 0 | 6 / 7 | 3.0 / 14 | 7 / 22 |
+
+- The shapes are right: after fire, snags fall over 10-20 years and down logs rise (Mixed Conifer 9 -> 14 -> 21; Fir/Spruce 8 -> 19 -> 44);
+  after clearcut, few snags and a decaying slash pulse. What is wrong is the size of what the event leaves.
+- **High-severity fire leaves 2-3.5x too many snags** and **consumes too little of the forest floor** (model 10-19 vs measured 3-7). The
+  model's pre-fire stand is the spin-up stand at the return interval (154-200 yr), probably more biomass than the stands that burned, and
+  its fire kills every tree into snags; plots called high severity still include some partial mortality.
+- **Clearcut leaves 3-5x too much slash** (fine woody debris 28 vs 6 in Mixed Conifer; forest floor 27 vs 13) and no snags where 4-5 are
+  measured: the model leaves all branches, tops and stumps on site; real cuts pile and burn, chip or yard much of it, and keep a few snags.
+- So after decay is fitted to mature stands, the young-stand misfit belongs to the LUCAS disturbance flows (defaults/stockflow/
+  event-pathways.csv): high-severity fire's share killed to snags vs consumed, and its forest floor consumption; clearcut's share of
+  branches and tops left on site. These are the next things to compare with the plots.
