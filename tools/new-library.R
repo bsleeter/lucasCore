@@ -126,6 +126,11 @@ if (!nrow(runs)) cat("LOCA2: no model runs found under", loca2, "- climate lists
   rp <- runs[order(Gcm, Ssp), .(s = paste(SspName, collapse = ", ")), by = .(Member, Gcm)][, .(Runs = paste(sprintf("%s (%s)", Gcm, s), collapse = "; ")), by = Member][order(Member)]
   saveDatasheet(P, as.data.frame(rp[, .(Name = Member, Runs)]), "lucasCore_ClimateReplicate", append = FALSE, force = TRUE)
   cat(sprintf("%-34s %4d scenarios, %d models, %d replicates (%d runs) from %s\n", "lucasCore_ClimateScenario/Model/Rep", length(sc), nrow(md), nrow(rp), nrow(runs), loca2)) }
+# ---- CBM-CFS3 ecozone and species type lists (Carbon Assumptions: CBM Crosswalk drop-downs; to-do 21) ------------------------
+for (sh in c("lucasCore_CbmEcozone", "lucasCore_CbmSpeciesType")) {
+  have <- suppressWarnings(as.data.table(datasheet(P, sh, optional = TRUE)))
+  if (!nrow(have)) { x <- rd("library", "project", paste0(sh, ".csv")); saveDatasheet(P, as.data.frame(x), sh, append = FALSE, force = TRUE)
+    cat(sprintf("%-34s %4d rows written\n", sh, nrow(x))) } else cat(sprintf("%-34s kept (%d rows)\n", sh, nrow(have))) }
 cat("library ready:", f, "\n")
 
 # ---- the Stock-Flow Definitions scenario ------------------------------------------------------------------------------
@@ -152,4 +157,18 @@ if (!nrow(suppressWarnings(datasheet(sfd, "stsim_OutputFilterTransitionGroups", 
 if (!nrow(suppressWarnings(datasheet(sfd, "stsim_OutputOptionsSpatial", optional = TRUE)))) {
   saveDatasheet(sfd, as.data.frame(rd("stockflow", "stsim_OutputOptionsSpatial.csv")), "stsim_OutputOptionsSpatial")
   cat("spatial output options: state class, age and transition maps every year\n") }
+
+# ---- the Carbon Assumptions scenario (to-do 21; docs/carbon-assumptions.md) ------------------------------------------------------
+# The assumptions the carbon calibration (stages 2-4) runs on, filled with the package defaults for the user to review and change;
+# Builds depend on it, so one set serves many builds. So far: the CBM Crosswalk (defaults/cbm/species-crosswalk.csv).
+ca <- rsyncrosim::scenario(P, "Carbon Assumptions")
+if (!nrow(suppressWarnings(datasheet(ca, "lucasCore_CbmCrosswalk", optional = TRUE)))) {
+  description(ca) <- paste("The assumptions behind the carbon calibration (docs/carbon-assumptions.md), filled with the package defaults: change any row,",
+    "or add a row for one ecodivision to override a forest type's all-ecodivisions row. Build scenarios depend on this scenario (it is not run).",
+    "CBM Crosswalk: the CBM-CFS3 ecozone and species type each forest type takes its live turnover and snag rates from, and an optional mean",
+    "annual temperature for dead-pool decay (blank = PRISM).")
+  x <- rd("cbm", "species-crosswalk.csv")
+  saveDatasheet(ca, data.frame(StateClassId = x$StateClassId, CbmEcozoneId = x$EcoBoundaryId, CbmSpeciesTypeId = x$SpeciesTypeId), "lucasCore_CbmCrosswalk")
+  cat("Carbon Assumptions scenario created (id", scenarioId(ca), "): CBM Crosswalk", nrow(x), "rows\n")
+} else cat("Carbon Assumptions scenario kept (id", scenarioId(ca), ")\n")
 cat("library ready:", f, "\n")

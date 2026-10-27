@@ -80,3 +80,13 @@ calibrated, measured, user).
 - Disturbance Flows covers the two major events only: high-severity fire and clearcut.
 - Build order: CBM Crosswalk, DOM Parameters, Live Turnover, Spin-up, Disturbance Flows, Decay Calibration Settings, Growth Inputs, then
   the read-out.
+
+## Progress
+
+- 2026-10-27 **CBM Crosswalk done**: project lists CBM Ecozones and CBM Species Types (with the rates each sets); scenario sheet CBM
+  Crosswalk (ecodivision optional, forest type, ecozone, species type, optional mean temperature) in a Carbon Assumptions scenario that
+  tools/new-library.R creates filled with the package default and the starter's Build depends on; tools/sync-library.R adds both to an
+  existing library (then add the scenario to the Build's dependencies). Stage 3 resolves each cell's row (ecodivision row first), logs
+  rows that differ from the package default, and falls back to the package default without the dependency. Admin boundary left out:
+  nothing in lucasCore uses it. Test: tests/phaseZ8-cbm-crosswalk.R. A library made in Studio gets the lists but no Carbon Assumptions
+  scenario (stage 3 then uses the package default) - the user can create one or copy it from the starter.

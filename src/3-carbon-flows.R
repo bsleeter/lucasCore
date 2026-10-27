@@ -50,6 +50,27 @@ MEAS_MIN_AGE <- 60L; MIN_DWM_CELL <- 30L   # measured calibration: mature stand 
 cells <- unique(cc[, .(Stratum, StateClass)])
 miss <- setdiff(cells$StateClass, cw$StateClass); if (length(miss)) fail("carbon curves for state classes not in the forest crosswalk: %s", paste(miss, collapse = ", "))
 cells[, sc := cw$StateClassId[match(StateClass, cw$StateClass)]][, ecodiv := eco$ecodiv[match(Stratum, eco$Stratum)]][, temp := eco$temp[match(Stratum, eco$Stratum)]]
+# Carbon Assumptions - CBM Crosswalk (to-do 21): each cell's CBM ecozone and species type (live turnover and snag rates) and an optional
+# mean temperature replacing PRISM's; a row for the cell's ecodivision overrides the forest type's blank-ecodivision row. An empty
+# sheet (no Carbon Assumptions dependency) = the package default, defaults/cbm/species-crosswalk.csv.
+cbx <- as.data.table(datasheet(scn, ds("CbmCrosswalk"), optional = TRUE, lookupsAsFactors = FALSE))
+cbx_def <- read_default("cbm", "species-crosswalk.csv")[, .(StratumId = NA_character_, StateClassId, CbmEcozoneId = EcoBoundaryId, CbmSpeciesTypeId = SpeciesTypeId, MeanTemperature = NA_real_)]
+if (!nrow(cbx)) { cbx <- cbx_def; say("CBM Crosswalk: none in this scenario (no Carbon Assumptions dependency) - the package default (%d forest types)", nrow(cbx))
+} else {
+  cbx <- cbx[, .(StratumId = as.character(StratumId), StateClassId, CbmEcozoneId, CbmSpeciesTypeId, MeanTemperature = as.numeric(MeanTemperature))]
+  chg <- merge(cbx, cbx_def, by = c("StratumId", "StateClassId"), all.x = TRUE, suffixes = c("", "_def"))[
+    is.na(CbmEcozoneId_def) | CbmEcozoneId != CbmEcozoneId_def | CbmSpeciesTypeId != CbmSpeciesTypeId_def | !is.na(MeanTemperature)]
+  say("CBM Crosswalk: %d rows from Carbon Assumptions; %s", nrow(cbx), if (nrow(chg)) paste0("differing from the package default: ", paste(sprintf("%s%s -> %s, %s%s",
+      ifelse(is.na(chg$StratumId), "", paste0(chg$StratumId, " / ")), sub("^Forest: ", "", chg$StateClassId), chg$CbmEcozoneId, chg$CbmSpeciesTypeId,
+      ifelse(is.na(chg$MeanTemperature), "", sprintf(", %.1f C", chg$MeanTemperature))), collapse = "; ")) else "the package default") }
+cbx_cell <- function(x) { own <- cbx[!is.na(StratumId)][x, on = .(StratumId = Stratum, StateClassId = StateClass), .(CbmEcozoneId, CbmSpeciesTypeId, MeanTemperature)]
+  all <- cbx[is.na(StratumId)][x, on = .(StateClassId = StateClass), .(CbmEcozoneId, CbmSpeciesTypeId, MeanTemperature)]
+  x[, `:=`(cbm_eco = data.table::fcoalesce(own$CbmEcozoneId, all$CbmEcozoneId), cbm_species = data.table::fcoalesce(own$CbmSpeciesTypeId, all$CbmSpeciesTypeId))]
+  x[, temp_user := data.table::fifelse(!is.na(own$CbmEcozoneId), own$MeanTemperature, all$MeanTemperature)]   # the matched row's temperature
+  x[!is.na(temp_user), temp := temp_user][, temp_user := NULL] }
+cbx_cell(cells)
+miss <- cells[is.na(cbm_eco) | is.na(cbm_species), unique(StateClass)]
+if (length(miss)) fail("CBM Crosswalk (Carbon Assumptions) has no row for forest type(s) %s", paste(miss, collapse = ", "))
 # return intervals and soil targets from stage 5 when this scenario has them (a stage 5 result upstream), else the provisional defaults
 ri5 <- as.data.table(datasheet(scn, ds("OutputReturnInterval"), optional = TRUE, lookupsAsFactors = FALSE))
 so5 <- as.data.table(datasheet(scn, ds("OutputSoilTarget"), optional = TRUE, lookupsAsFactors = FALSE))
@@ -183,9 +204,9 @@ write_ds(cells[, .(StratumId = Stratum, StateClassId = StateClass, Level, Plots 
 progressBar()
 
 # ---- forest: net growth, growth split, turnover and decay per cell ----------------------------------------------------
-rates <- setNames(lapply(cw$StateClass, function(s) { k <- cw[StateClass == s]; turnover_rates(s, k$softwood, k$deciduous, cbm) }), cw$StateClass)
+# live turnover per cell, from its CBM Crosswalk row (Carbon Assumptions)
 ng <- list(); fm_g <- list(); fm_d <- list(); err <- 0; nneg <- 0
-for (i in seq_len(nrow(cells))) { s <- cells$Stratum[i]; c0 <- cells$StateClass[i]; r <- rates[[c0]]; k <- cw[StateClass == c0]
+for (i in seq_len(nrow(cells))) { s <- cells$Stratum[i]; c0 <- cells$StateClass[i]; k <- cw[StateClass == c0]; r <- turnover_rates(c0, k$softwood, k$deciduous, cbm, cells$cbm_eco[i], cells$cbm_species[i])
   p <- cc[Stratum == s & StateClass == c0][order(Age)]
   g <- net_growth(p, r)
   sh <- g[, lapply(.SD, function(v) ifelse(Total > 0, v / Total, 0.2)), .SDcols = names(LIVE_POOLS)]
@@ -198,7 +219,7 @@ for (i in seq_len(nrow(cells))) { s <- cells$Stratum[i]; c0 <- cells$StateClass[
   fm_g[[i]] <- rbindlist(lapply(names(LIVE_POOLS), function(pl) data.table(StratumId = s, StateClassId = c0, AgeMin = g$Age, AgeMax = amax,
                                                                            FlowGroupId = paste(GROWTH_FLOW[[pl]], "[Type]"), Value = sh[[pl]])))
   cm <- cells[Stratum == s & StateClass == c0]
-  dv <- dom_flow_values(r, k$softwood, eco[Stratum == s, temp], cbm); fixed <- character()
+  dv <- dom_flow_values(r, k$softwood, cells$temp[i], cbm); fixed <- character()
   if (!is.na(cm$snag_fall)) { dv <- set_snag_fall(dv, cm$snag_fall); fixed <- SNAG_FALL_FLOWS }
   dv <- scale_decay(dv, c(mult_i(which(cells$Stratum == s & cells$StateClass == c0)), list(soil = cm$m_soil)), fixed)
   fm_d[[i]] <- data.table(StratumId = s, StateClassId = c0, AgeMin = NA_integer_, AgeMax = NA_integer_, FlowGroupId = paste(names(dv), "[Type]"), Value = unname(dv)) }

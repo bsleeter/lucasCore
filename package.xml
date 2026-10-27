@@ -56,6 +56,16 @@
 		<column name="Runs" displayName="Models and Scenarios" dataType="String" isOptional="True"/>
 	</dataSheet>
 
+	<!-- CBM-CFS3 lists for the Carbon Assumptions sheets (to-do 21): the ecozones and species types of defaults/cbm, with the rates each one sets -->
+	<dataSheet name="CbmEcozone" displayName="CBM Ecozones" dataScope="Project" displayMember="Name">
+		<column name="Name" displayName="Ecozone" dataType="String"/>
+		<column name="Description" displayName="Rates it sets" dataType="String" isOptional="True"/>
+	</dataSheet>
+	<dataSheet name="CbmSpeciesType" displayName="CBM Species Types" dataScope="Project" displayMember="Name">
+		<column name="Name" displayName="Species Type" dataType="String"/>
+		<column name="Description" displayName="Rates it sets" dataType="String" isOptional="True"/>
+	</dataSheet>
+
 	<dataSheet name="StratumSource" displayName="Stratum Sources (study areas, secondary and tertiary strata)" dataScope="Project" displayMember="Name">
 		<!-- written by tools/new-library.R from defaults/strata/presets.csv; add a custom row and run new-library.R with the rebuild-strata flag.
 		     The stsim Secondary and Tertiary Strata lists hold every unit of every row (stages cannot write project lists). -->
@@ -279,6 +289,18 @@
 		<column name="ClimateModelId" displayName="Climate Model" dataType="Integer" validationType="Datasheet" formula1="lucasCore_ClimateModel"/>
 		<column name="ClimateReplicateId" displayName="Replicate (blank = lowest-numbered with the scenario)" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="lucasCore_ClimateReplicate"/>
 		<column name="EndYear" displayName="Last Year (blank = 2100)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="LessEqual" formula1="2100"/>
+	</dataSheet>
+
+	<!-- Carbon Assumptions (to-do 21; docs/carbon-assumptions.md): kept in their own scenario that Builds depend on. CBM Crosswalk: the CBM-CFS3
+	     ecozone and species type each forest type takes its live turnover and snag rates from, optionally per ecodivision (a row for an
+	     ecodivision overrides the forest type's blank-ecodivision row), and an optional mean annual temperature for the dead-pool decay
+	     (blank = PRISM). Empty sheet = the package default (defaults/cbm/species-crosswalk.csv). Read by stage 3. -->
+	<dataSheet name="CbmCrosswalk" displayName="CBM Crosswalk">
+		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
+		<column name="StateClassId" displayName="Forest Type" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="CbmEcozoneId" displayName="CBM Ecozone" dataType="Integer" validationType="Datasheet" formula1="lucasCore_CbmEcozone"/>
+		<column name="CbmSpeciesTypeId" displayName="CBM Species Type" dataType="Integer" validationType="Datasheet" formula1="lucasCore_CbmSpeciesType"/>
+		<column name="MeanTemperature" displayName="Mean Annual Temperature (C; blank = PRISM)" dataType="Double" format="0.0" isOptional="True"/>
 	</dataSheet>
 
 	<dataSheet name="CarbonOptions" displayName="Carbon Options" isSingleRow="True" viewClassName="lucasCoreUI.CarbonOptionsView" viewClassAssembly="lucasCoreUI">
@@ -582,6 +604,7 @@
 	<transformer name="CarbonFlows" displayName="3 - Carbon Flows" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/3-carbon-flows.R">
 		<dataSheet name="CarbonCurve" type="Input"/>
 		<dataSheet name="CarbonOptions" type="Input"/>
+		<dataSheet name="CbmCrosswalk" type="Input"/>
 		<dataSheet name="stsim_FlowPathwayDiagram" type="Input"/>
 		<dataSheet name="OutputReturnInterval" type="Input"/>
 		<dataSheet name="OutputSoilTarget" type="Input"/>
@@ -741,6 +764,8 @@
 			<item name="ClimateScenario"/>
 			<item name="ClimateModel"/>
 			<item name="ClimateReplicate"/>
+			<item name="CbmEcozone"/>
+			<item name="CbmSpeciesType"/>
 		</group>
 	</layout>
 
@@ -751,6 +776,9 @@
 			<item name="ClimateOptions"/>
 			<item name="CarbonOptions"/>
 			<item name="GrowthOptions"/>
+			<group name="lucasCoreCarbonAssumptions" displayName="Carbon Assumptions">
+				<item name="CbmCrosswalk"/>
+			</group>
 			<group name="lucasCoreProjection" displayName="Projection">
 				<item name="ProjectionRun"/>
 				<item name="ProjectionTransitions"/>

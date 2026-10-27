@@ -20,10 +20,11 @@ GROWTH_FLOW <- c(Merchantable = "Net Growth Forest: Atmosphere -> Merchantable",
                  Foliage = "Net Growth Forest: Atmosphere -> Foliage", FineRoots = "Net Growth Forest: Atmosphere -> Fine Roots",
                  CoarseRoots = "Net Growth Forest: Atmosphere -> Coarse Roots")
 
-# turnover rates (per year) of one state class
-turnover_rates <- function(state_class_name, softwood, deciduous, cbm_dir) {
+# turnover rates (per year) of one state class: from the CBM ecozone and species type given (stage 3: the Carbon Assumptions' CBM
+# Crosswalk row of the cell), else the package default crosswalk (defaults/cbm/species-crosswalk.csv)
+turnover_rates <- function(state_class_name, softwood, deciduous, cbm_dir, ecozone = NULL, species = NULL) {
   rd <- function(f) data.table::fread(file.path(cbm_dir, f))
-  m <- rd("species-crosswalk.csv")[StateClassId == state_class_name]
+  m <- if (!is.null(ecozone) && !is.null(species)) data.table::data.table(EcoBoundaryId = ecozone, SpeciesTypeId = species) else rd("species-crosswalk.csv")[StateClassId == state_class_name]
   if (nrow(m) != 1) stop(sprintf("species-crosswalk.csv has %d rows for %s", nrow(m), state_class_name), call. = FALSE)
   eco <- rd("tblEcoBoundaryDefault.csv")[EcoBoundaryName == m$EcoBoundaryId]; sp <- rd("tblSpeciesTypeDefault.csv")[SpeciesTypeName == m$SpeciesTypeId]
   if (nrow(eco) != 1 || nrow(sp) != 1) stop(sprintf("CBM ecozone or species not found for %s", state_class_name), call. = FALSE)

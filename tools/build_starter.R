@@ -17,7 +17,7 @@ unlink(c(f, paste0(f, c(".data", ".temp", ".backup", ".input"))), recursive = TR
 if (system2(file.path(R.home("bin"), "Rscript.exe"), c(shQuote(file.path(pkg, "tools", "new-library.R")), shQuote(f)))) stop("new-library.R failed")
 
 L <- ssimLibrary(f); P <- rsyncrosim::project(L, "Definitions"); sc <- as.data.table(scenario(L, summary = TRUE))
-B <- rsyncrosim::scenario(P, "Build"); dependency(B) <- sc[Name == "Stock-Flow Definitions", ScenarioId]
+B <- rsyncrosim::scenario(P, "Build"); dependency(B) <- sc[Name %in% c("Stock-Flow Definitions", "Carbon Assumptions"), ScenarioId]
 description(B) <- paste(
   "Builds a LUCAS model. Before running, set: (1) Build Options - cell size, secondary and tertiary strata (blank = States, Federal Lands),",
   "historical start and end years; (2) Study Area - one row per unit of any source (blank = all of CONUS); (3) Climate Options - climate methods.",

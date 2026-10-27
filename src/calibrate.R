@@ -34,7 +34,7 @@ fia_dom_data <- function(cond_file, dist_file, opt, cw) {
 cal_setup <- function(k, ctx) {
   w <- ctx$cw[StateClassId == k$sc]; sw <- grepl("Softwood$", w$LagClass)
   live <- as.matrix(ctx$cc[Stratum == k$Stratum & StateClass == k$StateClass][order(Age), names(LIVE_POOLS), with = FALSE])
-  r <- turnover_rates(k$StateClass, sw, as.numeric(ctx$dens[StateClassId == k$sc, DeciduousShare]), ctx$cbm)
+  r <- turnover_rates(k$StateClass, sw, as.numeric(ctx$dens[StateClassId == k$sc, DeciduousShare]), ctx$cbm, k$cbm_eco, k$cbm_species)   # CBM Crosswalk row when the cell has one
   vals <- dom_flow_values(r, sw, k$temp, ctx$cbm); fixed <- character()
   if (!is.null(k$snag_fall) && !is.na(k$snag_fall)) { vals <- set_snag_fall(vals, k$snag_fall); fixed <- SNAG_FALL_FLOWS }   # measured snag fall
   list(k = k, live = live, vals = vals, fixed = fixed,
