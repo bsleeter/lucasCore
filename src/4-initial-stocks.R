@@ -23,7 +23,10 @@ fm <- as.data.table(datasheet(scn, "stsim_FlowMultiplier", optional = TRUE, look
 fm <- fm[is.na(AgeMin) & grepl("^(Biomass Turnover|Decay|Emission|Transfer):", FlowGroupId) & grepl("^Forest:", StateClassId)]
 if (!nrow(fm)) fail("no forest turnover and decay flow multipliers: run stage 3 first")
 setnames(cc, c("StratumId", "StateClassId"), c("Stratum", "StateClass"))
-fo <- fread(pkg_file("defaults", "stockflow", "stsim_FlowOrder.csv")); ev <- fread(pkg_file("defaults", "stockflow", "event-pathways.csv"), na.strings = "")
+fo <- fread(pkg_file("defaults", "stockflow", "stsim_FlowOrder.csv"))
+# the event flows stage 3 wrote (the LUCAS defaults plus its per-forest-type fire rows), so the spin-up disturbs as the model will
+ev <- as.data.table(datasheet(scn, "stsim_FlowPathway", optional = TRUE, lookupsAsFactors = FALSE))[!is.na(TransitionGroupId)]
+if (!nrow(ev)) fail("no transition-triggered flow pathways: run stage 3 first")
 LAST <- c(Fire = "Fire: High Severity [Type]", Clearcut = "Forest Harvest: Forest Clearcut [Type]")
 # the cells stage 3 calibrated: the study area's ecodivisions x every forest type (all of CONUS when stage 3 ran without a study area)
 cells <- unique(cc[, .(Stratum, StateClass)])[paste(Stratum, StateClass) %in% paste(dc$StratumId, dc$StateClassId)]

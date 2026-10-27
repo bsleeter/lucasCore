@@ -1,6 +1,6 @@
 # Dead organic matter calibration from measured FIA data - proposal for the package
 
-Status: proposal, 2026-10-26. Evidence and scripts: `dev/fia/` (scripts 05-15, `FINDINGS.md`) and `dev/nfcms/` (`FINDINGS.md`). Developed
+Status: proposal 2026-10-26; implemented in the package 2026-10-27 as Carbon Options 4 "Measured dead wood" (each decay multiplier fitted to its own measured pool in flow order; tests/phaseZ7-measured-dom.R). Evidence and scripts: `dev/fia/` (scripts 05-15, `FINDINGS.md`) and `dev/nfcms/` (`FINDINGS.md`). Developed
 on P26's region (California, Mediterranean Mountains ecodivision, the four main forest types: California Mixed Conifer, Fir/Spruce/Mountain
 Hemlock, Ponderosa Pine, Western Oak). Already in the package: the FIA-consistent pool grouping (`src/dom.R` `FIA_DOM`, LUCAS stock groups,
 commit a77735b) and the spin-up fire fix (`disturbance_matrices`, commit 1747b49). Related UI work: to-do item 18.

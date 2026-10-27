@@ -214,9 +214,13 @@ build_figures <- function(I, outdir) {
   # ---- charts: decay calibration ------------------------------------------------------------------------------------------------
   if (!is.null(I$decay) && nrow(I$decay)) {
     dc <- I$decay; eco <- head(dc[, .N, by = StratumId][order(-N), StratumId], 3); ne <- length(eco)
-    pc <- c(Snag = "#8c510a", `Down wood` = "#d8b365", `Forest floor` = "#5ab4ac", Soil = "#01665e")
-    cols <- c(Snag = "SnagDecayMultiplier", `Down wood` = "DownWoodDecayMultiplier", `Forest floor` = "ForestFloorDecayMultiplier", Soil = "SoilDecayMultiplier")
-    chart_figure("decay_calibration", "Dead organic matter calibration", "Decay rate multipliers of the snag, down wood, forest floor and soil pools by forest type, calibrated in stage 3 so spin-up carbon matches FIA and gSSURGO; 1 = the CBM-CFS3 default.",
+    meas <- "LitterDecayMultiplier" %in% names(dc) && any(!is.na(dc$LitterDecayMultiplier))   # the measured calibration (to-do 19): five dead-wood pools
+    if (meas) { pc <- c(Snag = "#8c510a", `Down logs` = "#bf812d", `Fine woody debris` = "#dfc27d", Litter = "#80cdc1", Duff = "#35978f", Soil = "#01665e")
+      cols <- c(Snag = "SnagDecayMultiplier", `Down logs` = "DownWoodDecayMultiplier", `Fine woody debris` = "FineWoodyDecayMultiplier", Litter = "LitterDecayMultiplier",
+                Duff = "DuffDecayMultiplier", Soil = "SoilDecayMultiplier")
+    } else { pc <- c(Snag = "#8c510a", `Down wood` = "#d8b365", `Forest floor` = "#5ab4ac", Soil = "#01665e")
+      cols <- c(Snag = "SnagDecayMultiplier", `Down wood` = "DownWoodDecayMultiplier", `Forest floor` = "ForestFloorDecayMultiplier", Soil = "SoilDecayMultiplier") }
+    chart_figure("decay_calibration", "Dead organic matter calibration", if (meas) "Decay rate multipliers by forest type, calibrated in stage 3 to FIA's measured snags, down logs, fine woody debris, litter and duff in mature stands (snag, down log and fine woody debris rates shared by the ecodivision) and soil to gSSURGO; 1 = the CBM-CFS3 default. Snag fall is set separately from remeasured dead trees." else "Decay rate multipliers of the snag, down wood, forest floor and soil pools by forest type, calibrated in stage 3 so spin-up carbon matches FIA and gSSURGO; 1 = the CBM-CFS3 default.",
       1, ne, h = 300 + 70 * max(dc[, .N, by = StratumId]$N), draw = function() {
         for (i in seq_along(eco)) { x <- dc[StratumId == eco[i]]; x <- x[order(x$SoilDecayMultiplier)]; ny <- nrow(x)
           par(mar = c(4.5, if (i == 1) 13 else 1, 3, 1))

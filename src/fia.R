@@ -114,3 +114,72 @@ fia_state <- function(dm, s, ref) {
                     c_ag_standing_dead_trees_short_tons_per_acre = dag, c_bg_standing_dead_trees_short_tons_per_acre = dbg,
                     c_total_standing_dead_trees_short_tons_per_acre = dag + dbg)],
        dist = x[, .(plt_cn = PLT_CN, condid = CONDID, dstrbcd1 = DSTRBCD1, trtcd1 = TRTCD1)]) }
+
+# ---- measured dead wood (to-do 19, 2026-10-27; docs/dom-calibration-proposal.md) ------------------------------------------------
+# From the DataMart folder, for the states that have <ST>_COND_DWM_CALC.csv (FIA's down woody material plots, 2001-):
+#   dwm   per forest condition with a DWM visit: coarse woody debris + piles (-> AG medium), fine woody debris (three size classes,
+#         -> AG fast), litter (-> AG very fast), duff (-> AG slow), Mg C/ha; with stand age, forest type group, ecodivision and measured
+#         standing dead carbon from the condition tables (fia_datamart), and the years since the last fire (DSTRBCD 30-32) and the last
+#         cutting (TRTCD 10) recorded at the plot location at any visit
+#   fall  remeasured standing dead trees (STATUSCD 2, STANDING_DEAD_CD 1) and their record at the next visit (PREV_TRE_CN): fallen
+#         (down, or no longer tallied with RECONCILECD 5-6) or still standing; carbon weight, years between visits, fire-killed
+#         (AGENTCD 30-39 or a fire at the location in the 10 years before) - for snag fall rates (calibrate.R snag_fall_rates)
+# Cached in the DataMart folder (fia-deadwood.rds), rebuilt when the files change.
+FIA_DW_METHOD <- "2026-10-27"
+LB_AC_TO_MG_HA <- 0.000453592 * 2.471
+
+fia_dead_wood <- function(dm, base) {
+  sts <- sort(sub("_COND_DWM_CALC[.]csv$", "", list.files(dm, "^[A-Z]{2}_COND_DWM_CALC[.]csv$")))
+  sts <- intersect(sts, base$states)
+  if (!length(sts)) return(NULL)
+  fi <- file.info(file.path(dm, as.vector(outer(sts, c("_COND_DWM_CALC.csv", "_PLOT.csv", "_COND.csv", "_TREE.csv"), paste0))))
+  key <- paste(c(FIA_DW_METHOD, base$key, basename(rownames(fi)), fi$size, as.numeric(fi$mtime)), collapse = "|")
+  cf <- file.path(dm, "fia-deadwood.rds")
+  if (file.exists(cf)) { c0 <- readRDS(cf); if (identical(c0$key, key)) { say("FIA dead wood: cached tables (%s)", cf); return(c0) } }
+  t0 <- Sys.time(); parts <- lapply(sts, function(s) fia_state_dead_wood(dm, s))
+  info <- base$cond[, .(plt_cn, condid, ecodiv, stdage, fortyp_grp, standing = c_ag_standing_dead_trees_short_tons_per_acre * TONS_C_ACRE)]
+  dwm <- merge(data.table::rbindlist(lapply(parts, `[[`, "dwm")), info, by = c("plt_cn", "condid"))
+  fall <- merge(data.table::rbindlist(lapply(parts, `[[`, "fall")), info[, .(plt_cn, condid, ecodiv, fortyp_grp)], by = c("plt_cn", "condid"))
+  out <- list(key = key, states = sts, dwm = dwm, fall = fall)
+  tryCatch(saveRDS(out, cf), error = function(e) say("FIA dead wood: could not cache the tables in %s (%s)", dm, conditionMessage(e)))
+  say("FIA dead wood: %d states read in %.1f min (%d DWM conditions, %d remeasured snags)", length(sts), as.numeric(Sys.time() - t0, units = "mins"), nrow(dwm), nrow(fall))
+  out }
+TONS_C_ACRE <- 2.2417
+
+fia_state_dead_wood <- function(dm, s) {
+  f <- function(t) file.path(dm, sprintf("%s_%s.csv", s, t))
+  num <- function(d, k) { k <- intersect(k, names(d)); if (length(k)) d[, (k) := lapply(.SD, as.numeric), .SDcols = k]; invisible(d) }
+  pl <- data.table::fread(f("PLOT"), select = c("CN", "MEASYEAR", "REMPER", "STATECD", "UNITCD", "COUNTYCD", "PLOT"), colClasses = list(character = "CN"))
+  pl[, loc := paste(STATECD, UNITCD, COUNTYCD, PLOT)]; num(pl, "REMPER")
+  cd <- data.table::fread(f("COND"), select = c("PLT_CN", "CONDID", paste0("DSTRBCD", 1:3), paste0("DSTRBYR", 1:3), paste0("TRTCD", 1:3), paste0("TRTYR", 1:3)),
+                          colClasses = list(character = "PLT_CN"))
+  num(cd, c(paste0("DSTRBCD", 1:3), paste0("DSTRBYR", 1:3), paste0("TRTCD", 1:3), paste0("TRTYR", 1:3)))
+  h <- merge(cd, pl[, .(CN, loc)], by.x = "PLT_CN", by.y = "CN")
+  ev <- unique(data.table::rbindlist(lapply(1:3, function(i) rbind(
+    h[get(paste0("DSTRBCD", i)) %in% 30:32 & data.table::between(get(paste0("DSTRBYR", i)), 1900, 2100), .(loc, year = get(paste0("DSTRBYR", i)), kind = "fire")],
+    h[get(paste0("TRTCD", i)) %in% 10 & data.table::between(get(paste0("TRTYR", i)), 1900, 2100), .(loc, year = get(paste0("TRTYR", i)), kind = "cut")]))))
+  since <- function(x, kd) { m <- merge(x[, .(id, loc, y)], ev[kind == kd], by = "loc", allow.cartesian = TRUE)[year <= y]; m[, .(ys = min(y - year)), by = id] }
+  # DWM conditions
+  w <- data.table::fread(f("COND_DWM_CALC"), select = c("PLT_CN", "CONDID", "MEASYEAR", "CWD_CARBON_COND", "PILE_CARBON_COND", "FWD_SM_CARBON_COND",
+                                                        "FWD_MD_CARBON_COND", "FWD_LG_CARBON_COND", "DUFF_CARBON", "LITTER_CARBON"), colClasses = list(character = "PLT_CN"))
+  w <- unique(w, by = c("PLT_CN", "CONDID")); kc <- grep("CARBON", names(w), value = TRUE); num(w, kc); w[, (kc) := lapply(.SD, `*`, LB_AC_TO_MG_HA), .SDcols = kc]
+  w <- merge(w, pl[, .(CN, loc)], by.x = "PLT_CN", by.y = "CN")
+  w[, `:=`(id = .I, y = MEASYEAR)]
+  sf <- since(w, "fire"); sc <- since(w, "cut")
+  w[, `:=`(since_fire = sf$ys[match(id, sf$id)], since_cut = sc$ys[match(id, sc$id)])]
+  dwm <- w[, .(plt_cn = PLT_CN, condid = CONDID, measyear = MEASYEAR, cwd = CWD_CARBON_COND + data.table::fifelse(is.na(PILE_CARBON_COND), 0, PILE_CARBON_COND),
+               fwd = FWD_SM_CARBON_COND + FWD_MD_CARBON_COND + FWD_LG_CARBON_COND, litter = LITTER_CARBON, duff = DUFF_CARBON, since_fire, since_cut)]
+  # remeasured snags
+  tr <- data.table::fread(f("TREE"), select = c("CN", "PREV_TRE_CN", "PLT_CN", "CONDID", "STATUSCD", "STANDING_DEAD_CD", "AGENTCD", "TPA_UNADJ", "CARBON_AG", "RECONCILECD"),
+                          colClasses = list(character = c("CN", "PREV_TRE_CN", "PLT_CN")))
+  num(tr, c("STANDING_DEAD_CD", "AGENTCD", "TPA_UNADJ", "CARBON_AG", "RECONCILECD"))
+  s1 <- merge(tr[STATUSCD == 2 & STANDING_DEAD_CD %in% 1 & is.finite(CARBON_AG) & is.finite(TPA_UNADJ), .(CN, PLT_CN, CONDID, AGENTCD, wC = CARBON_AG * TPA_UNADJ / 2000 * TONS_C_ACRE)],
+              pl[, .(CN, y = MEASYEAR, loc)], by.x = "PLT_CN", by.y = "CN")
+  s2 <- merge(tr[!is.na(PREV_TRE_CN) & nzchar(PREV_TRE_CN), .(PREV_TRE_CN, PLT_CN2 = PLT_CN, status2 = STATUSCD, standing2 = STANDING_DEAD_CD, reconcile = RECONCILECD)],
+              pl[, .(CN, y2 = MEASYEAR, remper = REMPER)], by.x = "PLT_CN2", by.y = "CN")
+  p <- merge(s1, s2, by.x = "CN", by.y = "PREV_TRE_CN")[status2 %in% 2 | (status2 %in% 0 & reconcile %in% c(5, 6))]
+  p[, `:=`(fell = !(status2 %in% 2 & standing2 %in% 1), yrs = data.table::fifelse(is.finite(remper) & remper > 0, remper, as.numeric(y2 - y)), id = .I)]
+  p <- p[yrs > 0]
+  lf <- merge(p[, .(id, loc, y)], ev[kind == "fire"], by = "loc", allow.cartesian = TRUE)[year <= y & y - year <= 10, unique(id)]
+  fall <- p[, .(plt_cn = PLT_CN, condid = CONDID, wC, fell, yrs, fire_killed = id %in% lf | AGENTCD %in% 30:39)]
+  list(dwm = dwm, fall = fall) }

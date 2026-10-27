@@ -254,6 +254,12 @@ figures, which are redone once after the P26 rerun.
    measured down woody material pools in mature stands, fix snag fall from remeasured dead trees, use fire as the spin-up's last
    disturbance, and fit the high-severity fire and clearcut event flows to plots after those events. Proposal, results on P26 and
    implementation plan: docs/dom-calibration-proposal.md; evidence: dev/fia (scripts 05-15) and dev/nfcms. UI choices: item 18.
+   IMPLEMENTING 2026-10-27 (user go-ahead): Carbon Options 4 "Measured dead wood" (new default; falls back to 1 without the DataMart
+   folder) - src/fia.R fia_dead_wood (all 48 states' COND_DWM_CALC + remeasured snags, cached fia-deadwood.rds), src/calibrate.R
+   dwm_targets / snag_fall_rates / cal_fit_measured (regional snag, down log, fine woody debris; litter and duff by type), src/dom.R
+   (five decay groups, fixed snag fall, ST-Sim row precedence in disturbance_matrices, fire_snag_rows), fitted fire and clearcut rows
+   in defaults/stockflow/event-pathways.csv, defaults/spinup/fire-snag-share.csv, stage 4 reads the event rows stage 3 wrote,
+   OutputDecayCalibration columns, decay figure. Test: tests/phaseZ7-measured-dom.R. DLL rebuild needed for the Carbon Options page.
 20. **Turnover and DOM rate table a user can view and override** - TO DO (user, 2026-10-27). Pick a region (ecodivision) and forest
    type from lists and see the rates the model runs with, laid out by pool: each live pool's turnover rate and its split (foliage -> AG
    very fast; branch -> snag branch / AG fast; stem -> snag stem; fine root -> AG / BG very fast; coarse root -> AG / BG fast), and each

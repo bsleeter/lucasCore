@@ -6,8 +6,12 @@
 # wetland, developed) and the transition-triggered event flows are the LUCAS defaults in defaults/stockflow (from the CONUS 1km
 # model). The fixed definitions (flow pathway diagram, flow order, groups, output options) come from the 'Stock-Flow Definitions'
 # scenario that tools/new-library.R creates: a stage 3 scenario depends on it (and on a stage 2 result, or runs after stage 2).
-# Carbon Options picks the dead organic matter decay: calibrated (default: snags, down wood, floor to FIA; soil to gSSURGO), FIA dead
-# pools with CBM-default soil, or CBM defaults throughout (the CONUS 1km build's way). Every option logs spin-up soil against gSSURGO.
+# Carbon Options picks the dead organic matter decay: measured dead wood (default from 2026-10-27, to-do 19; docs/dom-calibration-
+# proposal.md: FIA down woody material in mature stands, regional snag / down log / fine woody debris decay, litter and duff per forest
+# type, snag fall from remeasured dead trees, fire as the spin-up's last disturbance), calibrated to FIA condition pools (snags, down
+# wood, floor; the earlier default), FIA condition pools with CBM-default soil, or CBM defaults throughout (the CONUS 1km build's way).
+# The measured and condition-pool calibrations fit soil to gSSURGO; every option logs spin-up soil against it. High-severity fire's snag share
+# per forest type (defaults/spinup/fire-snag-share.csv) is written as state-class event rows whatever the option.
 # Needs the Live-Tree Carbon Curves of stage 2 (same pipeline, or a dependency on a stage 2 result).
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
@@ -42,6 +46,7 @@ progressBar()
 
 # ---- 3b: calibrate DOM decay (src/calibrate.R): snags, down wood, forest floor to FIA; soil to gSSURGO ----------------------
 MIN_PLOTS_CELL <- 200
+MEAS_MIN_AGE <- 60L; MIN_DWM_CELL <- 30L   # measured calibration: mature stand age; mature DWM conditions for a cell's own litter and duff fit (to-do 18: expose)
 cells <- unique(cc[, .(Stratum, StateClass)])
 miss <- setdiff(cells$StateClass, cw$StateClass); if (length(miss)) fail("carbon curves for state classes not in the forest crosswalk: %s", paste(miss, collapse = ", "))
 cells[, sc := cw$StateClassId[match(StateClass, cw$StateClass)]][, ecodiv := eco$ecodiv[match(Stratum, eco$Stratum)]][, temp := eco$temp[match(Stratum, eco$Stratum)]]
@@ -69,20 +74,67 @@ if (!is.null(study)) { cells <- cells[Stratum %in% study]
       paste(study, collapse = ", "), nrow(cells), nrow(all_cells)) }
 say("Decay calibration: %d cells, %d with >= %d FIA plots (own fit), %d with a gSSURGO soil target; return intervals %d-%d yr",
     nrow(cells), cells[plots >= MIN_PLOTS_CELL, .N], MIN_PLOTS_CELL, cells[!is.na(soil_target), .N], min(cells$ri), max(cells$ri))
-ctx <- list(cc = cc, cw = cw, dens = dens, cbm = cbm, fo = fread(pkg_file("defaults", "stockflow", "stsim_FlowOrder.csv")),
-            ev = fread(pkg_file("defaults", "stockflow", "event-pathways.csv"), na.strings = ""))
+# event flows: the LUCAS defaults plus state-class rows for high-severity fire's per-forest-type snag share (defaults/spinup/
+# fire-snag-share.csv, src/dom.R fire_snag_rows); the spin-up uses the same table stage 3 writes to stsim_FlowPathway
+ev_all <- fread(pkg_file("defaults", "stockflow", "event-pathways.csv"), colClasses = "character", na.strings = "")
+fss <- read_default("spinup", "fire-snag-share.csv")[, `:=`(StateClass = scl$Name[match(StateClassId, scl$Id)], Share = as.numeric(Share))][!is.na(StateClass)]
+ev_all <- rbind(ev_all, fire_snag_rows(ev_all, fss))
+say("High-severity fire snag share by forest type: %s", if (nrow(fss)) paste(sprintf("%s %.2f", sub("^Forest: ", "", fss$StateClass), fss$Share), collapse = ", ") else "none (the event table's rows for every type)")
+ctx <- list(cc = cc, cw = cw, dens = dens, cbm = cbm, fo = fread(pkg_file("defaults", "stockflow", "stsim_FlowOrder.csv")), ev = ev_all)
 t0 <- Sys.time(); cl <- parallel::makeCluster(max(1, min(30, parallel::detectCores() - 1)))
 parallel::clusterExport(cl, c("ctx", "dat", "cells", "all_cells"), envir = environment())
 pkgdir <- env$PackageDirectory; parallel::clusterExport(cl, "pkgdir", envir = environment())
 invisible(parallel::clusterEvalQ(cl, { library(data.table); for (f in c("flows.R", "dom.R", "calibrate.R")) source(file.path(pkgdir, "src", f)) }))
 # Carbon Options: which dead-pool decay rates are calibrated (1: snags, down wood and floor to FIA, soil to gSSURGO; 2: FIA dead pools,
 # CBM-default soil; 3: CBM defaults, no calibration - the CONUS 1km build's way). A pool that is not calibrated keeps multiplier 1.
+# 4 (default from 2026-10-27, to-do 19): measured dead wood - src/calibrate.R cal_fit_measured; needs the FIA DataMart Folder with the
+# <ST>_COND_DWM_CALC tables, else falls back to 1.
 copt <- read_ds("CarbonOptions"); dm <- copt$DeadOrganicMatterModel[1]
-dom_mode <- if (is.null(dm) || is.na(dm)) 1L else if (is.numeric(dm)) as.integer(dm) else if (grepl("^Calibrated", dm)) 1L else if (grepl("^FIA dead", dm)) 2L else if (grepl("^CBM default", dm)) 3L else NA_integer_
+dom_mode <- if (is.null(dm) || is.na(dm)) 4L else if (is.numeric(dm)) as.integer(dm) else if (grepl("^Measured", dm)) 4L else if (grepl("^Calibrated", dm)) 1L else if (grepl("^FIA (dead|condition)", dm)) 2L else if (grepl("^CBM default", dm)) 3L else NA_integer_
 if (is.na(dom_mode)) fail("Carbon Options: unrecognised Dead Organic Matter Decay choice '%s'", dm)
-say("Carbon Options: dead organic matter decay = %s", c("calibrated (snags, down wood, floor to FIA; soil to gSSURGO)", "FIA dead pools, CBM-default soil", "CBM defaults (no calibration)")[dom_mode])
+dw <- NULL
+if (dom_mode == 4L) {
+  dmf <- tryCatch(read_data_sources("FiaDataMartFolder")$FiaDataMartFolder, error = function(e) NA_character_)
+  if (length(dmf) && !is.na(dmf) && nzchar(dmf) && dir.exists(dmf)) dw <- fia_dead_wood(dmf, fia_datamart(dmf, src$EcodivisionFile))
+  if (is.null(dw)) { say("Carbon Options: measured dead wood needs the FIA DataMart Folder (Data Sources) with <ST>_COND_DWM_CALC.csv tables - using the FIA condition-pool calibration instead"); dom_mode <- 1L }
+}
+say("Carbon Options: dead organic matter decay = %s", c("calibrated to FIA condition pools (snags, down wood, floor; soil to gSSURGO)", "FIA condition pools, CBM-default soil",
+                                                        "CBM defaults (no calibration)", "measured dead wood (FIA down woody material, mature stands; regional decay; soil to gSSURGO)")[dom_mode])
 fc <- ft <- list(); red <- numeric()
-if (dom_mode %in% 1:2) {
+cells[, `:=`(snag_fall = NA_real_, SnagFallSource = NA_character_, mplots = NA_integer_, m_fwd = NA_real_, m_litter = NA_real_, m_duff = NA_real_)]
+cells[, FireSnagShare := fss$Share[match(StateClass, fss$StateClass)]]
+if (dom_mode == 4L) {
+  # snag fall from remeasured standing dead trees: the cell's own rate with >= min_snags snags, else its forest type's, else all types'
+  fr <- snag_fall_rates(dw, cw)
+  for (x in list(cells, all_cells)) {
+    x[, c("own_n", "own_r") := fr$cell[x, on = c("sc", "ecodiv"), .(snags, rate)]][, c("typ_n", "typ_r") := fr$type[x, on = "sc", .(snags, rate)]]
+    x[, `:=`(snag_fall = data.table::fcase(own_n >= fr$min_snags, own_r, typ_n >= fr$min_snags, typ_r, default = fr$all),
+             SnagFallSource = data.table::fcase(own_n >= fr$min_snags, sprintf("Cell (%d snags)", own_n), typ_n >= fr$min_snags, sprintf("Forest type (%d snags)", typ_n), default = "All forest types"))]
+    x[, c("own_n", "own_r", "typ_n", "typ_r") := NULL] }
+  dat_m <- dwm_targets(dw, cw, MEAS_MIN_AGE)
+  for (x in list(cells, all_cells)) x[, mplots := dat_m$obs[x, on = c("sc", "ecodiv"), .(n = sum(n)), by = .EACHI]$n][is.na(mplots), mplots := 0L]
+  say("Measured dead wood: %d down woody material conditions (%d states), %d mature (age >= %d, no fire or cutting in %d yr) in this build's types; snag fall from %d remeasured snags",
+      nrow(dw$dwm), length(dw$states), sum(dat_m$obs$n), MEAS_MIN_AGE, MEAS_RECENT, nrow(dw$fall))
+  # fits: each forest type pooled over its ecodivisions (the fallback), and each ecodivision over its types with enough plots (shared snag,
+  # down log and fine woody debris multipliers; litter and duff per type)
+  ecos <- unique(cells[mplots >= MIN_DWM_CELL, Stratum])   # the forest-type fallback only for types with a cell short of its own fit
+  types <- unique(all_cells[sc %in% cells[!(Stratum %in% ecos & mplots >= MIN_DWM_CELL), sc] & mplots > 0, sc])
+  parallel::clusterExport(cl, c("dat_m", "cells", "all_cells"), envir = environment())
+  jobs <- c(lapply(types, function(s) list(kind = "type", rows = all_cells[sc == s & mplots > 0])), lapply(ecos, function(e) list(kind = "eco", rows = cells[Stratum == e & mplots >= MIN_DWM_CELL])))
+  fits <- parallel::parLapply(cl, jobs, function(j) cal_fit_measured(j$rows, ctx, dat_m))
+  ft <- stats::setNames(fits[seq_along(types)], types); fe <- stats::setNames(fits[length(types) + seq_along(ecos)], ecos)
+  cells[, `:=`(Level = NA_character_, m_snag = NA_real_, m_cwd = NA_real_, m_floor = NA_real_, clearcut = NA_real_)]
+  M5 <- c("snag", "cwd", "fwd", "litter", "duff"); setm <- function(i, v, lv) cells[i, `:=`(Level = lv, m_snag = v[["snag"]], m_cwd = v[["cwd"]], m_fwd = v[["fwd"]], m_litter = v[["litter"]], m_duff = v[["duff"]])]
+  for (i in seq_len(nrow(cells))) { e <- cells$Stratum[i]; s <- as.character(cells$sc[i]); tf <- if (s %in% names(ft)) as.list(ft[[s]][1, ..M5]) else NULL
+    if (e %in% names(fe)) { f <- fe[[e]]; rows <- jobs[[length(types) + match(e, ecos)]]$rows; j <- match(cells$sc[i], rows$sc)
+      if (!is.na(j)) setm(i, as.list(f[j, ..M5]), "Ecodivision")
+      else if (!is.null(tf)) setm(i, c(as.list(f[1, .(snag, cwd, fwd)]), tf[c("litter", "duff")]), "Ecodivision; litter and duff by forest type")
+    } else if (!is.null(tf)) setm(i, tf, "Forest type") }
+  nod <- cells[is.na(Level), unique(StateClass)]
+  if (length(nod)) say("No mature down woody material plots for %s: CBM-default decay", paste(nod, collapse = ", "))
+  cells[is.na(Level), `:=`(Level = "CBM default (no FIA plots)", m_snag = 1, m_cwd = 1, m_fwd = 1, m_litter = 1, m_duff = 1)]
+  red <- unlist(lapply(fits, function(f) 1 - sum(f$loss1) / sum(f$loss0)))
+} else if (dom_mode %in% 1:2) {
   own <- which(cells$plots >= MIN_PLOTS_CELL); types <- intersect(unique(cells[plots < MIN_PLOTS_CELL, sc]), unique(all_cells[plots > 0, sc]))
   fc <- parallel::parLapply(cl, own, function(i) cal_fit(cells[i], ctx, dat))
   ft <- stats::setNames(parallel::parLapply(cl, types, function(s) cal_fit(all_cells[sc == s & plots > 0], ctx, dat)), types)
@@ -92,10 +144,11 @@ if (dom_mode %in% 1:2) {
   if (anyNA(cells$Level)) fail("no FIA dead-carbon plots for state classes %s", paste(unique(cells[is.na(Level), StateClass]), collapse = ", "))
   red <- c(sapply(fc, function(f) 1 - f$loss1 / f$loss0), sapply(ft, function(f) 1 - f$loss1 / f$loss0))
 } else cells[, `:=`(Level = "CBM default", m_snag = 1, m_cwd = 1, m_floor = 1, clearcut = NA_real_)]
-mult_i <- function(i) list(snag = cells$m_snag[i], cwd = cells$m_cwd[i], floor = cells$m_floor[i])
-w_i <- function(i) if (is.na(cells$clearcut[i])) 0 else cells$clearcut[i]     # uncalibrated: cycles of high-severity fire only
-parallel::clusterExport(cl, c("cells", "mult_i", "w_i"), envir = environment())
-if (dom_mode == 1L) {
+mult_i <- function(i) if (dom_mode == 4L) list(snag = cells$m_snag[i], cwd = cells$m_cwd[i], fwd = cells$m_fwd[i], litter = cells$m_litter[i], duff = cells$m_duff[i]) else
+  list(snag = cells$m_snag[i], cwd = cells$m_cwd[i], floor = cells$m_floor[i])
+w_i <- function(i) if (is.na(cells$clearcut[i])) 0 else cells$clearcut[i]     # uncalibrated or measured: cycles of high-severity fire only
+parallel::clusterExport(cl, c("cells", "mult_i", "w_i", "dom_mode"), envir = environment())
+if (dom_mode %in% c(1L, 4L)) {
   cells[, m_soil := unlist(parallel::parLapply(cl, seq_len(nrow(cells)), function(i) cal_soil(cells[i], ctx, mult_i(i), w_i(i))))]
   cells[, SoilSource := ifelse(is.na(m_soil), ifelse(is.na(soil_target), "Forest type median (no gSSURGO target)", "Forest type median (target unreachable)"), "gSSURGO target")]
   cells[is.na(m_soil), m_soil := median(cells[sc == .BY$sc, m_soil], na.rm = TRUE), by = sc]
@@ -108,18 +161,25 @@ parallel::stopCluster(cl)
 gs <- cells[!is.na(soil_target)]
 if (nrow(gs)) say("Soil vs gSSURGO: spin-up belowground carbon %.0f vs gSSURGO %.0f Mg C/ha (medians over %d cells; ratio median %.2f, range %.2f-%.2f)",
                   median(gs$eq_bg), median(gs$soil_target), nrow(gs), median(gs$eq_bg / gs$soil_target), min(gs$eq_bg / gs$soil_target), max(gs$eq_bg / gs$soil_target))
+if (dom_mode == 4L) say("Decay calibration took %.1f min; median misfit reduction %.0f%%; median multipliers snag %.2f, down logs %.2f, fine woody debris %.2f, litter %.2f, duff %.2f, soil %.2f; stem snag fall %.3f /yr",
+                        as.numeric(Sys.time() - t0, units = "mins"), 100 * median(red), median(cells$m_snag), median(cells$m_cwd), median(cells$m_fwd), median(cells$m_litter),
+                        median(cells$m_duff), median(cells$m_soil), median(cells$snag_fall)) else
 say("Decay calibration took %.1f min%s; median multipliers snag %.2f, down wood %.2f, forest floor %.2f, soil %.2f%s",
     as.numeric(Sys.time() - t0, units = "mins"), if (length(red)) sprintf("; median misfit reduction %.0f%%", 100 * median(red)) else "",
     median(cells$m_snag), median(cells$m_cwd), median(cells$m_floor), median(cells$m_soil),
     if (all(is.na(cells$clearcut))) "" else sprintf("; clearcut share %.2f", median(cells$clearcut, na.rm = TRUE)))
+mm <- as.matrix(cells[, if (dom_mode == 4L) .(m_snag, m_cwd, m_fwd, m_litter, m_duff) else .(m_snag, m_cwd, m_floor)])
 check(STAGE, "decay multipliers are finite and inside [0.05, 20] (soil [0.02, 50])",
-      all(is.finite(as.matrix(cells[, .(m_snag, m_cwd, m_floor, m_soil)]))) && all(cells[, c(m_snag, m_cwd, m_floor)] >= 0.05 - 1e-9 & cells[, c(m_snag, m_cwd, m_floor)] <= 20 + 1e-9) &&
-        all(cells$m_soil >= 0.02 - 1e-9 & cells$m_soil <= 50 + 1e-9))
+      all(is.finite(mm)) && all(mm >= 0.05 - 1e-9 & mm <= 20 + 1e-9) && all(is.finite(cells$m_soil)) && all(cells$m_soil >= 0.02 - 1e-9 & cells$m_soil <= 50 + 1e-9))
+if (dom_mode == 4L) check(STAGE, "measured snag fall rates are between 0.005 and 0.5 per year", all(cells$snag_fall >= 0.005 & cells$snag_fall <= 0.5),
+                          sprintf("range %.3f-%.3f", min(cells$snag_fall), max(cells$snag_fall)))
 if (length(red)) check(STAGE, "calibration reduces the FIA dead-carbon misfit in every fit", all(red > 0), sprintf("smallest reduction %.0f%%", 100 * min(red)))
 check(STAGE, "spin-up soil is finite and positive in every cell", all(is.finite(cells$eq_bg) & cells$eq_bg > 0), sprintf("range %.1f-%.1f Mg C/ha", min(cells$eq_bg), max(cells$eq_bg)))
 write_ds(cells[, .(StratumId = Stratum, StateClassId = StateClass, Level, Plots = plots, ReturnInterval = ri, SnagDecayMultiplier = round(m_snag, 4),
-                   DownWoodDecayMultiplier = round(m_cwd, 4), ForestFloorDecayMultiplier = round(m_floor, 4), SoilDecayMultiplier = round(m_soil, 4),
-                   ClearcutShare = round(clearcut, 3), SoilTarget = round(soil_target, 2), SoilSource)], "OutputDecayCalibration")
+                   DownWoodDecayMultiplier = round(m_cwd, 4), FineWoodyDecayMultiplier = round(m_fwd, 4), LitterDecayMultiplier = round(m_litter, 4),
+                   DuffDecayMultiplier = round(m_duff, 4), ForestFloorDecayMultiplier = round(m_floor, 4), SoilDecayMultiplier = round(m_soil, 4),
+                   ClearcutShare = round(clearcut, 3), SnagFallRate = round(snag_fall, 4), SnagFallSource, FireSnagShare, MeasuredPlots = mplots,
+                   SoilTarget = round(soil_target, 2), SoilSource)], "OutputDecayCalibration")
 progressBar()
 
 # ---- forest: net growth, growth split, turnover and decay per cell ----------------------------------------------------
@@ -138,7 +198,9 @@ for (i in seq_len(nrow(cells))) { s <- cells$Stratum[i]; c0 <- cells$StateClass[
   fm_g[[i]] <- rbindlist(lapply(names(LIVE_POOLS), function(pl) data.table(StratumId = s, StateClassId = c0, AgeMin = g$Age, AgeMax = amax,
                                                                            FlowGroupId = paste(GROWTH_FLOW[[pl]], "[Type]"), Value = sh[[pl]])))
   cm <- cells[Stratum == s & StateClass == c0]
-  dv <- scale_decay(dom_flow_values(r, k$softwood, eco[Stratum == s, temp], cbm), list(snag = cm$m_snag, cwd = cm$m_cwd, floor = cm$m_floor, soil = cm$m_soil))
+  dv <- dom_flow_values(r, k$softwood, eco[Stratum == s, temp], cbm); fixed <- character()
+  if (!is.na(cm$snag_fall)) { dv <- set_snag_fall(dv, cm$snag_fall); fixed <- SNAG_FALL_FLOWS }
+  dv <- scale_decay(dv, c(mult_i(which(cells$Stratum == s & cells$StateClass == c0)), list(soil = cm$m_soil)), fixed)
   fm_d[[i]] <- data.table(StratumId = s, StateClassId = c0, AgeMin = NA_integer_, AgeMax = NA_integer_, FlowGroupId = paste(names(dv), "[Type]"), Value = unname(dv)) }
 ng <- rbindlist(ng); fm_g <- rbindlist(fm_g); fm_d <- rbindlist(fm_d)
 say("Forest: %d net growth rows, %d growth-split rows (%d negative shares), %d turnover/decay rows", nrow(ng), nrow(fm_g), nneg, nrow(fm_d))
@@ -158,7 +220,7 @@ rd <- function(f) { x <- fread(pkg_file("defaults", "stockflow", f), colClasses 
   x[, which(vapply(x, function(v) any(!is.na(v)), TRUE)), with = FALSE] }
 fp_forest <- rbindlist(lapply(cw$StateClass, function(c0) FOREST_PATHWAYS[, .(FromStateClassId = c0, FromStockTypeId = From, ToStockTypeId = To,
                                                                                 StateAttributeTypeId = Attribute, FlowTypeId = FlowType, Multiplier = 1)]))
-fp <- rbind(fp_forest, rd("nonforest-pathways.csv"), rd("event-pathways.csv"), fill = TRUE)
+fp <- rbind(fp_forest, rd("nonforest-pathways.csv"), ev_all[, which(vapply(ev_all, function(v) any(!is.na(v)), TRUE)), with = FALSE], fill = TRUE)   # events with the per-type fire rows
 fm <- rbind(fm_g, fm_d, rd("nonforest-multipliers-grassland-shrubland.csv"), rd("nonforest-multipliers-wetland.csv"),
             rd("nonforest-multipliers-other.csv"), fill = TRUE)
 # (the CONUS 1km build also had 0.01 "scalar" multipliers on the four climate flow groups, undoing climate rasters stored as

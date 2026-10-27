@@ -282,7 +282,7 @@
 	</dataSheet>
 
 	<dataSheet name="CarbonOptions" displayName="Carbon Options" isSingleRow="True" viewClassName="lucasCoreUI.CarbonOptionsView" viewClassAssembly="lucasCoreUI">
-		<column name="DeadOrganicMatterModel" displayName="Dead Organic Matter Decay" dataType="Integer" validationType="List" formula1="1:Calibrated (snags, down wood, floor to FIA; soil to gSSURGO)|2:FIA dead pools, CBM-default soil|3:CBM defaults (no calibration)" defaultValue="1"/>
+		<column name="DeadOrganicMatterModel" displayName="Dead Organic Matter Decay" dataType="Integer" validationType="List" formula1="4:Measured dead wood (FIA down woody material, mature stands; regional decay; soil to gSSURGO)|1:Calibrated to FIA condition pools (soil to gSSURGO)|2:FIA condition pools, CBM-default soil|3:CBM defaults (no calibration)" defaultValue="4"/>
 	</dataSheet>
 
 	<dataSheet name="LandCoverCrosswalk" displayName="Land Cover Crosswalks" viewClassName="lucasCoreUI.LandCoverCrosswalkView" viewClassAssembly="lucasCoreUI">
@@ -371,9 +371,16 @@
 		<column name="ReturnInterval" displayName="Spin-up Return Interval (yr)" dataType="Integer"/>
 		<column name="SnagDecayMultiplier" displayName="Snag Decay Multiplier" dataType="Double" format="0.000"/>
 		<column name="DownWoodDecayMultiplier" displayName="Down Wood Decay Multiplier" dataType="Double" format="0.000"/>
-		<column name="ForestFloorDecayMultiplier" displayName="Forest Floor Decay Multiplier" dataType="Double" format="0.000"/>
+		<column name="FineWoodyDecayMultiplier" displayName="Fine Woody Debris Decay Multiplier" dataType="Double" format="0.000" isOptional="True"/>
+		<column name="LitterDecayMultiplier" displayName="Litter Decay Multiplier" dataType="Double" format="0.000" isOptional="True"/>
+		<column name="DuffDecayMultiplier" displayName="Duff Decay Multiplier" dataType="Double" format="0.000" isOptional="True"/>
+		<column name="ForestFloorDecayMultiplier" displayName="Forest Floor Decay Multiplier" dataType="Double" format="0.000" isOptional="True"/>
 		<column name="SoilDecayMultiplier" displayName="Soil Decay Multiplier" dataType="Double" format="0.000"/>
-		<column name="ClearcutShare" displayName="Last Disturbance Clearcut Share" dataType="Double" format="0.00"/>
+		<column name="ClearcutShare" displayName="Last Disturbance Clearcut Share" dataType="Double" format="0.00" isOptional="True"/>
+		<column name="SnagFallRate" displayName="Stem Snag Fall Rate (/yr)" dataType="Double" format="0.000" isOptional="True"/>
+		<column name="SnagFallSource" displayName="Snag Fall Source" dataType="String" isOptional="True"/>
+		<column name="FireSnagShare" displayName="High-Severity Fire Snag Share" dataType="Double" format="0.00" isOptional="True"/>
+		<column name="MeasuredPlots" displayName="FIA Down Woody Material Conditions (mature)" dataType="Integer" isOptional="True"/>
 		<column name="SoilTarget" displayName="gSSURGO Soil Target (Mg C/ha)" dataType="Double" format="0.0" isOptional="True"/>
 		<column name="SoilSource" displayName="Soil Multiplier Source" dataType="String"/>
 	</dataSheet>

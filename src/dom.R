@@ -21,23 +21,35 @@ DOM_POOLS <- c(AGVF = "DOM: Aboveground Very Fast", BGVF = "DOM: Belowground Ver
 #   soil           mineral soil, no roots (matched to gSSURGO, not FIA)                     BG Very Fast + BG Slow
 # The LUCAS stock groups pool the same way (DOM: Standing Deadwood, DOM: Down Deadwood, DOM: Litter, DOM: Soil + Deep Soil).
 FIA_DOM <- list(standing_dead = c("SnagStem", "SnagBranch"), down_dead = c("AGM", "BGF"), litter = c("AGVF", "AGF", "AGS"), soil = c("BGVF", "BGS"))
-# calibration groups: which pools' outflows (decay, emission and snag fall) each multiplier scales - the same pools as the FIA targets
-DECAY_GROUPS <- list(snag = c("SnagStem", "SnagBranch"), cwd = c("AGM", "BGF"), floor = c("AGVF", "AGF", "AGS"), soil = c("BGVF", "BGS"))
+# calibration groups: which pools' outflows (decay, emission, and snag fall unless it is fixed) each multiplier scales. The measured
+# calibration (to-do 19, 2026-10-27) has one multiplier per pool FIA's down woody material plots measure: snags, down logs (AG medium,
+# with the unmeasured dead coarse roots), fine woody debris (AG fast), litter (AG very fast) and duff (AG slow); the modelled-target
+# calibration has snags, down wood and one forest floor multiplier (AG very fast + fast + slow). Soil (BG very fast + slow) to gSSURGO.
+DECAY_GROUPS <- list(snag = c("SnagStem", "SnagBranch"), cwd = c("AGM", "BGF"), fwd = "AGF", litter = "AGVF", duff = "AGS",
+                     floor = c("AGVF", "AGF", "AGS"), soil = c("BGVF", "BGS"))
+# snag fall: in the measured calibration a fixed rate from FIA's remeasured standing dead trees (set_snag_fall), outside the snag multiplier
+SNAG_FALL_FLOWS <- c(stem = "Transfer: Snag Stem -> AG Medium", branch = "Transfer: Snag Branch -> AG Fast")
 
-# scale the DOM outflows (decay, emission, snag fall) of each decay group by its multiplier; AG Slow -> BG Slow keeps the CBM rate.
+# set the annual stem snag fall to stem_rate; branch snags fall faster in proportion, as CBM's two rates do
+set_snag_fall <- function(vals, stem_rate) {
+  if (is.null(stem_rate) || !length(stem_rate) || is.na(stem_rate)) return(vals)
+  vals[SNAG_FALL_FLOWS] <- vals[SNAG_FALL_FLOWS] * stem_rate / vals[[SNAG_FALL_FLOWS[["stem"]]]]; vals }
+
+# scale the DOM outflows (decay, emission, snag fall) of each decay group by its multiplier; AG Slow -> BG Slow keeps the CBM rate, and
+# the flows named in 'fixed' (the snag fall when it is measured) keep theirs.
 # A pool cannot lose more than its stock in a year: if a pool's outflows exceed 1 they are scaled down together. Used both in calibration
 # and for the flow multipliers stage 3 writes, so the model runs with exactly the rates that were calibrated.
-scale_decay <- function(vals, mult = NULL) {
+scale_decay <- function(vals, mult = NULL, fixed = character()) {
   fp <- FOREST_PATHWAYS[match(names(vals), FlowType)]
   if (anyNA(fp$From)) stop("flow types without a forest pathway: ", paste(names(vals)[is.na(fp$From)], collapse = ", "), call. = FALSE)
   from <- names(DOM_POOLS)[match(fp$From, DOM_POOLS)]
-  if (!is.null(mult)) for (g in names(mult)) { k <- !is.na(from) & from %in% DECAY_GROUPS[[g]] & names(vals) != "Transfer: AG Slow -> BG Slow"; vals[k] <- vals[k] * mult[[g]] }
+  if (!is.null(mult)) for (g in names(mult)) { k <- !is.na(from) & from %in% DECAY_GROUPS[[g]] & !names(vals) %in% c("Transfer: AG Slow -> BG Slow", fixed); vals[k] <- vals[k] * mult[[g]] }
   for (p in unique(na.omit(from))) { k <- !is.na(from) & from == p; t <- sum(vals[k]); if (t > 1) vals[k] <- vals[k] / t }
   vals }
 
-# build the annual matrices from named flow values (dom_flow_values) and the flow order; mult: decay-group multipliers (scale_decay)
-dom_matrices <- function(vals, flow_order, mult = NULL) {
-  vals <- scale_decay(vals, mult)
+# build the annual matrices from named flow values (dom_flow_values) and the flow order; mult, fixed: as scale_decay
+dom_matrices <- function(vals, flow_order, mult = NULL, fixed = character()) {
+  vals <- scale_decay(vals, mult, fixed)
   fp <- FOREST_PATHWAYS[match(names(vals), FlowType)]
   if (anyNA(fp$From)) stop("flow types without a forest pathway: ", paste(names(vals)[is.na(fp$From)], collapse = ", "), call. = FALSE)
   code <- function(s) names(DOM_POOLS)[match(s, DOM_POOLS)]
@@ -62,8 +74,11 @@ dom_matrices <- function(vals, flow_order, mult = NULL) {
 # from -> to stock pair the row with the largest FromAgeMin not above the age applies; a pair with only a blank age applies at every age.
 # (Fixed 2026-10-26: the largest FromAgeMin was taken over the whole event, so from age 11 fire dropped every dead-pool row - the
 # spin-up's fires never burned forest floor, woody debris or snags, while ST-Sim's runs did.)
+# As in ST-Sim (dev/stsim/01-flow-row-precedence.R, 2026-10-27): where a pair has rows for this state class, they replace that pair's
+# blank-class rows at every age; the blank rows of the other pairs still apply.
 disturbance_matrices <- function(events, group, state_class, age) {
-  e <- events[TransitionGroupId == group & (is.na(FromStateClassId) | FromStateClassId == state_class)]
+  e <- data.table::copy(events[TransitionGroupId == group & (is.na(FromStateClassId) | FromStateClassId == state_class)])
+  e <- e[, if (any(!is.na(FromStateClassId))) .SD[!is.na(FromStateClassId)] else .SD, by = .(FromStockTypeId, ToStockTypeId)]
   e[, amin := suppressWarnings(as.numeric(FromAgeMin))][is.na(amin), amin := 0]
   e <- e[amin <= age][, .SD[amin == max(amin)], by = .(FromStockTypeId, ToStockTypeId)]
   if (!nrow(e)) stop("no event flows for ", group, call. = FALSE)
@@ -89,3 +104,23 @@ dom_by_age <- function(mats, live, ri, hist, last, max_age = nrow(live) - 1) {
 
 # the FIA-comparable sums of a DOM-by-age matrix
 fia_dom_sums <- function(dom) sapply(FIA_DOM, function(p) rowSums(dom[, p, drop = FALSE]))
+
+# state-class rows for high-severity fire's live wood pairs from the per-forest-type snag shares (defaults/spinup/fire-snag-share.csv):
+# share = the part of live aboveground wood left standing (stems share x 0.65 / 0.545, branches share x 0.30 / 0.545 of the pool, the
+# blank rows' split), the rest of the pool burned (emission rows rescaled together). Every age row of each changed pair is repeated
+# for the class - older stands (FromAgeMin >= 11) get the share, younger ones keep the blank rows' values - because in ST-Sim a class
+# row hides the blank rows of its pair at every age. events: the event flow table (text columns); shares: state class name, Share.
+FIRE_HS <- "Fire: High Severity [Type]"
+fire_snag_rows <- function(events, shares) {
+  WOOD <- c(`Biomass: Merchantable` = "DOM: Snag Stem", `Biomass: Other Wood` = "DOM: Snag Branch"); SPLIT <- c(`Biomass: Merchantable` = 0.65, `Biomass: Other Wood` = 0.30)
+  b <- events[TransitionGroupId == FIRE_HS & is.na(FromStateClassId) & FromStockTypeId %in% names(WOOD)]
+  if (!nrow(b) || !nrow(shares)) return(events[0])
+  data.table::rbindlist(lapply(seq_len(nrow(shares)), function(j) { x <- data.table::copy(b)[, FromStateClassId := shares$StateClass[j]]
+    old <- suppressWarnings(as.numeric(x$FromAgeMin)) >= 11 & !is.na(x$FromAgeMin)
+    for (fr in names(WOOD)) { k <- old & x$FromStockTypeId == fr
+      snag <- shares$Share[j] * SPLIT[[fr]] / 0.545
+      x[k & ToStockTypeId == WOOD[[fr]], Multiplier := as.character(round(snag, 6))]
+      em <- k & grepl("^Atmosphere", x$ToStockTypeId); other <- k & !em & x$ToStockTypeId != WOOD[[fr]]
+      rest <- 1 - snag - sum(as.numeric(x$Multiplier[other])); v <- as.numeric(x$Multiplier[em])
+      if (sum(v) > 0) x[em, Multiplier := as.character(round(v / sum(v) * rest, 6))] }
+    x })) }

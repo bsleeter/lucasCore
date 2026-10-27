@@ -35,10 +35,12 @@ cal_setup <- function(k, ctx) {
   w <- ctx$cw[StateClassId == k$sc]; sw <- grepl("Softwood$", w$LagClass)
   live <- as.matrix(ctx$cc[Stratum == k$Stratum & StateClass == k$StateClass][order(Age), names(LIVE_POOLS), with = FALSE])
   r <- turnover_rates(k$StateClass, sw, as.numeric(ctx$dens[StateClassId == k$sc, DeciduousShare]), ctx$cbm)
-  list(k = k, live = live, vals = dom_flow_values(r, sw, k$temp, ctx$cbm),
+  vals <- dom_flow_values(r, sw, k$temp, ctx$cbm); fixed <- character()
+  if (!is.null(k$snag_fall) && !is.na(k$snag_fall)) { vals <- set_snag_fall(vals, k$snag_fall); fixed <- SNAG_FALL_FLOWS }   # measured snag fall
+  list(k = k, live = live, vals = vals, fixed = fixed,
        hist = disturbance_matrices(ctx$ev, "Fire: High Severity [Type]", k$StateClass, k$ri),
        harv = disturbance_matrices(ctx$ev, "Forest Harvest: Forest Clearcut [Type]", k$StateClass, k$ri)) }
-cal_dom <- function(S, fo, mult, w) { m <- dom_matrices(S$vals, fo, mult)
+cal_dom <- function(S, fo, mult, w) { m <- dom_matrices(S$vals, fo, mult, S$fixed)
   (1 - w) * dom_by_age(m, S$live, S$k$ri, S$hist, S$hist) + w * dom_by_age(m, S$live, S$k$ri, S$hist, S$harv) }
 
 cal_loss <- function(par, SS, OB, AG, scale, fo) {
@@ -72,3 +74,63 @@ cal_soil <- function(k, ctx, mult, w) {
     mean(rowSums(d[1:min(S$k$ri, nrow(d)), FIA_DOM$soil, drop = FALSE])) }
   r <- tryCatch(stats::uniroot(function(lm) log(bg(exp(lm))) - log(k$soil_target), c(log(0.02), log(50)))$root, error = function(e) NA_real_)
   exp(r) }
+
+# ---- measured calibration (to-do 19, 2026-10-27; docs/dom-calibration-proposal.md) ------------------------------------------------
+# Targets: FIA's down woody material plots (src/fia.R fia_dead_wood) - snags (measured standing dead), down logs (coarse woody debris +
+# piles; AG medium), fine woody debris (AG fast), litter (AG very fast), duff (AG slow) - in mature stands only (stand age >= MinAge,
+# no fire or cutting recorded at the plot in the past RECENT years): there the dead pools are the balance of turnover and decay, while
+# a young stand's are mostly what its last fire or harvest left. Snag fall is fixed from remeasured standing dead trees (snag_fall_rates),
+# so the snag multiplier fits only decay while standing. The spin-up's last disturbance is high-severity fire. Decay is regional (user
+# decision 2026-10-27): snag, down log and fine woody debris multipliers are shared by an ecodivision's forest types, litter and duff
+# multipliers are per forest type (cal_fit_measured). Soil to gSSURGO afterwards (cal_soil), as before.
+MEAS_POOLS <- c("standing", "cwd", "fwd", "litter", "duff")
+MEAS_SIM <- list(standing = c("SnagStem", "SnagBranch"), cwd = "AGM", fwd = "AGF", litter = "AGVF", duff = "AGS")   # dead roots are not on the transects
+MEAS_RECENT <- 30
+MEAS_MULT <- c("snag", "cwd", "fwd", "litter", "duff")
+
+# mature-stand targets per state class x ecodivision x age band (bands from min_age), as fia_dom_data's: list(obs, ages)
+dwm_targets <- function(dw, cw, min_age = 60) {
+  x <- dw$dwm[!is.na(stdage) & stdage >= min_age & stdage <= max(CAL_BANDS) & !(since_fire %in% 0:MEAS_RECENT) & !(since_cut %in% 0:MEAS_RECENT) &
+              is.finite(cwd) & is.finite(fwd) & is.finite(litter) & is.finite(duff) & is.finite(standing)]
+  # a few records are impossible (negative, or thousands of Mg C/ha): drop negatives and each pool's top 0.1% (as the growth data's cap)
+  for (p in MEAS_POOLS) { cap <- stats::quantile(x[[p]], 0.999); x <- x[get(p) >= 0 & get(p) <= cap] }
+  g <- cw[, .(fortyp_grp = as.integer(unlist(strsplit(FiaTypeGroups, ";")))), by = StateClassId]
+  x <- merge(x, g, by = "fortyp_grp", allow.cartesian = TRUE); data.table::setnames(x, "StateClassId", "sc")
+  x[, band := cut(stdage, unique(c(min_age, CAL_BANDS[CAL_BANDS > min_age])), include.lowest = TRUE)]
+  list(obs = x[, c(list(n = .N), lapply(.SD, mean)), by = .(sc, ecodiv, band), .SDcols = MEAS_POOLS], ages = x[, .N, by = .(sc, ecodiv, band, stdage)]) }
+
+# annual stem snag fall per state class x ecodivision from remeasured snags not killed by a recent fire (carbon-weighted share fallen
+# between visits -> k = -ln(1 - share) / years); cells with fewer than min_snags snags take their forest type's pooled rate, then all
+fall_rate <- function(d) { sh <- min(sum(d$wC[d$fell]) / sum(d$wC), 0.999); -log(1 - sh) / stats::weighted.mean(d$yrs, d$wC) }
+snag_fall_rates <- function(dw, cw, min_snags = 200) {
+  g <- cw[, .(fortyp_grp = as.integer(unlist(strsplit(FiaTypeGroups, ";")))), by = StateClassId]
+  x <- merge(dw$fall[fire_killed == FALSE & wC > 0], g, by = "fortyp_grp", allow.cartesian = TRUE); data.table::setnames(x, "StateClassId", "sc")
+  list(cell = x[, .(snags = .N, rate = fall_rate(.SD)), by = .(sc, ecodiv)], type = x[, .(snags = .N, rate = fall_rate(.SD)), by = sc],
+       all = fall_rate(x), min_snags = min_snags) }
+
+# fit a set of cells: each decay multiplier to its own measured pool, in the order carbon flows (user decision 2026-10-27) - snags to
+# standing dead, then down logs (AG medium, fed by snag fall) and fine woody debris (AG fast, fed by branch snag fall), then litter (AG
+# very fast), then duff (AG slow, fed by all of them). A pool depends only on its own multiplier and those fitted before it, so one pass
+# in this order is the solution, and no multiplier can stand in for another pool's misfit (fitting all pools' misfit at once let snag
+# decay trade against down log decay). Snag, down log and fine woody debris multipliers are shared by all rows (an ecodivision's
+# types, or one type's ecodivisions); litter and duff are fitted per state class. Each multiplier: Brent's 1-D search on the log scale
+# within [0.05, 20], which evaluates interior values and so does not stall where a pool's loss reaches its whole stock (a gradient
+# method jumped to the bound there, 2026-10-27). A row's misfit in a pool is scaled by its measured mean (floored at 0.5 Mg C/ha).
+# Returns one row per input row: the five multipliers and the misfit at CBM rates and after (all pools).
+cal_fit_measured <- function(rows, ctx, dat) {
+  SS <- lapply(seq_len(nrow(rows)), function(i) cal_setup(rows[i], ctx))
+  OB <- lapply(seq_len(nrow(rows)), function(i) dat$obs[sc == rows$sc[i] & ecodiv == rows$ecodiv[i]])
+  AG <- lapply(seq_len(nrow(rows)), function(i) dat$ages[sc == rows$sc[i] & ecodiv == rows$ecodiv[i]])
+  SC <- lapply(OB, function(o) pmax(sapply(MEAS_POOLS, function(p) stats::weighted.mean(o[[p]], o$n)), 0.5))   # floor: a pool measured ~0 in a cell
+  types <- unique(rows$sc); ti <- match(rows$sc, types)
+  pool_loss <- function(p5, i, pools = MEAS_POOLS) { sim <- cal_dom(SS[[i]], ctx$fo, as.list(stats::setNames(exp(p5), MEAS_MULT)), 0)
+    sim <- sapply(MEAS_SIM[pools], function(p) rowSums(sim[, p, drop = FALSE]))
+    pr <- AG[[i]][, lapply(stats::setNames(pools, pools), function(p) sum(N * sim[stdage + 1, p]) / sum(N)), by = band]
+    m <- merge(OB[[i]], pr, by = "band", suffixes = c("", "_sim"))
+    sum(sapply(pools, function(p) sum(m$n * ((m[[paste0(p, "_sim")]] - m[[p]]) / SC[[i]][[p]])^2))) }
+  P <- matrix(0, length(SS), 5, dimnames = list(NULL, MEAS_MULT))   # log multipliers per row; 0 = CBM
+  fit1 <- function(g, idx) { pool <- MEAS_POOLS[match(g, MEAS_MULT)]
+    stats::optimize(function(v) { Q <- P; Q[idx, g] <- v; sum(sapply(idx, function(i) pool_loss(Q[i, ], i, pool))) }, c(log(0.05), log(20)))$minimum }
+  for (g in c("snag", "cwd", "fwd")) P[, g] <- fit1(g, seq_along(SS))
+  for (g in c("litter", "duff")) for (t in seq_along(types)) { idx <- which(ti == t); P[idx, g] <- fit1(g, idx) }
+  data.table::rbindlist(lapply(seq_along(SS), function(i) c(as.list(exp(P[i, ])), list(loss0 = pool_loss(rep(0, 5), i), loss1 = pool_loss(P[i, ], i))))) }

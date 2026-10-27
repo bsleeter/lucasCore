@@ -11,3 +11,11 @@ forest state class, over the 1 km cells of the CONUS 1km model's forest type map
 up to 1,099 on organic soils. Stage 3b fits each cell's soil decay so the belowground pools, averaged over the disturbance cycle, match
 it; cells not listed take their forest type's median soil multiplier. FIA soil carbon is not used (user 2026-10-20: not reliable).
 Provisional: stage 5 recomputes the targets from its own forest type map at the model's resolution.
+
+`fire-snag-share.csv` (to-do 19, 2026-10-27): the share of a stand's live aboveground wood (stand age 11+) that high-severity fire
+leaves as snags, per forest type, fitted to FIA standing dead carbon on plots 0-20 years after high-severity fire (California,
+Mediterranean Mountains; docs/dom-calibration-proposal.md). Stage 3 writes it as state-class rows of the fire's flow pathways (stem
+snags = share x 0.65 / 0.545, branch snags = share x 0.30 / 0.545 of the pool, the rest burned), repeating every age row of the
+pairs it changes - in ST-Sim a class row hides the blank rows of its pair at every age (dev/stsim/01-flow-row-precedence.R). Types not
+listed keep the event table's rows (0.65 of stems, 0.30 of branches: 0.545 of live wood, the pooled before/after plot pairs).
+With the measured decay calibration the spin-up's last disturbance is high-severity fire (no fitted clearcut share).
