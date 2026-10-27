@@ -28,3 +28,4 @@ Starter/*.bak-*
 dev/treemap/out/*.tif
 dev/nfcms/out/*.tif
 dev/fia/out-dwm/*.png
+dev/fia/out-cal/*.rds

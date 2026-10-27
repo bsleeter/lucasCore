@@ -94,3 +94,28 @@ California Mixed Conifer, M260 (3,312 aged conditions), Mg C/ha by stand age:
   spin-up makes, observed directly.
 - So measured targets would ask for much less down wood in mature stands than the calibration targets today, which removes the need for
   the very slow down wood decay (0.25-0.30) that inflates young stands.
+
+## Decay calibrated to measured pools in mature stands (06-calibrate-measured.R, out-cal/; user decision 2026-10-26: age >= 60)
+
+P26's inputs (Build result 2), Mediterranean Mountains, targets from California DWM plots aged >= 60 with no recorded fire or harvest
+in the past 30 years (Mixed Conifer 1,986 conditions, Western Oak 1,203, Fir/Spruce 606, Ponderosa 475), fire as the spin-up's last
+disturbance, five multipliers (snags; down logs = AG Medium + BG Fast; fine woody debris = AG Fast; litter = AG Very Fast; duff = AG Slow).
+
+| Type | Current: snag / down wood / floor / clearcut share | Measured-mature: snag / down logs / fine woody / litter / duff | Misfit cut |
+| --- | --- | --- | --- |
+| California Mixed Conifer | 0.85 / 0.31 / 1.71 / 0.85 | 0.92 / 0.73 / 2.07 / 0.31 / 3.33 | 95% |
+| Fir/Spruce/Mountain Hemlock | 0.60 / 0.26 / 2.41 / 0.86 | 0.65 / 0.73 / 2.14 / 0.72 / 7.21 | 98% |
+| Ponderosa Pine | 1.64 / 0.27 / 1.75 / 0.99 | 2.19 / 0.71 / 2.22 / 0.22 / 3.25 | 98% |
+| Western Oak | 20 (bound) / 0.61 / 3.04 / 1.00 | 1.41 / 0.90 / 1.65 / 0.28 / 3.45 | 95% |
+
+- Down log decay moves back toward CBM's default (0.71-0.90, from 0.26-0.31). Fine woody debris and duff decay faster than CBM's default,
+  leaf litter slower. Western Oak's snag rate is no longer at a bound.
+- Mature fit by band: litter, duff and fine woody debris within about 1-2 Mg C/ha in every band. Down logs and snags match on average but
+  not in shape: the measured values rise with age (Mixed Conifer down logs 8.6 -> 13.5, snags 5.5 -> 15.4) while the model's fall or stay
+  flat (13.8 -> 7.8; 8.8 -> 12.7): the model still carries legacy from the spin-up fire at 60-100 years and adds too little in old stands.
+- Young stands (check, not fitted) miss badly, in a way that points at the disturbance flows and at what FIA records as a disturbance:
+  after fire the model has 4-5 times the measured snags (Mixed Conifer 0-5 yr: 128 vs 28) and twice the down logs; after harvest it puts
+  25-30 Mg C/ha of slash in fine woody debris where 3-4 is measured, and no snags where 5-10 are. FIA's fire codes (DSTRBCD 30-32) include
+  ground fires and its cutting code (TRTCD 10) includes partial cuts, while the model's are stand-replacing; and slash is often piled or
+  burned. Next: restrict the chronosequences to crown fire (32) and to clearcuts where they can be identified, and compare the LUCAS
+  event flows (share of the stand killed, left standing, consumed; slash left) with what the plots show.
