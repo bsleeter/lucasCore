@@ -110,6 +110,28 @@ fit_measured <- function(k) {
   list(mult = setNames(exp(o$par), c("snag", "cwd", "fwd", "litter", "duff")), loss0 = l0, loss1 = o$value, fit = merge(ob, pred(o$par), by = "band", suffixes = c("", "_sim"))) }
 t0 <- Sys.time(); M <- lapply(seq_len(nrow(cells)), function(i) fit_measured(cells[i])); names(M) <- cells$sc
 cat(sprintf("\nmeasured-pool calibration: %.1f min\n", as.numeric(Sys.time() - t0, units = "mins")))
+# LUCAS_POOLED=1 (dev, 2026-10-27): also fit ONE set of five multipliers shared by every type (a regional decay set) and compare its
+# misfit with the per-type fits, each type's loss scaled by its own targets' means as in fit_measured
+if (Sys.getenv("LUCAS_POOLED") == "1") {
+  parts <- lapply(seq_len(nrow(cells)), function(i) { k <- cells[i]; S <- cal_setup(k, ctx); ob <- obs[sc == k$sc]; ag <- ages[sc == k$sc]
+    scale <- sapply(MPOOLS, function(p) weighted.mean(ob[[p]], ob$n))
+    pred <- function(par) { mult <- as.list(setNames(exp(par), c("snag", "cwd", "fwd", "litter", "duff")))
+      d <- cal_dom(S, ctx$fo, mult, 0); sim <- sapply(SIM, function(p) rowSums(d[, p, drop = FALSE]))
+      ag[, lapply(setNames(names(SIM), names(SIM)), function(p) sum(N * sim[stdage + 1, p]) / sum(N)), by = band] }
+    loss <- function(par) { m <- merge(ob, pred(par), by = "band", suffixes = c("", "_sim")); sum(sapply(MPOOLS, function(p) sum(m$n * ((m[[paste0(p, "_sim")]] - m[[p]]) / scale[[p]])^2))) }
+    list(pred = pred, loss = loss) })
+  o <- optim(rep(0, 5), function(par) sum(sapply(parts, function(z) z$loss(par))), method = "L-BFGS-B", lower = rep(log(0.05), 5), upper = rep(log(20), 5), control = list(maxit = 500))
+  PM <- setNames(exp(o$par), c("snag", "cwd", "fwd", "litter", "duff"))
+  cmp <- rbindlist(lapply(seq_len(nrow(cells)), function(i) { s <- as.character(cells$sc[i])
+    data.table(type = sub(" Group", "", TYPES[[s]]), cbm = M[[s]]$loss0, per_type = M[[s]]$loss1, regional = parts[[i]]$loss(o$par)) }))
+  cat("\nRegional decay set (one for all types):", paste(sprintf("%s %.2f", names(PM), PM), collapse = ", "), "\n")
+  cat("Misfit (weighted, scaled squared error) - CBM defaults / per-type fit / regional fit:\n"); print(cmp[, lapply(.SD, function(z) if (is.numeric(z)) round(z, 1) else z)])
+  pf <- rbindlist(lapply(seq_len(nrow(cells)), function(i) merge(obs[sc == cells$sc[i]], parts[[i]]$pred(o$par), by = "band", suffixes = c("", "_sim"))[, type := sub(" Group", "", TYPES[[as.character(cells$sc[i])]])]))
+  print(pf[, .(type = substr(type, 1, 18), band, n, standing = sprintf("%.1f / %.1f", standing, standing_sim), downlogs = sprintf("%.1f / %.1f", cwd, cwd_sim), fwd = sprintf("%.1f / %.1f", fwd, fwd_sim),
+               litter = sprintf("%.1f / %.1f", litter, litter_sim), duff = sprintf("%.1f / %.1f", duff, duff_sim))])
+  saveRDS(list(mult = PM, compare = cmp, fit = pf), file.path(out, "regional-decay.rds")); fwrite(cmp, file.path(out, "regional-decay-misfit.csv"))
+  if (Sys.getenv("LUCAS_POOLED_ONLY") == "1") quit(save = "no")
+}
 
 # ---- the current calibration on the same inputs (dom.R's groups, modelled targets, every band, fitted clearcut share) ----------------
 DECAY_GROUPS <- list(snag = c("SnagStem", "SnagBranch"), cwd = c("AGM", "BGF"), floor = c("AGVF", "AGF", "AGS"), soil = c("BGVF", "BGS"))

@@ -1,0 +1,65 @@
+Group,Item,Value,Detail,Source,ForestType
+Live turnover,Foliage,0.117000001221895,100% to AG Very Fast,CBM ecozone x species (deciduous-weighted),California Mixed Conifer
+Live turnover,Branch (other wood),0.0399999991059303,"25% to Snag Branch, 75% to AG Fast",CBM,California Mixed Conifer
+Live turnover,Stem (merchantable),0.0044999998062849,100% to Snag Stem,CBM,California Mixed Conifer
+Live turnover,Fine root,0.640999972820282,"50% to AG Very Fast, 50% to BG Very Fast",CBM,California Mixed Conifer
+Live turnover,Coarse root,0.0199999995529652,"50% to AG Fast, 50% to BG Fast",CBM,California Mixed Conifer
+Snags,Stem snag fall,0.047,to AG Medium,FIA remeasured standing dead (12-snag-fall.R),California Mixed Conifer
+Snags,Branch snag fall,0.14687499521242,to AG Fast,CBM branch rate x the stem ratio,California Mixed Conifer
+Snags,High-severity fire: share of live wood left as snags,0.28,"stem 0.334, branch 0.154 of the pool",fitted to FIA snags 0-20 yr after fire (14),California Mixed Conifer
+Growth,Volume curve A (m3/ha),534.603,V = A (1 - exp(-k (t - L)^c)),"Fitted, 1344 plots",California Mixed Conifer
+Growth,Volume curve k,0.0246471,"","",California Mixed Conifer
+Growth,Volume curve c,0.8513,"",shared by the type's ecodivisions,California Mixed Conifer
+Growth,Lag L (yr),17.84,"",Class WestSoftwood,California Mixed Conifer
+Growth,Merchantable carbon density (Mg C/m3),0.2419,"",FIA wood/bark specific gravity of the type's species,California Mixed Conifer
+Growth,Deciduous share,0.02,weights foliage fall,FIA species volume,California Mixed Conifer
+Growth,Live carbon at 50 / 100 / 150 yr (Mg C/ha),150.6827,89 / 151 / 185,stage 2 carbon curve,California Mixed Conifer
+Growth,Pool shares at 100 yr,,"merch 56%, other 24%, foliage 5%, coarse root 14%, fine root 1%",stage 2 share curves,California Mixed Conifer
+Live turnover,Foliage,0.122100001141429,100% to AG Very Fast,CBM ecozone x species (deciduous-weighted),Fir/Spruce/Mountain Hemlock
+Live turnover,Branch (other wood),0.0399999991059303,"25% to Snag Branch, 75% to AG Fast",CBM,Fir/Spruce/Mountain Hemlock
+Live turnover,Stem (merchantable),0.0044999998062849,100% to Snag Stem,CBM,Fir/Spruce/Mountain Hemlock
+Live turnover,Fine root,0.640999972820282,"50% to AG Very Fast, 50% to BG Very Fast",CBM,Fir/Spruce/Mountain Hemlock
+Live turnover,Coarse root,0.0199999995529652,"50% to AG Fast, 50% to BG Fast",CBM,Fir/Spruce/Mountain Hemlock
+Snags,Stem snag fall,0.045,to AG Medium,FIA remeasured standing dead (12-snag-fall.R),Fir/Spruce/Mountain Hemlock
+Snags,Branch snag fall,0.140624995416147,to AG Fast,CBM branch rate x the stem ratio,Fir/Spruce/Mountain Hemlock
+Snags,High-severity fire: share of live wood left as snags,0.42,"stem 0.501, branch 0.231 of the pool",fitted to FIA snags 0-20 yr after fire (14),Fir/Spruce/Mountain Hemlock
+Growth,Volume curve A (m3/ha),5000,V = A (1 - exp(-k (t - L)^c)),"Fitted, 449 plots",Fir/Spruce/Mountain Hemlock
+Growth,Volume curve k,0.0109245,"","",Fir/Spruce/Mountain Hemlock
+Growth,Volume curve c,0.4332,"",shared by the type's ecodivisions,Fir/Spruce/Mountain Hemlock
+Growth,Lag L (yr),23.75,"",Type,Fir/Spruce/Mountain Hemlock
+Growth,Merchantable carbon density (Mg C/m3),0.2092,"",FIA wood/bark specific gravity of the type's species,Fir/Spruce/Mountain Hemlock
+Growth,Deciduous share,0.026,weights foliage fall,FIA species volume,Fir/Spruce/Mountain Hemlock
+Growth,Live carbon at 50 / 100 / 150 yr (Mg C/ha),143.8619,84 / 144 / 182,stage 2 carbon curve,Fir/Spruce/Mountain Hemlock
+Growth,Pool shares at 100 yr,,"merch 50%, other 27%, foliage 8%, coarse root 14%, fine root 1%",stage 2 share curves,Fir/Spruce/Mountain Hemlock
+Live turnover,Foliage,0.109350001342594,100% to AG Very Fast,CBM ecozone x species (deciduous-weighted),Ponderosa Pine
+Live turnover,Branch (other wood),0.0399999991059303,"25% to Snag Branch, 75% to AG Fast",CBM,Ponderosa Pine
+Live turnover,Stem (merchantable),0.0044999998062849,100% to Snag Stem,CBM,Ponderosa Pine
+Live turnover,Fine root,0.640999972820282,"50% to AG Very Fast, 50% to BG Very Fast",CBM,Ponderosa Pine
+Live turnover,Coarse root,0.0199999995529652,"50% to AG Fast, 50% to BG Fast",CBM,Ponderosa Pine
+Snags,Stem snag fall,0.11,to AG Medium,FIA remeasured standing dead (12-snag-fall.R),Ponderosa Pine
+Snags,Branch snag fall,0.343749988795026,to AG Fast,CBM branch rate x the stem ratio,Ponderosa Pine
+Snags,High-severity fire: share of live wood left as snags,0.36,"stem 0.429, branch 0.198 of the pool",fitted to FIA snags 0-20 yr after fire (14),Ponderosa Pine
+Growth,Volume curve A (m3/ha),250.162,V = A (1 - exp(-k (t - L)^c)),"Fitted, 780 plots",Ponderosa Pine
+Growth,Volume curve k,0.0132272,"","",Ponderosa Pine
+Growth,Volume curve c,1.0405,"",shared by the type's ecodivisions,Ponderosa Pine
+Growth,Lag L (yr),6.11,"",Type,Ponderosa Pine
+Growth,Merchantable carbon density (Mg C/m3),0.2415,"",FIA wood/bark specific gravity of the type's species,Ponderosa Pine
+Growth,Deciduous share,0.011,weights foliage fall,FIA species volume,Ponderosa Pine
+Growth,Live carbon at 50 / 100 / 150 yr (Mg C/ha),89.6587,60 / 90 / 102,stage 2 carbon curve,Ponderosa Pine
+Growth,Pool shares at 100 yr,,"merch 52%, other 26%, foliage 6%, coarse root 14%, fine root 2%",stage 2 share curves,Ponderosa Pine
+Live turnover,Foliage,0.366899997279048,100% to AG Very Fast,CBM ecozone x species (deciduous-weighted),Western Oak
+Live turnover,Branch (other wood),0.0399999991059303,"25% to Snag Branch, 75% to AG Fast",CBM,Western Oak
+Live turnover,Stem (merchantable),0.0044999998062849,100% to Snag Stem,CBM,Western Oak
+Live turnover,Fine root,0.640999972820282,"50% to AG Very Fast, 50% to BG Very Fast",CBM,Western Oak
+Live turnover,Coarse root,0.0199999995529652,"50% to AG Fast, 50% to BG Fast",CBM,Western Oak
+Snags,Stem snag fall,0.079,to AG Medium,FIA remeasured standing dead (12-snag-fall.R),Western Oak
+Snags,Branch snag fall,0.246874991952791,to AG Fast,CBM branch rate x the stem ratio,Western Oak
+Snags,High-severity fire: share of live wood left as snags,0.4,"stem 0.477, branch 0.220 of the pool",fitted to FIA snags 0-20 yr after fire (14),Western Oak
+Growth,Volume curve A (m3/ha),214.662,V = A (1 - exp(-k (t - L)^c)),"Fitted, 1118 plots",Western Oak
+Growth,Volume curve k,0.00190519,"","",Western Oak
+Growth,Volume curve c,1.3495,"",shared by the type's ecodivisions,Western Oak
+Growth,Lag L (yr),0,"",Class WestHardwood,Western Oak
+Growth,Merchantable carbon density (Mg C/m3),0.2978,"",FIA wood/bark specific gravity of the type's species,Western Oak
+Growth,Deciduous share,0.314,weights foliage fall,FIA species volume,Western Oak
+Growth,Live carbon at 50 / 100 / 150 yr (Mg C/ha),75.5359,42 / 76 / 91,stage 2 carbon curve,Western Oak
+Growth,Pool shares at 100 yr,,"merch 52%, other 30%, foliage 4%, coarse root 12%, fine root 2%",stage 2 share curves,Western Oak

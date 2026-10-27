@@ -261,3 +261,9 @@ figures, which are redone once after the P26 rerun.
    the source of each value (CBM default, calibrated, measured) and let the user enter their own. First populated for P26
    (dev/fia/16-rate-table.R -> dev/fia/out-cal-clearcut/rate-table.csv: CBM, current stage 3 and proposed calibration per type). Live
    turnover is not calibrated today (CBM ecozone x species defaults). Related: items 18, 19.
+   2026-10-27 (user): include the region's mean temperature and the CBM Q10s (2.65 leaf litter and duff, 2.0 the others, 1 deep soil),
+   viewable and editable; the high-severity fire and clearcut transfer shares; the key growth curve values. Scope: DOM decay is
+   REGIONAL (ecodivision; one set for every type), live turnover, snag fall, fire snag share and growth are per forest type. P26 test
+   (06 with LUCAS_POOLED=1, dev/fia/out-cal-regional): one regional decay set cuts the misfit from CBM by 93-95% vs 97-98% per type;
+   down logs, fine woody debris and snags fit about as well, litter and duff by type do not (forest floor measured 4 Fir/Spruce vs 9-10
+   the others). Tables: dev/fia/out-cal-clearcut/rate-table-{region,type,events}.csv (16-rate-table.R).

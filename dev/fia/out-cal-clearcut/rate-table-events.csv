@@ -1,0 +1,281 @@
+ForestType,Event,StandAge,From,Dest,Share
+California Mixed Conifer,Clearcut,0-10,Aboveground Medium,Atmosphere,0.5
+California Mixed Conifer,Clearcut,0-10,Aboveground Slow,Atmosphere,0.29
+California Mixed Conifer,Clearcut,0-10,Aboveground Very Fast,Atmosphere,0.29
+California Mixed Conifer,Clearcut,0-10,Biomass: Coarse Root,Aboveground Fast,0.5
+California Mixed Conifer,Clearcut,0-10,Biomass: Coarse Root,Belowground Fast,0.5
+California Mixed Conifer,Clearcut,0-10,Biomass: Fine Root,Aboveground Very Fast,0.5
+California Mixed Conifer,Clearcut,0-10,Biomass: Fine Root,Belowground Very Fast,0.5
+California Mixed Conifer,Clearcut,0-10,Biomass: Foliage,Aboveground Very Fast,0.04
+California Mixed Conifer,Clearcut,0-10,Biomass: Foliage,Atmosphere,0.96
+California Mixed Conifer,Clearcut,0-10,Biomass: Merchantable,Aboveground Medium,0.03
+California Mixed Conifer,Clearcut,0-10,Biomass: Merchantable,Forestry Sector,0.97
+California Mixed Conifer,Clearcut,0-10,Biomass: Other Wood,Aboveground Fast,0.04
+California Mixed Conifer,Clearcut,0-10,Biomass: Other Wood,Atmosphere,0.96
+California Mixed Conifer,Clearcut,0-10,Snag Branch,Aboveground Fast,0
+California Mixed Conifer,Clearcut,0-10,Snag Branch,Atmosphere,0.6
+California Mixed Conifer,Clearcut,0-10,Snag Stem,Aboveground Medium,0
+California Mixed Conifer,Clearcut,0-10,Snag Stem,Atmosphere,0.6
+California Mixed Conifer,Clearcut,11+,Aboveground Medium,Atmosphere,0.5
+California Mixed Conifer,Clearcut,11+,Aboveground Slow,Atmosphere,0.29
+California Mixed Conifer,Clearcut,11+,Aboveground Very Fast,Atmosphere,0.29
+California Mixed Conifer,Clearcut,11+,Biomass: Coarse Root,Aboveground Fast,0.5
+California Mixed Conifer,Clearcut,11+,Biomass: Coarse Root,Belowground Fast,0.5
+California Mixed Conifer,Clearcut,11+,Biomass: Fine Root,Aboveground Very Fast,0.5
+California Mixed Conifer,Clearcut,11+,Biomass: Fine Root,Belowground Very Fast,0.5
+California Mixed Conifer,Clearcut,11+,Biomass: Foliage,Aboveground Very Fast,0.04
+California Mixed Conifer,Clearcut,11+,Biomass: Foliage,Atmosphere,0.96
+California Mixed Conifer,Clearcut,11+,Biomass: Merchantable,Aboveground Medium,0.03
+California Mixed Conifer,Clearcut,11+,Biomass: Merchantable,Forestry Sector,0.97
+California Mixed Conifer,Clearcut,11+,Biomass: Other Wood,Aboveground Fast,0.04
+California Mixed Conifer,Clearcut,11+,Biomass: Other Wood,Atmosphere,0.96
+California Mixed Conifer,Clearcut,11+,Snag Branch,Aboveground Fast,0
+California Mixed Conifer,Clearcut,11+,Snag Branch,Atmosphere,0.6
+California Mixed Conifer,Clearcut,11+,Snag Stem,Aboveground Medium,0
+California Mixed Conifer,Clearcut,11+,Snag Stem,Atmosphere,0.6
+California Mixed Conifer,High-severity fire,0-10,Aboveground Fast,Atmosphere,0.79
+California Mixed Conifer,High-severity fire,0-10,Aboveground Medium,Atmosphere,0.24
+California Mixed Conifer,High-severity fire,0-10,Aboveground Slow,Atmosphere,0.8
+California Mixed Conifer,High-severity fire,0-10,Aboveground Very Fast,Atmosphere,1
+California Mixed Conifer,High-severity fire,0-10,Belowground Very Fast,Atmosphere,0.08
+California Mixed Conifer,High-severity fire,0-10,Biomass: Coarse Root,Aboveground Fast,0.475
+California Mixed Conifer,High-severity fire,0-10,Biomass: Coarse Root,Belowground Fast,0.475
+California Mixed Conifer,High-severity fire,0-10,Biomass: Fine Root,Aboveground Very Fast,0.435
+California Mixed Conifer,High-severity fire,0-10,Biomass: Fine Root,Atmosphere,0.08
+California Mixed Conifer,High-severity fire,0-10,Biomass: Fine Root,Belowground Very Fast,0.435
+California Mixed Conifer,High-severity fire,0-10,Biomass: Foliage,Aboveground Very Fast,0.09
+California Mixed Conifer,High-severity fire,0-10,Biomass: Foliage,Atmosphere,0.89
+California Mixed Conifer,High-severity fire,0-10,Biomass: Merchantable,Atmosphere,0.61
+California Mixed Conifer,High-severity fire,0-10,Biomass: Merchantable,Snag Stem,0.37
+California Mixed Conifer,High-severity fire,0-10,Biomass: Other Wood,Atmosphere,0.64
+California Mixed Conifer,High-severity fire,0-10,Biomass: Other Wood,Snag Branch,0.34
+California Mixed Conifer,High-severity fire,0-10,Snag Branch,Atmosphere,0.68
+California Mixed Conifer,High-severity fire,0-10,Snag Stem,Atmosphere,0.12
+California Mixed Conifer,High-severity fire,11+,Aboveground Fast,Atmosphere,0.79
+California Mixed Conifer,High-severity fire,11+,Aboveground Medium,Atmosphere,0.24
+California Mixed Conifer,High-severity fire,11+,Aboveground Slow,Atmosphere,0.8
+California Mixed Conifer,High-severity fire,11+,Aboveground Very Fast,Atmosphere,1
+California Mixed Conifer,High-severity fire,11+,Belowground Very Fast,Atmosphere,0.08
+California Mixed Conifer,High-severity fire,11+,Biomass: Coarse Root,Aboveground Fast,0.475
+California Mixed Conifer,High-severity fire,11+,Biomass: Coarse Root,Belowground Fast,0.475
+California Mixed Conifer,High-severity fire,11+,Biomass: Fine Root,Aboveground Very Fast,0.435
+California Mixed Conifer,High-severity fire,11+,Biomass: Fine Root,Atmosphere,0.08
+California Mixed Conifer,High-severity fire,11+,Biomass: Fine Root,Belowground Very Fast,0.435
+California Mixed Conifer,High-severity fire,11+,Biomass: Foliage,Aboveground Very Fast,0.29
+California Mixed Conifer,High-severity fire,11+,Biomass: Foliage,Atmosphere,0.69
+California Mixed Conifer,High-severity fire,11+,Biomass: Merchantable,Atmosphere,0.66605504587156
+California Mixed Conifer,High-severity fire,11+,Biomass: Merchantable,Snag Stem,0.33394495412844
+California Mixed Conifer,High-severity fire,11+,Biomass: Other Wood,Atmosphere,0.845871559633028
+California Mixed Conifer,High-severity fire,11+,Biomass: Other Wood,Snag Branch,0.154128440366972
+California Mixed Conifer,High-severity fire,11+,Snag Branch,Atmosphere,0.68
+California Mixed Conifer,High-severity fire,11+,Snag Stem,Atmosphere,0.12
+Fir/Spruce/Mountain Hemlock,Clearcut,0-10,Aboveground Medium,Atmosphere,0.5
+Fir/Spruce/Mountain Hemlock,Clearcut,0-10,Aboveground Slow,Atmosphere,0.29
+Fir/Spruce/Mountain Hemlock,Clearcut,0-10,Aboveground Very Fast,Atmosphere,0.29
+Fir/Spruce/Mountain Hemlock,Clearcut,0-10,Biomass: Coarse Root,Aboveground Fast,0.5
+Fir/Spruce/Mountain Hemlock,Clearcut,0-10,Biomass: Coarse Root,Belowground Fast,0.5
+Fir/Spruce/Mountain Hemlock,Clearcut,0-10,Biomass: Fine Root,Aboveground Very Fast,0.5
+Fir/Spruce/Mountain Hemlock,Clearcut,0-10,Biomass: Fine Root,Belowground Very Fast,0.5
+Fir/Spruce/Mountain Hemlock,Clearcut,0-10,Biomass: Foliage,Aboveground Very Fast,0.04
+Fir/Spruce/Mountain Hemlock,Clearcut,0-10,Biomass: Foliage,Atmosphere,0.96
+Fir/Spruce/Mountain Hemlock,Clearcut,0-10,Biomass: Merchantable,Aboveground Medium,0.03
+Fir/Spruce/Mountain Hemlock,Clearcut,0-10,Biomass: Merchantable,Forestry Sector,0.97
+Fir/Spruce/Mountain Hemlock,Clearcut,0-10,Biomass: Other Wood,Aboveground Fast,0.04
+Fir/Spruce/Mountain Hemlock,Clearcut,0-10,Biomass: Other Wood,Atmosphere,0.96
+Fir/Spruce/Mountain Hemlock,Clearcut,0-10,Snag Branch,Aboveground Fast,0
+Fir/Spruce/Mountain Hemlock,Clearcut,0-10,Snag Branch,Atmosphere,0.6
+Fir/Spruce/Mountain Hemlock,Clearcut,0-10,Snag Stem,Aboveground Medium,0
+Fir/Spruce/Mountain Hemlock,Clearcut,0-10,Snag Stem,Atmosphere,0.6
+Fir/Spruce/Mountain Hemlock,Clearcut,11+,Aboveground Medium,Atmosphere,0.5
+Fir/Spruce/Mountain Hemlock,Clearcut,11+,Aboveground Slow,Atmosphere,0.29
+Fir/Spruce/Mountain Hemlock,Clearcut,11+,Aboveground Very Fast,Atmosphere,0.29
+Fir/Spruce/Mountain Hemlock,Clearcut,11+,Biomass: Coarse Root,Aboveground Fast,0.5
+Fir/Spruce/Mountain Hemlock,Clearcut,11+,Biomass: Coarse Root,Belowground Fast,0.5
+Fir/Spruce/Mountain Hemlock,Clearcut,11+,Biomass: Fine Root,Aboveground Very Fast,0.5
+Fir/Spruce/Mountain Hemlock,Clearcut,11+,Biomass: Fine Root,Belowground Very Fast,0.5
+Fir/Spruce/Mountain Hemlock,Clearcut,11+,Biomass: Foliage,Aboveground Very Fast,0.04
+Fir/Spruce/Mountain Hemlock,Clearcut,11+,Biomass: Foliage,Atmosphere,0.96
+Fir/Spruce/Mountain Hemlock,Clearcut,11+,Biomass: Merchantable,Aboveground Medium,0.03
+Fir/Spruce/Mountain Hemlock,Clearcut,11+,Biomass: Merchantable,Forestry Sector,0.97
+Fir/Spruce/Mountain Hemlock,Clearcut,11+,Biomass: Other Wood,Aboveground Fast,0.04
+Fir/Spruce/Mountain Hemlock,Clearcut,11+,Biomass: Other Wood,Atmosphere,0.96
+Fir/Spruce/Mountain Hemlock,Clearcut,11+,Snag Branch,Aboveground Fast,0
+Fir/Spruce/Mountain Hemlock,Clearcut,11+,Snag Branch,Atmosphere,0.6
+Fir/Spruce/Mountain Hemlock,Clearcut,11+,Snag Stem,Aboveground Medium,0
+Fir/Spruce/Mountain Hemlock,Clearcut,11+,Snag Stem,Atmosphere,0.6
+Fir/Spruce/Mountain Hemlock,High-severity fire,0-10,Aboveground Fast,Atmosphere,0.79
+Fir/Spruce/Mountain Hemlock,High-severity fire,0-10,Aboveground Medium,Atmosphere,0.24
+Fir/Spruce/Mountain Hemlock,High-severity fire,0-10,Aboveground Slow,Atmosphere,0.8
+Fir/Spruce/Mountain Hemlock,High-severity fire,0-10,Aboveground Very Fast,Atmosphere,1
+Fir/Spruce/Mountain Hemlock,High-severity fire,0-10,Belowground Very Fast,Atmosphere,0.08
+Fir/Spruce/Mountain Hemlock,High-severity fire,0-10,Biomass: Coarse Root,Aboveground Fast,0.475
+Fir/Spruce/Mountain Hemlock,High-severity fire,0-10,Biomass: Coarse Root,Belowground Fast,0.475
+Fir/Spruce/Mountain Hemlock,High-severity fire,0-10,Biomass: Fine Root,Aboveground Very Fast,0.435
+Fir/Spruce/Mountain Hemlock,High-severity fire,0-10,Biomass: Fine Root,Atmosphere,0.08
+Fir/Spruce/Mountain Hemlock,High-severity fire,0-10,Biomass: Fine Root,Belowground Very Fast,0.435
+Fir/Spruce/Mountain Hemlock,High-severity fire,0-10,Biomass: Foliage,Aboveground Very Fast,0.09
+Fir/Spruce/Mountain Hemlock,High-severity fire,0-10,Biomass: Foliage,Atmosphere,0.89
+Fir/Spruce/Mountain Hemlock,High-severity fire,0-10,Biomass: Merchantable,Atmosphere,0.61
+Fir/Spruce/Mountain Hemlock,High-severity fire,0-10,Biomass: Merchantable,Snag Stem,0.37
+Fir/Spruce/Mountain Hemlock,High-severity fire,0-10,Biomass: Other Wood,Atmosphere,0.64
+Fir/Spruce/Mountain Hemlock,High-severity fire,0-10,Biomass: Other Wood,Snag Branch,0.34
+Fir/Spruce/Mountain Hemlock,High-severity fire,0-10,Snag Branch,Atmosphere,0.68
+Fir/Spruce/Mountain Hemlock,High-severity fire,0-10,Snag Stem,Atmosphere,0.12
+Fir/Spruce/Mountain Hemlock,High-severity fire,11+,Aboveground Fast,Atmosphere,0.79
+Fir/Spruce/Mountain Hemlock,High-severity fire,11+,Aboveground Medium,Atmosphere,0.24
+Fir/Spruce/Mountain Hemlock,High-severity fire,11+,Aboveground Slow,Atmosphere,0.8
+Fir/Spruce/Mountain Hemlock,High-severity fire,11+,Aboveground Very Fast,Atmosphere,1
+Fir/Spruce/Mountain Hemlock,High-severity fire,11+,Belowground Very Fast,Atmosphere,0.08
+Fir/Spruce/Mountain Hemlock,High-severity fire,11+,Biomass: Coarse Root,Aboveground Fast,0.475
+Fir/Spruce/Mountain Hemlock,High-severity fire,11+,Biomass: Coarse Root,Belowground Fast,0.475
+Fir/Spruce/Mountain Hemlock,High-severity fire,11+,Biomass: Fine Root,Aboveground Very Fast,0.435
+Fir/Spruce/Mountain Hemlock,High-severity fire,11+,Biomass: Fine Root,Atmosphere,0.08
+Fir/Spruce/Mountain Hemlock,High-severity fire,11+,Biomass: Fine Root,Belowground Very Fast,0.435
+Fir/Spruce/Mountain Hemlock,High-severity fire,11+,Biomass: Foliage,Aboveground Very Fast,0.29
+Fir/Spruce/Mountain Hemlock,High-severity fire,11+,Biomass: Foliage,Atmosphere,0.69
+Fir/Spruce/Mountain Hemlock,High-severity fire,11+,Biomass: Merchantable,Atmosphere,0.49908256880734
+Fir/Spruce/Mountain Hemlock,High-severity fire,11+,Biomass: Merchantable,Snag Stem,0.500917431192661
+Fir/Spruce/Mountain Hemlock,High-severity fire,11+,Biomass: Other Wood,Atmosphere,0.768807339449541
+Fir/Spruce/Mountain Hemlock,High-severity fire,11+,Biomass: Other Wood,Snag Branch,0.231192660550459
+Fir/Spruce/Mountain Hemlock,High-severity fire,11+,Snag Branch,Atmosphere,0.68
+Fir/Spruce/Mountain Hemlock,High-severity fire,11+,Snag Stem,Atmosphere,0.12
+Ponderosa Pine,Clearcut,0-10,Aboveground Medium,Atmosphere,0.5
+Ponderosa Pine,Clearcut,0-10,Aboveground Slow,Atmosphere,0.29
+Ponderosa Pine,Clearcut,0-10,Aboveground Very Fast,Atmosphere,0.29
+Ponderosa Pine,Clearcut,0-10,Biomass: Coarse Root,Aboveground Fast,0.5
+Ponderosa Pine,Clearcut,0-10,Biomass: Coarse Root,Belowground Fast,0.5
+Ponderosa Pine,Clearcut,0-10,Biomass: Fine Root,Aboveground Very Fast,0.5
+Ponderosa Pine,Clearcut,0-10,Biomass: Fine Root,Belowground Very Fast,0.5
+Ponderosa Pine,Clearcut,0-10,Biomass: Foliage,Aboveground Very Fast,0.04
+Ponderosa Pine,Clearcut,0-10,Biomass: Foliage,Atmosphere,0.96
+Ponderosa Pine,Clearcut,0-10,Biomass: Merchantable,Aboveground Medium,0.03
+Ponderosa Pine,Clearcut,0-10,Biomass: Merchantable,Forestry Sector,0.97
+Ponderosa Pine,Clearcut,0-10,Biomass: Other Wood,Aboveground Fast,0.04
+Ponderosa Pine,Clearcut,0-10,Biomass: Other Wood,Atmosphere,0.96
+Ponderosa Pine,Clearcut,0-10,Snag Branch,Aboveground Fast,0
+Ponderosa Pine,Clearcut,0-10,Snag Branch,Atmosphere,0.6
+Ponderosa Pine,Clearcut,0-10,Snag Stem,Aboveground Medium,0
+Ponderosa Pine,Clearcut,0-10,Snag Stem,Atmosphere,0.6
+Ponderosa Pine,Clearcut,11+,Aboveground Medium,Atmosphere,0.5
+Ponderosa Pine,Clearcut,11+,Aboveground Slow,Atmosphere,0.29
+Ponderosa Pine,Clearcut,11+,Aboveground Very Fast,Atmosphere,0.29
+Ponderosa Pine,Clearcut,11+,Biomass: Coarse Root,Aboveground Fast,0.5
+Ponderosa Pine,Clearcut,11+,Biomass: Coarse Root,Belowground Fast,0.5
+Ponderosa Pine,Clearcut,11+,Biomass: Fine Root,Aboveground Very Fast,0.5
+Ponderosa Pine,Clearcut,11+,Biomass: Fine Root,Belowground Very Fast,0.5
+Ponderosa Pine,Clearcut,11+,Biomass: Foliage,Aboveground Very Fast,0.04
+Ponderosa Pine,Clearcut,11+,Biomass: Foliage,Atmosphere,0.96
+Ponderosa Pine,Clearcut,11+,Biomass: Merchantable,Aboveground Medium,0.03
+Ponderosa Pine,Clearcut,11+,Biomass: Merchantable,Forestry Sector,0.97
+Ponderosa Pine,Clearcut,11+,Biomass: Other Wood,Aboveground Fast,0.04
+Ponderosa Pine,Clearcut,11+,Biomass: Other Wood,Atmosphere,0.96
+Ponderosa Pine,Clearcut,11+,Snag Branch,Aboveground Fast,0
+Ponderosa Pine,Clearcut,11+,Snag Branch,Atmosphere,0.6
+Ponderosa Pine,Clearcut,11+,Snag Stem,Aboveground Medium,0
+Ponderosa Pine,Clearcut,11+,Snag Stem,Atmosphere,0.6
+Ponderosa Pine,High-severity fire,0-10,Aboveground Fast,Atmosphere,0.79
+Ponderosa Pine,High-severity fire,0-10,Aboveground Medium,Atmosphere,0.24
+Ponderosa Pine,High-severity fire,0-10,Aboveground Slow,Atmosphere,0.8
+Ponderosa Pine,High-severity fire,0-10,Aboveground Very Fast,Atmosphere,1
+Ponderosa Pine,High-severity fire,0-10,Belowground Very Fast,Atmosphere,0.08
+Ponderosa Pine,High-severity fire,0-10,Biomass: Coarse Root,Aboveground Fast,0.475
+Ponderosa Pine,High-severity fire,0-10,Biomass: Coarse Root,Belowground Fast,0.475
+Ponderosa Pine,High-severity fire,0-10,Biomass: Fine Root,Aboveground Very Fast,0.435
+Ponderosa Pine,High-severity fire,0-10,Biomass: Fine Root,Atmosphere,0.08
+Ponderosa Pine,High-severity fire,0-10,Biomass: Fine Root,Belowground Very Fast,0.435
+Ponderosa Pine,High-severity fire,0-10,Biomass: Foliage,Aboveground Very Fast,0.09
+Ponderosa Pine,High-severity fire,0-10,Biomass: Foliage,Atmosphere,0.89
+Ponderosa Pine,High-severity fire,0-10,Biomass: Merchantable,Atmosphere,0.61
+Ponderosa Pine,High-severity fire,0-10,Biomass: Merchantable,Snag Stem,0.37
+Ponderosa Pine,High-severity fire,0-10,Biomass: Other Wood,Atmosphere,0.64
+Ponderosa Pine,High-severity fire,0-10,Biomass: Other Wood,Snag Branch,0.34
+Ponderosa Pine,High-severity fire,0-10,Snag Branch,Atmosphere,0.68
+Ponderosa Pine,High-severity fire,0-10,Snag Stem,Atmosphere,0.12
+Ponderosa Pine,High-severity fire,11+,Aboveground Fast,Atmosphere,0.79
+Ponderosa Pine,High-severity fire,11+,Aboveground Medium,Atmosphere,0.24
+Ponderosa Pine,High-severity fire,11+,Aboveground Slow,Atmosphere,0.8
+Ponderosa Pine,High-severity fire,11+,Aboveground Very Fast,Atmosphere,1
+Ponderosa Pine,High-severity fire,11+,Belowground Very Fast,Atmosphere,0.08
+Ponderosa Pine,High-severity fire,11+,Biomass: Coarse Root,Aboveground Fast,0.475
+Ponderosa Pine,High-severity fire,11+,Biomass: Coarse Root,Belowground Fast,0.475
+Ponderosa Pine,High-severity fire,11+,Biomass: Fine Root,Aboveground Very Fast,0.435
+Ponderosa Pine,High-severity fire,11+,Biomass: Fine Root,Atmosphere,0.08
+Ponderosa Pine,High-severity fire,11+,Biomass: Fine Root,Belowground Very Fast,0.435
+Ponderosa Pine,High-severity fire,11+,Biomass: Foliage,Aboveground Very Fast,0.29
+Ponderosa Pine,High-severity fire,11+,Biomass: Foliage,Atmosphere,0.69
+Ponderosa Pine,High-severity fire,11+,Biomass: Merchantable,Atmosphere,0.570642201834863
+Ponderosa Pine,High-severity fire,11+,Biomass: Merchantable,Snag Stem,0.429357798165138
+Ponderosa Pine,High-severity fire,11+,Biomass: Other Wood,Atmosphere,0.801834862385321
+Ponderosa Pine,High-severity fire,11+,Biomass: Other Wood,Snag Branch,0.198165137614679
+Ponderosa Pine,High-severity fire,11+,Snag Branch,Atmosphere,0.68
+Ponderosa Pine,High-severity fire,11+,Snag Stem,Atmosphere,0.12
+Western Oak,Clearcut,0-10,Aboveground Medium,Atmosphere,0.5
+Western Oak,Clearcut,0-10,Aboveground Slow,Atmosphere,0.29
+Western Oak,Clearcut,0-10,Aboveground Very Fast,Atmosphere,0.29
+Western Oak,Clearcut,0-10,Biomass: Coarse Root,Aboveground Fast,0.5
+Western Oak,Clearcut,0-10,Biomass: Coarse Root,Belowground Fast,0.5
+Western Oak,Clearcut,0-10,Biomass: Fine Root,Aboveground Very Fast,0.5
+Western Oak,Clearcut,0-10,Biomass: Fine Root,Belowground Very Fast,0.5
+Western Oak,Clearcut,0-10,Biomass: Foliage,Aboveground Very Fast,0.04
+Western Oak,Clearcut,0-10,Biomass: Foliage,Atmosphere,0.96
+Western Oak,Clearcut,0-10,Biomass: Merchantable,Aboveground Medium,0.03
+Western Oak,Clearcut,0-10,Biomass: Merchantable,Forestry Sector,0.97
+Western Oak,Clearcut,0-10,Biomass: Other Wood,Aboveground Fast,0.04
+Western Oak,Clearcut,0-10,Biomass: Other Wood,Atmosphere,0.96
+Western Oak,Clearcut,0-10,Snag Branch,Aboveground Fast,0
+Western Oak,Clearcut,0-10,Snag Branch,Atmosphere,0.6
+Western Oak,Clearcut,0-10,Snag Stem,Aboveground Medium,0
+Western Oak,Clearcut,0-10,Snag Stem,Atmosphere,0.6
+Western Oak,Clearcut,11+,Aboveground Medium,Atmosphere,0.5
+Western Oak,Clearcut,11+,Aboveground Slow,Atmosphere,0.29
+Western Oak,Clearcut,11+,Aboveground Very Fast,Atmosphere,0.29
+Western Oak,Clearcut,11+,Biomass: Coarse Root,Aboveground Fast,0.5
+Western Oak,Clearcut,11+,Biomass: Coarse Root,Belowground Fast,0.5
+Western Oak,Clearcut,11+,Biomass: Fine Root,Aboveground Very Fast,0.5
+Western Oak,Clearcut,11+,Biomass: Fine Root,Belowground Very Fast,0.5
+Western Oak,Clearcut,11+,Biomass: Foliage,Aboveground Very Fast,0.04
+Western Oak,Clearcut,11+,Biomass: Foliage,Atmosphere,0.96
+Western Oak,Clearcut,11+,Biomass: Merchantable,Aboveground Medium,0.03
+Western Oak,Clearcut,11+,Biomass: Merchantable,Forestry Sector,0.97
+Western Oak,Clearcut,11+,Biomass: Other Wood,Aboveground Fast,0.04
+Western Oak,Clearcut,11+,Biomass: Other Wood,Atmosphere,0.96
+Western Oak,Clearcut,11+,Snag Branch,Aboveground Fast,0
+Western Oak,Clearcut,11+,Snag Branch,Atmosphere,0.6
+Western Oak,Clearcut,11+,Snag Stem,Aboveground Medium,0
+Western Oak,Clearcut,11+,Snag Stem,Atmosphere,0.6
+Western Oak,High-severity fire,0-10,Aboveground Fast,Atmosphere,0.79
+Western Oak,High-severity fire,0-10,Aboveground Medium,Atmosphere,0.24
+Western Oak,High-severity fire,0-10,Aboveground Slow,Atmosphere,0.8
+Western Oak,High-severity fire,0-10,Aboveground Very Fast,Atmosphere,1
+Western Oak,High-severity fire,0-10,Belowground Very Fast,Atmosphere,0.08
+Western Oak,High-severity fire,0-10,Biomass: Coarse Root,Aboveground Fast,0.475
+Western Oak,High-severity fire,0-10,Biomass: Coarse Root,Belowground Fast,0.475
+Western Oak,High-severity fire,0-10,Biomass: Fine Root,Aboveground Very Fast,0.435
+Western Oak,High-severity fire,0-10,Biomass: Fine Root,Atmosphere,0.08
+Western Oak,High-severity fire,0-10,Biomass: Fine Root,Belowground Very Fast,0.435
+Western Oak,High-severity fire,0-10,Biomass: Foliage,Aboveground Very Fast,0.09
+Western Oak,High-severity fire,0-10,Biomass: Foliage,Atmosphere,0.89
+Western Oak,High-severity fire,0-10,Biomass: Merchantable,Atmosphere,0.61
+Western Oak,High-severity fire,0-10,Biomass: Merchantable,Snag Stem,0.37
+Western Oak,High-severity fire,0-10,Biomass: Other Wood,Atmosphere,0.64
+Western Oak,High-severity fire,0-10,Biomass: Other Wood,Snag Branch,0.34
+Western Oak,High-severity fire,0-10,Snag Branch,Atmosphere,0.68
+Western Oak,High-severity fire,0-10,Snag Stem,Atmosphere,0.12
+Western Oak,High-severity fire,11+,Aboveground Fast,Atmosphere,0.79
+Western Oak,High-severity fire,11+,Aboveground Medium,Atmosphere,0.24
+Western Oak,High-severity fire,11+,Aboveground Slow,Atmosphere,0.8
+Western Oak,High-severity fire,11+,Aboveground Very Fast,Atmosphere,1
+Western Oak,High-severity fire,11+,Belowground Very Fast,Atmosphere,0.08
+Western Oak,High-severity fire,11+,Biomass: Coarse Root,Aboveground Fast,0.475
+Western Oak,High-severity fire,11+,Biomass: Coarse Root,Belowground Fast,0.475
+Western Oak,High-severity fire,11+,Biomass: Fine Root,Aboveground Very Fast,0.435
+Western Oak,High-severity fire,11+,Biomass: Fine Root,Atmosphere,0.08
+Western Oak,High-severity fire,11+,Biomass: Fine Root,Belowground Very Fast,0.435
+Western Oak,High-severity fire,11+,Biomass: Foliage,Aboveground Very Fast,0.29
+Western Oak,High-severity fire,11+,Biomass: Foliage,Atmosphere,0.69
+Western Oak,High-severity fire,11+,Biomass: Merchantable,Atmosphere,0.522935779816514
+Western Oak,High-severity fire,11+,Biomass: Merchantable,Snag Stem,0.477064220183486
+Western Oak,High-severity fire,11+,Biomass: Other Wood,Atmosphere,0.779816513761468
+Western Oak,High-severity fire,11+,Biomass: Other Wood,Snag Branch,0.220183486238532
+Western Oak,High-severity fire,11+,Snag Branch,Atmosphere,0.68
+Western Oak,High-severity fire,11+,Snag Stem,Atmosphere,0.12
