@@ -15,7 +15,7 @@ f <- "F:/lucasCore/dev/libs/lucasCore-suitability.ssim"; L <- ssimLibrary(f); ok
 ds <- function(R, s) as.data.table(datasheet(R, s, lookupsAsFactors = FALSE))
 expect <- function(what, cond, detail = "") { cat(sprintf("%s  %s %s\n", if (isTRUE(cond)) "PASS" else "FAIL", what, detail)); if (!isTRUE(cond)) ok <<- FALSE }
 logs <- function(R, pat) { lg <- trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]]); unique(lg[grepl(pat, lg)]) }
-sm <- as.data.table(scenario(L, summary = TRUE)); for (id in sm[startsWith(Name, "Stage 3 test (CBM crosswalk") | startsWith(Name, "Carbon Assumptions (test"), ScenarioId]) delete(L, scenario = id, force = TRUE)
+sm <- as.data.table(scenario(L, summary = TRUE)); for (id in sm[startsWith(Name, "Stage 3 test (CBM crosswalk") | startsWith(Name, "Carbon Assumptions (test"), ScenarioId]) try(delete(L, scenario = id, force = TRUE), silent = TRUE)   # a parent's deletion takes its results
 CA <- sm[Name == "Carbon Assumptions", ScenarioId][1]
 CT <- scenario(rsyncrosim::project(L, 1), "Carbon Assumptions (test)", sourceScenario = CA)
 x <- ds(CT, "lucasCore_CbmCrosswalk")

@@ -303,6 +303,22 @@
 		<column name="MeanTemperature" displayName="Mean Annual Temperature (C; blank = PRISM)" dataType="Double" format="0.0" isOptional="True"/>
 	</dataSheet>
 
+	<!-- Carbon Assumptions: Dead Organic Matter Parameters - per dead pool, optionally per ecodivision (a row for an ecodivision overrides the
+	     pool's blank-ecodivision row): CBM-CFS3's base decay rate at the reference temperature, the Q10 of its temperature response, and the
+	     share of decay emitted (the rest goes to the next pool: AG Slow from the aboveground and snag pools, BG Slow from the belowground);
+	     the AG Slow row also holds the fixed AG Slow -> BG Slow transfer. Rate at temperature T = base x Q10^((T - reference) / 10), at most 1.
+	     Snag rows serve softwood and hardwood snags alike (CBM's are equal). The climate multipliers (stages 7, 11) take the Q10s too: AG Very
+	     Fast and AG Slow share one Q10, and the other pools but BG Slow another. Empty = defaults/cbm/dom-parameters.csv. -->
+	<dataSheet name="DomParameter" displayName="Dead Organic Matter Parameters">
+		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
+		<column name="Pool" displayName="Dead Pool" dataType="Integer" validationType="List" formula1="1:AG Very Fast|2:BG Very Fast|3:AG Fast|4:BG Fast|5:AG Medium|6:AG Slow|7:BG Slow|8:Snag Stem|9:Snag Branch"/>
+		<column name="BaseDecayRate" displayName="Base Decay Rate (/yr at the reference temperature)" dataType="Double" format="0.0000" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+		<column name="ReferenceTemperature" displayName="Reference Temperature (C)" dataType="Double" format="0.0"/>
+		<column name="Q10" displayName="Q10" dataType="Double" format="0.00" validationType="Decimal" validationCondition="Greater" formula1="0"/>
+		<column name="ShareEmitted" displayName="Share Emitted (rest to the next pool)" dataType="Double" format="0.000" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+		<column name="TransferToBGSlow" displayName="Transfer to BG Slow (/yr; AG Slow only)" dataType="Double" format="0.0000" isOptional="True"/>
+	</dataSheet>
+
 	<dataSheet name="CarbonOptions" displayName="Carbon Options" isSingleRow="True" viewClassName="lucasCoreUI.CarbonOptionsView" viewClassAssembly="lucasCoreUI">
 		<column name="DeadOrganicMatterModel" displayName="Dead Organic Matter Decay" dataType="Integer" validationType="List" formula1="4:Measured dead wood (FIA down woody material, mature stands; regional decay; soil to gSSURGO)|1:Calibrated to FIA condition pools (soil to gSSURGO)|2:FIA condition pools, CBM-default soil|3:CBM defaults (no calibration)" defaultValue="4"/>
 	</dataSheet>
@@ -602,6 +618,7 @@
 	</transformer>
 
 	<transformer name="CarbonFlows" displayName="3 - Carbon Flows" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/3-carbon-flows.R">
+		<dataSheet name="DomParameter" type="Input"/>
 		<dataSheet name="CarbonCurve" type="Input"/>
 		<dataSheet name="CarbonOptions" type="Input"/>
 		<dataSheet name="CbmCrosswalk" type="Input"/>
@@ -648,6 +665,7 @@
 	</transformer>
 
 	<transformer name="ClimateMultipliers" displayName="7 - Climate Multipliers" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/7-climate-multipliers.R">
+		<dataSheet name="DomParameter" type="Input"/>
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="ClimateOptions" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
@@ -714,6 +732,7 @@
 	</transformer>
 
 	<transformer name="ProjectionClimate" displayName="11 - Projection Climate" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/11-projection-climate.R">
+		<dataSheet name="DomParameter" type="Input"/>
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="ClimateOptions" type="Input"/>
 		<dataSheet name="ProjectionClimate" type="Input"/>
@@ -778,6 +797,7 @@
 			<item name="GrowthOptions"/>
 			<group name="lucasCoreCarbonAssumptions" displayName="Carbon Assumptions">
 				<item name="CbmCrosswalk"/>
+				<item name="DomParameter"/>
 			</group>
 			<group name="lucasCoreProjection" displayName="Projection">
 				<item name="ProjectionRun"/>

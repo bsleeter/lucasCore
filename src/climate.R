@@ -30,11 +30,22 @@ climate_flows <- function(co, stage) {
 
 # the parameters the models need on the model grid P: Q10 by flow group, tree-ring coefficients by primary stratum
 climate_params <- function(fm, P, stage) {
-  dom <- fread(pkg_file("defaults", "cbm", "tblDOMParametersDefault.csv"))
-  q10 <- setNames(vapply(seq_len(nrow(fm)), function(i) { if (fm$Model[i] != "Q10") return(NA_real_)
-    q <- unique(round(dom[SoilPoolID %in% as.integer(strsplit(fm$CbmPools[i], "|", fixed = TRUE)[[1]]), Q10], 4))
-    if (length(q) != 1) { check(stage, sprintf("the CBM pools of %s share one Q10", fm$FlowGroupId[i]), FALSE, paste(q, collapse = ", ")); return(NA_real_) }
-    q }, 0), fm$FlowGroupId)
+  # Q10s from Carbon Assumptions: Dead Organic Matter Parameters (to-do 21; package default = CBM-CFS3's). The pools of one climate flow
+  # group must share a Q10; where ecodivision rows give a group a different Q10, it is a raster on the model grid (P holds stratum ids).
+  dpt <- read_dom_parameters(); stl <- stsim_list("Stratum")
+  pool_of <- c(`0` = "AG Very Fast", `1` = "BG Very Fast", `2` = "AG Fast", `3` = "BG Fast", `4` = "AG Medium", `5` = "AG Slow", `6` = "BG Slow",
+               `7` = "Snag Stem", `8` = "Snag Branch", `9` = "Snag Stem", `10` = "Snag Branch")
+  q_at <- function(pools, st) { x <- dpt[!is.na(StratumId) & StratumId %in% st & Pool %in% pools]; x <- rbind(x, dpt[is.na(StratumId) & Pool %in% setdiff(pools, x$Pool)])
+    unique(round(x$Q10, 4)) }
+  q10 <- setNames(lapply(seq_len(nrow(fm)), function(i) { if (fm$Model[i] != "Q10") return(NA_real_)
+    pools <- unique(pool_of[strsplit(fm$CbmPools[i], "|", fixed = TRUE)[[1]]]); base <- q_at(pools, NA_character_)
+    ss <- unique(na.omit(dpt[Pool %in% pools, StratumId])); qs <- lapply(ss, function(s) q_at(pools, s))
+    if (length(base) != 1 || any(lengths(qs) != 1)) { check(stage, sprintf("the dead pools of %s (%s) share one Q10 (Dead Organic Matter Parameters)", fm$FlowGroupId[i],
+                                                                           paste(pools, collapse = ", ")), FALSE, paste(unique(c(base, unlist(qs))), collapse = ", ")); return(NA_real_) }
+    qs <- unlist(qs); dif <- qs != base
+    if (!any(dif)) return(base)
+    say("%s: Q10 %.3g, by ecodivision %s", fm$FlowGroupId[i], base, paste(sprintf("%s %.3g", ss[dif], qs[dif]), collapse = ", "))
+    classify(P, cbind(as.integer(stl$Id[match(ss[dif], stl$Name)]), qs[dif]), others = base) }), fm$FlowGroupId)
   coef_r <- NULL
   if ("Tree ring" %in% fm$Model) {
     tc <- read_default("climate", "tree-ring-coefficients.csv")
@@ -71,7 +82,7 @@ climate_emitter <- function(fm, P, prm) {
         if (is.null(tr_terms)) tr_terms <- list(pr = to_grid(Py / Pn), pl = to_grid(Pl / Pn), ta = to_grid(Ty - Tn, fill = 0))
         max(1 + prm$coef_r$bp * (tr_terms$pr - 1) + prm$coef_r$bl * (tr_terms$pl - 1) + prm$coef_r$bt * tr_terms$ta, 0)
       } else if (md == "Miami NPP") { forest <- fm$Role[j] == "ForestGrowth"; to_grid(miami(Ty, Py, forest) / nrm[[if (forest) "forest" else "nonforest"]])
-      } else to_grid(prm$q10[[g]]^((Ty - Tn) / 10))
+      } else { q <- prm$q10[[g]]; if (inherits(q, "SpatRaster")) q^(to_grid(Ty - Tn, fill = 0) / 10) else to_grid(q^((Ty - Tn) / 10)) }   # Q10 by ecodivision: a raster
       if (!is.null(attr(r, "unfilled"))) e$unfilled <- max(e$unfilled, attr(r, "unfilled"))
       r <- round(r, 3)
       f <- write_raster(r, sprintf("%s_%d.tif", gsub("[^A-Za-z0-9]+", "-", g), y), "FLT4S")

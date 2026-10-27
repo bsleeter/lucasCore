@@ -72,15 +72,16 @@ if (!dry) { dbDisconnect(con); on.exit(dbDisconnect(ref))
     if (!nrow(have_m) || identical(key(have_m), key(want_m))) next
     saveDatasheet(S, as.data.frame(want_m[, .(StockTypeId, StockGroupId)]), "stsim_StockTypeGroupMembership", append = FALSE)
     cat(sprintf("stock group memberships of scenario %d (%s) updated to the package's (%d rows)\n", sid, sm[ScenarioId == sid, Name], nrow(want_m))) }
-  # ---- 6. Carbon Assumptions (to-do 21, 2026-10-27): the CBM ecozone and species type lists, and a Carbon Assumptions scenario with the
-  # package's CBM Crosswalk when the project has none (as tools/new-library.R makes). Builds use it once it is one of their dependencies.
+  # ---- 6. Carbon Assumptions (to-do 21, 2026-10-27): the CBM ecozone and species type lists, and a Carbon Assumptions scenario (as
+  # tools/new-library.R makes) whose empty sheets get the package defaults (tools/carbon-assumptions.R). Builds use it once it is one of
+  # their dependencies.
   for (sh in c("lucasCore_CbmEcozone", "lucasCore_CbmSpeciesType")) if (!nrow(suppressWarnings(datasheet(P, sh, optional = TRUE)))) {
     v <- fread(file.path(pkg, "defaults", "library", "project", paste0(sh, ".csv")), colClasses = "character"); saveDatasheet(P, as.data.frame(v), sh, append = FALSE, force = TRUE)
     cat(sprintf("%s: %d rows added\n", sh, nrow(v))) }
-  sm <- as.data.table(scenario(L, summary = TRUE))
-  if (!"Carbon Assumptions" %in% sm$Name) { ca <- scenario(P, "Carbon Assumptions"); v <- fread(file.path(pkg, "defaults", "cbm", "species-crosswalk.csv"), colClasses = "character")
-    saveDatasheet(ca, data.frame(StateClassId = v$StateClassId, CbmEcozoneId = v$EcoBoundaryId, CbmSpeciesTypeId = v$SpeciesTypeId), "lucasCore_CbmCrosswalk")
-    description(ca) <- "The assumptions behind the carbon calibration (docs/carbon-assumptions.md), filled with the package defaults. Add this scenario as a dependency of each Build."
-    cat(sprintf("Carbon Assumptions scenario created (id %d, CBM Crosswalk %d rows): add it to each Build's dependencies\n", scenarioId(ca), nrow(v))) }
+  source(file.path(pkg, "tools", "carbon-assumptions.R")); sm <- as.data.table(scenario(L, summary = TRUE)); new_ca <- !"Carbon Assumptions" %in% sm$Name
+  ca <- if (new_ca) scenario(P, "Carbon Assumptions") else scenario(L, sm[Name == "Carbon Assumptions", ScenarioId][1])
+  filled <- fill_carbon_assumptions(ca, pkg)
+  if (length(filled)) cat(sprintf("Carbon Assumptions scenario %d %s: filled %s%s\n", scenarioId(ca), if (new_ca) "created" else "kept", paste(filled, collapse = ", "),
+                                  if (new_ca) " - add it to each Build's dependencies" else ""))
   st <- levels(datasheet(scenario(L, as.data.table(scenario(L, summary = TRUE))$ScenarioId[1]), "core_Pipeline", lookupsAsFactors = TRUE, optional = TRUE)$StageNameId)
   cat("stages now:", paste(st, collapse = " | "), "\n") }

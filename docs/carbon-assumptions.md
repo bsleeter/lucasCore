@@ -90,3 +90,9 @@ calibrated, measured, user).
   rows that differ from the package default, and falls back to the package default without the dependency. Admin boundary left out:
   nothing in lucasCore uses it. Test: tests/phaseZ8-cbm-crosswalk.R. A library made in Studio gets the lists but no Carbon Assumptions
   scenario (stage 3 then uses the package default) - the user can create one or copy it from the starter.
+- 2026-10-27 **Dead Organic Matter Parameters done**: scenario sheet in Carbon Assumptions (ecodivision optional, dead pool, base decay
+  rate, reference temperature, Q10, share emitted, AG Slow -> BG Slow transfer), filled from defaults/cbm/dom-parameters.csv (CBM-CFS3's
+  values) by tools/carbon-assumptions.R (new-library and sync-library). Stage 3 resolves each cell's rows (ecodivision first) for the
+  decay rates; stages 7 and 11 take the climate multipliers' Q10s from it (a raster by ecodivision where rows differ; the pools of one
+  climate flow group must share a Q10, else the stage's check fails). Defaults reproduce the previous rates within 2e-8. Test:
+  tests/phaseZ9-dom-parameters.R (REUSE=1 rechecks the last runs).

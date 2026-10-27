@@ -101,7 +101,8 @@ ev_all <- fread(pkg_file("defaults", "stockflow", "event-pathways.csv"), colClas
 fss <- read_default("spinup", "fire-snag-share.csv")[, `:=`(StateClass = scl$Name[match(StateClassId, scl$Id)], Share = as.numeric(Share))][!is.na(StateClass)]
 ev_all <- rbind(ev_all, fire_snag_rows(ev_all, fss))
 say("High-severity fire snag share by forest type: %s", if (nrow(fss)) paste(sprintf("%s %.2f", sub("^Forest: ", "", fss$StateClass), fss$Share), collapse = ", ") else "none (the event table's rows for every type)")
-ctx <- list(cc = cc, cw = cw, dens = dens, cbm = cbm, fo = fread(pkg_file("defaults", "stockflow", "stsim_FlowOrder.csv")), ev = ev_all)
+dpt <- read_dom_parameters()   # Carbon Assumptions: Dead Organic Matter Parameters (each cell resolves its ecodivision rows, src/flows.R dom_parameters)
+ctx <- list(cc = cc, cw = cw, dens = dens, cbm = cbm, fo = fread(pkg_file("defaults", "stockflow", "stsim_FlowOrder.csv")), ev = ev_all, dpt = dpt)
 t0 <- Sys.time(); cl <- parallel::makeCluster(max(1, min(30, parallel::detectCores() - 1)))
 parallel::clusterExport(cl, c("ctx", "dat", "cells", "all_cells"), envir = environment())
 pkgdir <- env$PackageDirectory; parallel::clusterExport(cl, "pkgdir", envir = environment())
@@ -219,7 +220,7 @@ for (i in seq_len(nrow(cells))) { s <- cells$Stratum[i]; c0 <- cells$StateClass[
   fm_g[[i]] <- rbindlist(lapply(names(LIVE_POOLS), function(pl) data.table(StratumId = s, StateClassId = c0, AgeMin = g$Age, AgeMax = amax,
                                                                            FlowGroupId = paste(GROWTH_FLOW[[pl]], "[Type]"), Value = sh[[pl]])))
   cm <- cells[Stratum == s & StateClass == c0]
-  dv <- dom_flow_values(r, k$softwood, cells$temp[i], cbm); fixed <- character()
+  dv <- dom_flow_values(r, k$softwood, cells$temp[i], cbm, dp = dom_parameters(dpt, s)); fixed <- character()
   if (!is.na(cm$snag_fall)) { dv <- set_snag_fall(dv, cm$snag_fall); fixed <- SNAG_FALL_FLOWS }
   dv <- scale_decay(dv, c(mult_i(which(cells$Stratum == s & cells$StateClass == c0)), list(soil = cm$m_soil)), fixed)
   fm_d[[i]] <- data.table(StratumId = s, StateClassId = c0, AgeMin = NA_integer_, AgeMax = NA_integer_, FlowGroupId = paste(names(dv), "[Type]"), Value = unname(dv)) }

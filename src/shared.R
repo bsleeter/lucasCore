@@ -106,6 +106,25 @@ pkg_file <- function(...) file.path(env$PackageDirectory, ...)
 read_default <- function(...) { f <- pkg_file("defaults", ...); if (!file.exists(f)) fail("package default %s is missing", f)
   fread(f, sep = ",", colClasses = "character", na.strings = "", encoding = "UTF-8") }
 
+# Carbon Assumptions - Dead Organic Matter Parameters (to-do 21): the scenario's rows (from its Carbon Assumptions dependency), else the
+# package default (defaults/cbm/dom-parameters.csv); logs every row that differs from the default. Columns as the sheet, Pool as its label.
+read_dom_parameters <- function() {
+  def <- read_default("cbm", "dom-parameters.csv")[, .(StratumId = NA_character_, Pool, BaseDecayRate = as.numeric(BaseDecayRate),
+          ReferenceTemperature = as.numeric(ReferenceTemperature), Q10 = as.numeric(Q10), ShareEmitted = as.numeric(ShareEmitted), TransferToBGSlow = as.numeric(TransferToBGSlow))]
+  x <- as.data.table(datasheet(scn, ds("DomParameter"), optional = TRUE, lookupsAsFactors = FALSE))
+  if (!nrow(x)) { say("Dead Organic Matter Parameters: none in this scenario (no Carbon Assumptions dependency) - the package default (CBM-CFS3)"); return(def) }
+  pl <- def$Pool; if (is.numeric(x$Pool)) x[, Pool := pl[Pool]]
+  x <- x[, .(StratumId = as.character(StratumId), Pool = as.character(Pool), BaseDecayRate = as.numeric(BaseDecayRate), ReferenceTemperature = as.numeric(ReferenceTemperature),
+             Q10 = as.numeric(Q10), ShareEmitted = as.numeric(ShareEmitted), TransferToBGSlow = as.numeric(TransferToBGSlow))]
+  bad <- setdiff(pl, x[is.na(StratumId), Pool]); if (length(bad)) fail("Dead Organic Matter Parameters: no all-ecodivisions row for %s", paste(bad, collapse = ", "))
+  m <- merge(x, def[, -"StratumId"], by = "Pool", suffixes = c("", "_def"))
+  d <- m[!is.na(StratumId) | abs(BaseDecayRate - BaseDecayRate_def) > 1e-9 | abs(ReferenceTemperature - ReferenceTemperature_def) > 1e-9 | abs(Q10 - Q10_def) > 1e-9 |
+         abs(ShareEmitted - ShareEmitted_def) > 1e-9 | (Pool == "AG Slow" & !isTRUE(all.equal(TransferToBGSlow, TransferToBGSlow_def)))]
+  say("Dead Organic Matter Parameters: %d rows from Carbon Assumptions; %s", nrow(x), if (nrow(d)) paste0("differing from the package default: ",
+      paste(sprintf("%s%s (rate %.4g, ref %.1f C, Q10 %.3g, emitted %.3g)", ifelse(is.na(d$StratumId), "", paste0(d$StratumId, " / ")), d$Pool, d$BaseDecayRate,
+                    d$ReferenceTemperature, d$Q10, d$ShareEmitted), collapse = "; ")) else "the package default")
+  x }
+
 # a project-scope stsim list (Name, Id) as a data.table
 stsim_list <- function(name) as.data.table(datasheet(prj, paste0("stsim_", name), lookupsAsFactors = FALSE, optional = TRUE))
 

@@ -45,15 +45,30 @@ net_growth <- function(pools, r) {
   g <- data.table::as.data.table(g); g[, Age := p$Age[-n]]; g[, Total := rowSums(.SD), .SDcols = names(LIVE_POOLS)]
   g[] }
 
-# turnover and DOM flow multipliers of one cell: flow type -> value (decay at temperature temp_c; decay_mult scales base decay rates)
-dom_flow_values <- function(r, softwood, temp_c, cbm_dir, decay_mult = NULL) {
-  par <- data.table::fread(file.path(cbm_dir, "tblDOMParametersDefault.csv"))
-  slow_ag_bg <- data.table::fread(file.path(cbm_dir, "tblSlowAGToBGTransferRate.csv"))$SlowAGToBGTransferRate
-  pools <- c(AGVF = 0, BGVF = 1, AGF = 2, BGF = 3, AGM = 4, AGS = 5, BGS = 6, SnagStem = if (softwood) 7 else 9, SnagBranch = if (softwood) 8 else 10)
-  rate <- sapply(names(pools), function(k) { q <- par[SoilPoolID == pools[[k]]]
+# dead pool parameters (Carbon Assumptions: Dead Organic Matter Parameters; to-do 21): the sheet's labels and the pool codes
+DOM_POOL_CODE <- c(`AG Very Fast` = "AGVF", `BG Very Fast` = "BGVF", `AG Fast` = "AGF", `BG Fast` = "BGF", `AG Medium` = "AGM", `AG Slow` = "AGS",
+                   `BG Slow` = "BGS", `Snag Stem` = "SnagStem", `Snag Branch` = "SnagBranch")
+# the package default table (defaults/cbm/dom-parameters.csv, CBM-CFS3's values), in the sheet's columns
+dom_parameter_default <- function(cbm_dir) { x <- data.table::fread(file.path(cbm_dir, "dom-parameters.csv"), na.strings = "")
+  x[, .(StratumId = NA_character_, Pool, BaseDecayRate, ReferenceTemperature, Q10, ShareEmitted, TransferToBGSlow = as.numeric(TransferToBGSlow))] }
+# one ecodivision's parameters from a table in the sheet's columns: each pool's row for the stratum, else its blank-stratum row
+dom_parameters <- function(tab, stratum = NA_character_) {
+  x <- tab[!is.na(StratumId) & StratumId == stratum]; x <- rbind(x, tab[is.na(StratumId) & !Pool %in% x$Pool])
+  miss <- setdiff(names(DOM_POOL_CODE), x$Pool); if (length(miss)) stop("Dead Organic Matter Parameters: no row for ", paste(miss, collapse = ", "), call. = FALSE)
+  x <- x[match(names(DOM_POOL_CODE), Pool)]; k <- unname(DOM_POOL_CODE)
+  list(rate = stats::setNames(x$BaseDecayRate, k), ref = stats::setNames(x$ReferenceTemperature, k), q10 = stats::setNames(x$Q10, k),
+       patm = stats::setNames(x$ShareEmitted, k), slow_ag_bg = x[Pool == "AG Slow", TransferToBGSlow]) }
+
+# turnover and DOM flow multipliers of one cell: flow type -> value (decay at temperature temp_c; decay_mult scales base decay rates);
+# dp: the cell's dead pool parameters (dom_parameters), else the package default. Snag parameters serve softwood and hardwood alike.
+dom_flow_values <- function(r, softwood, temp_c, cbm_dir, decay_mult = NULL, dp = NULL) {
+  if (is.null(dp)) dp <- dom_parameters(dom_parameter_default(cbm_dir))
+  slow_ag_bg <- if (length(dp$slow_ag_bg) && !is.na(dp$slow_ag_bg)) dp$slow_ag_bg else 0
+  pools <- unname(DOM_POOL_CODE); names(pools) <- pools
+  rate <- sapply(names(pools), function(k) {
     m <- if (!is.null(decay_mult) && !is.null(decay_mult[[k]])) decay_mult[[k]] else 1
-    min(1, m * q$OrganicMatterDecayRate * exp((temp_c - q$ReferenceTemp) * log(q$Q10) * 0.1)) })
-    patm <- sapply(names(pools), function(k) par[SoilPoolID == pools[[k]], PropToAtmosphere])
+    min(1, m * dp$rate[[k]] * exp((temp_c - dp$ref[[k]]) * log(dp$q10[[k]]) * 0.1)) })
+  patm <- dp$patm
   dec <- function(k) (1 - patm[[k]]) * rate[[k]]; emi <- function(k) patm[[k]] * rate[[k]]
   c("Biomass Turnover: Merchantable -> Snag Stems" = r$stem,
     "Biomass Turnover: Other Wood -> Snag Branches" = r$branch * r$branch_to_snag,
