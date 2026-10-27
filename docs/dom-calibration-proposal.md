@@ -13,7 +13,8 @@ their rise with stand age is an assumption; fitting young stands made the decay 
 disturbance. The proposal:
 
 1. **Calibrate decay to FIA's measured dead pools** (the down woody material plots), one multiplier per measured pool, in **mature stands
-   only** (age >= 60 by default).
+   only** (age >= 60 by default). Decay is **regional** (one set per ecodivision, shared by every forest type) for snags, down logs and
+   fine woody debris; **leaf litter and duff decay vary by forest type** (user decision 2026-10-27).
 2. **Set snag fall from measurement** (remeasured standing dead trees), separate from snag decay.
 3. **Make high-severity fire the spin-up's last disturbance** (no fitted clearcut share), as the old LUCAS spin-up did.
 4. **Fit the high-severity fire and clearcut event flows to FIA plots measured after those events**, including a per-forest-type share of
@@ -47,6 +48,15 @@ vary by forest type eventually) and no recorded fire or harvest at the plot in t
 
 **Five multipliers** (snags; down logs = AG Medium + BG Fast; fine woody debris = AG Fast; litter = AG Very Fast; duff = AG Slow), plus
 soil to gSSURGO as today. Dead coarse roots (BG Fast) have no measurement and ride with down logs.
+
+**Regional and forest type terms** (user decision 2026-10-27). Decay is a property of the region (climate) more than of the stand, so
+snag, down log and fine woody debris multipliers are fitted once per ecodivision, jointly over its forest types. Leaf litter and duff
+multipliers are fitted per forest type, because forest floor stocks differ sharply by type in the same region (measured litter 4 Mg
+C/ha in Fir/Spruce against 9-10 in the other three P26 types) - litter quality differs (needles, oak leaves), and the per-type term may
+also absorb errors in the uncalibrated, type-specific inputs (foliage biomass and turnover). On P26 (`06-calibrate-measured.R` with
+`LUCAS_POOLED`), the misfit left from CBM defaults is: per-type fit 2.5%, this hybrid 3.0%, fully regional 7.1%; the hybrid's largest
+loss is Western Oak down logs. Live turnover, snag fall, the fire snag share and the growth curves stay per forest type. The CBM Q10s
+(2.65 leaf litter and duff, 2.0 the others, 1.0 deep soil) and the region's mean temperature set each base rate before the multiplier.
 
 ### 2.2 Snag fall from measurement
 
@@ -91,7 +101,12 @@ floor at 0-5 years.
 
 After clearcut, Mixed Conifer: down logs 7.4 / 10.6 / 7.4 vs 8.1 / 7.3 / 6.2 (was 20.9 / 17.1 / 13.2); snags 4.3 vs 4.1 (was 0).
 
-Decay multipliers (x CBM): snags ~0 (0.05-0.14), down logs 0.74-0.96, fine woody debris 1.8-2.3, litter 0.22-0.72, duff 3.2-7.1.
+Decay multipliers (x CBM), per-type fit: snags ~0 (0.05-0.14), down logs 0.74-0.96, fine woody debris 1.8-2.3, litter 0.22-0.72, duff
+3.2-7.1. Hybrid fit (the proposal): regional snags 0.05, down logs 0.85, fine woody debris 2.14; by type litter 0.31 / 0.72 / 0.22 / 0.28
+and duff 3.25 / 7.10 / 3.16 / 3.38 (Mixed Conifer / Fir-Spruce / Ponderosa / Western Oak). The section 3 results above are from the
+per-type fit; the hybrid's mature-stand fit is in `dev/fia/out-cal-regional/hybrid-decay.rds`. The full set of rates a stand runs with
+(region: temperature, Q10, decay; type: turnover, snag fall, litter and duff decay, growth; fire and clearcut shares) is tabulated by
+`dev/fia/16-rate-table.R` (to-do 20, the user rate sheet).
 
 ## 4. Implementation
 
@@ -100,7 +115,8 @@ Decay multipliers (x CBM): snags ~0 (0.05-0.14), down logs 0.74-0.96, fine woody
 | FIA data | `src/fia.R`, Data Sources | DataMart route also reads `<ST>_COND_DWM_CALC.csv` and the TREE remeasurement fields (PREV_TRE_CN, STANDING_DEAD_CD, AGENTCD, RECONCILECD), cached as today; the USGS .Rds route has no DWM, so measured targets need DataMart (or a shipped target table, below) |
 | Targets | `src/calibrate.R` | per ecodivision x forest type x age band (>= 60): measured snags, down logs + piles, fine woody debris, litter, duff; exclusion of recent fire/harvest; pooled to the forest type where plots are few (as the growth curves) |
 | Snag fall | `src/fia.R`, `src/calibrate.R`, `src/dom.R` | fall rates per forest type x ecodivision (pooled fallback); `scale_decay` leaves snag fall out of the snag multiplier; stage 3 writes the fall flow multipliers |
-| Calibration | `src/calibrate.R`, `src/dom.R`, `src/3-carbon-flows.R` | five decay groups (`DECAY_GROUPS`), fire as the last disturbance, OutputDecayCalibration gains the new multipliers and the fall rate; the decay figure (`src/figures.R`) shows five pools |
+| Calibration | `src/calibrate.R`, `src/dom.R`, `src/3-carbon-flows.R` | five decay groups (`DECAY_GROUPS`), fire as the last disturbance; snag, down log and fine woody debris multipliers fitted jointly per ecodivision over its forest types, litter and duff per ecodivision x type (pooled to the type where plots are few); OutputDecayCalibration gains the new multipliers and the fall rate; the decay figure (`src/figures.R`) shows five pools |
+| Rate sheet | `package.xml`, `ui/` | to-do 20: pick ecodivision and forest type, view and override temperature, Q10s, decay (regional) and turnover, snag fall, litter/duff decay, fire and clearcut shares, growth values (type) |
 | Event flows | `defaults/stockflow/event-pathways.csv`, `src/3-carbon-flows.R` | high-severity fire and clearcut rows as above. The per-type fire snag share needs state-class-specific rows: stage 3 already writes stsim_FlowPathway from this table, so it can write class rows - first confirm how ST-Sim combines a state-class row with a blank-class row for the same flow (override or sum) and write rows accordingly |
 | Shipped defaults | `defaults/spinup/` | snag fall rates and fire snag shares by forest type (and region), so a build without DataMart still gets them |
 | UI | `package.xml`, `ui/CarbonOptionsView.cs` | to-do 18: targets (measured / modelled), minimum age, last disturbance, fire return interval |

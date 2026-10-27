@@ -4,6 +4,8 @@ Live turnover,Branch (other wood),0.0399999991059303,"25% to Snag Branch, 75% to
 Live turnover,Stem (merchantable),0.0044999998062849,100% to Snag Stem,CBM,California Mixed Conifer
 Live turnover,Fine root,0.640999972820282,"50% to AG Very Fast, 50% to BG Very Fast",CBM,California Mixed Conifer
 Live turnover,Coarse root,0.0199999995529652,"50% to AG Fast, 50% to BG Fast",CBM,California Mixed Conifer
+DOM decay,Leaf litter (AG Very Fast) decay,0.150762526844862,"x0.31 CBM at the region's temperature; 81.5% emitted, 18.5% to AG Slow","fitted to FIA litter, mature stands (06 hybrid)",California Mixed Conifer
+DOM decay,Duff (AG Slow) decay,0.0671089133921502,x3.25 CBM; all emitted (plus 0.006 /yr to BG Slow),"fitted to FIA duff, mature stands (06 hybrid)",California Mixed Conifer
 Snags,Stem snag fall,0.047,to AG Medium,FIA remeasured standing dead (12-snag-fall.R),California Mixed Conifer
 Snags,Branch snag fall,0.14687499521242,to AG Fast,CBM branch rate x the stem ratio,California Mixed Conifer
 Snags,High-severity fire: share of live wood left as snags,0.28,"stem 0.334, branch 0.154 of the pool",fitted to FIA snags 0-20 yr after fire (14),California Mixed Conifer
@@ -20,6 +22,8 @@ Live turnover,Branch (other wood),0.0399999991059303,"25% to Snag Branch, 75% to
 Live turnover,Stem (merchantable),0.0044999998062849,100% to Snag Stem,CBM,Fir/Spruce/Mountain Hemlock
 Live turnover,Fine root,0.640999972820282,"50% to AG Very Fast, 50% to BG Very Fast",CBM,Fir/Spruce/Mountain Hemlock
 Live turnover,Coarse root,0.0199999995529652,"50% to AG Fast, 50% to BG Fast",CBM,Fir/Spruce/Mountain Hemlock
+DOM decay,Leaf litter (AG Very Fast) decay,0.350577176834478,"x0.72 CBM at the region's temperature; 81.5% emitted, 18.5% to AG Slow","fitted to FIA litter, mature stands (06 hybrid)",Fir/Spruce/Mountain Hemlock
+DOM decay,Duff (AG Slow) decay,0.146721245202505,x7.10 CBM; all emitted (plus 0.006 /yr to BG Slow),"fitted to FIA duff, mature stands (06 hybrid)",Fir/Spruce/Mountain Hemlock
 Snags,Stem snag fall,0.045,to AG Medium,FIA remeasured standing dead (12-snag-fall.R),Fir/Spruce/Mountain Hemlock
 Snags,Branch snag fall,0.140624995416147,to AG Fast,CBM branch rate x the stem ratio,Fir/Spruce/Mountain Hemlock
 Snags,High-severity fire: share of live wood left as snags,0.42,"stem 0.501, branch 0.231 of the pool",fitted to FIA snags 0-20 yr after fire (14),Fir/Spruce/Mountain Hemlock
@@ -36,6 +40,8 @@ Live turnover,Branch (other wood),0.0399999991059303,"25% to Snag Branch, 75% to
 Live turnover,Stem (merchantable),0.0044999998062849,100% to Snag Stem,CBM,Ponderosa Pine
 Live turnover,Fine root,0.640999972820282,"50% to AG Very Fast, 50% to BG Very Fast",CBM,Ponderosa Pine
 Live turnover,Coarse root,0.0199999995529652,"50% to AG Fast, 50% to BG Fast",CBM,Ponderosa Pine
+DOM decay,Leaf litter (AG Very Fast) decay,0.107463103602643,"x0.22 CBM at the region's temperature; 81.5% emitted, 18.5% to AG Slow","fitted to FIA litter, mature stands (06 hybrid)",Ponderosa Pine
+DOM decay,Duff (AG Slow) decay,0.0652395320980402,x3.16 CBM; all emitted (plus 0.006 /yr to BG Slow),"fitted to FIA duff, mature stands (06 hybrid)",Ponderosa Pine
 Snags,Stem snag fall,0.11,to AG Medium,FIA remeasured standing dead (12-snag-fall.R),Ponderosa Pine
 Snags,Branch snag fall,0.343749988795026,to AG Fast,CBM branch rate x the stem ratio,Ponderosa Pine
 Snags,High-severity fire: share of live wood left as snags,0.36,"stem 0.429, branch 0.198 of the pool",fitted to FIA snags 0-20 yr after fire (14),Ponderosa Pine
@@ -52,6 +58,8 @@ Live turnover,Branch (other wood),0.0399999991059303,"25% to Snag Branch, 75% to
 Live turnover,Stem (merchantable),0.0044999998062849,100% to Snag Stem,CBM,Western Oak
 Live turnover,Fine root,0.640999972820282,"50% to AG Very Fast, 50% to BG Very Fast",CBM,Western Oak
 Live turnover,Coarse root,0.0199999995529652,"50% to AG Fast, 50% to BG Fast",CBM,Western Oak
+DOM decay,Leaf litter (AG Very Fast) decay,0.138360083223934,"x0.28 CBM at the region's temperature; 81.5% emitted, 18.5% to AG Slow","fitted to FIA litter, mature stands (06 hybrid)",Western Oak
+DOM decay,Duff (AG Slow) decay,0.0698397979027937,x3.38 CBM; all emitted (plus 0.006 /yr to BG Slow),"fitted to FIA duff, mature stands (06 hybrid)",Western Oak
 Snags,Stem snag fall,0.079,to AG Medium,FIA remeasured standing dead (12-snag-fall.R),Western Oak
 Snags,Branch snag fall,0.246874991952791,to AG Fast,CBM branch rate x the stem ratio,Western Oak
 Snags,High-severity fire: share of live wood left as snags,0.4,"stem 0.477, branch 0.220 of the pool",fitted to FIA snags 0-20 yr after fire (14),Western Oak

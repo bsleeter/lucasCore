@@ -1,37 +1,37 @@
 Pool,ForestType,TypeMultiplier
-Aboveground Very Fast,California Mixed Conifer,0.308418868683954
+Aboveground Very Fast,California Mixed Conifer,0.308424640665058
 Belowground Very Fast,California Mixed Conifer,1
-Aboveground Fast,California Mixed Conifer,2.19895909643548
-Belowground Fast,California Mixed Conifer,0.744668990885369
-Aboveground Medium,California Mixed Conifer,0.744668990885369
-Aboveground Slow,California Mixed Conifer,3.25347475652552
+Aboveground Fast,California Mixed Conifer,2.14473801446147
+Belowground Fast,California Mixed Conifer,0.848621479375787
+Aboveground Medium,California Mixed Conifer,0.848621479375787
+Aboveground Slow,California Mixed Conifer,3.2491739085191
 Belowground Slow,California Mixed Conifer,1
 Snag Stem,California Mixed Conifer,0.05
 Snag Branch,California Mixed Conifer,0.05
-Aboveground Very Fast,Fir/Spruce/Mountain Hemlock,0.717197039441603
+Aboveground Very Fast,Fir/Spruce/Mountain Hemlock,0.71719837849235
 Belowground Very Fast,Fir/Spruce/Mountain Hemlock,1
-Aboveground Fast,Fir/Spruce/Mountain Hemlock,2.2760303267422
-Belowground Fast,Fir/Spruce/Mountain Hemlock,0.768661659083923
-Aboveground Medium,Fir/Spruce/Mountain Hemlock,0.768661659083923
-Aboveground Slow,Fir/Spruce/Mountain Hemlock,7.11313382045143
+Aboveground Fast,Fir/Spruce/Mountain Hemlock,2.14473801446147
+Belowground Fast,Fir/Spruce/Mountain Hemlock,0.848621479375787
+Aboveground Medium,Fir/Spruce/Mountain Hemlock,0.848621479375787
+Aboveground Slow,Fir/Spruce/Mountain Hemlock,7.10371868117858
 Belowground Slow,Fir/Spruce/Mountain Hemlock,1
 Snag Stem,Fir/Spruce/Mountain Hemlock,0.05
 Snag Branch,Fir/Spruce/Mountain Hemlock,0.05
-Aboveground Very Fast,Ponderosa Pine,0.219839663310768
+Aboveground Very Fast,Ponderosa Pine,0.219844213326985
 Belowground Very Fast,Ponderosa Pine,1
-Aboveground Fast,Ponderosa Pine,2.3374990470851
-Belowground Fast,Ponderosa Pine,0.793721731671634
-Aboveground Medium,Ponderosa Pine,0.793721731671634
-Aboveground Slow,Ponderosa Pine,3.16406439103433
+Aboveground Fast,Ponderosa Pine,2.14473801446147
+Belowground Fast,Ponderosa Pine,0.848621479375787
+Aboveground Medium,Ponderosa Pine,0.848621479375787
+Aboveground Slow,Ponderosa Pine,3.15866514271027
 Belowground Slow,Ponderosa Pine,1
-Snag Stem,Ponderosa Pine,0.144003477180711
-Snag Branch,Ponderosa Pine,0.144003477180711
-Aboveground Very Fast,Western Oak,0.283071260578696
+Snag Stem,Ponderosa Pine,0.05
+Snag Branch,Ponderosa Pine,0.05
+Aboveground Very Fast,Western Oak,0.283052160532182
 Belowground Very Fast,Western Oak,1
-Aboveground Fast,Western Oak,1.76487479953135
-Belowground Fast,Western Oak,0.961351731945589
-Aboveground Medium,Western Oak,0.961351731945589
-Aboveground Slow,Western Oak,3.36505577756658
+Aboveground Fast,Western Oak,2.14473801446147
+Belowground Fast,Western Oak,0.848621479375787
+Aboveground Medium,Western Oak,0.848621479375787
+Aboveground Slow,Western Oak,3.38139358323373
 Belowground Slow,Western Oak,1
 Snag Stem,Western Oak,0.05
 Snag Branch,Western Oak,0.05

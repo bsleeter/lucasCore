@@ -1,9 +1,10 @@
 # =============================================================================
 # 16-rate-table.R - the values a P26 forest stand runs with, laid out for a user-facing sheet (to-do 20), in three scopes:
 #   region   (ecodivision) mean annual temperature; per DOM pool: CBM base decay rate at 10 C, Q10, rate at the region's temperature,
-#            multiplier and resulting rate, split to the next pool vs the atmosphere - for CBM, the regional calibration (one set for
-#            every type, out-cal-regional) and each type's own calibration (out-cal-clearcut)
-#   type     live turnover rates and splits, measured snag fall, high-severity fire snag share, growth and carbon curve values
+#            multiplier and resulting rate, split to the next pool vs the atmosphere. Calibration as decided 2026-10-27 (06 with
+#            LUCAS_POOLED=hybrid, out-cal-regional/hybrid-decay.rds): snags, down logs and fine woody debris regional; leaf litter
+#            (AG Very Fast) and duff (AG Slow) decay per forest type, so they sit in the type table
+#   type     live turnover rates and splits, leaf litter and duff decay, measured snag fall, high-severity fire snag share, growth and carbon curve values
 #   events   high-severity fire and clearcut: share of each pool moved to each destination (proposed flows, event-pathways-fitted2 plus
 #            the per-type fire snag share), by stand age where the flows differ
 # Read-only. Writes dev/fia/out-cal-clearcut/rate-table-{region,type,events}.csv and prints California Mixed Conifer.
@@ -12,7 +13,7 @@
 suppressPackageStartupMessages({ library(data.table); library(DBI) })
 pkg <- "F:/lucasCore"; cbm <- file.path(pkg, "defaults/cbm"); out <- file.path(pkg, "dev/fia/out-cal-clearcut")
 for (f in c("growth.R", "flows.R", "dom.R", "calibrate.R")) source(file.path(pkg, "src", f))
-r <- readRDS(file.path(out, "calibration.rds")); reg <- readRDS(file.path(pkg, "dev/fia/out-cal-regional/regional-decay.rds"))$mult
+r <- readRDS(file.path(out, "calibration.rds")); hy <- readRDS(file.path(pkg, "dev/fia/out-cal-regional/hybrid-decay.rds")); reg <- hy$mult[c("snag", "cwd", "fwd")]; TYPE_DECAY <- c("litter", "duff")
 SNAG_FALL <- fread(file.path(pkg, "dev/fia/snag-fall-measured.csv")); FIRE_SNAG <- fread(file.path(pkg, "dev/fia/fire-snag-share.csv"))
 FALLS <- c("Transfer: Snag Stem -> AG Medium", "Transfer: Snag Branch -> AG Fast")
 G_NEW <- list(snag = c("SnagStem", "SnagBranch"), cwd = c("AGM", "BGF"), fwd = "AGF", litter = "AGVF", duff = "AGS", soil = c("BGVF", "BGS"))
@@ -33,11 +34,12 @@ region <- rbindlist(lapply(names(POOL_ID), function(p) { z <- par[SoilPoolID == 
   data.table(Ecodivision = "M260", MeanTempC = round(temp, 2), Pool = nice(DOM_POOLS[[p]]), BaseRate10C = z$OrganicMatterDecayRate, Q10 = z$Q10,
              RateAtTemp = at, PctEmitted = 100 * z$PropToAtmosphere, PctToNextPool = 100 * (1 - z$PropToAtmosphere),
              NextPool = c(AGVF = "AG Slow", BGVF = "BG Slow", AGF = "AG Slow", BGF = "BG Slow", AGM = "AG Slow", AGS = "-", BGS = "-", SnagStem = "AG Slow", SnagBranch = "AG Slow")[[p]],
-             RegionalMultiplier = mr, RegionalRate = at * mr) }))
-region[Pool == "Aboveground Slow", Note := sprintf("plus a fixed transfer to BG Slow of %.3f /yr", slow_ag_bg)]
+             RegionalMultiplier = if (g %in% TYPE_DECAY) NA_real_ else mr, RegionalRate = if (g %in% TYPE_DECAY) NA_real_ else at * mr) }))
+region[Pool %in% c("Aboveground Very Fast", "Aboveground Slow"), Note := "decay rate by forest type (type table)"]
+region[Pool == "Aboveground Slow", Note := sprintf("decay rate by forest type (type table); plus a fixed transfer to BG Slow of %.3f /yr", slow_ag_bg)]
 region[Pool %in% c("Belowground Very Fast", "Belowground Slow"), Note := "soil: fitted per cell to gSSURGO in stage 3 (not in this dev fit)"]
 region[grepl("Snag", Pool), Note := "decay while standing; fall is a forest type value"]
-tm <- rbindlist(lapply(seq_len(nrow(r$cells)), function(i) { k <- r$cells[i]; m <- r$M[[as.character(k$sc)]]$mult
+tm <- rbindlist(lapply(seq_len(nrow(r$cells)), function(i) { k <- r$cells[i]; m <- as.list(hy$by_type[as.character(k$sc), ])
   data.table(Pool = region$Pool, ForestType = gsub("Forest: | Group", "", k$StateClass), TypeMultiplier = sapply(names(POOL_ID), function(p) { g <- grp_of(p); if (g %in% names(m)) m[[g]] else 1 })) }))
 fwrite(region, file.path(out, "rate-table-region.csv")); fwrite(tm, file.path(out, "rate-table-type-multipliers.csv"))
 
@@ -52,6 +54,8 @@ type <- rbindlist(lapply(seq_len(nrow(r$cells)), function(i) { k <- r$cells[i]; 
     c("Live turnover", "Stem (merchantable)", rt$stem, "100% to Snag Stem", "CBM"),
     c("Live turnover", "Fine root", rt$fine, "50% to AG Very Fast, 50% to BG Very Fast", "CBM"),
     c("Live turnover", "Coarse root", rt$coarse, "50% to AG Fast, 50% to BG Fast", "CBM"),
+    c("DOM decay", "Leaf litter (AG Very Fast) decay", rl <- region[Pool == "Aboveground Very Fast", RateAtTemp] * hy$by_type[as.character(k$sc), "litter"], sprintf("x%.2f CBM at the region's temperature; 81.5%% emitted, 18.5%% to AG Slow", hy$by_type[as.character(k$sc), "litter"]), "fitted to FIA litter, mature stands (06 hybrid)"),
+    c("DOM decay", "Duff (AG Slow) decay", region[Pool == "Aboveground Slow", RateAtTemp] * hy$by_type[as.character(k$sc), "duff"], sprintf("x%.2f CBM; all emitted (plus 0.006 /yr to BG Slow)", hy$by_type[as.character(k$sc), "duff"]), "fitted to FIA duff, mature stands (06 hybrid)"),
     c("Snags", "Stem snag fall", sf, "to AG Medium", "FIA remeasured standing dead (12-snag-fall.R)"),
     c("Snags", "Branch snag fall", bf, "to AG Fast", "CBM branch rate x the stem ratio"),
     c("Snags", "High-severity fire: share of live wood left as snags", fs, sprintf("stem %.3f, branch %.3f of the pool", fs * 0.65 / 0.545, fs * 0.30 / 0.545), "fitted to FIA snags 0-20 yr after fire (14)"),

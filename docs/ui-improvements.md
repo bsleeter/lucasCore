@@ -267,3 +267,5 @@ figures, which are redone once after the P26 rerun.
    (06 with LUCAS_POOLED=1, dev/fia/out-cal-regional): one regional decay set cuts the misfit from CBM by 93-95% vs 97-98% per type;
    down logs, fine woody debris and snags fit about as well, litter and duff by type do not (forest floor measured 4 Fir/Spruce vs 9-10
    the others). Tables: dev/fia/out-cal-clearcut/rate-table-{region,type,events}.csv (16-rate-table.R).
+   DECIDED 2026-10-27 (user): regional decay for snags, down logs and fine woody debris; leaf litter and duff decay per forest type
+   (hybrid fit: 3.0% of CBM's misfit left vs 2.5% per type, 7.1% fully regional). The sheet lists litter and duff decay with the type.

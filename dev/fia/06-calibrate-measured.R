@@ -111,8 +111,12 @@ fit_measured <- function(k) {
 t0 <- Sys.time(); M <- lapply(seq_len(nrow(cells)), function(i) fit_measured(cells[i])); names(M) <- cells$sc
 cat(sprintf("\nmeasured-pool calibration: %.1f min\n", as.numeric(Sys.time() - t0, units = "mins")))
 # LUCAS_POOLED=1 (dev, 2026-10-27): also fit ONE set of five multipliers shared by every type (a regional decay set) and compare its
-# misfit with the per-type fits, each type's loss scaled by its own targets' means as in fit_measured
-if (Sys.getenv("LUCAS_POOLED") == "1") {
+# misfit with the per-type fits, each type's loss scaled by its own targets' means as in fit_measured. LUCAS_POOLED=hybrid (user
+# decision 2026-10-27): snags, down logs and fine woody debris regional (shared), litter and duff per forest type
+pooled <- Sys.getenv("LUCAS_POOLED")
+if (pooled %in% c("1", "hybrid")) {
+  nc <- nrow(cells); np <- if (pooled == "1") 5 else 3 + 2 * nc
+  cell_par <- function(par, i) if (pooled == "1") par else c(par[1:3], par[3 + i], par[3 + nc + i])
   parts <- lapply(seq_len(nrow(cells)), function(i) { k <- cells[i]; S <- cal_setup(k, ctx); ob <- obs[sc == k$sc]; ag <- ages[sc == k$sc]
     scale <- sapply(MPOOLS, function(p) weighted.mean(ob[[p]], ob$n))
     pred <- function(par) { mult <- as.list(setNames(exp(par), c("snag", "cwd", "fwd", "litter", "duff")))
@@ -120,16 +124,17 @@ if (Sys.getenv("LUCAS_POOLED") == "1") {
       ag[, lapply(setNames(names(SIM), names(SIM)), function(p) sum(N * sim[stdage + 1, p]) / sum(N)), by = band] }
     loss <- function(par) { m <- merge(ob, pred(par), by = "band", suffixes = c("", "_sim")); sum(sapply(MPOOLS, function(p) sum(m$n * ((m[[paste0(p, "_sim")]] - m[[p]]) / scale[[p]])^2))) }
     list(pred = pred, loss = loss) })
-  o <- optim(rep(0, 5), function(par) sum(sapply(parts, function(z) z$loss(par))), method = "L-BFGS-B", lower = rep(log(0.05), 5), upper = rep(log(20), 5), control = list(maxit = 500))
-  PM <- setNames(exp(o$par), c("snag", "cwd", "fwd", "litter", "duff"))
+  o <- optim(rep(0, np), function(par) sum(sapply(seq_len(nc), function(i) parts[[i]]$loss(cell_par(par, i)))), method = "L-BFGS-B", lower = rep(log(0.05), np), upper = rep(log(20), np), control = list(maxit = 500))
+  PT <- t(sapply(seq_len(nc), function(i) setNames(exp(cell_par(o$par, i)), c("snag", "cwd", "fwd", "litter", "duff")))); rownames(PT) <- cells$sc; PM <- PT[1, ]
   cmp <- rbindlist(lapply(seq_len(nrow(cells)), function(i) { s <- as.character(cells$sc[i])
-    data.table(type = sub(" Group", "", TYPES[[s]]), cbm = M[[s]]$loss0, per_type = M[[s]]$loss1, regional = parts[[i]]$loss(o$par)) }))
-  cat("\nRegional decay set (one for all types):", paste(sprintf("%s %.2f", names(PM), PM), collapse = ", "), "\n")
+    data.table(type = sub(" Group", "", TYPES[[s]]), cbm = M[[s]]$loss0, per_type = M[[s]]$loss1, regional = parts[[i]]$loss(cell_par(o$par, i))) }))
+  cat("\nDecay multipliers by type (LUCAS_POOLED =", pooled, "):\n"); print(round(PT, 3))
   cat("Misfit (weighted, scaled squared error) - CBM defaults / per-type fit / regional fit:\n"); print(cmp[, lapply(.SD, function(z) if (is.numeric(z)) round(z, 1) else z)])
-  pf <- rbindlist(lapply(seq_len(nrow(cells)), function(i) merge(obs[sc == cells$sc[i]], parts[[i]]$pred(o$par), by = "band", suffixes = c("", "_sim"))[, type := sub(" Group", "", TYPES[[as.character(cells$sc[i])]])]))
+  pf <- rbindlist(lapply(seq_len(nrow(cells)), function(i) merge(obs[sc == cells$sc[i]], parts[[i]]$pred(cell_par(o$par, i)), by = "band", suffixes = c("", "_sim"))[, type := sub(" Group", "", TYPES[[as.character(cells$sc[i])]])]))
   print(pf[, .(type = substr(type, 1, 18), band, n, standing = sprintf("%.1f / %.1f", standing, standing_sim), downlogs = sprintf("%.1f / %.1f", cwd, cwd_sim), fwd = sprintf("%.1f / %.1f", fwd, fwd_sim),
                litter = sprintf("%.1f / %.1f", litter, litter_sim), duff = sprintf("%.1f / %.1f", duff, duff_sim))])
-  saveRDS(list(mult = PM, compare = cmp, fit = pf), file.path(out, "regional-decay.rds")); fwrite(cmp, file.path(out, "regional-decay-misfit.csv"))
+  tag <- if (pooled == "1") "regional-decay" else "hybrid-decay"
+  saveRDS(list(mult = PM, by_type = PT, compare = cmp, fit = pf), file.path(out, paste0(tag, ".rds"))); fwrite(cmp, file.path(out, paste0(tag, "-misfit.csv")))
   if (Sys.getenv("LUCAS_POOLED_ONLY") == "1") quit(save = "no")
 }
 
