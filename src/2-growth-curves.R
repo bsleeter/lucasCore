@@ -7,7 +7,7 @@
 # Growth Curve Options can instead copy all of these from a result scenario of another lucasCore library (src/growth-copy.R).
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
-source(pkg_file("src", "growth.R")); source(pkg_file("src", "carbon.R"))
+source(pkg_file("src", "growth.R")); source(pkg_file("src", "carbon.R")); source(pkg_file("src", "fia.R"))
 suppressPackageStartupMessages({ library(terra); library(sf); library(parallel) })
 STAGE <- "2 Growth Curves"
 progressBar(type = "begin", totalSteps = 6)
@@ -20,7 +20,7 @@ if (identical(src_choice, "Copy from another library")) {
   source(pkg_file("src", "growth-copy.R")); copy_curves(opt)
   finish_checks(); progressBar(type = "end"); quit(save = "no") }
 
-src <- read_data_sources(c("FiaConditionFile", "FiaDisturbanceFile", "EcodivisionFile", "PrismFolder"))
+src <- read_data_sources(c("EcodivisionFile", "PrismFolder"))
 fixed_lag <- !is.null(opt$LagYears) && !is.na(opt$LagYears)
 say("Growth options: lag %s, penalty %g, min plots per ecodivision %d, ages 0-%d, inventories from %d, volume cap q%.3f",
     if (fixed_lag) sprintf("fixed at %g yr", opt$LagYears) else sprintf("fitted per forest type (0-%g yr; class lag below %d plots)", opt$MaximumLag, opt$MinPlotsLag),
@@ -39,7 +39,8 @@ say("Cells: %d forest state classes x %d ecodivisions = %d curves", nrow(cw), nr
 progressBar()
 
 # ---- data and ecodivision climate -----------------------------------------------------------------------------------
-x <- growth_data(src$FiaConditionFile, src$FiaDisturbanceFile, opt)
+fx <- fia_tables(opt, src$EcodivisionFile)   # Growth Curve Options: FIA Data (src/fia.R)
+x <- growth_data(fx$cond, fx$dist, opt)
 say("FIA: %d plot-conditions after filters (%d plots)", nrow(x), uniqueN(x$pid))
 clim <- ecodiv_climate(src$EcodivisionFile, src$PrismFolder)
 progressBar()
@@ -110,7 +111,7 @@ write_ds(cur[, .(StratumId = StratumName, StateClassId = StateClassName, Age, Me
 progressBar()
 
 # ---- live-tree carbon and CBM pools (src/carbon.R) ------------------------------------------------------------------
-xc <- carbon_data(src$FiaConditionFile, src$FiaDisturbanceFile, opt)
+xc <- carbon_data(fx$cond, fx$dist, opt)
 xcv <- copy(xc)[, vol := c_live]   # fit_forest_type fits the column vol
 say("FIA carbon: %d plot-conditions after filters", nrow(xcv))
 t0 <- Sys.time(); cl <- makeCluster(nw)

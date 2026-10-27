@@ -2,7 +2,7 @@
 // GrowthOptionsView.cs - the Growth Curve Options page: fit new curves or copy them from another library, then only what applies
 // =============================================================================
 // Single-row sheet lucasCore_GrowthOptions, unchanged. Copying (src/growth-copy.R) needs the source library and optionally its
-// result scenario; fitting (stage 2) uses the settings in the Fitting group. The group that does not apply is greyed out.
+// result scenario; fitting (stage 2) uses the FIA data and Fitting groups (FIA data: src/fia.R). The group that does not apply is greyed out.
 // =============================================================================
 using System;
 using System.Drawing;
@@ -17,12 +17,14 @@ namespace lucasCoreUI
         protected override string SheetName { get { return "lucasCore_GrowthOptions"; } }
 
         private readonly Choice m_source = new Choice("CurveSource", 1);
+        private readonly Choice m_fia = new Choice("FiaSource", 1), m_dd = new Choice("DownDeadCarbon", 1);
+        private FlowLayoutPanel m_ddRow;
         private readonly TextBox m_library = new TextBox { Width = 460, Anchor = AnchorStyles.Left, Margin = new Padding(3, 3, 6, 3) };
         private readonly Button m_browse = new Button { Text = "Browse...", AutoSize = true, Margin = new Padding(3, 2, 12, 3) };
         private readonly TextBox m_scenario = Box(70);
         private readonly Label m_libState = new Label { AutoSize = true, ForeColor = SystemColors.GrayText, Margin = new Padding(3, 4, 3, 3) };
         private readonly TextBox m_lag = Box(70), m_minPlotsLag = Box(70), m_maxLag = Box(70), m_penalty = Box(70), m_minPlotsEco = Box(70), m_maxAge = Box(70), m_minYear = Box(70), m_cap = Box(70);
-        private GroupBox m_gCopy, m_gFit;
+        private GroupBox m_gCopy, m_gFit, m_gFia;
 
         public GrowthOptionsView()
         {
@@ -45,6 +47,20 @@ namespace lucasCoreUI
             copy.Controls.Add(sr);
             m_gCopy = Group("Copy from", copy);
             AddGroup(m_gCopy);
+
+            var fia = Column();
+            var fr = Row();
+            fr.Controls.Add(Option(m_fia, 1, "USGS condition tables (.Rds)"));
+            fr.Controls.Add(Option(m_fia, 2, "FIA DataMart (state CSVs)"));
+            fia.Controls.Add(fr);
+            m_ddRow = Row();
+            m_ddRow.Controls.Add(Caption("Down dead carbon:"));
+            m_ddRow.Controls.Add(Option(m_dd, 1, "Adjusted to field measurements by state"));
+            m_ddRow.Controls.Add(Option(m_dd, 2, "As in FIADB (model)"));
+            fia.Controls.Add(m_ddRow);
+            fia.Controls.Add(Wrapped("The FIA plot conditions the curves, carbon shares and decay calibration are fitted to. The USGS tables are the two .Rds files in Data Sources. FIA DataMart derives the same tables from the state PLOT, COND and TREE csv files in Data Sources: FIA DataMart Folder (all 48 conterminous states for the CONUS-wide curves), cached there after the first read; it reproduces the USGS tables (newer inventories included). FIADB's down dead wood is a model of live tree carbon; the USGS tables scale it by one field/model factor per state, which the default applies too (only the decay calibration uses it).", 640));
+            m_gFia = Group("FIA data", fia);
+            AddGroup(m_gFia);
 
             var fit = Form();
             FormRow(fit, "Fixed lag before merchantable volume (yr):", m_lag, "Blank = fitted for each forest type.");
@@ -107,6 +123,8 @@ namespace lucasCoreUI
             bool copying = IntValue("CurveSource", 1) == 2;
             m_gCopy.Enabled = copying;
             m_gFit.Enabled = !copying;
+            ShowChoice(m_fia); ShowChoice(m_dd);
+            m_gFia.Enabled = !copying; m_ddRow.Enabled = IntValue("FiaSource", 1) == 2;
             ShowLibraryState();
         }
     }

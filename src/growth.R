@@ -22,7 +22,7 @@ wb_curve <- function(t, A, k, c, lag) ifelse(t <= lag, 0, A * (1 - exp(-k * pmax
 
 # FIA conditions -> fitting data (one row per plot-condition, latest visit)
 growth_data <- function(cond_file, dist_file, opt) {
-  x <- data.table::as.data.table(readRDS(cond_file)); d <- data.table::as.data.table(readRDS(dist_file))
+  x <- data.table::as.data.table(if (is.character(cond_file)) readRDS(cond_file) else cond_file); d <- data.table::as.data.table(if (is.character(dist_file)) readRDS(dist_file) else dist_file)   # a table, or the USGS .Rds file
   x <- merge(x, d, by = c("plt_cn", "condid"), all.x = TRUE)
   x[, pid := sprintf("%02d-%d-%03d-%05d", statecd, unitcd, countycd, plot)]
   x[, vol := net_merchantable_bole_wood_vol_live_trees_cuft_per_acre * 0.0699725]   # ft3/ac -> m3/ha

@@ -13,13 +13,15 @@
 #                                    volume from TREE, each tree x TPA_UNADJ / the condition's share of the plot size it was measured on
 #                                    (microplot, subplot, macroplot). Reproduces the USGS California table (99-100% of conditions
 #                                    within 1% in every field) except down dead wood.
-#   Down dead carbon (DataMart only): FIADB's CARBON_DOWN_DEAD is 1/0.7 x the USGS table's in practically every condition, for a reason
-#   not yet found; Growth Curve Options chooses Scaled to the USGS tables (x 0.7, default: the curves and decay calibration of the
-#   USGS route) or As in FIADB. Only stage 3's decay calibration reads it.
+#   Down dead carbon (DataMart only): FIADB's CARBON_DOWN_DEAD is a model (Smith and Heath 2008, from live tree carbon); the USGS tables
+#   hold it times one constant per state (0.17-2.05, all 48 states: dev/fia/FINDINGS.md), consistent with the national GHG inventory's
+#   state field/model adjustment (Domke et al. 2013). Growth Curve Options: Adjusted to field measurements (default; those factors,
+#   defaults/growth/down-dead-state-factors.csv, as the USGS route) or As in FIADB. Only stage 3's decay calibration reads it.
 # The derived tables are cached in the DataMart folder (fia-conditions.rds) and rebuilt when the set of CSVs or their sizes and dates
 # change. Output columns are the USGS tables', so growth.R, carbon.R and calibrate.R read either source alike.
 # =============================================================================
 
+FIA_METHOD <- "2026-10-26b"   # bump when the derivation changes (the cache is rebuilt)
 FIA_SOURCES <- c("USGS condition tables (.Rds)", "FIA DataMart (state CSVs)")
 fia_choice <- function(v, labels) { if (is.null(v) || !length(v) || is.na(v[1])) return(1L)
   if (is.numeric(v)) as.integer(v[1]) else { k <- match(TRUE, startsWith(as.character(v[1]), sub(" .*", "", labels))); if (is.na(k)) 1L else k } }
@@ -32,11 +34,15 @@ fia_tables <- function(opt, ecodiv_file) {
     return(list(cond = data.table::as.data.table(readRDS(s$FiaConditionFile)), dist = data.table::as.data.table(readRDS(s$FiaDisturbanceFile)))) }
   dm <- read_data_sources("FiaDataMartFolder")$FiaDataMartFolder
   x <- fia_datamart(dm, ecodiv_file)
-  scale_dd <- fia_choice(opt$DownDeadCarbon, c("Scaled", "As")) == 1L
-  if (scale_dd) x$cond[, c_down_dead_tons_per_acre := c_down_dead_tons_per_acre * 0.7]
+  adjust_dd <- fia_choice(opt$DownDeadCarbon, c("Adjusted", "As")) == 1L
+  if (adjust_dd) {   # each state's field/model factor (defaults/growth/down-dead-state-factors.csv); a state without one keeps the model value
+    sf <- read_default("growth", "down-dead-state-factors.csv")
+    x$cond[, f := as.numeric(sf$Factor)[match(statecd, as.integer(sf$StateCode))]]   # read_default reads text
+    miss <- x$cond[is.na(f), unique(statecd)]; if (length(miss)) say("Down dead carbon: no state factor for state code(s) %s - FIADB's model value kept", paste(miss, collapse = ", "))
+    x$cond[is.na(f), f := 1][, c_down_dead_tons_per_acre := c_down_dead_tons_per_acre * f][, f := NULL] }
   say("FIA data: FIA DataMart, %d states (%s), %d forest conditions, inventories %d-%d; down dead carbon %s",
       length(x$states), paste(x$states, collapse = " "), nrow(x$cond), min(x$cond$invyr), max(x$cond$invyr),
-      if (scale_dd) "scaled x 0.7 to the USGS tables" else "as in FIADB (1/0.7 x the USGS tables)")
+      if (adjust_dd) "adjusted to field measurements by state (as in the USGS tables)" else "as FIADB's model (Smith and Heath 2008), unadjusted")
   if (length(x$states) < 48) say("FIA DataMart: %d of the 48 conterminous states - the pooled curves are not CONUS-wide", length(x$states))
   x }
 
@@ -46,7 +52,7 @@ fia_datamart <- function(dm, ecodiv_file) {
   sts <- sts[file.exists(file.path(dm, paste0(sts, "_COND.csv"))) & file.exists(file.path(dm, paste0(sts, "_TREE.csv")))]
   if (!length(sts)) fail("FIA DataMart Folder %s has no <ST>_PLOT, <ST>_COND and <ST>_TREE csv files", dm)
   fi <- file.info(file.path(dm, as.vector(outer(sts, c("_PLOT.csv", "_COND.csv", "_TREE.csv"), paste0))))
-  key <- paste(basename(rownames(fi)), fi$size, as.numeric(fi$mtime), collapse = "|")
+  key <- paste(c(FIA_METHOD, basename(rownames(fi)), fi$size, as.numeric(fi$mtime)), collapse = "|")   # the method version: a change rebuilds the cache
   cf <- file.path(dm, "fia-conditions.rds")
   if (file.exists(cf)) { c0 <- readRDS(cf); if (identical(c0$key, key)) { say("FIA DataMart: cached tables (%s)", cf); return(c0) } }
   t0 <- Sys.time(); ref <- fia_reference(dm)
@@ -56,6 +62,10 @@ fia_datamart <- function(dm, ecodiv_file) {
   eco <- sf::read_sf(ecodiv_file); pts <- unique(cond[!is.na(lat) & !is.na(lon), .(plt_cn, lat, lon)])
   j <- sf::st_join(sf::st_transform(sf::st_as_sf(pts, coords = c("lon", "lat"), crs = 4269), sf::st_crs(eco)), eco["ecodiv"])
   pts[, ecodiv := as.character(j$ecodiv[match(plt_cn, j$plt_cn)])]
+  # a fuzzed location just off the map (coasts, lake shores; 250 CONUS conditions) takes the nearest ecodivision, as the USGS table has one for every plot
+  off <- pts[is.na(ecodiv), which = TRUE]
+  if (length(off)) { p <- sf::st_transform(sf::st_as_sf(pts[off], coords = c("lon", "lat"), crs = 4269), sf::st_crs(eco))
+    pts[off, ecodiv := as.character(eco$ecodiv[sf::st_nearest_feature(p, eco)])] }
   cond[, ecodiv := pts$ecodiv[match(plt_cn, pts$plt_cn)]][, c("lat", "lon") := NULL]
   data.table::setcolorder(cond, c("plt_cn", "condid", "statecd", "unitcd", "countycd", "plot", "invyr", "ecodiv", "stdage", "fortyp_grp"))
   out <- list(key = key, states = sts, cond = cond, dist = dist)

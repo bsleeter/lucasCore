@@ -15,7 +15,7 @@ CAL_POOLS <- c("standing_dead", "down_dead", "litter")
 
 # FIA dead carbon per state class x ecodivision x age band (each class uses the plots of its FIA group set)
 fia_dom_data <- function(cond_file, dist_file, opt, cw) {
-  x <- data.table::as.data.table(readRDS(cond_file)); d <- data.table::as.data.table(readRDS(dist_file))
+  x <- data.table::as.data.table(if (is.character(cond_file)) readRDS(cond_file) else cond_file); d <- data.table::as.data.table(if (is.character(dist_file)) readRDS(dist_file) else dist_file)   # a table, or the USGS .Rds file
   x <- merge(x, d, by = c("plt_cn", "condid"))
   x <- x[dstrbcd1 %in% 0 & trtcd1 %in% 0 & !is.na(stdage) & stdage >= 1 & stdage <= max(CAL_BANDS) & invyr >= opt$MinInventoryYear]
   x[, pid := sprintf("%02d-%d-%03d-%05d", statecd, unitcd, countycd, plot)]; data.table::setorder(x, pid, condid, -invyr); x <- x[!duplicated(paste(pid, condid))]

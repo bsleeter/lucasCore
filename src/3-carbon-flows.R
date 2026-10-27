@@ -11,12 +11,12 @@
 # Needs the Live-Tree Carbon Curves of stage 2 (same pipeline, or a dependency on a stage 2 result).
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
-source(pkg_file("src", "growth.R")); source(pkg_file("src", "flows.R")); source(pkg_file("src", "dom.R")); source(pkg_file("src", "calibrate.R"))
+source(pkg_file("src", "growth.R")); source(pkg_file("src", "flows.R")); source(pkg_file("src", "dom.R")); source(pkg_file("src", "calibrate.R")); source(pkg_file("src", "fia.R"))
 suppressPackageStartupMessages({ library(terra); library(sf) })
 STAGE <- "3 Carbon Flows"
 progressBar(type = "begin", totalSteps = 6)
 
-src <- read_data_sources(c("EcodivisionFile", "PrismFolder", "FiaConditionFile", "FiaDisturbanceFile"))
+src <- read_data_sources(c("EcodivisionFile", "PrismFolder"))
 gopt <- as.list(read_ds("GrowthOptions"))
 cbm <- pkg_file("defaults", "cbm")
 if (!nrow(datasheet(scn, "stsim_FlowPathwayDiagram", optional = TRUE)))
@@ -56,7 +56,8 @@ cells[, ri := as.numeric(ri_tab$ReturnInterval)[match(paste(Stratum, StateClass)
 cells[is.na(ri), ri := median(as.numeric(ri_tab[StateClass == .BY$StateClass, ReturnInterval])), by = StateClass]
 cells[is.na(ri), ri := median(as.numeric(ri_tab$ReturnInterval))][, ri := as.integer(round(ri))]
 cells[, soil_target := as.numeric(soil_t$SoilTarget)[match(paste(Stratum, StateClass), paste(soil_t$Stratum, soil_t$StateClass))]]
-dat <- fia_dom_data(src$FiaConditionFile, src$FiaDisturbanceFile, gopt, cw)
+fx <- fia_tables(gopt, src$EcodivisionFile)   # Growth Curve Options: FIA Data (src/fia.R)
+dat <- fia_dom_data(fx$cond, fx$dist, gopt, cw); rm(fx)
 cells[, plots := dat$obs[, .(n = sum(n)), by = .(sc, ecodiv)][cells, on = c("sc", "ecodiv"), n]][is.na(plots), plots := 0L]
 # the study area: calibrate and write flows only for its ecodivisions (every forest type in them, so a cell that changes type during a
 # run still has flows). Each ecodivision x type is calibrated on its own FIA plots, so these values are the same as a CONUS build's;

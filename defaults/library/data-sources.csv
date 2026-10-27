@@ -8,6 +8,7 @@ CcapFile,Land cover,NOAA C-CAP Regional Land Cover,https://coast.noaa.gov/digita
 ForestTypeGroupFolder,Land cover,USFS Forest Type Groups (raster gateway),https://data.fs.usda.gov/geodata/rastergateway/forest_type/
 FiaConditionFile,Forest inventory and age,"USGS carbon density and merchantable volume on FIA conditions (USGS data release, from FIA)",https://apps.fs.usda.gov/fia/datamart/
 FiaDisturbanceFile,Forest inventory and age,"USGS FIA condition disturbance and treatment codes (USGS data release, from FIA)",https://apps.fs.usda.gov/fia/datamart/
+FiaDataMartFolder,Forest inventory and age,"FIA DataMart state tables (PLOT, COND, TREE csv) and FIADB_REFERENCE, for Growth Curve Options: FIA Data = FIA DataMart",https://apps.fs.usda.gov/fia/datamart/CSV/datamart_csv.html
 StandAgeFile,Forest inventory and age,NASA Carbon Monitoring System forest age (ORNL DAAC),https://daac.ornl.gov/
 MtbsSeverityFolder,Disturbance and fire,MTBS burn severity mosaics,https://www.mtbs.gov/direct-download
 LandfireDisturbanceFolder,Disturbance and fire,LANDFIRE Annual Disturbance,https://landfire.gov/data
