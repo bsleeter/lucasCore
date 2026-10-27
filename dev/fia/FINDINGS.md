@@ -260,3 +260,21 @@ Oak 0.40, Fir/Spruce 0.42** (pooled pairs gave 0.54). Then the mature-stand cali
 - Still off: down logs after clearcut (Mixed Conifer 21 vs 7 at 0-5 yr) - the pre-harvest down logs and felled snags the model leaves on
   site; and Fir/Spruce old-stand snags. Decay multipliers: snag decay ~0 (0.05-0.14), down logs 0.74-0.96, fine woody debris 1.8-2.3,
   litter 0.22-0.72, duff 3.2-7.1 (x CBM).
+
+## Clearcut event flows fitted (15-clearcut-fit.R, event-pathways-fitted2.csv, out-cal-clearcut/)
+
+Four clearcut values fitted by grid search to FIA's snags, down logs and fine woody debris 0-20 years after clearcut (Mixed Conifer and
+Ponderosa, Mediterranean Mountains, 72 plots, pooled), with the decay, snag fall and fire snag shares of 14:
+
+| | LUCAS today (09) | Fitted |
+| --- | --- | --- |
+| Standing snags left standing | 0 (all felled) | 0.4 (top of the grid) |
+| Felled snags left on site as down logs / branch litter | 1 | 0 (removed or burned) |
+| Existing down logs kept | 1 | 0.5 (half removed or burned in site preparation) |
+| Branches, tops and foliage left as slash | 0.13 | 0.04 (bottom of the grid) |
+
+Misfit 250 -> 51. Measured / fitted (09's) at 0-5 / 5-10 / 10-20 years: Mixed Conifer down logs 7.4 / 8.1 (20.9), 10.6 / 7.3 (17.1),
+7.4 / 6.2 (13.2); snags 4.3 / 4.1 (0), 1.5 / 3.0, 4.1 / 2.7; fine woody debris 5.9 / 7.6 (10.4); forest floor 12.7 / 13.2 (14.4) at
+0-5 but 4.1 / 9.8 at 5-10. Ponderosa down logs 6.0 / 4.4 (8.9). Two values sit at the edge of the grid (snags kept, slash), and the
+sample is small (44 Mixed Conifer and 28 Ponderosa plots): a first fit. Clearcut does not enter the mature-stand calibration (the spin-up's
+last disturbance is fire), so the decay multipliers are unchanged.

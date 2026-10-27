@@ -36,3 +36,5 @@ dev/fia/out-cal-snagfall/*.rds
 dev/fia/out-cal-snagfall/*.png
 dev/fia/out-cal-share/*.rds
 dev/fia/out-cal-share/*.png
+dev/fia/out-cal-clearcut/*.rds
+dev/fia/out-cal-clearcut/*.png
