@@ -280,4 +280,4 @@ figures, which are redone once after the P26 rerun.
    one row per forest type, not editable, not regional). Inventory of every assumption, where it lives, and the proposed Carbon
    Assumptions sheets (CBM Crosswalk as in lucasBuilder 2.0.4, Live Turnover, DOM Parameters, Decay Calibration Settings, Disturbance
    Flows, Spin-up, Growth inputs; filled with package defaults like the Land Cover Crosswalks): docs/carbon-assumptions.md. Takes in
-   items 18 and 20. Step 1 (CBM Crosswalk) done 2026-10-27 (tests/phaseZ8); step 2 (Dead Organic Matter Parameters) done (tests/phaseZ9).
+   items 18 and 20. Step 1 (CBM Crosswalk) done 2026-10-27 (tests/phaseZ8); step 2 (Dead Organic Matter Parameters) done (tests/phaseZ9); step 3 (Live Turnover) done (tests/phaseZ10).

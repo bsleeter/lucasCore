@@ -71,6 +71,17 @@ cbx_cell <- function(x) { own <- cbx[!is.na(StratumId)][x, on = .(StratumId = St
 cbx_cell(cells)
 miss <- cells[is.na(cbm_eco) | is.na(cbm_species), unique(StateClass)]
 if (length(miss)) fail("CBM Crosswalk (Carbon Assumptions) has no row for forest type(s) %s", paste(miss, collapse = ", "))
+# Carbon Assumptions - Live Turnover (to-do 21): each value the user set, per cell - the ecodivision row's, else the forest type's
+# all-ecodivisions row's (columns lt_<sheet column>; blank = the CBM Crosswalk's rates, src/flows.R turnover_rates)
+lt <- as.data.table(datasheet(scn, ds("LiveTurnover"), optional = TRUE, lookupsAsFactors = FALSE)); LTC <- names(LIVE_TURNOVER_COLS)
+if (nrow(lt)) {
+  lt[, StratumId := as.character(StratumId)]; for (k in LTC) lt[, (k) := if (k %in% names(lt)) as.numeric(get(k)) else NA_real_]
+  dup <- lt[duplicated(lt[, .(StratumId, StateClassId)])]; if (nrow(dup)) fail("Live Turnover: more than one row for %s", paste(unique(paste(dup$StratumId, dup$StateClassId)), collapse = "; "))
+  own <- lt[!is.na(StratumId)][cells, on = .(StratumId = Stratum, StateClassId = StateClass), ..LTC]; all <- lt[is.na(StratumId)][cells, on = .(StateClassId = StateClass), ..LTC]
+  for (k in LTC) cells[, (paste0("lt_", k)) := data.table::fcoalesce(own[[k]], all[[k]])]
+  say("Live Turnover: %d rows from Carbon Assumptions: %s", nrow(lt), paste(sprintf("%s%s (%s)", ifelse(is.na(lt$StratumId), "", paste0(lt$StratumId, " / ")), sub("^Forest: ", "", lt$StateClassId),
+      apply(lt[, ..LTC], 1, function(v) paste(sprintf("%s %s", LTC[!is.na(v)], v[!is.na(v)]), collapse = ", "))), collapse = "; "))
+} else say("Live Turnover: no rows - every rate from the CBM Crosswalk (root turnover split 0.5 / 0.5)")
 # return intervals and soil targets from stage 5 when this scenario has them (a stage 5 result upstream), else the provisional defaults
 ri5 <- as.data.table(datasheet(scn, ds("OutputReturnInterval"), optional = TRUE, lookupsAsFactors = FALSE))
 so5 <- as.data.table(datasheet(scn, ds("OutputSoilTarget"), optional = TRUE, lookupsAsFactors = FALSE))
@@ -125,6 +136,11 @@ say("Carbon Options: dead organic matter decay = %s", c("calibrated to FIA condi
 fc <- ft <- list(); red <- numeric()
 cells[, `:=`(snag_fall = NA_real_, SnagFallSource = NA_character_, mplots = NA_integer_, m_fwd = NA_real_, m_litter = NA_real_, m_duff = NA_real_)]
 cells[, FireSnagShare := fss$Share[match(StateClass, fss$StateClass)]]
+# a stem snag fall set in Live Turnover is used as given, ahead of the measured rate, in every option (fixed, not calibrated)
+user_fall <- function(x) { if (!"lt_StemSnagFall" %in% names(x)) return(invisible(x))
+  if (!"snag_fall" %in% names(x)) x[, `:=`(snag_fall = NA_real_, SnagFallSource = NA_character_)]
+  x[!is.na(lt_StemSnagFall), `:=`(snag_fall = lt_StemSnagFall, SnagFallSource = "User (Carbon Assumptions: Live Turnover)")] }
+user_fall(cells); user_fall(all_cells)
 if (dom_mode == 4L) {
   # snag fall from remeasured standing dead trees: the cell's own rate with >= min_snags snags, else its forest type's, else all types'
   fr <- snag_fall_rates(dw, cw)
@@ -132,7 +148,7 @@ if (dom_mode == 4L) {
     x[, c("own_n", "own_r") := fr$cell[x, on = c("sc", "ecodiv"), .(snags, rate)]][, c("typ_n", "typ_r") := fr$type[x, on = "sc", .(snags, rate)]]
     x[, `:=`(snag_fall = data.table::fcase(own_n >= fr$min_snags, own_r, typ_n >= fr$min_snags, typ_r, default = fr$all),
              SnagFallSource = data.table::fcase(own_n >= fr$min_snags, sprintf("Cell (%d snags)", own_n), typ_n >= fr$min_snags, sprintf("Forest type (%d snags)", typ_n), default = "All forest types"))]
-    x[, c("own_n", "own_r", "typ_n", "typ_r") := NULL] }
+    x[, c("own_n", "own_r", "typ_n", "typ_r") := NULL]; user_fall(x) }
   dat_m <- dwm_targets(dw, cw, MEAS_MIN_AGE)
   for (x in list(cells, all_cells)) x[, mplots := dat_m$obs[x, on = c("sc", "ecodiv"), .(n = sum(n)), by = .EACHI]$n][is.na(mplots), mplots := 0L]
   say("Measured dead wood: %d down woody material conditions (%d states), %d mature (age >= %d, no fire or cutting in %d yr) in this build's types; snag fall from %d remeasured snags",
@@ -207,7 +223,7 @@ progressBar()
 # ---- forest: net growth, growth split, turnover and decay per cell ----------------------------------------------------
 # live turnover per cell, from its CBM Crosswalk row (Carbon Assumptions)
 ng <- list(); fm_g <- list(); fm_d <- list(); err <- 0; nneg <- 0
-for (i in seq_len(nrow(cells))) { s <- cells$Stratum[i]; c0 <- cells$StateClass[i]; k <- cw[StateClass == c0]; r <- turnover_rates(c0, k$softwood, k$deciduous, cbm, cells$cbm_eco[i], cells$cbm_species[i])
+for (i in seq_len(nrow(cells))) { s <- cells$Stratum[i]; c0 <- cells$StateClass[i]; k <- cw[StateClass == c0]; r <- turnover_rates(c0, k$softwood, k$deciduous, cbm, cells$cbm_eco[i], cells$cbm_species[i], lt_user(cells[i]))
   p <- cc[Stratum == s & StateClass == c0][order(Age)]
   g <- net_growth(p, r)
   sh <- g[, lapply(.SD, function(v) ifelse(Total > 0, v / Total, 0.2)), .SDcols = names(LIVE_POOLS)]

@@ -21,8 +21,24 @@ GROWTH_FLOW <- c(Merchantable = "Net Growth Forest: Atmosphere -> Merchantable",
                  CoarseRoots = "Net Growth Forest: Atmosphere -> Coarse Roots")
 
 # turnover rates (per year) of one state class: from the CBM ecozone and species type given (stage 3: the Carbon Assumptions' CBM
-# Crosswalk row of the cell), else the package default crosswalk (defaults/cbm/species-crosswalk.csv)
-turnover_rates <- function(state_class_name, softwood, deciduous, cbm_dir, ecozone = NULL, species = NULL) {
+# Crosswalk row of the cell), else the package default crosswalk (defaults/cbm/species-crosswalk.csv); then any value the user set in
+# Carbon Assumptions: Live Turnover (user: a named list by the sheet's column names, NA = not set). Root turnover splits to the
+# aboveground pools: 0.5 unless set.
+LIVE_TURNOVER_COLS <- c(FoliageTurnover = "foliage", BranchTurnover = "branch", BranchToSnag = "branch_to_snag", StemTurnover = "stem",
+                        FineRootTurnover = "fine", FineRootToAG = "fine_to_ag", CoarseRootTurnover = "coarse", CoarseRootToAG = "coarse_to_ag",
+                        StemSnagFall = "stem_snag_to_dom", BranchSnagFall = "branch_snag_to_dom")
+turnover_rates <- function(state_class_name, softwood, deciduous, cbm_dir, ecozone = NULL, species = NULL, user = NULL) {
+  r <- cbm_turnover_rates(state_class_name, softwood, deciduous, cbm_dir, ecozone, species); r$fine_to_ag <- 0.5; r$coarse_to_ag <- 0.5; r$user <- character()
+  cbm_stem_fall <- r$stem_snag_to_dom
+  for (k in intersect(names(user), names(LIVE_TURNOVER_COLS))) { v <- suppressWarnings(as.numeric(user[[k]]))
+    if (length(v) && !is.na(v)) { r[[LIVE_TURNOVER_COLS[[k]]]] <- v; r$user <- c(r$user, k) } }
+  # a stem snag fall set without a branch one: branch snags fall faster in proportion, as CBM's two rates (and the measured rates) do
+  if ("StemSnagFall" %in% r$user && !"BranchSnagFall" %in% r$user) r$branch_snag_to_dom <- r$branch_snag_to_dom * r$stem_snag_to_dom / cbm_stem_fall
+  r }
+# the Live Turnover values of one cell (a one-row table with stage 3's lt_<column> columns), as turnover_rates' user list; NULL without them
+lt_user <- function(k) { if (!"lt_FoliageTurnover" %in% names(k)) return(NULL)
+  stats::setNames(lapply(names(LIVE_TURNOVER_COLS), function(c) k[[paste0("lt_", c)]]), names(LIVE_TURNOVER_COLS)) }
+cbm_turnover_rates <- function(state_class_name, softwood, deciduous, cbm_dir, ecozone = NULL, species = NULL) {
   rd <- function(f) data.table::fread(file.path(cbm_dir, f))
   m <- if (!is.null(ecozone) && !is.null(species)) data.table::data.table(EcoBoundaryId = ecozone, SpeciesTypeId = species) else rd("species-crosswalk.csv")[StateClassId == state_class_name]
   if (nrow(m) != 1) stop(sprintf("species-crosswalk.csv has %d rows for %s", nrow(m), state_class_name), call. = FALSE)
@@ -69,13 +85,14 @@ dom_flow_values <- function(r, softwood, temp_c, cbm_dir, decay_mult = NULL, dp 
     m <- if (!is.null(decay_mult) && !is.null(decay_mult[[k]])) decay_mult[[k]] else 1
     min(1, m * dp$rate[[k]] * exp((temp_c - dp$ref[[k]]) * log(dp$q10[[k]]) * 0.1)) })
   patm <- dp$patm
+  fa <- if (is.null(r$fine_to_ag)) 0.5 else r$fine_to_ag; ca <- if (is.null(r$coarse_to_ag)) 0.5 else r$coarse_to_ag   # root turnover shares to the AG pools
   dec <- function(k) (1 - patm[[k]]) * rate[[k]]; emi <- function(k) patm[[k]] * rate[[k]]
   c("Biomass Turnover: Merchantable -> Snag Stems" = r$stem,
     "Biomass Turnover: Other Wood -> Snag Branches" = r$branch * r$branch_to_snag,
     "Biomass Turnover: Other Wood -> AG Fast" = r$branch * (1 - r$branch_to_snag),
     "Biomass Turnover: Foliage -> AG Very Fast" = r$foliage,
-    "Biomass Turnover: Fine Roots -> AG Very Fast" = r$fine * 0.5, "Biomass Turnover: Fine Roots -> BG Very Fast" = r$fine * 0.5,
-    "Biomass Turnover: Coarse Roots -> AG Fast" = r$coarse * 0.5, "Biomass Turnover: Coarse Roots -> BG Fast" = r$coarse * 0.5,
+    "Biomass Turnover: Fine Roots -> AG Very Fast" = r$fine * fa, "Biomass Turnover: Fine Roots -> BG Very Fast" = r$fine * (1 - fa),
+    "Biomass Turnover: Coarse Roots -> AG Fast" = r$coarse * ca, "Biomass Turnover: Coarse Roots -> BG Fast" = r$coarse * (1 - ca),
     "Decay: AG Very Fast -> AG Slow" = dec("AGVF"), "Emission: AG Very Fast -> Atmosphere" = emi("AGVF"),
     "Decay: BG Very Fast -> BG Slow" = dec("BGVF"), "Emission: BG Very Fast -> Atmosphere" = emi("BGVF"),
     "Decay: AG Fast -> AG Slow" = dec("AGF"), "Emission: AG Fast -> Atmosphere" = emi("AGF"),

@@ -96,3 +96,9 @@ calibrated, measured, user).
   decay rates; stages 7 and 11 take the climate multipliers' Q10s from it (a raster by ecodivision where rows differ; the pools of one
   climate flow group must share a Q10, else the stage's check fails). Defaults reproduce the previous rates within 2e-8. Test:
   tests/phaseZ9-dom-parameters.R (REUSE=1 rechecks the last runs).
+- 2026-10-27 **Live Turnover done**: scenario sheet in Carbon Assumptions, per forest type (ecodivision optional): foliage, branch (and
+  share to snags), stem, fine root and coarse root turnover (and their shares to the AG pools, which were fixed at 0.5), stem and branch
+  snag fall. Every value optional, resolved per value: ecodivision row, then the forest type's all-ecodivisions row, then the CBM
+  Crosswalk (root splits 0.5). A stem snag fall set by the user is used as given in every Carbon Options mode, ahead of the measured
+  rate; a blank branch snag fall follows it in proportion. Empty by default (everything from CBM). Test: tests/phaseZ10-live-turnover.R;
+  phaseZ7 still passes.

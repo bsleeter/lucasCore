@@ -309,6 +309,27 @@
 	     the AG Slow row also holds the fixed AG Slow -> BG Slow transfer. Rate at temperature T = base x Q10^((T - reference) / 10), at most 1.
 	     Snag rows serve softwood and hardwood snags alike (CBM's are equal). The climate multipliers (stages 7, 11) take the Q10s too: AG Very
 	     Fast and AG Slow share one Q10, and the other pools but BG Slow another. Empty = defaults/cbm/dom-parameters.csv. -->
+	<!-- Carbon Assumptions: Live Turnover - per forest type, optionally per ecodivision: each live pool's yearly turnover and where it goes.
+	     Every value is optional: a blank takes the forest type's all-ecodivisions row, then the CBM Crosswalk's ecozone and species rates
+	     (root splits: 0.5). Foliage goes to AG Very Fast and stems to Snag Stem whole; branches split between Snag Branch and AG Fast, fine
+	     roots between AG and BG Very Fast, coarse roots between AG and BG Fast. Snag fall (stem snags -> AG Medium, branch snags -> AG Fast; a
+	     blank branch rate follows a set stem rate in proportion): blank = measured from FIA (Measured dead wood) or CBM; a value is used as
+	     given. Empty sheet = all from CBM. -->
+	<dataSheet name="LiveTurnover" displayName="Live Turnover">
+		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
+		<column name="StateClassId" displayName="Forest Type" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="FoliageTurnover" displayName="Foliage (/yr, to AG Very Fast)" dataType="Double" format="0.0000" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+		<column name="BranchTurnover" displayName="Branches (/yr)" dataType="Double" format="0.0000" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+		<column name="BranchToSnag" displayName="Branches: Share to Snag Branch (rest AG Fast)" dataType="Double" format="0.00" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+		<column name="StemTurnover" displayName="Stems (/yr, to Snag Stem)" dataType="Double" format="0.0000" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+		<column name="FineRootTurnover" displayName="Fine Roots (/yr)" dataType="Double" format="0.0000" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+		<column name="FineRootToAG" displayName="Fine Roots: Share to AG Very Fast (rest BG Very Fast)" dataType="Double" format="0.00" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+		<column name="CoarseRootTurnover" displayName="Coarse Roots (/yr)" dataType="Double" format="0.0000" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+		<column name="CoarseRootToAG" displayName="Coarse Roots: Share to AG Fast (rest BG Fast)" dataType="Double" format="0.00" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+		<column name="StemSnagFall" displayName="Stem Snag Fall (/yr, to AG Medium)" dataType="Double" format="0.0000" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+		<column name="BranchSnagFall" displayName="Branch Snag Fall (/yr, to AG Fast)" dataType="Double" format="0.0000" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+	</dataSheet>
+
 	<dataSheet name="DomParameter" displayName="Dead Organic Matter Parameters">
 		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
 		<column name="Pool" displayName="Dead Pool" dataType="Integer" validationType="List" formula1="1:AG Very Fast|2:BG Very Fast|3:AG Fast|4:BG Fast|5:AG Medium|6:AG Slow|7:BG Slow|8:Snag Stem|9:Snag Branch"/>
@@ -618,6 +639,7 @@
 	</transformer>
 
 	<transformer name="CarbonFlows" displayName="3 - Carbon Flows" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/3-carbon-flows.R">
+		<dataSheet name="LiveTurnover" type="Input"/>
 		<dataSheet name="DomParameter" type="Input"/>
 		<dataSheet name="CarbonCurve" type="Input"/>
 		<dataSheet name="CarbonOptions" type="Input"/>
@@ -797,6 +819,7 @@
 			<item name="GrowthOptions"/>
 			<group name="lucasCoreCarbonAssumptions" displayName="Carbon Assumptions">
 				<item name="CbmCrosswalk"/>
+				<item name="LiveTurnover"/>
 				<item name="DomParameter"/>
 			</group>
 			<group name="lucasCoreProjection" displayName="Projection">
