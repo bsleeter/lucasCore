@@ -228,3 +228,20 @@ fire-killed (fire agent, or a fire at the plot in the 10 years before). Carbon-w
   calibration - the separation the snag multiplier lacks today. Faster fall would also bring the post-fire snag pool down toward the plots
   (Mixed Conifer 77 vs 38 at 0-5 years) and move carbon into down logs sooner, which mature stands need (their down logs run low in old
   stands).
+
+## Snag fall fixed at the measured rates (13-snag-fall-fixed.R, snag-fall-measured.csv, out-cal-snagfall/)
+
+Stem snag fall set to the measured 'other snags' rate (Mixed Conifer 0.047, Fir/Spruce 0.045, Ponderosa 0.110, Western Oak 0.079 per year;
+branch snags scaled alike), the snag multiplier fitting only snag decay and emission; fitted event table and the fire fix as before.
+
+- The calibration drives snag decay to its lower bound (0.05 x CBM; Ponderosa 0.12): with fall at the measured rate, standing snags in
+  mature stands already lose carbon as fast as their stock allows, so standing decay has almost nothing left to do. Down log decay rises
+  toward CBM's default (0.84-1.05, from 0.58-0.77) because snags now deliver more to the ground.
+- Mature fit: Mixed Conifer and Ponderosa unchanged; old Mixed Conifer down logs a little closer (10.4 vs 13.5, was 9.3); Fir/Spruce's
+  snags now fall short in old stands (13.4 vs 21.7, was 18.1).
+- Post-fire snags do not change (Mixed Conifer 0-5 yr: 77 vs measured 38) - the measured fall rate is about the old model's fall + decay,
+  so the standing pool drains at the same speed. Down logs after fire now overshoot (Mixed Conifer 0-5 / 5-10 / 10-20 yr: 13.7 / 24.3 /
+  30.1 vs 9.1 / 14.2 / 21.4). So the post-fire snag excess is the size of the snag pulse, not how fast it falls: Mixed Conifer's own
+  before/after pairs gave 0.46 of the wood to snags and its 0-5 year snags (38 of a pre-fire 136) suggest about 0.3, against the pooled
+  0.54 used. A per-type fire snag share is the remaining lever.
+- Keep the measured fall rates regardless: they are observed, and they make snag decay a small, separately fitted term.

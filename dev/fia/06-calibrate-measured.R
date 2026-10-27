@@ -19,6 +19,23 @@ pkg <- "F:/lucasCore"; dm <- "F:/lucas-master/Data Sources/FIA/DataMart"
 out <- Sys.getenv("LUCAS_CAL_OUT", file.path(pkg, "dev/fia/out-cal")); dir.create(out, showWarnings = FALSE)
 event_file <- Sys.getenv("LUCAS_EVENT_FILE", file.path(pkg, "defaults/stockflow/event-pathways.csv")); cat("event flows:", event_file, "\n")
 for (f in c("growth.R", "flows.R", "dom.R", "calibrate.R")) source(file.path(pkg, "src", f))
+# LUCAS_SNAG_FALL (dev, 13-snag-fall-fixed.R): a csv of measured annual stem snag fall rates per FIA forest type group (Group, StemFall).
+# Snag fall is then fixed at that rate (branch snags scaled alike relative to CBM's rates) and the snag multiplier scales only decay and
+# emission of the snags, not their fall.
+snag_file <- Sys.getenv("LUCAS_SNAG_FALL", "")
+if (nzchar(snag_file)) {
+  SNAG_FALL <- fread(snag_file); cat("snag fall fixed from", snag_file, ":", paste(sprintf("%d %.3f", SNAG_FALL$Group, SNAG_FALL$StemFall), collapse = ", "), "\n")
+  FALLS <- c("Transfer: Snag Stem -> AG Medium", "Transfer: Snag Branch -> AG Fast")
+  scale_decay <- function(vals, mult = NULL) {   # dom.R's, with the snag fall transfers left out of the multipliers
+    fp <- FOREST_PATHWAYS[match(names(vals), FlowType)]; from <- names(DOM_POOLS)[match(fp$From, DOM_POOLS)]
+    if (!is.null(mult)) for (g in names(mult)) { k <- !is.na(from) & from %in% DECAY_GROUPS[[g]] & !names(vals) %in% c("Transfer: AG Slow -> BG Slow", FALLS); vals[k] <- vals[k] * mult[[g]] }
+    for (p in unique(na.omit(from))) { k <- !is.na(from) & from == p; t <- sum(vals[k]); if (t > 1) vals[k] <- vals[k] / t }
+    vals }
+  cal_setup0 <- cal_setup
+  cal_setup <- function(k, ctx) { S <- cal_setup0(k, ctx); r <- SNAG_FALL[Group == k$sc, StemFall]
+    if (length(r)) { f <- r / S$vals[["Transfer: Snag Stem -> AG Medium"]]; S$vals[FALLS] <- S$vals[FALLS] * f }
+    S }
+}
 lib <- file.path(pkg, "dev/libs/LUCAS P26 Demo Library.ssim"); MIN_AGE <- 60L; RECENT <- 30L
 TYPES <- c(`370` = "California Mixed Conifer Group", `260` = "Fir/Spruce/Mountain Hemlock Group", `220` = "Ponderosa Pine Group", `920` = "Western Oak Group")
 STRATUM <- "Mediterranean Mountains"; ECODIV <- "M260"

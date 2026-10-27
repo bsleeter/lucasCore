@@ -32,3 +32,5 @@ dev/fia/out-cal/*.rds
 dev/fia/out-cal/*.png
 dev/fia/out-cal-events/*.rds
 dev/fia/out-cal-events/*.png
+dev/fia/out-cal-snagfall/*.rds
+dev/fia/out-cal-snagfall/*.png
