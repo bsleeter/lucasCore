@@ -205,3 +205,26 @@ that visit, against the model's spin-up stand at the return interval (P26 carbon
   own 8 pairs give 0.46), and the measured snags fall faster in the first decade than the model's (Mixed Conifer 38 -> 49 -> 22 vs 77 ->
   55 -> 38 at 0-5, 5-10, 10-20 yr). Next: type-specific snag shares where pairs allow, and a check of post-fire snag fall rates from
   remeasured fire-killed trees.
+
+## Snag fall rates from remeasured dead trees (12-snag-fall.R, out-cal-events/snag-fall.csv)
+
+18,437 standing dead trees in Mediterranean Mountains (P26's four types) remeasured at the next visit (8-9 years later), 3,568 of them
+fire-killed (fire agent, or a fire at the plot in the 10 years before). Carbon-weighted share that fell, as an annual rate (half-life):
+
+| Type | Other snags | Fire-killed | Fire-killed 0-3 yr after | 4-10 yr after | Model: fall / decay / total loss |
+| --- | --- | --- | --- | --- | --- |
+| California Mixed Conifer | 0.047 (15 yr) | 0.050 (14) | 0.045 | 0.061 | 0.028 / 0.020 / 0.048 |
+| Fir/Spruce/Mountain Hemlock | 0.045 (15) | 0.054 (13) | 0.036 | 0.076 | 0.019 / 0.014 / 0.033 |
+| Ponderosa Pine | 0.110 (6) | 0.168 (4) | 0.175 | 0.145 | 0.069 / 0.051 / 0.120 |
+| Western Oak | 0.079 (9) | 0.082 (8) | 0.083 | 0.079 | 0.044 / 0.032 / 0.076 |
+
+- **Snags fall about twice as fast as the model lets them** (Mixed Conifer 0.047-0.050 per year vs 0.028; the model's half-life standing
+  is 25 years against a measured 14-15). The model's fall plus decay together roughly equal the measured fall alone, which is what one
+  multiplier on both produces: the calibration had to keep standing snag carbon right in mature stands, and could only do it by slowing
+  fall and decay together.
+- Fire-killed snags fall at about the same rate as other snags overall, with a delay in the conifers: slower in the first 3 years, faster
+  at 4-10 (Fir/Spruce 0.036 -> 0.076). Ponderosa's snags fall fastest (half-life about 4 years after fire).
+- So the snag fall rate should be set from these measurements, per forest type, and only snag decay (and emission) left to the
+  calibration - the separation the snag multiplier lacks today. Faster fall would also bring the post-fire snag pool down toward the plots
+  (Mixed Conifer 77 vs 38 at 0-5 years) and move carbon into down logs sooner, which mature stands need (their down logs run low in old
+  stands).
