@@ -38,3 +38,4 @@ dev/fia/out-cal-share/*.rds
 dev/fia/out-cal-share/*.png
 dev/fia/out-cal-clearcut/*.rds
 dev/fia/out-cal-clearcut/*.png
+dev/stsim/*.ssim*
