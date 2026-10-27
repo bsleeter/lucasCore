@@ -27,3 +27,4 @@ docs/guide/figures/
 Starter/*.bak-*
 dev/treemap/out/*.tif
 dev/nfcms/out/*.tif
+dev/fia/out-dwm/*.png

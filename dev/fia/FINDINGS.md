@@ -65,3 +65,32 @@ the added soil lab data (the USGS table may predate them).
   sharing one: consistent with the national GHG inventory's state field/model adjustment (Domke et al. 2013), with a regional value where
   a state's down woody material sample is small. So item 9's DataMart route should apply these per-state factors (shipped as a package
   default) rather than a single 0.7, to reproduce the USGS route; confirm against COND_DWM_CALC for one state.
+
+## Measured dead carbon from FIA's down woody material plots (05-dwm-mixed-conifer.R, out-dwm/)
+
+California COND_DWM_CALC (2001-2025), components matched to CBM pools: coarse woody debris >= 3 in + slash piles -> AG Medium; fine woody
+debris < 3 in -> AG Fast; litter -> AG Very Fast; duff -> AG Slow; standing dead trees -> snags. DWM conditions per P26 type: Mixed Conifer
+3,422 (3,413 in M260), Western Oak 3,939, Ponderosa 1,150, Fir/Spruce/MH 904, Lodgepole 83; with a recorded fire at the plot location
+483 / 531 / 115 / 79 / 3, with a recorded harvest 691 / 202 / 300 / 110 / 2.
+
+California Mixed Conifer, M260 (3,312 aged conditions), Mg C/ha by stand age:
+
+| Age | Standing dead | Coarse woody debris + piles | Fine woody debris | Litter | Duff | Modelled down dead (x 0.70) | Modelled litter |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 0-20 | 8.4 | 10.2 | 4.0 | 6.7 | 2.8 | 11.9 | 13.8 |
+| 20-40 | 1.6 | 7.8 | 2.4 | 8.1 | 5.8 | 13.1 | 16.5 |
+| 60-80 | 5.5 | 8.5 | 3.1 | 9.3 | 8.8 | 18.0 | 18.4 |
+| 100-150 | 13.2 | 10.9 | 3.0 | 8.8 | 6.7 | 25.5 | 19.0 |
+| 150-300 | 19.0 | 13.6 | 2.5 | 7.5 | 6.5 | 27.1 | 19.0 |
+
+- **Measured coarse woody debris is about half the modelled down dead in mature stands** (9-14 vs 18-27) and only slowly rises with age;
+  young stands carry a legacy (10.2 at 0-20 yr, dipping to 7.8). The model's down dead also counts stumps and their roots, which the
+  transects do not measure, but that cannot explain a factor of two.
+- Fine woody debris is small and flat (2.3-3.1; 4.0 in young stands). Litter (6.7-9.3) and duff (2.8-8.8) give a forest floor of 9-17,
+  below the modelled 14-19.
+- **The post-disturbance legacy is measurable.** By years since the last recorded fire at the plot: standing dead 28-32 in the first 10
+  years, 17 at 10-20 years; coarse woody debris rising 9 -> 13 as snags fall; forest floor low (7, burned) and recovering. Since harvest:
+  standing dead 5-9, coarse woody debris about 10, forest floor intact (12-15). This is the fire-last / clearcut-last distinction the
+  spin-up makes, observed directly.
+- So measured targets would ask for much less down wood in mature stands than the calibration targets today, which removes the need for
+  the very slow down wood decay (0.25-0.30) that inflates young stands.
