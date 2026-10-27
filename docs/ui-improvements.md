@@ -250,3 +250,7 @@ figures, which are redone once after the P26 rerun.
    a single value); (e) the pool groupings matched to FIA (src/dom.R FIA_DOM), at least documented on the page. Young stands are a
    check on the disturbance flows (fire and harvest event flows), not a calibration target. Design and dev results: dev/nfcms and
    dev/fia FINDINGS.md.
+19. **Dead organic matter calibration from measured FIA data** - PROPOSED 2026-10-26 (user asked for the write-up). Calibrate decay to FIA's
+   measured down woody material pools in mature stands, fix snag fall from remeasured dead trees, use fire as the spin-up's last
+   disturbance, and fit the high-severity fire and clearcut event flows to plots after those events. Proposal, results on P26 and
+   implementation plan: docs/dom-calibration-proposal.md; evidence: dev/fia (scripts 05-15) and dev/nfcms. UI choices: item 18.
