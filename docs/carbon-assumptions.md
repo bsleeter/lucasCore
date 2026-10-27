@@ -71,3 +71,12 @@ Carbon Assumptions group on the Build scenario:
 
 Read-out (to-do 20): pick ecodivision and forest type, see the rates the model runs with and where each came from (CBM default,
 calibrated, measured, user).
+
+## Decisions (user, 2026-10-27)
+
+- Every sheet has an optional ecodivision column; a row for an ecodivision overrides the all-ecodivisions row of the same forest type.
+- The sheets live in their own **Carbon Assumptions** scenario, not on the Build: Builds depend on it, so one set of assumptions is
+  shared by many scenarios - and, like the growth curves, by other libraries (a copy-from-library option, as Growth Curve Options has).
+- Disturbance Flows covers the two major events only: high-severity fire and clearcut.
+- Build order: CBM Crosswalk, DOM Parameters, Live Turnover, Spin-up, Disturbance Flows, Decay Calibration Settings, Growth Inputs, then
+  the read-out.
