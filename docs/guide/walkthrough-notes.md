@@ -53,3 +53,7 @@ found along the way are batched here and fixed while Studio is closed (the page 
   caption still says 486 Tg C (old Build); this Build gives 0.44 Pg C.
 - 4.3 grabs (2026-10-28): Figures 4.6 result scenario (marks 8 result, 9 Run Log), 4.7 Validation (10, 11), 4.8 Initial Stock
   Summary (12, 13); Build Figures onward renumbered 4.9-4.18. Decay Calibration grab dropped (user: no figure needed).
+- 4.4 (2026-10-28): Build Figures result 4 ran in 1:35 (10 figures). Steps now start with a Figures folder (New > Folder from the
+  result's menu, then New > Scenario on the folder): Figures 4.9-4.14 new (marks 1-8), Run Monitor 4.15 and Export 4.16 kept (marks
+  9-11), example Figures 4.17-4.20 redrawn from result 4 (initial carbon 439.3 Tg C, soil classes 66-75). Old 4.4a-d captures in
+  captures/old. Chapter 5's reference to the inherited pipeline / No Data figures now 4.12 and 4.13.

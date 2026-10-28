@@ -8,9 +8,6 @@ File,X,Y,W,H
 3.2b-study-area.png,1060,250,1600,250
 3.5a-carbon-options.png,630,250,1440,280
 4.1a-run-menu.png,0,145,540,600
-4.4a-build-figures-scenario.png,0,150,610,300
-4.4b-inherited-pipeline.png,620,160,1310,1240
-4.4d-stage-12.png,620,160,1310,200
 4.4e-export.png,0,800,610,300
 4.4f-run-done.png,620,160,1310,130
 5.1b-historical-dependency.png,0,150,610,330
@@ -75,3 +72,8 @@ File,X,Y,W,H
 4.3b-result-scenario.png,0,150,2009,1440
 4.3c-validation.png,590,150,1419,1420
 4.3d-initial-stock-summary.png,656,158,1508,1310
+4.4a-new-folder.png,0,150,660,640
+4.4b-new-scenario.png,0,150,660,520
+4.4c-build-figures-scenario.png,0,150,660,320
+4.4d-inherited-pipeline.png,620,160,1566,1430
+4.4h-stage-12.png,620,160,1566,260
