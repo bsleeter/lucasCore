@@ -58,3 +58,4 @@ found along the way are batched here and fixed while Studio is closed (the page 
   9-11), example Figures 4.17-4.20 redrawn from result 4 (initial carbon 439.3 Tg C, soil classes 66-75). Old 4.4a-d captures in
   captures/old. Chapter 5's reference to the inherited pipeline / No Data figures now 4.12 and 4.13.
 - 5.1 (2026-10-28): Figure 5.1 now the Build's right-click New > Scenario menu (mark 1; replaces the name dialog grab, in captures/old); step 2 says drag the result. Figures 5.2 (Explorer + dependency) and 5.3 (ST-Sim pipeline) still from the old library - re-grab.
+- 5.1 again: Figures 5.2 (P26 - Historical + dependency, marks 2-3) and 5.3 (ST-Sim pipeline, 4-5) re-grabbed; name in step 1 now P26 - Historical. The inherited-pipeline grab is not used (same as Figure 4.12; in captures/old).

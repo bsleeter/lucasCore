@@ -23,10 +23,6 @@ File,Step,X,Y,W,H
 4.4e-export.png,11,500,848,82,30
 4.4f-run-done.png,,1652,246,120,28
 4.4f-run-done.png,,1826,246,84,28
-5.1b-historical-dependency.png,2,106,380,392,26
-5.1b-historical-dependency.png,3,128,410,472,56
-5.1c-stsim-pipeline.png,4,964,279,774,28
-5.1c-stsim-pipeline.png,5,1746,279,164,28
 5.2a-run-control.png,6,626,206,70,32
 5.2a-run-control.png,7,593,246,260,28
 5.2a-run-control.png,8,1163,250,182,112
@@ -214,3 +210,7 @@ File,Step,X,Y,W,H
 4.4g-data-options.png,7,40,121,113,38
 4.4h-stage-12.png,8,1036,278,1115,30
 5.1a-new-scenario.png,1,455,899,192,32
+5.1b-historical-dependency.png,2,104,378,190,30
+5.1b-historical-dependency.png,3,150,437,368,30
+5.1c-stsim-pipeline.png,4,1036,278,918,30
+5.1c-stsim-pipeline.png,5,1957,278,197,30
