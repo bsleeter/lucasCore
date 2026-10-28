@@ -88,3 +88,12 @@ found along the way are batched here and fixed while Studio is closed (the page 
   historical run [6]; tiles step says they come from Build Options; '17 county tiles' line replaced. 6.3 Transitions (Figure 6.3) not
   re-grabbed (still old library). PENDING: run the setup, then 6.6 grabs (result, run log, suitability, rates, schedule, patches,
   tiles, validation).
+- 6.6 (2026-10-28): setup result 11 ran 34:21 (stage 9 13:53, stage 10 20:27) at 150 m fitting (user changed from 30 m; old 30 m
+  setup 54 min, stage 10 44 min; most of stage 10 now is first-time covariate layer build incl. NCCPI fetch). Test AUC 150 m vs 30 m:
+  urban 0.93/0.87, open 0.91/0.86, clearcut 0.85/0.83, selection 0.72/0.72, ag contr 0.85/0.84, ag exp 0.999/0.996; top-10% shares
+  81/63, 68/61, 61/54, 30/27, 42/43, 100/100 (not strict: old fit from an earlier Build, change counted in 150 m cells). Table 6.3
+  now shows both. FINDING: at 150 m fitting every placed group gets a size distribution (clearcut 56% multi-cell up to 50 cells,
+  selection 36% up to 100, ag contr 14%, urban 6%); at 30 m only clearcut (12%). Effect on projected patch sizes untested.
+  Fire rate 319 km2/yr, max 3,608 (2021); schedule 2024 = fire 2008, harvest 2014, land use 2010 (same seed). Figures 6.6 (result
+  tree + Run Monitor 11) and 6.7 (run log) re-grabbed. PENDING: grabs 6.8-6.13 (Suitability Summary, Projection Rates, Schedule,
+  Patch Sizes, tiles, Validation) still from the old setup; 6.4 Figure shows 150 m already.
