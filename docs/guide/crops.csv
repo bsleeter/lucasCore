@@ -11,7 +11,6 @@ File,X,Y,W,H
 4.4e-export.png,0,800,610,300
 4.4f-run-done.png,620,160,1310,130
 5.3a-spatial-multiprocessing.png,490,160,1370,200
-5.3b-library-multiprocessing.png,480,90,1390,350
 5.4a-jobs-running.png,495,160,1400,1015
 5.6a-run-figures-pipeline.png,10,155,2085,290
 5.6b-run-figures-options.png,10,155,2085,310
@@ -79,3 +78,4 @@ File,X,Y,W,H
 5.2b3-transition-filter.png,600,160,1586,520
 5.2c-stock-flow-output.png,600,240,1300,740
 5.2d-stock-filter.png,600,160,1586,880
+5.3b-library-multiprocessing.png,480,90,1390,350

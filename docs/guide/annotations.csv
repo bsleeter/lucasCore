@@ -26,11 +26,6 @@ File,Step,X,Y,W,H
 5.3a-spatial-multiprocessing.png,20,640,206,76,30
 5.3a-spatial-multiprocessing.png,21,506,275,262,28
 5.3a-spatial-multiprocessing.png,22,808,302,1016,36
-5.3b-library-multiprocessing.png,23,882,161,286,32
-5.3b-library-multiprocessing.png,24,506,335,262,28
-5.3b-library-multiprocessing.png,25,810,271,206,26
-5.3b-library-multiprocessing.png,26,810,381,310,32
-5.3b-library-multiprocessing.png,27,576,99,146,32
 5.4a-jobs-running.png,28,506,574,1380,594
 5.6a-run-figures-pipeline.png,29,105,351,421,25
 5.6a-run-figures-pipeline.png,31,562,274,295,30
@@ -215,3 +210,8 @@ File,Step,X,Y,W,H
 5.2c-stock-flow-output.png,18,770,934,186,30
 5.2c-stock-flow-output.png,19,980,809,864,144
 5.2d-stock-filter.png,,770,994,186,30
+5.3b-library-multiprocessing.png,23,898,162,339,30
+5.3b-library-multiprocessing.png,24,721,334,235,30
+5.3b-library-multiprocessing.png,25,1003,271,197,30
+5.3b-library-multiprocessing.png,26,1000,381,312,34
+5.3b-library-multiprocessing.png,27,579,98,142,32
