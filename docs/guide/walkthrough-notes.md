@@ -24,3 +24,10 @@ found along the way are batched here and fixed while Studio is closed (the page 
 - 1.3: Figures 1.7-1.11 re-grabbed; new Figure 1.12 (CBM Ecozones) with steps 4-5.
 - 1.4: Figures 1.13-1.14 re-grabbed (multiprocessing off; R 4.6.1).
 - 1.5: Figure 1.15 re-grabbed (FIA DataMart Folder outlined); sources table gains the FIA DataMart row.
+- 1.5 again: Figure 1.15 re-grabbed with the new Data Sources page (marks 1-6 now tab, page, path, Browse, Download, found); steps
+  1-6 and the sources table use the new names (FIA CONUS, FIA Carbon/Disturbance Summary).
+
+## Later (user, 2026-10-28)
+
+- Refine the Data Sources page further when building the Data Download stage (to-do 12). Path boxes are still on the narrow side in a
+  wide window: SizePaths reserves the navigation pane's width too (ClientSize is the whole page).
