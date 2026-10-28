@@ -281,3 +281,11 @@ figures, which are redone once after the P26 rerun.
    Assumptions sheets (CBM Crosswalk as in lucasBuilder 2.0.4, Live Turnover, DOM Parameters, Decay Calibration Settings, Disturbance
    Flows, Spin-up, Growth inputs; filled with package defaults like the Land Cover Crosswalks): docs/carbon-assumptions.md. Takes in
    items 18 and 20. Step 1 (CBM Crosswalk) done 2026-10-27 (tests/phaseZ8); step 2 (Dead Organic Matter Parameters) done (tests/phaseZ9); step 3 (Live Turnover) done (tests/phaseZ10); step 4 (Spin-up) done 2026-10-28 (tests/phaseZ11); step 5 (Disturbance Flows + Fire Snag Share) done 2026-10-28 (tests/phaseZ12); step 6 (Decay Calibration Settings + Fixed Decay Multipliers, to-dos 18 and 20 override) done 2026-10-28 (tests/phaseZ13).
+
+22. **Automatic spatial tiles** - PROPOSED 2026-10-28 (user: choosing Build Options > Tiles needs prior knowledge of the region). A tile holds
+    whole units, so the run cannot finish before the largest unit: the best tile count is floor(1 / largest unit's cell share), capped by
+    the number of units and the cores (P26: Plumas 19.8% -> 5, the number found by trial). Plan: blank Tiles = automatic (a typed number still
+    wins; 1 = one job); stage 1 logs the largest unit and its share, the best speed-up, the tiles chosen and an estimated peak memory per job
+    (~1.5 GB fixed + ~10 KB per 150 m cell, from the 24 Oct P26 measurements) with the jobs a 32/64 GB machine can hold (a warning, since
+    runs may be on another machine); say plainly when one unit dominates and tiling barely helps; Build Options note and guide 3.3 updated.
+    Only after the P26 historical run (no package edits during runs).
