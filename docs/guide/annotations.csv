@@ -37,8 +37,6 @@ File,Step,X,Y,W,H
 6.6g-projection-tiles.png,35,980,206,67,28
 6.6g-projection-tiles.png,36,937,305,792,30
 7.1a-projection-name.png,1,18,84,836,30
-7.1b-projection-dependencies.png,2,110,530,401,24
-7.1b-projection-dependencies.png,3,152,589,564,57
 7.1c-projection-pipeline.png,4,628,276,266,27
 7.1c-projection-pipeline.png,5,973,278,843,28
 7.1d-projection-tabular.png,6,691,396,203,25
@@ -47,8 +45,6 @@ File,Step,X,Y,W,H
 7.1e-projection-spatial.png,9,941,272,417,136
 7.1f-projection-filter.png,10,835,516,158,25
 7.1f-projection-filter.png,11,1073,677,904,26
-7.1g-run-control.png,,755,247,245,27
-7.1g-run-control.png,,1180,252,320,152
 7.3a-climate-dependency.png,12,112,410,350,24
 7.3a-climate-dependency.png,13,152,470,560,26
 7.3b-climate-pipeline.png,14,755,276,250,27
@@ -215,3 +211,7 @@ File,Step,X,Y,W,H
 6.6f-patch-sizes.png,34,1915,276,191,989
 6.6h-setup-validation.png,37,574,664,299,28
 6.6h-setup-validation.png,38,952,276,1153,395
+7.1b-projection-dependencies.png,2,137,562,240,24
+7.1b-projection-dependencies.png,3,153,621,383,56
+7.1g-run-control.png,,574,244,299,28
+7.1g-run-control.png,,1061,253,302,146

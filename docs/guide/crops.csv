@@ -14,12 +14,10 @@ File,X,Y,W,H
 6.3a-transitions.png,538,249,1450,1110
 6.6a-setup-result.png,10,150,2120,270
 6.6g-projection-tiles.png,610,195,1400,160
-7.1b-projection-dependencies.png,10,150,710,500
 7.1c-projection-pipeline.png,600,150,1420,230
 7.1d-projection-tabular.png,600,195,1420,440
 7.1e-projection-spatial.png,600,195,1420,440
 7.1f-projection-filter.png,720,195,1300,800
-7.1g-run-control.png,735,195,1290,300
 7.3a-climate-dependency.png,10,150,720,360
 7.3b-climate-pipeline.png,735,150,1290,220
 7.3c-climate-page.png,735,195,1290,460
@@ -79,3 +77,5 @@ File,X,Y,W,H
 6.6e-projection-schedule.png,560,235,1560,1250
 6.6f-patch-sizes.png,560,235,1560,1050
 6.6h-setup-validation.png,560,235,1560,470
+7.1b-projection-dependencies.png,10,150,530,530
+7.1g-run-control.png,560,190,850,250
