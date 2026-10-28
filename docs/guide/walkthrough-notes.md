@@ -57,3 +57,4 @@ found along the way are batched here and fixed while Studio is closed (the page 
   result's menu, then New > Scenario on the folder): Figures 4.9-4.14 new (marks 1-8), Run Monitor 4.15 and Export 4.16 kept (marks
   9-11), example Figures 4.17-4.20 redrawn from result 4 (initial carbon 439.3 Tg C, soil classes 66-75). Old 4.4a-d captures in
   captures/old. Chapter 5's reference to the inherited pipeline / No Data figures now 4.12 and 4.13.
+- 5.1 (2026-10-28): Figure 5.1 now the Build's right-click New > Scenario menu (mark 1; replaces the name dialog grab, in captures/old); step 2 says drag the result. Figures 5.2 (Explorer + dependency) and 5.3 (ST-Sim pipeline) still from the old library - re-grab.
