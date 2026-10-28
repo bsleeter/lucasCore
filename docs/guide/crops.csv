@@ -11,11 +11,7 @@ File,X,Y,W,H
 4.4e-export.png,0,800,610,300
 4.4f-run-done.png,620,160,1310,130
 5.6c-export-run-figures.png,10,915,580,340
-6.1a-projection-setup-pipeline.png,10,150,1985,330
-6.2a-run-settings.png,538,249,1450,900
 6.3a-transitions.png,538,249,1450,1110
-6.4a-spatial-allocation.png,533,250,1440,1715
-6.5a-fire.png,538,249,1450,800
 6.6a-setup-result.png,10,150,1980,330
 6.6c-suitability-summary.png,610,235,1405,1240
 6.6d-projection-rates.png,610,235,1405,1240
@@ -79,3 +75,7 @@ File,X,Y,W,H
 5.4a-jobs-running.png,575,160,1360,680
 5.6a-run-figures-pipeline.png,490,150,1640,210
 5.6b-run-figures-options.png,10,155,2120,420
+6.1a-projection-setup-pipeline.png,10,150,2120,400
+6.2a-run-settings.png,560,235,1560,915
+6.4a-spatial-allocation.png,560,235,1560,1700
+6.5a-fire.png,560,235,1560,840

@@ -82,3 +82,9 @@ found along the way are batched here and fixed while Studio is closed (the page 
   "Historical Run Figures". Figures 5.16-5.18 re-uploaded from result 9 (header now the study area name; with the run as dependency
   it read CONUS). Chapter 5 done except Figure 5.15 (Export, still old library) if it should be re-grabbed.
 - 5.6: Figure 5.19 added (Run Figure 6, Transitions per year, result 9) after the paragraph that describes it; examples say four of nine (user, 2026-10-28).
+- 6.1-6.5 (2026-10-28): Figures 6.1 (Projection Setup folder, [10] P26 - Projection Setup No Climate, Build dependency, stages 9-10),
+  6.2 Run Settings (2050, Stand-alone [6], 1 iteration, 5 tiles of Counties from Build Options), 6.4 Spatial Allocation and 6.5 Fire
+  (method 2) re-grabbed, marks unchanged. Text: step 1 makes a Projection Setup folder; 'Projection Start page' -> Run Settings;
+  historical run [6]; tiles step says they come from Build Options; '17 county tiles' line replaced. 6.3 Transitions (Figure 6.3) not
+  re-grabbed (still old library). PENDING: run the setup, then 6.6 grabs (result, run log, suitability, rates, schedule, patches,
+  tiles, validation).
