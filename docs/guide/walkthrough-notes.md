@@ -81,3 +81,4 @@ found along the way are batched here and fixed while Studio is closed (the page 
   tab) and 5.14 (Build dependency 30, Run Figures 33, Id 6 34) re-grabbed; step 1 now New > Scenario on the Figures folder,
   "Historical Run Figures". Figures 5.16-5.18 re-uploaded from result 9 (header now the study area name; with the run as dependency
   it read CONUS). Chapter 5 done except Figure 5.15 (Export, still old library) if it should be re-grabbed.
+- 5.6: Figure 5.19 added (Run Figure 6, Transitions per year, result 9) after the paragraph that describes it; examples say four of nine (user, 2026-10-28).
