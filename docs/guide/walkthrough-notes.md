@@ -62,3 +62,10 @@ found along the way are batched here and fixed while Studio is closed (the page 
 - 5.2 (2026-10-28): Figures 5.4-5.8 re-grabbed (marks 6-19); spatial output now described as inherited from the Build (stage 0); new Figure 5.9 Stocks output filter (outlined, no number) with a paragraph on the stock/flow filters; 5.9-5.17 renumbered 5.10-5.18; dropped 'first two P26 runs have no age maps'. Flow filter grab unused (captures/old).
 - 5.3 (2026-10-28): Figure 5.11 re-grabbed (library multiprocessing, marks 23-27). Step 9 rewritten: the Build result supplies the tiling raster (stage 1 Build-Tiles.tif, 5 tiles of whole counties, inherited); SecondaryStrata.tif is the per-county alternative; new paragraph after Table 5.1 on balanced tiles. Figure 5.10 re-grabbed (Build-Tiles.tif inherited, marks 20-22).
 - 5.4 (2026-10-28): Figure 5.12 re-grabbed (5 tile jobs, result 6, mark 28); text says 5 jobs, balanced tiles keep pace. PENDING after result 6: the run-time table and paragraph (still the 24 Oct 17-job run), file count/size, and chapter 5.5-5.6 numbers and figures (486.3 -> 500.4 Tg C captions are the old Build).
+- 5.4-5.5 (2026-10-28): historical result 6 (5 Build tiles, 20.0-20.2% of cells each) ran 2:51:03 (create 0:04, jobs 2:43:03, merge
+  7:55); 2,207 files, 4.3 GB, library 1.5 GB. Table and paragraph updated. FINDING: the three 17-county runs in the Demo Library
+  (results 8, 9, 14) took 2:19-2:28 (jobs 2:04-2:12, merge 15 min) with the same largest job (Plumas 19.8%), so 5 balanced tiles
+  were ~35 min SLOWER on this 64-core machine - contention among 5 equal jobs (or larger per-job extents) is the likely cause, not
+  verified. The guide's tile advice (5.3 step 9, the balanced-tiles paragraph, 6.2 step 9, to-do 22) needs a decision. 5.5 Carbon
+  paragraph now 439.3 -> 466.7 (2019) -> 444.3 Tg C (+5.0), fire-year losses 9.3 / 14.3. PENDING: 5.5 transition and developed-land
+  numbers, 5.6 Run Figures re-run on result 6 (Figures 5.13-5.18 and their captions).
