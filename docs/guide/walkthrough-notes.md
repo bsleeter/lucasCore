@@ -97,3 +97,4 @@ found along the way are batched here and fixed while Studio is closed (the page 
   Fire rate 319 km2/yr, max 3,608 (2021); schedule 2024 = fire 2008, harvest 2014, land use 2010 (same seed). Figures 6.6 (result
   tree + Run Monitor 11) and 6.7 (run log) re-grabbed. PENDING: grabs 6.8-6.13 (Suitability Summary, Projection Rates, Schedule,
   Patch Sizes, tiles, Validation) still from the old setup; 6.4 Figure shows 150 m already.
+- 6.6 grabs (2026-10-28): Figures 6.8 Suitability Summary, 6.9 Projection Rates, 6.10 Schedule, 6.11 Patch Sizes (mark 34 now the Written column, all Yes) and 6.13 Validation re-grabbed from result 11. Figure 6.12 (Projection-Tiles.tif) still from the old setup. Chapter 6 otherwise done.
