@@ -54,14 +54,19 @@ cal_loss <- function(par, SS, OB, AG, scale, fo) {
   tot }
 
 # fit one set of cells (a cell alone, or a forest type's cells with plots): returns multipliers, clearcut share and loss before/after
+# the multiplier search ranges (Carbon Assumptions: Decay Calibration Settings, in ctx$cal; defaults without it)
+cal_bounds <- function(ctx) { s <- ctx$cal
+  list(mult = c(if (is.null(s$mult_min)) 0.05 else s$mult_min, if (is.null(s$mult_max)) 20 else s$mult_max),
+       soil = c(if (is.null(s$soil_min)) 0.02 else s$soil_min, if (is.null(s$soil_max)) 50 else s$soil_max)) }
 cal_fit <- function(rows, ctx, dat) {
   SS <- lapply(seq_len(nrow(rows)), function(i) cal_setup(rows[i], ctx))
   OB <- lapply(seq_len(nrow(rows)), function(i) dat$obs[sc == rows$sc[i] & ecodiv == rows$ecodiv[i]])
   AG <- lapply(seq_len(nrow(rows)), function(i) dat$ages[sc == rows$sc[i] & ecodiv == rows$ecodiv[i]])
   ob <- data.table::rbindlist(OB); scale <- sapply(CAL_POOLS, function(p) stats::weighted.mean(ob[[p]], ob$n))
   l0 <- cal_loss(c(0, 0, 0, 0), SS, OB, AG, scale, ctx$fo)
+  b <- cal_bounds(ctx)
   o <- stats::optim(c(0, 0, 0, 0), cal_loss, SS = SS, OB = OB, AG = AG, scale = scale, fo = ctx$fo, method = "L-BFGS-B",
-                    lower = c(rep(log(0.05), 3), -6), upper = c(rep(log(20), 3), 6), control = list(maxit = 300))
+                    lower = c(rep(log(b$mult[1]), 3), -6), upper = c(rep(log(b$mult[2]), 3), 6), control = list(maxit = 300))
   list(snag = exp(o$par[1]), cwd = exp(o$par[2]), floor = exp(o$par[3]), clearcut = stats::plogis(o$par[4]), loss0 = l0, loss1 = o$value) }
 
 # cycle-averaged mineral soil carbon (FIA_DOM$soil: BG very fast + slow; dead coarse roots are down dead), the quantity matched to gSSURGO, of one cell for given multipliers
@@ -74,7 +79,7 @@ cal_soil <- function(k, ctx, mult, w) {
   S <- cal_setup(k, ctx)
   bg <- function(ms) { d <- cal_dom(S, ctx$fo, utils::modifyList(mult, list(soil = ms)), w)
     mean(rowSums(d[1:min(S$k$ri, nrow(d)), FIA_DOM$soil, drop = FALSE])) }
-  r <- tryCatch(stats::uniroot(function(lm) log(bg(exp(lm))) - log(k$soil_target), c(log(0.02), log(50)))$root, error = function(e) NA_real_)
+  r <- tryCatch(stats::uniroot(function(lm) log(bg(exp(lm))) - log(k$soil_target), log(cal_bounds(ctx)$soil))$root, error = function(e) NA_real_)
   exp(r) }
 
 # ---- measured calibration (to-do 19, 2026-10-27; docs/dom-calibration-proposal.md) ------------------------------------------------
@@ -87,12 +92,13 @@ cal_soil <- function(k, ctx, mult, w) {
 # multipliers are per forest type (cal_fit_measured). Soil to gSSURGO afterwards (cal_soil), as before.
 MEAS_POOLS <- c("standing", "cwd", "fwd", "litter", "duff")
 MEAS_SIM <- list(standing = c("SnagStem", "SnagBranch"), cwd = "AGM", fwd = "AGF", litter = "AGVF", duff = "AGS")   # dead roots are not on the transects
-MEAS_RECENT <- 30
+MEAS_RECENT <- 30   # default exclusion years (Decay Calibration Settings)
 MEAS_MULT <- c("snag", "cwd", "fwd", "litter", "duff")
 
-# mature-stand targets per state class x ecodivision x age band (bands from min_age), as fia_dom_data's: list(obs, ages)
-dwm_targets <- function(dw, cw, min_age = 60) {
-  x <- dw$dwm[!is.na(stdage) & stdage >= min_age & stdage <= max(CAL_BANDS) & !(since_fire %in% 0:MEAS_RECENT) & !(since_cut %in% 0:MEAS_RECENT) &
+# mature-stand targets per state class x ecodivision x age band (bands from min_age), as fia_dom_data's: list(obs, ages); recent: no
+# fire or cutting recorded at the plot within this many years
+dwm_targets <- function(dw, cw, min_age = 60, recent = MEAS_RECENT) {
+  x <- dw$dwm[!is.na(stdage) & stdage >= min_age & stdage <= max(CAL_BANDS) & !(since_fire %in% 0:recent) & !(since_cut %in% 0:recent) &
               is.finite(cwd) & is.finite(fwd) & is.finite(litter) & is.finite(duff) & is.finite(standing)]
   # a few records are impossible (negative, or thousands of Mg C/ha): drop negatives and each pool's top 0.1% (as the growth data's cap)
   for (p in MEAS_POOLS) { cap <- stats::quantile(x[[p]], 0.999); x <- x[get(p) >= 0 & get(p) <= cap] }
@@ -116,7 +122,7 @@ snag_fall_rates <- function(dw, cw, min_snags = 200) {
 # in this order is the solution, and no multiplier can stand in for another pool's misfit (fitting all pools' misfit at once let snag
 # decay trade against down log decay). Snag, down log and fine woody debris multipliers are shared by all rows (an ecodivision's
 # types, or one type's ecodivisions); litter and duff are fitted per state class. Each multiplier: Brent's 1-D search on the log scale
-# within [0.05, 20], which evaluates interior values and so does not stall where a pool's loss reaches its whole stock (a gradient
+# within the settings' range (default [0.05, 20]), which evaluates interior values and so does not stall where a pool's loss reaches its whole stock (a gradient
 # method jumped to the bound there, 2026-10-27). A row's misfit in a pool is scaled by its measured mean (floored at 0.5 Mg C/ha).
 # Returns one row per input row: the five multipliers and the misfit at CBM rates and after (all pools).
 cal_fit_measured <- function(rows, ctx, dat) {
@@ -131,8 +137,13 @@ cal_fit_measured <- function(rows, ctx, dat) {
     m <- merge(OB[[i]], pr, by = "band", suffixes = c("", "_sim"))
     sum(sapply(pools, function(p) sum(m$n * ((m[[paste0(p, "_sim")]] - m[[p]]) / SC[[i]][[p]])^2))) }
   P <- matrix(0, length(SS), 5, dimnames = list(NULL, MEAS_MULT))   # log multipliers per row; 0 = CBM
-  fit1 <- function(g, idx) { pool <- MEAS_POOLS[match(g, MEAS_MULT)]
-    stats::optimize(function(v) { Q <- P; Q[idx, g] <- v; sum(sapply(idx, function(i) pool_loss(Q[i, ], i, pool))) }, c(log(0.05), log(20)))$minimum }
-  for (g in c("snag", "cwd", "fwd")) P[, g] <- fit1(g, seq_along(SS))
-  for (g in c("litter", "duff")) for (t in seq_along(types)) { idx <- which(ti == t); P[idx, g] <- fit1(g, idx) }
+  # multipliers the user fixed (Carbon Assumptions: Fixed Decay Multipliers, columns fx_<pool> of rows): set before the fits, so the
+  # pools fitted after them see them, and left out of the rows each fit moves
+  FX <- sapply(MEAS_MULT, function(g) { v <- rows[[paste0("fx_", g)]]; if (is.null(v)) rep(NA_real_, nrow(rows)) else as.numeric(v) })
+  FX <- matrix(FX, nrow = nrow(rows), dimnames = list(NULL, MEAS_MULT)); P[!is.na(FX)] <- log(FX[!is.na(FX)])
+  lim <- log(cal_bounds(ctx)$mult)
+  fit1 <- function(g, idx) { pool <- MEAS_POOLS[match(g, MEAS_MULT)]; idx <- idx[is.na(FX[idx, g])]; if (!length(idx)) return(invisible())
+    P[idx, g] <<- stats::optimize(function(v) { Q <- P; Q[idx, g] <- v; sum(sapply(idx, function(i) pool_loss(Q[i, ], i, pool))) }, lim)$minimum }
+  for (g in c("snag", "cwd", "fwd")) fit1(g, seq_along(SS))
+  for (g in c("litter", "duff")) for (t in seq_along(types)) fit1(g, which(ti == t))
   data.table::rbindlist(lapply(seq_along(SS), function(i) c(as.list(exp(P[i, ])), list(loss0 = pool_loss(rep(0, 5), i), loss1 = pool_loss(P[i, ], i))))) }

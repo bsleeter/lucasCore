@@ -363,6 +363,36 @@
 		<column name="Share" displayName="Share of Live Aboveground Wood Left as Snags" dataType="Double" format="0.00" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
 	</dataSheet>
 
+	<!-- Carbon Assumptions: Decay Calibration Settings (to-do 18) - the numbers stage 3's decay calibration uses; blank = the default shown.
+	     Measured dead wood (Carbon Options 4): target plots are mature (stand age >= Mature Age) with no fire or cutting recorded in the past
+	     Exclusion Years; an ecodivision is fitted on its own with at least Min Plots mature conditions of a forest type, else the type is
+	     fitted pooled over its ecodivisions; a cell's own snag fall rate needs Min Snags remeasured snags (else its type's, then all types').
+	     Condition pools (options 1, 2): a cell fitted on its own needs Min Plots (Condition Pools) plots. Every decay multiplier is searched
+	     within [Multiplier Min, Multiplier Max], the soil multiplier within [Soil Min, Soil Max]. -->
+	<dataSheet name="DecayCalibrationSetting" displayName="Decay Calibration Settings" isSingleRow="True">
+		<column name="MatureAge" displayName="Mature Age (yr, blank = 60)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="1" formula2="250"/>
+		<column name="ExclusionYears" displayName="No Fire or Cutting Within (yr, blank = 30)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="MinPlotsOwnFit" displayName="Min Plots: Ecodivision's Own Fit (blank = 30)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1"/>
+		<column name="MinSnagsOwnRate" displayName="Min Snags: Own Snag Fall Rate (blank = 200)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1"/>
+		<column name="MinPlotsConditionPools" displayName="Min Plots: Cell's Own Fit, Condition Pools (blank = 200)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1"/>
+		<column name="MultiplierMin" displayName="Decay Multiplier Min (blank = 0.05)" dataType="Double" format="0.000" isOptional="True" validationType="Decimal" validationCondition="Greater" formula1="0"/>
+		<column name="MultiplierMax" displayName="Decay Multiplier Max (blank = 20)" dataType="Double" format="0.00" isOptional="True" validationType="Decimal" validationCondition="Greater" formula1="0"/>
+		<column name="SoilMultiplierMin" displayName="Soil Multiplier Min (blank = 0.02)" dataType="Double" format="0.000" isOptional="True" validationType="Decimal" validationCondition="Greater" formula1="0"/>
+		<column name="SoilMultiplierMax" displayName="Soil Multiplier Max (blank = 50)" dataType="Double" format="0.00" isOptional="True" validationType="Decimal" validationCondition="Greater" formula1="0"/>
+	</dataSheet>
+
+	<!-- Carbon Assumptions: Fixed Decay Multipliers (to-do 20) - a decay multiplier set by the user instead of calibrated, per pool, for a
+	     forest type and/or an ecodivision (ecodivision + forest type, then ecodivision, then forest type, then blank). The pools fitted after
+	     a fixed one (snags -> down logs, fine woody debris -> litter -> duff, then soil) are fitted with it. Forest floor stands for fine woody
+	     debris, litter and duff together (its single multiplier in the condition-pool options). In the condition-pool options (1, 2) snags,
+	     down logs and forest floor are fitted jointly, so a fixed one replaces the fitted value afterwards. Empty = every pool calibrated. -->
+	<dataSheet name="FixedDecayMultiplier" displayName="Fixed Decay Multipliers">
+		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
+		<column name="StateClassId" displayName="Forest Type (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass" isOptional="True"/>
+		<column name="Pool" displayName="Pool" dataType="Integer" validationType="List" formula1="1:Snags|2:Down logs|3:Fine woody debris|4:Litter|5:Duff|6:Forest floor|7:Soil"/>
+		<column name="Multiplier" displayName="Decay Multiplier (x CBM rate)" dataType="Double" format="0.000" validationType="Decimal" validationCondition="Greater" formula1="0"/>
+	</dataSheet>
+
 	<dataSheet name="Spinup" displayName="Spin-up">
 		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
 		<column name="StateClassId" displayName="Forest Type" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
@@ -485,6 +515,7 @@
 		<column name="SoilSource" displayName="Soil Multiplier Source" dataType="String"/>
 		<column name="ReturnIntervalSource" displayName="Return Interval Source" dataType="String" isOptional="True"/>
 		<column name="HistoricalClearcutShare" displayName="Spin-up Cycles Ended by Clearcut (share)" dataType="Double" format="0.00" isOptional="True"/>
+		<column name="FixedMultipliers" displayName="Multipliers Fixed by the User" dataType="String" isOptional="True"/>
 	</dataSheet>
 
 	<dataSheet name="InitialStockCurve" displayName="Initial Stock Curves (spin-up)">
@@ -686,6 +717,8 @@
 		<dataSheet name="Spinup" type="Input"/>
 		<dataSheet name="DisturbanceFlow" type="Input"/>
 		<dataSheet name="FireSnagShare" type="Input"/>
+		<dataSheet name="DecayCalibrationSetting" type="Input"/>
+		<dataSheet name="FixedDecayMultiplier" type="Input"/>
 		<dataSheet name="DomParameter" type="Input"/>
 		<dataSheet name="CarbonCurve" type="Input"/>
 		<dataSheet name="CarbonOptions" type="Input"/>
@@ -871,6 +904,8 @@
 				<item name="Spinup"/>
 				<item name="DisturbanceFlow"/>
 				<item name="FireSnagShare"/>
+				<item name="DecayCalibrationSetting"/>
+				<item name="FixedDecayMultiplier"/>
 			</group>
 			<group name="lucasCoreProjection" displayName="Projection">
 				<item name="ProjectionRun"/>

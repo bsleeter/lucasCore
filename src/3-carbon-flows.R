@@ -46,8 +46,17 @@ say("Ecodivision mean annual temperature (PRISM): %s", paste(sprintf("%s %.1f C"
 progressBar()
 
 # ---- 3b: calibrate DOM decay (src/calibrate.R): snags, down wood, forest floor to FIA; soil to gSSURGO ----------------------
-MIN_PLOTS_CELL <- 200
-MEAS_MIN_AGE <- 60L; MIN_DWM_CELL <- 30L   # measured calibration: mature stand age; mature DWM conditions for a cell's own litter and duff fit (to-do 18: expose)
+# Carbon Assumptions - Decay Calibration Settings (to-do 18): each blank value = the default here
+CAL <- list(mature_age = 60L, exclusion = 30L, min_dwm = 30L, min_snags = 200L, min_plots_cell = 200L, mult_min = 0.05, mult_max = 20, soil_min = 0.02, soil_max = 50)
+CAL_COLS <- c(mature_age = "MatureAge", exclusion = "ExclusionYears", min_dwm = "MinPlotsOwnFit", min_snags = "MinSnagsOwnRate", min_plots_cell = "MinPlotsConditionPools",
+              mult_min = "MultiplierMin", mult_max = "MultiplierMax", soil_min = "SoilMultiplierMin", soil_max = "SoilMultiplierMax")
+cs <- as.data.table(datasheet(scn, ds("DecayCalibrationSetting"), optional = TRUE, lookupsAsFactors = FALSE)); cal_user <- character()
+if (nrow(cs)) for (k in names(CAL_COLS)) { v <- if (CAL_COLS[[k]] %in% names(cs)) suppressWarnings(as.numeric(cs[[CAL_COLS[[k]]]][1])) else NA
+  if (!is.na(v)) { CAL[[k]] <- if (is.integer(CAL[[k]])) as.integer(v) else v; cal_user <- c(cal_user, sprintf("%s %s", CAL_COLS[[k]], v)) } }
+if (CAL$mult_min >= CAL$mult_max || CAL$soil_min >= CAL$soil_max) fail("Decay Calibration Settings: each multiplier minimum must be below its maximum (decay %g-%g, soil %g-%g)", CAL$mult_min, CAL$mult_max, CAL$soil_min, CAL$soil_max)
+say("Decay Calibration Settings: %s", if (length(cal_user)) paste("from Carbon Assumptions:", paste(cal_user, collapse = ", ")) else "the defaults")
+MIN_PLOTS_CELL <- CAL$min_plots_cell
+MEAS_MIN_AGE <- CAL$mature_age; MIN_DWM_CELL <- CAL$min_dwm   # measured calibration: mature stand age; mature DWM conditions for an ecodivision's own fit
 cells <- unique(cc[, .(Stratum, StateClass)])
 miss <- setdiff(cells$StateClass, cw$StateClass); if (length(miss)) fail("carbon curves for state classes not in the forest crosswalk: %s", paste(miss, collapse = ", "))
 cells[, sc := cw$StateClassId[match(StateClass, cw$StateClass)]][, ecodiv := eco$ecodiv[match(Stratum, eco$Stratum)]][, temp := eco$temp[match(Stratum, eco$Stratum)]]
@@ -107,6 +116,25 @@ if (nrow(sp)) {
   cells[!is.na(u_cc), hist_cc := u_cc[!is.na(u_cc)]]
   say("Spin-up: %d rows from Carbon Assumptions; return interval set for %d cells, historical clearcut share for %d cells", nrow(sp), sum(!is.na(u_ri)), sum(!is.na(u_cc)))
 } else say("Spin-up: no rows - return intervals from %s, historical cycles all high-severity fire", cells$ri_src[1])
+# Carbon Assumptions - Fixed Decay Multipliers (to-do 20): per cell and pool, the most specific row (ecodivision + forest type, ecodivision,
+# forest type, blank) - columns fx_<pool>; forest floor fills fine woody debris, litter and duff where they are not set themselves
+FX_POOLS <- c(snag = "Snags", cwd = "Down logs", fwd = "Fine woody debris", litter = "Litter", duff = "Duff", floor = "Forest floor", soil = "Soil")
+fxd <- as.data.table(datasheet(scn, ds("FixedDecayMultiplier"), optional = TRUE, lookupsAsFactors = FALSE))
+for (g in names(FX_POOLS)) cells[, (paste0("fx_", g)) := NA_real_]
+if (nrow(fxd)) {
+  fxd[, `:=`(StratumId = as.character(StratumId), StateClassId = as.character(StateClassId), Multiplier = as.numeric(Multiplier))]
+  fxd[, g :=names(FX_POOLS)[ifelse(as.character(Pool) %in% FX_POOLS, match(as.character(Pool), FX_POOLS), suppressWarnings(as.integer(as.character(Pool))))]]
+  if (anyNA(fxd$g)) fail("Fixed Decay Multipliers: unknown pool %s", paste(unique(fxd$Pool[is.na(fxd$g)]), collapse = ", "))
+  if (anyDuplicated(fxd[, .(StratumId, StateClassId, g)])) fail("Fixed Decay Multipliers: more than one row for the same pool, ecodivision and forest type")
+  fxd[, lvl := 2L * (!is.na(StratumId)) + (!is.na(StateClassId))]
+  for (g0 in unique(fxd$g)) { x <- fxd[g == g0]
+    v <- vapply(seq_len(nrow(cells)), function(i) { m <- x[(is.na(StratumId) | StratumId == cells$Stratum[i]) & (is.na(StateClassId) | StateClassId == cells$StateClass[i])]
+      if (nrow(m)) m$Multiplier[which.max(m$lvl)] else NA_real_ }, numeric(1))
+    cells[, (paste0("fx_", g0)) := v] }
+  for (g in c("fwd", "litter", "duff")) cells[is.na(get(paste0("fx_", g))), (paste0("fx_", g)) := fx_floor]
+  say("Fixed Decay Multipliers: %d rows from Carbon Assumptions; fixed in %s", nrow(fxd),
+      paste(vapply(names(FX_POOLS), function(g) sprintf("%s %d cells", FX_POOLS[[g]], sum(!is.na(cells[[paste0("fx_", g)]]))), ""), collapse = ", "))
+} else say("Fixed Decay Multipliers: no rows - every pool calibrated (or CBM default)")
 cells[, soil_target := as.numeric(soil_t$SoilTarget)[match(paste(Stratum, StateClass), paste(soil_t$Stratum, soil_t$StateClass))]]
 fx <- fia_tables(gopt, src$EcodivisionFile)   # Growth Curve Options: FIA Data (src/fia.R)
 dat <- fia_dom_data(fx$cond, fx$dist, gopt, cw); rm(fx)
@@ -154,7 +182,7 @@ eb <- event_balance(ev_all, cells)
 check(STAGE, "high-severity fire and clearcut move at most each pool's whole stock", eb$v <= 1 + 1e-4, sprintf("largest share %.4f (%s)", eb$v, eb$what))
 if (eb$v > 1 + 1e-4) finish_checks()   # rows are stored to 6 decimals
 dpt <- read_dom_parameters()   # Carbon Assumptions: Dead Organic Matter Parameters (each cell resolves its ecodivision rows, src/flows.R dom_parameters)
-ctx <- list(cc = cc, cw = cw, dens = dens, cbm = cbm, fo = fread(pkg_file("defaults", "stockflow", "stsim_FlowOrder.csv")), ev = ev_all, dpt = dpt)
+ctx <- list(cc = cc, cw = cw, dens = dens, cbm = cbm, fo = fread(pkg_file("defaults", "stockflow", "stsim_FlowOrder.csv")), ev = ev_all, dpt = dpt, cal = CAL)
 t0 <- Sys.time(); cl <- parallel::makeCluster(max(1, min(30, parallel::detectCores() - 1)))
 parallel::clusterExport(cl, c("ctx", "dat", "cells", "all_cells"), envir = environment())
 pkgdir <- env$PackageDirectory; parallel::clusterExport(cl, "pkgdir", envir = environment())
@@ -184,16 +212,16 @@ user_fall <- function(x) { if (!"lt_StemSnagFall" %in% names(x)) return(invisibl
 user_fall(cells); user_fall(all_cells)
 if (dom_mode == 4L) {
   # snag fall from remeasured standing dead trees: the cell's own rate with >= min_snags snags, else its forest type's, else all types'
-  fr <- snag_fall_rates(dw, cw)
+  fr <- snag_fall_rates(dw, cw, CAL$min_snags)
   for (x in list(cells, all_cells)) {
     x[, c("own_n", "own_r") := fr$cell[x, on = c("sc", "ecodiv"), .(snags, rate)]][, c("typ_n", "typ_r") := fr$type[x, on = "sc", .(snags, rate)]]
     x[, `:=`(snag_fall = data.table::fcase(own_n >= fr$min_snags, own_r, typ_n >= fr$min_snags, typ_r, default = fr$all),
              SnagFallSource = data.table::fcase(own_n >= fr$min_snags, sprintf("Cell (%d snags)", own_n), typ_n >= fr$min_snags, sprintf("Forest type (%d snags)", typ_n), default = "All forest types"))]
     x[, c("own_n", "own_r", "typ_n", "typ_r") := NULL]; user_fall(x) }
-  dat_m <- dwm_targets(dw, cw, MEAS_MIN_AGE)
+  dat_m <- dwm_targets(dw, cw, MEAS_MIN_AGE, CAL$exclusion)
   for (x in list(cells, all_cells)) x[, mplots := dat_m$obs[x, on = c("sc", "ecodiv"), .(n = sum(n)), by = .EACHI]$n][is.na(mplots), mplots := 0L]
   say("Measured dead wood: %d down woody material conditions (%d states), %d mature (age >= %d, no fire or cutting in %d yr) in this build's types; snag fall from %d remeasured snags",
-      nrow(dw$dwm), length(dw$states), sum(dat_m$obs$n), MEAS_MIN_AGE, MEAS_RECENT, nrow(dw$fall))
+      nrow(dw$dwm), length(dw$states), sum(dat_m$obs$n), MEAS_MIN_AGE, CAL$exclusion, nrow(dw$fall))
   # fits: each forest type pooled over its ecodivisions (the fallback), and each ecodivision over its types with enough plots (shared snag,
   # down log and fine woody debris multipliers; litter and duff per type)
   ecos <- unique(cells[mplots >= MIN_DWM_CELL, Stratum])   # the forest-type fallback only for types with a cell short of its own fit
@@ -204,15 +232,19 @@ if (dom_mode == 4L) {
   ft <- stats::setNames(fits[seq_along(types)], types); fe <- stats::setNames(fits[length(types) + seq_along(ecos)], ecos)
   cells[, `:=`(Level = NA_character_, m_snag = NA_real_, m_cwd = NA_real_, m_floor = NA_real_, clearcut = NA_real_)]
   M5 <- c("snag", "cwd", "fwd", "litter", "duff"); setm <- function(i, v, lv) cells[i, `:=`(Level = lv, m_snag = v[["snag"]], m_cwd = v[["cwd"]], m_fwd = v[["fwd"]], m_litter = v[["litter"]], m_duff = v[["duff"]])]
-  for (i in seq_len(nrow(cells))) { e <- cells$Stratum[i]; s <- as.character(cells$sc[i]); tf <- if (s %in% names(ft)) as.list(ft[[s]][1, ..M5]) else NULL
+  # a fit's value of pool g for a cell outside it: from a row where g was calibrated, not one the user fixed
+  pick <- function(f, rows, gs) stats::setNames(lapply(gs, function(g) { j <- which(is.na(rows[[paste0("fx_", g)]]))[1]; f[[g]][if (is.na(j)) 1L else j] }), gs)
+  for (i in seq_len(nrow(cells))) { e <- cells$Stratum[i]; s <- as.character(cells$sc[i]); tf <- if (s %in% names(ft)) pick(ft[[s]], jobs[[match(s, types)]]$rows, M5) else NULL
     if (e %in% names(fe)) { f <- fe[[e]]; rows <- jobs[[length(types) + match(e, ecos)]]$rows; j <- match(cells$sc[i], rows$sc)
       if (!is.na(j)) setm(i, as.list(f[j, ..M5]), "Ecodivision")
-      else if (!is.null(tf)) setm(i, c(as.list(f[1, .(snag, cwd, fwd)]), tf[c("litter", "duff")]), "Ecodivision; litter and duff by forest type")
+      else if (!is.null(tf)) setm(i, c(pick(f, rows, c("snag", "cwd", "fwd")), tf[c("litter", "duff")]), "Ecodivision; litter and duff by forest type")
     } else if (!is.null(tf)) setm(i, tf, "Forest type") }
   nod <- cells[is.na(Level), unique(StateClass)]
   if (length(nod)) say("No mature down woody material plots for %s: CBM-default decay", paste(nod, collapse = ", "))
   cells[is.na(Level), `:=`(Level = "CBM default (no FIA plots)", m_snag = 1, m_cwd = 1, m_fwd = 1, m_litter = 1, m_duff = 1)]
-  red <- unlist(lapply(fits, function(f) 1 - sum(f$loss1) / sum(f$loss0)))
+  # misfit reduction of every fit that calibrated something (a fit whose pools the user fixed throughout moves nothing)
+  red <- unlist(lapply(seq_along(fits), function(j) { r <- jobs[[j]]$rows
+    if (all(!is.na(as.matrix(r[, paste0("fx_", M5), with = FALSE])))) NULL else 1 - sum(fits[[j]]$loss1) / sum(fits[[j]]$loss0) }))
 } else if (dom_mode %in% 1:2) {
   own <- which(cells$plots >= MIN_PLOTS_CELL); types <- intersect(unique(cells[plots < MIN_PLOTS_CELL, sc]), unique(all_cells[plots > 0, sc]))
   fc <- parallel::parLapply(cl, own, function(i) cal_fit(cells[i], ctx, dat))
@@ -222,17 +254,29 @@ if (dom_mode == 4L) {
   for (s in types) cells[is.na(Level) & sc == s, `:=`(Level = "Forest type", m_snag = ft[[s]]$snag, m_cwd = ft[[s]]$cwd, m_floor = ft[[s]]$floor, clearcut = ft[[s]]$clearcut)]
   if (anyNA(cells$Level)) fail("no FIA dead-carbon plots for state classes %s", paste(unique(cells[is.na(Level), StateClass]), collapse = ", "))
   red <- c(sapply(fc, function(f) 1 - f$loss1 / f$loss0), sapply(ft, function(f) 1 - f$loss1 / f$loss0))
-} else cells[, `:=`(Level = "CBM default", m_snag = 1, m_cwd = 1, m_floor = 1, clearcut = NA_real_)]
-mult_i <- function(i) if (dom_mode == 4L) list(snag = cells$m_snag[i], cwd = cells$m_cwd[i], fwd = cells$m_fwd[i], litter = cells$m_litter[i], duff = cells$m_duff[i]) else
+} else cells[, `:=`(Level = "CBM default", m_snag = 1, m_cwd = 1, m_floor = 1, m_fwd = 1, m_litter = 1, m_duff = 1, clearcut = NA_real_)]
+# Fixed Decay Multipliers: the user's values in place of the calibrated (or CBM default) ones. The measured fits already used them; the
+# condition-pool fits (options 1, 2) fit snags, down wood and forest floor jointly, so there a fixed value replaces the fit afterwards.
+fx_set <- function(g, col) { k <- !is.na(cells[[paste0("fx_", g)]]); if (any(k)) cells[k, (col) := cells[[paste0("fx_", g)]][k]] }
+for (g in c("snag", "cwd")) fx_set(g, paste0("m_", g))
+if (dom_mode %in% 3:4) { for (g in c("fwd", "litter", "duff")) fx_set(g, paste0("m_", g)) } else {
+  fx_set("floor", "m_floor")
+  if (any(!is.na(cells$fx_litter) & is.na(cells$fx_floor))) say("Fixed Decay Multipliers: fine woody debris, litter and duff rows are not used with the condition-pool calibration (one forest floor multiplier) - set Forest floor instead") }
+if (dom_mode %in% 1:2 && any(!is.na(cells$fx_snag) | !is.na(cells$fx_cwd) | !is.na(cells$fx_floor))) say("Fixed Decay Multipliers: with the condition-pool calibration the other multipliers of a cell were fitted before its fixed values replaced the fitted ones")
+FX_USED <- if (dom_mode %in% 3:4) c("snag", "cwd", "fwd", "litter", "duff", "soil") else c("snag", "cwd", "floor", "soil")
+cells[, FixedMultipliers := apply(as.matrix(.SD), 1, function(v) { u <- FX_POOLS[FX_USED][!is.na(v)]; if (length(u)) paste(u, collapse = ", ") else NA_character_ }), .SDcols = paste0("fx_", FX_USED)]
+mult_i <- function(i) if (dom_mode %in% 3:4) list(snag = cells$m_snag[i], cwd = cells$m_cwd[i], fwd = cells$m_fwd[i], litter = cells$m_litter[i], duff = cells$m_duff[i]) else
   list(snag = cells$m_snag[i], cwd = cells$m_cwd[i], floor = cells$m_floor[i])
 w_i <- function(i) if (is.na(cells$clearcut[i])) 0 else cells$clearcut[i]     # uncalibrated or measured: cycles of high-severity fire only
 parallel::clusterExport(cl, c("cells", "mult_i", "w_i", "dom_mode"), envir = environment())
 if (dom_mode %in% c(1L, 4L)) {
-  cells[, m_soil := unlist(parallel::parLapply(cl, seq_len(nrow(cells)), function(i) cal_soil(cells[i], ctx, mult_i(i), w_i(i))))]
+  free <- which(is.na(cells$fx_soil)); cells[, m_soil := NA_real_]
+  if (length(free)) cells[free, m_soil := unlist(parallel::parLapply(cl, free, function(i) cal_soil(cells[i], ctx, mult_i(i), w_i(i))))]
   cells[, SoilSource := ifelse(is.na(m_soil), ifelse(is.na(soil_target), "Forest type median (no gSSURGO target)", "Forest type median (target unreachable)"), "gSSURGO target")]
   cells[is.na(m_soil), m_soil := median(cells[sc == .BY$sc, m_soil], na.rm = TRUE), by = sc]
   cells[is.na(m_soil), m_soil := median(cells$m_soil, na.rm = TRUE)]
 } else cells[, `:=`(m_soil = 1, SoilSource = "CBM default")]
+cells[!is.na(fx_soil), `:=`(m_soil = fx_soil, SoilSource = "User (Carbon Assumptions: Fixed Decay Multipliers)")]
 parallel::clusterExport(cl, "cells", envir = environment())
 # how far spin-up soil sits from gSSURGO: cycle-averaged belowground carbon (BG very fast + fast + slow) vs the cell's gSSURGO mean
 cells[, eq_bg := unlist(parallel::parLapply(cl, seq_len(nrow(cells)), function(i) cal_bg(cells[i], ctx, c(mult_i(i), list(soil = cells$m_soil[i])), w_i(i))))]
@@ -247,9 +291,12 @@ say("Decay calibration took %.1f min%s; median multipliers snag %.2f, down wood 
     as.numeric(Sys.time() - t0, units = "mins"), if (length(red)) sprintf("; median misfit reduction %.0f%%", 100 * median(red)) else "",
     median(cells$m_snag), median(cells$m_cwd), median(cells$m_floor), median(cells$m_soil),
     if (all(is.na(cells$clearcut))) "" else sprintf("; clearcut share %.2f", median(cells$clearcut, na.rm = TRUE)))
-mm <- as.matrix(cells[, if (dom_mode == 4L) .(m_snag, m_cwd, m_fwd, m_litter, m_duff) else .(m_snag, m_cwd, m_floor)])
-check(STAGE, "decay multipliers are finite and inside [0.05, 20] (soil [0.02, 50])",
-      all(is.finite(mm)) && all(mm >= 0.05 - 1e-9 & mm <= 20 + 1e-9) && all(is.finite(cells$m_soil)) && all(cells$m_soil >= 0.02 - 1e-9 & cells$m_soil <= 50 + 1e-9))
+MP <- if (dom_mode %in% 3:4) c("snag", "cwd", "fwd", "litter", "duff") else c("snag", "cwd", "floor")
+mm <- as.matrix(cells[, paste0("m_", MP), with = FALSE]); mf <- !is.na(as.matrix(cells[, paste0("fx_", MP), with = FALSE]))   # fixed by the user: any value
+inb <- function(v, b) v >= b[1] - 1e-9 & v <= b[2] + 1e-9; sf <- !is.na(cells$fx_soil)
+check(STAGE, sprintf("decay multipliers are finite and inside [%g, %g] (soil [%g, %g]), except those the user fixed", CAL$mult_min, CAL$mult_max, CAL$soil_min, CAL$soil_max),
+      all(is.finite(mm)) && all(mf | inb(mm, c(CAL$mult_min, CAL$mult_max))) && all(is.finite(cells$m_soil)) && all(sf | inb(cells$m_soil, c(CAL$soil_min, CAL$soil_max))),
+      sprintf("%d fixed values", sum(mf) + sum(sf)))
 if (dom_mode == 4L) check(STAGE, "measured snag fall rates are between 0.005 and 0.5 per year", all(cells$snag_fall >= 0.005 & cells$snag_fall <= 0.5),
                           sprintf("range %.3f-%.3f", min(cells$snag_fall), max(cells$snag_fall)))
 if (length(red)) check(STAGE, "calibration reduces the FIA dead-carbon misfit in every fit", all(red > 0), sprintf("smallest reduction %.0f%%", 100 * min(red)))
@@ -258,7 +305,7 @@ write_ds(cells[, .(StratumId = Stratum, StateClassId = StateClass, Level, Plots 
                    DownWoodDecayMultiplier = round(m_cwd, 4), FineWoodyDecayMultiplier = round(m_fwd, 4), LitterDecayMultiplier = round(m_litter, 4),
                    DuffDecayMultiplier = round(m_duff, 4), ForestFloorDecayMultiplier = round(m_floor, 4), SoilDecayMultiplier = round(m_soil, 4),
                    ClearcutShare = round(clearcut, 3), SnagFallRate = round(snag_fall, 4), SnagFallSource, FireSnagShare, MeasuredPlots = mplots,
-                   SoilTarget = round(soil_target, 2), SoilSource, ReturnIntervalSource = ri_src, HistoricalClearcutShare = hist_cc)], "OutputDecayCalibration")
+                   SoilTarget = round(soil_target, 2), SoilSource, ReturnIntervalSource = ri_src, HistoricalClearcutShare = hist_cc, FixedMultipliers)], "OutputDecayCalibration")
 progressBar()
 
 # ---- forest: net growth, growth split, turnover and decay per cell ----------------------------------------------------

@@ -66,7 +66,8 @@ plots): snags 0.85, down logs 0.86, fine woody debris 0.90, litter 0.99, duff 0.
 - Duff multiplier at its upper bound (20) in 19 cells.
 - Fire/clearcut transfers and the four fire snag shares come from California plots but apply everywhere (now editable, per ecodivision
   too, in Carbon Assumptions: Disturbance Flows and Fire Snag Share).
-- Hard-coded, not exposed (to-do 18): mature age 60, 30-year exclusion. (The spin-up return interval is on the Spin-up sheet.)
+- Calibration settings (mature age, exclusion years, plot and snag minimums, multiplier ranges) and fixed multipliers are on the
+  Carbon Assumptions sheets (2026-10-28); mature age is one value for every forest type.
 - Live turnover not fitted; users cannot view or override rates (to-do 20 rate sheet not built).
 - Waiting on Studio closed: DLL rebuild (Carbon Options page), P26 sync, then a P26 Build rerun (changes stages 3-4).
 - The guide's carbon chapter still describes the old calibration.

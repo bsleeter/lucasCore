@@ -37,8 +37,8 @@ return interval, number of cycles, maximum age), Disturbance (CBM disturbance ty
 | AG slow -> BG slow transfer (0.006/yr) | 3 | defaults/cbm/tblSlowAGToBGTransferRate.csv | no |
 | Mean annual temperature per ecodivision | 3 | PRISM normals, computed | no (lucasBuilder: override per row) |
 | Decay calibration choice (measured / condition pools / CBM defaults) | 3 | Carbon Options | yes |
-| Calibration settings: mature age 60, no fire/cut in 30 yr, 30 plots for own litter/duff fit, 200 snags for own fall rate, multiplier range 0.05-20, regional vs per-type scope | 3 | src/3-carbon-flows.R, src/calibrate.R | no (to-do 18) |
-| The fitted decay multipliers and snag fall rates | 3 | Decay Calibration output | no override (to-do 20) |
+| Calibration settings: mature age 60, no fire/cut in 30 yr, 30 plots for own litter/duff fit, 200 snags for own fall rate, multiplier range 0.05-20, regional vs per-type scope | 3 | src/3-carbon-flows.R, src/calibrate.R | Carbon Assumptions: Decay Calibration Settings (2026-10-28) |
+| The fitted decay multipliers and snag fall rates | 3 | Decay Calibration output | Carbon Assumptions: Fixed Decay Multipliers (2026-10-28); read-out still to do (to-do 20) |
 | Soil targets (gSSURGO per cell) | 3 | stage 5 output, else defaults/spinup/soil-targets.csv | no |
 | Disturbance transfers (each event: share of each pool to each pool / atmosphere / harvest) | 3, 4, runs | defaults/stockflow/event-pathways.csv | Carbon Assumptions: Disturbance Flows (fire, clearcut; 2026-10-28) |
 | High-severity fire snag share per forest type | 3, 4 | defaults/spinup/fire-snag-share.csv | Carbon Assumptions: Fire Snag Share (2026-10-28) |
@@ -122,3 +122,15 @@ calibrated, measured, user).
   flows; a Disturbance Flows row for an ecodivision + forest type wins for its pool. The spin-up (stages 3, 4) resolves rows per
   ecodivision too. Test: tests/phaseZ12-disturbance-flows.R (default-filled sheets reproduce phaseZ11's base exactly; clearcut merch to
   dead wood 0.03 -> 0.15 raises median AG Medium at age 0 from 4.1 to 11.4 Mg C/ha; an over-full row stops stage 3).
+- 2026-10-28 **Decay Calibration Settings and Fixed Decay Multipliers done** (to-dos 18 and 20's override). Decay Calibration Settings,
+  one row, every value optional: mature age (60), no fire or cutting within (30 yr), min mature plots for an ecodivision's own fit (30),
+  min remeasured snags for an own snag fall rate (200), min plots for a cell's own condition-pool fit (200), decay multiplier range
+  (0.05-20) and soil multiplier range (0.02-50); stage 3 stops if a minimum is not below its maximum. Fixed Decay Multipliers: per pool
+  (snags, down logs, fine woody debris, litter, duff, forest floor = the last three together, soil), ecodivision and forest type optional
+  (most specific row wins, as Disturbance Flows). In the measured calibration a fixed value is set before the fits, so the pools fitted
+  after it (snags -> down logs, fine woody debris -> litter -> duff -> soil) are fitted with it, and it is left out of the shared fits;
+  cells that take a pooled fit take a calibrated row's value, not a fixed one. With CBM defaults the fixed values replace 1; in the
+  condition-pool options they replace the joint fit afterwards (logged). Decay Calibration records the pools fixed per cell; the bounds
+  check skips them. Mature age per forest type is not in yet (one value). Test: tests/phaseZ13-decay-settings.R (defaults reproduce
+  phaseZ7 exactly; mature age 80 / 20 yr: 101,001 vs 126,465 mature plots; min snags 500: 90 vs 120 cells with their own fall rate;
+  max 10 caps every calibrated multiplier; fixed snag 1 gives mixed conifer the CBM snag decay rates).
