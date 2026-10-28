@@ -7,11 +7,7 @@ File,X,Y,W,H
 3.2a-study-area-pick.png,630,195,2039,400
 3.2b-study-area.png,1060,250,1600,250
 3.5a-carbon-options.png,630,250,1440,280
-3.7a-land-cover-crosswalks.png,530,245,1450,1000
 4.1a-run-menu.png,0,145,540,600
-4.1b-run-toolbar.png,0,40,720,260
-4.2a-run-monitor.png,520,150,1516,135
-4.2b-status-bar.png,0,1770,760,63
 4.4a-build-figures-scenario.png,0,150,610,300
 4.4b-inherited-pipeline.png,620,160,1310,1240
 4.4d-stage-12.png,620,160,1310,200
@@ -72,3 +68,7 @@ File,X,Y,W,H
 3.6c-carbon-method-filled.png,515,150,1494,700
 3.6d-cbm-crosswalk.png,515,150,1494,560
 3.6f-decay-settings.png,515,150,1494,420
+3.7a-land-cover-crosswalks.png,515,150,1494,1110
+4.1b-run-toolbar.png,0,40,720,260
+4.2a-run-monitor.png,515,150,1494,135
+4.2b-status-bar.png,0,1565,760,71
