@@ -28,6 +28,8 @@ found along the way are batched here and fixed while Studio is closed (the page 
 
 12. **Data Sources: FRI name** - "LANDFIRE Mean Fire Return Interval" but stage 5 uses the FRI_REPLAC (replacement-severity) field of that
     product for the spin-up return interval. Rename "LANDFIRE Fire Return Interval" with a note "replacement-severity interval, spin-up".
+13. **Decay Calibration output unreadable** (4.3e grab): about 20 columns, every name and most values cut to "Spin-...", "M...".
+    Shorter displayNames, Return Interval and its Source first after the keys, or a custom view; then grab it for 3.6 / 4.3.
 - 1.2: new Figure 1.6 (the new library in the Explorer); step 4 names the folder and library.
 - 1.3: Figures 1.7-1.11 re-grabbed; new Figure 1.12 (CBM Ecozones) with steps 4-5.
 - 1.4: Figures 1.13-1.14 re-grabbed (multiprocessing off; R 4.6.1).
@@ -49,3 +51,5 @@ found along the way are batched here and fixed while Studio is closed (the page 
   30 m 1,108; reversals 184); 3.3.1's stage 5 time corrected to ~12 min (log: 11.6 min of stage 5's 22.5). PENDING: grabs of the
   result scenario in the Explorer and its Validation page (then renumber again); re-run 4.4 Build Figures on result 2 - Figure 4.14's
   caption still says 486 Tg C (old Build); this Build gives 0.44 Pg C.
+- 4.3 grabs (2026-10-28): Figures 4.6 result scenario (marks 8 result, 9 Run Log), 4.7 Validation (10, 11), 4.8 Initial Stock
+  Summary (12, 13); Build Figures onward renumbered 4.9-4.18. 4.3e-decay-calibration-narrow.png kept unused (see tweak 13).
