@@ -26,6 +26,8 @@ found along the way are batched here and fixed while Studio is closed (the page 
 10. **Growth Curve Options number formats**: Maximum fitted lag shows 40.0000 (years: no decimals); lambda 0.0100 is fine.
 11. **Carbon Method: warn when the method changes after Fill**: picking CBM defaults on a page filled with the FIA rows keeps those rows (fitted fire flows, snag shares) - show a line "the sheets hold the FIA measured dead wood rows; press Fill to switch" (the guide says so in 3.6 for now). Needs the page to remember which method filled it (e.g. a hidden FilledWith column).
 
+12. **Data Sources: FRI name** - "LANDFIRE Mean Fire Return Interval" but stage 5 uses the FRI_REPLAC (replacement-severity) field of that
+    product for the spin-up return interval. Rename "LANDFIRE Fire Return Interval" with a note "replacement-severity interval, spin-up".
 - 1.2: new Figure 1.6 (the new library in the Explorer); step 4 names the folder and library.
 - 1.3: Figures 1.7-1.11 re-grabbed; new Figure 1.12 (CBM Ecozones) with steps 4-5.
 - 1.4: Figures 1.13-1.14 re-grabbed (multiprocessing off; R 4.6.1).
@@ -41,3 +43,9 @@ found along the way are batched here and fixed while Studio is closed (the page 
 - 3.3: new subsection 3.3.1 Modal or Area-matched (table of P26 numbers from the 2026-10-25 exploration, docs/ui-improvements.md item 8); step 6 now says Area-matched for P26. CHECK the table against the new P26 Build's stage 5 log (area in the wrong class, developed area) once it has run.
 - DECISION (user, 2026-10-28): Carbon Assumptions are set on the Build itself in the guide (no separate scenario, no dependency); the shared scenario becomes an advanced option in 3.6. Guide 3.1 description and pipeline note updated; Figure 3.1's description still says 'Dependencies: Carbon Assumptions' - re-grab. Update docs/carbon-build-process.md step 3 to match.
 - 3.5 Growth Curve Options (Figure 3.6, step 4 FIA data); 3.6 Carbon Assumptions written on the Build (Figures 3.7-3.11, table of the eight pages; separate scenario as an advanced note); Figure 3.1 re-grabbed with the Build-only description; Land Cover Crosswalks now Figure 3.12.
+- 4.2-4.3 (2026-10-28): P26 Build result 2 ran in 54:59, 68 of 68 Validation checks pass. New 4.2 The run log (Figure 4.5, marks 6
+  initial carbon and 7 total time; stage-time table) and 4.3 Checking the result (Validation, numbers from the log); old Figures
+  4.5-4.14 renumbered 4.6-4.15. Area-matched numbers agree with 3.3.1 (wrong class 28/65/mean 47 km2; developed 876 -> 1,121 vs
+  30 m 1,108; reversals 184); 3.3.1's stage 5 time corrected to ~12 min (log: 11.6 min of stage 5's 22.5). PENDING: grabs of the
+  result scenario in the Explorer and its Validation page (then renumber again); re-run 4.4 Build Figures on result 2 - Figure 4.14's
+  caption still says 486 Tg C (old Build); this Build gives 0.44 Pg C.
