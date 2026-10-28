@@ -69,3 +69,10 @@ found along the way are batched here and fixed while Studio is closed (the page 
   does not expect 5 tiles to be faster (both wait on ~20% of cells); the gain is memory (5 jobs, not 17) and merge (8 vs 15 min). Guide says so. 5.5 Carbon
   paragraph now 439.3 -> 466.7 (2019) -> 444.3 Tg C (+5.0), fire-year losses 9.3 / 14.3. PENDING: 5.5 transition and developed-land
   numbers, 5.6 Run Figures re-run on result 6 (Figures 5.13-5.18 and their captions).
+- 5.5-5.6 (2026-10-28): 5.5 Transitions (families within 0.5-8% of the record: urbanization 244/245 km2, fire 12,126/12,412, harvest
+  2,194/2,392 short 8%) and Developed land (run 876 -> 1,120 km2 vs Area-matched map 1,121, NLCD 30 m 1,108; flicker now only a Modal
+  note) rewritten. Run Figures result 8 (1:15, 9 figures, run 6): Figures 5.16-5.18 redrawn (urbanized 243, harvested 1,917 km2;
+  439.3 -> 444.4 Tg C, +5.1 on the maps; NBP +0.13 Tg C/yr); step 4 and examples say result 6. User's grab (5.6a, marks 29-32,
+  annotated, NOT yet in the guide) has the RUN result [6] as the dependency, not the Build result: stage 13 then has no Historical
+  Transition Summary and Figure 6 shows bars only. PENDING: re-grab 5.6a with the Build result [2] as dependency and 5.6b Run
+  Figures options with Id 6 (Figure 5.14 still shows result 9), then rerun.
