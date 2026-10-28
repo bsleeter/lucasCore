@@ -10,11 +10,6 @@ File,X,Y,W,H
 4.1a-run-menu.png,0,145,540,600
 4.4e-export.png,0,800,610,300
 4.4f-run-done.png,620,160,1310,130
-5.2a-run-control.png,540,155,930,290
-5.2b-tabular-output.png,540,235,1270,400
-5.2c-stock-flow-output.png,540,235,1215,740
-5.2b2-spatial-output.png,525,200,1275,360
-5.2b3-transition-filter.png,578,156,1600,512
 5.3a-spatial-multiprocessing.png,490,160,1370,200
 5.3b-library-multiprocessing.png,480,90,1390,350
 5.4a-jobs-running.png,495,160,1400,1015
@@ -78,3 +73,9 @@ File,X,Y,W,H
 5.1a-new-scenario.png,0,150,660,850
 5.1b-historical-dependency.png,0,150,660,330
 5.1c-stsim-pipeline.png,620,160,1566,260
+5.2a-run-control.png,600,160,880,280
+5.2b-tabular-output.png,600,240,1300,400
+5.2b2-spatial-output.png,600,240,900,330
+5.2b3-transition-filter.png,600,160,1586,520
+5.2c-stock-flow-output.png,600,240,1300,740
+5.2d-stock-filter.png,600,160,1586,880
