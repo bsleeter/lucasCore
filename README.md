@@ -52,9 +52,10 @@ fit once in the starter's optional Growth Curves scenario and shared by Builds a
 or copied from a result scenario of another lucasCore library (Growth Curves = Copy from another library, with the Source
 Library path and, optionally, the Source Result Scenario Id; seconds instead of minutes).
 
-Two more choices sit beside them. **Carbon Options**: dead organic matter decay calibrated (default: snags, down wood and forest floor to
-FIA, soil to gSSURGO), FIA dead pools with CBM-default soil, or CBM defaults throughout (the CONUS 1km model's way); stage 3 logs
-spin-up soil against gSSURGO for each. **Land Cover Crosswalks** (Crosswalks group): the EVT 2016, EVT 2001, RCMAP, C-CAP and USFS forest type group
+Two more choices sit beside them. **Carbon Method** (first page of the Carbon Assumptions scenario the Build depends on): dead organic
+matter from FIA measured dead wood (default) or CBM defaults (the CONUS 1km model's way), soil organic carbon from gSSURGO or CBM, and a
+Fill button that writes the method's rows into the other Carbon Assumptions sheets (`defaults/carbon-assumptions/<method>`); stage 3 logs
+spin-up soil against gSSURGO either way. **Land Cover Crosswalks** (Crosswalks group): the EVT 2016, EVT 2001, RCMAP, C-CAP and USFS forest type group
 crosswalks stage 5 uses, editable per scenario (`defaults/landcover/README.md`).
 
 The starter is made by `tools/new-library.R`, which can also make or update any library directly:

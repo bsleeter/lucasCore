@@ -1,0 +1,10 @@
+Pool,BaseDecayRate,ReferenceTemperature,Q10,ShareEmitted,TransferToBGSlow
+AG Very Fast,0.355,10,2.65,0.815,
+BG Very Fast,0.5,10,2,0.83,
+AG Fast,0.1435,10,2,0.83,
+BG Fast,0.1435,10,2,0.83,
+AG Medium,0.0374,10,2,0.83,
+AG Slow,0.015,10,2.65,1,0.006
+BG Slow,0.0033,10,1,1,
+Snag Stem,0.0187,10,2,0.83,
+Snag Branch,0.07175,10,2,0.83,

@@ -1,46 +1,39 @@
 # =============================================================================
-# carbon-assumptions.R - fill a Carbon Assumptions scenario's empty sheets with the package defaults (to-do 21; docs/carbon-assumptions.md)
+# carbon-assumptions.R - fill a Carbon Assumptions scenario with a carbon method's preset rows (to-do 21; docs/carbon-assumptions.md)
 # =============================================================================
-# Sourced by tools/new-library.R (new libraries) and tools/sync-library.R (existing ones). Each sheet is filled only when empty, so a
-# user's rows are never overwritten; a sheet added to the package later is filled the next time sync-library runs.
-#   lucasCore_CbmCrosswalk   defaults/cbm/species-crosswalk.csv  (forest type -> CBM ecozone, species type)
-#   lucasCore_DomParameter   defaults/cbm/dom-parameters.csv     (dead pool base decay rate, reference temperature, Q10, share emitted)
-#   lucasCore_DisturbanceFlow defaults/stockflow/event-pathways.csv (high-severity fire and clearcut rows, gas rows merged: src/dom.R)
-#   lucasCore_FireSnagShare  defaults/spinup/fire-snag-share.csv  (share of live wood fire leaves as snags, per forest type)
-# Live Turnover and Spin-up start empty (blank = CBM rates; stage 5's return intervals, all-fire cycles).
+# Sourced by tools/new-library.R (new libraries) and tools/sync-library.R (existing ones). The rows are the method's preset files,
+# defaults/carbon-assumptions/<method>/<sheet>.csv (tools/make_carbon_presets.R) - the same rows the Carbon Method page's Fill button
+# writes and stage 3 uses for a scenario never filled. A scenario is filled only when it is unfilled as a whole (CBM Crosswalk, Dead
+# Organic Matter Parameters and Disturbance Flows all empty), so a user's rows, and a sheet left empty on purpose, are never touched.
 # =============================================================================
 
-CA_DESCRIPTION <- paste("The assumptions behind the carbon calibration (docs/carbon-assumptions.md), filled with the package defaults: change any row,",
-  "or add a row for one ecodivision to override the all-ecodivisions row. Build scenarios depend on this scenario (it is not run).",
-  "CBM Crosswalk: the CBM-CFS3 ecozone and species type each forest type takes its live turnover and snag rates from, and an optional mean",
-  "annual temperature for dead-pool decay (blank = PRISM). Dead Organic Matter Parameters: each dead pool's base decay rate, reference",
-  "temperature, Q10 and share emitted, and the AG Slow -> BG Slow transfer. Live Turnover: live pool turnover and snag fall (empty = CBM).",
-  "Spin-up: return interval, share of past cycles ended by clearcut, last disturbance outside fire perimeters (empty = LANDFIRE, all fire,",
-  "clearcut). Disturbance Flows: where high-severity fire and clearcut move each pool's carbon. Fire Snag Share: the share of live wood",
-  "high-severity fire leaves standing, per forest type.")
+CA_DESCRIPTION <- paste("The assumptions behind the carbon calibration (docs/carbon-assumptions.md). Carbon Method: FIA measured dead wood or CBM",
+  "defaults, and the soil organic carbon source; Fill writes the method's rows into the other sheets. Change any row, or add a row for one",
+  "ecodivision to override the all-ecodivisions row. Build scenarios depend on this scenario (it is not run). CBM Crosswalk: the CBM-CFS3",
+  "ecozone and species type each forest type takes its live turnover and snag rates from. Dead Organic Matter Parameters: each dead pool's",
+  "base decay rate, reference temperature, Q10 and share emitted. Live Turnover: live pool turnover and snag fall (empty = CBM). Spin-up:",
+  "return interval, share of past cycles ended by clearcut, last disturbance outside fire perimeters (empty = LANDFIRE, all fire, clearcut).",
+  "Disturbance Flows: where high-severity fire and clearcut move each pool's carbon. Fire Snag Share: the share of live wood high-severity fire",
+  "leaves standing (empty = none). Decay Calibration Settings and Fixed Decay Multipliers: how the FIA calibration fits (empty = defaults).")
 DOM_POOL_LIST <- c("AG Very Fast", "BG Very Fast", "AG Fast", "BG Fast", "AG Medium", "AG Slow", "BG Slow", "Snag Stem", "Snag Branch")
+CA_METHODS <- c(`fia-measured` = 4L, `cbm-defaults` = 3L)
 
-fill_carbon_assumptions <- function(ca, pkg) {
-  rd <- function(...) data.table::fread(file.path(pkg, "defaults", ...), colClasses = "character", na.strings = "")
-  empty <- function(sh) !nrow(suppressWarnings(datasheet(ca, sh, optional = TRUE)))
-  done <- character()
-  if (empty("lucasCore_CbmCrosswalk")) { x <- rd("cbm", "species-crosswalk.csv")
-    saveDatasheet(ca, data.frame(StateClassId = x$StateClassId, CbmEcozoneId = x$EcoBoundaryId, CbmSpeciesTypeId = x$SpeciesTypeId), "lucasCore_CbmCrosswalk")
-    done <- c(done, sprintf("CBM Crosswalk %d rows", nrow(x))) }
-  if (empty("lucasCore_DomParameter")) { x <- rd("cbm", "dom-parameters.csv")
-    saveDatasheet(ca, data.frame(Pool = match(x$Pool, DOM_POOL_LIST), BaseDecayRate = as.numeric(x$BaseDecayRate), ReferenceTemperature = as.numeric(x$ReferenceTemperature),
-                                 Q10 = as.numeric(x$Q10), ShareEmitted = as.numeric(x$ShareEmitted), TransferToBGSlow = as.numeric(x$TransferToBGSlow)), "lucasCore_DomParameter")
-    done <- c(done, sprintf("Dead Organic Matter Parameters %d rows", nrow(x))) }
-  if (empty("lucasCore_DisturbanceFlow")) {
-    e <- new.env(); for (f in c("flows.R", "dom.R")) sys.source(file.path(pkg, "src", f), envir = e)
-    x <- e$events_to_sheet(rd("stockflow", "event-pathways.csv"))
-    saveDatasheet(ca, data.frame(Disturbance = match(x$Disturbance, names(e$DF_GROUPS)), AgeMin = x$AgeMin, FromStockTypeId = x$FromStockTypeId,
-                                 ToStockTypeId = x$ToStockTypeId, Share = x$Share), "lucasCore_DisturbanceFlow")
-    done <- c(done, sprintf("Disturbance Flows %d rows", nrow(x))) }
-  if (empty("lucasCore_FireSnagShare")) { x <- rd("spinup", "fire-snag-share.csv")
-    sc <- data.table::as.data.table(datasheet(ca, "stsim_StateClass", lookupsAsFactors = FALSE))
-    x[, StateClass := sc$Name[match(StateClassId, as.character(sc$Id))]]; x <- x[!is.na(StateClass)]
-    if (nrow(x)) { saveDatasheet(ca, data.frame(StateClassId = x$StateClass, Share = as.numeric(x$Share)), "lucasCore_FireSnagShare")
-      done <- c(done, sprintf("Fire Snag Share %d rows", nrow(x))) } }
+# list columns are saved as their codes; returns what was filled ("" when the scenario already had rows)
+fill_carbon_assumptions <- function(ca, pkg, method = "fia-measured") {
+  key <- c("lucasCore_CbmCrosswalk", "lucasCore_DomParameter", "lucasCore_DisturbanceFlow")
+  if (any(vapply(key, function(sh) nrow(suppressWarnings(datasheet(ca, sh, optional = TRUE))) > 0, TRUE))) return(character())
+  rd <- function(sheet) data.table::fread(file.path(pkg, "defaults", "carbon-assumptions", method, paste0(sheet, ".csv")), colClasses = "character", na.strings = "")
+  num <- function(x, cols) { for (k in intersect(cols, names(x))) data.table::set(x, j = k, value = as.numeric(x[[k]])); x }
+  done <- character(); put <- function(x, sheet, label) { if (nrow(x)) { saveDatasheet(ca, as.data.frame(x), sheet); done <<- c(done, sprintf("%s %d rows", label, nrow(x))) } }
+  put(rd("cbm-crosswalk"), "lucasCore_CbmCrosswalk", "CBM Crosswalk")
+  x <- num(rd("dom-parameters"), c("BaseDecayRate", "ReferenceTemperature", "Q10", "ShareEmitted", "TransferToBGSlow"))[, Pool := match(Pool, DOM_POOL_LIST)]
+  put(x, "lucasCore_DomParameter", "Dead Organic Matter Parameters")
+  x <- num(rd("disturbance-flows"), "Share")[, `:=`(Disturbance = match(Disturbance, c("High-severity fire", "Clearcut")), AgeMin = as.integer(AgeMin))]
+  put(x[, !c("StratumId", "StateClassId")], "lucasCore_DisturbanceFlow", "Disturbance Flows")
+  put(num(rd("fire-snag-share"), "Share"), "lucasCore_FireSnagShare", "Fire Snag Share")
+  x <- num(rd("decay-calibration-settings"), c("MultiplierMin", "MultiplierMax", "SoilMultiplierMin", "SoilMultiplierMax"))
+  for (k in intersect(c("MatureAge", "ExclusionYears", "MinPlotsOwnFit", "MinSnagsOwnRate", "MinPlotsConditionPools"), names(x))) data.table::set(x, j = k, value = as.integer(x[[k]]))
+  put(x, "lucasCore_DecayCalibrationSetting", "Decay Calibration Settings")
+  if (!nrow(suppressWarnings(datasheet(ca, "lucasCore_CarbonOptions", optional = TRUE)))) saveDatasheet(ca, data.frame(DeadOrganicMatterModel = CA_METHODS[[method]]), "lucasCore_CarbonOptions")
   if (length(done)) description(ca) <- CA_DESCRIPTION
   done }

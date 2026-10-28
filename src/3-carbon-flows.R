@@ -149,34 +149,59 @@ if (!is.null(study)) { cells <- cells[Stratum %in% study]
       paste(study, collapse = ", "), nrow(cells), nrow(all_cells)) }
 say("Decay calibration: %d cells, %d with >= %d FIA plots (own fit), %d with a gSSURGO soil target; return intervals %d-%d yr",
     nrow(cells), cells[plots >= MIN_PLOTS_CELL, .N], MIN_PLOTS_CELL, cells[!is.na(soil_target), .N], min(cells$ri), max(cells$ri))
+# Carbon Method (sheet CarbonOptions, on the Carbon Assumptions scenario): dead organic matter 4 = FIA measured dead wood (default from
+# 2026-10-27, to-do 19; src/calibrate.R cal_fit_measured; needs the FIA DataMart Folder with the <ST>_COND_DWM_CALC tables), 3 = CBM
+# defaults (no calibration - the CONUS 1km build's way); 1 and 2 (FIA condition pools, no longer offered, 2026-10-28) still run in older
+# libraries. A pool that is not calibrated keeps multiplier 1. Soil organic carbon: 1 = soil decay calibrated to gSSURGO, 2 = CBM
+# defaults; blank = gSSURGO with options 1 and 4, CBM with 2 and 3 (as before the choice existed).
+copt <- read_ds("CarbonOptions"); dm <- copt$DeadOrganicMatterModel[1]
+# (the sheet reads as its labels; option 2's label starts like option 1's, so it is tested first)
+dom_mode <- if (is.null(dm) || is.na(dm)) 4L else if (is.numeric(dm)) as.integer(dm) else if (grepl("^(FIA measured|Measured)", dm)) 4L else
+  if (grepl("^FIA (dead|condition) pools, CBM", dm)) 2L else if (grepl("^(Calibrated|FIA condition pools)", dm)) 1L else if (grepl("^CBM default", dm)) 3L else NA_integer_
+if (is.na(dom_mode)) fail("Carbon Method: unrecognised Dead Organic Matter choice '%s'", dm)
+sm0 <- if ("SoilCarbonModel" %in% names(copt)) copt$SoilCarbonModel[1] else NA
+soil_mode <- if (is.null(sm0) || is.na(sm0)) (if (dom_mode %in% c(1L, 4L)) 1L else 2L) else if (is.numeric(sm0)) as.integer(sm0) else if (grepl("^gSSURGO", sm0)) 1L else if (grepl("^CBM", sm0)) 2L else NA_integer_
+if (is.na(soil_mode)) fail("Carbon Method: unrecognised Soil Organic Carbon choice '%s'", sm0)
+say("Carbon Method: dead organic matter = %s; soil organic carbon = %s", c("calibrated to FIA condition pools (snags, down wood, floor; older option)", "FIA condition pools (older option)",
+    "CBM defaults (no calibration)", "FIA measured dead wood (down woody material and snags in mature stands; regional decay)")[dom_mode],
+    c("soil decay calibrated to gSSURGO", "CBM defaults (from the spin-up)")[soil_mode])
+# A Carbon Assumptions scenario nobody filled (made in Studio, the Fill button never pressed): CBM Crosswalk, Dead Organic Matter
+# Parameters and Disturbance Flows all empty. Stage 3 then takes every sheet from the method's preset files (defaults/carbon-assumptions/
+# <method>, tools/make_carbon_presets.R - the rows the Fill button writes). Once filled, an empty sheet means what it says (no fire snag
+# shares, no fixed multipliers, no settings: defaults).
+preset_dir <- pkg_file("defaults", "carbon-assumptions", if (dom_mode == 3L) "cbm-defaults" else "fia-measured")
+preset <- function(sheet) fread(file.path(preset_dir, paste0(sheet, ".csv")), colClasses = "character", na.strings = "")
+ca_filled <- any(vapply(c("CbmCrosswalk", "DomParameter", "DisturbanceFlow"), function(s) nrow(datasheet(scn, ds(s), optional = TRUE)) > 0, TRUE))
+if (!ca_filled) say("Carbon Assumptions: the sheets are empty (never filled) - using the %s rows (%s)", c("", "", "CBM defaults", "FIA measured dead wood")[dom_mode], preset_dir)
 # event flows: the LUCAS defaults (defaults/stockflow/event-pathways.csv), with high-severity fire and clearcut from Carbon Assumptions:
 # Disturbance Flows when the scenario has rows (src/dom.R sheet_to_events: ecodivision rows expanded to every class, every specific row
 # set given the younger age rows it hides), then each forest type's fire snag share (Carbon Assumptions: Fire Snag Share, else
 # defaults/spinup/fire-snag-share.csv; src/dom.R fire_snag_rows). The spin-up uses the same table stage 3 writes to stsim_FlowPathway.
 ev_def <- fread(pkg_file("defaults", "stockflow", "event-pathways.csv"), colClasses = "character", na.strings = "")[, FromStratumId := as.character(FromStratumId)]
-dfl <- as.data.table(datasheet(scn, ds("DisturbanceFlow"), optional = TRUE, lookupsAsFactors = FALSE))
-if (nrow(dfl)) {
-  dfl[, `:=`(StratumId = as.character(StratumId), StateClassId = as.character(StateClassId), Disturbance = as.character(Disturbance),
-             AgeMin = suppressWarnings(as.integer(AgeMin)), Share = as.numeric(Share))]
-  dfl[Disturbance %in% c("1", "2"), Disturbance := names(DF_GROUPS)[as.integer(Disturbance)]]
-  dup <- dfl[duplicated(dfl[, .(StratumId, StateClassId, Disturbance, AgeMin, FromStockTypeId, ToStockTypeId)])]
-  if (nrow(dup)) fail("Disturbance Flows: more than one row for %s", paste(unique(dup[, sprintf("%s %s -> %s%s", Disturbance, FromStockTypeId, ToStockTypeId,
-                                                                                               ifelse(is.na(StateClassId), "", paste0(" (", StateClassId, ")")))]), collapse = "; "))
-  ev_all <- rbind(ev_def[!TransitionGroupId %in% DF_GROUPS], complete_ages(sheet_to_events(dfl, ev_def, scl$Name)), fill = TRUE)
-  ky <- function(x) x[, paste(StratumId, StateClassId, Disturbance, AgeMin, FromStockTypeId, ToStockTypeId)]
-  d0 <- events_to_sheet(ev_def); k0 <- ky(d0); k1 <- ky(dfl)
-  diff_row <- (!k1 %in% k0) | abs(dfl$Share - d0$Share[match(k1, k0)]) > 1e-9; diff_row[is.na(diff_row)] <- TRUE
-  lab <- dfl[diff_row, sprintf("%s%s%s%s %s -> %s %.4f", ifelse(k1[diff_row] %in% k0, "", "+ "), ifelse(is.na(StratumId), "", paste0(StratumId, " / ")),
-                               ifelse(is.na(StateClassId), "", paste0(sub("^Forest: ", "", StateClassId), " ")), Disturbance, FromStockTypeId, ToStockTypeId, Share)]
-  say("Disturbance Flows: %d rows from Carbon Assumptions; vs the package defaults %d changed or added (+), %d removed%s", nrow(dfl), sum(diff_row), sum(!k0 %in% k1),
-      if (length(lab)) paste0(": ", paste(head(lab, 12), collapse = "; "), if (length(lab) > 12) "; ..." else "") else "")
-} else { ev_all <- copy(ev_def); say("Disturbance Flows: no rows - high-severity fire and clearcut flows from the package defaults") }
+dfl <- as.data.table(datasheet(scn, ds("DisturbanceFlow"), optional = TRUE, lookupsAsFactors = FALSE)); df_src <- "Carbon Assumptions"
+if (!nrow(dfl)) { dfl <- preset("disturbance-flows"); df_src <- sprintf("the %s preset (the sheet is empty)", basename(preset_dir)) }
+dfl[, `:=`(StratumId = as.character(StratumId), StateClassId = as.character(StateClassId), Disturbance = as.character(Disturbance),
+           AgeMin = suppressWarnings(as.integer(AgeMin)), Share = as.numeric(Share))]
+dfl[Disturbance %in% c("1", "2"), Disturbance := names(DF_GROUPS)[as.integer(Disturbance)]]
+dup <- dfl[duplicated(dfl[, .(StratumId, StateClassId, Disturbance, AgeMin, FromStockTypeId, ToStockTypeId)])]
+if (nrow(dup)) fail("Disturbance Flows: more than one row for %s", paste(unique(dup[, sprintf("%s %s -> %s%s", Disturbance, FromStockTypeId, ToStockTypeId,
+                                                                                             ifelse(is.na(StateClassId), "", paste0(" (", StateClassId, ")")))]), collapse = "; "))
+ev_all <- rbind(ev_def[!TransitionGroupId %in% DF_GROUPS], complete_ages(sheet_to_events(dfl, ev_def, scl$Name)), fill = TRUE)
+# rows that differ from the method's preset (what the Fill button writes)
+ky <- function(x) x[, paste(StratumId, StateClassId, Disturbance, AgeMin, FromStockTypeId, ToStockTypeId)]
+d0 <- preset("disturbance-flows")[, `:=`(AgeMin = suppressWarnings(as.integer(AgeMin)), Share = as.numeric(Share))]; k0 <- ky(d0); k1 <- ky(dfl)
+diff_row <- (!k1 %in% k0) | abs(dfl$Share - d0$Share[match(k1, k0)]) > 1e-9; diff_row[is.na(diff_row)] <- TRUE
+lab <- dfl[diff_row, sprintf("%s%s%s%s %s -> %s %.4f", ifelse(k1[diff_row] %in% k0, "", "+ "), ifelse(is.na(StratumId), "", paste0(StratumId, " / ")),
+                             ifelse(is.na(StateClassId), "", paste0(sub("^Forest: ", "", StateClassId), " ")), Disturbance, FromStockTypeId, ToStockTypeId, Share)]
+say("Disturbance Flows: %d rows from %s; vs the %s preset %d changed or added (+), %d removed%s", nrow(dfl), df_src, basename(preset_dir), sum(diff_row), sum(!k0 %in% k1),
+    if (length(lab)) paste0(": ", paste(head(lab, 12), collapse = "; "), if (length(lab) > 12) "; ..." else "") else "")
 fsh <- as.data.table(datasheet(scn, ds("FireSnagShare"), optional = TRUE, lookupsAsFactors = FALSE))
-fss <- if (nrow(fsh)) fsh[, .(Stratum = as.character(StratumId), StateClass = as.character(StateClassId), Share = as.numeric(Share))] else
-  read_default("spinup", "fire-snag-share.csv")[, .(Stratum = NA_character_, StateClass = scl$Name[match(StateClassId, scl$Id)], Share = as.numeric(Share))][!is.na(StateClass)]
+if (!ca_filled) fsh <- preset("fire-snag-share")   # filled scenario: an empty sheet = no per-type shares
+fss <- if (nrow(fsh)) fsh[, .(Stratum = if ("StratumId" %in% names(fsh)) as.character(StratumId) else NA_character_, StateClass = as.character(StateClassId), Share = as.numeric(Share))] else
+  data.table(Stratum = character(), StateClass = character(), Share = numeric())
 if (anyDuplicated(fss[, .(Stratum, StateClass)])) fail("Fire Snag Share: more than one row for a forest type and ecodivision")
 ev_all <- fire_snag_rows(ev_all, fss)
-say("High-severity fire snag share by forest type (%s): %s", if (nrow(fsh)) "Carbon Assumptions" else "package defaults",
+say("High-severity fire snag share by forest type (%s): %s", if (ca_filled) "Carbon Assumptions" else paste("the", basename(preset_dir), "preset"),
     if (nrow(fss)) paste(sprintf("%s%s %.2f", ifelse(is.na(fss$Stratum), "", paste0(fss$Stratum, " / ")), sub("^Forest: ", "", fss$StateClass), fss$Share), collapse = ", ") else "none (the event table's rows for every type)")
 eb <- event_balance(ev_all, cells)
 check(STAGE, "high-severity fire and clearcut move at most each pool's whole stock", eb$v <= 1 + 1e-4, sprintf("largest share %.4f (%s)", eb$v, eb$what))
@@ -187,21 +212,12 @@ t0 <- Sys.time(); cl <- parallel::makeCluster(max(1, min(30, parallel::detectCor
 parallel::clusterExport(cl, c("ctx", "dat", "cells", "all_cells"), envir = environment())
 pkgdir <- env$PackageDirectory; parallel::clusterExport(cl, "pkgdir", envir = environment())
 invisible(parallel::clusterEvalQ(cl, { library(data.table); for (f in c("flows.R", "dom.R", "calibrate.R")) source(file.path(pkgdir, "src", f)) }))
-# Carbon Options: which dead-pool decay rates are calibrated (1: snags, down wood and floor to FIA, soil to gSSURGO; 2: FIA dead pools,
-# CBM-default soil; 3: CBM defaults, no calibration - the CONUS 1km build's way). A pool that is not calibrated keeps multiplier 1.
-# 4 (default from 2026-10-27, to-do 19): measured dead wood - src/calibrate.R cal_fit_measured; needs the FIA DataMart Folder with the
-# <ST>_COND_DWM_CALC tables, else falls back to 1.
-copt <- read_ds("CarbonOptions"); dm <- copt$DeadOrganicMatterModel[1]
-dom_mode <- if (is.null(dm) || is.na(dm)) 4L else if (is.numeric(dm)) as.integer(dm) else if (grepl("^Measured", dm)) 4L else if (grepl("^Calibrated", dm)) 1L else if (grepl("^FIA (dead|condition)", dm)) 2L else if (grepl("^CBM default", dm)) 3L else NA_integer_
-if (is.na(dom_mode)) fail("Carbon Options: unrecognised Dead Organic Matter Decay choice '%s'", dm)
 dw <- NULL
 if (dom_mode == 4L) {
   dmf <- tryCatch(read_data_sources("FiaDataMartFolder")$FiaDataMartFolder, error = function(e) NA_character_)
   if (length(dmf) && !is.na(dmf) && nzchar(dmf) && dir.exists(dmf)) dw <- fia_dead_wood(dmf, fia_datamart(dmf, src$EcodivisionFile))
-  if (is.null(dw)) { say("Carbon Options: measured dead wood needs the FIA DataMart Folder (Data Sources) with <ST>_COND_DWM_CALC.csv tables - using the FIA condition-pool calibration instead"); dom_mode <- 1L }
+  if (is.null(dw)) fail("Carbon Method: FIA measured dead wood needs the FIA DataMart Folder (Data Sources) with the <ST>_COND_DWM_CALC.csv tables - set it, or choose CBM defaults")
 }
-say("Carbon Options: dead organic matter decay = %s", c("calibrated to FIA condition pools (snags, down wood, floor; soil to gSSURGO)", "FIA condition pools, CBM-default soil",
-                                                        "CBM defaults (no calibration)", "measured dead wood (FIA down woody material, mature stands; regional decay; soil to gSSURGO)")[dom_mode])
 fc <- ft <- list(); red <- numeric()
 cells[, `:=`(snag_fall = NA_real_, SnagFallSource = NA_character_, mplots = NA_integer_, m_fwd = NA_real_, m_litter = NA_real_, m_duff = NA_real_)]
 cells[, FireSnagShare := fss$Share[match(StateClass, fss$StateClass)]]
@@ -269,7 +285,7 @@ mult_i <- function(i) if (dom_mode %in% 3:4) list(snag = cells$m_snag[i], cwd = 
   list(snag = cells$m_snag[i], cwd = cells$m_cwd[i], floor = cells$m_floor[i])
 w_i <- function(i) if (is.na(cells$clearcut[i])) 0 else cells$clearcut[i]     # uncalibrated or measured: cycles of high-severity fire only
 parallel::clusterExport(cl, c("cells", "mult_i", "w_i", "dom_mode"), envir = environment())
-if (dom_mode %in% c(1L, 4L)) {
+if (soil_mode == 1L) {   # Soil Organic Carbon: gSSURGO
   free <- which(is.na(cells$fx_soil)); cells[, m_soil := NA_real_]
   if (length(free)) cells[free, m_soil := unlist(parallel::parLapply(cl, free, function(i) cal_soil(cells[i], ctx, mult_i(i), w_i(i))))]
   cells[, SoilSource := ifelse(is.na(m_soil), ifelse(is.na(soil_target), "Forest type median (no gSSURGO target)", "Forest type median (target unreachable)"), "gSSURGO target")]

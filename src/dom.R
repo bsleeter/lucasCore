@@ -154,7 +154,8 @@ fire_snag_rows <- function(events, shares) {
 # ---- Carbon Assumptions: Disturbance Flows (high-severity fire and clearcut) ------------------------------------------------------
 # A sheet row (ecodivision and forest type optional, disturbance, minimum stand age, from pool, to pool, share) is one event flow; a
 # row to "Atmosphere" is the carbon burned, written as ST-Sim's three gas rows (GAS_SPLIT, the shares of every LUCAS default row). The
-# flow type follows the destination: DOM or live pools = mortality, Atmosphere = emission of each gas, Forestry Sector = harvest.
+# flow type follows the pools, as in the LUCAS event table: live -> DOM = mortality, DOM -> DOM = DOM transfer (clearcut's felled snags),
+# Atmosphere = emission of each gas, Forestry Sector = harvest.
 DF_GROUPS <- c(`High-severity fire` = "Fire: High Severity [Type]", Clearcut = "Forest Harvest: Forest Clearcut [Type]")
 GAS_SPLIT <- c(CO2 = 0.9, CO = 0.09, CH4 = 0.01)
 # the default event rows of the two disturbances as sheet rows (gas rows merged into one Atmosphere row)
@@ -178,7 +179,9 @@ sheet_to_events <- function(x, template, classes) {
   atm <- x$ToStockTypeId == "Atmosphere"; n <- sum(atm)
   gas <- x[atm][rep(seq_len(n), each = 3)][, `:=`(to = rep(paste0("Atmosphere: ", names(GAS_SPLIT)), n), ft = rep(paste0("LULC: Emission Live ", names(GAS_SPLIT)), n),
                                                      v = Share * rep(GAS_SPLIT, n))]
-  rows <- rbind(x[!atm][, `:=`(to = ToStockTypeId, ft = ifelse(ToStockTypeId == "Forestry Sector", "LULC: Harvest Live", "LULC: Mortality Live"), v = Share)], gas)
+  rows <- rbind(x[!atm][, `:=`(to = ToStockTypeId, ft = data.table::fcase(ToStockTypeId == "Forestry Sector", "LULC: Harvest Live",
+                                                                        startsWith(FromStockTypeId, "DOM:") & startsWith(ToStockTypeId, "DOM:"), "LULC: Transfer DOM",
+                                                                        default = "LULC: Mortality Live"), v = Share)], gas)
   out <- template[rep(1L, nrow(rows))]; for (k in names(out)) data.table::set(out, j = k, value = NA_character_)
   out[, `:=`(FromStratumId = as.character(rows$StratumId), FromStateClassId = as.character(rows$StateClassId), FromAgeMin = as.character(rows$AgeMin),
              FromStockTypeId = rows$FromStockTypeId, ToStockTypeId = rows$to, TransitionGroupId = rows$grp, FlowTypeId = rows$ft, Multiplier = as.character(round(rows$v, 8)))]

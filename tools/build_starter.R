@@ -39,7 +39,9 @@ defaults_of <- function(sheet) { blk <- regmatches(xml, regexpr(sprintf('(?s)<da
   names(v) <- vapply(cols, att, "", a = "name"); as.data.frame(v[!vapply(v, is.null, TRUE)]) }
 bo <- defaults_of("BuildOptions"); bo$SecondarySourceId <- "States"; bo$TertiarySourceId <- "Federal Lands"
 saveDatasheet(B, bo, "lucasCore_BuildOptions")
-for (sh in c("ClimateOptions", "GrowthOptions", "CarbonOptions")) saveDatasheet(B, defaults_of(sh), paste0("lucasCore_", sh))
+for (sh in c("ClimateOptions", "GrowthOptions")) saveDatasheet(B, defaults_of(sh), paste0("lucasCore_", sh))
+# the carbon method sits with the carbon assumptions it governs (the Build takes it from that dependency)
+CA <- rsyncrosim::scenario(P, sc[Name == "Carbon Assumptions", ScenarioId][1]); saveDatasheet(CA, defaults_of("CarbonOptions"), "lucasCore_CarbonOptions")
 # the land cover crosswalks, editable per scenario (stage 5 logs any row that differs from this package default)
 xw <- data.table::fread(file.path(pkg, "defaults", "landcover", "land-cover-crosswalks.csv"), na.strings = "")
 saveDatasheet(B, as.data.frame(xw[, .(Source, Code, Description, StateClassId, Note)]), "lucasCore_LandCoverCrosswalk")
@@ -91,7 +93,7 @@ saveDatasheet(PS, data.frame(Surface = rw$Surface, Layer = list_label("RuleWeigh
 cat(sprintf("Projection defaults: %d transitions, %d allocation rows, %d covariates, %d rule weights\n",
             nrow(datasheet(PS, "lucasCore_ProjectionTransition")), nrow(datasheet(PS, "lucasCore_ProjectionAllocation")),
             nrow(datasheet(PS, "lucasCore_SuitabilityCovariate")), nrow(datasheet(PS, "lucasCore_RuleWeight"))))
-for (sh in c("BuildOptions", "ClimateOptions", "GrowthOptions", "CarbonOptions")) { cat(sh, ": "); x <- datasheet(B, paste0("lucasCore_", sh), lookupsAsFactors = FALSE)
+for (sh in c("BuildOptions", "ClimateOptions", "GrowthOptions", "CarbonOptions")) { cat(sh, ": "); x <- datasheet(if (sh == "CarbonOptions") CA else B, paste0("lucasCore_", sh), lookupsAsFactors = FALSE)
   cat(paste(names(x), unlist(lapply(x[1, ], as.character)), sep = " = ", collapse = "; "), "\n") }
 unlink(paste0(f, c(".temp", ".backup")), recursive = TRUE)
 cat("starter:", f, "\n"); print(as.data.table(scenario(L, summary = TRUE))[, .(ScenarioId, Name, IsResult)])

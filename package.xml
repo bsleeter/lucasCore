@@ -411,8 +411,12 @@
 		<column name="TransferToBGSlow" displayName="Transfer to BG Slow (/yr; AG Slow only)" dataType="Double" format="0.0000" isOptional="True"/>
 	</dataSheet>
 
-	<dataSheet name="CarbonOptions" displayName="Carbon Options" isSingleRow="True" viewClassName="lucasCoreUI.CarbonOptionsView" viewClassAssembly="lucasCoreUI">
-		<column name="DeadOrganicMatterModel" displayName="Dead Organic Matter Decay" dataType="Integer" validationType="List" formula1="4:Measured dead wood (FIA down woody material, mature stands; regional decay; soil to gSSURGO)|1:Calibrated to FIA condition pools (soil to gSSURGO)|2:FIA condition pools, CBM-default soil|3:CBM defaults (no calibration)" defaultValue="4"/>
+	<dataSheet name="CarbonOptions" displayName="Carbon Method" isSingleRow="True" viewClassName="lucasCoreUI.CarbonOptionsView" viewClassAssembly="lucasCoreUI">
+		<!-- 2026-10-28 (user): two dead organic matter methods on the page; the FIA condition-pool options 1 and 2 stay in this list (older libraries hold them, and a value missing from the list cannot even be read) but are not offered (stage 3 still
+		     reads them in older libraries). Soil organic carbon is its own choice (blank = gSSURGO with measured dead wood, CBM with CBM
+		     defaults, as before); SoilGrids is planned as a third. -->
+		<column name="DeadOrganicMatterModel" displayName="Dead Organic Matter" dataType="Integer" validationType="List" formula1="4:FIA measured dead wood (down woody material and snags in mature stands)|3:CBM defaults (no calibration)|1:FIA condition pools (older option)|2:FIA condition pools, CBM-default soil (older option)" defaultValue="4"/>
+		<column name="SoilCarbonModel" displayName="Soil Organic Carbon" dataType="Integer" validationType="List" formula1="1:gSSURGO (soil decay calibrated to its soil organic carbon)|2:CBM defaults (soil from the spin-up)" isOptional="True"/>
 	</dataSheet>
 
 	<dataSheet name="LandCoverCrosswalk" displayName="Land Cover Crosswalks" viewClassName="lucasCoreUI.LandCoverCrosswalkView" viewClassAssembly="lucasCoreUI">
@@ -895,9 +899,9 @@
 			<item name="StudyArea"/>
 			<item name="BuildOptions"/>
 			<item name="ClimateOptions"/>
-			<item name="CarbonOptions"/>
 			<item name="GrowthOptions"/>
 			<group name="lucasCoreCarbonAssumptions" displayName="Carbon Assumptions">
+				<item name="CarbonOptions"/>
 				<item name="CbmCrosswalk"/>
 				<item name="LiveTurnover"/>
 				<item name="DomParameter"/>

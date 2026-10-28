@@ -1,0 +1,2 @@
+MatureAge,ExclusionYears,MinPlotsOwnFit,MinSnagsOwnRate,MinPlotsConditionPools,MultiplierMin,MultiplierMax,SoilMultiplierMin,SoilMultiplierMax
+60,30,30,200,200,0.05,20,0.02,50

@@ -134,3 +134,18 @@ calibrated, measured, user).
   check skips them. Mature age per forest type is not in yet (one value). Test: tests/phaseZ13-decay-settings.R (defaults reproduce
   phaseZ7 exactly; mature age 80 / 20 yr: 101,001 vs 126,465 mature plots; min snags 500: 90 vs 120 cells with their own fall rate;
   max 10 caps every calibrated multiplier; fixed snag 1 gives mixed conifer the CBM snag decay rates).
+- 2026-10-28 **Carbon Method with presets** (user decisions: two methods, FIA measured dead wood and CBM defaults; soil organic carbon kept
+  as its own choice, gSSURGO or CBM, SoilGrids planned). Carbon Options moved from the Build into Carbon Assumptions as the Carbon Method
+  page (first in the group): dead organic matter (4 FIA measured, 3 CBM; 1 and 2 stay in the list for older libraries - a value missing
+  from a list cannot be read - but are not offered), Soil Organic Carbon (new column; blank = gSSURGO with FIA, CBM with CBM), and a Fill
+  button that loads defaults/carbon-assumptions/<method>/<sheet>.csv into all eight sheets (tools/make_carbon_presets.R writes them:
+  fia-measured = fitted fire/clearcut flows, fitted snag shares, settings written out; cbm-defaults = the LUCAS CONUS 1km fire/clearcut
+  flows, restored as defaults/stockflow/event-pathways-lucas.csv, no snag shares, no settings). A scenario never filled (CBM Crosswalk,
+  DOM Parameters and Disturbance Flows all empty) runs with the method's preset rows; once filled, an empty Fire Snag Share means none.
+  tools/carbon-assumptions.R (new-library, sync-library, starter) fills from the same files, only when the scenario is unfilled. Stage 3
+  stops if FIA measured dead wood has no FIA DataMart Folder (no silent fallback to condition pools). Flow types follow the pools as in
+  the LUCAS table: DOM -> DOM is LULC: Transfer DOM. Precedence measured (phaseZ14): a scenario's own Carbon Method wins, else the first
+  dependency with rows - so leave it unset on the Build (the starter no longer sets it there). Tests: tests/unit-carbon-assumptions.R
+  (no SyncroSim, 1 s) and tests/phaseZ14-carbon-method.R (empty FIA = filled FIA exactly; empty CBM = filled CBM; CBM writes the LUCAS
+  rows; gSSURGO soil with CBM dead wood). Running scenarios of one library at once from separate R processes or one multi-scenario
+  console call failed (database locked / exit 65535): a follow-up.

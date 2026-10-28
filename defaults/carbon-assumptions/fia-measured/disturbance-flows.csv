@@ -1,0 +1,40 @@
+StratumId,StateClassId,Disturbance,AgeMin,FromStockTypeId,ToStockTypeId,Share
+,,High-severity fire,,Biomass: Coarse Root,DOM: Aboveground Fast,0.475
+,,Clearcut,,Biomass: Coarse Root,DOM: Aboveground Fast,0.5
+,,High-severity fire,,Biomass: Coarse Root,DOM: Belowground Fast,0.475
+,,Clearcut,,Biomass: Coarse Root,DOM: Belowground Fast,0.5
+,,High-severity fire,,Biomass: Fine Root,Atmosphere,0.08
+,,High-severity fire,,Biomass: Fine Root,DOM: Aboveground Very Fast,0.435
+,,Clearcut,,Biomass: Fine Root,DOM: Aboveground Very Fast,0.5
+,,High-severity fire,,Biomass: Fine Root,DOM: Belowground Very Fast,0.435
+,,Clearcut,,Biomass: Fine Root,DOM: Belowground Very Fast,0.5
+,,Clearcut,,Biomass: Foliage,DOM: Aboveground Very Fast,0.04
+,,Clearcut,,Biomass: Foliage,Atmosphere,0.96
+,,Clearcut,,Biomass: Merchantable,DOM: Aboveground Medium,0.03
+,,Clearcut,,Biomass: Merchantable,Forestry Sector,0.97
+,,Clearcut,,Biomass: Other Wood,DOM: Aboveground Fast,0.04
+,,Clearcut,,Biomass: Other Wood,Atmosphere,0.96
+,,High-severity fire,,DOM: Aboveground Fast,Atmosphere,0.79
+,,High-severity fire,,DOM: Aboveground Medium,Atmosphere,0.24
+,,High-severity fire,,DOM: Aboveground Slow,Atmosphere,0.8
+,,High-severity fire,,DOM: Aboveground Very Fast,Atmosphere,1
+,,High-severity fire,,DOM: Belowground Very Fast,Atmosphere,0.08
+,,High-severity fire,,DOM: Snag Branch,Atmosphere,0.68
+,,Clearcut,,DOM: Snag Branch,Atmosphere,0.6
+,,High-severity fire,,DOM: Snag Stem,Atmosphere,0.12
+,,Clearcut,,DOM: Snag Stem,Atmosphere,0.6
+,,High-severity fire,0,Biomass: Foliage,Atmosphere,0.89
+,,High-severity fire,0,Biomass: Foliage,DOM: Aboveground Very Fast,0.09
+,,High-severity fire,0,Biomass: Merchantable,Atmosphere,0.61
+,,High-severity fire,0,Biomass: Merchantable,DOM: Snag Stem,0.37
+,,High-severity fire,0,Biomass: Other Wood,Atmosphere,0.64
+,,High-severity fire,0,Biomass: Other Wood,DOM: Snag Branch,0.34
+,,High-severity fire,11,Biomass: Foliage,Atmosphere,0.69
+,,High-severity fire,11,Biomass: Foliage,DOM: Aboveground Very Fast,0.29
+,,High-severity fire,11,Biomass: Merchantable,Atmosphere,0.35
+,,High-severity fire,11,Biomass: Merchantable,DOM: Snag Stem,0.65
+,,High-severity fire,11,Biomass: Other Wood,Atmosphere,0.7
+,,High-severity fire,11,Biomass: Other Wood,DOM: Snag Branch,0.3
+,,Clearcut,,DOM: Aboveground Very Fast,Atmosphere,0.29
+,,Clearcut,,DOM: Aboveground Slow,Atmosphere,0.29
+,,Clearcut,,DOM: Aboveground Medium,Atmosphere,0.5
