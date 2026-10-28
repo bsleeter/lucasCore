@@ -76,3 +76,8 @@ found along the way are batched here and fixed while Studio is closed (the page 
   annotated, NOT yet in the guide) has the RUN result [6] as the dependency, not the Build result: stage 13 then has no Historical
   Transition Summary and Figure 6 shows bars only. PENDING: re-grab 5.6a with the Build result [2] as dependency and 5.6b Run
   Figures options with Id 6 (Figure 5.14 still shows result 9), then rerun.
+- 5.6 again (2026-10-28): user re-made the dependency as the Build result [2] and Run = 6; Run Figures result 9 (1:12; result 8
+  deleted) draws Figure 6 with the record points (same totals as 5.5). Figures 5.13 (pipeline, cropped to the page, mark 29 on the
+  tab) and 5.14 (Build dependency 30, Run Figures 33, Id 6 34) re-grabbed; step 1 now New > Scenario on the Figures folder,
+  "Historical Run Figures". Figures 5.16-5.18 re-uploaded from result 9 (header now the study area name; with the run as dependency
+  it read CONUS). Chapter 5 done except Figure 5.15 (Export, still old library) if it should be re-grabbed.

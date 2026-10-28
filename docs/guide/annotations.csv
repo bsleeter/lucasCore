@@ -23,9 +23,6 @@ File,Step,X,Y,W,H
 4.4e-export.png,11,500,848,82,30
 4.4f-run-done.png,,1652,246,120,28
 4.4f-run-done.png,,1826,246,84,28
-5.6b-run-figures-options.png,30,153,411,437,25
-5.6b-run-figures-options.png,33,624,304,282,27
-5.6b-run-figures-options.png,34,927,247,1148,30
 5.6c-export-run-figures.png,35,177,934,82,30
 5.6c-export-run-figures.png,36,105,1087,469,25
 5.6c-export-run-figures.png,37,487,971,84,30
@@ -212,7 +209,9 @@ File,Step,X,Y,W,H
 5.3a-spatial-multiprocessing.png,21,667,272,290,30
 5.3a-spatial-multiprocessing.png,22,1000,302,883,34
 5.4a-jobs-running.png,28,588,658,1334,166
-5.6a-run-figures-pipeline.png,29,128,321,230,24
-5.6a-run-figures-pipeline.png,30,177,381,292,24
+5.6a-run-figures-pipeline.png,29,530,163,235,28
 5.6a-run-figures-pipeline.png,31,505,276,313,26
 5.6a-run-figures-pipeline.png,32,897,278,1209,30
+5.6b-run-figures-options.png,30,177,381,356,24
+5.6b-run-figures-options.png,33,574,305,298,27
+5.6b-run-figures-options.png,34,895,246,1211,30
