@@ -7,7 +7,7 @@
 	<!-- PROJECT DATASHEETS                                                                                  -->
 	<!-- =================================================================================================== -->
 
-	<dataSheet name="DataSource" displayName="Data Sources (national data on disk)" dataScope="Project" isSingleRow="True" viewClassName="lucasCoreUI.DataSourcesView" viewClassAssembly="lucasCoreUI">
+	<dataSheet name="DataSource" displayName="Data Sources" dataScope="Project" isSingleRow="True" viewClassName="lucasCoreUI.DataSourcesView" viewClassAssembly="lucasCoreUI">
 		<!-- plain paths: these files are GBs and are read, never copied into the library; an empty sheet uses the defaults -->
 		<column name="EcodivisionFile" displayName="FIA Ecodivisions (dissolved; fields StrtmId, StrtmNm) - primary strata and model lattice" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FIA/EcoDivision_map/EcoDivisions_Dissolve.shp"/>
 		<column name="FiaConditionFile" displayName="FIA Condition Carbon and Merchantable Volume (USGS .Rds)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FIA/USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds"/>
@@ -50,7 +50,7 @@
 		<column name="Runs" displayName="Replicates by Scenario" dataType="String" isOptional="True"/>
 	</dataSheet>
 
-	<dataSheet name="ClimateReplicate" displayName="Climate Replicates (LOCA2 ensemble members)" dataScope="Project" displayMember="Name">
+	<dataSheet name="ClimateReplicate" displayName="Climate Replicates (LOCA2)" dataScope="Project" displayMember="Name">
 		<!-- every ensemble member found under the LOCA2 folder (ui/Loca2Lists.cs; tools/new-library.R) -->
 		<column name="Name" displayName="Ensemble Member" dataType="String"/>
 		<column name="Runs" displayName="Models and Scenarios" dataType="String" isOptional="True"/>
@@ -66,7 +66,7 @@
 		<column name="Description" displayName="Rates it sets" dataType="String" isOptional="True"/>
 	</dataSheet>
 
-	<dataSheet name="StratumSource" displayName="Stratum Sources (study areas, secondary and tertiary strata)" dataScope="Project" displayMember="Name">
+	<dataSheet name="StratumSource" displayName="Stratum Sources" dataScope="Project" displayMember="Name">
 		<!-- written by tools/new-library.R from defaults/strata/presets.csv; add a custom row and run new-library.R with the rebuild-strata flag.
 		     The stsim Secondary and Tertiary Strata lists hold every unit of every row (stages cannot write project lists). -->
 		<column name="Name" displayName="Source" dataType="String"/>
