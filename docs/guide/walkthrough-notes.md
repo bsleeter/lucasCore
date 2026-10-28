@@ -18,7 +18,13 @@ found along the way are batched here and fixed while Studio is closed (the page 
    (COND_DWM_CALC tables). Reword in defaults/library/data-sources.csv.
 5. DONE with 2. Was: **Navigation pane too narrow on the project pages**: "Data Sources (national da", "Stratum Sources (study ar"... (see 2).
 
+6. **Build Options: empty gap in the Strata group** (3.3 grab): the group is twice as tall as its two drop-downs and note.
+7. **Build tree label cut off**: "Fitted Curves (written by the ..." in the scenario's LUCAS Core pane. Shorten the group's displayName.
+8. **Build Options tiles note lags the box**: typing 5 still showed "8 tiles ..." until the box loses focus. Update the note as the number changes.
 ## Guide sections done
+9. **Growth Curve Options says "FIA DataMart"**: the FIA data choice reads "FIA DataMart (state CSVs)" and its note "FIA DataMart Folder"; Data Sources now calls it FIA CONUS. Rename here too.
+10. **Growth Curve Options number formats**: Maximum fitted lag shows 40.0000 (years: no decimals); lambda 0.0100 is fine.
+11. **Carbon Method: warn when the method changes after Fill**: picking CBM defaults on a page filled with the FIA rows keeps those rows (fitted fire flows, snag shares) - show a line "the sheets hold the FIA measured dead wood rows; press Fill to switch" (the guide says so in 3.6 for now). Needs the page to remember which method filled it (e.g. a hidden FilledWith column).
 
 - 1.2: new Figure 1.6 (the new library in the Explorer); step 4 names the folder and library.
 - 1.3: Figures 1.7-1.11 re-grabbed; new Figure 1.12 (CBM Ecozones) with steps 4-5.
@@ -31,3 +37,7 @@ found along the way are batched here and fixed while Studio is closed (the page 
 
 - Refine the Data Sources page further when building the Data Download stage (to-do 12). Path boxes are still on the narrow side in a
   wide window: SizePaths reserves the navigation pane's width too (ClientSize is the whole page).
+- 3.1: Figures 3.1-3.2 re-grabbed (name P26 - Build, new description); 3.2 Figure 3.3 and 3.4 Figure 3.5 re-grabbed.
+- 3.3: new subsection 3.3.1 Modal or Area-matched (table of P26 numbers from the 2026-10-25 exploration, docs/ui-improvements.md item 8); step 6 now says Area-matched for P26. CHECK the table against the new P26 Build's stage 5 log (area in the wrong class, developed area) once it has run.
+- DECISION (user, 2026-10-28): Carbon Assumptions are set on the Build itself in the guide (no separate scenario, no dependency); the shared scenario becomes an advanced option in 3.6. Guide 3.1 description and pipeline note updated; Figure 3.1's description still says 'Dependencies: Carbon Assumptions' - re-grab. Update docs/carbon-build-process.md step 3 to match.
+- 3.5 Growth Curve Options (Figure 3.6, step 4 FIA data); 3.6 Carbon Assumptions written on the Build (Figures 3.7-3.11, table of the eight pages; separate scenario as an advanced note); Figure 3.1 re-grabbed with the Build-only description; Land Cover Crosswalks now Figure 3.12.
