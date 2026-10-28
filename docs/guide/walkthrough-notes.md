@@ -65,7 +65,7 @@ found along the way are batched here and fixed while Studio is closed (the page 
 - 5.4-5.5 (2026-10-28): historical result 6 (5 Build tiles, 20.0-20.2% of cells each) ran 2:51:03 (create 0:04, jobs 2:43:03, merge
   7:55); 2,207 files, 4.3 GB, library 1.5 GB. Table and paragraph updated. FINDING: the three 17-county runs in the Demo Library
   (results 8, 9, 14) took 2:19-2:28 (jobs 2:04-2:12, merge 15 min) with the same largest job (Plumas 19.8%), so 5 balanced tiles
-  were ~35 min SLOWER on this 64-core machine - contention among 5 equal jobs (or larger per-job extents) is the likely cause, not
-  verified. The guide's tile advice (5.3 step 9, the balanced-tiles paragraph, 6.2 step 9, to-do 22) needs a decision. 5.5 Carbon
+  took ~30 min longer, BUT the user had another bandwidth-heavy process running (2026-10-28), so not a clean test; user
+  does not expect 5 tiles to be faster (both wait on ~20% of cells); the gain is memory (5 jobs, not 17) and merge (8 vs 15 min). Guide says so. 5.5 Carbon
   paragraph now 439.3 -> 466.7 (2019) -> 444.3 Tg C (+5.0), fire-year losses 9.3 / 14.3. PENDING: 5.5 transition and developed-land
   numbers, 5.6 Run Figures re-run on result 6 (Figures 5.13-5.18 and their captions).
