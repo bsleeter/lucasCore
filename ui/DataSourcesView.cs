@@ -65,10 +65,10 @@ namespace lucasCoreUI
             {
                 List<Entry> es = m_entries.Where(e => e.Category == cat).ToList();
                 if (es.Count == 0) continue;
-                // fixed name and path widths, so every group's columns line up
+                // a fixed name width, and path boxes all sized together to the window (SizePaths), so every group's columns line up
                 var t = new TableLayoutPanel { AutoSize = true, ColumnCount = 5 };
                 t.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, NameWidth));
-                t.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, PathWidth));
+                t.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
                 t.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
                 t.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
                 t.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
@@ -76,10 +76,20 @@ namespace lucasCoreUI
                 AddGroup(Group(cat, t));
             }
             EndGroups();
+            this.Resize += (s, a) => SizePaths();
             this.ResumeLayout(false);
+            SizePaths();
         }
 
-        private const int NameWidth = 330, PathWidth = 560;
+        // name column, and the room the buttons, mark, group borders and scroll bar take beside the path box
+        private const int NameWidth = 280, Beside = 330, MinPath = 220;
+
+        // every path box takes the width the window leaves (at least MinPath), so Browse and Download stay in view
+        private void SizePaths()
+        {
+            int w = Math.Max(MinPath, this.ClientSize.Width - NameWidth - Beside);
+            foreach (Entry e in m_entries) if (e.Path != null && e.Path.Width != w) e.Path.Width = w;
+        }
         private readonly ToolTip m_tip = new ToolTip { AutoPopDelay = 20000 };
 
         // the dataset's name without the detail its column name carries in brackets or after " - " (that goes in the tooltip)
@@ -100,7 +110,7 @@ namespace lucasCoreUI
             cell.Controls.Add(name);
             if (e.Note != null) cell.Controls.Add(new Label { Text = e.Note, AutoSize = true, MaximumSize = new Size(NameWidth - 12, 0), Tag = Fit.Fixed, ForeColor = SystemColors.GrayText, Margin = new Padding(3, 1, 3, 0) });
             m_tip.SetToolTip(name, displayName + (e.Source != null ? Environment.NewLine + "Source: " + e.Source : "") + (e.Url != null ? Environment.NewLine + e.Url : ""));
-            e.Path = new TextBox { Width = PathWidth - 6, Anchor = AnchorStyles.Left | AnchorStyles.Right, Margin = new Padding(3, 4, 3, 3) };
+            e.Path = new TextBox { Width = MinPath, Anchor = AnchorStyles.Left, Margin = new Padding(3, 4, 3, 3) };
             var browse = new Button { Text = "Browse...", AutoSize = true, Margin = new Padding(3, 3, 3, 3) };
             var download = new Button { Text = "Download", AutoSize = true, Margin = new Padding(3, 3, 3, 3), Enabled = !string.IsNullOrEmpty(e.Url) };
             if (download.Enabled)
@@ -141,6 +151,8 @@ namespace lucasCoreUI
             {
                 string v = Show(Value(e.Column)).Trim();
                 e.Path.Text = v;
+                if (!e.Path.Focused) { e.Path.SelectionStart = v.Length; e.Path.ScrollToCaret(); }   // a long path shows its end (the file or folder name)
+                m_tip.SetToolTip(e.Path, v);
                 bool exists = false;
                 try { exists = v.Length > 0 && (File.Exists(v) || Directory.Exists(v)); } catch (Exception) { }
                 if (v.Length == 0)
