@@ -28,9 +28,9 @@ Open items added 2026-10-29, in order (they come before 9-14):
 | later | 26 Guide chapter 10, Troubleshooting | After beta testing (user) | - |
 | 4 | 22 Automatic spatial tiles | Proposed; P26 historical run is done, so package edits are no longer blocked by it | - |
 | 5 | 27 Scenarios of one library at once from R | Test speed (database locked) | - |
-| 6 | 29 Growth Inputs sheet | Last Carbon Assumptions sheet; changes inputs, so before any P26 freeze | - |
-| 7 | 28 Mature age per forest type | Changes the decay calibration | - |
-| 8 | 30 Rate read-out | Shows the final rates; easiest once 28 and 29 settle what goes in | 28, 29 |
+| 6 | 29 Growth Inputs sheet | Last Carbon Assumptions sheet; exposes package defaults, results unchanged unless a user edits it | - |
+| 7 | 28 Mature age per forest type | Optional per-type rows; blank = the single age (60), so results unchanged by default | - |
+| 8 | 30 Rate read-out | Output only, changes nothing; easiest once 28 and 29 settle what goes in | 28, 29 |
 | 9 | 31 Copy Carbon Assumptions; SoilGrids | Convenience and one more soil option | - |
 | 10 | 32 Carbon open science issues | Needs the user's look at the snag inputs | - |
 | any | 33 Leftovers inside done items | Small, independent | - |
