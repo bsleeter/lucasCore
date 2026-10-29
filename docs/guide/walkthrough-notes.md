@@ -104,3 +104,6 @@ found along the way are batched here and fixed while Studio is closed (the page 
 - 2026-10-28 projection [12] -> result [13]: 2:00:37 (jobs 1:54:51, merge 5:39), 5 tiles. 2024-2050: fire 9,943 km2 (2025 1,514; 2031 3,602),
   harvest 1,729, urbanization 172 km2. Total Ecosystem 443.2 (2023) -> 431.1 (2031) -> 445.1 Tg C (2050). Hand-over 443.2 vs historical
   444.3 (-0.24%, all in DOM: Soil 178.19 vs 179.28). 7.2 timing + hand-over text updated; Figures 7.8-7.11 wait on a projection Run Figures run.
+- 7.2 figures (2026-10-28): Run Figures [14] -> result [15] (run 13, dep Build 2; 1:25; joined to historical run 6, hand-over pass -0.24%).
+  Figures 7.8-7.11 replaced with its Fig01/06/07/08 PNGs; captions: 418 km2 urbanized, 3,194 km2 harvested; fire draws 1,514/3,602 km2;
+  carbon 439 -> 445 Tg C, 2031 about -9 Tg C; NBP mean +0.11 Tg C/yr. Chapter 7.2 done.
