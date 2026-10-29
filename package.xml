@@ -657,6 +657,39 @@
 		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer" isOptional="True"/>
 	</dataSheet>
 
+	<dataSheet name="CompareRunOptions" displayName="Compare Runs">
+		<!-- stage 14: the runs to compare, one row each (result scenario Ids in this library); the scenario depends on their Build result -->
+		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer"/>
+		<column name="Label" displayName="Label (blank = the scenario's name)" dataType="String" isOptional="True"/>
+		<column name="Colour" displayName="Colour (#rrggbb; blank = the default palette)" dataType="String" isOptional="True"/>
+		<column name="Baseline" displayName="Baseline (the run the others are compared with; none ticked = the first projection)" dataType="Boolean" isOptional="True"/>
+	</dataSheet>
+
+	<dataSheet name="OutputCompareFigure" displayName="Compare Figures (PNG)">
+		<!-- stage 14: one row per comparison figure (src/compare-figures.R); Export > LUCAS Core > Compare Figures saves them all to a folder -->
+		<column name="Figure" dataType="Integer"/>
+		<column name="Title" dataType="String"/>
+		<column name="Caption" dataType="String"/>
+		<column name="FileName" displayName="Figure (PNG)" dataType="String" isExternalFile="True" isRaster="False" externalFileFilter="PNG Files (*.png)|*.png"/>
+	</dataSheet>
+
+	<dataSheet name="OutputCompareSummary" displayName="Compare Summary">
+		<!-- stage 14: one row per run compared - total ecosystem carbon (Tg C), mean net biome productivity (Tg C/yr), transition areas (km2) -->
+		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer"/>
+		<column name="Label" dataType="String"/>
+		<column name="Role" displayName="Role (History, Baseline or Run)" dataType="String"/>
+		<column name="StartYear" dataType="Integer"/>
+		<column name="EndYear" dataType="Integer"/>
+		<column name="CarbonStart" displayName="Total ecosystem carbon, start (Tg C)" dataType="Double"/>
+		<column name="CarbonEnd" displayName="Total ecosystem carbon, end (Tg C)" dataType="Double"/>
+		<column name="CarbonChange" displayName="Change (Tg C)" dataType="Double"/>
+		<column name="VsBaseline" displayName="End, minus the baseline's (Tg C)" dataType="Double" isOptional="True"/>
+		<column name="MeanNBP" displayName="Mean net biome productivity (Tg C/yr)" dataType="Double" isOptional="True"/>
+		<column name="Fire" displayName="Fire (km2)" dataType="Double"/>
+		<column name="Harvest" displayName="Forest harvest (km2)" dataType="Double"/>
+		<column name="Urbanization" displayName="Urbanization (km2)" dataType="Double"/>
+	</dataSheet>
+
 	<dataSheet name="OutputBuildFigure" displayName="Build Figures (PNG)">
 		<!-- stage 12: one row per publication figure (src/figures.R); Export > LUCAS Core > Build Figures saves them all to a folder -->
 		<column name="Figure" dataType="Integer"/>
@@ -878,6 +911,18 @@
 	<!-- export: every run figure to a folder -->
 	<transformer name="RunFiguresExport" displayName="Run Figures" dataSheet="OutputRunFigure" column="FileName" isFolderExport="True"/>
 
+	<transformer name="CompareRuns" displayName="14 - Compare Runs" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/14-compare-runs.R">
+		<dataSheet name="CompareRunOptions" type="Input"/>
+		<dataSheet name="StudyArea" type="Input"/>
+		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
+		<dataSheet name="OutputCompareFigure" type="Output"/>
+		<dataSheet name="OutputCompareSummary" type="Output"/>
+		<dataSheet name="OutputValidation" type="Both"/>
+	</transformer>
+
+	<!-- export: every comparison figure to a folder -->
+	<transformer name="CompareFiguresExport" displayName="Compare Figures" dataSheet="OutputCompareFigure" column="FileName" isFolderExport="True"/>
+
 	<!-- =================================================================================================== -->
 	<!-- LAYOUTS                                                                                           -->
 	<!-- =================================================================================================== -->
@@ -919,6 +964,7 @@
 				<item name="ProjectionClimate"/>
 			</group>
 			<item name="RunFigureOptions"/>
+			<item name="CompareRunOptions"/>
 			<group name="lucasCoreCrosswalks" displayName="Crosswalks">
 				<item name="LandCoverCrosswalk"/>
 			</group>
@@ -951,6 +997,8 @@
 				<item name="OutputGrowthReport"/>
 				<item name="OutputBuildFigure"/>
 				<item name="OutputRunFigure"/>
+				<item name="OutputCompareFigure"/>
+				<item name="OutputCompareSummary"/>
 				<item name="OutputValidation"/>
 			</group>
 		</group>
@@ -960,6 +1008,7 @@
 		<group name="lucasCoreExport" displayName="LUCAS Core">
 			<item name="BuildFiguresExport" displayName="Build Figures (PNG)"/>
 			<item name="RunFiguresExport" displayName="Run Figures (PNG)"/>
+			<item name="CompareFiguresExport" displayName="Compare Figures (PNG)"/>
 		</group>
 	</layout>
 
