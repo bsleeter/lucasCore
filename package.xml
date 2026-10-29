@@ -643,7 +643,7 @@
 		<column name="FileName" displayName="Report (PDF)" dataType="String" isExternalFile="True" isRaster="False" externalFileFilter="PDF Files (*.pdf)|*.pdf"/>
 	</dataSheet>
 
-	<dataSheet name="RunFigureOptions" displayName="Run Figures" isSingleRow="True">
+	<dataSheet name="RunFigureOptions" displayName="Run Figures" isSingleRow="True" viewClassName="lucasCoreUI.RunFiguresView" viewClassAssembly="lucasCoreUI">
 		<!-- stage 13: which ST-Sim run (a historical run or a projection) to draw; the scenario depends on the run's Build result -->
 		<column name="RunScenarioId" displayName="Run (result scenario Id in this library; blank = the newest ST-Sim result)" dataType="Integer" isOptional="True"/>
 	</dataSheet>
@@ -657,7 +657,7 @@
 		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer" isOptional="True"/>
 	</dataSheet>
 
-	<dataSheet name="CompareRunOptions" displayName="Compare Runs">
+	<dataSheet name="CompareRunOptions" displayName="Compare Runs" viewClassName="lucasCoreUI.CompareRunsView" viewClassAssembly="lucasCoreUI">
 		<!-- stage 14: the runs to compare, one row each (result scenario Ids in this library); the scenario depends on their Build result -->
 		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer"/>
 		<column name="Label" displayName="Label (blank = the scenario's name)" dataType="String" isOptional="True"/>
