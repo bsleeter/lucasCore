@@ -4,12 +4,12 @@ SyncroSim 3 add-on to ST-Sim (stsim 4.5.x) that builds LUCAS land-use and carbon
 curves, CBM carbon parameters, spatial initial conditions, historical transitions, climate multipliers and initial stocks.
 Version 1.0.0 (development). Plan: https://claude.ai/code/artifact/b04aa2f8-a1c2-4a73-99dc-672c8918139d
 
-- **[User Guide](https://claude.ai/artifact/Xt2xiTJxHnduXtCARdPYc9)**: a step-by-step walkthrough in SyncroSim Studio, from
-  installing the package to building, running and comparing models
-- **[Package blueprint](https://claude.ai/artifact/BduWuCphVT7BAR9EJGbTiz)**: the 15 stages, the scenarios they run in, and the
+- **[User Guide](https://bsleeter.github.io/lucasCore/guide/)**: a step-by-step walkthrough in SyncroSim Studio, from
+  installing the package to building, running and comparing models (also [in the repo](docs/guide/user-guide.md))
+- **[Package blueprint](https://bsleeter.github.io/lucasCore/blueprint/)**: the 15 stages, the scenarios they run in, and the
   datasheets they pass to each other and to ST-Sim ([static figure](docs/blueprint/lucascore-blueprint.png))
-- **[Data blueprint](https://claude.ai/artifact/EFND3BdVZQLVceTbWMjCSV)**: the national datasets in the Data Sources sheet, the
-  stages that read each one, and the setting that switches it ([static figure](docs/blueprint/lucascore-data-blueprint.png))
+- **[Data blueprint](https://bsleeter.github.io/lucasCore/blueprint/data.html)**: the national datasets in the Data Sources sheet,
+  the stages that read each one, and the setting that switches it ([static figure](docs/blueprint/lucascore-data-blueprint.png))
 
 ## Install (development)
 
