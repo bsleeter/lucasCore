@@ -58,7 +58,7 @@ svg.dim .stage.sel,svg.dim .stage.rel{opacity:1}
 <div class="wrap">
   <div class="intro">
     <h1>lucasCore blueprint</h1>
-    <p>Version {{VERSION}}: the {{NSTAGES}} stages, the scenarios they run in, and the datasheets they hand on to each other and to ST-Sim. Select a stage, in the drawing or below, to list every sheet it reads and writes.</p>
+    <p>Version {{VERSION}}: the {{N}} stages, the scenarios they run in, and the datasheets they hand on to each other and to ST-Sim. Select a stage, in the drawing or below, to list every sheet it reads and writes.</p>
   </div>
   <div class="figure">
 {{SVG}}
@@ -68,7 +68,7 @@ svg.dim .stage.sel,svg.dim .stage.rel{opacity:1}
   <p class="note">Built by docs/blueprint/build.R from package.xml. The Validation sheet, which every stage writes, is left out of the lists.</p>
 </div>
 
-<script type="application/json" id="stage-data">{{STAGES}}</script>
+<script type="application/json" id="stage-data">{{DATA}}</script>
 <script>
 (function () {
   const S = JSON.parse(document.getElementById('stage-data').textContent);

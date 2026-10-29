@@ -1,0 +1,510 @@
+<title>lucasCore Data Blueprint</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap">
+<style>
+/* layout: the wide lineage drawing (scrolls sideways on a phone), dataset and stage pickers, then the selection's details */
+:root{ --sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Consolas,'Courier New',monospace; --bg:#f4f6f6;--surface:#ffffff;--line:#cfd6d8;--ink:#17242a;--ink2:#34444b;--muted:#5f6e74;--edge:#3b4a51;--on:#ffffff;
+--setup:#56666e;--setup-t:#eceff0;--land:#2d7650;--land-t:#e4f1e9;--carbon:#94561f;--carbon-t:#f7ece2;--climate:#2b679a;--climate-t:#e3edf6;--fig:#6a5293;--fig-t:#eee9f5; }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#101619;--surface:#172024;--line:#304048;--ink:#e3eaec;--ink2:#c3cfd3;--muted:#8fa0a6;--edge:#a8b7bc;--on:#101619;
+--setup:#9eb0b8;--setup-t:#1f2a2f;--land:#6dc59b;--land-t:#15291f;--carbon:#e3a46d;--carbon-t:#2d2118;--climate:#79b3e3;--climate-t:#15253a;--fig:#b9a0e6;--fig-t:#251f33; color-scheme:dark } }
+:root[data-theme="dark"]{ --bg:#101619;--surface:#172024;--line:#304048;--ink:#e3eaec;--ink2:#c3cfd3;--muted:#8fa0a6;--edge:#a8b7bc;--on:#101619;
+--setup:#9eb0b8;--setup-t:#1f2a2f;--land:#6dc59b;--land-t:#15291f;--carbon:#e3a46d;--carbon-t:#2d2118;--climate:#79b3e3;--climate-t:#15253a;--fig:#b9a0e6;--fig-t:#251f33; color-scheme:dark }
+body{background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans)}
+.wrap{max-width:1640px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:18px}
+.intro{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px}
+.intro h1{font:700 20px/1.2 var(--sans);margin:0;text-wrap:balance}
+.intro p{margin:0;color:var(--muted);max-width:72ch}
+.figure{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.figure svg{display:block;width:100%;min-width:1120px;height:auto}
+
+.bg{fill:var(--bg)} .box{fill:var(--surface);stroke:var(--line);stroke-width:1}
+.h1{font:700 22px var(--sans);fill:var(--ink)} .sub{font:400 12px var(--sans);fill:var(--muted)}
+.eyebrow{font:500 9.5px var(--mono);letter-spacing:.08em;fill:var(--muted)} .sname{font:700 14px var(--sans);fill:var(--ink)}
+.ghead{font:600 9px var(--mono);letter-spacing:.08em;fill:var(--muted)} .gt{font:600 12px var(--sans);fill:var(--ink)}
+.item{font:400 10px var(--sans);fill:var(--ink2)} .txt{font:400 11px var(--sans);fill:var(--ink2)}
+.mono{font:400 10px var(--mono);fill:var(--muted)} .lbl{font:400 9.5px var(--mono);fill:var(--muted)}
+.foot{font:400 10.5px var(--sans);fill:var(--muted)} .lgt{font:400 11px var(--sans);fill:var(--ink2)}
+.f-setup{--c:var(--setup);--t:var(--setup-t)} .f-land{--c:var(--land);--t:var(--land-t)} .f-carbon{--c:var(--carbon);--t:var(--carbon-t)}
+.f-climate{--c:var(--climate);--t:var(--climate-t)} .f-fig{--c:var(--fig);--t:var(--fig-t)}
+.lg{fill:var(--c)} .stage .sb{fill:var(--t);stroke:var(--c);stroke-width:1.2} .stage.ghost .sb{stroke-dasharray:4 3}
+.badge{fill:var(--c)} .badge-t{font:600 11px var(--mono);fill:var(--on)} .sn{font:600 11.5px var(--sans);fill:var(--ink)}
+.ss{font:400 9px var(--mono);fill:var(--muted)} .chip rect{fill:var(--c)} .chip-t{font:600 8.5px var(--mono);fill:var(--on)}
+.sheet rect{fill:var(--carbon-t);stroke:var(--line);stroke-width:.8} .sheet-t{font:400 10px var(--sans);fill:var(--ink2)}
+.edge{fill:none;stroke:var(--edge);stroke-width:1.3} .dep{fill:none;stroke:var(--edge);stroke-width:1.2;stroke-dasharray:5 4}
+.lead{fill:none;stroke:var(--muted);stroke-width:.8;stroke-dasharray:1.5 2.5} .halo{fill:none;stroke:var(--surface);stroke-width:7}
+.bus{fill:none;stroke:var(--setup);stroke-width:3.5;stroke-linecap:round} .tap{fill:none;stroke:var(--setup);stroke-width:1.5}
+.dot{fill:var(--setup)} .ah{fill:var(--edge)} .rule{stroke:var(--line);stroke-width:1}
+.engine rect{fill:var(--ink)} .engine-t{font:600 9.5px var(--mono);fill:var(--surface)}
+.rowbg{fill:transparent} .rowt{font:400 10.5px var(--sans);fill:var(--ink2)}
+.dsbg{fill:transparent} .dsn{font:600 11.5px var(--sans);fill:var(--ink)} .dsv{font:400 9.5px var(--mono);fill:var(--muted)}
+.wire{fill:none;stroke:var(--c);stroke-width:1.3;opacity:.75} .wire.alt{stroke-dasharray:4 3}
+.sport{fill:var(--edge)} .port{fill:var(--c)}
+.sn2{font:600 13px var(--sans);fill:var(--ink)} .mk{font:400 11px var(--sans);fill:var(--ink2)} .ch{font:400 10px var(--sans);fill:var(--muted)}
+
+.ds,.stage{cursor:pointer}
+.ds:focus,.stage:focus{outline:none}
+.ds:focus-visible .dsbg{stroke:var(--edge);stroke-width:1.5}
+.stage:focus-visible .sb{stroke-width:3}
+svg .wire,svg .stage,svg .ds text{transition:opacity .15s}
+.ds:hover .dsbg,.ds.on .dsbg{fill:var(--setup-t)}
+svg.dim .wire{opacity:.08}
+svg.dim .wire.on{opacity:1;stroke-width:2.2}
+svg.dim .stage:not(.on){opacity:.35}
+svg.dim .ds:not(.on) text{opacity:.4}
+.stage.on .sb{stroke-width:2.6}
+.pickers{display:grid;gap:10px}
+.picker{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.picker h2{margin:0 6px 0 0;font:600 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);min-width:72px}
+.pick{display:inline-flex;align-items:center;gap:7px;padding:3px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink2);font:500 12.5px var(--sans);cursor:pointer}
+.pick.st{padding-left:4px}
+.pick:hover{border-color:var(--edge)}
+.pick[aria-pressed="true"]{border-color:var(--edge);background:var(--setup-t);color:var(--ink)}
+.pick.st:hover,.pick.st[aria-pressed="true"]{border-color:var(--c)}
+.pick.st[aria-pressed="true"]{background:var(--t)}
+.pick:focus-visible,.chipb:focus-visible{outline:2px solid var(--edge);outline-offset:2px}
+.pick b,.chipb{display:inline-grid;place-items:center;min-width:24px;height:20px;padding:0 4px;border-radius:3px;background:var(--c);color:var(--on);font:600 11px var(--mono)}
+.chipb{border:0;cursor:pointer;height:19px;font-size:10.5px}
+.detail{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:20px 22px;display:grid;gap:12px}
+.d-head{display:flex;gap:14px;align-items:flex-start}
+.d-head .num{display:grid;place-items:center;min-width:40px;height:34px;padding:0 6px;border-radius:5px;background:var(--c);color:var(--on);font:600 15px var(--mono)}
+.d-head h2{margin:0;font:700 18px/1.25 var(--sans)}
+.d-meta{margin:2px 0 0;color:var(--muted);font:400 12px var(--mono);overflow-wrap:anywhere}
+.facts{display:grid;grid-template-columns:max-content 1fr;gap:4px 16px;margin:0;font-size:13px}
+.facts dt{color:var(--muted)}
+.facts dd{margin:0;min-width:0;overflow-wrap:anywhere;color:var(--ink2)}
+.facts code{font:400 12px var(--mono)}
+.detail h3{margin:6px 0 0;font:600 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.uses{list-style:none;margin:0;padding:0;display:grid}
+.uses li{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;padding:8px 0;border-top:1px solid var(--line);align-items:start}
+.uses li:first-child{border-top:0}
+.uses .what{min-width:0}
+.uses .what span{display:block;color:var(--ink);font-size:13.5px}
+.uses .what small{display:block;color:var(--muted);font-size:12px}
+.tag{display:inline-block;margin-left:6px;padding:0 6px;border-radius:3px;border:1px dashed var(--muted);color:var(--muted);font:500 10.5px var(--mono);vertical-align:1px}
+.dsbtn{border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink);font:600 12px var(--sans);padding:2px 8px;cursor:pointer;text-align:left}
+.note{margin:0;color:var(--muted);font-size:12.5px}
+@media (prefers-reduced-motion: reduce){svg .wire,svg .stage,svg .ds text{transition:none}}
+</style>
+
+<div class="wrap">
+  <div class="intro">
+    <h1>lucasCore data blueprint</h1>
+    <p>Version 1.0.0: the 26 national datasets in the Data Sources sheet, the stages that read each one, what for, and the setting that switches it. Select a dataset or a stage, in the drawing or below.</p>
+  </div>
+  <div class="figure">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000" role="img" aria-labelledby="bp-title">
+<title id="bp-title">lucasCore data blueprint: national datasets and the stages that read them</title>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker></defs>
+<rect class="bg" width="1600" height="1000"/>
+<text x="24" y="44" class="h1">lucasCore data blueprint</text>
+<text x="24" y="66" class="sub">The national datasets lucasCore reads, the stages that read them, what for, and the option that switches each one · version 1.0.0</text>
+<rect class="lg f-setup" x="1152.8" y="28" width="14" height="12" rx="2"/>
+<text x="1176.8" y="38" class="lgt">Setup</text>
+<rect class="lg f-land" x="1213.8" y="28" width="14" height="12" rx="2"/>
+<text x="1237.8" y="38" class="lgt">Land cover and change</text>
+<rect class="lg f-carbon" x="1374" y="28" width="14" height="12" rx="2"/>
+<text x="1398" y="38" class="lgt">Carbon</text>
+<rect class="lg f-climate" x="1441.2" y="28" width="14" height="12" rx="2"/>
+<text x="1465.2" y="38" class="lgt">Climate</text>
+<rect class="lg f-fig" x="1514.6" y="28" width="14" height="12" rx="2"/>
+<text x="1538.6" y="38" class="lgt">Figures</text>
+<path d="M1118.8,58 h18" class="wire f-setup" style="opacity:1"/>
+<text x="1142.8" y="62" class="lgt">read with the default settings</text>
+<path d="M1334.8,58 h18" class="wire f-setup alt" style="opacity:1"/>
+<text x="1358.8" y="62" class="lgt">read only under a non-default option</text>
+<rect class="box" x="24" y="104" width="600" height="830" rx="7"/><text x="40" y="126" class="eyebrow">DATA SOURCES SHEET · PROJECT SCOPE</text><text x="40" y="146" class="sname">National datasets</text>
+<text x="312" y="146" class="ghead">VINTAGE · RESOLUTION</text>
+<text x="40" y="172" class="ghead">FIA AND STRATA</text>
+<g class="ds" data-ds="EcodivisionFile" tabindex="0" role="button" aria-label="FIA ecodivisions"><rect class="dsbg" x="32" y="178" width="584" height="22" rx="3"/>
+<text x="40" y="193" class="dsn">FIA ecodivisions</text>
+<text x="312" y="193" class="dsv">dissolved shapefile · StrtmId, StrtmNm</text>
+</g>
+<g class="ds" data-ds="FiaConditionFile" tabindex="0" role="button" aria-label="FIA condition carbon and volume"><rect class="dsbg" x="32" y="201" width="584" height="22" rx="3"/>
+<text x="40" y="216" class="dsn">FIA condition carbon and volume</text>
+<text x="312" y="216" class="dsv">USGS data release · 2024-02-12 · .Rds</text>
+</g>
+<g class="ds" data-ds="FiaDisturbanceFile" tabindex="0" role="button" aria-label="FIA disturbance and treatment codes"><rect class="dsbg" x="32" y="224" width="584" height="22" rx="3"/>
+<text x="40" y="239" class="dsn">FIA disturbance and treatment codes</text>
+<text x="312" y="239" class="dsv">USGS data release · 2024-02-13 · .Rds</text>
+</g>
+<g class="ds" data-ds="FiaDataMartFolder" tabindex="0" role="button" aria-label="FIA DataMart"><rect class="dsbg" x="32" y="247" width="584" height="22" rx="3"/>
+<text x="40" y="262" class="dsn">FIA DataMart</text>
+<text x="312" y="262" class="dsv">state PLOT, COND, TREE, DWM csvs + REFERENCE</text>
+</g>
+<text x="40" y="297" class="ghead">LAND COVER, AGE AND SOIL</text>
+<g class="ds" data-ds="NlcdFolder" tabindex="0" role="button" aria-label="Annual NLCD"><rect class="dsbg" x="32" y="303" width="584" height="22" rx="3"/>
+<text x="40" y="318" class="dsn">Annual NLCD</text>
+<text x="312" y="318" class="dsv">Collection 1 · 30 m · one map a year</text>
+</g>
+<g class="ds" data-ds="Evt2016File" tabindex="0" role="button" aria-label="LANDFIRE EVT 2016"><rect class="dsbg" x="32" y="326" width="584" height="22" rx="3"/>
+<text x="40" y="341" class="dsn">LANDFIRE EVT 2016</text>
+<text x="312" y="341" class="dsv">LF 2.0.0 · 30 m</text>
+</g>
+<g class="ds" data-ds="Evt2001File" tabindex="0" role="button" aria-label="LANDFIRE EVT 2001"><rect class="dsbg" x="32" y="349" width="584" height="22" rx="3"/>
+<text x="40" y="364" class="dsn">LANDFIRE EVT 2001</text>
+<text x="312" y="364" class="dsv">LF 1.0.5 · 30 m</text>
+</g>
+<g class="ds" data-ds="RcmapFile" tabindex="0" role="button" aria-label="RCMAP vegetation class"><rect class="dsbg" x="32" y="372" width="584" height="22" rx="3"/>
+<text x="40" y="387" class="dsn">RCMAP vegetation class</text>
+<text x="312" y="387" class="dsv">2001</text>
+</g>
+<g class="ds" data-ds="CcapFile" tabindex="0" role="button" aria-label="C-CAP land cover"><rect class="dsbg" x="32" y="395" width="584" height="22" rx="3"/>
+<text x="40" y="410" class="dsn">C-CAP land cover</text>
+<text x="312" y="410" class="dsv">2001 · coastal wetlands</text>
+</g>
+<g class="ds" data-ds="ForestTypeGroupFolder" tabindex="0" role="button" aria-label="USFS forest type groups"><rect class="dsbg" x="32" y="418" width="584" height="22" rx="3"/>
+<text x="40" y="433" class="dsn">USFS forest type groups</text>
+<text x="312" y="433" class="dsv">NFCMS regional maps</text>
+</g>
+<g class="ds" data-ds="StandAgeFile" tabindex="0" role="button" aria-label="NASA CMS forest age"><rect class="dsbg" x="32" y="441" width="584" height="22" rx="3"/>
+<text x="40" y="456" class="dsn">NASA CMS forest age</text>
+<text x="312" y="456" class="dsv">1990</text>
+</g>
+<g class="ds" data-ds="FriFile" tabindex="0" role="button" aria-label="LANDFIRE fire return interval"><rect class="dsbg" x="32" y="464" width="584" height="22" rx="3"/>
+<text x="40" y="479" class="dsn">LANDFIRE fire return interval</text>
+<text x="312" y="479" class="dsv">LF 2016 · FRI_REPLAC</text>
+</g>
+<g class="ds" data-ds="SoilCarbonFile" tabindex="0" role="button" aria-label="gSSURGO soil organic carbon"><rect class="dsbg" x="32" y="487" width="584" height="22" rx="3"/>
+<text x="40" y="502" class="dsn">gSSURGO soil organic carbon</text>
+<text x="312" y="502" class="dsv">0 to 999 mm</text>
+</g>
+<text x="40" y="537" class="ghead">DISTURBANCE</text>
+<g class="ds" data-ds="MtbsSeverityFolder" tabindex="0" role="button" aria-label="MTBS burn severity"><rect class="dsbg" x="32" y="543" width="584" height="22" rx="3"/>
+<text x="40" y="558" class="dsn">MTBS burn severity</text>
+<text x="312" y="558" class="dsv">annual CONUS mosaics</text>
+</g>
+<g class="ds" data-ds="LcmsFolder" tabindex="0" role="button" aria-label="USFS LCMS annual change"><rect class="dsbg" x="32" y="566" width="584" height="22" rx="3"/>
+<text x="40" y="581" class="dsn">USFS LCMS annual change</text>
+<text x="312" y="581" class="dsv">v2025-11 · 30 m · 1985 on</text>
+</g>
+<g class="ds" data-ds="LandfireDisturbanceFolder" tabindex="0" role="button" aria-label="LANDFIRE disturbance"><rect class="dsbg" x="32" y="589" width="584" height="22" rx="3"/>
+<text x="40" y="604" class="dsn">LANDFIRE disturbance</text>
+<text x="312" y="604" class="dsv">annual · US_DIST · 1999 on</text>
+</g>
+<g class="ds" data-ds="FirePerimeterHistoryFile" tabindex="0" role="button" aria-label="Interagency fire perimeter history"><rect class="dsbg" x="32" y="612" width="584" height="22" rx="3"/>
+<text x="40" y="627" class="dsn">Interagency fire perimeter history</text>
+<text x="312" y="627" class="dsv">all years · wildfire perimeters</text>
+</g>
+<g class="ds" data-ds="BurnProbabilityFile" tabindex="0" role="button" aria-label="FSim burn probability"><rect class="dsbg" x="32" y="635" width="584" height="22" rx="3"/>
+<text x="40" y="650" class="dsn">FSim burn probability</text>
+<text x="312" y="650" class="dsv">CONUS LF2020 · 270 m</text>
+</g>
+<g class="ds" data-ds="FpaFodFile" tabindex="0" role="button" aria-label="FPA-FOD fire occurrence"><rect class="dsbg" x="32" y="658" width="584" height="22" rx="3"/>
+<text x="40" y="673" class="dsn">FPA-FOD fire occurrence</text>
+<text x="312" y="673" class="dsv">7th edition · geopackage</text>
+</g>
+<text x="40" y="708" class="ghead">CLIMATE</text>
+<g class="ds" data-ds="PrismFolder" tabindex="0" role="button" aria-label="PRISM"><rect class="dsbg" x="32" y="714" width="584" height="22" rx="3"/>
+<text x="40" y="729" class="dsn">PRISM</text>
+<text x="312" y="729" class="dsv">annual tmean and ppt · normals</text>
+</g>
+<g class="ds" data-ds="Loca2Folder" tabindex="0" role="button" aria-label="LOCA2"><rect class="dsbg" x="32" y="737" width="584" height="22" rx="3"/>
+<text x="40" y="752" class="dsn">LOCA2</text>
+<text x="312" y="752" class="dsv">GCM / member / SSP</text>
+</g>
+<text x="40" y="787" class="ghead">COVARIATES</text>
+<g class="ds" data-ds="RoadsFile" tabindex="0" role="button" aria-label="LANDFIRE roads"><rect class="dsbg" x="32" y="793" width="584" height="22" rx="3"/>
+<text x="40" y="808" class="dsn">LANDFIRE roads</text>
+<text x="312" y="808" class="dsv">LF2023 · 30 m</text>
+</g>
+<g class="ds" data-ds="ElevationFile" tabindex="0" role="button" aria-label="LANDFIRE elevation"><rect class="dsbg" x="32" y="816" width="584" height="22" rx="3"/>
+<text x="40" y="831" class="dsn">LANDFIRE elevation</text>
+<text x="312" y="831" class="dsv">LF2020 · 30 m</text>
+</g>
+<g class="ds" data-ds="WuiFolder" tabindex="0" role="button" aria-label="SILVIS WUI blocks"><rect class="dsbg" x="32" y="839" width="584" height="22" rx="3"/>
+<text x="40" y="854" class="dsn">SILVIS WUI blocks</text>
+<text x="312" y="854" class="dsv">v4 · 1990 to 2020 change</text>
+</g>
+<g class="ds" data-ds="NccpiFile" tabindex="0" role="button" aria-label="gNATSGO crop productivity"><rect class="dsbg" x="32" y="862" width="584" height="22" rx="3"/>
+<text x="40" y="877" class="dsn">gNATSGO crop productivity</text>
+<text x="312" y="877" class="dsv">NCCPI · 30 m</text>
+</g>
+<g class="ds" data-ds="ForestOwnerFile" tabindex="0" role="button" aria-label="USFS forest ownership"><rect class="dsbg" x="32" y="885" width="584" height="22" rx="3"/>
+<text x="40" y="900" class="dsn">USFS forest ownership</text>
+<text x="312" y="900" class="dsv">circa 2017 · 30 m</text>
+</g>
+<path class="wire f-setup" data-ds="EcodivisionFile" data-stage="1" d="M616,189 C808,189 808,123.0 998,123.0"/>
+<path class="wire f-carbon" data-ds="EcodivisionFile" data-stage="2" d="M616,189 C808,189 808,191.2 998,191.2"/>
+<path class="wire f-carbon" data-ds="EcodivisionFile" data-stage="3" d="M616,189 C808,189 808,267.2 998,267.2"/>
+<path class="wire f-land" data-ds="EcodivisionFile" data-stage="5" d="M616,189 C808,189 808,340.6 998,340.6"/>
+<path class="wire f-land" data-ds="EcodivisionFile" data-stage="6" d="M616,189 C808,189 808,419.2 998,419.2"/>
+<path class="wire f-carbon" data-ds="FiaConditionFile" data-stage="2" d="M616,212 C808,212 808,201.6 998,201.6"/>
+<path class="wire f-carbon" data-ds="FiaConditionFile" data-stage="3" d="M616,212 C808,212 808,277.6 998,277.6"/>
+<path class="wire f-carbon" data-ds="FiaDisturbanceFile" data-stage="2" d="M616,235 C808,235 808,212.0 998,212.0"/>
+<path class="wire f-carbon" data-ds="FiaDisturbanceFile" data-stage="3" d="M616,235 C808,235 808,288.0 998,288.0"/>
+<path class="wire f-carbon alt" data-ds="FiaDataMartFolder" data-stage="2" d="M616,258 C808,258 808,222.4 998,222.4"/>
+<path class="wire f-carbon" data-ds="FiaDataMartFolder" data-stage="3" d="M616,258 C808,258 808,298.4 998,298.4"/>
+<path class="wire f-setup" data-ds="NlcdFolder" data-stage="1" d="M616,314 C808,314 808,149.0 998,149.0"/>
+<path class="wire f-land" data-ds="NlcdFolder" data-stage="5" d="M616,314 C808,314 808,345.8 998,345.8"/>
+<path class="wire f-land" data-ds="NlcdFolder" data-stage="6" d="M616,314 C808,314 808,429.6 998,429.6"/>
+<path class="wire f-land" data-ds="NlcdFolder" data-stage="10" d="M616,314 C808,314 808,644.9 998,644.9"/>
+<path class="wire f-land" data-ds="Evt2016File" data-stage="5" d="M616,337 C808,337 808,351.0 998,351.0"/>
+<path class="wire f-land" data-ds="Evt2001File" data-stage="5" d="M616,360 C808,360 808,356.2 998,356.2"/>
+<path class="wire f-land" data-ds="RcmapFile" data-stage="5" d="M616,383 C808,383 808,361.4 998,361.4"/>
+<path class="wire f-land" data-ds="CcapFile" data-stage="5" d="M616,406 C808,406 808,366.6 998,366.6"/>
+<path class="wire f-land alt" data-ds="ForestTypeGroupFolder" data-stage="5" d="M616,429 C808,429 808,371.8 998,371.8"/>
+<path class="wire f-land" data-ds="StandAgeFile" data-stage="5" d="M616,452 C808,452 808,377.0 998,377.0"/>
+<path class="wire f-land" data-ds="FriFile" data-stage="5" d="M616,475 C808,475 808,382.2 998,382.2"/>
+<path class="wire f-land" data-ds="SoilCarbonFile" data-stage="5" d="M616,498 C808,498 808,387.4 998,387.4"/>
+<path class="wire f-carbon" data-ds="SoilCarbonFile" data-stage="8" d="M616,498 C808,498 808,503.0 998,503.0"/>
+<path class="wire f-land" data-ds="MtbsSeverityFolder" data-stage="6" d="M616,554 C808,554 808,440.0 998,440.0"/>
+<path class="wire f-land" data-ds="LcmsFolder" data-stage="6" d="M616,577 C808,577 808,450.4 998,450.4"/>
+<path class="wire f-land" data-ds="LcmsFolder" data-stage="10" d="M616,577 C808,577 808,650.7 998,650.7"/>
+<path class="wire f-land alt" data-ds="LandfireDisturbanceFolder" data-stage="6" d="M616,600 C808,600 808,460.8 998,460.8"/>
+<path class="wire f-land alt" data-ds="LandfireDisturbanceFolder" data-stage="10" d="M616,600 C808,600 808,656.4 998,656.4"/>
+<path class="wire f-carbon" data-ds="FirePerimeterHistoryFile" data-stage="8" d="M616,623 C808,623 808,529.0 998,529.0"/>
+<path class="wire f-land" data-ds="FirePerimeterHistoryFile" data-stage="9" d="M616,623 C808,623 808,572.5 998,572.5"/>
+<path class="wire f-land" data-ds="FirePerimeterHistoryFile" data-stage="10" d="M616,623 C808,623 808,662.2 998,662.2"/>
+<path class="wire f-land alt" data-ds="BurnProbabilityFile" data-stage="9" d="M616,646 C808,646 808,585.5 998,585.5"/>
+<path class="wire f-land alt" data-ds="FpaFodFile" data-stage="9" d="M616,669 C808,669 808,598.5 998,598.5"/>
+<path class="wire f-carbon" data-ds="PrismFolder" data-stage="2" d="M616,725 C808,725 808,232.8 998,232.8"/>
+<path class="wire f-carbon" data-ds="PrismFolder" data-stage="3" d="M616,725 C808,725 808,308.8 998,308.8"/>
+<path class="wire f-climate" data-ds="PrismFolder" data-stage="7" d="M616,725 C808,725 808,744.0 998,744.0"/>
+<path class="wire f-climate" data-ds="Loca2Folder" data-stage="11" d="M616,748 C808,748 808,820.0 998,820.0"/>
+<path class="wire f-land" data-ds="RoadsFile" data-stage="10" d="M616,804 C808,804 808,668.0 998,668.0"/>
+<path class="wire f-land" data-ds="ElevationFile" data-stage="9" d="M616,827 C808,827 808,611.5 998,611.5"/>
+<path class="wire f-land" data-ds="ElevationFile" data-stage="10" d="M616,827 C808,827 808,673.8 998,673.8"/>
+<path class="wire f-fig" data-ds="ElevationFile" data-stage="12" d="M616,827 C808,827 808,896.0 998,896.0"/>
+<path class="wire f-land" data-ds="WuiFolder" data-stage="10" d="M616,850 C808,850 808,679.6 998,679.6"/>
+<path class="wire f-land" data-ds="NccpiFile" data-stage="10" d="M616,873 C808,873 808,685.3 998,685.3"/>
+<path class="wire f-land" data-ds="ForestOwnerFile" data-stage="10" d="M616,896 C808,896 808,691.1 998,691.1"/>
+<circle class="sport" cx="616" cy="189" r="3"/>
+<circle class="sport" cx="616" cy="212" r="3"/>
+<circle class="sport" cx="616" cy="235" r="3"/>
+<circle class="sport" cx="616" cy="258" r="3"/>
+<circle class="sport" cx="616" cy="314" r="3"/>
+<circle class="sport" cx="616" cy="337" r="3"/>
+<circle class="sport" cx="616" cy="360" r="3"/>
+<circle class="sport" cx="616" cy="383" r="3"/>
+<circle class="sport" cx="616" cy="406" r="3"/>
+<circle class="sport" cx="616" cy="429" r="3"/>
+<circle class="sport" cx="616" cy="452" r="3"/>
+<circle class="sport" cx="616" cy="475" r="3"/>
+<circle class="sport" cx="616" cy="498" r="3"/>
+<circle class="sport" cx="616" cy="554" r="3"/>
+<circle class="sport" cx="616" cy="577" r="3"/>
+<circle class="sport" cx="616" cy="600" r="3"/>
+<circle class="sport" cx="616" cy="623" r="3"/>
+<circle class="sport" cx="616" cy="646" r="3"/>
+<circle class="sport" cx="616" cy="669" r="3"/>
+<circle class="sport" cx="616" cy="725" r="3"/>
+<circle class="sport" cx="616" cy="748" r="3"/>
+<circle class="sport" cx="616" cy="804" r="3"/>
+<circle class="sport" cx="616" cy="827" r="3"/>
+<circle class="sport" cx="616" cy="850" r="3"/>
+<circle class="sport" cx="616" cy="873" r="3"/>
+<circle class="sport" cx="616" cy="896" r="3"/>
+<g class="stage f-setup" data-stage="1" tabindex="0" role="button" aria-label="Stage 1, Study Area and Strata">
+<rect class="sb" x="1000" y="104" width="576" height="64" rx="5"/>
+<rect class="badge" x="1010" y="113" width="24" height="20" rx="3"/>
+<text x="1022" y="127" class="badge-t" text-anchor="middle">1</text>
+<text x="1044" y="128" class="sn2">Study Area and Strata</text>
+<text x="1012" y="147" class="mk">Model grid, land mask, primary, secondary and tertiary strata rasters</text>
+<text x="1012" y="161" class="ch">Set by: Build Options (cell size, strata sources); Study Area</text>
+</g>
+<circle class="port f-setup" cx="1000" cy="123.0" r="2.4"/>
+<circle class="port f-setup" cx="1000" cy="149.0" r="2.4"/>
+<g class="stage f-carbon" data-stage="2" tabindex="0" role="button" aria-label="Stage 2, Fit Growth Curves">
+<rect class="sb" x="1000" y="180" width="576" height="64" rx="5"/>
+<rect class="badge" x="1010" y="189" width="24" height="20" rx="3"/>
+<text x="1022" y="203" class="badge-t" text-anchor="middle">2</text>
+<text x="1044" y="204" class="sn2">Fit Growth Curves</text>
+<text x="1012" y="223" class="mk">Merchantable volume and live-tree carbon curves per forest class and ecodivision</text>
+<text x="1012" y="237" class="ch">Set by: Growth Curve Options (FIA Data, fit settings)</text>
+</g>
+<circle class="port f-carbon" cx="1000" cy="191.2" r="2.4"/>
+<circle class="port f-carbon" cx="1000" cy="201.6" r="2.4"/>
+<circle class="port f-carbon" cx="1000" cy="212.0" r="2.4"/>
+<circle class="port f-carbon" cx="1000" cy="222.4" r="2.4"/>
+<circle class="port f-carbon" cx="1000" cy="232.8" r="2.4"/>
+<g class="stage f-carbon" data-stage="3" tabindex="0" role="button" aria-label="Stage 3, Carbon Flows">
+<rect class="sb" x="1000" y="256" width="576" height="64" rx="5"/>
+<rect class="badge" x="1010" y="265" width="24" height="20" rx="3"/>
+<text x="1022" y="279" class="badge-t" text-anchor="middle">3</text>
+<text x="1044" y="280" class="sn2">Carbon Flows</text>
+<text x="1012" y="299" class="mk">Stock-flow parameters and the dead organic matter decay calibration</text>
+<text x="1012" y="313" class="ch">Set by: Carbon Method; the Carbon Assumptions sheets</text>
+</g>
+<circle class="port f-carbon" cx="1000" cy="267.2" r="2.4"/>
+<circle class="port f-carbon" cx="1000" cy="277.6" r="2.4"/>
+<circle class="port f-carbon" cx="1000" cy="288.0" r="2.4"/>
+<circle class="port f-carbon" cx="1000" cy="298.4" r="2.4"/>
+<circle class="port f-carbon" cx="1000" cy="308.8" r="2.4"/>
+<g class="stage f-land" data-stage="5" tabindex="0" role="button" aria-label="Stage 5, Initial Conditions">
+<rect class="sb" x="1000" y="332" width="576" height="64" rx="5"/>
+<rect class="badge" x="1010" y="341" width="24" height="20" rx="3"/>
+<text x="1022" y="355" class="badge-t" text-anchor="middle">5</text>
+<text x="1044" y="356" class="sn2">Initial Conditions</text>
+<text x="1012" y="375" class="mk">State class and stand age maps, annual NLCD on the grid, return intervals, soil targets</text>
+<text x="1012" y="389" class="ch">Set by: Build Options (Forest Type Map, Land Cover Resampling); Land Cover Crosswalks</text>
+</g>
+<circle class="port f-land" cx="1000" cy="340.6" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="345.8" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="351.0" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="356.2" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="361.4" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="366.6" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="371.8" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="377.0" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="382.2" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="387.4" r="2.4"/>
+<g class="stage f-land" data-stage="6" tabindex="0" role="button" aria-label="Stage 6, Historical Transitions">
+<rect class="sb" x="1000" y="408" width="576" height="64" rx="5"/>
+<rect class="badge" x="1010" y="417" width="24" height="20" rx="3"/>
+<text x="1022" y="431" class="badge-t" text-anchor="middle">6</text>
+<text x="1044" y="432" class="sn2">Historical Transitions</text>
+<text x="1012" y="451" class="mk">Historical transition pathways, targets and annual spatial multipliers</text>
+<text x="1012" y="465" class="ch">Set by: defaults/transitions/sources.csv (where each transition group comes from)</text>
+</g>
+<circle class="port f-land" cx="1000" cy="419.2" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="429.6" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="440.0" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="450.4" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="460.8" r="2.4"/>
+<g class="stage f-carbon" data-stage="8" tabindex="0" role="button" aria-label="Stage 8, Initial Stock Maps">
+<rect class="sb" x="1000" y="484" width="576" height="64" rx="5"/>
+<rect class="badge" x="1010" y="493" width="24" height="20" rx="3"/>
+<text x="1022" y="507" class="badge-t" text-anchor="middle">8</text>
+<text x="1044" y="508" class="sn2">Initial Stock Maps</text>
+<text x="1012" y="527" class="mk">Initial carbon stock maps by age and last disturbance</text>
+<text x="1012" y="541" class="ch">Set by: Carbon Assumptions &gt; Spin-up</text>
+</g>
+<circle class="port f-carbon" cx="1000" cy="503.0" r="2.4"/>
+<circle class="port f-carbon" cx="1000" cy="529.0" r="2.4"/>
+<g class="stage f-land" data-stage="9" tabindex="0" role="button" aria-label="Stage 9, Projection Transitions">
+<rect class="sb" x="1000" y="560" width="576" height="64" rx="5"/>
+<rect class="badge" x="1010" y="569" width="24" height="20" rx="3"/>
+<text x="1022" y="583" class="badge-t" text-anchor="middle">9</text>
+<text x="1044" y="584" class="sn2">Projection Transitions</text>
+<text x="1012" y="603" class="mk">Projection transition targets, fire sizes and slope selectivity</text>
+<text x="1012" y="617" class="ch">Set by: Projection Options; Projection Transitions; Fire</text>
+</g>
+<circle class="port f-land" cx="1000" cy="572.5" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="585.5" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="598.5" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="611.5" r="2.4"/>
+<g class="stage f-land" data-stage="10" tabindex="0" role="button" aria-label="Stage 10, Transition Suitability">
+<rect class="sb" x="1000" y="636" width="576" height="64" rx="5"/>
+<rect class="badge" x="1010" y="645" width="24" height="20" rx="3"/>
+<text x="1022" y="659" class="badge-t" text-anchor="middle">10</text>
+<text x="1044" y="660" class="sn2">Transition Suitability</text>
+<text x="1012" y="679" class="mk">Surfaces that place projected transitions, with adjacency and patch sizes</text>
+<text x="1012" y="693" class="ch">Set by: Projection Allocation; Suitability Options and Covariates; Rule Weights</text>
+</g>
+<circle class="port f-land" cx="1000" cy="644.9" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="650.7" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="656.4" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="662.2" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="668.0" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="673.8" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="679.6" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="685.3" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="691.1" r="2.4"/>
+<g class="stage f-climate" data-stage="7" tabindex="0" role="button" aria-label="Stage 7, Climate Multipliers">
+<rect class="sb" x="1000" y="712" width="576" height="64" rx="5"/>
+<rect class="badge" x="1010" y="721" width="24" height="20" rx="3"/>
+<text x="1022" y="735" class="badge-t" text-anchor="middle">7</text>
+<text x="1044" y="736" class="sn2">Climate Multipliers</text>
+<text x="1012" y="755" class="mk">Historical climate flow multipliers on growth and decomposition</text>
+<text x="1012" y="769" class="ch">Set by: Climate Options (forest and non-forest growth, decomposition)</text>
+</g>
+<circle class="port f-climate" cx="1000" cy="744.0" r="2.4"/>
+<g class="stage f-climate" data-stage="11" tabindex="0" role="button" aria-label="Stage 11, Projection Climate">
+<rect class="sb" x="1000" y="788" width="576" height="64" rx="5"/>
+<rect class="badge" x="1010" y="797" width="24" height="20" rx="3"/>
+<text x="1022" y="811" class="badge-t" text-anchor="middle">11</text>
+<text x="1044" y="812" class="sn2">Projection Climate</text>
+<text x="1012" y="831" class="mk">Projection climate flow multipliers</text>
+<text x="1012" y="845" class="ch">Set by: Projection &gt; Climate (LOCA2 scenario, model, replicate)</text>
+</g>
+<circle class="port f-climate" cx="1000" cy="820.0" r="2.4"/>
+<g class="stage f-fig" data-stage="12" tabindex="0" role="button" aria-label="Stage 12–14, Build, Run and Compare Figures">
+<rect class="sb" x="1000" y="864" width="576" height="64" rx="5"/>
+<rect class="badge" x="1010" y="873" width="44" height="20" rx="3"/>
+<text x="1032" y="887" class="badge-t" text-anchor="middle">12–14</text>
+<text x="1064" y="888" class="sn2">Build, Run and Compare Figures</text>
+<text x="1012" y="907" class="mk">PNG figures of a Build, a run, and a run comparison</text>
+<text x="1012" y="921" class="ch">Set by: Run Figures; Compare Runs</text>
+</g>
+<circle class="port f-fig" cx="1000" cy="896.0" r="2.4"/>
+<text x="24" y="962" class="foot">Wires run from a dataset to each stage that reads it, coloured by the stage. Vintages are those of the default paths in package.xml (Data Sources: a blank sheet uses them).</text>
+<text x="24" y="978" class="foot">Stages 0 and 4 read no national data. Generated by docs/blueprint/build-data.R from package.xml (lucasCore 1.0.0), 2026-10-29.</text>
+</svg>
+  </div>
+  <div class="pickers">
+    <div class="picker" id="pick-ds"><h2>Datasets</h2></div>
+    <div class="picker" id="pick-st"><h2>Stages</h2></div>
+  </div>
+  <article class="detail" id="detail" aria-live="polite"></article>
+  <p class="note">Built by docs/blueprint/build-data.R from package.xml; the companion drawing of stages and datasheets is built by build.R.</p>
+</div>
+
+<script type="application/json" id="data">{"datasets":[{"col":"EcodivisionFile","label":"FIA ecodivisions","group":"FIA and strata","vintage":"dissolved shapefile · StrtmId, StrtmNm","display":"FIA Ecodivisions (dissolved; fields StrtmId, StrtmNm) - primary strata and model lattice","path":"F:/lucas-master/Data Sources/FIA/EcoDivision_map/EcoDivisions_Dissolve.shp","uses":[{"stage":"1","role":"Primary strata and the model lattice","note":"","alt":false},{"stage":"2","role":"Each plot's ecodivision, and the ecodivision climate the curves use","note":"","alt":false},{"stage":"3","role":"Ecodivisions of the decay calibration and their climate","note":"","alt":false},{"stage":"5","role":"The model lattice (the same grid as stage 1)","note":"","alt":false},{"stage":"6","role":"The model lattice","note":"","alt":false}]},{"col":"FiaConditionFile","label":"FIA condition carbon and volume","group":"FIA and strata","vintage":"USGS data release · 2024-02-12 · .Rds","display":"FIA Condition Carbon and Merchantable Volume (USGS .Rds)","path":"F:/lucas-master/Data Sources/FIA/USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds","uses":[{"stage":"2","role":"Condition carbon and merchantable volume the curves are fitted to","note":"Growth Curve Options > FIA Data: USGS condition tables (default)","alt":false},{"stage":"3","role":"Condition carbon pools for the decay calibration","note":"Growth Curve Options > FIA Data: USGS condition tables (default)","alt":false}]},{"col":"FiaDisturbanceFile","label":"FIA disturbance and treatment codes","group":"FIA and strata","vintage":"USGS data release · 2024-02-13 · .Rds","display":"FIA Condition Disturbance and Treatment Codes (USGS .Rds)","path":"F:/lucas-master/Data Sources/FIA/USGS_forest_conditions_dstrbcd_and_trtcd_20240213.Rds","uses":[{"stage":"2","role":"Disturbance and treatment codes of each condition","note":"Growth Curve Options > FIA Data: USGS condition tables (default)","alt":false},{"stage":"3","role":"Disturbance and treatment codes of each condition","note":"Growth Curve Options > FIA Data: USGS condition tables (default)","alt":false}]},{"col":"FiaDataMartFolder","label":"FIA DataMart","group":"FIA and strata","vintage":"state PLOT, COND, TREE, DWM csvs + REFERENCE","display":"FIA DataMart Folder (state PLOT, COND, TREE csvs and FIADB_REFERENCE)","path":"F:/lucas-master/Data Sources/FIA/DataMart","uses":[{"stage":"2","role":"Condition tables derived from the state CSVs, in place of the USGS release","note":"Growth Curve Options > FIA Data: FIA DataMart","alt":true},{"stage":"3","role":"Measured down dead wood (COND_DWM_CALC) the decay is calibrated to","note":"Carbon Method: FIA measured dead wood (default)","alt":false}]},{"col":"NlcdFolder","label":"Annual NLCD","group":"Land cover, age and soil","vintage":"Collection 1 · 30 m · one map a year","display":"Annual NLCD Folder (Annual_NLCD_LndCov_year_CU_C1V0.tif)","path":"F:/lucas-master/Data Sources/NLCD/Annual NLCD","uses":[{"stage":"1","role":"Start-year land mask, modal on the model grid","note":"","alt":false},{"stage":"5","role":"Annual land cover on the model grid; developed, agriculture, water and ice classes","note":"Build Options > Land Cover Resampling","alt":false},{"stage":"6","role":"Land-use change (class gains and losses) and the clearcut rule","note":"","alt":false},{"stage":"10","role":"The 30 m annual record the suitability surfaces are fitted on","note":"","alt":false}]},{"col":"Evt2016File","label":"LANDFIRE EVT 2016","group":"Land cover, age and soil","vintage":"LF 2.0.0 · 30 m","display":"LANDFIRE EVT 2016 (LF 2.0.0)","path":"F:/lucas-master/Data Sources/EVT/LF2016_EVT_200_CONUS/LF2016_EVT_200_CONUS/Tif/LC16_EVT_200.tif","uses":[{"stage":"5","role":"Forest, shrub and grass types: the most common 30 m class in each cell","note":"Build Options > Forest Type Map: LANDFIRE EVT (default)","alt":false}]},{"col":"Evt2001File","label":"LANDFIRE EVT 2001","group":"Land cover, age and soil","vintage":"LF 1.0.5 · 30 m","display":"LANDFIRE EVT 2001 (LF 1.0.5)","path":"F:/lucas-master/Data Sources/EVT/US_105_EVT/US_105_EVT/Tif/us_105evt.tif","uses":[{"stage":"5","role":"Vegetation types alongside EVT 2016","note":"Land Cover Crosswalks > EVT 2001","alt":false}]},{"col":"RcmapFile","label":"RCMAP vegetation class","group":"Land cover, age and soil","vintage":"2001","display":"RCMAP Vegetation Class","path":"F:/lucas-master/Data Sources/RCMAP/2001_test2_full_wtih_tree.img","uses":[{"stage":"5","role":"Rangeland vegetation classes","note":"Land Cover Crosswalks > RCMAP","alt":false}]},{"col":"CcapFile","label":"C-CAP land cover","group":"Land cover, age and soil","vintage":"2001 · coastal wetlands","display":"C-CAP Land Cover 2001","path":"F:/lucas-master/Data Sources/CCAP/conus_2001_ccap_landcover_20200311.tif","uses":[{"stage":"5","role":"Wetland types (C-CAP classes 90 and up)","note":"Land Cover Crosswalks > C-CAP","alt":false}]},{"col":"ForestTypeGroupFolder","label":"USFS forest type groups","group":"Land cover, age and soil","vintage":"NFCMS regional maps","display":"USFS Forest Type Group Map Folder (NFCMS regional *_ForestType.tif)","path":"F:/lucas-master/Data Sources/NFCMS/Forest Type","uses":[{"stage":"5","role":"Forest types in place of LANDFIRE EVT","note":"Build Options > Forest Type Map: USFS forest type groups","alt":true}]},{"col":"StandAgeFile","label":"NASA CMS forest age","group":"Land cover, age and soil","vintage":"1990","display":"NASA CMS Forest Age 1990","path":"F:/lucas-master/Data Sources/Stand Age/cms_age_1990.tif","uses":[{"stage":"5","role":"Stand age, averaged over each cell","note":"","alt":false}]},{"col":"FriFile","label":"LANDFIRE fire return interval","group":"Land cover, age and soil","vintage":"LF 2016 · FRI_REPLAC","display":"LANDFIRE Mean Fire Return Interval","path":"F:/lucas-master/Data Sources/FRI/Tif/LC16_FRI_200.tif","uses":[{"stage":"5","role":"Replacement-fire return interval per ecodivision and forest class, for spin-up","note":"","alt":false}]},{"col":"SoilCarbonFile","label":"gSSURGO soil organic carbon","group":"Land cover, age and soil","vintage":"0 to 999 mm","display":"gSSURGO Soil Organic Carbon","path":"F:/lucas-master/Data Sources/gSSURGO/gssurgo_soc_0_999.tif","uses":[{"stage":"5","role":"Mean soil carbon per ecodivision and forest class: the target stage 3 calibrates to","note":"","alt":false},{"stage":"8","role":"Soil carbon map for the initial soil pool","note":"","alt":false}]},{"col":"MtbsSeverityFolder","label":"MTBS burn severity","group":"Disturbance","vintage":"annual CONUS mosaics","display":"MTBS Burn Severity Folder (mtbs_CONUS_year.tif)","path":"F:/lucas-master/Data Sources/MTBS/Burn Severity","uses":[{"stage":"6","role":"Wildfire by severity (burned share of 30 m pixels), and burned cells kept out of the clearcut rule","note":"","alt":false}]},{"col":"LcmsFolder","label":"USFS LCMS annual change","group":"Disturbance","vintage":"v2025-11 · 30 m · 1985 on","display":"USFS LCMS annual Change folder (year/*Change_year.tif; harvest, stages 6 and 10)","path":"F:/lucas-master/Data Sources/LCMS/v2025-11/Change_Annual","uses":[{"stage":"6","role":"Clearcut and selection harvest from Tree Removal","note":"defaults/transitions/sources.csv: Lcms (default)","alt":false},{"stage":"10","role":"Harvest events the clearcut and selection surfaces are fitted on","note":"Projection Allocation > Event Classes: LCMS (default)","alt":false}]},{"col":"LandfireDisturbanceFolder","label":"LANDFIRE disturbance","group":"Disturbance","vintage":"annual · US_DIST · 1999 on","display":"LANDFIRE Disturbance Folder (US_DISTyear)","path":"F:/lucas-master/Data Sources/Landfire Disturbance","uses":[{"stage":"6","role":"Disturbance by type, for a transition group whose source is Landfire","note":"defaults/transitions/sources.csv: Landfire","alt":true},{"stage":"10","role":"Event classes LANDFIRE:<type>","note":"Projection Allocation > Event Classes: LANDFIRE","alt":true}]},{"col":"FirePerimeterHistoryFile","label":"Interagency fire perimeter history","group":"Disturbance","vintage":"all years · wildfire perimeters","display":"Interagency Fire Perimeter History","path":"F:/lucas-master/Data Sources/NIFS/InterAgencyFirePerimeterHistory_All_Years_View/InterAgencyFirePerimeterHistory_All_Years_View.shp","uses":[{"stage":"8","role":"Last disturbance: high-severity fire where a perimeter since 1900 covers the cell, else clearcut","note":"","alt":false},{"stage":"9","role":"Fire sizes (one per incident and year) for the projection size distribution","note":"Fire > Fire Method: Historical rates (default)","alt":false},{"stage":"10","role":"Recently burned pixels kept out of the fit","note":"Suitability Options > Burn Window","alt":false}]},{"col":"BurnProbabilityFile","label":"FSim burn probability","group":"Disturbance","vintage":"CONUS LF2020 · 270 m","display":"Burn probability raster (fire method 2 default; FSim CONUS LF2020 270 m)","path":"F:/lucas-master/Data Sources/FSim/Data/I_FSim_CONUS_LF2020_270m/CONUS_BP.tif","uses":[{"stage":"9","role":"Burn probability that guides where projected fire spreads and starts","note":"Fire > Fire Method: Burn probability","alt":true}]},{"col":"FpaFodFile","label":"FPA-FOD fire occurrence","group":"Disturbance","vintage":"7th edition · geopackage","display":"FPA-FOD fire occurrence geopackage (ignition density, fire method 2)","path":"F:/lucas-master/Data Sources/FPA-FOD/7th/Data/FPA_FOD_20260615.gpkg","uses":[{"stage":"9","role":"Ignition density, smoothed (5 km default)","note":"Fire > Ignitions: FPA-FOD ignition density","alt":true}]},{"col":"PrismFolder","label":"PRISM","group":"Climate","vintage":"annual tmean and ppt · normals","display":"PRISM Folder (annual and normals)","path":"F:/lucas-master/Data Sources/Climate/prism","uses":[{"stage":"2","role":"Ecodivision climate for the growth curves","note":"","alt":false},{"stage":"3","role":"Ecodivision climate for the decay calibration","note":"","alt":false},{"stage":"7","role":"Annual temperature and precipitation for the historical climate multipliers","note":"Climate Options","alt":false}]},{"col":"Loca2Folder","label":"LOCA2","group":"Climate","vintage":"GCM / member / SSP","display":"LOCA2 Folder (gcm/r1i1p1f1/ssp)","path":"F:/lucas-master/Data Sources/Climate/LOCA2","uses":[{"stage":"11","role":"Projected climate of one scenario, model and replicate","note":"Projection > Climate","alt":false}]},{"col":"RoadsFile","label":"LANDFIRE roads","group":"Covariates","vintage":"LF2023 · 30 m","display":"Roads (LANDFIRE 30 m raster; stage 10)","path":"F:/lucas-master/Data Sources/Roads/LF2023_Roads_CONUS/Tif/LF2023_Roads_CONUS.tif","uses":[{"stage":"10","role":"Distance to roads covariate","note":"Suitability Covariates","alt":false}]},{"col":"ElevationFile","label":"LANDFIRE elevation","group":"Covariates","vintage":"LF2020 · 30 m","display":"Elevation (LANDFIRE 30 m DEM; stage 10)","path":"F:/lucas-master/Data Sources/DEM/LF2020_Elev_220_CONUS/Tif/LC20_Elev_220.tif","uses":[{"stage":"9","role":"Slope selectivity of projected fire (burned share by slope)","note":"Fire > Slope Selectivity (default on)","alt":false},{"stage":"10","role":"Elevation and slope covariates","note":"Suitability Covariates","alt":false},{"stage":"12","role":"Hillshade under the maps, when the path is set","note":"","alt":false}]},{"col":"WuiFolder","label":"SILVIS WUI blocks","group":"Covariates","vintage":"v4 · 1990 to 2020 change","display":"SILVIS WUI v4 blocks (folder of state .gdb; stage 10)","path":"F:/lucas-master/Data Sources/WUI/2020","uses":[{"stage":"10","role":"Housing density and WUI classes of the census blocks","note":"Suitability Covariates; Rule Weights","alt":false}]},{"col":"NccpiFile","label":"gNATSGO crop productivity","group":"Covariates","vintage":"NCCPI · 30 m","display":"gNATSGO crop productivity NCCPI, 30 m (stage 10; blank = fetched for the fitting region from Planetary Computer)","path":"","uses":[{"stage":"10","role":"Crop productivity covariate of ag expansion and contraction (blank path = fetched from Planetary Computer)","note":"Suitability Covariates","alt":false}]},{"col":"ForestOwnerFile","label":"USFS forest ownership","group":"Covariates","vintage":"circa 2017 · 30 m","display":"USFS forest ownership circa 2017, 30 m (stage 10)","path":"F:/lucas-master/Data Sources/Forest Ownership/Data/forest_own1/forest_own1.tif","uses":[{"stage":"10","role":"Forest owner type covariate of clearcut and selection","note":"Suitability Covariates","alt":false}]}],"stages":{"1":{"id":"1","label":"1","name":"Study Area and Strata","family":"setup","makes":"Model grid, land mask, primary, secondary and tertiary strata rasters","set":"Build Options (cell size, strata sources); Study Area","reads":[{"col":"EcodivisionFile","label":"FIA ecodivisions","role":"Primary strata and the model lattice","note":"","alt":false},{"col":"NlcdFolder","label":"Annual NLCD","role":"Start-year land mask, modal on the model grid","note":"","alt":false}]},"2":{"id":"2","label":"2","name":"Fit Growth Curves","family":"carbon","makes":"Merchantable volume and live-tree carbon curves per forest class and ecodivision","set":"Growth Curve Options (FIA Data, fit settings)","reads":[{"col":"EcodivisionFile","label":"FIA ecodivisions","role":"Each plot's ecodivision, and the ecodivision climate the curves use","note":"","alt":false},{"col":"FiaConditionFile","label":"FIA condition carbon and volume","role":"Condition carbon and merchantable volume the curves are fitted to","note":"Growth Curve Options > FIA Data: USGS condition tables (default)","alt":false},{"col":"FiaDisturbanceFile","label":"FIA disturbance and treatment codes","role":"Disturbance and treatment codes of each condition","note":"Growth Curve Options > FIA Data: USGS condition tables (default)","alt":false},{"col":"FiaDataMartFolder","label":"FIA DataMart","role":"Condition tables derived from the state CSVs, in place of the USGS release","note":"Growth Curve Options > FIA Data: FIA DataMart","alt":true},{"col":"PrismFolder","label":"PRISM","role":"Ecodivision climate for the growth curves","note":"","alt":false}]},"3":{"id":"3","label":"3","name":"Carbon Flows","family":"carbon","makes":"Stock-flow parameters and the dead organic matter decay calibration","set":"Carbon Method; the Carbon Assumptions sheets","reads":[{"col":"EcodivisionFile","label":"FIA ecodivisions","role":"Ecodivisions of the decay calibration and their climate","note":"","alt":false},{"col":"FiaConditionFile","label":"FIA condition carbon and volume","role":"Condition carbon pools for the decay calibration","note":"Growth Curve Options > FIA Data: USGS condition tables (default)","alt":false},{"col":"FiaDisturbanceFile","label":"FIA disturbance and treatment codes","role":"Disturbance and treatment codes of each condition","note":"Growth Curve Options > FIA Data: USGS condition tables (default)","alt":false},{"col":"FiaDataMartFolder","label":"FIA DataMart","role":"Measured down dead wood (COND_DWM_CALC) the decay is calibrated to","note":"Carbon Method: FIA measured dead wood (default)","alt":false},{"col":"PrismFolder","label":"PRISM","role":"Ecodivision climate for the decay calibration","note":"","alt":false}]},"5":{"id":"5","label":"5","name":"Initial Conditions","family":"land","makes":"State class and stand age maps, annual NLCD on the grid, return intervals, soil targets","set":"Build Options (Forest Type Map, Land Cover Resampling); Land Cover Crosswalks","reads":[{"col":"EcodivisionFile","label":"FIA ecodivisions","role":"The model lattice (the same grid as stage 1)","note":"","alt":false},{"col":"NlcdFolder","label":"Annual NLCD","role":"Annual land cover on the model grid; developed, agriculture, water and ice classes","note":"Build Options > Land Cover Resampling","alt":false},{"col":"Evt2016File","label":"LANDFIRE EVT 2016","role":"Forest, shrub and grass types: the most common 30 m class in each cell","note":"Build Options > Forest Type Map: LANDFIRE EVT (default)","alt":false},{"col":"Evt2001File","label":"LANDFIRE EVT 2001","role":"Vegetation types alongside EVT 2016","note":"Land Cover Crosswalks > EVT 2001","alt":false},{"col":"RcmapFile","label":"RCMAP vegetation class","role":"Rangeland vegetation classes","note":"Land Cover Crosswalks > RCMAP","alt":false},{"col":"CcapFile","label":"C-CAP land cover","role":"Wetland types (C-CAP classes 90 and up)","note":"Land Cover Crosswalks > C-CAP","alt":false},{"col":"ForestTypeGroupFolder","label":"USFS forest type groups","role":"Forest types in place of LANDFIRE EVT","note":"Build Options > Forest Type Map: USFS forest type groups","alt":true},{"col":"StandAgeFile","label":"NASA CMS forest age","role":"Stand age, averaged over each cell","note":"","alt":false},{"col":"FriFile","label":"LANDFIRE fire return interval","role":"Replacement-fire return interval per ecodivision and forest class, for spin-up","note":"","alt":false},{"col":"SoilCarbonFile","label":"gSSURGO soil organic carbon","role":"Mean soil carbon per ecodivision and forest class: the target stage 3 calibrates to","note":"","alt":false}]},"6":{"id":"6","label":"6","name":"Historical Transitions","family":"land","makes":"Historical transition pathways, targets and annual spatial multipliers","set":"defaults/transitions/sources.csv (where each transition group comes from)","reads":[{"col":"EcodivisionFile","label":"FIA ecodivisions","role":"The model lattice","note":"","alt":false},{"col":"NlcdFolder","label":"Annual NLCD","role":"Land-use change (class gains and losses) and the clearcut rule","note":"","alt":false},{"col":"MtbsSeverityFolder","label":"MTBS burn severity","role":"Wildfire by severity (burned share of 30 m pixels), and burned cells kept out of the clearcut rule","note":"","alt":false},{"col":"LcmsFolder","label":"USFS LCMS annual change","role":"Clearcut and selection harvest from Tree Removal","note":"defaults/transitions/sources.csv: Lcms (default)","alt":false},{"col":"LandfireDisturbanceFolder","label":"LANDFIRE disturbance","role":"Disturbance by type, for a transition group whose source is Landfire","note":"defaults/transitions/sources.csv: Landfire","alt":true}]},"8":{"id":"8","label":"8","name":"Initial Stock Maps","family":"carbon","makes":"Initial carbon stock maps by age and last disturbance","set":"Carbon Assumptions > Spin-up","reads":[{"col":"SoilCarbonFile","label":"gSSURGO soil organic carbon","role":"Soil carbon map for the initial soil pool","note":"","alt":false},{"col":"FirePerimeterHistoryFile","label":"Interagency fire perimeter history","role":"Last disturbance: high-severity fire where a perimeter since 1900 covers the cell, else clearcut","note":"","alt":false}]},"9":{"id":"9","label":"9","name":"Projection Transitions","family":"land","makes":"Projection transition targets, fire sizes and slope selectivity","set":"Projection Options; Projection Transitions; Fire","reads":[{"col":"FirePerimeterHistoryFile","label":"Interagency fire perimeter history","role":"Fire sizes (one per incident and year) for the projection size distribution","note":"Fire > Fire Method: Historical rates (default)","alt":false},{"col":"BurnProbabilityFile","label":"FSim burn probability","role":"Burn probability that guides where projected fire spreads and starts","note":"Fire > Fire Method: Burn probability","alt":true},{"col":"FpaFodFile","label":"FPA-FOD fire occurrence","role":"Ignition density, smoothed (5 km default)","note":"Fire > Ignitions: FPA-FOD ignition density","alt":true},{"col":"ElevationFile","label":"LANDFIRE elevation","role":"Slope selectivity of projected fire (burned share by slope)","note":"Fire > Slope Selectivity (default on)","alt":false}]},"10":{"id":"10","label":"10","name":"Transition Suitability","family":"land","makes":"Surfaces that place projected transitions, with adjacency and patch sizes","set":"Projection Allocation; Suitability Options and Covariates; Rule Weights","reads":[{"col":"NlcdFolder","label":"Annual NLCD","role":"The 30 m annual record the suitability surfaces are fitted on","note":"","alt":false},{"col":"LcmsFolder","label":"USFS LCMS annual change","role":"Harvest events the clearcut and selection surfaces are fitted on","note":"Projection Allocation > Event Classes: LCMS (default)","alt":false},{"col":"LandfireDisturbanceFolder","label":"LANDFIRE disturbance","role":"Event classes LANDFIRE:<type>","note":"Projection Allocation > Event Classes: LANDFIRE","alt":true},{"col":"FirePerimeterHistoryFile","label":"Interagency fire perimeter history","role":"Recently burned pixels kept out of the fit","note":"Suitability Options > Burn Window","alt":false},{"col":"RoadsFile","label":"LANDFIRE roads","role":"Distance to roads covariate","note":"Suitability Covariates","alt":false},{"col":"ElevationFile","label":"LANDFIRE elevation","role":"Elevation and slope covariates","note":"Suitability Covariates","alt":false},{"col":"WuiFolder","label":"SILVIS WUI blocks","role":"Housing density and WUI classes of the census blocks","note":"Suitability Covariates; Rule Weights","alt":false},{"col":"NccpiFile","label":"gNATSGO crop productivity","role":"Crop productivity covariate of ag expansion and contraction (blank path = fetched from Planetary Computer)","note":"Suitability Covariates","alt":false},{"col":"ForestOwnerFile","label":"USFS forest ownership","role":"Forest owner type covariate of clearcut and selection","note":"Suitability Covariates","alt":false}]},"7":{"id":"7","label":"7","name":"Climate Multipliers","family":"climate","makes":"Historical climate flow multipliers on growth and decomposition","set":"Climate Options (forest and non-forest growth, decomposition)","reads":[{"col":"PrismFolder","label":"PRISM","role":"Annual temperature and precipitation for the historical climate multipliers","note":"Climate Options","alt":false}]},"11":{"id":"11","label":"11","name":"Projection Climate","family":"climate","makes":"Projection climate flow multipliers","set":"Projection > Climate (LOCA2 scenario, model, replicate)","reads":[{"col":"Loca2Folder","label":"LOCA2","role":"Projected climate of one scenario, model and replicate","note":"Projection > Climate","alt":false}]},"12":{"id":"12","label":"12–14","name":"Build, Run and Compare Figures","family":"fig","makes":"PNG figures of a Build, a run, and a run comparison","set":"Run Figures; Compare Runs","reads":[{"col":"ElevationFile","label":"LANDFIRE elevation","role":"Hillshade under the maps, when the path is set","note":"","alt":false}]}}}</script>
+<script>
+(function () {
+  const J = JSON.parse(document.getElementById('data').textContent);
+  const arr = v => v == null ? [] : Array.isArray(v) ? v : typeof v === 'object' ? [] : [v];
+  const DS = Object.fromEntries(arr(J.datasets).map(d => [d.col, d]));
+  const ST = J.stages;
+  const svg = document.querySelector('.figure svg');
+  const detail = document.getElementById('detail');
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const chip = id => `<button class="chipb f-${ST[id].family}" data-st="${id}" aria-label="Stage ${esc(ST[id].label)}, ${esc(ST[id].name)}">${esc(ST[id].label)}</button>`;
+  const when = z => (z.alt ? '<span class="tag">non-default option</span>' : '') + (z.note ? `<small>${z.alt ? 'Only when ' : 'Switch: '}${esc(z.note)}</small>` : '');
+
+  document.getElementById('pick-ds').insertAdjacentHTML('beforeend', arr(J.datasets).map(d => `<button class="pick" data-ds="${d.col}" aria-pressed="false">${esc(d.label)}</button>`).join(''));
+  document.getElementById('pick-st').insertAdjacentHTML('beforeend', Object.values(ST).map(s => `<button class="pick st f-${s.family}" data-st="${s.id}" aria-pressed="false"><b>${esc(s.label)}</b>${esc(s.name)}</button>`).join(''));
+
+  // sel: the one dataset or stage chosen; dsSet and stSet: everything it connects to
+  function mark(dsSet, stSet, wire, sel) {
+    svg.classList.add('dim');
+    svg.querySelectorAll('.wire').forEach(w => w.classList.toggle('on', wire(w)));
+    svg.querySelectorAll('.ds').forEach(g => g.classList.toggle('on', dsSet.has(g.dataset.ds)));
+    svg.querySelectorAll('.stage').forEach(g => g.classList.toggle('on', stSet.has(g.dataset.stage)));
+    document.querySelectorAll('.pick').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.ds ? b.dataset.ds === sel.ds : b.dataset.st === sel.st)));
+  }
+
+  function selectDs(col) {
+    const d = DS[col]; if (!d) return;
+    const uses = arr(d.uses);
+    mark(new Set([col]), new Set(uses.map(z => z.stage)), w => w.dataset.ds === col, { ds: col });
+    detail.className = 'detail';
+    detail.innerHTML = `
+      <div class="d-head"><div><h2>${esc(d.label)}</h2><p class="d-meta">${esc(d.group)} · ${esc(d.vintage)}</p></div></div>
+      <dl class="facts">
+        <dt>Data Sources</dt><dd>${esc(d.display)}</dd>
+        <dt>Column</dt><dd><code>${esc(d.col)}</code></dd>
+        <dt>Default path</dt><dd><code>${d.path ? esc(d.path) : 'none (blank)'}</code></dd>
+      </dl>
+      <h3>Read by</h3>
+      <ul class="uses">${uses.map(z => `<li>${chip(z.stage)}<div class="what"><span>${esc(z.role)}</span>${when(z)}</div></li>`).join('')}</ul>`;
+  }
+
+  function selectSt(id) {
+    const s = ST[id]; if (!s) return;
+    const reads = arr(s.reads);
+    mark(new Set(reads.map(r => r.col)), new Set([id]), w => w.dataset.stage === id, { st: id });
+    detail.className = `detail f-${s.family}`;
+    detail.innerHTML = `
+      <div class="d-head"><span class="num">${esc(s.label)}</span><div><h2>${esc(s.name)}</h2><p class="d-meta">Set by: ${esc(s.set)}</p></div></div>
+      <dl class="facts"><dt>Makes</dt><dd>${esc(s.makes)}</dd></dl>
+      <h3>Reads</h3>
+      <ul class="uses">${reads.map(r => `<li><button class="dsbtn" data-ds="${r.col}">${esc(r.label)}</button><div class="what"><span>${esc(r.role)}</span>${when(r)}</div></li>`).join('')}</ul>`;
+  }
+
+  document.addEventListener('click', e => {
+    const t = e.target.closest('[data-st], [data-ds], .stage, .ds');
+    if (!t || t.classList.contains('wire')) return;
+    if (t.dataset.st) selectSt(t.dataset.st);
+    else if (t.classList.contains('stage')) selectSt(t.dataset.stage);
+    else if (t.dataset.ds) selectDs(t.dataset.ds);
+  });
+  svg.querySelectorAll('.stage, .ds').forEach(g => g.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault(); g.classList.contains('stage') ? selectSt(g.dataset.stage) : selectDs(g.dataset.ds);
+  }));
+  selectDs('NlcdFolder');
+})();
+</script>
