@@ -112,3 +112,6 @@ found along the way are batched here and fixed while Studio is closed (the page 
   Still old: 7.13 pipeline (7.3b), 7.15-7.17 (7.3d-f) and paragraph .101417 (ACCESS-CM2, [22]/[24], 'Projected Climate' folder).
 - 7.3: user uses CanESM5. Step 14 example now 'P26 - Projection CanESM ssp245'; paragraph names Climate - CanESM ssp245 / ssp585 in a
   Climate folder (result ids dropped until they exist). No ACCESS-CM2 left in the guide.
+- 7.3: climate [17] -> result [18], 4:29, 109 rasters 42 MB, all checks pass, multipliers 0.356-1.991. Decade means 2024-33 / 2041-50:
+  forest 1.066/1.000, non-forest 1.153/0.902, Q10 fast 1.156/1.262, slow 1.108/1.180. Join step (last hist decade -> first proj decade):
+  forest 0.994->1.066, non-forest 0.993->1.153. Step 13 updated. SSP5-8.5 not created yet.
