@@ -25,7 +25,7 @@ Open items added 2026-10-29, in order (they come before 9-14):
 | --- | --- | --- | --- |
 | ~~1~~ | ~~24 Stage 13 hand-over check~~ DONE | User's decision (exact match or remove); package edit only after the P26 reruns finish | 23's reruns |
 | ~~2~~ | ~~25 Guide P26 numbers~~ DONE | 7.2-7.4 and Appendix A quote the old projections | 23's reruns |
-| 3 | 26 Guide chapter 10, Troubleshooting | Still a placeholder | - |
+| later | 26 Guide chapter 10, Troubleshooting | After beta testing (user) | - |
 | 4 | 22 Automatic spatial tiles | Proposed; P26 historical run is done, so package edits are no longer blocked by it | - |
 | 5 | 27 Scenarios of one library at once from R | Test speed (database locked) | - |
 | 6 | 29 Growth Inputs sheet | Last Carbon Assumptions sheet; changes inputs, so before any P26 freeze | - |
@@ -366,7 +366,7 @@ figures, which are redone once after the P26 rerun.
     0.5%; tighten it to an exact match (within rounding) or remove it - user's choice. The guide's sentence about it is already gone.
 25. **Guide: P26 numbers after the reruns** - DONE 2026-10-29 (ids, 7.2-7.4 numbers, Figures 7.8-7.11 and 7.28-7.31, six re-grabs). Update 7.2 (projection start 443.2 -> 444.3 Tg C), the 7.3 timings if they change,
     7.4's tables and figures, and Appendix A where it quotes projection results.
-26. **Guide chapter 10, Troubleshooting** - TO DO. Still a placeholder; include the Validation outputs and the failures met so far
+26. **Guide chapter 10, Troubleshooting** - LATER (user, 2026-10-29: after beta testers have used the guide; their problems feed it). Still a placeholder; include the Validation outputs and the failures met so far
     (dependency order, a Boolean stored as 1, result pages greyed out, spatial multiprocessing mask).
 27. **Scenarios of one library at once from R** - FOLLOW-UP (2026-10-28). Running them from separate R processes or one multi-scenario
     console call failed (database locked / exit 65535); tests run one at a time.
