@@ -53,6 +53,10 @@ namespace lucasCoreUI
             m_caption.Resize += (s, e) => m_caption.MaximumSize = new Size(m_caption.Width, 0);
         }
 
+        // SyncroSim disables a page on a result scenario (its inputs are read only); this page only reads, and figures live in results
+        public override bool ShouldEnableView() { return true; }
+        public override void EnableView(bool enable) { base.EnableView(true); }
+
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (keyData == Keys.Left || keyData == Keys.PageUp) { Step(-1); return true; }
