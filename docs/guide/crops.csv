@@ -74,7 +74,7 @@ File,X,Y,W,H
 6.6e-projection-schedule.png,560,235,1560,1250
 6.6f-patch-sizes.png,560,235,1560,1050
 6.6h-setup-validation.png,560,235,1560,470
-7.1b-projection-dependencies.png,10,150,530,530
+7.1b-projection-dependencies.png,10,150,530,480
 7.1g-run-control.png,560,190,850,250
 7.3g-climate-paste.png,10,155,525,495
 7.3h-climate-rename.png,10,155,1835,205
@@ -87,7 +87,7 @@ File,X,Y,W,H
 7.4d-compare-pipeline.png,541,158,1546,190
 7.4e-compare-runs-empty.png,639,161,1798,310
 7.4f-compare-runs-filled.png,936,255,1229,354
-9.1a-figure-viewer.png,10,150,2100,1440
+9.1a-figure-viewer.png,10,150,2265,1440
 9.2a-add-to-results.png,11,85,1040,770
 9.2b-active-results.png,11,85,1040,770
 9.2c-results-dropdown.png,11,85,1540,420
