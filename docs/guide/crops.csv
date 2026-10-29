@@ -18,9 +18,9 @@ File,X,Y,W,H
 7.1d-projection-tabular.png,560,190,1300,460
 7.1e-projection-spatial.png,600,195,1420,440
 7.1f-projection-filter.png,720,195,1300,800
-7.3a-climate-dependency.png,10,150,720,360
+7.3a-climate-dependency.png,10,155,525,440
 7.3b-climate-pipeline.png,735,150,1290,220
-7.3c-climate-page.png,735,195,1290,460
+7.3c-climate-page.png,548,150,1300,590
 7.3d-climate-projections.png,10,150,720,600
 7.3e-parallel-scenarios.png,735,195,1290,250
 7.3f-run-both.png,10,150,760,605

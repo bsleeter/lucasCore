@@ -107,3 +107,6 @@ found along the way are batched here and fixed while Studio is closed (the page 
 - 7.2 figures (2026-10-28): Run Figures [14] -> result [15] (run 13, dep Build 2; 1:25; joined to historical run 6, hand-over pass -0.24%).
   Figures 7.8-7.11 replaced with its Fig01/06/07/08 PNGs; captions: 418 km2 urbanized, 3,194 km2 harvested; fire draws 1,514/3,602 km2;
   carbon 439 -> 445 Tg C, 2031 about -9 Tg C; NBP mean +0.11 Tg C/yr. Chapter 7.2 done.
+- 7.3 (2026-10-28): climate scenario [17] Climate - CanESM ssp245 (folder Climate; dep Build 2; SSP2-4.5, CanESM5, r1i1p1f1, to 2050).
+  Figures 7.12 (7.3a, marks 12-13) and 7.14 (7.3c, marks 16-17) re-grabbed; steps 9 and 12 name CanESM5 and the Rescan button.
+  Still old: 7.13 pipeline (7.3b), 7.15-7.17 (7.3d-f) and paragraph .101417 (ACCESS-CM2, [22]/[24], 'Projected Climate' folder).
