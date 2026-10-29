@@ -36,8 +36,9 @@ if (!is.na(hid)) {
     X <- join_runs(H, X); d <- unname(X$join["projection"] - X$join["history"])
     say("Projection joined to historical run %d: %d-%d; total ecosystem carbon in %d %.2f Tg C at the end of the history, %.2f at the projection's start (%+.2f%%)",
         hid, X$years[1], X$years[2], X$proj_start, X$join["history"], X$join["projection"], 100 * d / X$join["history"])
-    check(STAGE, "the projection starts from its historical run's final carbon (within 0.5%)", !anyNA(X$join) && abs(d) <= 0.005 * X$join["history"],
-          sprintf("%.2f vs %.2f Tg C in %d", X$join["history"], X$join["projection"], X$proj_start))
+    # stage 9 hands every pool the historical run mapped to the projection, so the two totals are equal (1e-6 allows for rounding)
+    check(STAGE, "the projection starts from its historical run's final carbon (exactly)", !anyNA(X$join) && abs(d) <= 1e-6 * X$join["history"],
+          sprintf("%.4f vs %.4f Tg C in %d (%+.4f)", X$join["history"], X$join["projection"], X$proj_start, d))
   } else if (!is.null(H)) say("Historical run %d ends in %d, not in %d where the projection starts: the projection alone is drawn", hid, H$years[2], X$years[1])
 }
 
