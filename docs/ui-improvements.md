@@ -17,7 +17,17 @@ built on P26 (the guide's numbers and figures, the demo bundle, metadata) should
 | 6 | 12 Data Download stage | Needs the final dataset list (9 and 10 add or replace sources); its LOCA2 download refreshes the lists through 11 | 9, 10, 11 |
 | 7 | 13 P26 demo bundle | Needs 12's layout and manifest, and a frozen P26 rerun after 8, 9 and 10 | 12; 8, 9, 10 |
 | 8 | 14 FGDC metadata | The model record needs the final input list and 12's manifest, and ships with 13 and P26 data releases; the output-metadata stage can start earlier | 12, 13 |
-| any | 6 Images viewer for figures | UI convenience, independent of the rest | - |
+| ~~any~~ | ~~6 Images viewer for figures~~ | DONE 2026-10-29 (own figure viewer pages) | - |
+
+Open items added 2026-10-29, in order (they come before 9-14):
+
+| Order | Item | Why here | Depends on |
+| --- | --- | --- | --- |
+| 1 | 24 Stage 13 hand-over check | User's decision (exact match or remove); package edit only after the P26 reruns finish | 23's reruns |
+| 2 | 25 Guide P26 numbers after the reruns | 7.2-7.4 and Appendix A quote the old projections | 23's reruns |
+| 3 | 26 Guide chapter 10, Troubleshooting | Still a placeholder | - |
+| 4 | 22 Automatic spatial tiles | Proposed; P26 historical run is done, so package edits are no longer blocked by it | - |
+| 5 | 27 Scenarios of one library at once from R | Test speed (database locked) | - |
 
 While 8-10 are open, the guide's procedures (chapters 6-10) can still be written: the steps do not change, only the P26 numbers and
 figures, which are redone once after the P26 rerun.
@@ -36,7 +46,9 @@ figures, which are redone once after the P26 rerun.
 5. **Every custom page: wrap and scroll** - DONE 2026-10-24. `Fit` (ui/LucasView.cs) sets every wrapping label and row to the width the
    window leaves it, on every resize; pages scroll vertically. Build Options and Data Sources use it too. The Study Area unit picker
    already filled its window.
-6. **Build Figures in Studio's Images viewer** - TO DO. Stage 12's PNGs are only a table of files (Build Results > Build Figures) plus a
+6. **Build Figures in Studio's Images viewer** - DONE 2026-10-29, differently: not the Images layout but a figure viewer page
+   (`ui/FigureView.cs`) on Build Figures, Run Figures and Compare Figures - a drop-down of figures, Previous/Next and arrow keys, the
+   PNG fitted to the page, its caption, Open full size, Save as, Save all; stays enabled on result scenarios. Guide 9.1. Original plan: Stage 12's PNGs are only a table of files (Build Results > Build Figures) plus a
    folder export. SyncroSim 3.1 has an Images viewer (Add Image, side by side, across scenarios) fed by a package `<layout type="Image">`;
    no installed package uses it, so the shape comes from the Map layout and SyncroSim's own strings. Likely needs: a project lookup
    "Build Figure" (the 17 titles, as package `<record>`s), a BuildFigureId filter column plus Iteration/Timestep on OutputBuildFigure
@@ -231,7 +243,11 @@ figures, which are redone once after the P26 rerun.
    ...)"): a result's DisplayName already starts with its id, so list DisplayName alone. The stand-alone hint still says to make the run
    with tools/new-historical.R --historical-only --bookend-maps; say instead that the run needs state class, age and stock maps for
    its last year (age maps are on by default from 25 October 2026).
-17. **Run Figures: a comparison set for several futures** - TO DO (user, 2026-10-25). Today's Run Figures describe one run (a projection
+17. **Run Figures: a comparison set for several futures** - DONE 2026-10-29 as its own stage, 14 Compare Runs (src/14-compare-runs.R,
+   src/compare-figures.R), in its own scenario on the Build result: the Compare Runs page picks runs from a drop-down with a Baseline
+   tick, colour and label; 9 figures plus a carbon table (stocks, NPP, NEP, LULC losses, NBP) and a land change table (fire, harvest,
+   urbanization, forest and developed area change), as the user asked. Run Figures picks its run from a drop-down. Monte Carlo bands
+   and the sign-agreement maps are not in yet. Guide 7.4. Original plan (user, 2026-10-25): Today's Run Figures describe one run (a projection
    is joined to its historical run). Comparing futures (normal climate, SSP2-4.5, SSP5-8.5, or different land-use rules) needs its own
    set, built on dev/figures/compare-futures.R. Planned, in stage 13: the Run Figures page takes several runs, each with a label, plus a
    reference run (default: the first); one run = today's set, several = the comparison set. Contents: (1) total ecosystem carbon and its
@@ -240,7 +256,8 @@ figures, which are redone once after the P26 rerun.
    share a Projection Setup); (5) end-year carbon difference maps against the reference; (6) mean NPP difference maps over the last
    decade; (7) a summary table per future (end carbon, cumulative NBP, NPP mean and spread, burned and harvested area, differences from
    the reference). With Monte Carlo iterations: means with bands, and maps of the mean difference with its sign agreement.
-18. **Spin-up and decay calibration choices in the UI** - TO DO (user, 2026-10-26). The dead-matter calibration (stage 3) and spin-up
+18. **Spin-up and decay calibration choices in the UI** - DONE 2026-10-28 through item 21 (Spin-up, Decay Calibration Settings, Carbon
+   Method pages); mature age per forest type is still one value. Original request (user, 2026-10-26): The dead-matter calibration (stage 3) and spin-up
    (stage 4) rest on assumptions a user should be able to see and set, in a Carbon Options group (or its own page): (a) the calibration
    targets - FIA's measured down woody material pools (coarse and fine woody debris, litter, duff, standing dead) or the condition
    table's modelled down dead and litter; (b) the stand ages fitted - mature stands only, from a minimum age (60 years by default; the
@@ -250,7 +267,7 @@ figures, which are redone once after the P26 rerun.
    a single value); (e) the pool groupings matched to FIA (src/dom.R FIA_DOM), at least documented on the page. Young stands are a
    check on the disturbance flows (fire and harvest event flows), not a calibration target. Design and dev results: dev/nfcms and
    dev/fia FINDINGS.md.
-19. **Dead organic matter calibration from measured FIA data** - PROPOSED 2026-10-26 (user asked for the write-up). Calibrate decay to FIA's
+19. **Dead organic matter calibration from measured FIA data** - DONE 2026-10-27 (Carbon Method "FIA measured dead wood", the default). PROPOSED 2026-10-26 (user asked for the write-up). Calibrate decay to FIA's
    measured down woody material pools in mature stands, fix snag fall from remeasured dead trees, use fire as the spin-up's last
    disturbance, and fit the high-severity fire and clearcut event flows to plots after those events. Proposal, results on P26 and
    implementation plan: docs/dom-calibration-proposal.md; evidence: dev/fia (scripts 05-15) and dev/nfcms. UI choices: item 18.
@@ -260,7 +277,9 @@ figures, which are redone once after the P26 rerun.
    (five decay groups, fixed snag fall, ST-Sim row precedence in disturbance_matrices, fire_snag_rows), fitted fire and clearcut rows
    in defaults/stockflow/event-pathways.csv, defaults/spinup/fire-snag-share.csv, stage 4 reads the event rows stage 3 wrote,
    OutputDecayCalibration columns, decay figure. Test: tests/phaseZ7-measured-dom.R. DLL rebuild needed for the Carbon Options page.
-20. **Turnover and DOM rate table a user can view and override** - TO DO (user, 2026-10-27). Pick a region (ecodivision) and forest
+20. **Turnover and DOM rate table a user can view and override** - MOSTLY DONE 2026-10-28 through item 21: the rates can be set
+   (Live Turnover, Dead Organic Matter Parameters, Fixed Decay Multipliers, Disturbance Flows); still open is one view of the rates a
+   region and forest type actually run with, and their source. Original request (user, 2026-10-27): Pick a region (ecodivision) and forest
    type from lists and see the rates the model runs with, laid out by pool: each live pool's turnover rate and its split (foliage -> AG
    very fast; branch -> snag branch / AG fast; stem -> snag stem; fine root -> AG / BG very fast; coarse root -> AG / BG fast), and each
    DOM pool's total loss rate with its split between the next pool and emission to the atmosphere (snags: fall, decay, emission). Show
@@ -275,7 +294,8 @@ figures, which are redone once after the P26 rerun.
    the others). Tables: dev/fia/out-cal-clearcut/rate-table-{region,type,events}.csv (16-rate-table.R).
    DECIDED 2026-10-27 (user): regional decay for snags, down logs and fine woody debris; leaf litter and duff decay per forest type
    (hybrid fit: 3.0% of CBM's misfit left vs 2.5% per type, 7.1% fully regional). The sheet lists litter and duff decay with the type.
-21. **Carbon assumptions a user can see and change** - TO DO (user, 2026-10-27): "a user needs the ability to change or specify any of
+21. **Carbon assumptions a user can see and change** - DONE 2026-10-28 (steps 1-6 plus the Carbon Method page with presets; progress in
+   docs/carbon-assumptions.md); the Growth inputs sheet was not built. Request (user, 2026-10-27): "a user needs the ability to change or specify any of
    the assumptions made which allow us to run the carbon calibration steps", starting with the CBM crosswalk (today a package file,
    one row per forest type, not editable, not regional). Inventory of every assumption, where it lives, and the proposed Carbon
    Assumptions sheets (CBM Crosswalk as in lucasBuilder 2.0.4, Live Turnover, DOM Parameters, Decay Calibration Settings, Disturbance
@@ -289,3 +309,15 @@ figures, which are redone once after the P26 rerun.
     (~1.5 GB fixed + ~10 KB per 150 m cell, from the 24 Oct P26 measurements) with the jobs a 32/64 GB machine can hold (a warning, since
     runs may be on another machine); say plainly when one unit dominates and tiling barely helps; Build Options note and guide 3.3 updated.
     Only after the P26 historical run (no package edits during runs).
+23. **Deep Soil reset at the projection start** - FIXED 2026-10-29 (eeea87c; found by the user plotting DOM: Soil). Stage 9 took the
+    projection's starting stocks from the Build's initial stock maps, which have no Deep Soil (it starts at zero), so every projection
+    dropped 1.09 Tg C in 2023. Stage 9 now also carries any pool the historical run mapped at its end year. P26 Projection Setup and
+    the three projections are being rerun by the user, then their Run Figures and Compare Runs.
+24. **Stage 13 hand-over check** - TO DO, after the reruns (user, 2026-10-29: "We want the hand off to be exact"). The check allows
+    0.5%; tighten it to an exact match (within rounding) or remove it - user's choice. The guide's sentence about it is already gone.
+25. **Guide: P26 numbers after the reruns** - TO DO. Update 7.2 (projection start 443.2 -> 444.3 Tg C), the 7.3 timings if they change,
+    7.4's tables and figures, and Appendix A where it quotes projection results.
+26. **Guide chapter 10, Troubleshooting** - TO DO. Still a placeholder; include the Validation outputs and the failures met so far
+    (dependency order, a Boolean stored as 1, result pages greyed out, spatial multiprocessing mask).
+27. **Scenarios of one library at once from R** - FOLLOW-UP (2026-10-28). Running them from separate R processes or one multi-scenario
+    console call failed (database locked / exit 65535); tests run one at a time.
