@@ -12,7 +12,7 @@ built on P26 (the guide's numbers and figures, the demo bundle, metadata) should
 | ~~1~~ | ~~11 LOCA2 list scan (the scan part)~~ | DONE 2026-10-26, verified in Studio | - |
 | ~~2~~ | ~~7 Spatial multiprocessing in the Build~~ | DONE 2026-10-26 | - |
 | ~~3~~ | ~~8 Area-preserving resampling~~ | DONE 2026-10-26 (Build Options choice; a P26 Area-matched comparison run is optional) | - |
-| 4 | 9 FIA plot data | Largest change to the model's inputs (curves, carbon); must reproduce the .Rds results before it becomes the default | - |
+| ~~4~~ | ~~9 FIA plot data~~ | DONE 2026-10-26 (default still the .Rds) - Largest change to the model's inputs (curves, carbon); must reproduce the .Rds results before it becomes the default | - |
 | 5 | 10 TreeMap option | Same domain as 9 (FIA plots, forest type, age); an option, so it changes results only if made the default | 9 helps (FIA plot ids) |
 | 6 | 12 Data Download stage | Needs the final dataset list (9 and 10 add or replace sources); its LOCA2 download refreshes the lists through 11 | 9, 10, 11 |
 | 7 | 13 P26 demo bundle | Needs 12's layout and manifest, and a frozen P26 rerun after 8, 9 and 10 | 12; 8, 9, 10 |
@@ -35,7 +35,7 @@ Open items added 2026-10-29, in order (they come before 9-14):
 | 10 | 32 Carbon open science issues | Needs the user's look at the snag inputs | - |
 | any | 33 Leftovers inside done items | Small, independent | - |
 
-Then items 9-14 in the 2026-10-25 order above. Item 10 (TreeMap) has a P26 comparison done (2026-10-26) and grew into a **Stand Age
+Then items 10-14 in the 2026-10-25 order above (9 is done). Item 10 (TreeMap) has a P26 comparison done (2026-10-26) and grew into a **Stand Age
 Source** choice: NASA CMS (today), TreeMap (age from FIA COND), GAMI, and age inferred from biomass + disturbance history; next is the
 three-way P26 comparison and its effect on 1985 carbon.
 
@@ -109,7 +109,11 @@ figures, which are redone once after the P26 rerun.
    Options to test: class-priority or threshold rules (a cell is developed above some fraction), area-matching allocation (rank cells by
    fraction until the 30 m area is met), or a finer grid. Each must keep the state class map and the transitions derived from the same
    maps ([[coherence over area]]), and be judged on carbon as well as area.
-9. **FIA plot data instead of the prebuilt USGS tables** - TO DO (user, 2026-10-25). Stages 2-4 fit growth curves, carbon parameters
+9. **FIA plot data instead of the prebuilt USGS tables** - DONE 2026-10-26 (46a42a2; ac74e26 CONUS check: 99.99% of the USGS
+   conditions, live carbon and volume 99-100%; stage 2 curves within 1% at the median). Growth Curve Options > FIA Data = FIA DataMart
+   (state CSVs), read by src/fia.R with a cache (fia-conditions.rds) and 48 state down dead factors; stages 2 and 3 both use it, and
+   the measured dead wood calibration (19) reads COND_DWM_CALC from the same folder. The P26 guide Build uses DataMart. Still open:
+   the package default is the USGS .Rds (FiaSource 1); switch it to DataMart when a package edit is safe. Original request (user, 2026-10-25). Stages 2-4 fit growth curves, carbon parameters
    and decay calibration from two condition-level tables the user supplied (Data Sources: FIA Condition Carbon and Merchantable Volume,
    `USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds`, and FIA Condition Disturbance and Treatment Codes,
    `USGS_forest_conditions_dstrbcd_and_trtcd_20240213.Rds`). Another user has no such files. Planned: read the FIA DataMart directly
