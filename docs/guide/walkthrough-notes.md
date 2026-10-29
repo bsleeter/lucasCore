@@ -100,3 +100,7 @@ found along the way are batched here and fixed while Studio is closed (the page 
 - 6.6 grabs (2026-10-28): Figures 6.8 Suitability Summary, 6.9 Projection Rates, 6.10 Schedule, 6.11 Patch Sizes (mark 34 now the Written column, all Yes) and 6.13 Validation re-grabbed from result 11. Figure 6.12 (Projection-Tiles.tif) still from the old setup. Chapter 6 otherwise done.
 - 7.1 (2026-10-28): projection scenario [12] P26 - Projection No Climate (deps [11] setup, [2] Build; not in a folder). Figures 7.2 (dependencies) and 7.4 (Run Control 2023-2050, 1 iteration) re-grabbed. Text: name, [11], drag order; steps 6-7 now checks (Build result 2 supplies spatial SC/Age/TR every 1 year and the transition group filter; it has NO tabular options, so step 5 Tabular stays a step); '5 county jobs' -> '5 tile jobs'. Figures 7.1 (name dialog), 7.3 (pipeline), 7.5-7.7 still old library.
 - 7.1: Figure 7.5 (Tabular, marks 6-7) re-grabbed on projection 12.
+
+- 2026-10-28 projection [12] -> result [13]: 2:00:37 (jobs 1:54:51, merge 5:39), 5 tiles. 2024-2050: fire 9,943 km2 (2025 1,514; 2031 3,602),
+  harvest 1,729, urbanization 172 km2. Total Ecosystem 443.2 (2023) -> 431.1 (2031) -> 445.1 Tg C (2050). Hand-over 443.2 vs historical
+  444.3 (-0.24%, all in DOM: Soil 178.19 vs 179.28). 7.2 timing + hand-over text updated; Figures 7.8-7.11 wait on a projection Run Figures run.
