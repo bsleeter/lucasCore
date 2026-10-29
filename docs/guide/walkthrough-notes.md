@@ -115,3 +115,7 @@ found along the way are batched here and fixed while Studio is closed (the page 
 - 7.3: climate [17] -> result [18], 4:29, 109 rasters 42 MB, all checks pass, multipliers 0.356-1.991. Decade means 2024-33 / 2041-50:
   forest 1.066/1.000, non-forest 1.153/0.902, Q10 fast 1.156/1.262, slow 1.108/1.180. Join step (last hist decade -> first proj decade):
   forest 0.994->1.066, non-forest 0.993->1.153. Step 13 updated. SSP5-8.5 not created yet.
+- 7.3 copy route (2026-10-28): [20] Climate - CanESM ssp585 made by Copy [17] / Paste into Climate folder / rename / SSP5-8.5 (verified: the
+  copy keeps dep Build 2, the stage 11 pipeline and the LOCA2 fields). New block after the LOCA2 blockquote: bullets + Figures 7.15 paste
+  (7.3g), 7.16 rename (7.3h), 7.17 SSP5-8.5 (7.3i), unnumbered marks; old 7.15-7.17 renumbered 7.18-7.20. [21] ssp585 result running.
+  Projection [19] P26 - Projection CanESM ssp245 exists (deps 11, 18, 2); grab 'Screenshot 2026-10-28 193425.png' shows it (for 7.3d).
