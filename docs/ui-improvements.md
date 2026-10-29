@@ -27,10 +27,9 @@ Open items added 2026-10-29, in order (they come before 9-14):
 | ~~2~~ | ~~25 Guide P26 numbers~~ DONE | 7.2-7.4 and Appendix A quote the old projections | 23's reruns |
 | later | 26 Guide chapter 10, Troubleshooting | After beta testing (user) | - |
 | 4 | 22 Automatic spatial tiles | Proposed; P26 historical run is done, so package edits are no longer blocked by it | - |
-| 5 | 27 Scenarios of one library at once from R | Test speed (database locked) | - |
-| 6 | 29 Growth Inputs sheet | Last Carbon Assumptions sheet; exposes package defaults, results unchanged unless a user edits it | - |
-| 7 | 28 Mature age per forest type | Optional per-type rows; blank = the single age (60), so results unchanged by default | - |
-| 8 | 30 Rate read-out | Output only, changes nothing; easiest once 28 and 29 settle what goes in | 28, 29 |
+| ~~6~~ | ~~29 Growth Inputs sheet~~ DONE 2026-10-29 | Last Carbon Assumptions sheet; exposes package defaults, results unchanged unless a user edits it | - |
+| ~~7~~ | ~~28 Mature age per forest type~~ DONE 2026-10-29 | Optional per-type rows; blank = the single age (60), so results unchanged by default | - |
+| ~~8~~ | ~~30 Rate read-out~~ DONE 2026-10-29 | Output only, changes nothing; easiest once 28 and 29 settle what goes in | 28, 29 |
 | 9 | 31 Copy Carbon Assumptions; SoilGrids | Convenience and one more soil option | - |
 | 10 | 32 Carbon open science issues | Needs the user's look at the snag inputs | - |
 | any | 33 Leftovers inside done items | Small, independent | - |
@@ -326,7 +325,7 @@ figures, which are redone once after the P26 rerun.
    (five decay groups, fixed snag fall, ST-Sim row precedence in disturbance_matrices, fire_snag_rows), fitted fire and clearcut rows
    in defaults/stockflow/event-pathways.csv, defaults/spinup/fire-snag-share.csv, stage 4 reads the event rows stage 3 wrote,
    OutputDecayCalibration columns, decay figure. Test: tests/phaseZ7-measured-dom.R. DLL rebuild needed for the Carbon Options page.
-20. **Turnover and DOM rate table a user can view and override** - MOSTLY DONE 2026-10-28 through item 21: the rates can be set
+20. **Turnover and DOM rate table a user can view and override** - DONE 2026-10-29 (the read-out is item 30, Carbon Rates). Since 2026-10-28 through item 21 the rates can be set
    (Live Turnover, Dead Organic Matter Parameters, Fixed Decay Multipliers, Disturbance Flows); still open is one view of the rates a
    region and forest type actually run with, and their source. Original request (user, 2026-10-27): Pick a region (ecodivision) and forest
    type from lists and see the rates the model runs with, laid out by pool: each live pool's turnover rate and its split (foliage -> AG
@@ -368,18 +367,16 @@ figures, which are redone once after the P26 rerun.
     7.4's tables and figures, and Appendix A where it quotes projection results.
 26. **Guide chapter 10, Troubleshooting** - LATER (user, 2026-10-29: after beta testers have used the guide; their problems feed it). Still a placeholder; include the Validation outputs and the failures met so far
     (dependency order, a Boolean stored as 1, result pages greyed out, spatial multiprocessing mask).
-27. **Scenarios of one library at once from R** - FOLLOW-UP (2026-10-28). Running them from separate R processes or one multi-scenario
-    console call failed (database locked / exit 65535); tests run one at a time.
-28. **Mature age per forest type** - TO DO (left over from 18/21). Decay Calibration Settings has one mature age (60) and one
+28. **Mature age per forest type** - DONE 2026-10-29 (Carbon Assumptions: Mature Age by Forest Type; docs/carbon-assumptions.md). Was (left over from 18/21): Decay Calibration Settings has one mature age (60) and one
     disturbance-free window (30 yr) for every type; stands reach a steady dead-wood level at very different ages (oak woodland and
     lodgepole sooner, fir/spruce and mixed conifer later). Add an optional per-forest-type (and per-ecodivision) row, blank = the
     single value; log the mature plots per type.
-29. **Growth Inputs sheet** - TO DO (step 7 of item 21, never built). The growth assumptions still fixed in the package: FIA forest type
+29. **Growth Inputs sheet** - DONE 2026-10-29 (Carbon Assumptions: Growth Inputs; user growth curves not in - copy curves from another library). Was (step 7 of item 21, never built): The growth assumptions still fixed in the package: FIA forest type
     group -> state class and growth class (defaults/growth/forest-type-crosswalk.csv), merchantable carbon density and deciduous share
     (defaults/growth/merch-carbon-density.csv), the coarse/fine root split (Li et al. 2003, hard-coded in src/carbon.R), and optional
     user volume or carbon curves (lucasBuilder's Merchantable Volume Curve). A Carbon Assumptions sheet filled with the defaults, as the
     other six.
-30. **Rate read-out** - TO DO (the open half of item 20). Stage 3 writes the resolved rates per ecodivision x forest type (live turnover
+30. **Rate read-out** - DONE 2026-10-29 (Build Results: Carbon Rates, stage 3, with an ecodivision and forest type page). Was (the open half of item 20): Stage 3 writes the resolved rates per ecodivision x forest type (live turnover
     and splits, each dead pool's base rate x temperature effect x multiplier, emitted vs passed on, snag fall, fire and clearcut shares,
     mean temperature, Q10, key growth curve values) with each value's source (CBM default, calibrated, measured, user); a read-only page
     on the Build result with ecodivision and forest type drop-downs shows them.

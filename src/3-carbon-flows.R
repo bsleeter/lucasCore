@@ -29,11 +29,11 @@ if (!nrow(datasheet(scn, "stsim_FlowPathwayDiagram", optional = TRUE)))
 cc <- as.data.table(datasheet(scn, ds("CarbonCurve"), optional = TRUE, lookupsAsFactors = FALSE))
 if (!nrow(cc)) fail("Live-Tree Carbon Curves are empty: run stage 2 first (same pipeline, or depend on a stage 2 result)")
 setnames(cc, c("StratumId", "StateClassId"), c("Stratum", "StateClass"))
-cw <- read_default("growth", "forest-type-crosswalk.csv"); dens <- read_default("growth", "merch-carbon-density.csv")
+gi <- read_growth_inputs(); cw <- gi$cw; dens <- gi$dens   # Carbon Assumptions: Growth Inputs over the package defaults
 scl <- stsim_list("StateClass"); stl <- stsim_list("Stratum")
 cw[, StateClass := scl$Name[match(StateClassId, scl$Id)]][, softwood := grepl("Softwood$", LagClass)]
 cw[, deciduous := as.numeric(dens$DeciduousShare[match(StateClassId, dens$StateClassId)])]
-if (anyNA(cw$deciduous)) fail("merch-carbon-density.csv has no DeciduousShare for some state classes (run tools/make_wood_density.R)")
+if (anyNA(cw$deciduous)) fail("Growth Inputs / merch-carbon-density.csv has no DeciduousShare for some state classes")
 say("Carbon curves: %d cells x %d ages", uniqueN(cc[, .(Stratum, StateClass)]), uniqueN(cc$Age))
 
 # ecodivision mean annual temperature (PRISM normals) for DOM decay
@@ -57,6 +57,21 @@ if (CAL$mult_min >= CAL$mult_max || CAL$soil_min >= CAL$soil_max) fail("Decay Ca
 say("Decay Calibration Settings: %s", if (length(cal_user)) paste("from Carbon Assumptions:", paste(cal_user, collapse = ", ")) else "the defaults")
 MIN_PLOTS_CELL <- CAL$min_plots_cell
 MEAS_MIN_AGE <- CAL$mature_age; MIN_DWM_CELL <- CAL$min_dwm   # measured calibration: mature stand age; mature DWM conditions for an ecodivision's own fit
+# Carbon Assumptions - Mature Age by Forest Type (to-do 28): per forest type (optionally one ecodivision) the mature age and disturbance-free
+# window of the measured calibration's target plots; types without a row keep the single values above
+ma <- as.data.table(datasheet(scn, ds("MatureAge"), optional = TRUE, lookupsAsFactors = FALSE)); MA_BY <- NULL
+if (nrow(ma)) {
+  ma[, `:=`(StratumId = as.character(StratumId), StateClassId = as.character(StateClassId), MatureAge = as.integer(MatureAge),
+            ExclusionYears = if ("ExclusionYears" %in% names(ma)) as.integer(ExclusionYears) else NA_integer_)]
+  if (anyDuplicated(ma[, .(StratumId, StateClassId)])) fail("Mature Age by Forest Type: more than one row for the same forest type and ecodivision")
+  ma[, sc := cw$StateClassId[match(StateClassId, cw$StateClass)]][, ecodiv := eco$ecodiv[match(StratumId, eco$Stratum)]]
+  bad <- ma[is.na(sc), unique(StateClassId)]; if (length(bad)) fail("Mature Age by Forest Type: %s is not a forest type with growth inputs", paste(bad, collapse = ", "))
+  bad <- ma[!is.na(StratumId) & is.na(ecodiv), unique(StratumId)]; if (length(bad)) fail("Mature Age by Forest Type: ecodivision %s is not in this build", paste(bad, collapse = ", "))
+  MA_BY <- ma[, .(sc, ecodiv, age = MatureAge, recent = data.table::fcoalesce(ExclusionYears, as.integer(CAL$exclusion)))]
+  say("Mature Age by Forest Type: %d rows from Carbon Assumptions: %s; other types mature from %d yr, no fire or cutting within %d yr", nrow(ma),
+      paste(sprintf("%s%s %d yr (no fire or cutting within %d)", ifelse(is.na(ma$StratumId), "", paste0(ma$StratumId, " / ")), sub("^Forest: ", "", ma$StateClassId), MA_BY$age, MA_BY$recent), collapse = "; "),
+      CAL$mature_age, CAL$exclusion)
+} else say("Mature Age by Forest Type: no rows - every forest type mature from %d yr", CAL$mature_age)
 cells <- unique(cc[, .(Stratum, StateClass)])
 miss <- setdiff(cells$StateClass, cw$StateClass); if (length(miss)) fail("carbon curves for state classes not in the forest crosswalk: %s", paste(miss, collapse = ", "))
 cells[, sc := cw$StateClassId[match(StateClass, cw$StateClass)]][, ecodiv := eco$ecodiv[match(Stratum, eco$Stratum)]][, temp := eco$temp[match(Stratum, eco$Stratum)]]
@@ -234,10 +249,10 @@ if (dom_mode == 4L) {
     x[, `:=`(snag_fall = data.table::fcase(own_n >= fr$min_snags, own_r, typ_n >= fr$min_snags, typ_r, default = fr$all),
              SnagFallSource = data.table::fcase(own_n >= fr$min_snags, sprintf("Cell (%d snags)", own_n), typ_n >= fr$min_snags, sprintf("Forest type (%d snags)", typ_n), default = "All forest types"))]
     x[, c("own_n", "own_r", "typ_n", "typ_r") := NULL]; user_fall(x) }
-  dat_m <- dwm_targets(dw, cw, MEAS_MIN_AGE, CAL$exclusion)
+  dat_m <- dwm_targets(dw, cw, MEAS_MIN_AGE, CAL$exclusion, MA_BY)
   for (x in list(cells, all_cells)) x[, mplots := dat_m$obs[x, on = c("sc", "ecodiv"), .(n = sum(n)), by = .EACHI]$n][is.na(mplots), mplots := 0L]
-  say("Measured dead wood: %d down woody material conditions (%d states), %d mature (age >= %d, no fire or cutting in %d yr) in this build's types; snag fall from %d remeasured snags",
-      nrow(dw$dwm), length(dw$states), sum(dat_m$obs$n), MEAS_MIN_AGE, CAL$exclusion, nrow(dw$fall))
+  say("Measured dead wood: %d down woody material conditions (%d states), %d mature (age >= %d, no fire or cutting in %d yr%s) in this build's types; snag fall from %d remeasured snags",
+      nrow(dw$dwm), length(dw$states), sum(dat_m$obs$n), MEAS_MIN_AGE, CAL$exclusion, if (is.null(MA_BY)) "" else "; per forest type where set", nrow(dw$fall))
   # fits: each forest type pooled over its ecodivisions (the fallback), and each ecodivision over its types with enough plots (shared snag,
   # down log and fine woody debris multipliers; litter and duff per type)
   ecos <- unique(cells[mplots >= MIN_DWM_CELL, Stratum])   # the forest-type fallback only for types with a cell short of its own fit
@@ -326,7 +341,7 @@ progressBar()
 
 # ---- forest: net growth, growth split, turnover and decay per cell ----------------------------------------------------
 # live turnover per cell, from its CBM Crosswalk row (Carbon Assumptions)
-ng <- list(); fm_g <- list(); fm_d <- list(); err <- 0; nneg <- 0
+ng <- list(); fm_g <- list(); fm_d <- list(); rates <- list(); err <- 0; nneg <- 0
 for (i in seq_len(nrow(cells))) { s <- cells$Stratum[i]; c0 <- cells$StateClass[i]; k <- cw[StateClass == c0]; r <- turnover_rates(c0, k$softwood, k$deciduous, cbm, cells$cbm_eco[i], cells$cbm_species[i], lt_user(cells[i]))
   p <- cc[Stratum == s & StateClass == c0][order(Age)]
   g <- net_growth(p, r)
@@ -343,8 +358,17 @@ for (i in seq_len(nrow(cells))) { s <- cells$Stratum[i]; c0 <- cells$StateClass[
   dv <- dom_flow_values(r, k$softwood, cells$temp[i], cbm, dp = dom_parameters(dpt, s)); fixed <- character()
   if (!is.na(cm$snag_fall)) { dv <- set_snag_fall(dv, cm$snag_fall); fixed <- SNAG_FALL_FLOWS }
   dv <- scale_decay(dv, c(mult_i(which(cells$Stratum == s & cells$StateClass == c0)), list(soil = cm$m_soil)), fixed)
+  # Carbon Rates read-out (to-do 30): the rates just built, with their sources
+  fxg <- FX_USED[!is.na(unlist(cm[, paste0("fx_", FX_USED), with = FALSE]))]
+  rates[[i]] <- cbind(data.table(StratumId = s, StateClassId = c0, MeanTemperature = cells$temp[i]),
+                      rate_rows(dv, r, dom_parameters(dpt, s), cells$temp[i], c(mult_i(which(cells$Stratum == s & cells$StateClass == c0)), list(soil = cm$m_soil)), fxg,
+                                cm$Level, cm$SoilSource, if (!is.na(cm$snag_fall)) cm$SnagFallSource else NA_character_))
   fm_d[[i]] <- data.table(StratumId = s, StateClassId = c0, AgeMin = NA_integer_, AgeMax = NA_integer_, FlowGroupId = paste(names(dv), "[Type]"), Value = unname(dv)) }
 ng <- rbindlist(ng); fm_g <- rbindlist(fm_g); fm_d <- rbindlist(fm_d)
+rates <- rbindlist(rates)
+write_ds(rates[, .(StratumId, StateClassId, Process, FromStockTypeId, ToStockTypeId, Rate = signif(Rate, 6), BaseRate = signif(BaseRate, 6), TemperatureEffect = round(TemperatureEffect, 4),
+                  Multiplier = round(Multiplier, 4), MeanTemperature = round(MeanTemperature, 2), Source)], "OutputCarbonRate")
+say("Carbon Rates: %d rows (%d cells x their turnover and dead organic matter flows)", nrow(rates), uniqueN(rates[, .(StratumId, StateClassId)]))
 say("Forest: %d net growth rows, %d growth-split rows (%d negative shares), %d turnover/decay rows", nrow(ng), nrow(fm_g), nneg, nrow(fm_d))
 progressBar()
 

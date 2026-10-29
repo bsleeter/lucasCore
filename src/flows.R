@@ -137,3 +137,30 @@ DOM: Snag Branch,DOM: Aboveground Slow,Decay: Snag Branch -> AG Slow,
 DOM: Snag Stem,Atmosphere,Emission: Snag Stem -> Atmosphere,
 DOM: Snag Stem,DOM: Aboveground Medium,Transfer: Snag Stem -> AG Medium,
 DOM: Snag Stem,DOM: Aboveground Slow,Decay: Snag Stem -> AG Slow,", na.strings = "")
+
+# ---- Carbon Rates read-out (to-do 30) -----------------------------------------------------------------------------------
+# one cell's rows for the Carbon Rates output: every turnover and DOM flow it runs with (vals: the named flow values after snag fall and
+# decay scaling, exactly what stage 3 writes), with where each came from. r: turnover_rates(); dp: dom_parameters() of the cell; temp: its
+# mean annual temperature (C); mult: the decay group multipliers applied (list snag, cwd, ...; soil); fixed_groups: the groups the user
+# fixed (Fixed Decay Multipliers); level: where the calibration came from (Decay Calibration's Fitted At); soil_source; snag_source: the
+# measured snag fall's source, NA when the snag fall is CBM's or the user's
+TURNOVER_SOURCE_COLS <- list(Merchantable = "StemTurnover", `Other Wood` = c("BranchTurnover", "BranchToSnag"), Foliage = "FoliageTurnover",
+                             `Fine Roots` = c("FineRootTurnover", "FineRootToAG"), `Coarse Roots` = c("CoarseRootTurnover", "CoarseRootToAG"))
+rate_rows <- function(vals, r, dp, temp, mult, fixed_groups = character(), level = NA_character_, soil_source = NA_character_, snag_source = NA_character_) {
+  fp <- FOREST_PATHWAYS[match(names(vals), FlowType)]
+  out <- data.table::data.table(Process = sub(":.*$", "", names(vals)), FromStockTypeId = fp$From, ToStockTypeId = fp$To, Rate = unname(vals),
+                                BaseRate = NA_real_, TemperatureEffect = NA_real_, Multiplier = NA_real_, Source = NA_character_)
+  cbm <- sprintf("CBM (%s)", r$source); user <- if (is.null(r$user)) character() else r$user
+  for (i in seq_len(nrow(out))) { f <- names(vals)[i]; from <- out$FromStockTypeId[i]
+    if (out$Process[i] == "Biomass Turnover") { pool <- sub(" -> .*$", "", sub("^Biomass Turnover: ", "", f))
+      out$Source[i] <- if (any(TURNOVER_SOURCE_COLS[[pool]] %in% user)) "User (Live Turnover)" else if (pool %in% c("Fine Roots", "Coarse Roots")) paste0(cbm, "; split 0.5 to the AG pool") else cbm
+    } else if (f %in% SNAG_FALL_FLOWS) {
+      out$Source[i] <- if (any(c("StemSnagFall", "BranchSnagFall") %in% user)) "User (Live Turnover)" else if (!is.na(snag_source)) paste("Measured snag fall:", snag_source) else cbm
+    } else if (f == "Transfer: AG Slow -> BG Slow") { out$Source[i] <- "Dead Organic Matter Parameters (fixed transfer)"
+    } else { k <- names(DOM_POOLS)[match(from, DOM_POOLS)]
+      out$BaseRate[i] <- dp$rate[[k]]; out$TemperatureEffect[i] <- exp((temp - dp$ref[[k]]) * log(dp$q10[[k]]) * 0.1)
+      g <- if (length(mult)) names(mult)[vapply(names(mult), function(g) k %in% DECAY_GROUPS[[g]], TRUE)][1] else NA_character_; if (!length(g)) g <- NA_character_
+      out$Multiplier[i] <- if (is.na(g)) 1 else mult[[g]]
+      out$Source[i] <- paste("Dead Organic Matter Parameters; multiplier", if (is.na(g)) "1 (none)" else if (g %in% fixed_groups) "fixed by the user (Fixed Decay Multipliers)"
+                             else if (g == "soil") soil_source else if (grepl("^CBM", level)) "1 (CBM default)" else sprintf("calibrated (%s)", level)) } }
+  out[] }

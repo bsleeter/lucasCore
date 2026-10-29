@@ -393,6 +393,32 @@
 		<column name="Multiplier" displayName="Decay Multiplier (x CBM rate)" dataType="Double" format="0.000" validationType="Decimal" validationCondition="Greater" formula1="0"/>
 	</dataSheet>
 
+	<!-- Carbon Assumptions: Mature Age by Forest Type (to-do 28) - the stand age from which an FIA plot of a forest type counts as mature
+	     in the measured dead wood calibration, and optionally its own disturbance-free window, for a forest type and optionally one
+	     ecodivision (an ecodivision row overrides the type's blank-ecodivision row). Forest types reach a steady dead-wood level at
+	     different ages. A type without a row, and a blank value, take Decay Calibration Settings' single value (60 yr, 30 yr). -->
+	<dataSheet name="MatureAge" displayName="Mature Age by Forest Type" viewClassName="lucasCoreUI.MatureAgeView" viewClassAssembly="lucasCoreUI">
+		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
+		<column name="StateClassId" displayName="Forest Type" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="MatureAge" displayName="Mature Age (yr)" dataType="Integer" validationType="WholeNumber" validationCondition="Between" formula1="1" formula2="250"/>
+		<column name="ExclusionYears" displayName="No Fire or Cutting Within (yr, blank = Decay Calibration Settings)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
+	</dataSheet>
+
+	<!-- Carbon Assumptions: Growth Inputs (to-do 29) - per forest type, the inputs of the growth curves (stage 2) and live carbon flows
+	     (stage 3) that were package files: the FIA forest type groups whose plots it is fitted to (codes, ';' between) and its growth class
+	     (east/west x softwood/hardwood: the lag class of the curves, and softwood or hardwood CBM turnover and snag rates), the carbon
+	     density of merchantable wood (Mg C per m3 of FIA net merchantable volume, wood and bark), the deciduous share (foliage fall), and
+	     a fixed fine root share of root carbon (blank = Li et al. 2003, which varies with root biomass). Empty sheet = the package defaults
+	     (defaults/growth/forest-type-crosswalk.csv, merch-carbon-density.csv); a forest type without a row keeps its default. -->
+	<dataSheet name="GrowthInput" displayName="Growth Inputs" viewClassName="lucasCoreUI.GrowthInputsView" viewClassAssembly="lucasCoreUI">
+		<column name="StateClassId" displayName="Forest Type" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="FiaTypeGroups" displayName="FIA Forest Type Groups (codes, ; between)" dataType="String"/>
+		<column name="GrowthClass" displayName="Growth Class" dataType="Integer" validationType="List" formula1="1:East Softwood|2:East Hardwood|3:West Softwood|4:West Hardwood"/>
+		<column name="MerchCarbonDensity" displayName="Merchantable Carbon Density (Mg C/m3)" dataType="Double" format="0.0000" validationType="Decimal" validationCondition="Greater" formula1="0"/>
+		<column name="DeciduousShare" displayName="Deciduous Share (foliage fall)" dataType="Double" format="0.000" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+		<column name="FineRootShare" displayName="Fine Root Share of Roots (blank = Li et al. 2003)" dataType="Double" format="0.000" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+	</dataSheet>
+
 	<dataSheet name="Spinup" displayName="Spin-up">
 		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
 		<column name="StateClassId" displayName="Forest Type" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
@@ -520,6 +546,25 @@
 		<column name="ReturnIntervalSource" displayName="Return Interval Source" dataType="String" isOptional="True"/>
 		<column name="HistoricalClearcutShare" displayName="Spin-up Cycles Ended by Clearcut (share)" dataType="Double" format="0.00" isOptional="True"/>
 		<column name="FixedMultipliers" displayName="Multipliers Fixed by the User" dataType="String" isOptional="True"/>
+	</dataSheet>
+
+	<!-- Carbon Rates (to-do 30; stage 3): every live turnover and dead organic matter flow rate a forest cell (ecodivision x forest type)
+	     runs with, exactly as written to stsim_FlowMultiplier, and where it came from. For dead pools also the base rate at the reference
+	     temperature (Dead Organic Matter Parameters), the temperature effect at the cell's mean annual temperature (Q10), and the decay
+	     multiplier (calibrated, fixed by the user, or 1); rate = base x temperature effect x multiplier x the share to that destination,
+	     unless the pool's outflows are capped at its whole stock. Shown by a page with ecodivision and forest type drop-downs. -->
+	<dataSheet name="OutputCarbonRate" displayName="Carbon Rates" viewClassName="lucasCoreUI.CarbonRatesView" viewClassAssembly="lucasCoreUI">
+		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum"/>
+		<column name="StateClassId" displayName="Forest Type" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="Process" displayName="Process" dataType="String"/>
+		<column name="FromStockTypeId" displayName="From Pool" dataType="Integer" validationType="Datasheet" formula1="stsim_StockType"/>
+		<column name="ToStockTypeId" displayName="To Pool" dataType="Integer" validationType="Datasheet" formula1="stsim_StockType"/>
+		<column name="Rate" displayName="Rate (/yr)" dataType="Double" format="0.00000"/>
+		<column name="BaseRate" displayName="Base Decay Rate (/yr)" dataType="Double" format="0.0000" isOptional="True"/>
+		<column name="TemperatureEffect" displayName="Temperature Effect" dataType="Double" format="0.000" isOptional="True"/>
+		<column name="Multiplier" displayName="Decay Multiplier" dataType="Double" format="0.000" isOptional="True"/>
+		<column name="MeanTemperature" displayName="Mean Annual Temperature (C)" dataType="Double" format="0.0" isOptional="True"/>
+		<column name="Source" displayName="Source" dataType="String"/>
 	</dataSheet>
 
 	<dataSheet name="InitialStockCurve" displayName="Initial Stock Curves (spin-up)">
@@ -757,6 +802,7 @@
 
 	<transformer name="GrowthCurves" displayName="2 - Fit Growth Curves" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/2-growth-curves.R">
 		<dataSheet name="GrowthOptions" type="Input"/>
+		<dataSheet name="GrowthInput" type="Input"/>
 		<dataSheet name="MerchantableVolumeCurve" type="Output"/>
 		<dataSheet name="CarbonCurve" type="Output"/>
 		<dataSheet name="OutputGrowthParameter" type="Output"/>
@@ -772,6 +818,8 @@
 		<dataSheet name="FireSnagShare" type="Input"/>
 		<dataSheet name="DecayCalibrationSetting" type="Input"/>
 		<dataSheet name="FixedDecayMultiplier" type="Input"/>
+		<dataSheet name="MatureAge" type="Input"/>
+		<dataSheet name="GrowthInput" type="Input"/>
 		<dataSheet name="DomParameter" type="Input"/>
 		<dataSheet name="CarbonCurve" type="Input"/>
 		<dataSheet name="CarbonOptions" type="Input"/>
@@ -783,6 +831,7 @@
 		<dataSheet name="stsim_FlowMultiplier" type="Output"/>
 		<dataSheet name="stsim_StateAttributeValue" type="Output"/>
 		<dataSheet name="OutputDecayCalibration" type="Output"/>
+		<dataSheet name="OutputCarbonRate" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
@@ -964,6 +1013,7 @@
 			<item name="GrowthOptions"/>
 			<group name="lucasCoreCarbonAssumptions" displayName="Carbon Assumptions">
 				<item name="CarbonOptions"/>
+				<item name="GrowthInput"/>
 				<item name="CbmCrosswalk"/>
 				<item name="LiveTurnover"/>
 				<item name="DomParameter"/>
@@ -971,6 +1021,7 @@
 				<item name="DisturbanceFlow"/>
 				<item name="FireSnagShare"/>
 				<item name="DecayCalibrationSetting"/>
+				<item name="MatureAge"/>
 				<item name="FixedDecayMultiplier"/>
 			</group>
 			<group name="lucasCoreProjection" displayName="Projection">
@@ -1011,6 +1062,7 @@
 				<item name="OutputGrowthParameter"/>
 				<item name="OutputCarbonParameter"/>
 				<item name="OutputDecayCalibration"/>
+				<item name="OutputCarbonRate"/>
 				<item name="OutputGrowthReport"/>
 				<item name="OutputBuildFigure"/>
 				<item name="OutputRunFigure"/>

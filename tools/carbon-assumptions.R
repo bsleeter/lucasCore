@@ -14,7 +14,9 @@ CA_DESCRIPTION <- paste("The assumptions behind the carbon calibration (docs/car
   "base decay rate, reference temperature, Q10 and share emitted. Live Turnover: live pool turnover and snag fall (empty = CBM). Spin-up:",
   "return interval, share of past cycles ended by clearcut, last disturbance outside fire perimeters (empty = LANDFIRE, all fire, clearcut).",
   "Disturbance Flows: where high-severity fire and clearcut move each pool's carbon. Fire Snag Share: the share of live wood high-severity fire",
-  "leaves standing (empty = none). Decay Calibration Settings and Fixed Decay Multipliers: how the FIA calibration fits (empty = defaults).")
+  "leaves standing (empty = none). Decay Calibration Settings, Mature Age by Forest Type and Fixed Decay Multipliers: how the FIA calibration",
+  "fits (empty = defaults). Growth Inputs: each forest type's FIA type groups, growth class, merchantable carbon density, deciduous share and fine",
+  "root share (empty = the package's).")
 DOM_POOL_LIST <- c("AG Very Fast", "BG Very Fast", "AG Fast", "BG Fast", "AG Medium", "AG Slow", "BG Slow", "Snag Stem", "Snag Branch")
 CA_METHODS <- c(`fia-measured` = 4L, `cbm-defaults` = 3L)
 
@@ -30,6 +32,10 @@ fill_carbon_assumptions <- function(ca, pkg, method = "fia-measured") {
   put(x, "lucasCore_DomParameter", "Dead Organic Matter Parameters")
   x <- num(rd("disturbance-flows"), "Share")[, `:=`(Disturbance = match(Disturbance, c("High-severity fire", "Clearcut")), AgeMin = as.integer(AgeMin))]
   put(x[, !c("StratumId", "StateClassId")], "lucasCore_DisturbanceFlow", "Disturbance Flows")
+  x <- num(rd("growth-inputs"), c("MerchCarbonDensity", "DeciduousShare", "FineRootShare"))[, GrowthClass := match(GrowthClass, c("East Softwood", "East Hardwood", "West Softwood", "West Hardwood"))]
+  put(x, "lucasCore_GrowthInput", "Growth Inputs")
+  x <- rd("mature-age"); for (k in intersect(c("MatureAge", "ExclusionYears"), names(x))) data.table::set(x, j = k, value = as.integer(x[[k]]))
+  put(x, "lucasCore_MatureAge", "Mature Age by Forest Type")
   put(num(rd("fire-snag-share"), "Share"), "lucasCore_FireSnagShare", "Fire Snag Share")
   x <- num(rd("decay-calibration-settings"), c("MultiplierMin", "MultiplierMax", "SoilMultiplierMin", "SoilMultiplierMax"))
   for (k in intersect(c("MatureAge", "ExclusionYears", "MinPlotsOwnFit", "MinSnagsOwnRate", "MinPlotsConditionPools"), names(x))) data.table::set(x, j = k, value = as.integer(x[[k]]))

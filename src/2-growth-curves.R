@@ -27,8 +27,8 @@ say("Growth options: lag %s, penalty %g, min plots per ecodivision %d, ages 0-%d
     opt$Penalty, opt$MinPlotsEcodivision, opt$MaximumAge, opt$MinInventoryYear, opt$VolumeCapQuantile)
 
 # ---- the cells: forest state classes x primary strata ---------------------------------------------------------------
-cw <- read_default("growth", "forest-type-crosswalk.csv")
 scl <- stsim_list("StateClass"); stl <- stsim_list("Stratum")
+gi <- read_growth_inputs(scl); cw <- gi$cw   # Carbon Assumptions: Growth Inputs over the package defaults
 miss <- setdiff(cw$StateClassId, scl$Id); if (length(miss)) fail("forest-type crosswalk state classes not in stsim State Class: %s", paste(miss, collapse = ", "))
 eco <- st_drop_geometry(read_sf(src$EcodivisionFile))
 if (!all(c("ecodiv", "StrtmId") %in% names(eco))) fail("%s needs fields ecodiv and StrtmId", basename(src$EcodivisionFile))
@@ -129,13 +129,13 @@ cpar <- rbindlist(lapply(seq_len(nrow(cw)), function(i) { cf <- cfits[[cw$FiaTyp
            r_s0 = cf$bg[["s0"]], r_sinf = cf$bg[["s_inf"]], r_tau = cf$bg[["tau"]])]; f }))
 cpar <- merge(cpar, eco, by = "ecodiv")
 cpar[, StateClassName := scl$Name[match(StateClassId, as.integer(scl$Id))]][, StratumName := stl$Name[match(StratumId, as.integer(stl$Id))]]
-dens <- read_default("growth", "merch-carbon-density.csv"); dens[, MgCPerM3 := as.numeric(MgCPerM3)]
-miss <- setdiff(cw$StateClassId, dens$StateClassId); if (length(miss)) fail("merch-carbon-density.csv has no density for state classes %s (run tools/make_wood_density.R)", paste(miss, collapse = ", "))
+dens <- gi$dens; dens[, MgCPerM3 := as.numeric(MgCPerM3)]
+miss <- setdiff(cw$StateClassId, dens$StateClassId); if (length(miss)) fail("Growth Inputs / merch-carbon-density.csv has no density for state classes %s (run tools/make_wood_density.R)", paste(miss, collapse = ", "))
 stem <- setNames(as.list(dens$MgCPerM3[match(cw$StateClassId, dens$StateClassId)]), scl$Name[match(cw$StateClassId, scl$Id)])
 pools <- rbindlist(lapply(seq_len(nrow(cpar)), function(i) { p <- cpar[i]
   V <- cur[StratumId == p$StratumId & StateClassId == p$StateClassId][order(Age), MerchantableVolume]
   r <- cbm_pools(ages, wb_curve(ages, p$A, p$k, p$c, 0), c(s0 = p$f_s0, s_inf = p$f_sinf, tau = p$f_tau), c(s0 = p$r_s0, s_inf = p$r_sinf, tau = p$r_tau),
-                 merch_carbon(V, stem[[p$StateClassName]]))
+                 merch_carbon(V, stem[[p$StateClassName]]), gi$fine[[as.character(p$StateClassId)]])
   r[, `:=`(StratumName = p$StratumName, StateClassName = p$StateClassName, StratumId = p$StratumId, StateClassId = p$StateClassId)] }))
 pc <- c("Merchantable", "Foliage", "Other", "CoarseRoots", "FineRoots")
 check(STAGE, "every forest state class x ecodivision has a carbon curve", nrow(cpar) == nrow(cw) * nrow(eco) && !anyNA(cpar$A), sprintf("%d cells", nrow(cpar)))

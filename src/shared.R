@@ -125,6 +125,16 @@ read_dom_parameters <- function() {
                     d$ReferenceTemperature, d$Q10, d$ShareEmitted), collapse = "; ")) else "the package default")
   x }
 
+# Carbon Assumptions - Growth Inputs (to-do 29): the package's forest type crosswalk and merchantable carbon density with the scenario's
+# rows (from its Carbon Assumptions dependency) laid over them (src/growth.R growth_inputs); logs what differs from the package
+read_growth_inputs <- function(scl = stsim_list("StateClass")) {
+  u <- as.data.table(datasheet(scn, ds("GrowthInput"), optional = TRUE, lookupsAsFactors = FALSE))
+  g <- tryCatch(growth_inputs(read_default("growth", "forest-type-crosswalk.csv"), read_default("growth", "merch-carbon-density.csv"), u, scl),
+                error = function(e) fail(conditionMessage(e)))
+  say("Growth Inputs: %s", if (!nrow(u)) "none in this scenario - the package defaults" else if (!length(g$changed)) sprintf("%d rows from Carbon Assumptions, all the package defaults", nrow(u))
+      else sprintf("%d rows from Carbon Assumptions; differing from the package: %s", nrow(u), paste(g$changed, collapse = "; ")))
+  g }
+
 # a project-scope stsim list (Name, Id) as a data.table
 stsim_list <- function(name) as.data.table(datasheet(prj, paste0("stsim_", name), lookupsAsFactors = FALSE, optional = TRUE))
 

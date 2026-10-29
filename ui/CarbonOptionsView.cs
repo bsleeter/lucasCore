@@ -29,6 +29,7 @@ namespace lucasCoreUI
 
         // sheet, preset file (defaults/carbon-assumptions/<method>/<file>.csv), page name
         private static readonly string[][] Sheets = {
+            new[] { "lucasCore_GrowthInput", "growth-inputs", "Growth Inputs" },
             new[] { "lucasCore_CbmCrosswalk", "cbm-crosswalk", "CBM Crosswalk" },
             new[] { "lucasCore_DomParameter", "dom-parameters", "Dead Organic Matter Parameters" },
             new[] { "lucasCore_LiveTurnover", "live-turnover", "Live Turnover" },
@@ -36,6 +37,7 @@ namespace lucasCoreUI
             new[] { "lucasCore_DisturbanceFlow", "disturbance-flows", "Disturbance Flows" },
             new[] { "lucasCore_FireSnagShare", "fire-snag-share", "Fire Snag Share" },
             new[] { "lucasCore_DecayCalibrationSetting", "decay-calibration-settings", "Decay Calibration Settings" },
+            new[] { "lucasCore_MatureAge", "mature-age", "Mature Age by Forest Type" },
             new[] { "lucasCore_FixedDecayMultiplier", "fixed-decay-multipliers", "Fixed Decay Multipliers" } };
         // a scenario counts as filled when any of these has rows (stage 3's rule)
         private static readonly string[] Key = { "lucasCore_CbmCrosswalk", "lucasCore_DomParameter", "lucasCore_DisturbanceFlow" };

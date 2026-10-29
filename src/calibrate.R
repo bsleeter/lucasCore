@@ -95,16 +95,26 @@ MEAS_SIM <- list(standing = c("SnagStem", "SnagBranch"), cwd = "AGM", fwd = "AGF
 MEAS_RECENT <- 30   # default exclusion years (Decay Calibration Settings)
 MEAS_MULT <- c("snag", "cwd", "fwd", "litter", "duff")
 
-# mature-stand targets per state class x ecodivision x age band (bands from min_age), as fia_dom_data's: list(obs, ages); recent: no
-# fire or cutting recorded at the plot within this many years
-dwm_targets <- function(dw, cw, min_age = 60, recent = MEAS_RECENT) {
-  x <- dw$dwm[!is.na(stdage) & stdage >= min_age & stdage <= max(CAL_BANDS) & !(since_fire %in% 0:recent) & !(since_cut %in% 0:recent) &
+# mature-stand targets per state class x ecodivision x age band (bands from the mature age), as fia_dom_data's: list(obs, ages); recent: no
+# fire or cutting recorded at the plot within this many years. by (Carbon Assumptions: Mature Age by Forest Type, to-do 28): a table
+# (sc, ecodiv, age, recent) of per-forest-type values - ecodiv NA = every ecodivision of the type, a row with an ecodivision wins; the
+# rest keep min_age and recent. NULL = one mature age for all, exactly as before.
+dwm_targets <- function(dw, cw, min_age = 60, recent = MEAS_RECENT, by = NULL) {
+  lo <- if (is.null(by)) min_age else min(min_age, by$age); rlo <- if (is.null(by)) recent else min(recent, by$recent)
+  x <- dw$dwm[!is.na(stdage) & stdage >= lo & stdage <= max(CAL_BANDS) & !(since_fire %in% 0:rlo) & !(since_cut %in% 0:rlo) &
               is.finite(cwd) & is.finite(fwd) & is.finite(litter) & is.finite(duff) & is.finite(standing)]
   # a few records are impossible (negative, or thousands of Mg C/ha): drop negatives and each pool's top 0.1% (as the growth data's cap)
   for (p in MEAS_POOLS) { cap <- stats::quantile(x[[p]], 0.999); x <- x[get(p) >= 0 & get(p) <= cap] }
   g <- cw[, .(fortyp_grp = as.integer(unlist(strsplit(FiaTypeGroups, ";")))), by = StateClassId]
   x <- merge(x, g, by = "fortyp_grp", allow.cartesian = TRUE); data.table::setnames(x, "StateClassId", "sc")
-  x[, band := cut(stdage, unique(c(min_age, CAL_BANDS[CAL_BANDS > min_age])), include.lowest = TRUE)]
+  if (is.null(by)) x[, band := cut(stdage, unique(c(min_age, CAL_BANDS[CAL_BANDS > min_age])), include.lowest = TRUE)]
+  else {
+    x[, `:=`(ma = min_age, rc = recent)]
+    t <- by[is.na(ecodiv)]; if (nrow(t)) x[t, on = "sc", `:=`(ma = i.age, rc = i.recent)]
+    e <- by[!is.na(ecodiv)]; if (nrow(e)) x[e, on = c("sc", "ecodiv"), `:=`(ma = i.age, rc = i.recent)]
+    x <- x[stdage >= ma & !(!is.na(since_fire) & since_fire >= 0 & since_fire <= rc) & !(!is.na(since_cut) & since_cut >= 0 & since_cut <= rc)]
+    x[, band := as.character(cut(stdage, unique(c(.BY$ma, CAL_BANDS[CAL_BANDS > .BY$ma])), include.lowest = TRUE)), by = ma]
+    x[, c("ma", "rc") := NULL] }
   list(obs = x[, c(list(n = .N), lapply(.SD, mean)), by = .(sc, ecodiv, band), .SDcols = MEAS_POOLS], ages = x[, .N, by = .(sc, ecodiv, band, stdage)]) }
 
 # annual stem snag fall per state class x ecodivision from remeasured snags not killed by a recent fire (carbon-weighted share fallen

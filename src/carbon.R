@@ -48,9 +48,9 @@ fit_share <- function(t, num, den) {
 merch_carbon <- function(V, density) V * density
 
 # CBM live pools by age from total live carbon, the two shares and merchantable carbon (all Mg C/ha)
-cbm_pools <- function(age, live, sh_fol, sh_bg, merch_c) {
+cbm_pools <- function(age, live, sh_fol, sh_bg, merch_c, fine_share = NA_real_) {
   fol <- share_curve(age, sh_fol) * live; bg <- share_curve(age, sh_bg) * live
   wood <- pmax(live - fol - bg, 0); merch <- pmin(merch_c, wood); other <- wood - merch
-  p_fine <- 0.072 + 0.354 * exp(-0.060 * (bg / 0.5))           # Li et al. (2003), on root biomass (t/ha)
+  p_fine <- if (is.null(fine_share) || is.na(fine_share)) 0.072 + 0.354 * exp(-0.060 * (bg / 0.5)) else fine_share   # Li et al. (2003), on root biomass (t/ha); or Growth Inputs fixed share
   data.table::data.table(Age = age, Merchantable = merch, Foliage = fol, Other = other, CoarseRoots = bg * (1 - p_fine), FineRoots = bg * p_fine,
                          TotalLive = live, MerchCapped = merch_c > wood + 1e-9) }

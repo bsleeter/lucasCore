@@ -103,3 +103,35 @@ ecodiv_climate <- function(eco_file, prism_folder) {
   cl <- cl[, .(mat = mean(mat), map = mean(map)), by = ecodiv]
   cl[, `:=`(z_t = (mat - mean(mat)) / stats::sd(mat), z_p = (log(map) - mean(log(map))) / stats::sd(log(map)))]
   cl[] }
+
+# ---- Carbon Assumptions: Growth Inputs (to-do 29) ---------------------------------------------------------------------
+# The package defaults (forest-type-crosswalk.csv, merch-carbon-density.csv) with the user's rows laid over them. cw, dens: the two
+# default tables (character columns, as read_default reads them); user: the sheet's rows (StateClassId as the state class name,
+# GrowthClass as its label or code), or NULL; scl: the stsim State Class list (Id, Name). Returns list(cw, dens, fine, changed):
+# cw and dens as the defaults with the user's values, fine = fixed fine root share per StateClassId (NA = Li et al. 2003), changed =
+# the forest types whose inputs differ from the package's (one line each). A row for a state class the package has no growth
+# inputs for stops with an error: such a class has no FIA type groups, density or curves to start from.
+GROWTH_CLASSES <- c(`East Softwood` = "EastSoftwood", `East Hardwood` = "EastHardwood", `West Softwood` = "WestSoftwood", `West Hardwood` = "WestHardwood")
+growth_inputs <- function(cw, dens, user, scl) {
+  cw <- data.table::copy(cw); dens <- data.table::copy(dens)
+  fine <- stats::setNames(rep(NA_real_, nrow(cw)), cw$StateClassId); changed <- character()
+  if (is.null(user) || !nrow(user)) return(list(cw = cw, dens = dens, fine = fine, changed = changed))
+  u <- data.table::as.data.table(user)
+  u[, sid := as.character(scl$Id[match(as.character(StateClassId), scl$Name)])]
+  u[is.na(sid), sid := as.character(StateClassId)]                 # a sheet read with lookups as ids
+  bad <- u[!sid %in% cw$StateClassId, unique(as.character(StateClassId))]
+  if (length(bad)) stop("Growth Inputs: no package growth inputs for ", paste(bad, collapse = ", "), " (only the package's forest types can be changed)", call. = FALSE)
+  if (anyDuplicated(u$sid)) stop("Growth Inputs: more than one row for ", paste(unique(u$StateClassId[duplicated(u$sid)]), collapse = ", "), call. = FALSE)
+  gc <- as.character(u$GrowthClass); num <- suppressWarnings(as.integer(gc))
+  u[, lag := ifelse(!is.na(num), unname(GROWTH_CLASSES)[num], unname(GROWTH_CLASSES[gc]))]
+  u[is.na(lag) & gc %in% GROWTH_CLASSES, lag := gc[is.na(lag) & gc %in% GROWTH_CLASSES]]
+  for (i in seq_len(nrow(u))) { s <- u$sid[i]; j <- match(s, cw$StateClassId); k <- match(s, dens$StateClassId); d <- character()
+    grp <- gsub("[[:space:]]", "", as.character(u$FiaTypeGroups[i]))
+    if (!is.na(grp) && nzchar(grp)) { if (!grepl("^[0-9]+(;[0-9]+)*$", grp)) stop("Growth Inputs: FIA forest type groups for ", u$StateClassId[i], " must be codes separated by ';' (got '", grp, "')", call. = FALSE)
+      if (grp != cw$FiaTypeGroups[j]) d <- c(d, sprintf("FIA groups %s (package %s)", grp, cw$FiaTypeGroups[j])); data.table::set(cw, j, "FiaTypeGroups", grp) }
+    if (!is.na(u$lag[i])) { if (u$lag[i] != cw$LagClass[j]) d <- c(d, sprintf("growth class %s (package %s)", u$lag[i], cw$LagClass[j])); data.table::set(cw, j, "LagClass", u$lag[i]) }
+    for (col in c("MgCPerM3", "DeciduousShare")) { v <- suppressWarnings(as.numeric(u[[if (col == "MgCPerM3") "MerchCarbonDensity" else col]][i]))
+      if (!is.na(v)) { if (abs(v - as.numeric(dens[[col]][k])) > 1e-9) d <- c(d, sprintf("%s %g (package %s)", col, v, dens[[col]][k])); data.table::set(dens, k, col, as.character(v)) } }
+    f <- suppressWarnings(as.numeric(u$FineRootShare[i])); if (!is.na(f)) { fine[[s]] <- f; d <- c(d, sprintf("fine root share %g (package: Li et al. 2003)", f)) }
+    if (length(d)) changed <- c(changed, sprintf("%s: %s", u$StateClassId[i], paste(d, collapse = ", "))) }
+  list(cw = cw, dens = dens, fine = fine, changed = changed) }

@@ -149,3 +149,15 @@ calibrated, measured, user).
   (no SyncroSim, 1 s) and tests/phaseZ14-carbon-method.R (empty FIA = filled FIA exactly; empty CBM = filled CBM; CBM writes the LUCAS
   rows; gSSURGO soil with CBM dead wood). Running scenarios of one library at once from separate R processes or one multi-scenario
   console call failed (database locked / exit 65535): a follow-up.
+- 2026-10-29 **Mature Age by Forest Type, Growth Inputs and the Carbon Rates read-out** (to-dos 28-30, for the v1.0.0 release; none changes
+  results until a user edits a row). Mature Age by Forest Type: per forest type, optionally per ecodivision (that row wins), the mature
+  age and optionally the disturbance-free window of the measured calibration's target plots; types without a row keep Decay Calibration
+  Settings' single values (src/calibrate.R dwm_targets `by`; the outlier cap stays the one computed on the single-value set). Growth
+  Inputs: per forest type the FIA forest type groups, growth class (east/west x softwood/hardwood), merchantable carbon density,
+  deciduous share and an optional fixed fine root share (blank = Li et al. 2003); empty = the package files, read by stages 2 and 3
+  through src/growth.R growth_inputs (a type the package has no inputs for stops the stage). User growth curves (lucasBuilder's
+  Merchantable Volume Curve) are not in: copy curves from another library instead. Carbon Rates (Build Results, stage 3): every forest
+  cell's turnover and dead organic matter rates exactly as written to stsim_FlowMultiplier, with the base rate, temperature effect,
+  decay multiplier and source (src/flows.R rate_rows), on a page with ecodivision and forest type drop-downs. Pages: ui/MatureAgeView.cs,
+  ui/GrowthInputsView.cs, ui/CarbonRatesView.cs; both presets gained growth-inputs.csv and mature-age.csv (the Fill button writes them).
+  Tests: tests/unit-growth-mature-rates.R (no SyncroSim, 3 s) and tests/phaseZ15-growth-mature-rates.R.
