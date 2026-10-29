@@ -122,3 +122,4 @@ found along the way are batched here and fixed while Studio is closed (the page 
 - 7.3 projections (2026-10-28): [19] P26 - Projection CanESM ssp245 (deps 11, 18, 2) and [22] P26 - Projection CanESM ssp585 (deps 11, 21, 2).
   Figures 7.18 (7.3d, marks 18-21), 7.19 (7.3e, 22-23), 7.20 (7.3f, 24-25) re-grabbed; paragraph names [19]/[22] and climate results [18]/[21].
   Still old: Figure 7.13 (7.3b climate pipeline). Unused grabs: 193425 (proj 19 alone), 193542 (copy before rename), 194349 (19 Tabular).
+- 7.3: Figure 7.13 (7.3b climate pipeline, marks 14-15) re-grabbed on [17]. All 7.3 figures now from the new library; projections 19 and 22 running.
