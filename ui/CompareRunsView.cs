@@ -108,7 +108,7 @@ namespace lucasCoreUI
                         if (d.ShowDialog(this) == DialogResult.OK) { Modify(rw, "Colour", string.Format("#{0:x2}{1:x2}{2:x2}", d.Color.R, d.Color.G, d.Color.B)); RefreshControls(); }
                     }
                 };
-                var rm = new Button { Text = "2715", Width = 26, Height = 24, FlatStyle = FlatStyle.Flat, ForeColor = Color.Firebrick, Margin = new Padding(3, 3, 3, 3) };
+                var rm = new Button { Text = "✕", Width = 26, Height = 24, FlatStyle = FlatStyle.Flat, ForeColor = Color.Firebrick, Margin = new Padding(3, 3, 3, 3) };
                 m_tip.SetToolTip(rm, "Remove this run from the comparison");
                 rm.Click += (s, e) => { Sheet.DeleteRows(new[] { rw }); m_shown = null; RefreshControls(); };
                 var role = new Label { AutoSize = true, ForeColor = SystemColors.GrayText, Margin = new Padding(3, 7, 3, 3), Tag = Fit.Fixed };
