@@ -83,3 +83,7 @@ File,X,Y,W,H
 7.3e-parallel-scenarios.png,548,150,650,280
 7.3f-run-both.png,10,155,665,650
 7.3j-run-monitor-both.png,598,153,1432,727
+7.4b-compare-dependency.png,11,158,518,582
+7.4d-compare-pipeline.png,541,158,1546,190
+7.4e-compare-runs-empty.png,639,161,1798,310
+7.4f-compare-runs-filled.png,936,255,1229,354

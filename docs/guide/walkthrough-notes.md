@@ -126,3 +126,5 @@ found along the way are batched here and fixed while Studio is closed (the page 
 - 7.3: Run Monitor grab (user: 'use the second one', 195119; 195056 to old) -> Figure 7.21 (7.3j, marks 26 scenarios, 27 ten jobs) after the Run Monitor paragraph, which now names results [23] (ssp245) and [24] (ssp585).
 
 - 2026-10-29: projections [23] ssp245 and [24] ssp585 ran together, each 1:58:36 (jobs 1:45:53 / 1:44:06, merge 7:28 / 6:50) vs 2:01 for [13] alone; timing added to the 7.3 Run Monitor paragraph. Outputs not compared (not needed).
+- 7.4 Compare runs (2026-10-29): new section after Figure 7.21; Figures 7.22-7.27 (7.4a name, 7.4b dependency, 7.4c No Data, 7.4d pipeline, 7.4e empty page, 7.4f filled page), marks 28-41. Scenario [32] runs [24], [23], [13] (baseline). First run [33] failed: page stored Baseline as 1 (SyncroSim wants -1); fixed in 876611c, DLL rebuild pending (Studio open). Results paragraph still to add after a good run.
+  Section 5.6 step 4 and its figure still show the old typed-Id Run Figures page (now a drop-down): re-grab when convenient. Old grabs 083459/083548 (typed Id) left in captures, unused.

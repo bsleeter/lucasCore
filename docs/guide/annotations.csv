@@ -221,3 +221,17 @@ File,Step,X,Y,W,H
 7.3f-run-both.png,25,388,727,275,30
 7.3j-run-monitor-both.png,26,610,245,1412,63
 7.3j-run-monitor-both.png,27,610,538,1412,330
+7.4a-compare-name.png,28,18,85,836,30
+7.4b-compare-dependency.png,29,132,472,292,24
+7.4b-compare-dependency.png,30,174,531,352,24
+7.4c-compare-no-data.png,31,40,123,112,33
+7.4d-compare-pipeline.png,32,562,277,296,24
+7.4d-compare-pipeline.png,33,938,280,1141,28
+7.4e-compare-runs-empty.png,34,658,306,344,26
+7.4e-compare-runs-empty.png,35,1060,387,107,32
+7.4f-compare-runs-filled.png,36,954,383,39,128
+7.4f-compare-runs-filled.png,37,1002,385,510,124
+7.4f-compare-runs-filled.png,38,1554,385,42,126
+7.4f-compare-runs-filled.png,39,1639,383,105,128
+7.4f-compare-runs-filled.png,40,1766,385,270,124
+7.4f-compare-runs-filled.png,41,956,532,107,30
