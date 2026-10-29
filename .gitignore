@@ -21,7 +21,7 @@ dev/fia/*.rds
 dev/growth/out_*.csv
 dev/climate/*.csv
 
-# guide screen captures and annotated figures (published in the guide doc, not the repo)
+# guide working captures and annotated figures (the published copies are docs/guide/images, made by docs/guide/build-guide.R)
 docs/guide/captures/
 docs/guide/figures/
 Starter/*.bak-*

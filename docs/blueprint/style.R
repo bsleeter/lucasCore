@@ -52,9 +52,20 @@ svg_head <- function(W, H, title) paste0(sprintf('<svg xmlns="http://www.w3.org/
 # the print figure: light tokens inside the SVG (CDATA, since the font URL has &)
 standalone_svg <- function(head, body) paste0(head, "\n<style><![CDATA[@import url('", gf, "');\nsvg{", fonts, light, "}", rules, "]]></style>\n", body, "\n</svg>\n")
 fill <- function(t, k, v) paste(strsplit(t, k, fixed = TRUE)[[1]], collapse = v)
-fill_page <- function(tpl, svg_inline, json, version, n) {
+# the pages are standalone documents served by GitHub Pages from docs/ (docs/.nojekyll: served as is). The nav uses the Pages URLs,
+# so it also works from a copy of the page somewhere else
+SITE <- "https://bsleeter.github.io/lucasCore/"
+PAGES <- paste0(SITE, "blueprint/")
+REPO <- "https://github.com/bsleeter/lucasCore"
+page_head <- '<!doctype html>\n<html lang="en">\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
+# the three public pages: the User Guide (docs/guide/build-guide.R) and the two blueprints
+nav <- function(current) { l <- c(guide = "User Guide", package = "Package blueprint", data = "Data blueprint")
+  href <- c(guide = paste0(SITE, "guide/"), package = PAGES, data = paste0(PAGES, "data.html"))
+  a <- vapply(names(l), function(k) sprintf('<a href="%s"%s>%s</a>', href[[k]], if (k == current) ' aria-current="page"' else "", l[[k]]), "")
+  paste0('<nav class="links" aria-label="lucasCore documentation">', paste(a, collapse = ""), sprintf('<a href="%s">Source on GitHub</a>', REPO), '</nav>') }
+fill_page <- function(tpl, svg_inline, json, version, n, current) {
   p <- fill(fill(fill(fill(fill(fill(tpl, "{{RULES}}", rules), "{{LIGHT}}", light), "{{DARK}}", dark), "{{FONTS}}", fonts), "{{SVG}}", svg_inline), "{{DATA}}", json)
-  fill(fill(p, "{{VERSION}}", version), "{{N}}", as.character(n)) }
+  paste0(page_head, fill(fill(fill(p, "{{VERSION}}", version), "{{N}}", as.character(n)), "{{NAV}}", nav(current))) }
 render_png <- function(svg_file, png_file, W, H) {
   browser <- Filter(file.exists, c("C:/Program Files/Google/Chrome/Application/chrome.exe", "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"))
   if (!length(browser)) return(cat("png: no Chrome or Edge found; open the SVG in a browser to export one\n"))

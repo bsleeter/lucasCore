@@ -8,7 +8,12 @@
 :root{ {{FONTS}} {{LIGHT}} }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ {{DARK}} color-scheme:dark } }
 :root[data-theme="dark"]{ {{DARK}} color-scheme:dark }
-body{background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans)}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans)}
+.links{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:13px}
+.links a{color:var(--ink2);text-decoration:none;border-bottom:1px solid var(--line)}
+.links a:hover{color:var(--ink);border-bottom-color:var(--edge)}
+.links a[aria-current]{color:var(--ink);font-weight:600;border-bottom:2px solid var(--edge)}
+.links a:focus-visible{outline:2px solid var(--edge);outline-offset:2px}
 .wrap{max-width:1640px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:18px}
 .intro{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px}
 .intro h1{font:700 20px/1.2 var(--sans);margin:0;text-wrap:balance}
@@ -62,6 +67,7 @@ svg.dim .ds:not(.on) text{opacity:.4}
 </style>
 
 <div class="wrap">
+  {{NAV}}
   <div class="intro">
     <h1>lucasCore data blueprint</h1>
     <p>Version {{VERSION}}: the {{N}} national datasets in the Data Sources sheet, the stages that read each one, what for, and the setting that switches it. Select a dataset or a stage, in the drawing or below.</p>

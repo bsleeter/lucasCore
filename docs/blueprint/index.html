@@ -1,3 +1,7 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>lucasCore Blueprint</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,7 +15,12 @@
 --setup:#9eb0b8;--setup-t:#1f2a2f;--land:#6dc59b;--land-t:#15291f;--carbon:#e3a46d;--carbon-t:#2d2118;--climate:#79b3e3;--climate-t:#15253a;--fig:#b9a0e6;--fig-t:#251f33; color-scheme:dark } }
 :root[data-theme="dark"]{ --bg:#101619;--surface:#172024;--line:#304048;--ink:#e3eaec;--ink2:#c3cfd3;--muted:#8fa0a6;--edge:#a8b7bc;--on:#101619;
 --setup:#9eb0b8;--setup-t:#1f2a2f;--land:#6dc59b;--land-t:#15291f;--carbon:#e3a46d;--carbon-t:#2d2118;--climate:#79b3e3;--climate-t:#15253a;--fig:#b9a0e6;--fig-t:#251f33; color-scheme:dark }
-body{background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans)}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans)}
+.links{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:13px}
+.links a{color:var(--ink2);text-decoration:none;border-bottom:1px solid var(--line)}
+.links a:hover{color:var(--ink);border-bottom-color:var(--edge)}
+.links a[aria-current]{color:var(--ink);font-weight:600;border-bottom:2px solid var(--edge)}
+.links a:focus-visible{outline:2px solid var(--edge);outline-offset:2px}
 .wrap{max-width:1640px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:18px}
 .intro{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px}
 .intro h1{font:700 20px/1.2 var(--sans);margin:0;text-wrap:balance}
@@ -83,6 +92,7 @@ svg.dim .stage.sel,svg.dim .stage.rel{opacity:1}
 </style>
 
 <div class="wrap">
+  <nav class="links" aria-label="lucasCore documentation"><a href="https://bsleeter.github.io/lucasCore/guide/">User Guide</a><a href="https://bsleeter.github.io/lucasCore/blueprint/" aria-current="page">Package blueprint</a><a href="https://bsleeter.github.io/lucasCore/blueprint/data.html">Data blueprint</a><a href="https://github.com/bsleeter/lucasCore">Source on GitHub</a></nav>
   <div class="intro">
     <h1>lucasCore blueprint</h1>
     <p>Version 1.0.0: the 15 stages, the scenarios they run in, and the datasheets they hand on to each other and to ST-Sim. Select a stage, in the drawing or below, to list every sheet it reads and writes.</p>

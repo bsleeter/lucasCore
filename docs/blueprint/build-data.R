@@ -166,7 +166,7 @@ stj <- lapply(names(S), function(id) { s <- S[[id]]
 names(stj) <- names(S)
 json <- gsub("</", "<\\/", toJSON(list(datasets = unname(dsj), stages = stj), auto_unbox = TRUE), fixed = TRUE)
 tpl <- paste(readLines(file.path(here, "template-data.html"), warn = FALSE, encoding = "UTF-8"), collapse = "\n")
-writeLines(fill_page(tpl, paste0(head, "\n", body, "\n</svg>"), json, version, length(D)), file.path(out, "data.html"), useBytes = TRUE)
+writeLines(fill_page(tpl, paste0(head, "\n", body, "\n</svg>"), json, version, length(D), "data"), file.path(out, "data.html"), useBytes = TRUE)
 
 render_png(svg_file, file.path(out, "lucascore-data-blueprint.png"), W, H)
 cat("svg:", svg_file, "\nhtml:", file.path(out, "data.html"), "\n")

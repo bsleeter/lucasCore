@@ -213,7 +213,7 @@ stages_json <- lapply(st, function(s) { id <- as.character(s$id)
        reads = sheet_list(s, "Input"), writes = sheet_list(s, "Output"), both = sheet_list(s, "Both")) })
 json <- gsub("</", "<\\/", toJSON(stages_json, auto_unbox = TRUE), fixed = TRUE)
 tpl <- paste(readLines(file.path(here, "template.html"), warn = FALSE, encoding = "UTF-8"), collapse = "\n")
-writeLines(fill_page(tpl, paste0(head, "\n", body, "\n</svg>"), json, version, length(st)), file.path(out, "index.html"), useBytes = TRUE)
+writeLines(fill_page(tpl, paste0(head, "\n", body, "\n</svg>"), json, version, length(st), "package"), file.path(out, "index.html"), useBytes = TRUE)
 
 render_png(file.path(out, "lucascore-blueprint.svg"), file.path(out, "lucascore-blueprint.png"), W, H)
 cat("svg:", file.path(out, "lucascore-blueprint.svg"), "\nhtml:", file.path(out, "index.html"), "\n")
