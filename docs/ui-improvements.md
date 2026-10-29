@@ -23,8 +23,8 @@ Open items added 2026-10-29, in order (they come before 9-14):
 
 | Order | Item | Why here | Depends on |
 | --- | --- | --- | --- |
-| 1 | 24 Stage 13 hand-over check | User's decision (exact match or remove); package edit only after the P26 reruns finish | 23's reruns |
-| 2 | 25 Guide P26 numbers after the reruns | 7.2-7.4 and Appendix A quote the old projections | 23's reruns |
+| ~~1~~ | ~~24 Stage 13 hand-over check~~ DONE | User's decision (exact match or remove); package edit only after the P26 reruns finish | 23's reruns |
+| ~~2~~ | ~~25 Guide P26 numbers~~ DONE | 7.2-7.4 and Appendix A quote the old projections | 23's reruns |
 | 3 | 26 Guide chapter 10, Troubleshooting | Still a placeholder | - |
 | 4 | 22 Automatic spatial tiles | Proposed; P26 historical run is done, so package edits are no longer blocked by it | - |
 | 5 | 27 Scenarios of one library at once from R | Test speed (database locked) | - |
@@ -358,13 +358,13 @@ figures, which are redone once after the P26 rerun.
     (~1.5 GB fixed + ~10 KB per 150 m cell, from the 24 Oct P26 measurements) with the jobs a 32/64 GB machine can hold (a warning, since
     runs may be on another machine); say plainly when one unit dominates and tiling barely helps; Build Options note and guide 3.3 updated.
     Only after the P26 historical run (no package edits during runs).
-23. **Deep Soil reset at the projection start** - FIXED 2026-10-29 (eeea87c; found by the user plotting DOM: Soil). Stage 9 took the
+23. **Deep Soil reset at the projection start** - FIXED and rerun 2026-10-29 (eeea87c; found by the user plotting DOM: Soil). Stage 9 took the
     projection's starting stocks from the Build's initial stock maps, which have no Deep Soil (it starts at zero), so every projection
     dropped 1.09 Tg C in 2023. Stage 9 now also carries any pool the historical run mapped at its end year. P26 Projection Setup and
     the three projections are being rerun by the user, then their Run Figures and Compare Runs.
-24. **Stage 13 hand-over check** - TO DO, after the reruns (user, 2026-10-29: "We want the hand off to be exact"). The check allows
+24. **Stage 13 hand-over check** - DONE 2026-10-29 (12a2de9: exact, 1e-6; new runs pass, the pre-fix run fails), after the reruns (user, 2026-10-29: "We want the hand off to be exact"). The check allows
     0.5%; tighten it to an exact match (within rounding) or remove it - user's choice. The guide's sentence about it is already gone.
-25. **Guide: P26 numbers after the reruns** - TO DO. Update 7.2 (projection start 443.2 -> 444.3 Tg C), the 7.3 timings if they change,
+25. **Guide: P26 numbers after the reruns** - DONE 2026-10-29 (ids, 7.2-7.4 numbers, Figures 7.8-7.11 and 7.28-7.31, six re-grabs). Update 7.2 (projection start 443.2 -> 444.3 Tg C), the 7.3 timings if they change,
     7.4's tables and figures, and Appendix A where it quotes projection results.
 26. **Guide chapter 10, Troubleshooting** - TO DO. Still a placeholder; include the Validation outputs and the failures met so far
     (dependency order, a Boolean stored as 1, result pages greyed out, spatial multiprocessing mask).
