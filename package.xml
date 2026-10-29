@@ -648,7 +648,7 @@
 		<column name="RunScenarioId" displayName="Run (result scenario Id in this library; blank = the newest ST-Sim result)" dataType="Integer" isOptional="True"/>
 	</dataSheet>
 
-	<dataSheet name="OutputRunFigure" displayName="Run Figures (PNG)">
+	<dataSheet name="OutputRunFigure" displayName="Run Figures (PNG)" viewClassName="lucasCoreUI.RunFigureView" viewClassAssembly="lucasCoreUI">
 		<!-- stage 13: one row per figure of the run (src/run-figures.R); Export > LUCAS Core > Run Figures saves them all to a folder -->
 		<column name="Figure" dataType="Integer"/>
 		<column name="Title" dataType="String"/>
@@ -665,7 +665,7 @@
 		<column name="Baseline" displayName="Baseline (the run the others are compared with; none ticked = the first projection)" dataType="Boolean" isOptional="True"/>
 	</dataSheet>
 
-	<dataSheet name="OutputCompareFigure" displayName="Compare Figures (PNG)">
+	<dataSheet name="OutputCompareFigure" displayName="Compare Figures (PNG)" viewClassName="lucasCoreUI.CompareFigureView" viewClassAssembly="lucasCoreUI">
 		<!-- stage 14: one row per comparison figure (src/compare-figures.R); Export > LUCAS Core > Compare Figures saves them all to a folder -->
 		<column name="Figure" dataType="Integer"/>
 		<column name="Title" dataType="String"/>
@@ -706,7 +706,7 @@
 		<column name="DevelopedChange" displayName="Developed area change (km2)" dataType="Double"/>
 	</dataSheet>
 
-	<dataSheet name="OutputBuildFigure" displayName="Build Figures (PNG)">
+	<dataSheet name="OutputBuildFigure" displayName="Build Figures (PNG)" viewClassName="lucasCoreUI.BuildFigureView" viewClassAssembly="lucasCoreUI">
 		<!-- stage 12: one row per publication figure (src/figures.R); Export > LUCAS Core > Build Figures saves them all to a folder -->
 		<column name="Figure" dataType="Integer"/>
 		<column name="Title" dataType="String"/>
