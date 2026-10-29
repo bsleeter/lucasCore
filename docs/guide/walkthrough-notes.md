@@ -123,3 +123,4 @@ found along the way are batched here and fixed while Studio is closed (the page 
   Figures 7.18 (7.3d, marks 18-21), 7.19 (7.3e, 22-23), 7.20 (7.3f, 24-25) re-grabbed; paragraph names [19]/[22] and climate results [18]/[21].
   Still old: Figure 7.13 (7.3b climate pipeline). Unused grabs: 193425 (proj 19 alone), 193542 (copy before rename), 194349 (19 Tabular).
 - 7.3: Figure 7.13 (7.3b climate pipeline, marks 14-15) re-grabbed on [17]. All 7.3 figures now from the new library; projections 19 and 22 running.
+- 7.3: Run Monitor grab (user: 'use the second one', 195119; 195056 to old) -> Figure 7.21 (7.3j, marks 26 scenarios, 27 ten jobs) after the Run Monitor paragraph, which now names results [23] (ssp245) and [24] (ssp585).
