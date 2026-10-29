@@ -15,7 +15,7 @@ built on P26 (the guide's numbers and figures, the demo bundle, metadata) should
 | ~~4~~ | ~~9 FIA plot data~~ | DONE 2026-10-26 (default stays the .Rds, user) - Largest change to the model's inputs (curves, carbon); must reproduce the .Rds results before it becomes the default | - |
 | 5 | 10 TreeMap option | Same domain as 9 (FIA plots, forest type, age); an option, so it changes results only if made the default | 9 helps (FIA plot ids) |
 | 6 | 12 Data Download stage | Needs the final dataset list (9 and 10 add or replace sources); its LOCA2 download refreshes the lists through 11 | 9, 10, 11 |
-| 7 | 13 P26 demo bundle | Needs 12's layout and manifest, and a frozen P26 rerun after 8, 9 and 10 | 12; 8, 9, 10 |
+| 7 | 13 Demo bundle (Calaveras, 2026-10-29; was P26) | Needs 12's layout and manifest, and a frozen P26 rerun after 8, 9 and 10 | 12; 8, 9, 10 |
 | 8 | 14 FGDC metadata | The model record needs the final input list and 12's manifest, and ships with 13 and P26 data releases; the output-metadata stage can start earlier | 12, 13 |
 | ~~any~~ | ~~6 Images viewer for figures~~ | DONE 2026-10-29 (own figure viewer pages) | - |
 
@@ -208,7 +208,42 @@ figures, which are redone once after the P26 rerun.
    - **Robustness**: resumable downloads, size or checksum checks so a half-finished file never counts as present, clear messages for
      login/manual datasets. CONUS-wide sets are tens to hundreds of GB; clipping is the default wherever a service allows it.
    - Downloads and clipping in R (terra, as the stages already do), so it is an ordinary Rscript stage.
-13. **P26 demo data bundle** - TO DO (user, 2026-10-25). A stand-alone, shippable set of the input data for the P26 Northern Sierra
+13. **Demo bundle: Calaveras County** - PLANNED 2026-10-29 (user: P26 is too large for a demo library; Calaveras has a good mix of
+   land change). Replaces the P26 bundle below, whose notes on contents, layout, script and hosting still apply.
+   - **Study area**: Calaveras County, CA (GEOID 06009), 2,686 km2, 88 x 64 km. Annual NLCD 1985-2023: developed 97 -> 151 km2
+     (+56%), conifer -184 km2, shrub +173 km2, grass/herbaceous -52 km2 (fire, much of it the 2015 Butte Fire). Two pyromes (P26 1,286
+     km2, P29 1,399 km2; P29's fire model is weaker, AUC 0.56 vs WRC 0.78) and two ecodivisions (M260 2,466 km2, 260 219 km2).
+   - **Resolution: 270 m** (proposed): a multiple of the 30 m sources and FSim's 270 m grid, 37,000 cells. Estimated from P26's 0.6 ms
+     per cell per year (8 h, 1.2 M cells, 39 years, one job): historical run ~15 min, projection ~10 min; 150 m would be ~45 and ~35
+     min. Build ~15-20 min (10 with copied curves) and Projection Setup 5-10 min hardly depend on cell size (stage 2's national FIA fit
+     is 13 min in any library; stages 5-7 read 30 m sources). Whole demo ~50 min at 270 m, ~2 h at 150 m. Use Area-matched resampling
+     (modal keeps about a third of the developed area). One county = one spatial tile; iterations can run as separate jobs.
+     **Test first** (after the P26 reruns, in a new library, never the P26 guide library): a Calaveras Build at 270 m and a 5-year run,
+     to see whether small grids carry a fixed per-timestep cost.
+   - **Delivery, both options (user):** (1) a **finished demo library** (zipped .ssim + data folder: Build, historical run, Projection
+     Setup, three projections, every figure); browse results, copy a projection and change its settings, add a climate future (stage 11
+     with a small LOCA2 clip) - ST-Sim runs need no Data Sources. Can ship before the package changes below. (2) a **Data folder** so a
+     user can follow the guide from an empty library and repeat the Build.
+   - **What the Data folder holds**: county + 10 km buffer for stages 5, 7 and 11 (NLCD, LANDFIRE, LCMS, RCMAP, C-CAP, stand age,
+     soils, roads, PRISM monthly, LOCA2 clip, strata layers); both pyromes for the fire stages 6 and 9 (FSim, FPA-FOD, MTBS, fire
+     perimeters); a fitting region larger than the county for stage 10 (neighbouring counties or the two pyromes; it needs at least 30
+     events per surface).
+   - **Growth curves and carbon rates from scratch**: they need national data (stage 2 fits each forest type to all its plots in the
+     country, then each ecodivision's deviation), but the national tables are small once derived. Ship `FIA/DataMart/` holding only the
+     caches `fia-conditions.rds` (74 MB) and `fia-deadwood.rds` (12 MB) instead of the 15 GB of state CSVs, plus the CONUS PRISM annual
+     normals (tmean, ppt) and the national ecodivision shapefile. Stages 2 and 3 then fit the curves and the measured dead-wood
+     calibration for real with the same national data as the demo Build (FIA Data = DataMart in the demo Build; package default stays
+     .Rds). Optional: the two USGS .Rds files (55 MB) for the default route. **Package change needed**: src/fia.R fia_datamart and
+     fia_dead_wood accept a cache with no CSVs ("tables only" mode, logging the build date and state count), with a unit test; only
+     when no runs are going. Shorter routes for the guide: Growth Curve Options > Copy from another library (the demo library), and
+     Carbon Method = CBM defaults (no FIA; shows how much the calibration matters).
+   - **Also needed for option 2**: item 12's Data Sources Home (paths relative to one folder, so the unzipped bundle resolves with
+     nothing to browse to); clear stage failures when a clipped file does not cover what a stage needs; tools/make-demo-bundle.R that
+     cuts everything, writes README (source, vintage, citation, terms) and manifest, and proves that a fresh library built only from the
+     bundle reproduces the demo Build's areas and initial carbon.
+   - **Hosting**: expected well under 2 GB at 270 m (a GitHub release asset); otherwise Zenodo or ScienceBase with a DOI. Check the
+     terms of PRISM, LOCA2 and NASA CMS stand age; FIA and most other inputs are federal and free to redistribute.
+   **Earlier plan (P26 demo data bundle)** - TO DO (user, 2026-10-25). A stand-alone, shippable set of the input data for the P26 Northern Sierra
    Nevada example, so a new user can install lucasCore, unzip the bundle and follow the guide end to end without downloading anything.
    A one-off for a reproducible example, not part of the model or the package.
    - **Contents**: every Data Sources input the P26 Build, historical run, Projection Setup and Projection Climate read, clipped to P26
