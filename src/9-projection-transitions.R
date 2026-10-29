@@ -81,6 +81,12 @@ if (!is.na(hid)) {
   sg <- as.data.table(datasheet(prj, "stsim_StockGroup", includeKey = TRUE))
   ist <- as.data.table(datasheet(scn, "stsim_InitialStockSpatial", optional = TRUE, lookupsAsFactors = FALSE))
   if (!nrow(ist)) fail("Projection Start: the build has no initial stocks (stage 8) to know the stock types")
+  # plus every stock type the run mapped in the start year that the build started at zero (stage 8 maps only the pools with initial
+  # carbon): Deep Soil fills during the run from BG Slow, and was reset to zero at the start of every projection before 29 October 2026
+  typ <- sg[grepl(" \\[Type\\]$", Name)]
+  typ <- typ[file.exists(file.path(hd, "stsim_OutputAverageSpatialStockGroup", sprintf("avgstkg_%d.it0.ts%d.tif", StockGroupId, ys)))]
+  more <- setdiff(sub(" \\[Type\\]$", "", typ$Name), ist$StockTypeId)
+  if (length(more)) { ist <- rbind(ist, data.table(StockTypeId = more), fill = TRUE); say("Projection Start: also carries %s from historical run %d (no initial stock map in the build)", paste(more, collapse = ", "), hid) }
   stf <- vapply(ist$StockTypeId, function(t) { id <- sg[Name == paste0(t, " [Type]"), StockGroupId]
     f <- if (length(id)) file.path(hd, "stsim_OutputAverageSpatialStockGroup", sprintf("avgstkg_%d.it0.ts%d.tif", id[1], ys)) else NA_character_
     if (is.na(f) || !file.exists(f)) NA_character_ else f }, "")
