@@ -119,3 +119,6 @@ found along the way are batched here and fixed while Studio is closed (the page 
   copy keeps dep Build 2, the stage 11 pipeline and the LOCA2 fields). New block after the LOCA2 blockquote: bullets + Figures 7.15 paste
   (7.3g), 7.16 rename (7.3h), 7.17 SSP5-8.5 (7.3i), unnumbered marks; old 7.15-7.17 renumbered 7.18-7.20. [21] ssp585 result running.
   Projection [19] P26 - Projection CanESM ssp245 exists (deps 11, 18, 2); grab 'Screenshot 2026-10-28 193425.png' shows it (for 7.3d).
+- 7.3 projections (2026-10-28): [19] P26 - Projection CanESM ssp245 (deps 11, 18, 2) and [22] P26 - Projection CanESM ssp585 (deps 11, 21, 2).
+  Figures 7.18 (7.3d, marks 18-21), 7.19 (7.3e, 22-23), 7.20 (7.3f, 24-25) re-grabbed; paragraph names [19]/[22] and climate results [18]/[21].
+  Still old: Figure 7.13 (7.3b climate pipeline). Unused grabs: 193425 (proj 19 alone), 193542 (copy before rename), 194349 (19 Tabular).

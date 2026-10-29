@@ -51,14 +51,6 @@ File,Step,X,Y,W,H
 7.3b-climate-pipeline.png,15,1075,280,930,26
 7.3c-climate-page.png,16,640,394,122,28
 7.3c-climate-page.png,17,852,390,972,330
-7.3d-climate-projections.png,18,112,442,450,24
-7.3d-climate-projections.png,19,152,498,568,82
-7.3d-climate-projections.png,20,112,592,450,24
-7.3d-climate-projections.png,21,152,648,568,82
-7.3e-parallel-scenarios.png,22,780,335,220,27
-7.3e-parallel-scenarios.png,23,1040,305,280,28
-7.3f-run-both.png,24,14,440,700,60
-7.3f-run-both.png,25,470,679,272,32
 1.2b-new-library.png,5,58,200,306,26
 1.2b-new-library.png,,104,260,170,26
 1.3a-library-packages.png,1,495,304,256,28
@@ -219,3 +211,11 @@ File,Step,X,Y,W,H
 7.3h-climate-rename.png,,133,320,315,27
 7.3h-climate-rename.png,,856,294,964,30
 7.3i-climate-ssp585.png,,1008,429,276,31
+7.3d-climate-projections.png,18,133,500,290,27
+7.3d-climate-projections.png,19,150,560,385,88
+7.3d-climate-projections.png,20,133,650,290,27
+7.3d-climate-projections.png,21,150,710,385,88
+7.3e-parallel-scenarios.png,22,628,335,80,27
+7.3e-parallel-scenarios.png,23,860,305,268,27
+7.3f-run-both.png,24,105,500,428,58
+7.3f-run-both.png,25,388,727,275,30

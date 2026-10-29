@@ -21,9 +21,6 @@ File,X,Y,W,H
 7.3a-climate-dependency.png,10,155,525,440
 7.3b-climate-pipeline.png,735,150,1290,220
 7.3c-climate-page.png,548,150,1300,590
-7.3d-climate-projections.png,10,150,720,600
-7.3e-parallel-scenarios.png,735,195,1290,250
-7.3f-run-both.png,10,150,760,605
 1.2b-new-library.png,0,0,720,300
 1.3a-library-packages.png,0,145,1843,1350
 1.3d-packages-added.png,470,150,1373,225
@@ -82,3 +79,6 @@ File,X,Y,W,H
 7.3g-climate-paste.png,10,155,525,495
 7.3h-climate-rename.png,10,155,1835,205
 7.3i-climate-ssp585.png,548,150,1300,590
+7.3d-climate-projections.png,10,155,525,650
+7.3e-parallel-scenarios.png,548,150,650,280
+7.3f-run-both.png,10,155,665,650
