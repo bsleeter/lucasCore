@@ -28,6 +28,16 @@ Open items added 2026-10-29, in order (they come before 9-14):
 | 3 | 26 Guide chapter 10, Troubleshooting | Still a placeholder | - |
 | 4 | 22 Automatic spatial tiles | Proposed; P26 historical run is done, so package edits are no longer blocked by it | - |
 | 5 | 27 Scenarios of one library at once from R | Test speed (database locked) | - |
+| 6 | 29 Growth Inputs sheet | Last Carbon Assumptions sheet; changes inputs, so before any P26 freeze | - |
+| 7 | 28 Mature age per forest type | Changes the decay calibration | - |
+| 8 | 30 Rate read-out | Shows the final rates; easiest once 28 and 29 settle what goes in | 28, 29 |
+| 9 | 31 Copy Carbon Assumptions; SoilGrids | Convenience and one more soil option | - |
+| 10 | 32 Carbon open science issues | Needs the user's look at the snag inputs | - |
+| any | 33 Leftovers inside done items | Small, independent | - |
+
+Then items 9-14 in the 2026-10-25 order above. Item 10 (TreeMap) has a P26 comparison done (2026-10-26) and grew into a **Stand Age
+Source** choice: NASA CMS (today), TreeMap (age from FIA COND), GAMI, and age inferred from biomass + disturbance history; next is the
+three-way P26 comparison and its effect on 1985 carbon.
 
 While 8-10 are open, the guide's procedures (chapters 6-10) can still be written: the steps do not change, only the P26 numbers and
 figures, which are redone once after the P26 rerun.
@@ -321,3 +331,25 @@ figures, which are redone once after the P26 rerun.
     (dependency order, a Boolean stored as 1, result pages greyed out, spatial multiprocessing mask).
 27. **Scenarios of one library at once from R** - FOLLOW-UP (2026-10-28). Running them from separate R processes or one multi-scenario
     console call failed (database locked / exit 65535); tests run one at a time.
+28. **Mature age per forest type** - TO DO (left over from 18/21). Decay Calibration Settings has one mature age (60) and one
+    disturbance-free window (30 yr) for every type; stands reach a steady dead-wood level at very different ages (oak woodland and
+    lodgepole sooner, fir/spruce and mixed conifer later). Add an optional per-forest-type (and per-ecodivision) row, blank = the
+    single value; log the mature plots per type.
+29. **Growth Inputs sheet** - TO DO (step 7 of item 21, never built). The growth assumptions still fixed in the package: FIA forest type
+    group -> state class and growth class (defaults/growth/forest-type-crosswalk.csv), merchantable carbon density and deciduous share
+    (defaults/growth/merch-carbon-density.csv), the coarse/fine root split (Li et al. 2003, hard-coded in src/carbon.R), and optional
+    user volume or carbon curves (lucasBuilder's Merchantable Volume Curve). A Carbon Assumptions sheet filled with the defaults, as the
+    other six.
+30. **Rate read-out** - TO DO (the open half of item 20). Stage 3 writes the resolved rates per ecodivision x forest type (live turnover
+    and splits, each dead pool's base rate x temperature effect x multiplier, emitted vs passed on, snag fall, fire and clearcut shares,
+    mean temperature, Q10, key growth curve values) with each value's source (CBM default, calibrated, measured, user); a read-only page
+    on the Build result with ecodivision and forest type drop-downs shows them.
+31. **Carbon Assumptions: copy from another library** - TO DO (planned 2026-10-27, as Growth Curve Options' copy), and the **SoilGrids**
+    option for Soil Organic Carbon (user, 2026-10-28).
+32. **Carbon open science issues** - TO LOOK AT (2026-10-27): snags short in 96 cells even at the lowest snag decay (inputs or fall
+    rate; user offered to look); duff multiplier at its 20 bound in 19 cells; the fitted fire/clearcut transfers and fire snag shares
+    are California-fitted but applied everywhere.
+33. **Leftovers inside done items** - TO DO: (1) Data Sources deep links into the USFS Research Data Archive; (7) guide 1.4 on
+    multiprocessing for tiled runs (check against the P26 setup); (8) a full P26 Build + historical run with Area-matched resampling to
+    compare carbon, transitions and figures, and matching the state class splits within NLCD classes (forest type, shrub/grass,
+    wetland types), still modal; (17) Monte Carlo bands and sign-agreement maps in Compare Runs.
