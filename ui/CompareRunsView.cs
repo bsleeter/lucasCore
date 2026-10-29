@@ -50,8 +50,16 @@ namespace lucasCoreUI
         {
             base.LoadDataFeed(dataFeed);
             m_runs = StsimRuns.List(this.DataFeed.Project);
+            // a tick saved as 1 by the first version of this page: SyncroSim's Boolean is -1, and a 1 makes the sheet unreadable to stage 14
+            if (this.Scenario != null && !this.Scenario.IsResult && this.ShouldEnableView())
+            {
+                List<DataRow> bad = Rows().Where(r => r["Baseline"] != DBNull.Value && Convert.ToInt32(r["Baseline"]) == 1).ToList();
+                if (bad.Count > 0) { Sheet.BeginModifyRows(); foreach (DataRow r in bad) r["Baseline"] = TRUE; Sheet.EndModifyRows(); }
+            }
             RefreshControls();
         }
+
+        private const int TRUE = -1;   // SyncroSim stores a ticked Boolean as -1 (a 1 fails its validation)
 
         private void Modify(DataRow row, string column, object value)
         {
@@ -92,7 +100,7 @@ namespace lucasCoreUI
                 {
                     if (Refreshing) return;
                     Sheet.BeginModifyRows();
-                    foreach (DataRow o in Rows()) o["Baseline"] = (o == rw && bas.Checked) ? (object)true : DBNull.Value;
+                    foreach (DataRow o in Rows()) o["Baseline"] = (o == rw && bas.Checked) ? (object)TRUE : DBNull.Value;
                     Sheet.EndModifyRows();
                     RefreshControls();
                 };
