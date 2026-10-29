@@ -31,7 +31,8 @@ namespace lucasCoreUI
         private readonly Button m_open = new Button { Text = "Open full size", AutoSize = true }, m_save = new Button { Text = "Save as...", AutoSize = true };
         private readonly Button m_saveAll = new Button { Text = "Save all...", AutoSize = true };
         private readonly PictureBox m_pic = new PictureBox { Dock = DockStyle.Fill, SizeMode = PictureBoxSizeMode.Zoom, BackColor = Color.White };
-        private readonly Label m_caption = new Label { Dock = DockStyle.Fill, AutoSize = false, ForeColor = SystemColors.ControlText, Padding = new Padding(6, 4, 6, 4) };
+        // the caption: read-only text that wraps to the page width and scrolls when long
+        private readonly TextBox m_caption = new TextBox { Dock = DockStyle.Fill, Multiline = true, ReadOnly = true, WordWrap = true, ScrollBars = ScrollBars.Vertical, BorderStyle = BorderStyle.None, BackColor = SystemColors.Control, TabStop = false };
         private readonly Label m_state = new Label { AutoSize = true, ForeColor = SystemColors.GrayText, Margin = new Padding(9, 8, 3, 3) };
         private List<Fig> m_figs = new List<Fig>();
 
@@ -40,7 +41,8 @@ namespace lucasCoreUI
             var bar = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, WrapContents = true, Padding = new Padding(4, 4, 4, 0) };
             bar.Controls.AddRange(new Control[] { m_list, m_prev, m_next, m_open, m_save, m_saveAll, m_state });
             var t = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 3 };
-            t.RowStyles.Add(new RowStyle(SizeType.AutoSize)); t.RowStyles.Add(new RowStyle(SizeType.Percent, 100)); t.RowStyles.Add(new RowStyle(SizeType.Absolute, 70));
+            t.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));   // without it the column shrinks to its narrowest content
+            t.RowStyles.Add(new RowStyle(SizeType.AutoSize)); t.RowStyles.Add(new RowStyle(SizeType.Percent, 100)); t.RowStyles.Add(new RowStyle(SizeType.Absolute, 80));
             t.Controls.Add(bar, 0, 0); t.Controls.Add(m_pic, 0, 1); t.Controls.Add(m_caption, 0, 2);
             this.Controls.Add(t);
             m_list.SelectedIndexChanged += (s, e) => Show(m_list.SelectedItem as Fig);
@@ -50,7 +52,6 @@ namespace lucasCoreUI
             m_saveAll.Click += (s, e) => SaveAll();
             m_pic.DoubleClick += (s, e) => m_open.PerformClick();
             var tip = new ToolTip(); tip.SetToolTip(m_pic, "Double-click to open the figure full size"); tip.SetToolTip(m_list, "Left and right arrow keys step through the figures");
-            m_caption.Resize += (s, e) => m_caption.MaximumSize = new Size(m_caption.Width, 0);
         }
 
         // SyncroSim disables a page on a result scenario (its inputs are read only); this page only reads, and figures live in results
