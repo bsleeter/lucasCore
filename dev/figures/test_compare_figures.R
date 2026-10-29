@@ -19,4 +19,4 @@ cat(sprintf("loaded %d runs in %.0f s: %s\n", length(R), as.numeric(Sys.time() -
             paste(vapply(R, function(r) sprintf("%d %s%s%s", r$rid, r$label, if (r$hist) " [history]" else "", if (r$base) " [baseline]" else ""), ""), collapse = "; ")))
 unlink(out, recursive = TRUE)
 res <- compare_figures(R, grid, dem, if (nrow(sa)) paste(unique(sub("^[^:]*: ", "", sa$Name)), collapse = ", ") else "Study area", out)
-print(res[, .(Figure, Title, File = basename(FileName))]); print(attr(res, "summary")); cat(sprintf("%.0f s\n", as.numeric(Sys.time() - t0, units = "secs")))
+print(res[, .(Figure, Title, File = basename(FileName))]); print(attr(res, "carbon")); print(attr(res, "land")); cat(sprintf("%.0f s\n", as.numeric(Sys.time() - t0, units = "secs")))

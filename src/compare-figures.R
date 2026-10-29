@@ -5,13 +5,14 @@
 # =============================================================================
 # Same format as the Build and run figures (src/figures.R, figure_kit), one line or bar colour per run:
 #   charts  total ecosystem carbon and each run's difference from the baseline | carbon fluxes per year | flux means by period |
-#           transitions per year | carbon by pool | land area change by cover group | a summary table
+#           transitions per year | carbon by pool | land area change by cover group | a carbon summary table | a land change summary table
 #   maps    the baseline's final-year total ecosystem carbon and each other run's difference from it
 # compare_runs(lib, runs) reads the runs (src/run-figures.R's load_run): runs is a data.table of RunScenarioId and, optionally,
 # Label, Colour ("#rrggbb", or SyncroSim's "a,r,g,b") and Baseline. A run that is the historical run of another listed run (its
 # Projection Setup's Projection Start) is the history: drawn in black up to the year its projections start from, and added when a
 # listed projection has one that is not listed. The baseline is the run ticked Baseline, else the first run that is not a history.
-# compare_figures() returns one row per PNG (Figure, Title, Caption, FileName); compare_summary() the summary table.
+# compare_figures() returns one row per PNG (Figure, Title, Caption, FileName), with the two summary tables as its attributes "carbon"
+# (compare_carbon) and "land" (compare_land).
 # =============================================================================
 
 COMPARE_PAL <- c("#4e79a7", "#f28e2b", "#e15759", "#59a14f", "#b07aa1", "#76b7b2", "#edc948", "#9c755f")
@@ -45,18 +46,30 @@ flow_of <- function(X, g) if (is.null(X$flows)) data.table(Timestep = integer(),
 trans_of <- function(X, f) X$trans[TransitionGroup == f, .(km2 = sum(ha) / 100), by = Timestep][order(Timestep)]
 at_year <- function(d, y, v = "Tg") { x <- d[Timestep == y][[v]]; if (length(x)) x[1] else NA_real_ }
 
-# the summary table: one row per run
-compare_summary <- function(R) {
+# the summary tables, one row per run: compare_carbon - total ecosystem carbon (Tg C) at the start and end, its change and the
+# difference from the baseline, the change in live biomass and in dead wood, litter and soil, and mean annual fluxes over the run (Tg C
+# per year: NPP, NEP, losses to land-use and land-cover change = fire emissions + harvest, NBP); compare_land - area burned, harvested
+# and urbanized over the run, and the change in forest and developed area (km2)
+role_of <- function(r) if (r$hist) "History" else if (r$base) "Baseline" else "Run"
+compare_carbon <- function(R) {
   B <- Filter(function(r) r$base, R)[[1]]; tb <- te_of(B$X)
+  pool <- function(X, g, y) { if (is.null(X$stocks)) return(NA_real_); v <- X$stocks[StockGroup %in% g & Timestep == y, sum(Mg)] / 1e6; if (length(v)) v else NA_real_ }
   rbindlist(lapply(R, function(r) { X <- r$X; t <- te_of(X); y0 <- X$years[1]; y1 <- X$years[2]
-    tot <- function(f) { d <- trans_of(X, f); sum(d[Timestep > y0, km2]) }
-    nbp <- flow_of(X, "Net Biome Productivity")[Timestep > y0]
-    data.table(RunScenarioId = r$rid, Label = r$label, Role = if (r$hist) "History" else if (r$base) "Baseline" else "Run",
-               StartYear = y0, EndYear = y1, CarbonStart = at_year(t, y0), CarbonEnd = at_year(t, y1),
-               CarbonChange = at_year(t, y1) - at_year(t, y0),
+    mf <- function(g) { d <- flow_of(X, g)[Timestep > y0]; if (nrow(d)) mean(d$Tg) else NA_real_ }
+    dom <- c("DOM: Deadwood", "DOM: Litter", "DOM: Soil")
+    data.table(RunScenarioId = r$rid, Label = r$label, Role = role_of(r), StartYear = y0, EndYear = y1,
+               CarbonStart = at_year(t, y0), CarbonEnd = at_year(t, y1), CarbonChange = at_year(t, y1) - at_year(t, y0),
                VsBaseline = if (r$hist || r$base) NA_real_ else at_year(t, y1) - at_year(tb, y1),
-               MeanNBP = if (nrow(nbp)) mean(nbp$Tg) else NA_real_,
-               Fire = tot("Fire"), Harvest = tot("Forest Harvest"), Urbanization = tot("Urbanization")) })) }
+               BiomassChange = pool(X, "Biomass: Total", y1) - pool(X, "Biomass: Total", y0), DomSoilChange = pool(X, dom, y1) - pool(X, dom, y0),
+               NPP = mf("Net Primary Productivity"), NEP = mf("Net Ecosystem Productivity"),
+               LulcLoss = sum(mf("LULC: Emission"), mf("LULC: Harvest"), na.rm = TRUE), NBP = mf("Net Biome Productivity")) })) }
+compare_land <- function(R) {
+  rbindlist(lapply(R, function(r) { X <- r$X; y0 <- X$years[1]; y1 <- X$years[2]
+    tot <- function(f) { d <- trans_of(X, f); sum(d[Timestep > y0, km2]) }
+    grp <- function(g, y) { a <- X$area[Timestep == y]; sum(a[cover_group(Class) == g, ha]) / 100 }
+    data.table(RunScenarioId = r$rid, Label = r$label, Role = role_of(r), StartYear = y0, EndYear = y1,
+               Fire = tot("Fire"), Harvest = tot("Forest Harvest"), Urbanization = tot("Urbanization"),
+               ForestChange = grp("Forest", y1) - grp("Forest", y0), DevelopedChange = grp("Developed", y1) - grp("Developed", y0)) })) }
 
 # ---- the figures -----------------------------------------------------------------------------------------------------------
 # R: compare_runs(); grid: the Build's state class map; dem; label: the study area
@@ -182,16 +195,32 @@ compare_figures <- function(R, grid, dem, label, outdir) {
       barplot(t(M), beside = TRUE, col = vapply(P, `[[`, "", "col"), border = NA, add = TRUE, axes = FALSE)
       ptitle(1, sprintf("Change in area, %d-%d", min(ps), ye)); under_legend(colnames(M), fill = vapply(P, `[[`, "", "col")) }) }
 
-  # ---- the summary table -----------------------------------------------------------------------------------------------------
-  S <- compare_summary(R); f1 <- function(x) ifelse(is.na(x), "", sprintf("%.1f", x)); f0 <- function(x) ifelse(is.na(x), "", format(round(x), big.mark = ","))
-  tab <- S[, .(Run = Label, Years = sprintf("%d-%d", StartYear, EndYear), `Carbon start` = f1(CarbonStart), `Carbon end` = f1(CarbonEnd), Change = sub("^(\\d)", "+\\1", f1(CarbonChange)),
-               `vs baseline` = ifelse(Role == "Baseline", "baseline", sub("^(\\d)", "+\\1", f1(VsBaseline))), `Mean NBP` = sprintf("%+.2f", MeanNBP),
-               `Fire km2` = f0(Fire), `Harvest km2` = f0(Harvest), `Urbanized km2` = f0(Urbanization))]
-  chart_figure("summary", "Summary of the runs", "Total ecosystem carbon (Tg C) at the start and end of each run, its change, and the difference from the baseline in the final year; mean net biome productivity (Tg C per year); and the area of fire, forest harvest and urbanization over the run.",
-    1, 1, h = 300 + 110 * nrow(tab), draw = function() { par(mar = c(0, 1, 1, 1)); plot.new(); nc <- ncol(tab); x <- c(.02, .19, .29, .38, .47, .55, .64, .72, .80, .89)[seq_len(nc)]
-      y <- seq(.92, by = -min(.8 / nrow(tab), .2), length.out = nrow(tab) + 1)
-      text(x, y[1], names(tab), adj = c(0, .5), font = 2, cex = .8, col = INK); abline(h = (y[1] + y[2]) / 2, col = GRID)
-      for (i in seq_len(nrow(tab))) { rect(-.01, y[i + 1] - .03, .0, y[i + 1] + .03, col = cols[i], border = NA)
-        text(x, y[i + 1], unlist(tab[i]), adj = c(0, .5), cex = .8, col = INK) } })
+  # ---- the summary tables: carbon, and land change -----------------------------------------------------------------------------
+  # a table figure: a colour swatch per run, a header of two lines (name, unit), columns spaced by their widest entry
+  table_figure <- function(slug, title, caption, tab, units) {
+    chart_figure(slug, title, caption, 1, 1, h = 380 + 110 * nrow(tab), draw = function() {
+      par(mar = c(0, 1, 1, 1)); plot.new()
+      wd <- vapply(seq_along(tab), function(j) max(nchar(c(names(tab)[j], units[j], tab[[j]]))), 0) + 3
+      x <- .03 + c(0, cumsum(wd)[-length(wd)]) / sum(wd) * .96
+      rj <- c(FALSE, rep(TRUE, ncol(tab) - 1)); xr <- ifelse(rj, x + wd / sum(wd) * .96 - .015, x)   # numbers right-aligned
+      y <- seq(.77, by = -min(.66 / nrow(tab), .17), length.out = nrow(tab))
+      for (j in seq_along(tab)) { text(xr[j], .95, names(tab)[j], adj = c(as.numeric(rj[j]), .5), font = 2, cex = .78, col = INK)
+        text(xr[j], .90, units[j], adj = c(as.numeric(rj[j]), .5), cex = .66, col = MUTED) }
+      abline(h = .855, col = GRID)
+      for (i in seq_len(nrow(tab))) { rect(.005, y[i] - .025, .02, y[i] + .025, col = cols[i], border = NA)
+        for (j in seq_along(tab)) text(xr[j], y[i], tab[[j]][i], adj = c(as.numeric(rj[j]), .5), cex = .8, col = INK) } }) }
+  f1 <- function(x) ifelse(is.na(x), "", sprintf("%.1f", x)); s1 <- function(x) ifelse(is.na(x), "", sprintf("%+.1f", x))
+  s2 <- function(x) ifelse(is.na(x), "", sprintf("%+.2f", x)); f2 <- function(x) ifelse(is.na(x), "", sprintf("%.2f", x))
+  f0 <- function(x) ifelse(is.na(x), "", format(round(x), big.mark = ",")); s0 <- function(x) ifelse(is.na(x), "", paste0(ifelse(round(x) > 0, "+", ""), format(round(x), big.mark = ",", trim = TRUE)))
+  Cb <- compare_carbon(R); Ld <- compare_land(R)
+  table_figure("carbon_summary", "Carbon summary", "Total ecosystem carbon at the end of each run, its change over the run and the difference from the baseline in the final year; the change in live biomass and in dead wood, litter and soil over the run; and mean annual fluxes over the run: net primary productivity, net ecosystem productivity, losses to land-use and land-cover change (fire emissions and harvest) and net biome productivity (net ecosystem productivity less those losses).",
+    Cb[, .(Run = Label, Years = sprintf("%d-%d", StartYear, EndYear), `Carbon end` = f1(CarbonEnd), Change = s1(CarbonChange),
+           `vs baseline` = ifelse(Role == "Baseline", "baseline", s1(VsBaseline)), `Live biomass` = s1(BiomassChange), `Dead & soil` = s1(DomSoilChange),
+           NPP = f2(NPP), NEP = s2(NEP), `LULC losses` = f2(LulcLoss), NBP = s2(NBP))],
+    c("", "", "Tg C", "Tg C", "Tg C", "change, Tg C", "change, Tg C", "Tg C/yr", "Tg C/yr", "Tg C/yr", "Tg C/yr"))
+  table_figure("land_summary", "Land change summary", "Area burned, harvested and urbanized over each run (summed over its years, so land burned twice counts twice), and the change in forest and developed land area from the first to the last year of the run.",
+    Ld[, .(Run = Label, Years = sprintf("%d-%d", StartYear, EndYear), Burned = f0(Fire), Harvested = f0(Harvest), Urbanized = f0(Urbanization),
+           Forest = s0(ForestChange), Developed = s0(DevelopedChange))],
+    c("", "", "km2", "km2", "km2", "change, km2", "change, km2"))
 
-  out <- rbindlist(K$rows); attr(out, "summary") <- S; out }
+  out <- rbindlist(K$rows); attr(out, "carbon") <- Cb; attr(out, "land") <- Ld; out }

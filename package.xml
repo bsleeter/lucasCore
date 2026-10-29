@@ -673,8 +673,8 @@
 		<column name="FileName" displayName="Figure (PNG)" dataType="String" isExternalFile="True" isRaster="False" externalFileFilter="PNG Files (*.png)|*.png"/>
 	</dataSheet>
 
-	<dataSheet name="OutputCompareSummary" displayName="Compare Summary">
-		<!-- stage 14: one row per run compared - total ecosystem carbon (Tg C), mean net biome productivity (Tg C/yr), transition areas (km2) -->
+	<dataSheet name="OutputCompareCarbon" displayName="Compare Carbon Summary">
+		<!-- stage 14: one row per run compared - carbon stocks (Tg C) and mean annual fluxes over the run (Tg C/yr) -->
 		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer"/>
 		<column name="Label" dataType="String"/>
 		<column name="Role" displayName="Role (History, Baseline or Run)" dataType="String"/>
@@ -684,10 +684,26 @@
 		<column name="CarbonEnd" displayName="Total ecosystem carbon, end (Tg C)" dataType="Double"/>
 		<column name="CarbonChange" displayName="Change (Tg C)" dataType="Double"/>
 		<column name="VsBaseline" displayName="End, minus the baseline's (Tg C)" dataType="Double" isOptional="True"/>
-		<column name="MeanNBP" displayName="Mean net biome productivity (Tg C/yr)" dataType="Double" isOptional="True"/>
-		<column name="Fire" displayName="Fire (km2)" dataType="Double"/>
-		<column name="Harvest" displayName="Forest harvest (km2)" dataType="Double"/>
-		<column name="Urbanization" displayName="Urbanization (km2)" dataType="Double"/>
+		<column name="BiomassChange" displayName="Live biomass change (Tg C)" dataType="Double" isOptional="True"/>
+		<column name="DomSoilChange" displayName="Dead wood, litter and soil change (Tg C)" dataType="Double" isOptional="True"/>
+		<column name="NPP" displayName="Mean net primary productivity (Tg C/yr)" dataType="Double" isOptional="True"/>
+		<column name="NEP" displayName="Mean net ecosystem productivity (Tg C/yr)" dataType="Double" isOptional="True"/>
+		<column name="LulcLoss" displayName="Mean losses to land-use and land-cover change: fire emissions and harvest (Tg C/yr)" dataType="Double" isOptional="True"/>
+		<column name="NBP" displayName="Mean net biome productivity (Tg C/yr)" dataType="Double" isOptional="True"/>
+	</dataSheet>
+
+	<dataSheet name="OutputCompareLand" displayName="Compare Land Change Summary">
+		<!-- stage 14: one row per run compared - transition areas over the run and the change in forest and developed area (km2) -->
+		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer"/>
+		<column name="Label" dataType="String"/>
+		<column name="Role" displayName="Role (History, Baseline or Run)" dataType="String"/>
+		<column name="StartYear" dataType="Integer"/>
+		<column name="EndYear" dataType="Integer"/>
+		<column name="Fire" displayName="Burned (km2, summed over the years)" dataType="Double"/>
+		<column name="Harvest" displayName="Forest harvest (km2, summed over the years)" dataType="Double"/>
+		<column name="Urbanization" displayName="Urbanized (km2)" dataType="Double"/>
+		<column name="ForestChange" displayName="Forest area change (km2)" dataType="Double"/>
+		<column name="DevelopedChange" displayName="Developed area change (km2)" dataType="Double"/>
 	</dataSheet>
 
 	<dataSheet name="OutputBuildFigure" displayName="Build Figures (PNG)">
@@ -916,7 +932,8 @@
 		<dataSheet name="StudyArea" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
 		<dataSheet name="OutputCompareFigure" type="Output"/>
-		<dataSheet name="OutputCompareSummary" type="Output"/>
+		<dataSheet name="OutputCompareCarbon" type="Output"/>
+		<dataSheet name="OutputCompareLand" type="Output"/>
 		<dataSheet name="OutputValidation" type="Both"/>
 	</transformer>
 
@@ -998,7 +1015,8 @@
 				<item name="OutputBuildFigure"/>
 				<item name="OutputRunFigure"/>
 				<item name="OutputCompareFigure"/>
-				<item name="OutputCompareSummary"/>
+				<item name="OutputCompareCarbon"/>
+				<item name="OutputCompareLand"/>
 				<item name="OutputValidation"/>
 			</group>
 		</group>

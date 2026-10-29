@@ -1,9 +1,10 @@
 # =============================================================================
-# 14-compare-runs.R - stage 14: figures (PNG) and a summary table that compare ST-Sim runs on one lucasCore Build
+# 14-compare-runs.R - stage 14: figures (PNG) and two summary tables that compare ST-Sim runs on one lucasCore Build
 # =============================================================================
 # Draws src/compare-figures.R's charts and maps of the runs listed in Compare Runs (result scenarios in this library: projections
 # under different climate futures or management, a historical run and its projections) and saves one row per PNG to Compare Figures
-# (Figure, Title, Caption, FileName) and one row per run to Compare Summary. Same format as the Build and run figures (stages 12, 13).
+# (Figure, Title, Caption, FileName), and one row per run to Compare Carbon Summary (stocks and mean fluxes) and Compare Land Change
+# Summary (transition areas, forest and developed area change). Same format as the Build and run figures (stages 12, 13).
 # Export > LUCAS Core > Compare Figures saves them all to a folder.
 # Its own scenario: depends on the runs' Build result (the grid). A run that is another listed run's historical run (its Projection
 # Setup's Projection Start) is drawn as the history in black, and a projection's historical run is added when it is not listed. The
@@ -35,7 +36,7 @@ dem <- tryCatch(read_data_sources("ElevationFile")$ElevationFile, error = functi
 progressBar()
 
 res <- compare_figures(R, grid, dem, label, file.path(TD(), "CompareFigures"))
-S <- attr(res, "summary")
+S <- attr(res, "carbon"); Ld <- attr(res, "land")
 say("%d figures drawn (%s)", nrow(res), paste(res$Title, collapse = "; "))
 for (i in seq_len(nrow(S))) say("%s: %.1f to %.1f Tg C (%+.1f)%s", S$Label[i], S$CarbonStart[i], S$CarbonEnd[i], S$CarbonChange[i],
                                  if (is.na(S$VsBaseline[i])) "" else sprintf(", %+.1f against the baseline", S$VsBaseline[i]))
@@ -43,7 +44,8 @@ progressBar()
 check(STAGE, "figures drawn", nrow(res) > 0, sprintf("%d PNG of %d runs", nrow(res), length(R)))
 check(STAGE, "every figure file was written", nrow(res) > 0 && all(file.exists(res$FileName)), paste(basename(res$FileName[!file.exists(res$FileName)]), collapse = "; "))
 write_ds(res[, .(Figure, Title, Caption, FileName)], "OutputCompareFigure")
-write_ds(S, "OutputCompareSummary")
+write_ds(S, "OutputCompareCarbon")
+write_ds(Ld, "OutputCompareLand")
 progressBar()
 finish_checks()
 progressBar(type = "end")
