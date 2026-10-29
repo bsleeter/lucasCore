@@ -1,9 +1,9 @@
 // =============================================================================
 // CompareRunsView.cs - the Compare Runs page (stage 14): the runs to compare, each picked from a drop-down, and which is the baseline
 // =============================================================================
-// Multi-row sheet lucasCore_CompareRunOptions, one row per run: RunScenarioId (a drop-down of the project's ST-Sim runs, StsimRuns),
+// Multi-row sheet lucasCore_CompareRunOptions, one line per run: a remove button (✕, first so it never falls off a narrow page), RunScenarioId (a drop-down of the project's ST-Sim runs, StsimRuns),
 // Label (blank = the scenario's name), Baseline (a tick; ticking one clears the others) and Colour (a swatch: click for a colour
-// dialog, right-click for the default palette). Add a run lists the newest run not yet chosen; Remove deletes the row. Stage 14 reads
+// dialog, right-click for the default palette). Add a run lists the newest run not yet chosen. Stage 14 reads
 // the sheet unchanged. A run that is another chosen run's historical run is marked as the history (drawn in black).
 // =============================================================================
 using System;
@@ -78,14 +78,14 @@ namespace lucasCoreUI
             m_table.Controls.Clear(); m_table.RowStyles.Clear(); m_table.RowCount = 0;
             Action<Control[]> line = cs => { int i = m_table.RowCount; m_table.RowCount = i + 1; m_table.RowStyles.Add(new RowStyle(SizeType.AutoSize)); for (int k = 0; k < cs.Length; k++) if (cs[k] != null) m_table.Controls.Add(cs[k], k, i); };
             Func<string, Label> head = t => new Label { Text = t, AutoSize = true, Font = new Font(this.Font, FontStyle.Bold), Margin = new Padding(3, 3, 12, 3), Tag = Fit.Fixed };
-            if (rows.Count > 0) line(new Control[] { head("Run"), head("Label in the figures"), head("Baseline"), head("Colour"), null, null });
+            if (rows.Count > 0) line(new Control[] { null, head("Run"), head("Baseline"), head("Colour"), head("Label (blank = the run's name)"), null });
             foreach (DataRow row in rows)
             {
                 DataRow rw = row;
-                var run = List(420);
+                var run = List(340);
                 run.DropDown += (s, e) => { m_runs = StsimRuns.List(this.DataFeed.Project); Fill(run, Rid(rw)); };
                 run.SelectionChangeCommitted += (s, e) => { var it = run.SelectedItem as RunItem; if (it != null) Modify(rw, "RunScenarioId", it.Key); RefreshControls(); };
-                var lab = Box(220); lab.TextAlign = HorizontalAlignment.Left;
+                var lab = Box(180); lab.TextAlign = HorizontalAlignment.Left;
                 lab.Validated += (s, e) => { if (Refreshing) return; string v = lab.Text.Trim(); Modify(rw, "Label", v.Length == 0 ? (object)DBNull.Value : v); RefreshControls(); };
                 var bas = new CheckBox { AutoSize = true, Anchor = AnchorStyles.None, Margin = new Padding(3, 6, 12, 3) };
                 bas.CheckedChanged += (s, e) =>
@@ -108,10 +108,11 @@ namespace lucasCoreUI
                         if (d.ShowDialog(this) == DialogResult.OK) { Modify(rw, "Colour", string.Format("#{0:x2}{1:x2}{2:x2}", d.Color.R, d.Color.G, d.Color.B)); RefreshControls(); }
                     }
                 };
-                var rm = new Button { Text = "Remove", AutoSize = true, Margin = new Padding(3, 3, 6, 3) };
+                var rm = new Button { Text = "2715", Width = 26, Height = 24, FlatStyle = FlatStyle.Flat, ForeColor = Color.Firebrick, Margin = new Padding(3, 3, 3, 3) };
+                m_tip.SetToolTip(rm, "Remove this run from the comparison");
                 rm.Click += (s, e) => { Sheet.DeleteRows(new[] { rw }); m_shown = null; RefreshControls(); };
                 var role = new Label { AutoSize = true, ForeColor = SystemColors.GrayText, Margin = new Padding(3, 7, 3, 3), Tag = Fit.Fixed };
-                line(new Control[] { run, lab, bas, col, rm, role });
+                line(new Control[] { rm, run, bas, col, lab, role });
             }
             m_table.ResumeLayout(true);
         }
@@ -138,8 +139,8 @@ namespace lucasCoreUI
             for (int i = 0; i < rows.Count; i++)
             {
                 DataRow r = rows[i]; int rid = Rid(r);
-                var run = (ComboBox)m_table.GetControlFromPosition(0, i + 1);   // line 0 is the header
-                var lab = (TextBox)m_table.GetControlFromPosition(1, i + 1);
+                var run = (ComboBox)m_table.GetControlFromPosition(1, i + 1);   // line 0 is the header
+                var lab = (TextBox)m_table.GetControlFromPosition(4, i + 1);
                 var bas = (CheckBox)m_table.GetControlFromPosition(2, i + 1);
                 var col = (Button)m_table.GetControlFromPosition(3, i + 1);
                 var role = (Label)m_table.GetControlFromPosition(5, i + 1);
