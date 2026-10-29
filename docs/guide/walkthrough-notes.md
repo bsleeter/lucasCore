@@ -110,3 +110,5 @@ found along the way are batched here and fixed while Studio is closed (the page 
 - 7.3 (2026-10-28): climate scenario [17] Climate - CanESM ssp245 (folder Climate; dep Build 2; SSP2-4.5, CanESM5, r1i1p1f1, to 2050).
   Figures 7.12 (7.3a, marks 12-13) and 7.14 (7.3c, marks 16-17) re-grabbed; steps 9 and 12 name CanESM5 and the Rescan button.
   Still old: 7.13 pipeline (7.3b), 7.15-7.17 (7.3d-f) and paragraph .101417 (ACCESS-CM2, [22]/[24], 'Projected Climate' folder).
+- 7.3: user uses CanESM5. Step 14 example now 'P26 - Projection CanESM ssp245'; paragraph names Climate - CanESM ssp245 / ssp585 in a
+  Climate folder (result ids dropped until they exist). No ACCESS-CM2 left in the guide.
