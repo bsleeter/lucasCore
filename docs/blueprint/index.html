@@ -1,0 +1,484 @@
+<title>lucasCore Blueprint</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap">
+<style>
+/* layout: one wide schematic (scrolls sideways on a phone), stage picker, then the selected stage's datasheets in three columns */
+:root{ --sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Consolas,'Courier New',monospace; --bg:#f4f6f6;--surface:#ffffff;--line:#cfd6d8;--ink:#17242a;--ink2:#34444b;--muted:#5f6e74;--edge:#3b4a51;--on:#ffffff;
+--setup:#56666e;--setup-t:#eceff0;--land:#2d7650;--land-t:#e4f1e9;--carbon:#94561f;--carbon-t:#f7ece2;--climate:#2b679a;--climate-t:#e3edf6;--fig:#6a5293;--fig-t:#eee9f5; }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#101619;--surface:#172024;--line:#304048;--ink:#e3eaec;--ink2:#c3cfd3;--muted:#8fa0a6;--edge:#a8b7bc;--on:#101619;
+--setup:#9eb0b8;--setup-t:#1f2a2f;--land:#6dc59b;--land-t:#15291f;--carbon:#e3a46d;--carbon-t:#2d2118;--climate:#79b3e3;--climate-t:#15253a;--fig:#b9a0e6;--fig-t:#251f33; color-scheme:dark } }
+:root[data-theme="dark"]{ --bg:#101619;--surface:#172024;--line:#304048;--ink:#e3eaec;--ink2:#c3cfd3;--muted:#8fa0a6;--edge:#a8b7bc;--on:#101619;
+--setup:#9eb0b8;--setup-t:#1f2a2f;--land:#6dc59b;--land-t:#15291f;--carbon:#e3a46d;--carbon-t:#2d2118;--climate:#79b3e3;--climate-t:#15253a;--fig:#b9a0e6;--fig-t:#251f33; color-scheme:dark }
+body{background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans)}
+.wrap{max-width:1640px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:18px}
+.intro{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px}
+.intro h1{font:700 20px/1.2 var(--sans);margin:0;text-wrap:balance}
+.intro p{margin:0;color:var(--muted);max-width:72ch}
+.figure{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.figure svg{display:block;width:100%;min-width:1120px;height:auto}
+
+.bg{fill:var(--bg)} .box{fill:var(--surface);stroke:var(--line);stroke-width:1}
+.h1{font:700 22px var(--sans);fill:var(--ink)} .sub{font:400 12px var(--sans);fill:var(--muted)}
+.eyebrow{font:500 9.5px var(--mono);letter-spacing:.08em;fill:var(--muted)} .sname{font:700 14px var(--sans);fill:var(--ink)}
+.ghead{font:600 9px var(--mono);letter-spacing:.08em;fill:var(--muted)} .gt{font:600 12px var(--sans);fill:var(--ink)}
+.item{font:400 10px var(--sans);fill:var(--ink2)} .txt{font:400 11px var(--sans);fill:var(--ink2)}
+.mono{font:400 10px var(--mono);fill:var(--muted)} .lbl{font:400 9.5px var(--mono);fill:var(--muted)}
+.foot{font:400 10.5px var(--sans);fill:var(--muted)} .lgt{font:400 11px var(--sans);fill:var(--ink2)}
+.f-setup{--c:var(--setup);--t:var(--setup-t)} .f-land{--c:var(--land);--t:var(--land-t)} .f-carbon{--c:var(--carbon);--t:var(--carbon-t)}
+.f-climate{--c:var(--climate);--t:var(--climate-t)} .f-fig{--c:var(--fig);--t:var(--fig-t)}
+.lg{fill:var(--c)} .stage .sb{fill:var(--t);stroke:var(--c);stroke-width:1.2} .stage.ghost .sb{stroke-dasharray:4 3}
+.badge{fill:var(--c)} .badge-t{font:600 11px var(--mono);fill:var(--on)} .sn{font:600 11.5px var(--sans);fill:var(--ink)}
+.ss{font:400 9px var(--mono);fill:var(--muted)} .chip rect{fill:var(--c)} .chip-t{font:600 8.5px var(--mono);fill:var(--on)}
+.sheet rect{fill:var(--carbon-t);stroke:var(--line);stroke-width:.8} .sheet-t{font:400 10px var(--sans);fill:var(--ink2)}
+.edge{fill:none;stroke:var(--edge);stroke-width:1.3} .dep{fill:none;stroke:var(--edge);stroke-width:1.2;stroke-dasharray:5 4}
+.lead{fill:none;stroke:var(--muted);stroke-width:.8;stroke-dasharray:1.5 2.5} .halo{fill:none;stroke:var(--surface);stroke-width:7}
+.bus{fill:none;stroke:var(--setup);stroke-width:3.5;stroke-linecap:round} .tap{fill:none;stroke:var(--setup);stroke-width:1.5}
+.dot{fill:var(--setup)} .ah{fill:var(--edge)} .rule{stroke:var(--line);stroke-width:1}
+.engine rect{fill:var(--ink)} .engine-t{font:600 9.5px var(--mono);fill:var(--surface)}
+.rowbg{fill:transparent} .rowt{font:400 10.5px var(--sans);fill:var(--ink2)}
+
+.stage,.chip{cursor:pointer}
+.stage:focus{outline:none}
+.stage:focus-visible .sb{stroke-width:3}
+svg .stage{transition:opacity .15s}
+svg.dim .stage{opacity:.3}
+svg.dim .stage.sel,svg.dim .stage.rel{opacity:1}
+.stage.sel .sb{stroke-width:2.8}
+.row.hit .rowbg{fill:var(--setup-t)}
+.sheet.hit rect{stroke:var(--carbon);stroke-width:1.8}
+.picker{display:flex;flex-wrap:wrap;gap:6px}
+.pick{display:inline-flex;align-items:center;gap:7px;padding:4px 10px 4px 4px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink2);font:500 12.5px var(--sans);cursor:pointer}
+.pick:hover{border-color:var(--c)}
+.pick[aria-pressed="true"]{border-color:var(--c);background:var(--t);color:var(--ink)}
+.pick:focus-visible,.chipb:focus-visible{outline:2px solid var(--c);outline-offset:2px}
+.pick b,.chipb{display:inline-grid;place-items:center;min-width:24px;height:20px;padding:0 4px;border-radius:3px;background:var(--c);color:var(--on);font:600 11px var(--mono)}
+.chipb{border:0;cursor:pointer;min-width:22px;height:18px;font-size:10.5px}
+.detail{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:20px 22px;display:grid;gap:14px}
+.d-head{display:flex;gap:14px;align-items:flex-start}
+.d-head .num{display:grid;place-items:center;min-width:40px;height:34px;border-radius:5px;background:var(--c);color:var(--on);font:600 17px var(--mono)}
+.d-head h2{margin:0;font:700 18px/1.25 var(--sans)}
+.d-meta{margin:2px 0 0;color:var(--muted);font:400 12px var(--mono)}
+.d-desc{margin:0;max-width:80ch;color:var(--ink2)}
+.d-where{margin:0;color:var(--muted);font-size:13px}
+.d-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+.d-cols section{min-width:0}
+.d-cols h3{margin:0 0 6px;font:600 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.d-cols ul{list-style:none;margin:0;padding:0;display:grid;gap:1px}
+.d-cols li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0;border-top:1px solid var(--line)}
+.d-cols li:first-child{border-top:0}
+.sh{min-width:0}
+.sh span{display:block;color:var(--ink);font-size:13px;line-height:1.3}
+.sh code{display:block;color:var(--muted);font:400 10.5px var(--mono);overflow-wrap:anywhere}
+.via{display:flex;flex-wrap:wrap;gap:3px;justify-content:flex-end;align-items:center;flex:none;max-width:45%}
+.via em{font:400 10.5px var(--mono);color:var(--muted);font-style:normal;margin-right:2px}
+.none{color:var(--muted);font-size:13px}
+.note{margin:0;color:var(--muted);font-size:12.5px}
+@media (prefers-reduced-motion: reduce){svg .stage{transition:none}}
+</style>
+
+<div class="wrap">
+  <div class="intro">
+    <h1>lucasCore blueprint</h1>
+    <p>Version 1.0.0: the 15 stages, the scenarios they run in, and the datasheets they hand on to each other and to ST-Sim. Select a stage, in the drawing or below, to list every sheet it reads and writes.</p>
+  </div>
+  <div class="figure">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000" role="img" aria-labelledby="bp-title">
+<title id="bp-title">lucasCore blueprint: scenarios, stages and datasheets</title>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker></defs>
+<rect class="bg" width="1600" height="1000"/>
+<text x="24" y="44" class="h1">lucasCore blueprint</text>
+<text x="24" y="66" class="sub">SyncroSim 3 add-on to ST-Sim 4.5 · version 1.0.0 · 15 stages in src/ · the scenarios they run in and the datasheets they pass on</text>
+<rect class="lg f-setup" x="1152.8" y="28" width="14" height="12" rx="2"/>
+<text x="1174.8" y="38" class="lgt">Setup</text>
+<rect class="lg f-land" x="1213.8" y="28" width="14" height="12" rx="2"/>
+<text x="1235.8" y="38" class="lgt">Land cover and change</text>
+<rect class="lg f-carbon" x="1374" y="28" width="14" height="12" rx="2"/>
+<text x="1396" y="38" class="lgt">Carbon</text>
+<rect class="lg f-climate" x="1441.2" y="28" width="14" height="12" rx="2"/>
+<text x="1463.2" y="38" class="lgt">Climate</text>
+<rect class="lg f-fig" x="1514.6" y="28" width="14" height="12" rx="2"/>
+<text x="1536.6" y="38" class="lgt">Figures</text>
+<path d="M1163.2,58 h16" class="edge" marker-end="url(#ah)"/>
+<text x="1185.2" y="62" class="lgt">datasheet passed on</text>
+<path d="M1311,58 h16" class="dep" marker-end="url(#ah)"/>
+<text x="1333" y="62" class="lgt">scenario dependency</text>
+<path d="M1458.8,58 h18" class="bus"/>
+<text x="1480.8" y="62" class="lgt">shared map sheet</text>
+<rect class="box" x="24" y="104" width="216" height="830" rx="7"/><text x="40" y="126" class="eyebrow">DATA SOURCES SHEET</text><text x="40" y="146" class="sname">National data</text>
+<text x="40" y="172" class="gt">FIA</text>
+<g class="chip f-setup" data-stage="1"><rect x="122" y="161" width="18" height="14" rx="3"/><text x="131" y="171.5" class="chip-t" text-anchor="middle">1</text></g><g class="chip f-carbon" data-stage="2"><rect x="143" y="161" width="18" height="14" rx="3"/><text x="152" y="171.5" class="chip-t" text-anchor="middle">2</text></g><g class="chip f-carbon" data-stage="3"><rect x="164" y="161" width="18" height="14" rx="3"/><text x="173" y="171.5" class="chip-t" text-anchor="middle">3</text></g><g class="chip f-land" data-stage="5"><rect x="185" y="161" width="18" height="14" rx="3"/><text x="194" y="171.5" class="chip-t" text-anchor="middle">5</text></g><g class="chip f-land" data-stage="6"><rect x="206" y="161" width="18" height="14" rx="3"/><text x="215" y="171.5" class="chip-t" text-anchor="middle">6</text></g>
+<text x="40" y="187" class="item">FIADB DataMart (PLOT, COND, TREE)</text>
+<text x="40" y="202" class="item">Condition carbon and volume (USGS)</text>
+<text x="40" y="217" class="item">Disturbance and treatment codes</text>
+<text x="40" y="232" class="item">FIA ecodivisions (primary strata)</text>
+<line class="rule" x1="40" y1="248" x2="224" y2="248"/>
+<text x="40" y="263" class="gt">Land cover</text>
+<g class="chip f-setup" data-stage="1"><rect x="143" y="252" width="18" height="14" rx="3"/><text x="152" y="262.5" class="chip-t" text-anchor="middle">1</text></g><g class="chip f-land" data-stage="5"><rect x="164" y="252" width="18" height="14" rx="3"/><text x="173" y="262.5" class="chip-t" text-anchor="middle">5</text></g><g class="chip f-land" data-stage="6"><rect x="185" y="252" width="18" height="14" rx="3"/><text x="194" y="262.5" class="chip-t" text-anchor="middle">6</text></g><g class="chip f-land" data-stage="10"><rect x="206" y="252" width="18" height="14" rx="3"/><text x="215" y="262.5" class="chip-t" text-anchor="middle">10</text></g>
+<text x="40" y="278" class="item">Annual NLCD</text>
+<text x="40" y="293" class="item">LANDFIRE EVT 2001 and 2016</text>
+<text x="40" y="308" class="item">RCMAP, C-CAP 2001</text>
+<text x="40" y="323" class="item">USFS forest type groups</text>
+<text x="40" y="338" class="item">NASA CMS forest age 1990</text>
+<line class="rule" x1="40" y1="354" x2="224" y2="354"/>
+<text x="40" y="369" class="gt">Disturbance</text>
+<g class="chip f-land" data-stage="5"><rect x="122" y="358" width="18" height="14" rx="3"/><text x="131" y="368.5" class="chip-t" text-anchor="middle">5</text></g><g class="chip f-land" data-stage="6"><rect x="143" y="358" width="18" height="14" rx="3"/><text x="152" y="368.5" class="chip-t" text-anchor="middle">6</text></g><g class="chip f-carbon" data-stage="8"><rect x="164" y="358" width="18" height="14" rx="3"/><text x="173" y="368.5" class="chip-t" text-anchor="middle">8</text></g><g class="chip f-land" data-stage="9"><rect x="185" y="358" width="18" height="14" rx="3"/><text x="194" y="368.5" class="chip-t" text-anchor="middle">9</text></g><g class="chip f-land" data-stage="10"><rect x="206" y="358" width="18" height="14" rx="3"/><text x="215" y="368.5" class="chip-t" text-anchor="middle">10</text></g>
+<text x="40" y="384" class="item">LANDFIRE disturbance</text>
+<text x="40" y="399" class="item">MTBS burn severity</text>
+<text x="40" y="414" class="item">USFS LCMS annual change</text>
+<text x="40" y="429" class="item">Interagency fire perimeters</text>
+<text x="40" y="444" class="item">FPA-FOD fire occurrence</text>
+<text x="40" y="459" class="item">FSim burn probability</text>
+<text x="40" y="474" class="item">LANDFIRE fire return interval</text>
+<line class="rule" x1="40" y1="490" x2="224" y2="490"/>
+<text x="40" y="505" class="gt">Climate</text>
+<g class="chip f-carbon" data-stage="2"><rect x="143" y="494" width="18" height="14" rx="3"/><text x="152" y="504.5" class="chip-t" text-anchor="middle">2</text></g><g class="chip f-carbon" data-stage="3"><rect x="164" y="494" width="18" height="14" rx="3"/><text x="173" y="504.5" class="chip-t" text-anchor="middle">3</text></g><g class="chip f-climate" data-stage="7"><rect x="185" y="494" width="18" height="14" rx="3"/><text x="194" y="504.5" class="chip-t" text-anchor="middle">7</text></g><g class="chip f-climate" data-stage="11"><rect x="206" y="494" width="18" height="14" rx="3"/><text x="215" y="504.5" class="chip-t" text-anchor="middle">11</text></g>
+<text x="40" y="520" class="item">PRISM annual and normals</text>
+<text x="40" y="535" class="item">LOCA2 (scenario, model, replicate)</text>
+<line class="rule" x1="40" y1="551" x2="224" y2="551"/>
+<text x="40" y="566" class="gt">Soil</text>
+<g class="chip f-land" data-stage="5"><rect x="185" y="555" width="18" height="14" rx="3"/><text x="194" y="565.5" class="chip-t" text-anchor="middle">5</text></g><g class="chip f-carbon" data-stage="8"><rect x="206" y="555" width="18" height="14" rx="3"/><text x="215" y="565.5" class="chip-t" text-anchor="middle">8</text></g>
+<text x="40" y="581" class="item">gSSURGO soil organic carbon</text>
+<line class="rule" x1="40" y1="597" x2="224" y2="597"/>
+<text x="40" y="612" class="gt">Covariates</text>
+<g class="chip f-land" data-stage="9"><rect x="185" y="601" width="18" height="14" rx="3"/><text x="194" y="611.5" class="chip-t" text-anchor="middle">9</text></g><g class="chip f-land" data-stage="10"><rect x="206" y="601" width="18" height="14" rx="3"/><text x="215" y="611.5" class="chip-t" text-anchor="middle">10</text></g>
+<text x="40" y="627" class="item">Roads and elevation (LANDFIRE)</text>
+<text x="40" y="642" class="item">SILVIS WUI v4</text>
+<text x="40" y="657" class="item">gNATSGO crop productivity</text>
+<text x="40" y="672" class="item">USFS forest ownership</text>
+<line class="rule" x1="40" y1="688" x2="224" y2="688"/>
+<text x="40" y="703" class="gt">Package defaults</text>
+<g class="chip f-setup" data-stage="0"><rect x="59" y="711" width="18" height="14" rx="3"/><text x="68" y="721.5" class="chip-t" text-anchor="middle">0</text></g><g class="chip f-carbon" data-stage="3"><rect x="80" y="711" width="18" height="14" rx="3"/><text x="89" y="721.5" class="chip-t" text-anchor="middle">3</text></g><g class="chip f-carbon" data-stage="4"><rect x="101" y="711" width="18" height="14" rx="3"/><text x="110" y="721.5" class="chip-t" text-anchor="middle">4</text></g><g class="chip f-land" data-stage="5"><rect x="122" y="711" width="18" height="14" rx="3"/><text x="131" y="721.5" class="chip-t" text-anchor="middle">5</text></g><g class="chip f-land" data-stage="6"><rect x="143" y="711" width="18" height="14" rx="3"/><text x="152" y="721.5" class="chip-t" text-anchor="middle">6</text></g><g class="chip f-carbon" data-stage="8"><rect x="164" y="711" width="18" height="14" rx="3"/><text x="173" y="721.5" class="chip-t" text-anchor="middle">8</text></g><g class="chip f-land" data-stage="9"><rect x="185" y="711" width="18" height="14" rx="3"/><text x="194" y="721.5" class="chip-t" text-anchor="middle">9</text></g><g class="chip f-land" data-stage="10"><rect x="206" y="711" width="18" height="14" rx="3"/><text x="215" y="721.5" class="chip-t" text-anchor="middle">10</text></g>
+<text x="40" y="740" class="item">stockflow, stsim, strata</text>
+<text x="40" y="755" class="item">carbon-assumptions, cbm, spinup</text>
+<text x="40" y="770" class="item">growth, initialstocks, climate</text>
+<text x="40" y="785" class="item">landcover crosswalks</text>
+<text x="40" y="800" class="item">transitions, projection rules</text>
+<text x="40" y="819" class="lbl">(used when a sheet is left empty)</text>
+<rect class="box" x="268" y="104" width="202" height="136" rx="7"/><text x="284" y="126" class="eyebrow">SCENARIO · DEPENDENCY</text><text x="284" y="146" class="sname">Stock-Flow Definitions</text>
+<g class="stage f-setup" data-stage="0" tabindex="0" role="button" aria-label="Stage 0, Stock-Flow Definitions"><rect class="sb" x="283" y="160" width="172" height="64" rx="5"/><rect class="badge" x="292" y="170" width="24" height="20" rx="3"/><text x="304" y="184" class="badge-t" text-anchor="middle">0</text><text x="324" y="179" class="sn">Stock-Flow</text><text x="324" y="193" class="sn">Definitions</text><text x="292" y="214" class="ss">0-stock-flow-definitions.R</text></g>
+<rect class="box" x="494" y="104" width="480" height="136" rx="7"/><text x="510" y="126" class="eyebrow">SCENARIO · DEPENDENCY · INPUT SHEETS</text><text x="510" y="146" class="sname">Carbon Assumptions</text>
+<g class="sheet" data-sheet="CarbonOptions"><rect x="510" y="158" width="142" height="20" rx="3"/><text x="518" y="172" class="sheet-t">Carbon Method</text></g>
+<g class="sheet" data-sheet="CbmCrosswalk"><rect x="663" y="158" width="142" height="20" rx="3"/><text x="671" y="172" class="sheet-t">CBM Crosswalk</text></g>
+<g class="sheet" data-sheet="LiveTurnover"><rect x="816" y="158" width="142" height="20" rx="3"/><text x="824" y="172" class="sheet-t">Live Turnover</text></g>
+<g class="sheet" data-sheet="DisturbanceFlow"><rect x="510" y="184" width="142" height="20" rx="3"/><text x="518" y="198" class="sheet-t">Disturbance Flows</text></g>
+<g class="sheet" data-sheet="FireSnagShare"><rect x="663" y="184" width="142" height="20" rx="3"/><text x="671" y="198" class="sheet-t">Fire Snag Share</text></g>
+<g class="sheet" data-sheet="DecayCalibrationSetting"><rect x="816" y="184" width="142" height="20" rx="3"/><text x="824" y="198" class="sheet-t">Decay Calibration Settings</text></g>
+<g class="sheet" data-sheet="FixedDecayMultiplier"><rect x="510" y="210" width="142" height="20" rx="3"/><text x="518" y="224" class="sheet-t">Fixed Decay Multipliers</text></g>
+<g class="sheet" data-sheet="Spinup"><rect x="663" y="210" width="142" height="20" rx="3"/><text x="671" y="224" class="sheet-t">Spin-up</text></g>
+<g class="sheet" data-sheet="DomParameter"><rect x="816" y="210" width="142" height="20" rx="3"/><text x="824" y="224" class="sheet-t">DOM Parameters</text></g>
+<rect class="box" x="998" y="104" width="230" height="136" rx="7"/><text x="1014" y="126" class="eyebrow">SCENARIO · OPTIONAL, SHARED</text><text x="1014" y="146" class="sname">Growth Curves (CONUS)</text>
+<g class="stage f-carbon ghost" data-stage="2" tabindex="0" role="button" aria-label="Stage 2, Fit Growth Curves"><rect class="sb" x="1027" y="160" width="172" height="64" rx="5"/><rect class="badge" x="1036" y="170" width="24" height="20" rx="3"/><text x="1048" y="184" class="badge-t" text-anchor="middle">2</text><text x="1068" y="185" class="sn">Fit Growth Curves</text><text x="1036" y="214" class="ss">2-growth-curves.R</text></g>
+<path d="M369,240 V266" class="dep" marker-end="url(#ah)"/>
+<text x="375" y="258" class="lbl">dependency</text>
+<path d="M734,240 V266" class="dep" marker-end="url(#ah)"/>
+<text x="740" y="258" class="lbl">dependency</text>
+<path d="M1113,240 V266" class="dep" marker-end="url(#ah)"/>
+<text x="1119" y="258" class="lbl">optional dependency</text>
+<rect class="box" x="268" y="268" width="960" height="322" rx="7"/><text x="284" y="290" class="eyebrow">SCENARIO · ONE PER STUDY AREA</text><text x="284" y="310" class="sname">Build</text>
+<text x="1212" y="290" class="eyebrow" text-anchor="end">PIPELINE</text>
+<text x="1212" y="310" class="mono" text-anchor="end">0 › 1 › 5 › 2 › 3 › 4 › 6 › 7 › 8 › 12</text>
+<text x="284" y="330" class="ghead">LAND</text>
+<text x="284" y="574" class="ghead">CARBON</text>
+<path d="M300,446 H1020" class="bus"/>
+<path d="M1020,446 H1038" class="edge" marker-end="url(#ah)"/>
+<line class="halo" x1="600" y1="440" x2="600" y2="452"/>
+<path d="M600,398 V492" class="edge" marker-end="url(#ah)"/>
+<text x="594" y="482" class="lbl" text-anchor="end">Return Intervals, Soil Targets</text>
+<path d="M370,398 V442" class="tap" marker-end="url(#ah)"/>
+<path d="M520,398 V446" class="tap"/>
+<path d="M748,398 V446" class="tap"/>
+<path d="M920,446 V400" class="tap" marker-end="url(#ah)"/>
+<path d="M955,446 V492" class="tap" marker-end="url(#ah)"/>
+<circle class="dot" cx="370" cy="446" r="3.2"/>
+<circle class="dot" cx="520" cy="446" r="3.2"/>
+<circle class="dot" cx="748" cy="446" r="3.2"/>
+<circle class="dot" cx="920" cy="446" r="3.2"/>
+<circle class="dot" cx="955" cy="446" r="3.2"/>
+<text x="612" y="462" class="lbl">Initial Conditions Spatial (ST-Sim maps)</text>
+<g class="stage f-setup" data-stage="1" tabindex="0" role="button" aria-label="Stage 1, Study Area and Strata"><rect class="sb" x="284" y="334" width="172" height="64" rx="5"/><rect class="badge" x="293" y="344" width="24" height="20" rx="3"/><text x="305" y="358" class="badge-t" text-anchor="middle">1</text><text x="325" y="353" class="sn">Study Area</text><text x="325" y="367" class="sn">and Strata</text><text x="293" y="388" class="ss">1-study-area.R</text></g>
+<g class="stage f-land" data-stage="5" tabindex="0" role="button" aria-label="Stage 5, Initial Conditions"><rect class="sb" x="473" y="334" width="172" height="64" rx="5"/><rect class="badge" x="482" y="344" width="24" height="20" rx="3"/><text x="494" y="358" class="badge-t" text-anchor="middle">5</text><text x="514" y="359" class="sn">Initial Conditions</text><text x="482" y="388" class="ss">5-initial-conditions.R</text></g>
+<g class="stage f-land" data-stage="6" tabindex="0" role="button" aria-label="Stage 6, Historical Transitions"><rect class="sb" x="662" y="334" width="172" height="64" rx="5"/><rect class="badge" x="671" y="344" width="24" height="20" rx="3"/><text x="683" y="358" class="badge-t" text-anchor="middle">6</text><text x="703" y="353" class="sn">Historical</text><text x="703" y="367" class="sn">Transitions</text><text x="671" y="388" class="ss">6-historical-transitions.R</text></g>
+<g class="stage f-climate" data-stage="7" tabindex="0" role="button" aria-label="Stage 7, Climate Multipliers"><rect class="sb" x="851" y="334" width="172" height="64" rx="5"/><rect class="badge" x="860" y="344" width="24" height="20" rx="3"/><text x="872" y="358" class="badge-t" text-anchor="middle">7</text><text x="892" y="359" class="sn">Climate Multipliers</text><text x="860" y="388" class="ss">7-climate-multipliers.R</text></g>
+<g class="stage f-fig" data-stage="12" tabindex="0" role="button" aria-label="Stage 12, Build Figures"><rect class="sb" x="1040" y="414" width="172" height="64" rx="5"/><rect class="badge" x="1049" y="424" width="24" height="20" rx="3"/><text x="1061" y="438" class="badge-t" text-anchor="middle">12</text><text x="1081" y="439" class="sn">Build Figures</text><text x="1049" y="468" class="ss">12-build-figures.R</text></g>
+<g class="stage f-carbon" data-stage="2" tabindex="0" role="button" aria-label="Stage 2, Fit Growth Curves"><rect class="sb" x="284" y="494" width="172" height="64" rx="5"/><rect class="badge" x="293" y="504" width="24" height="20" rx="3"/><text x="305" y="518" class="badge-t" text-anchor="middle">2</text><text x="325" y="519" class="sn">Fit Growth Curves</text><text x="293" y="548" class="ss">2-growth-curves.R</text></g>
+<g class="stage f-carbon" data-stage="3" tabindex="0" role="button" aria-label="Stage 3, Carbon Flows"><rect class="sb" x="473" y="494" width="172" height="64" rx="5"/><rect class="badge" x="482" y="504" width="24" height="20" rx="3"/><text x="494" y="518" class="badge-t" text-anchor="middle">3</text><text x="514" y="519" class="sn">Carbon Flows</text><text x="482" y="548" class="ss">3-carbon-flows.R</text></g>
+<g class="stage f-carbon" data-stage="4" tabindex="0" role="button" aria-label="Stage 4, Spin-up and Initial Stocks"><rect class="sb" x="662" y="494" width="172" height="64" rx="5"/><rect class="badge" x="671" y="504" width="24" height="20" rx="3"/><text x="683" y="518" class="badge-t" text-anchor="middle">4</text><text x="703" y="513" class="sn">Spin-up and</text><text x="703" y="527" class="sn">Initial Stocks</text><text x="671" y="548" class="ss">4-initial-stocks.R</text></g>
+<g class="stage f-carbon" data-stage="8" tabindex="0" role="button" aria-label="Stage 8, Initial Stock Maps"><rect class="sb" x="851" y="494" width="172" height="64" rx="5"/><rect class="badge" x="860" y="504" width="24" height="20" rx="3"/><text x="872" y="518" class="badge-t" text-anchor="middle">8</text><text x="892" y="519" class="sn">Initial Stock Maps</text><text x="860" y="548" class="ss">8-initial-stocks-spatial.R</text></g>
+<path d="M645,366 H660" class="edge" marker-end="url(#ah)"/>
+<path d="M653.5,358 V330" class="lead"/>
+<text x="653.5" y="326" class="lbl" text-anchor="middle">Annual NLCD</text>
+<path d="M456,526 H471" class="edge" marker-end="url(#ah)"/>
+<path d="M464.5,534 V566" class="lead"/>
+<text x="464.5" y="577" class="lbl" text-anchor="middle">Carbon Curves</text>
+<path d="M645,526 H660" class="edge" marker-end="url(#ah)"/>
+<path d="M653.5,534 V566" class="lead"/>
+<text x="653.5" y="577" class="lbl" text-anchor="middle">Decay Calibration, Flow Multipliers</text>
+<path d="M834,526 H849" class="edge" marker-end="url(#ah)"/>
+<path d="M842.5,534 V566" class="lead"/>
+<text x="842.5" y="577" class="lbl" text-anchor="middle">Initial Stock Curves</text>
+<text x="1126" y="494" class="lbl" text-anchor="middle">reads the summaries</text>
+<text x="1126" y="507" class="lbl" text-anchor="middle">of stages 1 to 8</text>
+<path d="M494,590 V620" class="dep" marker-end="url(#ah)"/>
+<text x="500" y="610" class="lbl">Build result</text>
+<path d="M859,590 V620" class="dep" marker-end="url(#ah)"/>
+<text x="865" y="610" class="lbl">Build result</text>
+<rect class="box" x="268" y="622" width="452" height="150" rx="7"/><text x="284" y="644" class="eyebrow">SCENARIO · ON THE BUILD RESULT</text><text x="284" y="664" class="sname">Projection Setup</text>
+<g class="stage f-land" data-stage="9" tabindex="0" role="button" aria-label="Stage 9, Projection Transitions"><rect class="sb" x="284" y="690" width="172" height="64" rx="5"/><rect class="badge" x="293" y="700" width="24" height="20" rx="3"/><text x="305" y="714" class="badge-t" text-anchor="middle">9</text><text x="325" y="709" class="sn">Projection</text><text x="325" y="723" class="sn">Transitions</text><text x="293" y="744" class="ss">9-projection-transitions.R</text></g>
+<g class="stage f-land" data-stage="10" tabindex="0" role="button" aria-label="Stage 10, Transition Suitability"><rect class="sb" x="532" y="690" width="172" height="64" rx="5"/><rect class="badge" x="541" y="700" width="24" height="20" rx="3"/><text x="553" y="714" class="badge-t" text-anchor="middle">10</text><text x="573" y="709" class="sn">Transition</text><text x="573" y="723" class="sn">Suitability</text><text x="541" y="744" class="ss">10-transition-suitability.R</text></g>
+<path d="M456,722 H530" class="edge" marker-end="url(#ah)"/>
+<text x="494" y="714" class="lbl" text-anchor="middle">Projection</text>
+<text x="494" y="738" class="lbl" text-anchor="middle">Schedule</text>
+<rect class="box" x="744" y="622" width="230" height="150" rx="7"/><text x="760" y="644" class="eyebrow">SCENARIO · ONE PER LOCA2 RUN</text><text x="760" y="664" class="sname">Projection Climate</text>
+<g class="stage f-climate" data-stage="11" tabindex="0" role="button" aria-label="Stage 11, Projection Climate"><rect class="sb" x="773" y="690" width="172" height="64" rx="5"/><rect class="badge" x="782" y="700" width="24" height="20" rx="3"/><text x="794" y="714" class="badge-t" text-anchor="middle">11</text><text x="814" y="715" class="sn">Projection Climate</text><text x="782" y="744" class="ss">11-projection-climate.R</text></g>
+<path d="M268,560 H254 V869 H266" class="dep" marker-end="url(#ah)"/>
+<rect class="box" x="268" y="804" width="330" height="130" rx="7"/><text x="284" y="826" class="eyebrow">SCENARIO · PIPELINE ST-SIM</text><text x="284" y="846" class="sname">Historical run</text>
+<g class="engine"><rect x="528" y="812" width="54" height="18" rx="9"/><text x="555" y="824.5" class="engine-t" text-anchor="middle">ST-Sim</text></g>
+<text x="284" y="870" class="txt">Depends on the Build result, then on</text>
+<text x="284" y="885" class="txt">Stock-Flow Definitions (in that order).</text>
+<text x="284" y="918" class="mono">tools/new-historical.R</text>
+<path d="M660,772 V802" class="dep" marker-end="url(#ah)"/>
+<path d="M859,772 V802" class="dep" marker-end="url(#ah)"/>
+<path d="M598,869 H620" class="dep" marker-end="url(#ah)"/>
+<rect class="box" x="622" y="804" width="352" height="130" rx="7"/><text x="638" y="826" class="eyebrow">SCENARIO · PIPELINE ST-SIM</text><text x="638" y="846" class="sname">Projection run</text>
+<g class="engine"><rect x="904" y="812" width="54" height="18" rx="9"/><text x="931" y="824.5" class="engine-t" text-anchor="middle">ST-Sim</text></g>
+<text x="638" y="868" class="txt">Depends on Projection Setup, Projection Climate</text>
+<text x="638" y="883" class="txt">and the Build result. Mode 1: one continuous run;</text>
+<text x="638" y="898" class="txt">mode 2 starts from a historical run's final maps.</text>
+<text x="638" y="920" class="mono">tools/new-projection.R</text>
+<path d="M974,869 H996" class="dep" marker-end="url(#ah)"/>
+<rect class="box" x="998" y="622" width="230" height="312" rx="7"/><text x="1014" y="644" class="eyebrow">SCENARIOS · ON RUN RESULTS</text><text x="1014" y="664" class="sname">Figures and comparison</text>
+<g class="stage f-fig" data-stage="13" tabindex="0" role="button" aria-label="Stage 13, Run Figures"><rect class="sb" x="1027" y="690" width="172" height="64" rx="5"/><rect class="badge" x="1036" y="700" width="24" height="20" rx="3"/><text x="1048" y="714" class="badge-t" text-anchor="middle">13</text><text x="1068" y="715" class="sn">Run Figures</text><text x="1036" y="744" class="ss">13-run-figures.R</text></g>
+<g class="stage f-fig" data-stage="14" tabindex="0" role="button" aria-label="Stage 14, Compare Runs"><rect class="sb" x="1027" y="790" width="172" height="64" rx="5"/><rect class="badge" x="1036" y="800" width="24" height="20" rx="3"/><text x="1048" y="814" class="badge-t" text-anchor="middle">14</text><text x="1068" y="815" class="sn">Compare Runs</text><text x="1036" y="844" class="ss">14-compare-runs.R</text></g>
+<text x="1014" y="882" class="txt">13 maps one run; 14 compares</text>
+<text x="1014" y="897" class="txt">runs and writes carbon and</text>
+<text x="1014" y="912" class="txt">land change summaries.</text>
+<rect class="box" x="1256" y="104" width="320" height="830" rx="7"/><text x="1272" y="126" class="eyebrow">WRITTEN INTO ST-SIM</text><text x="1272" y="146" class="sname">ST-Sim inputs</text>
+<text x="1272" y="172" class="ghead">DEFINITIONS</text>
+<g class="row" data-sheet="stsim_FlowPathwayDiagram" data-stages="0">
+<rect class="rowbg" x="1264" y="177" width="304" height="18" rx="3"/>
+<text x="1272" y="190" class="rowt">Flow Pathway Diagram</text>
+<g class="chip f-setup" data-stage="0"><rect x="1542" y="179" width="18" height="14" rx="3"/><text x="1551" y="189.5" class="chip-t" text-anchor="middle">0</text></g>
+</g>
+<g class="row" data-sheet="stsim_FlowOrder stsim_FlowOrderOptions" data-stages="0">
+<rect class="rowbg" x="1264" y="196" width="304" height="18" rx="3"/>
+<text x="1272" y="209" class="rowt">Flow Order and Options</text>
+<g class="chip f-setup" data-stage="0"><rect x="1542" y="198" width="18" height="14" rx="3"/><text x="1551" y="208.5" class="chip-t" text-anchor="middle">0</text></g>
+</g>
+<g class="row" data-sheet="stsim_FlowTypeGroupMembership stsim_StockTypeGroupMembership" data-stages="0">
+<rect class="rowbg" x="1264" y="215" width="304" height="18" rx="3"/>
+<text x="1272" y="228" class="rowt">Flow and Stock Type Groups</text>
+<g class="chip f-setup" data-stage="0"><rect x="1542" y="217" width="18" height="14" rx="3"/><text x="1551" y="227.5" class="chip-t" text-anchor="middle">0</text></g>
+</g>
+<g class="row" data-sheet="stsim_OutputOptionsStockFlow stsim_OutputFilterFlows stsim_OutputFilterStocks stsim_OutputFilterTransitionGroups stsim_OutputOptionsSpatial" data-stages="0">
+<rect class="rowbg" x="1264" y="234" width="304" height="18" rx="3"/>
+<text x="1272" y="247" class="rowt">Output Options and Filters</text>
+<g class="chip f-setup" data-stage="0"><rect x="1542" y="236" width="18" height="14" rx="3"/><text x="1551" y="246.5" class="chip-t" text-anchor="middle">0</text></g>
+</g>
+<text x="1272" y="278" class="ghead">INITIAL CONDITIONS</text>
+<g class="row" data-sheet="stsim_InitialConditionsSpatial" data-stages="1 5 6 9">
+<rect class="rowbg" x="1264" y="283" width="304" height="18" rx="3"/>
+<text x="1272" y="296" class="rowt">Initial Conditions Spatial</text>
+<g class="chip f-setup" data-stage="1"><rect x="1479" y="285" width="18" height="14" rx="3"/><text x="1488" y="295.5" class="chip-t" text-anchor="middle">1</text></g><g class="chip f-land" data-stage="5"><rect x="1500" y="285" width="18" height="14" rx="3"/><text x="1509" y="295.5" class="chip-t" text-anchor="middle">5</text></g><g class="chip f-land" data-stage="6"><rect x="1521" y="285" width="18" height="14" rx="3"/><text x="1530" y="295.5" class="chip-t" text-anchor="middle">6</text></g><g class="chip f-land" data-stage="9"><rect x="1542" y="285" width="18" height="14" rx="3"/><text x="1551" y="295.5" class="chip-t" text-anchor="middle">9</text></g>
+</g>
+<g class="row" data-sheet="stsim_InitialStockSpatial" data-stages="8 9">
+<rect class="rowbg" x="1264" y="302" width="304" height="18" rx="3"/>
+<text x="1272" y="315" class="rowt">Initial Stocks Spatial</text>
+<g class="chip f-carbon" data-stage="8"><rect x="1521" y="304" width="18" height="14" rx="3"/><text x="1530" y="314.5" class="chip-t" text-anchor="middle">8</text></g><g class="chip f-land" data-stage="9"><rect x="1542" y="304" width="18" height="14" rx="3"/><text x="1551" y="314.5" class="chip-t" text-anchor="middle">9</text></g>
+</g>
+<g class="row" data-sheet="core_SpatialMultiprocessing" data-stages="1 9">
+<rect class="rowbg" x="1264" y="321" width="304" height="18" rx="3"/>
+<text x="1272" y="334" class="rowt">Spatial Multiprocessing tiles</text>
+<g class="chip f-setup" data-stage="1"><rect x="1521" y="323" width="18" height="14" rx="3"/><text x="1530" y="333.5" class="chip-t" text-anchor="middle">1</text></g><g class="chip f-land" data-stage="9"><rect x="1542" y="323" width="18" height="14" rx="3"/><text x="1551" y="333.5" class="chip-t" text-anchor="middle">9</text></g>
+</g>
+<text x="1272" y="365" class="ghead">TRANSITIONS</text>
+<g class="row" data-sheet="stsim_Transition" data-stages="6">
+<rect class="rowbg" x="1264" y="370" width="304" height="18" rx="3"/>
+<text x="1272" y="383" class="rowt">Transitions</text>
+<g class="chip f-land" data-stage="6"><rect x="1542" y="372" width="18" height="14" rx="3"/><text x="1551" y="382.5" class="chip-t" text-anchor="middle">6</text></g>
+</g>
+<g class="row" data-sheet="stsim_DeterministicTransition" data-stages="6">
+<rect class="rowbg" x="1264" y="389" width="304" height="18" rx="3"/>
+<text x="1272" y="402" class="rowt">Deterministic Transitions</text>
+<g class="chip f-land" data-stage="6"><rect x="1542" y="391" width="18" height="14" rx="3"/><text x="1551" y="401.5" class="chip-t" text-anchor="middle">6</text></g>
+</g>
+<g class="row" data-sheet="stsim_TransitionTarget" data-stages="6 9">
+<rect class="rowbg" x="1264" y="408" width="304" height="18" rx="3"/>
+<text x="1272" y="421" class="rowt">Transition Targets</text>
+<g class="chip f-land" data-stage="6"><rect x="1521" y="410" width="18" height="14" rx="3"/><text x="1530" y="420.5" class="chip-t" text-anchor="middle">6</text></g><g class="chip f-land" data-stage="9"><rect x="1542" y="410" width="18" height="14" rx="3"/><text x="1551" y="420.5" class="chip-t" text-anchor="middle">9</text></g>
+</g>
+<g class="row" data-sheet="stsim_TransitionSpatialMultiplier" data-stages="6 9 10">
+<rect class="rowbg" x="1264" y="427" width="304" height="18" rx="3"/>
+<text x="1272" y="440" class="rowt">Transition Spatial Multipliers</text>
+<g class="chip f-land" data-stage="6"><rect x="1500" y="429" width="18" height="14" rx="3"/><text x="1509" y="439.5" class="chip-t" text-anchor="middle">6</text></g><g class="chip f-land" data-stage="9"><rect x="1521" y="429" width="18" height="14" rx="3"/><text x="1530" y="439.5" class="chip-t" text-anchor="middle">9</text></g><g class="chip f-land" data-stage="10"><rect x="1542" y="429" width="18" height="14" rx="3"/><text x="1551" y="439.5" class="chip-t" text-anchor="middle">10</text></g>
+</g>
+<g class="row" data-sheet="stsim_TransitionSpatialInitiationMultiplier" data-stages="9">
+<rect class="rowbg" x="1264" y="446" width="304" height="18" rx="3"/>
+<text x="1272" y="459" class="rowt">Spatial Initiation Multipliers</text>
+<g class="chip f-land" data-stage="9"><rect x="1542" y="448" width="18" height="14" rx="3"/><text x="1551" y="458.5" class="chip-t" text-anchor="middle">9</text></g>
+</g>
+<g class="row" data-sheet="stsim_TransitionSizeDistribution stsim_TransitionSizePrioritization" data-stages="9 10">
+<rect class="rowbg" x="1264" y="465" width="304" height="18" rx="3"/>
+<text x="1272" y="478" class="rowt">Size Distribution and Prioritization</text>
+<g class="chip f-land" data-stage="9"><rect x="1521" y="467" width="18" height="14" rx="3"/><text x="1530" y="477.5" class="chip-t" text-anchor="middle">9</text></g><g class="chip f-land" data-stage="10"><rect x="1542" y="467" width="18" height="14" rx="3"/><text x="1551" y="477.5" class="chip-t" text-anchor="middle">10</text></g>
+</g>
+<g class="row" data-sheet="stsim_TransitionAdjacencySetting stsim_TransitionAdjacencyMultiplier" data-stages="10">
+<rect class="rowbg" x="1264" y="484" width="304" height="18" rx="3"/>
+<text x="1272" y="497" class="rowt">Adjacency Settings and Multipliers</text>
+<g class="chip f-land" data-stage="10"><rect x="1542" y="486" width="18" height="14" rx="3"/><text x="1551" y="496.5" class="chip-t" text-anchor="middle">10</text></g>
+</g>
+<text x="1272" y="528" class="ghead">FLOWS AND STATE</text>
+<g class="row" data-sheet="stsim_FlowPathway" data-stages="3">
+<rect class="rowbg" x="1264" y="533" width="304" height="18" rx="3"/>
+<text x="1272" y="546" class="rowt">Flow Pathways</text>
+<g class="chip f-carbon" data-stage="3"><rect x="1542" y="535" width="18" height="14" rx="3"/><text x="1551" y="545.5" class="chip-t" text-anchor="middle">3</text></g>
+</g>
+<g class="row" data-sheet="stsim_FlowMultiplier" data-stages="3">
+<rect class="rowbg" x="1264" y="552" width="304" height="18" rx="3"/>
+<text x="1272" y="565" class="rowt">Flow Multipliers</text>
+<g class="chip f-carbon" data-stage="3"><rect x="1542" y="554" width="18" height="14" rx="3"/><text x="1551" y="564.5" class="chip-t" text-anchor="middle">3</text></g>
+</g>
+<g class="row" data-sheet="stsim_FlowSpatialMultiplier" data-stages="7 11">
+<rect class="rowbg" x="1264" y="571" width="304" height="18" rx="3"/>
+<text x="1272" y="584" class="rowt">Flow Spatial Multipliers</text>
+<g class="chip f-climate" data-stage="7"><rect x="1521" y="573" width="18" height="14" rx="3"/><text x="1530" y="583.5" class="chip-t" text-anchor="middle">7</text></g><g class="chip f-climate" data-stage="11"><rect x="1542" y="573" width="18" height="14" rx="3"/><text x="1551" y="583.5" class="chip-t" text-anchor="middle">11</text></g>
+</g>
+<g class="row" data-sheet="stsim_StateAttributeValue" data-stages="3 10">
+<rect class="rowbg" x="1264" y="590" width="304" height="18" rx="3"/>
+<text x="1272" y="603" class="rowt">State Attribute Values</text>
+<g class="chip f-carbon" data-stage="3"><rect x="1521" y="592" width="18" height="14" rx="3"/><text x="1530" y="602.5" class="chip-t" text-anchor="middle">3</text></g><g class="chip f-land" data-stage="10"><rect x="1542" y="592" width="18" height="14" rx="3"/><text x="1551" y="602.5" class="chip-t" text-anchor="middle">10</text></g>
+</g>
+<line class="rule" x1="1272" y1="628" x2="1560" y2="628"/>
+<text x="1272" y="652" class="ghead">LUCASCORE REPORT SHEETS</text>
+<g class="row" data-sheet="OutputStrataSummary" data-stages="1">
+<rect class="rowbg" x="1264" y="657" width="304" height="18" rx="3"/>
+<text x="1272" y="670" class="rowt">Strata Summary</text>
+<g class="chip f-setup" data-stage="1"><rect x="1542" y="659" width="18" height="14" rx="3"/><text x="1551" y="669.5" class="chip-t" text-anchor="middle">1</text></g>
+</g>
+<g class="row" data-sheet="OutputStateClassSummary" data-stages="5">
+<rect class="rowbg" x="1264" y="676" width="304" height="18" rx="3"/>
+<text x="1272" y="689" class="rowt">State Class Summary</text>
+<g class="chip f-land" data-stage="5"><rect x="1542" y="678" width="18" height="14" rx="3"/><text x="1551" y="688.5" class="chip-t" text-anchor="middle">5</text></g>
+</g>
+<g class="row" data-sheet="OutputGrowthParameter OutputCarbonParameter OutputGrowthReport" data-stages="2">
+<rect class="rowbg" x="1264" y="695" width="304" height="18" rx="3"/>
+<text x="1272" y="708" class="rowt">Growth and carbon curve parameters</text>
+<g class="chip f-carbon" data-stage="2"><rect x="1542" y="697" width="18" height="14" rx="3"/><text x="1551" y="707.5" class="chip-t" text-anchor="middle">2</text></g>
+</g>
+<g class="row" data-sheet="OutputDecayCalibration" data-stages="3">
+<rect class="rowbg" x="1264" y="714" width="304" height="18" rx="3"/>
+<text x="1272" y="727" class="rowt">Decay Calibration</text>
+<g class="chip f-carbon" data-stage="3"><rect x="1542" y="716" width="18" height="14" rx="3"/><text x="1551" y="726.5" class="chip-t" text-anchor="middle">3</text></g>
+</g>
+<g class="row" data-sheet="OutputReturnInterval OutputSoilTarget" data-stages="5">
+<rect class="rowbg" x="1264" y="733" width="304" height="18" rx="3"/>
+<text x="1272" y="746" class="rowt">Return intervals, soil targets</text>
+<g class="chip f-land" data-stage="5"><rect x="1542" y="735" width="18" height="14" rx="3"/><text x="1551" y="745.5" class="chip-t" text-anchor="middle">5</text></g>
+</g>
+<g class="row" data-sheet="OutputTransitionSummary" data-stages="6">
+<rect class="rowbg" x="1264" y="752" width="304" height="18" rx="3"/>
+<text x="1272" y="765" class="rowt">Historical Transition Summary</text>
+<g class="chip f-land" data-stage="6"><rect x="1542" y="754" width="18" height="14" rx="3"/><text x="1551" y="764.5" class="chip-t" text-anchor="middle">6</text></g>
+</g>
+<g class="row" data-sheet="OutputClimateSummary" data-stages="7 11">
+<rect class="rowbg" x="1264" y="771" width="304" height="18" rx="3"/>
+<text x="1272" y="784" class="rowt">Climate Multiplier Summary</text>
+<g class="chip f-climate" data-stage="7"><rect x="1521" y="773" width="18" height="14" rx="3"/><text x="1530" y="783.5" class="chip-t" text-anchor="middle">7</text></g><g class="chip f-climate" data-stage="11"><rect x="1542" y="773" width="18" height="14" rx="3"/><text x="1551" y="783.5" class="chip-t" text-anchor="middle">11</text></g>
+</g>
+<g class="row" data-sheet="OutputInitialStockSummary" data-stages="8">
+<rect class="rowbg" x="1264" y="790" width="304" height="18" rx="3"/>
+<text x="1272" y="803" class="rowt">Initial Stock Summary</text>
+<g class="chip f-carbon" data-stage="8"><rect x="1542" y="792" width="18" height="14" rx="3"/><text x="1551" y="802.5" class="chip-t" text-anchor="middle">8</text></g>
+</g>
+<g class="row" data-sheet="OutputProjectionSchedule OutputProjectionRate OutputFireSize OutputFireSlope" data-stages="9">
+<rect class="rowbg" x="1264" y="809" width="304" height="18" rx="3"/>
+<text x="1272" y="822" class="rowt">Projection schedule, rates, fires</text>
+<g class="chip f-land" data-stage="9"><rect x="1542" y="811" width="18" height="14" rx="3"/><text x="1551" y="821.5" class="chip-t" text-anchor="middle">9</text></g>
+</g>
+<g class="row" data-sheet="OutputSuitability OutputSuitabilityCurve OutputSuitabilityMap OutputPatchSize" data-stages="10">
+<rect class="rowbg" x="1264" y="828" width="304" height="18" rx="3"/>
+<text x="1272" y="841" class="rowt">Suitability maps and curves</text>
+<g class="chip f-land" data-stage="10"><rect x="1542" y="830" width="18" height="14" rx="3"/><text x="1551" y="840.5" class="chip-t" text-anchor="middle">10</text></g>
+</g>
+<g class="row" data-sheet="OutputBuildFigure OutputRunFigure OutputCompareFigure" data-stages="12 13 14">
+<rect class="rowbg" x="1264" y="847" width="304" height="18" rx="3"/>
+<text x="1272" y="860" class="rowt">Figures (PNG)</text>
+<g class="chip f-fig" data-stage="12"><rect x="1500" y="849" width="18" height="14" rx="3"/><text x="1509" y="859.5" class="chip-t" text-anchor="middle">12</text></g><g class="chip f-fig" data-stage="13"><rect x="1521" y="849" width="18" height="14" rx="3"/><text x="1530" y="859.5" class="chip-t" text-anchor="middle">13</text></g><g class="chip f-fig" data-stage="14"><rect x="1542" y="849" width="18" height="14" rx="3"/><text x="1551" y="859.5" class="chip-t" text-anchor="middle">14</text></g>
+</g>
+<g class="row" data-sheet="OutputCompareCarbon OutputCompareLand" data-stages="14">
+<rect class="rowbg" x="1264" y="866" width="304" height="18" rx="3"/>
+<text x="1272" y="879" class="rowt">Run comparison summaries</text>
+<g class="chip f-fig" data-stage="14"><rect x="1542" y="868" width="18" height="14" rx="3"/><text x="1551" y="878.5" class="chip-t" text-anchor="middle">14</text></g>
+</g>
+<text x="24" y="962" class="foot">Solid arrows: a datasheet one stage writes and a later stage reads. Dashed: a scenario dependency (the dependency supplies its sheets; the first one with rows wins). Chips: the stages that read a data group, or write a sheet.</text>
+<text x="24" y="978" class="foot">Every stage also writes the Validation sheet. Generated by docs/blueprint/build.R from package.xml (lucasCore 1.0.0), 2026-10-29.</text>
+</svg>
+  </div>
+  <div class="picker" id="picker" aria-label="Stages"></div>
+  <article class="detail" id="detail" aria-live="polite"></article>
+  <p class="note">Built by docs/blueprint/build.R from package.xml. The Validation sheet, which every stage writes, is left out of the lists.</p>
+</div>
+
+<script type="application/json" id="stage-data">{"0":{"id":0,"name":"Stock-Flow Definitions","script":"src/0-stock-flow-definitions.R","family":"setup","where":"Stock-Flow Definitions; also first in the Build pipeline (writes nothing there when the dependency has the definitions)","desc":"Writes the fixed LUCAS stock-flow definitions from defaults/stockflow: flow pathway diagram, flow order, flow and stock type groups, output options and filters.","reads":[],"writes":[{"sheet":"stsim_FlowOrder","label":"ST-Sim: Flow Order","from":[],"to":[]},{"sheet":"stsim_FlowOrderOptions","label":"ST-Sim: Flow Order Options","from":[],"to":[]},{"sheet":"stsim_FlowTypeGroupMembership","label":"ST-Sim: Flow Type Group Membership","from":[],"to":[]},{"sheet":"stsim_StockTypeGroupMembership","label":"ST-Sim: Stock Type Group Membership","from":[],"to":[]},{"sheet":"stsim_OutputOptionsStockFlow","label":"ST-Sim: Output Options Stock Flow","from":[],"to":[]},{"sheet":"stsim_OutputFilterFlows","label":"ST-Sim: Output Filter Flows","from":[],"to":[]},{"sheet":"stsim_OutputFilterStocks","label":"ST-Sim: Output Filter Stocks","from":[],"to":[]}],"both":[{"sheet":"stsim_FlowPathwayDiagram","label":"ST-Sim: Flow Pathway Diagram","from":[],"to":3},{"sheet":"stsim_OutputFilterTransitionGroups","label":"ST-Sim: Output Filter Transition Groups","from":[],"to":[]},{"sheet":"stsim_OutputOptionsSpatial","label":"ST-Sim: Output Options Spatial","from":[],"to":[]}]},"1":{"id":1,"name":"Study Area and Strata","script":"src/1-study-area.R","family":"setup","where":"Build","desc":"Makes the model grid at the Build cell size, cuts it to the study area, and writes the primary (FIA ecodivision), secondary and tertiary strata rasters.","reads":[{"sheet":"BuildOptions","label":"Build Options","from":[],"to":[5,6,7,8,9,10,11,12]},{"sheet":"StudyArea","label":"Study Area (blank = all of CONUS)","from":[],"to":[10,12,13,14]}],"writes":[{"sheet":"OutputStrataSummary","label":"Strata Summary","from":[],"to":[]},{"sheet":"core_SpatialMultiprocessing","label":"SyncroSim: Spatial Multiprocessing","from":9,"to":[]}],"both":[{"sheet":"stsim_InitialConditionsSpatial","label":"ST-Sim: Initial Conditions Spatial","from":[5,6,9],"to":[5,6,7,8,9,10,11,12,13,14]}]},"2":{"id":2,"name":"Fit Growth Curves","script":"src/2-growth-curves.R","family":"carbon","where":"Build, or once in the optional Growth Curves scenario shared by several builds","desc":"Fits merchantable volume curves and the live-tree carbon curves (CBM pools) for every forest state class and FIA ecodivision.","reads":[{"sheet":"GrowthOptions","label":"Growth Curve Options","from":[],"to":[]}],"writes":[{"sheet":"MerchantableVolumeCurve","label":"Merchantable Volume Curves","from":[],"to":12},{"sheet":"CarbonCurve","label":"Live-Tree Carbon Curves (CBM pools)","from":[],"to":[3,4,12]},{"sheet":"OutputGrowthParameter","label":"Growth Curve Parameters","from":[],"to":[]},{"sheet":"OutputCarbonParameter","label":"Carbon Curve Parameters","from":[],"to":[]},{"sheet":"OutputGrowthReport","label":"Growth Curve Report","from":[],"to":[]}],"both":[]},"3":{"id":3,"name":"Carbon Flows","script":"src/3-carbon-flows.R","family":"carbon","where":"Build","desc":"Sets the stock-flow parameters (net growth, growth split, turnover, dead organic matter decay) and the full flow configuration, with decay calibrated to the Carbon Method.","reads":[{"sheet":"LiveTurnover","label":"Live Turnover","from":[],"to":[]},{"sheet":"Spinup","label":"Spin-up","from":[],"to":8},{"sheet":"DisturbanceFlow","label":"Disturbance Flows","from":[],"to":[]},{"sheet":"FireSnagShare","label":"Fire Snag Share","from":[],"to":[]},{"sheet":"DecayCalibrationSetting","label":"Decay Calibration Settings","from":[],"to":[]},{"sheet":"FixedDecayMultiplier","label":"Fixed Decay Multipliers","from":[],"to":[]},{"sheet":"DomParameter","label":"Dead Organic Matter Parameters","from":[],"to":[7,11]},{"sheet":"CarbonCurve","label":"Live-Tree Carbon Curves (CBM pools)","from":2,"to":[4,12]},{"sheet":"CarbonOptions","label":"Carbon Method","from":[],"to":[]},{"sheet":"CbmCrosswalk","label":"CBM Crosswalk","from":[],"to":[]},{"sheet":"stsim_FlowPathwayDiagram","label":"ST-Sim: Flow Pathway Diagram","from":0,"to":0},{"sheet":"OutputReturnInterval","label":"Spin-up Return Intervals","from":5,"to":[]},{"sheet":"OutputSoilTarget","label":"Soil Carbon Targets (gSSURGO)","from":5,"to":[]}],"writes":[{"sheet":"stsim_FlowPathway","label":"ST-Sim: Flow Pathway","from":[],"to":[]},{"sheet":"stsim_FlowMultiplier","label":"ST-Sim: Flow Multiplier","from":[],"to":4},{"sheet":"stsim_StateAttributeValue","label":"ST-Sim: State Attribute Value","from":10,"to":10},{"sheet":"OutputDecayCalibration","label":"Decay Calibration","from":[],"to":[4,12]}],"both":[]},"4":{"id":4,"name":"Spin-up and Initial Stocks","script":"src/4-initial-stocks.R","family":"carbon","where":"Build","desc":"Spins up each ecodivision and forest state class and writes initial carbon stocks by age and last disturbance.","reads":[{"sheet":"CarbonCurve","label":"Live-Tree Carbon Curves (CBM pools)","from":2,"to":[3,12]},{"sheet":"OutputDecayCalibration","label":"Decay Calibration","from":3,"to":12},{"sheet":"stsim_FlowMultiplier","label":"ST-Sim: Flow Multiplier","from":3,"to":[]}],"writes":[{"sheet":"InitialStockCurve","label":"Initial Stock Curves (spin-up)","from":[],"to":8}],"both":[]},"5":{"id":5,"name":"Initial Conditions","script":"src/5-initial-conditions.R","family":"land","where":"Build","desc":"Maps state class and stand age at the model resolution, resamples annual NLCD to the model grid, and writes the per-cell spin-up return intervals and soil carbon targets.","reads":[{"sheet":"BuildOptions","label":"Build Options","from":[],"to":[1,6,7,8,9,10,11,12]},{"sheet":"LandCoverCrosswalk","label":"Land Cover Crosswalks","from":[],"to":[]}],"writes":[{"sheet":"OutputNlcdAnnual","label":"Annual NLCD (model grid)","from":[],"to":[6,9,10]},{"sheet":"OutputLandCoverLayers","label":"Land Cover Layers","from":[],"to":[]},{"sheet":"OutputReturnInterval","label":"Spin-up Return Intervals","from":[],"to":3},{"sheet":"OutputSoilTarget","label":"Soil Carbon Targets (gSSURGO)","from":[],"to":3},{"sheet":"OutputStateClassSummary","label":"State Class Summary","from":[],"to":[]}],"both":[{"sheet":"stsim_InitialConditionsSpatial","label":"ST-Sim: Initial Conditions Spatial","from":[1,6,9],"to":[1,6,7,8,9,10,11,12,13,14]}]},"6":{"id":6,"name":"Historical Transitions","script":"src/6-historical-transitions.R","family":"land","where":"Build","desc":"Derives the historical transition pathways and annual transition spatial multipliers from the same resampled maps as the state classes.","reads":[{"sheet":"BuildOptions","label":"Build Options","from":[],"to":[1,5,7,8,9,10,11,12]},{"sheet":"OutputNlcdAnnual","label":"Annual NLCD (model grid)","from":5,"to":[9,10]}],"writes":[{"sheet":"stsim_Transition","label":"ST-Sim: Transition","from":[],"to":[]},{"sheet":"stsim_DeterministicTransition","label":"ST-Sim: Deterministic Transition","from":[],"to":[]},{"sheet":"stsim_TransitionSpatialMultiplier","label":"ST-Sim: Transition Spatial Multiplier","from":[9,10],"to":[9,10]},{"sheet":"stsim_TransitionTarget","label":"ST-Sim: Transition Target","from":9,"to":9},{"sheet":"OutputTransitionSummary","label":"Historical Transition Summary","from":[],"to":[12,13]}],"both":[{"sheet":"stsim_InitialConditionsSpatial","label":"ST-Sim: Initial Conditions Spatial","from":[1,5,9],"to":[1,5,7,8,9,10,11,12,13,14]}]},"7":{"id":7,"name":"Climate Multipliers","script":"src/7-climate-multipliers.R","family":"climate","where":"Build","desc":"Writes annual climate flow spatial multipliers for the historical years from PRISM, with the Climate Options growth and decomposition methods.","reads":[{"sheet":"DomParameter","label":"Dead Organic Matter Parameters","from":[],"to":[3,11]},{"sheet":"BuildOptions","label":"Build Options","from":[],"to":[1,5,6,8,9,10,11,12]},{"sheet":"ClimateOptions","label":"Climate Options","from":[],"to":11},{"sheet":"stsim_InitialConditionsSpatial","label":"ST-Sim: Initial Conditions Spatial","from":[1,5,6,9],"to":[1,5,6,8,9,10,11,12,13,14]}],"writes":[{"sheet":"stsim_FlowSpatialMultiplier","label":"ST-Sim: Flow Spatial Multiplier","from":11,"to":[]},{"sheet":"OutputClimateSummary","label":"Climate Multiplier Summary","from":11,"to":[11,12]}],"both":[]},"8":{"id":8,"name":"Initial Stock Maps","script":"src/8-initial-stocks-spatial.R","family":"carbon","where":"Build","desc":"Maps the initial carbon stocks (ST-Sim Initial Stocks, spatial) from the stock curves, stand age and soil carbon.","reads":[{"sheet":"BuildOptions","label":"Build Options","from":[],"to":[1,5,6,7,9,10,11,12]},{"sheet":"Spinup","label":"Spin-up","from":[],"to":3},{"sheet":"InitialStockCurve","label":"Initial Stock Curves (spin-up)","from":4,"to":[]},{"sheet":"stsim_InitialConditionsSpatial","label":"ST-Sim: Initial Conditions Spatial","from":[1,5,6,9],"to":[1,5,6,7,9,10,11,12,13,14]}],"writes":[{"sheet":"OutputInitialStockSummary","label":"Initial Stock Summary","from":[],"to":12}],"both":[{"sheet":"stsim_InitialStockSpatial","label":"ST-Sim: Initial Stock Spatial","from":9,"to":[9,12]}]},"9":{"id":9,"name":"Projection Transitions","script":"src/9-projection-transitions.R","family":"land","where":"Projection Setup; also Build for a continuous run (mode 1) and a projection scenario that starts from a historical run (mode 2)","desc":"Sets projection transitions by drawing a whole historical year for each projection year and iteration; transition groups in one sampling set share the draw.","reads":[{"sheet":"BuildOptions","label":"Build Options","from":[],"to":[1,5,6,7,8,10,11,12]},{"sheet":"FireOptions","label":"Fire","from":[],"to":[]},{"sheet":"ProjectionOptions","label":"Projection Options","from":[],"to":10},{"sheet":"ProjectionStart","label":"Projection Start (from a historical run)","from":[],"to":[]},{"sheet":"ProjectionTransition","label":"Projection Transitions","from":[],"to":10},{"sheet":"OutputNlcdAnnual","label":"Annual NLCD (model grid)","from":5,"to":[6,10]}],"writes":[{"sheet":"OutputProjectionSchedule","label":"Projection Schedule (historical year drawn)","from":[],"to":10},{"sheet":"core_SpatialMultiprocessing","label":"SyncroSim: Spatial Multiprocessing","from":1,"to":[]},{"sheet":"OutputProjectionRate","label":"Projection Rates (historical, by unit)","from":[],"to":[]},{"sheet":"OutputFireSize","label":"Historical Fire Sizes (interagency perimeters, model cells)","from":[],"to":[]},{"sheet":"OutputFireSlope","label":"Fire Slope Selectivity (burned share by slope)","from":[],"to":[]}],"both":[{"sheet":"stsim_InitialConditionsSpatial","label":"ST-Sim: Initial Conditions Spatial","from":[1,5,6],"to":[1,5,6,7,8,10,11,12,13,14]},{"sheet":"stsim_TransitionSpatialMultiplier","label":"ST-Sim: Transition Spatial Multiplier","from":[6,10],"to":10},{"sheet":"stsim_InitialStockSpatial","label":"ST-Sim: Initial Stock Spatial","from":8,"to":[8,12]},{"sheet":"stsim_TransitionTarget","label":"ST-Sim: Transition Target","from":6,"to":[]},{"sheet":"stsim_TransitionSizeDistribution","label":"ST-Sim: Transition Size Distribution","from":10,"to":10},{"sheet":"stsim_TransitionSizePrioritization","label":"ST-Sim: Transition Size Prioritization","from":10,"to":10},{"sheet":"stsim_TransitionSpatialInitiationMultiplier","label":"ST-Sim: Transition Spatial Initiation Multiplier","from":[],"to":[]}]},"10":{"id":10,"name":"Transition Suitability","script":"src/10-transition-suitability.R","family":"land","where":"Projection Setup","desc":"Makes the surfaces that place projected transitions: fitted suitability (logistic GAM on the annual NLCD record) or WUI/PAD rules, with adjacency and patch sizes.","reads":[{"sheet":"BuildOptions","label":"Build Options","from":[],"to":[1,5,6,7,8,9,11,12]},{"sheet":"StudyArea","label":"Study Area (blank = all of CONUS)","from":[],"to":[1,12,13,14]},{"sheet":"ProjectionTransition","label":"Projection Transitions","from":[],"to":9},{"sheet":"ProjectionAllocation","label":"Projection Allocation (where transitions go)","from":[],"to":[]},{"sheet":"SuitabilityOptions","label":"Suitability Options","from":[],"to":[]},{"sheet":"SuitabilityRegion","label":"Suitability Fitting Region (blank = the study area)","from":[],"to":[]},{"sheet":"SuitabilityCovariate","label":"Suitability Covariates (empty = defaults/projection/covariates.csv)","from":[],"to":[]},{"sheet":"RuleWeight","label":"Allocation Rule Weights (Rules method)","from":[],"to":[]},{"sheet":"OutputNlcdAnnual","label":"Annual NLCD (model grid)","from":5,"to":[6,9]},{"sheet":"OutputProjectionSchedule","label":"Projection Schedule (historical year drawn)","from":9,"to":[]},{"sheet":"stsim_InitialConditionsSpatial","label":"ST-Sim: Initial Conditions Spatial","from":[1,5,6,9],"to":[1,5,6,7,8,9,11,12,13,14]},{"sheet":"ProjectionOptions","label":"Projection Options","from":[],"to":9}],"writes":[{"sheet":"stsim_TransitionAdjacencySetting","label":"ST-Sim: Transition Adjacency Setting","from":[],"to":[]},{"sheet":"stsim_TransitionAdjacencyMultiplier","label":"ST-Sim: Transition Adjacency Multiplier","from":[],"to":[]},{"sheet":"OutputSuitability","label":"Suitability Summary","from":[],"to":[]},{"sheet":"OutputSuitabilityCurve","label":"Suitability Response Curves","from":[],"to":[]},{"sheet":"OutputSuitabilityMap","label":"Suitability Maps","from":[],"to":[]},{"sheet":"OutputPatchSize","label":"Historical Patch Sizes (per Target group, model cells)","from":[],"to":[]}],"both":[{"sheet":"stsim_TransitionSpatialMultiplier","label":"ST-Sim: Transition Spatial Multiplier","from":[6,9],"to":9},{"sheet":"stsim_StateAttributeValue","label":"ST-Sim: State Attribute Value","from":3,"to":[]},{"sheet":"stsim_TransitionSizeDistribution","label":"ST-Sim: Transition Size Distribution","from":9,"to":9},{"sheet":"stsim_TransitionSizePrioritization","label":"ST-Sim: Transition Size Prioritization","from":9,"to":9}]},"11":{"id":11,"name":"Projection Climate","script":"src/11-projection-climate.R","family":"climate","where":"Projection Climate (one scenario per LOCA2 run)","desc":"Writes the climate flow spatial multipliers of the projection years from one LOCA2 run.","reads":[{"sheet":"DomParameter","label":"Dead Organic Matter Parameters","from":[],"to":[3,7]},{"sheet":"BuildOptions","label":"Build Options","from":[],"to":[1,5,6,7,8,9,10,12]},{"sheet":"ClimateOptions","label":"Climate Options","from":[],"to":7},{"sheet":"ProjectionClimate","label":"Climate","from":[],"to":[]},{"sheet":"stsim_InitialConditionsSpatial","label":"ST-Sim: Initial Conditions Spatial","from":[1,5,6,9],"to":[1,5,6,7,8,9,10,12,13,14]}],"writes":[{"sheet":"stsim_FlowSpatialMultiplier","label":"ST-Sim: Flow Spatial Multiplier","from":7,"to":[]}],"both":[{"sheet":"OutputClimateSummary","label":"Climate Multiplier Summary","from":7,"to":12}]},"12":{"id":12,"name":"Build Figures","script":"src/12-build-figures.R","family":"fig","where":"Build (last in its pipeline)","desc":"Draws the publication figures (PNG) of a Build result.","reads":[{"sheet":"BuildOptions","label":"Build Options","from":[],"to":[1,5,6,7,8,9,10,11]},{"sheet":"StudyArea","label":"Study Area (blank = all of CONUS)","from":[],"to":[1,10,13,14]},{"sheet":"stsim_InitialConditionsSpatial","label":"ST-Sim: Initial Conditions Spatial","from":[1,5,6,9],"to":[1,5,6,7,8,9,10,11,13,14]},{"sheet":"stsim_InitialStockSpatial","label":"ST-Sim: Initial Stock Spatial","from":[8,9],"to":[8,9]},{"sheet":"MerchantableVolumeCurve","label":"Merchantable Volume Curves","from":2,"to":[]},{"sheet":"CarbonCurve","label":"Live-Tree Carbon Curves (CBM pools)","from":2,"to":[3,4]},{"sheet":"OutputDecayCalibration","label":"Decay Calibration","from":3,"to":4},{"sheet":"OutputInitialStockSummary","label":"Initial Stock Summary","from":8,"to":[]},{"sheet":"OutputTransitionSummary","label":"Historical Transition Summary","from":6,"to":13},{"sheet":"OutputClimateSummary","label":"Climate Multiplier Summary","from":[7,11],"to":11}],"writes":[{"sheet":"OutputBuildFigure","label":"Build Figures (PNG)","from":[],"to":[]}],"both":[]},"13":{"id":13,"name":"Run Figures","script":"src/13-run-figures.R","family":"fig","where":"A scenario on an ST-Sim run result","desc":"Draws report figures (PNG) of one ST-Sim run on a lucasCore Build.","reads":[{"sheet":"RunFigureOptions","label":"Run Figures","from":[],"to":[]},{"sheet":"StudyArea","label":"Study Area (blank = all of CONUS)","from":[],"to":[1,10,12,14]},{"sheet":"stsim_InitialConditionsSpatial","label":"ST-Sim: Initial Conditions Spatial","from":[1,5,6,9],"to":[1,5,6,7,8,9,10,11,12,14]},{"sheet":"OutputTransitionSummary","label":"Historical Transition Summary","from":6,"to":12}],"writes":[{"sheet":"OutputRunFigure","label":"Run Figures (PNG)","from":[],"to":[]}],"both":[]},"14":{"id":14,"name":"Compare Runs","script":"src/14-compare-runs.R","family":"fig","where":"A scenario on several ST-Sim run results","desc":"Draws figures (PNG) and two summary tables (carbon, land change) that compare ST-Sim runs on one Build.","reads":[{"sheet":"CompareRunOptions","label":"Compare Runs","from":[],"to":[]},{"sheet":"StudyArea","label":"Study Area (blank = all of CONUS)","from":[],"to":[1,10,12,13]},{"sheet":"stsim_InitialConditionsSpatial","label":"ST-Sim: Initial Conditions Spatial","from":[1,5,6,9],"to":[1,5,6,7,8,9,10,11,12,13]}],"writes":[{"sheet":"OutputCompareFigure","label":"Compare Figures (PNG)","from":[],"to":[]},{"sheet":"OutputCompareCarbon","label":"Compare Carbon Summary","from":[],"to":[]},{"sheet":"OutputCompareLand","label":"Compare Land Change Summary","from":[],"to":[]}],"both":[]}}</script>
+<script>
+(function () {
+  const S = JSON.parse(document.getElementById('stage-data').textContent);
+  const ids = Object.keys(S).map(Number).sort((a, b) => a - b);
+  const arr = v => v == null ? [] : Array.isArray(v) ? v : typeof v === 'object' ? [] : [v];
+  const svg = document.querySelector('.figure svg');
+  const picker = document.getElementById('picker');
+  const detail = document.getElementById('detail');
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const chip = id => `<button class="chipb f-${S[id].family}" data-go="${id}" aria-label="Stage ${id}, ${esc(S[id].name)}">${id}</button>`;
+
+  picker.innerHTML = ids.map(id => `<button class="pick f-${S[id].family}" data-go="${id}" aria-pressed="false"><b>${id}</b>${esc(S[id].name)}</button>`).join('');
+
+  function list(title, items, mode) {
+    const li = arr(items).map(it => {
+      const from = arr(it.from), to = arr(it.to);
+      let via = '';
+      if (mode !== 'out') via += from.length ? `<em>from</em>${from.map(chip).join('')}` : (mode === 'in' ? '<em>user or package input</em>' : '');
+      if (mode !== 'in') via += to.length ? `<em>${mode === 'both' && from.length ? '· to' : 'read by'}</em>${to.map(chip).join('')}` : '';
+      return `<li><div class="sh"><span>${esc(it.label)}</span><code>${esc(it.sheet)}</code></div><div class="via">${via}</div></li>`;
+    }).join('');
+    return `<section><h3>${title}</h3>${li ? `<ul>${li}</ul>` : '<p class="none">None</p>'}</section>`;
+  }
+
+  function related(s) {
+    const r = new Set();
+    for (const k of ['reads', 'writes', 'both']) for (const it of arr(s[k])) { arr(it.from).forEach(i => r.add(i)); arr(it.to).forEach(i => r.add(i)); }
+    r.delete(s.id); return r;
+  }
+
+  function select(id) {
+    const s = S[id]; if (!s) return;
+    const rel = related(s);
+    svg.classList.add('dim');
+    svg.querySelectorAll('.stage').forEach(g => {
+      const n = Number(g.dataset.stage);
+      g.classList.toggle('sel', n === s.id); g.classList.toggle('rel', rel.has(n));
+    });
+    const reads = new Set([...arr(s.reads), ...arr(s.both)].map(it => it.sheet));
+    svg.querySelectorAll('.row').forEach(r => r.classList.toggle('hit', r.dataset.stages.split(' ').map(Number).includes(s.id)));
+    svg.querySelectorAll('.sheet').forEach(c => c.classList.toggle('hit', reads.has(c.dataset.sheet)));
+    picker.querySelectorAll('.pick').forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.go) === s.id)));
+    detail.className = `detail f-${s.family}`;
+    detail.innerHTML = `
+      <div class="d-head"><span class="num">${s.id}</span><div><h2>${esc(s.name)}</h2><p class="d-meta">${esc(s.script)}</p></div></div>
+      <p class="d-desc">${esc(s.desc)}</p>
+      <p class="d-where"><strong>Runs in:</strong> ${esc(s.where)}</p>
+      <div class="d-cols">${list('Reads', s.reads, 'in')}${list('Writes', s.writes, 'out')}${list('Reads and updates', s.both, 'both')}</div>`;
+  }
+
+  document.addEventListener('click', e => {
+    const t = e.target.closest('[data-go], .stage, .chip');
+    if (!t) return;
+    select(Number(t.dataset.go ?? t.dataset.stage));
+  });
+  svg.querySelectorAll('.stage').forEach(g => g.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(Number(g.dataset.stage)); }
+  }));
+  select(3);
+})();
+</script>
