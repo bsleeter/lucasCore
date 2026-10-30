@@ -20,6 +20,7 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | 8 | 14 FGDC metadata | No | Needs the final inputs and 12's manifest; ships with 13 and data releases | 12, 13 |
 | any | 33 Leftovers inside done items | Some | Small, independent; (7) guide 1.4 and (1) deep links any time; (8) and (17) larger | - |
 | later | 26 Guide chapter 9, Troubleshooting | No | After beta testers (user) | beta |
+| later | 36 Guide: Advanced Features (site productivity comparison) | No | After the items above (user); needs a P26 Build with Site productivity on | 35 |
 
 Done since the 2026-10-25 order: 6, 7, 8, 9, 11a, 15-21, 23-25, 28-30 (item 27 removed by the user).
 P26 needs a Build and Historical rerun after 35 (if made the default) and 34; the guide's P26 numbers and figures are redone once after.
@@ -424,3 +425,21 @@ P26 needs a Build and Historical rerun after 35 (if made the default) and 34; th
     **Other sources considered.** NFCMS Forest Productivity (PSW_ForestProductivity.tif, 30 m, values 0-10, legend unknown); gSSURGO
     forest productivity tables (not on disk); LANDFIRE has no productivity layer (canopy height / stand age as a site index proxy is
     a possible check only).
+36. **Guide: Advanced Features chapter, starting with site productivity** - PLANNED 2026-10-30 (user: keep the guide's walkthrough as
+    the basic approach, all defaults; advanced options go in their own chapter; do the other to-do items first, then return).
+    **Why a separate chapter.** Site Productivity is off by default, so the walkthrough shows what a new user gets; redoing it with
+    the option on would change every number in it (439 Tg C, run times, figures, projections) for no gain to a basic user, and the
+    option is not yet run on P26. Shown next to the basic Build, it also shows what the option changes.
+    **Chapter outline.** (1) What the TreeMap options are: Forest type map = TreeMap, Stand age = TreeMap, Site productivity = TreeMap
+    site class; the data they need (Data Sources: TreeMap Folder, FIA DataMart COND tables) and that older libraries need
+    tools/sync-library.R. (2) Make the variant: copy the P26 Build to "P26 - Build (site productivity)", Site productivity on, nothing
+    else changed; run it. (3) Read it: Build Results > Site Productivity (multipliers by forest type, ecodivision and site class),
+    the stage 12 Site productivity figure (multiplier map, mean site class map), Initial Stock Summary against the basic Build.
+    (4) Compare: a historical run 1985-2023 on each Build, then Compare Runs (stage 14) on the two: carbon stocks and growth by year,
+    by forest type and by area. Optionally the same projection on each. Later candidates for the chapter: Growth Inputs and Mature
+    Age by Forest Type (now in 3.6), TreeMap forest type and stand age, Area-matched resampling.
+    **Runs needed (in the P26 guide library, so ask first; only the user creates scenarios there).** The site productivity Build at
+    150 m (about as long as the basic Build), its historical run, a Compare Runs scenario; grabs of the Build Options with Site
+    productivity on, the Site Productivity page, the figure and the comparison figures.
+    **Open questions.** Which comparison figures make the point (stocks by year, growth by forest type, a difference map?); whether
+    the chapter also covers TreeMap forest type and stand age, which change the initial map itself.
