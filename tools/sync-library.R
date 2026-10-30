@@ -65,7 +65,7 @@ if (!dry) { dbDisconnect(con); on.exit(dbDisconnect(ref))
   if (nrow(miss)) { saveDatasheet(P, as.data.frame(miss[, intersect(names(miss), names(sat)), with = FALSE]), "stsim_StateAttributeType", append = TRUE)
     cat("added State Attribute Types:", paste(miss$Name, collapse = ", "), "\n") } else cat("State Attribute Types up to date\n")
   # Flow Multiplier Types (2026-10-30: Climate, for stages 7 and 11, and Site Productivity, stage 8 - they multiply in each cell)
-  fmt <- as.data.table(datasheet(P, "stsim_FlowMultiplierType")); want_t <- fread(file.path(pkg, "defaults", "stsim", "stsim_FlowMultiplierType.csv"), na.strings = "")
+  fmt <- as.data.table(datasheet(P, "stsim_FlowMultiplierType")); want_t <- fread(file.path(pkg, "defaults", "stsim", "stsim_FlowMultiplierType.csv"), sep = ",", na.strings = "")
   miss_t <- want_t[!Name %in% fmt$Name]
   if (nrow(miss_t)) { saveDatasheet(P, as.data.frame(miss_t[, intersect(names(miss_t), names(fmt)), with = FALSE]), "stsim_FlowMultiplierType", append = TRUE)
     cat("added Flow Multiplier Types:", paste(miss_t$Name, collapse = ", "), "\n") } else cat("Flow Multiplier Types up to date\n")

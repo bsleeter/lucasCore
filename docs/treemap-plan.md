@@ -184,6 +184,11 @@ matches TreeMap's, else the largest), as dev/treemap/01 does. Used by type, age 
   result has Climate rows plus one Site Productivity row, its map in its own folder and equal to the Build's; the projection's forest
   growth on / off is 1.024, 1.022, 1.017 in 2024-2026 (forest-area mean multiplier 1.031; the projection starts from Build 47's
   historical run, whose stocks were not scaled).
+- **P26 synced for the multiplier types, 2026-10-30.** tools/sync-library.R step 4 had never run on a library (the tests added the types
+  by hand): fread split the one-column CSV at the spaces in "Net Growth Uncertainty" and stopped before any change; now sep = ",".
+  P26 (LUCAS P26 Northern Sierra Nevada.ssim) now has Climate, Net Growth Uncertainty and Site Productivity; no new Carbon Assumptions
+  scenario (48 still there). Backups .bak-20261030-1015 (the failed run, identical) and -1016. Site Productivity can now be switched on
+  in a P26 Build.
 
 ## Notes
 
