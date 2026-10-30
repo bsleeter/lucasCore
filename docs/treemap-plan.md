@@ -131,6 +131,15 @@ matches TreeMap's, else the largest), as dev/treemap/01 does. Used by type, age 
   Left for step 2, so libraries are synced once: the **Data Sources: TreeMap Folder** column, with the Build Options columns
   (Forest Type Map and Stand Age Source = TreeMap, Site Productivity) - new columns in existing sheets need tools/sync-library.R (or a
   package version bump with an update) before an older library opens.
+- **Step 2 (type and age), 2026-10-30, done** (ac971f3). Columns: Data Sources **TreeMap Folder**; Build Options **Stand Age
+  Source** (NASA CMS default | TreeMap) and **Site Productivity** (None default | TreeMap site class; read in step 4); Forest Type
+  Map gains TreeMap. Stage 5: TreeMap's groups map to forest types as Growth Inputs map FIA groups (own group first); groups no type
+  fits take their neighbours' type and are logged (Placer: 960 other hardwoods 1.8%, 999 nonstocked); ages = plot STDAGE minus
+  (inventory year - start year), averaged over the cell, 0 or less = unknown (filled from neighbours). Page: Build Options' Land
+  cover group has a Stand age list. tools/sync-library.R takes --reference=<library> (dev/libs/sync-reference.ssim, made by
+  tools/new-library.R; the starter was not rebuilt). Test (tests/phaseZ17-treemap-type-age.R, test library synced): base and TreeMap
+  stage 5 runs pass; same forest cells; 86% type agreement with EVT; 1985 age median 81 (TreeMap) vs 66 (CMS), correlation 0.12.
+  The guide's Build Options figure and text need the new list once the user decides the default stays CMS.
 
 ## Notes
 
