@@ -119,7 +119,7 @@ figures, which are redone once after the P26 rerun.
    (the state COND, PLOT and TREE tables, or FIADB SQLite), filtered to the study area's states and the inventory years, and derive the
    same fields the .Rds tables carry (condition carbon by pool, merchantable volume, stand age, forest type group, DSTRBCD/TRTCD). Keep the
    .Rds route as an option, and check that the derived tables reproduce its P26 and CONUS curves before switching the default.
-10. **TreeMap for forest type group and stand age** - TO DO (user, 2026-10-25). Today the forest type comes from LANDFIRE EVT or the USFS
+10. **TreeMap for forest type group and stand age** - TO DO (user, 2026-10-25; PLANNED with item 35 in docs/treemap-plan.md, 2026-10-29). Today the forest type comes from LANDFIRE EVT or the USFS
    NFCMS forest type group maps (Build Options: Forest Type Map), and stand age from NASA CMS Forest Age 1990 (Data Sources:
    StandAgeFile). Add TreeMap (USFS, 30 m imputed FIA plots; its plot IDs carry FORTYPCD and stand age) as a third Forest Type Map
    option and as a stand age source, so type and age come from one consistent map. Needs: a Data Sources path for the TreeMap raster
@@ -401,7 +401,7 @@ figures, which are redone once after the P26 rerun.
     share as the check, not a fit (the age map was adjusted, so fitting to it is circular). Build: tools/calibrate-harvest-age.R, an
     optional Minimum Harvest Age page (like Mature Age) read by stages 6 and 9, unit test, test-library run comparing blocked share
     and initial carbon. P26 needs a Build and Historical rerun to pick it up.
-35. **Site productivity scaling of forest growth** - TO DO (user, 2026-10-29; not scoped in detail). Today every cell of one forest type,
+35. **Site productivity scaling of forest growth** - TO DO (user, 2026-10-29; PLANNED with item 10 in docs/treemap-plan.md, user 2026-10-29: use TreeMap). Today every cell of one forest type,
     ecodivision and age grows on the same curve; only the climate flow spatial multipliers (stages 7 and 11) vary it in space. Idea: a
     static productivity multiplier per cell = local site productivity / the mean of the plots the type x ecodivision curve was fitted to,
     so the curves stay right on average and good and poor sites grow faster and slower. Candidate sources on disk: (a) TreeMap 2016
