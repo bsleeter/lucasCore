@@ -2,44 +2,27 @@
 
 Ideas for the lucasCore pages in SyncroSim Studio, collected during the P26 user-guide walkthrough. Newest last.
 
-## Priorities (2026-10-25)
+## Priorities (2026-10-29)
 
-The open items (6-14) in order. What drives the order: some items change the model itself (its inputs or its results), and anything
-built on P26 (the guide's numbers and figures, the demo bundle, metadata) should come after those are settled.
+The open items in order. Item numbers are ids and do not change; this table is the order. The rule from 2026-10-25 still holds: items
+that change the model itself (its inputs or results) come first, and anything built on P26's results (the demo bundle, metadata, the
+guide's numbers and figures) after them, so it is redone only once. Within that, quick usability fixes go first.
 
-| Order | Item | Why here | Depends on |
-| --- | --- | --- | --- |
-| ~~1~~ | ~~11 LOCA2 list scan (the scan part)~~ | DONE 2026-10-26, verified in Studio | - |
-| ~~2~~ | ~~7 Spatial multiprocessing in the Build~~ | DONE 2026-10-26 | - |
-| ~~3~~ | ~~8 Area-preserving resampling~~ | DONE 2026-10-26 (Build Options choice; a P26 Area-matched comparison run is optional) | - |
-| ~~4~~ | ~~9 FIA plot data~~ | DONE 2026-10-26 (default stays the .Rds, user) - Largest change to the model's inputs (curves, carbon); must reproduce the .Rds results before it becomes the default | - |
-| 5 | 10 TreeMap option | Same domain as 9 (FIA plots, forest type, age); an option, so it changes results only if made the default | 9 helps (FIA plot ids) |
-| 6 | 12 Data Download stage | Needs the final dataset list (9 and 10 add or replace sources); its LOCA2 download refreshes the lists through 11 | 9, 10, 11 |
-| 7 | 13 Demo bundle (Calaveras, 2026-10-29; was P26) | Needs 12's layout and manifest, and a frozen P26 rerun after 8, 9 and 10 | 12; 8, 9, 10 |
-| 8 | 14 FGDC metadata | The model record needs the final input list and 12's manifest, and ships with 13 and P26 data releases; the output-metadata stage can start earlier | 12, 13 |
-| ~~any~~ | ~~6 Images viewer for figures~~ | DONE 2026-10-29 (own figure viewer pages) | - |
+| Order | Item | Changes results? | Why here | Depends on |
+| --- | --- | --- | --- | --- |
+| 1 | 22 Automatic spatial tiles | No | Small and self-contained; users otherwise need to know the region to pick Tiles | - |
+| 2 | 35 TreeMap: forest type, stand age, site productivity (with 10) | Yes, as options | Largest science gain (site class lifts R2 of carbon at age from 0.13 to 0.50 in mixed conifer); start with the phase 0 checks, which decide go/no-go | - |
+| 3 | 34 Minimum harvest ages | Yes (projections; stage 6 start ages) | FIA shows several are too high (mixed conifer 92 yr vs median age at cut 85); after 35 because the stand age source changes which cells pass | 35's age source |
+| 4 | 32 Carbon open science issues | Possibly | Short snags in 96 cells, duff at its bound in 19; best looked at before the TreeMap and harvest changes are judged | - |
+| 5 | 31 Copy Carbon Assumptions; SoilGrids option | No (an option) | Convenience and one more soil source | - |
+| 6 | 12 Data Download stage | No | Needs the final input list (35 adds TreeMap) | 35 |
+| 7 | 13 Demo bundle, Calaveras | No | Needs 12's home folder and a settled model; the finished demo library (option 1) can go earlier if wanted | 12; 35, 34 |
+| 8 | 14 FGDC metadata | No | Needs the final inputs and 12's manifest; ships with 13 and data releases | 12, 13 |
+| any | 33 Leftovers inside done items | Some | Small, independent; (7) guide 1.4 and (1) deep links any time; (8) and (17) larger | - |
+| later | 26 Guide chapter 9, Troubleshooting | No | After beta testers (user) | beta |
 
-Open items added 2026-10-29, in order (they come before 9-14):
-
-| Order | Item | Why here | Depends on |
-| --- | --- | --- | --- |
-| ~~1~~ | ~~24 Stage 13 hand-over check~~ DONE | User's decision (exact match or remove); package edit only after the P26 reruns finish | 23's reruns |
-| ~~2~~ | ~~25 Guide P26 numbers~~ DONE | 7.2-7.4 and Appendix A quote the old projections | 23's reruns |
-| later | 26 Guide chapter 10, Troubleshooting | After beta testing (user) | - |
-| 4 | 22 Automatic spatial tiles | Proposed; P26 historical run is done, so package edits are no longer blocked by it | - |
-| ~~6~~ | ~~29 Growth Inputs sheet~~ DONE 2026-10-29 | Last Carbon Assumptions sheet; exposes package defaults, results unchanged unless a user edits it | - |
-| ~~7~~ | ~~28 Mature age per forest type~~ DONE 2026-10-29 | Optional per-type rows; blank = the single age (60), so results unchanged by default | - |
-| ~~8~~ | ~~30 Rate read-out~~ DONE 2026-10-29 | Output only, changes nothing; easiest once 28 and 29 settle what goes in | 28, 29 |
-| 9 | 31 Copy Carbon Assumptions; SoilGrids | Convenience and one more soil option | - |
-| 10 | 32 Carbon open science issues | Needs the user's look at the snag inputs | - |
-| any | 33 Leftovers inside done items | Small, independent | - |
-
-Then items 10-14 in the 2026-10-25 order above (9 is done). Item 10 (TreeMap) has a P26 comparison done (2026-10-26) and grew into a **Stand Age
-Source** choice: NASA CMS (today), TreeMap (age from FIA COND), GAMI, and age inferred from biomass + disturbance history; next is the
-three-way P26 comparison and its effect on 1985 carbon.
-
-While 8-10 are open, the guide's procedures (chapters 6-10) can still be written: the steps do not change, only the P26 numbers and
-figures, which are redone once after the P26 rerun.
+Done since the 2026-10-25 order: 6, 7, 8, 9, 11a, 15-21, 23-25, 28-30 (item 27 removed by the user).
+P26 needs a Build and Historical rerun after 35 (if made the default) and 34; the guide's P26 numbers and figures are redone once after.
 
 1. **Data Sources page** - DONE 2026-10-24. Custom view (`ui/DataSourcesView.cs`) groups the paths by category (study area, land
    cover, forest inventory, disturbance and fire, climate, soils and terrain, infrastructure and ownership), links each to its download
@@ -365,7 +348,7 @@ figures, which are redone once after the P26 rerun.
     0.5%; tighten it to an exact match (within rounding) or remove it - user's choice. The guide's sentence about it is already gone.
 25. **Guide: P26 numbers after the reruns** - DONE 2026-10-29 (ids, 7.2-7.4 numbers, Figures 7.8-7.11 and 7.28-7.31, six re-grabs). Update 7.2 (projection start 443.2 -> 444.3 Tg C), the 7.3 timings if they change,
     7.4's tables and figures, and Appendix A where it quotes projection results.
-26. **Guide chapter 10, Troubleshooting** - LATER (user, 2026-10-29: after beta testers have used the guide; their problems feed it). Still a placeholder; include the Validation outputs and the failures met so far
+26. **Guide chapter 9, Troubleshooting** (chapter 10 before the 2026-10-29 renumbering) - LATER (user, 2026-10-29: after beta testers have used the guide; their problems feed it). Still a placeholder; include the Validation outputs and the failures met so far
     (dependency order, a Boolean stored as 1, result pages greyed out, spatial multiprocessing mask).
 28. **Mature age per forest type** - DONE 2026-10-29 (Carbon Assumptions: Mature Age by Forest Type; docs/carbon-assumptions.md). Was (left over from 18/21): Decay Calibration Settings has one mature age (60) and one
     disturbance-free window (30 yr) for every type; stands reach a steady dead-wood level at very different ages (oak woodland and
