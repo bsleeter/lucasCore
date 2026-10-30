@@ -65,12 +65,12 @@ plots): snags 0.85, down logs 0.86, fine woody debris 0.90, litter 0.99, duff 0.
 
 ## Not finished / open
 
-- Snags short in 96 cells even with snag decay at its minimum (inputs or fall rate; not diagnosed).
+- Snags short in 96 cells (2026-10-27) - fixed 2026-10-30: stem turnover fitted to FIA background mortality (to-do 32, tools/calibrate-stem-turnover.R; CBM ran 1.5-5x low).
 - Duff multiplier at its upper bound (20) in 19 cells.
 - Fire/clearcut transfers and the four fire snag shares come from California plots but apply everywhere (now editable, per ecodivision
   too, in Carbon Assumptions: Disturbance Flows and Fire Snag Share).
 - Calibration settings (mature age, exclusion years, plot and snag minimums, multiplier ranges) and fixed multipliers are on the
   Carbon Assumptions sheets (2026-10-28); mature age is one value for every forest type.
-- Live turnover not fitted; users cannot view or override rates (to-do 20 rate sheet not built).
+- Live turnover: stem turnover fitted to FIA (2026-10-30); the other rates CBM. Rates viewable (Carbon Rates) and settable (Live Turnover).
 - DLL rebuilt and P26 synced 2026-10-28; the P26 rebuild happens in a new library (guide walkthrough).
 - The guide's carbon chapter still describes the old calibration.

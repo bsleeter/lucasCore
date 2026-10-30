@@ -96,16 +96,28 @@ cbx_cell <- function(x) { own <- cbx[!is.na(StratumId)][x, on = .(StratumId = St
 cbx_cell(cells)
 miss <- cells[is.na(cbm_eco) | is.na(cbm_species), unique(StateClass)]
 if (length(miss)) fail("CBM Crosswalk (Carbon Assumptions) has no row for forest type(s) %s", paste(miss, collapse = ", "))
+copt <- read_ds("CarbonOptions"); dm <- copt$DeadOrganicMatterModel[1]
+# (the sheet reads as its labels; option 2's label starts like option 1's, so it is tested first)
+dom_mode <- if (is.null(dm) || is.na(dm)) 4L else if (is.numeric(dm)) as.integer(dm) else if (grepl("^(FIA measured|Measured)", dm)) 4L else
+  if (grepl("^FIA (dead|condition) pools, CBM", dm)) 2L else if (grepl("^(Calibrated|FIA condition pools)", dm)) 1L else if (grepl("^CBM default", dm)) 3L else NA_integer_
+if (is.na(dom_mode)) fail("Carbon Method: unrecognised Dead Organic Matter choice '%s'", dm)
 # Carbon Assumptions - Live Turnover (to-do 21): each value the user set, per cell - the ecodivision row's, else the forest type's
-# all-ecodivisions row's (columns lt_<sheet column>; blank = the CBM Crosswalk's rates, src/flows.R turnover_rates)
-lt <- as.data.table(datasheet(scn, ds("LiveTurnover"), optional = TRUE, lookupsAsFactors = FALSE)); LTC <- names(LIVE_TURNOVER_COLS)
+# all-ecodivisions row's (columns lt_<sheet column>; blank = the CBM Crosswalk's rates, src/flows.R turnover_rates). An empty sheet
+# with the FIA measured dead wood method takes the package's rows (to-do 32, 2026-10-30: stem turnover fitted to FIA's background
+# mortality, tools/calibrate-stem-turnover.R; CBM's rate ran 1.5-5x low and left the mature snags short)
+lt <- as.data.table(datasheet(scn, ds("LiveTurnover"), optional = TRUE, lookupsAsFactors = FALSE)); LTC <- names(LIVE_TURNOVER_COLS); lt_src <- "Carbon Assumptions"
+if (!nrow(lt) && dom_mode == 4L) { lt <- fread(pkg_file("defaults", "carbon-assumptions", "fia-measured", "live-turnover.csv"), colClasses = "character", na.strings = "")
+  lt_src <- "the package (FIA background mortality; the sheet is empty)" }
 if (nrow(lt)) {
   lt[, StratumId := as.character(StratumId)]; for (k in LTC) lt[, (k) := if (k %in% names(lt)) as.numeric(get(k)) else NA_real_]
   dup <- lt[duplicated(lt[, .(StratumId, StateClassId)])]; if (nrow(dup)) fail("Live Turnover: more than one row for %s", paste(unique(paste(dup$StratumId, dup$StateClassId)), collapse = "; "))
   own <- lt[!is.na(StratumId)][cells, on = .(StratumId = Stratum, StateClassId = StateClass), ..LTC]; all <- lt[is.na(StratumId)][cells, on = .(StateClassId = StateClass), ..LTC]
   for (k in LTC) cells[, (paste0("lt_", k)) := data.table::fcoalesce(own[[k]], all[[k]])]
-  say("Live Turnover: %d rows from Carbon Assumptions: %s", nrow(lt), paste(sprintf("%s%s (%s)", ifelse(is.na(lt$StratumId), "", paste0(lt$StratumId, " / ")), sub("^Forest: ", "", lt$StateClassId),
+  if (lt_src == "Carbon Assumptions") say("Live Turnover: %d rows from %s: %s", nrow(lt), lt_src, paste(sprintf("%s%s (%s)", ifelse(is.na(lt$StratumId), "", paste0(lt$StratumId, " / ")), sub("^Forest: ", "", lt$StateClassId),
       apply(lt[, ..LTC], 1, function(v) paste(sprintf("%s %s", LTC[!is.na(v)], v[!is.na(v)]), collapse = ", "))), collapse = "; "))
+  else { u <- cells[!is.na(lt_StemTurnover)]
+    say("Live Turnover: %d rows from %s; stem turnover in this build's %d forest cells %.4f-%.4f /yr (median %.4f), the other rates CBM's", nrow(lt), lt_src, nrow(u),
+        min(u$lt_StemTurnover), max(u$lt_StemTurnover), stats::median(u$lt_StemTurnover)) }
 } else say("Live Turnover: no rows - every rate from the CBM Crosswalk (root turnover split 0.5 / 0.5)")
 # return intervals and soil targets from stage 5 when this scenario has them (a stage 5 result upstream), else the provisional defaults
 ri5 <- as.data.table(datasheet(scn, ds("OutputReturnInterval"), optional = TRUE, lookupsAsFactors = FALSE))
@@ -169,11 +181,7 @@ say("Decay calibration: %d cells, %d with >= %d FIA plots (own fit), %d with a g
 # defaults (no calibration - the CONUS 1km build's way); 1 and 2 (FIA condition pools, no longer offered, 2026-10-28) still run in older
 # libraries. A pool that is not calibrated keeps multiplier 1. Soil organic carbon: 1 = soil decay calibrated to gSSURGO, 2 = CBM
 # defaults; blank = gSSURGO with options 1 and 4, CBM with 2 and 3 (as before the choice existed).
-copt <- read_ds("CarbonOptions"); dm <- copt$DeadOrganicMatterModel[1]
-# (the sheet reads as its labels; option 2's label starts like option 1's, so it is tested first)
-dom_mode <- if (is.null(dm) || is.na(dm)) 4L else if (is.numeric(dm)) as.integer(dm) else if (grepl("^(FIA measured|Measured)", dm)) 4L else
-  if (grepl("^FIA (dead|condition) pools, CBM", dm)) 2L else if (grepl("^(Calibrated|FIA condition pools)", dm)) 1L else if (grepl("^CBM default", dm)) 3L else NA_integer_
-if (is.na(dom_mode)) fail("Carbon Method: unrecognised Dead Organic Matter choice '%s'", dm)
+# (copt and dom_mode are read above, before Live Turnover)
 sm0 <- if ("SoilCarbonModel" %in% names(copt)) copt$SoilCarbonModel[1] else NA
 soil_mode <- if (is.null(sm0) || is.na(sm0)) (if (dom_mode %in% c(1L, 4L)) 1L else 2L) else if (is.numeric(sm0)) as.integer(sm0) else if (grepl("^gSSURGO", sm0)) 1L else if (grepl("^CBM", sm0)) 2L else NA_integer_
 if (is.na(soil_mode)) fail("Carbon Method: unrecognised Soil Organic Carbon choice '%s'", sm0)

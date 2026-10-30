@@ -55,8 +55,10 @@ cuts <- merge(cuts, grp[, .(typ0 = VALUE, TYPGRPCD)], by = "typ0", all.x = TRUE)
 cuts <- merge(cuts, gnm[, .(TYPGRPCD = VALUE, Type)], by = "TYPGRPCD", all.x = TRUE)
 cuts <- cuts[!is.na(kind) & !is.na(Type)]
 eco <- read_sf(ecof); pts <- unique(cuts[!is.na(LAT) & !is.na(LON), .(LAT, LON)])
-j <- st_join(st_transform(st_as_sf(pts, coords = c("LON", "LAT"), crs = 4269, remove = FALSE), st_crs(eco)), eco["StrtmNm"])
-pts[, Ecodivision := j$StrtmNm[match(paste(LAT, LON), paste(j$LAT, j$LON))]]
+j <- st_join(st_transform(st_as_sf(pts, coords = c("LON", "LAT"), crs = 4269, remove = FALSE), st_crs(eco)), eco["ecodiv"])
+en <- unique(as.data.table(st_drop_geometry(eco))[, .(ecodiv = as.character(ecodiv), StrtmNm)])   # one name per code: a second M260 polygon is named "Mediterranean" (2026-10-30)
+en <- en[order(ecodiv, -(startsWith(ecodiv, "M") & grepl("Mountains$", StrtmNm)))][!duplicated(ecodiv)]
+pts[, Ecodivision := en$StrtmNm[match(as.character(j$ecodiv[match(paste(LAT, LON), paste(j$LAT, j$LON))]), en$ecodiv)]]
 cuts <- merge(cuts, pts, by = c("LAT", "LON"), all.x = TRUE)
 cat(sprintf("%d states read in %.1f min: %d cuts with a forest type (%d clearcut, %d selection); %d without an ecodivision\n", length(sts),
             as.numeric(Sys.time() - t0, units = "mins"), nrow(cuts), cuts[kind == "clearcut", .N], cuts[kind == "selection", .N], cuts[is.na(Ecodivision), .N]))

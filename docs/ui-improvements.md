@@ -393,7 +393,20 @@ Not pushed: every lucasCore commit since 54177b2 (2026-10-29) is local only; the
     >= 50% of live carbon in 3.6% of conditions, >= 70% in 1.1%; they hold ~20% (>= 50%) / 7% (>= 70%) of the mortality carbon, about
     the same in snag-short and snag-OK cells. Background without them is still 2.2x CBM in the short cells (0.0100 vs 0.0045; all
     mortality 0.0124), so the shortfall is mostly chronic mortality, not outbreaks; the outbreak-heavy cells are lodgepole and aspen
-    TSM and lodgepole Marine Mountains (34-38% of mortality stand-replacing, insects 60-90% of it). Threshold to choose.
+    TSM and lodgepole Marine Mountains (34-38% of mortality stand-replacing, insects 60-90% of it). Threshold: 70% (user).
+    **Option A DONE 2026-10-30.** tools/calibrate-stem-turnover.R: all 48 states, 187,152 remeasured mature conditions (stand age
+    >= 60), the 1.2% that lost >= 70% to non-fire causes left out; background non-fire mortality / live aboveground carbon per year ->
+    defaults/carbon-assumptions/fia-measured/live-turnover.csv (StemTurnover only; 28 types + 123 type x ecodivision rows with >= 30
+    conditions). FIA / CBM 1.1-1.2x (Douglas-fir, pinyon/juniper), ~2-2.5x most types East and West, 3.4-4.2x lodgepole, aspen.
+    Trees under 5 in. (not tallied as snags) change the rates by only 2-5% (--min-dia, default 0). Stage 3: an empty Live Turnover
+    sheet with the FIA measured dead wood method takes these rows (Fill copies them). Test tests/phaseZ24-stem-turnover.R (532 cells,
+    stages 3-4 on Build 47): all pass; mature snags model / measured median 0.89 -> 1.00 (plot-weighted 0.83 -> 0.95), cells under
+    0.8 72 -> 62 (snag decay is shared by an ecodivision's types), snag multipliers at the lower bound 96 -> 30, median snag
+    multiplier 1.72 -> 7.72 (more input with the measured fall rate leaves decay to take the rest; FIA's snag carbon already holds
+    broken tops and lower density); pools' medians 0.84-0.99 of measured; live carbon still the stage 2 curves. P26 mixed conifer
+    snags 0.65 -> 1.05, down logs 0.69 -> 0.96; fir/spruce snags 0.41 -> 0.80. Also found: the ecodivision shapefile has a second
+    M260 polygon named "Mediterranean" (the package uses codes; both tools now map names by code; harvest-age.csv changed one count).
+    Open: (3) California-fitted fire/clearcut transfers and fire snag shares; option B (stand-replacing insect/disease events) later.
 33. **Leftovers inside done items** - TO DO: (1) Data Sources deep links into the USFS Research Data Archive; (7) guide 1.4 on
     multiprocessing for tiled runs (check against the P26 setup); (8) a full P26 Build + historical run with Area-matched resampling to
     compare carbon, transitions and figures, and matching the state class splits within NLCD classes (forest type, shrub/grass,
