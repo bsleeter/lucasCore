@@ -170,7 +170,12 @@ matches TreeMap's, else the largest), as dev/treemap/01 does. Used by type, age 
   and a note on what each stage does with it. Build Results > Site Productivity: ui/SiteProductivityView.cs, pick an ecodivision and
   Multiplier / Plots / Raw Ratio; a row per forest type, a column per site class, the type's plots and Basis; multipliers tinted
   green above 1, orange below. Compiled into lucasCoreUI.dll; not yet seen in Studio. Site Class Shares stays a plain raster list.
-  Not done: the stage 12 map of the multiplier.
+  User checked both pages in Studio: they look right. **Stage 12 figure "Site productivity"** (src/figures.R, after the initial carbon
+  maps, drawn only when the Build has the Site Productivity flow multiplier): (a) the forest cells' multiplier, brown below 1 and green
+  above; (b) the cell's mean FIA site class from stage 5's shares. Stage 12 finds the files in its dependencies' folders when it is its
+  own scenario. Test tests/phaseZ21-site-productivity-figure.R (stage 12 alone on the on and off test Builds): all pass; the off Build
+  draws no such figure. Copy of the figure: dev/treemap/out/site-productivity-figure.png. The multiplier is relative to the cell's
+  own forest type, so the same site class can map differently in two types.
 
 ## Notes
 

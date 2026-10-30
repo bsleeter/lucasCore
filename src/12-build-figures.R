@@ -29,6 +29,18 @@ in_study <- function(x) if (nrow(x) && all(c("StratumId", "StateClassId") %in% n
 st <- as.data.table(datasheet(scn, "stsim_InitialStockSpatial", optional = TRUE, lookupsAsFactors = FALSE))
 st <- st[!is.na(RasterFileName) & file.exists(RasterFileName)]
 sa <- sheet("StudyArea")
+# site productivity (to-do 35): stage 8's multiplier map and stage 5's site class shares, when the Build has them. A file path that is
+# not there is looked up by name in this scenario's and its dependencies' folders (stage 12 may be its own scenario on a Build result)
+find_file <- function(fn, sheet) { if (!length(fn) || is.na(fn) || file.exists(fn)) return(as.character(fn)[1])
+  ids <- c(rsyncrosim::scenarioId(scn), suppressWarnings(as.integer(rsyncrosim::dependency(scn)$ScenarioId)))
+  p <- file.path(paste0(main_library(), ".data"), sprintf("Scenario-%d", ids), sheet, basename(fn)); p <- p[file.exists(p)]; if (length(p)) p[1] else NA_character_ }
+fsm <- as.data.table(datasheet(scn, "stsim_FlowSpatialMultiplier", optional = TRUE, lookupsAsFactors = FALSE))
+fsm <- if (nrow(fsm) && "FlowMultiplierTypeId" %in% names(fsm)) fsm[FlowMultiplierTypeId %in% "Site Productivity"] else fsm[0]
+site_m <- if (nrow(fsm)) opt_rast(find_file(fsm$MultiplierFileName[1], "stsim_FlowSpatialMultiplier")) else NULL
+shs <- as.data.table(datasheet(scn, ds("OutputSiteClassMap"), optional = TRUE))
+shf <- if (nrow(shs) == 7) vapply(shs[order(SiteClass), FileName], find_file, "", sheet = ds("OutputSiteClassMap")) else NA
+site_class <- if (!anyNA(shf)) { X <- rast(shf); X[is.na(X)] <- 0; m <- Reduce(`+`, lapply(1:7, function(k) X[[k]] * k)); m[sum(X) == 0] <- NA; m } else NULL   # each cell's share-weighted mean class
+if (!is.null(site_m)) say("Site productivity: multiplier map %s%s", basename(sources(site_m)), if (is.null(site_class)) ", no site class shares" else "")
 dem <- tryCatch(read_data_sources("ElevationFile")$ElevationFile, error = function(e) { say("No hillshade: %s", conditionMessage(e)); NULL })
 I <- list(strata = list(prim, opt_rast(ic$SecondaryStratumFileName[1]), opt_rast(ic$TertiaryStratumFileName[1])),
           strata_names = list(stl, named("SecondaryStratum"), named("TertiaryStratum")),
@@ -38,7 +50,7 @@ I <- list(strata = list(prim, opt_rast(ic$SecondaryStratumFileName[1]), opt_rast
           decay = in_study(sheet("OutputDecayCalibration")),
           stocks = if (nrow(st)) setNames(lapply(st$RasterFileName, rast), st$StockTypeId) else NULL,
           stock_summary = sheet("OutputInitialStockSummary"), trans = sheet("OutputTransitionSummary"),
-          climate = sheet("OutputClimateSummary"), validation = sheet("OutputValidation"), dem = dem,
+          climate = sheet("OutputClimateSummary"), site = site_m, site_class = site_class, validation = sheet("OutputValidation"), dem = dem,
           label = if (nrow(sa)) paste(sub("^[^:]*: ", "", sa$UnitId), collapse = ", ") else "CONUS", years = c(opt$StartYear[1], opt$EndYear[1]),
           result = rsyncrosim::scenarioId(scn))
 progressBar()

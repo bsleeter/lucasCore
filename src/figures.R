@@ -7,12 +7,14 @@
 # past the study area; inside it the classes are blended into the relief, each panel has its title and subtitle above it and a
 # colour strip (classed values) or a key (named classes) below. Panels go side by side, or one under another when the study area is
 # wide (height / width under 0.75). Charts are base R, lettered the same way. Each figure is drawn only when its inputs are present:
-#   maps    study area and strata | initial land cover (state class, forest type, stand age) | initial carbon (total, live, soil)
+#   maps    study area and strata | initial land cover (state class, forest type, stand age) | initial carbon (total, live, soil) |
+#           site productivity (multiplier, mean site class)
 #   charts  area and carbon by state class | growth curves | decay calibration | land-use change | disturbance | climate | checks
 # build_figures(I, outdir) returns one row per PNG (Figure, Title, Caption, FileName).
 # I: strata (list of 3 SpatRasters: primary, secondary, tertiary), strata_names (list of 3 data.tables Id, Name), strata_sources
 #    (secondary and tertiary source names), sc (SpatRaster), sc_list (Name, Id, Color "a,r,g,b"), age (SpatRaster), carbon_curves,
-#    volume_curves, decay, stocks (named list of SpatRasters by stock type), trans, climate, validation (data.tables), dem
+#    volume_curves, decay, stocks (named list of SpatRasters by stock type), site and site_class (SpatRasters: the site productivity
+#    multiplier and mean site class, or NULL), trans, climate, validation (data.tables), dem
 #    (elevation .tif), label (study area), years (start, end), result (result scenario id, for the note)
 # =============================================================================
 suppressPackageStartupMessages({ library(terra); library(sf); library(data.table) })
@@ -22,6 +24,7 @@ INK <- "#20211f"; MUTED <- "#55534c"; GRID <- "#e3e1db"
 RAMP_AGE <- colorRampPalette(c("#f5efe3", "#e9dfa6", "#b9cf86", "#6fae74", "#2f8a6f", "#1f5f63", "#22314f"))
 RAMP_C <- colorRampPalette(c("#f5efe3", "#dfe6b4", "#a9cf86", "#62ab68", "#2b8152", "#195c3f", "#0f3a2b"))
 RAMP_SOIL <- colorRampPalette(c("#f5efe3", "#ead7ab", "#d4ae73", "#b07f45", "#85572b", "#5a3a1c", "#33210f"))
+RAMP_SITE <- colorRampPalette(c("#a6561c", "#d99a4e", "#f0d3a0", "#f5efe3", "#bcd9a4", "#6fae74", "#1f6f50"))   # below 1 brown, 1 cream, above green
 QUAL <- c("#4e79a7", "#f28e2b", "#59a14f", "#e15759", "#b07aa1", "#76b7b2", "#edc948", "#9c755f", "#ff9da7", "#86bcb6", "#8cd17d", "#d4a6c8")
 # n distinct colours for named units (counties, ...): Tableau's 20, the strong ten first and then their light tints (rotated, so unit k
 # and unit k + 10 never share a hue), then generated hues
@@ -176,6 +179,19 @@ build_figures <- function(I, outdir) {
     if (any(pools == "Soil")) P[[length(P) + 1]] <- mp(sum_of(names(I$stocks)[pools == "Soil"]), RAMP_SOIL, "Soil carbon (Mg C/ha)", "belowground pools; classes of equal area", equal = FALSE)
     map_figure("initial_carbon", sprintf("Initial carbon stocks, %s", I$years[1]), P,
       sprintf("Carbon in the start year (%s): %.1f Tg C in the study area. (a, b) Classes in even steps between each map's 1st and 99.5th percentiles; the end classes are open. (c) Classes of roughly equal area: forest soil starts at its type's gSSURGO mean (stage 3 calibrates decay to it), so it varies little within a type, and other land takes gSSURGO directly.%s", I$years[1], totTg, relief)) }
+
+  # ---- maps: site productivity (to-do 35) ----------------------------------------------------------------------------------------
+  if (!is.null(I$site)) {
+    m <- cv(I$site); m[!forest] <- NA; mb <- c(-Inf, 0.6, 0.7, 0.8, 0.9, 0.95, 1.05, 1.1, 1.2, 1.3, 1.5, Inf)
+    mf <- m[forest & !is.na(m)]
+    P <- list(list(k = classed(m, mb), cols = RAMP_SITE(length(mb) - 1), lab = c("<0.6", "0.6", "0.7", "0.8", "0.9", "0.95-1.05", "1.05", "1.1", "1.2", "1.3", ">1.5"),
+                   title = "Site productivity multiplier", sub = sprintf("forest cells: mean %.2f, 10th-90th percentile %.2f-%.2f; grey: not forest", mean(mf), quantile(mf, .1), quantile(mf, .9))))
+    if (!is.null(I$site_class)) { s <- cv(I$site_class); s[!forest] <- NA
+      P[[2]] <- list(k = classed(s, c(-Inf, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, Inf)), cols = rev(RAMP_SITE(7)), lab = c("1: 225+", "2: 165", "3: 120", "4: 85", "5: 50", "6: 20", "7: 0-19"),
+                     title = "FIA site class (mean of the cell's TreeMap plots)", sub = "potential growth, cubic feet per acre per year; grey: not forest or no TreeMap plot") }
+    map_figure("site_productivity", "Site productivity", P,
+      sprintf("(a) Each forest cell's growth multiplier (stage 8): its TreeMap pixels' FIA site class mix, each class weighted by its forest type and ecodivision's multiplier (Build Results > Site Productivity). It multiplies the climate multipliers on forest growth and scaled the cell's starting live and dead carbon; other land stays at 1.%s%s",
+              if (length(P) > 1) " (b) The cell's mean FIA site class, from the share of its TreeMap pixels in each class (stage 5); 1 is the most productive." else "", relief)) }
 
   # ---- charts: area and carbon by state class ----------------------------------------------------------------------------------
   fq <- as.data.table(freq(I$sc))[, .(Id = value, km2 = count * cell_km2)][, Class := scn$Name[match(Id, scn$Id)]][order(-km2)]
