@@ -1,5 +1,5 @@
 // =============================================================================
-// BuildOptionsView.cs - the Build Options page: model grid, historical period, strata and land cover, in framed groups
+// BuildOptionsView.cs - the Build Options page: model grid, historical period, strata, land cover and growth, in framed groups
 // =============================================================================
 // Single-row sheet lucasCore_BuildOptions. The projection end year is no longer set here (its column is kept, hidden, for older
 // libraries): it is in Projection > Run Settings, and the climate of the projection years comes from a Projection Climate scenario
@@ -39,6 +39,7 @@ namespace lucasCoreUI
         private readonly ComboBox m_forest = new ComboBox();
         private readonly ComboBox m_resample = new ComboBox();
         private readonly ComboBox m_age = new ComboBox();
+        private readonly ComboBox m_site = new ComboBox();
         private readonly CheckBox m_tiled = new CheckBox { Text = "Split runs into tiles:", AutoSize = true, Margin = new Padding(3, 5, 6, 3) };
         private readonly TextBox m_tiles = new TextBox();
         private readonly ComboBox m_tileLevel = new ComboBox();
@@ -110,7 +111,11 @@ namespace lucasCoreUI
             r.Controls.Add(Note("The forest type map assigns the forest type of forest cells; other cover comes from NLCD, RCMAP and C-CAP. TreeMap (USFS, 30 m) gives every forest pixel an FIA plot: its forest type group, and its stand age moved from the plot's inventory year to the start year. Data Sources: TreeMap Folder, and the FIA DataMart Folder for the plots' COND tables."));
             r.Controls.Add(Caption("Resampling to the grid:")); r.Controls.Add(List(m_resample, 330));
 
-            foreach (GroupBox g in new[] { gGrid, gHist, gStrata, gCover, gTiles }) { m_root.RowStyles.Add(new RowStyle(SizeType.AutoSize)); m_root.Controls.Add(g); }
+            GroupBox gGrowth = Group("Growth", out r,
+                Note("Site productivity scales each forest cell's growth by how productive its land is, on top of the climate multipliers. TreeMap gives every forest pixel an FIA plot and its site class (1 = 225+ ... 7 = 0-19 cubic feet per acre per year). Stage 2 turns each forest type and ecodivision's site classes into growth multipliers (the plots' live carbon over the growth curve at their age: Build Results > Site Productivity), stage 5 maps each cell's share of every class (Site Class Shares), and stage 8 combines them into the cell's multiplier, scales the cell's starting live and dead carbon by it, and writes it as a Site Productivity flow multiplier on forest growth. Older libraries need tools/sync-library.R first, for the Climate and Site Productivity Flow Multiplier Types."));
+            r.Controls.Add(Caption("Site productivity:")); r.Controls.Add(List(m_site, 200));
+
+            foreach (GroupBox g in new[] { gGrid, gHist, gStrata, gCover, gGrowth, gTiles }) { m_root.RowStyles.Add(new RowStyle(SizeType.AutoSize)); m_root.Controls.Add(g); }
 
             m_scroll.Controls.Add(m_root); this.Controls.Add(m_scroll);
             this.ResumeLayout(false);
@@ -145,6 +150,9 @@ namespace lucasCoreUI
             m_age.DisplayMember = "Name"; m_age.ValueMember = "Value";
             m_age.DataSource = new List<Item> { new Item { Value = 1, Name = "NASA CMS Forest Age 1990" }, new Item { Value = 2, Name = "TreeMap (FIA plot stand age)" } };
             this.SetComboBoxBinding(m_age, "StandAgeSource");
+            m_site.DisplayMember = "Name"; m_site.ValueMember = "Value";
+            m_site.DataSource = new List<Item> { new Item { Value = 1, Name = "None" }, new Item { Value = 2, Name = "TreeMap site class" } };
+            this.SetComboBoxBinding(m_site, "SiteProductivity");
             m_resample.DisplayMember = "Name"; m_resample.ValueMember = "Value";
             m_resample.DataSource = new List<Item> { new Item { Value = 1, Name = "Modal (most common 30 m class)" }, new Item { Value = 2, Name = "Area-matched (30 m class areas per secondary unit)" } };
             this.SetComboBoxBinding(m_resample, "LandCoverResampling");

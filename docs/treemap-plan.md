@@ -166,6 +166,11 @@ matches TreeMap's, else the largest), as dev/treemap/01 does. Used by type, age 
   tests/phaseZ20-site-productivity-build.R (two Builds of stages 5, 2, 3, 4, 7, 8, off and on, and 1985-1987 historical runs): all
   pass; every forest cell's starting live carbon = its multiplier x the off Build's (1e-7); forest multipliers mean 1.03 (10% 0.81,
   90% 1.27); starting forest live carbon x 1.040; historical forest growth x 1.030. Not tested: stage 11's carry-over (a projection).
+- **Step 7 (UI), 2026-10-30, pages done.** Build Options: a **Growth** group with the Site productivity list (None / TreeMap site class)
+  and a note on what each stage does with it. Build Results > Site Productivity: ui/SiteProductivityView.cs, pick an ecodivision and
+  Multiplier / Plots / Raw Ratio; a row per forest type, a column per site class, the type's plots and Basis; multipliers tinted
+  green above 1, orange below. Compiled into lucasCoreUI.dll; not yet seen in Studio. Site Class Shares stays a plain raster list.
+  Not done: the stage 12 map of the multiplier.
 
 ## Notes
 

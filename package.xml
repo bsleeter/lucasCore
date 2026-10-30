@@ -496,7 +496,7 @@
 		<column name="TotalLive" displayName="Total Live (Mg C/ha)" dataType="Double" format="0.00"/>
 	</dataSheet>
 
-	<dataSheet name="OutputSiteProductivity" displayName="Site Productivity">
+	<dataSheet name="OutputSiteProductivity" displayName="Site Productivity" viewClassName="lucasCoreUI.SiteProductivityView" viewClassAssembly="lucasCoreUI">
 		<!-- stage 2 when Build Options: Site Productivity = TreeMap site class (to-do 35, src/siteproductivity.R): the growth multiplier per
 		     forest type x ecodivision x FIA site class, from the fitting plots' live carbon / the curve at their age -->
 		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum"/>
