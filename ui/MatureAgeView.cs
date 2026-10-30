@@ -63,16 +63,18 @@ namespace lucasCoreUI
 
         private static IEnumerable<DataRow> Live(DataTable dt) { return dt.Rows.Cast<DataRow>().Where(x => x.RowState != DataRowState.Deleted); }
 
-        // the package's forest types (the growth inputs' state classes) that this library defines
+        // the package's forest types (the growth inputs' state classes) that this library defines, matched by name: the crosswalk's
+        // first column is the FIA forest type group code, not the library's state class Id
         private List<int> ForestTypes()
         {
             var ids = new List<int>();
             List<string[]> rows = Defaults.ReadCsv(Defaults.PackageFile("defaults", "growth", "forest-type-crosswalk.csv"));
             DataSheetColumn col = Sheet.Columns.Cast<DataSheetColumn>().FirstOrDefault(x => x.Name == "StateClassId");
-            var known = new HashSet<int>();
+            var byName = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             if (col != null && col.ValidationTable != null)
-                foreach (DataRow r in col.ValidationTable.DataSource.Rows) if (r.RowState != DataRowState.Deleted) known.Add(Convert.ToInt32(r[col.ValidationTable.ValueMember]));
-            foreach (string[] r in rows.Skip(1)) { int id; if (int.TryParse(r[0], out id) && (known.Count == 0 || known.Contains(id))) ids.Add(id); }
+                foreach (DataRow r in Live(col.ValidationTable.DataSource))
+                    byName[Convert.ToString(r[col.ValidationTable.DisplayMember]).Trim()] = Convert.ToInt32(r[col.ValidationTable.ValueMember]);
+            foreach (string[] r in rows.Skip(1)) { int id; if (r.Length > 1 && byName.TryGetValue("Forest: " + r[1].Trim(), out id) && !ids.Contains(id)) ids.Add(id); }
             return ids;
         }
 
