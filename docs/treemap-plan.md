@@ -113,11 +113,24 @@ matches TreeMap's, else the largest), as dev/treemap/01 does. Used by type, age 
    should change little; its pattern and the age-carbon spread more).
 9. **Docs.** Guide (Build Options, Build Results page, figure), methods paper, docs/ui-improvements.md items 10 and 35.
 
-## Choices for the user
+## Choices (user, 2026-10-29)
 
-- TreeMap vintage: 2016 is on disk; newer releases exist (to check: years, attributes, download size).
-- Multipliers by forest type only, or by type x ecodivision where plots allow (P26 has two ecodivisions).
-- Default: Site Productivity off (results as today) or on.
+- TreeMap vintage: **2016** (on disk) for now. Others: 2014 (RDS-2019-0026), 2020 (on the USFS raster gateway; archive id probably
+  RDS-2025-0031, unconfirmed), 2022 (RDS-2025-0032). The year is a function argument in src/treemap.R, so a later vintage is a file
+  name, not a redesign.
+- Multipliers by **forest type x ecodivision** where plots allow, else the type's.
+- Site Productivity **off by default** (results as today until switched on).
+
+## Progress
+
+- **Step 1 (data), 2026-10-29, schema-free part done.** src/treemap.R: fia_sites() (every forested condition's type, group, stand
+  age and site class from all states' COND, cached as fia-sites.rds in the DataMart folder; 897,304 conditions, 48 states, builds in
+  seconds; also what stage 2 needs for the site class of its fitting plots, and small enough for the demo bundle's tables-only mode),
+  treemap_crop(), treemap_plots() (TreeMap's type, else the largest condition) and treemap_coverage(). tests/unit-treemap.R: 8 checks
+  pass, P26 reproduces phase 0 (21.0 M pixels, 6,377 plots, all joined with a site class, stand age 94.5%).
+  Left for step 2, so libraries are synced once: the **Data Sources: TreeMap Folder** column, with the Build Options columns
+  (Forest Type Map and Stand Age Source = TreeMap, Site Productivity) - new columns in existing sheets need tools/sync-library.R (or a
+  package version bump with an update) before an older library opens.
 
 ## Notes
 
