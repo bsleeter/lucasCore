@@ -496,6 +496,18 @@
 		<column name="TotalLive" displayName="Total Live (Mg C/ha)" dataType="Double" format="0.00"/>
 	</dataSheet>
 
+	<dataSheet name="OutputSiteProductivity" displayName="Site Productivity">
+		<!-- stage 2 when Build Options: Site Productivity = TreeMap site class (to-do 35, src/siteproductivity.R): the growth multiplier per
+		     forest type x ecodivision x FIA site class, from the fitting plots' live carbon / the curve at their age -->
+		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum"/>
+		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="SiteClass" displayName="Site Class (1 = 225+ ... 7 = 0-19 cu ft/ac/yr)" dataType="Integer"/>
+		<column name="Plots" dataType="Integer"/>
+		<column name="RawRatio" displayName="Raw Ratio" dataType="Double" format="0.000" isOptional="True"/>
+		<column name="Multiplier" dataType="Double" format="0.000"/>
+		<column name="Basis" dataType="String"/>
+	</dataSheet>
+
 	<dataSheet name="OutputCarbonParameter" displayName="Carbon Curve Parameters">
 		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum"/>
 		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
@@ -808,10 +820,12 @@
 	<transformer name="GrowthCurves" displayName="2 - Fit Growth Curves" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/2-growth-curves.R">
 		<dataSheet name="GrowthOptions" type="Input"/>
 		<dataSheet name="GrowthInput" type="Input"/>
+		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="MerchantableVolumeCurve" type="Output"/>
 		<dataSheet name="CarbonCurve" type="Output"/>
 		<dataSheet name="OutputGrowthParameter" type="Output"/>
 		<dataSheet name="OutputCarbonParameter" type="Output"/>
+		<dataSheet name="OutputSiteProductivity" type="Output"/>
 		<dataSheet name="OutputGrowthReport" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
@@ -1066,6 +1080,7 @@
 				<item name="OutputSoilTarget"/>
 				<item name="OutputGrowthParameter"/>
 				<item name="OutputCarbonParameter"/>
+				<item name="OutputSiteProductivity"/>
 				<item name="OutputDecayCalibration"/>
 				<item name="OutputCarbonRate"/>
 				<item name="OutputGrowthReport"/>

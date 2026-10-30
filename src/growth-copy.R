@@ -67,4 +67,4 @@ copy_curves <- function(opt) {
   if (!is.na(rf) && file.exists(rf)) { to <- file.path(TD(), basename(rf)); file.copy(rf, to, overwrite = TRUE); write_ds(data.frame(FileName = to), "OutputGrowthReport") }
   check(STAGE, "growth curves copied from another library", TRUE, sprintf("%s, scenario %d (%s): %d volume and %d carbon curve rows", basename(lp), sid, nm,
                                                                          nrow(got$MerchantableVolumeCurve), nrow(got$CarbonCurve)))
-  invisible(sid) }
+  invisible(got) }   # the copied sheets: stage 2 needs the carbon curves for site productivity (outputs reach the library only after the run)

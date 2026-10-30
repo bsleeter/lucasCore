@@ -140,6 +140,16 @@ matches TreeMap's, else the largest), as dev/treemap/01 does. Used by type, age 
   tools/new-library.R; the starter was not rebuilt). Test (tests/phaseZ17-treemap-type-age.R, test library synced): base and TreeMap
   stage 5 runs pass; same forest cells; 86% type agreement with EVT; 1985 age median 81 (TreeMap) vs 66 (CMS), correlation 0.12.
   The guide's Build Options figure and text need the new list once the user decides the default stays CMS.
+- **Step 3 (multipliers in stage 2), 2026-10-30, done.** src/siteproductivity.R: site_plots() (each fitting plot, as carbon_data
+  filters them, now with plt_cn/condid kept, joined to fia_sites()'s site class and divided by its type x ecodivision curve at its
+  age; a plot goes to its own group's type first) and site_multipliers() (type level: class mean / type mean, shrunk with 20
+  pseudo-plots toward the type's plot-weighted linear trend across classes, so thin classes 1 and 7 are not pulled back toward 1;
+  cells with >= 30 plots: own class values shrunk toward the type's; fewer: the type's; normalised to a plot-weighted mean of 1, then
+  capped 0.3-2.5). Stage 2 writes **Build Results > Site Productivity** (OutputSiteProductivity: ecodivision, state class, site class,
+  plots, raw ratio, multiplier, basis) when Build Options asks for it, after fitting or after copying the curves (copy_curves() now
+  returns the copied sheets: outputs reach the library only when the run ends). Tests: tests/unit-site-productivity.R (10 checks) and
+  tests/phaseZ18-site-productivity-stage2.R (copy 2.9 min, fit 14.7 min, off: all pass; 182,929 fitting plots, 133 of 532 cells
+  with their own values; mixed conifer M260 1.54 / 1.59 / 1.26 / 0.97 / 0.61 / 0.53 / 0.33 for site classes 1-7).
 
 ## Notes
 

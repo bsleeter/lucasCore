@@ -29,7 +29,7 @@ carbon_data <- function(cond_file, dist_file, opt) {
          dstrbcd1 %in% 0 & trtcd1 %in% 0 & stdage >= 1 & stdage <= 400]
   x[, ccap := stats::quantile(c_live, opt$VolumeCapQuantile), by = fortyp_grp]; x <- x[c_live <= ccap]
   data.table::setorder(x, pid, condid, -invyr); x <- x[!duplicated(paste(pid, condid))]
-  x[, .(pid, ecodiv, fortyp_grp, stdage, c_live, c_ag, c_fol, c_bg)] }
+  x[, .(pid, plt_cn, condid, ecodiv, fortyp_grp, stdage, c_live, c_ag, c_fol, c_bg)] }   # plt_cn, condid: the site class join (src/siteproductivity.R)
 
 # a share of live carbon as a function of age, fitted as a ratio of sums: min sum (num - s(t) den)^2 / den. Unweighted, big plots
 # dominated and foliage came out 10-20% low at every age (experiment 14); weighted, foliage and roots are within 2% from age 6

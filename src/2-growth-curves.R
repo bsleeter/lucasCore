@@ -13,11 +13,39 @@ STAGE <- "2 Growth Curves"
 progressBar(type = "begin", totalSteps = 6)
 
 opt <- as.list(read_ds("GrowthOptions"))
+
+# Build Options: Site Productivity = TreeMap site class (to-do 35, src/siteproductivity.R): the growth multiplier per forest type x
+# ecodivision x FIA site class, from the fitting plots' live carbon / the carbon curve at their age; stage 5 maps it to the cells
+site_on <- { bo <- read_ds("BuildOptions"); v <- if (nrow(bo) && "SiteProductivity" %in% names(bo)) bo$SiteProductivity[1] else NA
+  !is.na(v) && (identical(suppressWarnings(as.integer(v)), 2L) || startsWith(as.character(v), "TreeMap")) }
+site_table <- function(xc, curves, cw, eco, scl, stl) {
+  source(pkg_file("src", "treemap.R")); source(pkg_file("src", "siteproductivity.R"))
+  p <- site_plots(xc, fia_sites(read_data_sources("FiaDataMartFolder")$FiaDataMartFolder), cw, curves, eco)
+  if (!nrow(p)) fail("Site productivity: no fitting plot has both a site class (FIA DataMart Folder COND tables) and a carbon curve (%d curve rows)", nrow(curves))
+  m <- site_multipliers(p, unique(curves[, .(StateClassId, StratumId)]))
+  wm <- m[, .(n = sum(Plots), mean = sum(Plots * Multiplier) / sum(Plots)), by = .(StateClassId, StratumId)][n > 0]
+  check(STAGE, "site productivity: the plot-weighted mean multiplier is 1 in every forest type x ecodivision (within 2%, after the cap)",
+        all(abs(wm$mean - 1) <= 0.02), sprintf("largest difference %.3f", max(abs(wm$mean - 1))))
+  check(STAGE, "site productivity: every forest type x ecodivision has a finite multiplier for site classes 1-7 within the cap",
+        m[, .N, by = .(StateClassId, StratumId)][, all(N == 7)] && all(is.finite(m$Multiplier) & m$Multiplier >= SITE_CAP[1] & m$Multiplier <= SITE_CAP[2]))
+  own <- m[Basis == "forest type x ecodivision", uniqueN(paste(StateClassId, StratumId))]
+  say("Site productivity (TreeMap site class): %d fitting plots with a site class; %d of %d forest type x ecodivision cells have their own values, the rest their type's; multipliers %.2f-%.2f",
+      nrow(p), own, nrow(unique(m[, .(StateClassId, StratumId)])), min(m$Multiplier), max(m$Multiplier))
+  write_ds(m[, .(StratumId = stl$Name[match(StratumId, as.integer(stl$Id))], StateClassId = scl$Name[match(StateClassId, as.integer(scl$Id))], SiteClass, Plots,
+                 RawRatio = round(RawRatio, 4), Multiplier = round(Multiplier, 4), Basis)], "OutputSiteProductivity") }
 # Growth Curve Options: copy the curves of another library's result scenario instead of fitting (src/growth-copy.R)
 src_choice <- if (is.null(opt$CurveSource) || is.na(opt$CurveSource)) "Fit new curves" else if (is.numeric(opt$CurveSource))
   c("Fit new curves", "Copy from another library")[opt$CurveSource] else as.character(opt$CurveSource)
 if (identical(src_choice, "Copy from another library")) {
-  source(pkg_file("src", "growth-copy.R")); copy_curves(opt)
+  source(pkg_file("src", "growth-copy.R")); got <- copy_curves(opt)
+  if (site_on) {   # the multipliers against the copied curves, from this library's FIA data
+    scl <- stsim_list("StateClass"); stl <- stsim_list("Stratum"); cw <- read_growth_inputs(scl)$cw
+    ef <- read_data_sources("EcodivisionFile")$EcodivisionFile; eco <- st_drop_geometry(read_sf(ef))
+    eco <- unique(data.table(ecodiv = as.character(eco$ecodiv), StratumId = as.integer(eco$StrtmId)))[StratumId %in% as.integer(stl$Id)]
+    fx <- fia_tables(opt, ef); xc <- carbon_data(fx$cond, fx$dist, opt)
+    cc <- as.data.table(got$CarbonCurve)   # names, as the sheet holds them
+    cc <- cc[, .(StateClassId = as.integer(scl$Id[match(StateClassId, scl$Name)]), StratumId = as.integer(stl$Id[match(StratumId, stl$Name)]), Age, TotalLive)]
+    site_table(xc, cc, cw, eco, scl, stl) }
   finish_checks(); progressBar(type = "end"); quit(save = "no") }
 
 src <- read_data_sources(c("EcodivisionFile", "PrismFolder"))
@@ -154,6 +182,7 @@ write_ds(cpar[, .(StratumId = StratumName, StateClassId = StateClassName, Method
                   RootShare0 = round(r_s0, 4), RootShareMature = round(r_sinf, 4), RootShareTau = round(r_tau, 2),
                   MerchCarbonDensity = round(unlist(stem[StateClassName]), 4),
                   MerchCappedAges = pools[, sum(MerchCapped), by = .(StratumId, StateClassId)][cpar, on = c("StratumId", "StateClassId"), V1])], "OutputCarbonParameter")
+if (site_on) site_table(xc, pools[, .(StateClassId, StratumId, Age, TotalLive)], cw, eco, scl, stl)
 progressBar()
 
 # ---- report: every curve over a sample of its plots -----------------------------------------------------------------
