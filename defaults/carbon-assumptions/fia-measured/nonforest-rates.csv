@@ -191,14 +191,14 @@ StratumId,StateClassId,AgeMin,FlowGroupId,Value
 ,Shrubland: Native Sage Steppe,,Transfer: AG Slow -> BG Slow [Type],0.006
 ,Shrubland: Native Sage Steppe,,Transfer: Snag Branch -> AG Fast [Type],0.1
 ,Shrubland: Native Sage Steppe,,Transfer: Snag Stem -> AG Medium [Type],0.032
-,Shrubland: Non-sage,,Biomass Turnover: Coarse Roots -> AG Fast [Type],0
+,Shrubland: Non-sage,,Biomass Turnover: Coarse Roots -> AG Fast [Type],0.01
 ,Shrubland: Non-sage,,Biomass Turnover: Coarse Roots -> BG Fast [Type],0.01
-,Shrubland: Non-sage,,Biomass Turnover: Fine Roots -> AG Very Fast [Type],0.01
+,Shrubland: Non-sage,,Biomass Turnover: Fine Roots -> AG Very Fast [Type],0.25595
 ,Shrubland: Non-sage,,Biomass Turnover: Fine Roots -> BG Very Fast [Type],0.25595
-,Shrubland: Non-sage,,Biomass Turnover: Foliage -> AG Very Fast [Type],0.25595
-,Shrubland: Non-sage,,Biomass Turnover: Merchantable -> Snag Stems [Type],0.5079
-,Shrubland: Non-sage,,Biomass Turnover: Other Wood -> AG Fast [Type],0.0045
-,Shrubland: Non-sage,,Biomass Turnover: Other Wood -> Snag Branches [Type],0.3346
+,Shrubland: Non-sage,,Biomass Turnover: Foliage -> AG Very Fast [Type],0.5079
+,Shrubland: Non-sage,,Biomass Turnover: Merchantable -> Snag Stems [Type],0.0045
+,Shrubland: Non-sage,,Biomass Turnover: Other Wood -> AG Fast [Type],0.3346
+,Shrubland: Non-sage,,Biomass Turnover: Other Wood -> Snag Branches [Type],0.3
 ,Shrubland: Non-sage,,Decay: AG Fast -> AG Slow [Type],0.024
 ,Shrubland: Non-sage,,Decay: AG Medium -> AG Slow [Type],0.0062
 ,Shrubland: Non-sage,,Decay: AG Very Fast -> AG Slow [Type],0.064

@@ -84,18 +84,18 @@ Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,
 Shrubland: Native Sage Steppe,Carbon Initial Conditions: Snag Branch,,,0.584
 Shrubland: Native Sage Steppe,Carbon Initial Conditions: Snag Stem,,,0
 Shrubland: Non-sage,Carbon Initial Conditions: Coarse Roots,,,0
-Shrubland: Non-sage,Carbon Initial Conditions: Fine Roots,,,1.2558
-Shrubland: Non-sage,Carbon Initial Conditions: Foliage,,,1.7073
+Shrubland: Non-sage,Carbon Initial Conditions: Fine Roots,,,0.6524
+Shrubland: Non-sage,Carbon Initial Conditions: Foliage,,,0.8604
 Shrubland: Non-sage,Carbon Initial Conditions: Merchantable,,,0
-Shrubland: Non-sage,Carbon Initial Conditions: Other Wood,,,0.587
-Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Fast,,,0.7481
+Shrubland: Non-sage,Carbon Initial Conditions: Other Wood,,,0.3137
+Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Fast,,,0.9901
 Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Medium,,,0
-Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Slow,,,5.5873
-Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.8493
+Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Slow,,,6.9509
+Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,1.1411
 Shrubland: Non-sage,Carbon Initial Conditions: Belowground Fast,,,0
-Shrubland: Non-sage,Carbon Initial Conditions: Belowground Slow,,,26.7409
-Shrubland: Non-sage,Carbon Initial Conditions: Belowground Very Fast,,,0.3331
-Shrubland: Non-sage,Carbon Initial Conditions: Snag Branch,,,1.2016
+Shrubland: Non-sage,Carbon Initial Conditions: Belowground Slow,,,21.3166
+Shrubland: Non-sage,Carbon Initial Conditions: Belowground Very Fast,,,0.173
+Shrubland: Non-sage,Carbon Initial Conditions: Snag Branch,,,0.5757
 Shrubland: Non-sage,Carbon Initial Conditions: Snag Stem,,,0
 Shrubland: Post Fire Shrub,Carbon Initial Conditions: Coarse Roots,,,0
 Shrubland: Post Fire Shrub,Carbon Initial Conditions: Fine Roots,,,0.6524
