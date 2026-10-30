@@ -372,6 +372,20 @@ Not pushed: every lucasCore commit since 54177b2 (2026-10-29) is local only; the
     on the Build result with ecodivision and forest type drop-downs shows them.
 31. **Carbon Assumptions: copy from another library** - TO DO (planned 2026-10-27, as Growth Curve Options' copy), and the **SoilGrids**
     option for Soil Organic Carbon (user, 2026-10-28).
+    **SoilGrids scoped 2026-10-30** (user asked for the level of effort). Today one soil map, Data Sources: gSSURGO Soil Organic Carbon
+    (gssurgo_soc_0_999.tif, g C/m2), is used in two places: stage 5 averages it per ecodivision x forest type into Soil Targets (stage
+    3 calibrates soil decay so the spin-up's deep soil matches them), and stage 8 fills it into non-forest cells. Carbon Method: Soil
+    Organic Carbon = gSSURGO | CBM defaults. SoilGrids 2.0 (ISRIC, 250 m, global, CC-BY 4.0) has no ready 0-100 cm stock (its "ocs"
+    layer is 0-30 cm); a matching stock is soc x bulk density x (1 - coarse fragments) x thickness over its 0-5, 5-15, 15-30, 30-60
+    and 60-100 cm layers (15 rasters, Homolosine, cloud-optimized VRTs). Plan: (1) tools/build-soilgrids-soc.R: download the CONUS
+    window once, compute 0-100 cm SOC in g C/m2 (and its Q0.05/Q0.95 range from the uncertainty layers), write one GeoTIFF on the
+    gSSURGO grid conventions (~0.5 day, mostly download); (2) Data Sources: SoilGrids Soil Organic Carbon file (schema change ->
+    sync-library); (3) stage 5 writes a target per source (a second column in Soil Targets), stage 8 fills non-forest from the chosen
+    source, stage 3 picks by Carbon Method; Soil Organic Carbon list gains "SoilGrids (soil decay calibrated to its soil organic
+    carbon)"; Carbon Method page and Data Sources page entries (~0.5-1 day); (4) tests on Placer, and a P26 comparison of the two
+    targets per ecodivision x type (~0.5 day). Total ~1.5-2 days. Known difference to expect: SoilGrids runs higher than SSURGO in
+    forests and mountains; gSSURGO has gaps (unmapped areas) that SoilGrids would fill - a "gSSURGO, SoilGrids where missing" choice
+    is cheap once both exist. A first look (download the P26 window only, compare targets) needs the user's OK to download.
 32. **Carbon open science issues** - DONE 2026-10-30 (raised 2026-10-27): snags short in 96 cells even at the lowest snag decay (inputs or fall
     rate; user offered to look); duff multiplier at its 20 bound in 19 cells; the fitted fire/clearcut transfers and fire snag shares
     are California-fitted but applied everywhere.
@@ -529,3 +543,9 @@ Not pushed: every lucasCore commit since 54177b2 (2026-10-29) is local only; the
     (initial carbon 439 Tg C, run times, Build figures, Historical Transition Summary, projections), and a guide section on the
     Minimum Harvest Age page with a grab (the options, the rows, Build Results > Minimum Harvest Ages). Site Productivity stays off in
     the walkthrough (item 36 covers it).
+    **2026-10-30: the user is running the P26 Build and Historical run in Studio** (item 32 done: stem turnover changed too). Checks
+    after: the Build's Validation all Pass; stage 3's log "Live Turnover: ... rows from the package" (if it says "from Carbon
+    Assumptions", P26's Carbon Assumptions scenario has its own Live Turnover rows, which win: Fill on the Carbon Method page replaces
+    them); stage 6's "Minimum harvest ages" lines and Build Results > Minimum Harvest Ages; Initial Stock Summary total carbon (was
+    439 Tg C); in the Historical run, realized clearcut and selection area against the Historical Transition Summary's LCMS area.
+    Then Claude pulls the numbers and figures for the guide.
