@@ -32,7 +32,7 @@ sa <- sheet("StudyArea")
 # site productivity (to-do 35): stage 8's multiplier map and stage 5's site class shares, when the Build has them. A file path that is
 # not there is looked up by name in this scenario's and its dependencies' folders (stage 12 may be its own scenario on a Build result)
 find_file <- function(fn, sheet) { if (!length(fn) || is.na(fn) || file.exists(fn)) return(as.character(fn)[1])
-  ids <- c(rsyncrosim::scenarioId(scn), suppressWarnings(as.integer(rsyncrosim::dependency(scn)$ScenarioId)))
+  ids <- c(rsyncrosim::scenarioId(scn), run_dependencies())
   p <- file.path(paste0(main_library(), ".data"), sprintf("Scenario-%d", ids), sheet, basename(fn)); p <- p[file.exists(p)]; if (length(p)) p[1] else NA_character_ }
 fsm <- as.data.table(datasheet(scn, "stsim_FlowSpatialMultiplier", optional = TRUE, lookupsAsFactors = FALSE))
 fsm <- if (nrow(fsm) && "FlowMultiplierTypeId" %in% names(fsm)) fsm[FlowMultiplierTypeId %in% "Site Productivity"] else fsm[0]

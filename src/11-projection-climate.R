@@ -80,6 +80,9 @@ progressBar()
 if ("Climate" %in% stsim_list("FlowMultiplierType")$Name) out$rows[, FlowMultiplierTypeId := "Climate"]
 # this scenario's rows hide the Build's, so the Build's Site Productivity multiplier (stage 8) comes along
 spm <- dependency_multipliers("Site Productivity")
+spv <- opt$SiteProductivity[1]
+if (is.null(spm) && !is.null(spv) && !is.na(spv) && (identical(suppressWarnings(as.integer(spv)), 2L) || startsWith(as.character(spv), "TreeMap")))
+  fail("Site Productivity is on in the Build Options, but no dependency has its flow multiplier: depend on a Build result that ran stage 8")
 if (!is.null(spm)) { out$rows <- rbind(out$rows, spm[, intersect(names(spm), c("Timestep", "FlowGroupId", "FlowMultiplierTypeId", "MultiplierFileName")), with = FALSE], fill = TRUE)
   say("Site Productivity: the Build's flow multiplier carried over (%s)", paste(unique(spm$FlowGroupId), collapse = ", ")) }
 write_stsim(out$rows, "FlowSpatialMultiplier")

@@ -88,12 +88,21 @@ write_stsim <- function(x, name, target = scn, ...) saveDatasheet(target, int_co
 # Projection Start could not find the historical run's maps)
 main_library <- function() sub("\\.temp[/\\\\]MultiProc[/\\\\].*$", "", normalizePath(env$LibraryFilePath, winslash = "/", mustWork = FALSE))
 
+# the dependency ids of the scenario being run, in priority order. A run writes into a result scenario that lists no dependencies of its
+# own (found 2026-10-30: dependency(scn) was empty inside stage 11), so they are read from its parent, the scenario the user ran
+run_dependencies <- function() {
+  d <- suppressWarnings(as.integer(rsyncrosim::dependency(scn)$ScenarioId)); if (length(d)) return(d)
+  L <- ssimLibrary(main_library()); s <- as.data.table(rsyncrosim::scenario(L, summary = TRUE))
+  p <- if ("ParentId" %in% names(s)) s[ScenarioId == rsyncrosim::scenarioId(scn), ParentId] else NA
+  if (length(p) != 1 || is.na(p)) return(integer(0))
+  d <- as.data.table(rsyncrosim::dependency(rsyncrosim::scenario(L, p))); if (nrow(d)) as.integer(d[order(Priority), ScenarioId]) else integer(0) }
+
 # the flow spatial multiplier rows of one Flow Multiplier Type in this scenario's dependencies (the first that has any), with each file's
 # full path: a scenario that writes its own rows hides its dependencies' (stage 11's climate rows would hide the Build's Site
 # Productivity row), so it carries these over
 dependency_multipliers <- function(type) {
   L <- ssimLibrary(main_library())
-  for (id in as.integer(rsyncrosim::dependency(scn)$ScenarioId)) {
+  for (id in run_dependencies()) {
     x <- as.data.table(datasheet(rsyncrosim::scenario(L, id), "stsim_FlowSpatialMultiplier", optional = TRUE, lookupsAsFactors = FALSE))
     if (nrow(x) && "FlowMultiplierTypeId" %in% names(x)) { x <- x[FlowMultiplierTypeId %in% type]
       if (nrow(x)) return(x[, MultiplierFileName := file.path(paste0(main_library(), ".data"), sprintf("Scenario-%d", id), "stsim_FlowSpatialMultiplier", basename(MultiplierFileName))][]) } }

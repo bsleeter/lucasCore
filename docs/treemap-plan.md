@@ -176,6 +176,14 @@ matches TreeMap's, else the largest), as dev/treemap/01 does. Used by type, age 
   own scenario. Test tests/phaseZ21-site-productivity-figure.R (stage 12 alone on the on and off test Builds): all pass; the off Build
   draws no such figure. Copy of the figure: dev/treemap/out/site-productivity-figure.png. The multiplier is relative to the cell's
   own forest type, so the same site class can map differently in two types.
+- **Projection carry-over, 2026-10-30, tested.** The first test found stage 11 carried nothing: inside a run, dependency(scn) is empty
+  (the result scenario lists no dependencies; they are on its parent). Fixed with src/shared.R run_dependencies() (the parent's
+  dependencies), used by dependency_multipliers() and stage 12's file lookup; stage 11 now fails if Build Options has Site Productivity
+  on but no dependency has its multiplier. Test tests/phaseZ22-site-productivity-projection.R: a Projection Climate result on each test
+  Build (on, off), then a 3-year projection on each from Projection Setup (hand-over test, 122 on Build 47): all pass. The on climate
+  result has Climate rows plus one Site Productivity row, its map in its own folder and equal to the Build's; the projection's forest
+  growth on / off is 1.024, 1.022, 1.017 in 2024-2026 (forest-area mean multiplier 1.031; the projection starts from Build 47's
+  historical run, whose stocks were not scaled).
 
 ## Notes
 
