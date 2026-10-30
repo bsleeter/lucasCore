@@ -389,6 +389,19 @@ P26 needs a Build and Historical rerun after 35 (if made the default) and 34; th
     share as the check, not a fit (the age map was adjusted, so fitting to it is circular). Build: tools/calibrate-harvest-age.R, an
     optional Minimum Harvest Age page (like Mature Age) read by stages 6 and 9, unit test, test-library run comparing blocked share
     and initial carbon. P26 needs a Build and Historical rerun to pick it up.
+    **Analysis 2026-10-30** (dev/harvest/04-harvest-age-fia.R, outputs in dev/harvest/out): CA, OR, WA, NV, ID remeasured conditions
+    cut between visits, paired with the previous visit (age at cut = previous STDAGE + years to the treatment year): 3,415 cuts, 851
+    clearcut-like (live basal area loss >= 75%), 1,045 partial (10-75%). Clearcut-like, 10th pct / median (n), today's AgeMin, share
+    of clearcuts it blocks: mixed conifer 49/92 (64), 92, 50%; Douglas-fir 37/54 (393), 40, 16%; Hemlock/Sitka 41/56 (100), 46, 20%;
+    ponderosa 50/83 (96), 61, 18%; fir/spruce/mtn hemlock 55/80 (67), 61, 16%; alder/maple 35/51 (47), 37, 17%; lodgepole 54/83 (20),
+    61, 20%; tanoak 46/59 (14), 46, 14%; western oak 43/84 (10), 50, 20%. Redwood: no clearcut-like cuts, partial 49/85 (18), AgeMin
+    161. Private land cuts younger (Douglas-fir median 50 private vs 79 public; mixed conifer 84 vs 111). Partial cuts, 10th pct /
+    median: mixed conifer 59/93, ponderosa 55/88, Douglas-fir 35/71, fir/spruce 51/93. Option (b), CMAI of P26's merchantable volume
+    curves (Mediterranean Mountains): mixed conifer 51 (NFMA 95% 39), ponderosa 33, Douglas-fir 32, fir/spruce 42, redwood 39,
+    tanoak 60, western oak 70: close to the FIA 10th percentile in mixed conifer and Douglas-fir, younger elsewhere.
+    Reading: today's AgeMin is too high mainly in mixed conifer (P26's main type: blocks half the clearcuts) and the 161-yr types
+    (redwood, other western softwood); elsewhere it blocks 15-20%. Next: user picks the rule (percentile, pooled West or CA, by owner
+    or not, selection ages from partial cuts or none, CMAI fallback for thin types).
 35. **TreeMap: forest type, stand age and site productivity from one map** - PLANNED 2026-10-29 (user: use TreeMap; combines item 10;
     full plan in docs/treemap-plan.md). **Phase 0 done 2026-10-29: go** (site class moves carbon at age around stage 2's own curves, mixed conifer m 1.59 -> 0.52 from site class 2 to 6; every P26 TreeMap pixel gets a site class with all 48 states' COND; Climate and Site Productivity flow multiplier types multiply in ST-Sim, untyped climate rows still work; details in the plan). Choices (user): TreeMap 2016, multipliers by type x ecodivision, Site Productivity off by default. **Step 1 schema-free part done** (src/treemap.R, tests/unit-treemap.R); **Step 2 done 2026-10-30** (ac971f3: TreeMap as Forest Type Map and Stand Age Source in stage 5; new columns need tools/sync-library.R --reference=dev/libs/sync-reference.ssim). P26 synced 2026-10-30. **Step 3 done** (site class multipliers in stage 2, Build Results > Site Productivity). **Step 4 stage 5 half done** (site class share maps). **Steps 4-6 done** (stage 8: cell multiplier, Site Productivity flow multiplier, scaled initial stocks; stages 7/11 tag Climate). **Step 7 pages done** (Build Options: Growth > Site productivity; Build Results > Site Productivity page). **Stage 12 Site productivity figure done** (pages checked in Studio). **Projection carry-over tested** (fixed: stages read dependencies from the run's parent). **P26 synced for the multiplier types 2026-10-30** (Climate, Site Productivity; sync-library read the one-column CSV wrong, fixed). Guide 3.3 updated (Build Options grab, Stand age and Growth steps). The rest of the guide work is item 36.
     **Why.** Every cell of one forest type, ecodivision and age grows on the same curve; only the climate multipliers (stages 7 and 11)
