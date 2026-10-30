@@ -21,6 +21,7 @@
 		<column name="StandAgeFile" displayName="NASA CMS Forest Age 1990" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Stand Age/cms_age_1990.tif"/>
 		<column name="ForestTypeGroupFolder" displayName="USFS Forest Type Group Map Folder (NFCMS regional *_ForestType.tif)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/NFCMS/Forest Type"/>
 		<column name="MtbsSeverityFolder" displayName="MTBS Burn Severity Folder (mtbs_CONUS_year.tif)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/MTBS/Burn Severity"/>
+		<column name="TreeMapFolder" displayName="TreeMap Folder (TreeMap2016.tif and its .vat.dbf; forest type, stand age, site productivity)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/TreeMap/Data"/>
 		<column name="LandfireDisturbanceFolder" displayName="LANDFIRE Disturbance Folder (US_DISTyear)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Landfire Disturbance"/>
 		<column name="LcmsFolder" displayName="USFS LCMS annual Change folder (year/*Change_year.tif; harvest, stages 6 and 10)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/LCMS/v2025-11/Change_Annual"/>
 		<column name="BurnProbabilityFile" displayName="Burn probability raster (fire method 2 default; FSim CONUS LF2020 270 m)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FSim/Data/I_FSim_CONUS_LF2020_270m/CONUS_BP.tif"/>
@@ -110,7 +111,11 @@
 		<column name="EndYear" displayName="Historical End Year" dataType="Integer" defaultValue="2023" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1985"/>
 		<!-- legacy (libraries made before 2026-10-24): the projection end year is now in Projection Options (Run Settings); stages 9 and 10 still read this one when that is blank -->
 		<column name="ProjectionEndYear" displayName="Projection End Year (legacy: now in Projection > Run Settings)" dataType="Integer" isOptional="True" isVisible="False"/>
-		<column name="ForestTypeMap" displayName="Forest Type Map" dataType="Integer" validationType="List" formula1="1:LANDFIRE EVT|2:USFS forest type groups" defaultValue="1"/>
+		<column name="ForestTypeMap" displayName="Forest Type Map" dataType="Integer" validationType="List" formula1="1:LANDFIRE EVT|2:USFS forest type groups|3:TreeMap (FIA plots)" defaultValue="1"/>
+		<!-- stage 5 (to-do 35 with 10): where forest stand age comes from (blank = NASA CMS, as Builds before 2026-10-30) -->
+		<column name="StandAgeSource" displayName="Stand Age Source" dataType="Integer" validationType="List" formula1="1:NASA CMS Forest Age 1990|2:TreeMap (FIA plot stand age)" defaultValue="1" isOptional="True"/>
+		<!-- to-do 35 step 4: a growth multiplier per forest cell from its TreeMap plots' site class (blank = none) -->
+		<column name="SiteProductivity" displayName="Site Productivity" dataType="Integer" validationType="List" formula1="1:None|2:TreeMap site class" defaultValue="1" isOptional="True"/>
 		<!-- stage 5: how the 30 m Annual NLCD becomes the model grid (src/landcover-match.R; blank = modal, as Builds before 2026-10-26) -->
 		<column name="LandCoverResampling" displayName="Land Cover Resampling" dataType="Integer" validationType="List" formula1="1:Modal (most common 30 m class)|2:Area-matched (30 m class areas per secondary stratum unit)" defaultValue="1" isOptional="True"/>
 		<!-- spatial multiprocessing (stage 1 writes the tile mask into the Build result; runs on the Build inherit it, a projection may set its own in Run Settings) -->

@@ -113,8 +113,37 @@ progressBar()
 #   USFS forest type groups  the NFCMS regional tiles (FIA forest type group codes) that touch the study area, mosaicked
 ftg <- function(v) { v <- suppressWarnings(as.integer(v)); ifelse(!is.na(v) & v >= 100 & v <= 999, v, NA_integer_) }
 fmap <- opt$ForestTypeMap[1]
-fmap <- if (is.null(fmap) || is.na(fmap)) "LANDFIRE EVT" else if (is.numeric(fmap)) c("LANDFIRE EVT", "USFS forest type groups")[fmap] else as.character(fmap)
-if (identical(fmap, "USFS forest type groups")) {
+fmap <- if (is.null(fmap) || is.na(fmap)) "LANDFIRE EVT" else if (is.numeric(fmap)) c("LANDFIRE EVT", "USFS forest type groups", "TreeMap (FIA plots)")[fmap] else as.character(fmap)
+# Stand Age Source: NASA CMS 1990 (default), or TreeMap: each pixel's FIA plot's stand age, moved from its inventory year to the start year
+asrc <- opt$StandAgeSource[1]
+asrc <- if (is.null(asrc) || is.na(asrc)) "NASA CMS" else if (is.numeric(asrc)) c("NASA CMS", "TreeMap")[asrc] else sub(" .*", "", as.character(asrc))
+# TreeMap (to-do 35 with 10, src/treemap.R): its 30 m plot ids over the study area and each plot's forested condition (type, age,
+# site class), read once for the forest type and the stand age
+if (startsWith(fmap, "TreeMap") || identical(asrc, "TreeMap")) {
+  source(pkg_file("src", "treemap.R"))
+  tmd <- read_data_sources("TreeMapFolder")$TreeMapFolder; dm <- read_data_sources("FiaDataMartFolder")$FiaDataMartFolder
+  tm30 <- treemap_crop(tmd, R); tm30 <- mask(tm30, project(P, tm30, method = "near"))   # P is NA outside the study area
+  tpx <- as.data.table(freq(tm30))[, .(Value = as.integer(value), n = count)]
+  tpl <- treemap_plots(tmd, tpx$Value, fia_sites(dm)); tcv <- treemap_coverage(tpx, tpl)
+  say("TreeMap 2016: %.1f M forest pixels, %d FIA plots; %.1f%% join a forested condition (%.1f%% of TreeMap's type), %.1f%% with a stand age, %.1f%% with a site class",
+      tcv$pixels / 1e6, tcv$plots, 100 * tcv$joined, 100 * tcv$matched, 100 * tcv$age, 100 * tcv$site)
+  check(STAGE, "TreeMap: at least 95% of the forest pixels join an FIA condition", tcv$joined >= 0.95,
+        sprintf("%.1f%% (the FIA DataMart Folder needs every state's COND table the plots come from)", 100 * tcv$joined))
+}
+if (startsWith(fmap, "TreeMap")) {
+  # TreeMap's groups are FIA's own codes, which is what the growth curves are fitted to: map them as Growth Inputs do (a group goes
+  # to the forest type whose own group it is before a type that pools several, e.g. Western White Pine's 12 western groups).
+  # A group no forest type fits (999 nonstocked, 960 other hardwoods in the package's crosswalk) takes its neighbours' type below.
+  source(pkg_file("src", "growth.R"))
+  gcw <- read_growth_inputs()$cw
+  gm <- gcw[, .(g = as.integer(strsplit(FiaTypeGroups, ";")[[1]])), by = .(id = as.integer(StateClassId))][, k := .N, by = id][order(k)]
+  tpl[, sc := gm$id[match(fortyp_grp, gm$g)]]
+  un <- merge(tpx, tpl, by = "Value")[is.na(sc), .(px = sum(n)), by = fortyp_grp][order(-px)]
+  if (nrow(un)) say("TreeMap: forest type groups with no forest type in Growth Inputs, %.1f%% of the TreeMap pixels, take their neighbours' type: %s",
+                    100 * sum(un$px) / tcv$pixels, paste(sprintf("%s %.1f%%", ifelse(is.na(un$fortyp_grp), "none", un$fortyp_grp), 100 * un$px / tcv$pixels), collapse = ", "))
+  f30 <- classify(tm30, cbind(tpl$Value, ftg(tpl$sc)), others = NA)
+  say("Forest type map: TreeMap 2016 (each pixel's FIA plot's forest type group, mapped as Growth Inputs map FIA groups)")
+} else if (identical(fmap, "USFS forest type groups")) {
   ftf <- read_data_sources("ForestTypeGroupFolder")$ForestTypeGroupFolder
   tiles <- list.files(ftf, "_ForestType[.]tif$", full.names = TRUE); if (!length(tiles)) fail("no *_ForestType.tif tiles in %s", ftf)
   win <- function(r) project(as.polygons(ext(R) + 3000, crs = crs(R)), crs(r))
@@ -146,7 +175,7 @@ G <- project(classify(rcr, cbind(rc$Code, rc$Id), others = NA), R, method = "mod
 G <- cover(G, classify(n0, rbind(c(71, 72), c(52, 54)), others = NA)); G <- fill_modal(mask(G, m), m, 54)
 cx <- xsrc("C-CAP")[!is.na(Id) & Id >= 90]; ccr <- crop_to(rast(src$CcapFile)); levels(ccr) <- NULL
 # every code found in the study area window needs a crosswalk row (a missing row would silently count as unmapped)
-maps <- if (exists("usfs30")) list(list("USFS Forest Type Group", usfs30)) else list(list("EVT 2016", e16), list("EVT 2001", e01))
+maps <- if (startsWith(fmap, "TreeMap")) list() else if (exists("usfs30")) list(list("USFS Forest Type Group", usfs30)) else list(list("EVT 2016", e16), list("EVT 2001", e01))   # TreeMap groups are checked above
 miss_codes <- rbindlist(lapply(c(maps, list(list("RCMAP", rcr), list("C-CAP", ccr))), function(z) {
   v <- terra::unique(z[[2]])[[1]]; v <- v[!is.na(v)]; data.table(Source = z[[1]], Code = setdiff(as.integer(v), xsrc(z[[1]])$Code)) }))
 check(STAGE, "every land cover code in the study area has a crosswalk row", !nrow(miss_codes),
@@ -167,9 +196,22 @@ S <- mask(S, m)
 forest <- S >= 100 | S == 90
 progressBar()
 
-# ---- stand age: NASA CMS 1990 shifted to the start year, filled from neighbours, forest and forested wetland only --------
-A <- project(crop_to(rast(src$StandAgeFile)), R, method = "average")
-A <- round(A - (1990 - y0)); A[A <= 0] <- NA
+# ---- stand age (Build Options: Stand Age Source), shifted to the start year, filled from neighbours, forest and forested wetland only
+#   NASA CMS (default)  CMS Forest Age 1990, averaged over the cell, minus (1990 - start year)
+#   TreeMap             each 30 m pixel's FIA plot's STDAGE minus (its inventory year - start year), averaged over the cell's pixels
+#                       with an age; a plot younger than that (a stand that started after the start year) counts as unknown
+# A cell left without an age (or 0 or less: started after the start year) takes its neighbours'
+if (identical(asrc, "TreeMap")) {
+  ok <- tpl[!is.na(stdage) & !is.na(invyr)]
+  a30 <- classify(tm30, cbind(ok$Value, as.numeric(ok$stdage - (ok$invyr - y0))), others = NA); a30[a30 <= 0] <- NA
+  A <- round(project(a30, R, method = "average"))
+  say("Stand age: TreeMap 2016 (FIA plot stand age moved from each plot's inventory year, %d-%d, to %d)", min(ok$invyr), max(ok$invyr), y0)
+} else {
+  A <- project(crop_to(rast(src$StandAgeFile)), R, method = "average")
+  A <- round(A - (1990 - y0))
+  say("Stand age: NASA CMS Forest Age 1990, moved to %d", y0)
+}
+A[A <= 0] <- NA
 A <- fill_modal(mask(A, m), m, round(global(A, "mean", na.rm = TRUE)[[1]]))
 A <- mask(ifel(forest, max(A, 1), 0), m)
 progressBar()

@@ -11,13 +11,16 @@
 #      (core_Sequence)
 #   4. project definitions the package defaults gained (stsim State Attribute Types): added through rsyncrosim
 #   5. the stock group memberships of non-result scenarios (the Stock-Flow Definitions scenario), set to the package defaults
-# Close the library in SyncroSim Studio first. Usage: Rscript tools/sync-library.R <library.ssim> [--dry-run]
+# Close the library in SyncroSim Studio first. Usage: Rscript tools/sync-library.R <library.ssim> [--dry-run] [--reference=<library.ssim>]
 # =============================================================================
 suppressPackageStartupMessages({ library(DBI); library(RSQLite); library(data.table) })
 a <- commandArgs(TRUE); pos <- a[!grepl("^--", a)]; dry <- "--dry-run" %in% a
 if (!length(pos)) stop("usage: Rscript tools/sync-library.R <library.ssim> [--dry-run]")
 here <- tryCatch(dirname(normalizePath(sub("--file=", "", grep("--file=", commandArgs(FALSE), value = TRUE)))), error = function(e) "tools")
 pkg <- normalizePath(file.path(here, ".."), winslash = "/"); ref_f <- file.path(pkg, "Starter", "LUCAS Core (CONUS).ssim")
+# --reference=<library.ssim>: compare with another library made by the current package (a fresh tools/new-library.R one) instead of the
+# starter, so the starter need not be rebuilt for a schema change (its path must not contain "--": the console reads it as an option)
+ra <- grep("^--reference=", a, value = TRUE); if (length(ra)) ref_f <- normalizePath(sub("^--reference=", "", ra[1]), winslash = "/")
 f <- normalizePath(pos[1], winslash = "/"); if (!file.exists(ref_f)) stop("build the starter first: Rscript tools/build_starter.R")
 if (!dry) { bak <- sprintf("%s.bak-%s", f, format(Sys.time(), "%Y%m%d-%H%M")); file.copy(f, bak); cat("backup:", bak, "\n") }
 ref <- dbConnect(SQLite(), ref_f, flags = SQLITE_RO); con <- dbConnect(SQLite(), f)

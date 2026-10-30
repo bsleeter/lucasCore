@@ -14,13 +14,13 @@
 # No SyncroSim calls here, so tests can source this file; say() is used when it exists.
 # =============================================================================
 
-TREEMAP_SITES_METHOD <- "2026-10-29"   # bump when fia_sites() changes (the cache is rebuilt)
+TREEMAP_SITES_METHOD <- "2026-10-30"   # bump when fia_sites() changes (the cache is rebuilt)
 SITE_CLASS_LABELS <- c(`1` = "225+", `2` = "165-224", `3` = "120-164", `4` = "85-119", `5` = "50-84", `6` = "20-49", `7` = "0-19")   # cu ft/ac/yr
 
 tm_say <- function(...) if (exists("say", mode = "function")) say(...) else message(sprintf(...))
 
 # every forested condition (COND_STATUS_CD 1) of every state in the DataMart folder dm: plt_cn, condid, condprop, fortypcd,
-# fortyp_grp, stdage, siteclcd, st
+# fortyp_grp, invyr, stdage (at invyr), siteclcd, st
 fia_sites <- function(dm) {
   cf <- list.files(dm, "^[A-Z]{2}_COND[.]csv$", full.names = TRUE)
   if (!length(cf)) stop(sprintf("FIA DataMart Folder %s has no <ST>_COND.csv files", dm), call. = FALSE)
@@ -30,10 +30,10 @@ fia_sites <- function(dm) {
   t0 <- Sys.time()
   ft <- fia_forest_types(dm)
   x <- data.table::rbindlist(lapply(cf, function(f)
-    data.table::fread(f, select = c("PLT_CN", "CONDID", "COND_STATUS_CD", "CONDPROP_UNADJ", "FORTYPCD", "STDAGE", "SITECLCD"),
+    data.table::fread(f, select = c("PLT_CN", "CONDID", "INVYR", "COND_STATUS_CD", "CONDPROP_UNADJ", "FORTYPCD", "STDAGE", "SITECLCD"),
                       colClasses = list(character = "PLT_CN"), showProgress = FALSE)[COND_STATUS_CD == 1][, st := substr(basename(f), 1, 2)]))
   x <- x[, .(plt_cn = PLT_CN, condid = CONDID, condprop = as.numeric(CONDPROP_UNADJ), fortypcd = FORTYPCD,
-             fortyp_grp = ft$TYPGRPCD[match(FORTYPCD, ft$VALUE)], stdage = STDAGE, siteclcd = SITECLCD, st)]
+             fortyp_grp = ft$TYPGRPCD[match(FORTYPCD, ft$VALUE)], invyr = INVYR, stdage = STDAGE, siteclcd = SITECLCD, st)]
   tryCatch(saveRDS(list(key = key, sites = x), cache), error = function(e) tm_say("FIA sites: could not cache in %s (%s)", dm, conditionMessage(e)))
   tm_say("FIA sites: %d forested conditions from %d states' COND in %.1f min", nrow(x), length(cf), as.numeric(Sys.time() - t0, units = "mins"))
   x }
@@ -67,7 +67,7 @@ treemap_plots <- function(tm_dir, ids, sites, year = 2016) {
   m <- merge(vat, sites, by = "plt_cn", allow.cartesian = TRUE)
   m[, matched := fortypcd == tm_fortypcd]
   m <- m[order(Value, -matched, -condprop)][!duplicated(Value)]
-  out <- merge(vat, m[, .(Value, condid, fortypcd, fortyp_grp, stdage, siteclcd, st, matched)], by = "Value", all.x = TRUE)
+  out <- merge(vat, m[, .(Value, condid, fortypcd, fortyp_grp, invyr, stdage, siteclcd, st, matched)], by = "Value", all.x = TRUE)
   out[is.na(matched), matched := FALSE][] }
 
 # pixel shares (pixels = data.table of Value and n, e.g. from terra::freq) joined to a condition, matching TreeMap's type, with a
