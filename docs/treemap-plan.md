@@ -36,6 +36,31 @@ stage 2) the same pixel carries a forest type (FORTYPCD), a stand age (STDAGE) a
 
   A quick model (log carbon on a quadratic in log age), not stage 2's curves; phase 0 redoes it on those.
 
+## Phase 0 results (2026-10-29): go
+
+- **(a) Site class against stage 2's own curves** (dev/treemap/02-site-class-curves.R; the fitting plots exactly as carbon_data filters
+  them, 195,775 conditions, each plot's live carbon / the P26 Build's carbon curve for its type, ecodivision and age; site class on
+  every plot). The multiplier m (mean ratio in the class / the type's mean ratio) falls with site class in nearly every type. P26's
+  ecodivisions, site class 2 to 6: California mixed conifer M260 1.59 / 1.30 / 0.94 / 0.60 / 0.52 (1,328 plots); fir/spruce/mtn
+  hemlock M260 1.72 / 1.40 / 0.97 / 0.74 / 0.59; Douglas-fir M260 1.51 / 1.13 / 1.09 / 0.86 / 0.67; ponderosa M260 1.98 / 1.34 /
+  1.32 / 0.92 / 0.82 (0.43 at 7); western oak M260 2.33 / 1.67 / 1.50 / 1.39 / 0.85. Site class explains 12-24% of the variance of
+  log(carbon / curve) in these types (stage 2's curves already carry the ecodivision; the quick 0.13 -> 0.50 above was age alone).
+  No effect where nearly every plot is one class (pinyon/juniper: all 7, so m = 1). Small or mixed groups are noisy and
+  non-monotone (tanoak/laurel 1.44 / 0.75 / 1.38 / 0.34): the shrinkage step is needed. Two traps for the implementation: match a
+  plot to the type whose own group it is first (Western White Pine's curve pools 12 western groups), and carbon_data drops the plot
+  ids (a version that keeps them). Output: dev/treemap/out/site-class-ratios.csv.
+- **(c) TreeMap coverage on P26** (dev/treemap/03-p26-coverage.R): 21.0 M TreeMap forest pixels (18,917 km2); with all 48 states'
+  COND every pixel's plot joins a forested condition whose type matches TreeMap's, and every one has a site class (stand age on
+  94.5%). Site class mix: 1 1%, 2 5%, 3 25%, 4 25%, 5 25%, 6 8%, 7 11%. 89% of pixels come from CA/OR/NV plots; the rest are plots
+  TreeMap imputed from other states (ID 5%, WA 3%; mostly Douglas-fir types 201/267), whose site class is still that plot's own.
+  6,377 distinct plots.
+- **(b) Flow Multiplier Types in ST-Sim** (dev/treemap/04-multiplier-types.R, test library lucasCore-suitability, Placer 1 km,
+  1985-1987 from scenario 48; the project there now has the types Climate and Site Productivity). A Site Productivity row of 2 on
+  "Net Growth Forest: Total" beside the Build's climate rows gave forest growth 2.003 / 2.002 x the climate-only run with the climate
+  rows untyped (an old Build) and 1.9997 / 1.9991 x with them typed Climate; had climate been dropped it would be 2.07 / 2.06 x (mean
+  climate multiplier 0.964 / 0.970). The two types multiply, and untyped rows still work beside typed ones. The runs draw fire and
+  harvest at random with no seed, so runs differ by up to 0.5% (first-year decay flows); the checks use that tolerance.
+
 ## Design
 
 **Multiplier.** For each forest type (and ecodivision where the plots allow), m(site class) = mean of observed live carbon / the stage 2
