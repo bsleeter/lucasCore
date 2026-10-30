@@ -320,6 +320,30 @@
 	     roots between AG and BG Very Fast, coarse roots between AG and BG Fast. Snag fall (stem snags -> AG Medium, branch snags -> AG Fast; a
 	     blank branch rate follows a set stem rate in proportion): blank = measured from FIA (Measured dead wood) or CBM; a value is used as
 	     given. Empty sheet = all from CBM. -->
+	<!-- Carbon Assumptions: Grassland, Shrubland and Wetland Carbon (to-do 39, 2026-10-30) - the non-forest rates that were package
+	     files only (defaults/stockflow/nonforest-*.csv, the CONUS 1 km build's, from IBIS; one value per class for all of CONUS, except the
+	     forested wetlands' growth curve and age-varying growth split). Rows
+	     replace the package's, the more specific last (class; + age; + ecodivision; + both). Empty = the package values. Growth: Net Growth
+	     (Mg C/ha/yr). Rates: per flow group - the growth split (Net Growth groups, shares adding to 1), live turnover and dead
+	     pool decay, emission and transfer (per year). Presets: defaults/carbon-assumptions/<method>/nonforest-growth.csv, -rates.csv -->
+	<dataSheet name="NonForestGrowth" displayName="Non-Forest Growth">
+		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
+		<column name="StateClassId" displayName="Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="AgeMin" displayName="Age (blank = all ages)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="NetGrowth" displayName="Net Growth (Mg C/ha/yr)" dataType="Double" format="0.000" validationType="Decimal" validationCondition="GreaterEqual" formula1="0"/>
+	</dataSheet>
+	<dataSheet name="NonForestRate" displayName="Non-Forest Rates">
+		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
+		<column name="StateClassId" displayName="Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="AgeMin" displayName="Age (blank = all ages)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="FlowGroupId" displayName="Flow" dataType="Integer" validationType="Datasheet" formula1="stsim_FlowGroup"/>
+		<column name="Value" displayName="Value (share of growth, or per year)" dataType="Double" format="0.0000" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+	</dataSheet>
+	<dataFeed name="NonForestCarbon" displayName="Grassland, Shrubland and Wetland Carbon" viewClassName="lucasCoreUI.NonForestCarbonView" viewClassAssembly="lucasCoreUI">
+		<dataSheet name="NonForestGrowth"/>
+		<dataSheet name="NonForestRate"/>
+	</dataFeed>
+
 	<dataSheet name="LiveTurnover" displayName="Live Turnover">
 		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
 		<column name="StateClassId" displayName="Forest Type" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
@@ -874,6 +898,8 @@
 
 	<transformer name="CarbonFlows" displayName="3 - Carbon Flows" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/3-carbon-flows.R">
 		<dataSheet name="LiveTurnover" type="Input"/>
+		<dataSheet name="NonForestGrowth" type="Input"/>
+		<dataSheet name="NonForestRate" type="Input"/>
 		<dataSheet name="Spinup" type="Input"/>
 		<dataSheet name="DisturbanceFlow" type="Input"/>
 		<dataSheet name="FireSnagShare" type="Input"/>
@@ -1094,6 +1120,7 @@
 				<item name="DecayCalibrationSetting"/>
 				<item name="MatureAge"/>
 				<item name="FixedDecayMultiplier"/>
+				<item name="NonForestCarbon"/>
 			</group>
 			<group name="lucasCoreProjection" displayName="Projection">
 				<item name="ProjectionRun"/>

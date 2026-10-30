@@ -395,11 +395,48 @@ rd <- function(f) { x <- fread(pkg_file("defaults", "stockflow", f), colClasses 
 fp_forest <- rbindlist(lapply(cw$StateClass, function(c0) FOREST_PATHWAYS[, .(FromStateClassId = c0, FromStockTypeId = From, ToStockTypeId = To,
                                                                                 StateAttributeTypeId = Attribute, FlowTypeId = FlowType, Multiplier = 1)]))
 fp <- rbind(fp_forest, rd("nonforest-pathways.csv"), ev_all[, which(vapply(ev_all, function(v) any(!is.na(v)), TRUE)), with = FALSE], fill = TRUE)   # events with the per-type fire rows
-fm <- rbind(fm_g, fm_d, rd("nonforest-multipliers-grassland-shrubland.csv"), rd("nonforest-multipliers-wetland.csv"),
-            rd("nonforest-multipliers-other.csv"), fill = TRUE)
+# Carbon Assumptions - Grassland, Shrubland and Wetland Carbon (to-do 39, 2026-10-30): the package's non-forest rates (the CONUS 1 km
+# build's, from IBIS; one value per class, the same in every ecodivision, except the forested wetlands' growth curve and age-varying
+# growth split) with the scenario's rows on top, the more specific last: a class's row for every ecodivision and age, then for one age,
+# then for one ecodivision, then for both. Growth: Net Growth (Mg C/ha/yr). Rates: the growth split (Net Growth groups, shares that add
+# to 1), live turnover and dead pool decay, emission and transfer (per year); for emergent wetlands a "<pool> ->" group is the pool's
+# total yearly loss and the flows out of it are shares of that loss, adding to 1. The initial pools stay the package's tables (stage 8).
+gs_m <- rbind(rd("nonforest-multipliers-grassland-shrubland.csv"), rd("nonforest-multipliers-wetland.csv"), fill = TRUE); nf_g <- rd("nonforest-net-growth.csv")
+if (!"AgeMin" %in% names(gs_m)) gs_m[, AgeMin := NA_character_]
+if (!"AgeMin" %in% names(nf_g)) nf_g[, AgeMin := NA_character_]
+gsr <- as.data.table(datasheet(scn, ds("NonForestRate"), optional = TRUE, lookupsAsFactors = FALSE))
+gsg <- as.data.table(datasheet(scn, ds("NonForestGrowth"), optional = TRUE, lookupsAsFactors = FALSE))
+gs0 <- copy(gs_m); ng0 <- copy(nf_g)
+# a sheet's rows onto a package table x (value column vx), the more specific last
+put_rows <- function(x, r, keys, vr, vx = "Value") {
+  r <- copy(r)[, `:=`(StratumId = as.character(StratumId), AgeMin = if ("AgeMin" %in% names(r)) as.character(as.integer(AgeMin)) else NA_character_, v = as.character(get(vr)))]
+  for (lv in list(c(), "AgeMin", "StratumId", c("StratumId", "AgeMin"))) {
+    s <- r[(if ("StratumId" %in% lv) !is.na(StratumId) else is.na(StratumId)) & (if ("AgeMin" %in% lv) !is.na(AgeMin) else is.na(AgeMin))]
+    if (nrow(s)) x[s, on = c(keys, lv), (vx) := i.v] }
+  invisible(x) }
+if (nrow(gsr)) {
+  gsr <- gsr[!is.na(StateClassId) & !is.na(FlowGroupId) & !is.na(Value)]
+  bad <- gsr[!paste(StateClassId, FlowGroupId) %in% gs_m[, paste(StateClassId, FlowGroupId)]]
+  check(STAGE, "every non-forest rate row names a grassland, shrubland or wetland class and one of its flows", !nrow(bad), paste(head(unique(bad[, paste(StateClassId, FlowGroupId)]), 5), collapse = "; "))
+  put_rows(gs_m, gsr, c("StateClassId", "FlowGroupId"), "Value") }
+if (nrow(gsg)) put_rows(nf_g, gsg[!is.na(StateClassId) & !is.na(NetGrowth)], "StateClassId", "NetGrowth")
+dr <- sum(as.numeric(gs_m$Value) != as.numeric(gs0$Value)); dg <- sum(as.numeric(nf_g$Value) != as.numeric(ng0$Value))
+say("Grassland, Shrubland and Wetland Carbon: %s; %d of %d rates and %d of %d net growth values differ from the package's%s", if (nrow(gsr) || nrow(gsg)) sprintf("%d rate and %d growth rows in this scenario", nrow(gsr), nrow(gsg)) else "no rows (the package values)",
+    dr, nrow(gs_m), dg, nrow(nf_g[StateClassId %in% gs_m$StateClassId]), if (dr + dg > 0) " (the initial pools stay the package's)" else "")
+spl <- gs_m[grepl("^Net Growth .*: Atmosphere ->", FlowGroupId), .(s = sum(as.numeric(Value))), by = .(StratumId, StateClassId, AgeMin)]
+check(STAGE, "grassland, shrubland and wetland growth splits add to 1 (at every age)", all(abs(spl$s - 1) < 1e-3), paste(head(spl[abs(s - 1) >= 1e-3, sprintf("%s %s %s %.3f", StratumId, StateClassId, AgeMin, s)], 5), collapse = "; "))
+# emergent wetlands: the shares out of a pool's total loss ("AG Very Fast ->" etc.) add to 1
+POOL_OUT <- c(`AG Very Fast ->` = "AG Very Fast ->", `BG Very Fast ->` = "BG Very Fast ->", `BG Slow ->` = "BG Slow ->")
+sh <- rbindlist(lapply(names(POOL_OUT), function(p) { pool <- sub(" ->$", "", p)
+  gs_m[StratumId %in% gs_m[FlowGroupId == p, unique(StratumId)] & StateClassId %in% gs_m[FlowGroupId == p, unique(StateClassId)] &
+       grepl(sprintf("^(Decay|Emission|Lateral Transport|Stabilization): %s -> ", pool), FlowGroupId), .(pool = pool, s = sum(as.numeric(Value))), by = .(StratumId, StateClassId)] }))
+check(STAGE, "emergent wetland shares out of each pool's total loss add to 1", !nrow(sh) || all(abs(sh$s - 1) < 1e-3), paste(head(sh[abs(s - 1) >= 1e-3, sprintf("%s %s %s %.3f", StratumId, StateClassId, pool, s)], 5), collapse = "; "))
+check(STAGE, "grassland, shrubland and wetland rates are between 0 and 1 and net growth is not negative", all(between(as.numeric(gs_m$Value), 0, 1)) && all(as.numeric(nf_g$Value) >= 0))
+if (all(is.na(gs_m$AgeMin))) gs_m[, AgeMin := NULL]
+fm <- rbind(fm_g, fm_d, gs_m, rd("nonforest-multipliers-other.csv"), fill = TRUE)
 # (the CONUS 1km build also had 0.01 "scalar" multipliers on the four climate flow groups, undoing climate rasters stored as
 # integers x 100; stage 7 writes true multipliers, so there are none: a run without climate multipliers runs at normal climate)
-sav <- rbind(ng, rd("nonforest-net-growth.csv"), fill = TRUE)
+sav <- rbind(ng, nf_g, fill = TRUE)
 for (k in c("Iteration", "Timestep")) for (x in list(fp, fm, sav)) if (k %in% names(x)) x[, (k) := NULL]
 
 # every flow type, flow group, stock type and state class named must exist in the library's definitions

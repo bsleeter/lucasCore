@@ -14,7 +14,7 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | ~~2~~ | ~~35 TreeMap: forest type, stand age, site productivity (with 10)~~ DONE 2026-10-30 | Yes, as options (off by default) | Code, pages, figure, tests and P26 sync done; its guide content is item 36 | - |
 | ~~3~~ | ~~34 Minimum harvest ages~~ DONE 2026-10-30 | Yes (projections; stage 6 start ages) | FIA values lowered to the study area's mapped cuts; selection at least 10 yr under clearcut | 35's age source |
 | ~~1~~ | ~~32 Carbon open science issues~~ DONE 2026-10-30 | Yes | Stem turnover fitted to FIA background mortality (snags now match); duff bound harmless; California event shares hold nationally | - |
-| 1 | 39 Grassland and shrubland carbon: expose the rates, then better science | Yes | User 2026-10-30: before the P26 rerun; every rate is one IBIS-derived value per class for all of CONUS, not visible or editable | - |
+| 1 | 39 Grassland, shrubland and wetland carbon | Yes (science step) | Rates exposed on a page 2026-10-30 (step 1 done); the science options are next if the user wants them before the P26 rerun | - |
 | 2 | 37 P26 rerun and guide refresh | Its own results | 34 changed the start ages, harvest pathways and so initial carbon; rerun once after 39 (and 32), then redo the guide's P26 numbers and figures, and add the Minimum Harvest Age page | 34, 32, 39 |
 | 3 | 31 Copy Carbon Assumptions; SoilGrids option | No (an option) | Convenience and one more soil source | - |
 | 4 | 12 Data Download stage | No | Needs the final input list (35 added TreeMap) | 35 |
@@ -561,3 +561,19 @@ Not pushed: every lucasCore commit since 54177b2 (2026-10-29) is local only; the
     in every one of the 19 ecodivisions; the only spatial and yearly variation is the climate multiplier (Miami NPP, precipitation)
     on non-forest growth. Nothing is calibrated to observations and nothing is on a page. Alternatives under discussion with the
     user (2026-10-30).
+    **Step 1 (expose) DONE 2026-10-30** (user: "Expose only for now"; then "the same design for wetlands"). Carbon Assumptions >
+    Grassland, Shrubland and Wetland Carbon (feed NonForestCarbon, ui/NonForestCarbonView.cs): Non-Forest Growth (Ecodivision, Class,
+    Age, Net Growth) and Non-Forest Rates (Ecodivision, Class, Age, Flow, Value); Fill / Reset loads every value that does not change
+    with age (presets defaults/carbon-assumptions/<method>/nonforest-growth.csv 11 rows, nonforest-rates.csv 434 rows: 9 grass/shrub
+    and 2 emergent wetland classes, the forested wetlands' rates; their 300-age growth curve and growth split are not listed but can
+    be set with rows); the Carbon Method page's Fill and tools/carbon-assumptions.R fill them too. Stage 3 starts from the package
+    tables and applies rows the more specific last (class; + age; + ecodivision; + both); checks growth splits add to 1 at every age,
+    emergent wetlands' shares out of each pool's total loss ("AG Very Fast ->" etc.) add to 1, rates in 0-1; logs the differences.
+    Starting pools stay the package tables (stage 8): a changed rate acts from the first year, not on the initial stocks. Test
+    tests/phaseZ25-nonforest-carbon.R: all pass (empty = the package's 65,246 rates and 11,609 net growth values exactly; class,
+    ecodivision and age rows land only where meant). Found in the package values: Shrubland: Non-sage's rates look shifted by one row
+    (fine roots -> AG very fast 0.01, merchantable -> snags 0.51, other wood -> AG fast 0.0045, where the other shrubs have ~0.26,
+    0.0045, 0.33); emergent wetland net growth 31 Mg C/ha/yr; irrigated perennial grass 9.19 - to review with the science step.
+    Libraries made before need tools/sync-library.R --reference=dev/libs/sync-reference-20261030.ssim (the Age columns); the
+    suitability test library is synced. Next (user to decide): the science options (gSSURGO soil calibration, RAP growth,
+    literature rates).

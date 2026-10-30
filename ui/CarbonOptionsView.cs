@@ -38,7 +38,9 @@ namespace lucasCoreUI
             new[] { "lucasCore_FireSnagShare", "fire-snag-share", "Fire Snag Share" },
             new[] { "lucasCore_DecayCalibrationSetting", "decay-calibration-settings", "Decay Calibration Settings" },
             new[] { "lucasCore_MatureAge", "mature-age", "Mature Age by Forest Type" },
-            new[] { "lucasCore_FixedDecayMultiplier", "fixed-decay-multipliers", "Fixed Decay Multipliers" } };
+            new[] { "lucasCore_FixedDecayMultiplier", "fixed-decay-multipliers", "Fixed Decay Multipliers" },
+            new[] { "lucasCore_NonForestGrowth", "nonforest-growth", "Non-Forest Growth" },
+            new[] { "lucasCore_NonForestRate", "nonforest-rates", "Non-Forest Rates" } };
         // a scenario counts as filled when any of these has rows (stage 3's rule)
         private static readonly string[] Key = { "lucasCore_CbmCrosswalk", "lucasCore_DomParameter", "lucasCore_DisturbanceFlow" };
 

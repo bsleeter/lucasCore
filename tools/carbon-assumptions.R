@@ -40,6 +40,8 @@ fill_carbon_assumptions <- function(ca, pkg, method = "fia-measured") {
   x <- num(rd("decay-calibration-settings"), c("MultiplierMin", "MultiplierMax", "SoilMultiplierMin", "SoilMultiplierMax"))
   for (k in intersect(c("MatureAge", "ExclusionYears", "MinPlotsOwnFit", "MinSnagsOwnRate", "MinPlotsConditionPools"), names(x))) data.table::set(x, j = k, value = as.integer(x[[k]]))
   put(x, "lucasCore_DecayCalibrationSetting", "Decay Calibration Settings")
+  put(num(rd("nonforest-growth"), "NetGrowth"), "lucasCore_NonForestGrowth", "Non-Forest Growth")
+  put(num(rd("nonforest-rates"), "Value"), "lucasCore_NonForestRate", "Non-Forest Rates")
   if (!nrow(suppressWarnings(datasheet(ca, "lucasCore_CarbonOptions", optional = TRUE)))) saveDatasheet(ca, data.frame(DeadOrganicMatterModel = CA_METHODS[[method]]), "lucasCore_CarbonOptions")
   if (length(done)) description(ca) <- CA_DESCRIPTION
   done }
