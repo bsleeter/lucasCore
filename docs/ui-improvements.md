@@ -437,4 +437,3 @@ figures, which are redone once after the P26 rerun.
     **Other sources considered.** NFCMS Forest Productivity (PSW_ForestProductivity.tif, 30 m, values 0-10, legend unknown); gSSURGO
     forest productivity tables (not on disk); LANDFIRE has no productivity layer (canopy height / stand age as a site index proxy is
     a possible check only).
-    site class, and a P26 Build and Historical comparison.
