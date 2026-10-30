@@ -47,9 +47,12 @@ mean is 1 and the curves stay right on average. Classes with few plots shrink to
 pixels of that forest type. Pixels with no matched condition or no site class count as 1 (share logged).
 
 **Growth.** A static flow spatial multiplier on the forest growth flows. Growth inputs scaled by m and first-order turnover give live
-carbon m x curve(age) at every age, so the multiplier means "this cell's curve is m times the type's". It combines with the climate
-multiplier (to be checked in phase 0: ST-Sim takes the product when a flow type belongs to two multiplied flow groups; otherwise fold
-m into the climate rasters of stages 7 and 11, and write it alone when climate is None).
+carbon m x curve(age) at every age, so the multiplier means "this cell's curve is m times the type's". It works beside the climate
+multiplier through ST-Sim's **Flow Multiplier Types** (user, 2026-10-29): multipliers of different types multiply in each cell. The
+project-level types (defaults/stsim/stsim_FlowMultiplierType.csv, today only "Net Growth Uncertainty") gain **Climate** and **Site
+Productivity**; stages 7 and 11 write their rows with FlowMultiplierTypeId = Climate (today they leave it blank), the productivity
+rows get Site Productivity. Stages cannot write project sheets, so the new types reach libraries through the package defaults: new
+libraries get them, existing ones through tools/sync-library.R (P26 included, before its next Build).
 
 **Initial stocks.** Stage 8 reads live and dead carbon from the curves by age; scale live and dead organic matter by m (all their
 inputs are proportional to live carbon and decay is first order), not the deep soil (gSSURGO). Otherwise a good site would start with
@@ -61,7 +64,8 @@ matches TreeMap's, else the largest), as dev/treemap/01 does. Used by type, age 
 ## Steps
 
 0. **Spikes (dev/, read only).** (a) The site class ratios against stage 2's own curves for P26's types, per ecodivision; (b) ST-Sim:
-   two flow spatial multipliers on one flow type multiply (a tiny test library); (c) TreeMap -> condition coverage on P26 with all 48
+   a Climate and a Site Productivity flow spatial multiplier on the same growth flow multiply (a tiny test library), and a blank-type
+   row (old Builds) still works beside them; (c) TreeMap -> condition coverage on P26 with all 48
    states' COND. Go/no-go and the shrinkage rule come from (a).
 1. **Data.** Data Sources: TreeMap folder (raster, attribute table). src/fia.R reads SITECLCD (cache key bump). src/treemap.R with the
    join and its checks.
@@ -72,7 +76,9 @@ matches TreeMap's, else the largest), as dev/treemap/01 does. Used by type, age 
 4. **Map (stage 5).** Build Options: Site Productivity = None | TreeMap site class. Multiplier raster on the model grid; checks: every
    forest cell has a value, the cap, the area-weighted mean per type x ecodivision near 1 (it need not be exactly 1: the landscape
    need not match the plots).
-5. **Growth flows (stage 3 or 7).** The static flow spatial multiplier (or folded into climate), per phase 0 (b).
+5. **Growth flows.** Flow Multiplier Types Climate and Site Productivity in the package defaults and sync-library; stages 7 and 11
+   tag their rows Climate; the stage that maps m (5) writes one static Site Productivity flow spatial multiplier on the forest growth
+   flow group.
 6. **Initial stocks (stages 4 and 8).** Live and dead organic matter x m. Check: cell initial live carbon against TreeMap's CARBON_L
    aggregated to the cell, with and without m (with m should fit better).
 7. **UI.** Build Options entries (with notes); a Build Results page Site Productivity (the table, by type and ecodivision); a stage 12
