@@ -12,7 +12,7 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | --- | --- | --- | --- | --- |
 | ~~1~~ | ~~22 Automatic spatial tiles~~ DONE 2026-10-29 | No | Small and self-contained; users otherwise need to know the region to pick Tiles | - |
 | 2 | 35 TreeMap: forest type, stand age, site productivity (with 10) | Yes, as options | Largest science gain (site class lifts R2 of carbon at age from 0.13 to 0.50 in mixed conifer); start with the phase 0 checks, which decide go/no-go | - |
-| 3 | 34 Minimum harvest ages | Yes (projections; stage 6 start ages) | FIA shows several are too high (mixed conifer 92 yr vs median age at cut 85); after 35 because the stand age source changes which cells pass | 35's age source |
+| ~~3~~ | ~~34 Minimum harvest ages~~ DONE 2026-10-30 | Yes (projections; stage 6 start ages) | FIA shows several are too high (mixed conifer 92 yr vs median age at cut 85); after 35 because the stand age source changes which cells pass | 35's age source |
 | 4 | 32 Carbon open science issues | Possibly | Short snags in 96 cells, duff at its bound in 19; best looked at before the TreeMap and harvest changes are judged | - |
 | 5 | 31 Copy Carbon Assumptions; SoilGrids option | No (an option) | Convenience and one more soil source | - |
 | 6 | 12 Data Download stage | No | Needs the final input list (35 adds TreeMap) | 35 |
@@ -400,8 +400,26 @@ P26 needs a Build and Historical rerun after 35 (if made the default) and 34; th
     curves (Mediterranean Mountains): mixed conifer 51 (NFMA 95% 39), ponderosa 33, Douglas-fir 32, fir/spruce 42, redwood 39,
     tanoak 60, western oak 70: close to the FIA 10th percentile in mixed conifer and Douglas-fir, younger elsewhere.
     Reading: today's AgeMin is too high mainly in mixed conifer (P26's main type: blocks half the clearcuts) and the 161-yr types
-    (redwood, other western softwood); elsewhere it blocks 15-20%. Next: user picks the rule (percentile, pooled West or CA, by owner
-    or not, selection ages from partial cuts or none, CMAI fallback for thin types).
+    (redwood, other western softwood); elsewhere it blocks 15-20%.
+    **DONE 2026-10-30** (user decisions the same day). (1) Package values, computed once: tools/calibrate-harvest-age.R over all 48
+    FIA DataMart states (27,427 cuts: 11,056 clearcut-like, 16,371 partial) -> defaults/transitions/harvest-age.csv (124 rows: per
+    forest type, plus type x ecodivision where >= 30 cuts; < 20 cuts -> CMAI of P26 result 47's merchantable volume curves) and the
+    AgeMin column of pathways/harvest.csv; selection capped at clearcut. (2) Second view, dev/harvest/05-lcms-cut-age.R: LCMS tree
+    removal x NASA CMS 1990 age in P26 at 30 m (1,797 km2 of first cuts): medians as FIA (mixed conifer 94 vs 92) but 10th percentiles
+    10-30 yr younger (mixed conifer clearcut 34, selection 39); FIA's values would block 10-34% of P26's mapped cuts. (3) Stage 6
+    settles them: each FIA value lowered to the study area's own (10th percentile of stage 5 age at each harvest's first cut on a cell
+    not yet clearcut, where the type has >= 1 km2 of mapped cuts), then the page's rows, then selection <= clearcut - 10 and >= 5
+    (thinning comes before final harvest; FIA and the maps both put partial cuts' young tail at or above clearcut's). Type x
+    ecodivision values become stratum pathway rows (no blank row for that type). The start-age rule now covers selection too, with
+    a cell reset once its chance of an earlier clearcut reaches 0.5. Build Results > Minimum Harvest Ages (OutputHarvestAge) lists
+    FIA, study area, used and basis. Page: Minimum Harvest Age (feed HarvestAge: options sheet HarvestAgeOptions - study area maps
+    on, minimum mapped area 1 km2, selection offset 10, floor 5 - and the override rows; Add the package values / Remove all rows).
+    Test tests/phaseZ23-harvest-age.R (Placer 1 km, stage 6 on a stage 5 result): all pass. Mixed conifer clearcut 49 (Placer's
+    1 km map gives 51: cell ages smooth the young tail the 30 m analysis shows), selection 39; fir/spruce clearcut 30 (maps),
+    western oak 38 (maps); 369 start ages raised (median 12 yr); 5% of clearcut and 3% of selection expected area below the minimum;
+    a 1985-2023 historical run cuts 87 km2 clearcut (Build 47's old ages: 70; LCMS 90) and 127 km2 selection (153; LCMS 137).
+    Not done: the page not yet seen in Studio; P26 needs a Build + Historical rerun to pick it up (initial ages and carbon change);
+    guide section for the page.
 35. **TreeMap: forest type, stand age and site productivity from one map** - PLANNED 2026-10-29 (user: use TreeMap; combines item 10;
     full plan in docs/treemap-plan.md). **Phase 0 done 2026-10-29: go** (site class moves carbon at age around stage 2's own curves, mixed conifer m 1.59 -> 0.52 from site class 2 to 6; every P26 TreeMap pixel gets a site class with all 48 states' COND; Climate and Site Productivity flow multiplier types multiply in ST-Sim, untyped climate rows still work; details in the plan). Choices (user): TreeMap 2016, multipliers by type x ecodivision, Site Productivity off by default. **Step 1 schema-free part done** (src/treemap.R, tests/unit-treemap.R); **Step 2 done 2026-10-30** (ac971f3: TreeMap as Forest Type Map and Stand Age Source in stage 5; new columns need tools/sync-library.R --reference=dev/libs/sync-reference.ssim). P26 synced 2026-10-30. **Step 3 done** (site class multipliers in stage 2, Build Results > Site Productivity). **Step 4 stage 5 half done** (site class share maps). **Steps 4-6 done** (stage 8: cell multiplier, Site Productivity flow multiplier, scaled initial stocks; stages 7/11 tag Climate). **Step 7 pages done** (Build Options: Growth > Site productivity; Build Results > Site Productivity page). **Stage 12 Site productivity figure done** (pages checked in Studio). **Projection carry-over tested** (fixed: stages read dependencies from the run's parent). **P26 synced for the multiplier types 2026-10-30** (Climate, Site Productivity; sync-library read the one-column CSV wrong, fixed). Guide 3.3 updated (Build Options grab, Stand age and Growth steps). The rest of the guide work is item 36.
     **Why.** Every cell of one forest type, ecodivision and age grows on the same curve; only the climate multipliers (stages 7 and 11)

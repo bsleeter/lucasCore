@@ -26,7 +26,8 @@
 #     where the NLCD clearcut rule was half fire, drought and pixel noise and LANDFIRE Thinning (fuels treatments, mostly invisible to
 #     Landsat) overlapped LCMS on 9% of its area (dev/harvest). If LANDFIRE is used, its type names cover codes the build's ranges
 #     (441-443, 741-743, 941) missed (940, 942-948, the 4-digit codes from 2024)
-#   * clearcut cells get at least the clearcut pathway's minimum age in their first clearcut year (the build
+#   * harvested cells get at least their pathway's minimum age at their first cut, clearcut or selection (to-do 34: the minimum ages are
+#     FIA's 10th percentile of age at the cut, defaults/transitions/harvest-age.csv and the Minimum Harvest Age page; the build
 #     required the minimum age in the start year)
 #   * every pathway type with no spatial multiplier gets a zero target, so no type runs everywhere by default
 # Needs stage 5 (same pipeline, or a dependency on its result).
@@ -64,7 +65,20 @@ num <- function(x) suppressWarnings(as.numeric(x))
 tr <- pw[, .(StateClassIdSource, StateClassIdDest, TransitionTypeId, Probability = num(Probability), Proportion = num(Proportion), AgeMin = num(AgeMin),
              AgeMax = num(AgeMax), AgeRelative = num(AgeRelative), AgeReset = ifelse(is.na(AgeReset), NA, toupper(AgeReset) %in% c("YES", "TRUE")),
              TSTMin = num(TSTMin), TSTMax = num(TSTMax), TSTRelative = num(TSTRelative))]
-tr <- tr[, names(tr)[vapply(tr, function(v) !all(is.na(v)), TRUE)], with = FALSE]
+# minimum harvest ages (to-do 34): the package's FIA values (defaults/transitions/harvest-age.csv, tools/calibrate-harvest-age.R: the
+# 10th percentile of FIA stand age at the cut, per forest type and, where FIA has enough cuts, per ecodivision), lowered to the study
+# area's own (LCMS cuts x the stand age map, below) and the Minimum Harvest Age page's rows; settled once the cut maps are made
+stl <- stsim_list("Stratum"); vP <- values(P, mat = FALSE); eco_here <- stl$Name[as.numeric(stl$Id) %in% unique(vP)]
+CC <- "Forest Harvest: Forest Clearcut"; SEL <- "Forest Harvest: Forest Selection"
+ha <- read_default("transitions", "harvest-age.csv")[, .(Ecodivision, StateClassId, TransitionTypeId, FIA = num(AgeMin), Source)]
+mh <- as.data.table(datasheet(scn, ds("MinimumHarvestAge"), optional = TRUE, lookupsAsFactors = FALSE))
+mh <- if (nrow(mh)) mh[!is.na(StateClassId) & !is.na(TransitionTypeId) & !is.na(AgeMin), .(Ecodivision = as.character(StratumId), StateClassId = as.character(StateClassId),
+                        TransitionTypeId = as.character(TransitionTypeId), AgeMin = num(AgeMin))] else data.table()
+hopt <- read_ds("HarvestAgeOptions"); hv <- function(k, d) if (nrow(hopt) && k %in% names(hopt) && !is.na(hopt[[k]][1])) hopt[[k]][1] else d
+H_MAPS <- as.logical(hv("UseStudyArea", TRUE)); H_MAP_KM2 <- num(hv("MinMapArea", 1)); H_OFFSET <- num(hv("SelectionOffset", 10)); H_FLOOR <- num(hv("SelectionFloor", 5))
+badh <- rbind(ha[, .(StateClassId, TransitionTypeId)], if (nrow(mh)) mh[, .(StateClassId, TransitionTypeId)])[!paste(StateClassId, TransitionTypeId) %in% pw[, paste(StateClassIdSource, TransitionTypeId)]]
+check(STAGE, "every minimum harvest age has a pathway", !nrow(badh), paste(unique(badh[, paste(StateClassId, TransitionTypeId)]), collapse = "; "))
+tr[, StratumIdSource := NA_character_]
 loc <- read_default("transitions", "state-locations.csv")[StateClassIdSource %in% scl$Name, .(StateClassIdSource, StateClassIdDest, Location)]
 say("Pathways: %d rows in %d sets (%s); %d transition types", nrow(tr), uniqueN(pw$Set), paste(unique(pw$Set), collapse = ", "), uniqueN(pw$TransitionTypeId))
 
@@ -185,23 +199,103 @@ if (nrow(ncc)) {
 layers <- rbindlist(layers)
 progressBar()
 
-# ---- clearcut minimum age: a clearcut cell is at least the pathway's minimum age in its first clearcut year -------------------
+# ---- minimum harvest ages, settled (user decisions 2026-10-30) -------------------------------------------------------------------
+# 1. the study area's own value: each forest type's 10th percentile of stand age at a cell's first cut (stage 5's age map, weighted by
+#    the cut share of the cell), where the type has at least Minimum Harvest Age > Minimum mapped area of such cuts (LCMS in P26 cut
+#    10-30 years younger at the 10th percentile than FIA's few plots show, dev/harvest/05-lcms-cut-age.R)
+# 2. every package (FIA) row is lowered to it; 3. the page's rows replace or add; 4. selection is at most the clearcut minimum minus
+#    the offset (the same ecodivision's clearcut, else the type's) and never below the floor, unless the page sets that selection row:
+#    thinning comes before final harvest, while FIA and the maps put partial cuts' young tail at or above clearcut's
+hg <- rbind(if (nrow(ccs)) data.table(TransitionGroupId = ccs$TransitionGroupId, kind = "clearcut"),
+            if (nrow(lcg)) data.table(TransitionGroupId = lcg[grepl("partial", Classes), TransitionGroupId], kind = "selection"))
+if (is.null(hg)) hg <- data.table(TransitionGroupId = character(), kind = character())
+hg[, TransitionTypeId := vapply(TransitionGroupId, function(g) grp_types(g)[1], "")]
+cn <- scl$Name[match(vS, as.integer(scl$Id))]; en <- stl$Name[match(vP, as.integer(stl$Id))]
+hl <- layers[TransitionGroupId %in% hg$TransitionGroupId & !is.na(File)][, kind := hg$kind[match(TransitionGroupId, hg$TransitionGroupId)]]
+setorder(hl, Timestep, -kind)   # within a year: selection, then clearcut
+wq <- function(x, w, p) { o <- order(x); x <- x[o]; w <- w[o]; x[which(cumsum(w) / sum(w) >= p)[1]] }
+smap <- data.table(StateClassId = character(), TransitionTypeId = character(), Map = numeric(), MapArea = numeric())
+if (isTRUE(H_MAPS) && nrow(hl)) {
+  # each harvest's first cut on a cell not yet clearcut (selection leaves the stand age; found 2026-10-30: taking only a cell's first
+  # cut of any kind left Placer's clearcut almost unsampled, 1,860 of 2,051 cut cells being first cut by selection)
+  seen <- list(clearcut = rep(FALSE, length(vS)), selection = rep(FALSE, length(vS))); pr <- rep(0, length(vS))
+  fc <- rbindlist(lapply(seq_len(nrow(hl)), function(i) { v <- values(rast(hl$File[i]), mat = FALSE); y <- hl$Timestep[i]; k <- hl$kind[i]
+    any_cut <- !is.na(v) & v > 0
+    on <- any_cut & !seen[[k]] & pr < 0.5 & !is.na(cn) & startsWith(cn, "Forest:") & !is.na(vA); seen[[k]] <<- seen[[k]] | any_cut
+    if (k == "clearcut") pr[any_cut] <<- 1 - (1 - pr[any_cut]) * (1 - v[any_cut])
+    data.table(StateClassId = cn[on], TransitionTypeId = hg$TransitionTypeId[match(hl$TransitionGroupId[i], hg$TransitionGroupId)], age = vA[on] + (y - y0 - 1), w = v[on]) }))
+  if (nrow(fc)) smap <- fc[, .(Map = round(wq(age, w, 0.1)), MapArea = sum(w) * cell_km2), by = .(StateClassId, TransitionTypeId)] }
+ha[smap[MapArea >= H_MAP_KM2], on = .(StateClassId, TransitionTypeId), `:=`(Map = i.Map, MapArea = i.MapArea)]
+if (!"Map" %in% names(ha)) ha[, `:=`(Map = NA_real_, MapArea = NA_real_)]
+ha[, AgeMin := pmin(FIA, Map, na.rm = TRUE)][, Basis := fifelse(!is.na(Map) & Map < FIA, "study area maps", "FIA")]
+if (nrow(mh)) {
+  ha <- rbind(ha[!paste(Ecodivision, StateClassId, TransitionTypeId) %in% mh[, paste(Ecodivision, StateClassId, TransitionTypeId)]], mh[, Basis := "Minimum Harvest Age page"], fill = TRUE)
+  say("Minimum Harvest Age page: %d rows replace or add to the package's (%s)", nrow(mh),
+      paste(mh[, sprintf("%s %s%s %g", sub("^Forest: ", "", StateClassId), sub("^.*: Forest ", "", TransitionTypeId), ifelse(is.na(Ecodivision), "", paste0(" in ", Ecodivision)), AgeMin)], collapse = "; ")) }
+# selection under clearcut: an ecodivision with its own clearcut row gets its own selection row (from the type's) so the cap can follow it
+cce <- ha[TransitionTypeId == CC & !is.na(Ecodivision) & Ecodivision %in% eco_here]
+add <- cce[!paste(Ecodivision, StateClassId) %in% ha[TransitionTypeId == SEL & !is.na(Ecodivision), paste(Ecodivision, StateClassId)]]
+if (nrow(add)) ha <- rbind(ha, ha[TransitionTypeId == SEL & is.na(Ecodivision)][add[, .(StateClassId, E = Ecodivision)], on = "StateClassId", nomatch = 0][, Ecodivision := E][, E := NULL])
+ccap <- function(e, t) { k <- match(paste(e, t), ha[TransitionTypeId == CC, paste(Ecodivision, StateClassId)])
+  k0 <- match(t, ha[TransitionTypeId == CC & is.na(Ecodivision), StateClassId]); ifelse(is.na(k), ha[TransitionTypeId == CC & is.na(Ecodivision)]$AgeMin[k0], ha[TransitionTypeId == CC]$AgeMin[k]) }
+s <- ha$TransitionTypeId == SEL & !ha$Basis %in% "Minimum Harvest Age page"
+if (any(s)) { cap <- ccap(ha$Ecodivision[s], ha$StateClassId[s]) - H_OFFSET; new <- pmax(H_FLOOR, pmin(ha$AgeMin[s], cap, na.rm = TRUE))
+  ch <- !is.na(new) & new != ha$AgeMin[s]; ha[which(s)[ch], `:=`(AgeMin = new[ch], Basis = sprintf("clearcut minimum - %g yr", H_OFFSET))] }
+hb <- ha[is.na(Ecodivision)]; he <- ha[!is.na(Ecodivision) & Ecodivision %in% eco_here]
+tr[hb, on = .(StateClassIdSource = StateClassId, TransitionTypeId), AgeMin := i.AgeMin]
+sp <- unique(he[, .(StateClassIdSource = StateClassId, TransitionTypeId)])
+if (nrow(sp)) {   # a type x harvest with an ecodivision row: one pathway row per ecodivision here, no blank-stratum row (ST-Sim would run both)
+  ex <- rbindlist(lapply(eco_here, function(e) copy(tr[sp, on = .(StateClassIdSource, TransitionTypeId), nomatch = 0])[, StratumIdSource := e]))
+  ex[he, on = .(StratumIdSource = Ecodivision, StateClassIdSource = StateClassId, TransitionTypeId), AgeMin := i.AgeMin]
+  tr <- rbind(tr[!sp, on = .(StateClassIdSource, TransitionTypeId)], ex) }
+setcolorder(tr, "StratumIdSource")
+tr <- tr[, names(tr)[vapply(tr, function(v) !all(is.na(v)), TRUE)], with = FALSE]
+here <- ha[(is.na(Ecodivision) | Ecodivision %in% eco_here) & StateClassId %in% unique(cn) & TransitionTypeId %in% c(CC, SEL)][order(StateClassId, TransitionTypeId, Ecodivision)]
+say("Minimum harvest ages (study area maps %s, at least %g km2; selection at most clearcut - %g yr, at least %g yr):", if (isTRUE(H_MAPS)) "on" else "off", H_MAP_KM2, H_OFFSET, H_FLOOR)
+for (i in seq_len(nrow(here))) with(here[i], say("  %s %s%s: %g yr (FIA %s, study area %s; %s)", sub("^Forest: ", "", StateClassId), sub("^.*: Forest ", "", TransitionTypeId),
+  if (is.na(Ecodivision)) "" else paste0(" in ", Ecodivision), AgeMin, if (is.na(FIA)) "-" else format(FIA), if (is.na(Map)) "-" else sprintf("%g over %.1f km2", Map, MapArea), Basis))
+check(STAGE, "selection minimum ages are not above clearcut's", { cs <- here[TransitionTypeId == SEL & Basis != "Minimum Harvest Age page"]
+  all(is.na(cs$AgeMin) | cs$AgeMin <= pmax(H_FLOOR, ccap(cs$Ecodivision, cs$StateClassId) - H_OFFSET) + 1e-9, na.rm = TRUE) })
+
+# ---- harvest minimum age: a harvested cell is at least its pathway's minimum age at its first cut -------------------------------
+# Clearcut and selection (LCMS standrep / partial). The start age is raised so the first cut before any clearcut meets the minimum
+# (a clearcut resets the age; a later cut on the regrowing stand cannot be helped by the start age and counts as blocked if young).
+# Each cell's minimum is its own ecodivision's where the table has one (as the pathways).
 age_blocked <- NULL
-if (nrow(ccs)) {
-  am <- pw[TransitionTypeId %in% grp_types(ccs$TransitionGroupId) & !is.na(AgeMin), .(AgeMin = max(as.integer(AgeMin))), by = StateClassIdSource]
-  vMin <- am$AgeMin[match(vS, sid(am$StateClassIdSource))]
-  req <- rep(NA_real_, length(vS)); ccl <- layers[TransitionGroupId == ccs$TransitionGroupId & !is.na(File)]
+if (nrow(hg)) {
+  min_age <- function(g) { v <- rep(NA_real_, length(vS))
+    for (tt in grp_types(g)) { b <- hb[TransitionTypeId == tt]; e <- he[TransitionTypeId == tt]
+      x <- b$AgeMin[match(cn, b$StateClassId)]
+      if (nrow(e)) { k <- match(paste(en, cn), paste(e$Ecodivision, e$StateClassId)); x[!is.na(k)] <- e$AgeMin[k[!is.na(k)]] }
+      v <- pmax(v, x, na.rm = TRUE) }
+    v }
+  vMin <- setNames(lapply(hg$TransitionGroupId, min_age), hg$TransitionGroupId)
   # ST-Sim ages cells at the end of each timestep, so a cell has aged (y - y0 - 1) years when the year-y transitions run. Any cut counts
-  # (LCMS gives fractions of 30 m pixels: on a 1 km grid few cells are half cut, and at >= 0.5 43% of Placer's clearcut was age-blocked)
-  for (i in order(ccl$Timestep)) { v <- values(rast(ccl$File[i]), mat = FALSE); y <- ccl$Timestep[i]
-    hit <- !is.na(v) & v > 0 & is.na(req) & !is.na(vMin); req[hit] <- vMin[hit] - (y - y0 - 1) }
+  # (LCMS gives fractions of 30 m pixels: on a 1 km grid few cells are half cut, and at >= 0.5 43% of Placer's clearcut was age-blocked).
+  # The multiplier is the chance the cell is cut that year, so a cell counts as reset once its chance of an earlier clearcut, pr, reaches
+  # one half (found 2026-10-30: counting any clearcut fraction as a reset put 66% of Placer's clearcut area on regrowing stands)
+  req <- rep(NA_real_, length(vS)); cut <- rep(FALSE, length(vS)); pr <- rep(0, length(vS)); first <- setNames(rep(0L, 2), c("clearcut", "selection"))
+  for (i in seq_len(nrow(hl))) { v <- values(rast(hl$File[i]), mat = FALSE); y <- hl$Timestep[i]; vm <- vMin[[hl$TransitionGroupId[i]]]
+    on <- !is.na(v) & v > 0
+    hit <- on & pr < 0.5 & !is.na(vm); r <- vm[hit] - (y - y0 - 1); req[hit] <- pmax(req[hit], r, na.rm = TRUE)
+    first[hl$kind[i]] <- first[hl$kind[i]] + sum(on & !cut); cut <- cut | on
+    if (hl$kind[i] == "clearcut") pr[on] <- 1 - (1 - pr[on]) * (1 - v[on]) }
   raise <- !is.na(req) & !is.na(vA) & vA < req
   vA2 <- vA; vA2[raise] <- req[raise]
-  say("Clearcut minimum age: %d cells cut; %d raised, by %.0f years on average", sum(!is.na(req)), sum(raise), if (any(raise)) mean(req[raise] - vA[raise]) else 0)
-  age_blocked <- rbindlist(lapply(seq_len(nrow(ccl)), function(i) { v <- values(rast(ccl$File[i]), mat = FALSE); y <- ccl$Timestep[i]
-    bl <- !is.na(v) & v > 0 & !is.na(vMin) & (vA2 + (y - y0 - 1)) < vMin
-    data.table(Timestep = y, TransitionGroupId = ccl$TransitionGroupId[i], AgeBlockedArea = sum(v[bl]) * cell_km2) }))
-  check(STAGE, "stand age after the clearcut rule is set on every land cell", !any(land & is.na(vA2)), sprintf("%d land cells without an age", sum(land & is.na(vA2))))
+  say("Harvest minimum age: %d cells cut (first cut: %d selection, %d clearcut); %d start ages raised, by %.0f years on average (median %.0f)",
+      sum(cut), first[["selection"]], first[["clearcut"]], sum(raise), if (any(raise)) mean(req[raise] - vA[raise]) else 0, if (any(raise)) median(req[raise] - vA[raise]) else 0)
+  for (t in unique(cn[raise])) say("  %s: %d cells raised by %.0f years on average", sub("^Forest: ", "", t), sum(raise & cn == t), mean((req - vA)[raise & cn == t]))
+  # blocked, expected area: a cut on a cell not yet reset (chance 1 - pr) is blocked if the raised start age has not reached the minimum;
+  # one on a reset cell (chance pr) if the years since its last clearcut have not
+  last <- rep(NA_real_, length(vS)); pr <- rep(0, length(vS)); after <- 0
+  age_blocked <- rbindlist(lapply(seq_len(nrow(hl)), function(i) { v <- values(rast(hl$File[i]), mat = FALSE); y <- hl$Timestep[i]; vm <- vMin[[hl$TransitionGroupId[i]]]
+    on <- !is.na(v) & v > 0 & !is.na(vm)
+    b0 <- (vA2 + (y - y0 - 1)) < vm; b1 <- !is.na(last) & (y - last - 1) < vm
+    e0 <- v * (1 - pr) * b0; e1 <- v * pr * b1; after <<- after + sum(e1[on]) * cell_km2
+    if (hl$kind[i] == "clearcut") { pr[on] <<- 1 - (1 - pr[on]) * (1 - v[on]); last[on] <<- y }
+    data.table(Timestep = y, TransitionGroupId = hl$TransitionGroupId[i], AgeBlockedArea = sum((e0 + e1)[on]) * cell_km2) }))[, .(AgeBlockedArea = sum(AgeBlockedArea)), by = .(Timestep, TransitionGroupId)]
+  say("Harvest minimum age: %.1f km2 of cuts expected below the minimum, %.1f km2 of them on stands regrowing after a clearcut", sum(age_blocked$AgeBlockedArea), after)
+  check(STAGE, "stand age after the harvest age rule is set on every land cell", !any(land & is.na(vA2)), sprintf("%d land cells without an age", sum(land & is.na(vA2))))
   A <- setValues(A, vA2)
 }
 progressBar()
@@ -264,8 +358,9 @@ write_stsim(tr, "Transition")
 write_stsim(loc, "DeterministicTransition")
 write_stsim(sm, "TransitionSpatialMultiplier")
 if (nrow(tt0)) write_stsim(tt0, "TransitionTarget")
-if (nrow(ccs)) { row <- ic[1]; row$AgeFileName <- write_raster(A, "StandAge.tif"); saveDatasheet(scn, as.data.frame(row), "stsim_InitialConditionsSpatial") }
+if (!is.null(age_blocked)) { row <- ic[1]; row$AgeFileName <- write_raster(A, "StandAge.tif"); saveDatasheet(scn, as.data.frame(row), "stsim_InitialConditionsSpatial") }
 write_ds(summ[order(Timestep, Source, TransitionGroupId), .(Timestep, TransitionGroup = TransitionGroupId, Source, Area, Cells, IneligibleArea, AgeBlockedArea)], "OutputTransitionSummary")
+write_ds(here[, .(StratumId = Ecodivision, StateClassId, TransitionTypeId, FiaAge = FIA, StudyAreaAge = Map, StudyAreaKm2 = round(MapArea, 2), AgeMin, Basis)], "OutputHarvestAge")
 progressBar()
 finish_checks()
 progressBar(type = "end")

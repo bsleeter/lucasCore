@@ -409,6 +409,29 @@
 		<column name="ExclusionYears" displayName="No Fire or Cutting Within (yr, blank = Decay Calibration Settings)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
 	</dataSheet>
 
+	<!-- Minimum Harvest Age (to-do 34): rows that replace or add to the package's minimum harvest ages (defaults/transitions/harvest-age.csv,
+	     tools/calibrate-harvest-age.R: FIA's 10th percentile of stand age at the cut). Stage 6 writes them into the harvest pathways and
+	     raises the start age of cells cut in the historical period before they reached it. Empty = the package values. -->
+	<dataSheet name="MinimumHarvestAge" displayName="Minimum Harvest Age (rows)">
+		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
+		<column name="StateClassId" displayName="Forest Type" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="TransitionTypeId" displayName="Harvest" dataType="Integer" validationType="Datasheet" formula1="stsim_TransitionType"/>
+		<column name="AgeMin" displayName="Minimum Age (yr)" dataType="Integer" validationType="WholeNumber" validationCondition="Between" formula1="0" formula2="300"/>
+	</dataSheet>
+	<!-- how stage 6 settles the minimum ages (user decisions 2026-10-30): lower the package (FIA) values to the study area's own (LCMS cuts x
+	     the stand age map) where a type has enough mapped cuts; selection at most clearcut minus the offset, never below the floor.
+	     Blank = the defaults (on, 1 km2, 10 yr, 5 yr) -->
+	<dataSheet name="HarvestAgeOptions" displayName="Minimum Harvest Age Options" isSingleRow="True">
+		<column name="UseStudyArea" displayName="Lower to the Study Area's Mapped Cuts" dataType="Boolean" isOptional="True"/>
+		<column name="MinMapArea" displayName="Minimum Mapped Cut Area per Forest Type (km2)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="SelectionOffset" displayName="Selection Younger than Clearcut by (yr)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="SelectionFloor" displayName="Selection Minimum at Least (yr)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
+	</dataSheet>
+	<dataFeed name="HarvestAge" displayName="Minimum Harvest Age" viewClassName="lucasCoreUI.MinimumHarvestAgeView" viewClassAssembly="lucasCoreUI">
+		<dataSheet name="HarvestAgeOptions"/>
+		<dataSheet name="MinimumHarvestAge"/>
+	</dataFeed>
+
 	<!-- Carbon Assumptions: Growth Inputs (to-do 29) - per forest type, the inputs of the growth curves (stage 2) and live carbon flows
 	     (stage 3) that were package files: the FIA forest type groups whose plots it is fitted to (codes, ';' between) and its growth class
 	     (east/west x softwood/hardwood: the lag class of the curves, and softwood or hardwood CBM turnover and snag rates), the carbon
@@ -649,6 +672,18 @@
 		<column name="AgeBlockedArea" displayName="Area below the Pathway Minimum Age (km2)" dataType="Double" format="0.00"/>
 	</dataSheet>
 
+	<dataSheet name="OutputHarvestAge" displayName="Minimum Harvest Ages">
+		<!-- stage 6 (to-do 34): the minimum harvest age of each forest type of the study area, and where it came from -->
+		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
+		<column name="StateClassId" displayName="Forest Type" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="TransitionTypeId" displayName="Harvest" dataType="Integer" validationType="Datasheet" formula1="stsim_TransitionType"/>
+		<column name="FiaAge" displayName="FIA (yr)" dataType="Double" format="0" isOptional="True"/>
+		<column name="StudyAreaAge" displayName="Study Area Maps (yr)" dataType="Double" format="0" isOptional="True"/>
+		<column name="StudyAreaKm2" displayName="Mapped Cuts (km2)" dataType="Double" format="0.0" isOptional="True"/>
+		<column name="AgeMin" displayName="Minimum Age Used (yr)" dataType="Double" format="0"/>
+		<column name="Basis" dataType="String"/>
+	</dataSheet>
+
 	<dataSheet name="OutputFireSize" displayName="Historical Fire Sizes (interagency perimeters, model cells)">
 		<column name="MaximumCells" displayName="Size Class (up to N model cells)" dataType="Integer"/>
 		<column name="MaximumArea" displayName="Size Class (up to, amount units)" dataType="Double" format="0.00"/>
@@ -885,12 +920,15 @@
 	<transformer name="HistoricalTransitions" displayName="6 - Historical Transitions" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/6-historical-transitions.R">
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="OutputNlcdAnnual" type="Input"/>
+		<dataSheet name="MinimumHarvestAge" type="Input"/>
+		<dataSheet name="HarvestAgeOptions" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Both"/>
 		<dataSheet name="stsim_Transition" type="Output"/>
 		<dataSheet name="stsim_DeterministicTransition" type="Output"/>
 		<dataSheet name="stsim_TransitionSpatialMultiplier" type="Output"/>
 		<dataSheet name="stsim_TransitionTarget" type="Output"/>
 		<dataSheet name="OutputTransitionSummary" type="Output"/>
+		<dataSheet name="OutputHarvestAge" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
@@ -1043,6 +1081,7 @@
 			<item name="BuildOptions"/>
 			<item name="ClimateOptions"/>
 			<item name="GrowthOptions"/>
+			<item name="HarvestAge"/>
 			<group name="lucasCoreCarbonAssumptions" displayName="Carbon Assumptions">
 				<item name="CarbonOptions"/>
 				<item name="GrowthInput"/>
@@ -1080,6 +1119,7 @@
 				<item name="OutputSiteClassMap"/>
 				<item name="OutputNlcdAnnual"/>
 				<item name="OutputTransitionSummary"/>
+				<item name="OutputHarvestAge"/>
 				<item name="OutputProjectionRate"/>
 				<item name="OutputProjectionSchedule"/>
 				<item name="OutputFireSize"/>
