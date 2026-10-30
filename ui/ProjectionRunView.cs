@@ -2,7 +2,7 @@
 // ProjectionRunView.cs - the Run Settings page of a projection: how it starts, which historical years it draws, iterations, type mix
 // =============================================================================
 // Feed ProjectionRun = Projection Options + Projection Start (both single-row, unchanged; stage 9 reads them). Blank still means
-// default: no historical run = a continuous run, no reference years = all historical transition years, no tiles = the Build's (Build Options; none there = one job, and 1 = one job even when the Build has tiles).
+// default: no historical run = a continuous run, no reference years = all historical transition years, no tiles = the Build's (Build Options; none there = one job, and 1 = one job even when the Build has tiles); 0 = automatic (stage 9 picks the number).
 // =============================================================================
 using System;
 using System.Collections.Generic;
@@ -87,20 +87,24 @@ namespace lucasCoreUI
             m_spatial.CheckedChanged += (s, e) => { if (!Refreshing && m_spatial.Checked) Write("HistoricalTypeShares", false); };
             m_shares.CheckedChanged += (s, e) => { if (!Refreshing && m_shares.Checked) Write("HistoricalTypeShares", true); };
             // ticked: follow the Build's tiles (or 4 of this projection's own when the Build has none); unticked: one job (1 when the Build has tiles, since blank follows the Build)
+            // (0 = automatic: stage 9 picks the number, as stage 1 does for the Build)
             m_tiled.CheckedChanged += (s, e) => { if (Refreshing) return;
-                if (m_tiled.Checked) { if (m_buildTiles > 1) Write("SpatialTiles", DBNull.Value); else { Write("SpatialTiles", 4); SetTileLevel(TileLevel()); } }
-                else Write("SpatialTiles", m_buildTiles > 1 ? (object)1 : DBNull.Value);
+                if (m_tiled.Checked) { if (BuildTiled()) Write("SpatialTiles", DBNull.Value); else { Write("SpatialTiles", 0); SetTileLevel(TileLevel()); } }
+                else Write("SpatialTiles", BuildTiled() ? (object)1 : DBNull.Value);
                 RefreshControls(); };
             m_tiles.Validated += (s, e) => { if (Refreshing) return; bool follow = Following(); string v = m_tiles.Text.Trim(); int n;
+                if (v.Equals("auto", StringComparison.OrdinalIgnoreCase)) v = "0";
                 if (v.Length == 0) Write("SpatialTiles", DBNull.Value);
-                else if (int.TryParse(v, out n) && n >= 1 && (!follow || n != m_buildTiles)) { Write("SpatialTiles", n); if (follow) SetTileLevel(m_buildLevel); }
+                else if (int.TryParse(v, out n) && n >= 0 && (!follow || n != m_buildTiles)) { Write("SpatialTiles", n); if (follow) SetTileLevel(m_buildLevel); }
                 RefreshControls(); };
             m_tileLevel.SelectionChangeCommitted += (s, e) => { if (Following()) Write("SpatialTiles", m_buildTiles); SetTileLevel(m_tileLevel.SelectedIndex + 1); RefreshControls(); };
             this.ResumeLayout(false);
         }
 
         private int TileLevel() { return IntValue("SpatialTilesStrata", 2); }
-        private bool Following() { return Value("SpatialTiles") == DBNull.Value && m_buildTiles > 1; }
+        private bool BuildTiled() { return m_buildTiles == 0 || m_buildTiles > 1; }
+        private bool Following() { return Value("SpatialTiles") == DBNull.Value && BuildTiled(); }
+        private static string TilesText(object t) { return t == DBNull.Value ? "" : Convert.ToInt32(t) == 0 ? "auto" : Convert.ToString(t); }
 
         // the tile level, and the Target Strata of this scenario's Target rows (Projection Transitions) to match
         private void SetTileLevel(int level)
@@ -175,10 +179,11 @@ namespace lucasCoreUI
             m_shares.Checked = shares; m_spatial.Checked = !shares;
             object own = Value("SpatialTiles"); bool follow = Following();
             object tiles = follow ? (object)m_buildTiles : own;
-            m_tiled.Checked = tiles != DBNull.Value && Convert.ToInt32(tiles) > 1; m_tiles.Enabled = m_tileLevel.Enabled = m_tiled.Checked; m_tiles.Text = Show(tiles);
+            m_tiled.Checked = tiles != DBNull.Value && (Convert.ToInt32(tiles) == 0 || Convert.ToInt32(tiles) > 1); m_tiles.Enabled = m_tileLevel.Enabled = m_tiled.Checked; m_tiles.Text = TilesText(tiles);
             if (m_tileLevel.Items.Count == 3) m_tileLevel.SelectedIndex = Math.Max(0, Math.Min(2, (follow ? m_buildLevel : TileLevel()) - 1));
             m_tileState.Text = follow ? "From the Build (Build Options): every run on it uses these tiles, and stage 9 sets the Target rows to this level. Change the number or level to set this projection's own; untick for one job."
-                : !m_tiled.Checked ? (m_buildTiles > 1 ? string.Format("One job: the Build's {0} tiles are not used (tick to follow the Build again).", m_buildTiles) : "")
+                : !m_tiled.Checked ? (BuildTiled() ? string.Format("One job: the Build's {0} tiles are not used (tick to follow the Build again).", m_buildTiles == 0 ? "automatic" : Convert.ToString(m_buildTiles)) : "")
+                : TilesText(own) == "auto" ? "Automatic: stage 9 packs whole units into as many tiles as still shorten the run and logs the choice; type a number to choose it yourself."
                 : m_synced > 0 ? string.Format("{0} Target row{1} set to this level on the Transitions page.", m_synced, m_synced == 1 ? "" : "s")
                 : "Target rows use this level (rows inherited from the Build are set by stage 9 when it runs).";
         }

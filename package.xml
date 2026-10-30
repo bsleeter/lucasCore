@@ -114,7 +114,7 @@
 		<!-- stage 5: how the 30 m Annual NLCD becomes the model grid (src/landcover-match.R; blank = modal, as Builds before 2026-10-26) -->
 		<column name="LandCoverResampling" displayName="Land Cover Resampling" dataType="Integer" validationType="List" formula1="1:Modal (most common 30 m class)|2:Area-matched (30 m class areas per secondary stratum unit)" defaultValue="1" isOptional="True"/>
 		<!-- spatial multiprocessing (stage 1 writes the tile mask into the Build result; runs on the Build inherit it, a projection may set its own in Run Settings) -->
-		<column name="SpatialTiles" displayName="Spatial Multiprocessing Tiles (blank = none)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1"/>
+		<column name="SpatialTiles" displayName="Spatial Multiprocessing Tiles (blank = none; 0 = automatic)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
 		<column name="SpatialTilesStrata" displayName="Spatial Tiles Strata (tiles are whole units of this level; every projection Target group uses it)" dataType="Integer" validationType="List" formula1="1:Primary|2:Secondary|3:Tertiary" defaultValue="2" isOptional="True"/>
 	</dataSheet>
 
@@ -171,7 +171,7 @@
 		<column name="ReferenceEndYear" displayName="Reference Period End (blank = historical end)" dataType="Integer" isOptional="True"/>
 		<column name="Iterations" displayName="Iterations (Monte Carlo)" dataType="Integer" defaultValue="10" validationType="WholeNumber" validationCondition="Greater" formula1="0"/>
 		<column name="RandomSeed" displayName="Random Seed (draws of historical years)" dataType="Integer" defaultValue="1"/>
-		<column name="SpatialTiles" displayName="Spatial Multiprocessing Tiles (blank = the Build's; 1 = one job)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1"/>
+		<column name="SpatialTiles" displayName="Spatial Multiprocessing Tiles (blank = the Build's; 1 = one job; 0 = automatic)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
 		<column name="SpatialTilesStrata" displayName="Spatial Tiles Strata (tiles are whole units of this Build Options strata level; every Target group uses it)" dataType="Integer" validationType="List" formula1="1:Primary|2:Secondary|3:Tertiary" defaultValue="2" isOptional="True"/>
 		<column name="HistoricalTypeShares" displayName="Weight a named group's types by their historical shares (default; off = the spatial allocation decides)" dataType="Boolean" defaultValue="-1" isOptional="True"/>
 	</dataSheet>

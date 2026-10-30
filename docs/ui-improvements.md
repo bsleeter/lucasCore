@@ -10,7 +10,7 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 
 | Order | Item | Changes results? | Why here | Depends on |
 | --- | --- | --- | --- | --- |
-| 1 | 22 Automatic spatial tiles | No | Small and self-contained; users otherwise need to know the region to pick Tiles | - |
+| ~~1~~ | ~~22 Automatic spatial tiles~~ DONE 2026-10-29 | No | Small and self-contained; users otherwise need to know the region to pick Tiles | - |
 | 2 | 35 TreeMap: forest type, stand age, site productivity (with 10) | Yes, as options | Largest science gain (site class lifts R2 of carbon at age from 0.13 to 0.50 in mixed conifer); start with the phase 0 checks, which decide go/no-go | - |
 | 3 | 34 Minimum harvest ages | Yes (projections; stage 6 start ages) | FIA shows several are too high (mixed conifer 92 yr vs median age at cut 85); after 35 because the stand age source changes which cells pass | 35's age source |
 | 4 | 32 Carbon open science issues | Possibly | Short snags in 96 cells, duff at its bound in 19; best looked at before the TreeMap and harvest changes are judged | - |
@@ -333,13 +333,17 @@ P26 needs a Build and Historical rerun after 35 (if made the default) and 34; th
    Flows, Spin-up, Growth inputs; filled with package defaults like the Land Cover Crosswalks): docs/carbon-assumptions.md. Takes in
    items 18 and 20. Step 1 (CBM Crosswalk) done 2026-10-27 (tests/phaseZ8); step 2 (Dead Organic Matter Parameters) done (tests/phaseZ9); step 3 (Live Turnover) done (tests/phaseZ10); step 4 (Spin-up) done 2026-10-28 (tests/phaseZ11); step 5 (Disturbance Flows + Fire Snag Share) done 2026-10-28 (tests/phaseZ12); step 6 (Decay Calibration Settings + Fixed Decay Multipliers, to-dos 18 and 20 override) done 2026-10-28 (tests/phaseZ13).
 
-22. **Automatic spatial tiles** - PROPOSED 2026-10-28 (user: choosing Build Options > Tiles needs prior knowledge of the region). A tile holds
-    whole units, so the run cannot finish before the largest unit: the best tile count is floor(1 / largest unit's cell share), capped by
-    the number of units and the cores (P26: Plumas 19.8% -> 5, the number found by trial). Plan: blank Tiles = automatic (a typed number still
-    wins; 1 = one job); stage 1 logs the largest unit and its share, the best speed-up, the tiles chosen and an estimated peak memory per job
-    (~1.5 GB fixed + ~10 KB per 150 m cell, from the 24 Oct P26 measurements) with the jobs a 32/64 GB machine can hold (a warning, since
-    runs may be on another machine); say plainly when one unit dominates and tiling barely helps; Build Options note and guide 3.3 updated.
-    Only after the P26 historical run (no package edits during runs).
+22. **Automatic spatial tiles** - DONE 2026-10-29 (user: choosing Build Options > Tiles needs prior knowledge of the region). Spatial
+    Tiles **0 = automatic** (Build Options and Run Settings; blank still = one job, so existing libraries are unchanged): ticking "Split
+    runs into tiles" now writes 0 and the box shows auto; a typed number still wins. Rule (src/shared.R auto_tiles): a tile holds whole
+    units, so a run cannot finish before its largest unit and more than ceiling(1 / its share) tiles cannot help; pack 1 to that many
+    tiles and take the fewest within 5% of the best finish, capped by the units and the cores (P26: Plumas 19.8% -> 5, as found by
+    trial; Placer's tertiary units with one at 52% -> 2, where floor(1 / share) would have said 1). Stage 1 (and stage 9 for a
+    projection's own) logs the largest unit and its share, the tiles used, the best speed-up, estimated peak memory (1.5 GB + 10 KB per
+    cell per job, 24 Oct P26 measurements) with the jobs a 32/64 GB machine holds, and plain warnings when more tiles cannot help or one
+    unit holds over half the land; with tiles off it says what automatic would choose. Pages: Build Options and Run Settings notes.
+    Tests: tests/unit-auto-tiles.R (13 checks incl. P26 -> 5), tests/phaseZ16-auto-tiles.R (stage 1 on lucasCore-suitability, three
+    cases). Guide 3.3 step updated. The UI DLL needs a rebuild with Studio closed.
 23. **Deep Soil reset at the projection start** - FIXED and rerun 2026-10-29 (eeea87c; found by the user plotting DOM: Soil). Stage 9 took the
     projection's starting stocks from the Build's initial stock maps, which have no Deep Soil (it starts at zero), so every projection
     dropped 1.09 Tg C in 2023. Stage 9 now also carries any pool the historical run mapped at its end year. P26 Projection Setup and

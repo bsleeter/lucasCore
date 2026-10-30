@@ -171,6 +171,32 @@ pack_tiles <- function(u, land, n) {
   list(values = tv, load = load, units = length(ua)) }
 tile_summary <- function(tl, n, lvl) sprintf("%d tiles of whole %s units (%d units; largest tile %.0f%%, smallest %.0f%% of the land)",
                                               n, lvl, tl$units, 100 * max(tl$load) / sum(tl$load), 100 * min(tl$load) / sum(tl$load))
+# Automatic tiles (Spatial Tiles = 0, to-do 22): a tile holds whole units, so a tiled run cannot finish before its largest unit, and
+# more than ceiling(1 / that unit's share) tiles cannot help. Pack the units into 1 to that many tiles (as pack_tiles does) and take
+# the fewest tiles whose largest tile is within 5% of the best, capped by the units and the cores (P26: Plumas 19.8% -> 5, the number
+# found by trial; Placer's tertiary units, one 52% -> 2, where floor(1 / share) would say 1). Peak memory of one ST-Sim job, measured
+# on P26 on 2026-10-24: about 1.5 GB plus 10 KB per cell.
+TILE_JOB_GB <- 1.5; TILE_CELL_KB <- 10
+auto_tiles <- function(u, land, cores = parallel::detectCores()) {
+  ua <- table(u[land]); s <- max(ua) / sum(ua); x <- sort(as.numeric(ua), decreasing = TRUE)
+  hi <- max(1L, min(as.integer(ceiling(1 / s - 1e-9)), length(ua), as.integer(cores)))
+  mk <- vapply(seq_len(hi), function(n) { load <- numeric(n); for (v in x) { k <- which.min(load); load[k] <- load[k] + v }; max(load) }, 0)
+  list(n = which(mk <= 1.05 * min(mk))[1], share = s, unit = names(ua)[which.max(ua)], units = length(ua), cores = as.integer(cores)) }
+tile_unit_name <- function(lvl, id) { l <- stsim_list(c(Primary = "Stratum", Secondary = "SecondaryStratum", Tertiary = "TertiaryStratum")[[lvl]])
+  nm <- l$Name[match(as.character(id), as.character(l$Id))]; if (length(nm) && !is.na(nm)) nm else as.character(id) }
+# log lines on the tiles: the largest unit and the best count, the speed-up and peak memory of the tiles used (tl = pack_tiles' result,
+# NULL for one job), and plain warnings when more tiles cannot help or one unit dominates
+tile_notes <- function(a, tl, n, lvl, unit_name) {
+  out <- sprintf("Spatial tiles: the largest %s unit (%s) holds %.1f%% of the land, so a tiled run takes at least that share of a one-job run; the most tiles that help is %d (%d units, %d cores)",
+                 lvl, unit_name, 100 * a$share, a$n, a$units, a$cores)
+  if (!is.null(tl)) {
+    job <- TILE_JOB_GB + TILE_CELL_KB * max(tl$load) / 2^20; all <- n * TILE_JOB_GB + TILE_CELL_KB * sum(tl$load) / 2^20
+    out <- c(out, sprintf("Spatial tiles: %d tiles, at best %.1fx faster than one job; estimated peak memory %.1f GB for the largest tile's job, %.0f GB for all %d at once (a 32 GB machine holds about %d such jobs, 64 GB about %d; Library > Properties > Multiprocessing sets how many run at once)",
+                          n, sum(tl$load) / max(tl$load), job, all, n, floor(32 / job), floor(64 / job)))
+    if (n > a$n) out <- c(out, sprintf("Spatial tiles: %d tiles is more than %d, so the extra jobs cannot make the run finish sooner", n, a$n)) }
+  if (a$share > 0.5) out <- c(out, sprintf("Spatial tiles: one %s unit holds %.0f%% of the land, so tiles of this level make a run at most %.1fx faster; a finer Spatial Tiles Strata level would split it",
+                                           lvl, 100 * a$share, 1 / a$share))
+  out }
 
 # Annual NLCD on the model grid R (a crop of lattice L): modal aggregation of the 30 m classes. The aggregation blocks are fixed to the
 # CONUS crop the CONUS 1km build used (lattice extent + one block, snapped to the NLCD 30 m grid), so a regional build aggregates the

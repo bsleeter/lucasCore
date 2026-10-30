@@ -90,10 +90,14 @@ namespace lucasCoreUI
             m_tertiary.SelectionChangeCommitted += (s, e) => WriteSource(m_tertiary, "TertiarySourceId");
 
             GroupBox gTiles = Group("Spatial multiprocessing", out r, m_tileState,
-                Note("ST-Sim runs the tiles of a spatial run in parallel and merges them. Stage 1 writes the tile map into the Build result, so the historical run and every projection on this Build are split the same way (a projection can set its own in Run Settings). Units are packed into tiles of about equal area, largest first, so no unit is split. A projection target must not be split between tiles, so every Target group uses this strata level. Tiled runs also need Library > Properties > Multiprocessing on, with about as many jobs as tiles. A change takes effect the next time the Build runs."));
+                Note("ST-Sim runs the tiles of a spatial run in parallel and merges them. Stage 1 writes the tile map into the Build result, so the historical run and every projection on this Build are split the same way (a projection can set its own in Run Settings). Units are packed into tiles of about equal area, largest first, so no unit is split. A projection target must not be split between tiles, so every Target group uses this strata level. Tiled runs also need Library > Properties > Multiprocessing on, with about as many jobs as tiles. A run cannot finish before its largest unit, so more tiles than 1 / that unit's share of the land only add jobs. A change takes effect the next time the Build runs."));
             r.Controls.Add(m_tiled); r.Controls.Add(Number(m_tiles, 50)); r.Controls.Add(Caption("of whole units of")); r.Controls.Add(List(m_tileLevel, 240));
-            m_tiled.CheckedChanged += (s, e) => { if (m_refreshing) return; Sheet.SetSingleRowData("SpatialTiles", m_tiled.Checked ? (object)Math.Max(2, Math.Min(8, Environment.ProcessorCount)) : DBNull.Value); RefreshControls(); };
-            m_tiles.Validated += (s, e) => { if (m_refreshing) return; int n; string v = m_tiles.Text.Trim(); if (v.Length == 0) Sheet.SetSingleRowData("SpatialTiles", DBNull.Value); else if (int.TryParse(v, out n) && n >= 1) Sheet.SetSingleRowData("SpatialTiles", n); RefreshControls(); };
+            // ticked = automatic (0: stage 1 picks the number); a typed number wins; "auto" or an empty box while ticked = automatic again
+            m_tiled.CheckedChanged += (s, e) => { if (m_refreshing) return; Sheet.SetSingleRowData("SpatialTiles", m_tiled.Checked ? (object)0 : DBNull.Value); RefreshControls(); };
+            m_tiles.Validated += (s, e) => { if (m_refreshing) return; int n; string v = m_tiles.Text.Trim();
+                if (v.Length == 0 || v.Equals("auto", StringComparison.OrdinalIgnoreCase)) Sheet.SetSingleRowData("SpatialTiles", m_tiled.Checked ? (object)0 : DBNull.Value);
+                else if (int.TryParse(v, out n) && n >= 0) Sheet.SetSingleRowData("SpatialTiles", n);
+                RefreshControls(); };
             m_tileLevel.SelectionChangeCommitted += (s, e) => { if (!m_refreshing) Sheet.SetSingleRowData("SpatialTilesStrata", m_tileLevel.SelectedIndex + 1); };
             m_secondary.SelectionChangeCommitted += (s, e) => TileLevelNames();
             m_tertiary.SelectionChangeCommitted += (s, e) => TileLevelNames();
@@ -193,10 +197,12 @@ namespace lucasCoreUI
             {
                 Select(m_secondary, Value("SecondarySourceId"));
                 Select(m_tertiary, Value("TertiarySourceId"));
-                object tiles = Value("SpatialTiles"); bool on = tiles != DBNull.Value && Convert.ToInt32(tiles) > 1;
-                m_tiled.Checked = on; m_tiles.Enabled = m_tileLevel.Enabled = on; m_tiles.Text = tiles == DBNull.Value ? "" : Convert.ToString(tiles);
+                object tiles = Value("SpatialTiles"); int nt = tiles == DBNull.Value ? 1 : Convert.ToInt32(tiles); bool on = nt == 0 || nt > 1;
+                m_tiled.Checked = on; m_tiles.Enabled = m_tileLevel.Enabled = on; m_tiles.Text = tiles == DBNull.Value ? "" : nt == 0 ? "auto" : Convert.ToString(nt);
                 object lvl = Value("SpatialTilesStrata"); if (m_tileLevel.Items.Count == 3) m_tileLevel.SelectedIndex = lvl == DBNull.Value ? 1 : Math.Max(0, Math.Min(2, Convert.ToInt32(lvl) - 1));
-                m_tileState.Text = on ? string.Format("{0} tiles of whole {1} units: written by stage 1.", tiles, m_tileLevel.SelectedItem) : "Off: runs on this Build are one job (unless a projection sets its own tiles in Run Settings).";
+                m_tileState.Text = !on ? "Off: runs on this Build are one job (unless a projection sets its own tiles in Run Settings). Stage 1's log says how many tiles automatic would use."
+                    : nt == 0 ? string.Format("Automatic: stage 1 packs whole {0} units into as many tiles as still shorten the run (the largest unit sets the limit, capped by the cores) and logs the choice, the speed-up and the memory each job needs. Type a number to choose it yourself.", m_tileLevel.SelectedItem)
+                    : string.Format("{0} tiles of whole {1} units: written by stage 1, which logs whether more tiles could help (type auto for the automatic number).", nt, m_tileLevel.SelectedItem);
                 m_root.Enabled = this.ShouldEnableView();
             }
             finally { m_refreshing = false; }

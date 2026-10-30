@@ -202,6 +202,8 @@ say("Sampling sets: %s", paste(sprintf("%s (%s)", sets, vapply(sets, function(s)
 # Options, Spatial Tiles Strata; the layer itself is chosen in Build Options), and a target must not be split between tiles, so every
 # Target group uses that level - the Run Settings page sets it on the Transitions rows, and this enforces it for inherited rows too
 tile_lvl <- tile_level(if (own_tiles) nz(po$SpatialTilesStrata, NA) else if ("SpatialTilesStrata" %in% names(opt)) nz(opt$SpatialTilesStrata, NA) else NA)
+if (tiles == 0L) { tiles <- auto_tiles(lev[[tile_lvl]], land)$n   # automatic (Spatial Tiles = 0): the same rule as stage 1
+  say("Spatial tiles: automatic (%s) -> %d", if (own_tiles) "Run Settings" else "Build Options", tiles) }
 if (tiles > 1) say("Spatial tiles: %d of whole %s units, from %s", tiles, tile_lvl, if (own_tiles) "Run Settings" else "the Build (Build Options)")
 if (tiles > 1) { chg <- pt[Method == "Target" & StrataLevel != tile_lvl, TransitionGroupId]
   if (length(chg)) say("Spatial tiles of %s units: Target Strata set to %s for %s", tile_lvl, tile_lvl, paste(chg, collapse = "; "))
@@ -394,11 +396,12 @@ if (tiles > 1) {
     if (tl$units < tiles) say("Spatial tiles: only %d %s units for %d tiles - some tiles stay empty", tl$units, lvls, tiles)
     tf <- write_raster(setValues(rast(P), tl$values), "Projection-Tiles.tif", "INT2U")
     saveDatasheet(scn, data.frame(MaskFileName = tf), "core_SpatialMultiprocessing")
-    say("Spatial tiles: %s", tile_summary(tl, tiles, lvls)) }
-} else if (build_tiles > 1) {   # Run Settings asks for one job: a one-tile mask, so the Build's tiles are not inherited
+    say("Spatial tiles: %s", tile_summary(tl, tiles, lvls))
+    ta <- auto_tiles(lev[[lvls]], land); for (m in tile_notes(ta, tl, tiles, lvls, tile_unit_name(lvls, ta$unit))) say("%s", m) }
+} else if (build_tiles != 1L) {   # one job (Run Settings, or automatic chose 1) while the Build is tiled: a one-tile mask, so the Build's tiles are not inherited
   tf <- write_raster(setValues(rast(P), ifelse(land, 1L, NA_integer_)), "Projection-Tiles.tif", "INT2U")
   saveDatasheet(scn, data.frame(MaskFileName = tf), "core_SpatialMultiprocessing")
-  say("Spatial tiles: one job (Run Settings), replacing the Build's %d tiles", build_tiles)
+  say("Spatial tiles: one job, replacing the Build's %s tiles", if (build_tiles == 0L) "automatic" else build_tiles)
 }
 
 # ---- outputs ----------------------------------------------------------------------------------------------------------
