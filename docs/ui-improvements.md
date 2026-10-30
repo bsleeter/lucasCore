@@ -386,6 +386,14 @@ Not pushed: every lucasCore commit since 54177b2 (2026-10-29) is local only; the
     yet assessed. Proposed fix for (1): fit stem turnover to FIA's non-fire mortality of mature stands (per type, per type x
     ecodivision where >= 30 remeasured conditions), all 48 states, as the package's Live Turnover values; growth curves stay (gross
     growth = curve increment + turnover), the DOM decay refits; awaiting the user's choice.
+    **Design (user, 2026-10-30):** do A now; later B models only extreme, stand-replacing insect/disease events as discrete spatial
+    events (sources: LANDFIRE Annual Disturbance insect/disease types, ADS/IDS, LCMS slow loss/stress, Meddens & Hicke beetle maps),
+    the rest stays background mortality. To avoid counting the same deaths twice, A's background can leave out stand-replacing
+    conditions. dev/fia/24-stand-replacing-share.R (40,310 remeasured mature western conditions, median period 10 yr): non-fire loss
+    >= 50% of live carbon in 3.6% of conditions, >= 70% in 1.1%; they hold ~20% (>= 50%) / 7% (>= 70%) of the mortality carbon, about
+    the same in snag-short and snag-OK cells. Background without them is still 2.2x CBM in the short cells (0.0100 vs 0.0045; all
+    mortality 0.0124), so the shortfall is mostly chronic mortality, not outbreaks; the outbreak-heavy cells are lodgepole and aspen
+    TSM and lodgepole Marine Mountains (34-38% of mortality stand-replacing, insects 60-90% of it). Threshold to choose.
 33. **Leftovers inside done items** - TO DO: (1) Data Sources deep links into the USFS Research Data Archive; (7) guide 1.4 on
     multiprocessing for tiled runs (check against the P26 setup); (8) a full P26 Build + historical run with Area-matched resampling to
     compare carbon, transitions and figures, and matching the state class splits within NLCD classes (forest type, shrub/grass,
