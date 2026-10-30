@@ -2,7 +2,7 @@
 
 Ideas for the lucasCore pages in SyncroSim Studio, collected during the P26 user-guide walkthrough. Newest last.
 
-## Priorities (2026-10-29)
+## Priorities (2026-10-30)
 
 The open items in order. Item numbers are ids and do not change; this table is the order. The rule from 2026-10-25 still holds: items
 that change the model itself (its inputs or results) come first, and anything built on P26's results (the demo bundle, metadata, the
@@ -11,19 +11,20 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | Order | Item | Changes results? | Why here | Depends on |
 | --- | --- | --- | --- | --- |
 | ~~1~~ | ~~22 Automatic spatial tiles~~ DONE 2026-10-29 | No | Small and self-contained; users otherwise need to know the region to pick Tiles | - |
-| 2 | 35 TreeMap: forest type, stand age, site productivity (with 10) | Yes, as options | Largest science gain (site class lifts R2 of carbon at age from 0.13 to 0.50 in mixed conifer); start with the phase 0 checks, which decide go/no-go | - |
-| ~~3~~ | ~~34 Minimum harvest ages~~ DONE 2026-10-30 | Yes (projections; stage 6 start ages) | FIA shows several are too high (mixed conifer 92 yr vs median age at cut 85); after 35 because the stand age source changes which cells pass | 35's age source |
-| 4 | 32 Carbon open science issues | Possibly | Short snags in 96 cells, duff at its bound in 19; best looked at before the TreeMap and harvest changes are judged | - |
-| 5 | 31 Copy Carbon Assumptions; SoilGrids option | No (an option) | Convenience and one more soil source | - |
-| 6 | 12 Data Download stage | No | Needs the final input list (35 adds TreeMap) | 35 |
-| 7 | 13 Demo bundle, Calaveras | No | Needs 12's home folder and a settled model; the finished demo library (option 1) can go earlier if wanted | 12; 35, 34 |
-| 8 | 14 FGDC metadata | No | Needs the final inputs and 12's manifest; ships with 13 and data releases | 12, 13 |
+| ~~2~~ | ~~35 TreeMap: forest type, stand age, site productivity (with 10)~~ DONE 2026-10-30 | Yes, as options (off by default) | Code, pages, figure, tests and P26 sync done; its guide content is item 36 | - |
+| ~~3~~ | ~~34 Minimum harvest ages~~ DONE 2026-10-30 | Yes (projections; stage 6 start ages) | FIA values lowered to the study area's mapped cuts; selection at least 10 yr under clearcut | 35's age source |
+| 1 | 32 Carbon open science issues | Possibly | Short snags in 96 cells, duff at its bound in 19, California-fitted shares used everywhere; the last item that may change the model before P26 is rerun | - |
+| 2 | 37 P26 rerun and guide refresh | Its own results | 34 changed the start ages, harvest pathways and so initial carbon; rerun once after 32, then redo the guide's P26 numbers and figures, and add the Minimum Harvest Age page | 34, 32 |
+| 3 | 31 Copy Carbon Assumptions; SoilGrids option | No (an option) | Convenience and one more soil source | - |
+| 4 | 12 Data Download stage | No | Needs the final input list (35 added TreeMap) | 35 |
+| 5 | 13 Demo bundle, Calaveras | No | Needs 12's home folder and a settled model; the finished demo library (option 1) can go earlier if wanted | 12; 37 |
+| 6 | 14 FGDC metadata | No | Needs the final inputs and 12's manifest; ships with 13 and data releases | 12, 13 |
 | any | 33 Leftovers inside done items | Some | Small, independent; (7) guide 1.4 and (1) deep links any time; (8) and (17) larger | - |
 | later | 26 Guide chapter 9, Troubleshooting | No | After beta testers (user) | beta |
-| later | 36 Guide: Advanced Features (site productivity comparison) | No | After the items above (user); needs a P26 Build with Site productivity on | 35 |
+| later | 36 Guide: Advanced Features (site productivity comparison) | No | After the items above (user); needs a P26 Build with Site productivity on | 35, 37 |
 
-Done since the 2026-10-25 order: 6, 7, 8, 9, 11a, 15-21, 23-25, 28-30 (item 27 removed by the user).
-P26 needs a Build and Historical rerun after 35 (if made the default) and 34; the guide's P26 numbers and figures are redone once after.
+Done since the 2026-10-25 order: 6, 7, 8, 9, 11a, 15-25, 28-30, 34, 35 (item 27 removed by the user).
+Not pushed: every lucasCore commit since 54177b2 (2026-10-29) is local only; the repo is public, so push only when the user asks.
 
 1. **Data Sources page** - DONE 2026-10-24. Custom view (`ui/DataSourcesView.cs`) groups the paths by category (study area, land
    cover, forest inventory, disturbance and fire, climate, soils and terrain, infrastructure and ownership), links each to its download
@@ -420,7 +421,7 @@ P26 needs a Build and Historical rerun after 35 (if made the default) and 34; th
     a 1985-2023 historical run cuts 87 km2 clearcut (Build 47's old ages: 70; LCMS 90) and 127 km2 selection (153; LCMS 137).
     Page checked in Studio (user, 2026-10-30). Not done: P26 needs a Build + Historical rerun to pick it up (initial ages and carbon change);
     guide section for the page.
-35. **TreeMap: forest type, stand age and site productivity from one map** - PLANNED 2026-10-29 (user: use TreeMap; combines item 10;
+35. **TreeMap: forest type, stand age and site productivity from one map** - DONE 2026-10-30 (planned 2026-10-29; user: use TreeMap; combines item 10;
     full plan in docs/treemap-plan.md). **Phase 0 done 2026-10-29: go** (site class moves carbon at age around stage 2's own curves, mixed conifer m 1.59 -> 0.52 from site class 2 to 6; every P26 TreeMap pixel gets a site class with all 48 states' COND; Climate and Site Productivity flow multiplier types multiply in ST-Sim, untyped climate rows still work; details in the plan). Choices (user): TreeMap 2016, multipliers by type x ecodivision, Site Productivity off by default. **Step 1 schema-free part done** (src/treemap.R, tests/unit-treemap.R); **Step 2 done 2026-10-30** (ac971f3: TreeMap as Forest Type Map and Stand Age Source in stage 5; new columns need tools/sync-library.R --reference=dev/libs/sync-reference.ssim). P26 synced 2026-10-30. **Step 3 done** (site class multipliers in stage 2, Build Results > Site Productivity). **Step 4 stage 5 half done** (site class share maps). **Steps 4-6 done** (stage 8: cell multiplier, Site Productivity flow multiplier, scaled initial stocks; stages 7/11 tag Climate). **Step 7 pages done** (Build Options: Growth > Site productivity; Build Results > Site Productivity page). **Stage 12 Site productivity figure done** (pages checked in Studio). **Projection carry-over tested** (fixed: stages read dependencies from the run's parent). **P26 synced for the multiplier types 2026-10-30** (Climate, Site Productivity; sync-library read the one-column CSV wrong, fixed). Guide 3.3 updated (Build Options grab, Stand age and Growth steps). The rest of the guide work is item 36.
     **Why.** Every cell of one forest type, ecodivision and age grows on the same curve; only the climate multipliers (stages 7 and 11)
     vary growth in space. TreeMap (USFS, 30 m) gives each forest pixel an imputed FIA plot; through the plot's FIA condition the pixel
@@ -474,3 +475,10 @@ P26 needs a Build and Historical rerun after 35 (if made the default) and 34; th
     productivity on, the Site Productivity page, the figure and the comparison figures.
     **Open questions.** Which comparison figures make the point (stocks by year, growth by forest type, a difference map?); whether
     the chapter also covers TreeMap forest type and stand age, which change the initial map itself.
+37. **P26 rerun and guide refresh** - TO DO (2026-10-30). Item 34 changed stage 6 (minimum harvest ages from FIA and the study
+    area's mapped cuts, selection at least 10 yr under clearcut, start ages raised for selection too), so P26's start ages, initial
+    carbon and historical harvest change; item 32 may change the carbon too, so rerun once after it. Steps: the P26 Build and the
+    Historical run in the user's guide library (the user runs them, or asks Claude to); then the guide's P26 numbers and figures
+    (initial carbon 439 Tg C, run times, Build figures, Historical Transition Summary, projections), and a guide section on the
+    Minimum Harvest Age page with a grab (the options, the rows, Build Results > Minimum Harvest Ages). Site Productivity stays off in
+    the walkthrough (item 36 covers it).
