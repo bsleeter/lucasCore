@@ -52,6 +52,7 @@ for (g in fm$FlowGroupId) with(summ[FlowGroup == g], say("%s (%s): PRISM study-a
 progressBar()
 
 # ---- outputs ----------------------------------------------------------------------------------------------------------
+if ("Climate" %in% stsim_list("FlowMultiplierType")$Name) out$rows[, FlowMultiplierTypeId := "Climate"]   # its own Flow Multiplier Type, so stage 8's Site Productivity multiplies with it (a library without the type: tools/sync-library.R)
 write_stsim(out$rows, "FlowSpatialMultiplier")
 write_ds(summ[, .(Timestep, FlowGroup, Model, Climate, Mean = round(Mean, 4), Min, Max)], "OutputClimateSummary")
 progressBar()

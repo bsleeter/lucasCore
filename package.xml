@@ -910,6 +910,9 @@
 		<dataSheet name="InitialStockCurve" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
 		<dataSheet name="stsim_InitialStockSpatial" type="Both"/>
+		<dataSheet name="OutputSiteClassMap" type="Input"/>
+		<dataSheet name="OutputSiteProductivity" type="Input"/>
+		<dataSheet name="stsim_FlowSpatialMultiplier" type="Both"/>
 		<dataSheet name="OutputInitialStockSummary" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>

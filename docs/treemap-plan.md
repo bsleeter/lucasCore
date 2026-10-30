@@ -156,6 +156,16 @@ matches TreeMap's, else the largest), as dev/treemap/01 does. Used by type, age 
   stage 2, turns them into the multiplier: sum over classes of share x the cell's type x ecodivision multiplier (with step 5's flow
   multiplier and step 6's initial stocks). Test tests/phaseZ19-site-class-shares.R (EVT types, CMS ages): passes; shares add to 1 in
   every cell with pixels; 99.1% of Placer's forest cells covered (the rest get 1); mix 1% / 5% / 25% / 25% / 24% / 6% / 15%.
+- **Steps 4-6 (stage 8), 2026-10-30, done.** Stage 8, after stage 2: cell multiplier = sum over site classes of stage 5's share x
+  stage 2's multiplier for the cell's type x ecodivision (no TreeMap pixels: 1; non-forest: 1); forest cells' starting live and dead
+  carbon x multiplier (deep soil not); the map becomes a flow spatial multiplier on "Net Growth Forest: Total" with Flow Multiplier
+  Type **Site Productivity**. Stages 7 and 11 tag their climate rows **Climate** (when the library has the type); stage 11 carries the
+  Build's Site Productivity row into a Projection Climate scenario (its own rows would hide the Build's; src/shared.R
+  dependency_multipliers()). The two types are in defaults/stsim/stsim_FlowMultiplierType.csv, and tools/sync-library.R step 4 adds
+  them to existing libraries (P26 still needs that run before Site Productivity can be switched on there). Test
+  tests/phaseZ20-site-productivity-build.R (two Builds of stages 5, 2, 3, 4, 7, 8, off and on, and 1985-1987 historical runs): all
+  pass; every forest cell's starting live carbon = its multiplier x the off Build's (1e-7); forest multipliers mean 1.03 (10% 0.81,
+  90% 1.27); starting forest live carbon x 1.040; historical forest growth x 1.030. Not tested: stage 11's carry-over (a projection).
 
 ## Notes
 

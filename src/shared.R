@@ -88,6 +88,17 @@ write_stsim <- function(x, name, target = scn, ...) saveDatasheet(target, int_co
 # Projection Start could not find the historical run's maps)
 main_library <- function() sub("\\.temp[/\\\\]MultiProc[/\\\\].*$", "", normalizePath(env$LibraryFilePath, winslash = "/", mustWork = FALSE))
 
+# the flow spatial multiplier rows of one Flow Multiplier Type in this scenario's dependencies (the first that has any), with each file's
+# full path: a scenario that writes its own rows hides its dependencies' (stage 11's climate rows would hide the Build's Site
+# Productivity row), so it carries these over
+dependency_multipliers <- function(type) {
+  L <- ssimLibrary(main_library())
+  for (id in as.integer(rsyncrosim::dependency(scn)$ScenarioId)) {
+    x <- as.data.table(datasheet(rsyncrosim::scenario(L, id), "stsim_FlowSpatialMultiplier", optional = TRUE, lookupsAsFactors = FALSE))
+    if (nrow(x) && "FlowMultiplierTypeId" %in% names(x)) { x <- x[FlowMultiplierTypeId %in% type]
+      if (nrow(x)) return(x[, MultiplierFileName := file.path(paste0(main_library(), ".data"), sprintf("Scenario-%d", id), "stsim_FlowSpatialMultiplier", basename(MultiplierFileName))][]) } }
+  NULL }
+
 # Transition Size Distribution / Size Prioritization rows for some groups, keeping every other group's rows (stages 9 and 10 each write
 # their own groups'; a later stage, or stage 9 rerun in a projection, must not drop the others). Rows carry Timestep = the historical
 # end + 1 so a continuous run's historical years keep their exact maps (found 2026-10-23).

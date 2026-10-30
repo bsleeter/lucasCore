@@ -77,6 +77,11 @@ for (g in fm$FlowGroupId) with(summ[FlowGroup == g], say("%s (%s) projection: me
 progressBar()
 
 # ---- outputs: the projection years only (the Build's summary rows are not carried into this result) ------------------------
+if ("Climate" %in% stsim_list("FlowMultiplierType")$Name) out$rows[, FlowMultiplierTypeId := "Climate"]
+# this scenario's rows hide the Build's, so the Build's Site Productivity multiplier (stage 8) comes along
+spm <- dependency_multipliers("Site Productivity")
+if (!is.null(spm)) { out$rows <- rbind(out$rows, spm[, intersect(names(spm), c("Timestep", "FlowGroupId", "FlowMultiplierTypeId", "MultiplierFileName")), with = FALSE], fill = TRUE)
+  say("Site Productivity: the Build's flow multiplier carried over (%s)", paste(unique(spm$FlowGroupId), collapse = ", ")) }
 write_stsim(out$rows, "FlowSpatialMultiplier")
 write_ds(summ[, .(Timestep, FlowGroup, Model, Climate, Mean = round(Mean, 4), Min, Max)], "OutputClimateSummary")
 progressBar()

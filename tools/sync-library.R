@@ -9,7 +9,7 @@
 #   2. every column of a lucasCore_ / stsim_ / core_ table in the starter that the library's table lacks: ALTER TABLE ADD COLUMN
 #   3. every lucasCore transformer and stage name the library lacks, with its stage value: new ids from the library's own id counter
 #      (core_Sequence)
-#   4. project definitions the package defaults gained (stsim State Attribute Types): added through rsyncrosim
+#   4. project definitions the package defaults gained (stsim State Attribute Types, Flow Multiplier Types): added through rsyncrosim
 #   5. the stock group memberships of non-result scenarios (the Stock-Flow Definitions scenario), set to the package defaults
 # Close the library in SyncroSim Studio first. Usage: Rscript tools/sync-library.R <library.ssim> [--dry-run] [--reference=<library.ssim>]
 # =============================================================================
@@ -64,6 +64,11 @@ if (!dry) { dbDisconnect(con); on.exit(dbDisconnect(ref))
   miss <- want[!Name %in% sat$Name]
   if (nrow(miss)) { saveDatasheet(P, as.data.frame(miss[, intersect(names(miss), names(sat)), with = FALSE]), "stsim_StateAttributeType", append = TRUE)
     cat("added State Attribute Types:", paste(miss$Name, collapse = ", "), "\n") } else cat("State Attribute Types up to date\n")
+  # Flow Multiplier Types (2026-10-30: Climate, for stages 7 and 11, and Site Productivity, stage 8 - they multiply in each cell)
+  fmt <- as.data.table(datasheet(P, "stsim_FlowMultiplierType")); want_t <- fread(file.path(pkg, "defaults", "stsim", "stsim_FlowMultiplierType.csv"), na.strings = "")
+  miss_t <- want_t[!Name %in% fmt$Name]
+  if (nrow(miss_t)) { saveDatasheet(P, as.data.frame(miss_t[, intersect(names(miss_t), names(fmt)), with = FALSE]), "stsim_FlowMultiplierType", append = TRUE)
+    cat("added Flow Multiplier Types:", paste(miss_t$Name, collapse = ", "), "\n") } else cat("Flow Multiplier Types up to date\n")
   # ---- 5. stock group memberships of non-result scenarios (the Stock-Flow Definitions scenario) -----------------------------------
   # stage 0 writes the package's memberships only into a Build without them; a library made by new-library.R carries its own copy in the
   # Stock-Flow Definitions scenario, so a change of the package's groups (2026-10-26: DOM: Litter = the forest floor incl. AG Slow, as

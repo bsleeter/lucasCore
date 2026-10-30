@@ -76,6 +76,37 @@ m <- match(key[isF], fk)
 check(STAGE, "every forest cell finds its ecodivision x class x last disturbance x age in the stock curves", !anyNA(m),
       sprintf("%d of %d forest cells unmatched (e.g. %s)", sum(is.na(m)), sum(isF), paste(head(unique(key[isF][is.na(m)]), 3), collapse = "; ")))
 out[which(isF)[!is.na(m)], ] <- as.matrix(cv[m[!is.na(m)], st$CurveColumn, with = FALSE]); src_of[isF] <- "stock curves (stage 4)"
+
+# ---- Site Productivity (Build Options; to-do 35, docs/treemap-plan.md) ------------------------------------------------------
+# A forest cell's growth multiplier = sum over FIA site classes of the share of its TreeMap pixels in the class (stage 5) x its forest
+# type x ecodivision's multiplier for the class (stage 2); a cell without TreeMap pixels keeps 1. It becomes the Site Productivity flow
+# spatial multiplier on forest growth, which multiplies with the Climate one in each cell, so the cell's live carbon follows m x its
+# curve. Its starting live and dead carbon are scaled by m too (their inputs all come from live carbon and decay is first order); the
+# deep soil (belowground slow, calibrated to gSSURGO) is not. Non-forest cells stay 1 (a cell that becomes forest later grows at 1).
+spv <- opt$SiteProductivity[1]
+site_on <- !is.null(spv) && !is.na(spv) && (identical(suppressWarnings(as.integer(spv)), 2L) || startsWith(as.character(spv), "TreeMap"))
+if (site_on) {
+  shs <- as.data.table(datasheet(scn, ds("OutputSiteClassMap"), optional = TRUE))
+  spm <- as.data.table(datasheet(scn, ds("OutputSiteProductivity"), optional = TRUE, lookupsAsFactors = FALSE))
+  if (nrow(shs) != 7) fail("Site Productivity: no site class shares - run stage 5 with Site Productivity on (same pipeline)")
+  if (!nrow(spm)) fail("Site Productivity: no multipliers - run stage 2 with Site Productivity on (same pipeline)")
+  if (!"Site Productivity" %in% stsim_list("FlowMultiplierType")$Name) fail("Site Productivity: the library has no Flow Multiplier Type 'Site Productivity' - run tools/sync-library.R on it")
+  fpath <- function(fn) if (file.exists(fn)) fn else file.path(paste0(main_library(), ".data"), sprintf("Scenario-%d", scenarioId(scn)), ds("OutputSiteClassMap"), basename(fn))
+  X <- values(rast(vapply(shs[order(SiteClass), FileName], fpath, "")), mat = TRUE)
+  wk <- dcast(spm, StratumId + StateClassId ~ SiteClass, value.var = "Multiplier")
+  M <- as.matrix(wk[match(paste(sname, cname), paste(wk$StratumId, wk$StateClassId)), as.character(1:7), with = FALSE])
+  has <- rowSums(!is.na(X)) > 0 & !is.na(M[, 1])
+  mult <- rep(1, ncell(P)); use <- isF & has; mult[use] <- rowSums(X[use, , drop = FALSE] * M[use, , drop = FALSE], na.rm = TRUE)
+  check(STAGE, "site productivity: every forest cell's multiplier is finite and within 0.3-2.5", all(is.finite(mult[isF]) & mult[isF] >= 0.3 - 1e-9 & mult[isF] <= 2.5 + 1e-9))
+  bgs0 <- which(st$StockTypeId == "DOM: Belowground Slow")
+  out[isF, -bgs0] <- out[isF, -bgs0] * mult[isF]
+  qs <- stats::quantile(mult[isF], c(0.1, 0.5, 0.9))
+  say("Site productivity: forest cells' growth multiplier mean %.2f (10%% %.2f, median %.2f, 90%% %.2f); %.1f%% of forest cells without TreeMap pixels keep 1; their starting live and dead carbon scaled the same way",
+      mean(mult[isF]), qs[1], qs[2], qs[3], 100 * mean(!has[isF]))
+  fg <- "Net Growth Forest: Total"; if (!fg %in% stsim_list("FlowGroup")$Name) fail("Site Productivity: flow group '%s' not found", fg)
+  write_stsim(data.table(FlowGroupId = fg, FlowMultiplierTypeId = "Site Productivity",
+                         MultiplierFileName = write_raster(setValues(rast(P), ifelse(land, mult, NA)), "SiteProductivity.tif", "FLT4S")), "FlowSpatialMultiplier", append = TRUE)
+}
 # legacy class tables: by class (and age for forested wetland)
 lt <- function(f) { x <- read_default("initialstocks", f); setnames(x, gsub("ID$", "Id", names(x)))
   x[, `:=`(Value = as.numeric(Value), AgeMin = suppressWarnings(as.integer(AgeMin)))][StateAttributeTypeId %in% st$Attribute] }
