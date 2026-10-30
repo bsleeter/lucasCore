@@ -119,7 +119,7 @@ figures, which are redone once after the P26 rerun.
    (the state COND, PLOT and TREE tables, or FIADB SQLite), filtered to the study area's states and the inventory years, and derive the
    same fields the .Rds tables carry (condition carbon by pool, merchantable volume, stand age, forest type group, DSTRBCD/TRTCD). Keep the
    .Rds route as an option, and check that the derived tables reproduce its P26 and CONUS curves before switching the default.
-10. **TreeMap for forest type group and stand age** - TO DO (user, 2026-10-25; PLANNED with item 35 in docs/treemap-plan.md, 2026-10-29). Today the forest type comes from LANDFIRE EVT or the USFS
+10. **TreeMap for forest type group and stand age** - TO DO (user, 2026-10-25; PLANNED 2026-10-29 together with site productivity: see item 35 and docs/treemap-plan.md). Today the forest type comes from LANDFIRE EVT or the USFS
    NFCMS forest type group maps (Build Options: Forest Type Map), and stand age from NASA CMS Forest Age 1990 (Data Sources:
    StandAgeFile). Add TreeMap (USFS, 30 m imputed FIA plots; its plot IDs carry FORTYPCD and stand age) as a third Forest Type Map
    option and as a stand age source, so type and age come from one consistent map. Needs: a Data Sources path for the TreeMap raster
@@ -401,16 +401,40 @@ figures, which are redone once after the P26 rerun.
     share as the check, not a fit (the age map was adjusted, so fitting to it is circular). Build: tools/calibrate-harvest-age.R, an
     optional Minimum Harvest Age page (like Mature Age) read by stages 6 and 9, unit test, test-library run comparing blocked share
     and initial carbon. P26 needs a Build and Historical rerun to pick it up.
-35. **Site productivity scaling of forest growth** - TO DO (user, 2026-10-29; PLANNED with item 10 in docs/treemap-plan.md, user 2026-10-29: use TreeMap). Today every cell of one forest type,
-    ecodivision and age grows on the same curve; only the climate flow spatial multipliers (stages 7 and 11) vary it in space. Idea: a
-    static productivity multiplier per cell = local site productivity / the mean of the plots the type x ecodivision curve was fitted to,
-    so the curves stay right on average and good and poor sites grow faster and slower. Candidate sources on disk: (a) TreeMap 2016
-    (Data Sources/TreeMap): each 30 m pixel is an FIA plot, so its FIA condition's SITECLCD (site class, cu ft/ac/yr) or SICOND/SIBASE
-    (site index) maps directly, on the same plots the curves use - first choice; (b) NFCMS Forest Productivity (Data Sources/NFCMS/Forest
-    Productivity/PSW_ForestProductivity.tif, 30 m, values 0-10, legend still to find); (c) gSSURGO forest productivity (site index and
-    cu ft/ac/yr in the SSURGO forprod tables; only the SOC and NCCPI rasters are on disk). Questions: normalise to 1 over the fitting
-    plots (not over area) so carbon totals stay unbiased; apply it to the growth flows only, or also to the initial live stocks (stages 4
-    and 8 read the curves by age) and spin-up, so initial carbon matches the faster or slower growth; how it combines with the climate
-    multiplier (product of both on the growth flow group); a cap on the range; whether fitting the curves per site class in stage 2 is
-    better than one curve scaled. Test: the area-weighted multiplier near 1 per type x ecodivision, initial carbon vs FIA plot carbon by
+35. **TreeMap: forest type, stand age and site productivity from one map** - PLANNED 2026-10-29 (user: use TreeMap; combines item 10;
+    full plan in docs/treemap-plan.md). Not started.
+    **Why.** Every cell of one forest type, ecodivision and age grows on the same curve; only the climate multipliers (stages 7 and 11)
+    vary growth in space. TreeMap (USFS, 30 m) gives each forest pixel an imputed FIA plot; through the plot's FIA condition the pixel
+    carries forest type (FORTYPCD), stand age (STDAGE) and site class (SITECLCD, 1 = 225+ to 7 = 0-19 cu ft/ac/yr), consistent with
+    each other and with the plots the growth curves are fitted to. So one join also finishes item 10.
+    **Evidence.** 6,757 TreeMap plots in CA/OR/NV with a site class, live carbon on age with and without site class: mixed conifer R2
+    0.13 -> 0.50 (carbon / curve 1.84 at site class 2 to 0.40 at 6), Douglas-fir 0.52 -> 0.70 (1.64 to 0.39), fir/spruce/mtn hemlock
+    0.23 -> 0.35, ponderosa 0.19 -> 0.30, western oak 0.20 -> 0.38; weak in lodgepole and tanoak. A quick fit, not stage 2's curves.
+    **Design.** (1) Multiplier m per forest type (and ecodivision where plots allow) and site class = mean observed live carbon / the
+    stage 2 curve at plot age, over the fitting plots in that class, divided by the same over all fitting plots: plot-weighted mean 1,
+    so the curves stay right on average; small classes shrink toward neighbours or 1; capped about 0.3-2.5. (2) Map: pixel -> plot ->
+    site class -> m for the cell's type and ecodivision; model cell = mean over its pixels of that type; unmatched pixels = 1 (share
+    logged). (3) Growth: a static flow spatial multiplier on the forest growth flows, with ST-Sim **Flow Multiplier Types** (user):
+    the project types (defaults/stsim/stsim_FlowMultiplierType.csv, today only Net Growth Uncertainty) gain **Climate** and **Site
+    Productivity**, which multiply in each cell; stages 7 and 11 tag their rows Climate (today blank). Stages cannot write project
+    sheets, so the types come with the package defaults and tools/sync-library.R (P26 before its next Build). Scaled growth with
+    first-order turnover gives live carbon m x curve(age). (4) Initial stocks: stage 8 scales live and dead organic matter by m, not
+    the deep soil. (5) One join, src/treemap.R (TreeMap CN = PLT_CN -> the forested condition matching TreeMap's FORTYPCD, else the
+    largest), used by type, age and productivity.
+    **Steps.** 0 spikes in dev/ (read only): site class ratios on stage 2's curves for P26 types per ecodivision (go/no-go, shrinkage);
+    a Climate and a Site Productivity multiplier on one growth flow multiply, and blank-type rows from old Builds still work; TreeMap
+    coverage on P26 with all 48 states' COND. 1 data: Data Sources TreeMap folder; src/fia.R reads SITECLCD (cache key bump);
+    src/treemap.R. 2 type and age (item 10): Build Options Forest Type Map = TreeMap, Stand Age Source = TreeMap (CMS stays default),
+    stage 5. 3 stage 2: Site Productivity output sheet (type x ecodivision x site class: plots, raw ratio, value used); checks
+    plot-weighted mean 1, monotone where plots allow. 4 stage 5: Build Options Site Productivity = None | TreeMap site class; the
+    multiplier raster; checks every forest cell has a value, the cap, area-weighted mean near 1. 5 growth flows: the two multiplier
+    types; stages 7 and 11 tag Climate; one static Site Productivity row. 6 initial stocks (stages 4 and 8) x m; check cell live
+    carbon against TreeMap CARBON_L with and without m. 7 UI: Build Options entries with notes, a Build Results page Site Productivity,
+    a stage 12 map. 8 tests: plain-R unit tests (join, normalisation, cap, shrinkage), then the Placer demo library (never the P26
+    guide library), then a P26 Build + Historical comparison. 9 docs: guide, methods paper.
+    **User choices.** TreeMap vintage (2016 on disk; newer releases exist); multipliers by type only or type x ecodivision; Site
+    Productivity default on or off.
+    **Other sources considered.** NFCMS Forest Productivity (PSW_ForestProductivity.tif, 30 m, values 0-10, legend unknown); gSSURGO
+    forest productivity tables (not on disk); LANDFIRE has no productivity layer (canopy height / stand age as a site index proxy is
+    a possible check only).
     site class, and a P26 Build and Historical comparison.
