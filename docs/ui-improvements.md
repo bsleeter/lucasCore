@@ -401,3 +401,16 @@ figures, which are redone once after the P26 rerun.
     share as the check, not a fit (the age map was adjusted, so fitting to it is circular). Build: tools/calibrate-harvest-age.R, an
     optional Minimum Harvest Age page (like Mature Age) read by stages 6 and 9, unit test, test-library run comparing blocked share
     and initial carbon. P26 needs a Build and Historical rerun to pick it up.
+35. **Site productivity scaling of forest growth** - TO DO (user, 2026-10-29; not scoped in detail). Today every cell of one forest type,
+    ecodivision and age grows on the same curve; only the climate flow spatial multipliers (stages 7 and 11) vary it in space. Idea: a
+    static productivity multiplier per cell = local site productivity / the mean of the plots the type x ecodivision curve was fitted to,
+    so the curves stay right on average and good and poor sites grow faster and slower. Candidate sources on disk: (a) TreeMap 2016
+    (Data Sources/TreeMap): each 30 m pixel is an FIA plot, so its FIA condition's SITECLCD (site class, cu ft/ac/yr) or SICOND/SIBASE
+    (site index) maps directly, on the same plots the curves use - first choice; (b) NFCMS Forest Productivity (Data Sources/NFCMS/Forest
+    Productivity/PSW_ForestProductivity.tif, 30 m, values 0-10, legend still to find); (c) gSSURGO forest productivity (site index and
+    cu ft/ac/yr in the SSURGO forprod tables; only the SOC and NCCPI rasters are on disk). Questions: normalise to 1 over the fitting
+    plots (not over area) so carbon totals stay unbiased; apply it to the growth flows only, or also to the initial live stocks (stages 4
+    and 8 read the curves by age) and spin-up, so initial carbon matches the faster or slower growth; how it combines with the climate
+    multiplier (product of both on the growth flow group); a cap on the range; whether fitting the curves per site class in stage 2 is
+    better than one curve scaled. Test: the area-weighted multiplier near 1 per type x ecodivision, initial carbon vs FIA plot carbon by
+    site class, and a P26 Build and Historical comparison.
