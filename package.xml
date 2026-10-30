@@ -701,6 +701,13 @@
 		<column name="Source" dataType="String"/>
 	</dataSheet>
 
+	<dataSheet name="OutputSiteClassMap" displayName="Site Class Shares (TreeMap)">
+		<!-- stage 5 when Build Options: Site Productivity = TreeMap site class (to-do 35 step 4): per cell, the share of its TreeMap 30 m
+		     pixels whose FIA plot is in each site class; stage 8 combines them with Site Productivity's multipliers -->
+		<column name="SiteClass" displayName="Site Class (1 = 225+ ... 7 = 0-19 cu ft/ac/yr)" dataType="Integer"/>
+		<column name="FileName" displayName="Share of the Cell" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
+	</dataSheet>
+
 	<dataSheet name="OutputGrowthReport" displayName="Growth Curve Report" isSingleRow="True">
 		<column name="FileName" displayName="Report (PDF)" dataType="String" isExternalFile="True" isRaster="False" externalFileFilter="PDF Files (*.pdf)|*.pdf"/>
 	</dataSheet>
@@ -868,6 +875,7 @@
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Both"/>
 		<dataSheet name="OutputNlcdAnnual" type="Output"/>
 		<dataSheet name="OutputLandCoverLayers" type="Output"/>
+		<dataSheet name="OutputSiteClassMap" type="Output"/>
 		<dataSheet name="OutputReturnInterval" type="Output"/>
 		<dataSheet name="OutputSoilTarget" type="Output"/>
 		<dataSheet name="OutputStateClassSummary" type="Output"/>
@@ -1064,6 +1072,7 @@
 				<item name="OutputStrataSummary"/>
 				<item name="OutputStateClassSummary"/>
 				<item name="OutputLandCoverLayers"/>
+				<item name="OutputSiteClassMap"/>
 				<item name="OutputNlcdAnnual"/>
 				<item name="OutputTransitionSummary"/>
 				<item name="OutputProjectionRate"/>

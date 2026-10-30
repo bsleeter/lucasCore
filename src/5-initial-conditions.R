@@ -119,7 +119,10 @@ asrc <- opt$StandAgeSource[1]
 asrc <- if (is.null(asrc) || is.na(asrc)) "NASA CMS" else if (is.numeric(asrc)) c("NASA CMS", "TreeMap")[asrc] else sub(" .*", "", as.character(asrc))
 # TreeMap (to-do 35 with 10, src/treemap.R): its 30 m plot ids over the study area and each plot's forested condition (type, age,
 # site class), read once for the forest type and the stand age
-if (startsWith(fmap, "TreeMap") || identical(asrc, "TreeMap")) {
+# Site Productivity = TreeMap site class (to-do 35 step 4): the share of each cell's TreeMap pixels in each FIA site class, for stage 8
+spv <- opt$SiteProductivity[1]
+site_on <- !is.null(spv) && !is.na(spv) && (identical(suppressWarnings(as.integer(spv)), 2L) || startsWith(as.character(spv), "TreeMap"))
+if (startsWith(fmap, "TreeMap") || identical(asrc, "TreeMap") || site_on) {
   source(pkg_file("src", "treemap.R"))
   tmd <- read_data_sources("TreeMapFolder")$TreeMapFolder; dm <- read_data_sources("FiaDataMartFolder")$FiaDataMartFolder
   tm30 <- treemap_crop(tmd, R); tm30 <- mask(tm30, project(P, tm30, method = "near"))   # P is NA outside the study area
@@ -212,6 +215,17 @@ if (identical(asrc, "TreeMap")) {
   say("Stand age: NASA CMS Forest Age 1990, moved to %d", y0)
 }
 A[A <= 0] <- NA
+if (site_on) {   # 7 single-band maps: share of the cell's TreeMap pixels (with a site class) in site class 1 ... 7; no pixels = NA
+  s30 <- classify(tm30, cbind(tpl$Value, as.numeric(tpl$siteclcd)), others = NA)
+  sh <- lapply(1:7, function(k) mask(project(ifel(is.na(s30), NA, s30 == k), R, method = "average"), P))
+  tot <- Reduce(`+`, lapply(sh, function(x) ifel(is.na(x), 0, x)))
+  vf <- values(mask(ifel(S >= 100, 1, NA), P), mat = FALSE); vt <- values(tot, mat = FALSE)
+  cov <- mean(!is.na(vt[which(vf == 1)]) & vt[which(vf == 1)] > 0)
+  check(STAGE, "site class shares add up to 1 wherever a cell has TreeMap pixels", all(abs(vt[!is.na(vt) & vt > 0] - 1) < 1e-4))
+  say("Site class shares (TreeMap): %.1f%% of forest cells have TreeMap pixels with a site class (the rest get multiplier 1 in stage 8); shares of the study area's TreeMap pixels: %s",
+      100 * cov, { pp <- merge(tpx, tpl, by = "Value"); paste(sprintf("%d %.0f%%", 1:7, 100 * vapply(1:7, function(k) pp[siteclcd %in% k, sum(n)] / tcv$pixels, 0)), collapse = ", ") })
+  write_ds(data.table(SiteClass = 1:7, FileName = vapply(1:7, function(k) write_raster(sh[[k]], sprintf("SiteClassShare%d.tif", k), "FLT4S"), "")), "OutputSiteClassMap")
+}
 A <- fill_modal(mask(A, m), m, round(global(A, "mean", na.rm = TRUE)[[1]]))
 A <- mask(ifel(forest, max(A, 1), 0), m)
 progressBar()

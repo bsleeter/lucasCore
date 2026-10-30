@@ -150,6 +150,12 @@ matches TreeMap's, else the largest), as dev/treemap/01 does. Used by type, age 
   returns the copied sheets: outputs reach the library only when the run ends). Tests: tests/unit-site-productivity.R (10 checks) and
   tests/phaseZ18-site-productivity-stage2.R (copy 2.9 min, fit 14.7 min, off: all pass; 182,929 fitting plots, 133 of 532 cells
   with their own values; mixed conifer M260 1.54 / 1.59 / 1.26 / 0.97 / 0.61 / 0.53 / 0.33 for site classes 1-7).
+- **Step 4 (cells), 2026-10-30, stage 5 half done.** The Build runs stage 5 before stage 2, so stage 5 cannot read the multipliers.
+  It writes what TreeMap knows per cell instead: **Build Results > Site Class Shares (TreeMap)** (OutputSiteClassMap), seven maps of
+  the share of the cell's TreeMap pixels in site class 1-7 (the plot's site class, whatever the type map). Stage 8, which runs after
+  stage 2, turns them into the multiplier: sum over classes of share x the cell's type x ecodivision multiplier (with step 5's flow
+  multiplier and step 6's initial stocks). Test tests/phaseZ19-site-class-shares.R (EVT types, CMS ages): passes; shares add to 1 in
+  every cell with pixels; 99.1% of Placer's forest cells covered (the rest get 1); mix 1% / 5% / 25% / 25% / 24% / 6% / 15%.
 
 ## Notes
 
