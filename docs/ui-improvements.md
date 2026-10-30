@@ -13,7 +13,7 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | ~~1~~ | ~~22 Automatic spatial tiles~~ DONE 2026-10-29 | No | Small and self-contained; users otherwise need to know the region to pick Tiles | - |
 | ~~2~~ | ~~35 TreeMap: forest type, stand age, site productivity (with 10)~~ DONE 2026-10-30 | Yes, as options (off by default) | Code, pages, figure, tests and P26 sync done; its guide content is item 36 | - |
 | ~~3~~ | ~~34 Minimum harvest ages~~ DONE 2026-10-30 | Yes (projections; stage 6 start ages) | FIA values lowered to the study area's mapped cuts; selection at least 10 yr under clearcut | 35's age source |
-| 1 | 32 Carbon open science issues | Possibly | Short snags in 96 cells, duff at its bound in 19, California-fitted shares used everywhere; the last item that may change the model before P26 is rerun | - |
+| ~~1~~ | ~~32 Carbon open science issues~~ DONE 2026-10-30 | Yes | Stem turnover fitted to FIA background mortality (snags now match); duff bound harmless; California event shares hold nationally | - |
 | 2 | 37 P26 rerun and guide refresh | Its own results | 34 changed the start ages, harvest pathways and so initial carbon; rerun once after 32, then redo the guide's P26 numbers and figures, and add the Minimum Harvest Age page | 34, 32 |
 | 3 | 31 Copy Carbon Assumptions; SoilGrids option | No (an option) | Convenience and one more soil source | - |
 | 4 | 12 Data Download stage | No | Needs the final input list (35 added TreeMap) | 35 |
@@ -22,8 +22,9 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | any | 33 Leftovers inside done items | Some | Small, independent; (7) guide 1.4 and (1) deep links any time; (8) and (17) larger | - |
 | later | 26 Guide chapter 9, Troubleshooting | No | After beta testers (user) | beta |
 | later | 36 Guide: Advanced Features (site productivity comparison) | No | After the items above (user); needs a P26 Build with Site productivity on | 35, 37 |
+| later | 38 Stand-replacing insect and disease events | Yes | Option B of 32 (user: eventually); background mortality already excludes them | 32 |
 
-Done since the 2026-10-25 order: 6, 7, 8, 9, 11a, 15-25, 28-30, 34, 35 (item 27 removed by the user).
+Done since the 2026-10-25 order: 6, 7, 8, 9, 11a, 15-25, 28-30, 32, 34, 35 (item 27 removed by the user).
 Not pushed: every lucasCore commit since 54177b2 (2026-10-29) is local only; the repo is public, so push only when the user asks.
 
 1. **Data Sources page** - DONE 2026-10-24. Custom view (`ui/DataSourcesView.cs`) groups the paths by category (study area, land
@@ -371,7 +372,7 @@ Not pushed: every lucasCore commit since 54177b2 (2026-10-29) is local only; the
     on the Build result with ecodivision and forest type drop-downs shows them.
 31. **Carbon Assumptions: copy from another library** - TO DO (planned 2026-10-27, as Growth Curve Options' copy), and the **SoilGrids**
     option for Soil Organic Carbon (user, 2026-10-28).
-32. **Carbon open science issues** - TO LOOK AT (2026-10-27): snags short in 96 cells even at the lowest snag decay (inputs or fall
+32. **Carbon open science issues** - DONE 2026-10-30 (raised 2026-10-27): snags short in 96 cells even at the lowest snag decay (inputs or fall
     rate; user offered to look); duff multiplier at its 20 bound in 19 cells; the fitted fire/clearcut transfers and fire snag shares
     are California-fitted but applied everywhere.
     **Diagnosed 2026-10-30** (dev/fia/22-snag-shortfall.R, 23-stem-mortality.R; outputs dev/fia/out-z7). (1) Snags: the "96 cells"
@@ -406,7 +407,20 @@ Not pushed: every lucasCore commit since 54177b2 (2026-10-29) is local only; the
     broken tops and lower density); pools' medians 0.84-0.99 of measured; live carbon still the stage 2 curves. P26 mixed conifer
     snags 0.65 -> 1.05, down logs 0.69 -> 0.96; fir/spruce snags 0.41 -> 0.80. Also found: the ecodivision shapefile has a second
     M260 polygon named "Mediterranean" (the package uses codes; both tools now map names by code; harvest-age.csv changed one count).
-    Open: (3) California-fitted fire/clearcut transfers and fire snag shares; option B (stand-replacing insect/disease events) later.
+    **(3) Assessed 2026-10-30, no change** (dev/fia/25-event-shares-national.R, all 48 states: DWM visits 0-5 yr after a
+    stand-replacing event paired with the visit before, as 08 did for M260). Fire (913 pairs, nearly all western): snags gained
+    0.49-0.61 of the live wood before in every western ecodivision with >= 10 pairs vs 0.59 in M260 (M340 0.38 on 34 pairs; Subtropical
+    0.06, southeastern low-carbon stands, likely salvaged); down logs gained ~0 everywhere; forest floor kept 0.18-0.29 vs 0.18.
+    Clearcut (1,000 pairs): snags left 0.00-0.04 and median down logs gained 0.00-0.05 of the wood before everywhere, as M260 and the
+    model (0.02); only the means differ (Subtropical 0.74, Warm Continental 2.8: a few site-preparation piles); forest floor kept
+    0.42-1.1 (M260 0.66). The M260 fits stand; regional overrides stay possible in Disturbance Flows and Fire Snag Share. Item 32 DONE;
+    option B is item 38.
+38. **Stand-replacing insect and disease events (to-do 32 option B)** - LATER (user, 2026-10-30: "eventually"). Background mortality
+    is now stem turnover fitted to FIA without stand-replacing losses (item 32). B adds only the stand-replacing (>= 70% of live
+    carbon) insect and disease events as discrete spatial events, so nothing is counted twice: a transition group with maps (LANDFIRE
+    Annual Disturbance insect/disease types and severity, which stage 6 already reads; ADS/IDS; LCMS slow loss; Meddens & Hicke for a
+    check) and pathways; the Insect flow rows already in defaults/stockflow/event-pathways.csv. Where it matters most: lodgepole and
+    aspen in Temperate Steppe Mountains, lodgepole in Marine Mountains (34-38% of their mortality is stand-replacing).
 33. **Leftovers inside done items** - TO DO: (1) Data Sources deep links into the USFS Research Data Archive; (7) guide 1.4 on
     multiprocessing for tiled runs (check against the P26 setup); (8) a full P26 Build + historical run with Area-matched resampling to
     compare carbon, transitions and figures, and matching the state class splits within NLCD classes (forest type, shrub/grass,
