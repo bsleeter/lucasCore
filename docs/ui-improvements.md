@@ -374,6 +374,18 @@ Not pushed: every lucasCore commit since 54177b2 (2026-10-29) is local only; the
 32. **Carbon open science issues** - TO LOOK AT (2026-10-27): snags short in 96 cells even at the lowest snag decay (inputs or fall
     rate; user offered to look); duff multiplier at its 20 bound in 19 cells; the fitted fire/clearcut transfers and fire snag shares
     are California-fitted but applied everywhere.
+    **Diagnosed 2026-10-30** (dev/fia/22-snag-shortfall.R, 23-stem-mortality.R; outputs dev/fia/out-z7). (1) Snags: the "96 cells"
+    were the cells with snag decay at its lower bound, not the short ones; of the 193 cells with measured targets the spin-up's mature
+    snags are under 0.8 x measured in 72, 14 of them at the bound (mostly interior-West mountains: lodgepole, fir/spruce, aspen).
+    Cause: the mortality input, not the fall rate. With decay ~0, snags ~ mortality / fall, and the model's stem mortality is CBM's
+    stem turnover (one rate per type, its CBM ecozone, never fitted). FIA remeasured mature conditions, 11 western states, non-fire
+    mortality per year of live aboveground carbon: snag-OK cells 0.0079 vs CBM 0.0052 (1.5x), short cells 0.0124 vs 0.0045 (2.7x);
+    across cells snag ratio vs FIA / CBM r = -0.67; lodgepole TSM 4.3x, aspen TSM 4.8x, fir/spruce TSM 3.5x. Cause of death does not
+    separate them (insect 14% vs 16% of standing dead; 64-70% unknown). (2) Duff at 20: all 19 cells are Exotic Hardwoods (one
+    per-type fit, 445 plots nationally, measured duff ~0.3-0.4 Mg C/ha) - harmless, leave. (3) California-fitted event shares: not
+    yet assessed. Proposed fix for (1): fit stem turnover to FIA's non-fire mortality of mature stands (per type, per type x
+    ecodivision where >= 30 remeasured conditions), all 48 states, as the package's Live Turnover values; growth curves stay (gross
+    growth = curve increment + turnover), the DOM decay refits; awaiting the user's choice.
 33. **Leftovers inside done items** - TO DO: (1) Data Sources deep links into the USFS Research Data Archive; (7) guide 1.4 on
     multiprocessing for tiled runs (check against the P26 setup); (8) a full P26 Build + historical run with Area-matched resampling to
     compare carbon, transitions and figures, and matching the state class splits within NLCD classes (forest type, shrub/grass,
