@@ -389,3 +389,15 @@ figures, which are redone once after the P26 rerun.
     multiprocessing for tiled runs (check against the P26 setup); (8) a full P26 Build + historical run with Area-matched resampling to
     compare carbon, transitions and figures, and matching the state class splits within NLCD classes (forest type, shrub/grass,
     wetland types), still modal; (17) Monte Carlo bands and sign-agreement maps in Compare Runs.
+34. **Calibrate the minimum harvest ages** - TO DO (scoped 2026-10-29, user: matters for projections, where cut cells must meet it; method
+    not chosen yet). Today defaults/transitions/pathways/harvest.csv gives Forest Clearcut one AgeMin per forest type, copied from the
+    CONUS 1 km build (20-161 yr: mixed conifer 92, redwood and Other Western Softwood 161); the selection types have none. Stage 9 uses
+    it for eligibility, and stage 6 raises the start age of every historically clearcut cell to it, so it also changes the initial ages,
+    initial carbon and historical results. Quick check on California FIA remeasured plots (prior-visit STDAGE on conditions cut between
+    visits: 788 cuts, 133 clearcut-like with basal area loss >= 75%): mixed conifer 10th pct 45, median 85 (so 92 blocks over half);
+    ponderosa 36/75; fir/spruce/mtn hemlock 70/95; Douglas-fir 39/63; redwood about 44/60-70; private land cuts youngest.
+    Options: (a) FIA age at harvest, a low percentile per type, California plus OR/WA/NV for thin types, selection from partial cuts,
+    optionally by owner; (b) growth-curve CMAI (NFMA 95% rule) from stage 2's curves as the fallback; (c) stage 6's AgeBlockedArea
+    share as the check, not a fit (the age map was adjusted, so fitting to it is circular). Build: tools/calibrate-harvest-age.R, an
+    optional Minimum Harvest Age page (like Mature Age) read by stages 6 and 9, unit test, test-library run comparing blocked share
+    and initial carbon. P26 needs a Build and Historical rerun to pick it up.
