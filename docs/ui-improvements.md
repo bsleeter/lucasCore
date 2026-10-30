@@ -14,8 +14,8 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | ~~2~~ | ~~35 TreeMap: forest type, stand age, site productivity (with 10)~~ DONE 2026-10-30 | Yes, as options (off by default) | Code, pages, figure, tests and P26 sync done; its guide content is item 36 | - |
 | ~~3~~ | ~~34 Minimum harvest ages~~ DONE 2026-10-30 | Yes (projections; stage 6 start ages) | FIA values lowered to the study area's mapped cuts; selection at least 10 yr under clearcut | 35's age source |
 | ~~1~~ | ~~32 Carbon open science issues~~ DONE 2026-10-30 | Yes | Stem turnover fitted to FIA background mortality (snags now match); duff bound harmless; California event shares hold nationally | - |
-| 1 | 39 Grassland, shrubland and wetland carbon | Yes (science step) | Rates exposed on a page 2026-10-30 (step 1 done); the science options are next if the user wants them before the P26 rerun | - |
-| 2 | 37 P26 rerun and guide refresh | Its own results | 34 changed the start ages, harvest pathways and so initial carbon; rerun once after 39 (and 32), then redo the guide's P26 numbers and figures, and add the Minimum Harvest Age page | 34, 32, 39 |
+| later | 39 Grassland, shrubland and wetland carbon: the science step | Yes | Step 1 done 2026-10-30 (rates on a page, Non-sage fixed); the user reruns P26 first; suspect values (emergent wetland growth 31, irrigated grass 9.19 Mg C/ha/yr) and the science options later | 37 |
+| 1 | 37 P26 rerun and guide refresh | Its own results | 34 changed the start ages, harvest pathways and so initial carbon; rerun once after 39 (and 32), then redo the guide's P26 numbers and figures, and add the Minimum Harvest Age page | 34, 32, 39 |
 | 3 | 31 Copy Carbon Assumptions; SoilGrids option | No (an option) | Convenience and one more soil source | - |
 | 4 | 12 Data Download stage | No | Needs the final input list (35 added TreeMap) | 35 |
 | 5 | 13 Demo bundle, Calaveras | No | Needs 12's home folder and a settled model; the finished demo library (option 1) can go earlier if wanted | 12; 37 |
@@ -549,7 +549,8 @@ Not pushed: every lucasCore commit since 54177b2 (2026-10-29) is local only; the
     Assumptions", P26's Carbon Assumptions scenario has its own Live Turnover rows, which win: Fill on the Carbon Method page replaces
     them); stage 6's "Minimum harvest ages" lines and Build Results > Minimum Harvest Ages; Initial Stock Summary total carbon (was
     439 Tg C); in the Historical run, realized clearcut and selection area against the Historical Transition Summary's LCMS area.
-    Then Claude pulls the numbers and figures for the guide.
+    Also (2026-10-30, after items 32 and 39): stage 3's "Grassland, Shrubland and Wetland Carbon: no rows (the package values)" line;
+    Non-sage shrub cells start with the fixed pools. Then Claude pulls the numbers and figures for the guide.
 39. **Grassland and shrubland carbon: expose the rates, then improve the science** - TO DO, top priority (user, 2026-10-30: before
     the P26 rerun; the rates came from IBIS simulations, "not very tractable"; at least make them visible and overridable, open to
     better science). **Today** (all package tables from the CONUS 1 km build, copied by stage 3 and stage 8): Net Growth one value per
