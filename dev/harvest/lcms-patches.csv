@@ -1,0 +1,4 @@
+Set,Patches,Median_ha,AreaWeightedMedian_ha,SinglePixelShare,Max_ha
+NLCD clearcut,596953,0.09,2.16,0.687,4944.87
+LCMS TR stand-replacing,85047,0.27,5.04,0.294,107.46
+LCMS TR partial,179574,0.27,1.89,0.319,212.04

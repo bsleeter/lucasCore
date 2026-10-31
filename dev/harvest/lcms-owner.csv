@@ -1,0 +1,99 @@
+Set,Owner,Gap,N
+NLCD clearcut,Corporate,9,640742
+NLCD clearcut,Not forest,3,40239
+NLCD clearcut,Family,9,331704
+NLCD clearcut,Federal,3,1030072
+NLCD clearcut,Other private,9,17277
+NLCD clearcut,Not forest,9,83947
+NLCD clearcut,Corporate,3,8288
+NLCD clearcut,State,9,28624
+NLCD clearcut,Federal,9,36118
+NLCD clearcut,State,3,4484
+NLCD clearcut,Federal,1,35955
+NLCD clearcut,Family,3,2867
+NLCD clearcut,Not forest,2,2222
+NLCD clearcut,Federal,2,18516
+NLCD clearcut,Corporate,2,1550
+NLCD clearcut,State,4,3905
+NLCD clearcut,Not forest,4,501
+NLCD clearcut,Family,2,3475
+NLCD clearcut,Corporate,4,3042
+NLCD clearcut,Other private,3,421
+NLCD clearcut,State,2,4591
+NLCD clearcut,Family,4,2154
+NLCD clearcut,Local,9,3801
+NLCD clearcut,Local,4,147
+NLCD clearcut,Other private,2,1328
+NLCD clearcut,Federal,4,124
+NLCD clearcut,Not forest,1,2618
+NLCD clearcut,Tribal,9,21581
+NLCD clearcut,Tribal,3,113
+NLCD clearcut,Corporate,1,273
+NLCD clearcut,Family,1,262
+NLCD clearcut,Tribal,4,28
+NLCD clearcut,Local,3,36
+NLCD clearcut,Local,2,134
+NLCD clearcut,State,1,22
+NLCD clearcut,Other private,4,2
+LCMS TR stand-replacing,Federal,3,315345
+LCMS TR stand-replacing,Corporate,9,533367
+LCMS TR stand-replacing,Not forest,3,10097
+LCMS TR stand-replacing,Federal,9,29079
+LCMS TR stand-replacing,Not forest,9,72786
+LCMS TR stand-replacing,State,9,22032
+LCMS TR stand-replacing,Family,9,160730
+LCMS TR stand-replacing,Federal,2,3307
+LCMS TR stand-replacing,Corporate,3,5068
+LCMS TR stand-replacing,Family,4,857
+LCMS TR stand-replacing,Family,3,749
+LCMS TR stand-replacing,Corporate,4,1945
+LCMS TR stand-replacing,Federal,4,89
+LCMS TR stand-replacing,State,3,663
+LCMS TR stand-replacing,Not forest,2,267
+LCMS TR stand-replacing,Other private,9,11886
+LCMS TR stand-replacing,Local,3,18
+LCMS TR stand-replacing,Federal,1,120
+LCMS TR stand-replacing,State,4,1421
+LCMS TR stand-replacing,State,2,1045
+LCMS TR stand-replacing,Tribal,9,14512
+LCMS TR stand-replacing,Other private,3,53
+LCMS TR stand-replacing,Local,9,1986
+LCMS TR stand-replacing,Corporate,2,992
+LCMS TR stand-replacing,Other private,2,49
+LCMS TR stand-replacing,Other private,4,2
+LCMS TR stand-replacing,Family,2,654
+LCMS TR stand-replacing,Not forest,4,111
+LCMS TR stand-replacing,Local,4,39
+LCMS TR stand-replacing,Tribal,3,10
+LCMS TR partial,Federal,3,549015
+LCMS TR partial,Corporate,9,513999
+LCMS TR partial,Not forest,3,1988
+LCMS TR partial,Not forest,9,13178
+LCMS TR partial,Federal,9,35222
+LCMS TR partial,Family,9,271276
+LCMS TR partial,State,9,20131
+LCMS TR partial,Federal,2,5138
+LCMS TR partial,Corporate,3,5567
+LCMS TR partial,Family,4,1887
+LCMS TR partial,Family,3,1290
+LCMS TR partial,Local,9,2489
+LCMS TR partial,Local,4,65
+LCMS TR partial,Corporate,4,3363
+LCMS TR partial,State,3,597
+LCMS TR partial,Other private,9,19946
+LCMS TR partial,Not forest,2,40
+LCMS TR partial,Local,3,21
+LCMS TR partial,Federal,1,85
+LCMS TR partial,State,2,1546
+LCMS TR partial,Tribal,9,14042
+LCMS TR partial,Corporate,2,1539
+LCMS TR partial,Federal,4,323
+LCMS TR partial,State,4,3703
+LCMS TR partial,Family,2,1202
+LCMS TR partial,Other private,3,83
+LCMS TR partial,Other private,2,680
+LCMS TR partial,Not forest,4,14
+LCMS TR partial,Tribal,3,35
+LCMS TR partial,Local,2,12
+LCMS TR partial,Other private,4,1
+LCMS TR partial,Tribal,4,20

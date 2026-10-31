@@ -1,0 +1,55 @@
+Type,Region,Cut,AgeMin,n,p10,p25,median,p75,BelowAgeMin
+Forest: California Mixed Conifer Group,CA,clearcut-like,92,64,48.9,75.75,91.5,117.25,0.5
+Forest: Ponderosa Pine Group,CA,clearcut-like,61,20,46.5,62.75,79,103,0.2
+Forest: Fir/Spruce/Mountain Hemlock Group,CA,clearcut-like,61,11,75,80.5,97,165,0.0909090909090909
+Forest: Douglas-fir Group,CA,clearcut-like,40,10,44.2,50,70,102.5,0.1
+Forest: Western Oak Group,CA,clearcut-like,50,8,65.9,82.25,85.5,92.25,0.125
+Forest: Tanoak/Laurel Group,CA,clearcut-like,46,7,62.8,73,86,126,0
+Forest: Other Western Softwood Group,CA,clearcut-like,161,5,68,74,80,86,0.8
+,CA,clearcut-like,,3,3.6,6,10,61,
+Forest: Redwood Group,CA,clearcut-like,161,3,48.8,54.5,64,77,1
+Forest: Alder/Maple Group,CA,clearcut-like,37,1,63,63,63,63,0
+Forest: Douglas-fir Group,West,clearcut-like,40,393,37,43,54,72,0.16030534351145
+Forest: Hemlock/Sitka Spruce Group,West,clearcut-like,46,100,40.9,47,56,69,0.2
+Forest: Ponderosa Pine Group,West,clearcut-like,61,96,50,66.5,82.5,98.25,0.177083333333333
+Forest: Fir/Spruce/Mountain Hemlock Group,West,clearcut-like,61,67,55,65,80,109,0.164179104477612
+Forest: California Mixed Conifer Group,West,clearcut-like,92,64,48.9,75.75,91.5,117.25,0.5
+Forest: Alder/Maple Group,West,clearcut-like,37,47,34.6,40.5,51,66,0.170212765957447
+Forest: Lodgepole Pine Group,West,clearcut-like,61,20,53.6,67.5,83,98.5,0.2
+Forest: Other Western Softwood Group,West,clearcut-like,161,15,64.4,73,85,105.5,0.933333333333333
+Forest: Tanoak/Laurel Group,West,clearcut-like,46,14,46.2,52.5,59,85,0.142857142857143
+Forest: Western Oak Group,West,clearcut-like,50,10,42.7,77.5,84,90,0.2
+,West,clearcut-like,,9,1.8,2,6,56,
+Forest: Western Larch Group,West,clearcut-like,61,6,73,76,84,115.25,0
+Forest: Elm/Ash/Cottonwood Group,West,clearcut-like,37,3,21.8,38,65,66,0.333333333333333
+Forest: Redwood Group,West,clearcut-like,161,3,48.8,54.5,64,77,1
+Forest: Aspen/Birch Group,West,clearcut-like,46,2,16,17.5,20,22.5,1
+Forest: Pinyon/Juniper Group,West,clearcut-like,92,1,144,144,144,144,0
+Forest: Western White Pine Group,West,clearcut-like,92,1,44,44,44,44,1
+Forest: California Mixed Conifer Group,CA,partial,92,121,59,73,93,118,
+Forest: Ponderosa Pine Group,CA,partial,61,33,37.2,51,88,106,
+Forest: Western Oak Group,CA,partial,50,22,54.7,64,84,117.5,
+Forest: Redwood Group,CA,partial,161,18,49.3,66.5,85,93.75,
+Forest: Fir/Spruce/Mountain Hemlock Group,CA,partial,61,17,68,75,94,105,
+Forest: Douglas-fir Group,CA,partial,40,13,37.8,43,47,65,
+Forest: Tanoak/Laurel Group,CA,partial,46,13,50,57,64,103,
+Forest: Lodgepole Pine Group,CA,partial,61,3,100,140.5,208,216,
+,CA,partial,,2,8.40000000000001,21,42,63,
+Forest: Alder/Maple Group,CA,partial,37,2,67.5,81.75,105.5,129.25,
+Forest: Other Western Softwood Group,CA,partial,161,2,43,43,43,43,
+Forest: Ponderosa Pine Group,West,partial,61,309,54.8,73,88,106,
+Forest: Douglas-fir Group,West,partial,40,278,35,47,71,93,
+Forest: California Mixed Conifer Group,West,partial,92,121,59,73,93,118,
+Forest: Fir/Spruce/Mountain Hemlock Group,West,partial,61,103,51.4,72,93,125,
+Forest: Lodgepole Pine Group,West,partial,61,60,25,51,77,100,
+Forest: Hemlock/Sitka Spruce Group,West,partial,46,41,35,51,68,81,
+Forest: Western Oak Group,West,partial,50,27,48.6,62.5,81,106,
+Forest: Other Western Softwood Group,West,partial,161,20,66.4,78,89.5,107.25,
+Forest: Alder/Maple Group,West,partial,37,19,28.8,40,57,65.5,
+Forest: Redwood Group,West,partial,161,18,49.3,66.5,85,93.75,
+Forest: Western Larch Group,West,partial,61,18,18,59.25,85,93.25,
+Forest: Tanoak/Laurel Group,West,partial,46,14,48.6,51.75,61.5,102.25,
+,West,partial,,9,3.2,6,54,84,
+Forest: Aspen/Birch Group,West,partial,46,3,55.8,57,59,67,
+Forest: Elm/Ash/Cottonwood Group,West,partial,37,3,86,99.5,122,123,
+Forest: Pinyon/Juniper Group,West,partial,92,2,31.6,62.5,114,165.5,

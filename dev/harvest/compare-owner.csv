@@ -1,0 +1,127 @@
+Set,Owner,Gap,N
+NLCD clearcut,Corporate,9,473128
+NLCD clearcut,Not forest,9,66462
+NLCD clearcut,Not forest,3,14945
+NLCD clearcut,State,3,2585
+NLCD clearcut,Other private,9,10860
+NLCD clearcut,Family,9,214826
+NLCD clearcut,Federal,3,610448
+NLCD clearcut,State,9,16988
+NLCD clearcut,Federal,9,24711
+NLCD clearcut,Federal,1,24268
+NLCD clearcut,Corporate,3,6005
+NLCD clearcut,Not forest,2,967
+NLCD clearcut,Family,3,2096
+NLCD clearcut,Federal,2,12379
+NLCD clearcut,Corporate,2,746
+NLCD clearcut,State,4,2192
+NLCD clearcut,Family,2,2222
+NLCD clearcut,Tribal,9,17074
+NLCD clearcut,Family,4,1320
+NLCD clearcut,State,2,2532
+NLCD clearcut,Other private,3,242
+NLCD clearcut,Local,4,117
+NLCD clearcut,Not forest,4,325
+NLCD clearcut,Other private,2,789
+NLCD clearcut,Not forest,1,1504
+NLCD clearcut,Corporate,4,2619
+NLCD clearcut,Local,9,2937
+NLCD clearcut,Tribal,4,13
+NLCD clearcut,Tribal,3,80
+NLCD clearcut,Corporate,1,222
+NLCD clearcut,Federal,4,27
+NLCD clearcut,Family,1,25
+NLCD clearcut,State,1,13
+NLCD clearcut,Local,2,68
+NLCD clearcut,Local,3,24
+LF Clearcut,Federal,3,93654
+LF Clearcut,Not forest,3,1459
+LF Clearcut,Corporate,9,225994
+LF Clearcut,Corporate,3,3428
+LF Clearcut,Family,9,33811
+LF Clearcut,Federal,9,10966
+LF Clearcut,State,4,607
+LF Clearcut,Not forest,9,37303
+LF Clearcut,Family,3,440
+LF Clearcut,Family,4,83
+LF Clearcut,Other private,9,2098
+LF Clearcut,State,9,7326
+LF Clearcut,Corporate,4,92
+LF Clearcut,Not forest,4,26
+LF Clearcut,Tribal,9,3019
+LF Clearcut,Corporate,2,338
+LF Clearcut,Federal,2,271
+LF Clearcut,Not forest,2,174
+LF Clearcut,Tribal,3,2
+LF Clearcut,State,3,514
+LF Clearcut,Family,2,4
+LF Clearcut,Federal,1,11
+LF Clearcut,Other private,3,5
+LF Clearcut,Local,9,1069
+LF Clearcut,Local,3,4
+LF Clearcut,Federal,4,1
+LF Harvest,Federal,3,190436
+LF Harvest,Not forest,3,5468
+LF Harvest,Corporate,9,616302
+LF Harvest,Not forest,9,38137
+LF Harvest,Federal,9,51123
+LF Harvest,Corporate,3,20387
+LF Harvest,Family,9,258402
+LF Harvest,Family,3,1291
+LF Harvest,State,9,28947
+LF Harvest,Other private,9,38011
+LF Harvest,Local,4,1955
+LF Harvest,Local,9,16643
+LF Harvest,Not forest,4,242
+LF Harvest,Federal,4,150
+LF Harvest,Local,3,234
+LF Harvest,Corporate,4,12251
+LF Harvest,Corporate,2,4478
+LF Harvest,Not forest,2,982
+LF Harvest,Federal,2,3225
+LF Harvest,Family,2,4167
+LF Harvest,State,4,1146
+LF Harvest,Family,4,2080
+LF Harvest,Other private,3,305
+LF Harvest,State,3,12227
+LF Harvest,Other private,2,4821
+LF Harvest,Tribal,9,8340
+LF Harvest,Tribal,3,31
+LF Harvest,State,2,945
+LF Harvest,Local,2,61
+LF Harvest,Federal,1,33
+LF Harvest,State,1,6
+LF Thinning,Corporate,9,874695
+LF Thinning,Corporate,3,21750
+LF Thinning,Federal,3,1820612
+LF Thinning,Not forest,9,40958
+LF Thinning,Not forest,3,44321
+LF Thinning,Federal,9,52158
+LF Thinning,Family,9,432378
+LF Thinning,Federal,2,7160
+LF Thinning,Family,2,2230
+LF Thinning,State,3,1977
+LF Thinning,Family,3,5414
+LF Thinning,State,9,41151
+LF Thinning,Other private,9,48780
+LF Thinning,Other private,3,2246
+LF Thinning,Local,9,10290
+LF Thinning,Local,4,4636
+LF Thinning,Not forest,4,314
+LF Thinning,Local,3,251
+LF Thinning,Corporate,2,1788
+LF Thinning,State,4,11444
+LF Thinning,Corporate,4,9415
+LF Thinning,Tribal,9,40920
+LF Thinning,Tribal,3,98
+LF Thinning,Not forest,2,289
+LF Thinning,Family,4,5551
+LF Thinning,Other private,2,2941
+LF Thinning,State,2,1214
+LF Thinning,Federal,4,123
+LF Thinning,Local,2,173
+LF Thinning,Federal,1,139
+LF Thinning,Corporate,1,4
+LF Thinning,State,1,1
+LF Thinning,Other private,4,12
+LF Thinning,Tribal,4,12
