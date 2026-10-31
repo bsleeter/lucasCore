@@ -4,7 +4,7 @@
 # On the test library lucasCore-suitability.ssim (Placer, 1 km): two Builds running stage 6 on a stage 5 result (phaseZ19) and Build 47, one with the
 # package values and one with a Minimum Harvest Age row (mixed conifer clearcut 70 yr in all ecodivisions). Build 47 (old ages:
 # mixed conifer clearcut 92, no selection minimum) is the before.
-# Checks: stage checks pass; every clearcut minimum is the lower of FIA and the study area maps (at least 1 km2 of mapped cuts); every
+# Checks: stage checks pass; strata everywhere or nowhere (every pathway, deterministic too, in every ecodivision); every clearcut minimum is the lower of FIA and the study area maps (at least 1 km2 of mapped cuts); every
 # selection minimum is at most clearcut - 10 and at least 5; the pathways carry the table (ponderosa selection as a Mediterranean
 # Mountains stratum row, no blank-stratum row); the page row replaces mixed conifer clearcut where no ecodivision row wins; less than
 # half of each harvest group's expected area is below its minimum; a 1985-2023 historical run cuts at least as much clearcut as Build 47's.
@@ -50,11 +50,14 @@ expect("the pathways carry the table: mixed conifer clearcut and selection", set
 expect("ponderosa selection: a Mediterranean Mountains stratum row and no blank-stratum row", length(am(t1, PP, SE, "Mediterranean Mountains")) == 1 && !length(am(t1, PP, SE)))
 expect("page row: mixed conifer clearcut 70 where no ecodivision row wins, and selection there 60 or less", any(t2[StateClassIdSource == MC & TransitionTypeId == CC, AgeMin] == 70) &&
        all(am(t2, MC, SE, "Mediterranean") <= 60))
-bl <- function(t) if ("StratumIdSource" %in% names(t)) t[is.na(StratumIdSource)] else t
-expect("other pathways unchanged (same blank-stratum rows apart from harvest)", nrow(bl(t1)[!TransitionTypeId %in% c(CC, SE)]) == nrow(t0[!TransitionTypeId %in% c(CC, SE)]))
-# ST-Sim takes a class's stratum rows in place of its blank-stratum rows: each such class x ecodivision needs all the class's pathways (P26 Build 50 lost half its fire)
-cov <- t1[!is.na(StratumIdSource), .(Has = uniqueN(TransitionTypeId)), by = .(StratumIdSource, StateClassIdSource)][t1[, .(All = uniqueN(TransitionTypeId)), by = StateClassIdSource], on = "StateClassIdSource", nomatch = 0]
-expect("every class x ecodivision with its own rows has all the class's pathways (fire, urbanization ...)", nrow(cov) > 0 && cov[, all(Has == All)], cov[Has != All, paste(StratumIdSource, StateClassIdSource, Has, "of", All, collapse = "; ")])
+# strata everywhere or nowhere (ST-Sim takes a cell's stratum rows in place of the blank-stratum rows; P26 Build 50 mixed them and lost half its fire)
+E <- unique(t1$StratumIdSource); n0 <- nrow(t0[!TransitionTypeId %in% c(CC, SE)])
+expect("every pathway row has an ecodivision, and each ecodivision has every pathway", !anyNA(t1$StratumIdSource) && length(E) > 1 &&
+       t1[, .N, by = StratumIdSource][, uniqueN(N) == 1 && N[1] == nrow(t0)], t1[, paste(StratumIdSource, .N, collapse = "; "), ])
+expect("other pathways unchanged (each ecodivision has Build 47's rows apart from harvest)", t1[!TransitionTypeId %in% c(CC, SE), .N, by = StratumIdSource][, all(N == n0)])
+dt <- as.data.table(datasheet(RB$pkg, "stsim_DeterministicTransition", lookupsAsFactors = FALSE)); d0 <- as.data.table(datasheet(B47, "stsim_DeterministicTransition", lookupsAsFactors = FALSE))
+expect("deterministic transitions by ecodivision too, Build 47's rows in each", "StratumIdSource" %in% names(dt) && !anyNA(dt$StratumIdSource) && setequal(unique(dt$StratumIdSource), E) &&
+       dt[, .N, by = StratumIdSource][, all(N == nrow(d0))])
 blk <- function(r) as.data.table(datasheet(r, "lucasCore_OutputTransitionSummary", lookupsAsFactors = FALSE))[grepl("Harvest", TransitionGroup), .(Expected = sum(Area), Blocked = sum(AgeBlockedArea, na.rm = TRUE)), by = TransitionGroup]
 b1 <- blk(RB$pkg); print(b1)
 expect("expected area below the minimum is under half of each harvest group", b1[, all(Blocked < 0.5 * Expected)], b1[, paste(sprintf("%s %.0f%%", sub(" [Type]", "", sub("^.*: ", "", TransitionGroup), fixed = TRUE), 100 * Blocked / Expected), collapse = "; ")])

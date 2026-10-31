@@ -248,21 +248,22 @@ if (any(s)) { cap <- ccap(ha$Ecodivision[s], ha$StateClassId[s]) - H_OFFSET; new
 hb <- ha[is.na(Ecodivision)]; he <- ha[!is.na(Ecodivision) & Ecodivision %in% eco_here]
 tr[hb, on = .(StateClassIdSource = StateClassId, TransitionTypeId), AgeMin := i.AgeMin]
 sp <- unique(he[, .(StateClassIdSource = StateClassId, TransitionTypeId)])
-if (nrow(sp)) {   # a type x harvest with an ecodivision row: one pathway row per ecodivision here, no blank-stratum row (ST-Sim would run both)
-  ex <- rbindlist(lapply(eco_here, function(e) copy(tr[sp, on = .(StateClassIdSource, TransitionTypeId), nomatch = 0])[, StratumIdSource := e]))
-  ex[he, on = .(StratumIdSource = Ecodivision, StateClassIdSource = StateClassId, TransitionTypeId), AgeMin := i.AgeMin]
-  tr <- rbind(tr[!sp, on = .(StateClassIdSource, TransitionTypeId)], ex)
-  # ST-Sim takes a class's rows for a cell's stratum IN PLACE OF its blank-stratum rows, so that class's other pathways (fire, urbanization,
-  # ...) go to each of those ecodivisions too; P26 Build 50 left them blank and its historical run lost half its fire and urbanization
-  k <- tr[, is.na(StratumIdSource) & StateClassIdSource %in% sp$StateClassIdSource]
-  tr <- rbind(tr, rbindlist(lapply(eco_here, function(e) copy(tr[k])[, StratumIdSource := e]))) }
+# Strata are used everywhere or nowhere: with any ecodivision harvest-age row, every pathway (probabilistic and deterministic) is written
+# once per ecodivision here and none is blank-stratum. ST-Sim takes a cell's stratum rows IN PLACE OF the blank-stratum rows, so a mix
+# hides pathways: P26 Build 50 had harvest rows by ecodivision for two types and its historical run lost half its fire and urbanization.
+if (nrow(sp)) {
+  tr <- rbindlist(lapply(eco_here, function(e) copy(tr)[, StratumIdSource := e]))
+  tr[he, on = .(StratumIdSource = Ecodivision, StateClassIdSource = StateClassId, TransitionTypeId), AgeMin := i.AgeMin]
+  loc <- rbindlist(lapply(eco_here, function(e) copy(loc)[, StratumIdSource := e])) }
 setcolorder(tr, "StratumIdSource")
 tr <- tr[, names(tr)[vapply(tr, function(v) !all(is.na(v)), TRUE)], with = FALSE]
-miss <- data.table()
-if ("StratumIdSource" %in% names(tr)) { ts <- tr[!is.na(StratumIdSource)]
-  need <- unique(ts[, .(StratumIdSource, StateClassIdSource)])[unique(tr[, .(StateClassIdSource, TransitionTypeId)]), on = "StateClassIdSource", nomatch = 0, allow.cartesian = TRUE]
-  miss <- need[!ts, on = .(StratumIdSource, StateClassIdSource, TransitionTypeId)] }
-check(STAGE, "a class with ecodivision pathways has every one of its pathways there", !nrow(miss), paste(head(miss[, paste(StratumIdSource, StateClassIdSource, TransitionTypeId)], 5), collapse = "; "))
+by_eco <- "StratumIdSource" %in% names(tr)
+pset <- function(x, e) x[StratumIdSource == e, sort(paste(StateClassIdSource, TransitionTypeId))]
+check(STAGE, "pathways use strata consistently (every row blank, or every ecodivision has every pathway)", !by_eco ||
+      (!anyNA(tr$StratumIdSource) && setequal(unique(tr$StratumIdSource), eco_here) && all(vapply(eco_here, function(e) identical(pset(tr, e), pset(tr, eco_here[1])), TRUE)) &&
+       "StratumIdSource" %in% names(loc) && !anyNA(loc$StratumIdSource) && setequal(unique(loc$StratumIdSource), eco_here)),
+      if (by_eco) sprintf("%d pathway rows over %d ecodivisions", nrow(tr), length(eco_here)) else "no ecodivision rows")
+if (by_eco) say("Pathways by ecodivision (an ecodivision harvest age): %d rows, %d deterministic, in each of %s", nrow(tr) / length(eco_here), nrow(loc) / length(eco_here), paste(eco_here, collapse = ", "))
 here <-ha[(is.na(Ecodivision) | Ecodivision %in% eco_here) & StateClassId %in% unique(cn) & TransitionTypeId %in% c(CC, SEL)][order(StateClassId, TransitionTypeId, Ecodivision)]
 say("Minimum harvest ages (study area maps %s, cuts after %s, at least %g km2; selection at most clearcut - %g yr, at least %g yr):", if (isTRUE(H_MAPS)) "on" else "off", if (exists("AGE_YEAR")) AGE_YEAR else "-", H_MAP_KM2, H_OFFSET, H_FLOOR)
 for (i in seq_len(nrow(here))) with(here[i], say("  %s %s%s: %g yr (FIA %s, study area %s; %s)", sub("^Forest: ", "", StateClassId), sub("^.*: Forest ", "", TransitionTypeId),
