@@ -50,7 +50,11 @@ expect("the pathways carry the table: mixed conifer clearcut and selection", set
 expect("ponderosa selection: a Mediterranean Mountains stratum row and no blank-stratum row", length(am(t1, PP, SE, "Mediterranean Mountains")) == 1 && !length(am(t1, PP, SE)))
 expect("page row: mixed conifer clearcut 70 where no ecodivision row wins, and selection there 60 or less", any(t2[StateClassIdSource == MC & TransitionTypeId == CC, AgeMin] == 70) &&
        all(am(t2, MC, SE, "Mediterranean") <= 60))
-expect("other pathways unchanged (same rows apart from harvest)", nrow(t1[!TransitionTypeId %in% c(CC, SE)]) == nrow(t0[!TransitionTypeId %in% c(CC, SE)]))
+bl <- function(t) if ("StratumIdSource" %in% names(t)) t[is.na(StratumIdSource)] else t
+expect("other pathways unchanged (same blank-stratum rows apart from harvest)", nrow(bl(t1)[!TransitionTypeId %in% c(CC, SE)]) == nrow(t0[!TransitionTypeId %in% c(CC, SE)]))
+# ST-Sim takes a class's stratum rows in place of its blank-stratum rows: each such class x ecodivision needs all the class's pathways (P26 Build 50 lost half its fire)
+cov <- t1[!is.na(StratumIdSource), .(Has = uniqueN(TransitionTypeId)), by = .(StratumIdSource, StateClassIdSource)][t1[, .(All = uniqueN(TransitionTypeId)), by = StateClassIdSource], on = "StateClassIdSource", nomatch = 0]
+expect("every class x ecodivision with its own rows has all the class's pathways (fire, urbanization ...)", nrow(cov) > 0 && cov[, all(Has == All)], cov[Has != All, paste(StratumIdSource, StateClassIdSource, Has, "of", All, collapse = "; ")])
 blk <- function(r) as.data.table(datasheet(r, "lucasCore_OutputTransitionSummary", lookupsAsFactors = FALSE))[grepl("Harvest", TransitionGroup), .(Expected = sum(Area), Blocked = sum(AgeBlockedArea, na.rm = TRUE)), by = TransitionGroup]
 b1 <- blk(RB$pkg); print(b1)
 expect("expected area below the minimum is under half of each harvest group", b1[, all(Blocked < 0.5 * Expected)], b1[, paste(sprintf("%s %.0f%%", sub(" [Type]", "", sub("^.*: ", "", TransitionGroup), fixed = TRUE), 100 * Blocked / Expected), collapse = "; ")])
@@ -64,4 +68,7 @@ RH <- if (reuse && !is.null(r <- latest(NH))) r else { H <- fresh(NH, 48); d <- 
 real <- function(r) as.data.table(datasheet(r, "stsim_OutputStratumTransition", lookupsAsFactors = FALSE))[grepl("[Type]", TransitionGroupId, fixed = TRUE) & grepl("Harvest", TransitionGroupId), .(km2 = sum(Amount) / 100), by = TransitionGroupId]
 h <- merge(merge(real(scenario(L, 49)), real(RH), by = "TransitionGroupId", suffixes = c(".B47", ".new")), b1[, .(TransitionGroupId = TransitionGroup, LCMS = Expected)], by = "TransitionGroupId"); print(h)
 expect("historical run: clearcut realized at least as much as with Build 47's ages", h[grepl("Clearcut", TransitionGroupId), km2.new >= 0.95 * km2.B47])
+oth <- function(r) as.data.table(datasheet(r, "stsim_OutputStratumTransition", lookupsAsFactors = FALSE))[grepl("[Type]", TransitionGroupId, fixed = TRUE) & grepl("^(Fire|Urbanization)", TransitionGroupId), .(km2 = sum(Amount) / 100), by = .(K = sub(":.*", "", TransitionGroupId))]
+o <- merge(oth(scenario(L, 49)), oth(RH), by = "K", suffixes = c(".B47", ".new")); print(o)
+expect("historical run: fire and urbanization within 5% of Build 47's", o[, all(abs(km2.new / km2.B47 - 1) < 0.05)])
 cat(if (ok) "\nALL PASS\n" else "\nSOME CHECKS FAILED\n")

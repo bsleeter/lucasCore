@@ -251,10 +251,19 @@ sp <- unique(he[, .(StateClassIdSource = StateClassId, TransitionTypeId)])
 if (nrow(sp)) {   # a type x harvest with an ecodivision row: one pathway row per ecodivision here, no blank-stratum row (ST-Sim would run both)
   ex <- rbindlist(lapply(eco_here, function(e) copy(tr[sp, on = .(StateClassIdSource, TransitionTypeId), nomatch = 0])[, StratumIdSource := e]))
   ex[he, on = .(StratumIdSource = Ecodivision, StateClassIdSource = StateClassId, TransitionTypeId), AgeMin := i.AgeMin]
-  tr <- rbind(tr[!sp, on = .(StateClassIdSource, TransitionTypeId)], ex) }
+  tr <- rbind(tr[!sp, on = .(StateClassIdSource, TransitionTypeId)], ex)
+  # ST-Sim takes a class's rows for a cell's stratum IN PLACE OF its blank-stratum rows, so that class's other pathways (fire, urbanization,
+  # ...) go to each of those ecodivisions too; P26 Build 50 left them blank and its historical run lost half its fire and urbanization
+  k <- tr[, is.na(StratumIdSource) & StateClassIdSource %in% sp$StateClassIdSource]
+  tr <- rbind(tr, rbindlist(lapply(eco_here, function(e) copy(tr[k])[, StratumIdSource := e]))) }
 setcolorder(tr, "StratumIdSource")
 tr <- tr[, names(tr)[vapply(tr, function(v) !all(is.na(v)), TRUE)], with = FALSE]
-here <- ha[(is.na(Ecodivision) | Ecodivision %in% eco_here) & StateClassId %in% unique(cn) & TransitionTypeId %in% c(CC, SEL)][order(StateClassId, TransitionTypeId, Ecodivision)]
+miss <- data.table()
+if ("StratumIdSource" %in% names(tr)) { ts <- tr[!is.na(StratumIdSource)]
+  need <- unique(ts[, .(StratumIdSource, StateClassIdSource)])[unique(tr[, .(StateClassIdSource, TransitionTypeId)]), on = "StateClassIdSource", nomatch = 0, allow.cartesian = TRUE]
+  miss <- need[!ts, on = .(StratumIdSource, StateClassIdSource, TransitionTypeId)] }
+check(STAGE, "a class with ecodivision pathways has every one of its pathways there", !nrow(miss), paste(head(miss[, paste(StratumIdSource, StateClassIdSource, TransitionTypeId)], 5), collapse = "; "))
+here <-ha[(is.na(Ecodivision) | Ecodivision %in% eco_here) & StateClassId %in% unique(cn) & TransitionTypeId %in% c(CC, SEL)][order(StateClassId, TransitionTypeId, Ecodivision)]
 say("Minimum harvest ages (study area maps %s, cuts after %s, at least %g km2; selection at most clearcut - %g yr, at least %g yr):", if (isTRUE(H_MAPS)) "on" else "off", if (exists("AGE_YEAR")) AGE_YEAR else "-", H_MAP_KM2, H_OFFSET, H_FLOOR)
 for (i in seq_len(nrow(here))) with(here[i], say("  %s %s%s: %g yr (FIA %s, study area %s; %s)", sub("^Forest: ", "", StateClassId), sub("^.*: Forest ", "", TransitionTypeId),
   if (is.na(Ecodivision)) "" else paste0(" in ", Ecodivision), AgeMin, if (is.na(FIA)) "-" else format(FIA), if (is.na(Map)) "-" else sprintf("%g over %.1f km2", Map, MapArea), Basis))
