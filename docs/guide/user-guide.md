@@ -1,6 +1,6 @@
 # lucasCore User Guide
 
-*A snapshot of the lucasCore User Guide, exported 2026-10-29. Also as a [web page](https://bsleeter.github.io/lucasCore/guide/), beside the [package](https://bsleeter.github.io/lucasCore/blueprint/) and [data](https://bsleeter.github.io/lucasCore/blueprint/data.html) blueprints.*
+*A snapshot of the lucasCore User Guide, exported 2026-10-31. Also as a [web page](https://bsleeter.github.io/lucasCore/guide/), beside the [package](https://bsleeter.github.io/lucasCore/blueprint/) and [data](https://bsleeter.github.io/lucasCore/blueprint/data.html) blueprints.*
 
 How to build and run a LUCAS land-use and carbon model with the lucasCore SyncroSim package, walked through on the Northern Sierra Nevada pyrome (P26) at 150 m.
 
@@ -166,7 +166,7 @@ Open the library's properties (double-click the library in the Explorer).
 
 1. Choose the **System** tab.
 2. Choose **Multiprocessing > General**.
-3. Leave **Enable multiprocessing** unticked for now. The Build stages read and write whole national grids and run one at a time; chapter 8 turns multiprocessing on for runs.
+3. Leave **Enable multiprocessing** unticked for now. The Build stages read and write whole national grids and run one at a time; section 5.3 turns multiprocessing on for runs.
 
 ![The library settings, System tab marked 1, Multiprocessing General page marked 2, with Enable multiprocessing unticked, marked 3](images/fig-1.13.png)
 
@@ -232,16 +232,21 @@ The Build is made once per study area. The historical run is made once per Build
 | Projection Climate (one per climate future) | stage 11 | Build result | Climate multipliers of the projection years from one LOCA2 scenario, climate model and replicate |
 | Projection | ST-Sim | Projection Setup result, Projection Climate result, Build result | Land cover, transitions and carbon, historical end to projection end |
 
-> Why runs stand alone: an ST-Sim-only scenario can be rerun, copied for another climate scenario and run side by side with others under multiprocessing (chapter 8). A scenario that runs lucasCore stages and then ST-Sim in one pipeline cannot run beside other scenarios.
+> Why runs stand alone: an ST-Sim-only scenario can be rerun, copied for another climate scenario and run side by side with others under multiprocessing (sections 5.3 and 7.3). A scenario that runs lucasCore stages and then ST-Sim in one pipeline cannot run beside other scenarios.
 
-**Times for P26 at 150 m.** Use these to plan; finer cells or larger areas take longer.
+**Times for P26 at 150 m.** Measured on this guide's P26 library and rounded, to show the level of effort rather than a promise. The ST-Sim runs use spatial multiprocessing with the five county tiles set in Build Options (section 3.3); the time in parentheses is the same run on the whole landscape as one job. Times are for one iteration; finer cells, larger areas or more iterations take longer.
 
-| Step | Time |
-| --- | --- |
-| Build | timed in chapter 4 |
-| Historical run, 1985-2023, one iteration | about 8 hours |
-| Projection Setup | timed in chapter 6 |
-| Projection | about 12 minutes per simulated year per iteration, less with multiprocessing |
+| Step | Time | Notes |
+| --- | --- | --- |
+| Build | about 1 hour | Once per study area. |
+| Build Figures | 1–2 minutes |  |
+| Historical run, 1985–2023 | about 2.5 hours (whole landscape: about 8 hours) | About 6 minutes of the 2.5 hours merges the tiles. Once per Build. |
+| Historical Run Figures | about 1 minute |  |
+| Projection Setup | 15–35 minutes |  |
+| Projection Climate, each | about 5 minutes | Once per climate future. |
+| Projection, 2023–2050 | about 2 hours (whole landscape: 5–6 hours) | Three projections run side by side took the same 2 hours as one alone. |
+| Run Figures or Compare Runs, each | 1–2 minutes |  |
+| All of it: Build to three compared projections | about 6 hours (whole landscape: about 15 hours) | Projections run side by side. |
 
 ## 3. The Build scenario
 
@@ -272,7 +277,7 @@ Dependencies: none. Pipeline: stages 0, 1, 5, 2, 3, 4, 6, 7, 8.
 
 *Figure 3.2. The Build pipeline.*
 
-> Stage 5 runs before stage 2: stage 2 needs only the study area, while stages 3 and 4 need stage 5's maps. Leave stage 2 out when growth curves are copied from another library (section 3.5). The Build needs no dependencies: its carbon assumptions are set on its own Carbon Assumptions pages (section 3.6).
+> Stage 5 runs before stage 2: stage 2 needs only the study area, while stages 3 and 4 need stage 5's maps. Leave stage 2 out when growth curves are copied from another library (section 3.5). The Build needs no dependencies: its carbon assumptions are set on its own Carbon Assumptions pages (section 3.7).
 
 > Stage 0 writes the fixed LUCAS stock-flow definitions (flow diagram, flow order, stock and flow group memberships, output options) into the Build result, so every run that depends on the Build gets them. Libraries copied from the older starter have a Stock-Flow Definitions scenario instead; stage 0 then finds the definitions already there and writes nothing.
 
@@ -296,11 +301,12 @@ The study area is one or more units of one kind: states, counties, HUCs, EPA eco
 2. **Cell size (m)**: `150`. A finer grid takes longer in every stage and every run; at 150 m a pyrome runs about 12 minutes per simulated year.
 3. **Historical period**: start year `1985`, end year `2023`. Land use, disturbance and climate come from these years' data. Projections start the year after the end year; their end year is set in the Projection Setup (chapter 6) and their climate in a Projection Climate scenario, so the Build itself knows nothing about projections.
 4. **Strata**: the primary strata are always the FIA ecodivisions (the growth curves are fitted on them). Choose the **Secondary** and **Tertiary** sources; here Counties and Federal Lands.
-5. **Land cover**: choose the **Forest type map**, LANDFIRE EVT (default) or USFS forest type groups; here USFS forest type groups.
+5. **Land cover**: choose the **Forest type map** (LANDFIRE EVT, the default; USFS forest type groups; or TreeMap) and where **Stand age** comes from (NASA CMS Forest Age 1990, the default, or TreeMap). TreeMap (USFS, 30 m) gives every forest pixel an FIA plot: its forest type group, and its stand age moved from the plot's inventory year to the start year. Here USFS forest type groups and NASA CMS.
 6. **Resampling to the grid**: how each year's 30 m Annual NLCD becomes the model grid. **Modal** (default) gives each cell its most common 30 m class; **Area-matched** makes every class's area in each secondary stratum unit equal its 30 m area, year by year, changing cells only where the 30 m totals move and never removing developed land. The start-year state classes and the land-use transitions both come from these maps. Here Area-matched; section 3.3.1 compares the two.
-7. **Spatial multiprocessing**: tick **Split runs into tiles**, enter the number of tiles and choose the strata level the tiles follow; here 5 tiles of whole Counties. Stage 1 writes the tile map into the Build result, so the historical run and every projection on this Build are split the same way; a projection can set its own tiles in its Run Settings. Units are packed into tiles of about equal area, largest first, so no county is split between tiles. Tiled runs also need library multiprocessing on (section 1.4), with about as many jobs as tiles. A change takes effect the next time the Build runs.
+7. **Growth**: **Site productivity** is None (the default) or TreeMap site class. With TreeMap site class, each forest cell's growth is scaled by how productive its land is, on top of the climate multipliers, and its starting live and dead carbon by the same multiplier. The multiplier comes from the FIA site class of the cell's TreeMap plots, set for each forest type and ecodivision from the plots' live carbon against the growth curve. **Build Results > Site Productivity** lists the multipliers, and Build Figures maps them. A library made before 30 October 2026 needs tools/sync-library.R first. Here None.
+8. **Spatial multiprocessing**: tick **Split runs into tiles** and choose the strata level the tiles follow. The number box then shows auto: stage 1 picks as many tiles as still shorten the run, and logs its choice, the speed-up and an estimate of each job's memory. Type a number to choose it yourself. P26 uses 5 tiles of whole Counties, the number automatic also picks. Stage 1 writes the tile map into the Build result, so the historical run and every projection on this Build are split the same way; a projection can set its own tiles in its Run Settings. Units are packed into tiles of about equal area, largest first, so no county is split between tiles. Tiled runs also need library multiprocessing on (section 1.4), with about as many jobs as tiles. A change takes effect the next time the Build runs.
 
-![The Build Options page: Build Options marked 1, cell size 150 marked 2, years 1985 to 2023 marked 3, strata Counties and Federal Lands marked 4, forest type map USFS forest type groups marked 5, resampling Area-matched marked 6, and spatial multiprocessing with 5 tiles of whole Secondary: Counties units marked 7](images/fig-3.4.png)
+![The Build Options page: Build Options marked 1, cell size 150 marked 2, years 1985 to 2023 marked 3, strata Counties and Federal Lands marked 4, forest type map USFS forest type groups and stand age NASA CMS Forest Age 1990 marked 5, resampling Area-matched marked 6, site productivity None marked 7, and spatial multiprocessing with 5 tiles of whole Secondary: Counties units marked 8](images/fig-3.4.png)
 
 *Figure 3.4. Build Options for P26.*
 
@@ -322,7 +328,7 @@ The two methods turn the same 30 m Annual NLCD into the model grid in different 
 | Developed land over 1985-2023 | flickers; 230 km² of it lost | only added; growth 105% of the 30 m growth |
 | Initial ecosystem carbon | reference | 8.0 Tg C (1.65%) lower, mostly forest that Modal over-counts |
 | What is right | each cell's own majority class | each county's class areas and their change |
-| Stage 5 time | reference | about 12 minutes for 39 years (P26 Build, section 4.2) |
+| Stage 5 time | reference | about 12 minutes for 39 years (P26 Build, section 4.3) |
 
 **When to choose which.** Use Area-matched for any study where land-use change, its rates or its carbon matter, which is most LUCAS work at 150 m or coarser. Use Modal to reproduce runs made with it (the CONUS 1 km model and P26 results before October 2026), or when the class of a particular cell matters more than totals. A smaller cell size narrows the gap for either.
 
@@ -343,7 +349,7 @@ The two methods turn the same 30 m Annual NLCD into the model grid in different 
 1. Choose **Growth Curve Options**.
 2. **Fit new curves** (default): stage 2 fits merchantable volume and live-tree carbon curves to FIA for every ecodivision and forest type in CONUS, about 13 minutes. One fit can serve many Builds. P26 fits its own.
 3. **Copy from another library**: reuse the curves of a library fitted with the same forest type classes. Set **Source library** (Browse...) and, optionally, the **Result scenario Id** (blank = the newest result in that library with curves). Takes seconds; remove stage 2 from the pipeline.
-4. **FIA data**: where the FIA plot conditions come from. **USGS condition tables** reads the two summary tables (FIA Carbon Summary and FIA Disturbance Summary in Data Sources); **FIA DataMart** derives the same fields from the raw FIA tables of all states (FIA CONUS in Data Sources), and reproduced the USGS curves within 1% in testing. Here FIA DataMart: it needs only FIA CONUS, which the dead wood calibration reads anyway (section 3.6). Leave **Down dead carbon** at *Adjusted to field measurements by state*, and the fitting settings at their defaults.
+4. **FIA data**: where the FIA plot conditions come from. **USGS condition tables** reads the two summary tables (FIA Carbon Summary and FIA Disturbance Summary in Data Sources); **FIA DataMart** derives the same fields from the raw FIA tables of all states (FIA CONUS in Data Sources), and reproduced the USGS curves within 1% in testing. Here FIA DataMart: it needs only FIA CONUS, which the dead wood calibration reads anyway (section 3.7). Leave **Down dead carbon** at *Adjusted to field measurements by state*, and the fitting settings at their defaults.
 
 The **Fitting settings** apply only when fitting; leave them at their defaults.
 
@@ -377,7 +383,27 @@ A Build can get its growth curves three ways:
 
 > Refit the Growth Curves scenario only when its inputs change (a new FIA release, or different fitting settings). Rerun the Builds that depend on it afterwards.
 
-### 3.6 Carbon Assumptions
+### 3.6 Minimum Harvest Age
+
+The Minimum Harvest Age page sets the youngest stand a clearcut or selection cut may take, for each forest type. Its defaults suit most study areas; P26 uses them.
+
+Choose **Minimum Harvest Age** (1), below Growth Curve Options.
+
+- **How stage 6 sets the values.** It starts from the package's values: the 10th percentile of the stand age at which FIA saw each forest type cut (clearcut: 75% or more of the live basal area removed; selection: 10-75%), per ecodivision where FIA has at least 30 cuts. Where the study area's LCMS harvest maps show a type cut younger, it lowers the value to the study area's own: the 10th percentile of stand age at a cell's first cut after the age map's year. Selection is then kept at least 10 years younger than clearcut, and never under 5 years.
+- The settings (2). **Study area** (ticked by default): lower the package values to the study area's mapped cuts. **Minimum mapped cuts** (1 km²): the area of first cuts a forest type needs before its own value is used. **Selection younger than clearcut by** (10 yr) and **Selection minimum at least** (5 yr): the selection rule.
+- **Rows** (3): a row replaces the value of one forest type and harvest, in every ecodivision or in one. **Add the package values** (4) lists them ready to edit; **Remove all rows** returns to the defaults.
+
+![The Minimum Harvest Age page of the P26 Build: Minimum Harvest Age marked 1, the study area settings 2, the rows table 3 and Add the package values 4](images/fig-3.7.png)
+
+*Figure 3.7. Minimum Harvest Age after Add the package values: 124 rows that keep the package's values, so they change nothing until one is edited.*
+
+**What the minimum does.** Projections cut only stands at least this old. In the historical period the recorded cuts are fixed, so stage 6 raises the 1985 age of any cell whose first recorded cut would come before it reached the minimum. A change here therefore also changes the initial ages and carbon.
+
+**Checking it.** Build Results > Minimum Harvest Ages lists the value each forest type and harvest got and where it came from; stage 6's log adds how many start ages it raised. In P26, mixed conifer clearcut is 49 yr (FIA; the maps say 55), fir/spruce/mountain hemlock clearcut 37 yr (the study area maps; FIA 57) and lodgepole pine clearcut 56 yr, and each selection minimum is 10 years under its clearcut. 29,960 cells had their 1985 age raised, by a median 15 years.
+
+**Pathways by ecodivision.** When a value differs by ecodivision, stage 6 writes every transition pathway once per ecodivision. ST-Sim reads a class's ecodivision pathways in place of its all-ecodivision ones, so a class with only its harvest pathways per ecodivision would lose its fire and urbanization pathways there. Mixed conifer has its own FIA value in Mediterranean Mountains, so the P26 Build holds its 605 pathways twice, once for each ecodivision.
+
+### 3.7 Carbon Assumptions
 
 The carbon assumptions are the rates and settings stages 3 and 4 use: how each live pool turns over, how fast each dead pool decays, where high-severity fire and clearcut move carbon, and how the decay calibration is fitted. They are on the Build's **Carbon Assumptions** pages. The first page, **Carbon Method**, picks the method and fills the others with its rows.
 
@@ -386,48 +412,105 @@ The carbon assumptions are the rates and settings stages 3 and 4 use: how each l
 3. **Soil organic carbon** (3). **gSSURGO** calibrates soil decay so the spin-up's soil carbon matches each ecodivision and forest type's mean gSSURGO soil organic carbon; **CBM defaults** leaves soil carbon to the spin-up. Here gSSURGO.
 4. Click **Fill with the FIA measured dead wood rows** (4). Until you do, the line beside the button says the sheets are empty: a run would still use the method's rows, but you could not see or edit them.
 
-![The Carbon Method page before Fill: Carbon Method marked 1, FIA measured dead wood 2, gSSURGO 3, the Fill button 4 and the line saying the sheets are empty outlined](images/fig-3.7.png)
+![The Carbon Method page of the P26 Build: Carbon Method marked 1, FIA measured dead wood 2, gSSURGO 3, the Fill button 4, and the line beside it, saying the sheets have rows, outlined](images/fig-3.8.png)
 
-*Figure 3.7. The Carbon Method page of a new Build.*
+*Figure 3.8. The Carbon Method page of the P26 Build. Its pages are already filled, so the line beside the button says the sheets have rows; on a new Build it says they are empty.*
 
-5. Studio asks before replacing the rows of the eight pages. Click **OK** (5).
+5. Studio asks before replacing the rows of the other pages. Click **OK** (5).
 
-![The confirmation dialog listing the eight Carbon Assumptions pages, with OK marked 5](images/fig-3.8.png)
+![The confirmation dialog listing the Carbon Assumptions pages Fill replaces, with OK marked 5](images/fig-3.9.png)
 
-*Figure 3.8. Fill replaces the rows of every Carbon Assumptions page.*
+*Figure 3.9. Fill replaces the rows of every Carbon Assumptions page. Non-Forest Growth and Non-Forest Rates are the two tables of the Grassland, Shrubland and Wetland Carbon page.*
 
 6. The line now reads **Filled with the FIA measured dead wood rows** (6).
 
-![The Carbon Method page after Fill, with the line Filled with the FIA measured dead wood rows marked 6](images/fig-3.9.png)
+![The Carbon Method page after Fill, with the line Filled with the FIA measured dead wood rows marked 6](images/fig-3.10.png)
 
-*Figure 3.9. The pages are filled.*
+*Figure 3.10. The pages are filled.*
 
-The other seven pages now hold the method's rows; edit any of them, or press Fill again to start over. On every page a row for one ecodivision overrides the forest type's all-ecodivisions row.
+The other pages now hold the method's rows; edit any of them, or press Fill again to start over. On every page a row for one ecodivision overrides the forest type's all-ecodivisions row.
 
 | Page | What it holds | Filled with (FIA measured dead wood) |
 | --- | --- | --- |
+| Growth Inputs | Each forest type's FIA forest type groups, growth class, merchantable carbon density, deciduous share and fine root share (stages 2 and 3) | The package values, 28 forest types (fine root share blank: Li et al. 2003) |
 | CBM Crosswalk | The CBM-CFS3 ecozone and species type each forest type takes its live turnover and snag rates from | The package crosswalk, 28 forest types |
-| Live Turnover | Turnover rates and splits of the live pools, in place of the CBM ones | Empty: CBM rates |
+| Live Turnover | Turnover rates and splits of the live pools, in place of the CBM ones | Stem turnover fitted to FIA mortality, 151 rows; the other rates CBM's |
 | Dead Organic Matter Parameters | Base decay rate, reference temperature, Q10 and share emitted of each dead pool | CBM-CFS3 values, 9 pools |
-| Spin-up | Return interval, share of past cycles ended by clearcut, last disturbance outside fire perimeters | Empty: LANDFIRE intervals, all high-severity fire, clearcut |
+| Spin-up | Return interval, share of past cycles ended by clearcut, last disturbance outside fire perimeters | Empty: LANDFIRE intervals (worked out by the Build), all high-severity fire, clearcut; the page lists them |
 | Disturbance Flows | Where high-severity fire and clearcut move each pool's carbon | 39 flows fitted to FIA |
 | Fire Snag Share | The share of live wood high-severity fire leaves standing, per forest type | 4 forest types fitted to FIA |
 | Decay Calibration Settings | Mature age, years without fire or cutting, minimum plots and snags, multiplier ranges | 60, 30, 30, 200, 200, 0.05-20, 0.02-50 |
-| Fixed Decay Multipliers | Decay multipliers you set instead of calibrating | Empty: every pool calibrated |
+| Mature Age by Forest Type | A forest type's own mature age, and optionally its own years without fire or cutting, for the measured calibration | Empty: every type uses Decay Calibration Settings' values |
+| Fixed Decay Multipliers | Decay multipliers you set instead of calibrating | Empty: every pool calibrated; the page lists the Build's multipliers |
+| Grassland, Shrubland and Wetland Carbon | Net growth and the yearly flow rates of the grassland, shrubland and wetland classes (stage 3) | The package values: 11 growth and 434 rate rows |
 
-![The CBM Crosswalk page: CBM Crosswalk marked 7 and the table of forest types with their CBM ecozone and species type outlined](images/fig-3.10.png)
+![The CBM Crosswalk page: CBM Crosswalk marked 7 and the table of forest types with their CBM ecozone and species type outlined](images/fig-3.11.png)
 
-*Figure 3.10. CBM Crosswalk, one of the filled pages.*
+*Figure 3.11. CBM Crosswalk, one of the filled pages.*
 
-![The Decay Calibration Settings page: Decay Calibration Settings marked 8 and its values outlined, mature age 60, 30 years without fire or cutting, 30 plots, 200 snags, 200 plots, multiplier range 0.05 to 20 and soil range 0.02 to 50](images/fig-3.11.png)
+![The Decay Calibration Settings page: Decay Calibration Settings marked 8 and its values outlined, mature age 60, 30 years without fire or cutting, 30 plots, 200 snags, 200 plots, multiplier range 0.05 to 20 and soil range 0.02 to 50](images/fig-3.12.png)
 
-*Figure 3.11. Decay Calibration Settings, written out at their defaults.*
+*Figure 3.12. Decay Calibration Settings, written out at their defaults.*
 
-> **Changing the method later.** Pick the other method and press **Fill** again: the eight pages then hold that method's rows. Changing the method without pressing Fill keeps the rows that are there, so a run would mix, for example, CBM default decay with the fitted fire flows.
+**Growth Inputs and Mature Age by Forest Type.** These two pages hold forest type values that the package otherwise supplies. Either page can stay empty: an empty page means the package values, and the Build gives the same result as before.
+
+**Growth Inputs** (9) has one row per forest type (10). The columns are the FIA forest type groups whose plots its growth curves are fitted to, its growth class (east or west, softwood or hardwood), its merchantable carbon density, its deciduous share and an optional fixed fine root share. The page's notes explain each column. **Fill** on Carbon Method writes the package values here. Change any of them, and stages 2 and 3 log every value that differs from the package's. **Reset to the package values** (11) puts every row back.
+
+The FIA groups, merchantable carbon density, fine root share and the lag set by the growth class shape the curves. They reach a Build only when Growth Curve Options fits new curves. The deciduous share and the growth class's softwood or hardwood turnover rates act in stage 3 on every Build.
+
+![The Growth Inputs page: Growth Inputs marked 9 under Carbon Assumptions, the table of forest types with FIA Forest Type Groups, Growth Class, Merchantable Carbon Density and Deciduous Share marked 10, the notes on what the columns mean, and Reset to the package values marked 11](images/fig-3.13.png)
+
+*Figure 3.13. Growth Inputs, filled with the package values.*
+
+**Mature Age by Forest Type** (12) is used by the FIA measured dead wood calibration in stage 3. That calibration fits decay rates to the dead wood of FIA plots in mature stands. A forest type without a row uses the single values from Decay Calibration Settings, which the bold line repeats (13). Give a type its own mature age (14) where it reaches a settled dead wood balance sooner or later than that. Two optional columns, **Ecodivision (blank = all)** and **No Fire or Cutting Within**, are hidden at first. Right-click the table to show them, then use them to limit a row to one ecodivision or to give the type its own window; an ecodivision row wins over the type's all-ecodivisions row.
+
+**Add every forest type** (15) lists each forest type at the single values, ready to edit. A row that keeps those values changes nothing. **Remove all rows** returns every type to the single values. The stage 3 log lists the rows it used and the number of mature plots for each type.
+
+![The Mature Age by Forest Type page: Mature Age by Forest Type marked 12, the bold line giving the single values (mature from 60 yr, no fire or cutting within 30 yr) marked 13, the table of forest types each at 60 yr marked 14, and the Add every forest type and Remove all rows buttons marked 15](images/fig-3.14.png)
+
+*Figure 3.14. Mature Age by Forest Type after Add every forest type: every type at the single value of 60 yr, which changes nothing until a value is edited.*
+
+**Live Turnover** (16) shows every live turnover rate of a forest type and where it comes from. Nothing on it is calibrated by the Build: the rates are CBM-CFS3's for the CBM ecozone and species type the forest type maps to (CBM Crosswalk), softwood or hardwood and the deciduous share from Growth Inputs. With FIA measured dead wood, stem turnover comes from FIA instead: each forest type's yearly mortality on remeasured mature plots (60 years and older), leaving out plots that lost 70% or more of their live carbon, because stand-replacing loss is simulated as fire, harvest or another disturbance. Fill writes these 151 stem rows, for all ecodivisions and for single ecodivisions where FIA has enough plots; an empty page uses the same rows. In P26 stem turnover runs from 0.2% to 3.6% a year, median 1.2%.
+
+Pick a forest type and an ecodivision (17). The line beneath names the CBM ecozone and species type, and the table lists the ten rates with the value used and where it comes from (18). Type a value in **This row** (19) to replace a rate for the forest type, in all ecodivisions or in the one picked; clear it to go back. An ecodivision row wins over the all-ecodivisions row, rate by rate. A sheet with rows uses only its rows, so the first value typed on an empty page writes the 151 FIA rows first, and the page says so. **All rows**, below, lists the sheet itself.
+
+![The Live Turnover page: Live Turnover marked 16, the Forest type and Ecodivision drop-downs set to Douglas-fir and all ecodivisions marked 17, the line naming CBM ecozone Pacific Maritime and species type Douglas-fir, the table of ten rates with Value used and the Comes from column marked 18 (CBM for most, FIA background mortality for stem turnover 0.0069), and the This row column marked 19; All rows below lists the sheet](images/fig-3.15.png)
+
+*Figure 3.15. Live Turnover for Douglas-fir in all ecodivisions: CBM's rates, with FIA's stem turnover.*
+
+**Grassland, Shrubland and Wetland Carbon** (20) holds how the grassland, shrubland and wetland classes grow, shed and decay. Its Growth table (21) gives each class's net growth (Mg C/ha/yr); its Rates table (22) gives the share or yearly rate of each flow. The package values come from the CONUS 1 km LUCAS build, which took them from IBIS model simulations: one value per class for every ecodivision, except forested wetlands, which grow on an age curve. Fill on Carbon Method, or the page's own **Fill with the package values**, writes them as rows; left empty, the Build uses the same values.
+
+Change a value to override it; a row with an ecodivision or an age applies there only. Net Growth flows split a class's growth among its live pools and must add to 1. For emergent wetlands, a flow named for a pool alone (for example BG Slow ->) is that pool's total yearly loss, and the flows out of it are shares of that loss, adding to 1. Stage 3 checks both and logs how many values differ from the package's. The starting carbon of these classes is still the package's table, so a changed rate acts from the first year but does not change the 1985 pools.
+
+![The Grassland, Shrubland and Wetland Carbon page after Fill: the page marked 20, the Growth table 21 and the Rates table 22](images/fig-3.16.png)
+
+*Figure 3.16. Grassland, Shrubland and Wetland Carbon after Fill: each class's net growth, and the share or yearly rate of each flow.*
+
+**Diagram view.** **Show: Diagram** (23) draws one class as an ecologist would sketch it. Pick the class and ecodivision (24), and an age for forested wetlands, whose rates change with age. The values are the ones the Build uses: the package's, with this page's rows on top, drawn bold. Live pools sit on the left, fast dead pools in the middle and slow pools on the right, above and below the soil surface. Net growth (NPP) enters the live pools from the left, split by its shares. Each box gives the pool's carbon at steady state, where inputs and losses balance, its turnover time and its yearly release to the atmosphere (and to water, for emergent wetlands). A curve's width is the carbon it carries at steady state; label the curves with the rates as entered or with the fluxes (25), and hover over one for the rate x stock = flux arithmetic.
+
+The line above the drawing (26) totals the budget: NPP, what leaves as CO2, to water and into deep soil, the steady-state live, dead and soil carbon, and the class's starting pools in the newest Build result. Grassland and shrubland starting pools came from a spin-up with these rates, so the budget lands near them (chaparral in P26: live 7.0, dead 33.8 and soil 75.3 Mg C/ha, against starting pools of 7.0, 29.8 and 74.6), and a changed rate shows its long-run effect in the drawing (27) at once. The emergent wetlands' rates settle well above their starting pools (palustrine emergent live 36 against 4.9 Mg C/ha), a mismatch for the science step to resolve.
+
+![The diagram view for Wetland: Estuarine Emergent in Hot Continental: Show Diagram marked 23, the Class and Ecodivision drop-downs marked 24, the Rates as entered / Fluxes choice marked 25, the budget line (net growth 31.1 Mg C/ha/yr; released as CO2 23.0, to water 5.12, buried in deep soil 3.01; steady state live 37.2, dead 54.9, soil 479.3 Mg C/ha) marked 26, and the drawing marked 27: net growth entering foliage (19.9%) and fine roots (80.1%), turnover to AG very fast (0.798) and BG very fast (0.848), decay to BG slow (0.629), and BG slow feeding deep soil](images/fig-3.17.png)
+
+*Figure 3.17. The diagram view for estuarine emergent wetland in the Hot Continental ecodivision: 31.1 Mg C/ha/yr of net growth leaves as CO2 (23.0), to water (5.1) and into deep soil (3.0).*
+
+**Spin-up** (28) sets the history each forest cell's starting carbon is spun up with. Its defaults come from the study area, so the Build works them out: the return interval of stand-replacing fire from LANDFIRE's fire regime maps (stage 5), every past cycle ended by high-severity fire, and a cell outside the fire perimeters of 1900 to the start year starting from a clearcut (stage 8). Fill writes nothing here. The page lists each ecodivision and forest type with its cells and its LANDFIRE interval (29) from the newest Build result, named above the table; before the first Build it shows the package's provisional intervals. Type a value in a shaded column to replace a default: your interval (30), with the interval the run takes beside it (31), or the share of past cycles ended by clearcut and the last disturbance outside fire perimeters (32). **All rows**, below, also takes rows for a forest type in all ecodivisions; an ecodivision row wins over them.
+
+![The Spin-up page with an empty sheet: Spin-up marked 28, the line naming Build result \[53\], and the table of ecodivisions and forest types with cells, the LANDFIRE interval column marked 29, Your interval marked 30, Interval used marked 31, and the share of cycles ended by clearcut and the last disturbance marked 32](images/fig-3.18.png)
+
+*Figure 3.18. Spin-up with an empty sheet: the LANDFIRE intervals of Build \[53\] for each ecodivision and forest type.*
+
+**Fixed Decay Multipliers** (33). Each dead pool decays at CBM-CFS3's rate for its temperature times a multiplier, which stage 3 calibrates for each ecodivision and forest type: snags, down logs, fine woody debris, litter and duff to FIA's measurements in mature stands, and soil to gSSURGO (with CBM defaults the multipliers stay 1). Fill writes nothing here. The page lists the newest Build result's multipliers (34), with where each was fitted and how many FIA plots it rests on. To fix one instead, select it and press **Fix the selected value** (35): a row with the calibrated value appears in the rows table (36), ready to edit. A fixed value is shaded on the page, and the pools fitted after it (snags, then down logs; fine woody debris, then litter, then duff; then soil) refit around it at the next Build. In P26 snags, down logs and fine woody debris are fitted per ecodivision (1.65, 0.82 and 2.26 in Mediterranean Mountains), litter and duff per forest type.
+
+![The Fixed Decay Multipliers page with an empty sheet: Fixed Decay Multipliers marked 33, the line naming Build result \[53\], the table of ecodivisions and forest types with Fitted at, FIA plots and the multipliers for snags, down logs, fine woody debris, litter, duff, forest floor and soil marked 34, the Fix the selected value button marked 35, and the empty rows table marked 36](images/fig-3.19.png)
+
+*Figure 3.19. Fixed Decay Multipliers with an empty sheet: the multipliers Build \[53\] calibrated for each ecodivision, forest type and dead pool.*
+
+> **Changing the method later.** Pick the other method and press **Fill** again: the pages then hold that method's rows. Changing the method without pressing Fill keeps the rows that are there, so a run would mix, for example, CBM default decay with the fitted fire flows.
 
 > **Sharing one set of assumptions (advanced).** The Carbon Assumptions pages appear on every scenario. To share one set among several Builds, fill them on a scenario of their own and add that scenario as a dependency of each Build, leaving the Builds' own Carbon Assumptions pages empty: a Build's own rows win over a dependency's.
 
-### 3.7 Land Cover Crosswalks
+### 3.8 Land Cover Crosswalks
 
 The crosswalks tell stage 5 which state class each land cover code becomes: forest types (state classes 100-999) from LANDFIRE EVT or the USFS forest type groups, grassland and shrubland types from RCMAP, wetland types from C-CAP.
 
@@ -435,9 +518,9 @@ The crosswalks tell stage 5 which state class each land cover code becomes: fore
 2. The table opens filled in with the package's crosswalks, one row per source code (about 1,350 rows). Leave them as they are, or change a **State Class** to send a code somewhere else; stage 5 logs every row that differs from the package default. A blank State Class marks a code with no LUCAS state class, not used by stage 5 (the Note says why).
 3. **Reset to package defaults** puts every row back.
 
-![The Land Cover Crosswalks page: Land Cover Crosswalks marked 1, the crosswalk table of source codes and state classes 2 and Reset to package defaults 3](images/fig-3.12.png)
+![The Land Cover Crosswalks page: Land Cover Crosswalks marked 1, the crosswalk table of source codes and state classes 2 and Reset to package defaults 3](images/fig-3.20.png)
 
-*Figure 3.12. Land Cover Crosswalks, filled in from the package defaults.*
+*Figure 3.20. Land Cover Crosswalks, filled in from the package defaults.*
 
 Save the library (**File > Save**) before running.
 
@@ -471,13 +554,13 @@ Studio opens the **Run Monitor** tab when a run starts.
 1. **Run Monitor** lists each run in progress.
 2. **Result Id** is the number the result scenario will have (here 2), and **Status** reads Running. Write the Result Id down: the historical run and the Projection Setup depend on this result.
 3. The red square stops the run. A stopped Build leaves an incomplete result; delete it and run again.
-4. **Run Log** stays grey while the model runs; the log opens once the run ends (section 4.2).
+4. **Run Log** stays grey while the model runs; the log opens once the run ends (section 4.3).
 
 ![The Run Monitor tab marked 1: P26 - Build with Result Id 2 and status Running marked 2, the stop button 3 and the Run Log link 4](images/fig-4.3.png)
 
 *Figure 4.3. The Run Monitor during the Build.*
 
-5. The status bar at the bottom of the window shows a progress bar and the stage running now, for example "1 - Study Area and Strata". The run log (section 4.2) gives the time each stage took.
+5. The status bar at the bottom of the window shows a progress bar and the stage running now, for example "1 - Study Area and Strata". The run log (section 4.3) gives the time each stage took.
 
 ![The status bar at the bottom of Studio, marked 5, with the progress bar and 1 - Study Area and Strata](images/fig-4.4.png)
 
@@ -485,38 +568,38 @@ Studio opens the **Run Monitor** tab when a run starts.
 
 > Keep the library open but leave the Build alone while it runs: SyncroSim runs the stages from the package folder and writes into the library as each stage ends.
 
-### 4.2 The run log
+### 4.3 The run log
 
 When the run ends, the Run Monitor shows **Done** and its **Run Log** link opens the log (Figure 4.5). Each stage writes what it read, the choices it made, its checks (a line that starts with the stage number and ends in *pass* or *fail*, with the numbers behind it) and the time it took. The end of the log gives the study area's initial carbon from stage 8 (6) and the total run time (7).
 
-![The Run Log window scrolled to the end: the initial carbon line marked 6, and SIMULATION COMPLETE with Total simulation time 00:54:59 marked 7](images/fig-4.5.png)
+![The Run Log window scrolled to the end: the initial carbon line, 0.44 Pg C, marked 6, and SIMULATION COMPLETE with Total simulation time 00:56:47 marked 7](images/fig-4.5.png)
 
 *Figure 4.5. The end of the P26 Build's run log.*
 
-The P26 Build took 55 minutes on a 32-core machine. Stage 5 and stage 2 take most of it:
+The P26 Build took 57 minutes on a 32-core machine. Stage 5 and stage 2 take most of it:
 
 | Stage (pipeline order) | Time (min:s) | Where the time goes |
 | --- | --- | --- |
-| 0 Stock-Flow Definitions | 0:40 | the stock and flow definitions |
-| 1 Study Area and Strata | 3:01 | the study area and strata rasters |
-| 5 Initial Conditions | 22:28 | area-matched land cover for 39 years (11.6 min), forest type and age maps |
-| 2 Fit Growth Curves | 13:20 | growth curves for 28 forest type groups (9.2 min), live carbon (2.7 min) |
-| 3 Carbon Flows | 3:01 | flow pathways and the decay calibration (0.8 min) |
-| 4 Spin-up and Initial Stocks | 0:38 | carbon by age for each ecodivision and forest type |
-| 6 Historical Transitions | 6:29 | 30 m disturbance maps and land-use change, 1986-2023 |
-| 7 Climate Multipliers | 4:12 | PRISM growth and decay multipliers, 1985-2023 |
-| 8 Initial Stock Maps | 1:05 | the 1985 carbon maps |
-| **Total** | **54:59** |  |
+| 0 Stock-Flow Definitions | 0:42 | the stock and flow definitions |
+| 1 Study Area and Strata | 3:11 | the study area and strata rasters |
+| 5 Initial Conditions | 22:34 | area-matched land cover for 39 years (11.6 min), forest type and age maps |
+| 2 Fit Growth Curves | 13:34 | growth curves for 28 forest type groups (9.2 min), live carbon (2.7 min) |
+| 3 Carbon Flows | 3:43 | flow pathways and the decay calibration (0.9 min) |
+| 4 Spin-up and Initial Stocks | 0:41 | carbon by age for each ecodivision and forest type |
+| 6 Historical Transitions | 6:53 | 30 m disturbance maps and land-use change, 1986-2023 |
+| 7 Climate Multipliers | 4:14 | PRISM growth and decay multipliers, 1985-2023 |
+| 8 Initial Stock Maps | 1:10 | the 1985 carbon maps |
+| **Total** | **56:47** |  |
 
-### 4.3 Checking the result
+### 4.4 Checking the result
 
-The finished run adds a result scenario under the Build in the Explorer, here **\[2\] P26 - Build (\[1\] @ 28-Oct-2026 9:25 AM)**. Everything the stages wrote is in it, and the next steps (Build Figures, the historical run) depend on this result, not on the Build itself.
+The finished run adds a result scenario under the Build in the Explorer, here **\[53\] P26 - Build (\[1\] @ 30-Oct-2026 10:10 PM)**. Everything the stages wrote is in it, and the next steps (Build Figures, the historical run) depend on this result, not on the Build itself.
 
-![The Explorer with the result scenario \[2\] P26 - Build under the Build's Results folder marked 8, its General Summary page with the Build's description, and the Run Log button marked 9](images/fig-4.6.png)
+![The Explorer with the result scenario \[53\] P26 - Build under the Build's Results folder marked 8, its General Summary page with the Build's description, and the Run Log button marked 9](images/fig-4.6.png)
 
 *Figure 4.6. The result scenario (8) under the Build's Results folder. Its Summary page keeps the Build's description, and Run Log (9) opens the log again at any time.*
 
-**Validation.** Every check a stage runs goes to the result's **LUCAS Core > Build Results > Validation** page, one row per check with its stage, status and detail. The P26 Build ran 68 checks and all passed. A failed check says what went wrong in its detail; the same line is in the run log.
+**Validation.** Every check a stage runs goes to the result's **LUCAS Core > Build Results > Validation** page, one row per check with its stage, status and detail. The P26 Build ran 74 checks and all passed. A failed check says what went wrong in its detail; the same line is in the run log.
 
 ![The result's LUCAS Core tab with Build Results > Validation marked 10, and the Validation table of Stage, Check, Status and Detail, its Status column marked 11, every row Pass](images/fig-4.7.png)
 
@@ -527,16 +610,35 @@ The finished run adds a result scenario under the Build in the Explorer, here **
 - **Land cover (stage 5, section 3.3.1).** Area in the wrong class 28 km² in 1985 and 65 km² in 2023, a mean of 47 km² (Modal: 1,078 km²). Developed land grows from 876 to 1,121 km², against 876 to 1,108 km² in the 30 m NLCD; 184 km² of cells flip between classes.
 - **Forest (stage 5).** 883,048 forest cells, 72.7% of the land; spin-up return intervals (LANDFIRE replacement-severity fire) of 140 to 311 years, median 186.
 - **Growth curves (stage 2).** 532 curves (28 forest types x 19 ecodivisions), of which the study area's two ecodivisions use 56.
-- **Carbon (stage 3).** The decay calibration cut the misfit to FIA measured dead wood by 94% (median of the 56 cells), and the spin-up's soil carbon matches gSSURGO (62 against 62 Mg C/ha).
-- **Initial carbon (stage 8).** 0.44 Pg C: live 0.21, dead organic matter 0.06, soil 0.18. Forest means 102, 24 and 69 Mg C/ha.
+- **Carbon (stage 3).** The decay calibration cut the misfit to FIA measured dead wood by 96% (median of the 56 cells), and the spin-up's soil carbon matches gSSURGO (62 against 62 Mg C/ha).
+- **Initial carbon (stage 8).** 0.44 Pg C: live 0.20, dead organic matter 0.07, soil 0.18. Forest means 100, 29 and 69 Mg C/ha.
 
-**Initial Stock Summary.** **Build Results > Initial Stock Summary** (12) gives the 1985 carbon by state class: its cells, the share whose last disturbance was a fire, mean live, dead organic matter and soil carbon (Mg C/ha), total carbon (Tg C, 13) and where the stocks came from (the stock curves for forest, fixed values for grassland and shrubland, gSSURGO for wetlands). In P26, California Mixed Conifer holds 245 of the 440 Tg C.
+**Initial Stock Summary.** **Build Results > Initial Stock Summary** (12) gives the 1985 carbon by state class: its cells, the share whose last disturbance was a fire, mean live, dead organic matter and soil carbon (Mg C/ha), total carbon (Tg C, 13) and where the stocks came from (the stock curves for forest, fixed values for grassland and shrubland, gSSURGO for wetlands). In P26, California Mixed Conifer holds 246 of the 442 Tg C.
 
-![The result's Build Results > Initial Stock Summary page marked 12: a row per state class with Cells, Share Post-Fire, Mean Live, Mean Dead Organic Matter, Mean Soil, Total Carbon marked 13 and Source](images/fig-4.8.png)
+![The result's Build Results > Initial Stock Summary page marked 12: a row per state class with Cells, Share Post-Fire, Mean Live, Mean Dead Organic Matter, Mean Soil, Total Carbon marked 13 and Source; California mixed conifer holds 246 Tg C](images/fig-4.8.png)
 
 *Figure 4.8. The Initial Stock Summary of the P26 Build: carbon in 1985 by state class.*
 
-### 4.4 Build Figures: maps and charts of the Build
+**Carbon Rates.** **Build Results > Carbon Rates** (14) shows the yearly carbon rates stage 3 wrote, one forest cell at a time. Choose an ecodivision and a forest type (15). The line beneath gives the cell's number of flows and its mean annual temperature. The table (16) lists every live turnover and dead organic matter flow of that cell in flow order:
+
+- **Rate**: the yearly share of the From pool that moves to the To pool, exactly as the run uses it.
+- **Pool Total**: all of that pool's yearly losses together.
+- **Base Rate, Temperature Effect and Decay Multiplier**: shown for dead pools, whose rate is these three multiplied together, times the share going to that destination.
+- **Source**: where each value came from, such as CBM, a calibrated decay multiplier or measured snag fall.
+
+The note at the bottom (17) explains how the columns combine. The page only reads: to change a rate, change its source in Carbon Assumptions and rerun the Build.
+
+![The Carbon Rates page of the P26 Build result: Carbon Rates marked 14 under Build Results, the Ecodivision and Forest type drop-downs marked 15 set to Mediterranean Mountains and Douglas-fir, the table of 27 flows with Process, From Pool, To Pool, Rate, Pool Total, Base Rate, Temperature Effect, Decay Multiplier and Source marked 16, its last row the merchantable stem turnover from Live Turnover, and the note on the columns marked 17](images/fig-4.9.png)
+
+*Figure 4.9. Carbon Rates for Douglas-fir in the Mediterranean Mountains ecodivision: CBM turnover for the live pools except the merchantable stems, which take FIA's from Live Turnover, calibrated decay for the dead pools and measured snag fall.*
+
+**Minimum Harvest Ages.** **Build Results > Minimum Harvest Ages** (18) lists each forest type and harvest with FIA's value, the study area maps' value and the area of first cuts behind it, the minimum stage 6 used (19) and where it came from (20): FIA, the study area maps, or the clearcut minimum less the selection offset. Rows with an ecodivision hold that ecodivision's own values (section 3.6).
+
+![The Minimum Harvest Ages page of the P26 Build result: Minimum Harvest Ages marked 18 under Build Results, and the table of Ecodivision, Forest Type, Harvest, FIA, Study Area Maps, Mapped Cuts, Minimum Age Used marked 19 and Basis marked 20](images/fig-4.10.png)
+
+*Figure 4.10. Minimum Harvest Ages of the P26 Build: the minimum each forest type and harvest got, and where it came from.*
+
+### 4.5 Build Figures: maps and charts of the Build
 
 Stage 12 draws report figures of a finished Build in the format of the lucasFireC2F report: each figure is one PNG headed *Figure N* with a note naming the study area, grid and years, and its panels are lettered (a), (b), (c). The **maps** sit on shaded relief from the elevation file in Data Sources, which runs on in light grey past the study area. Inside it the classes are blended into the relief, with a colour strip or a key under each panel. Panels stand side by side, or one under another when the study area is wide. The ten figures are the study area and strata, the initial land cover (state class, forest type, stand age) and the initial carbon (total, live biomass, soil), then **charts** of area and carbon by state class, the growth curves, the decay calibration, historical land-use change, disturbance, the climate multipliers and the Build's checks. Each comes with a caption ready for a report. Stage 12 reads only the Build's outputs, so it can run in a scenario of its own on the Build result, and takes a few minutes.
 
@@ -544,57 +646,57 @@ A Build whose pipeline does not include stage 12, such as this P26 Build, draws 
 
 1. Right-click the Build result (or the **Definitions** project) and choose **New > Folder** (1). Name it `Figures`; it appears under **Definitions**.
 
-![The Explorer with the P26 Build result right-clicked and its menu open at New > Folder..., marked 1](images/fig-4.9.png)
+![The Explorer with the P26 Build result right-clicked and its menu open at New > Folder..., marked 1](images/fig-4.11.png)
 
-*Figure 4.9. A new folder for the figure scenarios.*
+*Figure 4.11. A new folder for the figure scenarios.*
 
 2. Right-click the **Figures** folder, choose **New > Scenario** (2) and name it `Build Figures`.
 
-![The Figures folder right-clicked, its menu open at New > Scenario..., marked 2](images/fig-4.10.png)
+![The Figures folder right-clicked, its menu open at New > Scenario..., marked 2](images/fig-4.12.png)
 
-*Figure 4.10. A new scenario in the Figures folder.*
+*Figure 4.12. A new scenario in the Figures folder.*
 
-3. Add the Build result as its dependency: drag the result, `[2] P26 - Build (...)`, from the Build's **Results** folder onto the new scenario. It appears under the scenario's **Dependencies** folder (3).
+3. Add the Build result as its dependency: drag the result, `[53] P26 - Build (...)`, from the Build's **Results** folder onto the new scenario. It appears under the scenario's **Dependencies** folder (3).
 
-![The Explorer with the Figures folder, the \[3\] Build Figures scenario and its Dependencies folder holding the P26 Build result, marked 3](images/fig-4.11.png)
+![The Explorer with the Figures folder, the \[3\] Build Figures scenario and its Dependencies folder holding the P26 Build result \[53\], marked 3](images/fig-4.13.png)
 
-*Figure 4.11. The Build Figures scenario in its folder, with the Build result as its dependency.*
+*Figure 4.13. The Build Figures scenario in its folder, with the Build result as its dependency.*
 
-4. Double-click the scenario and open **General > Pipeline** (4). It lists the Build's nine stages in grey (5), because a dependency supplies its pipeline too: the box **Inherit values from '\[2\] P26 - Build ...'** (6) is ticked.
+4. Double-click the scenario and open **General > Pipeline** (4). It lists the Build's nine stages in grey (5), because a dependency supplies its pipeline too: the box **Inherit values from '\[53\] P26 - Build ...'** (6) is ticked.
 
-![The scenario's Pipeline page showing the nine inherited Build stages in grey; Pipeline marked 4, the inherited stages 5 and the ticked Inherit values box 6](images/fig-4.12.png)
+![The scenario's Pipeline page showing the nine inherited Build stages in grey; Pipeline marked 4, the inherited stages 5 and the ticked Inherit values box 6](images/fig-4.14.png)
 
-*Figure 4.12. The pipeline inherited from the Build result.*
+*Figure 4.14. The pipeline inherited from the Build result.*
 
 5. Untick **Inherit values** (6). Studio asks what to do with the inherited rows: choose **No Data** (7), which leaves the pipeline empty.
 
-![The Data Options dialog with No Data marked 7, beside Copy Data and Cancel](images/fig-4.13.png)
+![The Data Options dialog with No Data marked 7, beside Copy Data and Cancel](images/fig-4.15.png)
 
-*Figure 4.13. No Data starts the pipeline empty.*
+*Figure 4.15. No Data starts the pipeline empty.*
 
 > Leave the box ticked and this scenario reruns the whole Build. **Copy Data** copies the nine Build stages into the scenario, and you would then have to delete them.
 
 6. In the empty row, choose **12 - Build Figures** as the **Stage**, with **Run Order** 1 (8). Save the library (**File > Save**).
 
-![The Pipeline page with one row, Stage 12 - Build Figures and Run Order 1, marked 8; Inherit values is unticked](images/fig-4.14.png)
+![The Pipeline page with one row, Stage 12 - Build Figures and Run Order 1, marked 8; Inherit values is unticked](images/fig-4.16.png)
 
-*Figure 4.14. The Build Figures pipeline: stage 12 alone.*
+*Figure 4.16. The Build Figures pipeline: stage 12 alone.*
 
 7. Run the scenario as in section 4.1. The result appears in the scenario's **Results** folder, and its run log lists the figures drawn.
 
-![The Run Monitor with the Build Figures run, result 4, Status Done and the Run Log link outlined](images/fig-4.15.png)
+![The Run Monitor with the Build Figures run, result 4, Status Done and the Run Log link outlined](images/fig-4.17.png)
 
-*Figure 4.15. The finished Build Figures run in the Run Monitor. For P26 it took a minute and a half. The warning icon is the package-version note every run shows.*
+*Figure 4.17. The finished Build Figures run in the Run Monitor. For P26 it took a minute and a half. The warning icon is the package-version note every run shows.*
 
-**Where the figures are.** Double-click the result scenario and open **LUCAS Core > Build Results > Build Figures (PNG)**. The page is a figure viewer: pick a figure from its drop-down or step through them, with each caption below (section 9.1). The files are in the library's data folder, under `<library>.ssim.data\Scenario-<result id>\lucasCore_OutputBuildFigure`.
+**Where the figures are.** Double-click the result scenario and open **LUCAS Core > Build Results > Build Figures (PNG)**. The page is a figure viewer: pick a figure from its drop-down or step through them, with each caption below (section 8.1). The files are in the library's data folder, under `<library>.ssim.data\Scenario-<result id>\lucasCore_OutputBuildFigure`.
 
 **Export them all to a folder.**
 
 8. Select the result scenario in the Explorer. In the panel below the Explorer, open the **Export** tab (9), select **LUCAS Core > Build Figures (PNG)** (10) and click **Open** (11), then choose the folder to copy the PNGs into.
 
-![The Export tab marked 9, with LUCAS Core > Build Figures (PNG) marked 10 and the Open button marked 11](images/fig-4.16.png)
+![The Export tab marked 9, with LUCAS Core > Build Figures (PNG) marked 10 and the Open button marked 11](images/fig-4.18.png)
 
-*Figure 4.16. Exporting every Build figure to a folder.*
+*Figure 4.18. Exporting every Build figure to a folder.*
 
 > Each figure is drawn only when its inputs exist. A Build without stage 6 has no land-use change or disturbance charts. Without an elevation file the maps have no relief. A strata level with a single unit, such as one state, is not mapped.
 
@@ -602,21 +704,21 @@ The export names each file after its result scenario, for example `scn4.Fig02_la
 
 **Examples from the P26 Build.** Four of the ten figures stage 12 draws for P26 Northern Sierra Nevada (27,339 km² at 150 m, 1985 to 2023):
 
-![Figure 1 of the P26 Build: three maps of the study area, its two FIA ecodivisions, its 17 counties each in its own colour, and its federal lands, on shaded relief](images/fig-4.17.png)
+![Figure 1 of the P26 Build: three maps of the study area, its two FIA ecodivisions, its 17 counties each in its own colour, and its federal lands, on shaded relief](images/fig-4.19.png)
 
-*Figure 4.17. Study area and strata: (a) FIA ecodivisions, (b) the 17 counties, each in its own colour, and (c) federal lands.*
+*Figure 4.19. Study area and strata: (a) FIA ecodivisions, (b) the 17 counties, each in its own colour, and (c) federal lands.*
 
-![Figure 2 of the P26 Build: maps of the initial state class, the forest type groups and stand age of forest cells, on shaded relief](images/fig-4.18.png)
+![Figure 2 of the P26 Build: maps of the initial state class, the forest type groups and stand age of forest cells, on shaded relief](images/fig-4.20.png)
 
-*Figure 4.18. Initial land cover in 1985: (a) state class, the twelve largest named, (b) forest type group and (c) stand age of the forest cells. Grey inside the study area: not forest.*
+*Figure 4.20. Initial land cover in 1985: (a) state class, the twelve largest named, (b) forest type group and (c) stand age of the forest cells. Grey inside the study area: not forest.*
 
-![Figure 3 of the P26 Build: maps of initial total ecosystem carbon (439.3 Tg C), live biomass carbon and soil carbon in Mg C per hectare, on shaded relief; soil in classes of equal area](images/fig-4.19.png)
+![Figure 3 of the P26 Build: maps of initial total ecosystem carbon (441.6 Tg C), live biomass carbon and soil carbon in Mg C per hectare, on shaded relief](images/fig-4.21.png)
 
-*Figure 4.19. Initial carbon stocks in 1985: (a) total ecosystem carbon, 439 Tg C in the study area, (b) live biomass and (c) soil carbon. (a) and (b) are classed in even steps; (c) in classes of roughly equal area, because forest soil starts at its forest type's gSSURGO mean and so bunches between 66 and 75 Mg C/ha.*
+*Figure 4.21. Initial carbon stocks in 1985: (a) total ecosystem carbon, 442 Tg C in the study area, (b) live biomass and (c) soil carbon. (a) and (b) are classed in even steps; (c) in classes of roughly equal area, because forest soil starts at its forest type's gSSURGO mean and so bunches between 66 and 75 Mg C/ha.*
 
-![Figure 8 of the P26 Build: stacked bar charts of the area burned each year by severity, peaking in 2021, and the area harvested each year by clearcut and selection](images/fig-4.20.png)
+![Figure 8 of the P26 Build: stacked bar charts of the area burned each year by severity, peaking in 2021, and the area harvested each year by clearcut and selection](images/fig-4.22.png)
 
-*Figure 4.20. Disturbance history, 1986 to 2023: (a) area burned each year by MTBS severity class and (b) area harvested each year by clearcut and selection (LCMS tree removal).*
+*Figure 4.22. Disturbance history, 1986 to 2023: (a) area burned each year by MTBS severity class and (b) area harvested each year by clearcut and selection (LCMS tree removal).*
 
 ## 5. The historical run
 
@@ -630,13 +732,13 @@ The historical run is an ordinary ST-Sim scenario. It simulates the study area f
 
 *Figure 5.1. A new scenario for the historical run.*
 
-2. Add the Build result as its dependency: drag it from the Build's Results folder onto the new scenario, as in section 4.4. The new scenario (2) shows the Build result under **Dependencies** (3).
+2. Add the Build result as its dependency: drag it from the Build's Results folder onto the new scenario, as in section 4.5. The new scenario (2) shows the Build result under **Dependencies** (3).
 
-![The Explorer with the \[5\] P26 - Historical scenario marked 2 and its dependency on the P26 Build result marked 3](images/fig-5.2.png)
+![The Explorer with the \[5\] P26 - Historical scenario marked 2 and its dependency on the P26 Build result \[53\] marked 3](images/fig-5.2.png)
 
 *Figure 5.2. The historical run and its dependency on the Build result.*
 
-3. Double-click the scenario and open **General > Pipeline**. As in section 4.4, it first inherits the Build's nine stages: untick **Inherit values** and choose **No Data** (Figures 4.12 and 4.13).
+3. Double-click the scenario and open **General > Pipeline**. As in section 4.5, it first inherits the Build's nine stages: untick **Inherit values** and choose **No Data** (Figures 4.14 and 4.15).
 4. In the empty row, choose **ST-Sim** as the **Stage** (4), with **Run Order** 1 (5).
 
 ![The Pipeline page of P26 - Historical with one row: Stage ST-Sim marked 4 and Run Order 1 marked 5](images/fig-5.3.png)
@@ -776,16 +878,16 @@ With spatial multiprocessing on, the Run Monitor lists one job per tile under th
 
 > The tiles hold about the same number of cells, so the jobs keep pace: all five were at 1992 or 1993 in Figure 5.12. With one tile per county they would not: a small county reaches 1995 while a large one is still at 1987. The scenario finishes when its slowest job does, and then merges the jobs' outputs into one result ("ST-Sim merging jobs" in the run log).
 
-**The P26 run.** One iteration, 1985 to 2023 at 150 m, 17 county jobs, on the 112-core server (24 October 2026):
+**The P26 run.** One iteration, 1985 to 2023 at 150 m, 5 tile jobs, on the 112-core server (30 October 2026):
 
 | Step in the run log | Time |
 | --- | --: |
 | ST-Sim creating jobs | 0:00:04 |
-| ST-Sim running jobs | 2:43:03 |
-| ST-Sim merging jobs | 0:07:55 |
-| **Total** | **2:51:03** |
+| ST-Sim running jobs | 2:16:15 |
+| ST-Sim merging jobs | 0:06:14 |
+| **Total** | **2:22:36** |
 
-The five jobs each hold about a fifth of the cells (20.2% for the largest), so they ran side by side for the full 2 hours 43 minutes. Merging their tables and maps took another 8 minutes. The result holds the yearly state class, transition, stock and flow tables, a state class map for every year, a transition map for every year of each mapped family, and yearly average stock and flow maps: 2,207 files, 4.3 GB in the library's data folder, with the library file at 1.5 GB. Three earlier P26 runs with one job per county (17 jobs) took 2:19 to 2:28, but this run shared the computer with another process that used much of its bandwidth, so the times do not compare cleanly. Five tiles are not expected to be faster than county tiles: both wait on about a fifth of the cells (Plumas alone is 19.8%). What they save is memory, 5 jobs' fixed memory instead of 17, and merge time, 8 minutes instead of 15.
+The five jobs each hold about a fifth of the cells (20.2% for the largest), so they ran side by side for the full 2 hours 16 minutes. Merging their tables and maps took another 6 minutes. The result holds the yearly state class, transition, stock and flow tables, a state class map for every year, a transition map for every year of each mapped family, and yearly average stock and flow maps: 2,207 files, 4.3 GB in the library's data folder. Three earlier P26 runs with one job per county (17 jobs) took 2:19 to 2:28, but this run shared the computer with another process that used much of its bandwidth, so the times do not compare cleanly. Five tiles are not expected to be faster than county tiles: both wait on about a fifth of the cells (Plumas alone is 19.8%). What they save is memory, 5 jobs' fixed memory instead of 17, and merge time, 8 minutes instead of 15.
 
 > The first P26 historical run wrote no harvest maps, because its filter turned Spatial on for the Forest Harvest family but off for the clearcut and selection type groups that ST-Sim actually simulates. Builds run from 24 October 2026 write the corrected filter. For an older Build, set **Spatial** to Yes for those two type groups on the run scenario's Transition Groups filter page before running it.
 
@@ -793,17 +895,17 @@ The five jobs each hold about a fifth of the cells (20.2% for the largest), so t
 
 A historical run should reproduce the history the Build mapped. Three checks are worth making on every new study area.
 
-**Transitions against the record.** Compare each family's simulated area per year (the run's **Transitions** chart, or the Run Figures of section 5.6) with the Build's **Historical Transition Summary** (Build Results). Each family should come close over the whole record. In P26 over 1986-2023, urbanization (244 km² against 245) and intensification came within 0.5%, fire within 3% (12,126 km² against 12,412), agriculture within 5%, and harvest 8% short (2,194 km² against 2,392).
+**Transitions against the record.** Compare each family's simulated area per year (the run's **Transitions** chart, or the Run Figures of section 5.6) with the Build's **Historical Transition Summary** (Build Results). Each family should come close over the whole record. In P26 over 1986-2023, urbanization (244 km² against 245) and intensification came within 0.5%, fire within 3% (12,124 km² against 12,412), agriculture within 10% (2 km² against 2), and harvest 12% short (2,101 km² against 2,392). About 8 points of the harvest shortfall are cuts the model cannot place (one transition per cell per year, classes without a harvest pathway); the rest are cuts the minimum harvest ages (section 3.6) keep out of stands that regrew too little after an earlier clearcut.
 
 > **Builds run before 24 October 2026** have a Historical Transition Summary that double counts urbanization and intensification: groups that share one NLCD map (a cell becoming low-intensity development is Urbanization: Low from natural land, but Intensification: Open to Low from open space) were each given the whole map. Rerun the Build's stage 6 to correct it. Projection rates were never affected.
 
 **Developed land.** The run should end with about the developed area the Build mapped for the last year. In P26 the run went from 876 to 1,120 km² developed over 1985-2023; the Build's Area-matched maps hold 1,121 km² in 2023, and NLCD at 30 m 1,108 km². This holds for Area-matched state classes (section 3.3.1). With Modal state classes, a cell that is only partly developed (a road through forest) switches between developed and forest from year to year; the model has no pathway from developed land back to forest, so such a run urbanizes less than the record shows yet ends with more developed land (the earlier Modal P26 Build: 294 km² urbanized against 377, and 569 km² developed in 2023 against 422). For the same reason, the Projection Setup (stage 9) counts only first-time gains when it sets projection rates (section 6).
 
-**Carbon.** Total ecosystem carbon should change smoothly except in large disturbance years. In P26 it rose from 439.3 Tg C in 1985 to 466.7 Tg C in 2019, then lost 9.3 and 14.3 Tg C in the fire years 2020 and 2021, ending at 444.3 Tg C in 2023 (+5.0 over the run): fire emissions, while much of the burned forest's live carbon moved into standing dead wood, which then decays over the following decades.
+**Carbon.** Total ecosystem carbon should change smoothly except in large disturbance years. In P26 it rose from 441.6 Tg C in 1985 to 474.5 Tg C in 2019, then lost 9.4 and 14.5 Tg C in the fire years 2020 and 2021, ending at 451.6 Tg C in 2023 (+10.0 over the run): fire emissions, while much of the burned forest's live carbon moved into standing dead wood, which then decays over the following decades.
 
 ### 5.6 Run Figures (stage 13)
 
-Stage 13 draws report figures of a run in the same format as the Build figures (section 4.4): nine PNGs with a *Figure N* header, lettered panels, and maps on shaded relief. It works for historical runs and projections.
+Stage 13 draws report figures of a run in the same format as the Build figures (section 4.5): nine PNGs with a *Figure N* header, lettered panels, and maps on shaded relief. It works for historical runs and projections.
 
 | Figure | Shows |
 | --- | --- |
@@ -821,47 +923,47 @@ Each figure is drawn only when the run wrote what it needs: the land cover figur
 
 > **A library made before stage 13 existed** does not list it. Close Studio and run `tools/sync-library.R` on the library first (section 10).
 
-1. Right-click the **Figures** folder (section 4.4), choose **New > Scenario** and name it (29), for example `Historical Run Figures`.
-2. Add the **Build result** as its dependency, as in section 4.4, not the run. The Build result supplies the grid, the strata, the state class colours and the historical record. The run is chosen in step 4. The new scenario is marked (30) in Figure 5.14.
+1. Right-click the **Figures** folder (section 4.5), choose **New > Scenario** and name it (29), for example `Historical Run Figures`.
+2. Add the **Build result** as its dependency, as in section 4.5, not the run. The Build result supplies the grid, the strata, the state class colours and the historical record. The run is chosen in step 4. The new scenario is marked (30) in Figure 5.14.
 3. On **General > Pipeline** (31), untick **Inherit values**, choose **No Data**, and add **13 - Run Figures** as the only stage, with Run Order 1 (32).
 
 ![The Historical Run Figures scenario open, its tab marked 29; the General tab with Pipeline marked 31 and the single stage 13 - Run Figures at Run Order 1 marked 32](images/fig-5.13.png)
 
 *Figure 5.13. The Run Figures scenario and its pipeline: stage 13 alone.*
 
-4. On the **LUCAS Core (model builder)** tab, open **Run Figures** (33) and pick the run from the **Run to draw** drop-down (34). It lists this project's historical runs and projections, newest first, with their result Ids. For the historical run figures, pick `[6] P26 - Historical`. Figure 5.14 shows the same page in the projection's Run Figures scenario (section 7.2), drawing result `[13]`. Leave it at **(the newest run)** to draw the newest run in the library.
+4. On the **LUCAS Core (model builder)** tab, open **Run Figures** (33) and pick the run from the **Run to draw** drop-down (34). It lists this project's historical runs and projections, newest first, with their result Ids. For the historical run figures, pick `[54] P26 - Historical`. Figure 5.14 shows the same page in the projection's Run Figures scenario (section 7.2), drawing result `[13]`. Leave it at **(the newest run)** to draw the newest run in the library.
 5. Save the library and run the scenario. It takes about a minute for P26.
-6. Open the result: the figures are under **LUCAS Core > Build Results > Run Figures (PNG)**, in the figure viewer (section 9.1). The files are in the library's data folder, under `<library>.ssim.data\Scenario-<result id>\lucasCore_OutputRunFigure`.
+6. Open the result: the figures are under **LUCAS Core > Build Results > Run Figures (PNG)**, in the figure viewer (section 8.1). The files are in the library's data folder, under `<library>.ssim.data\Scenario-<result id>\lucasCore_OutputRunFigure`.
 
-![The Explorer with \[14\] Projection Run Figures selected in the Figures folder, marked 30; the LUCAS Core (model builder) tab with Run Figures marked 33; the Run to draw drop-down set to \[13\] P26 - Projection No Climate, marked 34, with a note below it](images/fig-5.14.png)
+![The Explorer with \[14\] Projection Run Figures selected in the Figures folder, marked 30; the LUCAS Core (model builder) tab with Run Figures marked 33; the Run to draw drop-down set to \[65\] P26 - Projection No Climate, marked 34, with a note below it](images/fig-5.14.png)
 
-*Figure 5.14. A Run Figures scenario and the run to draw, picked from the drop-down (here the no-climate projection, result 13).*
+*Figure 5.14. A Run Figures scenario and the run to draw, picked from the drop-down (here the no-climate projection, result 65).*
 
-7. To save them all to a folder, select the result scenario in the Explorer. In the panel below the Explorer, open the **Export** tab (35), select **LUCAS Core > Run Figures (PNG)** (36) and click **Open** (37), then choose the folder to copy the PNGs into, as in section 4.4.
+7. To save them all to a folder, select the result scenario in the Explorer. In the panel below the Explorer, open the **Export** tab (35), select **LUCAS Core > Run Figures (PNG)** (36) and click **Open** (37), then choose the folder to copy the PNGs into, as in section 4.5.
 
 ![The Export tab below the Explorer, marked 35, with LUCAS Core (model builder) > LUCAS Core > Run Figures (PNG) selected and marked 36, and the Open button marked 37](images/fig-5.15.png)
 
 *Figure 5.15. Exporting the run figures to a folder.*
 
-**Examples from the P26 historical run.** Four of the nine figures stage 13 draws for the P26 historical run (result 6, 1985 to 2023, one iteration):
+**Examples from the P26 historical run.** Four of the nine figures stage 13 draws for the P26 historical run (result 54, 1985 to 2023, one iteration):
 
-![Run Figure 1 of P26: state class maps for 1985 and 2023 side by side, and a land-use change map that shows urbanization in red, mostly around Lake Tahoe and the western foothills, and clearcut and selection harvest scattered through the mid-elevation forests](images/fig-5.16.png)
+![Run Figure 1 of P26: state class maps for 1985 and 2023 side by side, and a land-use change map that shows urbanization in red, mostly around the towns, and harvest in brown and gold across the forest: urbanized 243 km², harvested 1,909 km²](images/fig-5.16.png)
 
-*Figure 5.16. Land cover change: (a, b) state class in 1985 and 2023; (c) the change between them. The run urbanized 243 km², and harvested 1,917 km² of forest that stayed forest.*
+*Figure 5.16. Land cover change: (a, b) state class in 1985 and 2023; (c) the change between them. The run urbanized 243 km², and harvested 1,909 km² of forest that stayed forest.*
 
-![Run Figure 4 of P26: total ecosystem carbon density maps for 1985 and 2023, and a change map with losses in brown where the large fires burned in the north and centre, and small gains in green across most of the forest](images/fig-5.17.png)
+![Run Figure 4 of P26: total ecosystem carbon density maps for 1985 (441.6 Tg C) and 2023 (451.7 Tg C), and a change map with losses in brown where the large fires burned and gains in green across most of the remaining forest, +10.1 Tg C](images/fig-5.17.png)
 
-*Figure 5.17. Total ecosystem carbon: (a, b) carbon density in 1985 and 2023 (439.3 and 444.4 Tg C); (c) the change, +5.1 Tg C. Losses follow the large fires of the north and centre; most of the remaining forest gained carbon.*
+*Figure 5.17. Total ecosystem carbon: (a, b) carbon density in 1985 and 2023 (441.6 and 451.7 Tg C); (c) the change, +10.1 Tg C. Losses follow the large fires of the north and centre; most of the remaining forest gained carbon.*
 
-![Run Figure 8 of P26: (a) lines of net primary productivity, heterotrophic respiration and net ecosystem productivity per year; (b) bars of fire emissions and harvest losses with a line of net biome productivity, which falls to about -14 Tg C in 2021](images/fig-5.18.png)
+![Run Figure 8 of P26: (a) lines of net primary productivity, heterotrophic respiration and net ecosystem productivity per year; (b) bars of fire emissions and harvest losses per year, largest in 2020 and 2021, and a line of net biome productivity, mean +0.26 Tg C a year](images/fig-5.18.png)
 
-*Figure 5.18. Carbon fluxes: (a) net primary productivity, heterotrophic respiration and net ecosystem productivity; (b) fire emissions and harvest losses, and net biome productivity, a mean of +0.13 Tg C per year. Fire emissions in 2020 and 2021 turned the study area into a carbon source.*
+*Figure 5.18. Carbon fluxes: (a) net primary productivity, heterotrophic respiration and net ecosystem productivity; (b) fire emissions and harvest losses, and net biome productivity, a mean of +0.26 Tg C per year. Fire emissions in 2020 and 2021 turned the study area into a carbon source.*
 
 The run's **Transitions per year** figure compares each family with the Build's Historical Transition Summary, which the stage reads from its dependency. With the run result as the dependency instead of the Build result, the figure shows the run's bars alone. For a Build made before 24 October 2026, the summary double counts urbanization and intensification (section 5.5) until the Build's stage 6 is rerun.
 
-![Run Figure 6 of P26: six bar charts, one per transition family, of the area simulated per year with the Build's recorded area as a point on each bar: urbanization 244 km² simulated against 245 recorded, intensification 96 against 96, ag expansion 2 against 2, ag contraction 12 against 13, fire 12,126 against 12,412 with a peak near 3,700 km² in 2021, and forest harvest 2,194 against 2,392](images/fig-5.19.png)
+![Run Figure 6 of P26: six bar charts, one per transition family, of the area simulated per year with the Build's recorded area as a point: urbanization 244 against 245 km², intensification 96 against 96, ag expansion 2 against 2, ag contraction 12 against 13, fire 12,124 against 12,412 and forest harvest 2,101 against 2,392](images/fig-5.19.png)
 
-*Figure 5.19. Transitions per year: each family's simulated area (bars) against the Build's historical record (points), with the 1986-2023 totals in each panel title. Urbanization, intensification, agriculture and fire follow the record year by year; harvest falls short in most years (8% over the run).*
+*Figure 5.19. Transitions per year: each family's simulated area (bars) against the Build's historical record (points), with the 1986-2023 totals in each panel title. Urbanization, intensification, agriculture and fire follow the record year by year; harvest falls short in most years (12% over the run; section 5.5).*
 
 ## 6. The Projection Setup
 
@@ -876,11 +978,11 @@ A Projection Setup is made once per historical run it starts from and per set of
 
 ### 6.1 Create the Projection Setup scenario
 
-1. Right-click **Definitions**, choose **New > Folder** and name it `Projection Setup`, as for the Figures folder (section 4.4). Right-click the folder, choose **New > Scenario** and name it (1), for example `P26 - Projection Setup No Climate`.
+1. Right-click **Definitions**, choose **New > Folder** and name it `Projection Setup`, as for the Figures folder (section 4.5). Right-click the folder, choose **New > Scenario** and name it (1), for example `P26 - Projection Setup`.
 2. Add the **Build result** as its dependency (2), as for the historical run (section 5.1). Do not add the historical run: the setup reads its maps from the library, by the result id you enter in section 6.2.
 3. On **General > Pipeline** (3), untick **Inherit values**, choose **No Data**, and add **9 - Projection Transitions** with Run Order 1 and **10 - Transition Suitability** with Run Order 2 (4).
 
-![The Projection Setup folder in the Explorer with 10 P26 - Projection Setup No Climate marked 1 and its dependency, the Build result 2 P26 - Build, marked 2; the General tab with Pipeline marked 3 and the stages 9 - Projection Transitions and 10 - Transition Suitability at Run Order 1 and 2 marked 4](images/fig-6.1.png)
+![The Projection Setup folder in the Explorer with \[10\] P26 - Projection Setup marked 1 and its dependency, the Build result \[53\] P26 - Build, marked 2; the General tab with Pipeline marked 3 and the stages 9 - Projection Transitions and 10 - Transition Suitability at Run Order 1 and 2 marked 4](images/fig-6.1.png)
 
 *Figure 6.1. The Projection Setup scenario: the Build result as its dependency and stages 9 and 10 as its pipeline.*
 
@@ -890,7 +992,7 @@ Run Settings sets the projection years, where the projection starts, the Monte C
 
 4. On the **LUCAS Core (model builder)** tab, open **Projection > Run Settings** (5).
 5. **End year** (6): the last projection year; blank runs to 2100. Projections start the year after the Build's historical end (2024 for P26). The P26 example runs to `2050`.
-6. **How the projection starts** (7): choose **Stand-alone** and pick the historical run from the list: the result scenario of section 5 that has age maps (`[6] P26 - Historical` for P26). Stage 9 copies that run's 2023 state class, age and carbon stock maps into the setup as the projection's starting conditions, so the history is run once and every projection shares it. (**Continuous** is for a projection that runs the historical years itself in the same run; it is rarely needed.)
+6. **How the projection starts** (7): choose **Stand-alone** and pick the historical run from the list: the result scenario of section 5 that has age maps (`[54] P26 - Historical` for P26). Stage 9 copies that run's 2023 state class, age and carbon stock maps into the setup as the projection's starting conditions, so the history is run once and every projection shares it. (**Continuous** is for a projection that runs the historical years itself in the same run; it is rarely needed.)
 7. **Historical years drawn**: leave **All historical transition years** ticked, or give a shorter reference period (for example `2001` to `2023`). Each projection year draws one whole historical year from this period; groups in the same sampling set draw the same year, so a year's land use keeps its real mix.
 8. **Iterations** and **Random seed** (8): each iteration draws its own sequence of historical years, and the same seed gives the same draws. Use `1` for a first test, as here, and 10 or more for a Monte Carlo set.
 9. **Transition types within a named group**: leave **Weight each type by its historical share**, so urbanization keeps the historical mix of open, low, medium and high intensity.
@@ -997,7 +1099,7 @@ Method 3 needs a finished lucasFireC2F run: its library and the result scenario 
 
 ### 6.6 Run and check the Projection Setup
 
-24. Save the library and run the Projection Setup scenario (section 4.1). Its result appears under the scenario's **Results** folder (23), and the Run Monitor shows its Result Id and status (24). The P26 setup is result `[11]`. Projections (chapter 7) depend on this result.
+24. Save the library and run the Projection Setup scenario (section 4.1). Its result appears under the scenario's **Results** folder (23), and the Run Monitor shows its Result Id and status (24). The P26 setup is result `[57]` (`[11]` in Figure 6.6, an earlier run of the same setup). Projections (chapter 7) depend on this result.
 
 ![The Explorer with the Projection Setup folder and its scenario, 10 P26 - Projection Setup No Climate, marked 23; the Run Monitor with Result Id 11, status Done and the Run Log link marked 24](images/fig-6.6.png)
 
@@ -1005,7 +1107,7 @@ Method 3 needs a finished lucasFireC2F run: its library and the result scenario 
 
 The warning triangle on the result is SyncroSim's note that the lucasCore package does not state the SyncroSim version it was built for; it appears on every lucasCore result and can be ignored.
 
-**Time.** The P26 setup took 34 minutes: 14 for stage 9 and 20 for stage 10 (25, 26), which fitted six surfaces at a 150 m fitting resolution. Most of stage 10's time went on building its covariate layers for the first time (annual NLCD, distances, housing, NCCPI from Planetary Computer). It caches them per fitting resolution in the library's data folder (`lucasCore-suitability`), so a rerun at the same resolution is faster. An earlier P26 setup fitted at 30 m, about 55 million cells, and its stage 10 took 44 minutes.
+**Time.** The P26 setup took 16 minutes: 10 for stage 9 and 6 for stage 10 (25, 26), which fitted six surfaces at a 150 m fitting resolution. The first P26 setup took 34 minutes, 20 of them in stage 10 building its covariate layers for the first time (annual NLCD, distances, housing, NCCPI from Planetary Computer). It caches them per fitting resolution in the library's data folder (`lucasCore-suitability`), so a rerun at the same resolution is faster, as here. An earlier P26 setup fitted at 30 m, about 55 million cells, and its stage 10 took 44 minutes.
 
 ![The end of the run log: 10 - Transition Suitability Total time 00:20:27 marked 25 and Total simulation time 00:34:21 marked 26, below the stage 10 lines on the Open Space test, adjacency and size distributions](images/fig-6.7.png)
 
@@ -1078,9 +1180,9 @@ A projection is an ST-Sim run from the historical end year forward. Like the his
 
 *Figure 7.1. Naming the projection.*
 
-2. Add two dependencies (3) so that the Dependencies folder lists, from the top, the **Projection Setup result** (`[11]`), then the **Build result** (`[2]`). Studio puts each new dependency at the top of the list, so add them in reverse: drag the Build result onto the scenario first, then the setup result. The new scenario is marked (2).
+2. Add two dependencies (3) so that the Dependencies folder lists, from the top, the **Projection Setup result** (`[57]`), then the **Build result** (`[53]`). Studio puts each new dependency at the top of the list, so add them in reverse: drag the Build result onto the scenario first, then the setup result. The new scenario is marked (2).
 
-![The Explorer with the projection scenario, 12 P26 - Projection No Climate, marked 2, and its Dependencies folder holding the Projection Setup result 11 above the Build result 2, marked 3](images/fig-7.2.png)
+![The Explorer with the projection scenario, \[12\] P26 - Projection No Climate, marked 2, and its Dependencies folder holding the Projection Setup result \[57\] above the Build result \[53\], marked 3](images/fig-7.2.png)
 
 *Figure 7.2. The projection's dependencies: the setup result first, then the Build result.*
 
@@ -1122,27 +1224,27 @@ The stock and flow outputs (yearly tables and average stock and flow maps) come 
 
 ### 7.2 The projection's result
 
-The P26 projection (`[13]`, 2024-2050, one iteration) ran as 5 tile jobs in 2 hours 1 minute: 1:54:51 running the jobs and 5:39 merging them into one result. Over the 27 years it burned 9,943 km² (368 km² a year; the drawn years 2025 and 2031 add 1,514 and 3,602 km²), harvested 1,729 km² and urbanized 172 km². Ecosystem carbon starts at 443.2 Tg C, falls to 431.1 after the 2031 fire year and ends at 445.1 Tg C in 2050..
+The P26 projection (`[65]`, 2024-2050, one iteration) ran as 5 tile jobs, alongside the two climate projections of section 7.3, in 2 hours 2 minutes: 1:49:21 running the jobs and 11:05 merging them into one result. Over the 27 years it burned 9,942 km² (368 km² a year; the drawn years 2025 and 2031 add 1,513 and 3,602 km²), harvested 1,729 km² and urbanized 172 km². Ecosystem carbon starts at 451.6 Tg C, exactly where the historical run ends, falls to 438.1 after the 2031 fire year and ends at 452.2 Tg C in 2050.
 
 **Run Figures of a projection.** Run Figures (section 5.6) works on a projection as on a historical run. In the Run Figures scenario, pick the projection's result in the **Run to draw** drop-down (or leave it at **(the newest run)**). For a stand-alone projection, stage 13 finds the historical run it started from, through its Projection Setup's Projection Start, and puts it in front, so one set of figures runs from 1985 to the end of the projection. A dashed line marks where the projection starts.
 
 **Examples from the P26 projection.** Four of the nine figures for the historical run joined to the normal-climate projection (one iteration, 1985-2050):
 
-![Run Figure 1 of the joined P26 run: state class maps for 1985 and 2050, and a land-use change map 1985-2050 with clearcut and selection harvest across the west-side forests and urbanization in red around Lake Tahoe and the foothills](images/fig-7.8.png)
+![Run Figure 1 of the joined P26 run: state class maps for 1985 and 2050, and a land-use change map 1985-2050 (urbanized 416 km², harvested 3,228 km²)](images/fig-7.8.png)
 
-*Figure 7.8. Land cover change, 1985-2050: (a, b) state class in 1985 and 2050; (c) the change between them. 418 km² urbanized and 3,194 km² of forest harvested at least once over the 65 years.*
+*Figure 7.8. Land cover change, 1985-2050: (a, b) state class in 1985 and 2050; (c) the change between them. 416 km² urbanized and 3,228 km² of forest harvested at least once over the 65 years.*
 
-![Run Figure 6 of the joined P26 run: six panels of transitions per year, 1986-2050, bars for the run and points for the record up to 2023, with a dashed line at 2023; fire shows two projected spikes in 2025 and 2031 from the drawn years 2020 and 2021](images/fig-7.9.png)
+![Run Figure 6 of the joined P26 run: six panels of transitions per year, 1986-2050, bars for the run and points for the record up to 2023, with a dashed line where the projection starts; fire spikes in 2025 and 2031](images/fig-7.9.png)
 
-*Figure 7.9. Transitions per year. Titles give the area simulated to 2023 + the area projected after it, and the record in brackets. Each projected year repeats the amount of a drawn historical year: fire's spikes in 2025 and 2031 (1,514 and 3,602 km²) are draws of 2020 and 2021.*
+*Figure 7.9. Transitions per year. Titles give the area simulated to 2023 + the area projected after it, and the record in brackets. Each projected year repeats the amount of a drawn historical year: fire's spikes in 2025 and 2031 (1,513 and 3,602 km²) are draws of 2020 and 2021.*
 
-![Run Figure 7 of the joined P26 run: carbon by pool from 439 to 445 Tg C over 1985-2050, and yearly net ecosystem carbon balance bars with large losses in 2020, 2021, 2025 and 2031](images/fig-7.10.png)
+![Run Figure 7 of the joined P26 run: carbon by pool from 442 to 452 Tg C over 1985-2050, with no step at the 2023 hand-over, and yearly net ecosystem carbon balance bars, mean +0.16 Tg C a year](images/fig-7.10.png)
 
-*Figure 7.10. Carbon stocks, 1985-2050: 439 to 445 Tg C. The 2031 loss (about -9 Tg C) is that year's draw of the 2021 fire season; the stocks recover to 445 Tg C by 2050.*
+*Figure 7.10. Carbon stocks, 1985-2050: 442 to 452 Tg C. The 2031 loss (about -10 Tg C) is that year's draw of the 2021 fire season; the stocks recover to 452 Tg C by 2050.*
 
-![Run Figure 8 of the joined P26 run: net primary productivity, heterotrophic respiration and net ecosystem productivity varying year to year before 2023 and nearly flat after it; and fire and harvest losses with net biome productivity](images/fig-7.11.png)
+![Run Figure 8 of the joined P26 run: net primary productivity, heterotrophic respiration and net ecosystem productivity varying year to year up to 2023 and almost flat after it; fire and harvest losses with spikes in 2020, 2021, 2025 and 2031, and net biome productivity, mean +0.16 Tg C a year](images/fig-7.11.png)
 
-*Figure 7.11. Carbon fluxes, 1985-2050. (a) Productivity and respiration vary from year to year up to 2023 and are almost flat after it. (b) Losses to fire and harvest, and net biome productivity (mean +0.11 Tg C a year).*
+*Figure 7.11. Carbon fluxes, 1985-2050. (a) Productivity and respiration vary from year to year up to 2023 and are almost flat after it. (b) Losses to fire and harvest, and net biome productivity (mean +0.16 Tg C a year).*
 
 **Why the fluxes flatten after 2023.** Up to 2023, productivity and decay follow each year's PRISM weather through the climate flow multipliers. This projection has no climate future, so from 2024 every multiplier is 1.0: each year has the climate the growth curves and decay rates were fitted to. Only disturbance and stand age still move the fluxes, so net primary productivity, respiration and net ecosystem productivity change slowly, and the year-to-year variation of the historical period is gone. Net biome productivity still swings with the drawn fire years, because fire is not climate-driven here. Adding a climate future (section 7.3) brings back year-to-year climate and any trend the climate model projects.
 
@@ -1166,9 +1268,9 @@ Each climate future is its own small scenario on the Build result, so one Build 
 **Make the climate future.**
 
 9. Right-click **Definitions** (or a folder for the climate futures, here **Climate**), choose **New > Scenario** and name it after the run (12), for example `Climate - CanESM ssp245`.
-10. Add the **Build result** (`[2]`) as its only dependency (13). It supplies the grid, the historical end year and the climate effects.
+10. Add the **Build result** (`[53]`) as its only dependency (13). It supplies the grid, the historical end year and the climate effects.
 
-![The Explorer with the climate scenario, 17 Climate - CanESM ssp245 in a Climate folder, marked 12, and its Dependencies folder holding the Build result 2, marked 13](images/fig-7.12.png)
+![The Explorer with the climate scenario, \[17\] Climate - CanESM ssp245 in the Climate folder, marked 12, and its Dependencies folder holding the Build result \[53\], marked 13; \[20\] Climate - CanESM ssp585 below it has the same dependency](images/fig-7.12.png)
 
 *Figure 7.12. The Projection Climate scenario and its one dependency, the Build result.*
 
@@ -1184,7 +1286,7 @@ Each climate future is its own small scenario on the Build result, so one Build 
 
 *Figure 7.14. The LOCA2 run of the climate future.*
 
-13. Save and run. Its result holds the flow multipliers for 2024 to the Last Year. For P26 (`[18]`) it took 4.5 minutes and wrote 109 maps (42 MB). The run log gives each multiplier's mean in the first and last projected decade: under CanESM5 SSP2-4.5, forest growth is 1.07 in 2024-2033 and 1.00 in 2041-2050, non-forest growth 1.15 and 0.90, and decay of the fast and slow pools rises to 1.26 and 1.18.
+13. Save and run. Its result holds the flow multipliers for 2024 to the Last Year. For P26 (`[58]`) it took 4.6 minutes and wrote 114 maps (45 MB). The run log gives each multiplier's mean in the first and last projected decade: under CanESM5 SSP2-4.5, forest growth is 1.07 in 2024-2033 and 1.00 in 2041-2050, non-forest growth 1.15 and 0.90, and decay of the fast and slow pools rises to 1.26 and 1.18.
 
 > The lists of scenarios, models and replicates come with the package, from the LOCA2 runs on the machine lucasCore was developed on. Stage 11 reads the run from the LOCA2 folder in Data Sources and stops with a clear message, naming the models or replicates that do have the chosen SSP, if the run is not on this machine.
 
@@ -1220,9 +1322,9 @@ Each climate future is its own small scenario on the Build result, so one Build 
     - **Output Filters > Transition Groups**: the transition group output filter, for a Build made before 24 October 2026 (copy the rows from the historical run, as in section 7.1).
 17. Save and run.
 
-The P26 example runs two climate futures of one climate model, CanESM5: a moderate scenario, SSP2-4.5 (`[19]`, 18), and a high-emission scenario, SSP5-8.5 (`[22]`, 20). Each has its own Projection Climate result (`[18]` from `Climate - CanESM ssp245` and `[21]` from `Climate - CanESM ssp585`), and each projection lists its dependencies in the same order: setup, climate, Build (19, 21). The Projection Climate scenarios are kept in a **Climate** folder in the Explorer.
+The P26 example runs two climate futures of one climate model, CanESM5: a moderate scenario, SSP2-4.5 (`[19]`, 18), and a high-emission scenario, SSP5-8.5 (`[22]`, 20). Each has its own Projection Climate result (`[58]` from `Climate - CanESM ssp245` and `[59]` from `Climate - CanESM ssp585`), and each projection lists its dependencies in the same order: setup, climate, Build (19, 21). The Projection Climate scenarios are kept in a **Climate** folder in the Explorer.
 
-![The Explorer with two climate projections: 19 P26 - Projection CanESM ssp245 marked 18, with dependencies Projection Setup 11, Climate ssp245 18 and Build 2 marked 19; and 22 P26 - Projection CanESM ssp585 marked 20, with dependencies Projection Setup 11, Climate ssp585 21 and Build 2 marked 21](images/fig-7.18.png)
+![The Explorer with two climate projections: \[19\] P26 - Projection CanESM ssp245 marked 18, with dependencies Projection Setup \[57\], Climate ssp245 \[58\] and Build \[53\] marked 19; and \[22\] P26 - Projection CanESM ssp585 marked 20, with dependencies Projection Setup \[57\], Climate ssp585 \[59\] and Build \[53\] marked 21](images/fig-7.18.png)
 
 *Figure 7.18. Two climate projections on one Projection Setup: SSP2-4.5 and SSP5-8.5, each with its own Projection Climate result between the setup and the Build.*
 
@@ -1244,7 +1346,7 @@ To compare climate futures, make one Projection Climate scenario per SSP and mod
 
 *Figure 7.20. Running the two climate projections together.*
 
-The **Run Monitor** lists both scenarios (26), each with its own result (P26: `[23]` and `[24]`), and below them all 10 tile jobs, 5 per scenario, running side by side (27). Plan memory for all of them at once (section 5.3): for P26, about 2 GB per job, so about 20 GB for 10 jobs. Running both projections together costs no extra time: for P26 each finished in 1 h 59 min (tile jobs 1 h 44–46 min, merge 7 min), against 2 h 1 min for the no-climate projection run alone.
+The **Run Monitor** lists both scenarios (26), each with its own result (`[23]` and `[24]` in Figure 7.21), and below them all 10 tile jobs, 5 per scenario, running side by side (27). Plan memory for all of them at once (section 5.3): for P26, about 2 GB per job, so about 20 GB for 10 jobs. Running projections together costs no extra time: for P26, the three projections run side by side each finished in 2 h 4 min (tile jobs 1 h 47–48 min, merge 5–11 min), against 2 h 1 min for the no-climate projection run alone.
 
 ![The Run Monitor with P26 - Projection CanESM ssp245 (result 23) and P26 - Projection CanESM ssp585 (result 24) both Running, marked 26, and below them ten ST-Sim jobs, Job-1 to Job-5 for each result, all at timestep 2025, marked 27](images/fig-7.21.png)
 
@@ -1268,9 +1370,9 @@ Like Run Figures (section 5.6), it is a scenario of its own that depends on the 
 
 *Figure 7.22. Naming the comparison scenario.*
 
-2. Add the Build result as its dependency: drag `[2] P26 - Build (...)` from the Build's **Results** folder onto the new scenario (29). It appears under **Dependencies** (30). Stage 14 takes the model grid from it; the runs to compare are chosen on the scenario's own page.
+2. Add the Build result as its dependency: drag `[53] P26 - Build (...)` from the Build's **Results** folder onto the new scenario (29). It appears under **Dependencies** (30). Stage 14 takes the model grid from it; the runs to compare are chosen on the scenario's own page.
 
-![The Explorer with \[32\] Compare Projection Scenarios in the Figures folder, marked 29, and the Build result \[2\] under its Dependencies folder, marked 30](images/fig-7.23.png)
+![The Explorer with \[32\] Compare Projection Scenarios in the Figures folder, marked 29, and the Build result \[53\] under its Dependencies folder, marked 30](images/fig-7.23.png)
 
 *Figure 7.23. The comparison scenario in the Figures folder, with the Build result as its only dependency.*
 
@@ -1293,135 +1395,135 @@ Like Run Figures (section 5.6), it is a scenario of its own that depends on the 
 5. Each run gets a line. Set it up from left to right:
 
 - **✕** (36) removes the run.
-- **Run** (37): pick the run from the drop-down. It lists the project's historical runs and projections, newest first, with their result Ids. For P26, pick the three projections: `[24]` SSP5-8.5, `[23]` SSP2-4.5 and `[13]` no climate.
-- **Baseline** (38): tick the run the others are compared with. Ticking one clears the others. For P26, tick the no-climate projection `[13]`. With none ticked, the first projection in the list is the baseline, and the page says so beside it.
+- **Run** (37): pick the run from the drop-down. It lists the project's historical runs and projections, newest first, with their result Ids. For P26, pick the three projections: `[66]` SSP5-8.5, `[67]` SSP2-4.5 and `[65]` no climate.
+- **Baseline** (38): tick the run the others are compared with. Ticking one clears the others. For P26, tick the no-climate projection `[65]`. With none ticked, the first projection in the list is the baseline, and the page says so beside it.
 - **Colour** (39): **auto** takes the default palette (blue, orange, red, and so on, in list order). Click the swatch to choose a colour; right-click it to go back to auto.
 - **Label** (40): the name used in the figures' legends. Blank uses the scenario's name. For P26: `No Climate`, `CanESM ssp245` and `CanESM ssp585`.
 
 **Add a run** (41) adds another line.
 
-![The Compare Runs page with three runs: \[24\] CanESM ssp585, \[23\] CanESM ssp245 and \[13\] No Climate. Marks: 36 the remove buttons, 37 the run drop-downs, 38 the Baseline ticks with No Climate ticked, 39 the Colour swatches set to auto, 40 the labels, 41 the Add a run button](images/fig-7.27.png)
+![The Compare Runs page with three runs: \[67\] CanESM ssp245, \[66\] CanESM ssp585 and \[65\] No Climate. Marks: 36 the remove buttons, 37 the run drop-downs, 38 the Baseline ticks with No Climate ticked, 39 the Colour swatches set to auto, 40 the labels, 41 the Add a run button](images/fig-7.27.png)
 
 *Figure 7.27. The three P26 projections set up for comparison, with the no-climate run as the baseline.*
 
-The historical run does not need a line. Stage 14 finds the historical run each projection started from (through its Projection Setup's Projection Start; for P26, result `[6]`). It draws that run in black from 1985 to the projections' start year, and the projections in colour after it. Add the historical run only to give it its own label or colour.
+The historical run does not need a line. Stage 14 finds the historical run each projection started from (through its Projection Setup's Projection Start; for P26, result `[54]`). It draws that run in black from 1985 to the projections' start year, and the projections in colour after it. Add the historical run only to give it its own label or colour.
 
 6. Save the library and run the scenario. For P26 it takes about a minute.
 
-The figures are under **LUCAS Core > Build Results > Compare Figures (PNG)**, in the figure viewer (section 9.1). The two summary tables are also outputs, one row per run:
+The figures are under **LUCAS Core > Build Results > Compare Figures (PNG)**, in the figure viewer (section 8.1). The two summary tables are also outputs, one row per run:
 
 - **Compare Carbon Summary**: carbon at the start and end of the run, its change and its difference from the baseline; the change in live biomass and in dead wood, litter and soil; and mean annual NPP, NEP, losses to land-use and land-cover change (fire emissions and harvest) and NBP.
 - **Compare Land Change Summary**: the area burned, harvested and urbanized, and the change in forest and developed area.
 
 To save the figures to a folder, use **Export > LUCAS Core > Compare Figures (PNG)**, as for Run Figures.
 
-The P26 comparison is result `[36]`. It took 55 s and drew 9 figures. Its log lists each run and its role: the historical run `[6]`, added automatically, then the baseline `[13]` and the two climate projections. It also checks that the projections end in the same year.
+The P26 comparison is result `[71]`. It took 61 s and drew 9 figures. Its log lists each run and its role: the historical run `[54]`, added automatically, then the baseline `[65]` and the two climate projections. It also checks that the projections end in the same year.
 
-![Figure 1 of the comparison: (a) total ecosystem carbon from 1985 to 2050, the historical run in black and the three projections in colour after the 2023 dashed line, ending at 445, 438 and 440 Tg C; (b) each climate run minus No Climate, 2023 to 2050: SSP2-4.5 ends at -7.2 Tg C, and SSP5-8.5 falls to about -11 Tg C in 2041 before recovering to -5.0](images/fig-7.28.png)
+![Figure 1 of the comparison: (a) total ecosystem carbon from 1985 to 2050, the historical run in black and the three projections in colour after 2023, ending at 452 (No Climate), 447 (SSP5-8.5) and 446 Tg C (SSP2-4.5); (b) each climate run minus No Climate, -4.9 and -6.1 Tg C in 2050, with SSP5-8.5 lowest, about -12, in 2041](images/fig-7.28.png)
 
 *Figure 7.28. Total ecosystem carbon in the P26 runs, and each climate run's difference from the no-climate baseline.*
 
-In P26, both climate futures end with less carbon than the no-climate run (Figure 7.28): 7.2 Tg C less under SSP2-4.5, and 5.0 Tg C less under SSP5-8.5. SSP5-8.5 is the lower of the two until about 2045, about 11 Tg C below the baseline in 2041. It then gains on the baseline, because its growth rises in the last decade. The difference map (Figure 7.29) shows where these gaps lie in 2050.
+In P26, both climate futures end with less carbon than the no-climate run (Figure 7.28): 6.1 Tg C less under SSP2-4.5, and 4.9 Tg C less under SSP5-8.5. SSP5-8.5 is the lower of the two until about 2044, about 12 Tg C below the baseline in 2041. It then gains on the baseline, because its growth rises in the last decade. The difference map (Figure 7.29) shows where these gaps lie in 2050.
 
-![Figure 2 of the comparison: three maps of P26 in 2050. (a) No Climate total ecosystem carbon, 445.2 Tg C; (b) SSP2-4.5 minus No Climate, -7.2 Tg C; (c) SSP5-8.5 minus No Climate, -4.9 Tg C. Losses in brown and gains in green are scattered through the mid-elevation forest](images/fig-7.29.png)
+![Figure 2 of the comparison: three maps of P26 in 2050. (a) No Climate total ecosystem carbon, 452.3 Tg C; (b) SSP5-8.5 minus No Climate, -4.9 Tg C; (c) SSP2-4.5 minus No Climate, -6.0 Tg C; brown less carbon, green more](images/fig-7.29.png)
 
 *Figure 7.29. Total ecosystem carbon in 2050: the baseline, and each climate run minus the baseline.*
 
-The carbon summary (Figure 7.30) shows why. Both climate runs grow more than the baseline: NPP averages 10.6 Tg C per year against 10.3, and live biomass gains 3.9 and 6.9 Tg C against 2.2. But warmer years also speed decay, so dead wood, litter and soil lose 9 to 10 Tg C, where the baseline holds steady. The loss to fire and harvest is about 1.6 Tg C per year in every run, so net biome productivity turns slightly negative under both climate futures.
+The carbon summary (Figure 7.30) shows why. Both climate runs grow more than the baseline: NPP averages 11.3 Tg C per year against 10.9, and live biomass gains 7.2 and 9.6 Tg C against 3.2. But warmer years also speed decay, so dead wood, litter and soil lose 13 to 14 Tg C, against 2.7 Tg C in the baseline. The loss to fire and harvest is about 1.6 Tg C per year in every run, so net biome productivity turns slightly negative under both climate futures.
 
-![Figure 8 of the comparison, the carbon summary: one row per run with carbon at the end, change, difference from the baseline, live biomass change, dead wood, litter and soil change, and mean NPP, NEP, LULC losses and NBP. The climate runs gain more live biomass (+3.9, +6.9 Tg C) but lose 9.2 and 10.0 Tg C of dead wood, litter and soil](images/fig-7.30.png)
+![Figure 8 of the comparison, the carbon summary: one row per run with carbon at the start and end, change, difference from the baseline, live biomass change, dead wood, litter and soil change, and mean NPP, NEP, losses and NBP](images/fig-7.30.png)
 
 *Figure 7.30. The carbon summary of the comparison (also the Compare Carbon Summary output).*
 
-The land change summary (Figure 7.31) shows that the three projections burn, harvest and urbanize the same area, and so lose the same forest (about 120 km²) and gain the same developed land (172 km²). Climate changes growth and decay here, not disturbance.
+The land change summary (Figure 7.31) shows that the three projections harvest and urbanize the same area, lose about the same forest (118 to 120 km²) and gain the same developed land (172 km²). They burn the same area too, except that the SSP2-4.5 run's 2031 fire year burned 3,096 of the 3,602 km² drawn, so it burned 9,438 km² in all against 9,942. Climate changes growth and decay here, not the disturbance amounts.
 
-![Figure 9 of the comparison, the land change summary: one row per run with the area burned, harvested and urbanized and the change in forest and developed area. The three projections each burn about 9,943 km², harvest 1,729 km², urbanize 172 km², lose about 120 km² of forest and gain 172 km² of developed land](images/fig-7.31.png)
+![Figure 9 of the comparison, the land change summary: one row per run with the area burned, harvested and urbanized and the change in forest and developed area](images/fig-7.31.png)
 
 *Figure 7.31. The land change summary of the comparison (also the Compare Land Change Summary output).*
 
-## 9. Viewing results in SyncroSim
+## 8. Viewing results in SyncroSim
 
-Results can be viewed without leaving SyncroSim Studio in two ways: the lucasCore figures, drawn by stages 12, 13 and 14 (section 9.1), and the charts and maps you build yourself from a run's ST-Sim output (section 9.2).
+Results can be viewed without leaving SyncroSim Studio in two ways: the lucasCore figures, drawn by stages 12, 13 and 14 (section 8.1), and the charts and maps you build yourself from a run's ST-Sim output (section 8.2).
 
-### 9.1 The figures
+### 8.1 The figures
 
 Stages 12 (Build Figures), 13 (Run Figures) and 14 (Compare Runs) save their figures as PNG files in the result scenario. Studio shows them in a figure viewer:
 
-1. Double-click the result scenario (1), for example the comparison result `[36]`, and open the **LUCAS Core (model builder)** tab.
+1. Double-click the result scenario (1), for example the comparison result `[71]`, and open the **LUCAS Core (model builder)** tab.
 2. Under **Build Results**, open the figure page (2): **Build Figures (PNG)**, **Run Figures (PNG)** or **Compare Figures (PNG)**. It opens on the first figure.
 3. Pick a figure from the drop-down at the top (3), which lists each figure by number and title, or step through them with **< Previous** and **Next >** (4), or with the left and right arrow keys.
 4. The figure fills the page, with its caption below it (7). To see it at full size, click **Open full size** (5) or double-click the figure: it opens in Windows' image viewer.
-5. **Save as...** saves the figure shown; **Save all...** (6) saves every figure of the result to a folder you choose. This does the same as the **Export** tab (section 4.4), without leaving the page.
+5. **Save as...** saves the figure shown; **Save all...** (6) saves every figure of the result to a folder you choose. This does the same as the **Export** tab (section 4.5), without leaving the page.
 
-![The figure viewer on result 36: the result in the Explorer (1), Compare Figures (PNG) under Build Results (2), the figure drop-down showing Figure 1. Total ecosystem carbon (3), the Previous and Next buttons (4), Open full size (5), Save as and Save all (6), Figure 1 of the comparison filling the page, and its caption below (7)](images/fig-9.1.png)
+![The figure viewer on result 45: the result in the Explorer (1), Compare Figures (PNG) under Build Results (2), the figure drop-down showing Figure 1. Total ecosystem carbon (3), the Previous and Next buttons (4), Open full size (5), Save as and Save all (6), Figure 1 of the comparison filling the page, and its caption below (7)](images/fig-8.1.png)
 
-*Figure 9.1. The figure viewer, here on the comparison result `[36]`.*
+*Figure 8.1. The figure viewer, here on the comparison result `[45]`.*
 
 The viewer only reads the files: they stay in the library's data folder, under `<library>.ssim.data\Scenario-<result id>\lucasCore_Output...Figure`.
 
-### 9.2 Charts and maps
+### 8.2 Charts and maps
 
 Studio draws charts and maps from a run's ST-Sim output: the yearly tables (state classes, transitions, stocks and flows) and the maps the run wrote (section 5.2, Output Options). They are built in the **Charts** and **Maps** tabs of the panel below the Explorer, and they show the **active results**: the runs you add to the results list. Set that list first.
 
 1. In the Explorer, select the run scenarios to show (8). Hold **Ctrl** to pick several: for P26, the historical run and the three projections. Right-click them and choose **Add to Results** (9). The toolbar button (10) does the same.
 
-![The Explorer with P26 - Historical, P26 - Projection No Climate, P26 - Projection CanESM ssp245 and P26 - Projection CanESM ssp585 selected (8), the right-click menu with Add to Results (9), and the Add to Results button on the toolbar (10)](images/fig-9.2.png)
+![The Explorer with P26 - Historical, P26 - Projection No Climate, P26 - Projection CanESM ssp245 and P26 - Projection CanESM ssp585 selected (8), the right-click menu with Add to Results (9), and the Add to Results button on the toolbar (10)](images/fig-8.2.png)
 
-*Figure 9.2. Adding the four P26 runs to the active results.*
+*Figure 8.2. Adding the four P26 runs to the active results.*
 
 2. Each scenario in the results list is shown in bold with a red tick (11). Adding a run scenario adds **all** of its results, so a run that has been run more than once appears once for each result. To keep only one, open the scenario's **Results** folder, right-click each result you don't want and choose **Remove from Results** (or use the button beside **Add to Results** on the toolbar).
 
-![The four run scenarios in bold, each with a red tick, marked 11; the Results drop-down on the toolbar marked 12](images/fig-9.3.png)
+![The four run scenarios in bold, each with a red tick, marked 11; the Results drop-down on the toolbar marked 12](images/fig-8.3.png)
 
-*Figure 9.3. The four runs are now active results: every chart and map below shows them.*
+*Figure 8.3. The four runs are now active results: every chart and map below shows them.*
 
 3. To change which results the charts and maps show without rebuilding the list, open the **Results** drop-down on the toolbar (12). It lists every result in the list (13), ticked when it is shown. Click a result to untick it, which hides it from every chart and map but keeps it in the list, and click again to show it. **Select All** and **Deselect All** (14) tick or untick them all at once. **Remove All** (15) empties the list.
 
-![The Results drop-down open on the toolbar: the four ticked results \[6\] P26 - Historical, \[13\] P26 - Projection No Climate, \[23\] P26 - Projection CanESM ssp245 and \[24\] P26 - Projection CanESM ssp585 (13), Select All and Deselect All (14), and Remove All (15)](images/fig-9.4.png)
+![The Results drop-down open on the toolbar: the active results \[6\] P26 - Historical, \[37\] P26 - Projection Setup, \[38\] P26 - Projection No Climate, \[40\] P26 - Projection CanESM ssp245 and \[39\] P26 - Projection CanESM ssp585, with all but the historical run ticked (13), Select All and Deselect All (14), and Remove All (15)](images/fig-8.4.png)
 
-*Figure 9.4. The Results drop-down: tick or untick results to show them or hide them.*
+*Figure 8.4. The Results drop-down: tick or untick results to show them or hide them.*
 
 **A land cover chart.** The first chart shows the area of each land cover class in the four P26 runs, from 1985 to 2050.
 
 4. In the **Charts** tab below the Explorer, click **New** (16).
 
-![The Charts tab below the Explorer with its New button marked 16 and no charts yet](images/fig-9.5.png)
+![The Charts tab below the Explorer with its New button marked 16 and no charts yet](images/fig-8.5.png)
 
-*Figure 9.5. Starting a new chart.*
+*Figure 8.5. Starting a new chart.*
 
 5. Name the chart (17), for example `Land Use Land Cover`, and click **OK**. It opens on the right, with the variables Studio can chart in a tree on its left. The chart is saved in the library and listed in the Charts tab.
 
-![The New Chart dialog with the name Land Use Land Cover, marked 17](images/fig-9.6.png)
+![The New Chart dialog with the name Land Use Land Cover, marked 17](images/fig-8.6.png)
 
-*Figure 9.6. Naming the chart.*
+*Figure 8.6. Naming the chart.*
 
 6. Tick **ST-Sim > State Classes > Hectares** (18): the area of each state class, per year. Expand it, and under **Disaggregate By** tick **LULC** (19). The chart then has one panel per land cover class (Forest, Shrubland, Developed and so on), each adding up the state classes that carry that LULC label. Tick **State Class** instead for one panel per state class, or a stratum for one panel per county or ecoregion.
 
-![The chart's variable tree: ST-Sim > State Classes > Hectares (hectares) ticked, marked 18, and under Disaggregate By, LULC ticked, marked 19](images/fig-9.7.png)
+![The chart's variable tree: ST-Sim > State Classes > Hectares (hectares) ticked, marked 18, and under Disaggregate By, LULC ticked, marked 19](images/fig-8.7.png)
 
-*Figure 9.7. The variable and how it is split into panels.*
+*Figure 8.7. The variable and how it is split into panels.*
 
 7. Under **Include Data For > LULC** (20), untick the classes you don't want, for P26 **Barren** and **Snow/Ice**, which have almost no area. Then click **Apply** (21). The bar at the bottom of the chart says how many panels it will draw: 7 here.
 
-![Include Data For > LULC with every class ticked except Barren and Snow/Ice, marked 20, and the Apply button marked 21](images/fig-9.8.png)
+![Include Data For > LULC with every class ticked except Barren and Snow/Ice, marked 20, and the Apply button marked 21](images/fig-8.8.png)
 
-*Figure 9.8. Choosing the land cover classes, then Apply.*
+*Figure 8.8. Choosing the land cover classes, then Apply.*
 
 8. The chart shows each run as a line in every panel. But each line falls to zero where its run has no years (22): the historical run after 2023 and the projections before it. To fix this, click **Options** (23).
 
-![Seven panels, one per land cover class, each with the four runs; in every panel the historical line drops to zero after 2023 and the projection lines rise from zero in 2023, the drop marked 22; the Options button marked 23](images/fig-9.9.png)
+![Seven panels, one per land cover class, each with the four runs; in every panel the historical line drops to zero after 2023 and the projection lines rise from zero in 2023, the drop marked 22; the Options button marked 23](images/fig-8.9.png)
 
-*Figure 9.9. The first chart: years without data are drawn as zero.*
+*Figure 8.9. The first chart: years without data are drawn as zero.*
 
 9. In **Chart Options**, untick **No data as zero** (24) and click **OK**. Years a run doesn't cover are then left out instead of drawn as zero. The same dialog sets the Y axis (same scale for every panel, minimum at zero), what the legend shows, and whether titles and tooltips appear.
 
-![The Chart Options dialog, Options tab: Y axis, Legend, Data and Other settings, with No data as zero unticked, marked 24](images/fig-9.10.png)
+![The Chart Options dialog, Options tab: Y axis, Legend, Data and Other settings, with No data as zero unticked, marked 24](images/fig-8.10.png)
 
-*Figure 9.10. Chart Options: untick No data as zero.*
+*Figure 8.10. Chart Options: untick No data as zero.*
 
-![The finished Land Use Land Cover chart: seven panels (Agriculture, Shrubland, Developed, Water, Forest, Wetland, Grassland), the historical run from 1985 to 2023 and the three projections continuing from 2023 to 2050](images/fig-9.11.png)
+![The finished Land Use Land Cover chart: seven panels (Agriculture, Shrubland, Developed, Water, Forest, Wetland, Grassland), the historical run from 1985 to 2023 and the three projections continuing from 2023 to 2050](images/fig-8.11.png)
 
-*Figure 9.11. The finished land cover chart: the historical run to 2023, then the three projections to 2050.*
+*Figure 8.11. The finished land cover chart: the historical run to 2023, then the three projections to 2050.*
 
 In P26 the projections follow the historical trends: developed land grows from about 90,000 ha in 1985 to 128,000 ha in 2050, while forest, shrubland, grassland and agriculture shrink. The three projections lie almost on top of each other, because climate changes growth and decay, not land use (section 7.4). Hold the pointer over a line to see its value (tooltips). The toolbar above the chart sets the chart type (**Line Chart**), the years shown (**From** and **to**), and, for runs with several Monte Carlo iterations, whether to show their mean and a range across them.
 
@@ -1430,17 +1532,17 @@ In P26 the projections follow the historical trends: developed land grows from a
 - Name it, for example, `LULC Transitions` (28).
 - Tick **ST-Sim > Transitions > Hectares** (25), and under **Disaggregate By** tick **Transition Type/Group** (26).
 
-![The variable tree of the transitions chart: ST-Sim > Transitions > Hectares (hectares) ticked, marked 25, and under Disaggregate By, Transition Type/Group ticked, marked 26; Include Data For > Transition Type/Group open below](images/fig-9.12.png)
+![The variable tree of the transitions chart: ST-Sim > Transitions > Hectares (hectares) ticked, marked 25, and under Disaggregate By, Transition Type/Group ticked, marked 26; Include Data For > Transition Type/Group open below](images/fig-8.12.png)
 
-*Figure 9.12. The transitions chart: Hectares, split by transition type or group.*
+*Figure 8.12. The transitions chart: Hectares, split by transition type or group.*
 
 - Under **Include Data For > Transition Type/Group**, tick only the groups to chart (27). The list holds every transition group: the families (**Fire**, **Urbanization**) and their types (`Fire: High Severity [Type]`). A family already includes its types, so ticking both would chart the same area twice. For P26, tick the families **Ag Contraction**, **Ag Expansion**, **Fire**, **Intensification** and **Urbanization**, and the two harvest types **Forest Harvest: Forest Clearcut** and **Forest Harvest: Forest Selection**: 7 panels.
 
 Untick **No data as zero** as before (step 9).
 
-![The LULC Transitions chart (its tab marked 28): the Transition Type/Group list with Ag Expansion, Fire, Forest Harvest: Forest Clearcut, Forest Harvest: Forest Selection and Intensification ticked among the unticked types, marked 27; seven panels (Ag Contraction, Forest Selection, Ag Expansion, Intensification, Fire, Urbanization, Forest Clearcut) with the historical run to 2023 and the projections after it](images/fig-9.13.png)
+![The LULC Transitions chart (its tab marked 28): the Transition Type/Group list with Ag Expansion, Fire, Forest Harvest: Forest Clearcut, Forest Harvest: Forest Selection and Intensification ticked among the unticked types, marked 27; seven panels (Ag Contraction, Forest Selection, Ag Expansion, Intensification, Fire, Urbanization, Forest Clearcut) with the historical run to 2023 and the projections after it](images/fig-8.13.png)
 
-*Figure 9.13. The transitions chart: seven transition groups, ticked in the Include Data For list.*
+*Figure 8.13. The transitions chart: seven transition groups, ticked in the Include Data For list.*
 
 A gap in a line is a year with none of that transition, left out because **No data as zero** is off. For P26, the fire panel shows the 2021 fire year in the historical run (Dixie), about 360,000 ha. The projections draw their fire years at random from the historical record, so one projection year repeats it.
 
@@ -1449,9 +1551,9 @@ A gap in a line is a year with none of that transition, left out because **No da
 - Tick **ST-Sim > Stocks > Total** (29), and under **Disaggregate By** tick **Stock Type/Group** (30).
 - Under **Include Data For > Stock Type/Group**, tick the stocks to chart (31). As with transitions, the list holds both groups and their `[Type]` pools. For P26, tick the five live biomass pools (**Coarse Root**, **Fine Root**, **Foliage**, **Merchantable**, **Other Wood**) and their group, **Biomass: Total**: 6 panels.
 
-![The Carbon Stocks chart: ST-Sim > Stocks > Total ticked, marked 29; Disaggregate By Stock Type/Group ticked, marked 30; Include Data For > Stock Type/Group with the five Biomass \[Type\] pools and Biomass: Total ticked, marked 31; six panels of carbon from 1985 to 2050, with the historical run and the three projections](images/fig-9.14.png)
+![The Carbon Stocks chart: ST-Sim > Stocks > Total ticked, marked 29; Disaggregate By Stock Type/Group ticked, marked 30; Include Data For > Stock Type/Group with the five Biomass \[Type\] pools and Biomass: Total ticked, marked 31; six panels of carbon from 1985 to 2050, with the historical run and the three projections](images/fig-8.14.png)
 
-*Figure 9.14. The carbon stocks chart: the live biomass pools and their total.*
+*Figure 8.14. The carbon stocks chart: the live biomass pools and their total.*
 
 Stocks are in tonnes of carbon (Mg C): 200,000,000 is 200 Tg C. For P26, live biomass holds about 220 Tg C before the large fires of 2020 and 2021, falls to about 180 Tg C, and recovers to about 200 Tg C by 2050. Other choices in the same list chart the other pools: **DOM: Deadwood**, **DOM: Litter** and **DOM: Soil**, the **DOM: Total** group, or **Total Ecosystem**, all the pools together.
 
@@ -1459,34 +1561,34 @@ Stocks are in tonnes of carbon (Mg C): 200,000,000 is 200 Tg C. For P26, live bi
 
 10. Open the **Maps** tab (32) beside **Charts** and click **New** (33). Name the map, for example `State Class`.
 
-![The Maps tab, marked 32, and its New button, marked 33](images/fig-9.15.png)
+![The Maps tab, marked 32, and its New button, marked 33](images/fig-8.15.png)
 
-*Figure 9.15. Starting a new map.*
+*Figure 8.15. Starting a new map.*
 
 11. Type the year in **Timestep** (34), here `2050`, and tick **ST-Sim > State Classes > Iteration** (35): the state class map of each run, in the state class colours. A map draws one year of one Monte Carlo iteration, set in **Iteration** beside the timestep. The P26 runs have one.
 12. Use the **Results** drop-down (36) to choose which runs to show. The historical run ends in 2023 and has no 2050 map, so untick it: the map then shows the three projections. Click **Apply**.
 
-![The map's setup: Timestep 2050, marked 34; ST-Sim > State Classes > Iteration ticked with its state class colours below, marked 35; the Results drop-down open with the historical run unticked and the three projections ticked, marked 36; the Options button, marked 37; the first map panel below](images/fig-9.16.png)
+![The map's setup: Timestep 2050, marked 34; ST-Sim > State Classes > Iteration ticked with its state class colours below, marked 35; the Results drop-down open with the historical run unticked and the three projections ticked, marked 36; the Options button, marked 37; the first map panel below](images/fig-8.16.png)
 
-*Figure 9.16. The map's year and variable, with the historical run left out.*
+*Figure 8.16. The map's year and variable, with the historical run left out.*
 
 13. Studio puts each run in its own row by default. To put them side by side, click **Options** (37). Under **Arrangement**, set **Scenarios in** to **Columns** (38) and click **OK**. The same dialog sets the labels on each panel and their fonts. To compare years instead, enter several years in **Timestep** (for example `2023,2050`), and set **Timesteps in** to put them in rows or columns.
 
-![The Map Options dialog: Labels (scenario name, Id, indicator, timestep), Label fonts, and Arrangement with Scenarios in set to Columns, marked 38](images/fig-9.17.png)
+![The Map Options dialog: Labels (scenario name, Id, indicator, timestep), Label fonts, and Arrangement with Scenarios in set to Columns, marked 38](images/fig-8.17.png)
 
-*Figure 9.17. Map Options: scenarios in columns.*
+*Figure 8.17. Map Options: scenarios in columns.*
 
-![The finished map: the 2050 state class maps of \[13\] No Climate, \[23\] CanESM ssp245 and \[24\] CanESM ssp585 side by side, with the zoom and pan tools marked 39 and Panel size marked 40](images/fig-9.18.png)
+![The finished map: the 2050 state class maps of \[13\] No Climate, \[23\] CanESM ssp245 and \[24\] CanESM ssp585 side by side, with the zoom and pan tools marked 39 and Panel size marked 40](images/fig-8.18.png)
 
-*Figure 9.18. Land cover in 2050 under the three P26 projections.*
+*Figure 8.18. Land cover in 2050 under the three P26 projections.*
 
 The tools above the map (39) identify a cell (click it to see its state class), pan, and zoom: zooming one panel zooms them all, so the same place can be compared across runs. **Panel size** (40) makes the panels larger or smaller. The three projections look alike at this scale because their land-use change is the same (section 7.4), and their fires differ only where they fall at random.
 
 **A fire map: one year, three runs.** Transitions are mapped the same way. Make a second map, for example `Fire`, set **Timestep** to a projection year such as `2025` (41), and in the tree tick **Transitions > Iteration > Fire** (42): each cell burned that year, coloured by severity (high red, medium yellow, low green). The other transition groups in the list (harvest, urbanization, insect) map the same way.
 
-![The Fire map: Timestep 2025, marked 41; Transitions > Iteration > Fire ticked with its legend (No Occurrence, Fire: High, Low and Medium Severity), marked 42; the 2025 fires of \[13\] No Climate, \[23\] CanESM ssp245 and \[24\] CanESM ssp585 side by side, in different places in each run](images/fig-9.19.png)
+![The Fire map: Timestep 2025, marked 41; Transitions > Iteration > Fire ticked with its legend (No Occurrence, Fire: High, Low and Medium Severity), marked 42; the 2025 fires of \[13\] No Climate, \[23\] CanESM ssp245 and \[24\] CanESM ssp585 side by side, in different places in each run](images/fig-8.19.png)
 
-*Figure 9.19. Fire in 2025 under the three P26 projections: the same area burned, in different places.*
+*Figure 8.19. Fire in 2025 under the three P26 projections: the same area burned, in different places.*
 
 The three runs burn the same area each year (about 1,514 km² in 2025): the projections draw the same historical year's fire amount, so their fire totals match. But where each fire starts and how it spreads is random in each run, so the burns fall in different places. Fire placement is a stochastic process: one run shows one of many possible fire patterns, and only several Monte Carlo iterations show where fire is likely. Use **Iteration** to step through them in a run with more than one.
 
@@ -1512,7 +1614,9 @@ Besides the inputs they write for ST-Sim, the lucasCore stages save summary tabl
 | Carbon Curve Parameters | OutputCarbonParameter | 2 | The fitted live carbon curve and how it splits into foliage, roots and merchantable wood. |
 | Growth Curve Report | OutputGrowthReport | 2 | A PDF of every growth curve against its FIA plots. |
 | Decay Calibration | OutputDecayCalibration | 3 | The decay multipliers fitted to FIA dead wood, litter and soil for each ecodivision and state class. |
+| Carbon Rates | OutputCarbonRate | 3 | Every live turnover and dead organic matter rate each ecodivision and forest type runs with, with its base rate, temperature effect, decay multiplier and source. Its page has ecodivision and forest type drop-downs. |
 | Historical Transition Summary | OutputTransitionSummary | 6 | The area of each transition group in each historical year, from the record: what the historical run should reproduce (section 5.5). |
+| Minimum Harvest Ages | OutputHarvestAge | 6 | The minimum age of each forest type's clearcut and selection, the FIA and study area values behind it, and where it came from (section 3.6). |
 | Climate Multiplier Summary | OutputClimateSummary | 7 | Each climate multiplier (growth, decay) per year: the study-area mean and the cell range. |
 | Initial Stock Summary | OutputInitialStockSummary | 8 | Starting carbon by state class: live, dead organic matter and soil, in Mg C/ha, and the total in Tg C. |
 
@@ -1530,6 +1634,6 @@ Besides the inputs they write for ST-Sim, the lucasCore stages save summary tabl
 | Historical Patch Sizes | OutputPatchSize | 10 | The sizes of each year's patches of change, by size class. |
 | Climate Multiplier Summary | OutputClimateSummary | 11 | As for stage 7, for the projection's climate future. |
 
-**Figures and comparisons** (stages 12 to 14): **Build Figures (PNG)**, **Run Figures (PNG)** and **Compare Figures (PNG)** open in the figure viewer (section 9.1). Stage 14 also writes **Compare Carbon Summary** and **Compare Land Change Summary** (section 7.4).
+**Figures and comparisons** (stages 12 to 14): **Build Figures (PNG)**, **Run Figures (PNG)** and **Compare Figures (PNG)** open in the figure viewer (section 8.1). Stage 14 also writes **Compare Carbon Summary** and **Compare Land Change Summary** (section 7.4).
 
 **Validation.** Every stage adds its checks to **Validation**: one row per check, with the stage, what was checked, **Pass** or **Fail**, and the numbers behind it. The same lines are in the run log. Look here first when a result looks wrong.
