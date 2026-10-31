@@ -585,3 +585,11 @@ Not pushed: every lucasCore commit since 54177b2 (2026-10-29) is local only; the
     Page checked in Studio (user, 2026-10-30). Libraries made before need tools/sync-library.R --reference=dev/libs/sync-reference-20261030.ssim (the Age columns); the
     suitability test library is synced. Next (user to decide): the science options (gSSURGO soil calibration, RAP growth,
     literature rates).
+    **Diagram view DONE 2026-10-31** (user: ecologist's view, rates by default with a flux toggle, total NPP, the full steady-state
+    budget, no atmosphere pool). The page's Tables/Diagram switch (ui/NonForestBudget.cs, NonForestDiagram.cs) draws one class with
+    the values stage 3 uses and solves its steady state. With the package rates it lands on P26's starting pools for grass and shrub
+    (chaparral live 7.0 / dead 33.8 / soil 75.3 vs 7.0 / 29.8 / 74.6; natural perennial 4.5 / 24.8 / 92.1 vs 4.5 / 22.4 / 91.8), so
+    those starting tables are the rates' equilibrium. NOT for emergent wetlands: Palustrine Emergent's rates settle to live 36 and dead
+    49 Mg C/ha against starting pools of 4.9 and 17.4 (soil 621 vs 609), so the starting pools or the rates (31 Mg C/ha/yr net
+    growth?) came from different inputs - for the science step. Also seen in the diagram: every grass and shrub class sends coarse
+    root turnover half to AG fast (above ground), and annual grass half its fine root turnover to AG very fast.

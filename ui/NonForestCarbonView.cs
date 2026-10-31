@@ -42,7 +42,8 @@ namespace lucasCoreUI
         private readonly RadioButton m_flux = new RadioButton { Text = "Fluxes (Mg C/ha/yr)", AutoSize = true, Margin = new Padding(3, 3, 18, 3) };
         private readonly CheckBox m_hide = new CheckBox { Text = "Hide empty pools", AutoSize = true, Checked = true, Margin = new Padding(3, 3, 3, 3) };
         private readonly NonForestDiagram m_diagram = new NonForestDiagram { Dock = DockStyle.Fill, Margin = new Padding(0, 6, 0, 6), MinimumSize = new Size(200, 520) };
-        private readonly Label m_budget = new Label { AutoSize = true, MaximumSize = new Size(640, 0), Margin = new Padding(3, 6, 3, 3), Font = new Font(SystemFonts.MessageBoxFont, FontStyle.Bold) };
+        private readonly Label m_ageNote = Note("Forested wetlands grow on an age curve: the diagram holds the rates of the age shown fixed, so their budget is what those rates would settle to, not the class's starting pools.");
+        private readonly Label m_budget =new Label { AutoSize = true, MaximumSize = new Size(640, 0), Margin = new Padding(3, 6, 3, 3), Font = new Font(SystemFonts.MessageBoxFont, FontStyle.Bold) };
 
         public NonForestCarbonView()
         {
@@ -61,8 +62,7 @@ namespace lucasCoreUI
             var opt = Row(); opt.Controls.AddRange(new Control[] { Caption("Label the flows with"), m_rates_, m_flux, m_hide });
             m_diagramGroup = Group("Diagram", ProjectionTransitionsView.Stack(
                 Note("One class's values as the run uses them: the package's, with this page's rows on top (drawn bold). Net growth (NPP) enters the live pools from the left, split by its shares. Each box gives the pool's carbon at steady state, where inputs and losses balance, its turnover time, and what it releases to the atmosphere each year (and, for emergent wetlands, to water). A curve's width is the carbon it carries at steady state; hover over it for the arithmetic. The Build's starting pools came from a spin-up with these rates, so with the package values the budget lands near them."),
-                pick, opt, m_budget, m_diagram,
-                Note("Forested wetlands grow on an age curve: the diagram holds the rates of the age shown fixed, so their budget is what those rates would settle to, not the class's starting pools.")));
+                pick, opt, m_budget, m_diagram, m_ageNote));
             AddGroup(m_diagramGroup);
             var c = Column();
             c.Controls.Add(Wrapped("The starting carbon of grassland, shrubland and wetland cells is still the package's table (from the CONUS build's spin-up with the package rates), so a changed rate acts from the first year of a run but does not change the starting pools.", 720));
@@ -148,7 +148,7 @@ namespace lucasCoreUI
             string eco = m_eco.SelectedItem as string, cls = m_class.SelectedItem as string;
             if (eco == null || cls == null) { m_diagram.Budget = null; m_budget.Text = ""; m_diagram.Invalidate(); return; }
             bool ages = NonForestBudget.HasAges(eco, cls);
-            m_age.Visible = m_ageLabel.Visible = ages;
+            m_age.Visible = m_ageLabel.Visible = m_ageNote.Visible = ages;
             NonForestBudget b = NonForestBudget.Make(eco, cls, ages ? (int)m_age.Value : 0, SheetRows(Sheet, "Value", true), SheetRows(Growth, "NetGrowth", false));
             m_diagram.Budget = b; m_diagram.ShowFlux = m_flux.Checked; m_diagram.HideEmpty = m_hide.Checked;
             if (b == null) m_budget.Text = "";

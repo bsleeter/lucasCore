@@ -21,7 +21,8 @@ namespace lucasCoreUI
         public NonForestBudget Budget;
         public bool ShowFlux, HideEmpty = true;
 
-        private const int BH = 54, GAP = 10, TOP = 34;
+        private const int GAP = 10, TOP = 34;
+        private int BH { get { return Budget != null && Budget.Emergent ? 70 : 54; } }   // emergent wetlands' boxes carry a loss line too
         private static readonly int[][] Cols = { new[] { 70, 170 }, new[] { 340, 180 }, new[] { 610, 170 } };
         private readonly ToolTip m_tip = new ToolTip { InitialDelay = 100, ReshowDelay = 50 };
         private readonly List<KeyValuePair<PointF[], NonForestBudget.Edge>> m_hits = new List<KeyValuePair<PointF[], NonForestBudget.Edge>>();
@@ -81,7 +82,7 @@ namespace lucasCoreUI
                 for (int c = 0; c < 3; c++) g.DrawString(heads[c], small, grey, Cols[c][0] * scale, 10);
 
                 double maxF = Budget.Edges.Where(x => x.To != "ATM" && x.To != "AQ").Select(x => x.Flux).DefaultIfEmpty(0).Max();
-                var labels = new List<Tuple<PointF, string, bool, Color>>();
+                var labels = new List<Tuple<PointF, string, bool, Color, bool>>();   // where, text, the page's value, colour, centred
                 foreach (var ed in Budget.Edges.Where(x => x.To != "ATM" && x.To != "AQ" && x.Flux > 1e-9 && pos.ContainsKey(x.To)))
                 {
                     RectangleF t = pos[ed.To]; PointF a, b, c1, c2; Color col; bool same = false;
@@ -109,8 +110,8 @@ namespace lucasCoreUI
                     if (ed.Flux >= 0.03 * maxF || ed.Kind == "Net growth")
                     {
                         string txt = ShowFlux ? Num(ed.Flux) : ed.Kind == "Net growth" ? (ed.Entered * 100).ToString("0.#", CultureInfo.InvariantCulture) + "%" : RateText(ed.Entered);
-                        PointF at = same ? new PointF(bx + 3, (a.Y + b.Y) / 2 - 7) : ed.Kind == "Net growth" ? new PointF(8, b.Y - 17) : pts[15];
-                        labels.Add(Tuple.Create(at, txt, ed.Yours, col));
+                        PointF at = same ? new PointF(bx + 3, (a.Y + b.Y) / 2 - 7) : ed.Kind == "Net growth" ? new PointF(8, b.Y - 17) : new PointF(pts[10].X, pts[10].Y - 16);   // the middle of the curve, clear of the boxes; centred below
+                        labels.Add(Tuple.Create(at, txt, ed.Yours, col, !same && ed.Kind != "Net growth"));
                     }
                 }
                 foreach (var p in Budget.P.Values.Where(q => pos.ContainsKey(q.Key)))
@@ -128,13 +129,26 @@ namespace lucasCoreUI
                         g.DrawString(l2, small, tb, r.X + 7, r.Y + 20);
                         string l3 = (p.Co2 > 0 ? "CO₂ " + (ShowFlux ? Num(p.Co2) : RateText(Budget.Edges.Where(x => x.From == p.Key && x.To == "ATM").Sum(x => x.Entered))) : "")
                                     + (p.Aquatic > 0 ? (p.Co2 > 0 ? " · " : "") + "water " + (ShowFlux ? Num(p.Aquatic) : RateText(Budget.Edges.Where(x => x.From == p.Key && x.To == "AQ").Sum(x => x.Entered))) : "");
-                        if (Budget.Totals.Contains(p.Key)) l3 = "loss " + RateText(p.Total) + "/yr" + (l3.Length > 0 ? ": " + l3 : "");
-                        if (l3.Length > 0) g.DrawString(l3, small, tb, r.X + 7, r.Y + 36);
+                        // emergent wetlands: the pool's total loss on its own line, then the shares that leave
+                        string l4 = "";
+                        if (Budget.Totals.Contains(p.Key)) { l4 = l3; l3 = "loss " + RateText(p.Total) + "/yr" + (l4.Length > 0 && !ShowFlux ? ", shares:" : ""); }
+                        foreach (var ln in new[] { new KeyValuePair<string, float>(l3, 36), new KeyValuePair<string, float>(l4, 52) })
+                        {
+                            if (ln.Key.Length == 0) continue;
+                            Font f = small; Font tiny = null;
+                            if (g.MeasureString(ln.Key, small).Width > r.Width - 10) f = tiny = new Font(Font.FontFamily, Font.Size - 2f);   // a long line shrinks to fit the box
+                            g.DrawString(ln.Key, f, tb, r.X + 7, r.Y + ln.Value);
+                            if (tiny != null) tiny.Dispose();
+                        }
                     }
                 }
                 foreach (var l in labels)
                     using (var lb = new SolidBrush(Color.FromArgb(Math.Min(255, l.Item4.R / 2), Math.Min(255, l.Item4.G / 2), Math.Min(255, l.Item4.B / 2))))
-                        g.DrawString(l.Item2, l.Item3 ? bold : small, lb, l.Item1);
+                    {
+                        Font f = l.Item3 ? bold : small; float lw = g.MeasureString(l.Item2, f).Width;
+                        // curve labels are centred on the curve's middle; net growth and same-column labels keep their left edge
+                        g.DrawString(l.Item2, f, lb, l.Item1.X - (l.Item5 ? lw / 2 : 0), l.Item1.Y);
+                    }
             }
         }
 
