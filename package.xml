@@ -344,7 +344,7 @@
 		<dataSheet name="NonForestRate"/>
 	</dataFeed>
 
-	<dataSheet name="LiveTurnover" displayName="Live Turnover">
+	<dataSheet name="LiveTurnover" displayName="Live Turnover" viewClassName="lucasCoreUI.LiveTurnoverView" viewClassAssembly="lucasCoreUI">
 		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
 		<column name="StateClassId" displayName="Forest Type" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
 		<column name="FoliageTurnover" displayName="Foliage (/yr, to AG Very Fast)" dataType="Double" format="0.0000" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
@@ -415,7 +415,7 @@
 	     a fixed one (snags -> down logs, fine woody debris -> litter -> duff, then soil) are fitted with it. Forest floor stands for fine woody
 	     debris, litter and duff together (its single multiplier in the condition-pool options). In the condition-pool options (1, 2) snags,
 	     down logs and forest floor are fitted jointly, so a fixed one replaces the fitted value afterwards. Empty = every pool calibrated. -->
-	<dataSheet name="FixedDecayMultiplier" displayName="Fixed Decay Multipliers">
+	<dataSheet name="FixedDecayMultiplier" displayName="Fixed Decay Multipliers" viewClassName="lucasCoreUI.FixedDecayMultipliersView" viewClassAssembly="lucasCoreUI">
 		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
 		<column name="StateClassId" displayName="Forest Type (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass" isOptional="True"/>
 		<column name="Pool" displayName="Pool" dataType="Integer" validationType="List" formula1="1:Snags|2:Down logs|3:Fine woody debris|4:Litter|5:Duff|6:Forest floor|7:Soil"/>
@@ -471,7 +471,7 @@
 		<column name="FineRootShare" displayName="Fine Root Share of Roots (blank = Li et al. 2003)" dataType="Double" format="0.000" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
 	</dataSheet>
 
-	<dataSheet name="Spinup" displayName="Spin-up">
+	<dataSheet name="Spinup" displayName="Spin-up" viewClassName="lucasCoreUI.SpinupView" viewClassAssembly="lucasCoreUI">
 		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
 		<column name="StateClassId" displayName="Forest Type" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
 		<column name="ReturnInterval" displayName="Return Interval (yr, blank = LANDFIRE)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="1" formula2="5000"/>
