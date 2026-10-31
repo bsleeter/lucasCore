@@ -218,10 +218,14 @@ smap <- data.table(StateClassId = character(), TransitionTypeId = character(), M
 if (isTRUE(H_MAPS) && nrow(hl)) {
   # each harvest's first cut on a cell not yet clearcut (selection leaves the stand age; found 2026-10-30: taking only a cell's first
   # cut of any kind left Placer's clearcut almost unsampled, 1,860 of 2,051 cut cells being first cut by selection)
+  # Only cuts after the age map's own year count (found 2026-10-30): the map already shows a stand cut before then as young (CMS 1990
+  # moved back to 1985 puts a 1988 clearcut at about 0), so its cut would look like the cut of a very young stand. P26's fir/spruce
+  # clearcut value was 10 yr with them, against 34 yr from the 30 m maps with cuts after 1990 only (dev/harvest/05-lcms-cut-age.R).
+  asv <- opt$StandAgeSource[1]; AGE_YEAR <- if (!is.null(asv) && !is.na(asv) && (identical(suppressWarnings(as.integer(asv)), 2L) || startsWith(as.character(asv), "TreeMap"))) 2016L else 1990L
   seen <- list(clearcut = rep(FALSE, length(vS)), selection = rep(FALSE, length(vS))); pr <- rep(0, length(vS))
   fc <- rbindlist(lapply(seq_len(nrow(hl)), function(i) { v <- values(rast(hl$File[i]), mat = FALSE); y <- hl$Timestep[i]; k <- hl$kind[i]
     any_cut <- !is.na(v) & v > 0
-    on <- any_cut & !seen[[k]] & pr < 0.5 & !is.na(cn) & startsWith(cn, "Forest:") & !is.na(vA); seen[[k]] <<- seen[[k]] | any_cut
+    on <- any_cut & !seen[[k]] & pr < 0.5 & !is.na(cn) & startsWith(cn, "Forest:") & !is.na(vA) & y > AGE_YEAR; seen[[k]] <<- seen[[k]] | any_cut
     if (k == "clearcut") pr[any_cut] <<- 1 - (1 - pr[any_cut]) * (1 - v[any_cut])
     data.table(StateClassId = cn[on], TransitionTypeId = hg$TransitionTypeId[match(hl$TransitionGroupId[i], hg$TransitionGroupId)], age = vA[on] + (y - y0 - 1), w = v[on]) }))
   if (nrow(fc)) smap <- fc[, .(Map = round(wq(age, w, 0.1)), MapArea = sum(w) * cell_km2), by = .(StateClassId, TransitionTypeId)] }
@@ -251,7 +255,7 @@ if (nrow(sp)) {   # a type x harvest with an ecodivision row: one pathway row pe
 setcolorder(tr, "StratumIdSource")
 tr <- tr[, names(tr)[vapply(tr, function(v) !all(is.na(v)), TRUE)], with = FALSE]
 here <- ha[(is.na(Ecodivision) | Ecodivision %in% eco_here) & StateClassId %in% unique(cn) & TransitionTypeId %in% c(CC, SEL)][order(StateClassId, TransitionTypeId, Ecodivision)]
-say("Minimum harvest ages (study area maps %s, at least %g km2; selection at most clearcut - %g yr, at least %g yr):", if (isTRUE(H_MAPS)) "on" else "off", H_MAP_KM2, H_OFFSET, H_FLOOR)
+say("Minimum harvest ages (study area maps %s, cuts after %s, at least %g km2; selection at most clearcut - %g yr, at least %g yr):", if (isTRUE(H_MAPS)) "on" else "off", if (exists("AGE_YEAR")) AGE_YEAR else "-", H_MAP_KM2, H_OFFSET, H_FLOOR)
 for (i in seq_len(nrow(here))) with(here[i], say("  %s %s%s: %g yr (FIA %s, study area %s; %s)", sub("^Forest: ", "", StateClassId), sub("^.*: Forest ", "", TransitionTypeId),
   if (is.na(Ecodivision)) "" else paste0(" in ", Ecodivision), AgeMin, if (is.na(FIA)) "-" else format(FIA), if (is.na(Map)) "-" else sprintf("%g over %.1f km2", Map, MapArea), Basis))
 check(STAGE, "selection minimum ages are not above clearcut's", { cs <- here[TransitionTypeId == SEL & Basis != "Minimum Harvest Age page"]

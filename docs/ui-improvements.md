@@ -481,6 +481,11 @@ Not pushed: every lucasCore commit since 54177b2 (2026-10-29) is local only; the
     1 km map gives 51: cell ages smooth the young tail the 30 m analysis shows), selection 39; fir/spruce clearcut 30 (maps),
     western oak 38 (maps); 369 start ages raised (median 12 yr); 5% of clearcut and 3% of selection expected area below the minimum;
     a 1985-2023 historical run cuts 87 km2 clearcut (Build 47's old ages: 70; LCMS 90) and 127 km2 selection (153; LCMS 137).
+    **Fix 2026-10-30:** the study-area value counts only cuts after the age map's year (NASA CMS 1990; TreeMap 2016): the map
+    already shows a stand cut before then as young, so its 1986-1990 cuts looked like cuts of very young stands (P26 fir/spruce
+    clearcut came out 10 yr at 150 m, vs 34 from the 30 m cuts after 1990). Placer 1 km (dev/harvest/06-age-year-check.R): mapped
+    values rise 13-17 yr (mixed conifer 51 -> 63, fir/spruce 30 -> 43, western oak 38 -> 55; mapped area about halves); used
+    clearcut minimums fir/spruce 30 -> 43, western oak 38 -> 55, mixed conifer stays FIA 49.
     Page checked in Studio (user, 2026-10-30). Not done: P26 needs a Build + Historical rerun to pick it up (initial ages and carbon change);
     guide section for the page.
 35. **TreeMap: forest type, stand age and site productivity from one map** - DONE 2026-10-30 (planned 2026-10-29; user: use TreeMap; combines item 10;
