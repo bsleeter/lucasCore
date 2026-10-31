@@ -94,7 +94,6 @@ File,X,Y,W,H
 3.6h-mature-age.png,560,160,1595,1011
 3.6-minimum-harvest-age.png,671,194,1890,1148
 3.7a-carbon-method-p26.png,671,194,1864,735
-3.7i-live-turnover.png,671,194,1864,1406
 3.7j-grassland-carbon.png,671,194,1864,1445
 4.3c-validation.png,664,194,1884,1445
 4.3d-initial-stock-summary.png,664,194,1897,1187
@@ -111,3 +110,6 @@ File,X,Y,W,H
 7.4f-compare-runs-filled.png,919,260,1206,358
 5.6b-run-figures-options.png,11,163,2114,380
 6.1a-projection-setup-pipeline.png,5,163,2136,304
+3.7i-live-turnover.png,554,161,1553,1237
+3.7k-spin-up.png,554,161,1553,903
+3.7l-fixed-decay.png,554,161,1553,1376
