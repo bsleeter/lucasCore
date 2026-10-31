@@ -61,7 +61,7 @@ namespace lucasCoreUI
             var pick = Row(); pick.Controls.AddRange(new Control[] { Caption("Class"), m_class, Caption("Ecodivision"), m_eco, m_ageLabel, m_age });
             var opt = Row(); opt.Controls.AddRange(new Control[] { Caption("Label the flows with"), m_rates_, m_flux, m_hide });
             m_diagramGroup = Group("Diagram", ProjectionTransitionsView.Stack(
-                Note("One class's values as the run uses them: the package's, with this page's rows on top (drawn bold). Net growth (NPP) enters the live pools from the left, split by its shares. Each box gives the pool's carbon at steady state, where inputs and losses balance, its turnover time, and what it releases to the atmosphere each year (and, for emergent wetlands, to water). A curve's width is the carbon it carries at steady state; hover over it for the arithmetic. The Build's starting pools came from a spin-up with these rates, so with the package values the budget lands near them."),
+                Note("One class's values as the run uses them: the package's, with this page's rows on top (drawn bold). Net growth (NPP) enters the live pools from the left, split by its shares. Each box gives the pool's carbon at steady state, where inputs and losses balance, and its turnover time. What a pool releases leaves it as an arrow: curving up to the atmosphere, and for emergent wetlands sideways to water. A curve's width is the carbon it carries at steady state; hover over it for the arithmetic. The Build's starting pools came from a spin-up with these rates, so with the package values the budget lands near them."),
                 pick, opt, m_budget, m_diagram, m_ageNote));
             AddGroup(m_diagramGroup);
             var c = Column();

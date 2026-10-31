@@ -3,8 +3,9 @@
 // curves whose width is the steady-state flux, labelled with the rate as entered or the flux
 // =============================================================================
 // Net growth enters the live pools from the left, labelled with its share. Each box gives the pool's steady-state stock and turnover
-// time, and what it loses to the atmosphere (and, for emergent wetlands, to water); there is no atmosphere box. A value set by this
-// scenario's rows is drawn bold. Hovering a curve shows its rate, stock and flux.
+// time (and, for emergent wetlands, its total loss rate). What a pool releases leaves it as an arrow: curving up from its top right
+// corner to the atmosphere, out of its right side to water; there are no atmosphere or water boxes. A value set by this scenario's
+// rows is drawn bold. Hovering a curve or arrow shows its rate, stock and flux.
 // =============================================================================
 using System;
 using System.Collections.Generic;
@@ -21,9 +22,8 @@ namespace lucasCoreUI
         public NonForestBudget Budget;
         public bool ShowFlux, HideEmpty = true;
 
-        private const int GAP = 10, TOP = 34;
-        private int BH { get { return Budget != null && Budget.Emergent ? 70 : 54; } }   // emergent wetlands' boxes carry a loss line too
-        private static readonly int[][] Cols = { new[] { 70, 170 }, new[] { 340, 180 }, new[] { 610, 170 } };
+        private const int GAP = 34, TOP = 60, BH = 54;   // the gaps leave room for the arrows up to the atmosphere
+        private static readonly int[][] Cols = { new[] { 60, 160 }, new[] { 330, 170 }, new[] { 590, 160 } };   // room on the right for arrows to water
         private readonly ToolTip m_tip = new ToolTip { InitialDelay = 100, ReshowDelay = 50 };
         private readonly List<KeyValuePair<PointF[], NonForestBudget.Edge>> m_hits = new List<KeyValuePair<PointF[], NonForestBudget.Edge>>();
         private string m_tipText = "";
@@ -46,7 +46,7 @@ namespace lucasCoreUI
         // box positions: each column stacks its above-ground pools, then the soil surface, then the below-ground ones
         private Dictionary<string, RectangleF> Arrange(out float ground, out float bottom)
         {
-            var pos = new Dictionary<string, RectangleF>(); float scale = Math.Max(0.6f, Math.Min(1.4f, (Width - 20) / 800f));
+            var pos = new Dictionary<string, RectangleF>(); float scale = Math.Max(0.6f, Math.Min(1.4f, (Width - 20) / 830f));
             float maxAg = TOP; var vis = Budget.P.Values.Where(Visible_).ToList();
             for (int c = 0; c < 3; c++)
             {
@@ -56,7 +56,7 @@ namespace lucasCoreUI
             ground = maxAg + 6; bottom = ground;
             for (int c = 0; c < 3; c++)
             {
-                float y = ground + 16; foreach (var p in vis.Where(q => q.Col == c && !q.Above)) { pos[p.Key] = new RectangleF(Cols[c][0] * scale, y, Cols[c][1] * scale, BH); y += BH + GAP; }
+                float y = ground + 40; foreach (var p in vis.Where(q => q.Col == c && !q.Above)) { pos[p.Key] = new RectangleF(Cols[c][0] * scale, y, Cols[c][1] * scale, BH); y += BH + GAP; }
                 bottom = Math.Max(bottom, y);
             }
             return pos;
@@ -78,10 +78,10 @@ namespace lucasCoreUI
                 using (var dash = new Pen(SystemColors.GrayText, 1) { DashStyle = DashStyle.Dash }) g.DrawLine(dash, 4, ground, Width - 6, ground);
                 g.DrawString("soil surface", small, grey, Width - 8 - g.MeasureString("soil surface", small).Width, ground - 16);
                 string[] heads = { "Live", "Dead, fast", "Slow" };
-                float scale = Math.Max(0.6f, Math.Min(1.4f, (Width - 20) / 800f));
+                float scale = Math.Max(0.6f, Math.Min(1.4f, (Width - 20) / 830f));
                 for (int c = 0; c < 3; c++) g.DrawString(heads[c], small, grey, Cols[c][0] * scale, 10);
 
-                double maxF = Budget.Edges.Where(x => x.To != "ATM" && x.To != "AQ").Select(x => x.Flux).DefaultIfEmpty(0).Max();
+                double maxF = Budget.Edges.Select(x => x.Flux).DefaultIfEmpty(0).Max();
                 var labels = new List<Tuple<PointF, string, bool, Color, bool>>();   // where, text, the page's value, colour, centred
                 foreach (var ed in Budget.Edges.Where(x => x.To != "ATM" && x.To != "AQ" && x.Flux > 1e-9 && pos.ContainsKey(x.To)))
                 {
@@ -127,20 +127,30 @@ namespace lucasCoreUI
                         double tau = p.Out > 0 ? 1 / p.Out : 0;
                         string l2 = p.Key == "DS" ? "+" + Num(p.In) + " Mg C/ha/yr" : Num(p.Stock) + " Mg C/ha" + (tau > 0 ? " · " + (tau >= 10 ? Math.Round(tau).ToString(CultureInfo.InvariantCulture) : tau.ToString("0.0", CultureInfo.InvariantCulture)) + " yr" : "");
                         g.DrawString(l2, small, tb, r.X + 7, r.Y + 20);
-                        string l3 = (p.Co2 > 0 ? "CO₂ " + (ShowFlux ? Num(p.Co2) : RateText(Budget.Edges.Where(x => x.From == p.Key && x.To == "ATM").Sum(x => x.Entered))) : "")
-                                    + (p.Aquatic > 0 ? (p.Co2 > 0 ? " · " : "") + "water " + (ShowFlux ? Num(p.Aquatic) : RateText(Budget.Edges.Where(x => x.From == p.Key && x.To == "AQ").Sum(x => x.Entered))) : "");
-                        // emergent wetlands: the pool's total loss on its own line, then the shares that leave
-                        string l4 = "";
-                        if (Budget.Totals.Contains(p.Key)) { l4 = l3; l3 = "loss " + RateText(p.Total) + "/yr" + (l4.Length > 0 && !ShowFlux ? ", shares:" : ""); }
-                        foreach (var ln in new[] { new KeyValuePair<string, float>(l3, 36), new KeyValuePair<string, float>(l4, 52) })
-                        {
-                            if (ln.Key.Length == 0) continue;
-                            Font f = small; Font tiny = null;
-                            if (g.MeasureString(ln.Key, small).Width > r.Width - 10) f = tiny = new Font(Font.FontFamily, Font.Size - 2f);   // a long line shrinks to fit the box
-                            g.DrawString(ln.Key, f, tb, r.X + 7, r.Y + ln.Value);
-                            if (tiny != null) tiny.Dispose();
-                        }
+                        // emergent wetlands: the pool's total loss, of which the arrows out of it take shares
+                        if (Budget.Totals.Contains(p.Key)) g.DrawString("loss " + RateText(p.Total) + "/yr" + (ShowFlux ? "" : ", shared out"), small, tb, r.X + 7, r.Y + 36);
                     }
+                }
+                // what leaves the system: up to the atmosphere from each box's top right corner, sideways to water from its right side
+                Color air = Color.FromArgb(120, 120, 116), water = Color.FromArgb(55, 138, 221);
+                foreach (var ed in Budget.Edges.Where(x => (x.To == "ATM" || x.To == "AQ") && x.Flux > 1e-9 && pos.ContainsKey(x.From)))
+                {
+                    RectangleF r = pos[ed.From]; bool up = ed.To == "ATM"; Color col = up ? air : water;
+                    float w = (float)(1 + 7 * Math.Sqrt(ed.Flux / Math.Max(maxF, 1e-9)));
+                    PointF a = up ? new PointF(r.Right - 26, r.Top) : new PointF(r.Right, r.Bottom - 12);
+                    PointF b = up ? new PointF(r.Right - 8, r.Top - 26) : new PointF(r.Right + 26, r.Bottom - 12);
+                    PointF c1 = up ? new PointF(a.X, a.Y - 14) : new PointF(a.X + 9, a.Y), c2 = up ? new PointF(a.X + 2, b.Y + 4) : new PointF(b.X - 9, b.Y);
+                    using (var pen = new Pen(Color.FromArgb(150, col), w)) g.DrawBezier(pen, a, c1, c2, b);
+                    // the head points along the curve's last stretch
+                    double ang = Math.Atan2(b.Y - c2.Y, b.X - c2.X); float hx = (float)Math.Cos(ang), hy = (float)Math.Sin(ang);
+                    PointF tip = new PointF(b.X + hx * 6, b.Y + hy * 6);
+                    PointF[] head = { tip, new PointF(b.X - hy * 4, b.Y + hx * 4), new PointF(b.X + hy * 4, b.Y - hx * 4) };
+                    using (var hb = new SolidBrush(Color.FromArgb(210, col))) g.FillPolygon(hb, head);
+                    var pts = new PointF[11];
+                    for (int i = 0; i <= 10; i++) { float u = i / 10f, v = 1 - u; pts[i] = new PointF(v * v * v * a.X + 3 * v * v * u * c1.X + 3 * v * u * u * c2.X + u * u * u * b.X, v * v * v * a.Y + 3 * v * v * u * c1.Y + 3 * v * u * u * c2.Y + u * u * u * b.Y); }
+                    m_hits.Add(new KeyValuePair<PointF[], NonForestBudget.Edge>(pts, ed));
+                    string txt = (up ? "CO\u2082 " : "water ") + (ShowFlux ? Num(ed.Flux) : RateText(ed.Entered));
+                    labels.Add(Tuple.Create(up ? new PointF(tip.X + 3, tip.Y - 8) : new PointF(a.X + 3, a.Y + 4), txt, ed.Yours, col, false));
                 }
                 foreach (var l in labels)
                     using (var lb = new SolidBrush(Color.FromArgb(Math.Min(255, l.Item4.R / 2), Math.Min(255, l.Item4.G / 2), Math.Min(255, l.Item4.B / 2))))
@@ -170,7 +180,7 @@ namespace lucasCoreUI
                     var ed = h.Value; var b = Budget;
                     text = ed.Kind == "Net growth"
                         ? string.Format("Net growth to {0}: {1:0.#}% of {2} = {3} Mg C/ha/yr{4}", b.P[ed.To].Label.ToLower(), ed.Entered * 100, Num(b.Growth), Num(ed.Flux), ed.Yours ? " (this page's row)" : "")
-                        : string.Format("{0}: {1} to {2}\n{3} {4} x {5} Mg C/ha = {6} Mg C/ha/yr{7}", ed.Kind, b.P[ed.From].Label.ToLower(), b.P[ed.To].Label.ToLower(),
+                        : string.Format("{0}: {1} to {2}\n{3} {4} x {5} Mg C/ha = {6} Mg C/ha/yr{7}", ed.Kind, b.P[ed.From].Label.ToLower(), ed.To == "ATM" ? "the atmosphere" : ed.To == "AQ" ? "water" : b.P[ed.To].Label.ToLower(),
                             b.Totals.Contains(ed.From) && ed.Kind != "Biomass Turnover" ? "share " + RateText(ed.Entered) + " of loss " + RateText(b.P[ed.From].Total) + "/yr =" : "rate", RateText(ed.Rate) + "/yr",
                             Num(b.P[ed.From].Stock), Num(ed.Flux), ed.Yours ? "\n(set by this page's rows)" : "");
                     break;
