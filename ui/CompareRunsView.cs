@@ -131,7 +131,7 @@ namespace lucasCoreUI
             foreach (RunItem i in m_runs) cb.Items.Add(i);
             int idx = -1;
             for (int k = 0; k < cb.Items.Count; k++) if (Convert.ToInt32(((RunItem)cb.Items[k]).Key) == rid) idx = k;
-            if (idx < 0 && rid >= 0) { cb.Items.Add(new RunItem { Key = rid, Name = string.Format("[{0}] (not an ST-Sim run of this project)", rid) }); idx = cb.Items.Count - 1; }
+            if (idx < 0 && rid >= 0) { cb.Items.Add(StsimRuns.Missing(this.DataFeed.Project, rid)); idx = cb.Items.Count - 1; }
             cb.SelectedIndex = idx; cb.EndUpdate();
         }
 
@@ -162,7 +162,8 @@ namespace lucasCoreUI
             }
             HashSet<int> missing = new HashSet<int>(hist.Where(h => !chosen.Contains(h)));
             m_add.Enabled = m_runs.Any(i => !chosen.Contains(Convert.ToInt32(i.Key)));
-            m_state.Text = rows.Count == 0 ? "No runs chosen yet: Add a run, then pick it from the drop-down."
+            m_state.Text = m_runs.Count == 0 && StsimRuns.Problem.Length > 0 ? "The page finds no runs to list: " + StsimRuns.Problem
+                : rows.Count == 0 ? "No runs chosen yet: Add a run, then pick it from the drop-down."
                 : missing.Count > 0 ? string.Format("Historical run{0} {1} will be added in front of the projections.", missing.Count == 1 ? "" : "s", string.Join(", ", missing.Select(h => "[" + h + "]")))
                 : rows.Count == 1 ? "Add at least one more run to compare." : "";
         }

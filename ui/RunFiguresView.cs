@@ -44,7 +44,7 @@ namespace lucasCoreUI
             foreach (RunItem i in m_runs) m_run.Items.Add(i);
             int idx = 0;
             for (int k = 1; k < m_run.Items.Count; k++) if (rid != DBNull.Value && Convert.ToInt32(((RunItem)m_run.Items[k]).Key) == Convert.ToInt32(rid)) idx = k;
-            if (rid != DBNull.Value && idx == 0) { m_run.Items.Add(new RunItem { Key = rid, Name = string.Format("[{0}] (not an ST-Sim run of this project)", rid) }); idx = m_run.Items.Count - 1; }
+            if (rid != DBNull.Value && idx == 0) { m_run.Items.Add(StsimRuns.Missing(this.DataFeed.Project, Convert.ToInt32(rid))); idx = m_run.Items.Count - 1; }
             m_run.SelectedIndex = idx; m_run.EndUpdate();
         }
     }

@@ -120,13 +120,11 @@ namespace lucasCoreUI
             m_synced = change.Count;
         }
 
-        // result scenarios of this project, newest first: a historical run is one of them. Results are in Project.Results, not in
-        // Project.Scenarios (which holds only the scenarios you edit); reread whenever the drop-down opens, so a run that finished
-        // while this page was open is listed
+        // result scenarios of this project, newest first: a historical run is one of them (StsimRuns.Results: every scenario's own
+        // results, not only the active ones); reread whenever the drop-down opens, so a run that finished while this page was open is listed
         private void LoadRuns()
         {
-            m_runs = this.DataFeed.Project.Results.Cast<Scenario>()
-                .OrderByDescending(s => s.Id).Select(s => new Item { Key = s.Id, Name = s.DisplayName.StartsWith("[" + s.Id + "]") ? s.DisplayName : string.Format("[{0}] {1}", s.Id, s.DisplayName) }).ToList();   // a result's DisplayName already starts with its id
+            m_runs = StsimRuns.Results(this.DataFeed.Project).Select(s => new Item { Key = s.Id, Name = StsimRuns.Name(s) }).ToList();
         }
 
         public override void LoadDataFeed(DataFeed dataFeed)
