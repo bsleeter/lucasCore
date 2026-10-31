@@ -2,7 +2,7 @@
 
 Ideas for the lucasCore pages in SyncroSim Studio, collected during the P26 user-guide walkthrough. Newest last.
 
-## Priorities (2026-10-30)
+## Priorities (2026-10-31)
 
 The open items in order. Item numbers are ids and do not change; this table is the order. The rule from 2026-10-25 still holds: items
 that change the model itself (its inputs or results) come first, and anything built on P26's results (the demo bundle, metadata, the
@@ -14,19 +14,21 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | ~~2~~ | ~~35 TreeMap: forest type, stand age, site productivity (with 10)~~ DONE 2026-10-30 | Yes, as options (off by default) | Code, pages, figure, tests and P26 sync done; its guide content is item 36 | - |
 | ~~3~~ | ~~34 Minimum harvest ages~~ DONE 2026-10-30 | Yes (projections; stage 6 start ages) | FIA values lowered to the study area's mapped cuts; selection at least 10 yr under clearcut | 35's age source |
 | ~~1~~ | ~~32 Carbon open science issues~~ DONE 2026-10-30 | Yes | Stem turnover fitted to FIA background mortality (snags now match); duff bound harmless; California event shares hold nationally | - |
-| later | 39 Grassland, shrubland and wetland carbon: the science step | Yes | Step 1 done 2026-10-30 (rates on a page, Non-sage fixed); the user reruns P26 first; suspect values (emergent wetland growth 31, irrigated grass 9.19 Mg C/ha/yr) and the science options later | 37 |
-| 1 | 37 P26 rerun and guide refresh | Its own results | 34 changed the start ages, harvest pathways and so initial carbon; rerun once after 39 (and 32), then redo the guide's P26 numbers and figures, and add the Minimum Harvest Age page | 34, 32, 39 |
-| 3 | 31 Copy Carbon Assumptions; SoilGrids option | No (an option) | Convenience and one more soil source | - |
-| 4 | 12 Data Download stage | No | Needs the final input list (35 added TreeMap) | 35 |
-| 5 | 13 Demo bundle, Calaveras | No | Needs 12's home folder and a settled model; the finished demo library (option 1) can go earlier if wanted | 12; 37 |
-| 6 | 14 FGDC metadata | No | Needs the final inputs and 12's manifest; ships with 13 and data releases | 12, 13 |
+| ~~1~~ | ~~37 P26 rerun and guide refresh~~ DONE 2026-10-31 | Its own results | Build [53], Historical [54], projections [65]-[67], Compare [71]; guide numbers, figures and grabs; GitHub snapshot rebuilt | 34, 32 |
+| 1 | 39 Grassland, shrubland and wetland carbon: the science step | Yes | Step 1 (rates on a page) and the diagram view done; the diagram shows emergent wetland rates settling far above their starting pools; suspect values (emergent wetland growth 31, irrigated grass 9.19 Mg C/ha/yr), root turnover splits; the science options (user to decide) | - |
+| 2 | 43 Historical harvest 12% short: minimum ages in the historical period | Yes (historical harvest, start ages) | Options offered 2026-10-31, user to decide: apply the minimum ages only in projections, or resample start ages from the median | 34 |
+| 3 | 42 Fill prompt names the grassland tables by their old names | No | A wording fix in the Carbon Method page | - |
+| 4 | 31 Copy Carbon Assumptions; SoilGrids option | No (an option) | Convenience and one more soil source | - |
+| 5 | 12 Data Download stage | No | Needs the final input list (35 added TreeMap) | 35 |
+| 6 | 13 Demo bundle, Calaveras | No | Needs 12's home folder and a settled model; the finished demo library (option 1) can go earlier if wanted | 12; 39 |
+| 7 | 14 FGDC metadata | No | Needs the final inputs and 12's manifest; ships with 13 and data releases | 12, 13 |
 | any | 33 Leftovers inside done items | Some | Small, independent; (7) guide 1.4 and (1) deep links any time; (8) and (17) larger | - |
 | later | 26 Guide chapter 9, Troubleshooting | No | After beta testers (user) | beta |
 | later | 36 Guide: Advanced Features (site productivity comparison) | No | After the items above (user); needs a P26 Build with Site productivity on | 35, 37 |
 | later | 38 Stand-replacing insect and disease events | Yes | Option B of 32 (user: eventually); background mortality already excludes them | 32 |
 
-Done since the 2026-10-25 order: 6, 7, 8, 9, 11a, 15-25, 28-30, 32, 34, 35 (item 27 removed by the user).
-Not pushed: every lucasCore commit since 54177b2 (2026-10-29) is local only; the repo is public, so push only when the user asks.
+Done since the 2026-10-25 order: 6, 7, 8, 9, 11a, 15-25, 28-30, 32, 34, 35, 37, 40, 41 (item 27 removed by the user).
+Pushed: everything through 0ce1c25 (2026-10-31), with the guide snapshot rebuilt; the repo is public, so push only when the user asks.
 
 1. **Data Sources page** - DONE 2026-10-24. Custom view (`ui/DataSourcesView.cs`) groups the paths by category (study area, land
    cover, forest inventory, disturbance and fire, climate, soils and terrain, infrastructure and ownership), links each to its download
@@ -542,7 +544,16 @@ Not pushed: every lucasCore commit since 54177b2 (2026-10-29) is local only; the
     productivity on, the Site Productivity page, the figure and the comparison figures.
     **Open questions.** Which comparison figures make the point (stocks by year, growth by forest type, a difference map?); whether
     the chapter also covers TreeMap forest type and stand age, which change the initial map itself.
-37. **P26 rerun and guide refresh** - TO DO (2026-10-30). Item 34 changed stage 6 (minimum harvest ages from FIA and the study
+37. **P26 rerun and guide refresh** - DONE 2026-10-31. The first historical rerun (result 52) lost half its fire and urbanization:
+    stage 6 wrote harvest-age pathways per ecodivision for two forest types, and ST-Sim then dropped those classes' blank-stratum
+    pathways. Fixed (58ed57b, 737328c; user rule: strata are used everywhere or nowhere, so with any ecodivision harvest age every
+    pathway is written per ecodivision; test phaseZ23). Reruns: Build [53] (57 min, 74 checks pass, 442 Tg C), Historical [54]
+    (1986-2023: fire 12,124 km2 vs 12,412, urbanization 244 vs 245, harvest 2,101 vs 2,392, 12% short: about 8 points placement
+    limits, the rest the minimum ages, see item 43; carbon 441.6 -> 474.5 (2019) -> 451.6 Tg C), Setup [57], Climate [58]/[59],
+    projections [65] No Climate 452.2, [66] ssp585 447.3, [67] ssp245 446.0 Tg C in 2050, Compare [71]. Guide: numbers, run times,
+    16 run figures, new sections 3.6 Minimum Harvest Age and the Carbon Assumptions pages, 4.2 headings renumbered, Studio grabs
+    retaken (6.6-6.13 and chapter 8 kept on purpose: user, 2026-10-31), GitHub snapshot rebuilt (c398241, 0ce1c25).
+    Was: Item 34 changed stage 6 (minimum harvest ages from FIA and the study
     area's mapped cuts, selection at least 10 yr under clearcut, start ages raised for selection too), so P26's start ages, initial
     carbon and historical harvest change; item 32 may change the carbon too, so rerun once after it. Steps: the P26 Build and the
     Historical run in the user's guide library (the user runs them, or asks Claude to); then the guide's P26 numbers and figures
@@ -593,3 +604,25 @@ Not pushed: every lucasCore commit since 54177b2 (2026-10-29) is local only; the
     49 Mg C/ha against starting pools of 4.9 and 17.4 (soil 621 vs 609), so the starting pools or the rates (31 Mg C/ha/yr net
     growth?) came from different inputs - for the science step. Also seen in the diagram: every grass and shrub class sends coarse
     root turnover half to AG fast (above ground), and annual grass half its fine root turnover to AG very fast.
+    Diagram follow-up DONE 2026-10-31 (8a7fc0c, user): CO2 and water leave each pool as arrows (curving up to the atmosphere,
+    sideways to water), sized by flux; guide Figure 3.17. Left as is (user): BG slow's "water" label sits on the curve to deep soil.
+40. **Live Turnover, Spin-up and Fixed Decay Multipliers pages show the values used** - DONE 2026-10-31 (f0faf72; user: "nothing here
+    as a methodological change, just making the UI more friendly"). The three sheets hold overrides only, so they opened empty with no
+    hint of what empty means. Live Turnover: pick a forest type and ecodivision; each rate with the value stage 3 uses (CBM through
+    CBM Crosswalk and Growth Inputs, FIA stem turnover, or the sheet), where it comes from, and an editable row; the first value typed
+    on an empty page writes the 151 package FIA rows first (a sheet with rows uses only its rows). Spin-up: each ecodivision and
+    forest type with the newest Build result's LANDFIRE interval (else the provisional defaults) and the sheet's values beside it.
+    Fixed Decay Multipliers: the newest Build result's calibrated multipliers, fixed ones shaded, "Fix the selected value". Fill still
+    writes only the FIA stem rows: CBM rates written as rows would stop following CBM Crosswalk. Guide 3.7, Figures 3.15, 3.18, 3.19.
+41. **Run pickers listed no runs** - FIXED 2026-10-31 (7490ca0). Compare Runs, Run Figures and the projection's historical-run
+    drop-down read Project.Results, which holds only the toolbar's active results: with none active they listed nothing ("not an
+    ST-Sim run of this project", Add a run dead). They now gather every scenario's own Results (ui/StsimRuns.cs).
+42. **Fill prompt: old names for the grassland tables** - TO DO (found 2026-10-31). The Carbon Method page's Fill prompt lists
+    "Non-Forest Growth, Non-Forest Rates" (ui/CarbonOptionsView.cs Sheets); the page is Grassland, Shrubland and Wetland Carbon. Say
+    "Grassland, Shrubland and Wetland Carbon (growth and rates)"; the guide's Figure 3.9 caption explains the old names until then.
+43. **Historical harvest 12% short: the minimum ages in the historical period** - TO DO, user to decide (offered 2026-10-31). In
+    Historical [54] harvest reached 2,101 of LCMS's 2,392 km2: about 8 points are cuts the model cannot place (one transition per cell
+    per year, classes without a harvest pathway), the rest cuts the minimum harvest ages (item 34) keep out of stands that regrew too
+    little after an earlier clearcut. Options: apply the minimum ages only in projections (the record's cuts are fixed history), or
+    resample start ages from the median rather than raising them to the minimum; either changes start ages and initial carbon, so it
+    goes with a rerun.
