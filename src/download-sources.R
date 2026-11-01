@@ -235,7 +235,7 @@ download_handlers <- function() {
         u <- sprintf("%s?service=WCS&version=1.0.0&request=GetCoverage&coverage=%s&crs=EPSG:5070&bbox=%.0f,%.0f,%.0f,%.0f&width=%d&height=%d&time=%d-01-01T00:00:00.000Z&format=GeoTIFF",
                      NLCD_WCS, NLCD_COV, tl$xmin, tl$ymin, tl$xmax, tl$ymax, tl$nx, tl$ny, y)
         parts <- file.path(ctx$dl, y, sprintf("tile%02d.tif", seq_len(nrow(tl))))
-        fetch_files(u, parts, ctx$connections, ctx$log, sizes = rep(NA_real_, length(u)))
+        fetch_files(u, parts, 1, ctx$log, sizes = rep(NA_real_, length(u)))   # one tile at a time: the WCS answers 404 under parallel load (2026-11-01)
         mosaic_to(parts, file.path(ctx$place, items$file[i]), "INT1U"); unlink(dirname(parts[1]), recursive = TRUE)
         ctx$log(sprintf("  NLCD %d (%d tiles)", y, nrow(tl))) }
       ctx$place })
@@ -260,10 +260,13 @@ download_handlers <- function() {
       x <- data.table::data.table(year = yr, layer = l)[year %in% years_of(ctx, yr)][order(year)]
       x[, `:=`(url = LFPS, file = sprintf("US_DIST%d/LF%d_Dist/Tif/LF%d_Dist.tif", year, year, year), fetch = FALSE)][] },
     have = function(ctx, items) recorded(ctx, "LandfireDisturbanceFolder", file.path(ctx$place, items$file)),
-    finish = function(ctx, items) { b <- lfps_job(ctx, items$layer)
-      for (i in seq_len(nrow(items))) { y <- items$year[i]; write_band(b, i, file.path(ctx$place, items$file[i]))
-        csv <- pkg_file("defaults", "landfire", "disturbance", sprintf("US_DIST%d.csv", y)); cd <- file.path(ctx$place, sprintf("US_DIST%d/LF%d_Dist/CSV_Data", y, y))
-        dir.create(cd, recursive = TRUE, showWarnings = FALSE); file.copy(csv, file.path(cd, sprintf("LF%d_Dist.csv", y)), overwrite = TRUE) }
+    # (LFPS takes at most 15 layers a job: the years go in jobs of up to 15, each job's zip unpacked into its own folder)
+    finish = function(ctx, items) {
+      for (ch in split(seq_len(nrow(items)), ceiling(seq_len(nrow(items)) / 15))) { b <- lfps_job(ctx, items$layer[ch])
+        for (k in seq_along(ch)) { i <- ch[k]; y <- items$year[i]; write_band(b, k, file.path(ctx$place, items$file[i]))
+          csv <- pkg_file("defaults", "landfire", "disturbance", sprintf("US_DIST%d.csv", y)); cd <- file.path(ctx$place, sprintf("US_DIST%d/LF%d_Dist/CSV_Data", y, y))
+          dir.create(cd, recursive = TRUE, showWarnings = FALSE); file.copy(csv, file.path(cd, sprintf("LF%d_Dist.csv", y)), overwrite = TRUE) }
+        rm(b); gc(); unlink(file.path(ctx$dl, c("lfps.zip", "lfps")), recursive = TRUE) }
       ctx$place })
 
   # ---- NIFC Interagency Fire Perimeter History by ArcGIS REST, paged (2,000 features a page), to a GeoPackage -----------
