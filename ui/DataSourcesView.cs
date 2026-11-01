@@ -183,7 +183,7 @@ namespace lucasCoreUI
             try
             {
                 string[] parts = homePath.Split('|');
-                if (!parts[0].Contains("*")) { string p = Path.Combine(home, parts[0]); if (Directory.Exists(p)) { found = 1; return p; } return null; }
+                if (!parts[0].Contains("*")) { string p = Path.Combine(home, parts[0]); if (Directory.Exists(p) && Directory.EnumerateFileSystemEntries(p).Any()) { found = 1; return p; } return null; }   // an empty place (Make folders) is not there
                 string dir = PlaceFolder(home, homePath); if (!Directory.Exists(dir)) return null;
                 var pats = new[] { Path.GetFileName(parts[0]) }.Concat(parts.Skip(1));
                 // the suffix test keeps "*.tif" from matching .tiff (GetFiles' 3-letter extension rule)

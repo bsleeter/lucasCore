@@ -66,8 +66,11 @@ res <- rbindlist(lapply(todo, function(k) { h <- H[[k]]
     data.table(DataSource = k, Dataset = h$name, Status = "failed", Files = NA_integer_, SizeMb = NA_real_, Minutes = NA_real_,
                Next = sprintf("%s (rerun to resume)", substr(conditionMessage(e), 1, 300))) })
   progressBar(); r }), fill = TRUE)
-for (k in setdiff(asked, names(H))) res <- rbind(res, data.table(DataSource = k, Dataset = layout[Column == k, Name], Status = "manual",
-  Next = "Not fetched by this version: put it at its place in the home folder, or set its Data Sources path"), fill = TRUE)
+for (k in setdiff(asked, names(H))) { pk <- identical(layout[Column == k, Access], "package")
+  res <- rbind(res, data.table(DataSource = k, Dataset = layout[Column == k, Name], Status = if (pk) "skipped" else "manual",
+    Next = if (pk) "Ships with lucasCore: a blank Data Sources path reads the package copy" else if (identical(layout[Column == k, Access], "user"))
+      "No public source: put your copy at its place in the home folder, or set its Data Sources path" else
+      "Not fetched by this version: put it at its place in the home folder, or set its Data Sources path"), fill = TRUE) }
 write_ds(res, "OutputDataDownload")
 progressBar(type = "end")
 

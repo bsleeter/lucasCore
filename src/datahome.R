@@ -23,7 +23,8 @@ home_layout <- function(pkgdir) data.table::fread(file.path(pkgdir, "defaults", 
 home_path <- function(home, homepath) {
   if (is.null(home) || is.na(home) || !nzchar(home) || is.na(homepath)) return(structure(NA_character_, found = 0L))
   parts <- strsplit(homepath, "|", fixed = TRUE)[[1]]
-  if (!grepl("*", parts[1], fixed = TRUE)) { p <- file.path(home, parts[1]); return(if (dir.exists(p)) p else structure(NA_character_, found = 0L)) }
+  # a folder counts only when it holds something: Make folders / home_create leave every place empty
+  if (!grepl("*", parts[1], fixed = TRUE)) { p <- file.path(home, parts[1]); return(if (dir.exists(p) && length(list.files(p))) p else structure(NA_character_, found = 0L)) }
   dir <- dirname(file.path(home, parts[1])); pats <- c(basename(parts[1]), parts[-1])
   f <- unique(unlist(lapply(pats, function(p) Sys.glob(file.path(dir, p))))); f <- f[!dir.exists(f)]
   if (length(f) == 1) f else structure(NA_character_, found = length(f)) }
@@ -89,4 +90,5 @@ manifest_covers <- function(home, column, box) {
   if (identical(m$Copy, "national")) return(TRUE)
   e <- suppressWarnings(as.numeric(unlist(m[, .(Xmin, Ymin, Xmax, Ymax)])))
   if (anyNA(e)) return(FALSE)
-  box[1] >= e[1] && box[2] >= e[2] && box[3] <= e[3] && box[4] <= e[4] }
+  # within a metre: the box goes through text in manifest.csv (15 significant digits)
+  box[1] >= e[1] - 1 && box[2] >= e[2] - 1 && box[3] <= e[3] + 1 && box[4] <= e[4] + 1 }

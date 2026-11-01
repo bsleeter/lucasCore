@@ -189,7 +189,11 @@ Pushed: everything through 0ce1c25 (2026-10-31), with the guide snapshot rebuilt
    /vsizip//vsicurl/) and only the region is written; FIA DataMart (48 states), MTBS (ScienceBase), FPA-FOD, PRISM (HTTP mirror;
    the web service blocks repeats), LOCA2 (UCSD west regional cut, member per model) and SILVIS WUI (states touched) are fetched,
    resumed and clipped. P26 Check only: about 5.2 GB to fetch. The legacy PRISM 4 km normals are gone (current normals only), and
-   NFCMS v3 ships no .vat.dbf. Six decisions open. TO DO (design agreed with the user, 2026-10-25; not started).
+   NFCMS v3 ships no .vat.dbf. TESTED: plain R, P26 2019-2020 into an empty home: FSim, forest ownership, LCMS, MTBS,
+   TreeMap (and its .vat.dbf) and PRISM identical to the build machine's files over the region; NFCMS v3 differs from the local tiles
+   on 8.7% of PSW cells (the newer edition: a Build on "USFS forest type groups" from a download would change); a rerun skipped all
+   11. TreeMap is fetched whole (5.4 GB in about 90 s): its remote read broke. Through SyncroSim (dev/libs/download-test.ssim):
+   Check only for P26 (about 18 GB with the full LOCA2 model list), a real run and a rerun that skipped. Six decisions open. TO DO (design agreed with the user, 2026-10-25; not started).
    Supersedes the download half of item 11 (LOCA2 becomes one dataset here; 11's list scan/refresh stays). Today the Data Sources page
    (ui/DataSourcesView.cs) links each dataset's download PAGE (defaults/library/data-sources.csv: landfire.gov/data, mrlc.gov/data,
    the USFS archive index, ...), and the user fetches and points to every file by hand.

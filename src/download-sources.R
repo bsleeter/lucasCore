@@ -41,13 +41,15 @@ clipping <- function(ctx) !is.null(ctx$region$poly) && !ctx$keep
 # break deep in a large zip (TreeMap's 5.4 GB zip64, 2026-10-31: a deflate error 12,000 rows in): then the whole zip is fetched
 # (resumable) and clipped here
 zip_raster <- function(ctx, items, i, member, dest) {
-  if (clipping(ctx)) { gdal_remote()
+  if (clipping(ctx) && !file.exists(items$dest[i])) { gdal_remote()
     ok <- tryCatch({ clip_raster(remote_member(items$url[i], member), dest, ctx$region); TRUE }, error = function(e) { ctx$log(sprintf("  remote read of %s failed (%s): fetching the zip", basename(member), conditionMessage(e))); FALSE })
     if (ok) return(dest)
+    gc(); unlink(paste0(dest, c("", ".aux.xml")))   # the broken attempt's partial file
     fetch_files(items$url[i], items$dest[i], ctx$connections, ctx$log)
     x <- unzip_to(items$dest[i], file.path(ctx$dl, "unzip"), member); clip_raster(x, dest, ctx$region); unlink(x); return(dest) }
-  x <- unzip_to(items$dest[i], file.path(ctx$dl, "unzip"), member); dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)
-  file.rename(x, dest); dest }
+  x <- unzip_to(items$dest[i], file.path(ctx$dl, "unzip"), member)
+  if (clipping(ctx)) { clip_raster(x, dest, ctx$region); unlink(x); return(dest) }
+  dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE); file.rename(x, dest); dest }
 # a dbf attribute table from a zip, read remotely (OGR) and written back, or unpacked from the fetched zip
 zip_dbf <- function(ctx, items, i, member, dest) {
   if (clipping(ctx) && !file.exists(items$dest[i])) { gdal_remote(); x <- sf::st_drop_geometry(sf::read_sf(remote_member(items$url[i], member)))
@@ -79,7 +81,9 @@ download_handlers <- function() {
 
   # ---- TreeMap 2016: the raster and its attribute table (the plots), from one zip ------------------------------------
   H$TreeMapFolder <- list(column = "TreeMapFolder", name = "TreeMap 2016", version = "2016 (RDS-2021-0074)",
-    plan = function(ctx) data.table::data.table(url = sprintf(BOX, "yz7h8b8v92scoqfwukjyulokaevzo6v6"), file = "TreeMap2016.zip", fetch = !clipping(ctx)),
+    # fetched whole even for a region: its 4 GB raster is deflated, so a remote read streams nearly all of it, and one broke
+    # 12,000 rows in (2026-10-31); the zip comes down in minutes
+    plan = function(ctx) data.table::data.table(url = sprintf(BOX, "yz7h8b8v92scoqfwukjyulokaevzo6v6"), file = "TreeMap2016.zip", fetch = TRUE),
     finish = function(ctx, items) { dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE)
       zip_raster(ctx, items, 1, "Data/TreeMap2016.tif", file.path(ctx$place, "TreeMap2016.tif"))
       zip_dbf(ctx, items, 1, "Data/TreeMap2016.tif.vat.dbf", file.path(ctx$place, "TreeMap2016.tif.vat.dbf")); ctx$place })
