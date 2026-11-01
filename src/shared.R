@@ -67,14 +67,23 @@ sheet_defaults <- function(name, quiet = FALSE) {
 # Files the package ships: the dissolved FIA ecodivisions (ECOMAP 2007 divisions; ECOMAP 2025 renumbers them, so a fresh download
 # would not match the package's strata tables)
 PACKAGE_SOURCES <- list(EcodivisionFile = c("defaults", "strata", "ecodivisions", "EcoDivisions_Dissolve.shp"))
-read_data_sources <- function(cols) {
+# A blank path reads, in order: its place under Data Sources Home (src/datahome.R), the package.xml default, the package's own copy
+source(file.path(env$PackageDirectory, "src", "datahome.R"))
+# optional = TRUE: a column with nothing set, at home or by default, gives NA instead of stopping (NCCPI, fetched when blank)
+read_data_sources <- function(cols, optional = FALSE) {
   d <- as.data.table(datasheet(prj, ds("DataSource"), lookupsAsFactors = FALSE, optional = TRUE))
   def <- sheet_defaults("DataSource", quiet = TRUE)
+  home <- if (nrow(d) && "DataSourcesHome" %in% names(d)) d$DataSourcesHome[1] else NA_character_
+  hl <- if (!is.na(home) && nzchar(home)) home_layout(env$PackageDirectory) else NULL
   out <- list()
   for (k in cols) { v <- if (nrow(d) && k %in% names(d)) d[[k]][1] else NA_character_
+    if ((is.na(v) || !nzchar(v)) && !is.null(hl) && k %in% hl$Column) { h <- home_path(home, hl[Column == k, HomePath])
+      if (!is.na(h)) v <- h else if (attr(h, "found") > 1) fail("Data Sources: %s is blank and %d files match its place in the home folder (%s); keep one, or set the path",
+                                                                k, attr(h, "found"), file.path(home, hl[Column == k, HomePath])) }
     if (is.na(v) || !nzchar(v)) v <- def[[k]][1]
     if ((is.null(v) || is.na(v) || !nzchar(v)) && !is.null(PACKAGE_SOURCES[[k]])) v <- do.call(pkg_file, as.list(PACKAGE_SOURCES[[k]]))
-    if (is.null(v) || is.na(v) || !nzchar(v)) fail("Data Sources: %s is not set and has no default", k)
+    if (is.null(v) || is.na(v) || !nzchar(v)) { if (optional) { out[k] <- list(NA_character_); next }
+      fail("Data Sources: %s is not set and has no default", k) }
     if (!file.exists(v)) fail("Data Sources: %s not found (%s)", k, v)
     out[[k]] <- v }
   out }

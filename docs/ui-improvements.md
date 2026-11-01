@@ -176,7 +176,12 @@ Pushed: everything through 0ce1c25 (2026-10-31), with the guide snapshot rebuilt
    prism_<var>_us_25m_<yyyy>_avg_30y); the ecodivisions ship in defaults/strata/ecodivisions (blank EcodivisionFile = the package copy,
    presets.csv relative); data-sources.csv gained Access (package/service/file/login/user), DatasetId, Version and Doi, with the
    FSim id (RDS-2016-0034-3) and forest type link (NFCMS v3, RDS-2025-0019) corrected; the page marks user-supplied rows. Existing
-   files resolve exactly as before (plain-R tests). Six decisions open. Phase 2 (home folder, manifest) next. TO DO (design agreed with the user, 2026-10-25; not started).
+   files resolve exactly as before (plain-R tests). PHASE 2 CODE DONE 2026-10-31: src/datahome.R (home places from data-sources.csv
+   HomePath, home_create, manifest.csv / files.csv readers and writers, manifest_covers), read_data_sources reads a blank path's home
+   place before the package.xml default (optional = TRUE for NCCPI), defaults/download/endpoints.csv (method, clip, login, endpoint,
+   product, size per source), tools/data-home.R (check or --create a home folder), and the Data Sources page's home row (Browse, Make
+   folders, "✓ home" marks, manifest status). A hand-laid home of links (dev/libs/home-test) finds 26 of 27 (NCCPI is fetched). WAITING:
+   the DataSourcesHome column in package.xml, which needs Studio closed and the libraries synced. Six decisions open. TO DO (design agreed with the user, 2026-10-25; not started).
    Supersedes the download half of item 11 (LOCA2 becomes one dataset here; 11's list scan/refresh stays). Today the Data Sources page
    (ui/DataSourcesView.cs) links each dataset's download PAGE (defaults/library/data-sources.csv: landfire.gov/data, mrlc.gov/data,
    the USFS archive index, ...), and the user fetches and points to every file by hand.

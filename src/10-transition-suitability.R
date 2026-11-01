@@ -174,7 +174,7 @@ if (need_ag) { todo <- EPOCHS[!file.exists(vapply(EPOCHS, ep_c, "", k = "agshare
       writeRaster(focal(d, w = a$win, fun = "mean", na.rm = TRUE), a$ds[i], datatype = "FLT4S", gdal = "COMPRESS=DEFLATE", overwrite = TRUE); NULL }, a = a); stopCluster(cl) } }
 # crop productivity: Data Source NccpiFile, or fetched for the fitting grid from Planetary Computer (src/nccpi.R); no soil data = 0
 if ("Crop productivity (NCCPI)" %in% need && !file.exists(cf("nccpi"))) {
-  nf <- tryCatch(as.data.table(datasheet(prj, ds("DataSource"), lookupsAsFactors = FALSE, optional = TRUE))$NccpiFile[1], error = function(e) NA_character_)
+  nf <- read_data_sources("NccpiFile", optional = TRUE)$NccpiFile   # blank, and nothing in the home folder: fetched below
   r30 <- rast(E30, res = 30, crs = crs(ref))
   if (is.null(nf) || is.na(nf) || !nzchar(nf)) { source(pkg_file("src", "nccpi.R")); nf <- file.path(CA, "nccpi_30m.tif")
     if (!file.exists(nf)) { say("NCCPI: fetching gNATSGO nccpi3all for the fitting grid from Planetary Computer"); fetch_nccpi(r30, nf) } }

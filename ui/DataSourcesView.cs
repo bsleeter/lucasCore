@@ -9,6 +9,9 @@
 // comes with the package's default paths (LibrarySetup); a blank path means the package default (NCCPI: fetched from Planetary Computer;
 // the ecodivisions: the package's own copy). The file's Access column (to-do 12) marks the datasets with no public download "user": their
 // Download button is off and the mark says "user-supplied" until a path is found.
+// Data Sources Home (to-do 12, src/datahome.R): one folder holding every dataset at its place (the file's HomePath column). A blank path
+// whose place holds the data shows "✓ home"; Make folders creates the empty layout. The home folder's manifest.csv, written by the Data
+// Download stage, adds each dataset's status and the region it covers to its mark and tooltip.
 // =============================================================================
 using System;
 using System.Collections.Generic;
@@ -26,7 +29,9 @@ namespace lucasCoreUI
     {
         protected override string SheetName { get { return "lucasCore_DataSource"; } }
 
-        private class Entry { public string Column, Category, Source, Url, Name, Note, Access; public TextBox Path; public Label State; }
+        private class Entry { public string Column, Category, Source, Url, Name, Note, Access, HomePath; public TextBox Path; public Label State; }
+        private const string HomeColumn = "DataSourcesHome";
+        private TextBox m_home; private Label m_homeState;
         private readonly List<Entry> m_entries = new List<Entry>();
         private bool m_built;
 
@@ -52,15 +57,16 @@ namespace lucasCoreUI
             catch (Exception) { }
             var intro = Column();
             intro.Controls.Add(Note("The stages read these national datasets from disk. A new library starts with the paths of the machine lucasCore was built on: point each one at your own copy (Browse, or type the path). A red cross means the path does not exist on this machine. Download opens the dataset's download page; hover a name for the full description."));
+            if (Sheet.Columns.Cast<DataSheetColumn>().Any(c => c.Name == HomeColumn)) intro.Controls.Add(HomeRow());
             AddGroup(Group("Data Sources", intro));
 
             DataSheet ds = Sheet;
-            var cols = ds.Columns.Cast<DataSheetColumn>().Where(c => c.IsVisible && c.Name != "DataSourceId" && c.Name != "ProjectId" && c.DataType == typeof(string)).ToList();
+            var cols = ds.Columns.Cast<DataSheetColumn>().Where(c => c.IsVisible && c.Name != "DataSourceId" && c.Name != "ProjectId" && c.Name != HomeColumn && c.DataType == typeof(string)).ToList();
             foreach (DataSheetColumn c in cols)
             {
                 string[] m; meta.TryGetValue(c.Name, out m);
                 Func<int, string> at = k => m != null && m.Length > k && m[k].Length > 0 ? m[k] : null;
-                m_entries.Add(new Entry { Column = c.Name, Category = at(1) ?? "Other", Source = at(2), Url = at(3), Name = at(4), Note = at(5), Access = at(6) });
+                m_entries.Add(new Entry { Column = c.Name, Category = at(1) ?? "Other", Source = at(2), Url = at(3), Name = at(4), Note = at(5), Access = at(6), HomePath = at(10) });
             }
             var order = meta.Values.Select(m => m[1]).Distinct().ToList(); order.Add("Other");
             foreach (string cat in order)
@@ -129,6 +135,86 @@ namespace lucasCoreUI
             browse.Click += (s, a) => Browse(en);
         }
 
+        // the home folder: path, Browse, Make folders, and a mark
+        private Control HomeRow()
+        {
+            var row = Row(); row.WrapContents = false; row.Margin = new Padding(0, 6, 0, 0);
+            var cap = Caption("Data Sources Home"); m_tip.SetToolTip(cap, "One folder holding every dataset at its standard place: a blank path below reads its place here.");
+            m_home = new TextBox { Width = 420, Anchor = AnchorStyles.Left, Margin = new Padding(3, 4, 3, 3) };
+            var browse = new Button { Text = "Browse...", AutoSize = true };
+            var make = new Button { Text = "Make folders", AutoSize = true };
+            m_tip.SetToolTip(make, "Creates the empty folder layout in the home folder (nothing is moved or deleted)");
+            m_homeState = new Label { AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(6, 7, 3, 3), Font = new Font(this.Font, FontStyle.Bold) };
+            row.Controls.Add(cap); row.Controls.Add(m_home); row.Controls.Add(browse); row.Controls.Add(make); row.Controls.Add(m_homeState);
+            m_home.Validated += (s, a) => { if (Refreshing) return; string v = m_home.Text.Trim(); Write(HomeColumn, v.Length == 0 ? (object)DBNull.Value : v); RefreshControls(); };
+            browse.Click += (s, a) =>
+            {
+                using (var d = new FolderBrowserDialog { Description = "Choose the Data Sources Home folder", SelectedPath = Directory.Exists(m_home.Text.Trim()) ? m_home.Text.Trim() : "" })
+                    if (d.ShowDialog(this) == DialogResult.OK) { Write(HomeColumn, d.SelectedPath.Replace('\\', '/')); RefreshControls(); }
+            };
+            make.Click += (s, a) =>
+            {
+                string h = m_home.Text.Trim();
+                if (h.Length == 0) { MessageBox.Show(this, "Choose the home folder first.", "Data Sources Home"); return; }
+                int made = 0;
+                try
+                {
+                    foreach (string d in m_entries.Where(e => e.HomePath != null).Select(e => PlaceFolder(h, e.HomePath)).Concat(new[] { Path.Combine(h, "logs") }).Distinct())
+                        if (!Directory.Exists(d)) { Directory.CreateDirectory(d); made++; }
+                }
+                catch (Exception ex) { MessageBox.Show(this, ex.Message, "Data Sources Home"); }
+                RefreshControls();
+                MessageBox.Show(this, made == 0 ? "Every folder was already there." : string.Format("Made {0} folders in {1}.", made, h), "Data Sources Home");
+            };
+            return row;
+        }
+
+        // the folder a HomePath names: itself for a folder column, the pattern's folder for a file column
+        private static string PlaceFolder(string home, string homePath)
+        {
+            string first = homePath.Split('|')[0];
+            return Path.Combine(home, first.Contains("*") ? Path.GetDirectoryName(first) : first);
+        }
+
+        // a HomePath under the home folder, as src/datahome.R home_path: the folder, or the one file its patterns match. found = files matched
+        private static string Place(string home, string homePath, out int found)
+        {
+            found = 0;
+            try
+            {
+                string[] parts = homePath.Split('|');
+                if (!parts[0].Contains("*")) { string p = Path.Combine(home, parts[0]); if (Directory.Exists(p)) { found = 1; return p; } return null; }
+                string dir = PlaceFolder(home, homePath); if (!Directory.Exists(dir)) return null;
+                var pats = new[] { Path.GetFileName(parts[0]) }.Concat(parts.Skip(1));
+                // the suffix test keeps "*.tif" from matching .tiff (GetFiles' 3-letter extension rule)
+                List<string> files = pats.SelectMany(pt => Directory.GetFiles(dir, pt).Where(f => !pt.StartsWith("*") || f.EndsWith(pt.Substring(1), StringComparison.OrdinalIgnoreCase))).Distinct().ToList();
+                found = files.Count;
+                return files.Count == 1 ? files[0].Replace('\\', '/') : null;
+            }
+            catch (Exception) { return null; }
+        }
+
+        // manifest.csv of the home folder: Column -> its row (header names as keys)
+        private static Dictionary<string, Dictionary<string, string>> Manifest(string home)
+        {
+            var m = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
+            try
+            {
+                string f = Path.Combine(home, "manifest.csv"); if (home.Length == 0 || !File.Exists(f)) return m;
+                List<string[]> rows = Csv.Read(f); if (rows.Count < 2) return m;
+                string[] head = rows[0];
+                foreach (string[] r in rows.Skip(1))
+                {
+                    var d = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    for (int i = 0; i < head.Length && i < r.Length; i++) d[head[i]] = r[i];
+                    string c; if (d.TryGetValue("Column", out c)) m[c] = d;
+                }
+            }
+            catch (Exception) { }
+            return m;
+        }
+        private static string Get(Dictionary<string, string> d, string k) { string v; return d != null && d.TryGetValue(k, out v) ? v : ""; }
+
         private void Browse(Entry e)
         {
             string now = e.Path.Text.Trim();
@@ -149,6 +235,15 @@ namespace lucasCoreUI
 
         protected override void ShowData()
         {
+            string home = m_home == null ? "" : Show(Value(HomeColumn)).Trim();
+            if (m_home != null)
+            {
+                m_home.Text = home; m_tip.SetToolTip(m_home, home);
+                bool hx = false; try { hx = home.Length > 0 && Directory.Exists(home); } catch (Exception) { }
+                m_homeState.Text = home.Length == 0 ? "not set" : hx ? "✓" : "✗";
+                m_homeState.ForeColor = home.Length == 0 ? SystemColors.GrayText : hx ? Color.ForestGreen : Color.Firebrick;
+            }
+            var manifest = Manifest(home);
             foreach (Entry e in m_entries)
             {
                 string v = Show(Value(e.Column)).Trim();
@@ -157,13 +252,30 @@ namespace lucasCoreUI
                 m_tip.SetToolTip(e.Path, v);
                 bool exists = false;
                 try { exists = v.Length > 0 && (File.Exists(v) || Directory.Exists(v)); } catch (Exception) { }
-                if (v.Length == 0)
+                Dictionary<string, string> mr; manifest.TryGetValue(e.Column, out mr);
+                string got = mr == null ? "" : string.Format("{0}Downloaded {1} ({2}{3}); status {4}", Environment.NewLine, Get(mr, "Downloaded"),
+                                                             Get(mr, "Copy") == "national" ? "national copy" : "region: " + Get(mr, "Units"),
+                                                             Get(mr, "BufferKm").Length > 0 ? " + " + Get(mr, "BufferKm") + " km" : "", Get(mr, "Status"));
+                string flag = mr != null && Get(mr, "Status") != "done" ? " " + Get(mr, "Status") : "";
+                int found = 0; string place = v.Length == 0 && home.Length > 0 && e.HomePath != null ? Place(home, e.HomePath, out found) : null;
+                if (place != null)
                 {
+                    e.State.Text = "✓ home" + flag; e.State.ForeColor = flag.Length > 0 ? Color.DarkOrange : Color.ForestGreen;
+                    m_tip.SetToolTip(e.State, place + got);
+                }
+                else if (v.Length == 0 && found > 1)
+                {
+                    e.State.Text = string.Format("✗ {0} files", found); e.State.ForeColor = Color.Firebrick;
+                    m_tip.SetToolTip(e.State, string.Format("{0} files match {1} in the home folder: keep one, or set the path", found, e.HomePath));
+                }
+                else if (v.Length == 0)
+                {
+                    m_tip.SetToolTip(e.State, home.Length > 0 && e.HomePath != null ? "Nothing at " + e.HomePath + " in the home folder" : "");
                     e.State.Text = e.Column == "NccpiFile" ? "fetched" : e.Access == "package" ? "package copy" : e.Access == "user" ? "user-supplied" : "default";
                     e.State.ForeColor = SystemColors.GrayText;
                 }
-                else if (!exists && e.Access == "user") { e.State.Text = "✗ user-supplied"; e.State.ForeColor = Color.Firebrick; }
-                else { e.State.Text = exists ? "✓" : "✗"; e.State.ForeColor = exists ? Color.ForestGreen : Color.Firebrick; }
+                else if (!exists && e.Access == "user") { e.State.Text = "✗ user-supplied"; e.State.ForeColor = Color.Firebrick; m_tip.SetToolTip(e.State, v); }
+                else { e.State.Text = exists ? "✓" : "✗"; e.State.ForeColor = exists ? Color.ForestGreen : Color.Firebrick; m_tip.SetToolTip(e.State, v + got); }
             }
         }
     }
