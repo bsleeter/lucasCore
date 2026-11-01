@@ -216,8 +216,9 @@ Pushed: everything through 0ce1c25 (2026-10-31), with the guide snapshot rebuilt
    kept in settings.csv) sent with the first request only, the signed redirect fetched resumably, checked against the DAAC sha256,
    clipped and mosaicked; no token = "needs login", not a failure. TESTED: unit test of the check (P26 passes, P26 + 20 km and P29
    stop, hand-placed passes); stage 1 in dev/libs/download-test2.ssim on P29 and Placer stops with the message, on P26 passes the
-   check; stage 15 without a token marks stand age "needs login". NOT TESTED: a real stand age download (no Earthdata token on this
-   machine). Remaining decisions: forest ownership edition, newer editions, whole files kept. TO DO (design agreed with the user,
+   check; stage 15 without a token marks stand age "needs login"; with the user's token (2026-11-01, download-test.ssim scenario 9)
+   4 tiles (PSW, RMN, RMS, PNW; 1.6 GB in 19 s) passed sha256 and the P26 mosaic is identical to the build machine's cms_age_1990.tif
+   on all 37.6 million cells (INT2U as NASA ships it; the local copy is FLT4S). Remaining decisions: forest ownership edition, newer editions, whole files kept. TO DO (design agreed with the user,
    2026-10-25; not started).
    Supersedes the download half of item 11 (LOCA2 becomes one dataset here; 11's list scan/refresh stays). Today the Data Sources page
    (ui/DataSourcesView.cs) links each dataset's download PAGE (defaults/library/data-sources.csv: landfire.gov/data, mrlc.gov/data,
