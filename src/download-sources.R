@@ -235,7 +235,7 @@ download_handlers <- function() {
   # disturbance: one layer a year (LF2001_Dist99 ... LF2025_Dist25), all the missing years in one job; each year laid out as the
   # stages read it (US_DIST<year>/<name>/Tif and CSV_Data), with the attribute table shipped in defaults/landfire/disturbance
   H$LandfireDisturbanceFolder <- list(column = "LandfireDisturbanceFolder", name = "LANDFIRE annual disturbance", version = "LF2001_Dist99 to LF2025_Dist25", method = "lfps",
-    note = "Attribute tables from the package (defaults/landfire/disturbance); 2023 and 2025 tables are the provisional editions'",
+    note = "Attribute tables from the package (defaults/landfire/disturbance); the 2023 and 2025 tables are the provisional editions', whose codes match the final rasters (2025's final table is the same text, checked 2026-11-01; LANDFIRE publishes no final 2023 table)",
     plan = function(ctx) { need_region(ctx, "LANDFIRE disturbance"); lfps_email(ctx)
       p <- jsonlite::fromJSON(paste0(LFPS, "/products"))$products; l <- grep("^LF[0-9]{4}_Dist[0-9]{2}$", p$layerName, value = TRUE)
       yy <- as.integer(sub(".*_Dist", "", l)); yr <- ifelse(yy > 80, 1900L + yy, 2000L + yy)
