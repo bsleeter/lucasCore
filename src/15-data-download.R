@@ -65,6 +65,8 @@ res <- rbindlist(lapply(todo, function(k) { h <- H[[k]]
     # a missing or expired login is a step for the user, not a failure: the run goes on and the manifest is left as it was
     if (identical(h$method, "login") && grepl("needs an Earthdata login|refused the token", conditionMessage(e))) { log(sprintf("%s: needs a login: %s", h$name, conditionMessage(e)))
       return(data.table(DataSource = k, Dataset = h$name, Status = "needs login", Files = NA_integer_, SizeMb = NA_real_, Minutes = NA_real_, Next = conditionMessage(e))) }
+    if (grepl("no file is needed", conditionMessage(e))) { log(sprintf("%s: not needed: %s", h$name, conditionMessage(e)))
+      return(data.table(DataSource = k, Dataset = h$name, Status = "not needed", Files = 0L, SizeMb = NA_real_, Minutes = NA_real_, Next = conditionMessage(e))) }
     log(sprintf("%s: FAILED: %s", h$name, conditionMessage(e))); if (!check_only) record_failure(home, h, conditionMessage(e))
     data.table(DataSource = k, Dataset = h$name, Status = "failed", Files = NA_integer_, SizeMb = NA_real_, Minutes = NA_real_,
                Next = sprintf("%s (rerun to resume)", substr(conditionMessage(e), 1, 300))) })
@@ -79,6 +81,6 @@ progressBar(type = "end")
 
 say("%s", paste(sprintf("%s %d", names(table(res$Status)), as.integer(table(res$Status))), collapse = ", "))
 if (check_only) say("Check only: %.1f GB would download", sum(res$SizeMb, na.rm = TRUE) / 1000)
-check(STAGE, "every dataset done, skipped or checked", all(res$Status %in% c("done", "skipped", "would download", "manual", "needs login")),
+check(STAGE, "every dataset done, skipped or checked", all(res$Status %in% c("done", "skipped", "would download", "manual", "needs login", "not needed")),
       paste(res[Status == "failed", sprintf("%s: %s", DataSource, Next)], collapse = "; "))
 finish_checks()

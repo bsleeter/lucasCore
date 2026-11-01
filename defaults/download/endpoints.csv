@@ -1,9 +1,8 @@
 Column,Method,Clip,Login,Endpoint,Product,SizeGb,Note,Fetched
 EcodivisionFile,package,none,none,,defaults/strata/ecodivisions/EcoDivisions_Dissolve.shp,0.009,Shipped with the package (ECOMAP 2007 divisions); kept national: its extent sets the model lattice,no
 NlcdFolder,wcs,source,none,https://dmsdata.cr.usgs.gov/geoserver/mrlc_Land-Cover-Native_conus_year_data/wcs,Annual NLCD land cover (one coverage a year),1.4,"WCS 1.0.0 (2.0.1 fails); snap the box to the 30 m grid; published as Collection 1.2 (C1V2) only; size is one year, whole",yes
-Evt2001File,manual,none,none,,LF 1.0.5 EVT,2.6,No public source: LANDFIRE retired LF 2001 (by request only),no
 Evt2016File,lfps,source,email,https://lfps.usgs.gov/api/products,LF2016_EVT,3.7,"LFPS job; the file is renamed (no ""200"")",yes
-RcmapFile,manual,none,none,,RCMAP vegetation classes,5.6,"No public source for the class map in use; could be rebuilt from the RCMAP components (WCS)",no
+RcmapFile,file,after,none,https://www.sciencebase.gov/catalog/item/6849f4f6d4be026f96d9dcca,"1985_vegetation_state.zip (RCMAP vegetation state 1985, western US)",0.88,"Fetched whole (ScienceBase serves no byte ranges) and clipped; covers the western US rangelands, elsewhere NLCD fills",yes
 CcapFile,cog,source,none,https://coast.noaa.gov/digitalcoast/data/ccapregional.html,C-CAP Regional Land Cover 2001,0.64,Cloud-optimized GeoTIFF read for the region only; renamed and re-uploaded in 2026,yes
 ForestTypeGroupFolder,file,after,none,https://www.fs.usda.gov/rds/archive/catalog/RDS-2025-0019,NFCMS v3 forest type groups (regional zips),8.8,1.9-8.8 GB a region; the tiles on the build machine predate v3,yes
 TreeMapFolder,file,after,none,https://www.fs.usda.gov/rds/archive/catalog/RDS-2021-0074,TreeMap 2016,5.4,TreeMap 2022 is out (RDS-2025-0032),yes

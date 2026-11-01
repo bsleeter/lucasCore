@@ -1,8 +1,13 @@
 # Land cover crosswalks (stage 5)
 
-- `evt2016-crosswalk-CONUS-v2.csv`, `evt2001-crosswalk-CONUS-v2.csv`: LANDFIRE EVT values -> LUCAS state class Id (column ID; forest
-  type groups 100-999). EVT 2016 pixels named "Recently ..." take the EVT 2001 value. From `Data Sources/EVT`.
-- `rcmap-state-class.csv`: RCMAP 2001 vegetation class -> grassland and shrubland state classes (the CONUS 1km build's mapping).
+- `evt2016-crosswalk-CONUS-v2.csv`: LANDFIRE EVT 2016 values -> LUCAS state class Id (column ID; forest type groups 100-999). EVT 2016
+  pixels that are not forest (incl. "Recently ...") take the cell's other pixels, else its neighbours, or the USFS forest type group
+  map (Build Options: Forest Type Map). From `Data Sources/EVT`. EVT 2001 (LF 1.0.5) and its crosswalk were removed 2026-11-01
+  (user: published data only; LANDFIRE no longer publishes LF 2001).
+- `rcmap-state-class.csv`: RCMAP vegetation state -> grassland and shrubland state classes (the CONUS 1km build's mapping). Since
+  2026-11-01 the map is USGS's published 1985 vegetation state (Rigge, Bunde and Postma 2025, Ecological Potential ver. 2.0,
+  doi 10.5066/P13OMU52), with the same 11 classes as the unpublished 2001 prototype ("test2") it replaced; classes 0, 1 and 10-12 are
+  listed unmapped.
 - `ccap-state-class-crosswalk.csv`: C-CAP 2001 classes -> state classes; only wetland classes (>= 90) are used. From `Data Sources/CCAP`.
 - `LF16_FRI_200.csv`: LANDFIRE LC16 fire regime table; FRI_REPLAC (replacement-fire return interval, years) gives the spin-up return
   interval. From `Data Sources/FRI/CSV_Data`.

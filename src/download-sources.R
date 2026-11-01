@@ -193,6 +193,24 @@ download_handlers <- function() {
                              file = sprintf("%s_wui_block_1990_2020_change_v4_fgdb.zip", st), fetch = TRUE) },
     finish = function(ctx, items) { for (i in seq_len(nrow(items))) utils::unzip(items$dest[i], exdir = ctx$place); ctx$place })
 
+  # ---- RCMAP vegetation state 1985 (USGS, Ecological Potential ver. 2.0): fetched whole (ScienceBase serves no byte ranges) and
+  # clipped. It covers the western US rangelands; a region outside it gets no file, and stage 5 takes grassland and shrubland
+  # types from NLCD there ---------------------------------------------------------------------------------------------------
+  H$RcmapFile <- list(column = "RcmapFile", name = "RCMAP vegetation state 1985", version = "ver. 2.0, July 2025 (10.5066/P13OMU52)",
+    plan = function(ctx) { b <- ctx$region$box   # the map's extent in EPSG:5070 (checked 2026-11-01): no download for a region east of it
+      if (!is.null(ctx$region$poly) && (b[1] > 592484 || b[3] < -2875426 || b[2] > 3290176 || b[4] < 309856))
+        stop("the region lies outside RCMAP's western US rangelands: no file is needed (stage 5 takes grassland and shrubland types from NLCD)", call. = FALSE)
+      data.table::data.table(url = "https://www.sciencebase.gov/catalog/file/get/6849f4f6d4be026f96d9dcca?name=1985_vegetation_state.zip",
+                             file = "1985_vegetation_state.zip", fetch = TRUE) },
+    finish = function(ctx, items) { m <- "1985_vegetation_state_20250608.tif"; dest <- file.path(ctx$place, m)
+      x <- unzip_to(items$dest[1], file.path(ctx$dl, "unzip"), m)
+      if (clipping(ctx)) { r <- terra::rast(x); b <- terra::project(terra::vect(sf::st_as_sfc(sf::st_bbox(setNames(ctx$region$box, c("xmin", "ymin", "xmax", "ymax")), crs = sf::st_crs(5070)))), terra::crs(r))
+        e <- terra::intersect(terra::ext(b), terra::ext(r))
+        if (is.null(e) || !isTRUE(terra::global(terra::crop(r, e) %in% 2:9, "sum", na.rm = TRUE)[[1]] > 0))
+          stop("the region lies outside RCMAP's western US rangelands: no file is needed (stage 5 takes grassland and shrubland types from NLCD)", call. = FALSE)
+        clip_raster(x, dest, ctx$region) } else { dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE); file.rename(x, dest) }
+      unlink(x); dest })
+
   # ---- USFS forest ownership circa 2017, read remotely, with its attribute table ---------------------------------------
   H$ForestOwnerFile <- list(column = "ForestOwnerFile", name = "USFS forest ownership 2017", version = "circa 2017 (RDS-2020-0044)",
     plan = function(ctx) data.table::data.table(url = sprintf(RDS, "RDS-2020-0044", "RDS-2020-0044.zip"), file = "owner.zip", fetch = !clipping(ctx)),

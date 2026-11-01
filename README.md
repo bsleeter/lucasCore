@@ -30,7 +30,7 @@ lucasCore ships a starter library. An Empty Library does not work: it has no def
 2. In SyncroSim Studio, File > Open the copy.
 3. Open the **Build** scenario's properties and set, under LUCAS Core:
    - **Build Options**: cell size; secondary and tertiary strata (blank = States, Federal Lands); historical start and end years;
-     projection end year (blank = no projection; it starts the year after the historical end); Forest Type Map: LANDFIRE EVT (default) or USFS forest type groups
+     projection end year (blank = no projection; it starts the year after the historical end); Forest Type Map: LANDFIRE EVT 2016 (default; gaps from neighbouring cells or from the USFS map), USFS forest type groups, or TreeMap
    - **Study Area**: one row per unit, from any source ("State: California", "Ecodivision: Mediterranean Mountains", "Pyrome: ...",
      "HUC8: ..."); blank = all of CONUS
    - **Climate Options**: forest growth (None / Miami NPP / Tree ring), non-forest growth, decomposition; when projecting, the
@@ -62,7 +62,7 @@ Library path and, optionally, the Source Result Scenario Id; seconds instead of 
 Two more choices sit beside them. **Carbon Method** (first page of the Carbon Assumptions scenario the Build depends on): dead organic
 matter from FIA measured dead wood (default) or CBM defaults (the CONUS 1km model's way), soil organic carbon from gSSURGO or CBM, and a
 Fill button that writes the method's rows into the other Carbon Assumptions sheets (`defaults/carbon-assumptions/<method>`); stage 3 logs
-spin-up soil against gSSURGO either way. **Land Cover Crosswalks** (Crosswalks group): the EVT 2016, EVT 2001, RCMAP, C-CAP and USFS forest type group
+spin-up soil against gSSURGO either way. **Land Cover Crosswalks** (Crosswalks group): the EVT 2016, RCMAP, C-CAP and USFS forest type group
 crosswalks stage 5 uses, editable per scenario (`defaults/landcover/README.md`).
 
 The starter is made by `tools/new-library.R`, which can also make or update any library directly:

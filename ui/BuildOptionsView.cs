@@ -106,9 +106,9 @@ namespace lucasCoreUI
 
             GroupBox gCover = Group("Land cover", out r,
                 Note("Resampling: Modal gives each cell its most common 30 m Annual NLCD class; it under-counts minority classes (in P26 it keeps a third of the developed area) and cells flicker between classes from year to year. Area-matched makes every class's area in each secondary stratum unit equal its 30 m area, year by year, changing cells only where the 30 m totals move; developed land is only added, never removed. State classes and land-use transitions both come from the resampled maps."));
-            r.Controls.Add(Caption("Forest type map:")); r.Controls.Add(List(m_forest, 200));
+            r.Controls.Add(Caption("Forest type map:")); r.Controls.Add(List(m_forest, 330));
             r.Controls.Add(Caption("Stand age:")); r.Controls.Add(List(m_age, 260));
-            r.Controls.Add(Note("The forest type map assigns the forest type of forest cells; other cover comes from NLCD, RCMAP and C-CAP. TreeMap (USFS, 30 m) gives every forest pixel an FIA plot: its forest type group, and its stand age moved from the plot's inventory year to the start year. Data Sources: TreeMap Folder, and the FIA DataMart Folder for the plots' COND tables."));
+            r.Controls.Add(Note("The forest type map assigns the forest type of forest cells; other cover comes from NLCD, RCMAP (1985 vegetation state) and C-CAP. LANDFIRE EVT 2016 has no forest type on recently burned, logged or shrub-classed ground: those pixels take the cell's other pixels and else its neighbours, or the USFS forest type group map (Data Sources: USFS Forest Type Groups); in the Northern Sierra either keeps about 95% of forest cells' type. TreeMap (USFS, 30 m) gives every forest pixel an FIA plot: its forest type group, and its stand age moved from the plot's inventory year to the start year. Data Sources: TreeMap Folder, and the FIA DataMart Folder for the plots' COND tables."));
             r.Controls.Add(Caption("Resampling to the grid:")); r.Controls.Add(List(m_resample, 330));
 
             GroupBox gGrowth = Group("Growth", out r,
@@ -145,7 +145,7 @@ namespace lucasCoreUI
             base.LoadDataFeed(dataFeed);
             // the forest type list is bound: its items carry the column's list values
             m_forest.DisplayMember = "Name"; m_forest.ValueMember = "Value";
-            m_forest.DataSource = new List<Item> { new Item { Value = 1, Name = "LANDFIRE EVT" }, new Item { Value = 2, Name = "USFS forest type groups" }, new Item { Value = 3, Name = "TreeMap (FIA plots)" } };
+            m_forest.DataSource = new List<Item> { new Item { Value = 1, Name = "LANDFIRE EVT (gaps from neighbouring cells)" }, new Item { Value = 4, Name = "LANDFIRE EVT (gaps from USFS forest type groups)" }, new Item { Value = 2, Name = "USFS forest type groups" }, new Item { Value = 3, Name = "TreeMap (FIA plots)" } };
             this.SetComboBoxBinding(m_forest, "ForestTypeMap");
             m_age.DisplayMember = "Name"; m_age.ValueMember = "Value";
             m_age.DataSource = new List<Item> { new Item { Value = 1, Name = "NASA CMS Forest Age 1990" }, new Item { Value = 2, Name = "TreeMap (FIA plot stand age)" } };

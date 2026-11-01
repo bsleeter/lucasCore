@@ -16,9 +16,9 @@
 		<column name="FiaDisturbanceFile" displayName="FIA Condition Disturbance and Treatment Codes (USGS .Rds)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FIA/USGS_forest_conditions_dstrbcd_and_trtcd_20240213.Rds"/>
 		<column name="FiaDataMartFolder" displayName="FIA DataMart Folder (state PLOT, COND, TREE csvs and FIADB_REFERENCE)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FIA/DataMart"/>
 		<column name="NlcdFolder" displayName="Annual NLCD Folder (Annual_NLCD_LndCov_year_CU_C1V0.tif or _C1V2.tif)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/NLCD/Annual NLCD"/>
-		<column name="Evt2001File" displayName="LANDFIRE EVT 2001 (LF 1.0.5)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/EVT/US_105_EVT/US_105_EVT/Tif/us_105evt.tif"/>
+		<column name="Evt2001File" displayName="LANDFIRE EVT 2001 (retired 2026-11-01: not read; LANDFIRE no longer publishes it)" dataType="String" isOptional="True" isVisible="False"/>
 		<column name="Evt2016File" displayName="LANDFIRE EVT 2016 (LF 2.0.0)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/EVT/LF2016_EVT_200_CONUS/LF2016_EVT_200_CONUS/Tif/LC16_EVT_200.tif"/>
-		<column name="RcmapFile" displayName="RCMAP Vegetation Class" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/RCMAP/2001_test2_full_wtih_tree.img"/>
+		<column name="RcmapFile" displayName="RCMAP Vegetation State 1985 (USGS, doi 10.5066/P13OMU52)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/RCMAP/1985_vegetation_state/1985_vegetation_state_20250608.tif"/>
 		<column name="CcapFile" displayName="C-CAP Land Cover 2001" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/CCAP/conus_2001_ccap_landcover_20200311.tif"/>
 		<column name="StandAgeFile" displayName="NASA CMS Forest Age 1990" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Stand Age/cms_age_1990.tif"/>
 		<column name="ForestTypeGroupFolder" displayName="USFS Forest Type Group Map Folder (NFCMS regional *_ForestType.tif)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/NFCMS/Forest Type"/>
@@ -113,7 +113,7 @@
 		<column name="EndYear" displayName="Historical End Year" dataType="Integer" defaultValue="2023" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1985"/>
 		<!-- legacy (libraries made before 2026-10-24): the projection end year is now in Projection Options (Run Settings); stages 9 and 10 still read this one when that is blank -->
 		<column name="ProjectionEndYear" displayName="Projection End Year (legacy: now in Projection > Run Settings)" dataType="Integer" isOptional="True" isVisible="False"/>
-		<column name="ForestTypeMap" displayName="Forest Type Map" dataType="Integer" validationType="List" formula1="1:LANDFIRE EVT|2:USFS forest type groups|3:TreeMap (FIA plots)" defaultValue="1"/>
+		<column name="ForestTypeMap" displayName="Forest Type Map" dataType="Integer" validationType="List" formula1="1:LANDFIRE EVT (gaps from neighbouring cells)|2:USFS forest type groups|3:TreeMap (FIA plots)|4:LANDFIRE EVT (gaps from USFS forest type groups)" defaultValue="1"/>
 		<!-- stage 5 (to-do 35 with 10): where forest stand age comes from (blank = NASA CMS, as Builds before 2026-10-30) -->
 		<column name="StandAgeSource" displayName="Stand Age Source" dataType="Integer" validationType="List" formula1="1:NASA CMS Forest Age 1990|2:TreeMap (FIA plot stand age)" defaultValue="1" isOptional="True"/>
 		<!-- to-do 35 step 4: a growth multiplier per forest cell from its TreeMap plots' site class (blank = none) -->
@@ -501,7 +501,7 @@
 
 	<dataSheet name="LandCoverCrosswalk" displayName="Land Cover Crosswalks" viewClassName="lucasCoreUI.LandCoverCrosswalkView" viewClassAssembly="lucasCoreUI">
 		<!-- stage 5: forest types (state classes 100-999) from EVT, grassland and shrubland types from RCMAP, wetland types (90-96) from C-CAP -->
-		<column name="Source" dataType="Integer" validationType="List" formula1="1:EVT 2016|2:EVT 2001|3:RCMAP|4:C-CAP|5:USFS Forest Type Group"/>
+		<column name="Source" dataType="Integer" validationType="List" formula1="1:EVT 2016|2:EVT 2001 (retired)|3:RCMAP|4:C-CAP|5:USFS Forest Type Group"/>
 		<column name="Code" dataType="Integer"/>
 		<column name="Description" dataType="String" isOptional="True"/>
 		<column name="StateClassId" displayName="State Class" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="stsim_StateClass"/>
@@ -876,7 +876,7 @@
 		<!-- stage 15: one row per dataset -->
 		<column name="DataSource" displayName="Data Sources column" dataType="String"/>
 		<column name="Dataset" dataType="String"/>
-		<column name="Status" displayName="Status (done, skipped, would download, partial, manual, needs login, failed)" dataType="String"/>
+		<column name="Status" displayName="Status (done, skipped, would download, partial, manual, needs login, not needed, failed)" dataType="String"/>
 		<column name="Files" dataType="Integer" isOptional="True"/>
 		<column name="SizeMb" displayName="Size (MB)" dataType="Double" isOptional="True"/>
 		<column name="Minutes" dataType="Double" isOptional="True"/>
