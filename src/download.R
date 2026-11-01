@@ -110,8 +110,9 @@ run_dataset <- function(h, ctx, layout, check_only = FALSE) {
   ctx$dl <- file.path(ctx$home, ".downloads", col)
   items <- h$plan(ctx)
   if (!nrow(items)) return(out("failed", 0, 0, "the source lists no files for these years or this region"))
-  if (!is.null(h$have)) { got <- h$have(ctx, items)
-    if (up && all(got)) { log(sprintf("%s: up to date (all %d asked files in place)", h$name, nrow(items))); return(out("skipped", nrow(read_files(ctx$home)[Column == col]))) }
+  # (only within a covered region: a file in place for a smaller region is fetched again)
+  if (!is.null(h$have) && up) { got <- h$have(ctx, items)
+    if (all(got)) { log(sprintf("%s: up to date (all %d asked files in place)", h$name, nrow(items))); return(out("skipped", nrow(read_files(ctx$home)[Column == col]))) }
     if (any(got)) log(sprintf("%s: %d of %d asked files already in place; fetching the other %d", h$name, sum(got), nrow(items), sum(!got)))
     items <- items[!got] }
   items[, dest := file.path(ctx$dl, file)]; if (!"fetch" %in% names(items)) items[, fetch := TRUE]
@@ -125,7 +126,7 @@ run_dataset <- function(h, ctx, layout, check_only = FALSE) {
   if (nrow(get)) { sizes <- url_sizes(get$url)
     log(sprintf("%s: fetching %d files (%.0f MB%s)", h$name, nrow(get), sum(sizes, na.rm = TRUE) / 1e6, if (anyNA(sizes)) ", some sizes unknown" else ""))
     fetch_files(get$url, get$dest, ctx$connections, log, sizes); mb <- sum(file.size(get$dest), na.rm = TRUE) / 1e6 }
-  if (nrow(remote)) log(sprintf("%s: reading %d archives remotely, writing the region only", h$name, nrow(remote)))
+  if (nrow(remote)) log(if (!is.null(h$method)) sprintf("%s: clipped by its source (%s)", h$name, h$method) else sprintf("%s: reading %d archives remotely, writing the region only", h$name, nrow(remote)))
   log(sprintf("%s: %.0f MB fetched; unpacking%s", h$name, mb, if (is.null(ctx$region$poly) || ctx$keep) "" else " and clipping to the region"))
   path <- h$finish(ctx, items)
   # record: every file under the place, with checksums; the manifest row
@@ -133,7 +134,7 @@ run_dataset <- function(h, ctx, layout, check_only = FALSE) {
   copy <- if (is.null(ctx$region$poly) || ctx$keep || isTRUE(h$national)) "national" else "clipped"
   src <- layout[Column == col]
   write_manifest(ctx$home, data.table::data.table(Column = col, Dataset = h$name, Source = src$Source, Version = if (!is.null(h$version)) h$version else src$Version,
-    Url = paste(unique(dirname(items$url)), collapse = " "), Doi = src$Doi, Method = "direct", Copy = copy,
+    Url = paste(unique(dirname(items$url)), collapse = " "), Doi = src$Doi, Method = if (!is.null(h$method)) h$method else "direct", Copy = copy,
     Units = ctx$region$units, BufferKm = ctx$region$buffer_km, Xmin = ctx$region$box[1], Ymin = ctx$region$box[2], Xmax = ctx$region$box[3], Ymax = ctx$region$box[4],
     Files = nrow(fr), Bytes = sprintf("%.0f", sum(as.numeric(fr$Bytes))), Downloaded = format(Sys.time(), "%Y-%m-%dT%H:%M:%S"), Status = "done",
     Note = if (!is.null(h$note)) h$note else NA_character_))

@@ -20,7 +20,7 @@ BurnProbabilityFile,Disturbance and fire,"FSim burn probability, CONUS 270 m, 3r
 FpaFodFile,Disturbance and fire,"FPA-FOD wildfire occurrence (USFS Research Data Archive, RDS-2013-0009.7)",https://www.fs.usda.gov/rds/archive/catalog/RDS-2013-0009.7,FPA-FOD Fire Occurrence,,file,RDS-2013-0009.7,RDS-2013-0009.7,10.2737/RDS-2013-0009.7,disturbance/fpa-fod/*.gpkg
 PrismFolder,Climate,PRISM annual and normals,https://prism.oregonstate.edu/,PRISM,,file,PRISM,,,climate/prism
 Loca2Folder,Climate,LOCA2 downscaled CMIP6 projections,https://loca.ucsd.edu/,LOCA2,,file,LOCA2,,,climate/loca2
-SoilCarbonFile,Soils and terrain,NRCS gSSURGO,https://www.nrcs.usda.gov/resources/data-and-reports/gridded-soil-survey-geographic-gssurgo-database,gSSURGO Soil Organic Carbon,,file,gSSURGO,,,soils-terrain/gssurgo/*.tif
+SoilCarbonFile,Soils and terrain,NRCS gSSURGO (Data Download: gNATSGO soc0_999),https://www.nrcs.usda.gov/resources/data-and-reports/gridded-soil-survey-geographic-gssurgo-database,gSSURGO Soil Organic Carbon,"Data Download fetches gNATSGO soc0_999, gSSURGO with its gaps filled",service,gSSURGO / gNATSGO,,,soils-terrain/gssurgo/*.tif
 ElevationFile,Soils and terrain,LANDFIRE Elevation,https://landfire.gov/data,LANDFIRE Elevation,,service,LF2020_Elev,LF 2020,,soils-terrain/elevation/*.tif
 NccpiFile,Soils and terrain,gNATSGO NCCPI (Microsoft Planetary Computer),https://planetarycomputer.microsoft.com/dataset/gnatsgo-rasters,gNATSGO Crop Productivity,Blank = fetched for the fitting region from Planetary Computer,service,gnatsgo-rasters,,,soils-terrain/nccpi/*.tif
 RoadsFile,Infrastructure and ownership,LANDFIRE Roads,https://landfire.gov/data,LANDFIRE Roads,,service,LF2023_Roads,LF 2023,,infrastructure/roads/*.tif

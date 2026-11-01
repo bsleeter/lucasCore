@@ -196,8 +196,20 @@ Pushed: everything through 0ce1c25 (2026-10-31), with the guide snapshot rebuilt
    Check only for P26 (about 18 GB with the full LOCA2 model list), a real run and a rerun that skipped. LOCA2 PICKER (2026-11-01,
    user: typed model names were a problem): defaults/download/loca2-catalog.csv (tools/loca2-catalog.R crawls UCSD: 27 models, 108
    model-members, 329 runs) gives the page ticks for scenarios, models and the members the ticked models have; same three columns.
-   ACCESS-ESM1-5, CanESM5 and MPI-ESM1-2-LR have no monthly files in the west cut, so their runs come from the CONUS tree. Six
-   decisions open. TO DO (design agreed with the user, 2026-10-25; not started).
+   ACCESS-ESM1-5, CanESM5 and MPI-ESM1-2-LR have no monthly files in the west cut, so their runs come from the CONUS tree. Defaults:
+   one LOCA2 run; a rerun asking for more runs or years (handlers with have()) fetches only the missing files. PHASE 4 (2026-11-01;
+   user decisions: NLCD C1V2 for all years, gNATSGO soc0_999 for soil carbon, LFPS jobs with an email): ten datasets clipped by their
+   source, each needing a Study Area: NLCD by WCS 1.0.0 tiles on the 30 m grid; EVT 2016, FRI, elevation, roads and disturbance by
+   LFPS jobs (Output_Projection=5070 + 30 m = LANDFIRE's own grid; without it LFPS reprojects to an Albers centred on the box); the
+   disturbance attribute tables ship in defaults/landfire/disturbance (LFPS returns none); the email lives in the home folder's
+   settings.csv (page box under How), not in the scenario, so no schema change; fire perimeters from the six NIFC decade services
+   (the All Years View now holds only 342 perimeters from 2020 on); C-CAP read in place (COG); gNATSGO soil carbon and NCCPI from
+   Planetary Computer 10 m tiles. TESTED P26 into an empty home (about 12 min): C-CAP, EVT, FRI, elevation, roads and disturbance
+   2019-20 identical to the build machine's files; NLCD 2019 C1V2 vs C1V0 differs on 0.001% of cells; gNATSGO vs gSSURGO equal on
+   93% of shared cells (r 0.98; gSSURGO's extra 7% are zeros, which stage 5 treats as missing); perimeters 11,668 vs 10,783 (a newer
+   edition: years differ both ways, 2024 added); a rerun skipped all ten. Phase 5 next (Earthdata login, coverage checks in the
+   Build). Remaining decisions: forest ownership edition, newer editions, whole files kept. TO DO (design agreed with the user,
+   2026-10-25; not started).
    Supersedes the download half of item 11 (LOCA2 becomes one dataset here; 11's list scan/refresh stays). Today the Data Sources page
    (ui/DataSourcesView.cs) links each dataset's download PAGE (defaults/library/data-sources.csv: landfire.gov/data, mrlc.gov/data,
    the USFS archive index, ...), and the user fetches and points to every file by hand.

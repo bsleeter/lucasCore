@@ -54,6 +54,11 @@ home_create <- function(home, pkgdir) {
 read_manifest <- function(home) .home_table(home, "manifest.csv", MANIFEST_COLS)
 read_files <- function(home) .home_table(home, "files.csv", FILES_COLS)
 
+# settings.csv: Key,Value pairs that belong to the person filling the home folder rather than to a scenario (LfpsEmail: the address
+# LANDFIRE Product Service jobs are submitted with; the Data Download page writes it)
+home_setting <- function(home, key) { f <- file.path(home, "settings.csv"); if (!file.exists(f)) return(NA_character_)
+  x <- data.table::fread(f, colClasses = "character", na.strings = ""); v <- x$Value[x$Key == key]; if (length(v)) v[1] else NA_character_ }
+
 # replace the rows of the given columns (manifest: one row per Column; files: every row of those Columns), keep the rest. Written
 # through a temporary file and renamed, so a stopped run never leaves half a table
 .write_home_table <- function(home, name, cols, old, rows) {

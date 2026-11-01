@@ -1,0 +1,152 @@
+Value,Year,Dist_Type,Severity,Confidence,Source1,Source2,Source3,Description,r,g,b,Red,Green,Blue
+0,NA,NA,NA,NA,NA,NA,NA,Background,0,0,0,0,0,0
+11,1999,Wildfire,Unburned/Low,High,MTBS,,,,255,0,0,1,0,0
+12,1999,Wildfire,Low,High,MTBS,,,,255,0,0,1,0,0
+13,1999,Wildfire,Medium,High,MTBS,,,,255,0,0,1,0,0
+14,1999,Wildfire,High,High,MTBS,,,,255,0,0,1,0,0
+15,1999,Wildfire,Increased Green,High,MTBS,,,,255,0,0,1,0,0
+21,1999,Wildfire,Unburned/Low,High,BARC,,,,255,0,0,1,0,0
+22,1999,Wildfire,Low,High,BARC,,,,255,0,0,1,0,0
+23,1999,Wildfire,Medium,High,BARC,,,,255,0,0,1,0,0
+24,1999,Wildfire,High,High,BARC,,,,255,0,0,1,0,0
+25,1999,Wildfire,Water,High,BARC,,,,255,0,0,1,0,0
+31,1999,Wildfire,Unburned/Low,High,RAVG,,,,255,0,0,1,0,0
+32,1999,Wildfire,Low,High,RAVG,,,,255,0,0,1,0,0
+33,1999,Wildfire,Medium,High,RAVG,,,,255,0,0,1,0,0
+34,1999,Wildfire,High,High,RAVG,,,,255,0,0,1,0,0
+411,1999,Development,Low,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,191,191,191,0.749019608,0.749019608,0.749019608
+412,1999,Development,Medium,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,191,191,191,0.749019608,0.749019608,0.749019608
+413,1999,Development,High,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,191,191,191,0.749019608,0.749019608,0.749019608
+421,1999,Clearcut,Low,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,128,97,69,0.501960784,0.380392157,0.270588235
+422,1999,Clearcut,Medium,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,128,97,69,0.501960784,0.380392157,0.270588235
+423,1999,Clearcut,High,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,128,97,69,0.501960784,0.380392157,0.270588235
+431,1999,Harvest,Low,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,255,255,119,1,1,0.466666667
+432,1999,Harvest,Medium,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,255,255,119,1,1,0.466666667
+433,1999,Harvest,High,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,255,255,119,1,1,0.466666667
+441,1999,Thinning,Low,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,181,156,114,0.709803922,0.611764706,0.447058824
+442,1999,Thinning,Medium,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,181,156,114,0.709803922,0.611764706,0.447058824
+443,1999,Thinning,High,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,181,156,114,0.709803922,0.611764706,0.447058824
+451,1999,Mastication,Low,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,255,102,0,1,0.4,0
+452,1999,Mastication,Medium,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,255,102,0,1,0.4,0
+453,1999,Mastication,High,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,255,102,0,1,0.4,0
+461,1999,Other Mechanical,Low,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,96,255,71,0.376470588,1,0.278431373
+462,1999,Other Mechanical,Medium,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,96,255,71,0.376470588,1,0.278431373
+463,1999,Other Mechanical,High,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,96,255,71,0.376470588,1,0.278431373
+471,1999,Wildfire,Low,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,255,0,0,1,0,0
+472,1999,Wildfire,Medium,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,255,0,0,1,0,0
+473,1999,Wildfire,High,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,255,0,0,1,0,0
+481,1999,Wildland Fire Use,Low,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,255,0,0,1,0,0
+482,1999,Wildland Fire Use,Medium,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,255,0,0,1,0,0
+483,1999,Wildland Fire Use,High,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,255,0,0,1,0,0
+491,1999,Prescribed Fire,Low,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,173,0,28,0.678431373,0,0.109803922
+492,1999,Prescribed Fire,Medium,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,173,0,28,0.678431373,0,0.109803922
+493,1999,Prescribed Fire,High,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,173,0,28,0.678431373,0,0.109803922
+501,1999,Wildland Fire,Low,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,255,0,0,1,0,0
+502,1999,Wildland Fire,Medium,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,255,0,0,1,0,0
+503,1999,Wildland Fire,High,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,255,0,0,1,0,0
+511,1999,Weather,Low,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,191,191,191,0.749019608,0.749019608,0.749019608
+512,1999,Weather,Medium,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,191,191,191,0.749019608,0.749019608,0.749019608
+513,1999,Weather,High,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,191,191,191,0.749019608,0.749019608,0.749019608
+521,1999,Insecticide,Low,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,67,162,181,0.262745098,0.635294118,0.709803922
+522,1999,Insecticide,Medium,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,67,162,181,0.262745098,0.635294118,0.709803922
+523,1999,Insecticide,High,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,67,162,181,0.262745098,0.635294118,0.709803922
+531,1999,Chemical,Low,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,255,255,0,1,1,0
+532,1999,Chemical,Medium,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,255,255,0,1,1,0
+533,1999,Chemical,High,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,255,255,0,1,1,0
+541,1999,Insects,Low,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,146,232,215,0.57254902,0.909803922,0.843137255
+542,1999,Insects,Medium,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,146,232,215,0.57254902,0.909803922,0.843137255
+543,1999,Insects,High,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,146,232,215,0.57254902,0.909803922,0.843137255
+551,1999,Disease,Low,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,4,45,117,0.015686275,0.176470588,0.458823529
+552,1999,Disease,Medium,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,4,45,117,0.015686275,0.176470588,0.458823529
+553,1999,Disease,High,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,4,45,117,0.015686275,0.176470588,0.458823529
+561,1999,Insects/Disease,Low,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,0,0,255,0,0,1
+562,1999,Insects/Disease,Medium,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,0,0,255,0,0,1
+563,1999,Insects/Disease,High,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,0,0,255,0,0,1
+571,1999,Herbicide,Low,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,192,255,138,0.752941176,1,0.541176471
+572,1999,Herbicide,Medium,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,192,255,138,0.752941176,1,0.541176471
+573,1999,Herbicide,High,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,192,255,138,0.752941176,1,0.541176471
+581,1999,Biological,Low,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,0,51,0,0,0.2,0
+582,1999,Biological,Medium,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,0,51,0,0,0.2,0
+583,1999,Biological,High,High,Refresh Events,VCT,dNBR,Preliminary RSLC pixels - VCT or dNBR derived - intersect with Refresh Event,0,51,0,0,0.2,0
+601,1999,Unknown,Low,Medium to High,VCT,PAD,,"Anthropogenic causality not expected, most likely fire related (outside Refresh Event, PAD GAP Status equals 1 or 2).",122,127,117,0.478431373,0.498039216,0.458823529
+602,1999,Unknown,Medium,Medium to High,VCT,PAD,,"Anthropogenic causality not expected, most likely fire related (outside Refresh Event, PAD GAP Status equals 1 or 2).",122,127,117,0.478431373,0.498039216,0.458823529
+603,1999,Unknown,High,Medium to High,VCT,PAD,,"Anthropogenic causality not expected, most likely fire related (outside Refresh Event, PAD GAP Status equals 1 or 2).",122,127,117,0.478431373,0.498039216,0.458823529
+701,1999,Unknown,Low,Low to Medium,VCT,PAD,,"Anthropogenic causality likely, but unknown (outside Refresh Event 1km buffer, PAD GAP Status equals 3 or 4).",122,127,117,0.478431373,0.498039216,0.458823529
+702,1999,Unknown,Medium,Low to Medium,VCT,PAD,,"Anthropogenic causality likely, but unknown (outside Refresh Event 1km buffer, PAD GAP Status equals 3 or 4).",122,127,117,0.478431373,0.498039216,0.458823529
+703,1999,Unknown,High,Low to Medium,VCT,PAD,,"Anthropogenic causality likely, but unknown (outside Refresh Event 1km buffer, PAD GAP Status equals 3 or 4).",122,127,117,0.478431373,0.498039216,0.458823529
+711,1999,Development,Low,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",191,191,191,0.749019608,0.749019608,0.749019608
+712,1999,Development,Medium,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",191,191,191,0.749019608,0.749019608,0.749019608
+713,1999,Development,High,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",191,191,191,0.749019608,0.749019608,0.749019608
+721,1999,Clearcut,Low,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",128,97,69,0.501960784,0.380392157,0.270588235
+722,1999,Clearcut,Medium,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",128,97,69,0.501960784,0.380392157,0.270588235
+723,1999,Clearcut,High,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",128,97,69,0.501960784,0.380392157,0.270588235
+731,1999,Harvest,Low,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",255,255,119,1,1,0.466666667
+732,1999,Harvest,Medium,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",255,255,119,1,1,0.466666667
+733,1999,Harvest,High,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",255,255,119,1,1,0.466666667
+741,1999,Thinning,Low,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",181,156,114,0.709803922,0.611764706,0.447058824
+742,1999,Thinning,Medium,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",181,156,114,0.709803922,0.611764706,0.447058824
+743,1999,Thinning,High,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",181,156,114,0.709803922,0.611764706,0.447058824
+751,1999,Mastication,Low,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",255,102,0,1,0.4,0
+752,1999,Mastication,Medium,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",255,102,0,1,0.4,0
+753,1999,Mastication,High,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",255,102,0,1,0.4,0
+761,1999,Other Mechanical,Low,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",96,255,71,0.376470588,1,0.278431373
+762,1999,Other Mechanical,Medium,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",96,255,71,0.376470588,1,0.278431373
+763,1999,Other Mechanical,High,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",96,255,71,0.376470588,1,0.278431373
+771,1999,Wildfire,Low,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",255,0,0,1,0,0
+772,1999,Wildfire,Medium,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",255,0,0,1,0,0
+773,1999,Wildfire,High,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",255,0,0,1,0,0
+781,1999,Wildland Fire Use,Low,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",255,0,0,1,0,0
+782,1999,Wildland Fire Use,Medium,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",255,0,0,1,0,0
+783,1999,Wildland Fire Use,High,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",255,0,0,1,0,0
+791,1999,Prescribed Fire,Low,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",173,0,28,0.678431373,0,0.109803922
+792,1999,Prescribed Fire,Medium,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",173,0,28,0.678431373,0,0.109803922
+793,1999,Prescribed Fire,High,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",173,0,28,0.678431373,0,0.109803922
+801,1999,Wildland Fire,Low,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",255,0,0,1,0,0
+802,1999,Wildland Fire,Medium,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",255,0,0,1,0,0
+803,1999,Wildland Fire,High,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",255,0,0,1,0,0
+811,1999,Weather,Low,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",191,191,191,0.749019608,0.749019608,0.749019608
+812,1999,Weather,Medium,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",191,191,191,0.749019608,0.749019608,0.749019608
+813,1999,Weather,High,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",191,191,191,0.749019608,0.749019608,0.749019608
+821,1999,Insecticide,Low,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",67,162,181,0.262745098,0.635294118,0.709803922
+822,1999,Insecticide,Medium,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",67,162,181,0.262745098,0.635294118,0.709803922
+823,1999,Insecticide,High,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",67,162,181,0.262745098,0.635294118,0.709803922
+831,1999,Chemical,Low,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",255,255,0,1,1,0
+832,1999,Chemical,Medium,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",255,255,0,1,1,0
+833,1999,Chemical,High,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",255,255,0,1,1,0
+841,1999,Insects,Low,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",146,232,215,0.57254902,0.909803922,0.843137255
+842,1999,Insects,Medium,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",146,232,215,0.57254902,0.909803922,0.843137255
+843,1999,Insects,High,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",146,232,215,0.57254902,0.909803922,0.843137255
+851,1999,Disease,Low,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",4,45,117,0.015686275,0.176470588,0.458823529
+852,1999,Disease,Medium,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",4,45,117,0.015686275,0.176470588,0.458823529
+853,1999,Disease,High,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",4,45,117,0.015686275,0.176470588,0.458823529
+861,1999,Insects/Disease,Low,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",0,0,255,0,0,1
+862,1999,Insects/Disease,Medium,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",0,0,255,0,0,1
+863,1999,Insects/Disease,High,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",0,0,255,0,0,1
+871,1999,Herbicide,Low,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",192,255,138,0.752941176,1,0.541176471
+872,1999,Herbicide,Medium,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",192,255,138,0.752941176,1,0.541176471
+873,1999,Herbicide,High,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",192,255,138,0.752941176,1,0.541176471
+881,1999,Biological,Low,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",0,51,0,0,0.2,0
+882,1999,Biological,Medium,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",0,51,0,0,0.2,0
+883,1999,Biological,High,Medium,VCT,dNBR,PAD,"Anthropogenic causality likely, but possibility of other causality type than assigned (preliminary RSLC pixels intersect with Refresh Event 1km buffer, PAD GAP Status equals 0, 3, or 4).",0,51,0,0,0.2,0
+911,1999,Development,Low,Medium to High,Refresh Events,,,"Refresh Event disturbance type, but low confidence severity (always designated as low).",191,191,191,0.749019608,0.749019608,0.749019608
+921,1999,Clearcut,Low,Medium to High,Refresh Events,,,"Refresh Event disturbance type, but low confidence severity (always designated as low).",128,97,69,0.501960784,0.380392157,0.270588235
+931,1999,Harvest,Low,Medium to High,Refresh Events,,,"Refresh Event disturbance type, but low confidence severity (always designated as low).",255,255,119,1,1,0.466666667
+941,1999,Thinning,Low,Medium to High,Refresh Events,,,"Refresh Event disturbance type, but low confidence severity (always designated as low).",181,156,114,0.709803922,0.611764706,0.447058824
+951,1999,Mastication,Low,Medium to High,Refresh Events,,,"Refresh Event disturbance type, but low confidence severity (always designated as low).",255,102,0,1,0.4,0
+961,1999,Other Mechanical,Low,Medium to High,Refresh Events,,,"Refresh Event disturbance type, but low confidence severity (always designated as low).",96,255,71,0.376470588,1,0.278431373
+971,1999,Wildfire,Low,Medium to High,Refresh Events,,,"Refresh Event disturbance type, but low confidence severity (always designated as low).",255,0,0,1,0,0
+981,1999,Wildland Fire Use,Low,Medium to High,Refresh Events,,,"Refresh Event disturbance type, but low confidence severity (always designated as low).",255,0,0,1,0,0
+991,1999,Prescribed Fire,Low,Medium to High,Refresh Events,,,"Refresh Event disturbance type, but low confidence severity (always designated as low).",173,0,28,0.678431373,0,0.109803922
+1001,1999,Wildland Fire,Low,Medium to High,Refresh Events,,,"Refresh Event disturbance type, but low confidence severity (always designated as low).",255,0,0,1,0,0
+1011,1999,Weather,Low,Medium to High,Refresh Events,,,"Refresh Event disturbance type, but low confidence severity (always designated as low).",191,191,191,0.749019608,0.749019608,0.749019608
+1021,1999,Insecticide,Low,Medium to High,Refresh Events,,,"Refresh Event disturbance type, but low confidence severity (always designated as low).",67,162,181,0.262745098,0.635294118,0.709803922
+1031,1999,Chemical,Low,Medium to High,Refresh Events,,,"Refresh Event disturbance type, but low confidence severity (always designated as low).",255,255,0,1,1,0
+1041,1999,Insects,Low,Medium to High,Refresh Events,,,"Refresh Event disturbance type, but low confidence severity (always designated as low).",146,232,215,0.57254902,0.909803922,0.843137255
+1051,1999,Disease,Low,Medium to High,Refresh Events,,,"Refresh Event disturbance type, but low confidence severity (always designated as low).",4,45,117,0.015686275,0.176470588,0.458823529
+1061,1999,Insects/Disease,Low,Medium to High,Refresh Events,,,"Refresh Event disturbance type, but low confidence severity (always designated as low).",0,0,255,0,0,1
+1071,1999,Herbicide,Low,Medium to High,Refresh Events,,,"Refresh Event disturbance type, but low confidence severity (always designated as low).",192,255,138,0.752941176,1,0.541176471
+1081,1999,Biological,Low,Medium to High,Refresh Events,,,"Refresh Event disturbance type, but low confidence severity (always designated as low).",0,51,0,0,0.2,0
+1091,1999,Wildfire,Low,Medium to High,BLM,,,BLM Fires (not mapped from other DB) - Low confidence severity (always designated as low).,255,0,0,1,0,0
+1101,1999,Unknown,Low,Low to Medium,VCT,PAD,,"Every other occurrence, outside Refresh Event 1km buffer, PAD equals 0).",122,127,117,0.478431373,0.498039216,0.458823529
+1102,1999,Unknown,Medium,Low to Medium,VCT,PAD,,"Every other occurrence, outside Refresh Event 1km buffer, PAD equals 0).",122,127,117,0.478431373,0.498039216,0.458823529
+1103,1999,Unknown,High,Low to Medium,VCT,PAD,,"Every other occurrence, outside Refresh Event 1km buffer, PAD equals 0).",122,127,117,0.478431373,0.498039216,0.458823529

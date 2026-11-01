@@ -1,10 +1,10 @@
 Column,Method,Clip,Login,Endpoint,Product,SizeGb,Note,Fetched
 EcodivisionFile,package,none,none,,defaults/strata/ecodivisions/EcoDivisions_Dissolve.shp,0.009,Shipped with the package (ECOMAP 2007 divisions); kept national: its extent sets the model lattice,no
-NlcdFolder,wcs,source,none,https://dmsdata.cr.usgs.gov/geoserver/mrlc_Land-Cover-Native_conus_year_data/wcs,Annual NLCD land cover (one coverage a year),1.4,"WCS 1.0.0 (2.0.1 fails); snap the box to the 30 m grid; published as Collection 1.2 (C1V2) only; size is one year, whole",no
+NlcdFolder,wcs,source,none,https://dmsdata.cr.usgs.gov/geoserver/mrlc_Land-Cover-Native_conus_year_data/wcs,Annual NLCD land cover (one coverage a year),1.4,"WCS 1.0.0 (2.0.1 fails); snap the box to the 30 m grid; published as Collection 1.2 (C1V2) only; size is one year, whole",yes
 Evt2001File,manual,none,none,,LF 1.0.5 EVT,2.6,No public source: LANDFIRE retired LF 2001 (by request only),no
-Evt2016File,lfps,source,email,https://lfps.usgs.gov/api/products,LF2016_EVT,3.7,"LFPS job; the file is renamed (no ""200"")",no
+Evt2016File,lfps,source,email,https://lfps.usgs.gov/api/products,LF2016_EVT,3.7,"LFPS job; the file is renamed (no ""200"")",yes
 RcmapFile,manual,none,none,,RCMAP vegetation classes,5.6,"No public source for the class map in use; could be rebuilt from the RCMAP components (WCS)",no
-CcapFile,cog,source,none,https://coast.noaa.gov/digitalcoast/data/ccapregional.html,C-CAP Regional Land Cover 2001,0.64,Cloud-optimized GeoTIFF read for the region only; renamed and re-uploaded in 2026,no
+CcapFile,cog,source,none,https://coast.noaa.gov/digitalcoast/data/ccapregional.html,C-CAP Regional Land Cover 2001,0.64,Cloud-optimized GeoTIFF read for the region only; renamed and re-uploaded in 2026,yes
 ForestTypeGroupFolder,file,after,none,https://www.fs.usda.gov/rds/archive/catalog/RDS-2025-0019,NFCMS v3 forest type groups (regional zips),8.8,1.9-8.8 GB a region; the tiles on the build machine predate v3,yes
 TreeMapFolder,file,after,none,https://www.fs.usda.gov/rds/archive/catalog/RDS-2021-0074,TreeMap 2016,5.4,TreeMap 2022 is out (RDS-2025-0032),yes
 FiaConditionFile,manual,none,none,,USGS FIA condition carbon table,0.03,No public source; not needed with Growth Curve Options: FIA Data = FIA DataMart,no
@@ -12,17 +12,17 @@ FiaDisturbanceFile,manual,none,none,,USGS FIA condition disturbance table,0.02,N
 FiaDataMartFolder,file,none,none,https://apps.fs.usda.gov/fia/datamart/datamart.html,"FIA DataMart state CSV zips (PLOT, COND, TREE, COND_DWM_CALC) and FIADB_REFERENCE",15,All 48 states; replaced in place with no version: a re-download rebuilds the cache,yes
 StandAgeFile,login,after,earthdata,https://daac.ornl.gov/cgi-bin/dsviewer.pl?ds_id=1829,ORNL DAAC 1829 forest age 1990 (regional tiles),4.5,Mosaicked from the regional tiles; an Earthdata token or .netrc made outside SyncroSim,no
 MtbsSeverityFolder,file,after,none,https://www.sciencebase.gov/catalog/item/5e91dee782ce172707f02cdd,MTBS burn severity mosaics (one ScienceBase item a year),0.3,Old MTBS paths return 404,yes
-LandfireDisturbanceFolder,lfps,source,email,https://lfps.usgs.gov/api/products,LF2001_Dist99 to LF2025_Dist25,2.1,The DIST_TYPE table may come only in the full zips; layer names changed January 2026,no
+LandfireDisturbanceFolder,lfps,source,email,https://lfps.usgs.gov/api/products,LF2001_Dist99 to LF2025_Dist25,2.1,The DIST_TYPE table may come only in the full zips; layer names changed January 2026,yes
 LcmsFolder,file,after,none,https://data.fs.usda.gov/geodata/rastergateway/LCMS/,LCMS CONUS annual change,0.46,Size is one year; the version is in the file name (v2025-11),yes
-FirePerimeterHistoryFile,rest,source,none,https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/InterAgencyFirePerimeterHistory_All_Years_View/FeatureServer/0,InterAgencyFirePerimeterHistory_All_Years_View,0.63,"Paged query; the year field is FIRE_YEAR_INT; some years are 9999",no
-FriFile,lfps,source,email,https://lfps.usgs.gov/api/products,LF2016_FRI,2.0,LF2016 is still current for CONUS,no
+FirePerimeterHistoryFile,rest,source,none,https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services,InterAgencyFirePerimeterHistory decade services (1979 and prior to 2020s),0,"Paged queries of the six decade services (the All Years View lacks most 2020s perimeters); year field FIRE_YEAR_INT; some years are 9999",yes
+FriFile,lfps,source,email,https://lfps.usgs.gov/api/products,LF2016_FRI,2.0,LF2016 is still current for CONUS,yes
 BurnProbabilityFile,file,after,none,https://www.fs.usda.gov/rds/archive/catalog/RDS-2016-0034-3,FSim CONUS 270 m burn probability (LANDFIRE 2020),1.6,,yes
 FpaFodFile,file,after,none,https://www.fs.usda.gov/rds/archive/catalog/RDS-2013-0009.7,FPA-FOD GeoPackage,0.24,A new edition changes the id,yes
 PrismFolder,file,after,none,https://prism.oregonstate.edu/downloads/,PRISM annual tmean and ppt and the 30-year normals,0.15,"One variable-year a request; a file fetched twice in 24 h is blocked; normals renamed prism_<var>_us_25m_2020_avg_30y",yes
 Loca2Folder,file,source,none,https://cirrus.ucsd.edu/~pierce/LOCA2/,LOCA2 pre-cut NOAA regions,0.084,"Size is one region file; California is in ""west""; version tags differ by variable",yes
-SoilCarbonFile,stac,source,token,https://planetarycomputer.microsoft.com/api/stac/v1/collections/gnatsgo-rasters,gnatsgo-rasters asset soc0_999,0,"Region only, by windowed reads as src/nccpi.R; gNATSGO 2020, not the gSSURGO file in use (a decision for the user)",no
-ElevationFile,lfps,source,email,https://lfps.usgs.gov/api/products,LF2020_Elev,6.4,No full-extent zip found,no
-NccpiFile,stac,source,token,https://planetarycomputer.microsoft.com/api/stac/v1/collections/gnatsgo-rasters,gnatsgo-rasters asset nccpi3all,0,Already fetched by src/nccpi.R when the path is blank; the search is not paged,no
-RoadsFile,lfps,source,email,https://lfps.usgs.gov/api/products,LF2023_Roads,0.54,Buffer the box so nearby roads count,no
+SoilCarbonFile,stac,source,none,https://planetarycomputer.microsoft.com/api/stac/v1/collections/gnatsgo-rasters,gnatsgo-rasters asset soc0_999,0,"Region only (10 m tiles); gNATSGO 2020 soc0_999, chosen 2026-11-01 over the gSSURGO file of the build machine",yes
+ElevationFile,lfps,source,email,https://lfps.usgs.gov/api/products,LF2020_Elev,6.4,No full-extent zip found,yes
+NccpiFile,stac,source,none,https://planetarycomputer.microsoft.com/api/stac/v1/collections/gnatsgo-rasters,gnatsgo-rasters asset nccpi3all,0,Already fetched by src/nccpi.R when the path is blank; the search is not paged,yes
+RoadsFile,lfps,source,email,https://lfps.usgs.gov/api/products,LF2023_Roads,0.54,Buffer the box so nearby roads count,yes
 WuiFolder,file,after,none,https://silvis.forest.wisc.edu/data/wui-change/,SILVIS WUI change 1990-2020 (state geodatabase zips),0.285,"Size is California; AK and HI drop ""v4""",yes
 ForestOwnerFile,file,after,none,https://www.fs.usda.gov/rds/archive/catalog/RDS-2020-0044,USFS forest ownership circa 2017,0.56,Marked out of date; RDS-2025-0045 (2022) changes the classes,yes

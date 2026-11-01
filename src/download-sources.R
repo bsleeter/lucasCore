@@ -181,9 +181,7 @@ download_handlers <- function() {
         if (!length(f)) { ctx$log(sprintf("  LOCA2: no %s %s %s %s files", g, mem, r, v)); return(NULL) }
         data.table::data.table(url = paste0(d, f), file = file.path(g, mem, r, v, sub("[.]monthly[.]west[.]nc$", ".west.monthly.nc", f))) }))))[, fetch := TRUE][] },
     # in place = at the size files.csv recorded for it (a file put there by hand, unrecorded, is fetched again)
-    have = function(ctx, items) { f <- read_files(ctx$home)[Column == "Loca2Folder"]; p <- file.path(ctx$place, items$file)
-      rel <- substring(normalizePath(p, winslash = "/", mustWork = FALSE), nchar(normalizePath(ctx$home, winslash = "/")) + 2)
-      b <- f$Bytes[match(rel, f$Path)]; !is.na(b) & file.exists(p) & file.size(p) == as.numeric(b) },
+    have = function(ctx, items) recorded(ctx, "Loca2Folder", file.path(ctx$place, items$file)),
     finish = function(ctx, items) { for (i in seq_len(nrow(items))) { dest <- file.path(ctx$place, items$file[i]); dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)
         file.rename(items$dest[i], dest) }
       ctx$place })
@@ -201,4 +199,162 @@ download_handlers <- function() {
     finish = function(ctx, items) { dest <- file.path(ctx$place, "forest_own1.tif")
       zip_raster(ctx, items, 1, "Data/forest_own1/forest_own1.tif", dest)
       zip_dbf(ctx, items, 1, "Data/forest_own1/forest_own1.tif.vat.dbf", paste0(dest, ".vat.dbf")); dest })
+
+  # ==== clipped by the source (phase 4): nothing national is fetched; each needs a Study Area ===============================
+
+  # ---- Annual NLCD land cover (Collection 1.2) by WCS 1.0.0, one coverage a year, in tiles on the 30 m grid -----------------
+  H$NlcdFolder <- list(column = "NlcdFolder", name = "Annual NLCD land cover", version = "Collection 1.2 (C1V2)", method = "wcs",
+    note = "Clipped by MRLC's WCS; C1V2 for every year (the only collection published)",
+    plan = function(ctx) { need_region(ctx, "Annual NLCD")
+      have <- as.integer(substr(regmatches(x <- rawToChar(curl::curl_fetch_memory(paste0(NLCD_WCS, "?service=WCS&version=1.0.0&request=DescribeCoverage&coverage=", NLCD_COV))$content),
+        gregexpr("(?<=<gml:timePosition>)[0-9]{4}", x, perl = TRUE))[[1]], 1, 4))
+      y <- years_of(ctx, sort(unique(have)))
+      data.table::data.table(year = y, url = NLCD_WCS, file = sprintf("Annual_NLCD_LndCov_%d_CU_C1V2.tif", y), fetch = FALSE) },
+    have = function(ctx, items) recorded(ctx, "NlcdFolder", file.path(ctx$place, items$file)),
+    finish = function(ctx, items) {
+      tl <- grid_tiles(ctx$region$box, c(-2415585, 3314805), 30, 4000)
+      for (i in seq_len(nrow(items))) { y <- items$year[i]
+        u <- sprintf("%s?service=WCS&version=1.0.0&request=GetCoverage&coverage=%s&crs=EPSG:5070&bbox=%.0f,%.0f,%.0f,%.0f&width=%d&height=%d&time=%d-01-01T00:00:00.000Z&format=GeoTIFF",
+                     NLCD_WCS, NLCD_COV, tl$xmin, tl$ymin, tl$xmax, tl$ymax, tl$nx, tl$ny, y)
+        parts <- file.path(ctx$dl, y, sprintf("tile%02d.tif", seq_len(nrow(tl))))
+        fetch_files(u, parts, ctx$connections, ctx$log, sizes = rep(NA_real_, length(u)))
+        mosaic_to(parts, file.path(ctx$place, items$file[i]), "INT1U"); unlink(dirname(parts[1]), recursive = TRUE)
+        ctx$log(sprintf("  NLCD %d (%d tiles)", y, nrow(tl))) }
+      ctx$place })
+
+  # ---- LANDFIRE layers by LANDFIRE Product Service jobs (the job clips; output on LANDFIRE's own grid) -----------------
+  lf_single <- function(column, name, layer, version, out) list(column = column, name = name, version = version, method = "lfps",
+    plan = function(ctx) { need_region(ctx, name); lfps_email(ctx); data.table::data.table(url = LFPS, file = out, layer = layer, fetch = FALSE) },
+    finish = function(ctx, items) { b <- lfps_job(ctx, items$layer)
+      dest <- file.path(ctx$place, out); write_band(b, 1, dest); dest })
+  H$Evt2016File <- lf_single("Evt2016File", "LANDFIRE EVT 2016", "LF2016_EVT", "LF 2.0.0 (LF2016_EVT)", "LC16_EVT_200.tif")
+  H$FriFile <- lf_single("FriFile", "LANDFIRE mean fire return interval", "LF2016_FRI", "LF 2016 (LF2016_FRI)", "LC16_FRI_200.tif")
+  H$ElevationFile <- lf_single("ElevationFile", "LANDFIRE elevation", "LF2020_Elev", "LF 2020 (LF2020_Elev)", "LC20_Elev_220.tif")
+  H$RoadsFile <- lf_single("RoadsFile", "LANDFIRE roads", "LF2023_Roads", "LF 2023 (LF2023_Roads)", "LF2023_Roads_CONUS.tif")
+
+  # disturbance: one layer a year (LF2001_Dist99 ... LF2025_Dist25), all the missing years in one job; each year laid out as the
+  # stages read it (US_DIST<year>/<name>/Tif and CSV_Data), with the attribute table shipped in defaults/landfire/disturbance
+  H$LandfireDisturbanceFolder <- list(column = "LandfireDisturbanceFolder", name = "LANDFIRE annual disturbance", version = "LF2001_Dist99 to LF2025_Dist25", method = "lfps",
+    note = "Attribute tables from the package (defaults/landfire/disturbance); 2023 and 2025 tables are the provisional editions'",
+    plan = function(ctx) { need_region(ctx, "LANDFIRE disturbance"); lfps_email(ctx)
+      p <- jsonlite::fromJSON(paste0(LFPS, "/products"))$products; l <- grep("^LF[0-9]{4}_Dist[0-9]{2}$", p$layerName, value = TRUE)
+      yy <- as.integer(sub(".*_Dist", "", l)); yr <- ifelse(yy > 80, 1900L + yy, 2000L + yy)
+      x <- data.table::data.table(year = yr, layer = l)[year %in% years_of(ctx, yr)][order(year)]
+      x[, `:=`(url = LFPS, file = sprintf("US_DIST%d/LF%d_Dist/Tif/LF%d_Dist.tif", year, year, year), fetch = FALSE)][] },
+    have = function(ctx, items) recorded(ctx, "LandfireDisturbanceFolder", file.path(ctx$place, items$file)),
+    finish = function(ctx, items) { b <- lfps_job(ctx, items$layer)
+      for (i in seq_len(nrow(items))) { y <- items$year[i]; write_band(b, i, file.path(ctx$place, items$file[i]))
+        csv <- pkg_file("defaults", "landfire", "disturbance", sprintf("US_DIST%d.csv", y)); cd <- file.path(ctx$place, sprintf("US_DIST%d/LF%d_Dist/CSV_Data", y, y))
+        dir.create(cd, recursive = TRUE, showWarnings = FALSE); file.copy(csv, file.path(cd, sprintf("LF%d_Dist.csv", y)), overwrite = TRUE) }
+      ctx$place })
+
+  # ---- NIFC Interagency Fire Perimeter History by ArcGIS REST, paged (2,000 features a page), to a GeoPackage -----------
+  # from the six decade services: the All Years View holds only 342 perimeters from 2020 on (2026-11-01; the 2020s service has
+  # 18,484), so it no longer matches the shapefile the build machine downloaded
+  H$FirePerimeterHistoryFile <- list(column = "FirePerimeterHistoryFile", name = "Interagency fire perimeter history", version = "InterAgencyFirePerimeterHistory decade services (1979 and prior to 2020s)", method = "rest",
+    plan = function(ctx) data.table::data.table(url = NIFC[1], file = "InterAgencyFirePerimeterHistory.gpkg", fetch = FALSE),
+    finish = function(ctx, items) {
+      geo <- if (is.null(ctx$region$poly)) "" else { b <- region_box_ll(ctx$region)
+        sprintf("&geometry=%f,%f,%f,%f&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects", b[1], b[2], b[3], b[4]) }
+      parts <- lapply(NIFC, function(s) {
+        q <- function(extra) curl::curl_fetch_memory(sprintf("%s/query?where=1%%3D1%s%s", s, geo, extra))
+        n <- jsonlite::fromJSON(rawToChar(q("&returnCountOnly=true&f=json")$content))$count
+        if (!n) return(NULL)
+        pages <- lapply(seq(0, n - 1, by = 2000), function(o) { for (k in 1:4) { r <- tryCatch(q(sprintf("&outFields=*&orderByFields=OBJECTID&resultOffset=%d&resultRecordCount=2000&outSR=4326&f=geojson", o)), error = function(e) NULL)
+            if (!is.null(r) && r$status_code == 200) return(sf::read_sf(rawToChar(r$content), quiet = TRUE)); Sys.sleep(5 * k) }
+          stop(sprintf("fire perimeters: %s page at %d failed", basename(dirname(dirname(s))), o), call. = FALSE) })
+        x <- do.call(rbind, pages)
+        if (nrow(x) != n) stop(sprintf("fire perimeters: %d of %d features came from %s", nrow(x), n, basename(dirname(dirname(s)))), call. = FALSE)
+        ctx$log(sprintf("  %s: %d perimeters", sub("_Read_Only$", "", basename(dirname(dirname(s)))), n)); x })
+      parts <- Filter(Negate(is.null), parts); keep <- Reduce(intersect, lapply(parts, names))
+      x <- sf::st_transform(do.call(rbind, lapply(parts, function(p) p[, keep])), 5070)
+      dest <- file.path(ctx$place, items$file[1]); dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE); if (file.exists(dest)) file.remove(dest)
+      sf::write_sf(x, dest, layer = "perimeters"); dest })
+
+  # ---- NOAA C-CAP 2001 (cloud-optimized GeoTIFF): the region read where it sits, or the whole file fetched for CONUS ------
+  H$CcapFile <- list(column = "CcapFile", name = "C-CAP land cover 2001", version = "C-CAP Regional 2001", method = "cog",
+    plan = function(ctx) data.table::data.table(url = CCAP, file = "conus_2001_ccap_landcover.tif", fetch = !clipping(ctx)),
+    finish = function(ctx, items) { dest <- file.path(ctx$place, items$file[1])
+      clip_raster(if (clipping(ctx)) paste0("/vsicurl/", CCAP) else items$dest[1], dest, if (clipping(ctx)) ctx$region else list(poly = NULL)) })
+
+  # ---- gNATSGO (Planetary Computer): soil organic carbon and crop productivity, the region's 10 m tiles cropped -----------
+  gnatsgo <- function(column, name, asset, out, note) list(column = column, name = name, version = "gNATSGO July 2020 (gnatsgo-rasters)", method = "stac", note = note,
+    plan = function(ctx) { need_region(ctx, name); data.table::data.table(url = PC_STAC, file = out, fetch = FALSE) },
+    finish = function(ctx, items) { dest <- file.path(ctx$place, out); gnatsgo_region(ctx, asset, dest); dest })
+  H$SoilCarbonFile <- gnatsgo("SoilCarbonFile", "gNATSGO soil organic carbon", "soc0_999", "gnatsgo_soc0_999.tif", "gNATSGO soc0_999 (gSSURGO with its gaps filled), not the gSSURGO file of the build machine")
+  H$NccpiFile <- gnatsgo("NccpiFile", "gNATSGO crop productivity (NCCPI)", "nccpi3all", "gnatsgo_nccpi3all.tif", "nccpi3all at 10 m; stage 10 reads it onto its 30 m grid")
   H }
+
+# ---- service helpers (phase 4) ----------------------------------------------------------------------------------------------
+NLCD_WCS <- "https://dmsdata.cr.usgs.gov/geoserver/mrlc_Land-Cover-Native_conus_year_data/wcs"
+NLCD_COV <- "mrlc_Land-Cover-Native_conus_year_data:Land-Cover-Native_conus_year_data"
+LFPS <- "https://lfps.usgs.gov/api"
+NIFC <- sprintf("https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/%s/FeatureServer/0", c("InterAgencyFirePerimeterHistory_1979_And_Prior_Read_Only",
+  "InteragencyFirePerimeterHistory_1980s_Read_Only", "InteragencyFirePerimeterHistory_1990s_Read_Only", "InteragencyFirePerimeterHistor_2000s_Read_Only",
+  "InteragencyFirePerimeterHistory_2010s_Read_Only", "InterAgencyFirePerimeterHistory_2020s_Read_Only"))
+CCAP <- "https://ocmgeodatastor1.blob.core.windows.net/ccap/bulk_download/C-CAP_Regional_30-meter_Data/C-CAP_Regional_Land_Cover_Classification/CONUS/conus_2001_ccap_landcover.tif"
+PC_STAC <- "https://planetarycomputer.microsoft.com/api/stac/v1"
+
+need_region <- function(ctx, what) if (is.null(ctx$region$poly))
+  stop(sprintf("%s is clipped by its source for a Study Area; for all of CONUS fetch the national files by hand", what), call. = FALSE)
+
+# the planned files already recorded in files.csv at their recorded size (a hand-placed, unrecorded file is fetched again)
+recorded <- function(ctx, column, paths) { f <- read_files(ctx$home)[Column == column]
+  rel <- substring(normalizePath(paths, winslash = "/", mustWork = FALSE), nchar(normalizePath(ctx$home, winslash = "/")) + 2)
+  b <- f$Bytes[match(rel, f$Path)]; !is.na(b) & file.exists(paths) & file.size(paths) == as.numeric(b) }
+
+# the region's box snapped outward to a grid (origin = the grid's top-left corner), cut into tiles of at most `px` cells a side
+grid_tiles <- function(box, origin, cell, px) {
+  x0 <- origin[1] + floor((box[1] - origin[1]) / cell) * cell; x1 <- origin[1] + ceiling((box[3] - origin[1]) / cell) * cell
+  y1 <- origin[2] - floor((origin[2] - box[4]) / cell) * cell; y0 <- origin[2] - ceiling((origin[2] - box[2]) / cell) * cell
+  xs <- seq(x0, x1, by = px * cell); if (tail(xs, 1) < x1) xs <- c(xs, x1); ys <- seq(y1, y0, by = -px * cell); if (tail(ys, 1) > y0) ys <- c(ys, y0)
+  t <- data.table::CJ(i = seq_len(length(xs) - 1), j = seq_len(length(ys) - 1))
+  t[, `:=`(xmin = xs[i], xmax = xs[i + 1], ymax = ys[j], ymin = ys[j + 1])][, `:=`(nx = as.integer(round((xmax - xmin) / cell)), ny = as.integer(round((ymax - ymin) / cell)))][] }
+
+# tiles on one grid into one compressed GeoTIFF
+mosaic_to <- function(parts, dest, datatype) { dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)
+  v <- terra::vrt(parts, filename = tempfile(fileext = ".vrt"))
+  terra::writeRaster(v, dest, overwrite = TRUE, datatype = datatype, gdal = c("COMPRESS=DEFLATE", "TILED=YES", "BIGTIFF=IF_SAFER")); dest }
+
+# a band of a multi-band job output written as its own file
+write_band <- function(b, i, dest) { dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)
+  terra::writeRaster(b[[i]], dest, overwrite = TRUE, datatype = terra::datatype(b)[i], gdal = c("COMPRESS=DEFLATE", "TILED=YES", "BIGTIFF=IF_SAFER")); dest }
+
+# the LFPS email: the Data Download page keeps it in the home folder's settings.csv
+lfps_email <- function(ctx) { e <- home_setting(ctx$home, "LfpsEmail")
+  if (is.na(e) || !grepl("@", e)) stop("LANDFIRE: enter an email address on the Data Download page (LANDFIRE Product Service jobs need one)", call. = FALSE)
+  e }
+
+# one LANDFIRE Product Service job: the layers over the region's lon/lat box in EPSG:5070 at 30 m, which is LANDFIRE's own CONUS grid
+# (cells on the national files' 15 m offset, no resampling; without it LFPS reprojects to an Albers centred on the box);
+# waits for it (polling every 15 s, up to 3 hours), fetches its zip and returns the multi-band raster, one band per layer in order
+lfps_job <- function(ctx, layers) {
+  b <- region_box_ll(ctx$region); j <- function(u) jsonlite::fromJSON(rawToChar(curl::curl_fetch_memory(u)$content), simplifyVector = TRUE)
+  s <- j(sprintf("%s/job/submit?Email=%s&Layer_List=%s&Area_of_Interest=%s&Output_Projection=5070&Resample_Resolution=30", LFPS, curl::curl_escape(lfps_email(ctx)), curl::curl_escape(paste(layers, collapse = ";")),
+                 curl::curl_escape(sprintf("%.5f %.5f %.5f %.5f", b[1], b[2], b[3], b[4]))))
+  if (is.null(s$jobId)) stop(sprintf("LFPS refused the job: %s", paste(unlist(s$message), collapse = "; ")), call. = FALSE)
+  ctx$log(sprintf("  LFPS job %s: %d layers", s$jobId, length(layers))); t0 <- Sys.time(); last <- ""
+  repeat { Sys.sleep(15); st <- tryCatch(j(sprintf("%s/job/status?JobId=%s", LFPS, s$jobId)), error = function(e) list(status = "unreachable"))
+    if (!identical(st$status, last)) { ctx$log(sprintf("  LFPS job: %s", st$status)); last <- st$status }
+    if (grepl("Succeeded", st$status)) break
+    if (grepl("Failed|Cancel", st$status)) stop(sprintf("LFPS job %s failed: %s", s$jobId, paste(grep("ERROR", unlist(st$messages), value = TRUE), collapse = "; ")), call. = FALSE)
+    if (difftime(Sys.time(), t0, units = "hours") > 3) stop(sprintf("LFPS job %s still %s after 3 hours", s$jobId, st$status), call. = FALSE) }
+  z <- file.path(ctx$dl, "lfps.zip"); fetch_files(st$outputFile, z, 1, ctx$log, sizes = NA_real_)
+  x <- unzip_to(z, file.path(ctx$dl, "lfps")); r <- terra::rast(grep("[.]tif$", x, value = TRUE)[1])
+  if (terra::nlyr(r) != length(layers)) stop(sprintf("LFPS job returned %d bands for %d layers", terra::nlyr(r), length(layers)), call. = FALSE)
+  r }
+
+# a gNATSGO asset over the region: the STAC items (10 m tiles in EPSG:5070) touching its box, each cropped, then mosaicked
+gnatsgo_region <- function(ctx, asset, dest) {
+  b <- region_box_ll(ctx$region); feats <- list(); u <- sprintf("%s/search?collections=gnatsgo-rasters&bbox=%f,%f,%f,%f&limit=100", PC_STAC, b[1], b[2], b[3], b[4])
+  while (!is.null(u)) { p <- jsonlite::fromJSON(u, simplifyVector = FALSE); feats <- c(feats, p$features)
+    nx <- Filter(function(l) identical(l$rel, "next"), p$links); u <- if (length(nx)) nx[[1]]$href else NULL }
+  if (!length(feats)) stop("no gNATSGO tiles over the region", call. = FALSE)
+  dir.create(ctx$dl, recursive = TRUE, showWarnings = FALSE)
+  tok <- jsonlite::fromJSON("https://planetarycomputer.microsoft.com/api/sas/v1/token/soils/gnatsgo")$token
+  box <- terra::vect(sf::st_as_sfc(sf::st_bbox(setNames(ctx$region$box, c("xmin", "ymin", "xmax", "ymax")), crs = sf::st_crs(5070))))
+  parts <- Filter(Negate(is.null), lapply(feats, function(f) { h <- f$assets[[asset]]$href; if (is.null(h)) return(NULL)
+    r <- terra::rast(sprintf("/vsicurl/%s?%s", h, tok)); e <- terra::intersect(terra::ext(terra::project(box, terra::crs(r))), terra::ext(r)); if (is.null(e)) return(NULL)
+    terra::crop(r, e, snap = "out", filename = tempfile(tmpdir = ctx$dl, fileext = ".tif"), gdal = "COMPRESS=DEFLATE") }))
+  ctx$log(sprintf("  %s: %d tiles", asset, length(parts)))
+  mosaic_to(vapply(parts, terra::sources, ""), dest, terra::datatype(parts[[1]])) }
