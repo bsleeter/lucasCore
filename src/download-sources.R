@@ -155,21 +155,30 @@ download_handlers <- function() {
       lst <- function(x, d) { v <- if (nrow(ctx$opts) && x %in% names(ctx$opts)) ctx$opts[[x]][1] else NA; if (is.na(v) || !nzchar(v)) d else trimws(strsplit(v, ",")[[1]]) }
       models <- lst("Loca2Models", tryCatch(as.character(rsyncrosim::datasheet(ctx$prj, "lucasCore_ClimateModel", optional = TRUE)$Name), error = function(e) character()))
       if (!length(models)) stop("Data Download: list the LOCA2 models (the project's Climate Model list is empty)", call. = FALSE)
-      scen <- lst("Loca2Scenarios", c("ssp245", "ssp370", "ssp585")); want_mem <- lst("Loca2Member", "r1i1p1f1")[1]
+      scen <- lst("Loca2Scenarios", c("ssp245", "ssp370", "ssp585")); want_mem <- lst("Loca2Member", character())
       ll <- if (is.null(ctx$region$poly)) NULL else region_box_ll(ctx$region)
       west <- !is.null(ll) && ll[1] >= -124.69 && ll[3] <= -113.75 && ll[2] >= 31.94 && ll[4] <= 42.06
-      base <- if (west) "https://cirrus.ucsd.edu/~pierce/LOCA2/CONUS_regions_split/%s/west/0p0625deg/%s/%s/%s/" else "https://cirrus.ucsd.edu/~pierce/LOCA2/NAmer/%s/0p0625deg/%s/%s/%s/"
-      ctx$log(sprintf("  LOCA2: %s files, %d models x %d runs", if (west) "west regional" else "CONUS", length(models), length(scen) + 1))
-      # members differ by model (CNRM-ESM2-1 has r1i1p1f2): the asked member when the model has it, else its first
-      member_of <- function(g) { d <- sub("%s/%s/%s/$", "", sprintf(base, g, "%s", "%s", "%s")); h <- tryCatch(rawToChar(curl::curl_fetch_memory(d)$content), error = function(e) "")
-        m <- unique(regmatches(h, gregexpr("(?<=href=\")r[0-9]+i[0-9]+p[0-9]+f[0-9]+(?=/\")", h, perl = TRUE))[[1]])
-        if (!length(m) || want_mem %in% m) return(want_mem)
-        ctx$log(sprintf("  LOCA2: %s has no %s; taking %s", g, want_mem, m[1])); m[1] }
-      data.table::rbindlist(lapply(models, function(g) { mem <- member_of(g); data.table::rbindlist(lapply(c("historical", scen), function(r) data.table::rbindlist(lapply(c("pr", "tasmax", "tasmin"), function(v) {
-        d <- sprintf(base, g, mem, r, v); h <- tryCatch(rawToChar(curl::curl_fetch_memory(d)$content), error = function(e) "")
+      # the runs UCSD serves (defaults/download/loca2-catalog.csv, tools/loca2-catalog.R): members differ by model (CNRM-ESM2-1 has
+      # r1i1p1f2), and three models have no monthly files in the west cut, so those runs come from the CONUS tree. Blank members =
+      # each model's r1i1p1f1, else its first; asked members a model lacks fall back the same way
+      cat2 <- data.table::fread(pkg_file("defaults", "download", "loca2-catalog.csv"))
+      miss <- setdiff(models, cat2$Model); if (length(miss)) ctx$log(sprintf("  LOCA2: not in the UCSD catalog, skipped: %s", paste(miss, collapse = ", ")))
+      first <- function(m) if ("r1i1p1f1" %in% m) "r1i1p1f1" else m[1]
+      runs <- data.table::rbindlist(lapply(intersect(models, cat2$Model), function(g) { m <- unique(cat2[Model == g, Member])
+        mem <- if (length(want_mem)) intersect(want_mem, m) else first(m)
+        if (!length(mem)) { mem <- first(m); ctx$log(sprintf("  LOCA2: %s has none of %s; taking %s", g, paste(want_mem, collapse = ", "), mem)) }
+        cat2[Model == g & Member %in% mem & Scenario %in% c("historical", scen)] }))
+      gone <- unique(runs[, .(Model, Member)])[, .(Scenario = c("historical", scen)), by = .(Model, Member)][!runs, on = .(Model, Member, Scenario)]
+      if (nrow(gone)) ctx$log(sprintf("  LOCA2: UCSD has no %s", paste(gone$Model, gone$Member, gone$Scenario, collapse = ", ")))
+      runs[, tree := if (west) ifelse(West == "yes", "west", "conus") else "conus"]
+      ctx$log(sprintf("  LOCA2: %d runs of %d models (%d west regional, %d CONUS)", nrow(runs), data.table::uniqueN(runs$Model), sum(runs$tree == "west"), sum(runs$tree == "conus")))
+      base <- c(west = "https://cirrus.ucsd.edu/~pierce/LOCA2/CONUS_regions_split/%s/west/0p0625deg/%s/%s/%s/", conus = "https://cirrus.ucsd.edu/~pierce/LOCA2/NAmer/%s/0p0625deg/%s/%s/%s/")
+      data.table::rbindlist(lapply(seq_len(nrow(runs)), function(k) data.table::rbindlist(lapply(c("pr", "tasmax", "tasmin"), function(v) {
+        g <- runs$Model[k]; mem <- runs$Member[k]; r <- runs$Scenario[k]
+        d <- sprintf(base[[runs$tree[k]]], g, mem, r, v); h <- tryCatch(rawToChar(curl::curl_fetch_memory(d)$content), error = function(e) "")
         f <- unique(regmatches(h, gregexpr(sprintf('%s[.][^"]*?[.](west[.]monthly|monthly[.]west|monthly)[.]nc(?=")', v), h, perl = TRUE))[[1]])
         if (!length(f)) { ctx$log(sprintf("  LOCA2: no %s %s %s %s files", g, mem, r, v)); return(NULL) }
-        data.table::data.table(url = paste0(d, f), file = file.path(g, mem, r, v, sub("[.]monthly[.]west[.]nc$", ".west.monthly.nc", f))) })))) }))[, fetch := TRUE][] },
+        data.table::data.table(url = paste0(d, f), file = file.path(g, mem, r, v, sub("[.]monthly[.]west[.]nc$", ".west.monthly.nc", f))) }))))[, fetch := TRUE][] },
     finish = function(ctx, items) { for (i in seq_len(nrow(items))) { dest <- file.path(ctx$place, items$file[i]); dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)
         file.rename(items$dest[i], dest) }
       ctx$place })

@@ -867,9 +867,9 @@
 		<column name="KeepNational" displayName="Keep national copies (else each is clipped to the region)" dataType="Boolean" defaultValue="0" isOptional="True"/>
 		<column name="CheckOnly" displayName="Check only: list what would download, and how big, without fetching" dataType="Boolean" defaultValue="0" isOptional="True"/>
 		<column name="Connections" displayName="Downloads at once" dataType="Integer" defaultValue="4" isOptional="True"/>
-		<column name="Loca2Models" displayName="LOCA2 models (comma separated; blank = the project&apos;s Climate Model list)" dataType="String" isOptional="True"/>
-		<column name="Loca2Scenarios" displayName="LOCA2 scenarios (comma separated; blank = ssp245, ssp370, ssp585)" dataType="String" isOptional="True"/>
-		<column name="Loca2Member" displayName="LOCA2 member (blank = r1i1p1f1)" dataType="String" isOptional="True"/>
+		<column name="Loca2Models" displayName="LOCA2 models (blank = the project&apos;s Climate Model list; the page ticks them from defaults/download/loca2-catalog.csv)" dataType="String" isOptional="True"/>
+		<column name="Loca2Scenarios" displayName="LOCA2 scenarios (blank = ssp245, ssp370, ssp585; historical always comes)" dataType="String" isOptional="True"/>
+		<column name="Loca2Member" displayName="LOCA2 members (blank = each model&apos;s r1i1p1f1, else its first)" dataType="String" isOptional="True"/>
 	</dataSheet>
 
 	<dataSheet name="OutputDataDownload" displayName="Download Results">

@@ -4,7 +4,7 @@
 # In Studio the same scenario is: New Scenario, Pipeline = 15 - Data Download, Study Area = the units, Data Download = the options,
 # and the project's Data Sources: Data Sources Home set. Usage:
 #   Rscript tools/new-data-download.R <library.ssim> --home=<folder> [--units="Pyrome: P26 Northern Sierra Nevada;..."] [--name=...]
-#     [--check-only] [--datasets=A,B] [--years=1985-2025] [--buffer=10] [--models=A,B] [--run]
+#     [--check-only] [--datasets=A,B] [--years=1985-2025] [--buffer=10] [--models=A,B] [--scenarios=ssp245,ssp585] [--members=r1i1p1f1,...] [--run]
 # =============================================================================
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
 a <- commandArgs(TRUE); opt <- function(k, d = NA) { m <- grep(sprintf("^--%s=", k), a, value = TRUE); if (length(m)) sub(sprintf("^--%s=", k), "", m[1]) else d }
@@ -20,7 +20,7 @@ saveDatasheet(S, data.frame(StageNameId = "15 - Data Download", RunOrder = 1L), 
 if (length(units)) saveDatasheet(S, data.frame(UnitId = units), "lucasCore_StudyArea")
 y <- if (is.na(opt("years"))) c(NA, NA) else as.integer(strsplit(opt("years"), "-")[[1]])
 o <- data.frame(BufferKm = as.numeric(opt("buffer", 10)), YearFrom = y[1], YearTo = y[2], Datasets = opt("datasets"), CheckOnly = "--check-only" %in% a,
-                Loca2Models = opt("models"), Connections = 4L)
+                Loca2Models = opt("models"), Loca2Scenarios = opt("scenarios"), Loca2Member = opt("members"), Connections = 4L)
 saveDatasheet(S, o, "lucasCore_DataDownloadOptions")
 description(S) <- sprintf(paste0("Data Download (stage 15): fetches the Data Sources into Data Sources Home (%s) for %s plus %s km. Datasets: %s; years: %s; %s. ",
   "Made by tools/new-data-download.R on %s."), home, if (length(units)) paste(units, collapse = ", ") else "all of CONUS", o$BufferKm,

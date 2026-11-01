@@ -193,7 +193,11 @@ Pushed: everything through 0ce1c25 (2026-10-31), with the guide snapshot rebuilt
    TreeMap (and its .vat.dbf) and PRISM identical to the build machine's files over the region; NFCMS v3 differs from the local tiles
    on 8.7% of PSW cells (the newer edition: a Build on "USFS forest type groups" from a download would change); a rerun skipped all
    11. TreeMap is fetched whole (5.4 GB in about 90 s): its remote read broke. Through SyncroSim (dev/libs/download-test.ssim):
-   Check only for P26 (about 18 GB with the full LOCA2 model list), a real run and a rerun that skipped. Six decisions open. TO DO (design agreed with the user, 2026-10-25; not started).
+   Check only for P26 (about 18 GB with the full LOCA2 model list), a real run and a rerun that skipped. LOCA2 PICKER (2026-11-01,
+   user: typed model names were a problem): defaults/download/loca2-catalog.csv (tools/loca2-catalog.R crawls UCSD: 27 models, 108
+   model-members, 329 runs) gives the page ticks for scenarios, models and the members the ticked models have; same three columns.
+   ACCESS-ESM1-5, CanESM5 and MPI-ESM1-2-LR have no monthly files in the west cut, so their runs come from the CONUS tree. Six
+   decisions open. TO DO (design agreed with the user, 2026-10-25; not started).
    Supersedes the download half of item 11 (LOCA2 becomes one dataset here; 11's list scan/refresh stays). Today the Data Sources page
    (ui/DataSourcesView.cs) links each dataset's download PAGE (defaults/library/data-sources.csv: landfire.gov/data, mrlc.gov/data,
    the USFS archive index, ...), and the user fetches and points to every file by hand.
