@@ -101,12 +101,19 @@ run_dataset <- function(h, ctx, layout, check_only = FALSE) {
   out <- function(status, files = NA_integer_, mb = NA_real_, nxt = NA_character_)
     data.table::data.table(DataSource = col, Dataset = h$name, Status = status, Files = as.integer(files), SizeMb = round(mb, 1),
                            Minutes = round(as.numeric(difftime(Sys.time(), t0, units = "mins")), 2), Next = nxt)
-  if (dataset_up_to_date(ctx$home, col, ctx$region)) { log(sprintf("%s: up to date (manifest and files.csv)", h$name)); return(out("skipped", nrow(read_files(ctx$home)[Column == col]))) }
+  # a handler with have(ctx, items) (one TRUE per planned item already in place) can grow: a rerun asking for more (LOCA2 models,
+  # scenarios, members) fetches only what is missing; without it, a covering manifest means the dataset is done
+  up <- dataset_up_to_date(ctx$home, col, ctx$region)
+  if (up && is.null(h$have)) { log(sprintf("%s: up to date (manifest and files.csv)", h$name)); return(out("skipped", nrow(read_files(ctx$home)[Column == col]))) }
   hp <- layout[Column == col, HomePath]; first <- strsplit(hp, "|", fixed = TRUE)[[1]][1]
   ctx$place <- file.path(ctx$home, if (grepl("*", first, fixed = TRUE)) dirname(first) else first)
   ctx$dl <- file.path(ctx$home, ".downloads", col)
   items <- h$plan(ctx)
   if (!nrow(items)) return(out("failed", 0, 0, "the source lists no files for these years or this region"))
+  if (!is.null(h$have)) { got <- h$have(ctx, items)
+    if (up && all(got)) { log(sprintf("%s: up to date (all %d asked files in place)", h$name, nrow(items))); return(out("skipped", nrow(read_files(ctx$home)[Column == col]))) }
+    if (any(got)) log(sprintf("%s: %d of %d asked files already in place; fetching the other %d", h$name, sum(got), nrow(items), sum(!got)))
+    items <- items[!got] }
   items[, dest := file.path(ctx$dl, file)]; if (!"fetch" %in% names(items)) items[, fetch := TRUE]
   get <- items[fetch == TRUE]; remote <- items[fetch == FALSE]
   if (check_only) { s <- url_sizes(get$url); miss <- sum(is.na(s))

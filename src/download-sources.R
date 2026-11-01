@@ -153,15 +153,16 @@ download_handlers <- function() {
   H$Loca2Folder <- list(column = "Loca2Folder", name = "LOCA2 climate projections", national = TRUE, version = "LOCA2 (UCSD)",
     plan = function(ctx) {
       lst <- function(x, d) { v <- if (nrow(ctx$opts) && x %in% names(ctx$opts)) ctx$opts[[x]][1] else NA; if (is.na(v) || !nzchar(v)) d else trimws(strsplit(v, ",")[[1]]) }
-      models <- lst("Loca2Models", tryCatch(as.character(rsyncrosim::datasheet(ctx$prj, "lucasCore_ClimateModel", optional = TRUE)$Name), error = function(e) character()))
-      if (!length(models)) stop("Data Download: list the LOCA2 models (the project's Climate Model list is empty)", call. = FALSE)
-      scen <- lst("Loca2Scenarios", c("ssp245", "ssp370", "ssp585")); want_mem <- lst("Loca2Member", character())
+      # the runs UCSD serves (defaults/download/loca2-catalog.csv, tools/loca2-catalog.R): members differ by model (CNRM-ESM2-1 has
+      # r1i1p1f2), and three models have no monthly files in the west cut, so those runs come from the CONUS tree. Blank = one run:
+      # the project's first Climate Model UCSD serves (else the catalog's first), ssp245, and each model's r1i1p1f1, else its first;
+      # asked members a model lacks fall back the same way
+      cat2 <- data.table::fread(pkg_file("defaults", "download", "loca2-catalog.csv"))
+      pm <- tryCatch(as.character(rsyncrosim::datasheet(ctx$prj, "lucasCore_ClimateModel", optional = TRUE)$Name), error = function(e) character())
+      models <- lst("Loca2Models", c(intersect(sort(pm), cat2$Model), sort(unique(cat2$Model)))[1])
+      scen <- lst("Loca2Scenarios", "ssp245"); want_mem <- lst("Loca2Member", character())
       ll <- if (is.null(ctx$region$poly)) NULL else region_box_ll(ctx$region)
       west <- !is.null(ll) && ll[1] >= -124.69 && ll[3] <= -113.75 && ll[2] >= 31.94 && ll[4] <= 42.06
-      # the runs UCSD serves (defaults/download/loca2-catalog.csv, tools/loca2-catalog.R): members differ by model (CNRM-ESM2-1 has
-      # r1i1p1f2), and three models have no monthly files in the west cut, so those runs come from the CONUS tree. Blank members =
-      # each model's r1i1p1f1, else its first; asked members a model lacks fall back the same way
-      cat2 <- data.table::fread(pkg_file("defaults", "download", "loca2-catalog.csv"))
       miss <- setdiff(models, cat2$Model); if (length(miss)) ctx$log(sprintf("  LOCA2: not in the UCSD catalog, skipped: %s", paste(miss, collapse = ", ")))
       first <- function(m) if ("r1i1p1f1" %in% m) "r1i1p1f1" else m[1]
       runs <- data.table::rbindlist(lapply(intersect(models, cat2$Model), function(g) { m <- unique(cat2[Model == g, Member])
@@ -179,6 +180,10 @@ download_handlers <- function() {
         f <- unique(regmatches(h, gregexpr(sprintf('%s[.][^"]*?[.](west[.]monthly|monthly[.]west|monthly)[.]nc(?=")', v), h, perl = TRUE))[[1]])
         if (!length(f)) { ctx$log(sprintf("  LOCA2: no %s %s %s %s files", g, mem, r, v)); return(NULL) }
         data.table::data.table(url = paste0(d, f), file = file.path(g, mem, r, v, sub("[.]monthly[.]west[.]nc$", ".west.monthly.nc", f))) }))))[, fetch := TRUE][] },
+    # in place = at the size files.csv recorded for it (a file put there by hand, unrecorded, is fetched again)
+    have = function(ctx, items) { f <- read_files(ctx$home)[Column == "Loca2Folder"]; p <- file.path(ctx$place, items$file)
+      rel <- substring(normalizePath(p, winslash = "/", mustWork = FALSE), nchar(normalizePath(ctx$home, winslash = "/")) + 2)
+      b <- f$Bytes[match(rel, f$Path)]; !is.na(b) & file.exists(p) & file.size(p) == as.numeric(b) },
     finish = function(ctx, items) { for (i in seq_len(nrow(items))) { dest <- file.path(ctx$place, items$file[i]); dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)
         file.rename(items$dest[i], dest) }
       ctx$place })

@@ -6,8 +6,9 @@
 // stage cannot fetch yet (endpoints.csv Fetched = no) are shown greyed with their method. All fetchable ticked writes a blank
 // (every one); otherwise the ticked columns, comma separated. The home folder is shown from the project's Data Sources.
 // LOCA2: ticks from defaults/download/loca2-catalog.csv (the runs UCSD serves; tools/loca2-catalog.R), written to the same comma
-// separated columns. Models: none ticked = blank = the project's Climate Model list (shown ticked). Scenarios: all three = blank;
-// none = historical only. Members: the members the ticked models have; none ticked = blank = each model's r1i1p1f1, else its first.
+// separated columns. Blank (a new scenario) = one run: the project's first Climate Model UCSD serves (else the catalog's first), ssp245,
+// and each model's r1i1p1f1 (else its first). Unticking every model goes back to that one; no scenario ticked = historical only.
+// Members: the members the ticked models have; none ticked = each model's r1i1p1f1, else its first.
 // =============================================================================
 using System;
 using System.Collections.Generic;
@@ -152,7 +153,7 @@ namespace lucasCoreUI
                 m_modelBox[m] = b; m_models.Controls.Add(b);
             }
             lc.Controls.Add(m_models); lc.Controls.Add(m_modelNote);
-            proj.Click += (o, a) => { Write("Loca2Models", DBNull.Value); RefreshControls(); };
+            proj.Click += (o, a) => { List<string> p = ProjectModels().Where(m => m_modelBox.ContainsKey(m)).ToList(); Write("Loca2Models", p.Count == 0 ? (object)DBNull.Value : string.Join(", ", p)); RefreshControls(); };
             all.Click += (o, a) => { Write("Loca2Models", string.Join(", ", m_modelBox.Keys)); RefreshControls(); };
 
             var me = Row(); me.Controls.Add(Caption("Members:")); me.Controls.Add(Note("those the ticked models have; none ticked = each model's r1i1p1f1 (or its first, when it has none)")); lc.Controls.Add(me);
@@ -168,12 +169,19 @@ namespace lucasCoreUI
             return r.Where(x => x.Length > 0).ToList();
         }
 
+        // the stage's blank: the project's first Climate Model (by name) that UCSD serves, else the catalog's first
+        private string DefaultModel()
+        {
+            string p = ProjectModels().Where(m => m_modelBox.ContainsKey(m)).OrderBy(m => m, StringComparer.Ordinal).FirstOrDefault();
+            return p ?? m_modelBox.Keys.OrderBy(m => m, StringComparer.Ordinal).First();
+        }
+
         private static List<string> Split(object v) { return Show(v).Split(',').Select(x => x.Trim()).Where(x => x.Length > 0).ToList(); }
 
         private void WriteScenarios()
         {
             List<string> t = SSPS.Where(s => m_scenBox[s].Checked).ToList();
-            Write("Loca2Scenarios", t.Count == SSPS.Length ? (object)DBNull.Value : t.Count == 0 ? "historical" : string.Join(", ", t)); RefreshControls();
+            Write("Loca2Scenarios", t.Count == 0 ? "historical" : string.Join(", ", t)); RefreshControls();
         }
 
         private void WriteModels()
@@ -192,15 +200,15 @@ namespace lucasCoreUI
         {
             if (m_runs.Count == 0) return;
             List<string> sc = Split(Value("Loca2Scenarios"));
-            foreach (string s in SSPS) m_scenBox[s].Checked = sc.Count == 0 || sc.Contains(s, StringComparer.OrdinalIgnoreCase);
-            List<string> asked = Split(Value("Loca2Models")); bool fromProject = asked.Count == 0;
-            List<string> models = fromProject ? ProjectModels() : asked;
+            foreach (string s in SSPS) m_scenBox[s].Checked = sc.Count == 0 ? s == "ssp245" : sc.Contains(s, StringComparer.OrdinalIgnoreCase);
+            List<string> asked = Split(Value("Loca2Models")); bool byDefault = asked.Count == 0;
+            List<string> models = byDefault ? new List<string> { DefaultModel() } : asked;
             foreach (var kv in m_modelBox) kv.Value.Checked = models.Contains(kv.Key, StringComparer.OrdinalIgnoreCase);
             List<string> unknown = models.Where(m => !m_modelBox.ContainsKey(m)).ToList();
-            m_modelNote.Text = (fromProject ? (models.Count > 0 ? "Ticked: the project's Climate Model list. Tick or untick to choose your own." : "The project's Climate Model list is empty: tick the models to fetch.") : "Your own choice; Project's models goes back to the project's list.")
+            m_modelNote.Text = (byDefault ? "One model by default: the project's first Climate Model UCSD serves. Tick more to fetch them; Project's models ticks the project's whole list." : "Your choice. Untick them all to go back to the one default model.")
                 + (unknown.Count > 0 ? " Not served by UCSD, skipped: " + string.Join(", ", unknown) + "." : "")
                 + " * = no monthly files in UCSD's west cut: those come as the larger CONUS files.";
-            m_modelNote.ForeColor = fromProject && models.Count == 0 ? Color.Firebrick : SystemColors.GrayText;
+            m_modelNote.ForeColor = SystemColors.GrayText;
 
             // members: those the ticked models have, with how many of them have each
             List<string> picked = m_modelBox.Where(kv => kv.Value.Checked).Select(kv => kv.Key).ToList();
@@ -220,7 +228,7 @@ namespace lucasCoreUI
             m_members.ResumeLayout();
 
             // the runs the stage will take
-            var scen = new HashSet<string>(sc.Count == 0 ? SSPS : sc.ToArray(), StringComparer.OrdinalIgnoreCase); scen.Add("historical");
+            var scen = new HashSet<string>(sc.Count == 0 ? new[] { "ssp245" } : sc.ToArray(), StringComparer.OrdinalIgnoreCase); scen.Add("historical");
             int runs = 0, conus = 0;
             foreach (string m in picked)
             {
