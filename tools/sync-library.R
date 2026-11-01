@@ -11,7 +11,8 @@
 #      (core_Sequence)
 #   4. project definitions the package defaults gained (stsim State Attribute Types, Flow Multiplier Types): added through rsyncrosim
 #   5. the stock group memberships of non-result scenarios (the Stock-Flow Definitions scenario), set to the package defaults
-# Close the library in SyncroSim Studio first. Usage: Rscript tools/sync-library.R <library.ssim> [--dry-run] [--reference=<library.ssim>]
+# --columns-only: step 2 alone (a new column; no stages, definitions or Carbon Assumptions scenario), for a library being documented.
+# Close the library in SyncroSim Studio first. Usage: Rscript tools/sync-library.R <library.ssim> [--dry-run] [--columns-only] [--reference=<library.ssim>]
 # =============================================================================
 suppressPackageStartupMessages({ library(DBI); library(RSQLite); library(data.table) })
 a <- commandArgs(TRUE); pos <- a[!grepl("^--", a)]; dry <- "--dry-run" %in% a
@@ -33,6 +34,8 @@ dbBegin(con)
 for (t in tl) { rc <- cols(ref, t); lc <- cols(con, t); miss <- rc[!tolower(name) %in% tolower(lc$name)]
   for (i in seq_len(nrow(miss))) { sql <- sprintf('ALTER TABLE "%s" ADD COLUMN "%s" %s', t, miss$name[i], if (nzchar(miss$type[i])) miss$type[i] else "")
     cat(if (dry) "would add" else "add", t, ".", miss$name[i], miss$type[i], "\n"); if (!dry) dbExecute(con, sql); added <- added + 1 } }
+if ("--columns-only" %in% a) { if (dry) dbRollback(con) else dbCommit(con)
+  cat(sprintf("%s %d column(s); --columns-only: nothing else changed\n", if (dry) "would add" else "added", added)); quit(save = "no") }
 
 # ---- 3. missing transformers and stage names -----------------------------------------------------------------------------
 rt <- as.data.table(dbGetQuery(ref, "SELECT * FROM core_Transformer WHERE PackageName = 'lucasCore'")); lt <- as.data.table(dbGetQuery(con, "SELECT * FROM core_Transformer"))
