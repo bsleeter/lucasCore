@@ -250,7 +250,11 @@ Pushed: everything through 0ce1c25 (2026-10-31), with the guide snapshot rebuilt
    - **Packaging and hosting**: one zip (or a few), size to measure; GitHub release assets are capped at 2 GB per file, so a larger bundle
      goes to a data repository (Zenodo, ScienceBase) with a DOI, linked from the README and the guide's chapter 1. Check each dataset's
      terms allow redistribution of a clip, with attribution.
-14. **FGDC metadata for the model and its outputs** - TO DO (user, 2026-10-25). Completed runs need FGDC-compliant metadata (CSDGM,
+14. **FGDC metadata for the model and its outputs** - PLANNED 2026-10-31 as a metadata and data release generator following USGS
+   FSP (SM 502.7 and 502.8 as reissued 2026-06-01): implementation plan at https://claude.ai/artifact/RoBU7fJ7C7xa6pvg2z8LFK (one
+   content model, CSDGM writer, model record, stage 15 Data Release, Release Information page, mp and content checks, review packet,
+   phases 0-6 ending in a P26 trial release; five decisions open; Phase 0 needs the Center data manager). The 2026-10-25 scope below
+   still holds. TO DO (user, 2026-10-25). Completed runs need FGDC-compliant metadata (CSDGM,
    FGDC-STD-001-1998, as USGS data releases use; XML), in two layers:
    - **Model metadata** (thorough, one record per model): what the model is and how it was built. Identification (title, abstract,
      purpose, originators, citation, keywords, use constraints), extent and time period (study area bounding coordinates, 1985-2023
