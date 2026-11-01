@@ -56,7 +56,7 @@ xsrc <- function(s) xw[Source == s & !is.na(Code)]
 progressBar()
 
 # ---- annual NLCD on the model grid (parallel over years) --------------------------------------------------------------
-years <- y0:y1; nfs <- file.path(src$NlcdFolder, sprintf("Annual_NLCD_LndCov_%d_CU_C1V0.tif", years))
+years <- y0:y1; nfs <- nlcd_file(src$NlcdFolder, years)
 miss <- years[!file.exists(nfs)]; if (length(miss)) fail("Annual NLCD missing for %s", paste(miss, collapse = ", "))
 td <- TD(); pf <- ic$StratumFileName[1]; Lw <- wrap(L)
 cl <- makeCluster(max(1, min(length(years), 20, detectCores() - 1)))

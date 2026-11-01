@@ -5,6 +5,9 @@
   Id = Number x 100,000,000 + the source's own id (src/strata.R). Each scenario then picks, without touching project data:
   - its study area: Study Area sheet, one row per unit of any source (blank = all of CONUS)
   - its secondary and tertiary strata: Build Options (blank = States and Federal Lands, the CONUS 1km model)
+- `ecodivisions/EcoDivisions_Dissolve.shp`: the dissolved FIA ecodivisions (ECOMAP 2007 divisions; fields ecodiv, StrtmId, StrtmNm),
+  shipped because ECOMAP 2025 renumbers the divisions. The FIA Ecodivisions preset points here, and a blank Data Sources:
+  Ecodivision File reads it (src/shared.R, PACKAGE_SOURCES). A relative File in presets.csv is read from this folder.
 - `ecodivisions-list.csv`: FIA ecodivision names by Id, copied from `defaults/stsim/stsim_Stratum.csv` so the ecodivision units carry
   the primary strata's names (the ecodivision shapefile names Id 2601 both "Mediterranean" and "Mediterranean Mountains").
 - `states-list.csv`, `counties-list.csv`, `federal-lands-list.csv`, `gap-status-list.csv`: the names of sources whose polygons do not

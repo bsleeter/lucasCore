@@ -171,7 +171,12 @@ Pushed: everything through 0ce1c25 (2026-10-31), with the guide snapshot rebuilt
    LANDFIRE LFPS, NIFC REST, C-CAP and gNATSGO windowed reads; 12 whole files clipped after; 1 Earthdata login; 4 with no public
    source - EVT 2001, the RCMAP class map, the two USGS FIA tables). Phase 1 fixes package problems the research found: NLCD now
    published only as C1V2 (code hard-codes C1V0), PRISM normals renamed, NIFC field FIRE_YEAR_INT, wrong FSim id and forest type group
-   link in data-sources.csv, ECOMAP 2025 renumbers the divisions (ship the 2007 file). Six decisions open. TO DO (design agreed with the user, 2026-10-25; not started).
+   link in data-sources.csv, ECOMAP 2025 renumbers the divisions (ship the 2007 file). PHASE 1 DONE 2026-10-31: shared.R nlcd_file (C1V0 first, else C1V2),
+   read_fire_perimeters (FIRE_YEAR_INT or FIRE_YEAR_, 9999 dropped; stages 8, 9, 10), growth.R prism_normal (legacy .bil, else
+   prism_<var>_us_25m_<yyyy>_avg_30y); the ecodivisions ship in defaults/strata/ecodivisions (blank EcodivisionFile = the package copy,
+   presets.csv relative); data-sources.csv gained Access (package/service/file/login/user), DatasetId, Version and Doi, with the
+   FSim id (RDS-2016-0034-3) and forest type link (NFCMS v3, RDS-2025-0019) corrected; the page marks user-supplied rows. Existing
+   files resolve exactly as before (plain-R tests). Six decisions open. Phase 2 (home folder, manifest) next. TO DO (design agreed with the user, 2026-10-25; not started).
    Supersedes the download half of item 11 (LOCA2 becomes one dataset here; 11's list scan/refresh stays). Today the Data Sources page
    (ui/DataSourcesView.cs) links each dataset's download PAGE (defaults/library/data-sources.csv: landfire.gov/data, mrlc.gov/data,
    the USFS archive index, ...), and the user fetches and points to every file by hand.

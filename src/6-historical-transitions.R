@@ -118,7 +118,7 @@ if (any(!lc_kind %in% c("standrep", "partial"))) fail("sources.csv: Lcms classes
 lc <- setNames(vapply(yrs, function(y) { f <- Sys.glob(file.path(src$LcmsFolder, y, sprintf("*Change_%d.tif", y))); if (length(f)) f[1] else NA_character_ }, ""), yrs)
 if (nrow(lcg) && anyNA(lc)) say("LCMS missing for %s: no %s in those years", paste(yrs[is.na(lc)], collapse = ", "), paste(lcg$TransitionGroupId, collapse = ", "))
 lf_types <- strsplit(lfg$Classes, "|", fixed = TRUE)
-nf <- setNames(file.path(src$NlcdFolder, sprintf("Annual_NLCD_LndCov_%d_CU_C1V0.tif", (y0):y1)), y0:y1)
+nf <- setNames(nlcd_file(src$NlcdFolder, (y0):y1), y0:y1)
 mt <- setNames(vapply((y0):y1, function(y) { f <- file.path(src$MtbsSeverityFolder, sprintf("mtbs_CONUS_%d.tif", y)); if (file.exists(f)) f else NA_character_ }, ""), y0:y1)
 lf <- setNames(lapply(yrs, function(y) {
   d <- file.path(src$LandfireDisturbanceFolder, sprintf("US_DIST%d", y)); tif <- Sys.glob(file.path(d, "*", "Tif", "*.tif")); csv <- Sys.glob(file.path(d, "*", "CSV_Data", "*.csv"))

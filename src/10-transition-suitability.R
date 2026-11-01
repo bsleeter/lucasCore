@@ -110,7 +110,7 @@ for (s in unique(al$Surface)) { u <- reg_units(s); say("Fitting region of %s: %s
 say("Study area: %s", if (nrow(sa)) paste(sa$UnitId, collapse = ", ") else "all")
 
 # ---- the fitting grid (NLCD 30 m lattice, aggregated to the fitting resolution) and its layer cache ---------------------------
-nl_file <- function(y) file.path(src$NlcdFolder, sprintf("Annual_NLCD_LndCov_%d_CU_C1V0.tif", y))
+nl_file <- function(y) nlcd_file(src$NlcdFolder, y)
 ref <- rast(nl_file(y1)); both <- st_transform(st_union(c(st_transform(region, crs(ref)), st_transform(study, crs(ref)))), crs(ref))
 E30 <- align(ext(vect(both)) + 2000, ref, snap = "out"); fact <- res_f / 30
 G <- if (fact > 1) aggregate(rast(crop(ref, E30)), fact) else rast(crop(ref, E30))
@@ -161,9 +161,8 @@ if (!file.exists(hu_c(2020))) {
   for (d in DECS) writeRaster(rasterize(vect(b), G, sprintf("HUDEN%d", d)), hu_c(d), datatype = "FLT4S", gdal = "COMPRESS=DEFLATE", overwrite = TRUE)
   saveRDS(st_drop_geometry(b)[, "WUICLASS2020", drop = FALSE], file.path(CA, "wui_classes.rds")); write_sf(b[, "WUICLASS2020"], file.path(CA, "wui.gpkg")) }
 bf <- function(y) cf(sprintf("burn_%d", y))
-if (!file.exists(bf(y1))) { lay <- tools::file_path_sans_ext(basename(src$FirePerimeterHistoryFile))
-  fp <- st_read(src$FirePerimeterHistoryFile, query = sprintf('SELECT FIRE_YEAR_ FROM "%s" WHERE FIRE_YEAR_ >= %d AND FIRE_YEAR_ <= %d', lay, y0 - burn_w, y1), quiet = TRUE)
-  fp <- st_make_valid(st_transform(fp, crs(G))); fp <- fp[lengths(st_intersects(fp, st_as_sfc(st_bbox(ext(G), crs = st_crs(crs(G)))))) > 0, ]; fp$yr <- as.integer(fp$FIRE_YEAR_)
+if (!file.exists(bf(y1))) { fp <- read_fire_perimeters(src$FirePerimeterHistoryFile, y0 - burn_w, y1)
+  fp <- st_make_valid(st_transform(fp, crs(G))); fp <- fp[lengths(st_intersects(fp, st_as_sfc(st_bbox(ext(G), crs = st_crs(crs(G)))))) > 0, ]
   for (y in (y0 - burn_w):y1) { s <- fp[fp$yr == y, ]; r <- if (nrow(s)) !is.na(rasterize(vect(s), G, field = 1)) else init(G, 0)
     writeRaster(r, bf(y), datatype = "INT1U", gdal = "COMPRESS=DEFLATE", overwrite = TRUE) } }
 # agriculture distance and share by epoch (agriculture covariates, or adjacency on an agriculture surface)

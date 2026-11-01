@@ -1,5 +1,5 @@
 Preset,Number,Prefix,Description,File,Layer,IdField,NameTemplate,ValueField,CrosswalkFile,ListFile,Dissolve,Overlap,Fill,FillDistance,DefaultId
-FIA Ecodivisions,1,Ecodivision,FIA ecodivisions (the primary strata); Id = StrtmId,F:/lucas-master/Data Sources/FIA/EcoDivision_map/EcoDivisions_Dissolve.shp,,StrtmId,,,,ecodivisions-list.csv,,Last,Nearest,,
+FIA Ecodivisions,1,Ecodivision,FIA ecodivisions (the primary strata); Id = StrtmId,ecodivisions/EcoDivisions_Dissolve.shp,,StrtmId,,,,ecodivisions-list.csv,,Last,Nearest,,
 States,2,State,US states (TIGER 2009); Id = state FIPS. The CONUS 1km secondary strata,F:/lucas-master/Data Sources/Study Areas/States/tl_2009_us_state_conus.shp,,STATEFP,,,,states-list.csv,,Last,Modal,29000,
 Counties,3,County,US counties (TIGER 2022); Id = county GEOID,F:/lucas-master/Data Sources/Study Areas/Counties/tl_rd22_us_county.shp,,GEOID,,,,counties-list.csv,,Last,Modal,29000,
 HUC6,4,HUC6,Watershed basins (WBD HU6); Id = HUC6 code,F:/lucas-master/Data Sources/NHD/WBD_National_GDB.gdb,WBDHU6,huc6,{name} ({huc6}),,,,,Last,Nearest,,

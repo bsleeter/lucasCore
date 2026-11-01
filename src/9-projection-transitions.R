@@ -348,12 +348,11 @@ if (nrow(fire_rows) && fire_m < 3) { g <- fire_g; ms <- mem[[g]]; u <- unit_map(
       if (lost > 0) sprintf("; %.2f%% of the drawn area above probability 1 after slope selectivity (cut)", 100 * lost / max(tot_p, 1e-12)) else "")
   # fire sizes: interagency perimeters (wildfire; daily perimeters and prescribed fire left out; one per incident and year, its
   # largest record) touching the units, in model cells, as the fire group's size distribution
-  fp_src <- read_data_sources("FirePerimeterHistoryFile")$FirePerimeterHistoryFile; lay <- tools::file_path_sans_ext(basename(fp_src))
-  fp <- st_read(fp_src, query = sprintf("SELECT FIRE_YEAR_, INCIDENT, FEATURE_CA, GIS_ACRES FROM \"%s\" WHERE FIRE_YEAR_ >= %d AND FIRE_YEAR_ <= %d", lay, rs, re), quiet = TRUE)
+  fp <- read_fire_perimeters(read_data_sources("FirePerimeterHistoryFile")$FirePerimeterHistoryFile, rs, re, c("INCIDENT", "FEATURE_CA", "GIS_ACRES"))
   fp <- fp[fp$FEATURE_CA %in% c("Wildfire", "Wildfire Final Fire Perimeter", "Wildfire for Resource Benefit") & !is.na(fp$GIS_ACRES) & fp$GIS_ACRES > 0, ]
   upoly <- strata_polygons(rows[[fire_rows$UnitSource[1]]], env$PackageDirectory); upoly <- st_union(upoly[upoly$StratumId %in% units, ])
   fp <- st_transform(st_make_valid(fp), st_crs(upoly)); fp <- fp[lengths(st_intersects(fp, upoly)) > 0, ]
-  fd <- as.data.table(st_drop_geometry(fp))[, .(Acres = max(as.numeric(GIS_ACRES))), by = .(FIRE_YEAR_, Incident = toupper(trimws(INCIDENT)))]
+  fd <- as.data.table(st_drop_geometry(fp))[, .(Acres = max(as.numeric(GIS_ACRES))), by = .(yr, Incident = toupper(trimws(INCIDENT)))]
   cell_ha <- prod(res(P)) / 1e4; n <- pmax(1, round(fd$Acres * 0.40468564224 / cell_ha))
   brk <- c(1, 2, 3, 5, 10, 20, 50, 100, 200, 500, 1e3, 2e3, 5e3, 1e4, 2e4, 5e4, 1e5, 2e5, 5e5, 1e6); br <- brk[brk <= brk[min(which(brk >= max(n)))]]
   cnt <- as.numeric(table(factor(findInterval(n, c(0, br), left.open = TRUE), levels = seq_along(br))))

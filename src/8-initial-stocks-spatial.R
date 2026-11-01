@@ -41,8 +41,7 @@ cell_ha <- (res(P)[1] / 100)^2
 progressBar()
 
 # ---- last disturbance: interagency fire perimeters, 1900 to the start year --------------------------------------------------
-lay <- tools::file_path_sans_ext(basename(src$FirePerimeterHistoryFile))
-fp <- st_read(src$FirePerimeterHistoryFile, query = sprintf('SELECT FIRE_YEAR_ FROM "%s" WHERE FIRE_YEAR_ >= 1900 AND FIRE_YEAR_ <= %d', lay, y0), quiet = TRUE)
+fp <- read_fire_perimeters(src$FirePerimeterHistoryFile, 1900, y0)
 fp <- st_make_valid(st_transform(fp, crs(P)))
 bb <- st_as_sfc(st_bbox(c(xmin = xmin(P), ymin = ymin(P), xmax = xmax(P), ymax = ymax(P)), crs = st_crs(crs(P))))
 fp <- fp[lengths(st_intersects(fp, bb)) > 0, ]

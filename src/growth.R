@@ -91,10 +91,16 @@ fit_forest_type <- function(d, all_eco, clim, opt, lag) {
   out[, `:=`(L = lag, TotalPlots = nrow(d), ConusA = p0[["A"]], ConusK = p0[["k"]], ConusC = p0[["c"]])]
   out[] }
 
+# the annual PRISM normal of a variable under <prism_folder>/normals: the legacy 4 km .bil (PRISM_tmean_30yr_normal_4kmM4_annual_bil),
+# else the current names (prism_tmean_us_25m_2020_avg_30y, renamed 2025; monthly normals carry a month and are left out)
+prism_normal <- function(prism_folder, var) {
+  f <- Sys.glob(file.path(prism_folder, "normals", sprintf("PRISM_%s_30yr_normal_*_annual_bil", var), "*.bil"))
+  if (!length(f)) f <- list.files(file.path(prism_folder, "normals"), sprintf("^prism_%s_us_[^_]+_[0-9]{4}_avg_30y\\.(tif|bil)$", var), recursive = TRUE, full.names = TRUE, ignore.case = TRUE)
+  f[1] }
+
 # ecodivision climate: PRISM normals averaged over each ecodivision polygon, standardised
 ecodiv_climate <- function(eco_file, prism_folder) {
-  f_t <- Sys.glob(file.path(prism_folder, "normals", "PRISM_tmean_30yr_normal_*_annual_bil", "*.bil"))[1]
-  f_p <- Sys.glob(file.path(prism_folder, "normals", "PRISM_ppt_30yr_normal_*_annual_bil", "*.bil"))[1]
+  f_t <- prism_normal(prism_folder, "tmean"); f_p <- prism_normal(prism_folder, "ppt")
   if (is.na(f_t) || is.na(f_p)) stop("PRISM annual tmean/ppt normals not found under ", prism_folder, "/normals", call. = FALSE)
   tm <- terra::rast(f_t); pp <- terra::rast(f_p)
   eco <- terra::vect(sf::st_transform(sf::read_sf(eco_file), terra::crs(tm)))

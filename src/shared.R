@@ -63,13 +63,17 @@ sheet_defaults <- function(name, quiet = FALSE) {
     say("%s is empty: using the package defaults (%s)", name, paste(names(shown), unlist(lapply(shown, as.character)), sep = " = ", collapse = ", ")) }
   as.data.table(out) }
 
-# the project's Data Sources: a blank cell (or an empty sheet) takes the package default path; required columns must exist on disk
+# the project's Data Sources: a blank cell (or an empty sheet) takes the package default path; required columns must exist on disk.
+# Files the package ships: the dissolved FIA ecodivisions (ECOMAP 2007 divisions; ECOMAP 2025 renumbers them, so a fresh download
+# would not match the package's strata tables)
+PACKAGE_SOURCES <- list(EcodivisionFile = c("defaults", "strata", "ecodivisions", "EcoDivisions_Dissolve.shp"))
 read_data_sources <- function(cols) {
   d <- as.data.table(datasheet(prj, ds("DataSource"), lookupsAsFactors = FALSE, optional = TRUE))
   def <- sheet_defaults("DataSource", quiet = TRUE)
   out <- list()
   for (k in cols) { v <- if (nrow(d) && k %in% names(d)) d[[k]][1] else NA_character_
     if (is.na(v) || !nzchar(v)) v <- def[[k]][1]
+    if ((is.null(v) || is.na(v) || !nzchar(v)) && !is.null(PACKAGE_SOURCES[[k]])) v <- do.call(pkg_file, as.list(PACKAGE_SOURCES[[k]]))
     if (is.null(v) || is.na(v) || !nzchar(v)) fail("Data Sources: %s is not set and has no default", k)
     if (!file.exists(v)) fail("Data Sources: %s not found (%s)", k, v)
     out[[k]] <- v }
@@ -125,6 +129,22 @@ write_size_dist <- function(sd, pri, groups, ts) {
 pkg_file <- function(...) file.path(env$PackageDirectory, ...)
 read_default <- function(...) { f <- pkg_file("defaults", ...); if (!file.exists(f)) fail("package default %s is missing", f)
   fread(f, sep = ",", colClasses = "character", na.strings = "", encoding = "UTF-8") }
+
+# the Annual NLCD land cover file of each year: Collection 1.0 (C1V0) or 1.2 (C1V2, the only one MRLC publishes since June 2026).
+# C1V0 first, so a folder holding both keeps the collection earlier Builds used; a year with neither gives the C1V2 name
+nlcd_file <- function(folder, y) vapply(y, function(yy) { f <- file.path(folder, sprintf("Annual_NLCD_LndCov_%d_CU_C1V%d.tif", yy, c(0L, 2L)))
+  if (file.exists(f[1])) f[1] else f[2] }, "")
+
+# interagency fire perimeters of the years y0-y1, with the year as integer column yr. The NIFC feature service (and its GeoPackage)
+# names the year FIRE_YEAR_INT; the shapefile cuts it to FIRE_YEAR_. Perimeters of unknown year carry 9999
+read_fire_perimeters <- function(file, y0, y1, fields = character(0)) {
+  lay <- sf::st_layers(file)$name[1]
+  have <- names(sf::st_read(file, query = sprintf('SELECT * FROM "%s" WHERE FID = 0', lay), quiet = TRUE))
+  yf <- intersect(c("FIRE_YEAR_INT", "FIRE_YEAR_"), have)[1]
+  if (is.na(yf)) fail("Fire perimeters: %s has no FIRE_YEAR_INT or FIRE_YEAR_ field", basename(file))
+  fp <- sf::st_read(file, query = sprintf('SELECT %s FROM "%s" WHERE %s >= %d AND %s <= %d AND %s <> 9999', paste(unique(c(yf, fields)), collapse = ", "),
+                                          lay, yf, as.integer(y0), yf, as.integer(y1), yf), quiet = TRUE)
+  fp$yr <- as.integer(fp[[yf]]); fp }
 
 # Carbon Assumptions - Dead Organic Matter Parameters (to-do 21): the scenario's rows (from its Carbon Assumptions dependency), else the
 # package default (defaults/cbm/dom-parameters.csv); logs every row that differs from the default. Columns as the sheet, Pool as its label.

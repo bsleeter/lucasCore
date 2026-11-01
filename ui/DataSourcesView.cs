@@ -6,7 +6,9 @@
 // dataset (user, 2026-10-28): its name (else the column's display name without bracketed detail) with the note in grey under it, and
 // the column's full display name, source and link in a tooltip; the path; a Browse button (a folder dialog for *Folder columns, a file
 // dialog otherwise); a Download button (the download page); and a check of whether the path exists on this machine. A new library
-// comes with the package's default paths (LibrarySetup); a blank path means the package default (NCCPI: fetched from Planetary Computer).
+// comes with the package's default paths (LibrarySetup); a blank path means the package default (NCCPI: fetched from Planetary Computer;
+// the ecodivisions: the package's own copy). The file's Access column (to-do 12) marks the datasets with no public download "user": their
+// Download button is off and the mark says "user-supplied" until a path is found.
 // =============================================================================
 using System;
 using System.Collections.Generic;
@@ -24,7 +26,7 @@ namespace lucasCoreUI
     {
         protected override string SheetName { get { return "lucasCore_DataSource"; } }
 
-        private class Entry { public string Column, Category, Source, Url, Name, Note; public TextBox Path; public Label State; }
+        private class Entry { public string Column, Category, Source, Url, Name, Note, Access; public TextBox Path; public Label State; }
         private readonly List<Entry> m_entries = new List<Entry>();
         private bool m_built;
 
@@ -58,7 +60,7 @@ namespace lucasCoreUI
             {
                 string[] m; meta.TryGetValue(c.Name, out m);
                 Func<int, string> at = k => m != null && m.Length > k && m[k].Length > 0 ? m[k] : null;
-                m_entries.Add(new Entry { Column = c.Name, Category = at(1) ?? "Other", Source = at(2), Url = at(3), Name = at(4), Note = at(5) });
+                m_entries.Add(new Entry { Column = c.Name, Category = at(1) ?? "Other", Source = at(2), Url = at(3), Name = at(4), Note = at(5), Access = at(6) });
             }
             var order = meta.Values.Select(m => m[1]).Distinct().ToList(); order.Add("Other");
             foreach (string cat in order)
@@ -112,7 +114,7 @@ namespace lucasCoreUI
             m_tip.SetToolTip(name, displayName + (e.Source != null ? Environment.NewLine + "Source: " + e.Source : "") + (e.Url != null ? Environment.NewLine + e.Url : ""));
             e.Path = new TextBox { Width = MinPath, Anchor = AnchorStyles.Left, Margin = new Padding(3, 4, 3, 3) };
             var browse = new Button { Text = "Browse...", AutoSize = true, Margin = new Padding(3, 3, 3, 3) };
-            var download = new Button { Text = "Download", AutoSize = true, Margin = new Padding(3, 3, 3, 3), Enabled = !string.IsNullOrEmpty(e.Url) };
+            var download = new Button { Text = "Download", AutoSize = true, Margin = new Padding(3, 3, 3, 3), Enabled = !string.IsNullOrEmpty(e.Url) && e.Access != "user" };
             if (download.Enabled)
             {
                 string url = e.Url;
@@ -157,9 +159,10 @@ namespace lucasCoreUI
                 try { exists = v.Length > 0 && (File.Exists(v) || Directory.Exists(v)); } catch (Exception) { }
                 if (v.Length == 0)
                 {
-                    e.State.Text = e.Column == "NccpiFile" ? "fetched" : "default";
+                    e.State.Text = e.Column == "NccpiFile" ? "fetched" : e.Access == "package" ? "package copy" : e.Access == "user" ? "user-supplied" : "default";
                     e.State.ForeColor = SystemColors.GrayText;
                 }
+                else if (!exists && e.Access == "user") { e.State.Text = "✗ user-supplied"; e.State.ForeColor = Color.Firebrick; }
                 else { e.State.Text = exists ? "✓" : "✗"; e.State.ForeColor = exists ? Color.ForestGreen : Color.Firebrick; }
             }
         }

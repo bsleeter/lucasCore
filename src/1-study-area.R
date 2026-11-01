@@ -61,7 +61,7 @@ if (length(want)) {
 progressBar()
 
 # ---- land mask: start-year Annual NLCD, modal-aggregated (shared.R, nlcd_on_grid: same blocks as a CONUS build) --------
-nf <- file.path(src$NlcdFolder, sprintf("Annual_NLCD_LndCov_%d_CU_C1V0.tif", y0))
+nf <- nlcd_file(src$NlcdFolder, y0)
 if (!file.exists(nf)) fail("Annual NLCD %d not found: %s", y0, nf)
 n <- nlcd_on_grid(nf, L, R); say("NLCD %d: modal aggregation to %d m", y0, res_m)
 P <- mask(rasterize(vect(eco), R, "StrtmId"), n)
