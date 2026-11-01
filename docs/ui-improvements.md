@@ -180,8 +180,10 @@ Pushed: everything through 0ce1c25 (2026-10-31), with the guide snapshot rebuilt
    HomePath, home_create, manifest.csv / files.csv readers and writers, manifest_covers), read_data_sources reads a blank path's home
    place before the package.xml default (optional = TRUE for NCCPI), defaults/download/endpoints.csv (method, clip, login, endpoint,
    product, size per source), tools/data-home.R (check or --create a home folder), and the Data Sources page's home row (Browse, Make
-   folders, "✓ home" marks, manifest status). A hand-laid home of links (dev/libs/home-test) finds 26 of 27 (NCCPI is fetched). WAITING:
-   the DataSourcesHome column in package.xml, which needs Studio closed and the libraries synced. Six decisions open. TO DO (design agreed with the user, 2026-10-25; not started).
+   folders, "✓ home" marks, manifest status). A hand-laid home of links (dev/libs/home-test) finds 26 of 27 (NCCPI is fetched). The
+   DataSourcesHome column went into package.xml the same day; P26 (guide), P26 Demo, lucasCore-suitability and the two sync references
+   were synced with sync-library --columns-only (reference dev/libs/schema-ref-20261031.ssim); the older dev libraries were already
+   20-40 columns behind and were left. Six decisions open. TO DO (design agreed with the user, 2026-10-25; not started).
    Supersedes the download half of item 11 (LOCA2 becomes one dataset here; 11's list scan/refresh stays). Today the Data Sources page
    (ui/DataSourcesView.cs) links each dataset's download PAGE (defaults/library/data-sources.csv: landfire.gov/data, mrlc.gov/data,
    the USFS archive index, ...), and the user fetches and points to every file by hand.

@@ -9,6 +9,8 @@
 
 	<dataSheet name="DataSource" displayName="Data Sources" dataScope="Project" isSingleRow="True" viewClassName="lucasCoreUI.DataSourcesView" viewClassAssembly="lucasCoreUI">
 		<!-- plain paths: these files are GBs and are read, never copied into the library; an empty sheet uses the defaults -->
+		<!-- Data Sources Home (to-do 12, src/datahome.R): a blank path below reads its standard place in this folder -->
+		<column name="DataSourcesHome" displayName="Data Sources Home (one folder holding every dataset at its standard place)" dataType="String" isOptional="True"/>
 		<column name="EcodivisionFile" displayName="FIA Ecodivisions (dissolved; fields StrtmId, StrtmNm) - primary strata and model lattice; blank = the package copy" dataType="String" isOptional="True"/>
 		<column name="FiaConditionFile" displayName="FIA Condition Carbon and Merchantable Volume (USGS .Rds)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FIA/USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds"/>
 		<column name="FiaDisturbanceFile" displayName="FIA Condition Disturbance and Treatment Codes (USGS .Rds)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FIA/USGS_forest_conditions_dstrbcd_and_trtcd_20240213.Rds"/>
