@@ -166,7 +166,12 @@ Pushed: everything through 0ce1c25 (2026-10-31), with the guide snapshot rebuilt
    used by default"), it fetches only the monthly pr/tasmax/tasmin files for the study area's extent from the LOCA2 archive (UCSD; URL and access
    method to confirm), writes them in that folder layout, then refreshes the lists. Size, resumable downloads and a checksum matter;
    the full CONUS monthly set is large.
-12. **Data Download stage: fetch the Data Sources for a region** - TO DO (design agreed with the user, 2026-10-25; not started).
+12. **Data Download stage: fetch the Data Sources for a region** - PLANNED 2026-10-31: implementation plan at
+   https://claude.ai/artifact/JxEEj2xus6GcEA9rZyjJuQ (every one of the 27 Data Sources researched: 10 clipped by the source - NLCD WCS,
+   LANDFIRE LFPS, NIFC REST, C-CAP and gNATSGO windowed reads; 12 whole files clipped after; 1 Earthdata login; 4 with no public
+   source - EVT 2001, the RCMAP class map, the two USGS FIA tables). Phase 1 fixes package problems the research found: NLCD now
+   published only as C1V2 (code hard-codes C1V0), PRISM normals renamed, NIFC field FIRE_YEAR_INT, wrong FSim id and forest type group
+   link in data-sources.csv, ECOMAP 2025 renumbers the divisions (ship the 2007 file). Six decisions open. TO DO (design agreed with the user, 2026-10-25; not started).
    Supersedes the download half of item 11 (LOCA2 becomes one dataset here; 11's list scan/refresh stays). Today the Data Sources page
    (ui/DataSourcesView.cs) links each dataset's download PAGE (defaults/library/data-sources.csv: landfire.gov/data, mrlc.gov/data,
    the USFS archive index, ...), and the user fetches and points to every file by hand.
