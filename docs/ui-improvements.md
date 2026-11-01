@@ -183,7 +183,13 @@ Pushed: everything through 0ce1c25 (2026-10-31), with the guide snapshot rebuilt
    folders, "✓ home" marks, manifest status). A hand-laid home of links (dev/libs/home-test) finds 26 of 27 (NCCPI is fetched). The
    DataSourcesHome column went into package.xml the same day; P26 (guide), P26 Demo, lucasCore-suitability and the two sync references
    were synced with sync-library --columns-only (reference dev/libs/schema-ref-20261031.ssim); the older dev libraries were already
-   20-40 columns behind and were left. Six decisions open. TO DO (design agreed with the user, 2026-10-25; not started).
+   20-40 columns behind and were left. PHASE 3 (2026-10-31): stage 15 Data Download (src/15-data-download.R, engine src/download.R,
+   handlers src/download-sources.R, page ui/DataDownloadView.cs, tools/new-data-download.R; sync-library --schema-only adds the
+   stage). 11 sources: NFCMS v3 forest types, TreeMap, FSim, LCMS and forest ownership are read inside their remote zips (GDAL
+   /vsizip//vsicurl/) and only the region is written; FIA DataMart (48 states), MTBS (ScienceBase), FPA-FOD, PRISM (HTTP mirror;
+   the web service blocks repeats), LOCA2 (UCSD west regional cut, member per model) and SILVIS WUI (states touched) are fetched,
+   resumed and clipped. P26 Check only: about 5.2 GB to fetch. The legacy PRISM 4 km normals are gone (current normals only), and
+   NFCMS v3 ships no .vat.dbf. Six decisions open. TO DO (design agreed with the user, 2026-10-25; not started).
    Supersedes the download half of item 11 (LOCA2 becomes one dataset here; 11's list scan/refresh stays). Today the Data Sources page
    (ui/DataSourcesView.cs) links each dataset's download PAGE (defaults/library/data-sources.csv: landfire.gov/data, mrlc.gov/data,
    the USFS archive index, ...), and the user fetches and points to every file by hand.

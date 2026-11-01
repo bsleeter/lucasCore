@@ -12,7 +12,8 @@
 #   4. project definitions the package defaults gained (stsim State Attribute Types, Flow Multiplier Types): added through rsyncrosim
 #   5. the stock group memberships of non-result scenarios (the Stock-Flow Definitions scenario), set to the package defaults
 # --columns-only: step 2 alone (a new column; no stages, definitions or Carbon Assumptions scenario), for a library being documented.
-# Close the library in SyncroSim Studio first. Usage: Rscript tools/sync-library.R <library.ssim> [--dry-run] [--columns-only] [--reference=<library.ssim>]
+# --schema-only: steps 2 and 3 (new columns and new stages), nothing else.
+# Close the library in SyncroSim Studio first. Usage: Rscript tools/sync-library.R <library.ssim> [--dry-run] [--columns-only | --schema-only] [--reference=<library.ssim>]
 # =============================================================================
 suppressPackageStartupMessages({ library(DBI); library(RSQLite); library(data.table) })
 a <- commandArgs(TRUE); pos <- a[!grepl("^--", a)]; dry <- "--dry-run" %in% a
@@ -58,6 +59,7 @@ for (i in seq_len(nrow(miss_sv))) { cat(if (dry) "would add stage value for" els
                                                   TransformerId = miss_sv$TransformerId[i], RunOrder = NA_integer_, IsAuto = miss_sv$IsAuto[i]), append = TRUE) }
 if (dry) dbRollback(con) else dbCommit(con)
 cat(sprintf("%s %d column(s) and %d stage(s)\n", if (dry) "would add" else "added", added, nst))
+if ("--schema-only" %in% a) { cat("--schema-only: nothing else changed\n"); quit(save = "no") }
 
 # ---- 4. project definitions the package defaults gained --------------------------------------------------------------------
 if (!dry) { dbDisconnect(con); on.exit(dbDisconnect(ref))

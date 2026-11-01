@@ -41,7 +41,7 @@ home_create <- function(home, pkgdir) {
   dirs <- file.path(home, unique(c(vapply(d$HomePath, function(h) { p <- strsplit(h, "|", fixed = TRUE)[[1]][1]
     if (grepl("*", p, fixed = TRUE)) dirname(p) else p }, ""), "logs")))
   made <- dirs[!dir.exists(dirs)]; for (x in made) dir.create(x, recursive = TRUE)
-  made }
+  invisible(made) }
 
 # ---- manifest.csv and files.csv ------------------------------------------------------------------------------------------
 .home_table <- function(home, name, cols) {

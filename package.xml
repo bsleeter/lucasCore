@@ -858,6 +858,31 @@
 		<column name="Detail" dataType="String" isOptional="True"/>
 	</dataSheet>
 
+	<dataSheet name="DataDownloadOptions" displayName="Data Download" isSingleRow="True" viewClassName="lucasCoreUI.DataDownloadView" viewClassAssembly="lucasCoreUI">
+		<!-- stage 15 (to-do 12, src/download.R): fetch the Data Sources into Data Sources Home for the Study Area units plus a buffer -->
+		<column name="BufferKm" displayName="Buffer around the study area (km)" dataType="Double" defaultValue="10" isOptional="True"/>
+		<column name="YearFrom" displayName="First year of the annual datasets (blank = 1985)" dataType="Integer" isOptional="True"/>
+		<column name="YearTo" displayName="Last year of the annual datasets (blank = the latest each source has)" dataType="Integer" isOptional="True"/>
+		<column name="Datasets" displayName="Datasets (Data Sources columns, comma separated; blank = every one the stage can fetch)" dataType="String" isOptional="True"/>
+		<column name="KeepNational" displayName="Keep national copies (else each is clipped to the region)" dataType="Boolean" defaultValue="0" isOptional="True"/>
+		<column name="CheckOnly" displayName="Check only: list what would download, and how big, without fetching" dataType="Boolean" defaultValue="0" isOptional="True"/>
+		<column name="Connections" displayName="Downloads at once" dataType="Integer" defaultValue="4" isOptional="True"/>
+		<column name="Loca2Models" displayName="LOCA2 models (comma separated; blank = the project&apos;s Climate Model list)" dataType="String" isOptional="True"/>
+		<column name="Loca2Scenarios" displayName="LOCA2 scenarios (comma separated; blank = ssp245, ssp370, ssp585)" dataType="String" isOptional="True"/>
+		<column name="Loca2Member" displayName="LOCA2 member (blank = r1i1p1f1)" dataType="String" isOptional="True"/>
+	</dataSheet>
+
+	<dataSheet name="OutputDataDownload" displayName="Download Results">
+		<!-- stage 15: one row per dataset -->
+		<column name="DataSource" displayName="Data Sources column" dataType="String"/>
+		<column name="Dataset" dataType="String"/>
+		<column name="Status" displayName="Status (done, skipped, would download, partial, manual, failed)" dataType="String"/>
+		<column name="Files" dataType="Integer" isOptional="True"/>
+		<column name="SizeMb" displayName="Size (MB)" dataType="Double" isOptional="True"/>
+		<column name="Minutes" dataType="Double" isOptional="True"/>
+		<column name="Next" displayName="What to do next" dataType="String" isOptional="True"/>
+	</dataSheet>
+
 	<!-- =================================================================================================== -->
 	<!-- TRANSFORMERS                                                                                        -->
 	<!-- =================================================================================================== -->
@@ -1087,6 +1112,13 @@
 	<!-- export: every comparison figure to a folder -->
 	<transformer name="CompareFiguresExport" displayName="Compare Figures" dataSheet="OutputCompareFigure" column="FileName" isFolderExport="True"/>
 
+	<transformer name="DataDownload" displayName="15 - Data Download" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/15-data-download.R">
+		<dataSheet name="DataDownloadOptions" type="Input"/>
+		<dataSheet name="StudyArea" type="Input"/>
+		<dataSheet name="OutputDataDownload" type="Output"/>
+		<dataSheet name="OutputValidation" type="Output"/>
+	</transformer>
+
 	<!-- =================================================================================================== -->
 	<!-- LAYOUTS                                                                                           -->
 	<!-- =================================================================================================== -->
@@ -1133,6 +1165,7 @@
 			</group>
 			<item name="RunFigureOptions"/>
 			<item name="CompareRunOptions"/>
+			<item name="DataDownloadOptions"/>
 			<group name="lucasCoreCrosswalks" displayName="Crosswalks">
 				<item name="LandCoverCrosswalk"/>
 			</group>
@@ -1172,6 +1205,7 @@
 				<item name="OutputCompareFigure"/>
 				<item name="OutputCompareCarbon"/>
 				<item name="OutputCompareLand"/>
+				<item name="OutputDataDownload"/>
 				<item name="OutputValidation"/>
 			</group>
 		</group>
