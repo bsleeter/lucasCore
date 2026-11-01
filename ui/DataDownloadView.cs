@@ -43,6 +43,8 @@ namespace lucasCoreUI
         private readonly Label m_home = new Label { AutoSize = true, Margin = new Padding(3, 7, 3, 3), Font = new Font(SystemFonts.DefaultFont, FontStyle.Bold) };
         private readonly TextBox m_email = new TextBox { Width = 260, Margin = new Padding(3, 3, 6, 3) };
         private readonly Label m_emailNote = new Label { AutoSize = true, Margin = new Padding(3, 7, 3, 3) };
+        private readonly TextBox m_token = new TextBox { Width = 260, Margin = new Padding(3, 3, 6, 3), UseSystemPasswordChar = true };
+        private readonly Label m_tokenNote = new Label { AutoSize = true, Margin = new Padding(3, 7, 3, 3) };
         private string m_homeDir = "";
         private readonly Label m_total = new Label { AutoSize = true, Margin = new Padding(3, 6, 3, 3), ForeColor = SystemColors.GrayText };
         private readonly ToolTip m_tip = new ToolTip { AutoPopDelay = 20000 };
@@ -117,9 +119,12 @@ namespace lucasCoreUI
             var c = Row(); c.Controls.Add(Caption("Downloads at once:")); c.Controls.Add(m_con); c.Controls.Add(Note("blank = 4")); how.Controls.Add(c);
             var em = Row(); em.Controls.Add(Caption("LANDFIRE email:")); em.Controls.Add(m_email); em.Controls.Add(m_emailNote); how.Controls.Add(em);
             how.Controls.Add(Wrapped("The LANDFIRE Product Service clips the LANDFIRE layers to the region and needs an email address with each job. It is kept in the home folder's settings.csv, not in the scenario, so every download into that folder uses it.", 680));
+            var tk = Row(); tk.Controls.Add(Caption("Earthdata token:")); tk.Controls.Add(m_token); tk.Controls.Add(m_tokenNote); how.Controls.Add(tk);
+            how.Controls.Add(Wrapped("NASA CMS forest age needs an Earthdata login: sign in at urs.earthdata.nasa.gov, choose Generate Token, and paste it here (tokens last 60 days). It is kept in plain text in the home folder's settings.csv, so anyone who can open that folder can read it; set the EARTHDATA_TOKEN environment variable instead to keep it out of the folder.", 680));
             AddGroup(Group("How", how));
             EndGroups();
             m_email.Validated += (s, a) => { if (!Refreshing) SaveEmail(); };
+            m_token.Validated += (s, a) => { if (!Refreshing) SaveSetting("EarthdataToken", m_token.Text.Trim()); };
 
             BindNumber(m_buffer, () => Sheet, "BufferKm", false); BindNumber(m_from, () => Sheet, "YearFrom", true);
             BindNumber(m_to, () => Sheet, "YearTo", true); BindNumber(m_con, () => Sheet, "Connections", true);
@@ -274,17 +279,23 @@ namespace lucasCoreUI
 
         private void SaveEmail()
         {
-            if (m_homeDir.Length == 0) return;
             string v = m_email.Text.Trim();
             if (v.Length > 0 && !v.Contains("@")) { MessageBox.Show("That does not look like an email address.", "LANDFIRE email", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
+            SaveSetting("LfpsEmail", v);
+        }
+
+        // a blank value removes the key; other keys are kept
+        private void SaveSetting(string key, string value)
+        {
+            if (m_homeDir.Length == 0) return;
             try
             {
                 string f = Path.Combine(m_homeDir, "settings.csv");
-                var rows = File.Exists(f) ? Csv.Read(f).Skip(1).Where(r => r.Length >= 2 && r[0] != "LfpsEmail").Select(r => r[0] + "," + r[1]).ToList() : new List<string>();
-                if (v.Length > 0) rows.Add("LfpsEmail," + v);
+                var rows = File.Exists(f) ? Csv.Read(f).Skip(1).Where(r => r.Length >= 2 && r[0] != key).Select(r => r[0] + "," + r[1]).ToList() : new List<string>();
+                if (value.Length > 0) rows.Add(key + "," + value);
                 Directory.CreateDirectory(m_homeDir); File.WriteAllLines(f, new[] { "Key,Value" }.Concat(rows));
             }
-            catch (Exception ex) { MessageBox.Show("Could not save the email in the home folder: " + ex.Message, "LANDFIRE email", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+            catch (Exception ex) { MessageBox.Show("Could not save " + key + " in the home folder: " + ex.Message, "Data Download", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
             RefreshControls();
         }
 
@@ -296,6 +307,7 @@ namespace lucasCoreUI
             m_home.Text = home.Length > 0 ? home : "not set: set it on the Data Sources page (project)";
             m_home.ForeColor = home.Length > 0 ? SystemColors.ControlText : Color.Firebrick;
             m_homeDir = home; m_email.Enabled = home.Length > 0; m_email.Text = Setting("LfpsEmail");
+            m_token.Enabled = home.Length > 0; m_token.Text = Setting("EarthdataToken");
             m_buffer.Text = Show(Value("BufferKm")); m_from.Text = Show(Value("YearFrom")); m_to.Text = Show(Value("YearTo")); m_con.Text = Show(Value("Connections"));
             object k = Value("KeepNational"); m_keep.Checked = k != DBNull.Value && Convert.ToBoolean(k);
             object c = Value("CheckOnly"); m_check.Checked = c != DBNull.Value && Convert.ToBoolean(c);
@@ -308,6 +320,9 @@ namespace lucasCoreUI
             bool lf = m_ds.Any(d => d.Box.Checked && d.Method == "lfps"), hasEmail = m_email.Text.Contains("@");
             m_emailNote.Text = home.Length == 0 ? "set Data Sources Home first" : hasEmail ? "" : lf ? "needed: LANDFIRE layers are ticked" : "needed only for the LANDFIRE layers";
             m_emailNote.ForeColor = lf && !hasEmail ? Color.Firebrick : SystemColors.GrayText;
+            bool age = m_ds.Any(d => d.Box.Checked && d.Method == "login"), envTok = (Environment.GetEnvironmentVariable("EARTHDATA_TOKEN") ?? "").Length > 0;
+            m_tokenNote.Text = envTok ? "EARTHDATA_TOKEN is set: it is used first" : m_token.Text.Length > 0 ? "" : age ? "needed: NASA CMS forest age is ticked" : "needed only for NASA CMS forest age";
+            m_tokenNote.ForeColor = age && !envTok && m_token.Text.Length == 0 ? Color.Firebrick : SystemColors.GrayText;
         }
     }
 }

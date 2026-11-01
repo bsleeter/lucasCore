@@ -22,6 +22,7 @@ opt <- read_ds("BuildOptions"); y0 <- opt$StartYear[1]; y1 <- opt$EndYear[1]; ye
 ic <- as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", optional = TRUE, lookupsAsFactors = FALSE))
 if (!nrow(ic) || is.na(ic$StratumFileName[1])) fail("no strata rasters: run stage 1 first (same pipeline, or depend on a stage 1 result)")
 P <- rast(ic$StratumFileName[1])
+home_coverage(P)   # Data Sources read from the home folder must hold the study area (shared.R)
 
 fm <- climate_flows(read_ds("ClimateOptions"), STAGE)
 if (!nrow(fm)) { say("Every climate effect is None: no climate multipliers written (every flow runs at normal climate)"); finish_checks(); progressBar(type = "end"); quit(save = "no") }

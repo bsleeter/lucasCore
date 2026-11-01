@@ -25,6 +25,7 @@ opt <- read_ds("BuildOptions"); y0 <- opt$StartYear[1]; y1 <- opt$EndYear[1]
 ic <- as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", optional = TRUE, lookupsAsFactors = FALSE))
 if (!nrow(ic) || is.na(ic$StratumFileName[1])) fail("no strata rasters: run stage 1 first (same pipeline, or depend on a stage 1 result)")
 P <- rast(ic$StratumFileName[1]); R <- rast(P); m <- !is.na(P); res_m <- res(P)[1]
+home_coverage(P)   # Data Sources read from the home folder must hold the study area (shared.R)
 L <- model_lattice(st_transform(read_sf(src$EcodivisionFile), MODEL_CRS), res_m)
 scl <- stsim_list("StateClass"); stl <- stsim_list("Stratum")
 say("Grid: %d x %d cells of %d m, %d land cells; years %d-%d", ncol(R), nrow(R), res_m, global(m, "sum", na.rm = TRUE)[[1]], y0, y1)

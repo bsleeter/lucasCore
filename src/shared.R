@@ -78,8 +78,9 @@ read_data_sources <- function(cols, optional = FALSE) {
   out <- list()
   for (k in cols) { v <- if (nrow(d) && k %in% names(d)) d[[k]][1] else NA_character_
     if ((is.na(v) || !nzchar(v)) && !is.null(hl) && k %in% hl$Column) { h <- home_path(home, hl[Column == k, HomePath])
-      if (!is.na(h)) v <- h else if (attr(h, "found") > 1) fail("Data Sources: %s is blank and %d files match its place in the home folder (%s); keep one, or set the path",
-                                                                k, attr(h, "found"), file.path(home, hl[Column == k, HomePath])) }
+      if (!is.na(h)) { v <- h; .home_cov$home <- home; .home_cov$used <- union(.home_cov$used, k); if (!is.null(.home_cov$box)) home_covers(k, .home_cov$box, .home_cov$what) }
+      else if (attr(h, "found") > 1) fail("Data Sources: %s is blank and %d files match its place in the home folder (%s); keep one, or set the path",
+                                          k, attr(h, "found"), file.path(home, hl[Column == k, HomePath])) }
     if (is.na(v) || !nzchar(v)) v <- def[[k]][1]
     if ((is.null(v) || is.na(v) || !nzchar(v)) && !is.null(PACKAGE_SOURCES[[k]])) v <- do.call(pkg_file, as.list(PACKAGE_SOURCES[[k]]))
     if (is.null(v) || is.na(v) || !nzchar(v)) { if (optional) { out[k] <- list(NA_character_); next }
@@ -87,6 +88,27 @@ read_data_sources <- function(cols, optional = FALSE) {
     if (!file.exists(v)) fail("Data Sources: %s not found (%s)", k, v)
     out[[k]] <- v }
   out }
+
+# ---- Data Sources Home coverage (to-do 12, phase 5) -------------------------------------------------------------------------
+# A dataset read from the home folder holds only the region its Data Download was run for (manifest.csv). Each Build stage calls
+# home_coverage(<its grid>) once: every home dataset read so far, and every one read after, must cover that grid (less one cell of
+# tolerance, the grid being snapped outward), or the stage stops naming the dataset, the region it holds and what to do. A home
+# file with no manifest row (put there by hand) is not checked; a set path is never checked. home_coverage(x, cols, what) checks
+# the named columns against a wider extent (a fitting region, a kernel's reach) without changing the stage's own.
+.home_cov <- new.env(); .home_cov$used <- character(); .home_cov$box <- NULL; .home_cov$what <- "the study area"
+home_coverage <- function(x, cols = NULL, what = "the study area", warn_only = FALSE) {
+  e <- if (inherits(x, "SpatRaster")) { r <- terra::res(x)[1]; terra::as.polygons(terra::ext(x) - r, crs = terra::crs(x)) } else if (inherits(x, "SpatVector")) terra::as.polygons(terra::ext(x), crs = terra::crs(x)) else terra::vect(sf::st_as_sfc(sf::st_bbox(x)))
+  box <- as.vector(terra::ext(terra::project(e, "EPSG:5070")))[c(1, 3, 2, 4)]
+  if (is.null(cols)) { .home_cov$box <- box; .home_cov$what <- what; cols <- .home_cov$used } else cols <- intersect(cols, .home_cov$used)
+  for (k in cols) if (warn_only) tryCatch(home_covers(k, box, what), error = function(e) say("Warning: %s", sub("^.*?Data Sources: ", "", conditionMessage(e)))) else home_covers(k, box, what)
+  invisible(box) }
+home_covers <- function(k, box, what) {
+  ok <- manifest_covers(.home_cov$home, k, box); if (!isFALSE(ok)) return(invisible(TRUE))
+  m <- read_manifest(.home_cov$home)[Column == k]
+  if (!identical(m$Status, "done")) fail("Data Sources: %s in Data Sources Home is marked %s by its last Data Download (%s); run the Data Download again, or set its path",
+                                         k, m$Status, if (is.na(m$Note)) "no note" else m$Note)
+  fail("Data Sources: %s in Data Sources Home (%s) was downloaded for %s%s and does not cover %s; run a Data Download for this study area (or one holding it) into %s, or set its path",
+       k, m$Dataset, m$Units, if (is.na(m$BufferKm) || !nzchar(m$BufferKm)) "" else sprintf(" + %s km", m$BufferKm), what, .home_cov$home) }
 
 # saveDatasheet goes through text: whole-number doubles go as integers and nothing is written in scientific notation
 options(scipen = 999)

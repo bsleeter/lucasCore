@@ -31,6 +31,7 @@ if (!nrow(ic) || is.na(ic$StateClassFileName[1]) || is.na(ic$AgeFileName[1])) fa
 cv <- as.data.table(datasheet(scn, ds("InitialStockCurve"), optional = TRUE, lookupsAsFactors = FALSE))
 if (!nrow(cv)) fail("Initial Stock Curves are empty: run stage 4 first (same pipeline, or depend on a stage 4 result)")
 P <- rast(ic$StratumFileName[1]); S <- rast(ic$StateClassFileName[1]); A <- rast(ic$AgeFileName[1])
+home_coverage(P)   # Data Sources read from the home folder must hold the study area (shared.R)
 scl <- stsim_list("StateClass"); stl <- stsim_list("Stratum"); stt <- stsim_list("StockType")$Name
 st <- read_default("initialstocks", "stock-types.csv")
 check(STAGE, "every stock type exists", all(st$StockTypeId %in% stt), paste(setdiff(st$StockTypeId, stt), collapse = "; "))

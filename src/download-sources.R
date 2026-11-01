@@ -283,6 +283,31 @@ download_handlers <- function() {
     finish = function(ctx, items) { dest <- file.path(ctx$place, out); gnatsgo_region(ctx, asset, dest); dest })
   H$SoilCarbonFile <- gnatsgo("SoilCarbonFile", "gNATSGO soil organic carbon", "soc0_999", "gnatsgo_soc0_999.tif", "gNATSGO soc0_999 (gSSURGO with its gaps filled), not the gSSURGO file of the build machine")
   H$NccpiFile <- gnatsgo("NccpiFile", "gNATSGO crop productivity (NCCPI)", "nccpi3all", "gnatsgo_nccpi3all.tif", "nccpi3all at 10 m; stage 10 reads it onto its 30 m grid")
+
+  # ==== behind a login (phase 5) ==========================================================================================
+
+  # ---- NASA CMS forest age 1990 (ORNL DAAC 1829): the FIA-region tiles touching the region (boxes from NASA's CMR), fetched
+  # with an Earthdata token, checked against the DAAC's public sha256 files, clipped and mosaicked into one raster -------------
+  H$StandAgeFile <- list(column = "StandAgeFile", name = "NASA CMS forest age 1990", version = "ORNL DAAC 1829 (10.3334/ORNLDAAC/1829)", method = "login",
+    plan = function(ctx) {
+      g <- jsonlite::fromJSON(sprintf("https://cmr.earthdata.nasa.gov/search/granules.json?collection_concept_id=%s&page_size=200&readable_granule_name=*_age_1990.tif&options%%5Breadable_granule_name%%5D%%5Bpattern%%5D=true", CMS_AGE), simplifyVector = FALSE)$feed$entry
+      t <- data.table::rbindlist(lapply(g, function(e) { b <- as.numeric(strsplit(e$boxes[[1]], " ")[[1]])   # south west north east
+        u <- Filter(function(l) grepl("/protected/.*_age_1990[.]tif$", l$href), e$links)
+        if (!length(u)) NULL else data.table::data.table(src = u[[1]]$href, s = b[1], w = b[2], n = b[3], e = b[4]) }))
+      if (!nrow(t)) stop("NASA CMR lists no 1990 forest age tiles", call. = FALSE)
+      if (!is.null(ctx$region$poly)) { ll <- region_box_ll(ctx$region); t <- t[w < ll[3] & e > ll[1] & s < ll[4] & n > ll[2]] }
+      tok <- edl_token(ctx)
+      t[, `:=`(url = vapply(src, edl_signed, "", token = tok), file = basename(src), fetch = TRUE)][] },
+    finish = function(ctx, items) {
+      for (i in seq_len(nrow(items))) { h <- tryCatch(strsplit(rawToChar(curl::curl_fetch_memory(sub("/protected/", "/public/", paste0(items$src[i], ".sha256")))$content), "\\s+")[[1]][1], error = function(e) NA)
+        if (!is.na(h) && !identical(tolower(h), digest::digest(file = items$dest[i], algo = "sha256"))) { unlink(items$dest[i]); stop(sprintf("%s: sha256 does not match the DAAC's; rerun to fetch it again", items$file[i]), call. = FALSE) } }
+      # (CMR's lon/lat boxes overlap: a tile can touch the region's box yet hold no age there; those are left out of the mosaic)
+      parts <- unlist(lapply(seq_len(nrow(items)), function(i) { p <- tryCatch(clip_raster(items$dest[i], file.path(ctx$dl, "clip", items$file[i]), if (clipping(ctx)) ctx$region else list(poly = NULL)), error = function(e) NA_character_)
+        if (is.na(p) || !isTRUE(terra::global(terra::rast(p), "notNA")[[1]] > 0)) NULL else p }))
+      if (!length(parts)) stop("no forest age tile holds cells in the region", call. = FALSE)
+      dest <- file.path(ctx$place, "cms_age_1990.tif"); r <- terra::rast(parts[1])
+      if (length(parts) == 1) { dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE); file.copy(parts, dest, overwrite = TRUE) } else mosaic_to(parts, dest, terra::datatype(r))
+      ctx$log(sprintf("  forest age 1990: %d regional tiles (%s)", nrow(items), paste(sub("_age_1990.tif", "", items$file), collapse = ", "))); dest })
   H }
 
 # ---- service helpers (phase 4) ----------------------------------------------------------------------------------------------
@@ -294,6 +319,24 @@ NIFC <- sprintf("https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/servi
   "InteragencyFirePerimeterHistory_2010s_Read_Only", "InterAgencyFirePerimeterHistory_2020s_Read_Only"))
 CCAP <- "https://ocmgeodatastor1.blob.core.windows.net/ccap/bulk_download/C-CAP_Regional_30-meter_Data/C-CAP_Regional_Land_Cover_Classification/CONUS/conus_2001_ccap_landcover.tif"
 PC_STAC <- "https://planetarycomputer.microsoft.com/api/stac/v1"
+
+CMS_AGE <- "C2389890387-ORNL_CLOUD"   # NASA CMR collection of ORNL DAAC 1829
+
+# the Earthdata token: EARTHDATA_TOKEN in the environment, else the home folder's settings.csv (the Data Download page writes it).
+# A token is made at urs.earthdata.nasa.gov (Generate Token) and lasts 60 days
+edl_token <- function(ctx) { t <- Sys.getenv("EARTHDATA_TOKEN"); if (!nzchar(t)) t <- home_setting(ctx$home, "EarthdataToken")
+  if (is.na(t) || !nzchar(t)) stop("NASA CMS forest age needs an Earthdata login: make a token at urs.earthdata.nasa.gov (Generate Token) and enter it on the Data Download page, or set EARTHDATA_TOKEN", call. = FALSE)
+  t }
+
+# a protected DAAC url to the signed url it redirects to: the token goes with this first request only (the signed url takes no
+# header, and some storage refuses one), so the fetch after it is the ordinary resumable one
+edl_signed <- function(url, token) {
+  h <- curl::new_handle(followlocation = FALSE, range = "0-0", timeout = 60); curl::handle_setheaders(h, Authorization = paste("Bearer", token))
+  r <- curl::curl_fetch_memory(url, handle = h); loc <- curl::parse_headers_list(r$headers)[["location"]]
+  if (r$status_code %in% c(401, 403) || (!is.null(loc) && grepl("urs[.]earthdata", loc)))
+    stop("Earthdata refused the token (tokens last 60 days): make a new one at urs.earthdata.nasa.gov and enter it on the Data Download page", call. = FALSE)
+  if (r$status_code < 300 || r$status_code >= 400 || is.null(loc)) stop(sprintf("%s: the DAAC answered %d, not a redirect", basename(url), r$status_code), call. = FALSE)
+  loc }
 
 need_region <- function(ctx, what) if (is.null(ctx$region$poly))
   stop(sprintf("%s is clipped by its source for a Study Area; for all of CONUS fetch the national files by hand", what), call. = FALSE)

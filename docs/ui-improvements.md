@@ -207,8 +207,17 @@ Pushed: everything through 0ce1c25 (2026-10-31), with the guide snapshot rebuilt
    Planetary Computer 10 m tiles. TESTED P26 into an empty home (about 12 min): C-CAP, EVT, FRI, elevation, roads and disturbance
    2019-20 identical to the build machine's files; NLCD 2019 C1V2 vs C1V0 differs on 0.001% of cells; gNATSGO vs gSSURGO equal on
    93% of shared cells (r 0.98; gSSURGO's extra 7% are zeros, which stage 5 treats as missing); perimeters 11,668 vs 10,783 (a newer
-   edition: years differ both ways, 2024 added); a rerun skipped all ten. Phase 5 next (Earthdata login, coverage checks in the
-   Build). Remaining decisions: forest ownership edition, newer editions, whole files kept. TO DO (design agreed with the user,
+   edition: years differ both ways, 2024 added); a rerun skipped all ten. PHASE 5 (2026-11-01): coverage checks: read_data_sources
+   remembers the datasets it took from the home folder and each Build stage (1, 5-10) calls home_coverage(<its grid>) once; a home
+   dataset whose manifest region does not hold the grid (less one cell) stops the stage naming the dataset, the region it was
+   downloaded for and what to do; hand-placed files (no manifest row) and set paths are not checked; stage 10 also checks its fitting
+   region; stage 9's FPA-FOD kernel reach (3 x bandwidth, past the 10 km default buffer) only warns. NASA CMS forest age: the 1990
+   FIA-region tiles touching the region (boxes from NASA CMR), an Earthdata token (EARTHDATA_TOKEN, else the page's masked box,
+   kept in settings.csv) sent with the first request only, the signed redirect fetched resumably, checked against the DAAC sha256,
+   clipped and mosaicked; no token = "needs login", not a failure. TESTED: unit test of the check (P26 passes, P26 + 20 km and P29
+   stop, hand-placed passes); stage 1 in dev/libs/download-test2.ssim on P29 and Placer stops with the message, on P26 passes the
+   check; stage 15 without a token marks stand age "needs login". NOT TESTED: a real stand age download (no Earthdata token on this
+   machine). Remaining decisions: forest ownership edition, newer editions, whole files kept. TO DO (design agreed with the user,
    2026-10-25; not started).
    Supersedes the download half of item 11 (LOCA2 becomes one dataset here; 11's list scan/refresh stays). Today the Data Sources page
    (ui/DataSourcesView.cs) links each dataset's download PAGE (defaults/library/data-sources.csv: landfire.gov/data, mrlc.gov/data,

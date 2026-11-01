@@ -10,7 +10,7 @@ TreeMapFolder,file,after,none,https://www.fs.usda.gov/rds/archive/catalog/RDS-20
 FiaConditionFile,manual,none,none,,USGS FIA condition carbon table,0.03,No public source; not needed with Growth Curve Options: FIA Data = FIA DataMart,no
 FiaDisturbanceFile,manual,none,none,,USGS FIA condition disturbance table,0.02,No public source; not needed with Growth Curve Options: FIA Data = FIA DataMart,no
 FiaDataMartFolder,file,none,none,https://apps.fs.usda.gov/fia/datamart/datamart.html,"FIA DataMart state CSV zips (PLOT, COND, TREE, COND_DWM_CALC) and FIADB_REFERENCE",15,All 48 states; replaced in place with no version: a re-download rebuilds the cache,yes
-StandAgeFile,login,after,earthdata,https://daac.ornl.gov/cgi-bin/dsviewer.pl?ds_id=1829,ORNL DAAC 1829 forest age 1990 (regional tiles),4.5,Mosaicked from the regional tiles; an Earthdata token or .netrc made outside SyncroSim,no
+StandAgeFile,login,after,earthdata,https://daac.ornl.gov/cgi-bin/dsviewer.pl?ds_id=1829,ORNL DAAC 1829 forest age 1990 (regional tiles),4.5,"The FIA-region tiles touching the region, checked against the DAAC sha256, clipped and mosaicked; an Earthdata token on the Data Download page or EARTHDATA_TOKEN",yes
 MtbsSeverityFolder,file,after,none,https://www.sciencebase.gov/catalog/item/5e91dee782ce172707f02cdd,MTBS burn severity mosaics (one ScienceBase item a year),0.3,Old MTBS paths return 404,yes
 LandfireDisturbanceFolder,lfps,source,email,https://lfps.usgs.gov/api/products,LF2001_Dist99 to LF2025_Dist25,2.1,The DIST_TYPE table may come only in the full zips; layer names changed January 2026,yes
 LcmsFolder,file,after,none,https://data.fs.usda.gov/geodata/rastergateway/LCMS/,LCMS CONUS annual change,0.46,Size is one year; the version is in the file name (v2025-11),yes

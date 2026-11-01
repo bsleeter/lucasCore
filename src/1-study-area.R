@@ -58,6 +58,7 @@ if (length(want)) {
   R <- crop(L, align(intersect(ex, ext(L)), L, snap = "out"))
   say("Study area: %s (%d x %d cells of %d m)", paste(want, collapse = ", "), ncol(R), nrow(R), res_m)
 } else { R <- L; say("Study area: all of CONUS (%d x %d cells of %d m)", ncol(R), nrow(R), res_m) }
+home_coverage(R)   # every Data Source read from the home folder must hold the study area (shared.R)
 progressBar()
 
 # ---- land mask: start-year Annual NLCD, modal-aggregated (shared.R, nlcd_on_grid: same blocks as a CONUS build) --------

@@ -876,7 +876,7 @@
 		<!-- stage 15: one row per dataset -->
 		<column name="DataSource" displayName="Data Sources column" dataType="String"/>
 		<column name="Dataset" dataType="String"/>
-		<column name="Status" displayName="Status (done, skipped, would download, partial, manual, failed)" dataType="String"/>
+		<column name="Status" displayName="Status (done, skipped, would download, partial, manual, needs login, failed)" dataType="String"/>
 		<column name="Files" dataType="Integer" isOptional="True"/>
 		<column name="SizeMb" displayName="Size (MB)" dataType="Double" isOptional="True"/>
 		<column name="Minutes" dataType="Double" isOptional="True"/>

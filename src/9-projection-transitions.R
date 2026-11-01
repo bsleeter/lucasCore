@@ -65,6 +65,7 @@ say("Rules from %s: %s", src_rules, paste(pt[, sprintf("%d %s", .N, Method[1]), 
 ic <- as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", optional = TRUE, lookupsAsFactors = FALSE))
 if (!nrow(ic) || is.na(ic$StateClassFileName[1])) fail("no state class map: run stages 1, 5 and 6 first")
 P <- rast(ic$StratumFileName[1]); S2 <- rast(ic$SecondaryStratumFileName[1]); S3 <- rast(ic$TertiaryStratumFileName[1]); S <- rast(ic$StateClassFileName[1])
+home_coverage(P)   # Data Sources read from the home folder must hold the study area (shared.R)
 land <- !is.na(values(P, mat = FALSE)); vS <- values(S, mat = FALSE)
 
 # ---- mode 2: a stand-alone projection starts from a historical run's final maps (Projection Start) ----------------------------
@@ -306,6 +307,7 @@ if (nrow(fire_rows) && fire_m < 3) { g <- fire_g; ms <- mem[[g]]; u <- unit_map(
     ig <- if (ign_src == 1) bpm else {
       ff <- read_data_sources("FpaFodFile")$FpaFodFile; bw <- nz(fo$IgnitionBandwidth, 5000)
       box <- st_as_sfc(st_bbox(st_buffer(st_as_sfc(st_bbox(ext(P) , crs = st_crs(crs(P)))), 3 * bw)))
+      home_coverage(box, "FpaFodFile", "the ignition kernel's reach (3 x the bandwidth around the study area)", warn_only = TRUE)
       pts <- st_read(ff, layer = "Fires", wkt_filter = st_as_text(st_transform(box, st_crs(st_read(ff, layer = "Fires", query = "SELECT * FROM Fires LIMIT 0", quiet = TRUE)))), quiet = TRUE)
       pts <- st_transform(pts, crs(P)); n <- rasterize(vect(pts), rast(P), fun = "count", background = 0)
       sg <- bw / res(P)[1]; k <- max(1, ceiling(3 * sg)); gw <- outer(-k:k, -k:k, function(a, b) exp(-(a^2 + b^2) / (2 * sg^2))); gw <- gw / sum(gw)

@@ -42,6 +42,7 @@ opt <- read_ds("BuildOptions"); y0 <- opt$StartYear[1]; y1 <- opt$EndYear[1]; yr
 ic <- as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", optional = TRUE, lookupsAsFactors = FALSE))
 if (!nrow(ic) || is.na(ic$StateClassFileName[1]) || is.na(ic$AgeFileName[1])) fail("no state class or age map: run stage 5 first (same pipeline, or depend on a stage 5 result)")
 P <- rast(ic$StratumFileName[1]); S <- rast(ic$StateClassFileName[1]); A <- rast(ic$AgeFileName[1]); m <- !is.na(P)
+home_coverage(P)   # Data Sources read from the home folder must hold the study area (shared.R)
 res_m <- res(P)[1]; cell_km2 <- (res_m / 1000)^2
 nl <- read_ds("OutputNlcdAnnual"); miss <- setdiff(y0:y1, nl$Year)
 if (length(miss)) fail("annual NLCD on the model grid is missing for %s: run stage 5 with the same years", paste(miss, collapse = ", "))

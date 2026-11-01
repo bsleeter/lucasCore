@@ -51,6 +51,7 @@ say("Projection Allocation (%s): %s", al_src, paste(al[, sprintf("%s -> %s %s", 
 
 ic <- as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", optional = TRUE, lookupsAsFactors = FALSE))
 P <- rast(ic$StratumFileName[1]); land <- !is.na(values(P, mat = FALSE)); res_m <- res(P)[1]
+home_coverage(P)   # Data Sources read from the home folder must hold the study area (shared.R)
 adj_r <- nz(so$AdjacencyRadius, 3 * res_m)
 sm <- as.data.table(datasheet(scn, "stsim_TransitionSpatialMultiplier", optional = TRUE, lookupsAsFactors = FALSE)); if (!"Iteration" %in% names(sm)) sm[, Iteration := NA_integer_]
 pt <- read_ds("ProjectionTransition"); if (!nrow(pt)) pt <- read_default("projection", "transitions.csv")
@@ -113,6 +114,7 @@ say("Study area: %s", if (nrow(sa)) paste(sa$UnitId, collapse = ", ") else "all"
 nl_file <- function(y) nlcd_file(src$NlcdFolder, y)
 ref <- rast(nl_file(y1)); both <- st_transform(st_union(c(st_transform(region, crs(ref)), st_transform(study, crs(ref)))), crs(ref))
 E30 <- align(ext(vect(both)) + 2000, ref, snap = "out"); fact <- res_f / 30
+home_coverage(vect(E30, crs = crs(ref)), c("NlcdFolder", "FirePerimeterHistoryFile", "RoadsFile", "ElevationFile", "WuiFolder", "NccpiFile", "ForestOwnerFile"), "the fitting region")
 G <- if (fact > 1) aggregate(rast(crop(ref, E30)), fact) else rast(crop(ref, E30))
 key <- sprintf("r%d_%d_%d_%d_%d_%d-%d", res_f, round(xmin(G)), round(ymin(G)), ncol(G), nrow(G), y0, y1)
 CA <- file.path(paste0(main_library(), ".data"), "lucasCore-suitability", key); dir.create(CA, recursive = TRUE, showWarnings = FALSE)
