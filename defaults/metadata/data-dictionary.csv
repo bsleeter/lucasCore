@@ -1,0 +1,55 @@
+File,Column,Definition,Type,Units,Domain,NullValue
+state-classes.csv,run,"Short name of the simulation run (the release's run folder name).",text,,run names in the release,
+state-classes.csv,iteration,"Monte Carlo iteration of the run.",integer,,1 to the run's iterations,
+state-classes.csv,year,"Simulation year (the area at the end of the timestep).",integer,year,the run's start to end year,
+state-classes.csv,primary_stratum,"Primary stratum: the FIA ecological division (ECOMAP 2007) the cells are in.",text,,definitions.csv kind Stratum,
+state-classes.csv,secondary_stratum,"Secondary stratum: the Build Options secondary strata unit (default: state).",text,,definitions.csv kind Stratum,NA
+state-classes.csv,tertiary_stratum,"Tertiary stratum: the Build Options tertiary strata unit (default: federal land manager).",text,,definitions.csv kind Stratum,NA
+state-classes.csv,state_class,"Land-use and land-cover state class.",text,,definitions.csv kind StateClass,
+state-classes.csv,area_ha,"Area in the state class.",real,hectares,0 or more,
+transitions.csv,run,"Short name of the simulation run.",text,,run names in the release,
+transitions.csv,iteration,"Monte Carlo iteration of the run.",integer,,1 to the run's iterations,
+transitions.csv,year,"Simulation year in which the transitions happened.",integer,year,the run's start + 1 to end year,
+transitions.csv,primary_stratum,"Primary stratum (FIA ecological division).",text,,definitions.csv kind Stratum,
+transitions.csv,secondary_stratum,"Secondary stratum unit.",text,,definitions.csv kind Stratum,NA
+transitions.csv,tertiary_stratum,"Tertiary stratum unit.",text,,definitions.csv kind Stratum,NA
+transitions.csv,transition_group,"Transition group (land-use change or disturbance).",text,,definitions.csv kind TransitionGroup,
+transitions.csv,area_ha,"Area that made a transition of the group in the year.",real,hectares,0 or more,
+stocks.csv,run,"Short name of the simulation run.",text,,run names in the release,
+stocks.csv,iteration,"Monte Carlo iteration of the run.",integer,,1 to the run's iterations,
+stocks.csv,year,"Simulation year (the stock at the end of the timestep).",integer,year,the run's start to end year,
+stocks.csv,primary_stratum,"Primary stratum (FIA ecological division).",text,,definitions.csv kind Stratum,
+stocks.csv,secondary_stratum,"Secondary stratum unit.",text,,definitions.csv kind Stratum,NA
+stocks.csv,tertiary_stratum,"Tertiary stratum unit.",text,,definitions.csv kind Stratum,NA
+stocks.csv,state_class,"State class holding the carbon.",text,,definitions.csv kind StateClass,
+stocks.csv,stock_group,"Carbon stock group (pool or sum of pools).",text,,definitions.csv kind StockGroup,
+stocks.csv,carbon_t,"Carbon in the stock group.",real,metric tons of carbon,0 or more,
+flows.csv,run,"Short name of the simulation run.",text,,run names in the release,
+flows.csv,iteration,"Monte Carlo iteration of the run.",integer,,1 to the run's iterations,
+flows.csv,year,"Simulation year of the flow.",integer,year,the run's start + 1 to end year,
+flows.csv,primary_stratum,"Primary stratum (FIA ecological division).",text,,definitions.csv kind Stratum,
+flows.csv,secondary_stratum,"Secondary stratum unit.",text,,definitions.csv kind Stratum,NA
+flows.csv,tertiary_stratum,"Tertiary stratum unit.",text,,definitions.csv kind Stratum,NA
+flows.csv,state_class,"State class the flow comes from.",text,,definitions.csv kind StateClass,
+flows.csv,transition_type,"Transition type that triggered the flow; blank for annual (baseline) flows such as growth and decay.",text,,definitions.csv kind TransitionType,NA
+flows.csv,flow_group,"Carbon flow group.",text,,definitions.csv kind FlowGroup,
+flows.csv,carbon_t,"Carbon moved by the flow group in the year. CO2e groups are in metric tons of CO2 equivalent.",real,metric tons of carbon (CO2e groups: metric tons CO2e),any real number (net groups may be negative),
+definitions.csv,kind,"What the row defines: StateClass, TransitionGroup, TransitionType, StockType, StockGroup, FlowType, FlowGroup or Stratum.",text,,the eight kinds,
+definitions.csv,name,"The name as it appears in the tables.",text,,,
+definitions.csv,code,"Integer code used in the maps (state classes and strata); blank for kinds that are not mapped.",integer,,,NA
+definitions.csv,definition,"What the name means and how the Build maps it.",text,,,
+definitions.csv,source,"Data source the class or transition is mapped from (a source in the metadata lineage).",text,,data-sources-used.csv data_source,NA
+data-sources-used.csv,stage,"Build stage that read the data source.",text,,lucasCore stage names,
+data-sources-used.csv,data_source,"Data Sources column name (the lineage source it matches).",text,,lucasCore Data Sources columns,
+data-sources-used.csv,origin,"Where the Build read it: a Data Sources Home folder (the top, or regions/<name>), a path set by the user, the package default or the package's own copy.",text,,,
+data-sources-used.csv,files,"Number of files read.",integer,,1 or more,
+data-sources-used.csv,bytes,"Total size of the files read.",integer,bytes,1 or more,
+data-sources-used.csv,sha256,"SHA-256 checksum of the file, or for a folder of its sorted file checksums.",text,,64 hexadecimal characters,
+data-sources-used.csv,note,"Edition or other note on what was read.",text,,,NA
+validation.csv,stage,"Stage that ran the check.",text,,lucasCore stage names,
+validation.csv,check,"What the check tests.",text,,,
+validation.csv,status,"Result of the check.",text,"PASS, FAIL or WARN",,
+validation.csv,detail,"Numbers or names behind the result.",text,,,NA
+state-class-<run>-<year>.tif,value,"State class code of each model cell at the end of the year. The codes are listed with their names in definitions.csv (kind StateClass, column code).",integer,,definitions.csv kind StateClass code,-9999
+age-<run>-<year>.tif,value,"Stand age (years since the last stand-replacing event) of each model cell at the end of the year.",integer,years,0 or more,-9999
+carbon-<group>-<run>-<year>.tif,value,"Carbon in the stock group in each model cell at the end of the year.",real,metric tons of carbon per hectare,0 or more,-9999

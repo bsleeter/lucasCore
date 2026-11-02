@@ -1,0 +1,133 @@
+Kind,Name,Definition,Source
+StateClass,Agriculture: Cropland,"Cells whose most common start-year annual NLCD class (30 m pixels in the model cell) is Cultivated Crops (82): annual crops, perennial woody crops and land being actively tilled.",NlcdFolder
+StateClass,Agriculture: Pasture,"Cells whose most common start-year annual NLCD class is Pasture/Hay (81): grasses or legumes planted for grazing or for seed or hay crops.",NlcdFolder
+StateClass,Barren: All,"Cells whose most common start-year annual NLCD class is Barren Land (31), and that are not forest in any year: bedrock, scree, sand, mines and other land with less than 15% vegetation.",NlcdFolder
+StateClass,Developed: Open Space,"Cells whose most common start-year annual NLCD class is Developed, Open Space (21): impervious surface under 20% of cover, mostly lawn grass, parks and large-lot housing.",NlcdFolder
+StateClass,Developed: Low Intensity,"Cells whose most common start-year annual NLCD class is Developed, Low Intensity (22): impervious surface 20-49% of cover.",NlcdFolder
+StateClass,Developed: Medium Intensity,"Cells whose most common start-year annual NLCD class is Developed, Medium Intensity (23): impervious surface 50-79% of cover.",NlcdFolder
+StateClass,Developed: High Intensity,"Cells whose most common start-year annual NLCD class is Developed, High Intensity (24): impervious surface 80-100% of cover.",NlcdFolder
+StateClass,Developed: Transportation,"Developed cells under a LANDFIRE road. Defined in the package's class list; the default Build does not map it.",RoadsFile
+StateClass,Forest: *,"Cells that are forest (annual NLCD 41, 42 or 43) in any year of the record and are not developed, agricultural, water or ice in the start year, whose most common forest type among their 30 m pixels is the FIA forest type group ""{*}"". The type comes from the Build Options Forest Type Map: LANDFIRE EVT 2016 through the Land Cover Crosswalks (default), the USFS forest type group map, or TreeMap 2016. Forest cells with no typed pixel take their neighbours' type.",Evt2016File
+StateClass,Grassland: Annual,"Start-year NLCD Shrub/Scrub (52) or Grassland/Herbaceous (71) cells that are never forest, whose most common RCMAP vegetation state (1985) is Annual Grassland (RCMAP value 2).",RcmapFile
+StateClass,Grassland: Natural Perennial,"Start-year NLCD 52 or 71 cells that are never forest, whose most common RCMAP vegetation state (1985) is Natural Perennial Grassland (RCMAP value 3). Where RCMAP has no type (outside its western US extent), NLCD 71 cells.",RcmapFile
+StateClass,Grassland: Irrigated Perennial,"Start-year NLCD 52 or 71 cells that are never forest, whose most common RCMAP vegetation state (1985) is Irrigated Perennial Grassland (RCMAP value 4).",RcmapFile
+StateClass,Shrubland: Native Sage Steppe,"Start-year NLCD 52 or 71 cells that are never forest, whose most common RCMAP vegetation state (1985) is Native Sage Steppe (RCMAP value 5).",RcmapFile
+StateClass,Shrubland: Invaded Sage Steppe,"Start-year NLCD 52 or 71 cells that are never forest, whose most common RCMAP vegetation state (1985) is Invaded Sage Steppe (RCMAP value 6).",RcmapFile
+StateClass,Shrubland: Sage,"Start-year NLCD 52 or 71 cells that are never forest, whose most common RCMAP vegetation state (1985) is Sage Shrubland (RCMAP value 7).",RcmapFile
+StateClass,Shrubland: Non-sage,"Start-year NLCD 52 or 71 cells that are never forest, whose most common RCMAP vegetation state (1985) is Non-sage Shrubland (RCMAP value 8). Where RCMAP has no type (outside its western US extent), NLCD 52 cells.",RcmapFile
+StateClass,Shrubland: Chaparral,"Start-year NLCD 52 or 71 cells that are never forest, whose most common RCMAP vegetation state (1985) is Chaparral (RCMAP value 9).",RcmapFile
+StateClass,Shrubland: Post Fire Shrub,"Shrubland that follows stand-replacing loss of forest. Defined in the package's class list; in the default Build only agriculture pathways reach or leave it, and no cell starts in it.",
+StateClass,Snow/Ice: All,"Cells whose most common start-year annual NLCD class is Perennial Ice/Snow (12).",NlcdFolder
+StateClass,Water: All,"Cells whose most common start-year annual NLCD class is Open Water (11).",NlcdFolder
+StateClass,Wetland: Palustrine Forested,"Start-year NLCD Woody Wetlands (90) cells that are never forest; and start-year NLCD Emergent Herbaceous Wetlands (95) cells whose most common C-CAP 2001 class is Palustrine Forested (13) or Palustrine Scrub/Shrub Wetland (14).",CcapFile
+StateClass,Wetland: Palustrine Emergent,"Start-year NLCD Emergent Herbaceous Wetlands (95) cells whose most common C-CAP 2001 class is Palustrine Emergent Wetland (15), or that have no C-CAP wetland type.",CcapFile
+StateClass,Wetland: Estuarine Forested,"Start-year NLCD Emergent Herbaceous Wetlands (95) cells whose most common C-CAP 2001 class is Estuarine Forested (16) or Estuarine Scrub/Shrub Wetland (17).",CcapFile
+StateClass,Wetland: Estuarine Emergent,"Start-year NLCD Emergent Herbaceous Wetlands (95) cells whose most common C-CAP 2001 class is Estuarine Emergent Wetland (18).",CcapFile
+TransitionGroup,Urbanization,"Natural or agricultural cells that become developed: the cell's most common annual NLCD class changes to 21-24 from one year to the next.",NlcdFolder
+TransitionGroup,Intensification,"Developed cells that move to a higher NLCD development intensity (21 to 22, 23 or 24; 22 to 23 or 24; 23 to 24).",NlcdFolder
+TransitionGroup,Ag Expansion,"Natural cells that become agriculture: the cell's most common annual NLCD class changes to 81 or 82.",NlcdFolder
+TransitionGroup,Ag Change,"All agricultural expansion and contraction transitions together.",NlcdFolder
+TransitionGroup,Ag Contraction,"Agricultural cells that stop being agriculture (the most common annual NLCD class leaves 81 or 82). Each cell returns to the nearest natural state class of the start year.",NlcdFolder
+TransitionGroup,Ag Contraction: Cropland,"Ag Contraction from Agriculture: Cropland (NLCD 82).",NlcdFolder
+TransitionGroup,Ag Contraction: Pasture,"Ag Contraction from Agriculture: Pasture (NLCD 81).",NlcdFolder
+TransitionGroup,Fire,"Wildfire, by MTBS burn severity: low (MTBS 1 unburned to low and 2 low), medium (3 moderate) and high (4 high). The expected area per cell is the fraction of its 30 m pixels burned.",MtbsSeverityFolder
+TransitionGroup,Forest Harvest,"Removal of trees by harvest, from LCMS Tree Removal: clearcut where last year's forest becomes shrub or grass in NLCD that year or within two years, selection where it stays forest.",LcmsFolder
+TransitionGroup,Insect,"Insect and disease mortality by severity. Defined in the package's group list; no pathway uses it in the default model.",
+TransitionGroup,Restoration Wetland,"Conversion of other land to wetland. Defined in the package's group list; no pathway uses it in the default model.",
+TransitionGroup,Succession,"Natural change of state class without disturbance. Defined in the package's group list; no pathway uses it in the default model.",
+TransitionGroup,Succession: Post Fire Recovery,"Return of post-fire shrubland to forest. Defined in the package's group list; no pathway uses it in the default model.",
+TransitionGroup,Wetland Change: Gain,"Gain of wetland area. Defined in the package's group list; no pathway uses it in the default model.",
+TransitionGroup,Wetland Change: Loss,"Loss of wetland area. Defined in the package's group list; no pathway uses it in the default model.",
+TransitionType,Urbanization: Open,"A cell becomes Developed: Open Space (NLCD 21).",NlcdFolder
+TransitionType,Urbanization: Low,"A cell becomes Developed: Low Intensity (NLCD 22).",NlcdFolder
+TransitionType,Urbanization: Medium,"A cell becomes Developed: Medium Intensity (NLCD 23).",NlcdFolder
+TransitionType,Urbanization: High,"A cell becomes Developed: High Intensity (NLCD 24).",NlcdFolder
+TransitionType,Intensification: Open to Low,"Developed: Open Space becomes Developed: Low Intensity.",NlcdFolder
+TransitionType,Intensification: Open to Medium,"Developed: Open Space becomes Developed: Medium Intensity.",NlcdFolder
+TransitionType,Intensification: Open to High,"Developed: Open Space becomes Developed: High Intensity.",NlcdFolder
+TransitionType,Intensification: Low to Medium,"Developed: Low Intensity becomes Developed: Medium Intensity.",NlcdFolder
+TransitionType,Intensification: Low to High,"Developed: Low Intensity becomes Developed: High Intensity.",NlcdFolder
+TransitionType,Intensification: Medium to High,"Developed: Medium Intensity becomes Developed: High Intensity.",NlcdFolder
+TransitionType,Ag Expansion: Cropland,"A natural cell becomes Agriculture: Cropland (NLCD 82).",NlcdFolder
+TransitionType,Ag Expansion: Pasture,"A natural cell becomes Agriculture: Pasture (NLCD 81).",NlcdFolder
+TransitionType,Ag Contraction Cropland: *,"Agriculture: Cropland returns to the natural state class ""{*}"", the nearest natural class of the start year.",NlcdFolder
+TransitionType,Ag Contraction Pasture: *,"Agriculture: Pasture returns to the natural state class ""{*}"", the nearest natural class of the start year.",NlcdFolder
+TransitionType,Fire: Low Severity,"Wildfire of low severity: MTBS burn severity 1 (unburned to low) or 2 (low).",MtbsSeverityFolder
+TransitionType,Fire: Medium Severity,"Wildfire of moderate severity: MTBS burn severity 3.",MtbsSeverityFolder
+TransitionType,Fire: High Severity,"Wildfire of high severity: MTBS burn severity 4.",MtbsSeverityFolder
+TransitionType,Forest Harvest: Forest Clearcut,"Stand-replacing harvest: LCMS Tree Removal on last year's forest that annual NLCD shows as shrub or grass that year or within two years.",LcmsFolder
+TransitionType,Forest Harvest: Forest Selection,"Partial harvest: LCMS Tree Removal on last year's forest that stays forest.",LcmsFolder
+TransitionType,Forest Harvest: Forest Selection 20%,"Partial harvest removing about 20% of live biomass. Defined in the harvest pathways; it has no mapped source and a zero target in the historical model.",
+TransitionType,Forest Harvest: Forest Selection 85%,"Partial harvest removing about 85% of live biomass. Defined in the harvest pathways; it has no mapped source and a zero target in the historical model.",
+TransitionType,Forest Harvest: Salvage Logging,"Harvest of trees killed by a disturbance. Defined in the harvest pathways; it has no mapped source and a zero target in the historical model.",
+TransitionType,Insect: *,"Insect and disease mortality of {*}. Defined in the package's type list; no pathway uses it in the default model.",
+TransitionType,Restoration Wetland: *,"Conversion to Wetland: {*}. Defined in the package's type list; no pathway uses it in the default model.",
+TransitionType,Wetland Change: *,"Wetland change {*}. Defined in the package's type list; no pathway uses it in the default model.",
+TransitionType,Succession Post Fire: *,"Post-fire shrubland returns to Forest: {*}. Defined in the package's type list; no pathway uses it in the default model.",
+StockType,Aquatic,"Carbon moved out of the ecosystem to water bodies by lateral transport (a sink outside the ecosystem).",
+StockType,Atmosphere,"The atmosphere: the source of net growth and the sink of decay emissions (baseline flows).",
+StockType,Atmosphere: CH4,"Carbon emitted as methane by disturbance (transition-triggered flows only).",
+StockType,Atmosphere: CO,"Carbon emitted as carbon monoxide by disturbance (transition-triggered flows only).",
+StockType,Atmosphere: CO2,"Carbon emitted as carbon dioxide by disturbance (transition-triggered flows only).",
+StockType,Biomass: Merchantable,"Live carbon in merchantable stemwood (CBM-CFS3 merchantable pool).",
+StockType,Biomass: Other Wood,"Live carbon in branches, tops, stumps and non-merchantable trees (CBM-CFS3 other wood pool).",
+StockType,Biomass: Foliage,"Live carbon in foliage.",
+StockType,Biomass: Coarse Root,"Live carbon in roots 5 mm or more in diameter.",
+StockType,Biomass: Fine Root,"Live carbon in roots under 5 mm in diameter.",
+StockType,DOM: Snag Stem,"Dead organic matter: standing dead stemwood, from merchantable biomass turnover and mortality.",
+StockType,DOM: Snag Branch,"Dead organic matter: standing dead branches, from other wood turnover and mortality.",
+StockType,DOM: Aboveground Very Fast,"Dead organic matter: foliage and fine-root litter above the mineral soil (CBM-CFS3 AG very fast pool).",
+StockType,DOM: Aboveground Fast,"Dead organic matter: fine and small woody debris above the mineral soil (CBM-CFS3 AG fast pool).",
+StockType,DOM: Aboveground Medium,"Dead organic matter: coarse woody debris (down dead stems) (CBM-CFS3 medium pool).",
+StockType,DOM: Aboveground Slow,"Dead organic matter: humified organic horizons above the mineral soil (CBM-CFS3 AG slow pool).",
+StockType,DOM: Belowground Very Fast,"Dead organic matter: dead fine roots in the mineral soil (CBM-CFS3 BG very fast pool).",
+StockType,DOM: Belowground Fast,"Dead organic matter: dead coarse roots in the mineral soil (CBM-CFS3 BG fast pool).",
+StockType,DOM: Belowground Slow,"Dead organic matter: humified carbon in the mineral soil (CBM-CFS3 BG slow pool).",
+StockType,Deep Soil,"Stabilized soil carbon below the active mineral soil, fed from the belowground slow pool.",
+StockType,DOM: Peat,"Dead organic matter: peat in wetland soils.",
+StockType,DOM: Black Carbon,"Dead organic matter: pyrogenic (black) carbon. Not used.",
+StockType,Forestry Sector,"Carbon removed from the ecosystem by harvest (transition-triggered flows only).",
+StockGroup,Atmosphere,"The Atmosphere stock types.",
+StockGroup,Biomass: Aboveground,"Live carbon above ground: merchantable, other wood and foliage.",
+StockGroup,Biomass: Belowground,"Live carbon below ground: coarse and fine roots.",
+StockGroup,Biomass: Total,"All live biomass carbon, above and below ground.",
+StockGroup,DOM: Aboveground,"Dead organic matter above the mineral soil.",
+StockGroup,DOM: Belowground,"Dead organic matter in the mineral soil.",
+StockGroup,DOM: Deadwood,"All dead wood: standing and down.",
+StockGroup,DOM: Down Deadwood,"Down dead wood as FIA measures it (CARBON_DOWN_DEAD): aboveground medium (down stems) and belowground fast (dead coarse roots).",
+StockGroup,DOM: Litter,"Forest floor as FIA measures it (CARBON_LITTER): aboveground very fast, fast and slow pools.",
+StockGroup,DOM: No Soil,"All dead organic matter except the mineral soil pools.",
+StockGroup,DOM: Soil,"Mineral soil carbon: belowground slow, belowground very fast and deep soil.",
+StockGroup,DOM: Standing Deadwood,"Standing dead wood: snag stems and snag branches.",
+StockGroup,DOM: Total,"All dead organic matter carbon.",
+StockGroup,Total Ecosystem,"All ecosystem carbon: biomass and dead organic matter.",
+FlowType,Net Growth Forest: *,"Annual net uptake of carbon by forest into the live pool named after the arrow ({*}), from the fitted FIA growth curves.",
+FlowType,Net Growth Non Forest: *,"Annual net uptake of carbon by grassland, shrubland and other non-forest classes into the live pool named after the arrow ({*}), from the package's non-forest rates.",
+FlowType,Net Growth Wetland Emergent: *,"Annual net uptake of carbon by emergent wetland into the live pool named after the arrow ({*}).",
+FlowType,Biomass Turnover: *,"Annual transfer of live biomass to dead organic matter by litterfall and natural mortality ({*}).",
+FlowType,Decay: *,"Annual transfer of dead organic matter to a slower pool by decomposition ({*}).",
+FlowType,Emission: *,"Annual release of carbon to the atmosphere by decomposition (heterotrophic respiration) ({*}).",
+FlowType,Transfer: *,"Annual physical transfer between dead organic matter pools, such as snags falling ({*}).",
+FlowType,Stabilization: BG Slow -> Deep Soil,"Annual transfer of mineral soil carbon to the stable deep soil pool.",
+FlowType,Lateral Transport: *,"Annual loss of carbon to water bodies ({*}).",
+FlowType,LULC: Emission DOM CO2,"Dead organic matter carbon emitted as CO2 by a disturbance or land-use transition.",
+FlowType,LULC: Emission DOM CO,"Dead organic matter carbon emitted as CO by a disturbance or land-use transition.",
+FlowType,LULC: Emission DOM CH4,"Dead organic matter carbon emitted as CH4 by a disturbance or land-use transition.",
+FlowType,LULC: Emission Live CO2,"Live biomass carbon emitted as CO2 by a disturbance or land-use transition.",
+FlowType,LULC: Emission Live CO,"Live biomass carbon emitted as CO by a disturbance or land-use transition.",
+FlowType,LULC: Emission Live CH4,"Live biomass carbon emitted as CH4 by a disturbance or land-use transition.",
+FlowType,LULC: Harvest Live,"Live biomass carbon removed to the forestry sector by harvest.",
+FlowType,LULC: Harvest DOM,"Dead organic matter carbon removed to the forestry sector by harvest.",
+FlowType,LULC: Mortality Live,"Live biomass carbon killed by a disturbance or land-use transition and moved to dead organic matter.",
+FlowType,LULC: Transfer DOM,"Dead organic matter moved between pools by a disturbance or land-use transition.",
+FlowGroup,*,"The sum of the flow types in the group ""{*}"", in carbon (or carbon dioxide equivalent where the name says CO2e).",
+Stratum,*,"Primary stratum: the FIA ecological division ""{*}"" (ECOMAP 2007 divisions, dissolved; a Mountains division is the division's mountain provinces). Growth curves and carbon parameters vary by primary stratum.",EcodivisionFile
+Stratum,State: *,"Secondary or tertiary stratum: the US state {*} (US Census TIGER/Line 2009).",Strata:States
+Stratum,County: *,"Secondary or tertiary stratum: the US county {*} (US Census TIGER/Line 2022).",Strata:Counties
+Stratum,HUC6: *,"Secondary or tertiary stratum: the watershed basin (hydrologic unit, 6-digit) {*} (USGS Watershed Boundary Dataset).",Strata:HUC6
+Stratum,HUC8: *,"Secondary or tertiary stratum: the watershed subbasin (hydrologic unit, 8-digit) {*} (USGS Watershed Boundary Dataset).",Strata:HUC8
+Stratum,EPA L3: *,"Secondary or tertiary stratum: the EPA Level III ecoregion {*}.",Strata:EPA Level III Ecoregions
+Stratum,Pyrome: *,"Secondary or tertiary stratum: the pyrome {*}, a region of similar fire regime (Short and others, 2020).",Strata:Pyromes
+Stratum,Federal: *,"Secondary or tertiary stratum: land managed by {*} (National Atlas federal lands), or Non Federal.",Strata:Federal Lands
+Stratum,GAP: *,"Secondary or tertiary stratum: PAD-US GAP status {*} (most protected status where areas overlap), or Not in PAD-US.",Strata:GAP Status
+Stratum,Ecodivision: *,"Secondary or tertiary stratum: the FIA ecological division {*} (ECOMAP 2007 divisions, dissolved).",EcodivisionFile
