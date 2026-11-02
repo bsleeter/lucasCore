@@ -15,13 +15,13 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | ~~3~~ | ~~34 Minimum harvest ages~~ DONE 2026-10-30 | Yes (projections; stage 6 start ages) | FIA values lowered to the study area's mapped cuts; selection at least 10 yr under clearcut | 35's age source |
 | ~~1~~ | ~~32 Carbon open science issues~~ DONE 2026-10-30 | Yes | Stem turnover fitted to FIA background mortality (snags now match); duff bound harmless; California event shares hold nationally | - |
 | ~~1~~ | ~~37 P26 rerun and guide refresh~~ DONE 2026-10-31 | Its own results | Build [53], Historical [54], projections [65]-[67], Compare [71]; guide numbers, figures and grabs; GitHub snapshot rebuilt | 34, 32 |
-| 1 | 39 Grassland, shrubland and wetland carbon: the science step | Yes | Step 1 (rates on a page) and the diagram view done; the diagram shows emergent wetland rates settling far above their starting pools; suspect values (emergent wetland growth 31, irrigated grass 9.19 Mg C/ha/yr), root turnover splits; the science options (user to decide) | - |
-| 2 | 43 Historical harvest 12% short: minimum ages in the historical period | Yes (historical harvest, start ages) | Options offered 2026-10-31, user to decide: apply the minimum ages only in projections, or resample start ages from the median | 34 |
-| 3 | 42 Fill prompt names the grassland tables by their old names | No | A wording fix in the Carbon Method page | - |
-| 4 | 31 Copy Carbon Assumptions; SoilGrids option | No (an option) | Convenience and one more soil source | - |
 | ~~5~~ | ~~12 Data Download stage~~ DONE 2026-11-02 | No (P26 from downloaded data matches [53] where the data are the same) | Phases 1-6, region folders, write-once, editions, national paths; guide 1.6 and blueprints | 35 |
-| 6 | 13 Demo bundle, Calaveras | No | 12 done: a Calaveras Data Download gives its home; still needs a settled model; the finished demo library (option 1) can go earlier if wanted | 39 |
-| 7 | 14 FGDC metadata | No | 12 done: the home's manifest (source, version, DOI, region) and each Build's Data Sources Used (files, checksums) are its lineage; ships with 13 and data releases | 13 |
+| 1 | 14 FGDC metadata | No | User order 2026-11-02: first. Plan https://claude.ai/artifact/RoBU7fJ7C7xa6pvg2z8LFK (phases 0-6, five decisions open; Phase 0 needs the Center data manager); lineage from the home's manifest and each Build's Data Sources Used | 12 (done) |
+| 2 | 13 Downloadable sample library, Calaveras: fully built and operational | No | User order 2026-11-02: second, before the open science. Built with today's carbon method (rebuilt when 39 changes it); a Calaveras Data Download gives its home; ships with 14's metadata records | 14 |
+| 3 | 39 Grassland, shrubland and wetland carbon: options beyond today's crude method | Yes | User order 2026-11-02: third, with the other open science items (user: explore additional options).  Step 1 (rates on a page) and the diagram view done; the diagram shows emergent wetland rates settling far above their starting pools; suspect values (emergent wetland growth 31, irrigated grass 9.19 Mg C/ha/yr), root turnover splits; the science options (user to decide) | - |
+| 3 | 43 Historical harvest 12% short: minimum ages in the historical period | Yes (historical harvest, start ages) | Options offered 2026-10-31, user to decide: apply the minimum ages only in projections, or resample start ages from the median | 34 |
+| 4 | 42 Fill prompt names the grassland tables by their old names | No | A wording fix in the Carbon Method page | - |
+| 5 | 31 Copy Carbon Assumptions; SoilGrids option | No (an option) | Convenience and one more soil source | - |
 | any | 44 Data Download follow-ups | No | Small; (b) the National test runs overnight | 12 |
 | any | 33 Leftovers inside done items | Some | Small, independent; (7) guide 1.4 and (1) deep links any time; (8) and (17) larger | - |
 | later | 26 Guide chapter 9, Troubleshooting | No | After beta testers (user) | beta |
@@ -29,7 +29,7 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | later | 38 Stand-replacing insect and disease events | Yes | Option B of 32 (user: eventually); background mortality already excludes them | 32 |
 
 Done since the 2026-10-25 order: 6, 7, 8, 9, 11a, 12, 15-25, 28-30, 32, 34, 35, 37, 40, 41 (item 27 removed by the user).
-Pushed: everything through 2967086 (2026-11-02), with the guide snapshot and both blueprints rebuilt; the repo is public, so push only when the user asks.
+Pushed: everything through a8adf51 (2026-11-02), released as v1.0.0 on GitHub with the .ssimpkg; the repo is public, so push only when the user asks.
 
 1. **Data Sources page** - DONE 2026-10-24. Custom view (`ui/DataSourcesView.cs`) groups the paths by category (study area, land
    cover, forest inventory, disturbance and fire, climate, soils and terrain, infrastructure and ownership), links each to its download
