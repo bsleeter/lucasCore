@@ -280,9 +280,13 @@ nlcd_on_grid <- function(nf, L, R) {
   terra::project(n, R, method = "near") }
 # the 30 m extent of those aggregation blocks and the aggregation factor (MTBS and LANDFIRE disturbance sit on the same 30 m grid,
 # so stage 6 aggregates them over the same blocks)
+# The anchor is the national Annual NLCD file's extent (NLCD_CONUS_EXT), not the file's own: a regional clip from the Data Download
+# has a smaller extent, and anchoring on it moved every block by up to 4 pixels (P26 2026-11-01: 7.7% of 150 m cells changed class)
+NLCD_CONUS_EXT <- c(-2415585, 2384415, 164805, 3314805)   # xmin, xmax, ymin, ymax of Annual_NLCD_LndCov_*_CU (EPSG:5070, 30 m)
 grid_blocks <- function(n30, L, R) {
   res_m <- terra::res(R)[1]; fact <- round(res_m / terra::res(n30)[1]); blk <- fact * terra::res(n30)[1]
-  conus <- terra::ext(terra::crop(n30, terra::ext(L) + blk)); want <- terra::ext(R) + blk
+  nat <- terra::rast(terra::ext(NLCD_CONUS_EXT), resolution = terra::res(n30), crs = terra::crs(n30))
+  conus <- terra::ext(terra::crop(nat, terra::ext(L) + blk)); want <- terra::ext(R) + blk
   x0 <- terra::xmin(conus) + floor((terra::xmin(want) - terra::xmin(conus)) / blk) * blk
   y0 <- terra::ymin(conus) + floor((terra::ymin(want) - terra::ymin(conus)) / blk) * blk
   x1 <- min(terra::xmax(conus), terra::xmin(conus) + ceiling((terra::xmax(want) - terra::xmin(conus)) / blk) * blk)
