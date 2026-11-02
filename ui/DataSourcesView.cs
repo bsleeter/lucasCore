@@ -39,6 +39,7 @@ namespace lucasCoreUI
         private const string HomeColumn = "DataSourcesHome";
         private TextBox m_home; private Label m_homeState;
         private readonly List<Entry> m_entries = new List<Entry>();
+        private readonly List<TableLayoutPanel> m_tables = new List<TableLayoutPanel>();
         private bool m_built;
 
         public DataSourcesView() { }
@@ -80,7 +81,7 @@ namespace lucasCoreUI
                 List<Entry> es = m_entries.Where(e => e.Category == cat).ToList();
                 if (es.Count == 0) continue;
                 // a fixed name width, and path boxes all sized together to the window (SizePaths), so every group's columns line up
-                var t = new TableLayoutPanel { AutoSize = true, ColumnCount = 6 };
+                var t = new TableLayoutPanel { AutoSize = true, ColumnCount = 6 }; m_tables.Add(t);
                 t.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
                 t.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, NameWidth));
                 t.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
@@ -108,6 +109,16 @@ namespace lucasCoreUI
             int ed = m_entries.Any(e => e.Edition != null && e.Edition.Visible) ? 240 : 0;
             int w = Math.Max(MinPath, this.ClientSize.Width - NameWidth - Beside - mark - ed);
             foreach (Entry e in m_entries) if (e.Path != null && e.Path.Width != w) e.Path.Width = w;
+            // then fit what is on screen: with display scaling the name column and buttons are wider than the constants say, so
+            // the boxes give up whatever a group still runs past the page's right edge
+            int over = 0;
+            foreach (TableLayoutPanel t in m_tables)
+            {
+                if (!t.IsHandleCreated || !this.IsHandleCreated) continue;
+                int left = this.PointToClient(t.PointToScreen(Point.Empty)).X;
+                over = Math.Max(over, left + t.GetPreferredSize(Size.Empty).Width + SystemInformation.VerticalScrollBarWidth + 16 - this.ClientSize.Width);
+            }
+            if (over > 0) { w = Math.Max(MinPath, w - over); foreach (Entry e in m_entries) if (e.Path != null && e.Path.Width != w) e.Path.Width = w; }
         }
         private readonly ToolTip m_tip = new ToolTip { AutoPopDelay = 20000 };
 

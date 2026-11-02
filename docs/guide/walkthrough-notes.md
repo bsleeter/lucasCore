@@ -170,4 +170,4 @@ After the captures: export the doc (Markdown and HTML) into source/ and run buil
 - 2026-11-02 later: 1.16-1.21 all in the doc (rev 423). 1.17 from the 10:49 grab, cropped above its band; 1.19 and 1.20 from the
   11:01:37 grab; 1.20's LANDFIRE email greyed by cover.ps1 (user: cover it); 1.21 = the 11:02 grab with its banded row mended from
   the 10:53 grab by patch.ps1 (same window, table unmoved). Still to grab: 1.15 (Data Sources page with the home set); 1.22 later.
-  The home lists a test region, County-Bristol-Rhode-Island (3 files, from the write-once tests): keep it out of figures.
+  The Rhode Island test region was deleted from the home 2026-11-02 (user OK) so the marks read only the P26 region.
