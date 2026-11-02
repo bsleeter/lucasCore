@@ -171,3 +171,4 @@ After the captures: export the doc (Markdown and HTML) into source/ and run buil
   11:01:37 grab; 1.20's LANDFIRE email greyed by cover.ps1 (user: cover it); 1.21 = the 11:02 grab with its banded row mended from
   the 10:53 grab by patch.ps1 (same window, table unmoved). Still to grab: 1.15 (Data Sources page with the home set); 1.22 later.
   The Rhode Island test region was deleted from the home 2026-11-02 (user OK) so the marks read only the P26 region.
+  Figure 1.22's placeholder and caption were taken out of the doc 2026-11-02 for the GitHub build; add both back with the image when a home holds a second edition.

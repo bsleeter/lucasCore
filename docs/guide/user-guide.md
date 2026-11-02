@@ -1,6 +1,6 @@
 # lucasCore User Guide
 
-*A snapshot of the lucasCore User Guide, exported 2026-10-31. Also as a [web page](https://bsleeter.github.io/lucasCore/guide/), beside the [package](https://bsleeter.github.io/lucasCore/blueprint/) and [data](https://bsleeter.github.io/lucasCore/blueprint/data.html) blueprints.*
+*A snapshot of the lucasCore User Guide, exported 2026-11-02. Also as a [web page](https://bsleeter.github.io/lucasCore/guide/), beside the [package](https://bsleeter.github.io/lucasCore/blueprint/) and [data](https://bsleeter.github.io/lucasCore/blueprint/data.html) blueprints.*
 
 How to build and run a LUCAS land-use and carbon model with the lucasCore SyncroSim package, walked through on the Northern Sierra Nevada pyrome (P26) at 150 m.
 
@@ -20,7 +20,7 @@ It is for modelers who know SyncroSim's basics (libraries, projects, scenarios, 
 - **Preparation and runs.** lucasCore scenarios come in two kinds. Preparation scenarios run lucasCore stages and write the inputs a model needs (the Build, the Projection Setup). Runs are ST-Sim alone, with dependencies that supply every input (the historical run, each projection). Real runs are always stand-alone in this way.
 - **Package version.** Written for lucasCore 1.0.0 on SyncroSim 3.1 with ST-Sim 4.5.
 
-**The workflow in one line.** Build (stages 1-8) → Historical run (ST-Sim) → Projection Setup (stages 9-10, with the hand-over from the historical run) → Projections (ST-Sim, as many as needed).
+**The workflow in one line.** Data Download (stage 15, once per region) → Build (stages 1-8) → Historical run (ST-Sim) → Projection Setup (stages 9-10, with the hand-over from the historical run) → Projections (ST-Sim, as many as needed).
 
 ## 1. Getting started
 
@@ -181,18 +181,20 @@ Open the library's properties (double-click the library in the Explorer).
 
 ### 1.5 Data Sources
 
-The stages read national data from disk. The paths are set once per library, in the project's Data Sources sheet.
+The stages read national data from disk, and there are two ways to give a library its data. The usual way is to name a Data Sources Home folder and let a Data Download scenario fill it (section 1.6). The other is to point each dataset's path at a copy you already have. Either way the setting is made once per library, in the project's Data Sources sheet, and the two can be mixed: a path that is set is used, and a blank path reads the home.
 
 1. In the Definitions project's settings, choose the **LUCAS Core (model builder)** tab.
 2. Choose **LUCAS Core > Data Sources**. The datasets are grouped by kind: study area and strata, land cover, forest inventory and age, disturbance and fire, climate, soils and terrain, infrastructure and ownership. Hover a dataset's name for its full description, source and download link; a grey note under a name says when it is needed.
-3. Each dataset has a path box. A new library comes with every path filled in: they are where the data sit on the machine lucasCore was built on (F:/lucas-master/Data Sources/...). A long path shows its end; hover it for the whole path. Change each one to where your copy lives: type or paste the path, or
-4. click **Browse...** to pick the file or folder.
-5. **Download** opens the page where the dataset can be downloaded. Datasets in the USFS Research Data Archive open the archive and name their RDS identifier.
-6. The mark at the end shows whether the path exists on this machine: a green tick, or a red cross for a path that must still be fixed. The gNATSGO Crop Productivity path is the one exception: leave it blank (the mark reads "fetched") and stage 10 fetches the layer for you.
+3. In **Data Sources Home**, type the folder the Data Download will fill, or click **Browse...** to pick it. Choose a drive with room: P26 needs about 33 GB, 31 GB of which are copies shared by every study area (section 1.6). **Make folders** creates the empty layout; the Data Download does this too.
+4. Each dataset has a path box. A new library starts with every path blank, and a blank path reads the dataset from the home. To use a copy you already have, type or paste its path; a long path shows its end, and hovering it shows the whole path. You can also
+5. click **Browse...** to pick the file or folder.
+6. **Download** opens the page where the dataset can be downloaded by hand. Datasets in the USFS Research Data Archive open the archive and name their RDS identifier.
+7. The mark at the end says where the dataset will be read from. **✓ home** means the home holds it; when the copy is in a region's folder the mark names it, for example **✓ home: regions/Pyrome-P26-Northern-Sierra-Nevada**. Hover the mark for the folder, the region it was downloaded for and its status. A set path shows a green tick, or a red cross for a path that does not exist on this machine. A blank path with nothing in the home reads **default**, **package copy** (the ecodivisions ship with lucasCore) or **user-supplied** (no public source).
+8. A dataset whose home also holds a newer edition gets an edition drop-down at the end of its row. A library reads the edition it first read until you change it here (section 1.6.8).
 
-![The Data Sources page, one row per dataset grouped by kind: the LUCAS Core (model builder) tab marked 1, Data Sources 2, a path box 3, its Browse button 4, its Download button 5 and the found mark 6; the FIA CONUS row outlined, with its grey note](images/fig-1.15.png)
+![The Data Sources page with a home set: the LUCAS Core (model builder) tab marked 1, Data Sources 2, the Data Sources Home row with F:/lucasCore/dev/libs/Data Sources marked 3, the blank Annual NLCD path box 4, its Browse 5 and Download 6 buttons, and its mark, home: regions/Pyrome-P26-Northern-Sierra-Nevada, marked 7; every Land cover row reads the same, and FIA Ecodivisions reads package copy](images/fig-1.15.png)
 
-*Figure 1.15. Data Sources in a new library, filled with the paths of the machine lucasCore was built on. Change each one to where the data sit on yours.*
+*Figure 1.15. Data Sources with a home set: every path is blank, and the marks show each dataset in the home, most in the P26 region's folder.*
 
 The sources, and what each is used for:
 
@@ -209,10 +211,159 @@ The sources, and what each is used for:
 | LANDFIRE disturbance, mean fire return interval | Spin-up return intervals and disturbance detail (stages 4-6) |
 | FSim burn probability, FPA-FOD | Projected fire placement and ignitions, fire method 2 (stage 9) |
 | PRISM, LOCA2 | Historical and projected climate multipliers (stage 7) |
-| gSSURGO soil organic carbon | Soil carbon targets (stage 3) |
+| gNATSGO soil organic carbon | Soil carbon targets (stage 3) |
 | Roads, elevation, SILVIS WUI, NCCPI, forest ownership | Suitability surfaces for projected land use and harvest (stage 10) |
 
-> A blank NCCPI path is fine: stage 10 fetches the crop productivity layer for the fitting region from Planetary Computer and caches it.
+> The Data Download fetches NCCPI with the rest. With no home copy and a blank path, stage 10 fetches the crop productivity layer for its fitting region from Planetary Computer and caches it.
+
+### 1.6 Downloading the data
+
+A Data Download scenario fetches the datasets a Build needs into Data Sources Home, for one region: the study area's units plus a buffer. It runs stage 15 alone, before the Build, and needs no dependencies. One download serves every Build whose study area lies inside its region. A rerun fetches only what is missing, and partial files resume where they stopped.
+
+#### 1.6.1 How the home folder is laid out
+
+The home keeps each dataset at a fixed place under it, such as `land-cover/nlcd-annual` or `forest/fia-datamart`, which is where a blank path on the Data Sources page looks. It holds two kinds of copy:
+
+- **Shared national copies, at the top of the home.** FIA DataMart, PRISM, LOCA2 and FPA-FOD are kept whole and shared by every study area: the growth curves fit on every state, and the climate data cover CONUS.
+- **A region's clips, in `regions/<name>/`.** Every other dataset is cut to the region. Each region has its own folder, laid out like the home, so a second study area never touches the first one's files.
+
+Each folder also has a `manifest.csv` (one row per dataset: its source, version and DOI, the region it covers, and whether it is done) and a `files.csv` (every file's size and SHA-256 checksum). The home's `settings.csv` holds the LANDFIRE email and the Earthdata token, and `logs/` holds a log of each download.
+
+```
+Data Sources/                      Data Sources Home
+  manifest.csv  files.csv  settings.csv  logs/
+  forest/fia-datamart/             FIA DataMart, all states (shared)
+  climate/prism/  climate/loca2/   (shared)
+  regions/
+    Pyrome-P26-Northern-Sierra-Nevada/
+      manifest.csv  files.csv
+      land-cover/nlcd-annual/      41 years, 1985-2025
+      land-cover/...  disturbance/...  soils-terrain/...  infrastructure/...
+```
+
+> **Write-once.** No file in the home is ever replaced. A rerun only adds files. A region that differs from one already downloaded needs its own name, and a new edition of a source goes beside the old one (section 1.6.8). A library's data therefore never change under it, and each Build records the files it read, with their checksums (section 4.4).
+
+#### 1.6.2 Create the Data Download scenario
+
+1. Right-click the Definitions project and choose **New > Scenario**. Its settings open on the **General** tab, **Summary** page.
+2. In **Name**, type `P26 - Data Download`.
+3. In **Description**, record the region, the datasets and the home. For the example:
+
+```
+Data Download for P26 Northern Sierra Nevada (Pyrome P26 + 10 km), By region, into Data Sources Home F:/lucasCore/dev/libs/Data Sources (regions/Pyrome-P26-Northern-Sierra-Nevada). Every dataset the stage can fetch; years 1985 to the latest each source has; LOCA2 CanESM5 r1i1p1f1, SSP2-4.5 and SSP5-8.5. Pipeline: stage 15 alone. No dependencies. Run with Check only first.
+```
+
+4. Choose **Pipeline**, and add one stage: **15 - Data Download**.
+
+![The Data Download scenario's Pipeline page with one row, 15 - Data Download, Run Order 1; Pipeline marked 4 and the stage list 5](images/fig-1.16.png)
+
+*Figure 1.16. The Data Download pipeline: stage 15 alone.*
+
+#### 1.6.3 Study Area
+
+The region is the scenario's own **Study Area** page: give it the same units as the Build (section 3.2). For the example, add **Pyromes: P26 Northern Sierra Nevada**.
+
+> Counties and States are filled to their neighbours over 29 km when the Build makes its strata, so a Build of those units reaches 29 km past them. A Data Download for counties or states widens its buffer to at least 30 km to match, and the run log says so.
+
+#### 1.6.4 The Data Download page
+
+Choose **LUCAS Core > Data Download**. The page has five groups.
+
+**Region**
+
+1. **Into Data Sources Home** shows the project's home folder (section 1.5). It is set on the Data Sources page, not here.
+2. **Buffer around the study area (km)**: blank means 10.
+3. **Home layout**: **By region** (the default) puts the region's clips in `regions/<name>` and the shared copies at the top. **National** ignores the Study Area and keeps every dataset whole at the top, for a home that will serve many study areas (section 1.6.7).
+4. **Region name**: blank takes the name from the Study Area units, here `Pyrome-P26-Northern-Sierra-Nevada`. The line under it lists the regions the home already holds. Reusing a name adds to that region only when its Study Area matches.
+
+![The Data Download page, Region group: Data Download marked 1, the home folder F:/lucasCore/dev/libs/Data Sources marked 2, the buffer of 10 km 3, Home layout By region 4 and the blank Region name box 5](images/fig-1.17.png)
+
+*Figure 1.17. Where the download goes.*
+
+**Datasets**
+
+5. Each dataset has a tick, grouped as on the Data Sources page. The text after its name says how it comes and its size in the P26 download. Hover a dataset for its national size, its source and any login it needs. **Tick all** and **Clear** set every tick; all ticked is the default. Datasets with no public source, and the ecodivisions that ship with lucasCore, are greyed. The line at the top totals the ticked datasets for a P26-sized region.
+
+| The row says | What happens | Examples |
+| --- | --- | --- |
+| clipped by its source | The source's service cuts the region, so only the region is downloaded | Annual NLCD, LANDFIRE layers, fire perimeters, C-CAP, gNATSGO |
+| the region read from a remote archive | The region is read out of a remote zip without downloading the zip | NFCMS forest types, LCMS, FSim, forest ownership |
+| whole file fetched, then clipped | The whole file is downloaded once, clipped, and the whole copy deleted (unless Keep national copies is ticked) | TreeMap (5.4 GB download, 94 MB kept), RCMAP, NASA CMS stand age, MTBS |
+| the states the region touches, fetched whole | The state files are downloaded and kept | SILVIS WUI |
+| one national copy shared by every region | Downloaded whole into the top of the home, once | FIA DataMart, PRISM, FPA-FOD, LOCA2 |
+
+![The Datasets group of the Data Download page: Tick all, Clear and the total line marked 6, then the Study area, Land cover and Forest inventory and age rows, each with how it comes and its P26 size](images/fig-1.18.png)
+
+*Figure 1.18. The datasets, each with how it comes and its P26 size.*
+
+**Years**
+
+6. **Years**: the annual datasets (NLCD, MTBS, LCMS, LANDFIRE disturbance, PRISM). Blank means 1985 to the latest each source has.
+
+**LOCA2 climate projections**
+
+7. Tick the climate models, scenarios and members to fetch. Historical always comes with them. **Project's models** ticks the models on the project's Climate Models list, and the total line gives the download. Models with no western-US monthly files (ACCESS-ESM1-5, CanESM5, MPI-ESM1-2-LR) come as CONUS files, so they are much larger: the two CanESM5 runs of the example are 15 GB. To use a model in a projection later, add it here, run the download again (only the new runs are fetched), then **Rescan LOCA2 folder** on the Projection Climate page (section 7.3).
+
+![The LOCA2 group: scenarios ssp245 and ssp585 ticked, marked 7, CanESM5 ticked and outlined among the models, and the total line, 3 runs (9 files), outlined](images/fig-1.19.png)
+
+*Figure 1.19. LOCA2 runs for the projections.*
+
+**How**
+
+8. **Check only**: lists what would download, and how big, without fetching anything.
+9. **Keep national copies**: keeps the whole file of each "whole file fetched, then clipped" dataset at the top of the home, so a later region needs no second download. It has no effect on datasets clipped by their source.
+10. **Fetch new editions**: see section 1.6.8. Leave it unticked.
+11. **Downloads at once**: blank means 4.
+12. **LANDFIRE email**: the LANDFIRE Product Service clips the LANDFIRE layers and needs an email address with each job.
+13. **Earthdata token**: NASA CMS forest age needs an Earthdata login. Sign in at urs.earthdata.nasa.gov, choose **Generate Token** and paste the token here; tokens last 60 days. The email and the token are kept in the home's `settings.csv`, not in the scenario, so every download into that home uses them. The token is plain text there: set the `EARTHDATA_TOKEN` environment variable instead to keep it out of the folder.
+
+![The How group: Check only ticked, marked 8; Keep national copies 9 and Fetch new editions 10 unticked; Downloads at once 4, marked 11; the LANDFIRE email 12, greyed out here; and the Earthdata token 13, shown as dots](images/fig-1.20.png)
+
+*Figure 1.20. How the download runs, and the two logins.*
+
+#### 1.6.5 Run it
+
+1. With **Check only** ticked, run the scenario (section 4.1). It takes a few minutes and lists every dataset as "would download", with its size.
+2. Untick **Check only** and run again.
+3. Open the result's **Download Results**. There is one row per dataset: its status (done, skipped, would download, manual, needs login, not needed or failed), files, size, minutes, and where it is or what to do next. A first download into an empty home shows each dataset done. Figure 1.21 is a rerun on a home that already holds P26: every row is skipped, nothing is fetched, and each row names the folder that holds it.
+
+![The Data Download result's Build Results > Download Results page, outlined, with the table of 23 datasets, every one skipped, and the What to do next column outlined: in regions/Pyrome-P26 for the clips, at the top of the home for FIA DataMart, LOCA2 and PRISM](images/fig-1.21.png)
+
+*Figure 1.21. Download Results of a rerun: every dataset is already in the home, so each is skipped, and each row says where it is.*
+
+For P26 the first download took about 2.5 hours:
+
+| Part | Time | Downloaded | Kept |
+| --- | --- | --- | --- |
+| FIA DataMart, all states (shared) | about 1 hour | 3.2 GB | 15.3 GB |
+| LANDFIRE disturbance, 27 years (LFPS jobs) | about 40 minutes | 33 MB | 33 MB |
+| Annual NLCD, 41 years (WCS tiles) | about 15 minutes | 276 MB | 276 MB |
+| TreeMap 2016 | a few minutes | 5.4 GB | 94 MB |
+| LOCA2: ACCESS-CM2 SSP2-4.5; later CanESM5 SSP2-4.5 and SSP5-8.5 | 1 minute; 16 minutes | 0.4 GB; 15.3 GB | the same |
+| Everything else | about 30 minutes | 3 GB | 1 GB |
+
+In all, the P26 region's folder holds 1.5 GB and the shared copies 31 GB. A rerun with nothing to fetch takes under a minute. A second study area downloads only its own clips; the shared copies are already there.
+
+Then build. With the home set and the paths blank, every stage reads from the home. The Data Sources page marks each dataset **✓ home: regions/Pyrome-P26-Northern-Sierra-Nevada**, and the run log names the folder each dataset came from.
+
+#### 1.6.6 When something goes wrong
+
+- **A dataset failed.** Download Results gives the error. The servers are busy at times: rerun the scenario. Finished files are kept and partial ones resume. Annual NLCD checks every tile and fetches again any that come back blank.
+- **Needs login.** The Earthdata token is missing or has expired. Make a new one (step 13) and rerun; the rest of the download is unaffected.
+- **"write-once: regions/... already holds ... for ..."** The region name is in use for a different region. Give this download its own Region name; nothing is fetched until you do.
+- **The Build stops with "... was downloaded for ... and does not cover the study area".** The home holds that dataset for a smaller region. Run a Data Download for this study area, or for one that holds it.
+
+#### 1.6.7 More study areas, and a national home
+
+With **By region**, each new study area gets its own download and folder, and the shared copies are fetched only the first time. A Build reads each dataset from the smallest region whose box covers its study area, so one large download, such as all of California, serves every Build inside it: P26, P29 and Placer County.
+
+**National** keeps every dataset whole at the top of the home, so any study area in CONUS reads from it with no further download. It is about 175 GB: Annual NLCD alone is 56 GB, at 1.4 GB a year, and the gNATSGO soil layers are about 9 GB each. MRLC served the NLCD files at about 1.3 MB/s when this was tested, so a national home is an overnight job; a stopped run resumes. The national files and a region's clips are the same cell for cell.
+
+#### 1.6.8 New editions
+
+When a source publishes a new version, the next download says so in Download Results ("new edition ... available") and skips the dataset. Tick **Fetch new editions** to fetch it. The new edition goes into `editions/<version>/` inside the folder that holds the old one, and the old one is never changed.
+
+A library keeps reading the edition it first read; a Build never switches by itself, and its run log says when a newer edition is in the home. To switch, choose the edition in the dataset's drop-down on the Data Sources page (section 1.5, step 8) and confirm. The library's results were built from the old edition, so rebuild before comparing new results with old.
 
 ## 2. How a model is built and run
 
@@ -226,6 +377,7 @@ The Build is made once per study area. The historical run is made once per Build
 
 | Scenario | Pipeline | Dependencies, in order | Writes |
 | --- | --- | --- | --- |
+| Data Download (once per region) | stage 15 | none | The datasets, into Data Sources Home (section 1.6); Download Results in the library |
 | Build | stages 0, 1, 5, 2, 3, 4, 6, 7, 8 | none | Stock-flow definitions, strata and initial conditions, growth curves, carbon flows, spin-up stocks, historical transitions, historical (PRISM) climate multipliers, initial stock maps |
 | Historical run | ST-Sim | Build result | Land cover, transitions and carbon, start to end year |
 | Projection Setup | stages 9, 10 | Build result | Projection transitions and fire to the end year in Run Settings, suitability surfaces, and the historical run's final state as the projection's starting maps |
@@ -238,6 +390,7 @@ The Build is made once per study area. The historical run is made once per Build
 
 | Step | Time | Notes |
 | --- | --- | --- |
+| Data Download, first time | about 2.5 hours | Once per region. FIA DataMart is about an hour of it, once per home. A rerun with nothing to fetch takes under a minute. |
 | Build | about 1 hour | Once per study area. |
 | Build Figures | 1–2 minutes |  |
 | Historical run, 1985–2023 | about 2.5 hours (whole landscape: about 8 hours) | About 6 minutes of the 2.5 hours merges the tiles. Once per Build. |
@@ -301,7 +454,7 @@ The study area is one or more units of one kind: states, counties, HUCs, EPA eco
 2. **Cell size (m)**: `150`. A finer grid takes longer in every stage and every run; at 150 m a pyrome runs about 12 minutes per simulated year.
 3. **Historical period**: start year `1985`, end year `2023`. Land use, disturbance and climate come from these years' data. Projections start the year after the end year; their end year is set in the Projection Setup (chapter 6) and their climate in a Projection Climate scenario, so the Build itself knows nothing about projections.
 4. **Strata**: the primary strata are always the FIA ecodivisions (the growth curves are fitted on them). Choose the **Secondary** and **Tertiary** sources; here Counties and Federal Lands.
-5. **Land cover**: choose the **Forest type map** (LANDFIRE EVT 2016, the default, with the pixels it does not call forest filled from neighbouring cells or from the USFS forest type groups; USFS forest type groups; or TreeMap) and where **Stand age** comes from (NASA CMS Forest Age 1990, the default, or TreeMap). TreeMap (USFS, 30 m) gives every forest pixel an FIA plot: its forest type group, and its stand age moved from the plot's inventory year to the start year. Here USFS forest type groups and NASA CMS.
+5. **Land cover**: choose the **Forest type map** (LANDFIRE EVT, the default; USFS forest type groups; or TreeMap) and where **Stand age** comes from (NASA CMS Forest Age 1990, the default, or TreeMap). TreeMap (USFS, 30 m) gives every forest pixel an FIA plot: its forest type group, and its stand age moved from the plot's inventory year to the start year. Here USFS forest type groups and NASA CMS.
 6. **Resampling to the grid**: how each year's 30 m Annual NLCD becomes the model grid. **Modal** (default) gives each cell its most common 30 m class; **Area-matched** makes every class's area in each secondary stratum unit equal its 30 m area, year by year, changing cells only where the 30 m totals move and never removing developed land. The start-year state classes and the land-use transitions both come from these maps. Here Area-matched; section 3.3.1 compares the two.
 7. **Growth**: **Site productivity** is None (the default) or TreeMap site class. With TreeMap site class, each forest cell's growth is scaled by how productive its land is, on top of the climate multipliers, and its starting live and dead carbon by the same multiplier. The multiplier comes from the FIA site class of the cell's TreeMap plots, set for each forest type and ecodivision from the plots' live carbon against the growth curve. **Build Results > Site Productivity** lists the multipliers, and Build Figures maps them. A library made before 30 October 2026 needs tools/sync-library.R first. Here None.
 8. **Spatial multiprocessing**: tick **Split runs into tiles** and choose the strata level the tiles follow. The number box then shows auto: stage 1 picks as many tiles as still shorten the run, and logs its choice, the speed-up and an estimate of each job's memory. Type a number to choose it yourself. P26 uses 5 tiles of whole Counties, the number automatic also picks. Stage 1 writes the tile map into the Build result, so the historical run and every projection on this Build are split the same way; a projection can set its own tiles in its Run Settings. Units are packed into tiles of about equal area, largest first, so no county is split between tiles. Tiled runs also need library multiprocessing on (section 1.4), with about as many jobs as tiles. A change takes effect the next time the Build runs.
@@ -637,6 +790,8 @@ The note at the bottom (17) explains how the columns combine. The page only read
 ![The Minimum Harvest Ages page of the P26 Build result: Minimum Harvest Ages marked 18 under Build Results, and the table of Ecodivision, Forest Type, Harvest, FIA, Study Area Maps, Mapped Cuts, Minimum Age Used marked 19 and Basis marked 20](images/fig-4.10.png)
 
 *Figure 4.10. Minimum Harvest Ages of the P26 Build: the minimum each forest type and harvest got, and where it came from.*
+
+**Data Sources Used.** **Build Results > Data Sources Used** lists, for each stage, every dataset it read: the stage, the Data Sources column, where it came from (the top of the home, a region folder such as `regions/Pyrome-P26-Northern-Sierra-Nevada`, or a set path), the path, the number of files and their size. A dataset from the home also gets its SHA-256 checksum, taken from the home's `files.csv`; a folder gets one checksum over all its files. Because the home is write-once, these checksums record exactly which data a Build was made from, for a data release or a later check. A Note says when a home dataset's files no longer match `files.csv`, which means a file was changed by hand.
 
 ### 4.5 Build Figures: maps and charts of the Build
 
@@ -1288,7 +1443,7 @@ Each climate future is its own small scenario on the Build result, so one Build 
 
 13. Save and run. Its result holds the flow multipliers for 2024 to the Last Year. For P26 (`[58]`) it took 4.6 minutes and wrote 114 maps (45 MB). The run log gives each multiplier's mean in the first and last projected decade: under CanESM5 SSP2-4.5, forest growth is 1.07 in 2024-2033 and 1.00 in 2041-2050, non-forest growth 1.15 and 0.90, and decay of the fast and slow pools rises to 1.26 and 1.18.
 
-> The lists of scenarios, models and replicates come with the package, from the LOCA2 runs on the machine lucasCore was developed on. Stage 11 reads the run from the LOCA2 folder in Data Sources and stops with a clear message, naming the models or replicates that do have the chosen SSP, if the run is not on this machine.
+> The lists of scenarios, models and replicates are made from the runs in the LOCA2 folder. That is the Data Sources path when it is set, and otherwise the home's `climate/loca2`, which holds the runs the Data Download fetched (section 1.6.4, step 7). After a download adds runs, click **Rescan LOCA2 folder**: runs no longer in the folder are marked "none found in the LOCA2 folder" and drop out of the lists. Stage 11 reads the run from the same folder. If the run is not there, it stops with a clear message that names the models or replicates that do have the chosen SSP.
 
 **A second climate future, by copying the first.** A copy keeps the Build dependency, the stage 11 pipeline and the LOCA2 run, so only the name and the run need changing:
 
