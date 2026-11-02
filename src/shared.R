@@ -282,8 +282,8 @@ nlcd_on_grid <- function(nf, L, R) {
 # so stage 6 aggregates them over the same blocks)
 # The anchor is the national Annual NLCD file's extent (NLCD_CONUS_EXT), not the file's own: a regional clip from the Data Download
 # has a smaller extent, and anchoring on it moved every block by up to 4 pixels (P26 2026-11-01: 7.7% of 150 m cells changed class)
-NLCD_CONUS_EXT <- c(-2415585, 2384415, 164805, 3314805)   # xmin, xmax, ymin, ymax of Annual_NLCD_LndCov_*_CU (EPSG:5070, 30 m)
-grid_blocks <- function(n30, L, R) {
+# (an argument, not a global: stages 5 and 6 send grid_blocks to parallel workers on its own)
+grid_blocks <- function(n30, L, R, NLCD_CONUS_EXT = c(-2415585, 2384415, 164805, 3314805)) {   # xmin, xmax, ymin, ymax of Annual_NLCD_LndCov_*_CU (EPSG:5070, 30 m)
   res_m <- terra::res(R)[1]; fact <- round(res_m / terra::res(n30)[1]); blk <- fact * terra::res(n30)[1]
   nat <- terra::rast(terra::ext(NLCD_CONUS_EXT), resolution = terra::res(n30), crs = terra::crs(n30))
   conus <- terra::ext(terra::crop(nat, terra::ext(L) + blk)); want <- terra::ext(R) + blk
