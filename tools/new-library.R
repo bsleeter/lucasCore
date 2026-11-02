@@ -111,9 +111,8 @@ loca2 <- { d <- as.data.table(datasheet(P, "lucasCore_DataSource", optional = TR
     place <- data.table::fread(file.path(pkgdir, "defaults", "library", "data-sources.csv"), colClasses = "character")[Column == "Loca2Folder", HomePath]
     rd <- file.path(home, "regions"); cand <- file.path(c(home, if (dir.exists(rd)) sort(list.dirs(rd, recursive = FALSE))), place)
     cand <- cand[dir.exists(cand) & vapply(cand, function(x) length(list.files(x)) > 0, TRUE)]; if (length(cand)) v <- cand[1] }
-  if (is.na(v) || !nzchar(v)) { xml <- paste(readLines(file.path(pkgdir, "package.xml"), warn = FALSE), collapse = "\n")
-    v <- sub('.*name="Loca2Folder"[^>]*defaultValue="([^"]*)".*', "\\1", xml) }
-  opt("loca2", v) }
+  # (package.xml has no default LOCA2 folder: the build machine's was removed 2026-11-02)
+  opt("loca2", if (is.na(v)) "" else v) }
 ssp_names <- c(ssp126 = "SSP1-2.6", ssp245 = "SSP2-4.5", ssp370 = "SSP3-7.0", ssp585 = "SSP5-8.5")
 has_run <- function(d) all(vapply(c("pr", "tasmax", "tasmin"), function(v) length(Sys.glob(file.path(d, v, "*.monthly.nc"))) > 0, TRUE))
 runs <- if (dir.exists(loca2)) rbindlist(lapply(list.dirs(loca2, recursive = FALSE), function(g) rbindlist(lapply(list.dirs(g, recursive = FALSE), function(m) {
@@ -121,7 +120,9 @@ runs <- if (dir.exists(loca2)) rbindlist(lapply(list.dirs(loca2, recursive = FAL
   if (!has_run(file.path(m, "historical")) || !length(s)) return(NULL)
   data.table(Gcm = basename(g), Member = basename(m), Ssp = s) })))) else data.table()
 have_s <- suppressWarnings(as.data.table(datasheet(P, "lucasCore_ClimateScenario", optional = TRUE)))
-if (!nrow(runs)) cat("LOCA2: no model runs found under", loca2, "- climate lists left empty\n") else if (nrow(have_s) && !"--rebuild-climate" %in% a) {
+if (!nrow(runs)) cat(sprintf("LOCA2: no model runs found%s - %s\n", if (nzchar(loca2)) paste(" under", loca2) else " (no LOCA2 folder: set Data Sources Home after a Data Download)",
+                             if (nrow(have_s)) sprintf("the climate lists kept (%d scenarios: the shipped lists or an earlier scan; Rescan on the Projection Climate page updates them)", nrow(have_s))
+                             else "climate lists left empty")) else if (nrow(have_s) && !"--rebuild-climate" %in% a) {
   cat(sprintf("%-34s kept (%d rows)\n", "lucasCore_ClimateScenario / Model", nrow(have_s)))
 } else {
   sc <- unique(runs$Ssp); sc <- sc[order(sc)]

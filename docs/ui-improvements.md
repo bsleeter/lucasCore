@@ -717,6 +717,6 @@ Pushed: everything through a8adf51 (2026-11-02), released as v1.0.0 on GitHub wi
     strata_path, src/shared.R strata_from_home), recorded in Data Sources Used. HUC6, HUC8, EPA L3 and pyromes ship ListFiles, so a
     new library needs no polygons. Also fixed: the Studio template's FIA Ecodivisions File (an F: path); tools/new-data-download.R
     could not set Data Sources Home in a new library (its blank row reads as no row; a second row was silently dropped). Tests:
-    tests/unit-strata-home.R, tests/phaseZ26-strata-home.R (stage 1 on P26, home vs the old local files). Still on the build machine
-    (to decide): the Data Sources defaults in package.xml (F: paths, read only when the home lacks a dataset) and the LOCA2 lists a
-    new Studio library scans from that default path.
+    tests/unit-strata-home.R, tests/phaseZ26-strata-home.R (stage 1 on P26, home vs the old local files). Then (same day, user):
+    package.xml lost its 24 Data Sources defaults (F: paths): a blank path reads the home or the package, else stops saying to run a
+    Data Download; so a new library no longer scans the build machine's LOCA2 folder (the shipped lists, then Rescan).

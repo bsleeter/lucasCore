@@ -12,32 +12,32 @@
 		<!-- Data Sources Home (to-do 12, src/datahome.R): a blank path below reads its standard place in this folder -->
 		<column name="DataSourcesHome" displayName="Data Sources Home (one folder holding every dataset at its standard place)" dataType="String" isOptional="True"/>
 		<column name="EcodivisionFile" displayName="FIA Ecodivisions (dissolved; fields StrtmId, StrtmNm) - primary strata and model lattice; blank = the package copy" dataType="String" isOptional="True"/>
-		<column name="FiaConditionFile" displayName="FIA Condition Carbon and Merchantable Volume (USGS .Rds)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FIA/USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds"/>
-		<column name="FiaDisturbanceFile" displayName="FIA Condition Disturbance and Treatment Codes (USGS .Rds)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FIA/USGS_forest_conditions_dstrbcd_and_trtcd_20240213.Rds"/>
-		<column name="FiaDataMartFolder" displayName="FIA DataMart Folder (state PLOT, COND, TREE csvs and FIADB_REFERENCE)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FIA/DataMart"/>
-		<column name="NlcdFolder" displayName="Annual NLCD Folder (Annual_NLCD_LndCov_year_CU_C1V0.tif or _C1V2.tif)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/NLCD/Annual NLCD"/>
+		<column name="FiaConditionFile" displayName="FIA Condition Carbon and Merchantable Volume (USGS .Rds)" dataType="String" isOptional="True"/>
+		<column name="FiaDisturbanceFile" displayName="FIA Condition Disturbance and Treatment Codes (USGS .Rds)" dataType="String" isOptional="True"/>
+		<column name="FiaDataMartFolder" displayName="FIA DataMart Folder (state PLOT, COND, TREE csvs and FIADB_REFERENCE)" dataType="String" isOptional="True"/>
+		<column name="NlcdFolder" displayName="Annual NLCD Folder (Annual_NLCD_LndCov_year_CU_C1V0.tif or _C1V2.tif)" dataType="String" isOptional="True"/>
 		<column name="Evt2001File" displayName="LANDFIRE EVT 2001 (retired 2026-11-01: not read; LANDFIRE no longer publishes it)" dataType="String" isOptional="True" isVisible="False"/>
-		<column name="Evt2016File" displayName="LANDFIRE EVT 2016 (LF 2.0.0)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/EVT/LF2016_EVT_200_CONUS/LF2016_EVT_200_CONUS/Tif/LC16_EVT_200.tif"/>
-		<column name="RcmapFile" displayName="RCMAP Vegetation State 1985 (USGS, doi 10.5066/P13OMU52)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/RCMAP/1985_vegetation_state/1985_vegetation_state_20250608.tif"/>
-		<column name="CcapFile" displayName="C-CAP Land Cover 2001" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/CCAP/conus_2001_ccap_landcover_20200311.tif"/>
-		<column name="StandAgeFile" displayName="NASA CMS Forest Age 1990" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Stand Age/cms_age_1990.tif"/>
-		<column name="ForestTypeGroupFolder" displayName="USFS Forest Type Group Map Folder (NFCMS regional *_ForestType.tif)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/NFCMS/Forest Type"/>
-		<column name="MtbsSeverityFolder" displayName="MTBS Burn Severity Folder (mtbs_CONUS_year.tif)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/MTBS/Burn Severity"/>
-		<column name="TreeMapFolder" displayName="TreeMap Folder (TreeMap2016.tif and its .vat.dbf; forest type, stand age, site productivity)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/TreeMap/Data"/>
-		<column name="LandfireDisturbanceFolder" displayName="LANDFIRE Disturbance Folder (US_DISTyear)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Landfire Disturbance"/>
-		<column name="LcmsFolder" displayName="USFS LCMS annual Change folder (year/*Change_year.tif; harvest, stages 6 and 10)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/LCMS/v2025-11/Change_Annual"/>
-		<column name="BurnProbabilityFile" displayName="Burn probability raster (fire method 2 default; FSim CONUS LF2020 270 m)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FSim/Data/I_FSim_CONUS_LF2020_270m/CONUS_BP.tif"/>
-		<column name="FpaFodFile" displayName="FPA-FOD fire occurrence geopackage (ignition density, fire method 2)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FPA-FOD/7th/Data/FPA_FOD_20260615.gpkg"/>
-		<column name="FriFile" displayName="LANDFIRE Mean Fire Return Interval" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FRI/Tif/LC16_FRI_200.tif"/>
-		<column name="PrismFolder" displayName="PRISM Folder (annual and normals)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Climate/prism"/>
-		<column name="Loca2Folder" displayName="LOCA2 Folder (gcm/r1i1p1f1/ssp)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Climate/LOCA2"/>
-		<column name="SoilCarbonFile" displayName="Soil Organic Carbon (gNATSGO soc0_999; gSSURGO also reads)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/gSSURGO/gssurgo_soc_0_999.tif"/>
-		<column name="FirePerimeterHistoryFile" displayName="Interagency Fire Perimeter History" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/NIFS/InterAgencyFirePerimeterHistory_All_Years_View/InterAgencyFirePerimeterHistory_All_Years_View.shp"/>
-		<column name="RoadsFile" displayName="Roads (LANDFIRE 30 m raster; stage 10)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Roads/LF2023_Roads_CONUS/Tif/LF2023_Roads_CONUS.tif"/>
-		<column name="ElevationFile" displayName="Elevation (LANDFIRE 30 m DEM; stage 10)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/DEM/LF2020_Elev_220_CONUS/Tif/LC20_Elev_220.tif"/>
-		<column name="WuiFolder" displayName="SILVIS WUI v4 blocks (folder of state .gdb; stage 10)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/WUI/2020"/>
+		<column name="Evt2016File" displayName="LANDFIRE EVT 2016 (LF 2.0.0)" dataType="String" isOptional="True"/>
+		<column name="RcmapFile" displayName="RCMAP Vegetation State 1985 (USGS, doi 10.5066/P13OMU52)" dataType="String" isOptional="True"/>
+		<column name="CcapFile" displayName="C-CAP Land Cover 2001" dataType="String" isOptional="True"/>
+		<column name="StandAgeFile" displayName="NASA CMS Forest Age 1990" dataType="String" isOptional="True"/>
+		<column name="ForestTypeGroupFolder" displayName="USFS Forest Type Group Map Folder (NFCMS regional *_ForestType.tif)" dataType="String" isOptional="True"/>
+		<column name="MtbsSeverityFolder" displayName="MTBS Burn Severity Folder (mtbs_CONUS_year.tif)" dataType="String" isOptional="True"/>
+		<column name="TreeMapFolder" displayName="TreeMap Folder (TreeMap2016.tif and its .vat.dbf; forest type, stand age, site productivity)" dataType="String" isOptional="True"/>
+		<column name="LandfireDisturbanceFolder" displayName="LANDFIRE Disturbance Folder (US_DISTyear)" dataType="String" isOptional="True"/>
+		<column name="LcmsFolder" displayName="USFS LCMS annual Change folder (year/*Change_year.tif; harvest, stages 6 and 10)" dataType="String" isOptional="True"/>
+		<column name="BurnProbabilityFile" displayName="Burn probability raster (fire method 2 default; FSim CONUS LF2020 270 m)" dataType="String" isOptional="True"/>
+		<column name="FpaFodFile" displayName="FPA-FOD fire occurrence geopackage (ignition density, fire method 2)" dataType="String" isOptional="True"/>
+		<column name="FriFile" displayName="LANDFIRE Mean Fire Return Interval" dataType="String" isOptional="True"/>
+		<column name="PrismFolder" displayName="PRISM Folder (annual and normals)" dataType="String" isOptional="True"/>
+		<column name="Loca2Folder" displayName="LOCA2 Folder (gcm/r1i1p1f1/ssp)" dataType="String" isOptional="True"/>
+		<column name="SoilCarbonFile" displayName="Soil Organic Carbon (gNATSGO soc0_999; gSSURGO also reads)" dataType="String" isOptional="True"/>
+		<column name="FirePerimeterHistoryFile" displayName="Interagency Fire Perimeter History" dataType="String" isOptional="True"/>
+		<column name="RoadsFile" displayName="Roads (LANDFIRE 30 m raster; stage 10)" dataType="String" isOptional="True"/>
+		<column name="ElevationFile" displayName="Elevation (LANDFIRE 30 m DEM; stage 10)" dataType="String" isOptional="True"/>
+		<column name="WuiFolder" displayName="SILVIS WUI v4 blocks (folder of state .gdb; stage 10)" dataType="String" isOptional="True"/>
 		<column name="NccpiFile" displayName="gNATSGO crop productivity NCCPI, 30 m (stage 10; blank = fetched for the fitting region from Planetary Computer)" dataType="String" isOptional="True"/>
-		<column name="ForestOwnerFile" displayName="USFS forest ownership circa 2017, 30 m (stage 10)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Forest Ownership/Data/forest_own1/forest_own1.tif"/>
+		<column name="ForestOwnerFile" displayName="USFS forest ownership circa 2017, 30 m (stage 10)" dataType="String" isOptional="True"/>
 	</dataSheet>
 
 	<dataSheet name="DataSourceEdition" displayName="Data Source Editions" dataScope="Project">

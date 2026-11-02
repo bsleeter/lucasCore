@@ -67,7 +67,8 @@ sheet_defaults <- function(name, quiet = FALSE) {
 # Files the package ships: the dissolved FIA ecodivisions (ECOMAP 2007 divisions; ECOMAP 2025 renumbers them, so a fresh download
 # would not match the package's strata tables)
 PACKAGE_SOURCES <- list(EcodivisionFile = c("defaults", "strata", "ecodivisions", "EcoDivisions_Dissolve.shp"))
-# A blank path reads, in order: its place under Data Sources Home (src/datahome.R), the package.xml default, the package's own copy
+# A blank path reads, in order: its place under Data Sources Home (src/datahome.R), the package's own copy (package.xml has no default paths:
+# the build machine's were removed 2026-11-02, so a dataset missing from the home stops with what to do)
 source(file.path(env$PackageDirectory, "src", "datahome.R"))
 # optional = TRUE: a column with nothing set, at home or by default, gives NA instead of stopping (NCCPI, fetched when blank)
 read_data_sources <- function(cols, optional = FALSE) {
@@ -99,7 +100,8 @@ read_data_sources <- function(cols, optional = FALSE) {
     if (is.na(v) || !nzchar(v)) { v <- def[[k]][1]; how <- "default" }
     if ((is.null(v) || is.na(v) || !nzchar(v)) && !is.null(PACKAGE_SOURCES[[k]])) { v <- do.call(pkg_file, as.list(PACKAGE_SOURCES[[k]])); how <- "package" }
     if (is.null(v) || is.na(v) || !nzchar(v)) { if (optional) { out[k] <- list(NA_character_); next }
-      fail("Data Sources: %s is not set and has no default", k) }
+      fail("Data Sources: %s is not set and is not in Data Sources Home%s: run a Data Download scenario for this study area, or set its path on the Data Sources page", k,
+           if (is.null(hl)) " (Data Sources Home is not set)" else "") }
     if (!file.exists(v)) fail("Data Sources: %s not found (%s)", k, v)
     .home_cov$read[[k]] <- list(DataSource = k, Origin = how, Dir = dir, Path = v)
     out[[k]] <- v }
