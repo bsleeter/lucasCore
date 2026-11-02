@@ -76,6 +76,8 @@ fetch_files <- function(urls, dest, connections = 4, log = message, sizes = url_
     if (try > 1) { log(sprintf("  retrying %d of %d files (%d)", length(todo), length(urls), try - 1)); Sys.sleep(10 * (try - 1)) }   # a busy server gets a moment
     # a partial file bigger than the server's size is wrong: start it again
     for (i in todo) if (file.exists(dest[i]) && !is.na(sizes[i]) && file.size(dest[i]) > sizes[i]) file.remove(dest[i])
+    # a file of unknown size cannot be resumed or checked (a WCS answer has no ranges): one left by an earlier run starts again
+    for (i in todo) if (file.exists(dest[i]) && is.na(sizes[i])) file.remove(dest[i])
     for (ch in split(todo, ceiling(seq_along(todo) / max(1, connections)))) {
       r <- curl::multi_download(urls[ch], dest[ch], resume = TRUE, progress = FALSE, multiplex = FALSE,
                                 connecttimeout = 60, low_speed_time = 300, low_speed_limit = 100, failonerror = TRUE)
