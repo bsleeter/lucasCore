@@ -73,7 +73,7 @@ todo <- if (length(asked)) intersect(asked, names(H)) else names(H)
 check_only <- isTRUE(as.logical(o("CheckOnly", FALSE)))
 y_to <- o("YearTo", NA_integer_)
 ctx <- list(home = home, region_home = region_home, region = region, years = c(as.integer(o("YearFrom", 1985L)), if (is.na(y_to)) NA_integer_ else as.integer(y_to)),
-            keep = isTRUE(as.logical(o("KeepNational", FALSE))), connections = as.integer(o("Connections", 4L)), opts = opt, log = log, prj = prj)
+            keep = isTRUE(as.logical(o("KeepNational", FALSE))), new_editions = isTRUE(as.logical(o("FetchNewEditions", FALSE))), connections = as.integer(o("Connections", 4L)), opts = opt, log = log, prj = prj)
 say("%s %d datasets into %s%s", if (check_only) "Checking" else "Downloading", length(todo), home, if (ctx$keep) " (national copies kept)" else "")
 progressBar(type = "begin", totalSteps = length(todo))
 res <- rbindlist(lapply(todo, function(k) { h <- H[[k]]

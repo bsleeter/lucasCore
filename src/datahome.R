@@ -107,24 +107,42 @@ home_regions <- function(home) {
   d <- file.path(home, "regions"); if (is.null(home) || is.na(home) || !dir.exists(d)) return(character())
   normalizePath(list.dirs(d, recursive = FALSE), winslash = "/") }
 
-# a region's folder name from its Study Area unit names (or the name typed on the page): letters, digits, - and _ only
+# a region's folder name from its Study Area unit names (or the name typed on the page), and an edition's from its version:
+# letters, digits, - and _ only
 region_name <- function(x) {
   n <- gsub("^-+|-+$", "", gsub("[^A-Za-z0-9_]+", "-", paste(x, collapse = "+")))
   if (!nzchar(n)) stop("the region needs a name of letters or digits", call. = FALSE)
   if (nchar(n) > 60) n <- paste0(substr(n, 1, 51), "-", substr(digest::digest(n, algo = "md5"), 1, 8))
   n }
 
-# a folder's label in messages: "regions/P26", or "the top of the home" for national copies and hand-laid homes
-home_label <- function(home, dir) if (identical(normalizePath(dir, winslash = "/", mustWork = FALSE), normalizePath(home, winslash = "/", mustWork = FALSE)))
-  "the top of the home" else paste0("regions/", basename(dir))
+edition_tag <- function(version) region_name(version)
+
+# a folder's label in messages: "regions/P26", "regions/P26/editions/LF2025-final", or "the top of the home"
+home_label <- function(home, dir) { d <- normalizePath(dir, winslash = "/", mustWork = FALSE); h <- normalizePath(home, winslash = "/", mustWork = FALSE)
+  if (identical(d, h)) "the top of the home" else if (startsWith(d, paste0(h, "/"))) substring(d, nchar(h) + 2) else d }
+
+# ---- editions (plan, "Design: editions") ------------------------------------------------------------------------------------
+# A new edition of a dataset a folder already holds goes to <folder>/editions/<tag>/, laid out like a home (own manifest.csv and
+# files.csv); the dataset's first place stays as it is. A library reads the first edition until its Data Source Editions sheet
+# (set on the Data Sources page) names another. Every edition of a dataset in the home: Folder (the top or a region), Edition
+# (blank = the first), Dir, Version, Downloaded
+home_editions <- function(home, column) {
+  base <- c(normalizePath(home, winslash = "/", mustWork = FALSE), home_regions(home))
+  data.table::rbindlist(lapply(base, function(b) { m <- read_manifest(b)[Column == column & Status == "done"]
+    eds <- if (dir.exists(file.path(b, "editions"))) list.dirs(file.path(b, "editions"), recursive = FALSE) else character()
+    x <- data.table::rbindlist(lapply(eds, function(e) { r <- read_manifest(e)[Column == column & Status == "done"]
+      if (nrow(r)) data.table::data.table(Folder = home_label(home, b), Edition = basename(e), Dir = normalizePath(e, winslash = "/"), Version = r$Version, Downloaded = r$Downloaded) }))
+    rbind(if (nrow(m)) data.table::data.table(Folder = home_label(home, b), Edition = "", Dir = b, Version = m$Version, Downloaded = m$Downloaded), x) })) }
 
 # where a blank dataset is read from: the folders holding its place (the top and every region), best first. A folder whose
 # manifest covers the box comes first, smallest box first (a national copy last); then folders with no manifest row (laid out
 # by hand: the top before regions); folders whose manifest does not cover the box last, so the coverage check names what to do.
 # box NULL (no study area known): the top first. Returns list(dir, path), or NULL when no folder has it; stops when a folder
 # matches 2+ files
-home_pick <- function(home, column, homepath, box = NULL) {
+# edition: the library's chosen edition (blank = the first: each folder itself; else each folder's editions/<edition>)
+home_pick <- function(home, column, homepath, box = NULL, edition = NULL) {
   dirs <- c(normalizePath(home, winslash = "/", mustWork = FALSE), home_regions(home)); best <- NULL; rank <- Inf
+  if (!is.null(edition) && !is.na(edition) && nzchar(edition)) { dirs <- file.path(dirs, "editions", edition); dirs <- dirs[dir.exists(dirs)] }
   for (i in seq_along(dirs)) { p <- home_path(dirs[i], homepath)
     if (is.na(p)) { if (attr(p, "found") > 1) stop(sprintf("Data Sources: %s is blank and %d files match its place in %s (%s); keep one, or set the path",
                                                            column, attr(p, "found"), home_label(home, dirs[i]), file.path(dirs[i], homepath)), call. = FALSE)

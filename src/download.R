@@ -99,7 +99,7 @@ dataset_up_to_date <- function(home, column, region) {
   nrow(f) > 0 && all(file.exists(file.path(home, f$Path))) && all(file.size(file.path(home, f$Path)) == as.numeric(f$Bytes)) }
 
 # "in regions/P26", "at the top of the home": where a dataset is, for Download Results
-held_in <- function(where) if (startsWith(where, "regions/")) paste("in", where) else paste("at", where)
+held_in <- function(where) if (identical(where, "the top of the home")) paste("at", where) else paste("in", where)
 
 # the folder a dataset is written to: the top of the home for national copies, else the run's region folder (regions/<name>;
 # the top when the run is national or the home has no regions)
@@ -140,12 +140,20 @@ run_dataset <- function(h, ctx, layout, check_only = FALSE) {
   # a handler with have(ctx, items) (one TRUE per planned item already in place) can grow: a rerun asking for more (LOCA2 models,
   # scenarios, members) fetches only what is missing; without it, a covering manifest means the dataset is done
   up <- dataset_up_to_date(ctx$store, col, ctx$region)
-  if (up && is.null(h$have)) { m <- read_manifest(ctx$store)[Column == col]
-    log(sprintf("%s: up to date in %s (manifest and files.csv)%s", h$name, where,
-                if (!is.null(h$version) && !identical(m$Version, h$version)) sprintf("; it holds %s, this version fetches %s: a new edition goes into another region name", m$Version, h$version) else ""))
+  # a new edition (the folder holds this dataset for the region, at another version): into <folder>/editions/<tag>/ when Fetch new
+  # editions is ticked, else skipped; the first edition is never touched, and a library reads it until its Data Sources page says
+  m0 <- read_manifest(ctx$store)[Column == col]
+  newer <- up && !is.null(h$version) && nrow(m0) == 1 && !is.na(m0$Version) && !identical(m0$Version, h$version)
+  if (newer) { ed <- file.path(ctx$store, "editions", edition_tag(h$version))
+    if (!isTRUE(ctx$new_editions) && !dataset_up_to_date(ed, col, ctx$region)) {
+      log(sprintf("%s: %s holds %s; this version fetches %s, a new edition (tick Fetch new editions to download it)", h$name, where, m0$Version, h$version))
+      return(out("skipped", nrow(read_files(ctx$store)[Column == col]), nxt = sprintf("%s; new edition %s available: tick Fetch new editions to add it beside the first", held_in(where), h$version))) }
+    ctx$store <- ed; where <- home_label(ctx$home, ed); up <- dataset_up_to_date(ed, col, ctx$region)
+    log(sprintf("%s: new edition %s, into %s", h$name, h$version, where)) }
+  if (up && is.null(h$have)) { log(sprintf("%s: up to date in %s (manifest and files.csv)", h$name, where))
     return(out("skipped", nrow(read_files(ctx$store)[Column == col]), nxt = held_in(where))) }
   # a copy held elsewhere for this region (a clipped copy in the region folder of a dataset now kept whole, or a national copy)
-  if (!up && is.null(h$have)) for (d in setdiff(unique(c(ctx$region_home, ctx$home)), ctx$store))
+  if (!up && !newer && is.null(h$have)) for (d in setdiff(unique(c(ctx$region_home, ctx$home)), ctx$store))
     if (dataset_up_to_date(d, col, ctx$region)) { log(sprintf("%s: up to date in %s", h$name, home_label(ctx$home, d)))
       return(out("skipped", nrow(read_files(d)[Column == col]), nxt = held_in(home_label(ctx$home, d)))) }
   # write-once: a folder that holds this dataset for another region is never refetched over

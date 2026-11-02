@@ -13,7 +13,8 @@
 // and each model's r1i1p1f1 (else its first). Unticking every model goes back to that one; no scenario ticked = historical only.
 // Members: the members the ticked models have; none ticked = each model's r1i1p1f1, else its first.
 // Home layout (HomeLayout 1 National, 2 By region) and Region name (blank = from the Study Area units): the region's clips go in
-// <home>/regions/<name>/, and the page lists the regions the home already holds.
+// <home>/regions/<name>/, and the page lists the regions the home already holds. Fetch new editions (FetchNewEditions): a dataset the
+// home holds at an older version gets the new one in <folder>/editions/<tag>/ (src/download.R).
 // =============================================================================
 using System;
 using System.Collections.Generic;
@@ -37,6 +38,7 @@ namespace lucasCoreUI
         private readonly Label m_regions = new Label { AutoSize = true, MaximumSize = new Size(680, 0), ForeColor = SystemColors.GrayText, Margin = new Padding(3, 2, 3, 4) };
         private readonly TextBox m_buffer = Box(60), m_from = Box(60), m_to = Box(60), m_con = Box(40);
         private readonly CheckBox m_keep = new CheckBox { Text = "Keep national copies (else each whole file is clipped to the region after download)", AutoSize = true, Margin = new Padding(3, 5, 3, 3) };
+        private readonly CheckBox m_editions = new CheckBox { Text = "Fetch new editions: a dataset the home holds at an older version gets the new one beside it (editions/); libraries keep reading the old one until changed on their Data Sources page", AutoSize = true, MaximumSize = new Size(680, 0), Margin = new Padding(3, 5, 3, 3) };
         private readonly CheckBox m_check = new CheckBox { Text = "Check only: list what would download, and how big, without fetching anything", AutoSize = true, Margin = new Padding(3, 5, 3, 3) };
         // LOCA2 catalog rows: model, member, scenario, has the west regional cut
         private class Run { public string Model, Member, Scenario; public bool West; }
@@ -128,7 +130,7 @@ namespace lucasCoreUI
 
             AddGroup(Group("LOCA2 climate projections", BuildLoca2()));
 
-            var how = Column(); how.Controls.Add(m_check); how.Controls.Add(m_keep);
+            var how = Column(); how.Controls.Add(m_check); how.Controls.Add(m_keep); how.Controls.Add(m_editions);
             var c = Row(); c.Controls.Add(Caption("Downloads at once:")); c.Controls.Add(m_con); c.Controls.Add(Note("blank = 4")); how.Controls.Add(c);
             var em = Row(); em.Controls.Add(Caption("LANDFIRE email:")); em.Controls.Add(m_email); em.Controls.Add(m_emailNote); how.Controls.Add(em);
             how.Controls.Add(Wrapped("The LANDFIRE Product Service clips the LANDFIRE layers to the region and needs an email address with each job. It is kept in the home folder's settings.csv, not in the scenario, so every download into that folder uses it.", 680));
@@ -143,6 +145,7 @@ namespace lucasCoreUI
             BindNumber(m_to, () => Sheet, "YearTo", true); BindNumber(m_con, () => Sheet, "Connections", true);
             m_keep.CheckedChanged += (s, a) => { if (!Refreshing) Write("KeepNational", m_keep.Checked); };
             m_check.CheckedChanged += (s, a) => { if (!Refreshing) Write("CheckOnly", m_check.Checked); };
+            m_editions.CheckedChanged += (s, a) => { if (!Refreshing) Write("FetchNewEditions", m_editions.Checked); };
             this.ResumeLayout(false);
         }
 
@@ -347,6 +350,8 @@ namespace lucasCoreUI
             m_buffer.Text = Show(Value("BufferKm")); m_from.Text = Show(Value("YearFrom")); m_to.Text = Show(Value("YearTo")); m_con.Text = Show(Value("Connections"));
             object k = Value("KeepNational"); m_keep.Checked = k != DBNull.Value && Convert.ToBoolean(k);
             object c = Value("CheckOnly"); m_check.Checked = c != DBNull.Value && Convert.ToBoolean(c);
+            object ne = Sheet.Columns.Cast<DataSheetColumn>().Any(x => x.Name == "FetchNewEditions") ? Value("FetchNewEditions") : DBNull.Value;
+            m_editions.Checked = ne != DBNull.Value && Convert.ToBoolean(ne); m_editions.Enabled = Sheet.Columns.Cast<DataSheetColumn>().Any(x => x.Name == "FetchNewEditions");
             ShowLoca2();
             string ds = Show(Value("Datasets")).Trim();
             var picked = new HashSet<string>(ds.Split(',').Select(x => x.Trim()).Where(x => x.Length > 0), StringComparer.OrdinalIgnoreCase);

@@ -40,6 +40,12 @@
 		<column name="ForestOwnerFile" displayName="USFS forest ownership circa 2017, 30 m (stage 10)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Forest Ownership/Data/forest_own1/forest_own1.tif"/>
 	</dataSheet>
 
+	<dataSheet name="DataSourceEdition" displayName="Data Source Editions" dataScope="Project">
+		<!-- which edition of a Data Sources Home dataset this library reads (src/datahome.R, editions; set on the Data Sources page): no row = the first edition -->
+		<column name="DataSource" displayName="Data Sources column" dataType="String"/>
+		<column name="Edition" displayName="Edition (the folder under editions/; blank = the first)" dataType="String" isOptional="True"/>
+	</dataSheet>
+
 	<dataSheet name="ClimateScenario" displayName="Climate Scenarios (LOCA2)" dataScope="Project" displayMember="Name">
 		<!-- the SSP folders found under Data Sources: LOCA2 Folder (ui/Loca2Lists.cs at library setup and Projection Climate > Rescan; tools/new-library.R) -->
 		<column name="Name" dataType="String"/>
@@ -867,6 +873,7 @@
 		<column name="YearTo" displayName="Last year of the annual datasets (blank = the latest each source has)" dataType="Integer" isOptional="True"/>
 		<column name="Datasets" displayName="Datasets (Data Sources columns, comma separated; blank = every one the stage can fetch)" dataType="String" isOptional="True"/>
 		<column name="KeepNational" displayName="Keep national copies (else each is clipped to the region)" dataType="Boolean" defaultValue="0" isOptional="True"/>
+		<column name="FetchNewEditions" displayName="Fetch new editions (a dataset the home holds at an older version: the new one beside it, in editions/)" dataType="Boolean" defaultValue="0" isOptional="True"/>
 		<column name="CheckOnly" displayName="Check only: list what would download, and how big, without fetching" dataType="Boolean" defaultValue="0" isOptional="True"/>
 		<column name="Connections" displayName="Downloads at once" dataType="Integer" defaultValue="4" isOptional="True"/>
 		<column name="Loca2Models" displayName="LOCA2 models (blank = the project&apos;s Climate Model list; the page ticks them from defaults/download/loca2-catalog.csv)" dataType="String" isOptional="True"/>

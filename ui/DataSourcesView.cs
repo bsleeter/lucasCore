@@ -11,7 +11,11 @@
 // Download button is off and the mark says "user-supplied" until a path is found.
 // Data Sources Home (to-do 12, src/datahome.R): one folder holding every dataset at its place (the file's HomePath column). A blank path
 // whose place holds the data shows "✓ home"; Make folders creates the empty layout. The home folder's manifest.csv, written by the Data
-// Download stage, adds each dataset's status and the region it covers to its mark and tooltip.
+// Download stage, adds each dataset's status and the region it covers to its mark and tooltip. The home is looked for at its top and
+// in every regions/<name> folder (By region layout); the mark names where ("✓ home", "✓ home: regions/P26", "✓ home: 2 regions"), and
+// the Build itself picks the smallest region holding its study area. Editions (src/datahome.R): a dataset whose folder also holds
+// editions/<tag>/ copies gets a drop-down of them; the choice, confirmed, is written to lucasCore_DataSourceEdition (blank Edition =
+// the first edition), the only place a library's edition changes.
 // =============================================================================
 using System;
 using System.Collections.Generic;
@@ -29,7 +33,9 @@ namespace lucasCoreUI
     {
         protected override string SheetName { get { return "lucasCore_DataSource"; } }
 
-        private class Entry { public string Column, Category, Source, Url, Name, Note, Access, HomePath; public TextBox Path; public Label State; }
+        private class Entry { public string Column, Category, Source, Url, Name, Note, Access, HomePath; public TextBox Path; public Label State; public ComboBox Edition; }
+        private class Ed { public string Tag, Text; public override string ToString() { return Text; } }
+        private const string EditionSheet = "lucasCore_DataSourceEdition";
         private const string HomeColumn = "DataSourcesHome";
         private TextBox m_home; private Label m_homeState;
         private readonly List<Entry> m_entries = new List<Entry>();
@@ -74,7 +80,8 @@ namespace lucasCoreUI
                 List<Entry> es = m_entries.Where(e => e.Category == cat).ToList();
                 if (es.Count == 0) continue;
                 // a fixed name width, and path boxes all sized together to the window (SizePaths), so every group's columns line up
-                var t = new TableLayoutPanel { AutoSize = true, ColumnCount = 5 };
+                var t = new TableLayoutPanel { AutoSize = true, ColumnCount = 6 };
+                t.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
                 t.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, NameWidth));
                 t.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
                 t.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
@@ -128,11 +135,74 @@ namespace lucasCoreUI
                 download.Click += (s, a) => { try { Process.Start(url); } catch (Exception) { } };
             }
             e.State = new Label { AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(6, 7, 3, 3), Font = new Font(this.Font, FontStyle.Bold) };
-            t.Controls.Add(cell, 0, r); t.Controls.Add(e.Path, 1, r); t.Controls.Add(browse, 2, r); t.Controls.Add(download, 3, r); t.Controls.Add(e.State, 4, r);
+            e.Edition = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = 230, Visible = false, Anchor = AnchorStyles.Left, Margin = new Padding(3, 4, 3, 3) };
+            t.Controls.Add(cell, 0, r); t.Controls.Add(e.Path, 1, r); t.Controls.Add(browse, 2, r); t.Controls.Add(download, 3, r); t.Controls.Add(e.State, 4, r); t.Controls.Add(e.Edition, 5, r);
 
             Entry en = e;
             e.Path.Validated += (s, a) => { if (Refreshing) return; string v = en.Path.Text.Trim(); Write(en.Column, v.Length == 0 ? (object)DBNull.Value : v); RefreshControls(); };
             browse.Click += (s, a) => Browse(en);
+            e.Edition.SelectionChangeCommitted += (s, a) => ChooseEdition(en);
+        }
+
+        // the folders of the home: its top, then every regions/<name> folder
+        private static List<string> Folders(string home)
+        {
+            var f = new List<string>(); if (home.Length == 0) return f;
+            f.Add(home);
+            try { string r = Path.Combine(home, "regions"); if (Directory.Exists(r)) f.AddRange(Directory.GetDirectories(r).OrderBy(x => x, StringComparer.OrdinalIgnoreCase)); } catch (Exception) { }
+            return f;
+        }
+        private static string FolderLabel(string home, string dir) { return string.Equals(Path.GetFullPath(dir).TrimEnd('\\'), Path.GetFullPath(home).TrimEnd('\\'), StringComparison.OrdinalIgnoreCase) ? "the top" : "regions/" + Path.GetFileName(dir); }
+
+        // the editions of a dataset in the folders that hold it: editions/<tag>/ with a done manifest row for the column
+        private static List<Ed> Editions(string home, string column, out string firstVersion)
+        {
+            var eds = new List<Ed>(); firstVersion = "";
+            foreach (string f in Folders(home))
+            {
+                Dictionary<string, string> m; if (Manifest(f).TryGetValue(column, out m) && firstVersion.Length == 0) firstVersion = Get(m, "Version");
+                string ed = Path.Combine(f, "editions"); if (!Directory.Exists(ed)) continue;
+                foreach (string d in Directory.GetDirectories(ed))
+                {
+                    Dictionary<string, string> r; if (!Manifest(d).TryGetValue(column, out r) || Get(r, "Status") != "done") continue;
+                    string tag = Path.GetFileName(d);
+                    if (!eds.Any(x => x.Tag == tag)) eds.Add(new Ed { Tag = tag, Text = string.Format("{0} ({1})", Get(r, "Version"), Get(r, "Downloaded").Split('T')[0]) });
+                }
+            }
+            return eds;
+        }
+
+        // the edition this library reads: its Data Source Editions row (blank or none = the first)
+        private string EditionOf(string column)
+        {
+            try
+            {
+                DataTable dt = this.DataFeed.Project.GetDataSheet(EditionSheet).GetData();
+                DataRow r = dt.Rows.Cast<DataRow>().FirstOrDefault(x => x.RowState != DataRowState.Deleted && Convert.ToString(x["DataSource"]) == column);
+                return r == null || r["Edition"] == DBNull.Value ? "" : Convert.ToString(r["Edition"]);
+            }
+            catch (Exception) { return ""; }
+        }
+
+        // a change of edition is the user's decision: confirmed, then written (blank = back to the first)
+        private void ChooseEdition(Entry e)
+        {
+            var pick = e.Edition.SelectedItem as Ed; if (pick == null) return;
+            string now = EditionOf(e.Column);
+            if (pick.Tag == now) return;
+            string from = now.Length == 0 ? "the first edition" : "edition " + now, to = pick.Tag.Length == 0 ? "the first edition" : "edition " + pick.Tag;
+            if (MessageBox.Show(this, string.Format("Read {0} for {1} instead of {2}?" + Environment.NewLine + Environment.NewLine + "This library's results were built from {2}. The next Build reads {0}, so its results will differ from the ones before; rebuild to use it.", to, e.Name ?? e.Column, from),
+                                "Change edition", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) { RefreshControls(); return; }
+            try
+            {
+                DataSheet es = this.DataFeed.Project.GetDataSheet(EditionSheet); DataTable dt = es.GetData();
+                DataRow r = dt.Rows.Cast<DataRow>().FirstOrDefault(x => x.RowState != DataRowState.Deleted && Convert.ToString(x["DataSource"]) == e.Column);
+                object v = pick.Tag.Length == 0 ? (object)DBNull.Value : pick.Tag;
+                if (r != null) { es.BeginModifyRows(); try { r["Edition"] = v; } finally { es.EndModifyRows(); } }
+                else { es.BeginAddRows(); try { DataRow n = dt.NewRow(); n["DataSource"] = e.Column; n["Edition"] = v; dt.Rows.Add(n); } finally { es.EndAddRows(); } }
+            }
+            catch (Exception ex) { MessageBox.Show(this, "Could not save the edition: " + ex.Message, "Change edition", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+            RefreshControls();
         }
 
         // the home folder: path, Browse, Make folders, and a mark
@@ -243,7 +313,7 @@ namespace lucasCoreUI
                 m_homeState.Text = home.Length == 0 ? "not set" : hx ? "✓" : "✗";
                 m_homeState.ForeColor = home.Length == 0 ? SystemColors.GrayText : hx ? Color.ForestGreen : Color.Firebrick;
             }
-            var manifest = Manifest(home);
+            List<string> folders = Folders(home);
             foreach (Entry e in m_entries)
             {
                 string v = Show(Value(e.Column)).Trim();
@@ -252,16 +322,26 @@ namespace lucasCoreUI
                 m_tip.SetToolTip(e.Path, v);
                 bool exists = false;
                 try { exists = v.Length > 0 && (File.Exists(v) || Directory.Exists(v)); } catch (Exception) { }
-                Dictionary<string, string> mr; manifest.TryGetValue(e.Column, out mr);
+                // the folders that hold it (top first, then regions), each with its manifest row
+                var at = new List<KeyValuePair<string, string>>(); int found = 0; Dictionary<string, string> mr = null;
+                if (v.Length == 0 && e.HomePath != null)
+                    foreach (string f in folders)
+                    {
+                        int n; string p = Place(f, e.HomePath, out n); if (n > 1 && found == 0) found = n;
+                        if (p == null) continue;
+                        Dictionary<string, string> r; Manifest(f).TryGetValue(e.Column, out r); if (mr == null) mr = r;
+                        at.Add(new KeyValuePair<string, string>(FolderLabel(home, f), p + (r == null ? "" : string.Format(" ({0}{1}; {2})", Get(r, "Copy") == "national" ? "national copy" : "region: " + Get(r, "Units"),
+                                                                                                                      Get(r, "BufferKm").Length > 0 ? " + " + Get(r, "BufferKm") + " km" : "", Get(r, "Status")))));
+                    }
                 string got = mr == null ? "" : string.Format("{0}Downloaded {1} ({2}{3}); status {4}", Environment.NewLine, Get(mr, "Downloaded"),
                                                              Get(mr, "Copy") == "national" ? "national copy" : "region: " + Get(mr, "Units"),
                                                              Get(mr, "BufferKm").Length > 0 ? " + " + Get(mr, "BufferKm") + " km" : "", Get(mr, "Status"));
                 string flag = mr != null && Get(mr, "Status") != "done" ? " " + Get(mr, "Status") : "";
-                int found = 0; string place = v.Length == 0 && home.Length > 0 && e.HomePath != null ? Place(home, e.HomePath, out found) : null;
-                if (place != null)
+                if (at.Count > 0)
                 {
-                    e.State.Text = "✓ home" + flag; e.State.ForeColor = flag.Length > 0 ? Color.DarkOrange : Color.ForestGreen;
-                    m_tip.SetToolTip(e.State, place + got);
+                    string where = at.Count > 1 ? string.Format(": {0} folders", at.Count) : at[0].Key == "the top" ? "" : ": " + at[0].Key;
+                    e.State.Text = "✓ home" + where + flag; e.State.ForeColor = flag.Length > 0 ? Color.DarkOrange : Color.ForestGreen;
+                    m_tip.SetToolTip(e.State, string.Join(Environment.NewLine, at.Select(x => x.Key + ": " + x.Value)) + (at.Count > 1 ? Environment.NewLine + "A Build reads the smallest one holding its study area." : ""));
                 }
                 else if (v.Length == 0 && found > 1)
                 {
@@ -276,6 +356,17 @@ namespace lucasCoreUI
                 }
                 else if (!exists && e.Access == "user") { e.State.Text = "✗ user-supplied"; e.State.ForeColor = Color.Firebrick; m_tip.SetToolTip(e.State, v); }
                 else { e.State.Text = exists ? "✓" : "✗"; e.State.ForeColor = exists ? Color.ForestGreen : Color.Firebrick; m_tip.SetToolTip(e.State, v + got); }
+                string first = ""; List<Ed> eds = v.Length == 0 && at.Count > 0 ? Editions(home, e.Column, out first) : new List<Ed>();
+                e.Edition.Visible = eds.Count > 0;
+                if (eds.Count > 0)
+                {
+                    string cur = EditionOf(e.Column);
+                    e.Edition.BeginUpdate(); e.Edition.Items.Clear();
+                    e.Edition.Items.Add(new Ed { Tag = "", Text = "First edition" + (first.Length > 0 ? " (" + first + ")" : "") });
+                    foreach (Ed x in eds) e.Edition.Items.Add(x);
+                    e.Edition.SelectedItem = e.Edition.Items.Cast<Ed>().FirstOrDefault(x => x.Tag == cur) ?? e.Edition.Items[0]; e.Edition.EndUpdate();
+                    m_tip.SetToolTip(e.Edition, "The edition this library reads. A Build never changes it; choosing another asks first.");
+                }
             }
         }
     }

@@ -76,12 +76,25 @@ read_data_sources <- function(cols, optional = FALSE) {
   home <- if (nrow(d) && "DataSourcesHome" %in% names(d)) d$DataSourcesHome[1] else NA_character_
   hl <- if (!is.na(home) && nzchar(home)) home_layout(env$PackageDirectory) else NULL
   out <- list(); regions <- !is.null(hl) && length(home_regions(home)) > 0
+  # the editions this library reads (Data Source Editions, set on the Data Sources page; no row = the first edition)
+  ed <- tryCatch(as.data.table(datasheet(prj, ds("DataSourceEdition"), optional = TRUE, lookupsAsFactors = FALSE)), error = function(e) data.table())
+  ed <- if (nrow(ed) && all(c("DataSource", "Edition") %in% names(ed))) setNames(as.character(ed$Edition), ed$DataSource) else character()
   for (k in cols) { v <- if (nrow(d) && k %in% names(d)) d[[k]][1] else NA_character_; how <- "set"; dir <- NA_character_
     if ((is.na(v) || !nzchar(v)) && !is.null(hl) && k %in% hl$Column) {
       # with region folders, the folder is chosen by the study area: the smallest region whose manifest covers it (datahome.R)
-      pk <- tryCatch(home_pick(home, k, hl[Column == k, HomePath], if (regions) study_box() else NULL), error = function(e) fail("%s", conditionMessage(e)))
+      want_ed <- if (k %in% names(ed) && !is.na(ed[[k]]) && nzchar(ed[[k]])) ed[[k]] else NULL
+      pk <- tryCatch(home_pick(home, k, hl[Column == k, HomePath], if (regions || !is.null(want_ed)) study_box() else NULL, want_ed), error = function(e) fail("%s", conditionMessage(e)))
+      if (is.null(pk) && !is.null(want_ed)) fail("Data Sources: %s: edition %s, which this library reads (Data Sources page), is not in Data Sources Home %s", k, want_ed, home)
+      if (!is.null(pk) && is.null(.home_cov$said_ed[[k]])) { .home_cov$said_ed[[k]] <- TRUE
+        others <- tryCatch(home_editions(home, k), error = function(e) data.table())
+        # (the other editions in the folder read from: another region's copy is not an edition)
+        pd <- normalizePath(pk$dir, winslash = "/", mustWork = FALSE); base <- home_label(home, sub("/editions/[^/]+$", "", pd))
+        others <- if (nrow(others)) others[Dir != pd & Folder == base] else others
+        if (nrow(others)) say("Data Sources: %s: the home also holds %s; this library reads %s. A change of edition is made on the Data Sources page", k,
+                             paste(sprintf("%s (%s, %s)", ifelse(nzchar(others$Edition), others$Edition, "the first edition"), others$Version, others$Folder), collapse = ", "),
+                             if (is.null(want_ed)) "the first edition" else sprintf("edition %s", want_ed)) }
       if (!is.null(pk)) { v <- pk$path; how <- "home"; dir <- pk$dir; .home_cov$home <- home; .home_cov$dirs[[k]] <- pk$dir; .home_cov$used <- union(.home_cov$used, k)
-        if (regions && is.null(.home_cov$said[[k]])) { .home_cov$said[[k]] <- TRUE; say("Data Sources: %s from %s", k, home_label(home, pk$dir)) }
+        if ((regions || !is.null(want_ed)) && is.null(.home_cov$said[[k]])) { .home_cov$said[[k]] <- TRUE; say("Data Sources: %s from %s", k, home_label(home, pk$dir)) }
         if (!is.null(.home_cov$box)) home_covers(k, .home_cov$box, .home_cov$what) } }
     if (is.na(v) || !nzchar(v)) { v <- def[[k]][1]; how <- "default" }
     if ((is.null(v) || is.na(v) || !nzchar(v)) && !is.null(PACKAGE_SOURCES[[k]])) { v <- do.call(pkg_file, as.list(PACKAGE_SOURCES[[k]])); how <- "package" }
