@@ -163,3 +163,11 @@ library (`dev/libs/LUCAS P26 Northern Sierra Nevada.ssim`), with Data Sources Ho
 
 Data Sources Used (section 4.4, text only, no figure) has rows only in Builds run after 2026-11-02; result [53] predates it.
 After the captures: export the doc (Markdown and HTML) into source/ and run build-guide.R to refresh the GitHub copy.
+- 2026-11-02: in the doc: 1.16 (captures/1.6a-download-pipeline.png) and 1.18 (1.6c-download-datasets.png). The grabs carry full-width
+  white bands (about 30 px, at random rows; in the files, not the viewer): crop around them, or regrab when one crosses the figure.
+  Still to grab: 1.15 (Data Sources page), 1.17 (Region group: the regions line was under a band), 1.19 (LOCA2: band over a model row),
+  1.21 (Download Results: band over a row); 1.20 can come from the 10:51 grab once the LANDFIRE email question is settled.
+- 2026-11-02 later: 1.16-1.21 all in the doc (rev 423). 1.17 from the 10:49 grab, cropped above its band; 1.19 and 1.20 from the
+  11:01:37 grab; 1.20's LANDFIRE email greyed by cover.ps1 (user: cover it); 1.21 = the 11:02 grab with its banded row mended from
+  the 10:53 grab by patch.ps1 (same window, table unmoved). Still to grab: 1.15 (Data Sources page with the home set); 1.22 later.
+  The home lists a test region, County-Bristol-Rhode-Island (3 files, from the write-once tests): keep it out of figures.
