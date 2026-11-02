@@ -62,7 +62,7 @@ namespace lucasCoreUI
             }
             catch (Exception) { }
             var intro = Column();
-            intro.Controls.Add(Note("The stages read these national datasets from disk. A new library starts with the paths of the machine lucasCore was built on: point each one at your own copy (Browse, or type the path). A red cross means the path does not exist on this machine. Download opens the dataset's download page; hover a name for the full description."));
+            intro.Controls.Add(Note("The stages read these national datasets from disk. Set Data Sources Home to the folder a Data Download scenario fills, and leave a path blank to read the dataset from there; the mark says where it is (\"✓ home\", or the region folder holding it). To use a copy you already have, set its path instead (Browse, or type it); a red cross means the path does not exist on this machine. Download opens the dataset's download page; hover a name or a mark for more."));
             if (Sheet.Columns.Cast<DataSheetColumn>().Any(c => c.Name == HomeColumn)) intro.Controls.Add(HomeRow());
             AddGroup(Group("Data Sources", intro));
 
@@ -96,13 +96,17 @@ namespace lucasCoreUI
             SizePaths();
         }
 
-        // name column, and the room the buttons, mark, group borders and scroll bar take beside the path box
-        private const int NameWidth = 280, Beside = 330, MinPath = 220;
+        // name column, and the room the buttons, group borders and scroll bar take beside the path box (the mark and an edition
+        // drop-down are measured in SizePaths)
+        private const int NameWidth = 280, Beside = 280, MinPath = 220;
 
-        // every path box takes the width the window leaves (at least MinPath), so Browse and Download stay in view
+        // every path box takes the width the window leaves (at least MinPath), so Browse, Download, the whole mark ("✓ home:
+        // regions/<name>") and an edition drop-down stay in view; called again whenever the marks change
         private void SizePaths()
         {
-            int w = Math.Max(MinPath, this.ClientSize.Width - NameWidth - Beside);
+            int mark = m_entries.Count == 0 ? 90 : m_entries.Max(e => e.State.PreferredSize.Width + e.State.Margin.Horizontal);
+            int ed = m_entries.Any(e => e.Edition != null && e.Edition.Visible) ? 240 : 0;
+            int w = Math.Max(MinPath, this.ClientSize.Width - NameWidth - Beside - mark - ed);
             foreach (Entry e in m_entries) if (e.Path != null && e.Path.Width != w) e.Path.Width = w;
         }
         private readonly ToolTip m_tip = new ToolTip { AutoPopDelay = 20000 };
@@ -368,6 +372,7 @@ namespace lucasCoreUI
                     m_tip.SetToolTip(e.Edition, "The edition this library reads. A Build never changes it; choosing another asks first.");
                 }
             }
+            SizePaths();   // the marks just changed width
         }
     }
 }
