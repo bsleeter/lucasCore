@@ -2,7 +2,7 @@
 
 Ideas for the lucasCore pages in SyncroSim Studio, collected during the P26 user-guide walkthrough. Newest last.
 
-## Priorities (2026-10-31)
+## Priorities (2026-11-02)
 
 The open items in order. Item numbers are ids and do not change; this table is the order. The rule from 2026-10-25 still holds: items
 that change the model itself (its inputs or results) come first, and anything built on P26's results (the demo bundle, metadata, the
@@ -19,16 +19,17 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | 2 | 43 Historical harvest 12% short: minimum ages in the historical period | Yes (historical harvest, start ages) | Options offered 2026-10-31, user to decide: apply the minimum ages only in projections, or resample start ages from the median | 34 |
 | 3 | 42 Fill prompt names the grassland tables by their old names | No | A wording fix in the Carbon Method page | - |
 | 4 | 31 Copy Carbon Assumptions; SoilGrids option | No (an option) | Convenience and one more soil source | - |
-| 5 | 12 Data Download stage | No | Needs the final input list (35 added TreeMap) | 35 |
-| 6 | 13 Demo bundle, Calaveras | No | Needs 12's home folder and a settled model; the finished demo library (option 1) can go earlier if wanted | 12; 39 |
-| 7 | 14 FGDC metadata | No | Needs the final inputs and 12's manifest; ships with 13 and data releases | 12, 13 |
+| ~~5~~ | ~~12 Data Download stage~~ DONE 2026-11-02 | No (P26 from downloaded data matches [53] where the data are the same) | Phases 1-6, region folders, write-once, editions, national paths; guide 1.6 and blueprints | 35 |
+| 6 | 13 Demo bundle, Calaveras | No | 12 done: a Calaveras Data Download gives its home; still needs a settled model; the finished demo library (option 1) can go earlier if wanted | 39 |
+| 7 | 14 FGDC metadata | No | 12 done: the home's manifest (source, version, DOI, region) and each Build's Data Sources Used (files, checksums) are its lineage; ships with 13 and data releases | 13 |
+| any | 44 Data Download follow-ups | No | Small; (b) the National test runs overnight | 12 |
 | any | 33 Leftovers inside done items | Some | Small, independent; (7) guide 1.4 and (1) deep links any time; (8) and (17) larger | - |
 | later | 26 Guide chapter 9, Troubleshooting | No | After beta testers (user) | beta |
 | later | 36 Guide: Advanced Features (site productivity comparison) | No | After the items above (user); needs a P26 Build with Site productivity on | 35, 37 |
 | later | 38 Stand-replacing insect and disease events | Yes | Option B of 32 (user: eventually); background mortality already excludes them | 32 |
 
-Done since the 2026-10-25 order: 6, 7, 8, 9, 11a, 15-25, 28-30, 32, 34, 35, 37, 40, 41 (item 27 removed by the user).
-Pushed: everything through 0ce1c25 (2026-10-31), with the guide snapshot rebuilt; the repo is public, so push only when the user asks.
+Done since the 2026-10-25 order: 6, 7, 8, 9, 11a, 12, 15-25, 28-30, 32, 34, 35, 37, 40, 41 (item 27 removed by the user).
+Pushed: everything through 2967086 (2026-11-02), with the guide snapshot and both blueprints rebuilt; the repo is public, so push only when the user asks.
 
 1. **Data Sources page** - DONE 2026-10-24. Custom view (`ui/DataSourcesView.cs`) groups the paths by category (study area, land
    cover, forest inventory, disturbance and fire, climate, soils and terrain, infrastructure and ownership), links each to its download
@@ -166,7 +167,21 @@ Pushed: everything through 0ce1c25 (2026-10-31), with the guide snapshot rebuilt
    used by default"), it fetches only the monthly pr/tasmax/tasmin files for the study area's extent from the LOCA2 archive (UCSD; URL and access
    method to confirm), writes them in that folder layout, then refreshes the lists. Size, resumable downloads and a checksum matter;
    the full CONUS monthly set is large.
-12. **Data Download stage: fetch the Data Sources for a region** - PLANNED 2026-10-31: implementation plan at
+12. **Data Download stage: fetch the Data Sources for a region** - DONE 2026-11-02 (all pushed, through 2967086). PHASE 6: P26 from
+   nothing, Build result 13 in dev/libs/"LUCAS P26 Northern Sierra Nevada Data Download.ssim": 74/74 checks, 44 min vs 57 for [53];
+   NLCD, ever-forest, wetland, harvest and NLCD transitions identical to [53] after the grid_blocks fix (blocks were anchored on each
+   file's own extent); the rest differ only where the data changed (NFCMS v3, published RCMAP, gNATSGO, newer FIA). HOME LAYOUT
+   (user: a second region must never overwrite the data another library read): By region writes regions/<name> (name from the Study
+   Area units), FIA, PRISM, LOCA2 and FPA-FOD whole at the top; write-once through staging; a Build reads each blank dataset from the
+   smallest region whose manifest covers its study area; the download buffer is at least a Counties/States modal fill distance + 1 km;
+   tools/data-home.R --to-region moved the P26 home. EDITIONS (user rule: a library keeps the edition it first read): Fetch new
+   editions puts a new version in <folder>/editions/<tag>/; the project's Data Source Editions sheet, set only on the Data Sources
+   page, picks it. NATIONAL PATHS: MRLC NLCD zips, LANDFIRE full-extent zips, all gNATSGO tiles (a national home is about 175 GB,
+   overnight). Also: Data Sources Used output (every Build stage: datasets read, where from, checksums); NLCD WCS tile corners fixed
+   (a thin last tile row landed a row high); the Data Sources page finds regions and shows marks whole; dataset rows on the Data
+   Download page say how each comes and its P26 size; LOCA2 Rescan reads the home. Guide section 1.6 (Figures 1.15-1.21) and both
+   blueprints updated. Plans: https://claude.ai/artifact/JxEEj2xus6GcEA9rZyjJuQ. Follow-ups are item 44. History below.
+   PLANNED 2026-10-31: implementation plan at
    https://claude.ai/artifact/JxEEj2xus6GcEA9rZyjJuQ (every one of the 27 Data Sources researched: 10 clipped by the source - NLCD WCS,
    LANDFIRE LFPS, NIFC REST, C-CAP and gNATSGO windowed reads; 12 whole files clipped after; 1 Earthdata login; 4 with no public
    source - EVT 2001, the RCMAP class map, the two USGS FIA tables). Phase 1 fixes package problems the research found: NLCD now
@@ -683,3 +698,11 @@ Pushed: everything through 0ce1c25 (2026-10-31), with the guide snapshot rebuilt
     little after an earlier clearcut. Options: apply the minimum ages only in projections (the record's cuts are fixed history), or
     resample start ages from the median rather than raising them to the minimum; either changes start ages and initial carbon, so it
     goes with a rerun.
+44. **Data Download follow-ups** - TO DO (from item 12, 2026-11-02). (a) Guide Figure 1.22, the Data Sources edition drop-down, once a
+    home holds a second edition (placeholder and caption were taken out of the doc; add both back with the image). (b) National mode end
+    to end: fill a national home (about 175 GB, overnight; MRLC served about 1.3 MB/s) and run stage 1 on P26 and P29 against it.
+    (c) Log messages and comments in stages 3, 5 and 8 still say gSSURGO (the labels say gNATSGO). (d) Test scenarios 14, 15, 16, 22
+    and 24 in the phase 6 Download library and 12-18 in download-test.ssim: keep as regression checks or delete. (e) The older guide
+    library backup (LUCAS P26 Northern Sierra Nevada.ssim.bak-20261102-0804, 3.4 GB) can go. (f) The P26 home's NLCD files keep the
+    WCS edge row (row 12000, in the buffer, outside what the Build reads); a fresh download is right. (g) PARKED (user): fetch FIA
+    DataMart only for the states a study area needs.
