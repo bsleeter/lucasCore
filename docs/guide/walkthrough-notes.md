@@ -144,3 +144,22 @@ found along the way are batched here and fixed while Studio is closed (the page 
 - Deep Soil reruns (2026-10-29): setup [37], projections [38] No Climate / [40] ssp245 / [39] ssp585 (each 2 h 4 min, side by side), Run Figures [44] / [41] / [42], comparison [45]; old [13] [23] [24] [15] [27] [28] [36] [43] deleted by the user ([11] remains). Guide text now cites the new ids in 6.x (setup result, dependency step), 7.2, 7.4 and 9.1; Figures 7.8-7.11 and 7.28-7.31 replaced with the new PNGs; 7.2 projection numbers (start 444.3 = history end, 431.2 after 2031, 444.6 in 2050, fire 2025/2031 1,513/3,602 km2, NBP mean +0.08), 7.3 timing (three side by side, 2 h 4 min), 7.4 (-4.6 / -2.0 vs baseline, SSP5-8.5 about -8 in 2041, NPP 10.6 vs 10.2, live +5.1/+8.6 vs +0.3). Stage 13 check is now exact (12a2de9). Grabs that still show old ids (re-grab if wanted): Run Figures page drawing [13] (Figure 5.14), setup Run Monitor [11], projection dependency folders [11] (7.x, 7.18), Run Monitor [23]/[24] (Figure 7.21, text says so), Compare Runs page [24]/[23]/[13] (7.27), figure viewer on [36] (9.1), 9.2 chart/map grabs of [13]/[23]/[24].
 - Re-grabs after the reruns (2026-10-29): 5.6b (Figure 5.14, Run to draw [38]), 7.1b (7.2, setup [37] above Build [2]; marks moved, crop 480 high), 7.3d (7.18, setup [37]), 7.4f (7.27, [39] [40] [38], same marks), 9.1a (9.1, viewer on [45]; marks 3-7 moved, crop 2265 wide), 9.2c (9.4, five results incl. setup [37] ticked and [6] unticked; marks resized). Old grabs in captures/old/*-pre-rerun.png. Kept as is (user): 6.6 and 7.21 (text names their old ids), 9.18 and 9.19.
 - Chapter 8 (Running faster) dropped 2026-10-29 (user: covered in other chapters); "chapter 8" references now point to sections 5.3 and 7.3. Viewing results is now chapter 8 (8.1, 8.2, Figures 8.1-8.19; capture files keep their 9.x names); Troubleshooting is chapter 9, a placeholder until beta testers report back.
+
+## Data Download captures to take (2026-11-02)
+
+The Guide's new section 1.6 (and the revised 1.5) has placeholders marked **Capture: Figure 1.nn** in the Claude Doc. In the P26 guide
+library (`dev/libs/LUCAS P26 Northern Sierra Nevada.ssim`), with Data Sources Home `F:/lucasCore/dev/libs/Data Sources`:
+
+| Figure | Where | Show and mark |
+| --- | --- | --- |
+| 1.15 (replaces the old one) | Definitions > LUCAS Core (model builder) > Data Sources | 1 the tab, 2 Data Sources, 3 the Data Sources Home row, 4 a path box (blank), 5 Browse, 6 Download, 7 a mark reading "✓ home: regions/Pyrome-P26-Northern-Sierra-Nevada"; outline one Land cover row |
+| 1.16 | P26 - Data Download > Pipeline | 4 Pipeline, 5 the one row 15 - Data Download |
+| 1.17 | P26 - Data Download > LUCAS Core > Data Download, Region group | 1 Data Download, 2 the home line, 3 the buffer, 4 Home layout By region, 5 the Region name box (blank) and the regions line under it |
+| 1.18 | the same page, Datasets group | 6 Tick all and the total line; the Land cover and Forest inventory rows with their how-it-comes text in view |
+| 1.19 | the same page, LOCA2 group | 7 CanESM5, SSP2-4.5 and SSP5-8.5 ticked, and the total line |
+| 1.20 | the same page, How group | 8 Check only ticked, 9 Keep national copies, 10 Fetch new editions (both unticked), 11 Downloads at once, 12 the LANDFIRE email, 13 the Earthdata token box (dots only; never show a token) |
+| 1.21 | the Data Download result > Download Results | every row done; the Next column showing "in regions/..." and "at the top of the home" |
+| 1.22 (later) | Data Sources, once a home holds a second edition | the edition drop-down open on that row |
+
+Data Sources Used (section 4.4, text only, no figure) has rows only in Builds run after 2026-11-02; result [53] predates it.
+After the captures: export the doc (Markdown and HTML) into source/ and run build-guide.R to refresh the GitHub copy.
