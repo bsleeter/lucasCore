@@ -8,7 +8,8 @@
 #   --rebuild-strata           rewrite Stratum Sources and the unit lists (after adding a custom source row with a new Number;
 #                              existing unit ids keep their meaning, so scenario data stays valid)
 #   --rebuild-climate          rewrite the LOCA2 Climate Scenario and Climate Model lists from the LOCA2 folder (after adding runs)
-#   --loca2                    LOCA2 folder to scan (default: the project's Data Sources value, else the package default)
+#   --loca2                    LOCA2 folder to scan (default: the project's Data Sources value; blank = its place in Data Sources
+#                              Home, the top else a region, as the Build reads it; else the package default)
 #
 # Why this is not a stage: SyncroSim keeps only a run's scenario-scope output; project-scope sheets a stage saves during a run
 # are discarded (Phase A spike, 2026-10-19: stage 0 saved 21 definition sheets and none persisted). The definitions are the
@@ -105,6 +106,11 @@ if (nrow(have_l) && !rebuild && all(as.integer(have_l$Id) >= UNIT_OFFSET)) {
 # <gcm>/<member>/<ssp>/{pr,tasmax,tasmin}/*.monthly.nc; a model is listed when it has a historical run and at least one SSP with all
 # three variables. Existing lists are kept unless --rebuild-climate (scenarios that chose a model keep pointing at its row).
 loca2 <- { d <- as.data.table(datasheet(P, "lucasCore_DataSource", optional = TRUE, lookupsAsFactors = FALSE)); v <- if (nrow(d) && "Loca2Folder" %in% names(d)) d$Loca2Folder[1] else NA
+  home <- if (nrow(d) && "DataSourcesHome" %in% names(d)) d$DataSourcesHome[1] else NA
+  if ((is.na(v) || !nzchar(v)) && !is.na(home) && nzchar(home)) {   # the Build's order (src/shared.R): the top of the home, else a region
+    place <- data.table::fread(file.path(pkgdir, "defaults", "library", "data-sources.csv"), colClasses = "character")[Column == "Loca2Folder", HomePath]
+    rd <- file.path(home, "regions"); cand <- file.path(c(home, if (dir.exists(rd)) sort(list.dirs(rd, recursive = FALSE))), place)
+    cand <- cand[dir.exists(cand) & vapply(cand, function(x) length(list.files(x)) > 0, TRUE)]; if (length(cand)) v <- cand[1] }
   if (is.na(v) || !nzchar(v)) { xml <- paste(readLines(file.path(pkgdir, "package.xml"), warn = FALSE), collapse = "\n")
     v <- sub('.*name="Loca2Folder"[^>]*defaultValue="([^"]*)".*', "\\1", xml) }
   opt("loca2", v) }

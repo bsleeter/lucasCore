@@ -70,7 +70,8 @@ namespace lucasCoreUI
 
         public string Summary() { return string.Format("{0} scenarios, {1} models, {2} replicates ({3} runs) in {4}", Scenarios.Count, Models.Count, Replicates.Count, RunCount, Folder); }
 
-        // Data Sources: LOCA2 Folder, else package.xml's default for it
+        // the folder the Build reads (src/shared.R, read_data_sources): Data Sources: LOCA2 Folder; blank = its place in Data Sources Home
+        // (the top of the home, where LOCA2's national copy goes, else a region folder that holds it); else package.xml's default
         public static string FolderOf(Project p, DataStore store)
         {
             try
@@ -78,8 +79,19 @@ namespace lucasCoreUI
                 DataSheet ds = p.GetDataSheet("lucasCore_DataSource");
                 DataTable dt = store == null ? ds.GetData() : ds.GetData(store);
                 DataRow r = dt.Rows.Cast<DataRow>().FirstOrDefault(x => x.RowState != DataRowState.Deleted);
-                if (r != null && dt.Columns.Contains("Loca2Folder") && r["Loca2Folder"] != DBNull.Value && Convert.ToString(r["Loca2Folder"]).Trim().Length > 0)
-                    return Convert.ToString(r["Loca2Folder"]).Trim();
+                Func<string, string> cell = k => r != null && dt.Columns.Contains(k) && r[k] != DBNull.Value ? Convert.ToString(r[k]).Trim() : "";
+                if (cell("Loca2Folder").Length > 0) return cell("Loca2Folder");
+                string home = cell("DataSourcesHome");
+                if (home.Length > 0)
+                {
+                    string place = "climate/loca2";
+                    foreach (string[] row in Csv.Read(Path.Combine(LibrarySetup.PackageDirectory(), "defaults", "library", "data-sources.csv")).Skip(1))
+                        if (row.Length > 10 && row[0] == "Loca2Folder" && row[10].Length > 0) place = row[10];
+                    var where = new List<string> { Path.Combine(home, place) };
+                    string regions = Path.Combine(home, "regions");
+                    if (Directory.Exists(regions)) where.AddRange(Directory.GetDirectories(regions).OrderBy(x => x, StringComparer.OrdinalIgnoreCase).Select(x => Path.Combine(x, place)));
+                    foreach (string f in where) if (Directory.Exists(f) && Directory.EnumerateFileSystemEntries(f).Any()) return f;
+                }
             }
             catch (Exception) { }
             try
