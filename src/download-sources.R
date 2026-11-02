@@ -249,7 +249,7 @@ download_handlers <- function() {
           n[bad] <- vapply(parts[bad], classed, 0) }
         if (any(n < ref)) stop(sprintf("NLCD %d: tile %s still short of class cells after 4 tries", y, paste(which(n < ref), collapse = ", ")), call. = FALSE)
         ref <<- pmax(ref, n); got[i, ] <<- n; zero_ok <<- zero_ok | n == 0
-        mosaic_to(parts, file.path(ctx$place, items$file[i]), "INT1U"); unlink(dirname(parts[1]), recursive = TRUE)
+        mosaic_to(parts, file.path(ctx$place, items$file[i]), "INT1U", c(min(tl$xmin), min(tl$ymin), max(tl$xmax), max(tl$ymax))); unlink(dirname(parts[1]), recursive = TRUE)
         ctx$log(sprintf("  NLCD %d (%d tiles)", y, nrow(tl))) }
       for (i in seq_len(nrow(items))) one_year(i)
       # a year fetched before a later year raised a tile's count is fetched again
@@ -392,8 +392,11 @@ grid_tiles <- function(box, origin, cell, px) {
   t[, `:=`(xmin = xs[i], xmax = xs[i + 1], ymax = ys[j], ymin = ys[j + 1])][, `:=`(nx = as.integer(round((xmax - xmin) / cell)), ny = as.integer(round((ymax - ymin) / cell)))][] }
 
 # tiles on one grid into one compressed GeoTIFF
-mosaic_to <- function(parts, dest, datatype) { dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)
+mosaic_to <- function(parts, dest, datatype, box = NULL) { dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)
   v <- terra::vrt(parts, filename = tempfile(fileext = ".vrt"))
+  # box (xmin, ymin, xmax, ymax): the grid the tiles were asked on. The NLCD WCS writes tile corners with too few digits, which
+  # left the mosaic 0.2 m off the 30 m grid (res 30.000003) and moved 150 m blocks by a pixel (P26 2026-11-01: 6.6% of cells)
+  if (!is.null(box)) { stopifnot(abs(terra::xmin(v) - box[1]) < 1, abs(terra::ymax(v) - box[4]) < 1); terra::set.ext(v, terra::ext(box[1], box[3], box[2], box[4])) }   # set.ext keeps the cell values (ext<- drops them)
   terra::writeRaster(v, dest, overwrite = TRUE, datatype = datatype, gdal = c("COMPRESS=DEFLATE", "TILED=YES", "BIGTIFF=IF_SAFER")); dest }
 
 # a band of a multi-band job output written as its own file
