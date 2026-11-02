@@ -37,7 +37,8 @@ where <- c(`0` = "Stock-Flow Definitions; also first in the Build pipeline (writ
   `5` = "Build", `6` = "Build", `7` = "Build", `8` = "Build",
   `9` = "Projection Setup; also Build for a continuous run (mode 1) and a projection scenario that starts from a historical run (mode 2)",
   `10` = "Projection Setup", `11` = "Projection Climate (one scenario per LOCA2 run)", `12` = "Build (last in its pipeline)",
-  `13` = "A scenario on an ST-Sim run result", `14` = "A scenario on several ST-Sim run results")
+  `13` = "A scenario on an ST-Sim run result", `14` = "A scenario on several ST-Sim run results",
+  `15` = "Data Download: its own scenario (Study Area and Data Download pages), run before the Build; no dependencies")
 desc <- c(`0` = "Writes the fixed LUCAS stock-flow definitions from defaults/stockflow: flow pathway diagram, flow order, flow and stock type groups, output options and filters.",
   `1` = "Makes the model grid at the Build cell size, cuts it to the study area, and writes the primary (FIA ecodivision), secondary and tertiary strata rasters.",
   `2` = "Fits merchantable volume curves and the live-tree carbon curves (CBM pools) for every forest state class and FIA ecodivision.",
@@ -52,7 +53,8 @@ desc <- c(`0` = "Writes the fixed LUCAS stock-flow definitions from defaults/sto
   `11` = "Writes the climate flow spatial multipliers of the projection years from one LOCA2 run.",
   `12` = "Draws the publication figures (PNG) of a Build result.",
   `13` = "Draws report figures (PNG) of one ST-Sim run on a lucasCore Build.",
-  `14` = "Draws figures (PNG) and two summary tables (carbon, land change) that compare ST-Sim runs on one Build.")
+  `14` = "Draws figures (PNG) and two summary tables (carbon, land change) that compare ST-Sim runs on one Build.",
+  `15` = "Fetches the national datasets into Data Sources Home for the Study Area plus a buffer: the region's clips in regions/<name>, the shared national copies at the top, or every dataset whole (Home layout National). Write-once, with a manifest and files.csv checksums; a blank Data Sources path reads the home.")
 
 # ---- drawing helpers --------------------------------------------------------
 wrap2 <- function(s) { if (nchar(s) <= 19) return(s); sp <- gregexpr(" ", s)[[1]]; k <- sp[which.min(abs(sp - nchar(s) / 2))]
@@ -90,11 +92,11 @@ leg(list(list(kind = "edge", label = "datasheet passed on"), list(kind = "dep", 
 # ---- national data ----------------------------------------------------------
 data_groups <- list(
   list("FIA", c(1, 2, 3, 5, 6), c("FIADB DataMart (PLOT, COND, TREE)", "Condition carbon and volume (USGS)", "Disturbance and treatment codes", "FIA ecodivisions (primary strata)")),
-  list("Land cover", c(1, 5, 6, 10), c("Annual NLCD", "LANDFIRE EVT 2001 and 2016", "RCMAP, C-CAP 2001", "USFS forest type groups", "NASA CMS forest age 1990")),
+  list("Land cover", c(1, 5, 6, 10), c("Annual NLCD", "LANDFIRE EVT 2016", "RCMAP 1985, C-CAP 2001", "USFS forest types, TreeMap", "NASA CMS forest age 1990")),
   list("Disturbance", c(5, 6, 8, 9, 10), c("LANDFIRE disturbance", "MTBS burn severity", "USFS LCMS annual change", "Interagency fire perimeters",
                                          "FPA-FOD fire occurrence", "FSim burn probability", "LANDFIRE fire return interval")),
   list("Climate", c(2, 3, 7, 11), c("PRISM annual and normals", "LOCA2 (scenario, model, replicate)")),
-  list("Soil", c(5, 8), "gSSURGO soil organic carbon"),
+  list("Soil", c(5, 8), "gNATSGO soil organic carbon"),
   list("Covariates", c(9, 10), c("Roads and elevation (LANDFIRE)", "SILVIS WUI v4", "gNATSGO crop productivity", "USFS forest ownership")),
   list("Package defaults", c(0, 3, 4, 5, 6, 8, 9, 10), c("stockflow, stsim, strata", "carbon-assumptions, cbm, spinup", "growth, initialstocks, climate",
                                                           "landcover crosswalks", "transitions, projection rules")))
@@ -107,6 +109,9 @@ for (i in seq_along(data_groups)) { d <- data_groups[[i]]
   for (it in d[[3]]) { y <- y + 15; add(TX(40, y, it, "item")) }
   y <- y + 31 }
 add(TX(40, y - 12, "(used when a sheet is left empty)", "lbl"))
+# stage 15 fills the national data into Data Sources Home, where a blank path reads it
+add(sprintf('<line class="rule" x1="40" y1="%d" x2="224" y2="%d"/>', y + 6, y + 6), TX(40, y + 26, "Filled by its own scenario", "lbl"), block(15, 40, y + 34))
+if (y + 34 + BH > 934) stop("the Data Download block runs past the national data box (y = ", y + 34 + BH, ")")
 
 # ---- definitions row --------------------------------------------------------
 add(box(268, 104, 202, 136, "Scenario · dependency", "Stock-Flow Definitions"), block(0, 283, 160))
@@ -184,7 +189,7 @@ reports <- list("Strata Summary" = "OutputStrataSummary", "State Class Summary" 
   "Projection schedule, rates, fires" = c("OutputProjectionSchedule", "OutputProjectionRate", "OutputFireSize", "OutputFireSlope"),
   "Suitability maps and curves" = c("OutputSuitability", "OutputSuitabilityCurve", "OutputSuitabilityMap", "OutputPatchSize"),
   "Figures (PNG)" = c("OutputBuildFigure", "OutputRunFigure", "OutputCompareFigure"),
-  "Run comparison summaries" = c("OutputCompareCarbon", "OutputCompareLand"))
+  "Run comparison summaries" = c("OutputCompareCarbon", "OutputCompareLand"), "Download Results" = "OutputDataDownload")
 row <- function(label, sheets, y) { w <- writers(sheets); if (!length(w)) stop("no stage writes ", paste(sheets, collapse = ", "))
   add(sprintf('<g class="row" data-sheet="%s" data-stages="%s">', paste(sheets, collapse = " "), paste(w, collapse = " ")),
       sprintf('<rect class="rowbg" x="1264" y="%d" width="304" height="18" rx="3"/>', y - 13), TX(1272, y, label, "rowt"), chips(w, 1560, y - 11), "</g>") }
@@ -199,7 +204,7 @@ for (lab in names(reports)) { row(lab, reports[[lab]], y); y <- y + 19 }
 if (y > 934) stop("the ST-Sim column runs past its box (y = ", y, ")")
 
 add(TX(24, 962, "Solid arrows: a datasheet one stage writes and a later stage reads. Dashed: a scenario dependency (the dependency supplies its sheets; the first one with rows wins). Chips: the stages that read a data group, or write a sheet.", "foot"),
-    TX(24, 978, sprintf("Every stage also writes the Validation sheet. Generated by docs/blueprint/build.R from package.xml (lucasCore %s), %s.", version, format(Sys.Date())), "foot"))
+    TX(24, 978, sprintf("Every stage also writes the Validation sheet, and every Build stage the Data Sources Used sheet. Generated by docs/blueprint/build.R from package.xml (lucasCore %s), %s.", version, format(Sys.Date())), "foot"))
 body <- paste(c(defs, g), collapse = "\n")
 head <- svg_head(W, H, "lucasCore blueprint: scenarios, stages and datasheets")
 writeLines(standalone_svg(head, body), file.path(out, "lucascore-blueprint.svg"), useBytes = TRUE)

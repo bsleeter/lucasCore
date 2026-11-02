@@ -3,7 +3,8 @@
 # =============================================================================
 # Companion to build.R (stages and datasheets). Writes lucascore-data-blueprint.svg (print), lucascore-data-blueprint.png (2x) and
 # data.html (light/dark; click a dataset or a stage). The dataset list, display names and default paths come from package.xml's Data
-# Sources sheet; the groups, short labels, vintages and what each stage does with each dataset are set below. The build stops when
+# Sources sheet (its visible dataset columns: not Data Sources Home, nor a hidden retired one such as EVT 2001); the groups, short
+# labels, vintages and what each stage does with each dataset are set below. The build stops when
 # package.xml has a Data Sources column the drawing does not place, or when a stage script and the uses below disagree about which
 # columns it reads (stage 2 and 3 read the FIA columns through src/fia.R, stage 10 NCCPI also through src/nccpi.R).
 # Usage: Rscript docs/blueprint/build-data.R [out_dir]
@@ -17,6 +18,7 @@ source(file.path(here, "style.R"))
 
 x <- read_xml(file.path(pkg, "package.xml")); version <- xml_attr(x, "version")
 cols <- xml_find_all(x, "/package/dataSheet[@name='DataSource']/column")
+cols <- cols[xml_attr(cols, "name") != "DataSourcesHome" & !(xml_attr(cols, "isVisible") %in% "False")]
 ds_display <- setNames(xml_attr(cols, "displayName"), xml_attr(cols, "name"))
 ds_default <- setNames(xml_attr(cols, "defaultValue"), xml_attr(cols, "name"))
 
@@ -34,22 +36,23 @@ D <- list(
     u(2, "Disturbance and treatment codes of each condition", fia_note), u(3, "Disturbance and treatment codes of each condition", fia_note))),
   list("FIA and strata", "FiaDataMartFolder", "FIA DataMart", "state PLOT, COND, TREE, DWM csvs + REFERENCE", list(
     u(2, "Condition tables derived from the state CSVs, in place of the USGS release", "Growth Curve Options > FIA Data: FIA DataMart", TRUE),
-    u(3, "Measured down dead wood (COND_DWM_CALC) the decay is calibrated to", "Carbon Method: FIA measured dead wood (default)"))),
-  list("Land cover, age and soil", "NlcdFolder", "Annual NLCD", "Collection 1 · 30 m · one map a year", list(
+    u(3, "Measured down dead wood (COND_DWM_CALC) the decay is calibrated to", "Carbon Method: FIA measured dead wood (default)"),
+    u(5, "Each TreeMap plot's forested condition (type, stand age, site class)", "Build Options: a TreeMap option", TRUE))),
+  list("Land cover, age and soil", "NlcdFolder", "Annual NLCD", "Collection 1.2 · 30 m · one map a year from 1985", list(
     u(1, "Start-year land mask, modal on the model grid"), u(5, "Annual land cover on the model grid; developed, agriculture, water and ice classes", "Build Options > Land Cover Resampling"),
     u(6, "Land-use change (class gains and losses) and the clearcut rule"), u(10, "The 30 m annual record the suitability surfaces are fitted on"))),
   list("Land cover, age and soil", "Evt2016File", "LANDFIRE EVT 2016", "LF 2.0.0 · 30 m", list(
     u(5, "Forest, shrub and grass types: the most common 30 m class in each cell", "Build Options > Forest Type Map: LANDFIRE EVT (default)"))),
-  list("Land cover, age and soil", "Evt2001File", "LANDFIRE EVT 2001", "LF 1.0.5 · 30 m", list(
-    u(5, "Vegetation types alongside EVT 2016", "Land Cover Crosswalks > EVT 2001"))),
-  list("Land cover, age and soil", "RcmapFile", "RCMAP vegetation class", "2001", list(u(5, "Rangeland vegetation classes", "Land Cover Crosswalks > RCMAP"))),
+  list("Land cover, age and soil", "RcmapFile", "RCMAP vegetation state", "1985 · published 2025 · western US", list(u(5, "Grassland and shrubland types (classes 2 to 9)", "Land Cover Crosswalks > RCMAP"))),
   list("Land cover, age and soil", "CcapFile", "C-CAP land cover", "2001 · coastal wetlands", list(u(5, "Wetland types (C-CAP classes 90 and up)", "Land Cover Crosswalks > C-CAP"))),
-  list("Land cover, age and soil", "ForestTypeGroupFolder", "USFS forest type groups", "NFCMS regional maps", list(
-    u(5, "Forest types in place of LANDFIRE EVT", "Build Options > Forest Type Map: USFS forest type groups", TRUE))),
-  list("Land cover, age and soil", "StandAgeFile", "NASA CMS forest age", "1990", list(u(5, "Stand age, averaged over each cell"))),
+  list("Land cover, age and soil", "ForestTypeGroupFolder", "USFS forest type groups", "NFCMS v3 · regional maps", list(
+    u(5, "Forest types in place of LANDFIRE EVT, or filling its gaps", "Build Options > Forest Type Map: USFS forest type groups", TRUE))),
+  list("Land cover, age and soil", "TreeMapFolder", "TreeMap", "2016 · 30 m FIA plot ids", list(
+    u(5, "Forest type, stand age or site class from each pixel's FIA plot", "Build Options > Forest Type Map, Stand Age Source or Site Productivity: TreeMap", TRUE))),
+  list("Land cover, age and soil", "StandAgeFile", "NASA CMS forest age", "1990 · ORNL DAAC 1829", list(u(5, "Stand age, averaged over each cell"))),
   list("Land cover, age and soil", "FriFile", "LANDFIRE fire return interval", "LF 2016 · FRI_REPLAC", list(
     u(5, "Replacement-fire return interval per ecodivision and forest class, for spin-up"))),
-  list("Land cover, age and soil", "SoilCarbonFile", "gSSURGO soil organic carbon", "0 to 999 mm", list(
+  list("Land cover, age and soil", "SoilCarbonFile", "gNATSGO soil organic carbon", "soc0_999 · 10 m", list(
     u(5, "Mean soil carbon per ecodivision and forest class: the target stage 3 calibrates to"), u(8, "Soil carbon map for the initial soil pool"))),
   list("Disturbance", "MtbsSeverityFolder", "MTBS burn severity", "annual CONUS mosaics", list(
     u(6, "Wildfire by severity (burned share of 30 m pixels), and burned cells kept out of the clearcut rule"))),
@@ -120,7 +123,7 @@ leg(list(list(fam = "setup", label = "Setup"), list(fam = "land", label = "Land 
          list(fam = "climate", label = "Climate"), list(fam = "fig", label = "Figures")), 38)
 leg(list(list(alt = FALSE, label = "read with the default settings"), list(alt = TRUE, label = "read only under a non-default option")), 62)
 
-add(box(24, 104, 600, 830, "Data Sources sheet · project scope", "National datasets"), TX(312, 146, "VINTAGE · RESOLUTION", "ghead"))
+add(box(24, 104, 600, 830, "Data Sources sheet · filled by stage 15 Data Download", "National datasets"), TX(312, 146, "VINTAGE · RESOLUTION", "ghead"))
 y <- 172; sy <- c(); grp <- ""
 for (d in D) {
   if (d[[1]] != grp) { if (nzchar(grp)) y <- y + 12; grp <- d[[1]]; add(TX(40, y, toupper(grp), "ghead")); y <- y + 21 }
@@ -147,7 +150,7 @@ for (id in names(S)) { s <- S[[id]]; yy <- by[[id]]; bw <- if (nchar(s[[1]]) > 2
       TX(BX + 20 + bw, yy + 24, s[[2]], "sn2"), TX(BX + 12, yy + 43, s[[3]], "mk"), TX(BX + 12, yy + 57, paste("Set by:", s[[4]]), "ch"), "</g>")
   for (ty in uses$ty[uses$stage == id]) add(sprintf('<circle class="port f-%s" cx="%d" cy="%.1f" r="2.4"/>', fam[[id]], BX, ty)) }
 
-add(TX(24, 962, "Wires run from a dataset to each stage that reads it, coloured by the stage. Vintages are those of the default paths in package.xml (Data Sources: a blank sheet uses them).", "foot"),
+add(TX(24, 962, "Wires run from a dataset to each stage that reads it, coloured by the stage. Vintages are those stage 15 Data Download fetches into Data Sources Home, where a blank path reads them.", "foot"),
     TX(24, 978, sprintf("Stages 0 and 4 read no national data. Generated by docs/blueprint/build-data.R from package.xml (lucasCore %s), %s.", version, format(Sys.Date())), "foot"))
 body <- paste(c(defs, g), collapse = "\n")
 head <- svg_head(W, H, "lucasCore data blueprint: national datasets and the stages that read them")

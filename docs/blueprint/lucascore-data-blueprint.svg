@@ -45,7 +45,7 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <text x="1142.8" y="62" class="lgt">read with the default settings</text>
 <path d="M1334.8,58 h18" class="wire f-setup alt" style="opacity:1"/>
 <text x="1358.8" y="62" class="lgt">read only under a non-default option</text>
-<rect class="box" x="24" y="104" width="600" height="830" rx="7"/><text x="40" y="126" class="eyebrow">DATA SOURCES SHEET · PROJECT SCOPE</text><text x="40" y="146" class="sname">National datasets</text>
+<rect class="box" x="24" y="104" width="600" height="830" rx="7"/><text x="40" y="126" class="eyebrow">DATA SOURCES SHEET · FILLED BY STAGE 15 DATA DOWNLOAD</text><text x="40" y="146" class="sname">National datasets</text>
 <text x="312" y="146" class="ghead">VINTAGE · RESOLUTION</text>
 <text x="40" y="172" class="ghead">FIA AND STRATA</text>
 <g class="ds" data-ds="EcodivisionFile" tabindex="0" role="button" aria-label="FIA ecodivisions"><rect class="dsbg" x="32" y="178" width="584" height="22" rx="3"/>
@@ -67,39 +67,39 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <text x="40" y="297" class="ghead">LAND COVER, AGE AND SOIL</text>
 <g class="ds" data-ds="NlcdFolder" tabindex="0" role="button" aria-label="Annual NLCD"><rect class="dsbg" x="32" y="303" width="584" height="22" rx="3"/>
 <text x="40" y="318" class="dsn">Annual NLCD</text>
-<text x="312" y="318" class="dsv">Collection 1 · 30 m · one map a year</text>
+<text x="312" y="318" class="dsv">Collection 1.2 · 30 m · one map a year from 1985</text>
 </g>
 <g class="ds" data-ds="Evt2016File" tabindex="0" role="button" aria-label="LANDFIRE EVT 2016"><rect class="dsbg" x="32" y="326" width="584" height="22" rx="3"/>
 <text x="40" y="341" class="dsn">LANDFIRE EVT 2016</text>
 <text x="312" y="341" class="dsv">LF 2.0.0 · 30 m</text>
 </g>
-<g class="ds" data-ds="Evt2001File" tabindex="0" role="button" aria-label="LANDFIRE EVT 2001"><rect class="dsbg" x="32" y="349" width="584" height="22" rx="3"/>
-<text x="40" y="364" class="dsn">LANDFIRE EVT 2001</text>
-<text x="312" y="364" class="dsv">LF 1.0.5 · 30 m</text>
+<g class="ds" data-ds="RcmapFile" tabindex="0" role="button" aria-label="RCMAP vegetation state"><rect class="dsbg" x="32" y="349" width="584" height="22" rx="3"/>
+<text x="40" y="364" class="dsn">RCMAP vegetation state</text>
+<text x="312" y="364" class="dsv">1985 · published 2025 · western US</text>
 </g>
-<g class="ds" data-ds="RcmapFile" tabindex="0" role="button" aria-label="RCMAP vegetation class"><rect class="dsbg" x="32" y="372" width="584" height="22" rx="3"/>
-<text x="40" y="387" class="dsn">RCMAP vegetation class</text>
-<text x="312" y="387" class="dsv">2001</text>
+<g class="ds" data-ds="CcapFile" tabindex="0" role="button" aria-label="C-CAP land cover"><rect class="dsbg" x="32" y="372" width="584" height="22" rx="3"/>
+<text x="40" y="387" class="dsn">C-CAP land cover</text>
+<text x="312" y="387" class="dsv">2001 · coastal wetlands</text>
 </g>
-<g class="ds" data-ds="CcapFile" tabindex="0" role="button" aria-label="C-CAP land cover"><rect class="dsbg" x="32" y="395" width="584" height="22" rx="3"/>
-<text x="40" y="410" class="dsn">C-CAP land cover</text>
-<text x="312" y="410" class="dsv">2001 · coastal wetlands</text>
+<g class="ds" data-ds="ForestTypeGroupFolder" tabindex="0" role="button" aria-label="USFS forest type groups"><rect class="dsbg" x="32" y="395" width="584" height="22" rx="3"/>
+<text x="40" y="410" class="dsn">USFS forest type groups</text>
+<text x="312" y="410" class="dsv">NFCMS v3 · regional maps</text>
 </g>
-<g class="ds" data-ds="ForestTypeGroupFolder" tabindex="0" role="button" aria-label="USFS forest type groups"><rect class="dsbg" x="32" y="418" width="584" height="22" rx="3"/>
-<text x="40" y="433" class="dsn">USFS forest type groups</text>
-<text x="312" y="433" class="dsv">NFCMS regional maps</text>
+<g class="ds" data-ds="TreeMapFolder" tabindex="0" role="button" aria-label="TreeMap"><rect class="dsbg" x="32" y="418" width="584" height="22" rx="3"/>
+<text x="40" y="433" class="dsn">TreeMap</text>
+<text x="312" y="433" class="dsv">2016 · 30 m FIA plot ids</text>
 </g>
 <g class="ds" data-ds="StandAgeFile" tabindex="0" role="button" aria-label="NASA CMS forest age"><rect class="dsbg" x="32" y="441" width="584" height="22" rx="3"/>
 <text x="40" y="456" class="dsn">NASA CMS forest age</text>
-<text x="312" y="456" class="dsv">1990</text>
+<text x="312" y="456" class="dsv">1990 · ORNL DAAC 1829</text>
 </g>
 <g class="ds" data-ds="FriFile" tabindex="0" role="button" aria-label="LANDFIRE fire return interval"><rect class="dsbg" x="32" y="464" width="584" height="22" rx="3"/>
 <text x="40" y="479" class="dsn">LANDFIRE fire return interval</text>
 <text x="312" y="479" class="dsv">LF 2016 · FRI_REPLAC</text>
 </g>
-<g class="ds" data-ds="SoilCarbonFile" tabindex="0" role="button" aria-label="gSSURGO soil organic carbon"><rect class="dsbg" x="32" y="487" width="584" height="22" rx="3"/>
-<text x="40" y="502" class="dsn">gSSURGO soil organic carbon</text>
-<text x="312" y="502" class="dsv">0 to 999 mm</text>
+<g class="ds" data-ds="SoilCarbonFile" tabindex="0" role="button" aria-label="gNATSGO soil organic carbon"><rect class="dsbg" x="32" y="487" width="584" height="22" rx="3"/>
+<text x="40" y="502" class="dsn">gNATSGO soil organic carbon</text>
+<text x="312" y="502" class="dsv">soc0_999 · 10 m</text>
 </g>
 <text x="40" y="537" class="ghead">DISTURBANCE</text>
 <g class="ds" data-ds="MtbsSeverityFolder" tabindex="0" role="button" aria-label="MTBS burn severity"><rect class="dsbg" x="32" y="543" width="584" height="22" rx="3"/>
@@ -159,7 +159,7 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <path class="wire f-setup" data-ds="EcodivisionFile" data-stage="1" d="M616,189 C808,189 808,123.0 998,123.0"/>
 <path class="wire f-carbon" data-ds="EcodivisionFile" data-stage="2" d="M616,189 C808,189 808,191.2 998,191.2"/>
 <path class="wire f-carbon" data-ds="EcodivisionFile" data-stage="3" d="M616,189 C808,189 808,267.2 998,267.2"/>
-<path class="wire f-land" data-ds="EcodivisionFile" data-stage="5" d="M616,189 C808,189 808,340.6 998,340.6"/>
+<path class="wire f-land" data-ds="EcodivisionFile" data-stage="5" d="M616,189 C808,189 808,340.4 998,340.4"/>
 <path class="wire f-land" data-ds="EcodivisionFile" data-stage="6" d="M616,189 C808,189 808,419.2 998,419.2"/>
 <path class="wire f-carbon" data-ds="FiaConditionFile" data-stage="2" d="M616,212 C808,212 808,201.6 998,201.6"/>
 <path class="wire f-carbon" data-ds="FiaConditionFile" data-stage="3" d="M616,212 C808,212 808,277.6 998,277.6"/>
@@ -167,18 +167,19 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <path class="wire f-carbon" data-ds="FiaDisturbanceFile" data-stage="3" d="M616,235 C808,235 808,288.0 998,288.0"/>
 <path class="wire f-carbon alt" data-ds="FiaDataMartFolder" data-stage="2" d="M616,258 C808,258 808,222.4 998,222.4"/>
 <path class="wire f-carbon" data-ds="FiaDataMartFolder" data-stage="3" d="M616,258 C808,258 808,298.4 998,298.4"/>
+<path class="wire f-land alt" data-ds="FiaDataMartFolder" data-stage="5" d="M616,258 C808,258 808,345.1 998,345.1"/>
 <path class="wire f-setup" data-ds="NlcdFolder" data-stage="1" d="M616,314 C808,314 808,149.0 998,149.0"/>
-<path class="wire f-land" data-ds="NlcdFolder" data-stage="5" d="M616,314 C808,314 808,345.8 998,345.8"/>
+<path class="wire f-land" data-ds="NlcdFolder" data-stage="5" d="M616,314 C808,314 808,349.8 998,349.8"/>
 <path class="wire f-land" data-ds="NlcdFolder" data-stage="6" d="M616,314 C808,314 808,429.6 998,429.6"/>
 <path class="wire f-land" data-ds="NlcdFolder" data-stage="10" d="M616,314 C808,314 808,644.9 998,644.9"/>
-<path class="wire f-land" data-ds="Evt2016File" data-stage="5" d="M616,337 C808,337 808,351.0 998,351.0"/>
-<path class="wire f-land" data-ds="Evt2001File" data-stage="5" d="M616,360 C808,360 808,356.2 998,356.2"/>
-<path class="wire f-land" data-ds="RcmapFile" data-stage="5" d="M616,383 C808,383 808,361.4 998,361.4"/>
-<path class="wire f-land" data-ds="CcapFile" data-stage="5" d="M616,406 C808,406 808,366.6 998,366.6"/>
-<path class="wire f-land alt" data-ds="ForestTypeGroupFolder" data-stage="5" d="M616,429 C808,429 808,371.8 998,371.8"/>
-<path class="wire f-land" data-ds="StandAgeFile" data-stage="5" d="M616,452 C808,452 808,377.0 998,377.0"/>
-<path class="wire f-land" data-ds="FriFile" data-stage="5" d="M616,475 C808,475 808,382.2 998,382.2"/>
-<path class="wire f-land" data-ds="SoilCarbonFile" data-stage="5" d="M616,498 C808,498 808,387.4 998,387.4"/>
+<path class="wire f-land" data-ds="Evt2016File" data-stage="5" d="M616,337 C808,337 808,354.5 998,354.5"/>
+<path class="wire f-land" data-ds="RcmapFile" data-stage="5" d="M616,360 C808,360 808,359.3 998,359.3"/>
+<path class="wire f-land" data-ds="CcapFile" data-stage="5" d="M616,383 C808,383 808,364.0 998,364.0"/>
+<path class="wire f-land alt" data-ds="ForestTypeGroupFolder" data-stage="5" d="M616,406 C808,406 808,368.7 998,368.7"/>
+<path class="wire f-land alt" data-ds="TreeMapFolder" data-stage="5" d="M616,429 C808,429 808,373.5 998,373.5"/>
+<path class="wire f-land" data-ds="StandAgeFile" data-stage="5" d="M616,452 C808,452 808,378.2 998,378.2"/>
+<path class="wire f-land" data-ds="FriFile" data-stage="5" d="M616,475 C808,475 808,382.9 998,382.9"/>
+<path class="wire f-land" data-ds="SoilCarbonFile" data-stage="5" d="M616,498 C808,498 808,387.6 998,387.6"/>
 <path class="wire f-carbon" data-ds="SoilCarbonFile" data-stage="8" d="M616,498 C808,498 808,503.0 998,503.0"/>
 <path class="wire f-land" data-ds="MtbsSeverityFolder" data-stage="6" d="M616,554 C808,554 808,440.0 998,440.0"/>
 <path class="wire f-land" data-ds="LcmsFolder" data-stage="6" d="M616,577 C808,577 808,450.4 998,450.4"/>
@@ -271,16 +272,17 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <text x="1012" y="375" class="mk">State class and stand age maps, annual NLCD on the grid, return intervals, soil targets</text>
 <text x="1012" y="389" class="ch">Set by: Build Options (Forest Type Map, Land Cover Resampling); Land Cover Crosswalks</text>
 </g>
-<circle class="port f-land" cx="1000" cy="340.6" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="345.8" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="351.0" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="356.2" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="361.4" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="366.6" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="371.8" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="377.0" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="382.2" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="387.4" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="340.4" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="345.1" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="349.8" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="354.5" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="359.3" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="364.0" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="368.7" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="373.5" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="378.2" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="382.9" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="387.6" r="2.4"/>
 <g class="stage f-land" data-stage="6" tabindex="0" role="button" aria-label="Stage 6, Historical Transitions">
 <rect class="sb" x="1000" y="408" width="576" height="64" rx="5"/>
 <rect class="badge" x="1010" y="417" width="24" height="20" rx="3"/>
@@ -360,7 +362,7 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <text x="1012" y="921" class="ch">Set by: Run Figures; Compare Runs</text>
 </g>
 <circle class="port f-fig" cx="1000" cy="896.0" r="2.4"/>
-<text x="24" y="962" class="foot">Wires run from a dataset to each stage that reads it, coloured by the stage. Vintages are those of the default paths in package.xml (Data Sources: a blank sheet uses them).</text>
-<text x="24" y="978" class="foot">Stages 0 and 4 read no national data. Generated by docs/blueprint/build-data.R from package.xml (lucasCore 1.0.0), 2026-10-29.</text>
+<text x="24" y="962" class="foot">Wires run from a dataset to each stage that reads it, coloured by the stage. Vintages are those stage 15 Data Download fetches into Data Sources Home, where a blank path reads them.</text>
+<text x="24" y="978" class="foot">Stages 0 and 4 read no national data. Generated by docs/blueprint/build-data.R from package.xml (lucasCore 1.0.0), 2026-11-02.</text>
 </svg>
 

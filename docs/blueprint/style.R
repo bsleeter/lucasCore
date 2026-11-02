@@ -13,7 +13,7 @@ box <- function(x, y, w, h, eyebrow, name = NULL) paste0(sprintf('<rect class="b
 defs <- '<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker></defs>'
 # stage families (both drawings colour a stage, its chips and its wires by these)
 fam <- c(`0` = "setup", `1` = "setup", `2` = "carbon", `3` = "carbon", `4` = "carbon", `8` = "carbon", `5` = "land", `6` = "land",
-         `9` = "land", `10` = "land", `7` = "climate", `11` = "climate", `12` = "fig", `13` = "fig", `14` = "fig")
+         `9` = "land", `10` = "land", `7` = "climate", `11` = "climate", `12` = "fig", `13` = "fig", `14` = "fig", `15` = "setup")
 
 rules <- "
 .bg{fill:var(--bg)} .box{fill:var(--surface);stroke:var(--line);stroke-width:1}

@@ -30,7 +30,7 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker></defs>
 <rect class="bg" width="1600" height="1000"/>
 <text x="24" y="44" class="h1">lucasCore blueprint</text>
-<text x="24" y="66" class="sub">SyncroSim 3 add-on to ST-Sim 4.5 · version 1.0.0 · 15 stages in src/ · the scenarios they run in and the datasheets they pass on</text>
+<text x="24" y="66" class="sub">SyncroSim 3 add-on to ST-Sim 4.5 · version 1.0.0 · 16 stages in src/ · the scenarios they run in and the datasheets they pass on</text>
 <rect class="lg f-setup" x="1152.8" y="28" width="14" height="12" rx="2"/>
 <text x="1174.8" y="38" class="lgt">Setup</text>
 <rect class="lg f-land" x="1213.8" y="28" width="14" height="12" rx="2"/>
@@ -58,9 +58,9 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <text x="40" y="263" class="gt">Land cover</text>
 <g class="chip f-setup" data-stage="1"><rect x="143" y="252" width="18" height="14" rx="3"/><text x="152" y="262.5" class="chip-t" text-anchor="middle">1</text></g><g class="chip f-land" data-stage="5"><rect x="164" y="252" width="18" height="14" rx="3"/><text x="173" y="262.5" class="chip-t" text-anchor="middle">5</text></g><g class="chip f-land" data-stage="6"><rect x="185" y="252" width="18" height="14" rx="3"/><text x="194" y="262.5" class="chip-t" text-anchor="middle">6</text></g><g class="chip f-land" data-stage="10"><rect x="206" y="252" width="18" height="14" rx="3"/><text x="215" y="262.5" class="chip-t" text-anchor="middle">10</text></g>
 <text x="40" y="278" class="item">Annual NLCD</text>
-<text x="40" y="293" class="item">LANDFIRE EVT 2001 and 2016</text>
-<text x="40" y="308" class="item">RCMAP, C-CAP 2001</text>
-<text x="40" y="323" class="item">USFS forest type groups</text>
+<text x="40" y="293" class="item">LANDFIRE EVT 2016</text>
+<text x="40" y="308" class="item">RCMAP 1985, C-CAP 2001</text>
+<text x="40" y="323" class="item">USFS forest types, TreeMap</text>
 <text x="40" y="338" class="item">NASA CMS forest age 1990</text>
 <line class="rule" x1="40" y1="354" x2="224" y2="354"/>
 <text x="40" y="369" class="gt">Disturbance</text>
@@ -80,7 +80,7 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <line class="rule" x1="40" y1="551" x2="224" y2="551"/>
 <text x="40" y="566" class="gt">Soil</text>
 <g class="chip f-land" data-stage="5"><rect x="185" y="555" width="18" height="14" rx="3"/><text x="194" y="565.5" class="chip-t" text-anchor="middle">5</text></g><g class="chip f-carbon" data-stage="8"><rect x="206" y="555" width="18" height="14" rx="3"/><text x="215" y="565.5" class="chip-t" text-anchor="middle">8</text></g>
-<text x="40" y="581" class="item">gSSURGO soil organic carbon</text>
+<text x="40" y="581" class="item">gNATSGO soil organic carbon</text>
 <line class="rule" x1="40" y1="597" x2="224" y2="597"/>
 <text x="40" y="612" class="gt">Covariates</text>
 <g class="chip f-land" data-stage="9"><rect x="185" y="601" width="18" height="14" rx="3"/><text x="194" y="611.5" class="chip-t" text-anchor="middle">9</text></g><g class="chip f-land" data-stage="10"><rect x="206" y="601" width="18" height="14" rx="3"/><text x="215" y="611.5" class="chip-t" text-anchor="middle">10</text></g>
@@ -97,6 +97,9 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <text x="40" y="785" class="item">landcover crosswalks</text>
 <text x="40" y="800" class="item">transitions, projection rules</text>
 <text x="40" y="819" class="lbl">(used when a sheet is left empty)</text>
+<line class="rule" x1="40" y1="837" x2="224" y2="837"/>
+<text x="40" y="857" class="lbl">Filled by its own scenario</text>
+<g class="stage f-setup" data-stage="15" tabindex="0" role="button" aria-label="Stage 15, Data Download"><rect class="sb" x="40" y="865" width="172" height="64" rx="5"/><rect class="badge" x="49" y="875" width="24" height="20" rx="3"/><text x="61" y="889" class="badge-t" text-anchor="middle">15</text><text x="81" y="890" class="sn">Data Download</text><text x="49" y="919" class="ss">15-data-download.R</text></g>
 <rect class="box" x="268" y="104" width="202" height="136" rx="7"/><text x="284" y="126" class="eyebrow">SCENARIO · DEPENDENCY</text><text x="284" y="146" class="sname">Stock-Flow Definitions</text>
 <g class="stage f-setup" data-stage="0" tabindex="0" role="button" aria-label="Stage 0, Stock-Flow Definitions"><rect class="sb" x="283" y="160" width="172" height="64" rx="5"/><rect class="badge" x="292" y="170" width="24" height="20" rx="3"/><text x="304" y="184" class="badge-t" text-anchor="middle">0</text><text x="324" y="179" class="sn">Stock-Flow</text><text x="324" y="193" class="sn">Definitions</text><text x="292" y="214" class="ss">0-stock-flow-definitions.R</text></g>
 <rect class="box" x="494" y="104" width="480" height="136" rx="7"/><text x="510" y="126" class="eyebrow">SCENARIO · DEPENDENCY · INPUT SHEETS</text><text x="510" y="146" class="sname">Carbon Assumptions</text>
@@ -280,10 +283,10 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <text x="1272" y="565" class="rowt">Flow Multipliers</text>
 <g class="chip f-carbon" data-stage="3"><rect x="1542" y="554" width="18" height="14" rx="3"/><text x="1551" y="564.5" class="chip-t" text-anchor="middle">3</text></g>
 </g>
-<g class="row" data-sheet="stsim_FlowSpatialMultiplier" data-stages="7 11">
+<g class="row" data-sheet="stsim_FlowSpatialMultiplier" data-stages="7 8 11">
 <rect class="rowbg" x="1264" y="571" width="304" height="18" rx="3"/>
 <text x="1272" y="584" class="rowt">Flow Spatial Multipliers</text>
-<g class="chip f-climate" data-stage="7"><rect x="1521" y="573" width="18" height="14" rx="3"/><text x="1530" y="583.5" class="chip-t" text-anchor="middle">7</text></g><g class="chip f-climate" data-stage="11"><rect x="1542" y="573" width="18" height="14" rx="3"/><text x="1551" y="583.5" class="chip-t" text-anchor="middle">11</text></g>
+<g class="chip f-climate" data-stage="7"><rect x="1500" y="573" width="18" height="14" rx="3"/><text x="1509" y="583.5" class="chip-t" text-anchor="middle">7</text></g><g class="chip f-carbon" data-stage="8"><rect x="1521" y="573" width="18" height="14" rx="3"/><text x="1530" y="583.5" class="chip-t" text-anchor="middle">8</text></g><g class="chip f-climate" data-stage="11"><rect x="1542" y="573" width="18" height="14" rx="3"/><text x="1551" y="583.5" class="chip-t" text-anchor="middle">11</text></g>
 </g>
 <g class="row" data-sheet="stsim_StateAttributeValue" data-stages="3 10">
 <rect class="rowbg" x="1264" y="590" width="304" height="18" rx="3"/>
@@ -352,7 +355,12 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <text x="1272" y="879" class="rowt">Run comparison summaries</text>
 <g class="chip f-fig" data-stage="14"><rect x="1542" y="868" width="18" height="14" rx="3"/><text x="1551" y="878.5" class="chip-t" text-anchor="middle">14</text></g>
 </g>
+<g class="row" data-sheet="OutputDataDownload" data-stages="15">
+<rect class="rowbg" x="1264" y="885" width="304" height="18" rx="3"/>
+<text x="1272" y="898" class="rowt">Download Results</text>
+<g class="chip f-setup" data-stage="15"><rect x="1542" y="887" width="18" height="14" rx="3"/><text x="1551" y="897.5" class="chip-t" text-anchor="middle">15</text></g>
+</g>
 <text x="24" y="962" class="foot">Solid arrows: a datasheet one stage writes and a later stage reads. Dashed: a scenario dependency (the dependency supplies its sheets; the first one with rows wins). Chips: the stages that read a data group, or write a sheet.</text>
-<text x="24" y="978" class="foot">Every stage also writes the Validation sheet. Generated by docs/blueprint/build.R from package.xml (lucasCore 1.0.0), 2026-10-29.</text>
+<text x="24" y="978" class="foot">Every stage also writes the Validation sheet, and every Build stage the Data Sources Used sheet. Generated by docs/blueprint/build.R from package.xml (lucasCore 1.0.0), 2026-11-02.</text>
 </svg>
 
