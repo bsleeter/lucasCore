@@ -168,14 +168,14 @@ run_dataset <- function(h, ctx, layout, check_only = FALSE) {
   get <- items[fetch == TRUE]; remote <- items[fetch == FALSE]
   if (check_only) { s <- url_sizes(get$url); miss <- sum(is.na(s))
     log(sprintf("%s: %d files to fetch into %s, %.0f MB%s%s", h$name, nrow(get), where, sum(s, na.rm = TRUE) / 1e6, if (miss) sprintf(" (%d sizes unknown)", miss) else "",
-                if (nrow(remote)) sprintf("; %d archives read remotely for the region only", nrow(remote)) else ""))
+                if (nrow(remote)) sprintf("; %d read from its service%s", nrow(remote), if (is.null(ctx$region$poly)) " whole" else " for the region only") else ""))
     return(out("would download", nrow(items), sum(s, na.rm = TRUE) / 1e6,
-               paste(c(sub("^in ", "into ", held_in(where)), if (miss) sprintf("%d files did not report a size", miss), if (nrow(remote)) "read remotely: only the region is written"), collapse = "; "))) }
+               paste(c(sub("^in ", "into ", held_in(where)), if (miss) sprintf("%d files did not report a size", miss), if (nrow(remote)) (if (is.null(ctx$region$poly)) "read from its service whole" else "read remotely: only the region is written")), collapse = "; "))) }
   mb <- 0
   if (nrow(get)) { sizes <- url_sizes(get$url)
     log(sprintf("%s: fetching %d files (%.0f MB%s)", h$name, nrow(get), sum(sizes, na.rm = TRUE) / 1e6, if (anyNA(sizes)) ", some sizes unknown" else ""))
     fetch_files(get$url, get$dest, ctx$connections, log, sizes); mb <- sum(file.size(get$dest), na.rm = TRUE) / 1e6 }
-  if (nrow(remote)) log(if (!is.null(h$method)) sprintf("%s: clipped by its source (%s)", h$name, h$method) else sprintf("%s: reading %d archives remotely, writing the region only", h$name, nrow(remote)))
+  if (nrow(remote)) log(if (!is.null(h$method)) sprintf("%s: %s by its source (%s)", h$name, if (is.null(ctx$region$poly)) "read whole" else "clipped", h$method) else sprintf("%s: reading %d archives remotely, writing the region only", h$name, nrow(remote)))
   log(sprintf("%s: %.0f MB fetched; unpacking%s", h$name, mb, if (is.null(ctx$region$poly) || ctx$keep) "" else " and clipping to the region"))
   # finish writes into a staging folder; commit_staged moves its files into place without replacing any a library may have read
   place <- ctx$place; stage <- file.path(ctx$store, ".staging", col); unlink(stage, recursive = TRUE); dir.create(stage, recursive = TRUE, showWarnings = FALSE)
@@ -183,7 +183,10 @@ run_dataset <- function(h, ctx, layout, check_only = FALSE) {
   path <- h$finish(ctx, items); path <- commit_staged(stage, place, path, ctx$store, col, log)
   # record: every file under the place, with checksums; the manifest row
   fr <- files_rows(ctx$store, col, path, sha = TRUE); write_files(ctx$store, fr)
-  copy <- if (is.null(ctx$region$poly) || ctx$keep || isTRUE(h$national)) "national" else "clipped"
+  # a region's download is a national copy only when whole files were kept: a source that clips (NLCD, LANDFIRE, perimeters,
+  # gNATSGO, stand age tiles) gives the region alone, Keep national copies or not
+  by_source <- isTRUE(h$method %in% c("wcs", "lfps", "rest", "stac", "login"))
+  copy <- if (is.null(ctx$region$poly) || isTRUE(h$national) || (ctx$keep && !by_source)) "national" else "clipped"
   src <- layout[Column == col]
   write_manifest(ctx$store, data.table::data.table(Column = col, Dataset = h$name, Source = src$Source, Version = if (!is.null(h$version)) h$version else src$Version,
     Url = paste(unique(dirname(items$url)), collapse = " "), Doi = src$Doi, Method = if (!is.null(h$method)) h$method else "direct", Copy = copy,

@@ -70,10 +70,6 @@ asked <- trimws(strsplit(o("Datasets", ""), ",")[[1]]); asked <- asked[nzchar(as
 if (length(asked)) { bad <- setdiff(asked, layout$Column); if (length(bad)) fail("Data Download: Datasets: %s are not Data Sources columns", paste(bad, collapse = ", "))
   cant <- setdiff(asked, names(H)); if (length(cant)) say("Not fetched by this version (%s): %s", "see the Data Download plan", paste(cant, collapse = ", ")) }
 todo <- if (length(asked)) intersect(asked, names(H)) else names(H)
-# national copies of the datasets their sources clip (NLCD by WCS, LANDFIRE by LFPS jobs, perimeters by REST, C-CAP, gNATSGO,
-# NASA CMS) need the sources' national files, which this version does not fetch yet (plan, home layout work item 3)
-clip_only <- if (is.null(region$poly)) todo[vapply(H[todo], function(h) isTRUE(h$method %in% c("wcs", "lfps", "rest", "cog", "stac", "login")), TRUE)] else character()
-todo <- setdiff(todo, clip_only)
 check_only <- isTRUE(as.logical(o("CheckOnly", FALSE)))
 y_to <- o("YearTo", NA_integer_)
 ctx <- list(home = home, region_home = region_home, region = region, years = c(as.integer(o("YearFrom", 1985L)), if (is.na(y_to)) NA_integer_ else as.integer(y_to)),
@@ -96,8 +92,6 @@ for (k in setdiff(asked, names(H))) { pk <- identical(layout[Column == k, Access
     Next = if (pk) "Ships with lucasCore: a blank Data Sources path reads the package copy" else if (identical(layout[Column == k, Access], "user"))
       "No public source: put your copy at its place in the home folder, or set its Data Sources path" else
       "Not fetched by this version: put it at its place in the home folder, or set its Data Sources path"), fill = TRUE) }
-for (k in clip_only) res <- rbind(res, data.table(DataSource = k, Dataset = H[[k]]$name, Status = "manual",
-  Next = "Clipped by its source: a national copy is not fetched by this version. Run the download By region, or put the national file at its place at the top of the home"), fill = TRUE)
 write_ds(res, "OutputDataDownload")
 progressBar(type = "end")
 

@@ -38,6 +38,20 @@ region_states <- function(ctx) {
 years_of <- function(ctx, have) { y1 <- if (is.na(ctx$years[2])) max(have) else ctx$years[2]; intersect(have, ctx$years[1]:y1) }
 
 clipping <- function(ctx) !is.null(ctx$region$poly) && !ctx$keep
+whole_conus <- function(ctx) is.null(ctx$region$poly)   # all of CONUS (Home layout National): the sources' national files
+
+# the one GeoTIFF in a downloaded zip, unpacked to dest (sidecars left behind, as the region's files have none). R's unzip may
+# refuse a member over 4 GB (LANDFIRE elevation): then Windows' tar, which reads zip64
+zip_tif <- function(ctx, zip, dest) {
+  m <- utils::unzip(zip, list = TRUE)$Name; t <- m[grepl("[.]tif$", m, ignore.case = TRUE)]
+  if (length(t) != 1) stop(sprintf("%s holds %d .tif files (%s); expected one", basename(zip), length(t), paste(head(t, 4), collapse = ", ")), call. = FALSE)
+  ex <- file.path(ctx$dl, "unzip"); dir.create(ex, recursive = TRUE, showWarnings = FALSE); x <- file.path(ex, t)
+  ok <- tryCatch({ utils::unzip(zip, files = t, exdir = ex); file.exists(x) && file.size(x) > 0 }, error = function(e) FALSE, warning = function(w) FALSE)
+  if (!ok) { unlink(x); system2("tar", c("-xf", shQuote(zip), "-C", shQuote(ex), shQuote(t)))
+    if (!file.exists(x)) stop(sprintf("could not unpack %s from %s", t, basename(zip)), call. = FALSE) }
+  dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)
+  if (!file.rename(x, dest)) stop(sprintf("could not move %s to its place", basename(t)), call. = FALSE)
+  unlink(ex, recursive = TRUE); dest }
 
 # a raster from a zip: the region read remotely, or (national) the whole zip fetched and the member unpacked. A remote read can
 # break deep in a large zip (TreeMap's 5.4 GB zip64, 2026-10-31: a deflate error 12,000 rows in): then the whole zip is fetched
@@ -220,18 +234,25 @@ download_handlers <- function() {
       zip_raster(ctx, items, 1, "Data/forest_own1/forest_own1.tif", dest)
       zip_dbf(ctx, items, 1, "Data/forest_own1/forest_own1.tif.vat.dbf", paste0(dest, ".vat.dbf")); dest })
 
-  # ==== clipped by the source (phase 4): nothing national is fetched; each needs a Study Area ===============================
+  # ==== clipped by the source (phase 4) for a region; for all of CONUS (Home layout National) the sources' national files =====
 
   # ---- Annual NLCD land cover (Collection 1.2) by WCS 1.0.0, one coverage a year, in tiles on the 30 m grid -----------------
   H$NlcdFolder <- list(column = "NlcdFolder", name = "Annual NLCD land cover", version = "Collection 1.2 (C1V2)", method = "wcs",
     note = "Clipped by MRLC's WCS; C1V2 for every year (the only collection published)",
-    plan = function(ctx) { need_region(ctx, "Annual NLCD")
+    plan = function(ctx) {
       have <- as.integer(substr(regmatches(x <- rawToChar(curl::curl_fetch_memory(paste0(NLCD_WCS, "?service=WCS&version=1.0.0&request=DescribeCoverage&coverage=", NLCD_COV))$content),
         gregexpr("(?<=<gml:timePosition>)[0-9]{4}", x, perl = TRUE))[[1]], 1, 4))
-      y <- years_of(ctx, sort(unique(have)))
-      data.table::data.table(year = y, url = NLCD_WCS, file = sprintf("Annual_NLCD_LndCov_%d_CU_C1V2.tif", y), fetch = FALSE) },
-    have = function(ctx, items) recorded(ctx, "NlcdFolder", file.path(ctx$place, items$file)),
+      y <- years_of(ctx, sort(unique(have))); out <- sprintf("Annual_NLCD_LndCov_%d_CU_C1V2.tif", y)
+      # all of CONUS: MRLC's national zip a year (1.4 GB each), on the national grid the 150 m blocks are anchored to
+      if (whole_conus(ctx)) return(data.table::data.table(year = y, url = sprintf(NLCD_BUNDLE, y), file = sub("[.]tif$", ".zip", out), out = out, fetch = TRUE))
+      data.table::data.table(year = y, url = NLCD_WCS, file = out, out = out, fetch = FALSE) },
+    have = function(ctx, items) recorded(ctx, "NlcdFolder", file.path(ctx$place, items$out)),
     finish = function(ctx, items) {
+      if (whole_conus(ctx)) { for (i in seq_len(nrow(items))) { d <- zip_tif(ctx, items$dest[i], file.path(ctx$place, items$out[i]))
+          e <- as.vector(terra::ext(terra::rast(d)))
+          if (any(abs(e - NLCD_NATIONAL_EXT) > 1)) stop(sprintf("NLCD %d: the national file's extent (%s) is not the national NLCD grid", items$year[i], paste(round(e), collapse = ", ")), call. = FALSE)
+          unlink(items$dest[i]); ctx$log(sprintf("  NLCD %d (national)", items$year[i])) }
+        return(ctx$place) }
       tl <- grid_tiles(ctx$region$box, c(-2415585, 3314805), 30, 4000)
       # under load the WCS now and then answers a full-size tile with no data (P26 2026-11-01: one tile each in 2001, 2003 and 2009).
       # NLCD's no-data cells are the same every year, so each tile's count of class cells must equal the most seen in any year;
@@ -251,7 +272,7 @@ download_handlers <- function() {
           n[bad] <- vapply(parts[bad], classed, 0) }
         if (any(n < ref)) stop(sprintf("NLCD %d: tile %s still short of class cells after 4 tries", y, paste(which(n < ref), collapse = ", ")), call. = FALSE)
         ref <<- pmax(ref, n); got[i, ] <<- n; zero_ok <<- zero_ok | n == 0
-        mosaic_to(parts, file.path(ctx$place, items$file[i]), "INT1U", c(min(tl$xmin), min(tl$ymin), max(tl$xmax), max(tl$ymax))); unlink(dirname(parts[1]), recursive = TRUE)
+        mosaic_to(parts, file.path(ctx$place, items$out[i]), "INT1U", c(min(tl$xmin), min(tl$ymin), max(tl$xmax), max(tl$ymax))); unlink(dirname(parts[1]), recursive = TRUE)
         ctx$log(sprintf("  NLCD %d (%d tiles)", y, nrow(tl))) }
       for (i in seq_len(nrow(items))) one_year(i)
       # a year fetched before a later year raised a tile's count is fetched again
@@ -259,31 +280,40 @@ download_handlers <- function() {
       ctx$place })
 
   # ---- LANDFIRE layers by LANDFIRE Product Service jobs (the job clips; output on LANDFIRE's own grid) -----------------
-  lf_single <- function(column, name, layer, version, out) list(column = column, name = name, version = version, method = "lfps",
-    plan = function(ctx) { need_region(ctx, name); lfps_email(ctx); data.table::data.table(url = LFPS, file = out, layer = layer, fetch = FALSE) },
-    finish = function(ctx, items) { b <- lfps_job(ctx, items$layer)
-      dest <- file.path(ctx$place, out); write_band(b, 1, dest); dest })
-  H$Evt2016File <- lf_single("Evt2016File", "LANDFIRE EVT 2016", "LF2016_EVT", "LF 2.0.0 (LF2016_EVT)", "LC16_EVT_200.tif")
-  H$FriFile <- lf_single("FriFile", "LANDFIRE mean fire return interval", "LF2016_FRI", "LF 2016 (LF2016_FRI)", "LC16_FRI_200.tif")
-  H$ElevationFile <- lf_single("ElevationFile", "LANDFIRE elevation", "LF2020_Elev", "LF 2020 (LF2020_Elev)", "LC20_Elev_220.tif")
-  H$RoadsFile <- lf_single("RoadsFile", "LANDFIRE roads", "LF2023_Roads", "LF 2023 (LF2023_Roads)", "LF2023_Roads_CONUS.tif")
+  # (all of CONUS: LANDFIRE's full-extent zip of the layer, `zip` under landfire.gov/data-downloads)
+  lf_single <- function(column, name, layer, version, out, zip) list(column = column, name = name, version = version, method = "lfps",
+    plan = function(ctx) { if (whole_conus(ctx)) return(data.table::data.table(url = sprintf("%s/%s", LF_DL, zip), file = basename(zip), fetch = TRUE))
+      lfps_email(ctx); data.table::data.table(url = LFPS, file = out, layer = layer, fetch = FALSE) },
+    finish = function(ctx, items) { dest <- file.path(ctx$place, out)
+      if (whole_conus(ctx)) { zip_tif(ctx, items$dest[1], dest); unlink(items$dest[1]); return(dest) }
+      b <- lfps_job(ctx, items$layer); write_band(b, 1, dest); dest })
+  H$Evt2016File <- lf_single("Evt2016File", "LANDFIRE EVT 2016", "LF2016_EVT", "LF 2.0.0 (LF2016_EVT)", "LC16_EVT_200.tif", "CONUS_LF2016/LF2016_EVT_CONUS.zip")
+  H$FriFile <- lf_single("FriFile", "LANDFIRE mean fire return interval", "LF2016_FRI", "LF 2016 (LF2016_FRI)", "LC16_FRI_200.tif", "CONUS_LF2016/LF2016_FRI_CONUS.zip")
+  H$ElevationFile <- lf_single("ElevationFile", "LANDFIRE elevation", "LF2020_Elev", "LF 2020 (LF2020_Elev)", "LC20_Elev_220.tif", "CONUS_Topo_LF2020/LF2020_Elev_CONUS.zip")
+  H$RoadsFile <- lf_single("RoadsFile", "LANDFIRE roads", "LF2023_Roads", "LF 2023 (LF2023_Roads)", "LF2023_Roads_CONUS.tif", "CONUS_LF2023/LF2023_Roads_CONUS.zip")
 
   # disturbance: one layer a year (LF2001_Dist99 ... LF2025_Dist25), all the missing years in one job; each year laid out as the
   # stages read it (US_DIST<year>/<name>/Tif and CSV_Data), with the attribute table shipped in defaults/landfire/disturbance
   H$LandfireDisturbanceFolder <- list(column = "LandfireDisturbanceFolder", name = "LANDFIRE annual disturbance", version = "LF2001_Dist99 to LF2025_Dist25", method = "lfps",
     note = "Attribute tables from the package (defaults/landfire/disturbance); the 2023 and 2025 tables are the provisional editions', whose codes match the final rasters (2025's final table is the same text, checked 2026-11-01; LANDFIRE publishes no final 2023 table)",
-    plan = function(ctx) { need_region(ctx, "LANDFIRE disturbance"); lfps_email(ctx)
+    plan = function(ctx) { if (!whole_conus(ctx)) lfps_email(ctx)
       p <- jsonlite::fromJSON(paste0(LFPS, "/products"))$products; l <- grep("^LF[0-9]{4}_Dist[0-9]{2}$", p$layerName, value = TRUE)
       yy <- as.integer(sub(".*_Dist", "", l)); yr <- ifelse(yy > 80, 1900L + yy, 2000L + yy)
       x <- data.table::data.table(year = yr, layer = l)[year %in% years_of(ctx, yr)][order(year)]
-      x[, `:=`(url = LFPS, file = sprintf("US_DIST%d/LF%d_Dist/Tif/LF%d_Dist.tif", year, year, year), fetch = FALSE)][] },
-    have = function(ctx, items) recorded(ctx, "LandfireDisturbanceFolder", file.path(ctx$place, items$file)),
+      x[, out := sprintf("US_DIST%d/LF%d_Dist/Tif/LF%d_Dist.tif", year, year, year)]
+      # all of CONUS: LANDFIRE's national zip a year, named as the LFPS layer (LF2001_Dist99_CONUS.zip ... LF2025_Dist25_CONUS.zip)
+      if (whole_conus(ctx)) x[, `:=`(url = sprintf("%s/CONUS_Disturbance/%s_CONUS.zip", LF_DL, layer), file = paste0(layer, "_CONUS.zip"), fetch = TRUE)][]
+      else x[, `:=`(url = LFPS, file = out, fetch = FALSE)][] },
+    have = function(ctx, items) recorded(ctx, "LandfireDisturbanceFolder", file.path(ctx$place, items$out)),
     # (LFPS takes at most 15 layers a job: the years go in jobs of up to 15, each job's zip unpacked into its own folder)
     finish = function(ctx, items) {
+      dist_csv <- function(y) { csv <- pkg_file("defaults", "landfire", "disturbance", sprintf("US_DIST%d.csv", y)); cd <- file.path(ctx$place, sprintf("US_DIST%d/LF%d_Dist/CSV_Data", y, y))
+        dir.create(cd, recursive = TRUE, showWarnings = FALSE); file.copy(csv, file.path(cd, sprintf("LF%d_Dist.csv", y)), overwrite = TRUE) }
+      if (whole_conus(ctx)) { for (i in seq_len(nrow(items))) { zip_tif(ctx, items$dest[i], file.path(ctx$place, items$out[i])); dist_csv(items$year[i]); unlink(items$dest[i])
+          ctx$log(sprintf("  LANDFIRE disturbance %d (national)", items$year[i])) }
+        return(ctx$place) }
       for (ch in split(seq_len(nrow(items)), ceiling(seq_len(nrow(items)) / 15))) { b <- lfps_job(ctx, items$layer[ch])
-        for (k in seq_along(ch)) { i <- ch[k]; y <- items$year[i]; write_band(b, k, file.path(ctx$place, items$file[i]))
-          csv <- pkg_file("defaults", "landfire", "disturbance", sprintf("US_DIST%d.csv", y)); cd <- file.path(ctx$place, sprintf("US_DIST%d/LF%d_Dist/CSV_Data", y, y))
-          dir.create(cd, recursive = TRUE, showWarnings = FALSE); file.copy(csv, file.path(cd, sprintf("LF%d_Dist.csv", y)), overwrite = TRUE) }
+        for (k in seq_along(ch)) { i <- ch[k]; y <- items$year[i]; write_band(b, k, file.path(ctx$place, items$out[i])); dist_csv(y) }
         rm(b); gc(); unlink(file.path(ctx$dl, c("lfps.zip", "lfps")), recursive = TRUE) }
       ctx$place })
 
@@ -316,10 +346,11 @@ download_handlers <- function() {
     finish = function(ctx, items) { dest <- file.path(ctx$place, items$file[1])
       clip_raster(if (clipping(ctx)) paste0("/vsicurl/", CCAP) else items$dest[1], dest, if (clipping(ctx)) ctx$region else list(poly = NULL)) })
 
-  # ---- gNATSGO (Planetary Computer): soil organic carbon and crop productivity, the region's 10 m tiles cropped -----------
+  # ---- gNATSGO (Planetary Computer): soil organic carbon and crop productivity, the region's 10 m tiles cropped; for all of
+  # CONUS every tile (357, about 10 GB a layer) fetched and written as one 10 m GeoTIFF ---------------------------------------
   gnatsgo <- function(column, name, asset, out, note) list(column = column, name = name, version = "gNATSGO July 2020 (gnatsgo-rasters)", method = "stac", note = note,
-    plan = function(ctx) { need_region(ctx, name); data.table::data.table(url = PC_STAC, file = out, fetch = FALSE) },
-    finish = function(ctx, items) { dest <- file.path(ctx$place, out); gnatsgo_region(ctx, asset, dest); dest })
+    plan = function(ctx) { if (whole_conus(ctx)) return(gnatsgo_tiles(asset)); data.table::data.table(url = PC_STAC, file = out, fetch = FALSE) },
+    finish = function(ctx, items) { dest <- file.path(ctx$place, out); if (whole_conus(ctx)) gnatsgo_national(ctx, items, dest) else gnatsgo_region(ctx, asset, dest); dest })
   H$SoilCarbonFile <- gnatsgo("SoilCarbonFile", "gNATSGO soil organic carbon", "soc0_999", "gnatsgo_soc0_999.tif", "gNATSGO soc0_999 (gSSURGO with its gaps filled), not the gSSURGO file of the build machine")
   H$NccpiFile <- gnatsgo("NccpiFile", "gNATSGO crop productivity (NCCPI)", "nccpi3all", "gnatsgo_nccpi3all.tif", "nccpi3all at 10 m; stage 10 reads it onto its 30 m grid")
 
@@ -358,6 +389,10 @@ NIFC <- sprintf("https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/servi
   "InteragencyFirePerimeterHistory_2010s_Read_Only", "InterAgencyFirePerimeterHistory_2020s_Read_Only"))
 CCAP <- "https://ocmgeodatastor1.blob.core.windows.net/ccap/bulk_download/C-CAP_Regional_30-meter_Data/C-CAP_Regional_Land_Cover_Classification/CONUS/conus_2001_ccap_landcover.tif"
 PC_STAC <- "https://planetarycomputer.microsoft.com/api/stac/v1"
+# national files (Home layout National; checked 2026-11-02)
+NLCD_BUNDLE <- "https://www.mrlc.gov/downloads/sciweb1/shared/mrlc/data-bundles/Annual_NLCD_LndCov_%d_CU_C1V2.zip"
+NLCD_NATIONAL_EXT <- c(-2415585, 2384415, 164805, 3314805)   # xmin, xmax, ymin, ymax: the national grid (shared.R, grid_blocks)
+LF_DL <- "https://landfire.gov/data-downloads"
 
 CMS_AGE <- "C2389890387-ORNL_CLOUD"   # NASA CMR collection of ORNL DAAC 1829
 
@@ -377,8 +412,6 @@ edl_signed <- function(url, token) {
   if (r$status_code < 300 || r$status_code >= 400 || is.null(loc)) stop(sprintf("%s: the DAAC answered %d, not a redirect", basename(url), r$status_code), call. = FALSE)
   loc }
 
-need_region <- function(ctx, what) if (is.null(ctx$region$poly))
-  stop(sprintf("%s is clipped by its source for a Study Area; for all of CONUS fetch the national files by hand", what), call. = FALSE)
 
 # the planned files already recorded in files.csv at their recorded size (a hand-placed, unrecorded file is fetched again)
 recorded <- function(ctx, column, paths) { st <- if (is.null(ctx$store)) ctx$home else ctx$store; f <- read_files(st)[Column == column]
@@ -430,13 +463,28 @@ lfps_job <- function(ctx, layers) {
   r }
 
 # a gNATSGO asset over the region: the STAC items (10 m tiles in EPSG:5070) touching its box, each cropped, then mosaicked
-gnatsgo_region <- function(ctx, asset, dest) {
-  b <- region_box_ll(ctx$region); feats <- list(); u <- sprintf("%s/search?collections=gnatsgo-rasters&bbox=%f,%f,%f,%f&limit=100", PC_STAC, b[1], b[2], b[3], b[4])
+# the gNATSGO tiles (STAC items) over a lon/lat box, and a read token for them
+pc_tiles <- function(b) { feats <- list(); u <- sprintf("%s/search?collections=gnatsgo-rasters&bbox=%f,%f,%f,%f&limit=100", PC_STAC, b[1], b[2], b[3], b[4])
   while (!is.null(u)) { p <- jsonlite::fromJSON(u, simplifyVector = FALSE); feats <- c(feats, p$features)
     nx <- Filter(function(l) identical(l$rel, "next"), p$links); u <- if (length(nx)) nx[[1]]$href else NULL }
+  feats }
+pc_token <- function() jsonlite::fromJSON("https://planetarycomputer.microsoft.com/api/sas/v1/token/soils/gnatsgo")$token
+# all of CONUS: every tile of the asset, fetched whole (signed urls)
+gnatsgo_tiles <- function(asset) { feats <- pc_tiles(c(-125, 24, -66, 50)); tok <- pc_token()
+  h <- vapply(feats, function(f) if (is.null(f$assets[[asset]])) NA_character_ else f$assets[[asset]]$href, "")
+  data.table::data.table(url = paste0(h, "?", tok), file = paste0(vapply(feats, function(f) f$id, ""), ".tif"), fetch = TRUE)[!is.na(h)] }
+# the tiles joined (a VRT) and written as one compressed 10 m GeoTIFF by GDAL itself (BigTIFF: about 1.3e11 cells)
+gnatsgo_national <- function(ctx, items, dest) {
+  v <- file.path(ctx$dl, "national.vrt"); sf::gdal_utils("buildvrt", items$dest, v)
+  dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)
+  sf::gdal_utils("translate", v, dest, options = c("-co", "COMPRESS=DEFLATE", "-co", "TILED=YES", "-co", "BIGTIFF=YES", "-co", "NUM_THREADS=ALL_CPUS"))
+  ctx$log(sprintf("  %s: %d tiles joined (national)", basename(dest), nrow(items))); dest }
+
+gnatsgo_region <- function(ctx, asset, dest) {
+  feats <- pc_tiles(region_box_ll(ctx$region))
   if (!length(feats)) stop("no gNATSGO tiles over the region", call. = FALSE)
   dir.create(ctx$dl, recursive = TRUE, showWarnings = FALSE)
-  tok <- jsonlite::fromJSON("https://planetarycomputer.microsoft.com/api/sas/v1/token/soils/gnatsgo")$token
+  tok <- pc_token()
   box <- terra::vect(sf::st_as_sfc(sf::st_bbox(setNames(ctx$region$box, c("xmin", "ymin", "xmax", "ymax")), crs = sf::st_crs(5070))))
   parts <- Filter(Negate(is.null), lapply(feats, function(f) { h <- f$assets[[asset]]$href; if (is.null(h)) return(NULL)
     r <- terra::rast(sprintf("/vsicurl/%s?%s", h, tok)); e <- terra::intersect(terra::ext(terra::project(box, terra::crs(r))), terra::ext(r)); if (is.null(e)) return(NULL)
