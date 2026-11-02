@@ -272,7 +272,7 @@ download_handlers <- function() {
           n[bad] <- vapply(parts[bad], classed, 0) }
         if (any(n < ref)) stop(sprintf("NLCD %d: tile %s still short of class cells after 4 tries", y, paste(which(n < ref), collapse = ", ")), call. = FALSE)
         ref <<- pmax(ref, n); got[i, ] <<- n; zero_ok <<- zero_ok | n == 0
-        mosaic_to(parts, file.path(ctx$place, items$out[i]), "INT1U", c(min(tl$xmin), min(tl$ymin), max(tl$xmax), max(tl$ymax))); unlink(dirname(parts[1]), recursive = TRUE)
+        mosaic_to(parts, file.path(ctx$place, items$out[i]), "INT1U", c(min(tl$xmin), min(tl$ymin), max(tl$xmax), max(tl$ymax)), tiles = tl); unlink(dirname(parts[1]), recursive = TRUE)
         ctx$log(sprintf("  NLCD %d (%d tiles)", y, nrow(tl))) }
       for (i in seq_len(nrow(items))) one_year(i)
       # a year fetched before a later year raised a tile's count is fetched again
@@ -426,8 +426,14 @@ grid_tiles <- function(box, origin, cell, px) {
   t <- data.table::CJ(i = seq_len(length(xs) - 1), j = seq_len(length(ys) - 1))
   t[, `:=`(xmin = xs[i], xmax = xs[i + 1], ymax = ys[j], ymin = ys[j + 1])][, `:=`(nx = as.integer(round((xmax - xmin) / cell)), ny = as.integer(round((ymax - ymin) / cell)))][] }
 
-# tiles on one grid into one compressed GeoTIFF
-mosaic_to <- function(parts, dest, datatype, box = NULL) { dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)
+# tiles on one grid into one compressed GeoTIFF. tiles (grid_tiles rows, one per part): each part is given the corners it was asked
+# with, after its size is checked, instead of the ones its server wrote: the NLCD WCS rounds them, and a thin last row of tiles (6 rows
+# in P26) landed a row high, its first row over the row above (P26 2026-11-02: 508 cells of the region's row 12000 were national row 12001)
+mosaic_to <- function(parts, dest, datatype, box = NULL, tiles = NULL) { dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)
+  if (!is.null(tiles)) { stopifnot(nrow(tiles) == length(parts))
+    parts <- vapply(seq_along(parts), function(i) { r <- terra::rast(parts[i])
+      if (terra::nrow(r) != tiles$ny[i] || terra::ncol(r) != tiles$nx[i]) stop(sprintf("tile %d came back %d x %d cells, not the %d x %d asked for", i, terra::ncol(r), terra::nrow(r), tiles$nx[i], tiles$ny[i]), call. = FALSE)
+      v1 <- tempfile(fileext = ".vrt"); sf::gdal_utils("translate", parts[i], v1, options = c("-of", "VRT", "-a_ullr", tiles$xmin[i], tiles$ymax[i], tiles$xmax[i], tiles$ymin[i])); v1 }, "") }
   v <- terra::vrt(parts, filename = tempfile(fileext = ".vrt"))
   # box (xmin, ymin, xmax, ymax): the grid the tiles were asked on. The NLCD WCS writes tile corners with too few digits, which
   # left the mosaic 0.2 m off the 30 m grid (res 30.000003) and moved 150 m blocks by a pixel (P26 2026-11-01: 6.6% of cells)
