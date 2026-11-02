@@ -8,7 +8,8 @@
 # defaults/metadata/data-dictionary.csv  File, Column, Definition, Type, Units, Domain, NullValue: every column of every file the Data
 #                                    Release stage exports (<run> and <year> in a File stand for the run and year).
 # defaults/metadata/citations.csv    one row per Data Sources column and strata preset: the source citation for the lineage.
-# Plain R (data.table only), so the unit tests and the stages can both use it; md_dir() is the folder of the three tables.
+#                                    "{accessed}" in a Citation is filled with the date the home's manifest says it was downloaded.
+# Plain R (data.table only), so the unit tests and the stages can both use it; each reader takes the folder of the three tables.
 # =============================================================================
 suppressPackageStartupMessages(library(data.table))
 
