@@ -2,16 +2,22 @@
 
 SyncroSim 3 add-on to ST-Sim (stsim 4.5.x) that builds LUCAS land-use and carbon models from national datasets: FIA growth
 curves, CBM carbon parameters, spatial initial conditions, historical transitions, climate multipliers and initial stocks.
-Version 1.0.0 (development). Plan: https://claude.ai/code/artifact/b04aa2f8-a1c2-4a73-99dc-672c8918139d
+Version 1.0.0 ([release](https://github.com/bsleeter/lucasCore/releases/tag/v1.0.0)). Plan: https://claude.ai/code/artifact/b04aa2f8-a1c2-4a73-99dc-672c8918139d
 
 - **[User Guide](https://bsleeter.github.io/lucasCore/guide/)**: a step-by-step walkthrough in SyncroSim Studio, from
   installing the package to building, running and comparing models (also [in the repo](docs/guide/user-guide.md))
-- **[Package blueprint](https://bsleeter.github.io/lucasCore/blueprint/)**: the 15 stages, the scenarios they run in, and the
+- **[Package blueprint](https://bsleeter.github.io/lucasCore/blueprint/)**: the 16 stages, the scenarios they run in, and the
   datasheets they pass to each other and to ST-Sim ([static figure](docs/blueprint/lucascore-blueprint.png))
 - **[Data blueprint](https://bsleeter.github.io/lucasCore/blueprint/data.html)**: the national datasets in the Data Sources sheet,
   the stages that read each one, and the setting that switches it ([static figure](docs/blueprint/lucascore-data-blueprint.png))
 
-## Install (development)
+## Install
+
+Download `lucasCore-1.0.0.ssimpkg` from the [v1.0.0 release](https://github.com/bsleeter/lucasCore/releases/tag/v1.0.0), then in
+SyncroSim Studio choose File > Local Packages > Install from File and pick it (User Guide, section 1.1). Needs SyncroSim 3.1.9 or
+later with ST-Sim 4.5.4, and R 4.6 with rsyncrosim, terra, sf, data.table, mgcv and jsonlite.
+
+**Development install**, running the scripts from a checkout of this repository:
 
 ```
 "C:\Program Files\SyncroSim\SyncroSim.PackageManager.exe" --xinstall="F:\lucasCore"
