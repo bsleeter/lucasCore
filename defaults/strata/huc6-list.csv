@@ -1,0 +1,406 @@
+Name,Id
+St. John (010100),10100
+Penobscot (010200),10200
+Kennebec (010300),10300
+Androscoggin (010400),10400
+Maine Coastal (010500),10500
+Saco (010600),10600
+Merrimack (010700),10700
+Upper Connecticut (010801),10801
+Lower Connecticut (010802),10802
+Massachusetts-Rhode Island Coastal (010900),10900
+Connecticut Coastal (011000),11000
+Upper Hudson (020200),20200
+Lower Hudson (020301),20301
+Long Island (020302),20302
+Upper Delaware (020401),20401
+Lower Delaware (020402),20402
+Mid Atlantic Coastal (020403),20403
+Upper Susquehanna (020501),20501
+West Branch Susquehanna (020502),20502
+Lower Susquehanna (020503),20503
+Upper Chesapeake (020600),20600
+Potomac (020700),20700
+Lower Chesapeake (020801),20801
+James (020802),20802
+Roanoke (030101),30101
+Albemarle-Chowan (030102),30102
+Pamlico (030201),30201
+Neuse (030202),30202
+Onslow Bay (030203),30203
+Cape Fear (030300),30300
+Upper Pee Dee (030401),30401
+Lower Pee Dee (030402),30402
+Santee (030501),30501
+Edisto-South Carolina Coastal (030502),30502
+Savannah (030601),30601
+Ogeechee (030602),30602
+Altamaha (030701),30701
+St. Marys-Satilla (030702),30702
+St. Johns (030801),30801
+East Florida Coastal (030802),30802
+Kissimmee (030901),30901
+Southern Florida (030902),30902
+Peace (031001),31001
+Tampa Bay (031002),31002
+Aucilla-Waccasassa (031101),31101
+Suwannee (031102),31102
+Ochlockonee (031200),31200
+Apalachicola (031300),31300
+Florida Panhandle Coastal (031401),31401
+Choctawhatchee (031402),31402
+Escambia (031403),31403
+Coosa-Tallapoosa (031501),31501
+Alabama (031502),31502
+Black Warrior-Tombigbee (031601),31601
+Mobile Bay-Tombigbee (031602),31602
+Pascagoula (031700),31700
+Pearl (031800),31800
+Northwestern Lake Superior (040101),40101
+St. Louis (040102),40102
+Southwestern Lake Superior (040103),40103
+Southcentral Lake Superior (040201),40201
+Southeastern Lake Superior (040202),40202
+Northwestern Lake Michigan (040301),40301
+Fox (040302),40302
+Southwestern Lake Michigan (040400),40400
+Southeastern Lake Michigan (040500),40500
+Northeastern Lake Michigan (040601),40601
+Northwestern Lake Huron (040700),40700
+Southwestern Lake Huron (040801),40801
+Saginaw (040802),40802
+St. Clair-Detroit (040900),40900
+Western Lake Erie (041000),41000
+Southern Lake Erie (041100),41100
+Eastern Lake Erie (041201),41201
+Southwestern Lake Ontario (041300),41300
+Southeastern Lake Ontario (041401),41401
+Oswego (041402),41402
+Northeastern Lake Ontario (041403),41403
+Northwestern Lake Superior (041600),41600
+Northeastern Lake Superior (041700),41700
+Lake Superior (041800),41800
+Lake Michigan (041900),41900
+Northern Lake Huron (042000),42000
+Wanipitai River-French River (042100),42100
+Eastern Georgia Bay (042200),42200
+Eastern Lake Huron (042300),42300
+Lake Huron (042400),42400
+Northern Lake Erie (042500),42500
+Lake Erie (042600),42600
+Northern Lake Ontario (042701),42701
+Lake Ontario and Niagara Peninsula (042702),42702
+Lake Ontario (042800),42800
+St. Lawrence (042900),42900
+Lake Champlain-Richelieu River (043001),43001
+Saint Francois River-Saint Lawrence River (043002),43002
+Chaudiere River (043100),43100
+Mojikit Lake-Ogoki River (043200),43200
+Long Lake-Kenogami River (043300),43300
+Allegheny (050100),50100
+Monongahela (050200),50200
+Upper Ohio-Beaver (050301),50301
+Upper Ohio-Little Kanawha (050302),50302
+Muskingum (050400),50400
+Kanawha (050500),50500
+Scioto (050600),50600
+Guyandotte (050701),50701
+Big Sandy (050702),50702
+Great Miami (050800),50800
+Middle Ohio-Raccoon (050901),50901
+Middle Ohio-Little Miami (050902),50902
+Licking (051001),51001
+Kentucky (051002),51002
+Green (051100),51100
+Wabash (051201),51201
+Patoka-White (051202),51202
+Upper Cumberland (051301),51301
+Lower Cumberland (051302),51302
+Lower Ohio-Salt (051401),51401
+Lower Ohio (051402),51402
+French Broad-Holston (060101),60101
+Upper Tennessee (060102),60102
+Middle Tennessee-Hiwassee (060200),60200
+Middle Tennessee-Elk (060300),60300
+Lower Tennessee (060400),60400
+Mississippi Headwaters (070101),70101
+Upper Mississippi-Crow-Rum (070102),70102
+Minnesota (070200),70200
+St. Croix (070300),70300
+Upper Mississippi-Black-Root (070400),70400
+Chippewa (070500),70500
+Upper Mississippi-Maquoketa-Plum (070600),70600
+Wisconsin (070700),70700
+Upper Mississippi-Skunk-Wapsipinicon (070801),70801
+Iowa (070802),70802
+Rock (070900),70900
+Des Moines (071000),71000
+Upper Mississippi-Salt (071100),71100
+Upper Illinois (071200),71200
+Lower Illinois (071300),71300
+Upper Mississippi-Meramec (071401),71401
+Kaskaskia (071402),71402
+Lower Mississippi-Memphis (080101),80101
+Hatchie-Obion (080102),80102
+Town of Madrid-Saint Johns Bayou (080103),80103
+Lower Mississippi-Helena (080201),80201
+St. Francis (080202),80202
+Lower White (080203),80203
+Lower Arkansas (080204),80204
+Lower Mississippi-Greenville (080301),80301
+Yazoo (080302),80302
+Upper Ouachita (080401),80401
+Lower Ouachita (080402),80402
+Lower Red (080403),80403
+Boeuf-Tensas (080500),80500
+Lower Mississippi-Natchez (080601),80601
+Big Black-Homochitto (080602),80602
+Lower Mississippi-Baton Rouge (080701),80701
+Lake Maurepas (080702),80702
+Lower Grand (080703),80703
+Atchafalaya-Vermillion (080801),80801
+Calcasieu-Mermentau (080802),80802
+Lower Mississippi-New Orleans (080901),80901
+Lake Pontchartrain (080902),80902
+Central Louisiana Coastal (080903),80903
+Souris (090100),90100
+Upper Red (090201),90201
+Devils Lake-Sheyenne (090202),90202
+Lower Red (090203),90203
+Rainy (090300),90300
+Upper South Saskatchewan River (090400),90400
+Missouri Headwaters (100200),100200
+Upper Missouri (100301),100301
+Marias (100302),100302
+Fort Peck Lake (100401),100401
+Musselshell (100402),100402
+Milk (100500),100500
+Missouri-Poplar (100600),100600
+Upper Yellowstone (100700),100700
+Big Horn (100800),100800
+Tongue (100901),100901
+Powder (100902),100902
+Lower Yellowstone (101000),101000
+Lake Sakakawea (101101),101101
+Little Missouri (101102),101102
+Cheyenne (101201),101201
+Belle Fourche (101202),101202
+Lake Oahe (101301),101301
+Cannonball-Heart-Knife (101302),101302
+Grand-Moreau (101303),101303
+Fort Randall Reservoir (101401),101401
+White (101402),101402
+Niobrara (101500),101500
+James (101600),101600
+Lewis and Clark Lake (101701),101701
+Big Sioux (101702),101702
+North Platte (101800),101800
+South Platte (101900),101900
+Middle Platte (102001),102001
+Lower Platte (102002),102002
+Loup (102100),102100
+Elkhorn (102200),102200
+Missouri-Little Sioux (102300),102300
+Missouri-Nishnabotna (102400),102400
+Republican (102500),102500
+Smoky Hill (102600),102600
+Kansas (102701),102701
+Big Blue (102702),102702
+Grand (102801),102801
+Chariton (102802),102802
+Osage (102901),102901
+Gasconade (102902),102902
+Lower Missouri-Blackwater (103001),103001
+Lower Missouri (103002),103002
+Upper White (110100),110100
+Upper Arkansas (110200),110200
+Middle Arkansas (110300),110300
+Upper Cimarron (110400),110400
+Lower Cimarron (110500),110500
+Arkansas-Keystone (110600),110600
+Verdigris (110701),110701
+Neosho (110702),110702
+Upper Canadian (110800),110800
+Middle Canadian (110901),110901
+Lower Canadian (110902),110902
+Upper Beaver (111001),111001
+Lower Beaver (111002),111002
+Lower North Canadian (111003),111003
+Robert S. Kerr Reservoir (111101),111101
+Lower Arkansas-Fourche La Fave (111102),111102
+Prairie Dog Town Fork Red (111201),111201
+Salt Fork Red (111202),111202
+North Fork Red (111203),111203
+Red-Pease (111301),111301
+Red-Lake Texoma (111302),111302
+Washita (111303),111303
+Red-Little (111401),111401
+Red-Saline (111402),111402
+Big Cypress-Sulphur (111403),111403
+Sabine (120100),120100
+Neches (120200),120200
+Upper Trinity (120301),120301
+Lower Trinity (120302),120302
+San Jacinto (120401),120401
+Galveston Bay-Sabine Lake (120402),120402
+Brazos Headwaters (120500),120500
+Middle Brazos-Clear Fork (120601),120601
+Middle Brazos-Bosque (120602),120602
+Lower Brazos (120701),120701
+Little (120702),120702
+Upper Colorado (120800),120800
+Middle Colorado-Concho (120901),120901
+Middle Colorado-Llano (120902),120902
+Lower Colorado (120903),120903
+San Bernard Coastal (120904),120904
+Lavaca (121001),121001
+Guadalupe (121002),121002
+San Antonio (121003),121003
+Central Texas Coastal (121004),121004
+Nueces (121101),121101
+Southwestern Texas Coastal (121102),121102
+Rio Grande Headwaters (130100),130100
+Upper Rio Grande (130201),130201
+Rio Grande-Elephant Butte (130202),130202
+Rio Grande-Caballo (130301),130301
+Mimbres (130302),130302
+Rio Grande-Fort Quitman (130401),130401
+Rio Grande-Amistad (130402),130402
+Devils (130403),130403
+Rio Grande Closed Basins (130500),130500
+Upper Pecos (130600),130600
+Lower Pecos (130700),130700
+Rio Grande-Falcon (130800),130800
+Lower Rio Grande (130900),130900
+Rio Conchos (131000),131000
+Rio Salado (131100),131100
+Rio San Juan (131200),131200
+Colorado Headwaters (140100),140100
+Gunnison (140200),140200
+Upper Colorado-Dolores (140300),140300
+Upper Green (140401),140401
+Great Divide Closed Basin (140402),140402
+White-Yampa (140500),140500
+Lower Green (140600),140600
+Upper Colorado-Dirty Devil (140700),140700
+Upper San Juan (140801),140801
+Lower San Juan (140802),140802
+Lower Colorado-Lake Mead (150100),150100
+Little Colorado (150200),150200
+Lower Colorado (150301),150301
+Bill Williams (150302),150302
+Upper Gila (150400),150400
+Middle Gila (150501),150501
+San Pedro-Willcox (150502),150502
+Santa Cruz (150503),150503
+Salt (150601),150601
+Verde (150602),150602
+Lower Gila-Agua Fria (150701),150701
+Lower Gila (150702),150702
+Rio Sonoyta (150801),150801
+Rio De La Concepcion (150802),150802
+Rio De Bavispe (150803),150803
+Upper Bear (160101),160101
+Lower Bear (160102),160102
+Weber (160201),160201
+Jordan (160202),160202
+Great Salt Lake (160203),160203
+Escalante Desert-Sevier Lake (160300),160300
+Humboldt (160401),160401
+Black Rock Desert (160402),160402
+Truckee (160501),160501
+Carson (160502),160502
+Walker (160503),160503
+Central Nevada Desert Basins (160600),160600
+Kootenai (170101),170101
+Pend Oreille (170102),170102
+Spokane (170103),170103
+Upper Columbia (170200),170200
+Yakima (170300),170300
+Snake Headwaters (170401),170401
+Upper Snake (170402),170402
+Middle Snake-Boise (170501),170501
+Middle Snake-Powder (170502),170502
+Lower Snake (170601),170601
+Salmon (170602),170602
+Clearwater (170603),170603
+Middle Columbia (170701),170701
+John Day (170702),170702
+Deschutes (170703),170703
+Lower Columbia (170800),170800
+Willamette (170900),170900
+Washington Coastal (171001),171001
+Northern Oregon Coastal (171002),171002
+Southern Oregon Coastal (171003),171003
+Puget Sound (171100),171100
+Oregon Closed Basins (171200),171200
+Northern California Coastal (180101),180101
+Klamath (180102),180102
+Upper Sacramento (180200),180200
+Lower Sacramento (180201),180201
+Tulare-Buena Vista Lakes (180300),180300
+San Joaquin (180400),180400
+San Francisco Bay (180500),180500
+Central California Coastal (180600),180600
+Ventura-San Gabriel Coastal (180701),180701
+Santa Ana (180702),180702
+Laguna-San Diego Coastal (180703),180703
+North Lahontan (180800),180800
+Mono-Owens Lakes (180901),180901
+Northern Mojave (180902),180902
+Southern Mojave (181001),181001
+Salton Sea (181002),181002
+Southern Southeast Alaska (190101),190101
+Central Southeast Alaska (190102),190102
+Northern Southeast Alaska (190103),190103
+Gulf of Alaska (190104),190104
+Icy Strait-Chatham Strait (190105),190105
+Copper River (190201),190201
+Prince William Sound (190202),190202
+Kenai Peninsula (190203),190203
+Knik Arm (190204),190204
+Susitna River (190205),190205
+Western Cook Inlet (190206),190206
+Kodiak-Shelikof (190207),190207
+Cook Inlet (190208),190208
+Aleutian Islands (190301),190301
+Kvichak-Port Heiden (190302),190302
+Nushagak River (190303),190303
+Upper Kuskokwim River (190304),190304
+Lower Kuskokwim River (190305),190305
+Norton Sound (190501),190501
+Northern Seward Peninsula (190502),190502
+Kobuk-Selawik Rivers (190503),190503
+Noatak River-Lisburne Peninsula (190504),190504
+Kotzebue Sound (190505),190505
+Western Arctic (190601),190601
+Barrow Alaska (190602),190602
+Colville River (190603),190603
+Prudhoe Bay (190604),190604
+Eastern Arctic (190605),190605
+Headwaters Yukon River (190701),190701
+White River-Yukon River (190704),190704
+Fortymile River-Yukon River (190705),190705
+Porcupine River (190801),190801
+Chandalar-Christian River (190802),190802
+Tanana River (190803),190803
+Beaver Creek-Yukon River (190804),190804
+Koyukuk River (190901),190901
+Melozitna River-Yukon River (190902),190902
+Outlet Yukon River (190903),190903
+Hawaii (200100),200100
+Maui (200200),200200
+Kahoolawe (200300),200300
+Lanai (200400),200400
+Molokai (200500),200500
+Oahu (200600),200600
+Kauai (200700),200700
+Niihau (200800),200800
+Northwestern Hawaiian Islands (200900),200900
+Puerto Rico (210100),210100
+Virgin Islands (210200),210200
+Guam (220100),220100
+Rota Island-Tinian Island-Saipan Island (220201),220201
+Northern Islands Municipality (220202),220202
+American Samoa (220300),220300
+United States Minor Outlying Islands (220400),220400

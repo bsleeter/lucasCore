@@ -19,7 +19,8 @@
 #   FillDistance         metres, for Modal (states: 29000 m = the 59-cell window of the CONUS 1km build)
 #   DefaultId            the id of uncovered cells for Fill = Default (federal lands: 9 Non Federal)
 # A source's own ids must be below UNIT_OFFSET (1e8) and Number x 1e8 must fit stsim's 32-bit integers (Number <= 20), so HUC10 and
-# HUC12 codes cannot be ids. Files named in a row are read relative to defaults/strata when they are not absolute.
+# HUC12 codes cannot be ids. Files named in a row are read relative to defaults/strata when they are not absolute. A preset whose File
+# is blank, or names a file this machine lacks, reads its polygons from Data Sources Home (strata_path; presets.csv DataSource).
 # =============================================================================
 
 STRATA_COLS <- c("Preset", "Number", "Prefix", "File", "Layer", "IdField", "NameTemplate", "ValueField", "CrosswalkFile", "ListFile",
@@ -55,6 +56,26 @@ strata_presets <- function(pkgdir) {
 
 strata_file <- function(f, pkgdir) if (is.na(f)) NA_character_ else if (grepl("^([A-Za-z]:|/|\\\\)", f)) f else file.path(pkgdir, "defaults", "strata", f)
 
+# the Data Sources Home dataset a preset's polygons come from (presets.csv DataSource: StatesFile, CountiesFile, ...), else NA
+strata_home_column <- function(preset, pkgdir) {
+  p <- data.table::fread(file.path(pkgdir, "defaults", "strata", "presets.csv"), sep = ",", colClasses = "character", na.strings = "")
+  v <- if ("DataSource" %in% names(p)) p$DataSource[match(preset, p$Preset)] else NA_character_
+  if (length(v) != 1 || is.na(v) || !nzchar(v)) NA_character_ else v }
+
+# where a source's polygons are read: its File when that exists on this machine; else, for a preset, its place in Data Sources Home
+# (a Data Download scenario fetches every preset's polygons there). The home is looked up by the function in option
+# lucas.strata.home (column -> path or NA; set by src/shared.R for the stages); without it only a File can be read.
+strata_path <- function(s, pkgdir) {
+  f <- strata_file(s$File, pkgdir); if (!is.na(f) && file.exists(f)) return(f)
+  col <- strata_home_column(s$Preset, pkgdir); look <- getOption("lucas.strata.home")
+  p <- if (!is.na(col) && is.function(look)) look(col) else NA_character_
+  if (!is.na(p) && file.exists(p)) return(structure(p, home = TRUE))
+  stop(sprintf("strata source %s: %s", s$Preset,
+    if (!is.na(col)) sprintf("%snot in Data Sources Home: run a Data Download scenario (dataset %s), or set the source's File on the Stratum Sources page",
+                             if (!is.na(f)) sprintf("%s not found, and ", f) else "", col)
+    else if (!is.na(f)) sprintf("%s not found (set the source's File on the Stratum Sources page)", f)
+    else "no File: set one on the Stratum Sources page"), call. = FALSE) }
+
 # fill a "{field}" template from a data frame's columns
 fill_template <- function(tpl, d) { out <- rep(tpl, nrow(d))
   for (k in regmatches(tpl, gregexpr("\\{[^}]+\\}", tpl))[[1]]) { f <- gsub("[{}]", "", k)
@@ -62,15 +83,30 @@ fill_template <- function(tpl, d) { out <- rep(tpl, nrow(d))
     out <- mapply(function(o, v) sub(k, v, o, fixed = TRUE), out, as.character(d[[f]]), USE.NAMES = FALSE) }
   out }
 
+# curved polygons (MULTISURFACE, CURVEPOLYGON: PAD-US has some) made straight-edged by GDAL, which sf and terra cannot rasterize
+linear_polygons <- function(p) {
+  bad <- !as.character(sf::st_geometry_type(p)) %in% c("POLYGON", "MULTIPOLYGON")
+  if (!any(bad)) return(p)
+  a <- tempfile(fileext = ".gpkg"); b <- tempfile(fileext = ".gpkg"); on.exit(unlink(c(a, b)))
+  sf::write_sf(sf::st_sf(i = which(bad), geometry = sf::st_geometry(p)[bad]), a, quiet = TRUE)
+  sf::gdal_utils("vectortranslate", a, b, options = c("-nlt", "CONVERT_TO_LINEAR", "-nlt", "PROMOTE_TO_MULTI"), quiet = TRUE)
+  x <- sf::read_sf(b); g <- sf::st_geometry(p); g[x$i] <- sf::st_set_crs(sf::st_geometry(x), sf::st_crs(p)); sf::st_geometry(p) <- g
+  p }
+
 # the polygons of a source in EPSG:5070 with an integer column StratumId; `bbox` (an sf bbox in 5070) limits what is read
 strata_polygons <- function(s, pkgdir, bbox = NULL) {
-  f <- strata_file(s$File, pkgdir); if (is.na(f) || !file.exists(f)) stop(sprintf("strata source %s not found (%s)", s$Preset, f), call. = FALSE)
+  f <- strata_path(s, pkgdir)
+  # a home copy is laid out by the package (src/download-sources.R), so the preset's read fields apply, not the library row's
+  # (a library made before the home kept, say, Federal Lands as the National Atlas file: ADMIN1, no layer)
+  if (isTRUE(attr(f, "home"))) { pr <- strata_presets(pkgdir)[[s$Preset]]
+    for (k in c("Layer", "IdField", "ValueField", "CrosswalkFile", "NameTemplate", "Dissolve")) s[[k]] <- pr[[k]]
+    f <- as.character(f) }
   args <- list(dsn = f, quiet = TRUE); if (!is.na(s$Layer)) args$layer <- s$Layer
   if (!is.null(bbox)) { crs0 <- sf::st_crs(do.call(sf::read_sf, c(args, list(query = sprintf("SELECT * FROM \"%s\" LIMIT 0",
       if (!is.na(s$Layer)) s$Layer else tools::file_path_sans_ext(basename(f)))))))
     # densified first: an Albers rectangle's edges are curves in lon/lat, and a 4-corner polygon cuts off the northern border
     args$wkt_filter <- sf::st_as_text(sf::st_transform(sf::st_segmentize(sf::st_as_sfc(bbox), 5000), crs0)) }
-  p <- suppressWarnings(sf::st_transform(do.call(sf::read_sf, args), "EPSG:5070"))
+  p <- suppressWarnings(sf::st_transform(linear_polygons(do.call(sf::read_sf, args)), "EPSG:5070"))
   if (!is.na(s$ValueField)) {
     if (!s$ValueField %in% names(p)) stop(sprintf("%s has no field %s", basename(f), s$ValueField), call. = FALSE)
     cw <- data.table::fread(strata_file(s$CrosswalkFile, pkgdir), sep = ",", colClasses = "character")

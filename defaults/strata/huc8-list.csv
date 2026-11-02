@@ -1,0 +1,2414 @@
+Name,Id
+Allagash River (01010002),1010002
+Fish River (01010003),1010003
+Aroostook River (01010004),1010004
+Meduxnekeag River (01010005),1010005
+Headwaters Saint John River (01010006),1010006
+Big Black River-Saint John River (01010007),1010007
+Saint Francis River-Saint John River (01010008),1010008
+Little River-Saint John River (01010009),1010009
+Becaguimec Stream-Saint John River (01010010),1010010
+Keswick River-Saint John River (01010011),1010011
+West Branch Penobscot River (01020001),1020001
+East Branch Penobscot River (01020002),1020002
+Mattawamkeag River (01020003),1020003
+Piscataquis River (01020004),1020004
+Penobscot River (01020005),1020005
+Upper Kennebec River (01030001),1030001
+Dead River (01030002),1030002
+Lower Kennebec River (01030003),1030003
+Upper Androscoggin River (01040001),1040001
+Lower Androscoggin River (01040002),1040002
+Saint Croix River (01050001),1050001
+Maine Coastal (01050002),1050002
+St. George-Sheepscot (01050003),1050003
+Passamaquoddy Bay-Bay of Fundy (01050004),1050004
+Presumpscot (01060001),1060001
+Saco River (01060002),1060002
+Piscataqua-Salmon Falls (01060003),1060003
+Pemigewasset River (01070001),1070001
+Winnipesaukee River (01070002),1070002
+Contoocook River (01070003),1070003
+Nashua River (01070004),1070004
+Concord River (01070005),1070005
+Merrimack River (01070006),1070006
+Headwaters Connecticut River (01080101),1080101
+Passumpsic River (01080102),1080102
+Ammonoosuc River-Connecticut River (01080103),1080103
+Waits River-Connecticut River (01080104),1080104
+White River (01080105),1080105
+Black River-Connecticut River (01080106),1080106
+West River-Connecticut River (01080107),1080107
+Ashuelot River-Connecticut River (01080201),1080201
+Millers River (01080202),1080202
+Deerfield River (01080203),1080203
+Chicopee River (01080204),1080204
+Outlet Connecticut River (01080205),1080205
+Westfield River (01080206),1080206
+Farmington River (01080207),1080207
+Charles (01090001),1090001
+Cape Cod (01090002),1090002
+Blackstone River (01090003),1090003
+Narragansett (01090004),1090004
+Point Judith-Block Island (01090006),1090006
+Quinebaug River (01100001),1100001
+Shetucket River (01100002),1100002
+Thames (01100003),1100003
+Quinnipiac (01100004),1100004
+Housatonic (01100005),1100005
+Saugatuck (01100006),1100006
+Pawcatuck River (01100007),1100007
+Upper Hudson (02020001),2020001
+Sacandaga (02020002),2020002
+Hudson-Hoosic (02020003),2020003
+Mohawk (02020004),2020004
+Schoharie (02020005),2020005
+Middle Hudson (02020006),2020006
+Rondout (02020007),2020007
+Hudson-Wappinger (02020008),2020008
+Lower Hudson (02030101),2030101
+Bronx (02030102),2030102
+Hackensack-Passaic (02030103),2030103
+Sandy Hook-Staten Island (02030104),2030104
+Raritan (02030105),2030105
+Northern Long Island (02030201),2030201
+Southern Long Island (02030202),2030202
+Long Island Sound (02030203),2030203
+Upper Delaware (02040101),2040101
+East Branch Delaware (02040102),2040102
+Lackawaxen (02040103),2040103
+Middle Delaware-Mongaup-Brodhead (02040104),2040104
+Middle Delaware-Musconetcong (02040105),2040105
+Lehigh (02040106),2040106
+Crosswicks-Neshaminy (02040201),2040201
+Lower Delaware (02040202),2040202
+Schuylkill (02040203),2040203
+Delaware Bay (02040204),2040204
+Brandywine-Christina (02040205),2040205
+Cohansey-Maurice (02040206),2040206
+Broadkill-Smyrna (02040207),2040207
+Mullica-Toms (02040301),2040301
+Great Egg Harbor (02040302),2040302
+Chincoteague (02040303),2040303
+Eastern Lower Delmarva (02040304),2040304
+Upper Susquehanna (02050101),2050101
+Chenango (02050102),2050102
+Owego-Wappasening (02050103),2050103
+Tioga (02050104),2050104
+Chemung (02050105),2050105
+Upper Susquehanna-Tunkhannock (02050106),2050106
+Upper Susquehanna-Lackawanna (02050107),2050107
+Upper West Branch Susquehanna (02050201),2050201
+Sinnemahoning (02050202),2050202
+Middle West Branch Susquehanna (02050203),2050203
+Bald Eagle (02050204),2050204
+Pine (02050205),2050205
+Lower West Branch Susquehanna (02050206),2050206
+Lower Susquehanna-Penns (02050301),2050301
+Upper Juniata (02050302),2050302
+Raystown (02050303),2050303
+Lower Juniata (02050304),2050304
+Lower Susquehanna-Swatara (02050305),2050305
+Lower Susquehanna (02050306),2050306
+Upper Chesapeake Bay (02060001),2060001
+Chester-Sassafras (02060002),2060002
+Gunpowder-Patapsco (02060003),2060003
+Severn (02060004),2060004
+Choptank (02060005),2060005
+Patuxent (02060006),2060006
+South Branch Potomac (02070001),2070001
+North Branch Potomac (02070002),2070002
+Cacapon-Town (02070003),2070003
+Conococheague-Opequon (02070004),2070004
+South Fork Shenandoah (02070005),2070005
+North Fork Shenandoah (02070006),2070006
+Shenandoah (02070007),2070007
+Middle Potomac-Catoctin (02070008),2070008
+Monocacy (02070009),2070009
+Middle Potomac-Anacostia-Occoquan (02070010),2070010
+Lower Potomac (02070011),2070011
+Lower Chesapeake Bay (02080101),2080101
+Great Wicomico-Piankatank (02080102),2080102
+Rapidan-Upper Rappahannock (02080103),2080103
+Lower Rappahannock (02080104),2080104
+Mattaponi (02080105),2080105
+Pamunkey (02080106),2080106
+York (02080107),2080107
+Lynnhaven-Poquoson (02080108),2080108
+Nanticoke (02080109),2080109
+Tangier (02080110),2080110
+Pokomoke-Western Lower Delmarva (02080111),2080111
+Upper James (02080201),2080201
+Maury (02080202),2080202
+Middle James-Buffalo (02080203),2080203
+Rivanna (02080204),2080204
+Middle James-Willis (02080205),2080205
+Lower James (02080206),2080206
+Appomattox (02080207),2080207
+Hampton Roads (02080208),2080208
+Upper Roanoke (03010101),3010101
+Middle Roanoke (03010102),3010102
+Upper Dan (03010103),3010103
+Lower Dan (03010104),3010104
+Banister (03010105),3010105
+Roanoke Rapids (03010106),3010106
+Lower Roanoke (03010107),3010107
+Nottoway (03010201),3010201
+Blackwater (03010202),3010202
+Chowan (03010203),3010203
+Meherrin (03010204),3010204
+Albemarle (03010205),3010205
+Upper Tar (03020101),3020101
+Fishing (03020102),3020102
+Lower Tar (03020103),3020103
+Pamlico (03020104),3020104
+Pamlico Sound (03020105),3020105
+Upper Neuse (03020201),3020201
+Middle Neuse (03020202),3020202
+Contentnea (03020203),3020203
+Lower Neuse (03020204),3020204
+White Oak River (03020301),3020301
+New River (03020302),3020302
+Haw (03030002),3030002
+Deep (03030003),3030003
+Upper Cape Fear (03030004),3030004
+Lower Cape Fear (03030005),3030005
+Black (03030006),3030006
+Northeast Cape Fear (03030007),3030007
+Upper Yadkin (03040101),3040101
+South Yadkin (03040102),3040102
+Lower Yadkin (03040103),3040103
+Upper Pee Dee (03040104),3040104
+Rocky (03040105),3040105
+Lower Pee Dee (03040201),3040201
+Lynches (03040202),3040202
+Lumber (03040203),3040203
+Little Pee Dee (03040204),3040204
+Black (03040205),3040205
+Waccamaw (03040206),3040206
+Carolina Coastal-Sampit (03040207),3040207
+Coastal Carolina (03040208),3040208
+Upper Catawba (03050101),3050101
+South Fork Catawba (03050102),3050102
+Lower Catawba (03050103),3050103
+Wateree (03050104),3050104
+Upper Broad (03050105),3050105
+Lower Broad (03050106),3050106
+Tyger (03050107),3050107
+Enoree (03050108),3050108
+Saluda (03050109),3050109
+Congaree (03050110),3050110
+Lake Marion (03050111),3050111
+Santee (03050112),3050112
+Cooper (03050201),3050201
+South Carolina Coastal (03050202),3050202
+North Fork Edisto (03050203),3050203
+South Fork Edisto (03050204),3050204
+Four Hole Swamp (03050205),3050205
+Edisto River (03050206),3050206
+Salkehatchie (03050207),3050207
+Broad-St. Helena (03050208),3050208
+Bulls Bay (03050209),3050209
+St. Helena Island (03050210),3050210
+Seneca (03060101),3060101
+Tugaloo (03060102),3060102
+Upper Savannah (03060103),3060103
+Broad (03060104),3060104
+Little (03060105),3060105
+Middle Savannah (03060106),3060106
+Stevens (03060107),3060107
+Brier (03060108),3060108
+Lower Savannah (03060109),3060109
+Calibogue Sound-Wright River (03060110),3060110
+Upper Ogeechee (03060201),3060201
+Lower Ogeechee (03060202),3060202
+Canoochee (03060203),3060203
+Ogeechee Coastal (03060204),3060204
+Upper Oconee (03070101),3070101
+Lower Oconee (03070102),3070102
+Upper Ocmulgee (03070103),3070103
+Lower Ocmulgee (03070104),3070104
+Little Ocmulgee (03070105),3070105
+Altamaha (03070106),3070106
+Ohoopee (03070107),3070107
+Satilla (03070201),3070201
+Little Satilla (03070202),3070202
+Cumberland-St. Simons (03070203),3070203
+St. Marys (03070204),3070204
+Nassau (03070205),3070205
+Upper St. Johns (03080101),3080101
+Oklawaha (03080102),3080102
+Lower St. Johns (03080103),3080103
+Daytona-St. Augustine (03080201),3080201
+Cape Canaveral (03080202),3080202
+Vero Beach (03080203),3080203
+Kissimmee (03090101),3090101
+Northern Okeechobee Inflow (03090102),3090102
+Western Okeechobee Inflow (03090103),3090103
+Lake Okeechobee (03090201),3090201
+Everglades (03090202),3090202
+Florida Bay-Florida Keys (03090203),3090203
+Big Cypress Swamp (03090204),3090204
+Caloosahatchee (03090205),3090205
+Florida Southeast Coast (03090206),3090206
+Peace (03100101),3100101
+Myakka (03100102),3100102
+Charlotte Harbor (03100103),3100103
+Sarasota Bay (03100201),3100201
+Manatee (03100202),3100202
+Little Manatee (03100203),3100203
+Alafia (03100204),3100204
+Hillsborough (03100205),3100205
+Tampa Bay (03100206),3100206
+Crystal-Pithlachascotee (03100207),3100207
+Withlacoochee (03100208),3100208
+Waccasassa (03110101),3110101
+Econfina-Steinhatchee (03110102),3110102
+Aucilla (03110103),3110103
+Upper Suwannee (03110201),3110201
+Alapaha (03110202),3110202
+Withlacoochee (03110203),3110203
+Little (03110204),3110204
+Lower Suwannee (03110205),3110205
+Santa Fe (03110206),3110206
+Apalachee Bay-St. Marks (03120001),3120001
+Upper Ochlockonee (03120002),3120002
+Lower Ochlockonee (03120003),3120003
+Upper Chattahoochee (03130001),3130001
+Middle Chattahoochee-Lake Harding (03130002),3130002
+Middle Chattahoochee-Walter F (03130003),3130003
+Lower Chattahoochee (03130004),3130004
+Upper Flint (03130005),3130005
+Middle Flint (03130006),3130006
+Kinchafoonee-Muckalee (03130007),3130007
+Lower Flint (03130008),3130008
+Ichawaynochaway (03130009),3130009
+Spring (03130010),3130010
+Apalachicola (03130011),3130011
+Chipola (03130012),3130012
+New (03130013),3130013
+Apalachicola Bay (03130014),3130014
+St. Andrew-St. Joseph Bays (03140101),3140101
+Choctawhatchee Bay (03140102),3140102
+Yellow (03140103),3140103
+Blackwater (03140104),3140104
+Pensacola Bay (03140105),3140105
+Perdido (03140106),3140106
+Perdido Bay (03140107),3140107
+Upper Choctawhatchee (03140201),3140201
+Pea (03140202),3140202
+Lower Choctawhatchee (03140203),3140203
+Upper Conecuh (03140301),3140301
+Patsaliga (03140302),3140302
+Sepulga (03140303),3140303
+Lower Conecuh (03140304),3140304
+Escambia (03140305),3140305
+Conasauga (03150101),3150101
+Coosawattee (03150102),3150102
+Oostanaula (03150103),3150103
+Etowah (03150104),3150104
+Upper Coosa (03150105),3150105
+Middle Coosa (03150106),3150106
+Lower Coosa (03150107),3150107
+Upper Tallapoosa (03150108),3150108
+Middle Tallapoosa (03150109),3150109
+Lower Tallapoosa (03150110),3150110
+Upper Alabama (03150201),3150201
+Cahaba (03150202),3150202
+Middle Alabama (03150203),3150203
+Lower Alabama (03150204),3150204
+Upper Tombigbee (03160101),3160101
+Town (03160102),3160102
+Buttahatchee (03160103),3160103
+Tibbee (03160104),3160104
+Luxapallila (03160105),3160105
+Middle Tombigbee-Lubbub (03160106),3160106
+Sipsey (03160107),3160107
+Noxubee (03160108),3160108
+Mulberry (03160109),3160109
+Sipsey Fork (03160110),3160110
+Locust (03160111),3160111
+Upper Black Warrior (03160112),3160112
+Lower Black Warrior (03160113),3160113
+Middle Tombigbee-Chickasaw (03160201),3160201
+Sucarnoochee (03160202),3160202
+Lower Tombigbee (03160203),3160203
+Mobile-Tensaw (03160204),3160204
+Mobile Bay (03160205),3160205
+Chunky-Okatibbee (03170001),3170001
+Upper Chickasawhay (03170002),3170002
+Lower Chickasawhay (03170003),3170003
+Upper Leaf (03170004),3170004
+Lower Leaf (03170005),3170005
+Pascagoula (03170006),3170006
+Black (03170007),3170007
+Escatawpa (03170008),3170008
+Mississippi Coastal (03170009),3170009
+Upper Pearl (03180001),3180001
+Middle Pearl-Strong (03180002),3180002
+Middle Pearl-Silver (03180003),3180003
+Lower Pearl (03180004),3180004
+Bogue Chitto (03180005),3180005
+Baptism-Brule (04010101),4010101
+Beaver-Lester (04010102),4010102
+St. Louis (04010201),4010201
+Cloquet (04010202),4010202
+Beartrap-Nemadji (04010301),4010301
+Bad-Montreal (04010302),4010302
+Black-Presque Isle (04020101),4020101
+Ontonagon (04020102),4020102
+Keweenaw Peninsula (04020103),4020103
+Sturgeon (04020104),4020104
+Dead-Kelsey (04020105),4020105
+Betsy-Chocolay (04020201),4020201
+Tahquamenon (04020202),4020202
+Waiska (04020203),4020203
+Manitowoc-Sheboygan (04030101),4030101
+Door-Kewaunee (04030102),4030102
+Duck-Pensaukee (04030103),4030103
+Oconto (04030104),4030104
+Peshtigo (04030105),4030105
+Brule (04030106),4030106
+Michigamme (04030107),4030107
+Menominee (04030108),4030108
+Cedar-Ford (04030109),4030109
+Escanaba (04030110),4030110
+Tacoosh-Whitefish (04030111),4030111
+Fishdam-Sturgeon (04030112),4030112
+Manistique River (04030113),4030113
+Millecoquins Lake-Brevoort River (04030114),4030114
+Upper Fox (04030201),4030201
+Wolf (04030202),4030202
+Lake Winnebago (04030203),4030203
+Lower Fox (04030204),4030204
+Little Calumet-Galien (04040001),4040001
+Pike-Root (04040002),4040002
+Milwaukee (04040003),4040003
+St. Joseph (04050001),4050001
+Black-Macatawa (04050002),4050002
+Kalamazoo (04050003),4050003
+Upper Grand (04050004),4050004
+Maple (04050005),4050005
+Lower Grand (04050006),4050006
+Thornapple (04050007),4050007
+Pere Marquette-White (04060101),4060101
+Muskegon (04060102),4060102
+Manistee (04060103),4060103
+Betsie-Platte (04060104),4060104
+Boardman-Charlevoix (04060105),4060105
+Lone Lake-Ocqueoc (04070003),4070003
+Cheboygan (04070004),4070004
+Black (04070005),4070005
+Thunder Bay (04070006),4070006
+Au Sable (04070007),4070007
+Au Gres-Rifle (04080101),4080101
+Kawkawlin-Pine (04080102),4080102
+Pigeon-Wiscoggin (04080103),4080103
+Birch-Willow (04080104),4080104
+Tittabawassee (04080201),4080201
+Pine (04080202),4080202
+Shiawassee (04080203),4080203
+Flint (04080204),4080204
+Cass (04080205),4080205
+Saginaw (04080206),4080206
+St. Clair (04090001),4090001
+Lake St. Clair (04090002),4090002
+Clinton (04090003),4090003
+Detroit (04090004),4090004
+Upper Thames River (04090006),4090006
+Lower Thames River (04090007),4090007
+Ottawa-Stony (04100001),4100001
+Raisin (04100002),4100002
+St. Joseph (04100003),4100003
+St. Marys (04100004),4100004
+Upper Maumee (04100005),4100005
+Tiffin (04100006),4100006
+Auglaize (04100007),4100007
+Blanchard (04100008),4100008
+Lower Maumee (04100009),4100009
+Cedar-Portage (04100010),4100010
+Sandusky (04100011),4100011
+Huron-Vermilion (04100012),4100012
+Huron (04100013),4100013
+Black-Rocky (04110001),4110001
+Cuyahoga (04110002),4110002
+Ashtabula-Chagrin (04110003),4110003
+Grand (04110004),4110004
+Chautauqua-Conneaut (04120101),4120101
+Cattaraugus (04120102),4120102
+Buffalo-Eighteenmile (04120103),4120103
+Oak Orchard-Twelvemile (04130001),4130001
+Upper Genesee (04130002),4130002
+Lower Genesee (04130003),4130003
+Irondequoit-Ninemile (04140101),4140101
+Salmon-Sandy (04140102),4140102
+Seneca (04140201),4140201
+Oneida (04140202),4140202
+Oswego (04140203),4140203
+Black (04140301),4140301
+Chaumont-Perch (04140302),4140302
+Dog River-Frontal Lake Superior (04160001),4160001
+Black Sturgeon River-Frontal Lake Superior (04160002),4160002
+Nipigon River (04160003),4160003
+Jackpine River-Frontal Lake Superior (04160004),4160004
+Little Pic River-Frontal Lake Superior (04170001),4170001
+Pic River-Frontal Lake Superior (04170002),4170002
+White River-Frontal Lake Superior (04170003),4170003
+Magpie River-Frontal Lake Superior (04170004),4170004
+Agawa River-Frontal Lake Superior (04170005),4170005
+Goulais River-Frontal Lake Superior (04170006),4170006
+Lake Superior (04180000),4180000
+Lake Michigan (04190000),4190000
+Carp-Pine (04200001),4200001
+St. Marys (04200002),4200002
+Gordon Lake (04200003),4200003
+Upper Mississagi River (04200004),4200004
+Lower Mississagi River (04200005),4200005
+Serpent River-Frontal Lake Huron (04200006),4200006
+Vermillion River (04200007),4200007
+Spanish River-Frontal Lake Huron (04200008),4200008
+Killarney Lake-Frontal Lake Huron (04200009),4200009
+Upper Wanapitei River (04210001),4210001
+Lower Wanapitei River (04210002),4210002
+Sturgeon River (04210003),4210003
+French River-Frontal Lake Huron (04210004),4210004
+Magnetawan River-Frontal Lake Huron (04220001),4220001
+Lake Muskoka-Frontal Lake Huron (04220002),4220002
+Severn River-Lake Simcoe (04220003),4220003
+Nottawasaga River-Frontal Lake Huron (04220004),4220004
+Eugenia Lake-Frontal Lake Huron (04230001),4230001
+Bruce Peninsula-Frontal Lake Huron (04230002),4230002
+Saugeen River (04230003),4230003
+Penetangore River-Frontal Lake Huron (04230004),4230004
+Maitland River-Frontal Lake Huron (04230005),4230005
+Ausable River-Frontal Lake Huron (04230006),4230006
+Manitoulin Island (04240001),4240001
+Lake Huron (04240002),4240002
+Cedar Creek-Frontal Lake Erie (04250001),4250001
+Talbot Creek-Frontal Lake Erie (04250002),4250002
+Big Creek-Frontal Lake Erie (04250003),4250003
+Upper Grand River (04250004),4250004
+Lower Grand River (04250005),4250005
+Lake Erie (04260000),4260000
+Niagara River (04270101),4270101
+Jordan Harbour-Frontal Lake Ontario (04270102),4270102
+Sixteen Mile Creek-Frontal Lake Ontario (04270103),4270103
+Humber River-Frontal Lake Ontario (04270104),4270104
+Ganaraska River-Frontal Lake Ontario (04270105),4270105
+Moira River-Frontal Lake Ontario (04270106),4270106
+Napanee River-Frontal Lake Ontario (04270107),4270107
+Scugog River (04270201),4270201
+Gull River (04270202),4270202
+Kawartha Lakes (04270203),4270203
+Otonabee River (04270204),4270204
+Trent River (04270205),4270205
+Prince Edward County-Frontal Lake Ontario (04280001),4280001
+Lake Ontario (04280002),4280002
+Headwaters St. Lawrence River (04290001),4290001
+Indian (04290002),4290002
+Oswegatchie (04290003),4290003
+Grass (04290004),4290004
+Raquette (04290005),4290005
+St. Regis (04290006),4290006
+Salmon (04290007),4290007
+Raisin River-St. Lawrence River (04290008),4290008
+Mettawee River (04300101),4300101
+Otter Creek (04300102),4300102
+Winooski River (04300103),4300103
+Ausable River (04300104),4300104
+Lamoille River (04300105),4300105
+Saranac River (04300106),4300106
+Missiquoi River (04300107),4300107
+Lake Champlain (04300108),4300108
+Richelieu River (04300109),4300109
+Chateaugay-English (04300201),4300201
+St. Francois River (04300202),4300202
+Chaudiere River (04310001),4310001
+Mojikit Lake-Ogoki River (04320000),4320000
+Long Lake-Kenogami River (04330000),4330000
+Upper Allegheny (05010001),5010001
+Conewango (05010002),5010002
+Middle Allegheny-Tionesta (05010003),5010003
+French (05010004),5010004
+Clarion (05010005),5010005
+Middle Allegheny-Redbank (05010006),5010006
+Conemaugh (05010007),5010007
+Kiskiminetas (05010008),5010008
+Lower Allegheny (05010009),5010009
+Tygart Valley (05020001),5020001
+West Fork (05020002),5020002
+Upper Monongahela (05020003),5020003
+Cheat (05020004),5020004
+Lower Monongahela (05020005),5020005
+Youghiogheny (05020006),5020006
+Upper Ohio (05030101),5030101
+Shenango (05030102),5030102
+Mahoning (05030103),5030103
+Beaver (05030104),5030104
+Connoquenessing (05030105),5030105
+Upper Ohio-Wheeling (05030106),5030106
+Little Muskingum-Middle Island (05030201),5030201
+Upper Ohio-Shade (05030202),5030202
+Little Kanawha (05030203),5030203
+Hocking (05030204),5030204
+Tuscarawas (05040001),5040001
+Mohican (05040002),5040002
+Walhonding (05040003),5040003
+Muskingum (05040004),5040004
+Wills (05040005),5040005
+Licking (05040006),5040006
+Upper New (05050001),5050001
+Middle New (05050002),5050002
+Greenbrier (05050003),5050003
+Lower New (05050004),5050004
+Gauley (05050005),5050005
+Upper Kanawha (05050006),5050006
+Elk (05050007),5050007
+Lower Kanawha (05050008),5050008
+Coal (05050009),5050009
+Upper Scioto (05060001),5060001
+Lower Scioto (05060002),5060002
+Paint (05060003),5060003
+Upper Guyandotte (05070101),5070101
+Lower Guyandotte (05070102),5070102
+Tug (05070201),5070201
+Upper Levisa (05070202),5070202
+Lower Levisa (05070203),5070203
+Big Sandy (05070204),5070204
+"Upper Great Miami, Indiana, Ohio (05080001)",5080001
+"Lower Great Miami, Indiana, Ohio (05080002)",5080002
+Whitewater (05080003),5080003
+Raccoon-Symmes (05090101),5090101
+Twelvepole (05090102),5090102
+Little Scioto-Tygarts (05090103),5090103
+Little Sandy (05090104),5090104
+Ohio Brush-Whiteoak (05090201),5090201
+Little Miami (05090202),5090202
+Middle Ohio-Laughery (05090203),5090203
+Licking (05100101),5100101
+South Fork Licking (05100102),5100102
+North Fork Kentucky (05100201),5100201
+Middle Fork Kentucky (05100202),5100202
+South Fork Kentucky (05100203),5100203
+Upper Kentucky (05100204),5100204
+Lower Kentucky (05100205),5100205
+Upper Green (05110001),5110001
+Barren (05110002),5110002
+Middle Green (05110003),5110003
+Rough (05110004),5110004
+Lower Green (05110005),5110005
+Pond (05110006),5110006
+Upper Wabash (05120101),5120101
+Salamonie (05120102),5120102
+Mississinewa (05120103),5120103
+Eel (05120104),5120104
+Middle Wabash-Deer (05120105),5120105
+Tippecanoe (05120106),5120106
+Wildcat (05120107),5120107
+Middle Wabash-Little Vermilion (05120108),5120108
+Vermilion (05120109),5120109
+Sugar (05120110),5120110
+Middle Wabash-Busseron (05120111),5120111
+Embarras (05120112),5120112
+Lower Wabash (05120113),5120113
+Little Wabash (05120114),5120114
+Skillet (05120115),5120115
+Upper White (05120201),5120201
+Lower White (05120202),5120202
+Eel (05120203),5120203
+Driftwood (05120204),5120204
+Flatrock-Haw (05120205),5120205
+Upper East Fork White (05120206),5120206
+Muscatatuck (05120207),5120207
+Lower East Fork White (05120208),5120208
+Patoka (05120209),5120209
+Upper Cumberland (05130101),5130101
+Rockcastle (05130102),5130102
+Upper Cumberland-Lake Cumberland (05130103),5130103
+South Fork Cumberland (05130104),5130104
+Obey (05130105),5130105
+Upper Cumberland-Cordell Hull Reservoir (05130106),5130106
+Collins (05130107),5130107
+Caney (05130108),5130108
+Lower Cumberland-Old Hickory Lake (05130201),5130201
+Lower Cumberland-Sycamore (05130202),5130202
+Stones (05130203),5130203
+Harpeth (05130204),5130204
+Lower Cumberland (05130205),5130205
+Red (05130206),5130206
+Silver-Little Kentucky (05140101),5140101
+Salt (05140102),5140102
+Rolling Fork (05140103),5140103
+Blue-Sinking (05140104),5140104
+Lower Ohio-Little Pigeon (05140201),5140201
+Highland-Pigeon (05140202),5140202
+Lower Ohio-Bay (05140203),5140203
+Saline (05140204),5140204
+Tradewater (05140205),5140205
+Lower Ohio (05140206),5140206
+North Fork Holston (06010101),6010101
+South Fork Holston (06010102),6010102
+"Watauga, North Carolina, Tennessee (06010103)",6010103
+Holston (06010104),6010104
+Upper French Broad (06010105),6010105
+Pigeon (06010106),6010106
+Lower French Broad (06010107),6010107
+Nolichucky (06010108),6010108
+Watts Bar Lake (06010201),6010201
+Upper Little Tennessee (06010202),6010202
+Tuckasegee (06010203),6010203
+Lower Little Tennessee (06010204),6010204
+"Upper Clinch, Tennessee, Virginia (06010205)",6010205
+Powell (06010206),6010206
+Lower Clinch (06010207),6010207
+Emory (06010208),6010208
+Middle Tennessee-Chickamauga (06020001),6020001
+Hiwassee (06020002),6020002
+Ocoee (06020003),6020003
+Sequatchie (06020004),6020004
+Guntersville Lake (06030001),6030001
+Wheeler Lake (06030002),6030002
+Upper Elk (06030003),6030003
+Lower Elk (06030004),6030004
+Pickwick Lake (06030005),6030005
+Bear (06030006),6030006
+Lower Tennessee-Beech (06040001),6040001
+Upper Duck (06040002),6040002
+Lower Duck (06040003),6040003
+Buffalo (06040004),6040004
+Kentucky Lake (06040005),6040005
+Lower Tennessee (06040006),6040006
+Mississippi Headwaters (07010101),7010101
+Leech Lake (07010102),7010102
+Prairie-Willow (07010103),7010103
+Elk-Nokasippi (07010104),7010104
+Pine (07010105),7010105
+Crow Wing (07010106),7010106
+Redeye (07010107),7010107
+Long Prairie (07010108),7010108
+Platte-Spunk (07010201),7010201
+Sauk (07010202),7010202
+Clearwater-Elk (07010203),7010203
+Crow (07010204),7010204
+South Fork Crow (07010205),7010205
+Twin Cities (07010206),7010206
+Rum (07010207),7010207
+Upper Minnesota (07020001),7020001
+Pomme De Terre (07020002),7020002
+Lac Qui Parle (07020003),7020003
+Hawk-Yellow Medicine (07020004),7020004
+Chippewa (07020005),7020005
+Redwood (07020006),7020006
+Middle Minnesota (07020007),7020007
+Cottonwood (07020008),7020008
+Blue Earth (07020009),7020009
+Watonwan (07020010),7020010
+Le Sueur (07020011),7020011
+Lower Minnesota (07020012),7020012
+Upper St. Croix (07030001),7030001
+Namekagon (07030002),7030002
+Kettle (07030003),7030003
+Snake (07030004),7030004
+Lower St. Croix (07030005),7030005
+Rush-Vermillion (07040001),7040001
+Cannon (07040002),7040002
+Buffalo-Whitewater (07040003),7040003
+Zumbro (07040004),7040004
+Trempealeau (07040005),7040005
+La Crosse-Pine (07040006),7040006
+Black (07040007),7040007
+Root (07040008),7040008
+Upper Chippewa (07050001),7050001
+Flambeau (07050002),7050002
+South Fork Flambeau (07050003),7050003
+Jump (07050004),7050004
+Lower Chippewa (07050005),7050005
+Eau Claire (07050006),7050006
+Red Cedar (07050007),7050007
+Coon-Yellow (07060001),7060001
+Upper Iowa (07060002),7060002
+Grant-Little Maquoketa (07060003),7060003
+Turkey (07060004),7060004
+Apple-Plum (07060005),7060005
+Maquoketa (07060006),7060006
+Upper Wisconsin (07070001),7070001
+Lake Dubay (07070002),7070002
+Castle Rock (07070003),7070003
+Baraboo (07070004),7070004
+Lower Wisconsin (07070005),7070005
+Kickapoo (07070006),7070006
+Copperas-Duck (07080101),7080101
+Upper Wapsipinicon (07080102),7080102
+Lower Wapsipinicon (07080103),7080103
+Flint-Henderson (07080104),7080104
+South Skunk (07080105),7080105
+North Skunk (07080106),7080106
+Skunk (07080107),7080107
+Upper Cedar (07080201),7080201
+Shell Rock (07080202),7080202
+Winnebago (07080203),7080203
+West Fork Cedar (07080204),7080204
+Middle Cedar (07080205),7080205
+Lower Cedar (07080206),7080206
+Upper Iowa (07080207),7080207
+Middle Iowa (07080208),7080208
+Lower Iowa (07080209),7080209
+Upper Rock (07090001),7090001
+Middle Rock (07090002),7090002
+Pecatonica (07090003),7090003
+Sugar (07090004),7090004
+Lower Rock (07090005),7090005
+Kishwaukee (07090006),7090006
+Green (07090007),7090007
+Des Moines Headwaters (07100001),7100001
+Upper Des Moines (07100002),7100002
+East Fork Des Moines (07100003),7100003
+Middle Des Moines (07100004),7100004
+Boone (07100005),7100005
+North Raccoon (07100006),7100006
+South Raccoon (07100007),7100007
+Lake Red Rock (07100008),7100008
+Lower Des Moines (07100009),7100009
+Bear-Wyaconda (07110001),7110001
+North Fabius (07110002),7110002
+South Fabius (07110003),7110003
+The Sny (07110004),7110004
+North Fork Salt (07110005),7110005
+South Fork Salt (07110006),7110006
+Salt (07110007),7110007
+Cuivre (07110008),7110008
+Peruque-Piasa (07110009),7110009
+Kankakee (07120001),7120001
+Iroquois (07120002),7120002
+Chicago (07120003),7120003
+Des Plaines (07120004),7120004
+Upper Illinois (07120005),7120005
+Upper Fox (07120006),7120006
+Lower Fox (07120007),7120007
+Lower Illinois-Senachwine Lake (07130001),7130001
+Vermilion (07130002),7130002
+Lower Illinois-Lake Chautauqua (07130003),7130003
+Mackinaw (07130004),7130004
+Spoon (07130005),7130005
+Upper Sangamon (07130006),7130006
+South Fork Sangamon (07130007),7130007
+Lower Sangamon (07130008),7130008
+Salt (07130009),7130009
+La Moine (07130010),7130010
+Lower Illinois (07130011),7130011
+Macoupin (07130012),7130012
+Cahokia-Joachim (07140101),7140101
+Meramec (07140102),7140102
+Bourbeuse (07140103),7140103
+Big (07140104),7140104
+Upper Mississippi-Cape Girardeau (07140105),7140105
+Big Muddy (07140106),7140106
+Whitewater (07140107),7140107
+Cache (07140108),7140108
+Upper Kaskaskia (07140201),7140201
+Middle Kaskaskia (07140202),7140202
+Shoal (07140203),7140203
+Lower Kaskaskia (07140204),7140204
+Lower Mississippi-Memphis (08010100),8010100
+Bayou De Chien-Mayfield (08010201),8010201
+Obion (08010202),8010202
+South Fork Obion (08010203),8010203
+North Fork Forked Deer (08010204),8010204
+South Fork Forked Deer (08010205),8010205
+Forked Deer (08010206),8010206
+Upper Hatchie (08010207),8010207
+Lower Hatchie (08010208),8010208
+Loosahatchie (08010209),8010209
+Wolf (08010210),8010210
+Horn Lake-Nonconnah (08010211),8010211
+Town of Madrid-Saint Johns Bayou (08010300),8010300
+Lower Mississippi-Helena (08020100),8020100
+Upper St. Francis (08020202),8020202
+Lower St. Francis (08020203),8020203
+Little River Ditches (08020204),8020204
+L'Anguille (08020205),8020205
+Lower White-Bayou Des Arc (08020301),8020301
+Cache (08020302),8020302
+Lower White (08020303),8020303
+Big (08020304),8020304
+Lower Arkansas (08020401),8020401
+Bayou Meto (08020402),8020402
+Lower Mississippi-Greenville (08030100),8030100
+Little Tallahatchie (08030201),8030201
+Tallahatchie (08030202),8030202
+Yocona (08030203),8030203
+Coldwater (08030204),8030204
+Yalobusha (08030205),8030205
+Upper Yazoo (08030206),8030206
+Big Sunflower (08030207),8030207
+Lower Yazoo (08030208),8030208
+Deer-Steele (08030209),8030209
+Ouachita Headwaters (08040101),8040101
+Upper Ouachita (08040102),8040102
+Little Missouri (08040103),8040103
+Lower Ouachita-Smackover (08040201),8040201
+Lower Ouachita-Bayou De Loutre (08040202),8040202
+Upper Saline (08040203),8040203
+Lower Saline (08040204),8040204
+Bayou Bartholomew (08040205),8040205
+Bayou D'Arbonne (08040206),8040206
+Lower Ouachita (08040207),8040207
+Lower Red (08040301),8040301
+Castor (08040302),8040302
+Dugdemona (08040303),8040303
+Little (08040304),8040304
+Black (08040305),8040305
+Bayou Cocodrie (08040306),8040306
+Boeuf (08050001),8050001
+Bayou Macon (08050002),8050002
+Tensas (08050003),8050003
+Lower Mississippi-Natchez (08060100),8060100
+Upper Big Black (08060201),8060201
+Lower Big Black (08060202),8060202
+Bayou Pierre (08060203),8060203
+Coles Creek (08060204),8060204
+Homochitto (08060205),8060205
+Buffalo (08060206),8060206
+Lower Mississippi-Baton Rouge (08070100),8070100
+Bayou Sara-Thompson (08070201),8070201
+Amite (08070202),8070202
+Tickfaw (08070203),8070203
+Lake Maurepas (08070204),8070204
+Tangipahoa (08070205),8070205
+Lower Grand (08070300),8070300
+Atchafalaya (08080101),8080101
+Bayou Teche (08080102),8080102
+Vermilion (08080103),8080103
+Mermentau Headwaters (08080201),8080201
+Mermentau (08080202),8080202
+Upper Calcasieu (08080203),8080203
+Whisky Chitto (08080204),8080204
+West Fork Calcasieu (08080205),8080205
+Lower Calcasieu (08080206),8080206
+Lower Mississippi-New Orleans (08090100),8090100
+Liberty Bayou-Tchefuncta (08090201),8090201
+Lake Pontchartrain (08090202),8090202
+Eastern Louisiana Coastal (08090203),8090203
+East Central Louisiana Coastal (08090301),8090301
+West Central Louisiana Coastal (08090302),8090302
+Des Lacs (09010002),9010002
+Lower Souris (09010003),9010003
+Willow (09010004),9010004
+Deep (09010005),9010005
+Long Creek (09010006),9010006
+Headwaters Souris River (09010007),9010007
+Moose Mountain Creek-Souris River (09010008),9010008
+Upper Moose Mountain Creek (09010009),9010009
+Bois De Sioux (09020101),9020101
+Mustinka (09020102),9020102
+Otter Tail (09020103),9020103
+Upper Red (09020104),9020104
+Western Wild Rice (09020105),9020105
+Buffalo (09020106),9020106
+Elm-Marsh (09020107),9020107
+Eastern Wild Rice (09020108),9020108
+Goose (09020109),9020109
+Devils Lake (09020201),9020201
+Upper Sheyenne (09020202),9020202
+Middle Sheyenne (09020203),9020203
+Lower Sheyenne (09020204),9020204
+Maple (09020205),9020205
+Sandhill-Wilson (09020301),9020301
+Red Lakes (09020302),9020302
+Red Lake (09020303),9020303
+Thief (09020304),9020304
+Clearwater (09020305),9020305
+Grand Marais-Red (09020306),9020306
+Turtle (09020307),9020307
+Forest (09020308),9020308
+Snake (09020309),9020309
+Park (09020310),9020310
+Middle Red (09020311),9020311
+Two Rivers (09020312),9020312
+Roseau (09020314),9020314
+Upper Pembina River (09020315),9020315
+Lower Pembina River (09020316),9020316
+Morris River (09020317),9020317
+Rat River-Tourond Creek (09020318),9020318
+La Salle River (09020319),9020319
+Rainy Headwaters (09030001),9030001
+Vermilion (09030002),9030002
+Rainy Lake (09030003),9030003
+Little Fork (09030005),9030005
+Big Fork (09030006),9030006
+Rapid (09030007),9030007
+Lower Rainy (09030008),9030008
+Lake of the Woods (09030009),9030009
+Big Turtle River-Rainy Lake (09030010),9030010
+Shoal Lake (09030011),9030011
+St. Marys (09040001),9040001
+Belly (09040002),9040002
+Upper Oldman River (09040003),9040003
+Oldman River-Willow Creek (09040004),9040004
+Red Rock (10020001),10020001
+Beaverhead (10020002),10020002
+Ruby (10020003),10020003
+Big Hole (10020004),10020004
+Jefferson (10020005),10020005
+Boulder (10020006),10020006
+Madison (10020007),10020007
+Gallatin (10020008),10020008
+Upper Missouri (10030101),10030101
+Upper Missouri-Dearborn (10030102),10030102
+Smith (10030103),10030103
+Sun (10030104),10030104
+Belt (10030105),10030105
+Two Medicine (10030201),10030201
+Cut Bank (10030202),10030202
+Marias (10030203),10030203
+Willow (10030204),10030204
+Teton (10030205),10030205
+Bullwhacker-Dog (10040101),10040101
+Arrow (10040102),10040102
+Judith (10040103),10040103
+Fort Peck Reservoir (10040104),10040104
+Big Dry (10040105),10040105
+Little Dry (10040106),10040106
+Upper Musselshell (10040201),10040201
+Middle Musselshell (10040202),10040202
+Flatwillow (10040203),10040203
+Box Elder (10040204),10040204
+Lower Musselshell (10040205),10040205
+Milk Headwaters (10050001),10050001
+Upper Milk (10050002),10050002
+Wild Horse Lake (10050003),10050003
+Middle Milk (10050004),10050004
+Big Sandy (10050005),10050005
+Sage (10050006),10050006
+Lodge (10050007),10050007
+Battle (10050008),10050008
+Peoples (10050009),10050009
+Cottonwood (10050010),10050010
+Whitewater (10050011),10050011
+Lower Milk (10050012),10050012
+Frenchman (10050013),10050013
+Beaver (10050014),10050014
+Rock (10050015),10050015
+Porcupine (10050016),10050016
+Prairie Elk-Wolf (10060001),10060001
+Redwater (10060002),10060002
+Poplar (10060003),10060003
+West Fork Poplar (10060004),10060004
+Charlie-Little Muddy (10060005),10060005
+Big Muddy (10060006),10060006
+Brush Lake Closed Basin (10060007),10060007
+Yellowstone Headwaters (10070001),10070001
+Upper Yellowstone (10070002),10070002
+Shields (10070003),10070003
+Upper Yellowstone-Lake Basin (10070004),10070004
+Stillwater (10070005),10070005
+Clarks Fork Yellowstone (10070006),10070006
+Upper Yellowstone-Pompeys Pillar (10070007),10070007
+Pryor (10070008),10070008
+Upper Wind (10080001),10080001
+Little Wind (10080002),10080002
+Popo Agie (10080003),10080003
+Muskrat (10080004),10080004
+Lower Wind (10080005),10080005
+Badwater (10080006),10080006
+Upper Bighorn (10080007),10080007
+Nowood (10080008),10080008
+Greybull (10080009),10080009
+Big Horn Lake (10080010),10080010
+Dry (10080011),10080011
+North Fork Shoshone (10080012),10080012
+South Fork Shoshone (10080013),10080013
+Shoshone (10080014),10080014
+Lower Bighorn (10080015),10080015
+Little Bighorn (10080016),10080016
+Upper Tongue (10090101),10090101
+Lower Tongue (10090102),10090102
+Middle Fork Powder (10090201),10090201
+Upper Powder (10090202),10090202
+South Fork Powder (10090203),10090203
+Salt (10090204),10090204
+Crazy Woman (10090205),10090205
+Clear (10090206),10090206
+Middle Powder (10090207),10090207
+Little Powder (10090208),10090208
+Lower Powder (10090209),10090209
+Mizpah (10090210),10090210
+Lower Yellowstone-Sunday (10100001),10100001
+Big Porcupine (10100002),10100002
+Rosebud (10100003),10100003
+Lower Yellowstone (10100004),10100004
+O'Fallon (10100005),10100005
+Lake Sakakawea (10110101),10110101
+Little Muddy (10110102),10110102
+Upper Little Missouri (10110201),10110201
+Boxelder (10110202),10110202
+Middle Little Missouri (10110203),10110203
+Beaver (10110204),10110204
+Lower Little Missouri (10110205),10110205
+Antelope (10120101),10120101
+Dry Fork Cheyenne (10120102),10120102
+Upper Cheyenne (10120103),10120103
+Lance (10120104),10120104
+Lightning (10120105),10120105
+Angostura Reservoir (10120106),10120106
+Beaver (10120107),10120107
+Hat (10120108),10120108
+Middle Cheyenne-Spring (10120109),10120109
+Rapid (10120110),10120110
+Middle Cheyenne-Elk (10120111),10120111
+Lower Cheyenne (10120112),10120112
+Cherry (10120113),10120113
+Upper Belle Fourche (10120201),10120201
+Lower Belle Fourche (10120202),10120202
+Redwater (10120203),10120203
+Painted Woods-Square Butte (10130101),10130101
+Upper Lake Oahe (10130102),10130102
+Apple Creek (10130103),10130103
+Beaver (10130104),10130104
+Lower Lake Oahe (10130105),10130105
+West Missouri Coteau (10130106),10130106
+Knife (10130201),10130201
+Upper Heart (10130202),10130202
+Lower Heart (10130203),10130203
+Upper Cannonball (10130204),10130204
+Cedar (10130205),10130205
+Lower Cannonball (10130206),10130206
+North Fork Grand (10130301),10130301
+South Fork Grand (10130302),10130302
+Grand (10130303),10130303
+South Fork Moreau (10130304),10130304
+Upper Moreau (10130305),10130305
+Lower Moreau (10130306),10130306
+Fort Randall Reservoir (10140101),10140101
+Bad (10140102),10140102
+Medicine Knoll (10140103),10140103
+Medicine (10140104),10140104
+Crow (10140105),10140105
+Upper White (10140201),10140201
+Middle White (10140202),10140202
+Little White (10140203),10140203
+Lower White (10140204),10140204
+Niobrara Headwaters (10150002),10150002
+Upper Niobrara (10150003),10150003
+Middle Niobrara (10150004),10150004
+Snake (10150005),10150005
+Keya Paha (10150006),10150006
+Lower Niobrara (10150007),10150007
+James Headwaters (10160001),10160001
+Pipestem (10160002),10160002
+Upper James (10160003),10160003
+Elm (10160004),10160004
+Mud (10160005),10160005
+Middle James (10160006),10160006
+North Fork Snake (10160007),10160007
+Snake (10160008),10160008
+Turtle (10160009),10160009
+Lower James (10160011),10160011
+Lewis and Clark Lake (10170101),10170101
+Vermillion (10170102),10170102
+Lake Thompson (10170103),10170103
+Ponca (10170104),10170104
+Upper Big Sioux (10170201),10170201
+Middle Big Sioux (10170202),10170202
+Lower Big Sioux (10170203),10170203
+Rock (10170204),10170204
+North Platte Headwaters (10180001),10180001
+Upper North Platte (10180002),10180002
+Pathfinder-Seminoe Reservoirs (10180003),10180003
+Medicine Bow (10180004),10180004
+Little Medicine Bow (10180005),10180005
+Sweetwater (10180006),10180006
+Middle North Platte-Casper (10180007),10180007
+Glendo Reservoir (10180008),10180008
+Middle North Platte-Scotts Bluff (10180009),10180009
+Upper Laramie (10180010),10180010
+Lower Laramie (10180011),10180011
+Horse (10180012),10180012
+Pumpkin (10180013),10180013
+Lower North Platte (10180014),10180014
+South Platte Headwaters (10190001),10190001
+Upper South Platte (10190002),10190002
+Middle South Platte-Cherry Creek (10190003),10190003
+Clear (10190004),10190004
+St. Vrain (10190005),10190005
+Big Thompson (10190006),10190006
+Cache La Poudre (10190007),10190007
+Lone Tree-Owl (10190008),10190008
+Crow (10190009),10190009
+Kiowa (10190010),10190010
+Bijou (10190011),10190011
+Middle South Platte-Sterling (10190012),10190012
+Beaver (10190013),10190013
+Pawnee (10190014),10190014
+Upper Lodgepole (10190015),10190015
+Lower Lodgepole (10190016),10190016
+Sidney Draw (10190017),10190017
+Lower South Platte (10190018),10190018
+Middle Platte-Buffalo (10200101),10200101
+Wood (10200102),10200102
+Middle Platte-Prairie (10200103),10200103
+Lower Platte-Shell (10200201),10200201
+Lower Platte (10200202),10200202
+Salt (10200203),10200203
+Upper Middle Loup (10210001),10210001
+Dismal (10210002),10210002
+Lower Middle Loup (10210003),10210003
+South Loup (10210004),10210004
+Mud (10210005),10210005
+Upper North Loup (10210006),10210006
+Lower North Loup (10210007),10210007
+Calamus (10210008),10210008
+Loup (10210009),10210009
+Cedar (10210010),10210010
+Upper Elkhorn (10220001),10220001
+North Fork Elkhorn (10220002),10220002
+Lower Elkhorn (10220003),10220003
+Logan (10220004),10220004
+Blackbird-Soldier (10230001),10230001
+Floyd (10230002),10230002
+Little Sioux (10230003),10230003
+Monona-Harrison Ditch (10230004),10230004
+Maple (10230005),10230005
+Big Papillion-Mosquito (10230006),10230006
+Boyer (10230007),10230007
+Keg-Weeping Water (10240001),10240001
+West Nishnabotna (10240002),10240002
+East Nishnabotna (10240003),10240003
+Nishnabotna (10240004),10240004
+Tarkio-Wolf (10240005),10240005
+Little Nemaha (10240006),10240006
+South Fork Big Nemaha (10240007),10240007
+Big Nemaha (10240008),10240008
+West Nodaway (10240009),10240009
+Nodaway (10240010),10240010
+Independence-Sugar (10240011),10240011
+Platte (10240012),10240012
+One Hundred and Two (10240013),10240013
+Arikaree (10250001),10250001
+North Fork Republican (10250002),10250002
+South Fork Republican (10250003),10250003
+Upper Republican (10250004),10250004
+Frenchman (10250005),10250005
+Stinking Water (10250006),10250006
+Red Willow (10250007),10250007
+Medicine (10250008),10250008
+Harlan County Reservoir (10250009),10250009
+Upper Sappa (10250010),10250010
+Lower Sappa (10250011),10250011
+South Fork Beaver (10250012),10250012
+Little Beaver (10250013),10250013
+Beaver (10250014),10250014
+Prairie Dog (10250015),10250015
+Middle Republican (10250016),10250016
+Lower Republican (10250017),10250017
+Smoky Hill Headwaters (10260001),10260001
+North Fork Smoky Hill (10260002),10260002
+Upper Smoky Hill (10260003),10260003
+Ladder (10260004),10260004
+Hackberry (10260005),10260005
+Middle Smoky Hill (10260006),10260006
+Big (10260007),10260007
+Lower Smoky Hill (10260008),10260008
+Upper Saline (10260009),10260009
+Lower Saline (10260010),10260010
+Upper North Fork Solomon (10260011),10260011
+Lower North Fork Solomon (10260012),10260012
+Upper South Fork Solomon (10260013),10260013
+Lower South Fork Solomon (10260014),10260014
+Solomon (10260015),10260015
+Upper Kansas (10270101),10270101
+Middle Kansas (10270102),10270102
+Delaware (10270103),10270103
+"Lower Kansas, Kansas (10270104)",10270104
+Upper Big Blue (10270201),10270201
+Middle Big Blue (10270202),10270202
+West Fork Big Blue (10270203),10270203
+Turkey (10270204),10270204
+Lower Big Blue (10270205),10270205
+Upper Little Blue (10270206),10270206
+Lower Little Blue (10270207),10270207
+Upper Grand (10280101),10280101
+Thompson (10280102),10280102
+Lower Grand (10280103),10280103
+Upper Chariton (10280201),10280201
+Lower Chariton (10280202),10280202
+Little Chariton (10280203),10280203
+Upper Marais Des Cygnes (10290101),10290101
+Lower Marais Des Cygnes (10290102),10290102
+Little Osage (10290103),10290103
+Marmaton (10290104),10290104
+Harry S. Truman Reservoir (10290105),10290105
+Sac (10290106),10290106
+Pomme De Terre (10290107),10290107
+South Grand (10290108),10290108
+Lake of the Ozarks (10290109),10290109
+Niangua (10290110),10290110
+Lower Osage (10290111),10290111
+Upper Gasconade (10290201),10290201
+Big Piney (10290202),10290202
+Lower Gasconade (10290203),10290203
+Lower Missouri-Crooked (10300101),10300101
+Lower Missouri-Moreau (10300102),10300102
+Lamine (10300103),10300103
+Blackwater (10300104),10300104
+Lower Missouri (10300200),10300200
+Beaver Reservoir (11010001),11010001
+James (11010002),11010002
+Bull Shoals Lake (11010003),11010003
+Middle White (11010004),11010004
+Buffalo (11010005),11010005
+North Fork White (11010006),11010006
+Upper Black (11010007),11010007
+Current (11010008),11010008
+Lower Black (11010009),11010009
+Spring (11010010),11010010
+Eleven Point (11010011),11010011
+Strawberry (11010012),11010012
+Upper White-Village (11010013),11010013
+Little Red (11010014),11010014
+Arkansas Headwaters (11020001),11020001
+Upper Arkansas (11020002),11020002
+Fountain (11020003),11020003
+Chico (11020004),11020004
+Upper Arkansas-Lake Meredith (11020005),11020005
+Huerfano (11020006),11020006
+Apishapa (11020007),11020007
+Horse (11020008),11020008
+Upper Arkansas-John Martin Reservoir (11020009),11020009
+Purgatoire (11020010),11020010
+Big Sandy (11020011),11020011
+Rush (11020012),11020012
+Two Butte (11020013),11020013
+Middle Arkansas-Lake McKinney (11030001),11030001
+Whitewoman (11030002),11030002
+Arkansas-Dodge City (11030003),11030003
+Coon-Pickerel (11030004),11030004
+Pawnee (11030005),11030005
+Buckner (11030006),11030006
+Upper Walnut Creek (11030007),11030007
+Lower Walnut Creek (11030008),11030008
+Rattlesnake (11030009),11030009
+Gar-Peace (11030010),11030010
+Cow (11030011),11030011
+Little Arkansas (11030012),11030012
+Middle Arkansas-Slate (11030013),11030013
+North Fork Ninnescah (11030014),11030014
+South Fork Ninnescah (11030015),11030015
+Ninnescah (11030016),11030016
+Upper Walnut River (11030017),11030017
+Lower Walnut River (11030018),11030018
+Cimarron Headwaters (11040001),11040001
+Upper Cimarron (11040002),11040002
+North Fork Cimarron (11040003),11040003
+Sand Arroyo (11040004),11040004
+Bear (11040005),11040005
+Upper Cimarron-Liberal (11040006),11040006
+Crooked (11040007),11040007
+Upper Cimarron-Bluff (11040008),11040008
+Lower Cimarron-Eagle Chief (11050001),11050001
+Lower Cimarron-Skeleton (11050002),11050002
+Lower Cimarron (11050003),11050003
+Kaw Lake (11060001),11060001
+Upper Salt Fork Arkansas (11060002),11060002
+Medicine Lodge (11060003),11060003
+Lower Salt Fork Arkansas (11060004),11060004
+Chikaskia (11060005),11060005
+Black Bear-Red Rock (11060006),11060006
+Upper Verdigris (11070101),11070101
+Fall (11070102),11070102
+Middle Verdigris (11070103),11070103
+Elk (11070104),11070104
+Lower Verdigris (11070105),11070105
+Caney (11070106),11070106
+Bird (11070107),11070107
+Neosho Headwaters (11070201),11070201
+Upper Cottonwood (11070202),11070202
+Lower Cottonwood (11070203),11070203
+Upper Neosho (11070204),11070204
+Middle Neosho (11070205),11070205
+Lake O' The Cherokees (11070206),11070206
+Spring (11070207),11070207
+Elk (11070208),11070208
+Lower Neosho (11070209),11070209
+Canadian Headwaters (11080001),11080001
+Cimarron (11080002),11080002
+Upper Canadian (11080003),11080003
+Mora (11080004),11080004
+Conchas (11080005),11080005
+Upper Canadian-Ute Reservoir (11080006),11080006
+Ute (11080007),11080007
+Revuelto (11080008),11080008
+Middle Canadian-Trujillo (11090101),11090101
+Punta de Agua (11090102),11090102
+Rita Blanca (11090103),11090103
+Carrizo (11090104),11090104
+Lake Meredith (11090105),11090105
+Middle Canadian-Spring (11090106),11090106
+Lower Canadian-Deer (11090201),11090201
+Lower Canadian-Walnut (11090202),11090202
+Little (11090203),11090203
+Lower Canadian (11090204),11090204
+Upper Beaver (11100101),11100101
+Middle Beaver (11100102),11100102
+Coldwater (11100103),11100103
+Palo Duro (11100104),11100104
+Lower Beaver (11100201),11100201
+Upper Wolf (11100202),11100202
+Lower Wolf (11100203),11100203
+Middle North Canadian (11100301),11100301
+Lower North Canadian (11100302),11100302
+Deep Fork (11100303),11100303
+Polecat-Snake (11110101),11110101
+Dirty-Greenleaf (11110102),11110102
+Illinois (11110103),11110103
+Robert S. Kerr Reservoir (11110104),11110104
+Poteau (11110105),11110105
+Frog-Mulberry (11110201),11110201
+Dardanelle Reservoir (11110202),11110202
+Lake Conway-Point Remove (11110203),11110203
+Petit Jean (11110204),11110204
+Cadron (11110205),11110205
+Fourche La Fave (11110206),11110206
+Lower Arkansas-Maumelle (11110207),11110207
+Tierra Blanca (11120101),11120101
+Palo Duro (11120102),11120102
+Upper Prairie Dog Town Fork Red (11120103),11120103
+Tule (11120104),11120104
+Lower Prairie Dog Town Fork Red (11120105),11120105
+Upper Salt Fork Red (11120201),11120201
+Lower Salt Fork Red (11120202),11120202
+Upper North Fork Red (11120301),11120301
+Middle North Fork Red (11120302),11120302
+Lower North Fork Red (11120303),11120303
+Elm Fork Red (11120304),11120304
+Groesbeck-Sandy (11130101),11130101
+Blue-China (11130102),11130102
+North Pease (11130103),11130103
+Middle Pease (11130104),11130104
+Pease (11130105),11130105
+Farmers-Mud (11130201),11130201
+Cache (11130202),11130202
+West Cache (11130203),11130203
+North Wichita (11130204),11130204
+South Wichita (11130205),11130205
+Wichita (11130206),11130206
+Southern Beaver (11130207),11130207
+Northern Beaver (11130208),11130208
+Little Wichita (11130209),11130209
+Lake Texoma (11130210),11130210
+Washita Headwaters (11130301),11130301
+Upper Washita (11130302),11130302
+Middle Washita (11130303),11130303
+Lower Washita (11130304),11130304
+Bois D'arc-Island (11140101),11140101
+Blue (11140102),11140102
+Muddy Boggy (11140103),11140103
+Clear Boggy (11140104),11140104
+Kiamichi (11140105),11140105
+Pecan-Waterhole (11140106),11140106
+Upper Little (11140107),11140107
+Mountain Fork (11140108),11140108
+"Lower Little Arkansas, Oklahoma (11140109)",11140109
+McKinney-Posten Bayous (11140201),11140201
+Middle Red-Coushatta (11140202),11140202
+Loggy Bayou (11140203),11140203
+Red Chute (11140204),11140204
+Bodcau Bayou (11140205),11140205
+Bayou Pierre (11140206),11140206
+Lower Red-Lake Iatt (11140207),11140207
+Saline Bayou (11140208),11140208
+Black Lake Bayou (11140209),11140209
+Sulphur Headwaters (11140301),11140301
+Lower Sulpher (11140302),11140302
+White Oak Bayou (11140303),11140303
+Cross Bayou (11140304),11140304
+Lake O'the Pines (11140305),11140305
+Caddo Lake (11140306),11140306
+Little Cypress (11140307),11140307
+Upper Sabine (12010001),12010001
+Middle Sabine (12010002),12010002
+Lake Fork (12010003),12010003
+Toledo Bend Reservoir (12010004),12010004
+Lower Sabine (12010005),12010005
+Upper Neches (12020001),12020001
+Middle Neches (12020002),12020002
+Lower Neches (12020003),12020003
+Upper Angelina (12020004),12020004
+Lower Angelina (12020005),12020005
+Village (12020006),12020006
+Pine Island Bayou (12020007),12020007
+Upper West Fork Trinity (12030101),12030101
+Lower West Fork Trinity (12030102),12030102
+Elm Fork Trinity (12030103),12030103
+Denton (12030104),12030104
+Upper Trinity (12030105),12030105
+East Fork Trinity (12030106),12030106
+Cedar (12030107),12030107
+Richland (12030108),12030108
+Chambers (12030109),12030109
+Lower Trinity-Tehuacana (12030201),12030201
+Lower Trinity-Kickapoo (12030202),12030202
+Lower Trinity (12030203),12030203
+West Fork San Jacinto (12040101),12040101
+Spring (12040102),12040102
+East Fork San Jacinto (12040103),12040103
+Buffalo-San Jacinto (12040104),12040104
+Sabine Lake (12040201),12040201
+East Galveston Bay (12040202),12040202
+North Galveston Bay (12040203),12040203
+West Galveston Bay (12040204),12040204
+Austin-Oyster (12040205),12040205
+Yellow House Draw (12050001),12050001
+Blackwater Draw (12050002),12050002
+North Fork Double Mountain Fork Brazos (12050003),12050003
+Double Mountain Fork Brazos (12050004),12050004
+Running Water Draw (12050005),12050005
+White (12050006),12050006
+Salt Fork Brazos (12050007),12050007
+Middle Brazos-Millers (12060101),12060101
+Upper Clear Fork Brazos (12060102),12060102
+Paint (12060103),12060103
+Lower Clear Fork Brazos (12060104),12060104
+Hubbard (12060105),12060105
+Middle Brazos-Palo Pinto (12060201),12060201
+Middle Brazos-Lake Whitney (12060202),12060202
+Bosque (12060203),12060203
+North Bosque (12060204),12060204
+Lower Brazos-Little Brazos (12070101),12070101
+Yegua (12070102),12070102
+Navasota (12070103),12070103
+Lower Brazos (12070104),12070104
+Leon (12070201),12070201
+Cowhouse (12070202),12070202
+Lampasas (12070203),12070203
+Little (12070204),12070204
+San Gabriel (12070205),12070205
+Lost Draw (12080001),12080001
+Colorado Headwaters (12080002),12080002
+Monument-Seminole Draws (12080003),12080003
+Mustang Draw (12080004),12080004
+Johnson Draw (12080005),12080005
+Sulphur Springs Draw (12080006),12080006
+Beals (12080007),12080007
+Upper Colorado (12080008),12080008
+Middle Colorado-Elm (12090101),12090101
+South Concho (12090102),12090102
+Middle Concho (12090103),12090103
+North Concho (12090104),12090104
+Concho (12090105),12090105
+Middle Colorado (12090106),12090106
+Pecan Bayou (12090107),12090107
+Jim Ned (12090108),12090108
+San Saba (12090109),12090109
+Brady (12090110),12090110
+Buchanan-Lyndon B. Johnson Lakes (12090201),12090201
+North Llano (12090202),12090202
+South Llano (12090203),12090203
+Llano (12090204),12090204
+Austin-Travis Lakes (12090205),12090205
+Pedernales (12090206),12090206
+Lower Colorado-Cummins (12090301),12090301
+Lower Colorado (12090302),12090302
+San Bernard (12090401),12090401
+East Matagorda Bay (12090402),12090402
+Lavaca (12100101),12100101
+Navidad (12100102),12100102
+Upper Guadalupe (12100201),12100201
+Middle Guadalupe (12100202),12100202
+San Marcos (12100203),12100203
+Lower Guadalupe (12100204),12100204
+Upper San Antonio (12100301),12100301
+Medina (12100302),12100302
+Lower San Antonio (12100303),12100303
+Cibolo (12100304),12100304
+Central Matagorda Bay (12100401),12100401
+West Matagorda Bay (12100402),12100402
+East San Antonio Bay (12100403),12100403
+West San Antonio Bay (12100404),12100404
+Aransas Bay (12100405),12100405
+Mission (12100406),12100406
+Aransas (12100407),12100407
+Nueces Headwaters (12110101),12110101
+West Nueces (12110102),12110102
+Upper Nueces (12110103),12110103
+Turkey (12110104),12110104
+Middle Nueces (12110105),12110105
+Upper Frio (12110106),12110106
+Hondo (12110107),12110107
+Lower Frio (12110108),12110108
+San Miguel (12110109),12110109
+Atascosa (12110110),12110110
+Lower Nueces (12110111),12110111
+North Corpus Christi Bay (12110201),12110201
+South Corpus Christi Bay (12110202),12110202
+North Laguna Madre (12110203),12110203
+San Fernando (12110204),12110204
+Baffin Bay (12110205),12110205
+Palo Blanco (12110206),12110206
+Central Laguna Madre (12110207),12110207
+South Laguna Madre (12110208),12110208
+Rio Grande Headwaters (13010001),13010001
+Alamosa-Trinchera (13010002),13010002
+San Luis (13010003),13010003
+Saguache (13010004),13010004
+Conejos (13010005),13010005
+Upper Rio Grande (13020101),13020101
+Rio Chama (13020102),13020102
+Rio Grande-Santa Fe (13020201),13020201
+Jemez (13020202),13020202
+Rio Grande-Albuquerque (13020203),13020203
+Rio Puerco (13020204),13020204
+Arroyo Chico (13020205),13020205
+North Plains (13020206),13020206
+Rio San Jose (13020207),13020207
+Plains of San Agustin (13020208),13020208
+Rio Salado (13020209),13020209
+Jornada Del Muerto (13020210),13020210
+Elephant Butte Reservoir (13020211),13020211
+Caballo (13030101),13030101
+El Paso-Las Cruces (13030102),13030102
+Jornada Draw (13030103),13030103
+Playas Lake (13030201),13030201
+Mimbres (13030202),13030202
+Rio Grande-Fort Quitman (13040100),13040100
+Cibolo-Red Light (13040201),13040201
+Alamito (13040202),13040202
+Black Hills-Fresno (13040203),13040203
+Terlingua (13040204),13040204
+Big Bend (13040205),13040205
+Maravillas (13040206),13040206
+Santiago Draw (13040207),13040207
+Reagan-Sanderson (13040208),13040208
+San Francisco (13040209),13040209
+Lozier Canyon (13040210),13040210
+Big Canyon (13040211),13040211
+Amistad Reservoir (13040212),13040212
+Upper Devils (13040301),13040301
+Lower Devils (13040302),13040302
+Dry Devils (13040303),13040303
+Western Estancia (13050001),13050001
+Eastern Estancia (13050002),13050002
+Tularosa Valley (13050003),13050003
+Salt Basin (13050004),13050004
+Pecos Headwaters (13060001),13060001
+Pintada Arroyo (13060002),13060002
+Upper Pecos (13060003),13060003
+Taiban (13060004),13060004
+Arroyo Del Macho (13060005),13060005
+Gallo Arroyo (13060006),13060006
+Upper Pecos-Long Arroyo (13060007),13060007
+Rio Hondo (13060008),13060008
+Rio Felix (13060009),13060009
+Rio Penasco (13060010),13060010
+Upper Pecos-Black (13060011),13060011
+Lower Pecos-Red Bluff Reservoir (13070001),13070001
+Delaware (13070002),13070002
+Toyah (13070003),13070003
+Salt Draw (13070004),13070004
+Barrilla Draw (13070005),13070005
+Coyanosa-Hackberry Draws (13070006),13070006
+Landreth-Monument Draws (13070007),13070007
+Pecos (13070008),13070008
+Tunas (13070009),13070009
+Independence (13070010),13070010
+Howard Draw (13070011),13070011
+Lower Pecos (13070012),13070012
+Elm-Sycamore (13080001),13080001
+San Ambrosia-Santa Isabel (13080002),13080002
+International Falcon Reservoir (13080003),13080003
+Los Olmos (13090001),13090001
+Lower Rio Grande (13090002),13090002
+Rio Conchos (13100000),13100000
+Rio Salado (13110000),13110000
+Rio San Juan (13120000),13120000
+Colorado Headwaters (14010001),14010001
+Blue (14010002),14010002
+Eagle (14010003),14010003
+Roaring Fork (14010004),14010004
+Colorado Headwaters-Plateau (14010005),14010005
+East-Taylor (14020001),14020001
+Upper Gunnison (14020002),14020002
+Tomichi (14020003),14020003
+North Fork Gunnison (14020004),14020004
+Lower Gunnison (14020005),14020005
+Uncompahgre (14020006),14020006
+Westwater Canyon (14030001),14030001
+Upper Dolores (14030002),14030002
+San Miguel (14030003),14030003
+Lower Dolores (14030004),14030004
+Upper Colorado-Kane Springs (14030005),14030005
+Upper Green (14040101),14040101
+New Fork (14040102),14040102
+Upper Green-Slate (14040103),14040103
+Big Sandy (14040104),14040104
+Bitter (14040105),14040105
+Upper Green-Flaming Gorge Reservoir (14040106),14040106
+Blacks Fork (14040107),14040107
+Muddy (14040108),14040108
+Vermilion (14040109),14040109
+Great Divide Closed Basin (14040200),14040200
+Upper Yampa (14050001),14050001
+Lower Yampa (14050002),14050002
+Little Snake (14050003),14050003
+Muddy (14050004),14050004
+Upper White (14050005),14050005
+Piceance-Yellow (14050006),14050006
+Lower White (14050007),14050007
+Duchesne (14060003),14060003
+Strawberry (14060004),14060004
+Lower Green-Desolation Canyon (14060005),14060005
+Willow (14060006),14060006
+Price (14060007),14060007
+Lower Green (14060008),14060008
+San Rafael (14060009),14060009
+Lower Green-Diamond (14060010),14060010
+Upper Lake Powell (14070001),14070001
+Muddy (14070002),14070002
+Fremont (14070003),14070003
+Dirty Devil (14070004),14070004
+Escalante (14070005),14070005
+Lower Lake Powell (14070006),14070006
+Paria (14070007),14070007
+Upper San Juan (14080101),14080101
+Piedra (14080102),14080102
+Blanco Canyon (14080103),14080103
+Animas (14080104),14080104
+Middle San Juan (14080105),14080105
+Chaco (14080106),14080106
+Mancos (14080107),14080107
+Lower San Juan-Four Corners (14080201),14080201
+McElmo (14080202),14080202
+Montezuma (14080203),14080203
+Chinle (14080204),14080204
+Lower San Juan (14080205),14080205
+Lower Colorado-Marble Canyon (15010001),15010001
+Grand Canyon (15010002),15010002
+Kanab (15010003),15010003
+Havasu Canyon (15010004),15010004
+Lake Mead (15010005),15010005
+Grand Wash (15010006),15010006
+Red Lake (15010007),15010007
+Upper Virgin (15010008),15010008
+Fort Pearce Wash (15010009),15010009
+Lower Virgin (15010010),15010010
+White (15010011),15010011
+Muddy (15010012),15010012
+Meadow Valley Wash (15010013),15010013
+Detrital Wash (15010014),15010014
+Las Vegas Wash (15010015),15010015
+Little Colorado Headwaters (15020001),15020001
+Upper Little Colorado (15020002),15020002
+Carrizo Wash (15020003),15020003
+Zuni (15020004),15020004
+Silver (15020005),15020005
+Upper Puerco (15020006),15020006
+Lower Puerco (15020007),15020007
+Middle Little Colorado (15020008),15020008
+Leroux Wash (15020009),15020009
+Chevelon Canyon (15020010),15020010
+Cottonwood Wash (15020011),15020011
+Corn-Oraibi (15020012),15020012
+Polacca Wash (15020013),15020013
+Jadito Wash (15020014),15020014
+Canyon Diablo (15020015),15020015
+Lower Little Colorado (15020016),15020016
+Dinnebito Wash (15020017),15020017
+Moenkopi Wash (15020018),15020018
+Havasu-Mohave Lakes (15030101),15030101
+Piute Wash (15030102),15030102
+Sacramento Wash (15030103),15030103
+Imperial Reservoir (15030104),15030104
+Bouse Wash (15030105),15030105
+Tyson Wash (15030106),15030106
+Lower Colorado (15030107),15030107
+Yuma Desert (15030108),15030108
+Big Sandy (15030201),15030201
+Burro (15030202),15030202
+Santa Maria (15030203),15030203
+Bill Williams (15030204),15030204
+Upper Gila (15040001),15040001
+Upper Gila-Mangas (15040002),15040002
+Animas Valley (15040003),15040003
+San Francisco (15040004),15040004
+Upper Gila-San Carlos Reservoir (15040005),15040005
+San Simon (15040006),15040006
+San Carlos (15040007),15040007
+Middle Gila (15050100),15050100
+Willcox Playa (15050201),15050201
+Upper San Pedro (15050202),15050202
+Lower San Pedro (15050203),15050203
+Upper Santa Cruz (15050301),15050301
+Rillito (15050302),15050302
+Lower Santa Cruz (15050303),15050303
+Brawley Wash (15050304),15050304
+Aguirre Valley (15050305),15050305
+Santa Rosa Wash (15050306),15050306
+Black (15060101),15060101
+White (15060102),15060102
+Upper Salt (15060103),15060103
+Carrizo (15060104),15060104
+Tonto (15060105),15060105
+Lower Salt (15060106),15060106
+Big Chino-Williamson Valley (15060201),15060201
+Upper Verde (15060202),15060202
+Lower Verde (15060203),15060203
+Lower Gila-Painted Rock Reservoir (15070101),15070101
+Agua Fria (15070102),15070102
+Hassayampa (15070103),15070103
+Centennial Wash (15070104),15070104
+Lower Gila (15070201),15070201
+Tenmile Wash (15070202),15070202
+San Cristobal Wash (15070203),15070203
+San Simon Wash (15080101),15080101
+Rio Sonoyta (15080102),15080102
+Tule Desert (15080103),15080103
+Rio De La Concepcion (15080200),15080200
+Whitewater Draw (15080301),15080301
+San Bernardino Valley (15080302),15080302
+Cloverdale (15080303),15080303
+Upper Bear (16010101),16010101
+Central Bear (16010102),16010102
+Bear Lake (16010201),16010201
+Middle Bear (16010202),16010202
+Little Bear-Logan (16010203),16010203
+Lower Bear-Malad (16010204),16010204
+Upper Weber (16020101),16020101
+Lower Weber (16020102),16020102
+Utah Lake (16020201),16020201
+Spanish Fork (16020202),16020202
+Provo (16020203),16020203
+Jordan (16020204),16020204
+Hamlin-Snake Valleys (16020301),16020301
+Pine Valley (16020302),16020302
+Tule Valley (16020303),16020303
+Rush-Tooele Valleys (16020304),16020304
+Skull Valley (16020305),16020305
+Southern Great Salt Lake Desert (16020306),16020306
+"Pilot-Thousand Springs, Nevada, Utah (16020307)",16020307
+Northern Great Salt Lake Desert (16020308),16020308
+Curlew Valley (16020309),16020309
+Great Salt Lake (16020310),16020310
+Upper Sevier (16030001),16030001
+East Fork Sevier (16030002),16030002
+Middle Sevier (16030003),16030003
+San Pitch (16030004),16030004
+Lower Sevier (16030005),16030005
+Escalante Desert (16030006),16030006
+Beaver Bottoms-Upper Beaver (16030007),16030007
+Lower Beaver (16030008),16030008
+Sevier Lake (16030009),16030009
+Upper Humboldt (16040101),16040101
+North Fork Humboldt (16040102),16040102
+South Fork Humboldt (16040103),16040103
+Pine (16040104),16040104
+Middle Humboldt (16040105),16040105
+Rock (16040106),16040106
+Reese (16040107),16040107
+Lower Humboldt (16040108),16040108
+Little Humboldt (16040109),16040109
+Upper Quinn (16040201),16040201
+Lower Quinn (16040202),16040202
+Smoke Creek Desert (16040203),16040203
+Massacre Lake (16040204),16040204
+Thousand-Virgin (16040205),16040205
+Lake Tahoe (16050101),16050101
+Truckee (16050102),16050102
+Pyramid-Winnemucca Lakes (16050103),16050103
+Granite Springs Valley (16050104),16050104
+Upper Carson (16050201),16050201
+Middle Carson (16050202),16050202
+Carson Desert (16050203),16050203
+East Walker (16050301),16050301
+West Walker (16050302),16050302
+Walker (16050303),16050303
+Walker Lake (16050304),16050304
+Dixie Valley (16060001),16060001
+Gabbs Valley (16060002),16060002
+Southern Big Smoky Valley (16060003),16060003
+Northern Big Smoky Valley (16060004),16060004
+Diamond-Monitor Valleys (16060005),16060005
+Little Smoky-Newark Valleys (16060006),16060006
+Long-Ruby Valleys (16060007),16060007
+Spring-Steptoe Valleys (16060008),16060008
+Dry Lake Valley (16060009),16060009
+Fish Lake-Soda Spring Valleys (16060010),16060010
+Ralston-Stone Cabin Valleys (16060011),16060011
+Hot Creek-Railroad Valleys (16060012),16060012
+Cactus-Sarcobatus Flats (16060013),16060013
+Sand Spring-Tikaboo Valleys (16060014),16060014
+Ivanpah-Pahrump Valleys (16060015),16060015
+Middle Kootenai (17010101),17010101
+Fisher (17010102),17010102
+Yaak (17010103),17010103
+Lower Kootenai (17010104),17010104
+Moyie (17010105),17010105
+Elk (17010106),17010106
+Headwaters Kootenai River (17010107),17010107
+Upper Kootenai River (17010108),17010108
+Duncan River (17010109),17010109
+Slocan River (17010110),17010110
+Upper Clark Fork (17010201),17010201
+Flint-Rock (17010202),17010202
+Blackfoot (17010203),17010203
+Middle Clark Fork (17010204),17010204
+Bitterroot (17010205),17010205
+North Fork Flathead (17010206),17010206
+Middle Fork Flathead (17010207),17010207
+Flathead Lake (17010208),17010208
+South Fork Flathead (17010209),17010209
+Stillwater (17010210),17010210
+Swan (17010211),17010211
+Lower Flathead (17010212),17010212
+Lower Clark Fork (17010213),17010213
+Pend Oreille Lake (17010214),17010214
+Priest (17010215),17010215
+Pend Oreille (17010216),17010216
+Upper Coeur d'Alene (17010301),17010301
+South Fork Coeur d'Alene (17010302),17010302
+Coeur d'Alene Lake (17010303),17010303
+St. Joe (17010304),17010304
+Upper Spokane (17010305),17010305
+Hangman (17010306),17010306
+Lower Spokane (17010307),17010307
+Little Spokane (17010308),17010308
+Franklin D. Roosevelt Lake (17020001),17020001
+Kettle (17020002),17020002
+Colville (17020003),17020003
+Sanpoil (17020004),17020004
+Chief Joseph (17020005),17020005
+Okanogan (17020006),17020006
+Similkameen (17020007),17020007
+Methow (17020008),17020008
+Lake Chelan (17020009),17020009
+Upper Columbia-Entiat (17020010),17020010
+Wenatchee (17020011),17020011
+Moses Coulee (17020012),17020012
+Upper Crab (17020013),17020013
+Banks Lake (17020014),17020014
+Lower Crab (17020015),17020015
+Upper Columbia-Priest Rapids (17020016),17020016
+Headwaters Columbia River (17020017),17020017
+Canoe River-McNaughton Lake (17020018),17020018
+McNaughton Lake-Columbia River (17020019),17020019
+Goldstream River-Columbia River (17020020),17020020
+Upper Arrow Lake-Columbia River (17020021),17020021
+Upper Yakima (17030001),17030001
+Naches (17030002),17030002
+Lower Yakima (17030003),17030003
+Snake Headwaters (17040101),17040101
+Gros Ventre (17040102),17040102
+Greys-Hoback (17040103),17040103
+Palisades (17040104),17040104
+Salt (17040105),17040105
+Idaho Falls (17040201),17040201
+Upper Henrys (17040202),17040202
+Lower Henrys (17040203),17040203
+Teton (17040204),17040204
+Willow (17040205),17040205
+American Falls (17040206),17040206
+Blackfoot (17040207),17040207
+Portneuf (17040208),17040208
+Lake Walcott (17040209),17040209
+Raft (17040210),17040210
+Goose (17040211),17040211
+Upper Snake-Rock (17040212),17040212
+Salmon Falls (17040213),17040213
+Beaver-Camas (17040214),17040214
+Medicine Lodge (17040215),17040215
+Birch (17040216),17040216
+Little Lost (17040217),17040217
+Big Lost (17040218),17040218
+Big Wood (17040219),17040219
+Camas (17040220),17040220
+Little Wood (17040221),17040221
+C.J. Strike Reservoir (17050101),17050101
+Bruneau (17050102),17050102
+Middle Snake-Succor (17050103),17050103
+Upper Owyhee (17050104),17050104
+South Fork Owyhee (17050105),17050105
+East Little Owyhee (17050106),17050106
+Middle Owyhee (17050107),17050107
+Jordan (17050108),17050108
+Crooked-Rattlesnake (17050109),17050109
+Lower Owyhee (17050110),17050110
+North and Middle Forks Boise (17050111),17050111
+Boise-Mores (17050112),17050112
+South Fork Boise (17050113),17050113
+Lower Boise (17050114),17050114
+Middle Snake-Payette (17050115),17050115
+Upper Malheur (17050116),17050116
+Lower Malheur (17050117),17050117
+Bully (17050118),17050118
+Willow (17050119),17050119
+South Fork Payette (17050120),17050120
+Middle Fork Payette (17050121),17050121
+Payette (17050122),17050122
+North Fork Payette (17050123),17050123
+Weiser (17050124),17050124
+Brownlee Reservoir (17050201),17050201
+Burnt (17050202),17050202
+Powder (17050203),17050203
+Hells Canyon (17060101),17060101
+Imnaha (17060102),17060102
+Lower Snake-Asotin (17060103),17060103
+Upper Grande Ronde (17060104),17060104
+Wallowa (17060105),17060105
+Lower Grande Ronde (17060106),17060106
+Lower Snake-Tucannon (17060107),17060107
+Palouse (17060108),17060108
+Rock (17060109),17060109
+Lower Snake (17060110),17060110
+Upper Salmon (17060201),17060201
+Pahsimeroi (17060202),17060202
+Middle Salmon-Panther (17060203),17060203
+Lemhi (17060204),17060204
+Upper Middle Fork Salmon (17060205),17060205
+Lower Middle Fork Salmon (17060206),17060206
+Middle Salmon-Chamberlain (17060207),17060207
+South Fork Salmon (17060208),17060208
+Lower Salmon (17060209),17060209
+Little Salmon (17060210),17060210
+Upper Selway (17060301),17060301
+Lower Selway (17060302),17060302
+Lochsa (17060303),17060303
+Middle Fork Clearwater (17060304),17060304
+South Fork Clearwater (17060305),17060305
+Clearwater (17060306),17060306
+Upper North Fork Clearwater (17060307),17060307
+Lower North Fork Clearwater (17060308),17060308
+Middle Columbia-Lake Wallula (17070101),17070101
+Walla Walla (17070102),17070102
+Umatilla (17070103),17070103
+Willow (17070104),17070104
+Middle Columbia-Hood (17070105),17070105
+Klickitat (17070106),17070106
+Upper John Day (17070201),17070201
+North Fork John Day (17070202),17070202
+Middle Fork John Day (17070203),17070203
+Lower John Day (17070204),17070204
+Upper Deschutes (17070301),17070301
+Little Deschutes (17070302),17070302
+Beaver-South Fork (17070303),17070303
+Upper Crooked (17070304),17070304
+Lower Crooked (17070305),17070305
+Lower Deschutes (17070306),17070306
+Trout (17070307),17070307
+Lower Columbia-Sandy (17080001),17080001
+Lewis (17080002),17080002
+Lower Columbia-Clatskanie (17080003),17080003
+Upper Cowlitz (17080004),17080004
+Lower Cowlitz (17080005),17080005
+Lower Columbia (17080006),17080006
+Middle Fork Willamette (17090001),17090001
+Coast Fork Willamette (17090002),17090002
+Upper Willamette (17090003),17090003
+Mckenzie (17090004),17090004
+North Santiam (17090005),17090005
+South Santiam (17090006),17090006
+Middle Willamette (17090007),17090007
+Yamhill (17090008),17090008
+Molalla-Pudding (17090009),17090009
+Tualatin (17090010),17090010
+Clackamas (17090011),17090011
+Lower Willamette (17090012),17090012
+Hoh-Quillayute (17100101),17100101
+Queets-Quinault (17100102),17100102
+Upper Chehalis (17100103),17100103
+Lower Chehalis (17100104),17100104
+Grays Harbor (17100105),17100105
+Willapa Bay (17100106),17100106
+Necanicum (17100201),17100201
+Nehalem (17100202),17100202
+Wilson-Trusk-Nestuccu (17100203),17100203
+Siletz-Yaquina (17100204),17100204
+Alsea (17100205),17100205
+Siuslaw (17100206),17100206
+Siltcoos (17100207),17100207
+North Umpqua (17100301),17100301
+South Umpqua (17100302),17100302
+Umpqua (17100303),17100303
+Coos (17100304),17100304
+Coquille (17100305),17100305
+Sixes (17100306),17100306
+Upper Rogue (17100307),17100307
+Middle Rogue (17100308),17100308
+Applegate (17100309),17100309
+Lower Rogue (17100310),17100310
+Illinois (17100311),17100311
+Chetco (17100312),17100312
+Sumas River (17110001),17110001
+Strait of Georgia (17110002),17110002
+San Juan Islands (17110003),17110003
+Nooksack (17110004),17110004
+Upper Skagit (17110005),17110005
+Sauk (17110006),17110006
+Lower Skagit (17110007),17110007
+Stillaguamish (17110008),17110008
+Skykomish (17110009),17110009
+Snoqualmie (17110010),17110010
+Snohomish (17110011),17110011
+Lake Washington (17110012),17110012
+Duwamish (17110013),17110013
+Puyallup (17110014),17110014
+Nisqually (17110015),17110015
+Deschutes (17110016),17110016
+Skokomish (17110017),17110017
+Hood Canal (17110018),17110018
+Puget Sound (17110019),17110019
+Dungeness-Elwha (17110020),17110020
+Crescent-Hoko (17110021),17110021
+Harney-Malheur Lakes (17120001),17120001
+Silvies (17120002),17120002
+Donner und Blitzen (17120003),17120003
+Silver (17120004),17120004
+Summer Lake (17120005),17120005
+Lake Abert (17120006),17120006
+Warner Lakes (17120007),17120007
+Guano (17120008),17120008
+Alvord Lake (17120009),17120009
+Smith (18010101),18010101
+Mad-Redwood (18010102),18010102
+Upper Eel (18010103),18010103
+Middle Fork Eel (18010104),18010104
+Lower Eel (18010105),18010105
+South Fork Eel (18010106),18010106
+Mattole (18010107),18010107
+Big-Navarro-Garcia (18010108),18010108
+Gualala-Salmon (18010109),18010109
+Russian (18010110),18010110
+Williamson (18010201),18010201
+Sprague (18010202),18010202
+Upper Klamath Lake (18010203),18010203
+Lost (18010204),18010204
+Butte (18010205),18010205
+Upper Klamath (18010206),18010206
+Shasta (18010207),18010207
+Scott (18010208),18010208
+Lower Klamath (18010209),18010209
+Salmon (18010210),18010210
+Trinity (18010211),18010211
+South Fork Trinity (18010212),18010212
+Goose Lake (18020001),18020001
+Upper Pit (18020002),18020002
+Lower Pit (18020003),18020003
+McCloud (18020004),18020004
+Sacramento Headwaters (18020005),18020005
+Sacramento-Stone Corral (18020104),18020104
+Lower American (18020111),18020111
+Upper Stony (18020115),18020115
+Upper Cache (18020116),18020116
+North Fork Feather (18020121),18020121
+East Branch North Fork Feather (18020122),18020122
+Middle Fork Feather (18020123),18020123
+Upper Yuba (18020125),18020125
+Upper Bear (18020126),18020126
+North Fork American (18020128),18020128
+South Fork American (18020129),18020129
+Cow Creek (18020151),18020151
+Cottonwood Creek (18020152),18020152
+Battle Creek (18020153),18020153
+Clear Creek-Sacramento River (18020154),18020154
+Paynes Creek-Sacramento River (18020155),18020155
+Thomes Creek-Sacramento River (18020156),18020156
+Big Chico Creek-Sacramento River (18020157),18020157
+Butte Creek (18020158),18020158
+Honcut Headwaters-Lower Feather (18020159),18020159
+Upper Coon-Upper Auburn (18020161),18020161
+Upper Putah (18020162),18020162
+Lower Sacramento (18020163),18020163
+Upper Kern (18030001),18030001
+South Fork Kern (18030002),18030002
+Middle Kern-Upper Tehachapi-Grapevine (18030003),18030003
+Upper Poso (18030004),18030004
+Upper Deer-Upper White (18030005),18030005
+Upper Tule (18030006),18030006
+Upper Kaweah (18030007),18030007
+Upper Dry (18030009),18030009
+Upper King (18030010),18030010
+Tulare Lake Bed (18030012),18030012
+Middle San Joaquin-Lower Chowchilla (18040001),18040001
+Lower San Joaquin River (18040002),18040002
+San Joaquin Delta (18040003),18040003
+Upper San Joaquin (18040006),18040006
+Fresno River (18040007),18040007
+Upper Merced (18040008),18040008
+Upper Tuolumne (18040009),18040009
+Upper Stanislaus (18040010),18040010
+Upper Calaveras California (18040011),18040011
+Upper Mokelumne (18040012),18040012
+Upper Cosumnes (18040013),18040013
+Panoche-San Luis Reservoir (18040014),18040014
+Rock Creek-French Camp Slough (18040051),18040051
+Suisun Bay (18050001),18050001
+San Pablo Bay (18050002),18050002
+Coyote (18050003),18050003
+San Francisco Bay (18050004),18050004
+Tomales-Drake Bays (18050005),18050005
+San Francisco Coastal South (18050006),18050006
+Pajaro (18060002),18060002
+Carrizo Plain (18060003),18060003
+Estrella (18060004),18060004
+Salinas (18060005),18060005
+Central Coastal (18060006),18060006
+Cuyama (18060007),18060007
+Santa Maria (18060008),18060008
+San Antonio (18060009),18060009
+Santa Ynez (18060010),18060010
+Santa Barbara Coastal (18060013),18060013
+Santa Barbara Channel Islands (18060014),18060014
+Monterey Bay (18060015),18060015
+Ventura (18070101),18070101
+Santa Clara (18070102),18070102
+Calleguas (18070103),18070103
+Santa Monica Bay (18070104),18070104
+Los Angeles (18070105),18070105
+San Gabriel (18070106),18070106
+San Pedro Channel Islands (18070107),18070107
+Seal Beach (18070201),18070201
+San Jacinto (18070202),18070202
+Santa Ana (18070203),18070203
+Newport Bay (18070204),18070204
+Aliso-San Onofre (18070301),18070301
+Santa Margarita (18070302),18070302
+San Luis Rey-Escondido (18070303),18070303
+San Diego (18070304),18070304
+Cottonwood-Tijuana (18070305),18070305
+Surprise Valley (18080001),18080001
+Madeline Plains (18080002),18080002
+Honey-Eagle Lakes (18080003),18080003
+Mono Lake (18090101),18090101
+Crowley Lake (18090102),18090102
+Owens Lake (18090103),18090103
+Eureka-Saline Valleys (18090201),18090201
+Upper Amargosa (18090202),18090202
+Death Valley-Lower Amargosa (18090203),18090203
+Panamint Valley (18090204),18090204
+Indian Wells-Searles Valleys (18090205),18090205
+Antelope-Fremont Valleys (18090206),18090206
+Coyote-Cuddeback Lakes (18090207),18090207
+Mojave (18090208),18090208
+Southern Mojave (18100100),18100100
+Whitewater River (18100201),18100201
+Carrizo Creek (18100202),18100202
+San Felipe Creek (18100203),18100203
+Salton Sea (18100204),18100204
+Ketchikan (19010102),19010102
+Prince of Wales (19010103),19010103
+Bradfield Canal (19010104),19010104
+Burroughs Bay (19010105),19010105
+Headwaters Portland Canal (19010106),19010106
+Outlet Portland Canal (19010107),19010107
+Admiralty Island (19010204),19010204
+Lower Iskut (19010205),19010205
+Holkham Bay (19010206),19010206
+Stikine River (19010207),19010207
+Thomas Bay (19010208),19010208
+Etolin-Zarembo-Wrangell Islands (19010209),19010209
+Kuiu-Kupreanof-Mitkof Islands (19010210),19010210
+Chichagof Island (19010211),19010211
+Baranof Island (19010212),19010212
+Lynn Canal (19010301),19010301
+Glacier Bay (19010302),19010302
+Chilkat-Skagway Rivers (19010303),19010303
+Taku River (19010304),19010304
+Bering Glacier (19010402),19010402
+Tatshenshini River (19010403),19010403
+Alsek River (19010404),19010404
+Yakutat Bay-Gulf of Alaska (19010405),19010405
+Palma Bay (19010406),19010406
+Icy Strait-Chatham Strait (19010500),19010500
+Upper Copper River (19020101),19020101
+Middle Copper River (19020102),19020102
+Chitina River (19020103),19020103
+Lower Copper River (19020104),19020104
+Eastern Prince William Sound (19020201),19020201
+Resurrection River-Frontal Resurrection Bay (19020202),19020202
+Prince William Sound (19020203),19020203
+Lower Kenai Peninsula (19020301),19020301
+Upper Kenai Peninsula (19020302),19020302
+Anchorage (19020401),19020401
+Matanuska (19020402),19020402
+Upper Susitna River (19020501),19020501
+Chulitna River (19020502),19020502
+Talkeetna River (19020503),19020503
+Yentna River (19020504),19020504
+Lower Susitna River (19020505),19020505
+Redoubt-Trading Bays (19020601),19020601
+Tuxedni-Kamishak Bays (19020602),19020602
+Kodiak-Afognak Islands (19020701),19020701
+Shelikof Strait (19020702),19020702
+Cook Inlet (19020800),19020800
+Cold Bay (19030101),19030101
+Fox Islands (19030102),19030102
+Western Aleutian Islands (19030103),19030103
+Pribilof Islands (19030104),19030104
+Port Heiden (19030201),19030201
+Ugashik Bay (19030202),19030202
+Egegik Bay (19030203),19030203
+Naknek (19030204),19030204
+Lake Clark (19030205),19030205
+Lake Iliamna (19030206),19030206
+Upper Nushagak River (19030301),19030301
+Mulchatna River (19030302),19030302
+Lower Nushagak River (19030303),19030303
+Wood River (19030304),19030304
+Togiak (19030305),19030305
+Nushagak Bay (19030306),19030306
+North Fork Kuskokwim River (19030401),19030401
+Takotna River (19030403),19030403
+Holitna River (19030404),19030404
+Stony River (19030405),19030405
+Middle Fork Kuskokwim River (19030406),19030406
+South Fork Kuskokwim River (19030407),19030407
+Aniak (19030501),19030501
+Kuskokwim Delta (19030502),19030502
+Nunavak-St.Matthew Islands (19030503),19030503
+St. Lawrence Island (19050101),19050101
+Unalakleet (19050102),19050102
+Norton Bay (19050103),19050103
+Nome (19050104),19050104
+Imuruk Basin (19050105),19050105
+Shishmaref (19050201),19050201
+Goodhope-Spafarief Bay (19050202),19050202
+Buckland River (19050203),19050203
+Selawik Lake (19050301),19050301
+Upper Kobuk River (19050302),19050302
+Middle Kobuk River (19050303),19050303
+Lower Kobuk River (19050304),19050304
+Upper Noatak River (19050401),19050401
+Middle Noatak River (19050402),19050402
+Lower Noatak River (19050403),19050403
+Wulik-Kivalina Rivers (19050404),19050404
+Lisburne Peninsula (19050405),19050405
+Kotzebue Sound (19050500),19050500
+Kukpowruk River (19060101),19060101
+Kokolik River (19060102),19060102
+Utukok River (19060103),19060103
+Kuk River (19060201),19060201
+Northwest Coast (19060202),19060202
+Meade River (19060203),19060203
+Ikpikpuk River (19060204),19060204
+Harrison Bay (19060205),19060205
+Admiralty Bay-Dease Inlet (19060206),19060206
+Upper Colville River (19060301),19060301
+Killik River (19060302),19060302
+Chandler-Anaktuvuk Rivers (19060303),19060303
+Lower Colville River (19060304),19060304
+Kuparuk River (19060401),19060401
+Sagavanirktok River (19060402),19060402
+Mikkelson Bay (19060403),19060403
+Canning River (19060501),19060501
+Camden Bay (19060502),19060502
+Kongakut River-Beaufort Lagoon (19060504),19060504
+Firth River (19060505),19060505
+Babbage River (19060506),19060506
+Atlin Lake (19070101),19070101
+Bennett Lake (19070102),19070102
+Tagish Lake (19070103),19070103
+Takhini River (19070104),19070104
+White River (19070402),19070402
+Ladue River-White River (19070403),19070403
+Fortymile River (19070502),19070502
+Sixtymile River-Yukon River (19070503),19070503
+Tatonduk River-Yukon River (19070505),19070505
+Charley River-Yukon River (19070506),19070506
+Headwaters Porcupine River (19080101),19080101
+Bell River-Porcupine River (19080102),19080102
+Old Crow River (19080103),19080103
+Coleen River (19080104),19080104
+Sheenjek River (19080105),19080105
+Black River (19080106),19080106
+Grass River (19080107),19080107
+Porcupine Flats-Porcupine River (19080108),19080108
+Middle Fork-North Fork Chandalar Rivers (19080201),19080201
+East Fork Chandalar River (19080202),19080202
+Christian River (19080203),19080203
+Lower Chandalar River (19080204),19080204
+Nebesna-Chisana Rivers (19080301),19080301
+Tok-Tanana River (19080302),19080302
+Healy Lake-Tanana River (19080303),19080303
+Delta River (19080304),19080304
+Salcha River (19080305),19080305
+Chena River (19080306),19080306
+Tanana Flats-Tanana River (19080307),19080307
+Nenana River (19080308),19080308
+Tolovana River (19080309),19080309
+Kantishna River (19080310),19080310
+Lower Tanana River (19080311),19080311
+Birch Creek (19080401),19080401
+Beaver Creek (19080402),19080402
+Yukon Flats-Yukon River (19080403),19080403
+Ramparts-Yukon River (19080404),19080404
+Upper Koyukuk River (19090101),19090101
+South Fork Koyukuk River (19090102),19090102
+Alatna River (19090103),19090103
+Kanuti River (19090104),19090104
+Allakaket-Koyukuk River (19090105),19090105
+Huslia River (19090106),19090106
+Dulbi River (19090107),19090107
+Koyukuk Flats-Koyukuk River (19090108),19090108
+Kateel River-Koyukuk River (19090109),19090109
+Tozitna River (19090201),19090201
+Nowitna River (19090202),19090202
+Melozitna River (19090203),19090203
+Klatsuta River-Yukon River (19090204),19090204
+Galena-Yukon River (19090205),19090205
+Anvik River-Yukon River (19090301),19090301
+Upper Innoko River (19090302),19090302
+Lower Innoko River (19090303),19090303
+Chuilnuk River-Yukon River (19090304),19090304
+Yukon Delta (19090305),19090305
+Hawaii (20010000),20010000
+Maui (20020000),20020000
+Kahoolawe (20030000),20030000
+Lanai (20040000),20040000
+Molokai (20050000),20050000
+Oahu (20060000),20060000
+Kauai (20070000),20070000
+Niihau (20080001),20080001
+Kaula (20080002),20080002
+Nihoa Island (20090001),20090001
+Necker Island (20090002),20090002
+French Frigate Shoals (20090003),20090003
+Gardner Pinnacles (20090004),20090004
+Maro Reef (20090005),20090005
+Laysan Island (20090006),20090006
+Lisianski Island (20090007),20090007
+Pearl and Hermes Atoll (20090008),20090008
+Midway Islands (20090009),20090009
+Kure Atoll (20090010),20090010
+Cibuco-Guajataca (21010002),21010002
+Culebrinas-Guanajibo (21010003),21010003
+Southern Puerto Rico (21010004),21010004
+Eastern Puerto Rico (21010005),21010005
+Puerto Rican Western Islands (21010007),21010007
+Puerto Rican Eastern Islands (21010008),21010008
+St. John-St. Thomas (21020001),21020001
+St. Croix (21020002),21020002
+Guam (22010000),22010000
+Saipan Island (22020101),22020101
+Tinian Island (22020102),22020102
+Aguijan Island (22020103),22020103
+Rota Island (22020104),22020104
+Farallon de Pajaros (22020201),22020201
+Maug Islands (22020202),22020202
+Asuncion Island (22020203),22020203
+Agrihan Island (22020204),22020204
+Pagan Island (22020205),22020205
+Alamagan Island (22020206),22020206
+Guguan Island (22020207),22020207
+Sarigan Island (22020208),22020208
+Anatahan Island (22020209),22020209
+Farallon de Medinilla (22020210),22020210
+Tutuila Island (22030001),22030001
+Ofu Island-Olosega Island (22030002),22030002
+Ta'u Island (22030003),22030003
+Rose Atoll (22030004),22030004
+Swains Island (22030005),22030005
+Wake Island (22040001),22040001
+Johnston Atoll (22040002),22040002
+Kingman Reef (22040003),22040003
+Palmyra Atoll (22040004),22040004
+Jarvis Island (22040005),22040005
+Howland Island (22040006),22040006
+Baker Island (22040007),22040007

@@ -4,10 +4,10 @@
 # defaults/metadata/definitions.csv  Kind, Name, Definition, Source: what each state class, transition group and type, stock and flow
 #                                    type and group, and stratum means. A Name ending in "*" is a pattern: it defines every name that
 #                                    starts with the part before the "*", and "{*}" in its Definition is replaced by the rest of the
-#                                    name. Source is a Data Sources column (or "Strata:<preset>"), the lineage source it is mapped from.
+#                                    name. Source is a Data Sources column (a strata preset: its Data Download dataset), the lineage source it is mapped from.
 # defaults/metadata/data-dictionary.csv  File, Column, Definition, Type, Units, Domain, NullValue: every column of every file the Data
 #                                    Release stage exports (<run> and <year> in a File stand for the run and year).
-# defaults/metadata/citations.csv    one row per Data Sources column and strata preset: the source citation for the lineage.
+# defaults/metadata/citations.csv    one row per Data Sources column (strata presets included): the source citation for the lineage.
 #                                    "{accessed}" in a Citation is filled with the date the home's manifest says it was downloaded.
 # Plain R (data.table only), so the unit tests and the stages can both use it; each reader takes the folder of the three tables.
 # =============================================================================

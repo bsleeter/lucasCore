@@ -22,6 +22,7 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | 3 | 43 Historical harvest 12% short: minimum ages in the historical period | Yes (historical harvest, start ages) | Options offered 2026-10-31, user to decide: apply the minimum ages only in projections, or resample start ages from the median | 34 |
 | 4 | 42 Fill prompt names the grassland tables by their old names | No | A wording fix in the Carbon Method page | - |
 | 5 | 31 Copy Carbon Assumptions; SoilGrids option | No (an option) | Convenience and one more soil source | - |
+| ~~any~~ | ~~45 Stratum Sources polygons from Data Download~~ DONE 2026-11-02 | No | Needed before 13 (others could not run stage 1) | 12 |
 | any | 44 Data Download follow-ups | No | Small; (b) the National test runs overnight | 12 |
 | any | 33 Leftovers inside done items | Some | Small, independent; (7) guide 1.4 and (1) deep links any time; (8) and (17) larger | - |
 | later | 26 Guide chapter 9, Troubleshooting | No | After beta testers (user) | beta |
@@ -706,3 +707,16 @@ Pushed: everything through a8adf51 (2026-11-02), released as v1.0.0 on GitHub wi
     library backup (LUCAS P26 Northern Sierra Nevada.ssim.bak-20261102-0804, 3.4 GB) can go. (f) The P26 home's NLCD files keep the
     WCS edge row (row 12000, in the buffer, outside what the Build reads); a fresh download is right. (g) PARKED (user): fetch FIA
     DataMart only for the states a study area needs.
+45. **Stratum Sources polygons from Data Download** - DONE 2026-11-02 (user: "a major omission"; nobody without the build machine
+    could run stage 1 or a Data Download for a study area: every preset but the ecodivisions named a file under F:/lucas-master).
+    Data Download fetches them first, national, at the top of the home (study-area/): StatesFile (TIGER 2009), CountiesFile (TIGER
+    2022), WatershedsFile (WBD national: HU6 and HU8 layers to one GeoPackage, from a 2.8 GB zip), EcoregionsFile (EPA Level IV),
+    PyromesFile (RDS-2020-0020), PadusFile (PAD-US 4.0 state geodatabases, 49 files: layers gap_status and federal_fee). Federal
+    Lands now comes from PAD-US 4.0 federal and tribal fee land (user, 2026-11-02; was the 2014 National Atlas fedlanp010g). The
+    presets' File is blank and presets.csv names each one's DataSource; a File that exists wins, else the home (src/strata.R
+    strata_path, src/shared.R strata_from_home), recorded in Data Sources Used. HUC6, HUC8, EPA L3 and pyromes ship ListFiles, so a
+    new library needs no polygons. Also fixed: the Studio template's FIA Ecodivisions File (an F: path); tools/new-data-download.R
+    could not set Data Sources Home in a new library (its blank row reads as no row; a second row was silently dropped). Tests:
+    tests/unit-strata-home.R, tests/phaseZ26-strata-home.R (stage 1 on P26, home vs the old local files). Still on the build machine
+    (to decide): the Data Sources defaults in package.xml (F: paths, read only when the home lacks a dataset) and the LOCA2 lists a
+    new Studio library scans from that default path.

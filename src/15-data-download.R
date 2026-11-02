@@ -11,6 +11,8 @@
 # <home>/regions/<Region name>/ (blank = from the Study Area units) and the datasets kept whole (FIA, PRISM, LOCA2, FPA-FOD)
 # at the top, shared by every region; National ignores the Study Area and keeps every dataset whole at the top. Write-once
 # (src/download.R): no file in the home is ever replaced, so a second region never changes what another library read.
+# The Stratum Sources presets' polygons (states, counties, watersheds, ecoregions, pyromes, federal lands, GAP status) are fetched
+# first, national: the region is made from the Study Area units' polygons.
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
 source(pkg_file("src", "strata.R")); source(pkg_file("src", "download.R")); source(pkg_file("src", "download-sources.R"))
@@ -32,17 +34,56 @@ layout <- home_layout(env$PackageDirectory)
 logf <- file.path(home, "logs", sprintf("download-%s.log", format(Sys.time(), "%Y%m%d-%H%M%S")))
 log <- function(x) { say("%s", x); cat(format(Sys.time(), "%H:%M:%S "), x, "\n", sep = "", file = logf, append = TRUE) }
 
-# ---- the region ------------------------------------------------------------------------------------------------------------
-buffer_km <- as.numeric(o("BufferKm", 10))
+# ---- the datasets asked ----------------------------------------------------------------------------------------------------
+H <- download_handlers()
+asked <- trimws(strsplit(o("Datasets", ""), ",")[[1]]); asked <- asked[nzchar(asked)]
+if (length(asked)) { bad <- setdiff(asked, layout$Column); if (length(bad)) fail("Data Download: Datasets: %s are not Data Sources columns", paste(bad, collapse = ", "))
+  cant <- setdiff(asked, names(H)); if (length(cant)) say("Not fetched by this version (%s): %s", "see the Data Download plan", paste(cant, collapse = ", ")) }
+todo <- if (length(asked)) intersect(asked, names(H)) else names(H)
+check_only <- isTRUE(as.logical(o("CheckOnly", FALSE)))
+y_to <- o("YearTo", NA_integer_)
+make_ctx <- function(region, region_home) list(home = home, region_home = region_home, region = region,
+  years = c(as.integer(o("YearFrom", 1985L)), if (is.na(y_to)) NA_integer_ else as.integer(y_to)),
+  keep = isTRUE(as.logical(o("KeepNational", FALSE))), new_editions = isTRUE(as.logical(o("FetchNewEditions", FALSE))), connections = as.integer(o("Connections", 4L)),
+  opts = opt, log = log, prj = prj)
+CONUS <- list(box = c(-2400000, 200000, 2300000, 3200000), poly = NULL, units = "CONUS", buffer_km = NA_real_)
+fetch_one <- function(k, ctx, check_only) { h <- H[[k]]
+  tryCatch(run_dataset(h, ctx, layout, check_only), error = function(e) {
+    # a missing or expired login is a step for the user, not a failure: the run goes on and the manifest is left as it was
+    if (identical(h$method, "login") && grepl("needs an Earthdata login|refused the token", conditionMessage(e))) { log(sprintf("%s: needs a login: %s", h$name, conditionMessage(e)))
+      return(data.table(DataSource = k, Dataset = h$name, Status = "needs login", Files = NA_integer_, SizeMb = NA_real_, Minutes = NA_real_, Next = conditionMessage(e))) }
+    if (grepl("no file is needed", conditionMessage(e))) { log(sprintf("%s: not needed: %s", h$name, conditionMessage(e)))
+      return(data.table(DataSource = k, Dataset = h$name, Status = "not needed", Files = 0L, SizeMb = NA_real_, Minutes = NA_real_, Next = conditionMessage(e))) }
+    log(sprintf("%s: FAILED: %s", h$name, conditionMessage(e))); if (!check_only) record_failure(store_for(h, ctx), h, conditionMessage(e))
+    data.table(DataSource = k, Dataset = h$name, Status = "failed", Files = NA_integer_, SizeMb = NA_real_, Minutes = NA_real_,
+               Next = if (grepl("^write-once", conditionMessage(e))) substr(conditionMessage(e), 1, 300) else sprintf("%s (rerun to resume)", substr(conditionMessage(e), 1, 300))) }) }
+
+# ---- the Stratum Sources polygons first: the region is the Study Area units' polygons ---------------------------------------
+# Every preset whose File this machine lacks reads its polygons from the home (src/strata.R). They are national and come first:
+# the asked ones, and always those the Study Area's units need and the States (the WUI and FIA handlers pick states from them),
+# fetched even on a Check only run, since the region cannot be worked out without them
 hl <- o("HomeLayout", 2L)   # a list column reads as its label ("National (...)") or its number
 national <- if (is.numeric(hl)) identical(as.integer(hl), 1L) else grepl("^National", as.character(hl))
 sa <- read_ds("StudyArea"); want <- if (nrow(sa) && !national) unique(as.character(sa$UnitId)) else character()
+rows <- sources_from_sheet(as.data.table(datasheet(prj, ds("StratumSource"), optional = TRUE, lookupsAsFactors = FALSE)))
+by_num <- setNames(rows, vapply(rows, function(s) as.character(s$Number), ""))
+ul <- stsim_list("SecondaryStratum"); ul[, Id := as.integer(Id)]
+uid <- if (length(want)) ul$Id[match(want, ul$Name)] else integer()
+if (anyNA(uid)) fail("Study Area units not in the unit list: %s", paste(want[is.na(uid)], collapse = ", "))
+from_home <- function(s) { f <- strata_file(s$File, env$PackageDirectory); if (!is.na(f) && file.exists(f)) NA_character_ else strata_home_column(s$Preset, env$PackageDirectory) }
+need <- unlist(lapply(c(by_num[as.character(unique(unit_source(uid)))], rows["States"]), function(s) if (is.null(s)) NA_character_ else from_home(s)))
+strata_ds <- intersect(names(H), unique(na.omit(c(intersect(todo, unlist(lapply(rows, from_home))), need))))
+res0 <- if (length(strata_ds)) {
+  say("Stratum Sources polygons first (national, at the top of the home): %s", paste(strata_ds, collapse = ", "))
+  rbindlist(lapply(strata_ds, function(k) fetch_one(k, make_ctx(CONUS, NULL), check_only && !k %in% need)), fill = TRUE) } else data.table()
+todo <- setdiff(todo, strata_ds)
+if (nrow(res0) && any(res0$Status == "failed" & res0$DataSource %in% need))
+  fail("Data Download: the Study Area's polygons could not be fetched: %s", paste(res0[Status == "failed", sprintf("%s: %s", DataSource, Next)], collapse = "; "))
+
+# ---- the region ------------------------------------------------------------------------------------------------------------
+buffer_km <- as.numeric(o("BufferKm", 10))
 region_home <- NULL
 if (length(want)) {
-  ul <- stsim_list("SecondaryStratum"); ul[, Id := as.integer(Id)]; uid <- ul$Id[match(want, ul$Name)]
-  if (anyNA(uid)) fail("Study Area units not in the unit list: %s", paste(want[is.na(uid)], collapse = ", "))
-  rows <- sources_from_sheet(as.data.table(datasheet(prj, ds("StratumSource"), optional = TRUE, lookupsAsFactors = FALSE)))
-  by_num <- setNames(rows, vapply(rows, function(s) as.character(s$Number), ""))
   parts <- split(unit_native(uid), unit_source(uid))
   poly <- do.call(c, lapply(names(parts), function(k) { sp <- strata_polygons(by_num[[k]], env$PackageDirectory); sp <- sp[sp$StratumId %in% parts[[k]], ]
     if (!nrow(sp)) fail("no %s polygons for the study area units %s", by_num[[k]]$Preset, paste(parts[[k]], collapse = ", "))
@@ -61,32 +102,14 @@ if (length(want)) {
   region_home <- file.path(home, "regions", rn); home_create(region_home, env$PackageDirectory)
   say("Region folder: regions/%s (national copies at the top of the home)", rn)
 } else {
-  region <- list(box = c(-2400000, 200000, 2300000, 3200000), poly = NULL, units = "CONUS", buffer_km = NA_real_)
+  region <- CONUS
   say("Region: all of CONUS (%s; national copies at the top of the home)", if (national) "Home layout National" else "no Study Area") }
 
 # ---- the datasets ----------------------------------------------------------------------------------------------------------
-H <- download_handlers()
-asked <- trimws(strsplit(o("Datasets", ""), ",")[[1]]); asked <- asked[nzchar(asked)]
-if (length(asked)) { bad <- setdiff(asked, layout$Column); if (length(bad)) fail("Data Download: Datasets: %s are not Data Sources columns", paste(bad, collapse = ", "))
-  cant <- setdiff(asked, names(H)); if (length(cant)) say("Not fetched by this version (%s): %s", "see the Data Download plan", paste(cant, collapse = ", ")) }
-todo <- if (length(asked)) intersect(asked, names(H)) else names(H)
-check_only <- isTRUE(as.logical(o("CheckOnly", FALSE)))
-y_to <- o("YearTo", NA_integer_)
-ctx <- list(home = home, region_home = region_home, region = region, years = c(as.integer(o("YearFrom", 1985L)), if (is.na(y_to)) NA_integer_ else as.integer(y_to)),
-            keep = isTRUE(as.logical(o("KeepNational", FALSE))), new_editions = isTRUE(as.logical(o("FetchNewEditions", FALSE))), connections = as.integer(o("Connections", 4L)), opts = opt, log = log, prj = prj)
+ctx <- make_ctx(region, region_home)
 say("%s %d datasets into %s%s", if (check_only) "Checking" else "Downloading", length(todo), home, if (ctx$keep) " (national copies kept)" else "")
 progressBar(type = "begin", totalSteps = length(todo))
-res <- rbindlist(lapply(todo, function(k) { h <- H[[k]]
-  r <- tryCatch(run_dataset(h, ctx, layout, check_only), error = function(e) {
-    # a missing or expired login is a step for the user, not a failure: the run goes on and the manifest is left as it was
-    if (identical(h$method, "login") && grepl("needs an Earthdata login|refused the token", conditionMessage(e))) { log(sprintf("%s: needs a login: %s", h$name, conditionMessage(e)))
-      return(data.table(DataSource = k, Dataset = h$name, Status = "needs login", Files = NA_integer_, SizeMb = NA_real_, Minutes = NA_real_, Next = conditionMessage(e))) }
-    if (grepl("no file is needed", conditionMessage(e))) { log(sprintf("%s: not needed: %s", h$name, conditionMessage(e)))
-      return(data.table(DataSource = k, Dataset = h$name, Status = "not needed", Files = 0L, SizeMb = NA_real_, Minutes = NA_real_, Next = conditionMessage(e))) }
-    log(sprintf("%s: FAILED: %s", h$name, conditionMessage(e))); if (!check_only) record_failure(store_for(h, ctx), h, conditionMessage(e))
-    data.table(DataSource = k, Dataset = h$name, Status = "failed", Files = NA_integer_, SizeMb = NA_real_, Minutes = NA_real_,
-               Next = if (grepl("^write-once", conditionMessage(e))) substr(conditionMessage(e), 1, 300) else sprintf("%s (rerun to resume)", substr(conditionMessage(e), 1, 300))) })
-  progressBar(); r }), fill = TRUE)
+res <- rbind(res0, rbindlist(lapply(todo, function(k) { r <- fetch_one(k, ctx, check_only); progressBar(); r }), fill = TRUE), fill = TRUE)
 for (k in setdiff(asked, names(H))) { pk <- identical(layout[Column == k, Access], "package")
   res <- rbind(res, data.table(DataSource = k, Dataset = layout[Column == k, Name], Status = if (pk) "skipped" else "manual",
     Next = if (pk) "Ships with lucasCore: a blank Data Sources path reads the package copy" else if (identical(layout[Column == k, Access], "user"))

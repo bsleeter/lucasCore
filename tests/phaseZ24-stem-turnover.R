@@ -15,7 +15,7 @@ ds <- function(R, s) as.data.table(datasheet(R, s, lookupsAsFactors = FALSE))
 expect <- function(what, cond, detail = "") { cat(sprintf("%s  %s %s\n", if (isTRUE(cond)) "PASS" else "FAIL", what, detail)); if (!isTRUE(cond)) ok <<- FALSE }
 logs <- function(R, pat) { lg <- trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]]); unique(lg[grepl(pat, lg)]) }
 P <- rsyncrosim::project(L, 1); d <- datasheet(P, "lucasCore_DataSource")
-if (!nrow(d) || is.na(d$FiaDataMartFolder[1]) || d$FiaDataMartFolder[1] != DM) { if (!nrow(d)) d[1, ] <- NA; d$FiaDataMartFolder <- DM; saveDatasheet(P, d, "lucasCore_DataSource") }
+if (!nrow(d) || is.na(d$FiaDataMartFolder[1]) || d$FiaDataMartFolder[1] != DM) { if (!nrow(d)) d[1, ] <- NA; d$FiaDataMartFolder <- DM; saveDatasheet(P, d, "lucasCore_DataSource", append = FALSE, force = TRUE) }
 name <- "Stage 3-4 test (FIA stem turnover)"
 old <- scenario(L, summary = TRUE); for (id in old$ScenarioId[old$Name == name]) delete(L, scenario = id, force = TRUE)
 S <- scenario(L, name, sourceScenario = 2)

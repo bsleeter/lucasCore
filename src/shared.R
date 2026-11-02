@@ -105,6 +105,21 @@ read_data_sources <- function(cols, optional = FALSE) {
     out[[k]] <- v }
   out }
 
+# a strata preset with no File on this machine reads its polygons from Data Sources Home (src/strata.R strata_path): the national
+# copy a Data Download scenario puts at the top of the home (looked up with no study area box: study_box() reads strata polygons
+# itself). Recorded in Data Sources Used like the Data Sources the stage read.
+strata_from_home <- function(col) {
+  d <- as.data.table(datasheet(prj, ds("DataSource"), lookupsAsFactors = FALSE, optional = TRUE))
+  home <- if (nrow(d) && "DataSourcesHome" %in% names(d)) d$DataSourcesHome[1] else NA_character_
+  if (is.na(home) || !nzchar(home)) return(NA_character_)
+  hp <- home_layout(env$PackageDirectory)[Column == col, HomePath]; if (length(hp) != 1) return(NA_character_)
+  pk <- home_pick(home, col, hp)
+  if (is.null(pk)) return(NA_character_)
+  if (is.null(.home_cov$home)) .home_cov$home <- home
+  if (is.null(.home_cov$read[[col]])) .home_cov$read[[col]] <- list(DataSource = col, Origin = "home", Dir = pk$dir, Path = pk$path)
+  pk$path }
+options(lucas.strata.home = strata_from_home)
+
 # the study area's box (EPSG:5070, xmin, ymin, xmax, ymax), for choosing among region folders: stage 1's primary strata raster
 # when the scenario has one, else the Study Area units' polygons; all of CONUS with no Study Area
 study_box <- function() {

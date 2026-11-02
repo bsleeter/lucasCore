@@ -13,7 +13,8 @@ L <- ssimLibrary(normalizePath(pos[1], winslash = "/")); P <- project(L, 1)
 home <- normalizePath(opt("home"), winslash = "/", mustWork = FALSE)
 d <- datasheet(P, "lucasCore_DataSource", optional = TRUE, empty = FALSE)
 if (!nrow(d)) d <- data.frame(DataSourcesHome = home) else d$DataSourcesHome <- home
-saveDatasheet(P, d, "lucasCore_DataSource")
+# replace, not append: a new library's row is all blank, which rsyncrosim reads as no row, and a second row is silently dropped
+saveDatasheet(P, d, "lucasCore_DataSource", append = FALSE, force = TRUE)
 units <- if (is.na(opt("units"))) character() else trimws(strsplit(opt("units"), ";")[[1]])
 S <- scenario(P, opt("name", sprintf("Data Download - %s", if (length(units)) paste(units, collapse = ", ") else "CONUS")))
 saveDatasheet(S, data.frame(StageNameId = "15 - Data Download", RunOrder = 1L), "core_Pipeline")

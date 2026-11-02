@@ -55,13 +55,14 @@ expect("a name nothing defines comes back NA", is.na(md_define(defs, "StockType"
 
 # ---- sources and citations ----------------------------------------------------------------------------------------------
 ds <- fread(file.path(pkg, "defaults", "library", "data-sources.csv"))
-keys <- c(ds$Column, paste0("Strata:", pre$Preset))
+keys <- ds$Column
 src <- unique(na.omit(defs$Source))
-expect("every Source is a Data Sources column or a strata preset", all(src %in% keys), paste(setdiff(src, keys), collapse = ", "))
+expect("every Source is a Data Sources column (strata presets: their Data Download dataset)", all(src %in% keys), paste(setdiff(src, keys), collapse = ", "))
 cf <- file.path(md, "citations.csv")
 if (file.exists(cf)) {
-  ct <- md_citations(md); need <- setdiff(keys, "Strata:FIA Ecodivisions")
-  expect("every Data Sources column and strata preset has a citation", all(need %in% ct$Column), paste(setdiff(need, ct$Column), collapse = ", "))
+  ct <- md_citations(md); need <- keys
+  expect("every Data Sources column has a citation", all(need %in% ct$Column), paste(setdiff(need, ct$Column), collapse = ", "))
+  expect("no citation for a column that does not exist", all(ct$Column %in% keys), paste(setdiff(ct$Column, keys), collapse = ", "))
   expect("every citation has an originator, date and title", !anyNA(ct[, .(Originator, PubDate, Title)]))
   dois <- na.omit(ct$Doi); expect("DOIs are bare 10.x/...", all(grepl("^10[.][0-9]+/", dois)), paste(dois[!grepl("^10[.][0-9]+/", dois)], collapse = ", "))
 } else cat("skip: citations.csv not written yet\n")

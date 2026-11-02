@@ -71,6 +71,28 @@ zip_dbf <- function(ctx, items, i, member, dest) {
   if (clipping(ctx) && !file.exists(items$dest[i])) { gdal_remote(); x <- sf::st_drop_geometry(sf::read_sf(remote_member(items$url[i], member)))
     foreign::write.dbf(as.data.frame(x), dest); dest } else { x <- unzip_to(items$dest[i], file.path(ctx$dl, "unzip"), member); file.rename(x, dest); dest } }
 
+# a shapefile (the .shp and every sidecar of its name) from a downloaded zip or .tar.gz, unpacked flat into place; returns the .shp
+shp_from_archive <- function(ctx, archive, member, place) {
+  tar <- grepl("[.]tar[.]gz$|[.]tgz$", archive)
+  m <- if (tar) utils::untar(archive, list = TRUE) else utils::unzip(archive, list = TRUE)$Name
+  stem <- sub("[.]shp$", "", member, ignore.case = TRUE); want <- m[startsWith(m, paste0(stem, "."))]
+  if (!any(tolower(want) == tolower(member))) stop(sprintf("%s lacks %s", basename(archive), member), call. = FALSE)
+  ex <- file.path(ctx$dl, "unpack"); unlink(ex, recursive = TRUE); dir.create(ex, recursive = TRUE)
+  if (tar) utils::untar(archive, files = want, exdir = ex) else utils::unzip(archive, files = want, exdir = ex)
+  dir.create(place, recursive = TRUE, showWarnings = FALSE)
+  for (f in want) if (!file.rename(file.path(ex, f), file.path(place, basename(f)))) stop(sprintf("could not move %s to its place", basename(f)), call. = FALSE)
+  unlink(ex, recursive = TRUE); file.path(place, basename(member)) }
+
+# vector layers of a downloaded zip (read in place through /vsizip/) copied into one GeoPackage, with only the named fields. The first
+# layer of the source when `layers` is NULL, written as `names` (default: the source layer names)
+layers_to_gpkg <- function(archive, inner, layers, fields, dest, names = layers) {
+  src <- sprintf("/vsizip/%s/%s", normalizePath(archive, winslash = "/"), inner)
+  if (is.null(layers)) { layers <- sf::st_layers(src)$name[1]; if (is.null(names)) names <- layers }
+  dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE); unlink(dest)
+  for (i in seq_along(layers)) sf::gdal_utils("vectortranslate", src, dest, options = c(if (i > 1) "-update", "-nln", names[i], "-select", paste(fields[[i]], collapse = ","),
+                                                                                         "-nlt", "CONVERT_TO_LINEAR", "-nlt", "PROMOTE_TO_MULTI", layers[i]), quiet = TRUE)
+  dest }
+
 BOX <- "https://usfs-public.box.com/shared/static/%s.zip"
 RDS <- "https://www.fs.usda.gov/rds/archive/products/%s/%s"
 
@@ -233,6 +255,54 @@ download_handlers <- function() {
     finish = function(ctx, items) { dest <- file.path(ctx$place, "forest_own1.tif")
       zip_raster(ctx, items, 1, "Data/forest_own1/forest_own1.tif", dest)
       zip_dbf(ctx, items, 1, "Data/forest_own1/forest_own1.tif.vat.dbf", paste0(dest, ".vat.dbf")); dest })
+
+  # ---- the Stratum Sources presets' polygons (study areas, secondary and tertiary strata): national, at the top of the home ------
+  # Stage 15 runs these before it works out the region (the region is the Study Area units' polygons). Files named as the presets
+  # read them; each preset's DataSource (defaults/strata/presets.csv) names its dataset here.
+  strata_shp <- function(column, name, version, url, file, member) list(column = column, name = name, national = TRUE, version = version,
+    plan = function(ctx) data.table::data.table(url = url, file = file, fetch = TRUE),
+    finish = function(ctx, items) shp_from_archive(ctx, items$dest[1], member, ctx$place))
+  H$StatesFile <- strata_shp("StatesFile", "TIGER/Line states 2009", "TIGER/Line 2009 (tl_2009_us_state)",
+                             "https://www2.census.gov/geo/tiger/TIGER2009/tl_2009_us_state.zip", "tl_2009_us_state.zip", "tl_2009_us_state.shp")
+  H$CountiesFile <- strata_shp("CountiesFile", "TIGER/Line counties 2022", "TIGER/Line 2022 redistricting (tl_rd22_us_county)",
+                               "https://www2.census.gov/geo/tiger/TIGER_RD18/LAYER/COUNTY/tl_rd22_us_county.zip", "tl_rd22_us_county.zip", "tl_rd22_us_county.shp")
+  H$EcoregionsFile <- strata_shp("EcoregionsFile", "EPA Level IV ecoregions", "EPA Level IV (us_eco_l4_no_st, 2024-11)",
+                                 "https://dmap-prod-oms-edc.s3.us-east-1.amazonaws.com/ORD/Ecoregions/us/us_eco_l4.zip", "us_eco_l4.zip", "us_eco_l4_no_st.shp")
+  H$PyromesFile <- strata_shp("PyromesFile", "Pyromes", "RDS-2020-0020", sprintf(RDS, "RDS-2020-0020", "RDS-2020-0020.zip"), "pyromes.zip",
+                              "Data/Pyromes_CONUS_20200206.shp")
+  # WBD: the 2.8 GB national zip; its HU6 and HU8 layers go to one GeoPackage (layers WBDHU6, WBDHU8, as the presets name them)
+  H$WatershedsFile <- list(column = "WatershedsFile", name = "WBD watersheds (HU6, HU8)", national = TRUE, version = "WBD national GDB (HU6, HU8)",
+    note = "The national zip is replaced in place each month; the home keeps the snapshot it fetched",
+    plan = function(ctx) data.table::data.table(url = "https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/WBD/National/GDB/WBD_National_GDB.zip",
+                                                file = "WBD_National_GDB.zip", fetch = TRUE),
+    finish = function(ctx, items) { gdb <- grep("[.]gdb/?$", unique(dirname(utils::unzip(items$dest[1], list = TRUE)$Name)), value = TRUE)[1]
+      if (is.na(gdb)) stop("WBD_National_GDB.zip holds no .gdb", call. = FALSE)
+      layers_to_gpkg(items$dest[1], gdb, c("WBDHU6", "WBDHU8"), list(c("huc6", "name"), c("huc8", "name")), file.path(ctx$place, "wbd_hu6_hu8.gpkg")) })
+  # PAD-US 4.0, for two presets: the state geodatabases (ScienceBase "PAD-US 4.0 State Downloads"; the national files and the
+  # flattened GAP analysis file are served only through ScienceBase's web page, 2026-11-02). Each state's combined Fee, Designation,
+  # Easement, DOD, tribal and NGP layer goes into one GeoPackage, as two layers:
+  #   gap_status    GAP_Sts, without the Proclamation boundaries (not land designations); polygons overlap, and the GAP Status preset
+  #                 takes the most protected (Overlap = Min)
+  #   federal_fee   Own_Name, the fee land owned by a federal agency or a tribe (Own_Type FED or TRIB): the Federal Lands preset, mapped
+  #                 to its managers by federal-lands-crosswalk.csv (TRIB = BIA, the Indian lands of the National Atlas map it replaced)
+  PADUS_LAYERS <- list(gap_status = "SELECT GAP_Sts FROM \"%s\" WHERE Category <> 'Proclamation'",
+                       federal_fee = "SELECT Own_Name FROM \"%s\" WHERE Category = 'Fee' AND Own_Type IN ('FED', 'TRIB')")
+  H$PadusFile <- list(column = "PadusFile", name = "PAD-US 4.0 (GAP status, federal and tribal fee land)", national = TRUE,
+    version = "PAD-US 4.0 state geodatabases (gap_status, federal_fee)",
+    plan = function(ctx) { st <- unname(CONUS_STATES)
+      data.table::data.table(url = sprintf("https://www.sciencebase.gov/catalog/file/get/652d4f80d34e44db0e2ee45c?name=PADUS4_0_State_%s_GDB.zip", st),
+                             file = sprintf("PADUS4_0_State_%s_GDB.zip", st), fetch = TRUE) },
+    finish = function(ctx, items) { dest <- file.path(ctx$place, "padus4.gpkg"); dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE); unlink(dest)
+      for (i in seq_len(nrow(items))) { m <- utils::unzip(items$dest[i], list = TRUE)$Name
+        gdb <- unique(sub("([.]gdb)/.*$", "\\1", m[grepl("[.]gdb/", m)]))[1]
+        if (is.na(gdb)) stop(sprintf("%s holds no geodatabase", items$file[i]), call. = FALSE)
+        src <- sprintf("/vsizip/%s/%s", normalizePath(items$dest[i], winslash = "/"), gdb)
+        lay <- grep("^PADUS4_0Comb_", sf::st_layers(src)$name, value = TRUE)[1]
+        if (is.na(lay)) stop(sprintf("%s has no PADUS4_0Comb_ layer", items$file[i]), call. = FALSE)
+        # (ogr2ogr cannot -select while appending: each layer is an -sql query)
+        for (k in names(PADUS_LAYERS)) sf::gdal_utils("vectortranslate", src, dest, quiet = TRUE,
+          options = c(if (file.exists(dest)) "-update", if (i > 1) "-append", "-nln", k, "-sql", sprintf(PADUS_LAYERS[[k]], lay), "-nlt", "CONVERT_TO_LINEAR", "-nlt", "PROMOTE_TO_MULTI", "-t_srs", "EPSG:5070")) }
+      ctx$log(sprintf("  PAD-US 4.0: %d states into %s (layers %s)", nrow(items), basename(dest), paste(names(PADUS_LAYERS), collapse = ", "))); dest })
 
   # ==== clipped by the source (phase 4) for a region; for all of CONUS (Home layout National) the sources' national files =====
 

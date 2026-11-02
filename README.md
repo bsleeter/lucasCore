@@ -34,26 +34,31 @@ lucasCore ships a starter library. An Empty Library does not work: it has no def
 1. Copy `Starter/LUCAS Core (CONUS).ssim` to where the model will live and rename it (build it first with
    `Rscript tools/build_starter.R` if it is missing: it is not in git).
 2. In SyncroSim Studio, File > Open the copy.
-3. Open the **Build** scenario's properties and set, under LUCAS Core:
+3. Fetch the data: on the project's **Data Sources** page set **Data Sources Home** (an empty folder with room: about 1.5 GB for a
+   pyrome-sized region, plus about 30 GB of national files every region shares: FIA, PRISM, LOCA2), then run a **Data Download** scenario (pipeline 15) with the
+   same Study Area units as the Build (User Guide, section 1.6). It fetches every national dataset the Build reads, and the polygons
+   of the Stratum Sources (states, counties, watersheds, ecoregions, pyromes, federal lands, GAP status), into the home, where a blank
+   path reads them.
+4. Open the **Build** scenario's properties and set, under LUCAS Core:
    - **Build Options**: cell size; secondary and tertiary strata (blank = States, Federal Lands); historical start and end years;
      projection end year (blank = no projection; it starts the year after the historical end); Forest Type Map: LANDFIRE EVT 2016 (default; gaps from neighbouring cells or from the USFS map), USFS forest type groups, or TreeMap
    - **Study Area**: one row per unit, from any source ("State: California", "Ecodivision: Mediterranean Mountains", "Pyrome: ...",
      "HUC8: ..."); blank = all of CONUS
    - **Climate Options**: forest growth (None / Miami NPP / Tree ring), non-forest growth, decomposition; when projecting, the
      scenario (SSP), climate model and replicate
-4. Run **Build**. Its dependency (Stock-Flow Definitions) and pipeline (stages 1, 5, 2, 3, 4, 6, 7, 8) are already set. California at
+5. Run **Build**. Its dependency (Stock-Flow Definitions) and pipeline (stages 1, 5, 2, 3, 4, 6, 7, 8) are already set. California at
    1 km takes about 50 minutes; the result scenario holds every input an ST-Sim historical run needs except Run Control.
-5. Make the historical run: `Rscript tools/new-historical.R "<library.ssim>" [--build=<result id>] [--iterations=1]` adds
+6. Make the historical run: `Rscript tools/new-historical.R "<library.ssim>" [--build=<result id>] [--iterations=1]` adds
    "Historical <start>-<end>", or in Studio: a new scenario with dependencies **the Build result first, then Stock-Flow
    Definitions** (the order matters: the first one supplies the whole Flow Pathways feed, and Stock-Flow Definitions has the diagram
    but no pathways), Run Control = start to end year, spatial, and Pipeline = ST-Sim. Placer County at 1 km: 12 minutes, one iteration.
-6. Projections, one continuous run (mode 1): tick Run a projection in Build Options (end year), pick the LOCA2 scenario, model and
+7. Projections, one continuous run (mode 1): tick Run a projection in Build Options (end year), pick the LOCA2 scenario, model and
    replicate in Climate Options, and set Projection Options (reference years, iterations, seed, spatial tiles) and, if needed,
    Projection Transitions (one row per transition group: Target by strata level or Probability by any Stratum Source, a sampling set,
    excluded GAP statuses; empty = defaults/projection/transitions.csv). Stage 9 draws a whole historical year per projection year and
    iteration (groups in a sampling set share the draw) and writes targets and multiplier maps; the same new-historical.R then makes
    "Historical and Projection <start>-<end>". Placer County, 1 km, 1985-2050, 2 iterations: build 25 min, run 41 min.
-7. Projections from a historical run (mode 2): make the historical run once with `tools/new-historical.R "<library>" --historical-only
+8. Projections from a historical run (mode 2): make the historical run once with `tools/new-historical.R "<library>" --historical-only
    --bookend-maps`, then `Rscript tools/new-projection.R "<library>" --historical=<its result id> [--years=10]` for each projection.
    The projection scenario depends on the Build result, names the run in Projection Start, and runs stage 9 (which hands over the
    run's final state class, age and 14 carbon pool maps) then ST-Sim. Placer: historical run 12 min once; 10 years x 2 iterations 8 min.
