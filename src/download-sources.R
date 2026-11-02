@@ -6,8 +6,10 @@
 # finish writes the files the stages read, with the names they read today, and returns the dataset's place (folder or file).
 # Rasters inside zips are read where they sit (GDAL /vsizip//vsicurl/, byte ranges) and only the region is written: a 26 MB
 # forest type tile comes out of a 2 GB regional zip without fetching the zip. National copies (no Study Area, or Keep national
-# copies) fetch the whole zips instead. Handlers marked national = TRUE always keep the whole files: FIA DataMart (the growth curves
-# fit on every state), PRISM (the growth curves' ecodivision climate covers CONUS) and LOCA2 (cut to its own regions).
+# copies) fetch the whole zips instead. Handlers marked national = TRUE always keep the whole files, at the top of the home:
+# FIA DataMart (the growth curves fit on every state), PRISM (the growth curves' ecodivision climate covers CONUS), LOCA2 (cut to
+# its own regions) and FPA-FOD (fetched whole anyway: a GeoPackage is too slow to read through a remote zip). FSim is read
+# remotely and clipped: its 1.6 GB zip is never fetched for a region.
 # =============================================================================
 
 # GDAL reading remote archives: Box and some servers answer HEAD with 404, so GDAL asks with ranged GETs
@@ -127,7 +129,7 @@ download_handlers <- function() {
     finish = function(ctx, items) zip_raster(ctx, items, 1, "Data/I_FSim_CONUS_LF2020_270m/CONUS_BP.tif", file.path(ctx$place, "CONUS_BP.tif")))
 
   # ---- FPA-FOD: the GeoPackage (fetched: a database is slow to read through a remote zip), its Fires layer clipped -------
-  H$FpaFodFile <- list(column = "FpaFodFile", name = "FPA-FOD fire occurrence", version = "RDS-2013-0009.7",
+  H$FpaFodFile <- list(column = "FpaFodFile", name = "FPA-FOD fire occurrence", national = TRUE, version = "RDS-2013-0009.7",
     plan = function(ctx) data.table::data.table(url = sprintf(RDS, "RDS-2013-0009.7", "RDS-2013-0009.7_Data_Format3_GPKG.zip"), file = "fpafod.zip", fetch = TRUE),
     finish = function(ctx, items) { x <- unzip_to(items$dest[1], file.path(ctx$dl, "unzip"), "Data/FPA_FOD_20260615.gpkg"); dest <- file.path(ctx$place, "FPA_FOD_20260615.gpkg")
       if (clipping(ctx)) clip_vector(x, dest, ctx$region, layer = "Fires") else { dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE); file.rename(x, dest) }
@@ -379,8 +381,8 @@ need_region <- function(ctx, what) if (is.null(ctx$region$poly))
   stop(sprintf("%s is clipped by its source for a Study Area; for all of CONUS fetch the national files by hand", what), call. = FALSE)
 
 # the planned files already recorded in files.csv at their recorded size (a hand-placed, unrecorded file is fetched again)
-recorded <- function(ctx, column, paths) { f <- read_files(ctx$home)[Column == column]
-  rel <- substring(normalizePath(paths, winslash = "/", mustWork = FALSE), nchar(normalizePath(ctx$home, winslash = "/")) + 2)
+recorded <- function(ctx, column, paths) { st <- if (is.null(ctx$store)) ctx$home else ctx$store; f <- read_files(st)[Column == column]
+  rel <- substring(normalizePath(paths, winslash = "/", mustWork = FALSE), nchar(normalizePath(st, winslash = "/")) + 2)
   b <- f$Bytes[match(rel, f$Path)]; !is.na(b) & file.exists(paths) & file.size(paths) == as.numeric(b) }
 
 # the region's box snapped outward to a grid (origin = the grid's top-left corner), cut into tiles of at most `px` cells a side

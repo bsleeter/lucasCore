@@ -75,19 +75,60 @@ read_data_sources <- function(cols, optional = FALSE) {
   def <- sheet_defaults("DataSource", quiet = TRUE)
   home <- if (nrow(d) && "DataSourcesHome" %in% names(d)) d$DataSourcesHome[1] else NA_character_
   hl <- if (!is.na(home) && nzchar(home)) home_layout(env$PackageDirectory) else NULL
-  out <- list()
-  for (k in cols) { v <- if (nrow(d) && k %in% names(d)) d[[k]][1] else NA_character_
-    if ((is.na(v) || !nzchar(v)) && !is.null(hl) && k %in% hl$Column) { h <- home_path(home, hl[Column == k, HomePath])
-      if (!is.na(h)) { v <- h; .home_cov$home <- home; .home_cov$used <- union(.home_cov$used, k); if (!is.null(.home_cov$box)) home_covers(k, .home_cov$box, .home_cov$what) }
-      else if (attr(h, "found") > 1) fail("Data Sources: %s is blank and %d files match its place in the home folder (%s); keep one, or set the path",
-                                          k, attr(h, "found"), file.path(home, hl[Column == k, HomePath])) }
-    if (is.na(v) || !nzchar(v)) v <- def[[k]][1]
-    if ((is.null(v) || is.na(v) || !nzchar(v)) && !is.null(PACKAGE_SOURCES[[k]])) v <- do.call(pkg_file, as.list(PACKAGE_SOURCES[[k]]))
+  out <- list(); regions <- !is.null(hl) && length(home_regions(home)) > 0
+  for (k in cols) { v <- if (nrow(d) && k %in% names(d)) d[[k]][1] else NA_character_; how <- "set"; dir <- NA_character_
+    if ((is.na(v) || !nzchar(v)) && !is.null(hl) && k %in% hl$Column) {
+      # with region folders, the folder is chosen by the study area: the smallest region whose manifest covers it (datahome.R)
+      pk <- tryCatch(home_pick(home, k, hl[Column == k, HomePath], if (regions) study_box() else NULL), error = function(e) fail("%s", conditionMessage(e)))
+      if (!is.null(pk)) { v <- pk$path; how <- "home"; dir <- pk$dir; .home_cov$home <- home; .home_cov$dirs[[k]] <- pk$dir; .home_cov$used <- union(.home_cov$used, k)
+        if (regions && is.null(.home_cov$said[[k]])) { .home_cov$said[[k]] <- TRUE; say("Data Sources: %s from %s", k, home_label(home, pk$dir)) }
+        if (!is.null(.home_cov$box)) home_covers(k, .home_cov$box, .home_cov$what) } }
+    if (is.na(v) || !nzchar(v)) { v <- def[[k]][1]; how <- "default" }
+    if ((is.null(v) || is.na(v) || !nzchar(v)) && !is.null(PACKAGE_SOURCES[[k]])) { v <- do.call(pkg_file, as.list(PACKAGE_SOURCES[[k]])); how <- "package" }
     if (is.null(v) || is.na(v) || !nzchar(v)) { if (optional) { out[k] <- list(NA_character_); next }
       fail("Data Sources: %s is not set and has no default", k) }
     if (!file.exists(v)) fail("Data Sources: %s not found (%s)", k, v)
+    .home_cov$read[[k]] <- list(DataSource = k, Origin = how, Dir = dir, Path = v)
     out[[k]] <- v }
   out }
+
+# the study area's box (EPSG:5070, xmin, ymin, xmax, ymax), for choosing among region folders: stage 1's primary strata raster
+# when the scenario has one, else the Study Area units' polygons; all of CONUS with no Study Area
+study_box <- function() {
+  if (!is.null(.home_cov$study_box)) return(.home_cov$study_box)
+  b <- tryCatch({
+    ic <- as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", optional = TRUE, lookupsAsFactors = FALSE))
+    sa <- read_ds("StudyArea"); want <- if (nrow(sa)) unique(as.character(sa$UnitId)) else character()
+    if (nrow(ic) && "StratumFileName" %in% names(ic) && !is.na(ic$StratumFileName[1]) && file.exists(ic$StratumFileName[1])) {
+      r <- terra::rast(ic$StratumFileName[1]); as.vector(terra::ext(terra::project(terra::as.polygons(terra::ext(r), crs = terra::crs(r)), "EPSG:5070")))[c(1, 3, 2, 4)]
+    } else if (!length(want)) c(-2400000, 200000, 2300000, 3200000) else {
+      if (!exists("strata_polygons", mode = "function")) source(pkg_file("src", "strata.R"))
+      ul <- stsim_list("SecondaryStratum"); uid <- as.integer(ul$Id)[match(want, ul$Name)]
+      if (anyNA(uid)) stop("Study Area units not in the unit list: ", paste(want[is.na(uid)], collapse = ", "))
+      rows <- sources_from_sheet(as.data.table(datasheet(prj, ds("StratumSource"), optional = TRUE, lookupsAsFactors = FALSE)))
+      by_num <- setNames(rows, vapply(rows, function(s) as.character(s$Number), ""))
+      parts <- split(unit_native(uid), unit_source(uid))
+      bb <- do.call(rbind, lapply(names(parts), function(k) { sp <- strata_polygons(by_num[[k]], env$PackageDirectory); as.numeric(sf::st_bbox(sp[sp$StratumId %in% parts[[k]], ])) }))
+      c(min(bb[, 1]), min(bb[, 2]), max(bb[, 3]), max(bb[, 4])) } },
+    error = function(e) { say("Data Sources Home: the study area is not known yet (%s); reading the top of the home first", conditionMessage(e)); NULL })
+  .home_cov$study_box <- b; b }
+
+# the Data Sources a stage read, for Data Sources Used (written by finish_checks): where each came from, and its files' sizes and
+# checksum (from the home's files.csv: one file's sha256, or the sha256 of the sorted path and sha256 list of a folder). A path set
+# by hand has no checksum. A home dataset whose files no longer match files.csv is noted: the write-once rule was broken
+data_sources_used <- function() {
+  if (!length(.home_cov$read)) return(NULL)
+  stage <- if (exists("STAGE")) STAGE else NA_character_
+  rbindlist(lapply(.home_cov$read, function(x) {
+    f <- if (identical(x$Origin, "home")) read_files(x$Dir)[Column == x$DataSource] else data.table()
+    if (nrow(f)) { fp <- file.path(x$Dir, f$Path); ok <- all(file.exists(fp)) && all(file.size(fp) == as.numeric(f$Bytes))
+      sh <- if (nrow(f) == 1) f$Sha256 else digest::digest(paste(sort(paste(f$Path, f$Sha256)), collapse = "\n"), algo = "sha256", serialize = FALSE)
+      return(data.table(Stage = stage, DataSource = x$DataSource, Origin = home_label(.home_cov$home, x$Dir), Path = x$Path,
+                        Files = nrow(f), Bytes = sum(as.numeric(f$Bytes)), Sha256 = sh, Note = if (ok) NA_character_ else "files on disk differ from files.csv")) }
+    fl <- if (dir.exists(x$Path)) list.files(x$Path, recursive = TRUE, full.names = TRUE) else x$Path
+    data.table(Stage = stage, DataSource = x$DataSource, Origin = x$Origin, Path = x$Path, Files = length(fl),
+               Bytes = sum(as.numeric(file.size(fl)), na.rm = TRUE), Sha256 = NA_character_,
+               Note = if (identical(x$Origin, "home")) "no files.csv rows (laid out by hand)" else "not from Data Sources Home: no checksum") })) }
 
 # ---- Data Sources Home coverage (to-do 12, phase 5) -------------------------------------------------------------------------
 # A dataset read from the home folder holds only the region its Data Download was run for (manifest.csv). Each Build stage calls
@@ -95,7 +136,7 @@ read_data_sources <- function(cols, optional = FALSE) {
 # tolerance, the grid being snapped outward), or the stage stops naming the dataset, the region it holds and what to do. A home
 # file with no manifest row (put there by hand) is not checked; a set path is never checked. home_coverage(x, cols, what) checks
 # the named columns against a wider extent (a fitting region, a kernel's reach) without changing the stage's own.
-.home_cov <- new.env(); .home_cov$used <- character(); .home_cov$box <- NULL; .home_cov$what <- "the study area"
+.home_cov <- new.env(); .home_cov$used <- character(); .home_cov$box <- NULL; .home_cov$what <- "the study area"; .home_cov$dirs <- list(); .home_cov$read <- list()
 home_coverage <- function(x, cols = NULL, what = "the study area", warn_only = FALSE) {
   e <- if (inherits(x, "SpatRaster")) { r <- terra::res(x)[1]; terra::as.polygons(terra::ext(x) - r, crs = terra::crs(x)) } else if (inherits(x, "SpatVector")) terra::as.polygons(terra::ext(x), crs = terra::crs(x)) else terra::vect(sf::st_as_sfc(sf::st_bbox(x)))
   box <- as.vector(terra::ext(terra::project(e, "EPSG:5070")))[c(1, 3, 2, 4)]
@@ -103,12 +144,13 @@ home_coverage <- function(x, cols = NULL, what = "the study area", warn_only = F
   for (k in cols) if (warn_only) tryCatch(home_covers(k, box, what), error = function(e) say("Warning: %s", sub("^.*?Data Sources: ", "", conditionMessage(e)))) else home_covers(k, box, what)
   invisible(box) }
 home_covers <- function(k, box, what) {
-  ok <- manifest_covers(.home_cov$home, k, box); if (!isFALSE(ok)) return(invisible(TRUE))
-  m <- read_manifest(.home_cov$home)[Column == k]
-  if (!identical(m$Status, "done")) fail("Data Sources: %s in Data Sources Home is marked %s by its last Data Download (%s); run the Data Download again, or set its path",
-                                         k, m$Status, if (is.na(m$Note)) "no note" else m$Note)
-  fail("Data Sources: %s in Data Sources Home (%s) was downloaded for %s%s and does not cover %s; run a Data Download for this study area (or one holding it) into %s, or set its path",
-       k, m$Dataset, m$Units, if (is.na(m$BufferKm) || !nzchar(m$BufferKm)) "" else sprintf(" + %s km", m$BufferKm), what, .home_cov$home) }
+  dir <- .home_cov$dirs[[k]]; if (is.null(dir)) dir <- .home_cov$home; at <- home_label(.home_cov$home, dir)
+  ok <- manifest_covers(dir, k, box); if (!isFALSE(ok)) return(invisible(TRUE))
+  m <- read_manifest(dir)[Column == k]
+  if (!identical(m$Status, "done")) fail("Data Sources: %s in Data Sources Home (%s) is marked %s by its last Data Download (%s); run the Data Download again, or set its path",
+                                         k, at, m$Status, if (is.na(m$Note)) "no note" else m$Note)
+  fail("Data Sources: %s in Data Sources Home (%s, %s) was downloaded for %s%s and does not cover %s; run a Data Download for this study area (or one holding it) into %s, or set its path",
+       k, at, m$Dataset, m$Units, if (is.na(m$BufferKm) || !nzchar(m$BufferKm)) "" else sprintf(" + %s km", m$BufferKm), what, .home_cov$home) }
 
 # saveDatasheet goes through text: whole-number doubles go as integers and nothing is written in scientific notation
 options(scipen = 999)
@@ -311,6 +353,11 @@ check <- function(stage, what, ok, detail = "") {
   invisible(ok) }
 # save the checks to Validation and stop the stage when any failed
 finish_checks <- function() {
+  # Data Sources Used: what this stage read (a library made before 2026-11-02 lacks the sheet until tools/sync-library.R adds it)
+  u <- data_sources_used()
+  if (!is.null(u) && nrow(u)) { bad <- u[!is.na(Note) & Note == "files on disk differ from files.csv"]
+    if (nrow(bad)) say("Warning: %s in Data Sources Home differ from their files.csv record (a file was replaced or removed)", paste(bad$DataSource, collapse = ", "))
+    tryCatch(write_ds(u, "OutputDataSources", append = TRUE), error = function(e) say("Data Sources Used not written (%s): run tools/sync-library.R on this library", conditionMessage(e))) }
   if (!length(.checks)) return(invisible())
   x <- rbindlist(.checks); write_ds(x, "OutputValidation", append = TRUE)
   bad <- x[Status != "Pass"]

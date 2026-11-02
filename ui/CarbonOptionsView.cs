@@ -3,8 +3,8 @@
 // carbon source, and a Fill button that writes the method's rows into the other Carbon Assumptions sheets
 // =============================================================================
 // Single-row sheet lucasCore_CarbonOptions: DeadOrganicMatterModel 4 = FIA measured dead wood (default), 3 = CBM defaults (1 and 2, the
-// FIA condition-pool options, are no longer offered, user 2026-10-28; stage 3 still reads them); SoilCarbonModel 1 = gSSURGO, 2 = CBM
-// defaults, blank = gSSURGO with FIA measured dead wood and CBM with CBM defaults (the page shows the one that applies). Fill loads
+// FIA condition-pool options, are no longer offered, user 2026-10-28; stage 3 still reads them); SoilCarbonModel 1 = gNATSGO, 2 = CBM
+// defaults, blank = gNATSGO with FIA measured dead wood and CBM with CBM defaults (the page shows the one that applies). Fill loads
 // defaults/carbon-assumptions/<method>/<sheet>.csv (tools/make_carbon_presets.R) into each sheet of this scenario, replacing its rows -
 // the same rows stage 3 uses when the sheets were never filled.
 // =============================================================================
@@ -54,8 +54,8 @@ namespace lucasCoreUI
             d.Controls.Add(Wrapped("Every dead pool uses the CBM-CFS3 default decay and snag fall rates, with the LUCAS fire and clearcut flows, as the CONUS 1 km model did.", 620));
             AddGroup(Group("Dead organic matter", d));
             var s = Column();
-            s.Controls.Add(Option(m_soil, 1, "gSSURGO"));
-            s.Controls.Add(Wrapped("Soil decay is calibrated so the spin-up's soil carbon matches each ecodivision and forest type's mean gSSURGO soil organic carbon (Data Sources: Soil Carbon).", 620));
+            s.Controls.Add(Option(m_soil, 1, "gNATSGO"));
+            s.Controls.Add(Wrapped("Soil decay is calibrated so the spin-up's soil carbon matches each ecodivision and forest type's mean gNATSGO soil organic carbon (Data Sources: Soil Carbon).", 620));
             s.Controls.Add(Option(m_soil, 2, "CBM defaults"));
             s.Controls.Add(Wrapped("Soil keeps the CBM-CFS3 default decay rates, so soil carbon comes from the spin-up alone. (SoilGrids is planned as a further source.)", 620));
             AddGroup(Group("Soil organic carbon", s));

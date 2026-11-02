@@ -53,7 +53,7 @@ namespace lucasCoreUI
             foreach (DataGridViewColumn c in m_grid.Columns) c.SortMode = DataGridViewColumnSortMode.NotSortable;
             var r = Row(); r.Controls.Add(m_fix); r.Controls.Add(m_state);
             AddGroup(Group("Decay multipliers (stage 3)", ProjectionTransitionsView.Stack(
-                Note("Each dead pool decays at CBM-CFS3's rate for its temperature times a multiplier. The Build calibrates the multipliers (stage 3): with FIA measured dead wood, so that each ecodivision and forest type's snags, down logs, fine woody debris, litter and duff match FIA's measurements in mature stands, and soil matches gSSURGO; with CBM defaults they stay 1. So the values exist only once a Build has run."),
+                Note("Each dead pool decays at CBM-CFS3's rate for its temperature times a multiplier. The Build calibrates the multipliers (stage 3): with FIA measured dead wood, so that each ecodivision and forest type's snags, down logs, fine woody debris, litter and duff match FIA's measurements in mature stands, and soil matches gNATSGO; with CBM defaults they stay 1. So the values exist only once a Build has run."),
                 Note("Empty page: every pool calibrated, as listed below. To fix a value instead, select it and press Fix the selected value, then edit the multiplier in the rows table. A fixed value is shaded; the pools fitted after it (snags, then down logs; fine woody debris, then litter, then duff; then soil) are fitted with it, so they change at the next Build."),
                 m_source, m_grid, r)));
             var c2 = Column();

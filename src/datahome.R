@@ -97,3 +97,75 @@ manifest_covers <- function(home, column, box) {
   if (anyNA(e)) return(FALSE)
   # within a metre: the box goes through text in manifest.csv (15 significant digits)
   box[1] >= e[1] - 1 && box[2] >= e[2] - 1 && box[3] <= e[3] + 1 && box[4] <= e[4] + 1 }
+
+# ---- regions (Home layout: By region; plan, "Second study areas: home layout") ---------------------------------------------
+# A home folder keeps national copies at its top and one folder per region under regions/<name>/, each laid out like a home
+# (its own manifest.csv and files.csv). A Data Download writes only into its own region folder (or the top, for national
+# copies), and never replaces a file already there (src/download.R, write-once), so one region's download cannot change the
+# data another library read. A Build takes each blank dataset from the smallest folder whose manifest covers its study area.
+home_regions <- function(home) {
+  d <- file.path(home, "regions"); if (is.null(home) || is.na(home) || !dir.exists(d)) return(character())
+  normalizePath(list.dirs(d, recursive = FALSE), winslash = "/") }
+
+# a region's folder name from its Study Area unit names (or the name typed on the page): letters, digits, - and _ only
+region_name <- function(x) {
+  n <- gsub("^-+|-+$", "", gsub("[^A-Za-z0-9_]+", "-", paste(x, collapse = "+")))
+  if (!nzchar(n)) stop("the region needs a name of letters or digits", call. = FALSE)
+  if (nchar(n) > 60) n <- paste0(substr(n, 1, 51), "-", substr(digest::digest(n, algo = "md5"), 1, 8))
+  n }
+
+# a folder's label in messages: "regions/P26", or "the top of the home" for national copies and hand-laid homes
+home_label <- function(home, dir) if (identical(normalizePath(dir, winslash = "/", mustWork = FALSE), normalizePath(home, winslash = "/", mustWork = FALSE)))
+  "the top of the home" else paste0("regions/", basename(dir))
+
+# where a blank dataset is read from: the folders holding its place (the top and every region), best first. A folder whose
+# manifest covers the box comes first, smallest box first (a national copy last); then folders with no manifest row (laid out
+# by hand: the top before regions); folders whose manifest does not cover the box last, so the coverage check names what to do.
+# box NULL (no study area known): the top first. Returns list(dir, path), or NULL when no folder has it; stops when a folder
+# matches 2+ files
+home_pick <- function(home, column, homepath, box = NULL) {
+  dirs <- c(normalizePath(home, winslash = "/", mustWork = FALSE), home_regions(home)); best <- NULL; rank <- Inf
+  for (i in seq_along(dirs)) { p <- home_path(dirs[i], homepath)
+    if (is.na(p)) { if (attr(p, "found") > 1) stop(sprintf("Data Sources: %s is blank and %d files match its place in %s (%s); keep one, or set the path",
+                                                           column, attr(p, "found"), home_label(home, dirs[i]), file.path(dirs[i], homepath)), call. = FALSE)
+                    next }
+    cov <- if (is.null(box)) NA else manifest_covers(dirs[i], column, box)
+    r <- if (isTRUE(cov)) { m <- read_manifest(dirs[i])[Column == column]; e <- as.numeric(unlist(m[, .(Xmin, Ymin, Xmax, Ymax)]))
+           if (identical(m$Copy, "national")) 1e30 else (e[3] - e[1]) * (e[4] - e[2]) }
+         else if (is.na(cov)) 1e31 else 1e32   # ties keep the earlier folder: the top first
+    if (r < rank) { rank <- r; best <- list(dir = dirs[i], path = p) } }
+  best }
+
+# move a home laid out before regions (one clip per dataset at the top) into regions/<name>: every dataset whose manifest says
+# clipped moves with its files.csv and manifest rows; national copies, settings.csv and logs stay at the top. A folder place moves
+# whole; a file place moves its recorded files and their sidecars. Nothing is rewritten: each file is renamed, and its size checked
+# against files.csv after. dry = TRUE lists what would move. Returns the moved columns
+home_to_region <- function(home, name, pkgdir, dry = FALSE, log = message) {
+  name <- region_name(name); dest <- file.path(home, "regions", name)
+  m <- read_manifest(home); f <- read_files(home); lay <- home_layout(pkgdir)
+  cols <- m[Copy %in% "clipped", Column]
+  if (!length(cols)) { log("nothing to move: no clipped datasets at the top of the home"); return(invisible(character())) }
+  dm <- read_manifest(dest); clash <- intersect(cols, dm$Column)
+  if (length(clash)) stop(sprintf("regions/%s already holds %s", name, paste(clash, collapse = ", ")), call. = FALSE)
+  moves <- rbindlist(lapply(cols, function(k) { hp <- strsplit(lay[Column == k, HomePath], "|", fixed = TRUE)[[1]][1]
+    if (!grepl("*", hp, fixed = TRUE) && dir.exists(file.path(home, hp))) return(data.table(Column = k, Rel = hp, Folder = TRUE))
+    rel <- f[Column == k, Path]
+    side <- unlist(lapply(unique(rel), function(r) { a <- list.files(file.path(home, dirname(r)))
+      file.path(dirname(r), a[startsWith(a, paste0(tools::file_path_sans_ext(basename(r)), "."))]) }))
+    data.table(Column = k, Rel = unique(c(rel, side)), Folder = FALSE) }))
+  for (i in seq_len(nrow(moves))) log(sprintf("%s %s: %s%s", if (dry) "would move" else "moving", moves$Column[i], moves$Rel[i], if (moves$Folder[i]) "/ (folder)" else ""))
+  if (dry) return(invisible(cols))
+  for (i in seq_len(nrow(moves))) { from <- file.path(home, moves$Rel[i]); to <- file.path(dest, moves$Rel[i])
+    if (file.exists(to)) stop(sprintf("regions/%s/%s already exists; nothing more was moved", name, moves$Rel[i]), call. = FALSE)
+    dir.create(dirname(to), recursive = TRUE, showWarnings = FALSE)
+    if (!file.rename(from, to)) stop(sprintf("could not move %s (is it open?); nothing more was moved", moves$Rel[i]), call. = FALSE) }
+  # the tables: rows move with their files (written region first, so a stop leaves the rows where the files are)
+  .write_home_table(dest, "files.csv", FILES_COLS, read_files(dest), f[Column %in% cols])
+  .write_home_table(dest, "manifest.csv", MANIFEST_COLS, read_manifest(dest), m[Column %in% cols])
+  for (nm in c("files.csv", "manifest.csv")) { x <- if (nm == "files.csv") f[!Column %in% cols] else m[!Column %in% cols]
+    tmp <- file.path(home, paste0(nm, ".tmp")); data.table::fwrite(x, tmp); file.rename(tmp, file.path(home, nm)) }
+  fr <- read_files(dest)[Column %in% cols]; p <- file.path(dest, fr$Path)
+  badf <- fr$Path[!file.exists(p) | file.size(p) != as.numeric(fr$Bytes)]
+  if (length(badf)) stop(sprintf("after the move %d files differ from files.csv: %s", length(badf), paste(head(badf, 5), collapse = ", ")), call. = FALSE)
+  log(sprintf("moved %d datasets (%d files) into regions/%s; every file at its files.csv size", length(cols), nrow(fr), name))
+  invisible(cols) }

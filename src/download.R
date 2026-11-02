@@ -98,51 +98,101 @@ dataset_up_to_date <- function(home, column, region) {
   f <- read_files(home)[Column == column]
   nrow(f) > 0 && all(file.exists(file.path(home, f$Path))) && all(file.size(file.path(home, f$Path)) == as.numeric(f$Bytes)) }
 
+# "in regions/P26", "at the top of the home": where a dataset is, for Download Results
+held_in <- function(where) if (startsWith(where, "regions/")) paste("in", where) else paste("at", where)
+
+# the folder a dataset is written to: the top of the home for national copies, else the run's region folder (regions/<name>;
+# the top when the run is national or the home has no regions)
+store_for <- function(h, ctx) if (isTRUE(h$national) || is.null(ctx$region_home)) ctx$home else ctx$region_home
+
+# write-once (plan, "Second study areas"): a handler's finish writes into a staging folder, and its files then move to the
+# place. A file already there is kept when identical; when it differs it is replaced only if no library can have read it (not in
+# files.csv, and the dataset has no done manifest row), else the dataset stops and nothing moves. Returns `path` at the place
+commit_staged <- function(stage, place, path, store, column, log = message) {
+  f <- list.files(stage, recursive = TRUE, full.names = TRUE, all.files = TRUE, no.. = TRUE)
+  rel <- substring(f, nchar(stage) + 2); dest <- file.path(place, rel)
+  to_store <- function(p) substring(normalizePath(p, winslash = "/", mustWork = FALSE), nchar(normalizePath(store, winslash = "/")) + 2)
+  done <- identical(read_manifest(store)[Column == column, Status], "done"); rec <- read_files(store)$Path
+  sha <- function(x) digest::digest(file = x, algo = "sha256")
+  have <- file.exists(dest); same <- rep(FALSE, length(f)); bad <- character()
+  for (i in which(have)) { same[i] <- file.size(f[i]) == file.size(dest[i]) && sha(f[i]) == sha(dest[i])
+    if (!same[i] && (done || to_store(dest[i]) %in% rec)) bad <- c(bad, to_store(dest[i])) }
+  if (length(bad)) { unlink(stage, recursive = TRUE)
+    stop(sprintf("write-once: %d files would replace different files a library may have read (%s%s); nothing was changed. Download this region under another region name",
+                 length(bad), paste(head(bad, 3), collapse = ", "), if (length(bad) > 3) ", ..." else ""), call. = FALSE) }
+  if (any(have & !same)) log(sprintf("  replacing %d unrecorded files left by an unfinished download", sum(have & !same)))
+  file.remove(f[have & same])
+  for (i in which(!(have & same))) { dir.create(dirname(dest[i]), recursive = TRUE, showWarnings = FALSE)
+    if (file.exists(dest[i])) file.remove(dest[i])
+    if (!file.rename(f[i], dest[i]) && !(file.copy(f[i], dest[i]) && file.remove(f[i]))) stop(sprintf("could not move %s into %s", rel[i], place), call. = FALSE) }
+  unlink(stage, recursive = TRUE)
+  if (sum(have & same)) log(sprintf("  %d files already in place, identical: kept", sum(have & same)))
+  sp <- normalizePath(path, winslash = "/", mustWork = FALSE); st <- normalizePath(stage, winslash = "/", mustWork = FALSE)
+  if (identical(sp, st)) place else if (startsWith(sp, paste0(st, "/"))) file.path(place, substring(sp, nchar(st) + 2)) else path }
+
 run_dataset <- function(h, ctx, layout, check_only = FALSE) {
   t0 <- Sys.time(); col <- h$column; log <- ctx$log
   out <- function(status, files = NA_integer_, mb = NA_real_, nxt = NA_character_)
     data.table::data.table(DataSource = col, Dataset = h$name, Status = status, Files = as.integer(files), SizeMb = round(mb, 1),
                            Minutes = round(as.numeric(difftime(Sys.time(), t0, units = "mins")), 2), Next = nxt)
+  # where it goes: national copies (FIA, PRISM, LOCA2, FPA-FOD) whole at the top of the home, the rest in the region folder
+  ctx$store <- store_for(h, ctx); where <- home_label(ctx$home, ctx$store); if (isTRUE(h$national)) ctx$keep <- TRUE
   # a handler with have(ctx, items) (one TRUE per planned item already in place) can grow: a rerun asking for more (LOCA2 models,
   # scenarios, members) fetches only what is missing; without it, a covering manifest means the dataset is done
-  up <- dataset_up_to_date(ctx$home, col, ctx$region)
-  if (up && is.null(h$have)) { log(sprintf("%s: up to date (manifest and files.csv)", h$name)); return(out("skipped", nrow(read_files(ctx$home)[Column == col]))) }
+  up <- dataset_up_to_date(ctx$store, col, ctx$region)
+  if (up && is.null(h$have)) { m <- read_manifest(ctx$store)[Column == col]
+    log(sprintf("%s: up to date in %s (manifest and files.csv)%s", h$name, where,
+                if (!is.null(h$version) && !identical(m$Version, h$version)) sprintf("; it holds %s, this version fetches %s: a new edition goes into another region name", m$Version, h$version) else ""))
+    return(out("skipped", nrow(read_files(ctx$store)[Column == col]), nxt = held_in(where))) }
+  # a copy held elsewhere for this region (a clipped copy in the region folder of a dataset now kept whole, or a national copy)
+  if (!up && is.null(h$have)) for (d in setdiff(unique(c(ctx$region_home, ctx$home)), ctx$store))
+    if (dataset_up_to_date(d, col, ctx$region)) { log(sprintf("%s: up to date in %s", h$name, home_label(ctx$home, d)))
+      return(out("skipped", nrow(read_files(d)[Column == col]), nxt = held_in(home_label(ctx$home, d)))) }
+  # write-once: a folder that holds this dataset for another region is never refetched over
+  m <- read_manifest(ctx$store)[Column == col]
+  if (nrow(m) && identical(m$Status, "done") && !isTRUE(manifest_covers(ctx$store, col, ctx$region$box)))
+    stop(sprintf("write-once: %s already holds %s for %s%s, which does not cover this region, and a library may have read it; download this region under another region name",
+                 where, h$name, m$Units, if (is.na(m$BufferKm) || !nzchar(m$BufferKm)) "" else sprintf(" + %s km", m$BufferKm)), call. = FALSE)
   hp <- layout[Column == col, HomePath]; first <- strsplit(hp, "|", fixed = TRUE)[[1]][1]
-  ctx$place <- file.path(ctx$home, if (grepl("*", first, fixed = TRUE)) dirname(first) else first)
-  ctx$dl <- file.path(ctx$home, ".downloads", col)
+  ctx$place <- file.path(ctx$store, if (grepl("*", first, fixed = TRUE)) dirname(first) else first)
+  ctx$dl <- file.path(ctx$store, ".downloads", col)
   items <- h$plan(ctx)
   if (!nrow(items)) return(out("failed", 0, 0, "the source lists no files for these years or this region"))
   # (only within a covered region: a file in place for a smaller region is fetched again)
   if (!is.null(h$have) && up) { got <- h$have(ctx, items)
-    if (all(got)) { log(sprintf("%s: up to date (all %d asked files in place)", h$name, nrow(items))); return(out("skipped", nrow(read_files(ctx$home)[Column == col]))) }
+    if (all(got)) { log(sprintf("%s: up to date in %s (all %d asked files in place)", h$name, where, nrow(items)))
+      return(out("skipped", nrow(read_files(ctx$store)[Column == col]), nxt = held_in(where))) }
     if (any(got)) log(sprintf("%s: %d of %d asked files already in place; fetching the other %d", h$name, sum(got), nrow(items), sum(!got)))
     items <- items[!got] }
   items[, dest := file.path(ctx$dl, file)]; if (!"fetch" %in% names(items)) items[, fetch := TRUE]
   get <- items[fetch == TRUE]; remote <- items[fetch == FALSE]
   if (check_only) { s <- url_sizes(get$url); miss <- sum(is.na(s))
-    log(sprintf("%s: %d files to fetch, %.0f MB%s%s", h$name, nrow(get), sum(s, na.rm = TRUE) / 1e6, if (miss) sprintf(" (%d sizes unknown)", miss) else "",
+    log(sprintf("%s: %d files to fetch into %s, %.0f MB%s%s", h$name, nrow(get), where, sum(s, na.rm = TRUE) / 1e6, if (miss) sprintf(" (%d sizes unknown)", miss) else "",
                 if (nrow(remote)) sprintf("; %d archives read remotely for the region only", nrow(remote)) else ""))
     return(out("would download", nrow(items), sum(s, na.rm = TRUE) / 1e6,
-               paste(c(if (miss) sprintf("%d files did not report a size", miss), if (nrow(remote)) "read remotely: only the region is written"), collapse = "; "))) }
+               paste(c(sub("^in ", "into ", held_in(where)), if (miss) sprintf("%d files did not report a size", miss), if (nrow(remote)) "read remotely: only the region is written"), collapse = "; "))) }
   mb <- 0
   if (nrow(get)) { sizes <- url_sizes(get$url)
     log(sprintf("%s: fetching %d files (%.0f MB%s)", h$name, nrow(get), sum(sizes, na.rm = TRUE) / 1e6, if (anyNA(sizes)) ", some sizes unknown" else ""))
     fetch_files(get$url, get$dest, ctx$connections, log, sizes); mb <- sum(file.size(get$dest), na.rm = TRUE) / 1e6 }
   if (nrow(remote)) log(if (!is.null(h$method)) sprintf("%s: clipped by its source (%s)", h$name, h$method) else sprintf("%s: reading %d archives remotely, writing the region only", h$name, nrow(remote)))
   log(sprintf("%s: %.0f MB fetched; unpacking%s", h$name, mb, if (is.null(ctx$region$poly) || ctx$keep) "" else " and clipping to the region"))
-  path <- h$finish(ctx, items)
+  # finish writes into a staging folder; commit_staged moves its files into place without replacing any a library may have read
+  place <- ctx$place; stage <- file.path(ctx$store, ".staging", col); unlink(stage, recursive = TRUE); dir.create(stage, recursive = TRUE, showWarnings = FALSE)
+  ctx$place <- stage
+  path <- h$finish(ctx, items); path <- commit_staged(stage, place, path, ctx$store, col, log)
   # record: every file under the place, with checksums; the manifest row
-  fr <- files_rows(ctx$home, col, path, sha = TRUE); write_files(ctx$home, fr)
+  fr <- files_rows(ctx$store, col, path, sha = TRUE); write_files(ctx$store, fr)
   copy <- if (is.null(ctx$region$poly) || ctx$keep || isTRUE(h$national)) "national" else "clipped"
   src <- layout[Column == col]
-  write_manifest(ctx$home, data.table::data.table(Column = col, Dataset = h$name, Source = src$Source, Version = if (!is.null(h$version)) h$version else src$Version,
+  write_manifest(ctx$store, data.table::data.table(Column = col, Dataset = h$name, Source = src$Source, Version = if (!is.null(h$version)) h$version else src$Version,
     Url = paste(unique(dirname(items$url)), collapse = " "), Doi = src$Doi, Method = if (!is.null(h$method)) h$method else "direct", Copy = copy,
     Units = ctx$region$units, BufferKm = ctx$region$buffer_km, Xmin = ctx$region$box[1], Ymin = ctx$region$box[2], Xmax = ctx$region$box[3], Ymax = ctx$region$box[4],
     Files = nrow(fr), Bytes = sprintf("%.0f", sum(as.numeric(fr$Bytes))), Downloaded = format(Sys.time(), "%Y-%m-%dT%H:%M:%S"), Status = "done",
     Note = if (!is.null(h$note)) h$note else NA_character_))
   unlink(ctx$dl, recursive = TRUE)
   log(sprintf("%s: done, %d files, %.0f MB at %s", h$name, nrow(fr), sum(as.numeric(fr$Bytes)) / 1e6, substring(path, nchar(ctx$home) + 2)))
-  out("done", nrow(fr), sum(as.numeric(fr$Bytes)) / 1e6) }
+  out("done", nrow(fr), sum(as.numeric(fr$Bytes)) / 1e6, held_in(where)) }
 
 # a failed dataset: its manifest row says so (kept from an earlier done run otherwise untouched files would be lost: only a
 # dataset with no done row gets a failed row)

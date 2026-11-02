@@ -9,6 +9,8 @@
 // separated columns. Blank (a new scenario) = one run: the project's first Climate Model UCSD serves (else the catalog's first), ssp245,
 // and each model's r1i1p1f1 (else its first). Unticking every model goes back to that one; no scenario ticked = historical only.
 // Members: the members the ticked models have; none ticked = each model's r1i1p1f1, else its first.
+// Home layout (HomeLayout 1 National, 2 By region) and Region name (blank = from the Study Area units): the region's clips go in
+// <home>/regions/<name>/, and the page lists the regions the home already holds.
 // =============================================================================
 using System;
 using System.Collections.Generic;
@@ -27,6 +29,9 @@ namespace lucasCoreUI
 
         private class Ds { public string Column, Name, Category, Method, Login, Note; public double SizeGb; public bool Fetched; public CheckBox Box; }
         private readonly List<Ds> m_ds = new List<Ds>();
+        private readonly Choice m_layout = new Choice("HomeLayout", 2);
+        private readonly TextBox m_region = new TextBox { Width = 200, Margin = new Padding(3, 3, 6, 3) };
+        private readonly Label m_regions = new Label { AutoSize = true, MaximumSize = new Size(680, 0), ForeColor = SystemColors.GrayText, Margin = new Padding(3, 2, 3, 4) };
         private readonly TextBox m_buffer = Box(60), m_from = Box(60), m_to = Box(60), m_con = Box(40);
         private readonly CheckBox m_keep = new CheckBox { Text = "Keep national copies (else each whole file is clipped to the region after download)", AutoSize = true, Margin = new Padding(3, 5, 3, 3) };
         private readonly CheckBox m_check = new CheckBox { Text = "Check only: list what would download, and how big, without fetching anything", AutoSize = true, Margin = new Padding(3, 5, 3, 3) };
@@ -66,6 +71,11 @@ namespace lucasCoreUI
             var hr = Row(); hr.Controls.Add(Caption("Into Data Sources Home:")); hr.Controls.Add(m_home); where.Controls.Add(hr);
             var br = Row(); br.Controls.Add(Caption("Buffer around the study area (km):")); br.Controls.Add(m_buffer); br.Controls.Add(Note("blank = 10")); where.Controls.Add(br);
             where.Controls.Add(Wrapped("The region is this scenario's Study Area page (blank = all of CONUS, national copies) plus the buffer. One download serves every Build whose study area it holds; a rerun fetches only what the home folder's manifest does not yet show as done, and resumes partial files.", 680));
+            var lr = Row(); lr.Controls.Add(Caption("Home layout:")); lr.Controls.Add(Option(m_layout, 2, "By region")); lr.Controls.Add(Option(m_layout, 1, "National")); where.Controls.Add(lr);
+            var rn = Row(); rn.Controls.Add(Caption("Region name:")); rn.Controls.Add(m_region); rn.Controls.Add(Note("blank = from the Study Area units")); where.Controls.Add(rn);
+            where.Controls.Add(m_regions);
+            where.Controls.Add(Wrapped("By region: the region's clips go in the home folder's regions/<name> folder, and the datasets kept whole (FIA, PRISM, LOCA2, FPA-FOD) at its top, shared by every region. National: every dataset whole at the top, for a home that serves many study areas (the LANDFIRE, NLCD, perimeter, C-CAP, gNATSGO and stand age national files are not fetched by this version). No file in the home is ever replaced: a region that differs from one already downloaded needs its own name. A Build reads each dataset from the smallest region holding its study area.", 680));
+            m_region.Validated += (s, a) => { if (!Refreshing) { string v = m_region.Text.Trim(); Write("RegionName", v.Length > 0 ? (object)v : DBNull.Value); RefreshControls(); } };
             AddGroup(Group("Region", where));
 
             // the datasets, grouped as on the Data Sources page
@@ -308,6 +318,11 @@ namespace lucasCoreUI
             m_home.ForeColor = home.Length > 0 ? SystemColors.ControlText : Color.Firebrick;
             m_homeDir = home; m_email.Enabled = home.Length > 0; m_email.Text = Setting("LfpsEmail");
             m_token.Enabled = home.Length > 0; m_token.Text = Setting("EarthdataToken");
+            ShowChoice(m_layout); m_region.Text = Show(Value("RegionName")); m_region.Enabled = IntValue("HomeLayout", 2) == 2;
+            string[] regs = new string[0];
+            try { string rd = Path.Combine(home, "regions"); if (home.Length > 0 && Directory.Exists(rd)) regs = Directory.GetDirectories(rd).Select(Path.GetFileName).OrderBy(x => x).ToArray(); }
+            catch (Exception) { }
+            m_regions.Text = home.Length == 0 ? "" : regs.Length == 0 ? "This home holds no regions yet." : "Regions in this home: " + string.Join(", ", regs) + " (the same name adds to that region only if its Study Area matches)";
             m_buffer.Text = Show(Value("BufferKm")); m_from.Text = Show(Value("YearFrom")); m_to.Text = Show(Value("YearTo")); m_con.Text = Show(Value("Connections"));
             object k = Value("KeepNational"); m_keep.Checked = k != DBNull.Value && Convert.ToBoolean(k);
             object c = Value("CheckOnly"); m_check.Checked = c != DBNull.Value && Convert.ToBoolean(c);

@@ -183,7 +183,7 @@ say("Decay calibration: %d cells, %d with >= %d FIA plots (own fit), %d with a g
 # defaults; blank = gSSURGO with options 1 and 4, CBM with 2 and 3 (as before the choice existed).
 # (copt and dom_mode are read above, before Live Turnover)
 sm0 <- if ("SoilCarbonModel" %in% names(copt)) copt$SoilCarbonModel[1] else NA
-soil_mode <- if (is.null(sm0) || is.na(sm0)) (if (dom_mode %in% c(1L, 4L)) 1L else 2L) else if (is.numeric(sm0)) as.integer(sm0) else if (grepl("^gSSURGO", sm0)) 1L else if (grepl("^CBM", sm0)) 2L else NA_integer_
+soil_mode <- if (is.null(sm0) || is.na(sm0)) (if (dom_mode %in% c(1L, 4L)) 1L else 2L) else if (is.numeric(sm0)) as.integer(sm0) else if (grepl("^gSSURGO|^gNATSGO", sm0)) 1L else if (grepl("^CBM", sm0)) 2L else NA_integer_
 if (is.na(soil_mode)) fail("Carbon Method: unrecognised Soil Organic Carbon choice '%s'", sm0)
 say("Carbon Method: dead organic matter = %s; soil organic carbon = %s", c("calibrated to FIA condition pools (snags, down wood, floor; older option)", "FIA condition pools (older option)",
     "CBM defaults (no calibration)", "FIA measured dead wood (down woody material and snags in mature stands; regional decay)")[dom_mode],

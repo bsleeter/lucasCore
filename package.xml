@@ -31,7 +31,7 @@
 		<column name="FriFile" displayName="LANDFIRE Mean Fire Return Interval" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/FRI/Tif/LC16_FRI_200.tif"/>
 		<column name="PrismFolder" displayName="PRISM Folder (annual and normals)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Climate/prism"/>
 		<column name="Loca2Folder" displayName="LOCA2 Folder (gcm/r1i1p1f1/ssp)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Climate/LOCA2"/>
-		<column name="SoilCarbonFile" displayName="gSSURGO Soil Organic Carbon" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/gSSURGO/gssurgo_soc_0_999.tif"/>
+		<column name="SoilCarbonFile" displayName="Soil Organic Carbon (gNATSGO soc0_999; gSSURGO also reads)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/gSSURGO/gssurgo_soc_0_999.tif"/>
 		<column name="FirePerimeterHistoryFile" displayName="Interagency Fire Perimeter History" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/NIFS/InterAgencyFirePerimeterHistory_All_Years_View/InterAgencyFirePerimeterHistory_All_Years_View.shp"/>
 		<column name="RoadsFile" displayName="Roads (LANDFIRE 30 m raster; stage 10)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/Roads/LF2023_Roads_CONUS/Tif/LF2023_Roads_CONUS.tif"/>
 		<column name="ElevationFile" displayName="Elevation (LANDFIRE 30 m DEM; stage 10)" dataType="String" isOptional="True" defaultValue="F:/lucas-master/Data Sources/DEM/LF2020_Elev_220_CONUS/Tif/LC20_Elev_220.tif"/>
@@ -493,10 +493,10 @@
 
 	<dataSheet name="CarbonOptions" displayName="Carbon Method" isSingleRow="True" viewClassName="lucasCoreUI.CarbonOptionsView" viewClassAssembly="lucasCoreUI">
 		<!-- 2026-10-28 (user): two dead organic matter methods on the page; the FIA condition-pool options 1 and 2 stay in this list (older libraries hold them, and a value missing from the list cannot even be read) but are not offered (stage 3 still
-		     reads them in older libraries). Soil organic carbon is its own choice (blank = gSSURGO with measured dead wood, CBM with CBM
+		     reads them in older libraries). Soil organic carbon is its own choice (blank = gNATSGO soil carbon with measured dead wood, CBM with CBM
 		     defaults, as before); SoilGrids is planned as a third. -->
 		<column name="DeadOrganicMatterModel" displayName="Dead Organic Matter" dataType="Integer" validationType="List" formula1="4:FIA measured dead wood (down woody material and snags in mature stands)|3:CBM defaults (no calibration)|1:FIA condition pools (older option)|2:FIA condition pools, CBM-default soil (older option)" defaultValue="4"/>
-		<column name="SoilCarbonModel" displayName="Soil Organic Carbon" dataType="Integer" validationType="List" formula1="1:gSSURGO (soil decay calibrated to its soil organic carbon)|2:CBM defaults (soil from the spin-up)" isOptional="True"/>
+		<column name="SoilCarbonModel" displayName="Soil Organic Carbon" dataType="Integer" validationType="List" formula1="1:gNATSGO (soil decay calibrated to its soil organic carbon)|2:CBM defaults (soil from the spin-up)" isOptional="True"/>
 	</dataSheet>
 
 	<dataSheet name="LandCoverCrosswalk" displayName="Land Cover Crosswalks" viewClassName="lucasCoreUI.LandCoverCrosswalkView" viewClassAssembly="lucasCoreUI">
@@ -607,7 +607,7 @@
 		<column name="SnagFallSource" displayName="Snag Fall Source" dataType="String" isOptional="True"/>
 		<column name="FireSnagShare" displayName="High-Severity Fire Snag Share" dataType="Double" format="0.00" isOptional="True"/>
 		<column name="MeasuredPlots" displayName="FIA Down Woody Material Conditions (mature)" dataType="Integer" isOptional="True"/>
-		<column name="SoilTarget" displayName="gSSURGO Soil Target (Mg C/ha)" dataType="Double" format="0.0" isOptional="True"/>
+		<column name="SoilTarget" displayName="gNATSGO Soil Target (Mg C/ha)" dataType="Double" format="0.0" isOptional="True"/>
 		<column name="SoilSource" displayName="Soil Multiplier Source" dataType="String"/>
 		<column name="ReturnIntervalSource" displayName="Return Interval Source" dataType="String" isOptional="True"/>
 		<column name="HistoricalClearcutShare" displayName="Spin-up Cycles Ended by Clearcut (share)" dataType="Double" format="0.00" isOptional="True"/>
@@ -675,7 +675,7 @@
 		<column name="Cells" dataType="Integer"/>
 	</dataSheet>
 
-	<dataSheet name="OutputSoilTarget" displayName="Soil Carbon Targets (gSSURGO)">
+	<dataSheet name="OutputSoilTarget" displayName="Soil Carbon Targets (gNATSGO)">
 		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum"/>
 		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
 		<column name="SoilTarget" displayName="Mean Soil Organic Carbon (Mg C/ha)" dataType="Double" format="0.0"/>
@@ -861,6 +861,8 @@
 	<dataSheet name="DataDownloadOptions" displayName="Data Download" isSingleRow="True" viewClassName="lucasCoreUI.DataDownloadView" viewClassAssembly="lucasCoreUI">
 		<!-- stage 15 (to-do 12, src/download.R): fetch the Data Sources into Data Sources Home for the Study Area units plus a buffer -->
 		<column name="BufferKm" displayName="Buffer around the study area (km)" dataType="Double" defaultValue="10" isOptional="True"/>
+		<column name="HomeLayout" displayName="Home layout" dataType="Integer" validationType="List" formula1="1:National (every dataset whole at the top of the home; any study area reads it)|2:By region (the region&apos;s clips in regions/&lt;name&gt;; national datasets shared at the top)" defaultValue="2" isOptional="True"/>
+		<column name="RegionName" displayName="Region name (By region: the folder under regions/; blank = from the Study Area units)" dataType="String" isOptional="True"/>
 		<column name="YearFrom" displayName="First year of the annual datasets (blank = 1985)" dataType="Integer" isOptional="True"/>
 		<column name="YearTo" displayName="Last year of the annual datasets (blank = the latest each source has)" dataType="Integer" isOptional="True"/>
 		<column name="Datasets" displayName="Datasets (Data Sources columns, comma separated; blank = every one the stage can fetch)" dataType="String" isOptional="True"/>
@@ -881,6 +883,18 @@
 		<column name="SizeMb" displayName="Size (MB)" dataType="Double" isOptional="True"/>
 		<column name="Minutes" dataType="Double" isOptional="True"/>
 		<column name="Next" displayName="What to do next" dataType="String" isOptional="True"/>
+	</dataSheet>
+
+	<dataSheet name="OutputDataSources" displayName="Data Sources Used">
+		<!-- every Build stage (shared.R, finish_checks): the Data Sources it read, where from, and the checksums the home's files.csv records -->
+		<column name="Stage" dataType="String"/>
+		<column name="DataSource" displayName="Data Sources column" dataType="String"/>
+		<column name="Origin" displayName="From (a home folder: the top or regions/name; else set, default or package)" dataType="String"/>
+		<column name="Path" dataType="String"/>
+		<column name="Files" dataType="Integer" isOptional="True"/>
+		<column name="Bytes" dataType="Double" isOptional="True"/>
+		<column name="Sha256" displayName="SHA-256 (one file; a folder: of its sorted file checksums)" dataType="String" isOptional="True"/>
+		<column name="Note" dataType="String" isOptional="True"/>
 	</dataSheet>
 
 	<!-- =================================================================================================== -->
@@ -908,6 +922,7 @@
 		<dataSheet name="OutputStrataSummary" type="Output"/>
 		<dataSheet name="core_SpatialMultiprocessing" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
+		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
 
 	<transformer name="GrowthCurves" displayName="2 - Fit Growth Curves" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/2-growth-curves.R">
@@ -921,6 +936,7 @@
 		<dataSheet name="OutputSiteProductivity" type="Output"/>
 		<dataSheet name="OutputGrowthReport" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
+		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
 
 	<transformer name="CarbonFlows" displayName="3 - Carbon Flows" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/3-carbon-flows.R">
@@ -947,6 +963,7 @@
 		<dataSheet name="OutputDecayCalibration" type="Output"/>
 		<dataSheet name="OutputCarbonRate" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
+		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
 
 	<transformer name="InitialStocks" displayName="4 - Spin-up and Initial Stocks" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/4-initial-stocks.R">
@@ -955,6 +972,7 @@
 		<dataSheet name="stsim_FlowMultiplier" type="Input"/>
 		<dataSheet name="InitialStockCurve" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
+		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
 
 	<transformer name="InitialConditions" displayName="5 - Initial Conditions" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/5-initial-conditions.R">
@@ -968,6 +986,7 @@
 		<dataSheet name="OutputSoilTarget" type="Output"/>
 		<dataSheet name="OutputStateClassSummary" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
+		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
 
 	<transformer name="HistoricalTransitions" displayName="6 - Historical Transitions" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/6-historical-transitions.R">
@@ -983,6 +1002,7 @@
 		<dataSheet name="OutputTransitionSummary" type="Output"/>
 		<dataSheet name="OutputHarvestAge" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
+		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
 
 	<transformer name="ClimateMultipliers" displayName="7 - Climate Multipliers" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/7-climate-multipliers.R">
@@ -993,6 +1013,7 @@
 		<dataSheet name="stsim_FlowSpatialMultiplier" type="Output"/>
 		<dataSheet name="OutputClimateSummary" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
+		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
 
 	<transformer name="InitialStocksSpatial" displayName="8 - Initial Stock Maps" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/8-initial-stocks-spatial.R">
@@ -1006,6 +1027,7 @@
 		<dataSheet name="stsim_FlowSpatialMultiplier" type="Both"/>
 		<dataSheet name="OutputInitialStockSummary" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
+		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
 
 	<transformer name="ProjectionTransitions" displayName="9 - Projection Transitions" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/9-projection-transitions.R">
@@ -1028,6 +1050,7 @@
 		<dataSheet name="stsim_TransitionSizePrioritization" type="Both"/>
 		<dataSheet name="stsim_TransitionSpatialInitiationMultiplier" type="Both"/>
 		<dataSheet name="OutputValidation" type="Output"/>
+		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
 
 	<transformer name="TransitionSuitability" displayName="10 - Transition Suitability" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/10-transition-suitability.R">
@@ -1053,6 +1076,7 @@
 		<dataSheet name="OutputSuitabilityMap" type="Output"/>
 		<dataSheet name="OutputPatchSize" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
+		<dataSheet name="OutputDataSources" type="Output"/>
 		<dataSheet name="ProjectionOptions" type="Input"/>
 	</transformer>
 
@@ -1065,6 +1089,7 @@
 		<dataSheet name="stsim_FlowSpatialMultiplier" type="Output"/>
 		<dataSheet name="OutputClimateSummary" type="Both"/>
 		<dataSheet name="OutputValidation" type="Output"/>
+		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
 
 	<transformer name="BuildFigures" displayName="12 - Build Figures" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/12-build-figures.R">
@@ -1082,6 +1107,7 @@
 		<dataSheet name="OutputSiteClassMap" type="Input"/>
 		<dataSheet name="OutputBuildFigure" type="Output"/>
 		<dataSheet name="OutputValidation" type="Both"/>
+		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
 
 	<!-- export: every Build figure to a folder -->
@@ -1094,6 +1120,7 @@
 		<dataSheet name="OutputTransitionSummary" type="Input"/>
 		<dataSheet name="OutputRunFigure" type="Output"/>
 		<dataSheet name="OutputValidation" type="Both"/>
+		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
 
 	<!-- export: every run figure to a folder -->
@@ -1107,6 +1134,7 @@
 		<dataSheet name="OutputCompareCarbon" type="Output"/>
 		<dataSheet name="OutputCompareLand" type="Output"/>
 		<dataSheet name="OutputValidation" type="Both"/>
+		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
 
 	<!-- export: every comparison figure to a folder -->
@@ -1206,6 +1234,7 @@
 				<item name="OutputCompareCarbon"/>
 				<item name="OutputCompareLand"/>
 				<item name="OutputDataDownload"/>
+				<item name="OutputDataSources"/>
 				<item name="OutputValidation"/>
 			</group>
 		</group>
