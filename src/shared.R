@@ -173,9 +173,11 @@ read_fire_perimeters <- function(file, y0, y1, fields = character(0)) {
   have <- names(sf::st_read(file, query = sprintf('SELECT * FROM "%s" WHERE FID = 0', lay), quiet = TRUE))
   yf <- intersect(c("FIRE_YEAR_INT", "FIRE_YEAR_"), have)[1]
   if (is.na(yf)) fail("Fire perimeters: %s has no FIRE_YEAR_INT or FIRE_YEAR_ field", basename(file))
-  fp <- sf::st_read(file, query = sprintf('SELECT %s FROM "%s" WHERE %s >= %d AND %s <= %d AND %s <> 9999', paste(unique(c(yf, fields)), collapse = ", "),
-                                          lay, yf, as.integer(y0), yf, as.integer(y1), yf), quiet = TRUE)
-  fp$yr <- as.integer(fp[[yf]]); fp }
+  # SELECT * keeps the geometry: a field list drops it from a GeoPackage (the Data Download's copy), though not from a shapefile
+  fp <- sf::st_read(file, query = sprintf('SELECT * FROM "%s" WHERE %s >= %d AND %s <= %d AND %s <> 9999', lay, yf, as.integer(y0), yf, as.integer(y1), yf), quiet = TRUE)
+  # a shapefile cuts field names to 10 characters (FEATURE_CA); a GeoPackage keeps them whole (FEATURE_CATEGORY): either answers to the short name
+  for (k in setdiff(fields, names(fp))) { m <- grep(paste0("^", k), names(fp), value = TRUE)[1]; if (!is.na(m)) names(fp)[names(fp) == m] <- k }
+  fp <- fp[, unique(c(yf, intersect(fields, names(fp))))]; fp$yr <- as.integer(fp[[yf]]); fp }
 
 # Carbon Assumptions - Dead Organic Matter Parameters (to-do 21): the scenario's rows (from its Carbon Assumptions dependency), else the
 # package default (defaults/cbm/dom-parameters.csv); logs every row that differs from the default. Columns as the sheet, Pool as its label.
