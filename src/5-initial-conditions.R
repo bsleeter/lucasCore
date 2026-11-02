@@ -89,6 +89,9 @@ if (lcr == "2" || grepl("^Area", lcr)) {
   DEVI <- which(LC_CLASSES %in% 21:24); prev <- NULL; pp <- NULL; short <- 0; nrev <- 0; lost <- 0; wrong <- list(); a30 <- list()
   for (i in seq_along(years)) {
     K <- values(rast(cfs[i]), mat = TRUE)[land, , drop = FALSE]; K[is.na(K)] <- 0
+    # a hole in the 30 m map (a blank tile from the NLCD service, P26 2026-11-01) leaves land cells with no pixels at all
+    z <- sum(rowSums(K) == 0); if (z > 0.01 * nrow(K)) fail("Annual NLCD %d: %d land cells (%.1f%%) have no 30 m land cover; the file has a gap (%s). Download it again",
+                                                             years[i], z, 100 * z / nrow(K), nfs[i])
     first <- is.null(prev)
     if (first) { M <- match(values(rast(nl_files[i]), mat = FALSE)[land], LC_CLASSES); prev <- ifelse(is.na(M), max.col(K, ties.method = "first"), M) }   # the first year starts from the modal map
     r <- match_step(prev, K, first); A <- r$cur; short <- short + r$short

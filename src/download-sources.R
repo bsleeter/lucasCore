@@ -231,13 +231,29 @@ download_handlers <- function() {
     have = function(ctx, items) recorded(ctx, "NlcdFolder", file.path(ctx$place, items$file)),
     finish = function(ctx, items) {
       tl <- grid_tiles(ctx$region$box, c(-2415585, 3314805), 30, 4000)
-      for (i in seq_len(nrow(items))) { y <- items$year[i]
+      # under load the WCS now and then answers a full-size tile with no data (P26 2026-11-01: one tile each in 2001, 2003 and 2009).
+      # NLCD's no-data cells are the same every year, so each tile's count of class cells must equal the most seen in any year;
+      # a tile short of it is fetched again
+      classed <- function(p) { v <- terra::values(terra::rast(p), mat = FALSE); sum(!is.na(v) & v >= 11 & v <= 95) }
+      ref <- rep(0, nrow(tl)); got <- matrix(NA_real_, nrow(items), nrow(tl)); zero_ok <- rep(FALSE, nrow(tl))   # zero_ok: blank after 4 tries (outside CONUS)
+      one_year <- function(i) { y <- items$year[i]
         u <- sprintf("%s?service=WCS&version=1.0.0&request=GetCoverage&coverage=%s&crs=EPSG:5070&bbox=%.0f,%.0f,%.0f,%.0f&width=%d&height=%d&time=%d-01-01T00:00:00.000Z&format=GeoTIFF",
                      NLCD_WCS, NLCD_COV, tl$xmin, tl$ymin, tl$xmax, tl$ymax, tl$nx, tl$ny, y)
         parts <- file.path(ctx$dl, y, sprintf("tile%02d.tif", seq_len(nrow(tl))))
         fetch_files(u, parts, 1, ctx$log, sizes = rep(NA_real_, length(u)))   # one tile at a time: the WCS answers 404 under parallel load (2026-11-01)
+        n <- vapply(parts, classed, 0)
+        for (try in 1:4) { bad <- which(n < ref | (n == 0 & !zero_ok)); if (!length(bad)) break
+          ctx$log(sprintf("  NLCD %d: tile %s came back with %s class cells (expected %s); fetching again", y, paste(bad, collapse = ", "),
+                          paste(n[bad], collapse = ", "), paste(ref[bad], collapse = ", ")))
+          Sys.sleep(10 * try); file.remove(parts[bad]); fetch_files(u[bad], parts[bad], 1, ctx$log, sizes = rep(NA_real_, length(bad)))
+          n[bad] <- vapply(parts[bad], classed, 0) }
+        if (any(n < ref)) stop(sprintf("NLCD %d: tile %s still short of class cells after 4 tries", y, paste(which(n < ref), collapse = ", ")), call. = FALSE)
+        ref <<- pmax(ref, n); got[i, ] <<- n; zero_ok <<- zero_ok | n == 0
         mosaic_to(parts, file.path(ctx$place, items$file[i]), "INT1U"); unlink(dirname(parts[1]), recursive = TRUE)
         ctx$log(sprintf("  NLCD %d (%d tiles)", y, nrow(tl))) }
+      for (i in seq_len(nrow(items))) one_year(i)
+      # a year fetched before a later year raised a tile's count is fetched again
+      for (i in which(apply(got, 1, function(n) any(n < ref)))) { ctx$log(sprintf("  NLCD %d: a tile has fewer class cells than in later years; fetching it again", items$year[i])); one_year(i) }
       ctx$place })
 
   # ---- LANDFIRE layers by LANDFIRE Product Service jobs (the job clips; output on LANDFIRE's own grid) -----------------
