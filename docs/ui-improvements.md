@@ -322,7 +322,12 @@ Pushed: everything through the v1.0.1 release (2026-11-02: strata polygons and n
 14. **FGDC metadata for the model and its outputs** - PLANNED 2026-10-31 as a metadata and data release generator following USGS
    FSP (SM 502.7 and 502.8 as reissued 2026-06-01): implementation plan at https://claude.ai/artifact/RoBU7fJ7C7xa6pvg2z8LFK (one
    content model, CSDGM writer, model record, stage 15 Data Release, Release Information page, mp and content checks, review packet,
-   phases 0-6 ending in a P26 trial release; decisions settled 2026-11-02 (CSDGM first, one release per Build, maps every year, archive always, ScienceBase by hand); Data Release is stage 16; Phase 0 needs the Center data manager). The 2026-10-25 scope below
+   phases 0-6 ending in a P26 trial release; decisions settled 2026-11-02 (CSDGM first, one release per Build, maps every year, archive always, ScienceBase by hand); Data Release is stage 16; Phase 0 needs the Center data manager).
+   Phase 1 (definitions, data dictionary, citations) done 2026-11-02. Phase 2 (model record) done 2026-11-02: `src/metadata-record.R`
+   (facts from a Build result, the content model, the CSDGM writer, mp), `tools/model-record.R "<library>" --build=<id>`, record defaults,
+   keywords and Use Constraints notes in `defaults/metadata`, `tests/unit-metadata-record.R`; P26 Build 53 passes mp with no errors or
+   warnings, but it predates Data Sources Used, so its lineage is inferred from the home: test the lineage again on the next P26 Build.
+   Not yet written by the Build itself (a step of stage 12 or 16; wire it when no run is going). The 2026-10-25 scope below
    still holds. TO DO (user, 2026-10-25). Completed runs need FGDC-compliant metadata (CSDGM,
    FGDC-STD-001-1998, as USGS data releases use; XML), in two layers:
    - **Model metadata** (thorough, one record per model): what the model is and how it was built. Identification (title, abstract,
