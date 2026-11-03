@@ -65,6 +65,10 @@ url_sizes <- function(urls) vapply(urls, function(u) {
   cr <- curl::parse_headers_list(r$headers)[["content-range"]]
   if (is.null(cr) || !grepl("/[0-9]+$", cr)) NA_real_ else as.numeric(sub(".*/", "", cr)) }, 0, USE.NAMES = FALSE)
 
+# the server says the file is not there (HEAD 404). No answer at all is not gone: the fetch then tries, and says what failed
+url_gone <- function(u) { r <- tryCatch(curl::curl_fetch_memory(u, handle = curl::new_handle(nobody = TRUE, followlocation = TRUE, timeout = 60)), error = function(e) NULL)
+  !is.null(r) && r$status_code == 404 }
+
 # fetch urls to files, `connections` at a time. A file already at the size the server reports is kept; a shorter one resumes
 # (HTTP 206); a server that ignores the range (200) or a file that ends up the wrong size starts again. Stops naming what failed.
 fetch_files <- function(urls, dest, connections = 4, log = message, sizes = url_sizes(urls)) {
@@ -174,6 +178,8 @@ run_dataset <- function(h, ctx, layout, check_only = FALSE) {
     items <- items[!got] }
   items[, dest := file.path(ctx$dl, file)]; if (!"fetch" %in% names(items)) items[, fetch := TRUE]
   get <- items[fetch == TRUE]; remote <- items[fetch == FALSE]
+  if (check_only && "supplied" %in% names(items)) { log(sprintf("%s: from %s, supplied by hand", h$name, items$supplied[1]))
+    return(out("would download", 1, 0, sprintf("from %s, supplied by hand", items$supplied[1]))) }
   if (check_only) { s <- url_sizes(get$url); miss <- sum(is.na(s))
     log(sprintf("%s: %d files to fetch into %s, %.0f MB%s%s", h$name, nrow(get), where, sum(s, na.rm = TRUE) / 1e6, if (miss) sprintf(" (%d sizes unknown)", miss) else "",
                 if (nrow(remote)) sprintf("; %d read from its service%s", nrow(remote), if (is.null(ctx$region$poly)) " whole" else " for the region only") else ""))
@@ -183,7 +189,8 @@ run_dataset <- function(h, ctx, layout, check_only = FALSE) {
   if (nrow(get)) { sizes <- url_sizes(get$url)
     log(sprintf("%s: fetching %d files (%.0f MB%s)", h$name, nrow(get), sum(sizes, na.rm = TRUE) / 1e6, if (anyNA(sizes)) ", some sizes unknown" else ""))
     fetch_files(get$url, get$dest, ctx$connections, log, sizes); mb <- sum(file.size(get$dest), na.rm = TRUE) / 1e6 }
-  if (nrow(remote)) log(if (!is.null(h$method)) sprintf("%s: %s by its source (%s)", h$name, if (is.null(ctx$region$poly)) "read whole" else "clipped", h$method) else sprintf("%s: reading %d archives remotely, writing the region only", h$name, nrow(remote)))
+  if ("supplied" %in% names(items)) log(sprintf("%s: reading %s, supplied by hand", h$name, items$supplied[1]))
+  else if (nrow(remote)) log(if (!is.null(h$method)) sprintf("%s: %s by its source (%s)", h$name, if (is.null(ctx$region$poly)) "read whole" else "clipped", h$method) else sprintf("%s: reading %d archives remotely, writing the region only", h$name, nrow(remote)))
   log(sprintf("%s: %.0f MB fetched; unpacking%s", h$name, mb, if (is.null(ctx$region$poly) || ctx$keep) "" else " and clipping to the region"))
   # finish writes into a staging folder; commit_staged moves its files into place without replacing any a library may have read
   place <- ctx$place; stage <- file.path(ctx$store, ".staging", col); unlink(stage, recursive = TRUE); dir.create(stage, recursive = TRUE, showWarnings = FALSE)
@@ -197,10 +204,10 @@ run_dataset <- function(h, ctx, layout, check_only = FALSE) {
   copy <- if (is.null(ctx$region$poly) || isTRUE(h$national) || (ctx$keep && !by_source)) "national" else "clipped"
   src <- layout[Column == col]
   write_manifest(ctx$store, data.table::data.table(Column = col, Dataset = h$name, Source = src$Source, Version = if (!is.null(h$version)) h$version else src$Version,
-    Url = paste(unique(dirname(items$url)), collapse = " "), Doi = src$Doi, Method = if (!is.null(h$method)) h$method else "direct", Copy = copy,
+    Url = paste(unique(dirname(items$url)), collapse = " "), Doi = src$Doi, Method = if ("supplied" %in% names(items)) "by hand" else if (!is.null(h$method)) h$method else "direct", Copy = copy,
     Units = ctx$region$units, BufferKm = ctx$region$buffer_km, Xmin = ctx$region$box[1], Ymin = ctx$region$box[2], Xmax = ctx$region$box[3], Ymax = ctx$region$box[4],
     Files = nrow(fr), Bytes = sprintf("%.0f", sum(as.numeric(fr$Bytes))), Downloaded = format(Sys.time(), "%Y-%m-%dT%H:%M:%S"), Status = "done",
-    Note = if (!is.null(h$note)) h$note else NA_character_))
+    Note = if ("note" %in% names(items)) items$note[1] else if (!is.null(h$note)) h$note else NA_character_))
   unlink(ctx$dl, recursive = TRUE)
   log(sprintf("%s: done, %d files, %.0f MB at %s", h$name, nrow(fr), sum(as.numeric(fr$Bytes)) / 1e6, substring(path, nchar(ctx$home) + 2)))
   out("done", nrow(fr), sum(as.numeric(fr$Bytes)) / 1e6, held_in(where)) }

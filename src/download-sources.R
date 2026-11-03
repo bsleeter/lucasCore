@@ -233,21 +233,29 @@ download_handlers <- function() {
 
   # ---- RCMAP vegetation state 1985 (USGS, Ecological Potential ver. 2.0): fetched whole (ScienceBase serves no byte ranges) and
   # clipped. It covers the western US rangelands; a region outside it gets no file, and stage 5 takes grassland and shrubland
-  # types from NLCD there ---------------------------------------------------------------------------------------------------
+  # types from NLCD there. Since 2026-11-02 ScienceBase answers 404 for this item's files and its new download page wants a person
+  # (a captcha, or a sign-in), so while the address stays gone the zip (or its tif) comes from <home>/supplied, put there by hand; the manifest says so
+  # ---------------------------------------------------------------------------------------------------
   H$RcmapFile <- list(column = "RcmapFile", name = "RCMAP vegetation state 1985", version = "ver. 2.0, July 2025 (10.5066/P13OMU52)",
     plan = function(ctx) { b <- ctx$region$box   # the map's extent in EPSG:5070 (checked 2026-11-01): no download for a region east of it
       if (!is.null(ctx$region$poly) && (b[1] > 592484 || b[3] < -2875426 || b[2] > 3290176 || b[4] < 309856))
         stop("the region lies outside RCMAP's western US rangelands: no file is needed (stage 5 takes grassland and shrubland types from NLCD)", call. = FALSE)
-      data.table::data.table(url = "https://www.sciencebase.gov/catalog/file/get/6849f4f6d4be026f96d9dcca?name=1985_vegetation_state.zip",
-                             file = "1985_vegetation_state.zip", fetch = TRUE) },
-    finish = function(ctx, items) { m <- "1985_vegetation_state_20250608.tif"; dest <- file.path(ctx$place, m)
-      x <- unzip_to(items$dest[1], file.path(ctx$dl, "unzip"), m)
+      own <- file.path(ctx$home, "supplied", c("1985_vegetation_state.zip", RCMAP_TIF)); own <- own[file.exists(own)]
+      if (length(own)) return(data.table::data.table(url = RCMAP_URL, file = basename(own[1]), fetch = FALSE, supplied = own[1],
+        note = sprintf("Supplied by hand as %s: ScienceBase's download page asks for a captcha", basename(own[1]))))
+      if (url_gone(RCMAP_URL)) stop(sprintf("by hand: ScienceBase no longer serves this file to a script. Open %s in a browser, download 1985_vegetation_state.zip (883 MB; it may ask you to tick a captcha or sign in), put it in %s and run again",
+                                            RCMAP_ITEM, file.path(ctx$home, "supplied")), call. = FALSE)
+      data.table::data.table(url = RCMAP_URL, file = "1985_vegetation_state.zip", fetch = TRUE) },
+    finish = function(ctx, items) { m <- RCMAP_TIF; dest <- file.path(ctx$place, m)
+      own <- "supplied" %in% names(items); from <- if (own) items$supplied[1] else items$dest[1]
+      x <- if (grepl("[.]tif$", from)) from else unzip_to(from, file.path(ctx$dl, "unzip"), m)
+      if (own && any(abs(as.vector(terra::ext(terra::rast(x))) - RCMAP_EXT) > 1)) stop(sprintf("%s is not the RCMAP map: its extent is not RCMAP's", basename(x)), call. = FALSE)
       if (clipping(ctx)) { r <- terra::rast(x); b <- terra::project(terra::vect(sf::st_as_sfc(sf::st_bbox(setNames(ctx$region$box, c("xmin", "ymin", "xmax", "ymax")), crs = sf::st_crs(5070)))), terra::crs(r))
         e <- terra::intersect(terra::ext(b), terra::ext(r))
         if (is.null(e) || !isTRUE(terra::global(terra::crop(r, e) %in% 2:9, "sum", na.rm = TRUE)[[1]] > 0))
           stop("the region lies outside RCMAP's western US rangelands: no file is needed (stage 5 takes grassland and shrubland types from NLCD)", call. = FALSE)
-        clip_raster(x, dest, ctx$region) } else { dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE); file.rename(x, dest) }
-      unlink(x); dest })
+        clip_raster(x, dest, ctx$region) } else { dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE); if (x == from) file.copy(x, dest) else file.rename(x, dest) }
+      if (x != from) unlink(x); dest })
 
   # ---- USFS forest ownership circa 2017, read remotely, with its attribute table ---------------------------------------
   H$ForestOwnerFile <- list(column = "ForestOwnerFile", name = "USFS forest ownership 2017", version = "circa 2017 (RDS-2020-0044)",
@@ -451,6 +459,10 @@ download_handlers <- function() {
   H }
 
 # ---- service helpers (phase 4) ----------------------------------------------------------------------------------------------
+RCMAP_ITEM <- "https://www.sciencebase.gov/catalog/item/6849f4f6d4be026f96d9dcca"
+RCMAP_URL <- "https://www.sciencebase.gov/catalog/file/get/6849f4f6d4be026f96d9dcca?name=1985_vegetation_state.zip"
+RCMAP_TIF <- "1985_vegetation_state_20250608.tif"
+RCMAP_EXT <- c(-2875426, 592484, 309856, 3290176)   # xmin, xmax, ymin, ymax in EPSG:5070
 NLCD_WCS <- "https://dmsdata.cr.usgs.gov/geoserver/mrlc_Land-Cover-Native_conus_year_data/wcs"
 NLCD_COV <- "mrlc_Land-Cover-Native_conus_year_data:Land-Cover-Native_conus_year_data"
 LFPS <- "https://lfps.usgs.gov/api"

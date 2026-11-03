@@ -350,6 +350,7 @@ Then build. With the home set and the paths blank, every stage reads from the ho
 
 - **A dataset failed.** Download Results gives the error. The servers are busy at times: rerun the scenario. Finished files are kept and partial ones resume. Annual NLCD checks every tile and fetches again any that come back blank.
 - **Needs login.** The Earthdata token is missing or has expired. Make a new one (step 13) and rerun; the rest of the download is unaffected.
+- **"by hand: ScienceBase no longer serves this file to a script".** ScienceBase now wants a person to download RCMAP vegetation state 1985. Open the [ScienceBase item](https://www.sciencebase.gov/catalog/item/6849f4f6d4be026f96d9dcca) in a browser, download `1985_vegetation_state.zip` (883 MB; it may ask you to tick a captcha or sign in), put it in a folder named `supplied` at the top of the home, and rerun. Only RCMAP is fetched. The zip can stay there for later study areas, and the manifest records that the copy was supplied by hand. Do not build without it in the western US: the Build still runs, but takes grassland and shrubland types from NLCD.
 - **"write-once: regions/... already holds ... for ..."** The region name is in use for a different region. Give this download its own Region name; nothing is fetched until you do.
 - **The Build stops with "... was downloaded for ... and does not cover the study area".** The home holds that dataset for a smaller region. Run a Data Download for this study area, or for one that holds it.
 

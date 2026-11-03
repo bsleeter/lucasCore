@@ -56,7 +56,7 @@ fetch_one <- function(k, ctx, check_only) { h <- H[[k]]
       return(data.table(DataSource = k, Dataset = h$name, Status = "not needed", Files = 0L, SizeMb = NA_real_, Minutes = NA_real_, Next = conditionMessage(e))) }
     log(sprintf("%s: FAILED: %s", h$name, conditionMessage(e))); if (!check_only) record_failure(store_for(h, ctx), h, conditionMessage(e))
     data.table(DataSource = k, Dataset = h$name, Status = "failed", Files = NA_integer_, SizeMb = NA_real_, Minutes = NA_real_,
-               Next = if (grepl("^write-once", conditionMessage(e))) substr(conditionMessage(e), 1, 300) else sprintf("%s (rerun to resume)", substr(conditionMessage(e), 1, 300))) }) }
+               Next = if (grepl("^write-once|^by hand:", conditionMessage(e))) substr(conditionMessage(e), 1, 300) else sprintf("%s (rerun to resume)", substr(conditionMessage(e), 1, 300))) }) }
 
 # ---- the Stratum Sources polygons first: the region is the Study Area units' polygons ---------------------------------------
 # Every preset whose File this machine lacks reads its polygons from the home (src/strata.R). They are national and come first:
