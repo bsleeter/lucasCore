@@ -255,14 +255,14 @@ namespace lucasCoreUI
         }
 
         // the folder a HomePath names: itself for a folder column, the pattern's folder for a file column
-        private static string PlaceFolder(string home, string homePath)
+        internal static string PlaceFolder(string home, string homePath)
         {
             string first = homePath.Split('|')[0];
             return Path.Combine(home, first.Contains("*") ? Path.GetDirectoryName(first) : first);
         }
 
         // a HomePath under the home folder, as src/datahome.R home_path: the folder, or the one file its patterns match. found = files matched
-        private static string Place(string home, string homePath, out int found)
+        internal static string Place(string home, string homePath, out int found)
         {
             found = 0;
             try

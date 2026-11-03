@@ -116,7 +116,9 @@ namespace lucasCoreUI
         protected void LoadGrid(Panel host, string sheet)
         {
             host.Controls.Clear();
-            MultiRowDataFeedView v = this.Session.CreateMultiRowDataFeedView(this.Scenario, this.ControllingScenario);
+            // a project page (Stratum Sources) has no scenario: SyncroSim's project grid
+            MultiRowDataFeedView v = this.Scenario == null ? this.Session.CreateMultiRowDataFeedView(this.DataFeed.Project)
+                                                           : this.Session.CreateMultiRowDataFeedView(this.Scenario, this.ControllingScenario);
             v.LoadDataFeed(this.DataFeed, sheet);
             v.Dock = DockStyle.Fill;
             host.Controls.Add(v);

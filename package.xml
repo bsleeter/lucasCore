@@ -75,7 +75,7 @@
 		<column name="Description" displayName="Rates it sets" dataType="String" isOptional="True"/>
 	</dataSheet>
 
-	<dataSheet name="StratumSource" displayName="Stratum Sources" dataScope="Project" displayMember="Name">
+	<dataSheet name="StratumSource" displayName="Stratum Sources" dataScope="Project" displayMember="Name" viewClassName="lucasCoreUI.StratumSourcesView" viewClassAssembly="lucasCoreUI">
 		<!-- written by tools/new-library.R from defaults/strata/presets.csv; add a custom row and run new-library.R with the rebuild-strata flag.
 		     The stsim Secondary and Tertiary Strata lists hold every unit of every row (stages cannot write project lists). -->
 		<column name="Name" displayName="Source" dataType="String"/>
