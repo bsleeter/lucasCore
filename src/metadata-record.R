@@ -76,7 +76,7 @@ md_build_facts <- function(lib, sid) {
   man <- data.table()
   if (!is.na(home)) for (f in c(file.path(home, "manifest.csv"), Sys.glob(file.path(home, "regions", "*", "manifest.csv")))) {
     if (!file.exists(f)) next
-    m <- fread(f, colClasses = "character")[, .(Column, Dataset, Version, Downloaded, Status)]
+    m <- fread(f, colClasses = "character")[, .(Column, Dataset, Version, Method, Downloaded, Status)]
     m[, Origin := if (dirname(f) == home) "top" else paste0("regions/", basename(dirname(f)))]; man <- rbind(man, m)
   }
 
@@ -100,15 +100,17 @@ md_sentences <- function(l) { l <- trimws(l[nzchar(trimws(l))]); paste(ifelse(gr
 
 md_valid_date <- function(x) !is.na(x) & (grepl("^[0-9]{4}([0-9]{2}([0-9]{2})?)?$", x) | x %in% c("Unknown", "Unpublished material"))
 
-# One lineage source: a citations.csv row as a CSDGM citation, its access date from the home's manifest
-md_source <- function(cit, column, accessed, contribution) {
+# One lineage source: a citations.csv row as a CSDGM citation, its access date from the home's manifest. by_hand: the file came
+# from the source by hand (a captcha, say), and Data Download only clipped it
+md_source <- function(cit, column, accessed, contribution, by_hand = FALSE) {
   c1 <- cit[Column == column]
   if (!nrow(c1)) return(NULL)
   link <- if (!is.na(c1$Doi)) paste0("https://doi.org/", c1$Doi) else c1$OnlineLink
   list(abbrev = column,
        citation = list(origin = trimws(strsplit(c1$Originator, ";", fixed = TRUE)[[1]]), pubdate = c1$PubDate, title = c1$Title,
                        edition = c1$Edition, geoform = c1$GeoForm, pubplace = c1$PubPlace, publish = c1$Publisher,
-                       othercit = if (!is.na(accessed)) sprintf("Accessed %s through the lucasCore Data Download stage.", accessed) else NA_character_,
+                       othercit = if (is.na(accessed)) NA_character_ else if (by_hand) sprintf("Downloaded by hand from the source and clipped by the lucasCore Data Download stage, %s.", accessed)
+                                  else sprintf("Accessed %s through the lucasCore Data Download stage.", accessed),
                        onlink = link[!is.na(link)]),
        typesrc = "Online", time = c1$PubDate, current = "publication date", contribution = contribution)
 }
@@ -157,17 +159,21 @@ md_model_content <- function(facts, dir) {
   stage_of <- function(n) { s <- lg$stages[vapply(lg$stages, function(x) x$number == n, TRUE)]; if (length(s)) s[[1]]$name else paste("stage", n) }
   if (nrow(du)) {
     du[, Number := sub("^([0-9]+).*", "\\1", Stage)]
-    srcs <- du[, .(Stages = paste(unique(Number), collapse = ","), Note = paste(unique(na.omit(Note)), collapse = "; ")), by = DataSource]
+    srcs <- du[, .(Stages = paste(unique(Number), collapse = ","), Note = paste(unique(na.omit(Note)), collapse = "; "), Origin = Origin[1]), by = DataSource]
   } else {
     m <- facts$manifests[Status == "done" & Column %in% cit$Column]
-    srcs <- data.table(DataSource = unique(c("EcodivisionFile", m$Column)), Stages = NA_character_, Note = "")
+    srcs <- data.table(DataSource = unique(c("EcodivisionFile", m$Column)), Stages = NA_character_, Note = "", Origin = NA_character_)
     notes <- c(notes, "this Build predates the Data Sources Used output: the lineage sources are every dataset in Data Sources Home, not the ones the Build read; run the Build again")
   }
-  access <- function(col) { m <- facts$manifests[Column == col & !is.na(Downloaded)]; if (!nrow(m)) NA_character_ else substr(max(m$Downloaded), 1, 10) }
+  # the manifest row of the folder the Build read: another region's copy has its own date. No Data Sources Used: the newest
+  held <- function(col, origin) { m <- facts$manifests[Column == col & Status == "done" & !is.na(Downloaded)]
+    if (!is.na(origin)) m <- m[Origin == sub("^the top of the home$", "top", origin)]
+    m[order(Downloaded)][seq_len(nrow(m)) == nrow(m)] }
   sources <- Filter(Negate(is.null), lapply(seq_len(nrow(srcs)), function(i) {
-    col <- srcs$DataSource[i]
+    col <- srcs$DataSource[i]; h <- held(col, srcs$Origin[i])
     st <- if (is.na(srcs$Stages[i])) "Read by the Build" else paste0("Read by ", paste(vapply(strsplit(srcs$Stages[i], ",")[[1]], stage_of, ""), collapse = "; "))
-    md_source(cit, col, access(col), paste0(st, if (nzchar(srcs$Note[i])) paste0(" (", srcs$Note[i], ")") else "", "."))
+    md_source(cit, col, if (nrow(h)) substr(h$Downloaded, 1, 10) else NA_character_, paste0(st, if (nzchar(srcs$Note[i])) paste0(" (", srcs$Note[i], ")") else "", "."),
+              by_hand = nrow(h) > 0 && identical(h$Method, "by hand"))
   }))
   miss <- setdiff(srcs$DataSource, cit$Column); if (length(miss)) notes <- c(notes, paste("no citation for", paste(miss, collapse = ", ")))
   bad <- vapply(sources, function(s) !md_valid_date(s$citation$pubdate), TRUE)

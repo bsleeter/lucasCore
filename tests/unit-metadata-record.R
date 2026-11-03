@@ -60,7 +60,7 @@ facts <- list(lib = "Placer.ssim", result_id = 9L, result_name = "Build ([1] @ 0
                             Origin = c("package", "top", "top", "top"), Path = NA_character_, Note = c(NA, NA, "cached tables", NA)),
   log = lg, state_classes = data.table(Id = c(41L, 82L), Name = c("Forest: Ponderosa Pine Group", "Agriculture: Cropland"), Description = NA_character_),
   map_values = c(41, 82), grid = list(rows = 60, cols = 40, cell = 1000, land_cells = 2000, west = -121.5, east = -120, south = 38.7, north = 39.3),
-  states = "California", home = "home", manifests = data.table(Column = c("StatesFile", "PrismFolder", "WuiFolder"), Dataset = "", Version = "",
+  states = "California", home = "home", manifests = data.table(Column = c("StatesFile", "PrismFolder", "WuiFolder"), Dataset = "", Version = "", Method = "direct",
   Downloaded = c("2026-11-02T13:00:35", "2026-11-01T09:00:00", "2026-11-01T09:00:00"), Status = "done", Origin = "top"))
 x <- md_model_content(facts, md)
 abbr <- vapply(x$quality$sources, `[[`, "", "abbrev")
@@ -76,6 +76,17 @@ expect("drafted text listed", all(c("drafted: title", "drafted: abstract") %in% 
 expect("place keywords: the states", "California" %in% x$place[[1]]$keys)
 expect("state class entity: one value per mapped class", length(x$entities[[1]]$attrs[[1]]$domain$values) == 2)
 expect("state classes defined", !any(grepl("not defined", vapply(x$entities[[1]]$attrs[[1]]$domain$values, `[[`, "", "definition"))))
+# the access date is the copy the Build read, not the newest in the home; a copy supplied by hand says so
+f4 <- facts; f4$sources_used <- data.table(Stage = "5 Initial Conditions", DataSource = c("RcmapFile", "PrismFolder"), Origin = c("regions/A", "the top of the home"), Path = NA_character_, Note = NA_character_)
+f4$manifests <- data.table(Column = c("RcmapFile", "RcmapFile", "PrismFolder"), Dataset = "", Version = "", Method = c("direct", "by hand", "direct"),
+                           Downloaded = c("2026-11-01T14:59:00", "2026-11-02T20:13:26", "2026-11-01T09:00:00"), Status = "done", Origin = c("regions/A", "regions/B", "top"))
+cit4 <- function(f, col) { s <- md_model_content(f, md)$quality$sources; s[[which(vapply(s, `[[`, "", "abbrev") == col)]]$citation$othercit }
+expect("access date: the region the Build read, not the newest", grepl("Accessed 2026-11-01", cit4(f4, "RcmapFile")))
+expect("access date: the top of the home matches its manifest", grepl("Accessed 2026-11-01", cit4(f4, "PrismFolder")))
+f5 <- f4; f5$sources_used$Origin[1] <- "regions/B"
+expect("a copy supplied by hand says so", grepl("Downloaded by hand from the source.*2026-11-02", cit4(f5, "RcmapFile")))
+f6 <- f4; f6$sources_used$Origin[1] <- "set"
+expect("a file not read from the home has no access date", is.na(cit4(f6, "RcmapFile")))
 f2 <- facts; f2$sources_used <- data.table(Stage = character(), DataSource = character(), Origin = character(), Path = character(), Note = character())
 x2 <- md_model_content(f2, md)
 expect("no Data Sources Used: lineage inferred from the home, and said so", any(grepl("predates", x2$notes)) &&
