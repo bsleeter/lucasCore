@@ -87,6 +87,13 @@ f5 <- f4; f5$sources_used$Origin[1] <- "regions/B"
 expect("a copy supplied by hand says so", grepl("Downloaded by hand from the source.*2026-11-02", cit4(f5, "RcmapFile")))
 f6 <- f4; f6$sources_used$Origin[1] <- "set"
 expect("a file not read from the home has no access date", is.na(cit4(f6, "RcmapFile")))
+# stage 1's software line goes to the record's software, not its process steps
+sw <- md_parse_log(c("START TRANSFORMER: 1 - Study Area and Strata", "Software: R 4.6.1; lucasCore commit abc1234", "Strata: x", "END TRANSFORMER: 1 - Study Area and Strata"))
+expect("software line read from the log", identical(sw$software, "R 4.6.1; lucasCore commit abc1234"))
+expect("software line left out of the stage's text", identical(sw$stages[[1]]$lines, "Strata: x"))
+f7 <- facts; f7$log$software <- sw$software
+expect("native names R and the commit", grepl("R 4.6.1; lucasCore commit abc1234$", md_model_content(f7, md)$native))
+expect("an older log still names R", grepl("; R$", x$native))
 f2 <- facts; f2$sources_used <- data.table(Stage = character(), DataSource = character(), Origin = character(), Path = character(), Note = character())
 x2 <- md_model_content(f2, md)
 expect("no Data Sources Used: lineage inferred from the home, and said so", any(grepl("predates", x2$notes)) &&

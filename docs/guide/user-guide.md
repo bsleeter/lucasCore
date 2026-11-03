@@ -380,6 +380,7 @@ The Build is made once per study area. The historical run is made once per Build
 | --- | --- | --- | --- |
 | Data Download (once per region) | stage 15 | none | The datasets, into Data Sources Home (section 1.6); Download Results in the library |
 | Build | stages 0, 1, 5, 2, 3, 4, 6, 7, 8 | none | Stock-flow definitions, strata and initial conditions, growth curves, carbon flows, spin-up stocks, historical transitions, historical (PRISM) climate multipliers, initial stock maps |
+| Model Record | stage 16 | Build result | The Build's FGDC metadata record (section 4.6) |
 | Historical run | ST-Sim | Build result | Land cover, transitions and carbon, start to end year |
 | Projection Setup | stages 9, 10 | Build result | Projection transitions and fire to the end year in Run Settings, suitability surfaces, and the historical run's final state as the projection's starting maps |
 | Projection Climate (one per climate future) | stage 11 | Build result | Climate multipliers of the projection years from one LOCA2 scenario, climate model and replicate |
@@ -875,6 +876,20 @@ The export names each file after its result scenario, for example `scn4.Fig02_la
 ![Figure 8 of the P26 Build: stacked bar charts of the area burned each year by severity, peaking in 2021, and the area harvested each year by clearcut and selection](images/fig-4.22.png)
 
 *Figure 4.22. Disturbance history, 1986 to 2023: (a) area burned each year by MTBS severity class and (b) area harvested each year by clearcut and selection (LCMS tree removal).*
+
+### 4.6 Model Record: the Build's FGDC metadata
+
+Stage 16 writes the Build's metadata record in the FGDC CSDGM standard: what the model covers, every dataset the Build read (from **Data Sources Used**) as a cited source, every stage as a process step, the validation checks, and the definitions of the state classes. It needs the Build's run log, which exists only once the Build has ended, so it has a scenario of its own.
+
+1. Create a new scenario and name it `Model Record`.
+2. Drag the Build result onto it, so the result appears under its **Dependencies** folder.
+3. On **General > Pipeline**, untick **Inherit values** if it is ticked, choose **No Data**, and add one stage: **16 - Model Record**.
+4. Run the scenario. It takes about a minute.
+5. Open the result's **Build Results > Model Record**. It lists the record, what the USGS metadata parser (mp) found, what is still a placeholder or drafted (the DOI and your contact details, for example), and anything the record had to infer. **Export > LUCAS Core > Model Record** saves the XML to a folder.
+
+mp runs when the environment variable `LUCAS_MP` names `mp.exe`, or mp is on the PATH. Without it the record is still written, and the page says mp did not run. An error from mp fails the stage.
+
+> A library made before this stage existed does not list it: run `tools/sync-library.R` on the library first, with Studio closed.
 
 ## 5. The historical run
 

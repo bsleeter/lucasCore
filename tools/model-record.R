@@ -15,13 +15,10 @@ out <- arg("out"); if (is.na(out)) out <- file.path(dirname(normalizePath(lib, w
 if (!is.na(arg("mp"))) options(lucas.mp = arg("mp"))
 dir.create(out, showWarnings = FALSE, recursive = TRUE)
 
-facts <- md_build_facts(lib, sid)
-x <- md_model_content(facts, file.path(pkg, "defaults", "metadata"))
-f <- file.path(out, "model.xml"); xml2::write_xml(md_csdgm(x), f)
+r <- md_write_record(lib, sid, out, file.path(pkg, "defaults", "metadata")); x <- r$content; f <- r$file; m <- r$mp
 cat(sprintf("model record: %s (%d lineage sources, %d process steps)\n", f, length(x$quality$sources), length(x$quality$steps)))
 cat("still to supply:\n", paste0("  ", x$draft, "\n"), sep = "")
 if (length(x$notes)) cat("notes:\n", paste0("  ", x$notes, "\n"), sep = "")
-m <- md_mp(f)
 if (is.null(m)) cat("mp not found: set --mp=, the option lucas.mp or LUCAS_MP\n") else {
   writeLines(m$Message, file.path(out, "model-mp.txt"))
   cat(sprintf("mp: %d errors, %d warnings\n", sum(m$Level == "Error"), sum(m$Level == "Warning"))); if (nrow(m)) cat(paste0("  ", m$Message, "\n"), sep = "") }

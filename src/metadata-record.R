@@ -33,11 +33,12 @@ md_parse_log <- function(lines) {
     body <- if (end > a[i] + 1) lines[(a[i] + 1):(end - 1)] else character()
     tm <- grep(" Total time: ", body, value = TRUE); tm <- tm[startsWith(tm, name) & !grepl("post processing|saving results", tm)]
     body <- body[!grepl(": (pass|fail|FAIL|warn)( |$)", body) & !grepl("=> Total time:| Total time: |^-+$", body) & !startsWith(body, "[Warning]")]
-    body <- body[!grepl(paste0("^[0-9]+ [A-Za-z -]+: wrote "), body)]
+    body <- body[!grepl(paste0("^[0-9]+ [A-Za-z -]+: wrote "), body) & !startsWith(body, "Software: ")]
     list(name = name, number = sub(" - .*", "", name), lines = md_scrub_paths(body), time = sub(".* Total time: ", "", tm[1] %||% NA_character_))
   })
   list(syncrosim = sub("^SyncroSim Version: ", "", grep("^SyncroSim Version: ", lines, value = TRUE)[1] %||% NA_character_),
        core = ver("core"), stsim = ver("stsim"), lucasCore = ver("lucasCore"), date = date, stages = stages,
+       software = sub("^Software: ", "", grep("^Software: ", lines, value = TRUE)[1]),   # stage 1's line (shared.R, software_line); NA in a Build before 2026-11-03
        total = sub("^Total simulation time: ", "", grep("^Total simulation time: ", lines, value = TRUE)[1] %||% NA_character_))
 }
 
@@ -88,6 +89,13 @@ md_build_facts <- function(lib, sid) {
        grid = list(rows = nrow(r), cols = ncol(r), cell = res(r)[1], land_cells = land,
                    west = ll$xmin, east = ll$xmax, south = ll$ymin, north = ll$ymax),
        states = states, home = home, manifests = man)
+}
+
+# Writes a Build result's record into `out` and runs mp on it, for stage 12 and tools/model-record.R. The record's name carries the result id
+md_write_record <- function(lib, sid, out, dir, file = "model.xml") {
+  facts <- md_build_facts(lib, sid); x <- md_model_content(facts, dir)
+  dir.create(out, showWarnings = FALSE, recursive = TRUE); f <- file.path(out, file); xml2::write_xml(md_csdgm(x), f)
+  list(file = f, content = x, mp = md_mp(f))
 }
 
 # ---- the content model -----------------------------------------------------------------------------------------------------
@@ -233,7 +241,7 @@ md_model_content <- function(facts, dir) {
     status = list(progress = "Complete", update = "None planned"),
     bounding = list(west = round(g$west, 4), east = round(g$east, 4), north = round(g$north, 4), south = round(g$south, 4)),
     theme = theme, place = place, accconst = D("AccessConstraints"), useconst = useconst, contact = contact,
-    native = sprintf("SyncroSim %s; ST-Sim %s; lucasCore %s; R", lg$syncrosim %||% "?", lg$stsim %||% "?", version),
+    native = sprintf("SyncroSim %s; ST-Sim %s; lucasCore %s; %s", lg$syncrosim %||% "?", lg$stsim %||% "?", version, lg$software %||% "R"),
     crossref = list(origin = "Sleeter, B.M.", pubdate = substr(lg$date %||% today, 1, 4), title = gsub("{version}", version, D("SoftwareCitation"), fixed = TRUE),
                     geoform = "software", othercit = NA_character_, onlink = "https://github.com/bsleeter/lucasCore"),
     quality = list(attracc = attracc, logic = logic, complete = complete, horizpa = horizpa, sources = sources, steps = steps),

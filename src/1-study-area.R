@@ -18,6 +18,7 @@
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
 source(pkg_file("src", "strata.R"))
 suppressPackageStartupMessages({ library(terra); library(sf) })
+say(software_line())
 STAGE <- "1 Study Area"
 progressBar(type = "begin", totalSteps = 6)
 

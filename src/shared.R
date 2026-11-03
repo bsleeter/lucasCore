@@ -28,6 +28,12 @@ prj <- rsyncrosim::project()
 fail <- function(...) stop(sprintf(...), call. = FALSE)
 say  <- function(...) updateRunLog(sprintf(...))
 
+# the R version and, in a git checkout of the package, its commit: a Build logs this line and the model record reads it from the log
+software_line <- function() {
+  git <- function(...) tryCatch(suppressWarnings(system2("git", c("-C", shQuote(env$PackageDirectory), ...), stdout = TRUE, stderr = FALSE)), error = function(e) character())
+  head <- if (dir.exists(file.path(env$PackageDirectory, ".git"))) git("rev-parse", "--short", "HEAD") else character()
+  sprintf("Software: R %s%s", getRversion(), if (length(head) == 1) sprintf("; lucasCore commit %s%s", head, if (length(git("status", "--porcelain", "--untracked-files=no"))) " with uncommitted changes" else "") else "") }
+
 # a datasheet of this package as a data.table; an empty option sheet comes back as one row of the package defaults
 DEFAULTED_SHEETS <- c("BuildOptions", "GrowthOptions", "ClimateOptions", "CarbonOptions", "ProjectionOptions", "SuitabilityOptions")
 read_ds <- function(name, ...) { x <- as.data.table(datasheet(scn, ds(name), optional = TRUE, lookupsAsFactors = FALSE, ...))
