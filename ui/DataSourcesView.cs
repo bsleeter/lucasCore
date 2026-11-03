@@ -37,7 +37,8 @@ namespace lucasCoreUI
         private class Ed { public string Tag, Text; public override string ToString() { return Text; } }
         private const string EditionSheet = "lucasCore_DataSourceEdition";
         private const string HomeColumn = "DataSourcesHome";
-        private TextBox m_home; private Label m_homeState;
+        private const string MpKey = "MpPath", MpUrl = "https://geology.usgs.gov/tools/metadata/";
+        private TextBox m_home, m_mp; private Label m_homeState, m_mpState;
         private readonly List<Entry> m_entries = new List<Entry>();
         private readonly List<TableLayoutPanel> m_tables = new List<TableLayoutPanel>();
         private bool m_built;
@@ -64,7 +65,7 @@ namespace lucasCoreUI
             catch (Exception) { }
             var intro = Column();
             intro.Controls.Add(Note("The stages read these national datasets from disk. Set Data Sources Home to the folder a Data Download scenario fills, and leave a path blank to read the dataset from there; the mark says where it is (\"✓ home\", or the region folder holding it). To use a copy you already have, set its path instead (Browse, or type it); a red cross means the path does not exist on this machine. Download opens the dataset's download page; hover a name or a mark for more."));
-            if (Sheet.Columns.Cast<DataSheetColumn>().Any(c => c.Name == HomeColumn)) intro.Controls.Add(HomeRow());
+            if (Sheet.Columns.Cast<DataSheetColumn>().Any(c => c.Name == HomeColumn)) { intro.Controls.Add(HomeRow()); intro.Controls.Add(MpRow()); }
             AddGroup(Group("Data Sources", intro));
 
             DataSheet ds = Sheet;
@@ -254,6 +255,41 @@ namespace lucasCoreUI
             return row;
         }
 
+        // the USGS metadata parser, which stage 16 checks the model record with: its path goes in the home's settings.csv (MpPath), not
+        // the library, since it belongs to this machine
+        private Control MpRow()
+        {
+            var row = Row(); row.WrapContents = false; row.Margin = new Padding(0, 2, 0, 0);
+            var cap = Caption("Metadata parser (mp)"); m_tip.SetToolTip(cap, "mp.exe, the USGS metadata parser. Stage 16 - Model Record checks its record with it. Kept in the home folder's settings.csv, not in the library.");
+            m_mp = new TextBox { Width = 420, Anchor = AnchorStyles.Left, Margin = new Padding(3, 4, 3, 3) };
+            var browse = new Button { Text = "Browse...", AutoSize = true };
+            var download = new Button { Text = "Download", AutoSize = true };
+            m_tip.SetToolTip(download, "Opens USGS's page for its formal metadata tools" + Environment.NewLine + MpUrl);
+            download.Click += (s, a) => { try { Process.Start(MpUrl); } catch (Exception) { } };
+            m_mpState = new Label { AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(6, 7, 3, 3), Font = new Font(this.Font, FontStyle.Bold) };
+            row.Controls.Add(cap); row.Controls.Add(m_mp); row.Controls.Add(browse); row.Controls.Add(download); row.Controls.Add(m_mpState);
+            m_mp.Validated += (s, a) => { if (!Refreshing) SaveMp(m_mp.Text.Trim()); };
+            browse.Click += (s, a) =>
+            {
+                string now = m_mp.Text.Trim();
+                using (var d = new OpenFileDialog { Title = "Choose mp.exe", Filter = "mp.exe|mp.exe|Programs (*.exe)|*.exe", CheckFileExists = true })
+                {
+                    try { if (now.Length > 0 && Directory.Exists(Path.GetDirectoryName(now))) d.InitialDirectory = Path.GetDirectoryName(now); } catch (Exception) { }
+                    if (d.ShowDialog(this) == DialogResult.OK) SaveMp(d.FileName.Replace('\\', '/'));
+                }
+            };
+            return row;
+        }
+
+        private void SaveMp(string value)
+        {
+            string home = Show(Value(HomeColumn)).Trim();
+            if (home.Length == 0) { RefreshControls(); return; }
+            try { if (value != HomeSettings.Get(home, MpKey)) HomeSettings.Save(home, MpKey, value); }
+            catch (Exception ex) { MessageBox.Show(this, "Could not save the path in the home folder: " + ex.Message, "Metadata parser", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+            RefreshControls();
+        }
+
         // the folder a HomePath names: itself for a folder column, the pattern's folder for a file column
         internal static string PlaceFolder(string home, string homePath)
         {
@@ -327,6 +363,11 @@ namespace lucasCoreUI
                 bool hx = false; try { hx = home.Length > 0 && Directory.Exists(home); } catch (Exception) { }
                 m_homeState.Text = home.Length == 0 ? "not set" : hx ? "✓" : "✗";
                 m_homeState.ForeColor = home.Length == 0 ? SystemColors.GrayText : hx ? Color.ForestGreen : Color.Firebrick;
+                string mp = HomeSettings.Get(home, MpKey);
+                bool mx = false; try { mx = mp.Length > 0 && File.Exists(mp); } catch (Exception) { }
+                m_mp.Text = mp; m_mp.Enabled = home.Length > 0; m_tip.SetToolTip(m_mp, mp);
+                m_mpState.Text = home.Length == 0 ? "set the home first" : mp.Length == 0 ? "not set" : mx ? "✓" : "✗";
+                m_mpState.ForeColor = home.Length == 0 || mp.Length == 0 ? SystemColors.GrayText : mx ? Color.ForestGreen : Color.Firebrick;
             }
             List<string> folders = Folders(home);
             foreach (Entry e in m_entries)

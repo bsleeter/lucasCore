@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using SyncroSim.Core;
@@ -162,6 +163,28 @@ namespace lucasCoreUI
         protected override void OnRowsAdded(object sender, DataSheetRowEventArgs e) { base.OnRowsAdded(sender, e); if (!Refreshing) RefreshControls(); }
         protected override void OnRowsModified(object sender, DataSheetRowEventArgs e) { base.OnRowsModified(sender, e); if (!Refreshing) RefreshControls(); }
         protected override void OnRowsDeleted(object sender, DataSheetRowEventArgs e) { base.OnRowsDeleted(sender, e); if (!Refreshing) RefreshControls(); }
+    }
+
+    // <home>/settings.csv: Key,Value rows that belong to the person and machine rather than a library (src/datahome.R home_setting)
+    internal static class HomeSettings
+    {
+        public static string Get(string home, string key)
+        {
+            try { string f = Path.Combine(home, "settings.csv"); if (home.Length == 0 || !File.Exists(f)) return "";
+                  foreach (string[] r in Csv.Read(f).Skip(1)) if (r.Length >= 2 && r[0] == key) return r[1]; }
+            catch (Exception) { }
+            return "";
+        }
+
+        // a blank value removes the key; other keys are kept
+        public static void Save(string home, string key, string value)
+        {
+            Func<string, string> q = v => v.Contains(",") ? "\"" + v.Replace("\"", "\"\"") + "\"" : v;
+            string f = Path.Combine(home, "settings.csv");
+            var rows = File.Exists(f) ? Csv.Read(f).Skip(1).Where(r => r.Length >= 2 && r[0] != key).Select(r => r[0] + "," + q(r[1])).ToList() : new List<string>();
+            if (value.Length > 0) rows.Add(key + "," + q(value));
+            Directory.CreateDirectory(home); File.WriteAllLines(f, new[] { "Key,Value" }.Concat(rows));
+        }
     }
 
     // Pages wrap to the window instead of needing a wide window: every wrapping label (AutoSize with a MaximumSize width) and every

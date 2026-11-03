@@ -11,7 +11,7 @@
 # =============================================================================
 suppressPackageStartupMessages({ library(data.table); library(xml2) })
 pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
-source(file.path(pkg, "src", "metadata.R")); source(file.path(pkg, "src", "metadata-record.R"))
+source(file.path(pkg, "src", "datahome.R")); source(file.path(pkg, "src", "metadata.R")); source(file.path(pkg, "src", "metadata-record.R"))
 a <- grep("^--mp=", commandArgs(TRUE), value = TRUE); if (length(a)) options(lucas.mp = sub("^--mp=", "", a[1]))
 ok <- 0; bad <- 0
 expect <- function(what, cond, detail = "") { if (isTRUE(cond)) { ok <<- ok + 1; cat("pass:", what, "\n") } else { bad <<- bad + 1; cat("FAIL:", what, detail, "\n") } }
@@ -87,6 +87,15 @@ f5 <- f4; f5$sources_used$Origin[1] <- "regions/B"
 expect("a copy supplied by hand says so", grepl("Downloaded by hand from the source.*2026-11-02", cit4(f5, "RcmapFile")))
 f6 <- f4; f6$sources_used$Origin[1] <- "set"
 expect("a file not read from the home has no access date", is.na(cit4(f6, "RcmapFile")))
+# where mp comes from: the option (--mp=), then the page's setting in the home, then LUCAS_MP, then the PATH
+local({ old <- options(lucas.mp = NULL); oe <- Sys.getenv("LUCAS_MP"); on.exit({ options(old); Sys.setenv(LUCAS_MP = oe) })
+  h <- tempfile("mp-home"); dir.create(h); writeLines(c("Key,Value", "LfpsEmail,a@b.c", "MpPath,C:/tools/page/mp.exe"), file.path(h, "settings.csv"))
+  Sys.setenv(LUCAS_MP = "C:/tools/env/mp.exe")
+  expect("mp: the page's setting beats LUCAS_MP", identical(md_mp_default(h), "C:/tools/page/mp.exe"))
+  expect("mp: a home with no setting falls to LUCAS_MP", identical(md_mp_default(tempdir()), "C:/tools/env/mp.exe"))
+  expect("mp: no home falls to LUCAS_MP", identical(md_mp_default(), "C:/tools/env/mp.exe"))
+  options(lucas.mp = "C:/tools/opt/mp.exe"); expect("mp: --mp= beats the page's setting", identical(md_mp_default(h), "C:/tools/opt/mp.exe"))
+  options(lucas.mp = NULL); expect("mp: a saved path that is gone is not run", is.null(md_mp("x.xml", md_mp_default(h)))) })
 # stage 1's software line goes to the record's software, not its process steps
 sw <- md_parse_log(c("START TRANSFORMER: 1 - Study Area and Strata", "Software: R 4.6.1; lucasCore commit abc1234", "Strata: x", "END TRANSFORMER: 1 - Study Area and Strata"))
 expect("software line read from the log", identical(sw$software, "R 4.6.1; lucasCore commit abc1234"))

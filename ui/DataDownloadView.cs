@@ -303,13 +303,7 @@ namespace lucasCoreUI
         }
 
         // <home>/settings.csv: Key,Value rows (src/datahome.R home_setting); the email lives there, not in the scenario
-        private string Setting(string key)
-        {
-            try { string f = Path.Combine(m_homeDir, "settings.csv"); if (m_homeDir.Length == 0 || !File.Exists(f)) return "";
-                  foreach (string[] r in Csv.Read(f).Skip(1)) if (r.Length >= 2 && r[0] == key) return r[1]; }
-            catch (Exception) { }
-            return "";
-        }
+        private string Setting(string key) { return HomeSettings.Get(m_homeDir, key); }
 
         private void SaveEmail()
         {
@@ -322,13 +316,7 @@ namespace lucasCoreUI
         private void SaveSetting(string key, string value)
         {
             if (m_homeDir.Length == 0) return;
-            try
-            {
-                string f = Path.Combine(m_homeDir, "settings.csv");
-                var rows = File.Exists(f) ? Csv.Read(f).Skip(1).Where(r => r.Length >= 2 && r[0] != key).Select(r => r[0] + "," + r[1]).ToList() : new List<string>();
-                if (value.Length > 0) rows.Add(key + "," + value);
-                Directory.CreateDirectory(m_homeDir); File.WriteAllLines(f, new[] { "Key,Value" }.Concat(rows));
-            }
+            try { HomeSettings.Save(m_homeDir, key, value); }
             catch (Exception ex) { MessageBox.Show("Could not save " + key + " in the home folder: " + ex.Message, "Data Download", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
             RefreshControls();
         }

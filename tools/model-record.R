@@ -7,7 +7,7 @@
 # =============================================================================
 suppressPackageStartupMessages(library(data.table))
 pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
-source(file.path(pkg, "src", "metadata.R")); source(file.path(pkg, "src", "metadata-record.R"))
+source(file.path(pkg, "src", "datahome.R")); source(file.path(pkg, "src", "metadata.R")); source(file.path(pkg, "src", "metadata-record.R"))
 a <- commandArgs(TRUE); arg <- function(k) { v <- sub(paste0("^--", k, "="), "", grep(paste0("^--", k, "="), a, value = TRUE)); if (length(v)) v[1] else NA_character_ }
 lib <- a[!startsWith(a, "--")][1]; sid <- as.integer(arg("build"))
 if (is.na(lib) || is.na(sid)) stop("usage: Rscript tools/model-record.R \"<library.ssim>\" --build=<result scenario id> [--out=] [--mp=]")
@@ -19,6 +19,6 @@ r <- md_write_record(lib, sid, out, file.path(pkg, "defaults", "metadata")); x <
 cat(sprintf("model record: %s (%d lineage sources, %d process steps)\n", f, length(x$quality$sources), length(x$quality$steps)))
 cat("still to supply:\n", paste0("  ", x$draft, "\n"), sep = "")
 if (length(x$notes)) cat("notes:\n", paste0("  ", x$notes, "\n"), sep = "")
-if (is.null(m)) cat("mp not found: set --mp=, the option lucas.mp or LUCAS_MP\n") else {
+if (is.null(m)) cat("mp not found: set it on the Data Sources page, or use --mp= or LUCAS_MP\n") else {
   writeLines(m$Message, file.path(out, "model-mp.txt"))
   cat(sprintf("mp: %d errors, %d warnings\n", sum(m$Level == "Error"), sum(m$Level == "Warning"))); if (nrow(m)) cat(paste0("  ", m$Message, "\n"), sep = "") }

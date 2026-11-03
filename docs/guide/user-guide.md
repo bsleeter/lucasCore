@@ -887,7 +887,7 @@ Stage 16 writes the Build's metadata record in the FGDC CSDGM standard: what the
 4. Run the scenario. It takes about a minute.
 5. Open the result's **Build Results > Model Record**. It lists the record, what the USGS metadata parser (mp) found, what is still a placeholder or drafted (the DOI and your contact details, for example), and anything the record had to infer. **Export > LUCAS Core > Model Record** saves the XML to a folder.
 
-mp runs when the environment variable `LUCAS_MP` names `mp.exe`, or mp is on the PATH. Without it the record is still written, and the page says mp did not run. An error from mp fails the stage.
+To have the record checked by mp, set **Metadata parser (mp)** on the project's **Data Sources** page, under Data Sources Home, to `mp.exe` (**Browse...**; **Download** opens USGS's page for it). The path is kept in the home folder's `settings.csv`, not in the library, because it belongs to this machine. Without it, stage 16 tries the environment variable `LUCAS_MP` and then the PATH; if it finds no mp the record is still written, and the page says mp did not run. An error from mp fails the stage.
 
 > A library made before this stage existed does not list it: run `tools/sync-library.R` on the library first, with Studio closed.
 

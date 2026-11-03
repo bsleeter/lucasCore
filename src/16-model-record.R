@@ -5,7 +5,7 @@
 # still a placeholder or drafted, and what the record had to infer. Export > LUCAS Core > Model Record saves the XML to a folder.
 # It reads the Build's run log, which exists only once that run has ended, so this stage has a scenario of its own: pipeline stage 16 alone,
 # dependency the Build result. tools/model-record.R writes the same record outside a run.
-# mp runs when LUCAS_MP or the option lucas.mp names it, or it is on the PATH; an error from mp fails the stage, and no mp only says so.
+# mp runs when the Data Sources page names it (or LUCAS_MP does, or it is on the PATH); an error from mp fails the stage, and no mp only says so.
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
 source(pkg_file("src", "metadata.R")); source(pkg_file("src", "metadata-record.R"))
@@ -20,7 +20,7 @@ progressBar()
 
 r <- md_write_record(main_library(), id[1], file.path(TD(), "ModelRecord"), pkg_file("defaults", "metadata"), sprintf("model-record-%d.xml", id[1]))
 m <- r$mp; x <- r$content; bad <- if (is.null(m)) 0L else sum(m$Level == "Error")
-mp <- if (is.null(m)) "not run: mp not found (set LUCAS_MP to mp.exe)" else paste(c(sprintf("%d errors, %d warnings", bad, sum(m$Level == "Warning")), head(m$Message, 5)), collapse = "; ")
+mp <- if (is.null(m)) "not run: mp not found (set it on the Data Sources page)" else paste(c(sprintf("%d errors, %d warnings", bad, sum(m$Level == "Warning")), head(m$Message, 5)), collapse = "; ")
 say("Model record: %s for Build result %d, %d lineage sources, %d process steps; mp %s", basename(r$file), id[1], length(x$quality$sources), length(x$quality$steps), mp)
 if (length(x$draft)) say("Still placeholder or drafted: %s", paste(x$draft, collapse = "; "))
 if (length(x$notes)) say("The record had to infer: %s", paste(x$notes, collapse = "; "))

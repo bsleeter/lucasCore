@@ -95,7 +95,7 @@ md_build_facts <- function(lib, sid) {
 md_write_record <- function(lib, sid, out, dir, file = "model.xml") {
   facts <- md_build_facts(lib, sid); x <- md_model_content(facts, dir)
   dir.create(out, showWarnings = FALSE, recursive = TRUE); f <- file.path(out, file); xml2::write_xml(md_csdgm(x), f)
-  list(file = f, content = x, mp = md_mp(f))
+  list(file = f, content = x, mp = md_mp(f, md_mp_default(facts$home)))
 }
 
 # ---- the content model -----------------------------------------------------------------------------------------------------
@@ -335,8 +335,12 @@ md_csdgm <- function(x) {
 }
 
 # ---- the USGS metadata parser --------------------------------------------------------------------------------------------
-# mp: the option lucas.mp, else the environment variable LUCAS_MP, else mp on the PATH (ArcGIS ships an older copy: check the version)
-md_mp_default <- function() { p <- getOption("lucas.mp", Sys.getenv("LUCAS_MP", unset = "")); if (nzchar(p)) p else unname(Sys.which("mp")) }
+# mp: the option lucas.mp, else the home's settings.csv (MpPath, the Data Sources page), else the environment variable LUCAS_MP, else mp
+# on the PATH (ArcGIS ships an older copy: check the version)
+md_mp_default <- function(home = NA_character_) {
+  p <- getOption("lucas.mp", ""); if (nzchar(p)) return(p)
+  s <- if (is.na(home)) NA_character_ else home_setting(home, "MpPath"); if (!is.na(s) && nzchar(s)) return(s)
+  p <- Sys.getenv("LUCAS_MP", unset = ""); if (nzchar(p)) p else unname(Sys.which("mp")) }
 md_mp <- function(xml, mp = md_mp_default()) {
   if (is.na(mp) || !file.exists(mp)) return(NULL)
   err <- tempfile(fileext = ".txt"); on.exit(unlink(err))
