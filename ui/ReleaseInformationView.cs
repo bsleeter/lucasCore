@@ -158,7 +158,7 @@ namespace lucasCoreUI
             int order = now.Count == 0 ? 1 : now.Where(r => r["SortOrder"] != DBNull.Value).Select(Order).DefaultIfEmpty(now.Count).Max() + 1;
             PersonItem next = m_people.FirstOrDefault(i => !have.Contains(i.Id));
             if (next == null) return;
-            DataSheet ds = OriginatorSheet; DataTable dt = ds.GetData();
+            DataSheet ds = OriginatorSheet; if (ds == null) { m_noPeople.Text = "This page cannot reach the Release Originators sheet."; return; } DataTable dt = ds.GetData();
             ds.BeginAddRows(); DataRow nr = dt.NewRow(); nr["PersonId"] = next.Id; nr["SortOrder"] = order; dt.Rows.Add(nr); ds.EndAddRows();
             m_shown = null; RefreshControls();
         }

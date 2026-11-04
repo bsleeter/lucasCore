@@ -872,13 +872,23 @@
 		<column name="Notes" displayName="What the record had to infer" dataType="String" isOptional="True"/>
 	</dataSheet>
 
-	<dataSheet name="DataReleaseOptions" displayName="Data Release" isSingleRow="True" viewClassName="lucasCoreUI.DataReleaseView" viewClassAssembly="lucasCoreUI">
+	<!-- a page with a second sheet needs a feed holding both: outside the feed this.DataFeed.GetDataSheet returns null (tests/unit-page-feeds.R) -->
+	<dataFeed name="DataReleasePage" displayName="Data Release" viewClassName="lucasCoreUI.DataReleaseView" viewClassAssembly="lucasCoreUI">
+		<dataSheet name="DataReleaseOptions"/>
+		<dataSheet name="DataReleaseRun"/>
+	</dataFeed>
+	<dataFeed name="ReleaseInformationPage" displayName="Release Information" viewClassName="lucasCoreUI.ReleaseInformationView" viewClassAssembly="lucasCoreUI">
+		<dataSheet name="ReleaseInformation"/>
+		<dataSheet name="ReleaseOriginator"/>
+	</dataFeed>
+
+	<dataSheet name="DataReleaseOptions" displayName="Data Release" isSingleRow="True">
 		<!-- stage 17 (to-do 14, src/release.R): where to write the release and how many years of maps; the runs are in DataReleaseRun, on the same page -->
 		<column name="OutputFolder" displayName="Release folder (blank = a folder named after the library, beside it)" dataType="String" isOptional="True"/>
 		<column name="MapEvery" displayName="Maps every (years; blank or 1 = every year)" dataType="Integer" isOptional="True"/>
 	</dataSheet>
 
-	<dataSheet name="ReleaseInformation" displayName="Release Information" isSingleRow="True" viewClassName="lucasCoreUI.ReleaseInformationView" viewClassAssembly="lucasCoreUI">
+	<dataSheet name="ReleaseInformation" displayName="Release Information" isSingleRow="True">
 		<!-- stage 17 (to-do 14, Phase 4): what only a person can supply. Blank = the drafted text or package default, listed as still to supply. The originators are in ReleaseOriginator, on the same page -->
 		<column name="ReleaseStatus" displayName="Release status" dataType="Integer" validationType="List" formula1="1:Draft|2:Provisional|3:Approved" defaultValue="1" isOptional="True"/>
 		<column name="Title" dataType="String" isOptional="True"/>
@@ -1298,8 +1308,8 @@
 			<item name="RunFigureOptions"/>
 			<item name="CompareRunOptions"/>
 			<item name="DataDownloadOptions"/>
-			<item name="DataReleaseOptions"/>
-			<item name="ReleaseInformation"/>
+			<item name="DataReleasePage"/>
+			<item name="ReleaseInformationPage"/>
 			<group name="lucasCoreCrosswalks" displayName="Crosswalks">
 				<item name="LandCoverCrosswalk"/>
 			</group>

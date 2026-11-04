@@ -82,7 +82,7 @@ namespace lucasCoreUI
             HashSet<int> have = new HashSet<int>(Rows().Select(Rid));
             RunItem next = m_runs.FirstOrDefault(i => !have.Contains(Convert.ToInt32(i.Key)));
             if (next == null) return;
-            DataSheet ds = RunSheet; DataTable dt = ds.GetData();
+            DataSheet ds = RunSheet; if (ds == null) { m_state.Text = "This page cannot reach the Data Release Runs sheet."; return; } DataTable dt = ds.GetData();
             ds.BeginAddRows(); DataRow nr = dt.NewRow(); nr["RunScenarioId"] = next.Key; dt.Rows.Add(nr); ds.EndAddRows();
             m_shown = null; RefreshControls();
         }
