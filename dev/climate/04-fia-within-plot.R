@@ -5,8 +5,9 @@
 # Plots with 2+ kept intervals only. Plot fixed effects remove everything persistent about the plot and its county (site, curve bias,
 # survivor effect), so beta comes from how one plot's growth anomaly moves with its own interval climate. Placebo as in 03.
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
 suppressPackageStartupMessages({ library(data.table) })
-OUT <- "F:/lucasCore/dev/climate"
+OUT <- file.path(pkg, "dev/climate")
 pr <- fread(file.path(OUT, "fia-pairs.csv")); cl <- fread(file.path(OUT, "county-climate.csv"))
 pr[, GEOID := as.integer(sub("^([0-9]+)-.*$", "\\1", p)) * 1000 + as.integer(sub("^[0-9]+-[0-9]+-([0-9]+)-.*$", "\\1", p))]
 pr[, resid := obs_rate - exp_rate][, id := .I]

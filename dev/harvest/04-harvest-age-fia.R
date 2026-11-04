@@ -11,8 +11,10 @@
 # Writes dev/harvest/out/harvest-age-fia.csv, harvest-age-cuts.csv, harvest-age-cmai.csv. Read-only (the P26 library is only read).
 # Usage: Rscript dev/harvest/04-harvest-age-fia.R
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages(library(data.table))
-pkg <- "F:/lucasCore"; dm <- "F:/lucas-master/Data Sources/FIA/DataMart"; out <- file.path(pkg, "dev/harvest/out"); dir.create(out, showWarnings = FALSE)
+dm <- file.path(DS, "FIA/DataMart"); out <- file.path(pkg, "dev/harvest/out"); dir.create(out, showWarnings = FALSE)
 STATES <- c("CA", "OR", "WA", "NV", "ID")
 norm <- function(x) sub("sgroup$", "group", gsub("[^a-z]", "", tolower(sub("^Forest: ", "", x))))   # "Other western softwoods group" = "Other Western Softwood Group"
 grp <- fread(file.path(dm, "REFERENCE", "REF_FOREST_TYPE.csv"), select = c("VALUE", "TYPGRPCD"))
@@ -65,7 +67,7 @@ cat("\nClearcut-like by owner (all five states)\n"); print(dcast(own[n >= 5], Ty
 
 # ---- option (b): culmination of mean annual increment on the P26 Build result's merchantable volume curves ---------------------
 suppressPackageStartupMessages(library(rsyncrosim))
-L <- suppressWarnings(ssimLibrary("F:/lucasCore/dev/libs/LUCAS P26 Northern Sierra Nevada.ssim"))
+L <- suppressWarnings(ssimLibrary(file.path(pkg, "dev/libs/LUCAS P26 Northern Sierra Nevada.ssim")))
 sc <- as.data.table(scenario(L, summary = TRUE)); bid <- max(sc[IsResult == "Yes" & startsWith(Name, "P26 - Build"), ScenarioId])
 vc <- as.data.table(datasheet(scenario(L, bid), "lucasCore_MerchantableVolumeCurve", lookupsAsFactors = FALSE))
 cat(sprintf("\nCMAI from P26 Build result %d's merchantable volume curves (%d rows)\n", bid, nrow(vc)))

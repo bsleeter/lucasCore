@@ -9,8 +9,10 @@
 # Writes dev/nfcms/out/dead-by-age.csv. Read-only.
 # Usage: Rscript dev/nfcms/03-dead-by-age.R
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(terra); library(data.table); library(DBI) })
-lib <- "F:/lucasCore/dev/libs/LUCAS P26 Demo Library.ssim"; dd <- paste0(lib, ".data"); out <- "F:/lucasCore/dev/nfcms/out"; rid <- 14L
+lib <- file.path(pkg, "dev/libs/LUCAS P26 Demo Library.ssim"); dd <- paste0(lib, ".data"); out <- file.path(pkg, "dev/nfcms/out"); rid <- 14L
 BANDS <- c(0, 10, 20, 40, 60, 80, 100, 150, 300)
 TYPES <- c(370, 260, 240, 220, 920)   # California Mixed Conifer, Fir/Spruce/Mountain Hemlock, Lodgepole, Ponderosa, Western Oak (state class = FIA group)
 con <- dbConnect(RSQLite::SQLite(), lib, flags = RSQLite::SQLITE_RO)
@@ -30,7 +32,7 @@ lucas <- rbindlist(lapply(c(1985L, 2020L), function(y) {
                   litter = values(g(c("DOM: Aboveground Very Fast [Type]", "DOM: Aboveground Slow [Type]")), mat = FALSE))
   v[sc %in% TYPES][, band := cut(age, BANDS)][!is.na(band), .(source = sprintf("lucas %d", y), n = .N, standing = mean(standing), down = mean(down), litter = mean(litter)), by = .(sc, band)] }))
 f <- 2.2417
-x <- as.data.table(readRDS("F:/lucas-master/Data Sources/FIA/USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds"))[(statecd * 1000 + countycd) %in% fips & invyr >= 2001 & invyr < 9999 & fortyp_grp %in% TYPES & !is.na(stdage)]
+x <- as.data.table(readRDS(file.path(DS, "FIA/USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds")))[(statecd * 1000 + countycd) %in% fips & invyr >= 2001 & invyr < 9999 & fortyp_grp %in% TYPES & !is.na(stdage)]
 x[, pid := paste(statecd, unitcd, countycd, plot)]; setorder(x, pid, condid, -invyr); x <- x[!duplicated(paste(pid, condid))]
 fia <- x[, band := cut(stdage, BANDS)][!is.na(band), .(source = "FIA", n = .N, standing = mean(c_ag_standing_dead_trees_short_tons_per_acre * f), down = mean(c_down_dead_tons_per_acre * f),
                                                      litter = mean(c_litter_tons_per_acre * f)), by = .(sc = fortyp_grp, band)]

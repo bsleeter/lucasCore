@@ -10,8 +10,9 @@
 # half of each harvest group's expected area is below its minimum; a 1985-2023 historical run cuts at least as much clearcut as Build 47's.
 # Usage: Rscript tests/phaseZ23-harvest-age.R      (REUSE=1 reuses each run that already exists)
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table); library(terra) })
-f <- "F:/lucasCore/dev/libs/lucasCore-suitability.ssim"; L <- suppressWarnings(ssimLibrary(f)); P1 <- rsyncrosim::project(L, 1); ok <- TRUE
+f <- file.path(pkg, "dev/libs/lucasCore-suitability.ssim"); L <- suppressWarnings(ssimLibrary(f)); P1 <- rsyncrosim::project(L, 1); ok <- TRUE
 expect <- function(what, cond, detail = "") { cat(sprintf("%s  %s %s\n", if (isTRUE(cond)) "PASS" else "FAIL", what, detail)); if (!isTRUE(cond)) ok <<- FALSE }
 logs <- function(R, pat) { lg <- trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]]); unique(lg[grepl(pat, lg)]) }
 reuse <- Sys.getenv("REUSE") == "1"

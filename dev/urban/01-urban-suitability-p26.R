@@ -15,8 +15,10 @@
 # Steps cache their results in dev/urban/cache; delete a file to redo its step.
 # Usage: Rscript dev/urban/01-urban-suitability-p26.R
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(terra); library(sf); library(data.table); library(mgcv); library(parallel); library(ggplot2) })
-DS <- "F:/lucas-master/Data Sources"; OUT <- "F:/lucasCore/dev/urban"; CA <- file.path(OUT, "cache"); dir.create(CA, showWarnings = FALSE)
+DS <- DS; OUT <- file.path(pkg, "dev/urban"); CA <- file.path(OUT, "cache"); dir.create(CA, showWarnings = FALSE)
 terraOptions(progress = 0, memfrac = 0.5)
 t00 <- Sys.time(); say <- function(...) cat(format(Sys.time(), "%H:%M"), sprintf(...), "\n")
 YRS <- 1985:2023; EPOCHS <- seq(1985, 2020, 5); DEV <- 21:24

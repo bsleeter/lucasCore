@@ -13,8 +13,10 @@
 # clearcut-last curves). Writes dev/fia/out-cal/ (multipliers, fit tables, figure). Read-only.
 # Usage: Rscript dev/fia/06-calibrate-measured.R
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(data.table); library(sf); library(terra); library(DBI) })
-pkg <- "F:/lucasCore"; dm <- "F:/lucas-master/Data Sources/FIA/DataMart"
+dm <- file.path(DS, "FIA/DataMart")
 # dev variants (09-fit-events.R): LUCAS_CAL_OUT = output folder, LUCAS_EVENT_FILE = event flow table in place of the package's
 out <- Sys.getenv("LUCAS_CAL_OUT", file.path(pkg, "dev/fia/out-cal")); dir.create(out, showWarnings = FALSE)
 event_file <- Sys.getenv("LUCAS_EVENT_FILE", file.path(pkg, "defaults/stockflow/event-pathways.csv")); cat("event flows:", event_file, "\n")

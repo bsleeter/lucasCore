@@ -9,7 +9,9 @@
 #      California mixed conifer in M260 (about 1.59 at site class 2 and 0.52 at 6, before shrinkage)
 # Usage: Rscript tests/unit-site-productivity.R
 # =============================================================================
-suppressPackageStartupMessages(library(data.table)); pkg <- "F:/lucasCore"; ok <- TRUE
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))
+suppressPackageStartupMessages(library(data.table)); ok <- TRUE
 expect <- function(what, cond, detail = "") { cat(sprintf("%s  %s %s\n", if (isTRUE(cond)) "PASS" else "FAIL", what, detail)); if (!isTRUE(cond)) ok <<- FALSE }
 source(file.path(pkg, "src", "siteproductivity.R"))
 
@@ -36,7 +38,7 @@ cw <- data.table(StateClassId = c(240L, 370L), FiaTypeGroups = c("200;220;370", 
 expect("group 370 goes to its own type, 220 to the pooled one", identical(site_type_of(cw)[order(g), id], c(240L, 240L, 370L)))
 
 # 3. real data on the P26 Build's curves
-lib <- file.path(pkg, "dev/libs/LUCAS P26 Northern Sierra Nevada.ssim"); dm <- "F:/lucas-master/Data Sources/FIA/DataMart"
+lib <- file.path(pkg, "dev/libs/LUCAS P26 Northern Sierra Nevada.ssim"); dm <- file.path(DS, "FIA/DataMart")
 if (file.exists(lib) && file.exists(file.path(dm, "fia-conditions.rds"))) {
   source(file.path(pkg, "src", "carbon.R")); source(file.path(pkg, "src", "treemap.R"))
   con <- DBI::dbConnect(RSQLite::SQLite(), lib, flags = RSQLite::SQLITE_RO)

@@ -6,11 +6,12 @@
 #   --secondary / --tertiary   Stratum Sources names for Build Options
 #   With --secondary=States the strata are compared with the CONUS 1km model on the same cells (universal ids less their offset).
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(terra) })
 a <- commandArgs(TRUE); opt <- function(k, d) { m <- grep(sprintf("^--%s=", k), a, value = TRUE); if (length(m)) sub(sprintf("^--%s=", k), "", m[1]) else d }
-D <- opt("dir", "F:/lucasCore/dev/libs"); UNITS <- opt("units", "County: Placer California")
+D <- opt("dir", file.path(pkg, "dev/libs")); UNITS <- opt("units", "County: Placer California")
 SEC <- opt("secondary", "States"); TER <- opt("tertiary", "Federal Lands")
-REF <- "F:/lucas-master/Models/CONUS 1km/Data/Initial Conditions"; OFF <- 1e8
+REF <- Sys.getenv("LUCAS_CONUS1KM_INITIAL_CONDITIONS"); OFF <- 1e8
 dir.create(D, showWarnings = FALSE, recursive = TRUE)
 tag <- gsub("[^A-Za-z0-9]+", "-", paste(SEC, TER, substr(UNITS, 1, 24)))
 f <- file.path(D, sprintf("lucasCore-smoke-%s.ssim", tag)); unlink(c(f, paste0(f, c(".data", ".temp", ".backup"))), recursive = TRUE)
@@ -29,7 +30,8 @@ summ <- datasheet(R, "lucasCore_OutputStrataSummary")
 for (lv in c("Primary", "Secondary", "Tertiary")) { x <- summ[summ$Level == lv, ]
   cat(sprintf("%-9s %3d units, %7d cells: %s\n", lv, nrow(x), sum(x$Cells), paste(head(paste0(x$Name, " (", x$Cells, ")")[order(-x$Cells)], 6), collapse = "; "))) }
 ic <- datasheet(R, "stsim_InitialConditionsSpatial")
-if (SEC == "States" && nrow(ic)) {
+if (SEC == "States" && nrow(ic) && !nzchar(REF)) cat("Skipped the CONUS 1km comparison: LUCAS_CONUS1KM_INITIAL_CONDITIONS is not set\n")
+if (SEC == "States" && nrow(ic) && nzchar(REF)) {
   native <- function(r) r %% OFF
   cmp <- function(new, ref, nm) { refc <- crop(ref, new); a <- values(new, mat = FALSE); b <- values(refc, mat = FALSE); b[is.na(a)] <- NA
     cat(sprintf("vs CONUS 1km %-9s only-new %5d  only-ref %5d  value differs %6d (%.2f%%)\n", nm,

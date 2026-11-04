@@ -26,7 +26,7 @@ enc <- function(x, map, label, units, year) { v <- values(x, mat = FALSE); lo <-
   stopifnot(identical(readBin(memDecompress(z, "gzip"), "integer", n = length(code), size = 2, signed = FALSE, endian = "little"), code))
   list(Map = map, Label = label, Units = units, Year = year, Columns = ncol(x), Rows = nrow(x), CellSize = res(x)[1], Min = lo, Max = hi, Data = base64_enc(z)) }
 # a hillshade for the page to shade the maps with: the DEM averaged onto the model grid, lit from the northwest at 45 degrees
-dem_file <- if (length(a) >= 4) a[4] else "F:/lucas-master/Data Sources/DEM/LF2020_Elev_220_CONUS/Tif/LC20_Elev_220.tif"
+dem_file <- if (length(a) >= 4) a[4] else stop("give the DEM tif (LANDFIRE LF2020 Elev, LC20_Elev_220.tif) as the fourth argument")
 g <- live[[1]]; dem <- rast(dem_file); levels(dem) <- NULL
 dem <- project(crop(dem, project(as.polygons(ext(g) + 1000, crs = crs(g)), crs(dem))), g, method = "average")
 hs <- shade(terrain(dem, "slope", unit = "radians"), terrain(dem, "aspect", unit = "radians"), angle = 45, direction = 315)

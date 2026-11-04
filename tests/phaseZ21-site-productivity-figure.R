@@ -6,8 +6,9 @@
 # draws a "Site productivity" figure (a PNG), the off Build none.
 # Usage: Rscript tests/phaseZ21-site-productivity-figure.R
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
-f <- "F:/lucasCore/dev/libs/lucasCore-suitability.ssim"; L <- suppressWarnings(ssimLibrary(f)); P1 <- rsyncrosim::project(L, 1); ok <- TRUE
+f <- file.path(pkg, "dev/libs/lucasCore-suitability.ssim"); L <- suppressWarnings(ssimLibrary(f)); P1 <- rsyncrosim::project(L, 1); ok <- TRUE
 expect <- function(what, cond, detail = "") { cat(sprintf("%s  %s %s\n", if (isTRUE(cond)) "PASS" else "FAIL", what, detail)); if (!isTRUE(cond)) ok <<- FALSE }
 sc <- as.data.table(scenario(L, summary = TRUE))
 newest <- function(nm) max(sc[IsResult == "Yes" & (Name == nm | startsWith(Name, paste0(nm, " ([")))]$ScenarioId)
@@ -24,5 +25,5 @@ on <- figures("on", newest("Build test (site productivity)")); off <- figures("o
 sp <- on[Title == "Site productivity"]
 expect("on: a Site productivity figure, written as a PNG", nrow(sp) == 1 && file.exists(sp$FileName) && identical(readBin(sp$FileName, "raw", 4), as.raw(c(0x89, 0x50, 0x4e, 0x47))), if (nrow(sp)) sp$FileName else "")
 expect("off: no Site productivity figure", !nrow(off[Title == "Site productivity"]))
-if (nrow(sp)) file.copy(sp$FileName, "F:/lucasCore/dev/treemap/out/site-productivity-figure.png", overwrite = TRUE)
+dir.create(file.path(pkg, "dev/treemap/out"), showWarnings = FALSE, recursive = TRUE); if (nrow(sp)) file.copy(sp$FileName, file.path(pkg, "dev/treemap/out/site-productivity-figure.png"), overwrite = TRUE)
 cat(if (ok) "\nALL PASS\n" else "\nSOME CHECKS FAILED\n")

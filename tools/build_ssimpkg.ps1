@@ -1,4 +1,4 @@
-# Builds lucasCore-<version>.ssimpkg, the single-file package attached to a GitHub release, from the committed state of the
+# Builds lucasCore-<version>.ssimpkg, the single-file package attached to a release, from the committed state of the
 # repository (git archive HEAD, so uncommitted edits and untracked dev outputs never ship). dev/, docs/ and tests/ are left out:
 # the stages do not read them, and they are 90% of the repository's size.
 # Usage, from the repository root:  powershell -File tools\build_ssimpkg.ps1 [-OutDir <folder>]

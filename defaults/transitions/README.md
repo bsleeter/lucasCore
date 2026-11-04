@@ -1,7 +1,7 @@
 # Historical transitions (stage 6)
 
 - `pathways/*.csv`: ST-Sim transition pathways, one file per set (urbanization, intensification, harvest, fire, ag expansion, ag
-  contraction). Copied unchanged from `F:/lucas-master/Data/Transition Pathways/Transitions - <Set>.csv`, the six sets the CONUS 1km
+  contraction). Copied unchanged from `Data/Transition Pathways/Transitions - <Set>.csv`, the six sets the CONUS 1km
   build merged into its historical model. Stage 6 reads every file in the folder, so adding a set (insects, prescribed fire, succession,
   wetland change are still in the source folder) means copying it here and giving its groups a source.
 - `state-locations.csv`: each state class's place in the ST-Sim pathway diagram (`stsim_DeterministicTransition`). From `States.csv`.

@@ -1,7 +1,7 @@
 # =============================================================================
 # make_wood_density.R - merchantable stem carbon per m3 of FIA net merchantable volume, per forest state class (stage 2)
 # =============================================================================
-# Usage: Rscript tools/make_wood_density.R [reference folder]   (default: F:/lucas-master/Data Sources/FIA/Reference)
+# Usage: Rscript tools/make_wood_density.R [reference folder]   (default: FIA/Reference under LUCAS_DATA_HOME)
 # Inputs (public FIA data, downloaded 2026-10-20):
 #   REF_SPECIES.csv   FIA DataMart: wood and bark specific gravity (green volume, dry weight), bark volume as % of wood volume,
 #                     live-tree carbon ratio, per species
@@ -12,7 +12,7 @@
 #   so it already matches CBM's merchantable pool (stem without stump and top); bark is added here, as CBM includes it.
 # =============================================================================
 suppressPackageStartupMessages({ library(data.table); library(jsonlite) })
-a <- commandArgs(TRUE); ref <- if (length(a)) a[1] else "F:/lucas-master/Data Sources/FIA/Reference"
+a <- commandArgs(TRUE); ref <- if (length(a)) a[1] else file.path(Sys.getenv("LUCAS_DATA_HOME"), "FIA", "Reference")
 here <- tryCatch(dirname(normalizePath(sub("--file=", "", grep("--file=", commandArgs(FALSE), value = TRUE)))), error = function(e) "tools")
 pkg <- normalizePath(file.path(here, ".."), winslash = "/")
 sp <- fread(file.path(ref, "REF_SPECIES.csv"))[, .(SPCD, COMMON_NAME, SFTWD_HRDWD, WOOD_SG = WOOD_SPGR_GREENVOL_DRYWT, BARK_SG = BARK_SPGR_GREENVOL_DRYWT,

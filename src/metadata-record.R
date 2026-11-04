@@ -276,7 +276,7 @@ md_model_content <- function(facts, dir, info = NULL) {
     theme = theme, place = place, accconst = D("AccessConstraints"), useconst = useconst, contact = contact, datacred = if (md_supplied(info, "Credit")) info$Credit else NA_character_,
     native = sprintf("SyncroSim %s; ST-Sim %s; lucasCore %s; %s", lg$syncrosim %||% "?", lg$stsim %||% "?", version, lg$software %||% "R"),
     crossref = list(origin = "Sleeter, B.M.", pubdate = substr(lg$date %||% today, 1, 4), title = gsub("{version}", version, D("SoftwareCitation"), fixed = TRUE),
-                    geoform = "software", othercit = NA_character_, onlink = "https://github.com/bsleeter/lucasCore"),
+                    geoform = "software", othercit = NA_character_, onlink = "https://code.usgs.gov/LUCC/lucasCore"),
     quality = list(attracc = attracc, logic = logic, complete = complete, horizpa = horizpa, sources = sources, steps = steps),
     raster = list(rows = g$rows, cols = g$cols, cell = res),
     entities = entities, overview = overview,

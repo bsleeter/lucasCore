@@ -4,9 +4,11 @@
 # How much LANDFIRE Thinning area LCMS sees as Tree Removal (any year y-1..y+2), and how much of LCMS partial removal (Tree Removal that
 # stays forest) LANDFIRE records as Thinning/Harvest/Clearcut; by owner. Explains the 125 vs 35 km2/yr gap.
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(terra); library(data.table); library(parallel) })
-CA <- "F:/lucasCore/dev/libs/lucasCore-suitability.ssim.data/lucasCore-suitability/r30_-2170395_1863765_5539_11473_1985-2023"
-LF <- "F:/lucas-master/Data Sources/Landfire Disturbance"; LC <- "F:/lucas-master/Data Sources/LCMS/v2025-11/Change_Annual"
+CA <- file.path(pkg, "dev/libs/lucasCore-suitability.ssim.data/lucasCore-suitability/r30_-2170395_1863765_5539_11473_1985-2023")
+LF <- file.path(DS, "Landfire Disturbance"); LC <- file.path(DS, "LCMS/v2025-11/Change_Annual")
 cf <- function(k) file.path(CA, paste0(k, ".tif")); YRS <- 1999:2023
 own <- values(rast(cf("owner")), mat = FALSE)
 OWN <- c(`0` = "Not forest", `1` = "Family", `2` = "Corporate", `3` = "TIMO/REIT", `4` = "Other private", `5` = "Federal", `6` = "State", `7` = "Local", `8` = "Tribal")

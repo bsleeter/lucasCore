@@ -5,8 +5,9 @@
 # top (same exclusions as the fit: GAP 1-3 land is 0, recent burns left out); then both capture curves (map from 2012 conditions,
 # scored on 2013-2023, fit on 1986-2012). Usage: Rscript dev/urban/04-urban-refit-maps.R
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
 suppressPackageStartupMessages({ library(terra); library(sf); library(data.table); library(ggplot2) })
-OUT <- "F:/lucasCore/dev/urban"; CA <- file.path(OUT, "cache"); DEVALL <- 21:24
+OUT <- file.path(pkg, "dev/urban"); CA <- file.path(OUT, "cache"); DEVALL <- 21:24
 n12 <- rast(file.path(CA, "nlcd_2012.tif")); n23 <- rast(file.path(CA, "nlcd_2023.tif")); gap <- rast(file.path(CA, "gap.tif"))
 burn <- Reduce(`|`, lapply(2009:2023, function(k) rast(file.path(CA, sprintf("burn_%d.tif", k))) > 0))
 base <- !(n12 %in% c(DEVALL, 11, 12)) & !is.na(n12) & !(gap %in% 1:3) & !burn

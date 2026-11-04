@@ -13,7 +13,7 @@
 # Usage: Rscript tests/phaseZ14-carbon-method.R      (REUSE=1 rechecks the last runs)
 # =============================================================================
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
-f <- "F:/lucasCore/dev/libs/lucasCore-suitability.ssim"; L <- ssimLibrary(f); ok <- TRUE; pkg <- "F:/lucasCore"
+f <- file.path(pkg, "dev/libs/lucasCore-suitability.ssim"); L <- ssimLibrary(f); ok <- TRUE; pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 ds <- function(R, s) as.data.table(datasheet(R, s, lookupsAsFactors = FALSE))
 expect <- function(what, cond, detail = "") { cat(sprintf("%s  %s %s\n", if (isTRUE(cond)) "PASS" else "FAIL", what, detail)); if (!isTRUE(cond)) ok <<- FALSE }
 logs <- function(R, pat) { lg <- trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]]); unique(lg[grepl(pat, lg)]) }

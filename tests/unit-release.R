@@ -108,7 +108,7 @@ ok("a number column has a range domain", e$attrs[[which(vapply(e$attrs, `[[`, ""
 ok("a text column keeps the dictionary's domain", e$attrs[[which(vapply(e$attrs, `[[`, "", "label") == "state_class")]]$domain$type == "unrep")
 ok("every exported map variable is in the dictionary", all(vapply(c("state-class-<run>-<year>.tif", "age-<run>-<year>.tif", "transition-<group>-<run>-<year>.tif", "carbon-<group>-<run>-<year>.tif", "flow-<group>-<run>-<year>.tif"), function(f) nrow(md_columns(dict, f)) == 1, TRUE)))
 ctn <- data.table(file = c("historical/a/run.xml", "README.txt"), product = c("historical", "release"), bytes = c(10, 31e9))
-x1 <- tempfile(fileext = ".xml"); writeLines("<a>F:/lucasCore/secret</a>", x1)
+x1 <- tempfile(fileext = ".xml"); writeLines("<a>D:/example/secret</a>", x1)
 ch <- rl_checks(ctn, data.table(name = "x", definition = NA_character_), "bad column", x1, "placeholder: Doi", list(ok = list(FALSE), detail = list("d")))
 ok("every check fails when it should", nrow(ch) == 7 && sum(!ch$Pass) == 6)   # the 100 files check is the one that passes here
 ok("the machine path is found", !ch[grepl("machine path", Check), Pass])

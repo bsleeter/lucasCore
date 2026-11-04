@@ -7,8 +7,9 @@
 # have state class, age and transition maps every year.
 # Usage: Rscript tests/phaseZ2-transition-filter.R
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
-L <- ssimLibrary("F:/lucasCore/dev/libs/lucasCore-studio-library.ssim"); P <- rsyncrosim::project(L, "Definitions")
+L <- ssimLibrary(file.path(pkg, "dev/libs/lucasCore-studio-library.ssim")); P <- rsyncrosim::project(L, "Definitions")
 sc <- as.data.table(rsyncrosim::scenario(L, summary = TRUE))
 for (i in sc[IsResult == "No" & Name == "Transition filter (phaseZ2)", ScenarioId]) delete(L, scenario = i, force = TRUE)
 S <- rsyncrosim::scenario(P, "Transition filter (phaseZ2)")
@@ -16,7 +17,7 @@ saveDatasheet(S, data.frame(StageNameId = "0 - Stock-Flow Definitions", RunOrder
 R <- run(S)
 f <- as.data.table(datasheet(R, "stsim_OutputFilterTransitionGroups", lookupsAsFactors = FALSE))
 g <- as.data.table(datasheet(P, "stsim_TransitionGroup", lookupsAsFactors = FALSE))$Name
-main <- fread("F:/lucasCore/defaults/stockflow/main-transition-groups.csv")$TransitionGroupId
+main <- fread(file.path(pkg, "defaults/stockflow/main-transition-groups.csv"))$TransitionGroupId
 yes <- function(v) !is.na(v) & v %in% c(TRUE, -1, 1, "Yes")
 mapped <- f[yes(Spatial), TransitionGroupId]
 cat(sprintf("%d of %d groups listed, %d summarised; maps for: %s\n", nrow(f), length(g), sum(yes(f$Summary)), paste(mapped, collapse = ", ")))

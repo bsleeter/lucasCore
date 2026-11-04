@@ -19,7 +19,7 @@
 
   A File set on the Stratum Sources page wins when it exists on the machine; a blank File, or one the machine lacks (a library made
   on another computer), reads the home (src/strata.R, strata_path). A Data Download fetches these first, since its region is the
-  Study Area units' polygons. Before this the presets named files under F:/lucas-master/Data Sources, which only the build machine had.
+  Study Area units' polygons. Before this the presets named files in a folder only the build machine had.
 - `huc6-list.csv`, `huc8-list.csv`, `epa-l3-list.csv`, `pyromes-list.csv`: the unit lists of the sources whose names were built from
   their polygons, written by `tools/strata-from-home.R` from the shipped universal list, so a new library needs no polygons.
 - `ecodivisions/EcoDivisions_Dissolve.shp`: the dissolved FIA ecodivisions (ECOMAP 2007 divisions; fields ecodiv, StrtmId, StrtmNm),

@@ -11,9 +11,11 @@
 # Writes dev/fia/out-dwm/ (figures, dwm-by-age.csv, dwm-counts.csv). Read-only.
 # Usage: Rscript dev/fia/05-dwm-mixed-conifer.R [forest type group, default 370] [ecodivision, default M260]
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages(library(data.table))
 a <- commandArgs(TRUE); g0 <- if (length(a) >= 1) as.integer(a[1]) else 370L; eco <- if (length(a) >= 2) a[2] else "M260"
-dm <- "F:/lucas-master/Data Sources/FIA/DataMart"; out <- "F:/lucasCore/dev/fia/out-dwm"; dir.create(out, showWarnings = FALSE)
+dm <- file.path(DS, "FIA/DataMart"); out <- file.path(pkg, "dev/fia/out-dwm"); dir.create(out, showWarnings = FALSE)
 LB <- 0.000453592 * 2.471   # lb/acre -> Mg/ha
 w <- fread(file.path(dm, "CA_COND_DWM_CALC.csv"), select = c("PLT_CN", "CONDID", "MEASYEAR", "INVYR", "CWD_CARBON_COND", "PILE_CARBON_COND", "FWD_SM_CARBON_COND",
            "FWD_MD_CARBON_COND", "FWD_LG_CARBON_COND", "DUFF_CARBON", "LITTER_CARBON", "CONDPROP_CWD", "CONDPROP_FWD_SM", "CONDPROP_DUFF"), colClasses = list(character = "PLT_CN"))

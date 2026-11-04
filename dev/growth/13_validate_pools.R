@@ -1,11 +1,13 @@
 # Validate stage 2 carbon pools against FIA's measured pools by age band (in-sample; every cell with plots, plot-weighted)
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages(library(data.table))
-source("F:/lucasCore/src/carbon.R")
-D <- "F:/lucas-master/Data Sources/FIA/"
+source(file.path(pkg, "src/carbon.R"))
+D <- file.path(DS, "FIA/")
 x <- carbon_data(paste0(D, "USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds"), paste0(D, "USGS_forest_conditions_dstrbcd_and_trtcd_20240213.Rds"),
                  list(MinInventoryYear = 1997, VolumeCapQuantile = 0.999))
-cc <- fread("F:/lucasCore/dev/libs/carbon-curves.csv"); cw <- fread("F:/lucasCore/defaults/growth/forest-type-crosswalk.csv", colClasses = "character")
-codes <- fread("F:/lucas-master/Data Sources/FIA/EcoDivision_Strata.csv", colClasses = "character"); st <- fread("F:/lucasCore/defaults/stsim/stsim_Stratum.csv")
+cc <- fread(file.path(pkg, "dev/libs/carbon-curves.csv")); cw <- fread(file.path(pkg, "defaults/growth/forest-type-crosswalk.csv"), colClasses = "character")
+codes <- fread(file.path(DS, "FIA/EcoDivision_Strata.csv"), colClasses = "character"); st <- fread(file.path(pkg, "defaults/stsim/stsim_Stratum.csv"))
 cc[, ecodiv := codes$ecodiv[match(as.character(st$Id[match(StratumId, st$Name)]), codes$StratumId)]][, sc := cw$StateClassId[match(sub("^Forest: ", "", StateClassId), cw$StateClassName)]]
 # each plot to its forest state class (201 shares 200's plots: use 200 only)
 g2sc <- cw[StateClassId != "201", .(fortyp_grp = as.integer(unlist(strsplit(FiaTypeGroups, ";")))), by = StateClassId]
@@ -19,4 +21,4 @@ r[, `:=`(live_bias_pct = round(100 * (live_mod / live_obs - 1), 1), fol_bias_pct
          root_bias_pct = round(100 * (root_mod / root_obs - 1), 1), wood_bias_pct = round(100 * (wood_mod / wood_obs - 1), 1))]
 options(width = 200); print(r[, .(band, plots, live_obs = round(live_obs, 1), live_bias_pct, fol_obs = round(fol_obs, 2), fol_bias_pct, root_obs = round(root_obs, 1), root_bias_pct,
                                  wood_obs = round(wood_obs, 1), wood_bias_pct, merch_share_of_wood = round(merch_share, 2))])
-fwrite(r, "F:/lucasCore/dev/growth/out_exp13_pools.csv")
+fwrite(r, file.path(pkg, "dev/growth/out_exp13_pools.csv"))

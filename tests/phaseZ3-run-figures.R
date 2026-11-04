@@ -6,8 +6,9 @@
 # Figures has rows that are PNGs, and stage 13's checks passed. Usage: Rscript tests/phaseZ3-run-figures.R [run result id]
 # (bring the library up to date first: Rscript tools/sync-library.R <library>)
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
-a <- commandArgs(TRUE); f <- "F:/lucasCore/dev/libs/lucasCore-studio-library.ssim"
+a <- commandArgs(TRUE); f <- file.path(pkg, "dev/libs/lucasCore-studio-library.ssim")
 L <- ssimLibrary(f); P <- rsyncrosim::project(L, "Definitions"); sc <- as.data.table(rsyncrosim::scenario(L, summary = TRUE))
 bid <- max(sc[IsResult == "Yes" & grepl("Build", Name, fixed = TRUE) & !grepl("Figures", Name), ScenarioId]); cat("Build result", bid, "\n")
 for (i in sc[IsResult == "No" & Name == "Run Figures (phaseZ3)", ScenarioId]) delete(L, scenario = i, force = TRUE)

@@ -1,10 +1,11 @@
 # Experiments 4-5: (4) where to switch from a cell's own fit to the pooled fit, and how hard to pull toward the type group;
 # (5) whether the growth rate k should vary by ecodivision too (asymptote A and k per ecodivision, shape c shared).
 # Out-of-fold predictions (5 folds grouped by plot) for every cell with n >= 5 and every method; combined offline into hybrids.
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
 suppressPackageStartupMessages({ library(data.table); library(parallel) })
-source("F:/lucasCore/dev/growth/curves.R")
+source(file.path(pkg, "dev/growth/curves.R"))
 FORM <- "weibull_t10"; F <- FORMS[[FORM]]
-x <- readRDS("F:/lucasCore/dev/growth/fia_prepared.rds")[undisturbed & untreated & age_ok & vol_ok & latest & sc != 201]
+x <- readRDS(file.path(pkg, "dev/growth/fia_prepared.rds"))[undisturbed & untreated & age_ok & vol_ok & latest & sc != 201]
 x[, fold := fold_ids(pid)]
 LAMBDAS <- c(0, 0.003, 0.01, 0.03, 0.1, 0.3, 1)
 
@@ -42,7 +43,7 @@ cl <- makeCluster(min(20, detectCores() - 2)); clusterExport(cl, c("x", "FORM", 
 invisible(clusterEvalQ(cl, library(data.table)))
 t0 <- Sys.time(); P <- rbindlist(parLapply(cl, sort(unique(x$sc)), run_ftg), fill = TRUE); stopCluster(cl)
 cat(sprintf("%.1f min\n", as.numeric(Sys.time() - t0, units = "mins")))
-saveRDS(P, "F:/lucasCore/dev/growth/out_exp45_pred.rds")
+saveRDS(P, file.path(pkg, "dev/growth/out_exp45_pred.rds"))
 
 # ---- summaries ----
 P[, nc := .N, by = .(sc, ecodiv)][, size := cut(nc, c(0, 30, 100, 300, 1000, Inf), labels = c("<30", "30-100", "100-300", "300-1000", ">1000"))]
@@ -57,4 +58,4 @@ hy <- rbindlist(lapply(c(100, 300, 1000, 1e9), function(T) rbindlist(lapply(pm, 
   data.table(T = T, pooled = m, rmse = sqrt(mean((P$vol - pr)^2, na.rm = TRUE)),
              rmse_sparse = sqrt(mean(((P$vol - pr)^2)[P$nc < 300], na.rm = TRUE)), bias = mean(pr - P$vol, na.rm = TRUE)) }))))
 cat("\nHybrids (T = 1e9: pooled everywhere), best 12 by overall RMSE\n"); print(hy[order(rmse)][1:12], digits = 4)
-fwrite(hy, "F:/lucasCore/dev/growth/out_exp45_hybrids.csv"); fwrite(tab, "F:/lucasCore/dev/growth/out_exp45_bysize.csv")
+fwrite(hy, file.path(pkg, "dev/growth/out_exp45_hybrids.csv")); fwrite(tab, file.path(pkg, "dev/growth/out_exp45_bysize.csv"))

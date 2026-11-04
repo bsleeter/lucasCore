@@ -17,8 +17,9 @@
 # Writes dev/resampling/compare-methods.csv and prints the table. Read-only; no package code is changed.
 # Usage: Rscript dev/resampling/02-compare-methods.R
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
 suppressPackageStartupMessages({ library(terra); library(data.table) })
-pkg <- "F:/lucasCore"; cache <- file.path(pkg, "dev/resampling/cache")
+cache <- file.path(pkg, "dev/resampling/cache")
 build <- file.path(pkg, "dev/libs/LUCAS P26 Demo Library.ssim.data/Scenario-2")
 years <- 1985:2023; km2 <- 0.0225
 S <- lapply(years, function(y) rast(file.path(cache, sprintf("shares_%d.tif", y)))); names(S) <- years

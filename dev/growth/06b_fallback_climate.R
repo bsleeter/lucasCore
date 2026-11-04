@@ -4,11 +4,12 @@
 #   clim_A         A from a weighted linear regression on ecodivision climate (z temperature, z log precipitation); k pooled
 #   clim_Ak        A and log k both regressed on climate
 #   sister_clim    the sister ecodivision's pooled A, k when it has >= 300 plots, else clim_Ak
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
 suppressPackageStartupMessages({ library(data.table); library(parallel) })
-source("F:/lucasCore/dev/growth/curves.R")
+source(file.path(pkg, "dev/growth/curves.R"))
 FORM <- "weibull_t10"
-x <- readRDS("F:/lucasCore/dev/growth/fia_prepared.rds")[undisturbed & untreated & age_ok & vol_ok & latest & sc != 201]
-clim <- fread("F:/lucasCore/dev/growth/out_ecodiv_climate.csv", colClasses = c(ecodiv = "character"))
+x <- readRDS(file.path(pkg, "dev/growth/fia_prepared.rds"))[undisturbed & untreated & age_ok & vol_ok & latest & sc != 201]
+clim <- fread(file.path(pkg, "dev/growth/out_ecodiv_climate.csv"), colClasses = c(ecodiv = "character"))
 clim[, `:=`(z_t = (mat - mean(mat)) / sd(mat), z_p = (log(map) - mean(log(map))) / sd(log(map)))]
 sister_of <- function(e) if (startsWith(e, "M")) substring(e, 2) else paste0("M", e)
 wb <- function(t, A, k, c) ifelse(t <= 10, 0, A * (1 - exp(-k * pmax(t - 10, 0)^c)))
@@ -39,8 +40,8 @@ run_ftg <- function(g) { d <- x[sc == g]; cs <- d[, .N, by = ecodiv][N >= 100]$e
 cl <- makeCluster(min(20, detectCores() - 2)); clusterExport(cl, c("x", "FORM", "FORMS", "fit_form", "predict_form", "clim", "sister_of", "wb", "fit_Ak"))
 invisible(clusterEvalQ(cl, library(data.table)))
 r <- rbindlist(parLapply(cl, sort(unique(x$sc)), run_ftg)); stopCluster(cl)
-own <- fread("F:/lucasCore/dev/growth/out_exp6_fallback.csv")[method == "own", .(sc, ecodiv, own_rmse = rmse)]
+own <- fread(file.path(pkg, "dev/growth/out_exp6_fallback.csv"))[method == "own", .(sc, ecodiv, own_rmse = rmse)]
 r <- merge(r, own, by = c("sc", "ecodiv")); r[, rel := rmse / own_rmse - 1]
-fwrite(r, "F:/lucasCore/dev/growth/out_exp6b_fallback.csv")
+fwrite(r, file.path(pkg, "dev/growth/out_exp6b_fallback.csv"))
 print(r[, .(cells = .N, rmse = round(sqrt(weighted.mean(rmse^2, n)), 1), bias = round(weighted.mean(bias, n), 1),
             median_excess_pct = round(100 * median(rel), 1), p90_excess_pct = round(100 * quantile(rel, .9), 1)), by = method][order(rmse)])

@@ -5,13 +5,15 @@
 # Build's map; area match = developed matched per county (02-compare-methods.R), the rest modal or the cell's most common
 # non-developed class. Writes dev/resampling/class-areas-1985.csv. Read-only.
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(terra); library(sf); library(data.table) })
-pkg <- "F:/lucasCore"; build <- file.path(pkg, "dev/libs/LUCAS P26 Demo Library.ssim.data/Scenario-2"); km2 <- 0.0225
+build <- file.path(pkg, "dev/libs/LUCAS P26 Demo Library.ssim.data/Scenario-2"); km2 <- 0.0225
 for (e in parse(file.path(pkg, "src/shared.R")))
   if (is.call(e) && identical(as.character(e[[1]]), "<-") && as.character(e[[2]]) %in% c("MODEL_CRS", "model_lattice", "grid_blocks")) eval(e, globalenv())
 R <- rast(file.path(build, "stsim_InitialConditionsSpatial", "StateClass.tif"))
-L <- model_lattice(st_transform(read_sf("F:/lucas-master/Data Sources/FIA/EcoDivision_map/EcoDivisions_Dissolve.shp"), MODEL_CRS), res(R)[1])
-n30 <- rast("F:/lucas-master/Data Sources/NLCD/Annual NLCD/Annual_NLCD_LndCov_1985_CU_C1V0.tif"); b <- grid_blocks(n30, L, R)
+L <- model_lattice(st_transform(read_sf(file.path(DS, "FIA/EcoDivision_map/EcoDivisions_Dissolve.shp")), MODEL_CRS), res(R)[1])
+n30 <- rast(file.path(DS, "NLCD/Annual NLCD/Annual_NLCD_LndCov_1985_CU_C1V0.tif")); b <- grid_blocks(n30, L, R)
 x <- crop(n30, b$ext); levels(x) <- NULL
 cls <- c(11, 12, 21, 22, 23, 24, 31, 41, 42, 43, 52, 71, 81, 82, 90, 95)
 cnt <- mask(project(aggregate(segregate(x, classes = cls), b$fact, "sum", na.rm = TRUE), R, method = "near"), R)

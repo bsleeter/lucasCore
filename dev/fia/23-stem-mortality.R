@@ -11,8 +11,10 @@
 # Writes dev/fia/out-z7/stem-mortality.csv. Read-only.
 # Usage: Rscript dev/fia/23-stem-mortality.R
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages(library(data.table))
-dm <- "F:/lucas-master/Data Sources/FIA/DataMart"; pkg <- "F:/lucasCore"; out <- file.path(pkg, "dev/fia/out-z7")
+dm <- file.path(DS, "FIA/DataMart"); out <- file.path(pkg, "dev/fia/out-z7")
 ST <- c("AZ", "CA", "CO", "ID", "MT", "NM", "NV", "OR", "UT", "WA", "WY")
 cc <- readRDS(file.path(dm, "fia-conditions.rds"))$cond[, .(PLT_CN = plt_cn, CONDID = as.integer(condid), ecodiv, fortyp_grp = as.integer(fortyp_grp), stdage = as.numeric(stdage))]
 m <- rbindlist(lapply(ST, function(s) {

@@ -9,9 +9,11 @@
 # at the cut, against the FIA values (defaults/transitions/harvest-age.csv). Writes dev/harvest/out/lcms-cut-age.csv. Read-only.
 # Usage: Rscript dev/harvest/05-lcms-cut-age.R [--pyrome=26]
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(terra); library(sf); library(data.table) })
 a <- commandArgs(TRUE); PYR <- as.integer(sub("^--pyrome=", "", c(grep("^--pyrome=", a, value = TRUE), "--pyrome=26")[1]))
-ds <- "F:/lucas-master/Data Sources"; pkg <- "F:/lucasCore"; out <- file.path(pkg, "dev/harvest/out"); Y0 <- 1990; Y1 <- 2023
+ds <- DS; out <- file.path(pkg, "dev/harvest/out"); Y0 <- 1990; Y1 <- 2023
 nf <- function(y) file.path(ds, "NLCD/Annual NLCD", sprintf("Annual_NLCD_LndCov_%d_CU_C1V0.tif", y))
 lf <- function(y) Sys.glob(file.path(ds, "LCMS/v2025-11/Change_Annual", y, sprintf("*Change_%d.tif", y)))[1]
 ref <- rast(nf(2000))

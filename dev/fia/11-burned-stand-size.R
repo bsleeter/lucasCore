@@ -9,8 +9,10 @@
 # other ages. Also FIA's unburned live wood by stand age for scale. Read-only.
 # Usage: Rscript dev/fia/11-burned-stand-size.R
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(data.table); library(DBI) })
-pkg <- "F:/lucasCore"; dm <- "F:/lucas-master/Data Sources/FIA/DataMart"; ECODIV <- "M260"; K <- 2.2417
+dm <- file.path(DS, "FIA/DataMart"); ECODIV <- "M260"; K <- 2.2417
 TYPES <- c(`370` = "California Mixed Conifer", `260` = "Fir/Spruce/Mountain Hemlock", `220` = "Ponderosa Pine", `920` = "Western Oak")
 cd <- fread(file.path(dm, "CA_COND.csv"), select = c("PLT_CN", "CONDID", "COND_STATUS_CD", "STDAGE", "FORTYPCD", paste0("DSTRBCD", 1:3), paste0("DSTRBYR", 1:3)), colClasses = list(character = "PLT_CN"))
 pl <- fread(file.path(dm, "CA_PLOT.csv"), select = c("CN", "PREV_PLT_CN", "STATECD", "UNITCD", "COUNTYCD", "PLOT", "MEASYEAR"), colClasses = list(character = c("CN", "PREV_PLT_CN")))

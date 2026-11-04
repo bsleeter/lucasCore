@@ -30,7 +30,7 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker></defs>
 <rect class="bg" width="1600" height="1000"/>
 <text x="24" y="44" class="h1">lucasCore blueprint</text>
-<text x="24" y="66" class="sub">SyncroSim 3 add-on to ST-Sim 4.5 · version 1.0.0 · 16 stages in src/ · the scenarios they run in and the datasheets they pass on</text>
+<text x="24" y="66" class="sub">SyncroSim 3 add-on to ST-Sim 4.5 · version 1.0.1 · 18 stages in src/ · the scenarios they run in and the datasheets they pass on</text>
 <rect class="lg f-setup" x="1152.8" y="28" width="14" height="12" rx="2"/>
 <text x="1174.8" y="38" class="lgt">Setup</text>
 <rect class="lg f-land" x="1213.8" y="28" width="14" height="12" rx="2"/>
@@ -192,12 +192,11 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <text x="638" y="898" class="txt">mode 2 starts from a historical run's final maps.</text>
 <text x="638" y="920" class="mono">tools/new-projection.R</text>
 <path d="M974,869 H996" class="dep" marker-end="url(#ah)"/>
-<rect class="box" x="998" y="622" width="230" height="312" rx="7"/><text x="1014" y="644" class="eyebrow">SCENARIOS · ON RUN RESULTS</text><text x="1014" y="664" class="sname">Figures and comparison</text>
-<g class="stage f-fig" data-stage="13" tabindex="0" role="button" aria-label="Stage 13, Run Figures"><rect class="sb" x="1027" y="690" width="172" height="64" rx="5"/><rect class="badge" x="1036" y="700" width="24" height="20" rx="3"/><text x="1048" y="714" class="badge-t" text-anchor="middle">13</text><text x="1068" y="715" class="sn">Run Figures</text><text x="1036" y="744" class="ss">13-run-figures.R</text></g>
-<g class="stage f-fig" data-stage="14" tabindex="0" role="button" aria-label="Stage 14, Compare Runs"><rect class="sb" x="1027" y="790" width="172" height="64" rx="5"/><rect class="badge" x="1036" y="800" width="24" height="20" rx="3"/><text x="1048" y="814" class="badge-t" text-anchor="middle">14</text><text x="1068" y="815" class="sn">Compare Runs</text><text x="1036" y="844" class="ss">14-compare-runs.R</text></g>
-<text x="1014" y="882" class="txt">13 maps one run; 14 compares</text>
-<text x="1014" y="897" class="txt">runs and writes carbon and</text>
-<text x="1014" y="912" class="txt">land change summaries.</text>
+<rect class="box" x="998" y="602" width="230" height="332" rx="7"/><text x="1014" y="624" class="eyebrow">SCENARIOS · ON RESULTS</text><text x="1014" y="644" class="sname">Figures, records, release</text>
+<g class="stage f-fig" data-stage="13" tabindex="0" role="button" aria-label="Stage 13, Run Figures"><rect class="sb" x="1027" y="666" width="172" height="64" rx="5"/><rect class="badge" x="1036" y="676" width="24" height="20" rx="3"/><text x="1048" y="690" class="badge-t" text-anchor="middle">13</text><text x="1068" y="691" class="sn">Run Figures</text><text x="1036" y="720" class="ss">13-run-figures.R</text></g>
+<g class="stage f-fig" data-stage="14" tabindex="0" role="button" aria-label="Stage 14, Compare Runs"><rect class="sb" x="1027" y="732" width="172" height="64" rx="5"/><rect class="badge" x="1036" y="742" width="24" height="20" rx="3"/><text x="1048" y="756" class="badge-t" text-anchor="middle">14</text><text x="1068" y="757" class="sn">Compare Runs</text><text x="1036" y="786" class="ss">14-compare-runs.R</text></g>
+<g class="stage f-fig" data-stage="16" tabindex="0" role="button" aria-label="Stage 16, Model Record"><rect class="sb" x="1027" y="798" width="172" height="64" rx="5"/><rect class="badge" x="1036" y="808" width="24" height="20" rx="3"/><text x="1048" y="822" class="badge-t" text-anchor="middle">16</text><text x="1068" y="823" class="sn">Model Record</text><text x="1036" y="852" class="ss">16-model-record.R</text></g>
+<g class="stage f-fig" data-stage="17" tabindex="0" role="button" aria-label="Stage 17, Data Release"><rect class="sb" x="1027" y="864" width="172" height="64" rx="5"/><rect class="badge" x="1036" y="874" width="24" height="20" rx="3"/><text x="1048" y="888" class="badge-t" text-anchor="middle">17</text><text x="1068" y="889" class="sn">Data Release</text><text x="1036" y="918" class="ss">17-data-release.R</text></g>
 <rect class="box" x="1256" y="104" width="320" height="830" rx="7"/><text x="1272" y="126" class="eyebrow">WRITTEN INTO ST-SIM</text><text x="1272" y="146" class="sname">ST-Sim inputs</text>
 <text x="1272" y="172" class="ghead">DEFINITIONS</text>
 <g class="row" data-sheet="stsim_FlowPathwayDiagram" data-stages="0">
@@ -361,6 +360,6 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <g class="chip f-setup" data-stage="15"><rect x="1542" y="887" width="18" height="14" rx="3"/><text x="1551" y="897.5" class="chip-t" text-anchor="middle">15</text></g>
 </g>
 <text x="24" y="962" class="foot">Solid arrows: a datasheet one stage writes and a later stage reads. Dashed: a scenario dependency (the dependency supplies its sheets; the first one with rows wins). Chips: the stages that read a data group, or write a sheet.</text>
-<text x="24" y="978" class="foot">Every stage also writes the Validation sheet, and every Build stage the Data Sources Used sheet. Generated by docs/blueprint/build.R from package.xml (lucasCore 1.0.0), 2026-11-02.</text>
+<text x="24" y="978" class="foot">Every stage also writes the Validation sheet, and every Build stage the Data Sources Used sheet. Generated by docs/blueprint/build.R from package.xml (lucasCore 1.0.1), 2026-11-04.</text>
 </svg>
 

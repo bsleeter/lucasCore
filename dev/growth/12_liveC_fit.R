@@ -1,14 +1,16 @@
 # Quick test: fit FIA live-tree carbon (incl. saplings) directly by age, Weibull without lag, for the experiment 11 cells
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages(library(data.table))
-source("F:/lucasCore/src/growth.R")
-o11 <- fread("F:/lucasCore/dev/growth/out_exp11_young_carbon.csv", colClasses = c(ecodiv = "character"))
-D <- "F:/lucas-master/Data Sources/FIA/"
+source(file.path(pkg, "src/growth.R"))
+o11 <- fread(file.path(pkg, "dev/growth/out_exp11_young_carbon.csv"), colClasses = c(ecodiv = "character"))
+D <- file.path(DS, "FIA/")
 x <- as.data.table(readRDS(paste0(D, "USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds")))
 x <- merge(x, as.data.table(readRDS(paste0(D, "USGS_forest_conditions_dstrbcd_and_trtcd_20240213.Rds"))), by = c("plt_cn", "condid"))
 x <- x[dstrbcd1 %in% 0 & trtcd1 %in% 0 & !is.na(stdage) & stdage >= 1 & stdage <= 400 & invyr >= 1997]
 x[, pid := sprintf("%02d-%d-%03d-%05d", statecd, unitcd, countycd, plot)]; setorder(x, pid, condid, -invyr); x <- x[!duplicated(paste(pid, condid))]
 x[, `:=`(c_live = c_total_all_live_trees_short_tons_per_acre * 2.2417, ecodiv = as.character(ecodiv))]
-cw <- fread("F:/lucasCore/defaults/growth/forest-type-crosswalk.csv", colClasses = "character")
+cw <- fread(file.path(pkg, "defaults/growth/forest-type-crosswalk.csv"), colClasses = "character")
 res <- rbindlist(lapply(unique(o11[, paste(type, ecodiv)]), function(k) { r <- o11[paste(type, ecodiv) == k]
   g <- as.integer(strsplit(cw[StateClassName == r$type[1], FiaTypeGroups], ";")[[1]]); d <- x[fortyp_grp %in% g & ecodiv == r$ecodiv[1]]
   d <- d[c_live <= quantile(c_live, .999)]

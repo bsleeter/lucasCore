@@ -6,9 +6,11 @@
 # the phaseQ setup (P26 region, 30 m). Reports annual areas, how often each finds the other's events (NLCD can lag: +-2 years), what
 # LANDFIRE says the NLCD events are, the owner types and the patch sizes. Output: dev/harvest/compare-*.csv and the console.
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(terra); library(data.table); library(parallel) })
-CA <- "F:/lucasCore/dev/libs/lucasCore-suitability.ssim.data/lucasCore-suitability/r30_-2170395_1863765_5539_11473_1985-2023"
-LF <- "F:/lucas-master/Data Sources/Landfire Disturbance"; OUT <- "F:/lucasCore/dev/harvest"
+CA <- file.path(pkg, "dev/libs/lucasCore-suitability.ssim.data/lucasCore-suitability/r30_-2170395_1863765_5539_11473_1985-2023")
+LF <- file.path(DS, "Landfire Disturbance"); OUT <- file.path(pkg, "dev/harvest")
 cf <- function(k) file.path(CA, paste0(k, ".tif")); YRS <- 1999:2023
 reg <- values(rast(cf("region")), mat = FALSE); G <- rast(cf("region")); nc <- ncol(G)
 own <- values(rast(cf("owner")), mat = FALSE); gap <- values(rast(cf("gap")), mat = FALSE)

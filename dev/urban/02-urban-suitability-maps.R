@@ -6,8 +6,9 @@
 # final model, with random placement for reference. GAP 1-3 cells are 0.
 # Usage: Rscript dev/urban/02-urban-suitability-maps.R
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
 suppressPackageStartupMessages({ library(terra); library(sf); library(data.table); library(ggplot2) })
-OUT <- "F:/lucasCore/dev/urban"; CA <- file.path(OUT, "cache"); DEV <- 21:24
+OUT <- file.path(pkg, "dev/urban"); CA <- file.path(OUT, "cache"); DEV <- 21:24
 S30 <- rast(file.path(OUT, "urban-suitability-p26-30m.tif")); S150 <- rast(file.path(OUT, "urban-suitability-p26-150m.tif"))
 n12 <- rast(file.path(CA, "nlcd_2012.tif")); n23 <- rast(file.path(CA, "nlcd_2023.tif"))
 new <- !(n12 %in% c(DEV, 11, 12)) & (n23 %in% DEV) & !is.na(n12)

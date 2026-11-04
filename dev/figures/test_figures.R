@@ -4,11 +4,12 @@
 # Usage: Rscript dev/figures/test_figures.R [library.ssim] [result id] [out dir]
 #   defaults: the Studio-style test library (tests/phaseX-studio-library.R), its newest Build result, dev/figures/out
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table); library(terra) })
 a <- commandArgs(TRUE)
-f <- if (length(a) >= 1) a[1] else "F:/lucasCore/dev/libs/lucasCore-studio-library.ssim"
-out <- if (length(a) >= 3) a[3] else "F:/lucasCore/dev/figures/out"
-source("F:/lucasCore/src/figures.R")
+f <- if (length(a) >= 1) a[1] else file.path(pkg, "dev/libs/lucasCore-studio-library.ssim")
+out <- if (length(a) >= 3) a[3] else file.path(pkg, "dev/figures/out")
+source(file.path(pkg, "src/figures.R"))
 L <- ssimLibrary(f); P <- rsyncrosim::project(L, "Definitions"); sc <- as.data.table(rsyncrosim::scenario(L, summary = TRUE))
 rid <- if (length(a) >= 2) as.integer(a[2]) else max(sc[IsResult == "Yes" & grepl("Build", Name, fixed = TRUE), ScenarioId])
 R <- rsyncrosim::scenario(L, rid); ds <- function(s, sc = R) suppressWarnings(as.data.table(datasheet(sc, s, lookupsAsFactors = FALSE, optional = TRUE)))

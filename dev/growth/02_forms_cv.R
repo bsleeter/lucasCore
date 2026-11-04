@@ -1,8 +1,9 @@
 # Experiment 1: which curve form, and plot-level data or age medians? Cell-wise fits (type group x ecodivision, n >= 100),
 # 5-fold cross-validation grouped by plot; scored on held-out plot volumes.
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
 suppressPackageStartupMessages({ library(data.table); library(parallel) })
-source("F:/lucasCore/dev/growth/curves.R")
-x <- readRDS("F:/lucasCore/dev/growth/fia_prepared.rds")
+source(file.path(pkg, "dev/growth/curves.R"))
+x <- readRDS(file.path(pkg, "dev/growth/fia_prepared.rds"))
 x <- x[undisturbed & untreated & age_ok & vol_ok & latest & sc != 201]
 x[, fold := fold_ids(pid)]
 cells <- x[, .N, by = .(sc, ecodiv)][N >= 100]
@@ -25,7 +26,7 @@ cl <- makeCluster(min(20, detectCores() - 2)); clusterExport(cl, c("x", "cells",
 invisible(clusterEvalQ(cl, library(data.table)))
 t0 <- Sys.time(); res <- rbindlist(parLapply(cl, seq_len(nrow(cells)), run_cell)); stopCluster(cl)
 cat(sprintf("%.1f min\n", as.numeric(Sys.time() - t0, units = "mins")))
-fwrite(res, "F:/lucasCore/dev/growth/out_exp1_forms_cv.csv")
+fwrite(res, file.path(pkg, "dev/growth/out_exp1_forms_cv.csv"))
 s <- res[, .(cells = .N, R2_cv = 1 - sum(sse) / sum(sst), rmse_w = sqrt(sum(sse) / sum(n)), bias_w = sum(bias * n) / sum(n),
              wins = 0L, bound_fits = sum(bound > 0), failed = sum(failed)), by = method]
 w <- res[, .SD[which.min(rmse)], by = .(sc, ecodiv)][, .N, by = method]; s[w, wins := i.N, on = "method"]

@@ -8,8 +8,9 @@
 # dev/fia/out-cal-share.
 # Usage: Rscript dev/fia/14-fire-snag-share.R
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
 suppressPackageStartupMessages({ library(data.table); library(DBI) })
-pkg <- "F:/lucasCore"; RS <- "C:/Program Files/R/R-4.6.1/bin/Rscript.exe"
+RS <- file.path(R.home("bin"), "Rscript")
 for (f in c("growth.R", "flows.R", "dom.R", "calibrate.R")) source(file.path(pkg, "src", f))
 r <- readRDS(file.path(pkg, "dev/fia/out-cal-snagfall/calibration.rds")); obs <- fread(file.path(pkg, "dev/fia/out-cal-snagfall/young-stand-replacing.csv"))[kind == "fire" & years != "(20,30]"]
 SNAG_FALL <- fread(file.path(pkg, "dev/fia/snag-fall-measured.csv")); FALLS <- c("Transfer: Snag Stem -> AG Medium", "Transfer: Snag Branch -> AG Fast")

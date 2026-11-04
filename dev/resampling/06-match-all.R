@@ -16,8 +16,9 @@
 # dev/resampling/match-all.csv. Read-only; no package code is changed.
 # Usage: Rscript dev/resampling/06-match-all.R
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
 suppressPackageStartupMessages({ library(terra); library(data.table) })
-pkg <- "F:/lucasCore"; cache <- file.path(pkg, "dev/resampling/cache"); build <- file.path(pkg, "dev/libs/LUCAS P26 Demo Library.ssim.data/Scenario-2")
+cache <- file.path(pkg, "dev/resampling/cache"); build <- file.path(pkg, "dev/libs/LUCAS P26 Demo Library.ssim.data/Scenario-2")
 years <- 1985:2023; km2 <- 0.0225; CLS <- c(11, 12, 21, 22, 23, 24, 31, 41, 42, 43, 52, 71, 81, 82, 90, 95)
 DEV <- which(CLS %in% 21:24); ND <- setdiff(seq_along(CLS), DEV)
 tmpl <- rast(file.path(cache, "shares_1985.tif"))[["modal"]]

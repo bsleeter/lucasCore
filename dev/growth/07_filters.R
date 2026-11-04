@@ -5,10 +5,11 @@
 #   cond1       condition 1 only (the old script)
 #   treated_in  treated (partially cut) conditions included
 #   old_way     condition 1, treated included, plot number alone as id, age medians (the old script's whole recipe)
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
 suppressPackageStartupMessages({ library(data.table); library(parallel) })
-source("F:/lucasCore/dev/growth/curves.R")
+source(file.path(pkg, "dev/growth/curves.R"))
 FORM <- "weibull_t10"
-x0 <- readRDS("F:/lucasCore/dev/growth/fia_prepared.rds")[undisturbed & age_ok & vol_ok & sc != 201]
+x0 <- readRDS(file.path(pkg, "dev/growth/fia_prepared.rds"))[undisturbed & age_ok & vol_ok & sc != 201]
 x0[, fold := fold_ids(pid)]
 test_pool <- x0[latest & untreated]
 cells <- test_pool[, .N, by = .(sc, ecodiv)][N >= 100]
@@ -25,7 +26,7 @@ run <- function(i) { cc <- cells[i]; d <- x0[sc == cc$sc & ecodiv == cc$ecodiv];
 cl <- makeCluster(min(20, detectCores() - 2)); clusterExport(cl, c("x0", "cells", "VAR", "FORM", "FORMS", "fit_form", "predict_form", "median_by_age"))
 invisible(clusterEvalQ(cl, library(data.table)))
 r <- rbindlist(parLapply(cl, seq_len(nrow(cells)), run)); stopCluster(cl)
-fwrite(r, "F:/lucasCore/dev/growth/out_exp7_filters.csv")
+fwrite(r, file.path(pkg, "dev/growth/out_exp7_filters.csv"))
 r[, v100_vs_base := v100 / v100[variant == "base"], by = .(sc, ecodiv)]
 print(r[, .(cells = .N, train_rows = sum(ntrain), rmse = round(sqrt(weighted.mean(rmse^2, n)), 1), bias = round(weighted.mean(bias, n), 1),
             V100_vs_base_median = round(median(v100_vs_base), 3), V100_vs_base_p10 = round(quantile(v100_vs_base, .1), 3), V100_vs_base_p90 = round(quantile(v100_vs_base, .9), 3)), by = variant])

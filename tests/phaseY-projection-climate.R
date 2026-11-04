@@ -8,10 +8,11 @@
 #    gets its multipliers, and its growth flows differ from the normal-climate one
 # Usage: Rscript tests/phaseY-projection-climate.R [--scenario=SSP2-4.5] [--model=ACCESS-CM2]
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
 a <- commandArgs(TRUE); opt <- function(k, d) { m <- grep(sprintf("^--%s=", k), a, value = TRUE); if (length(m)) sub(sprintf("^--%s=", k), "", m[1]) else d }
-f <- "F:/lucasCore/dev/libs/lucasCore-studio-library.ssim"; RS <- "C:/Program Files/R/R-4.6.1/bin/Rscript.exe"
-tool <- function(script, args) { out <- system2(RS, c(file.path("F:/lucasCore/tools", script), shQuote(f), shQuote(args)), stdout = TRUE, stderr = TRUE)
+f <- file.path(pkg, "dev/libs/lucasCore-studio-library.ssim"); RS <- file.path(R.home("bin"), "Rscript")
+tool <- function(script, args) { out <- system2(RS, c(file.path(file.path(pkg, "tools"), script), shQuote(f), shQuote(args)), stdout = TRUE, stderr = TRUE)
   out <- out[!grepl("Warning|undetermined|^In ssimLibrary|row names|short variable", out)]; cat(grep("created|note|scenario '", out, value = TRUE), sep = "\n")
   id <- as.integer(tail(out, 1)); if (is.na(id)) { cat(out, sep = "\n"); stop(script, " failed") }; id }
 logl <- function(R) trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]])

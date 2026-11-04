@@ -9,7 +9,9 @@
 #   4. Carbon Rates: each row's rate is the flow value the model runs with, and decay rows = base x temperature effect x multiplier x share
 # Usage: Rscript tests/unit-growth-mature-rates.R
 # =============================================================================
-suppressPackageStartupMessages(library(data.table)); pkg <- "F:/lucasCore"; ok <- TRUE
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))
+suppressPackageStartupMessages(library(data.table)); ok <- TRUE
 expect <- function(what, cond, detail = "") { cat(sprintf("%s  %s %s\n", if (isTRUE(cond)) "PASS" else "FAIL", what, detail)); if (!isTRUE(cond)) ok <<- FALSE }
 for (f in c("growth.R", "carbon.R", "flows.R", "dom.R", "calibrate.R")) source(file.path(pkg, "src", f))
 rd <- function(...) fread(file.path(pkg, "defaults", ...), colClasses = "character", na.strings = "")
@@ -44,7 +46,7 @@ f <- cbm_pools(age, live, sf, sb, 0.4 * live, 0.25)
 expect("a fixed fine root share is used as given", max(abs(f$FineRoots - 0.25 * (f$FineRoots + f$CoarseRoots))) < 1e-12 && max(abs(f$TotalLive - b$TotalLive)) < 1e-12)
 
 # 3. Mature Age by Forest Type
-dwf <- "F:/lucas-master/Data Sources/FIA/DataMart/fia-deadwood.rds"
+dwf <- file.path(DS, "FIA/DataMart/fia-deadwood.rds")
 if (file.exists(dwf)) {
   dw <- readRDS(dwf); oc <- git_env("calibrate.R")
   key <- function(x) x$obs[, band := as.character(band)][order(sc, ecodiv, band)]

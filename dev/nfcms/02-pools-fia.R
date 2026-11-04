@@ -14,8 +14,10 @@
 # Writes dev/nfcms/out/pools-by-type.csv. Read-only.
 # Usage: Rscript dev/nfcms/02-pools-fia.R
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(terra); library(data.table); library(DBI) })
-lib <- "F:/lucasCore/dev/libs/LUCAS P26 Demo Library.ssim"; dd <- paste0(lib, ".data"); out <- "F:/lucasCore/dev/nfcms/out"; rid <- 14L; yr <- 2020L
+lib <- file.path(pkg, "dev/libs/LUCAS P26 Demo Library.ssim"); dd <- paste0(lib, ".data"); out <- file.path(pkg, "dev/nfcms/out"); rid <- 14L; yr <- 2020L
 con <- dbConnect(RSQLite::SQLite(), lib, flags = RSQLite::SQLITE_RO)
 avg <- as.data.table(dbGetQuery(con, sprintf("SELECT g.Name, o.Filename FROM stsim_OutputAverageSpatialStockGroup o JOIN stsim_StockGroup g ON g.StockGroupId = o.StockGroupId WHERE o.ScenarioId = %d AND o.Timestep = %d", rid, yr)))
 scf <- dbGetQuery(con, sprintf("SELECT Filename FROM stsim_OutputSpatialState WHERE ScenarioId = %d AND Timestep = %d AND Iteration = 1", rid, yr))$Filename
@@ -38,10 +40,10 @@ v <- v[!is.na(sc) & sc >= 100 & sc <= 999 & !is.na(n_tec)]
 
 # ---- FIA plots in P26's counties --------------------------------------------------------------------------------------------
 f <- 2.2417
-x <- as.data.table(readRDS("F:/lucas-master/Data Sources/FIA/USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds"))[(statecd * 1000 + countycd) %in% fips & invyr >= 2001 & invyr < 9999]
+x <- as.data.table(readRDS(file.path(DS, "FIA/USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds")))[(statecd * 1000 + countycd) %in% fips & invyr >= 2001 & invyr < 9999]
 x[, pid := paste(statecd, unitcd, countycd, plot)]; setorder(x, pid, condid, -invyr); x <- x[!duplicated(paste(pid, condid))]
 # each FIA type group to its own state class (a class fitted on pooled groups, as Western White Pine, takes only groups with no class)
-cw <- fread("F:/lucasCore/defaults/growth/forest-type-crosswalk.csv")[, .(fortyp_grp = as.integer(unlist(strsplit(as.character(FiaTypeGroups), ";")))), by = StateClassId]
+cw <- fread(file.path(pkg, "defaults/growth/forest-type-crosswalk.csv"))[, .(fortyp_grp = as.integer(unlist(strsplit(as.character(FiaTypeGroups), ";")))), by = StateClassId]
 cw <- cw[order(fortyp_grp != StateClassId)][!duplicated(fortyp_grp)]
 x <- merge(x, cw, by = "fortyp_grp"); x[, sc := StateClassId]
 fia <- x[, .(plots = .N, wood = mean(c_ag_all_live_trees_short_tons_per_acre * f), foliage = mean(c_foliage_all_live_trees_short_tons_per_acre * f), roots = mean(c_bg_all_live_trees_short_tons_per_acre * f),

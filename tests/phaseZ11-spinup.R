@@ -13,8 +13,9 @@
 # post-fire curves and leaves the other classes' post-fire shares as they were.
 # Usage: Rscript tests/phaseZ11-spinup.R      (REUSE=1 rechecks the last runs)
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
-f <- "F:/lucasCore/dev/libs/lucasCore-suitability.ssim"; L <- ssimLibrary(f); ok <- TRUE
+f <- file.path(pkg, "dev/libs/lucasCore-suitability.ssim"); L <- ssimLibrary(f); ok <- TRUE
 ds <- function(R, s) as.data.table(datasheet(R, s, lookupsAsFactors = FALSE))
 expect <- function(what, cond, detail = "") { cat(sprintf("%s  %s %s\n", if (isTRUE(cond)) "PASS" else "FAIL", what, detail)); if (!isTRUE(cond)) ok <<- FALSE }
 logs <- function(R, pat) { lg <- trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]]); unique(lg[grepl(pat, lg)]) }
@@ -61,7 +62,7 @@ chg <- merge(cb[StateClassId == MC & Age == 100], cv[StateClassId == MC & Age ==
 cat(sprintf("mixed conifer at age 100, DOM after fire (base -> changed): %s\n", paste(sprintf("%s %.1f -> %.1f", chg$StratumId, chg$TotalDOM.x, chg$TotalDOM.y)[chg$TransitionGroupId == FIRE], collapse = "; ")))
 
 # the averaged cycle against a Monte Carlo of random fire / clearcut cycles, for the 60-yr cell (stage 4's own pieces)
-pkg <- "F:/lucasCore"; say <- function(...) invisible(); fail <- function(...) stop(sprintf(...))
+say <- function(...) invisible(); fail <- function(...) stop(sprintf(...))
 for (s in c("flows.R", "dom.R")) source(file.path(pkg, "src", s))
 fm <- ds(RC, "stsim_FlowMultiplier")[is.na(AgeMin) & grepl("^(Biomass Turnover|Decay|Emission|Transfer):", FlowGroupId) & StratumId == e1 & StateClassId == MC]
 vals <- setNames(as.numeric(fm$Value), sub(" \\[Type\\]$", "", fm$FlowGroupId)); M <- dom_matrices(vals, fread(file.path(pkg, "defaults", "stockflow", "stsim_FlowOrder.csv")))

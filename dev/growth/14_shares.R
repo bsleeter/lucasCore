@@ -2,12 +2,14 @@
 #   type_sq     per forest type, minimise sum (num - s den)^2  (stage 2 as first built: big plots dominate)
 #   type_ratio  per forest type, minimise sum (num - s den)^2 / den  (= ratio of sums at each age)
 #   eco_ratio   per forest type x ecodivision where it has >= 200 plots, else type_ratio
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages(library(data.table))
-source("F:/lucasCore/src/carbon.R")
-D <- "F:/lucas-master/Data Sources/FIA/"
+source(file.path(pkg, "src/carbon.R"))
+D <- file.path(DS, "FIA/")
 x <- carbon_data(paste0(D, "USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds"), paste0(D, "USGS_forest_conditions_dstrbcd_and_trtcd_20240213.Rds"),
                  list(MinInventoryYear = 1997, VolumeCapQuantile = 0.999))
-cw <- fread("F:/lucasCore/defaults/growth/forest-type-crosswalk.csv", colClasses = "character")
+cw <- fread(file.path(pkg, "defaults/growth/forest-type-crosswalk.csv"), colClasses = "character")
 g2sc <- cw[StateClassId != "201", .(fortyp_grp = as.integer(unlist(strsplit(FiaTypeGroups, ";")))), by = StateClassId][!duplicated(fortyp_grp)]
 x <- merge(x, g2sc, by = "fortyp_grp"); setnames(x, "StateClassId", "sc")
 fit_share_w <- function(t, num, den, weighted) { ok <- den > 0; t <- t[ok]; num <- num[ok]; den <- den[ok]; w <- if (weighted) 1 / den else rep(1, length(den))

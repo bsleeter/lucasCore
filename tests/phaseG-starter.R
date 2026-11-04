@@ -6,10 +6,11 @@
 # Stages 3 and 4 work only on the study area's ecodivisions.
 # Usage: Rscript tests/phaseG-starter.R [--units="County: Placer California"] [--dir=dev/libs]
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
 a <- commandArgs(TRUE); opt <- function(k, d) { m <- grep(sprintf("^--%s=", k), a, value = TRUE); if (length(m)) sub(sprintf("^--%s=", k), "", m[1]) else d }
-D <- opt("dir", "F:/lucasCore/dev/libs"); UNITS <- opt("units", "County: Placer California")
-src <- "F:/lucasCore/Starter/LUCAS Core (CONUS).ssim"; if (!file.exists(src)) stop("build the starter first: Rscript tools/build_starter.R")
+D <- opt("dir", file.path(pkg, "dev/libs")); UNITS <- opt("units", "County: Placer California")
+src <- file.path(pkg, "Starter/LUCAS Core (CONUS).ssim"); if (!file.exists(src)) stop("build the starter first: Rscript tools/build_starter.R")
 f <- file.path(D, sprintf("lucasCore-starter-%s.ssim", gsub("[^A-Za-z0-9]+", "-", substr(UNITS, 1, 30))))
 unlink(c(f, paste0(f, c(".data", ".temp", ".backup"))), recursive = TRUE); file.copy(src, f)
 L <- ssimLibrary(f); P <- rsyncrosim::project(L, "Definitions"); sc <- as.data.table(scenario(L, summary = TRUE))

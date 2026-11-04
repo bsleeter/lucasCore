@@ -3,9 +3,10 @@
 # =============================================================================
 # Usage: Rscript tests/phaseB-flows.R [--dir=dev/libs]
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
 a <- commandArgs(TRUE); opt <- function(k, d) { m <- grep(sprintf("^--%s=", k), a, value = TRUE); if (length(m)) sub(sprintf("^--%s=", k), "", m[1]) else d }
-D <- opt("dir", "F:/lucasCore/dev/libs"); dir.create(D, showWarnings = FALSE, recursive = TRUE)
+D <- opt("dir", file.path(pkg, "dev/libs")); dir.create(D, showWarnings = FALSE, recursive = TRUE)
 f <- file.path(D, "lucasCore-flows.ssim"); unlink(c(f, paste0(f, c(".data", ".temp", ".backup"))), recursive = TRUE)
 if (system2(file.path(R.home("bin"), "Rscript.exe"), c("tools/new-library.R", shQuote(f)), stdout = FALSE)) stop("new-library.R failed")
 L <- ssimLibrary(f); P <- rsyncrosim::project(L, "Definitions")

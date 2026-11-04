@@ -8,10 +8,12 @@
 #      site class, stand age on about 94.5%, 6,377 plots)
 # Usage: Rscript tests/unit-treemap.R
 # =============================================================================
-suppressPackageStartupMessages({ library(data.table); library(terra) }); pkg <- "F:/lucasCore"; ok <- TRUE
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))
+suppressPackageStartupMessages({ library(data.table); library(terra) }); ok <- TRUE
 expect <- function(what, cond, detail = "") { cat(sprintf("%s  %s %s\n", if (isTRUE(cond)) "PASS" else "FAIL", what, detail)); if (!isTRUE(cond)) ok <<- FALSE }
 source(file.path(pkg, "src", "treemap.R"))
-dm <- "F:/lucas-master/Data Sources/FIA/DataMart"; tmd <- "F:/lucas-master/Data Sources/TreeMap/Data"
+dm <- file.path(DS, "FIA/DataMart"); tmd <- file.path(DS, "TreeMap/Data")
 
 # 1. the site cache
 t0 <- Sys.time(); s1 <- fia_sites(dm); t1 <- as.numeric(Sys.time() - t0, units = "secs")
@@ -26,7 +28,7 @@ td <- file.path(tempdir(), "tm"); dir.create(td, showWarnings = FALSE)
 writeRaster(rast(nrows = 1, ncols = 3, vals = 1:3), file.path(td, "TreeMap2016.tif"), overwrite = TRUE)
 foreign::write.dbf(data.frame(Value = 1:3, CN = c("A", "B", "C"), FORTYPCD = c(201L, 371L, 221L)), file.path(td, "TreeMap2016.tif.vat.dbf"))
 fs <- data.table(plt_cn = c("A", "A", "B", "B"), condid = c(1L, 2L, 1L, 2L), condprop = c(0.7, 0.3, 0.4, 0.6), fortypcd = c(221L, 201L, 261L, 281L),
-                 fortyp_grp = c(220L, 200L, 260L, 280L), stdage = c(40L, 80L, 60L, 90L), siteclcd = c(5L, 3L, 4L, 6L), st = "CA")
+                 fortyp_grp = c(220L, 200L, 260L, 280L), invyr = 2015L, stdage = c(40L, 80L, 60L, 90L), siteclcd = c(5L, 3L, 4L, 6L), st = "CA")
 p <- treemap_plots(td, 1:3, fs)
 expect("TreeMap's type wins over a larger condition", p[Value == 1, condid == 2 && matched && siteclcd == 3])
 expect("no condition of TreeMap's type: the largest", p[Value == 2, condid == 2 && !matched && stdage == 90])

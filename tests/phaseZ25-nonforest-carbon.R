@@ -8,8 +8,9 @@
 #          Wetland: Palustrine Forested 2.0 at age 50 only: those values land where they should and nowhere else
 # Usage: Rscript tests/phaseZ25-nonforest-carbon.R      (REUSE=1 reuses each run that already exists)
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
-f <- "F:/lucasCore/dev/libs/lucasCore-suitability.ssim"; L <- suppressWarnings(ssimLibrary(f)); P1 <- rsyncrosim::project(L, 1); ok <- TRUE
+f <- file.path(pkg, "dev/libs/lucasCore-suitability.ssim"); L <- suppressWarnings(ssimLibrary(f)); P1 <- rsyncrosim::project(L, 1); ok <- TRUE
 expect <- function(what, cond, detail = "") { cat(sprintf("%s  %s %s\n", if (isTRUE(cond)) "PASS" else "FAIL", what, detail)); if (!isTRUE(cond)) ok <<- FALSE }
 logs <- function(R, pat) { lg <- trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]]); unique(lg[grepl(pat, lg)]) }
 reuse <- Sys.getenv("REUSE") == "1"
@@ -28,8 +29,8 @@ run3 <- function(k) { nm <- sprintf("Stage 3 test (non-forest carbon, %s)", k); 
 R <- lapply(c(empty = "empty", rows = "rows"), run3)
 for (k in names(R)) { v <- as.data.table(datasheet(R[[k]], "lucasCore_OutputValidation")); expect(sprintf("%s: stage 3 checks pass", k), nrow(v) > 0 && all(v$Status == "Pass"), paste(v[Status != "Pass", paste(Check, Detail)], collapse = "; "))
   cat(logs(R[[k]], "^Grassland, Shrubland and Wetland Carbon"), sep = "\n") }
-pk <- rbind(fread("F:/lucasCore/defaults/stockflow/nonforest-multipliers-grassland-shrubland.csv"), fread("F:/lucasCore/defaults/stockflow/nonforest-multipliers-wetland.csv"), fill = TRUE)
-pg <- fread("F:/lucasCore/defaults/stockflow/nonforest-net-growth.csv")[StateClassId %in% unique(pk$StateClassId)]
+pk <- rbind(fread(file.path(pkg, "defaults/stockflow/nonforest-multipliers-grassland-shrubland.csv")), fread(file.path(pkg, "defaults/stockflow/nonforest-multipliers-wetland.csv")), fill = TRUE)
+pg <- fread(file.path(pkg, "defaults/stockflow/nonforest-net-growth.csv"))[StateClassId %in% unique(pk$StateClassId)]
 K <- c("StratumId", "StateClassId", "AgeMin", "FlowGroupId")
 fm <- function(r) { x <- as.data.table(datasheet(r, "stsim_FlowMultiplier", lookupsAsFactors = FALSE))[StateClassId %in% unique(pk$StateClassId)]; x[, AgeMin := as.integer(AgeMin)][, c(K, "Value"), with = FALSE] }
 sv <- function(r) { x <- as.data.table(datasheet(r, "stsim_StateAttributeValue", lookupsAsFactors = FALSE))[StateClassId %in% unique(pk$StateClassId) & StateAttributeTypeId == "Net Growth"]

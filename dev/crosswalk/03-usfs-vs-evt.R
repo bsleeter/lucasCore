@@ -5,12 +5,14 @@
 # pixels only one of them calls forest. Also every code found in the nine USFS tiles (for the crosswalk default).
 # Usage: Rscript dev/crosswalk/03-usfs-vs-evt.R [pyrome, default 26]
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(terra); library(sf); library(data.table) })
 for (v in c("PROJ_LIB", "PROJ_DATA", "GDAL_DATA")) if (grepl("syncro", tolower(Sys.getenv(v)))) Sys.unsetenv(v)
 a <- commandArgs(TRUE); PY <- if (length(a)) as.integer(a[1]) else 26L
-DS <- "F:/lucas-master/Data Sources/"; FT <- paste0(DS, "NFCMS/Forest Type/")
-xw <- fread("F:/lucasCore/defaults/landcover/land-cover-crosswalks.csv", na.strings = "")
-sc <- fread("F:/lucasCore/defaults/stsim/stsim_StateClass.csv"); nm <- function(id) sc$Name[match(id, sc$Id)]
+DS <- file.path(DS, ""); FT <- paste0(DS, "NFCMS/Forest Type/")
+xw <- fread(file.path(pkg, "defaults/landcover/land-cover-crosswalks.csv"), na.strings = "")
+sc <- fread(file.path(pkg, "defaults/stsim/stsim_StateClass.csv")); nm <- function(id) sc$Name[match(id, sc$Id)]
 e16 <- rast(paste0(DS, "EVT/LF2016_EVT_200_CONUS/LF2016_EVT_200_CONUS/Tif/LC16_EVT_200.tif")); levels(e16) <- NULL
 py <- read_sf(paste0(DS, "Pyromes/Data/Pyromes_CONUS_20200206.shp")); pv <- vect(st_transform(py[py$PYROME == PY, ], crs(e16)))
 e <- mask(crop(e16, pv), pv)

@@ -12,10 +12,12 @@
 # Read-only on the library and the data sources; no package code is changed. 02-compare-methods.R builds the alternatives from these.
 # Usage: Rscript dev/resampling/01-class-shares.R
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(terra); library(sf); library(parallel) })
-pkg <- "F:/lucasCore"; lib <- file.path(pkg, "dev/libs/LUCAS P26 Demo Library.ssim")
+lib <- file.path(pkg, "dev/libs/LUCAS P26 Demo Library.ssim")
 out <- file.path(pkg, "dev/resampling/cache"); dir.create(out, recursive = TRUE, showWarnings = FALSE)
-nlcd <- "F:/lucas-master/Data Sources/NLCD/Annual NLCD"; eco <- "F:/lucas-master/Data Sources/FIA/EcoDivision_map/EcoDivisions_Dissolve.shp"
+nlcd <- file.path(DS, "NLCD/Annual NLCD"); eco <- file.path(DS, "FIA/EcoDivision_map/EcoDivisions_Dissolve.shp")
 build <- file.path(paste0(lib, ".data"), "Scenario-2")
 years <- 1985:2023
 

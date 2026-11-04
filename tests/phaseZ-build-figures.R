@@ -6,8 +6,9 @@
 # stage 12's checks passed.
 # Usage: Rscript tests/phaseZ-build-figures.R   (bring the library up to date first: Rscript tools/sync-library.R <library>)
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
-f <- "F:/lucasCore/dev/libs/lucasCore-studio-library.ssim"
+f <- file.path(pkg, "dev/libs/lucasCore-studio-library.ssim")
 L <- ssimLibrary(f); P <- rsyncrosim::project(L, "Definitions"); sc <- as.data.table(rsyncrosim::scenario(L, summary = TRUE))
 bid <- max(sc[IsResult == "Yes" & grepl("Build", Name, fixed = TRUE) & !grepl("Figures", Name), ScenarioId]); cat("Build result", bid, "\n")
 old <- sc[IsResult == "No" & Name == "Build Figures (phaseZ)", ScenarioId]; for (i in old) delete(L, scenario = i, force = TRUE)

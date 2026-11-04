@@ -3,8 +3,9 @@
 # against the previous run that counted every cut (Placer test library; 2026-10-30). Read: the previous "Build test (harvest age)" result.
 # Usage: Rscript dev/harvest/06-age-year-check.R
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
-f <- "F:/lucasCore/dev/libs/lucasCore-suitability.ssim"; L <- suppressWarnings(ssimLibrary(f)); P1 <- rsyncrosim::project(L, 1)
+f <- file.path(pkg, "dev/libs/lucasCore-suitability.ssim"); L <- suppressWarnings(ssimLibrary(f)); P1 <- rsyncrosim::project(L, 1)
 sc <- as.data.table(scenario(L, summary = TRUE))
 old <- max(sc[IsResult == "Yes" & startsWith(Name, "Build test (harvest age) ("), ScenarioId]); S5 <- max(sc[IsResult == "Yes" & startsWith(Name, "Stage 5 test (site class shares)"), ScenarioId])
 nm <- "Build test (harvest age, cuts after the age map)"; for (id in sc[IsResult == "No" & Name == nm, ScenarioId]) delete(L, scenario = id, force = TRUE)

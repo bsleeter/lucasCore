@@ -1,0 +1,42 @@
+[
+  {
+    "name": "lucasCore",
+    "organization": "U.S. Geological Survey",
+    "description": "A SyncroSim add-on to ST-Sim that builds LUCAS land-use and carbon models from national datasets.",
+    "version": "1.1.0",
+    "status": "Development",
+    "permissions": {
+      "usageType": "openSource",
+      "licenses": [
+        {
+          "name": "Public Domain, CC0-1.0",
+          "URL": "https://code.usgs.gov/LUCC/lucasCore/-/raw/main/LICENSE.md"
+        }
+      ]
+    },
+    "homepageURL": "https://code.usgs.gov/LUCC/lucasCore",
+    "downloadURL": "https://code.usgs.gov/LUCC/lucasCore/-/archive/main/lucasCore-main.zip",
+    "disclaimerURL": "https://code.usgs.gov/LUCC/lucasCore/-/raw/main/DISCLAIMER.md",
+    "repositoryURL": "https://code.usgs.gov/LUCC/lucasCore.git",
+    "vcs": "git",
+    "laborHours": 0,
+    "tags": [
+      "usg-artificial-intelligence",
+      "land use",
+      "land cover",
+      "carbon",
+      "LUCAS",
+      "SyncroSim",
+      "ST-Sim"
+    ],
+    "languages": [
+      "R",
+      "C#",
+      "PowerShell",
+      "Shell"
+    ],
+    "date": {
+      "metadataLastUpdated": "2026-11-04"
+    }
+  }
+]

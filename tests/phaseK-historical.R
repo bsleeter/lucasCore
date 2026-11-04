@@ -6,10 +6,11 @@
 # year vs the initial stock maps, transition area vs stage 6's expected area, state class change, and the carbon trajectory.
 # Usage: Rscript tests/phaseK-historical.R [--units="County: Placer California"] [--iterations=1] [--build=<existing result id>]
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
 a <- commandArgs(TRUE); opt <- function(k, d) { m <- grep(sprintf("^--%s=", k), a, value = TRUE); if (length(m)) sub(sprintf("^--%s=", k), "", m[1]) else d }
 UNITS <- opt("units", "County: Placer California"); IT <- opt("iterations", "1")
-f <- "F:/lucasCore/dev/libs/lucasCore-forest-map.ssim"; if (!file.exists(f)) stop("run tests/phaseJ-forest-map.R first")
+f <- file.path(pkg, "dev/libs/lucasCore-forest-map.ssim"); if (!file.exists(f)) stop("run tests/phaseJ-forest-map.R first")
 L <- ssimLibrary(f); P <- rsyncrosim::project(L, "Definitions"); sc <- as.data.table(scenario(L, summary = TRUE))
 logl <- function(R) trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]])
 mins <- function(t0) as.numeric(Sys.time() - t0, units = "mins")
@@ -32,7 +33,7 @@ if (is.na(bid)) {
 RB <- scenario(L, bid)
 
 # ---- the historical scenario -------------------------------------------------------------------------------------------
-out <- system2("C:/Program Files/R/R-4.6.1/bin/Rscript.exe", c("F:/lucasCore/tools/new-historical.R", shQuote(f), sprintf("--build=%d", bid),
+out <- system2(file.path(R.home("bin"), "Rscript"), c(file.path(pkg, "tools/new-historical.R"), shQuote(f), sprintf("--build=%d", bid),
                sprintf("--iterations=%s", IT), "--replace"), stdout = TRUE, stderr = TRUE)
 out <- out[!grepl("Warning|undetermined|^In ssimLibrary", out)]; cat(out, sep = "\n")
 hid <- as.integer(tail(out, 1)); if (is.na(hid)) stop("tools/new-historical.R did not create the scenario")
@@ -60,5 +61,5 @@ cat("\ntransition area 1986-2023: stage 6 expected (km2) vs the run (area units)
 ss <- ds(RH, "stsim_OutputStratumState"); cls <- ss[Timestep %in% range(Timestep), .(Amount = sum(Amount) / max(Iteration)), by = .(Timestep, StateClassId)]
 cw <- dcast(cls, StateClassId ~ Timestep, value.var = "Amount", fill = 0); setnames(cw, c("StateClassId", "First", "Last"))
 cat("\nstate classes, first vs last year:\n"); print(cw[, Change := Last - First][order(-abs(Change))][1:min(.N, 20)])
-saveRDS(list(stock = st_tot, transitions = cmp, classes = cw, build = bid, run = scenarioId(RH)), "F:/lucasCore/dev/libs/test-historical.rds")
+saveRDS(list(stock = st_tot, transitions = cmp, classes = cw, build = bid, run = scenarioId(RH)), file.path(pkg, "dev/libs/test-historical.rds"))
 cat("HISTORICAL RUN DONE\n")

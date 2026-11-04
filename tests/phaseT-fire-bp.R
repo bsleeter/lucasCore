@@ -6,14 +6,15 @@
 # the burned area by year against the historical run's drawn years.
 # Usage: Rscript tests/phaseT-fire-bp.R [--setup=58] [--historical=49] [--years=3] [--ignitions=FPA-FOD|Burn]
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
 a <- commandArgs(TRUE); opt <- function(k, d) { m <- grep(sprintf("^--%s=", k), a, value = TRUE); if (length(m)) sub(sprintf("^--%s=", k), "", m[1]) else d }
-f <- "F:/lucasCore/dev/libs/lucasCore-suitability.ssim"; RS <- "C:/Program Files/R/R-4.6.1/bin/Rscript.exe"
+f <- file.path(pkg, "dev/libs/lucasCore-suitability.ssim"); RS <- file.path(R.home("bin"), "Rscript")
 sid <- as.integer(opt("setup", 58)); hid <- as.integer(opt("historical", 49)); YRS <- opt("years", "3"); ign <- opt("ignitions", "FPA-FOD")
 L <- ssimLibrary(f)
 logl <- function(R) trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]])
 ds <- function(R, s) as.data.table(datasheet(R, s, lookupsAsFactors = FALSE))
-out <- system2(RS, c("F:/lucasCore/tools/new-projection.R", shQuote(f), shQuote(c(sprintf("--historical=%d", hid), "--stage9", sprintf("--build=%d", sid), sprintf("--years=%s", YRS),
+out <- system2(RS, c(file.path(pkg, "tools/new-projection.R"), shQuote(f), shQuote(c(sprintf("--historical=%d", hid), "--stage9", sprintf("--build=%d", sid), sprintf("--years=%s", YRS),
                "--replace", sprintf("--name=Projection (fire BP, %s ignitions)", ign)))), stdout = TRUE, stderr = TRUE)
 pid <- as.integer(tail(out[!grepl("Warning|undetermined|^In ssimLibrary", out)], 1)); if (is.na(pid)) { cat(out, sep = "\n"); stop("new-projection.R failed") }
 S <- scenario(L, pid)

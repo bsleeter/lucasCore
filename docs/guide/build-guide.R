@@ -1,5 +1,5 @@
 # =============================================================================
-# build-guide.R - the public copy of the lucasCore User Guide (a Claude Doc) for GitHub
+# build-guide.R - the public copy of the lucasCore User Guide (a Claude Doc)
 # =============================================================================
 # The guide is written and edited as a Claude Doc (https://claude.ai/artifact/Xt2xiTJxHnduXtCARdPYc9). This makes a snapshot of it:
 #   user-guide.md   rendered by GitHub in the repo view (its outline menu lists the sections)
@@ -44,9 +44,9 @@ for (i in seq_along(name)) { dest <- file.path(img_dir, name[i])
 stale <- setdiff(list.files(img_dir), name); if (length(stale)) { file.remove(file.path(img_dir, stale)); cat("removed", length(stale), "unused images\n") }
 
 # the doc's one embedded diagram (the scenario chain) does not export: the package blueprint shows the same chain
-chain_md <- sprintf("[![The package blueprint: lucasCore's scenarios and stages](../blueprint/lucascore-blueprint.png)](%s)\n\n*The scenario chain, from the [package blueprint](%s) (the interactive diagram of the guide's Claude Doc does not export).*", PAGES, PAGES)
-chain_html <- sprintf('<figure><a href="%s"><img src="../blueprint/lucascore-blueprint.png" alt="The package blueprint: lucasCore\'s scenarios, stages and datasheets" loading="lazy"></a><figcaption>The scenario chain, from the <a href="%s">package blueprint</a>.</figcaption></figure>', PAGES, PAGES)
-note_md <- sprintf("*A snapshot of the lucasCore User Guide, exported %s. Also as a [web page](%sguide/), beside the [package](%s) and [data](%sdata.html) blueprints.*", exported, SITE, PAGES, PAGES)
+chain_md <- "[![The package blueprint: lucasCore's scenarios and stages](../blueprint/lucascore-blueprint.png)](../blueprint/index.html)\n\n*The scenario chain, from the [package blueprint](../blueprint/index.html).*"
+chain_html <- '<figure><a href="../blueprint/index.html"><img src="../blueprint/lucascore-blueprint.png" alt="The package blueprint: lucasCore\'s scenarios, stages and datasheets" loading="lazy"></a><figcaption>The scenario chain, from the <a href="../blueprint/index.html">package blueprint</a>.</figcaption></figure>'
+note_md <- sprintf("*A snapshot of the lucasCore User Guide, exported %s. Also as a [web page](index.html), beside the [package](../blueprint/index.html) and [data](../blueprint/data.html) blueprints.*", exported)
 note_html <- sprintf('<p class="snapshot">A snapshot of the lucasCore User Guide, exported %s. Figures are SyncroSim Studio 3.1 on Windows; the worked example is the Northern Sierra Nevada pyrome (P26).</p>', exported)
 
 # ---- user-guide.md ------------------------------------------------------------------------------------------------------------------

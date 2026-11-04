@@ -6,13 +6,14 @@
 # every Target group's strata to Tertiary and writes the tile mask of whole tertiary units; the projection runs on the tiles.
 # Usage: Rscript tests/phaseW-spatial-tiles.R [--level=Tertiary] [--tiles=2]
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table); library(terra) })
 a <- commandArgs(TRUE); opt <- function(k, d) { m <- grep(sprintf("^--%s=", k), a, value = TRUE); if (length(m)) sub(sprintf("^--%s=", k), "", m[1]) else d }
-f <- "F:/lucasCore/dev/libs/lucasCore-suitability.ssim"; RS <- "C:/Program Files/R/R-4.6.1/bin/Rscript.exe"
+f <- file.path(pkg, "dev/libs/lucasCore-suitability.ssim"); RS <- file.path(R.home("bin"), "Rscript")
 lvl <- opt("level", "Tertiary"); ntile <- as.integer(opt("tiles", 2))
 L <- ssimLibrary(f)
 ds <- function(R, s) as.data.table(datasheet(R, s, lookupsAsFactors = FALSE))
-tool <- function(script, args) { out <- system2(RS, c(file.path("F:/lucasCore/tools", script), shQuote(f), shQuote(args)), stdout = TRUE, stderr = TRUE)
+tool <- function(script, args) { out <- system2(RS, c(file.path(file.path(pkg, "tools"), script), shQuote(f), shQuote(args)), stdout = TRUE, stderr = TRUE)
   out <- out[!grepl("Warning|undetermined|^In ssimLibrary|row names|short variable", out)]; id <- as.integer(tail(out, 1)); if (is.na(id)) { cat(out, sep = "\n"); stop(script, " failed") }; id }
 sid <- tool("new-projection-setup.R", c("--build=47", "--historical=49", "--method=None", "--name=Projection Setup (tiles test)", "--replace"))
 saveDatasheet(scenario(L, sid), data.frame(Iterations = 1L, SpatialTiles = ntile, SpatialTilesStrata = lvl), "lucasCore_ProjectionOptions")

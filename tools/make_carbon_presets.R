@@ -14,7 +14,7 @@
 # Usage: Rscript tools/make_carbon_presets.R
 # =============================================================================
 suppressPackageStartupMessages(library(data.table))
-pkg <- "F:/lucasCore"; e <- new.env(); for (f in c("flows.R", "dom.R")) sys.source(file.path(pkg, "src", f), envir = e)
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/"); e <- new.env(); for (f in c("flows.R", "dom.R")) sys.source(file.path(pkg, "src", f), envir = e)
 rd <- function(...) fread(file.path(pkg, "defaults", ...), colClasses = "character", na.strings = "")
 out <- file.path(pkg, "defaults", "carbon-assumptions"); dir.create(out, showWarnings = FALSE)
 w <- function(x, method, sheet) { d <- file.path(out, method); dir.create(d, showWarnings = FALSE); fwrite(x, file.path(d, paste0(sheet, ".csv")), na = "") }

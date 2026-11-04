@@ -1,7 +1,8 @@
 # Old vs new curves against observed mean plot volume in age bands (same filters as stage 2)
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
 suppressPackageStartupMessages(library(data.table))
-x <- readRDS("F:/lucasCore/dev/growth/fia_prepared.rds")[undisturbed & untreated & age_ok & vol_ok & latest]
-cmp <- fread("F:/lucasCore/dev/growth/out_exp8_compare_existing.csv", colClasses = c(ecodiv = "character"))
+x <- readRDS(file.path(pkg, "dev/growth/fia_prepared.rds"))[undisturbed & untreated & age_ok & vol_ok & latest]
+cmp <- fread(file.path(pkg, "dev/growth/out_exp8_compare_existing.csv"), colClasses = c(ecodiv = "character"))
 bands <- data.table(age = c(25, 50, 100, 200), lo = c(20, 45, 90, 175), hi = c(30, 55, 110, 225))
 obs <- rbindlist(lapply(seq_len(nrow(bands)), function(i) x[stdage >= bands$lo[i] & stdage <= bands$hi[i], .(obs = mean(vol), n = .N), by = .(fortyp = fortyp_grp, ecodiv)][, age := bands$age[i]]))
 m <- merge(cmp, obs, by = c("fortyp", "ecodiv", "age"))[n >= 20]

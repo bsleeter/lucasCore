@@ -7,10 +7,12 @@
 # the DataMart cache (fia-conditions.rds in the DataMart folder).
 # Usage: Rscript dev/fia/02-compare-conus.R
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages(library(data.table))
-fia <- "F:/lucas-master/Data Sources/FIA"; dm <- file.path(fia, "DataMart"); out <- "F:/lucasCore/dev/fia"
+fia <- file.path(DS, "FIA"); dm <- file.path(fia, "DataMart"); out <- file.path(pkg, "dev/fia")
 say <- function(...) cat(sprintf(...), "\n"); fail <- function(...) stop(sprintf(...)); read_data_sources <- function(k) setNames(list(dm), k)
-source("F:/lucasCore/src/fia.R"); source("F:/lucasCore/src/growth.R"); source("F:/lucasCore/src/carbon.R")
+source(file.path(pkg, "src/fia.R")); source(file.path(pkg, "src/growth.R")); source(file.path(pkg, "src/carbon.R"))
 eco <- file.path(fia, "EcoDivision_map", "EcoDivisions_Dissolve.shp")
 t0 <- Sys.time(); D <- fia_tables(list(FiaSource = 2L, DownDeadCarbon = 1L), eco)
 U <- list(cond = as.data.table(readRDS(file.path(fia, "USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds"))),

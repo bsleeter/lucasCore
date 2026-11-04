@@ -7,9 +7,11 @@
 # forest: a selection / thinning candidate). Uses the stage 10 cache of the phaseQ setup (P26 region, 30 m).
 # Output: dev/harvest/lcms-*.csv and the console.
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(terra); library(data.table); library(parallel) })
-CA <- "F:/lucasCore/dev/libs/lucasCore-suitability.ssim.data/lucasCore-suitability/r30_-2170395_1863765_5539_11473_1985-2023"
-LC <- "F:/lucas-master/Data Sources/LCMS/v2025-11/Change_Annual"; OUT <- "F:/lucasCore/dev/harvest"
+CA <- file.path(pkg, "dev/libs/lucasCore-suitability.ssim.data/lucasCore-suitability/r30_-2170395_1863765_5539_11473_1985-2023")
+LC <- file.path(DS, "LCMS/v2025-11/Change_Annual"); OUT <- file.path(pkg, "dev/harvest")
 cf <- function(k) file.path(CA, paste0(k, ".tif")); YRS <- 1986:2023
 G <- rast(cf("region")); nc <- ncol(G)
 own <- values(rast(cf("owner")), mat = FALSE); gap <- values(rast(cf("gap")), mat = FALSE)

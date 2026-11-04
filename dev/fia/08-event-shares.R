@@ -12,8 +12,10 @@
 # dev/fia/out-cal/event-shares.csv. Read-only.
 # Usage: Rscript dev/fia/08-event-shares.R
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages(library(data.table))
-pkg <- "F:/lucasCore"; dm <- "F:/lucas-master/Data Sources/FIA/DataMart"; out <- file.path(pkg, "dev/fia/out-cal"); ECODIV <- "M260"
+dm <- file.path(DS, "FIA/DataMart"); out <- file.path(pkg, "dev/fia/out-cal"); ECODIV <- "M260"
 TYPES <- c(`370` = "California Mixed Conifer", `260` = "Fir/Spruce/Mountain Hemlock", `220` = "Ponderosa Pine", `920` = "Western Oak")
 LB <- 0.000453592 * 2.471; K <- 2.2417
 w <- unique(fread(file.path(dm, "CA_COND_DWM_CALC.csv"), select = c("PLT_CN", "CONDID", "MEASYEAR", "CWD_CARBON_COND", "PILE_CARBON_COND", "FWD_SM_CARBON_COND",

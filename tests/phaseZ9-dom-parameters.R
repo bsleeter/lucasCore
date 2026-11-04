@@ -12,8 +12,9 @@
 # fails its check.
 # Usage: Rscript tests/phaseZ9-dom-parameters.R
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table); library(terra) })
-f <- "F:/lucasCore/dev/libs/lucasCore-suitability.ssim"; L <- ssimLibrary(f); ok <- TRUE
+f <- file.path(pkg, "dev/libs/lucasCore-suitability.ssim"); L <- ssimLibrary(f); ok <- TRUE
 ds <- function(R, s) as.data.table(datasheet(R, s, lookupsAsFactors = FALSE))
 expect <- function(what, cond, detail = "") { cat(sprintf("%s  %s %s\n", if (isTRUE(cond)) "PASS" else "FAIL", what, detail)); if (!isTRUE(cond)) ok <<- FALSE }
 logs <- function(R, pat) { lg <- trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]]); unique(lg[grepl(pat, lg)]) }
@@ -48,7 +49,7 @@ cap0 <- agvf[, .(s0 = sum(Value_base), s1 = sum(Value_changed)), by = .(StratumI
 expect("AG Very Fast decay and emission scale by 0.5 / 0.355 in every cell below the 1.0 loss cap (or reach it); cells at the cap unchanged", all(ifelse(agvf$s0 >= 1 - 1e-9, !agvf$diff, abs(agvf$Value_changed / agvf$Value_base - 0.5 / 0.355) < 1e-6 | agvf$s1 >= 1 - 1e-9)),
        sprintf("%d rows (%d at the cap already); ratio %.4f-%.4f", nrow(agvf), sum(agvf$s0 >= 1 - 1e-9), min(agvf$Value_changed / agvf$Value_base), max(agvf$Value_changed / agvf$Value_base)))
 agm <- m[grepl("^(Decay|Emission): AG Medium", FlowGroupId)]
-dp <- fread("F:/lucasCore/defaults/cbm/dom-parameters.csv")[Pool == "AG Medium"]
+dp <- fread(file.path(pkg, "defaults/cbm/dom-parameters.csv"))[Pool == "AG Medium"]
 expect("AG Medium changes in Marine Mountains only", all(agm[StratumId == "Marine Mountains", diff]) && !any(agm[StratumId != "Marine Mountains", diff]))
 k <- agm[StratumId == "Marine Mountains" & grepl("^Decay", FlowGroupId)][1]
 tmp <- log(k$Value_base / ((1 - dp$ShareEmitted) * dp$BaseDecayRate)) / (log(dp$Q10) * 0.1) + dp$ReferenceTemperature     # the cell's temperature, from the base rate
@@ -62,11 +63,11 @@ local({
   env <- new.env(); env$say <- function(...) cat("  say:", sprintf(...), "\n"); rs <- new.env(); rs$res <- list()
   env$check <- function(stage, what, cond, detail = "") rs$res[[length(rs$res) + 1]] <- list(what = what, cond = cond, detail = detail)
   env$stsim_list <- function(x) data.table(Name = c("Marine", "Marine Mountains"), Id = c(1L, 2L))
-  env$pkg_file <- function(...) file.path("F:/lucasCore", ...)
-  sys.source("F:/lucasCore/src/climate.R", envir = env)
-  fm <- fread("F:/lucasCore/defaults/climate/flow-multipliers.csv")[Role == "Decomposition"][, Model := "Q10"]
+  env$pkg_file <- function(...) file.path(pkg, ...)
+  sys.source(file.path(pkg, "src/climate.R"), envir = env)
+  fm <- fread(file.path(pkg, "defaults/climate/flow-multipliers.csv"))[Role == "Decomposition"][, Model := "Q10"]
   Pg <- rast(nrows = 1, ncols = 2, vals = c(1L, 2L))
-  base <- fread("F:/lucasCore/defaults/cbm/dom-parameters.csv", na.strings = "")[, .(StratumId = NA_character_, Pool, BaseDecayRate, ReferenceTemperature, Q10, ShareEmitted, TransferToBGSlow)]
+  base <- fread(file.path(pkg, "defaults/cbm/dom-parameters.csv"), na.strings = "")[, .(StratumId = NA_character_, Pool, BaseDecayRate, ReferenceTemperature, Q10, ShareEmitted, TransferToBGSlow)]
   env$read_dom_parameters <- function() base; p0 <- env$climate_params(fm, Pg, "t")
   expect("climate Q10s by default: 2.65 fast, 2.0 slow, single numbers", identical(unname(unlist(p0$q10)), c(2.65, 2)))
   mm <- rbind(base, base[Pool %in% c("AG Very Fast", "AG Slow")][, `:=`(StratumId = "Marine Mountains", Q10 = 3.0)])

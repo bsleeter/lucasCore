@@ -13,8 +13,10 @@
 # Writes dev/fia/compare-ca.csv (per field: conditions compared, median ratio, share within 1% and 5%). Read-only.
 # Usage: Rscript dev/fia/01-datamart-ca.R
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(data.table); library(sf) })
-dm <- "F:/lucas-master/Data Sources/FIA/DataMart"; fia <- "F:/lucas-master/Data Sources/FIA"; out <- "F:/lucasCore/dev/fia"
+dm <- file.path(DS, "FIA/DataMart"); fia <- file.path(DS, "FIA"); out <- file.path(pkg, "dev/fia")
 t0 <- Sys.time()
 pl <- fread(file.path(dm, "CA_PLOT.csv"), select = c("CN", "INVYR", "STATECD", "UNITCD", "COUNTYCD", "PLOT", "LAT", "LON", "MACRO_BREAKPOINT_DIA"), colClasses = list(character = "CN"))
 cd <- fread(file.path(dm, "CA_COND.csv"), select = c("PLT_CN", "CONDID", "COND_STATUS_CD", "STDAGE", "FORTYPCD", "CONDPROP_UNADJ", "MICRPROP_UNADJ", "SUBPPROP_UNADJ", "MACRPROP_UNADJ", "DSTRBCD1", "TRTCD1",

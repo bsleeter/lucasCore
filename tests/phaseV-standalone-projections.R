@@ -7,13 +7,14 @@
 # the first projection year's carbon starts where the historical run ended.
 # Usage: Rscript tests/phaseV-standalone-projections.R [--build=47] [--historical=49] [--years=3]
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
 a <- commandArgs(TRUE); opt <- function(k, d) { m <- grep(sprintf("^--%s=", k), a, value = TRUE); if (length(m)) sub(sprintf("^--%s=", k), "", m[1]) else d }
-f <- "F:/lucasCore/dev/libs/lucasCore-suitability.ssim"; RS <- "C:/Program Files/R/R-4.6.1/bin/Rscript.exe"; CON <- "C:/Program Files/SyncroSim/SyncroSim.Console.exe"
+f <- file.path(pkg, "dev/libs/lucasCore-suitability.ssim"); RS <- file.path(R.home("bin"), "Rscript"); CON <- "C:/Program Files/SyncroSim/SyncroSim.Console.exe"
 bid <- as.integer(opt("build", 47)); hid <- as.integer(opt("historical", 49)); YRS <- opt("years", "3")
 L <- ssimLibrary(f)
 ds <- function(R, s) as.data.table(datasheet(R, s, lookupsAsFactors = FALSE))
-tool <- function(script, args) { out <- system2(RS, c(file.path("F:/lucasCore/tools", script), shQuote(f), shQuote(args)), stdout = TRUE, stderr = TRUE)
+tool <- function(script, args) { out <- system2(RS, c(file.path(file.path(pkg, "tools"), script), shQuote(f), shQuote(args)), stdout = TRUE, stderr = TRUE)
   out <- out[!grepl("Warning|undetermined|^In ssimLibrary|row names|short variable", out)]; cat(out, sep = "\n"); id <- as.integer(tail(out, 1)); if (is.na(id)) stop(script, " failed"); id }
 latest <- function(p) { s <- as.data.table(scenario(L, summary = TRUE)); r <- s[IsResult == "Yes" & ParentId == p, ScenarioId]; if (length(r)) max(r) else NA_integer_ }
 failed <- function(r) any(grepl("\\[Failure\\]", runLog(scenario(L, r))))

@@ -6,13 +6,14 @@
 # curves, and this library as the source.
 # Usage: Rscript tests/phaseH-copy-curves.R [--source=dev/libs/lucasCore-starter-County-Placer-California.ssim] [--units="County: Placer California"]
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
 a <- commandArgs(TRUE); opt <- function(k, d) { m <- grep(sprintf("^--%s=", k), a, value = TRUE); if (length(m)) sub(sprintf("^--%s=", k), "", m[1]) else d }
-D <- "F:/lucasCore/dev/libs"; UNITS <- opt("units", "County: Placer California")
+D <- file.path(pkg, "dev/libs"); UNITS <- opt("units", "County: Placer California")
 SRC <- normalizePath(opt("source", file.path(D, "lucasCore-starter-County-Placer-California.ssim")), winslash = "/")
 if (!file.exists(SRC)) stop("source library not found (run tests/phaseG-starter.R first): ", SRC)
 f <- file.path(D, "lucasCore-copy-curves.ssim"); unlink(c(f, paste0(f, c(".data", ".temp", ".backup"))), recursive = TRUE)
-file.copy("F:/lucasCore/Starter/LUCAS Core (CONUS).ssim", f)
+file.copy(file.path(pkg, "Starter/LUCAS Core (CONUS).ssim"), f)
 L <- ssimLibrary(f); P <- rsyncrosim::project(L, "Definitions"); sc <- as.data.table(scenario(L, summary = TRUE))
 sfd <- sc[Name == "Stock-Flow Definitions", ScenarioId]
 logl <- function(R) trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]])

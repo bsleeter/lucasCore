@@ -4,15 +4,16 @@
 # Needs a library whose Data Sources Home holds the strata datasets (a Data Download with StatesFile, CountiesFile, WatershedsFile, EcoregionsFile, PyromesFile, PadusFile) and the
 # study area's NLCD, e.g. dev/libs/strata-home-test.ssim on the P26 home. For each secondary / tertiary pair, stage 1 runs twice
 # on the study area: (home) the presets' Files blank, so the polygons come from the home; (local) the Files set to the copies on
-# the build machine (F:/lucas-master/Data Sources). The strata rasters are compared cell for cell (unit ids less their offset), and
+# the build machine (D:/example/Data Sources). The strata rasters are compared cell for cell (unit ids less their offset), and
 # Data Sources Used must name each strata dataset from the home in the first run.
 # Usage: Rscript tests/phaseZ26-strata-home.R <library.ssim> [--units="Pyrome: P26 Northern Sierra Nevada"] [--res=150]
 # =============================================================================
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))
 suppressPackageStartupMessages({ library(rsyncrosim); library(terra); library(data.table) })
 a <- commandArgs(TRUE); opt <- function(k, d) { m <- grep(sprintf("^--%s=", k), a, value = TRUE); if (length(m)) sub(sprintf("^--%s=", k), "", m[1]) else d }
 pos <- a[!grepl("^--", a)]; if (!length(pos)) stop("usage: Rscript tests/phaseZ26-strata-home.R <library.ssim> [--units=...] [--res=150]")
 UNITS <- opt("units", "Pyrome: P26 Northern Sierra Nevada"); RES <- as.integer(opt("res", 150)); OFF <- 1e8
-OLD <- "F:/lucas-master/Data Sources"
+OLD <- DS
 LOCAL <- c(States = "Study Areas/States/tl_2009_us_state_conus.shp", Counties = "Study Areas/Counties/tl_rd22_us_county.shp", HUC6 = "NHD/WBD_National_GDB.gdb",
            HUC8 = "NHD/WBD_National_GDB.gdb", `EPA Level III Ecoregions` = "Ecoregions/us_eco_l4_no_st.shp", Pyromes = "Pyromes/Data/Pyromes_CONUS_20200206.shp",
            `Federal Lands` = "PADUS/Federal Lands/fedlanp010g.shp", `GAP Status` = "PADUS/padus_gapstatus.shp")

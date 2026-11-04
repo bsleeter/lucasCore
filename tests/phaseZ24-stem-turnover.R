@@ -8,9 +8,11 @@
 # lower bound; every other pool stays within 0.6-1.6 of measured. Writes dev/fia/out-z24/.
 # Usage: Rscript tests/phaseZ24-stem-turnover.R
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
-f <- "F:/lucasCore/dev/libs/lucasCore-suitability.ssim"; L <- ssimLibrary(f); ok <- TRUE
-DM <- "F:/lucas-master/Data Sources/FIA/DataMart"; out <- "F:/lucasCore/dev/fia/out-z24"; dir.create(out, showWarnings = FALSE)
+f <- file.path(pkg, "dev/libs/lucasCore-suitability.ssim"); L <- ssimLibrary(f); ok <- TRUE
+DM <- file.path(DS, "FIA/DataMart"); out <- file.path(pkg, "dev/fia/out-z24"); dir.create(out, showWarnings = FALSE, recursive = TRUE)
 ds <- function(R, s) as.data.table(datasheet(R, s, lookupsAsFactors = FALSE))
 expect <- function(what, cond, detail = "") { cat(sprintf("%s  %s %s\n", if (isTRUE(cond)) "PASS" else "FAIL", what, detail)); if (!isTRUE(cond)) ok <<- FALSE }
 logs <- function(R, pat) { lg <- trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]]); unique(lg[grepl(pat, lg)]) }
@@ -32,7 +34,7 @@ expect("every cell has a snag fall rate", all(is.finite(dc$SnagFallRate)), sprin
 sh <- dc[Level == "Ecodivision", .(n = uniqueN(round(SnagDecayMultiplier, 4)) + uniqueN(round(DownWoodDecayMultiplier, 4)) + uniqueN(round(FineWoodyDecayMultiplier, 4))), by = StratumId]
 expect("snag, down log and fine woody debris multipliers are shared within each ecodivision", all(sh$n == 3))
 print(dc[, .N, by = Level])
-fp <- ds(R, "stsim_FlowPathway"); fss <- fread("F:/lucasCore/defaults/spinup/fire-snag-share.csv")
+fp <- ds(R, "stsim_FlowPathway"); fss <- fread(file.path(pkg, "defaults/spinup/fire-snag-share.csv"))
 cr <- fp[TransitionGroupId == "Fire: High Severity [Type]" & !is.na(FromStateClassId)]
 expect("high-severity fire has class rows at both age rows for each listed type", uniqueN(cr$FromStateClassId) == nrow(fss) && all(cr[, uniqueN(FromAgeMin), by = FromStateClassId]$V1 == 2),
        sprintf("%d rows, %d classes", nrow(cr), uniqueN(cr$FromStateClassId)))
@@ -41,11 +43,11 @@ expect("class fire rows move the whole live wood pool", all(abs(bal$s - 1) < 1e-
 # spin-up mature dead pools vs the measured targets (fire-last curves; cells with the most mature DWM plots)
 ic <- ds(R, "lucasCore_InitialStockCurve")[TransitionGroupId == "Fire: High Severity [Type]" & Age >= 60 & Age <= 150]
 mod <- ic[, .(standing = mean(SnagStem + SnagBranch), cwd = mean(AGM), fwd = mean(AGF), litter = mean(AGVF), duff = mean(AGS)), by = .(StratumId, StateClassId)]
-source("F:/lucasCore/src/calibrate.R"); say <- function(...) invisible(); fail <- function(...) stop(sprintf(...)); source("F:/lucasCore/src/fia.R")
-dw <- readRDS(file.path(DM, "fia-deadwood.rds")); scl <- ds(P, "stsim_StateClass"); cw <- fread("F:/lucasCore/defaults/growth/forest-type-crosswalk.csv")[, StateClass := scl$Name[match(StateClassId, scl$Id)]]
+source(file.path(pkg, "src/calibrate.R")); say <- function(...) invisible(); fail <- function(...) stop(sprintf(...)); source(file.path(pkg, "src/fia.R"))
+dw <- readRDS(file.path(DM, "fia-deadwood.rds")); scl <- ds(P, "stsim_StateClass"); cw <- fread(file.path(pkg, "defaults/growth/forest-type-crosswalk.csv"))[, StateClass := scl$Name[match(StateClassId, scl$Id)]]
 x <- dwm_targets(dw, cw, 60)$obs[, lapply(.SD, function(v) sum(v * n) / sum(n)), by = .(sc, ecodiv), .SDcols = MEAS_POOLS][, n := dwm_targets(dw, cw, 60)$obs[, .(n = sum(n)), by = .(sc, ecodiv)]$n]
 x[, StateClassId := cw$StateClass[match(sc, cw$StateClassId)]]
-st <- ds(P, "stsim_Stratum"); ef <- datasheet(P, "lucasCore_DataSource")$EcodivisionFile; if (is.null(ef) || is.na(ef) || !nzchar(ef)) { con <- DBI::dbConnect(RSQLite::SQLite(), "F:/lucasCore/dev/libs/LUCAS P26 Demo Library.ssim", flags = RSQLite::SQLITE_RO); ef <- DBI::dbGetQuery(con, "SELECT EcodivisionFile FROM lucasCore_DataSource")$EcodivisionFile; DBI::dbDisconnect(con) }
+st <- ds(P, "stsim_Stratum"); ef <- datasheet(P, "lucasCore_DataSource")$EcodivisionFile; if (is.null(ef) || is.na(ef) || !nzchar(ef)) { con <- DBI::dbConnect(RSQLite::SQLite(), file.path(pkg, "dev/libs/LUCAS P26 Demo Library.ssim"), flags = RSQLite::SQLITE_RO); ef <- DBI::dbGetQuery(con, "SELECT EcodivisionFile FROM lucasCore_DataSource")$EcodivisionFile; DBI::dbDisconnect(con) }
 eco <- sf::st_drop_geometry(sf::read_sf(ef))
 x[, StratumId := st$Name[match(as.integer(eco$StrtmId[match(ecodiv, eco$ecodiv)]), st$Id)]]
 cmp <- merge(x, mod, by = c("StratumId", "StateClassId"), suffixes = c("", "_model"))[order(-n)]
@@ -57,7 +59,7 @@ r <- cmp[n >= 100, .(pool = MEAS_POOLS, ratio = sapply(MEAS_POOLS, function(p) m
 print(r); expect("median spin-up / measured within 0.6-1.6 for every pool (cells with >= 100 plots)", all(r$ratio > 0.6 & r$ratio < 1.6))
 # against CBM turnover (phaseZ7, 2026-10-27)
 expect("stage 3 took the package's FIA stem turnover", any(grepl("Live Turnover: [0-9]+ rows from the package", logs(R, "^Live Turnover"))))
-b <- fread("F:/lucasCore/dev/fia/out-z7/mature-vs-measured.csv"); b0 <- fread("F:/lucasCore/dev/fia/out-z7/decay-calibration.csv")
+b <- fread(file.path(pkg, "dev/fia/out-z7/mature-vs-measured.csv")); b0 <- fread(file.path(pkg, "dev/fia/out-z7/decay-calibration.csv"))
 k <- merge(b[, .(StratumId, StateClassId, n, r0 = standing_model / standing)], cmp[, .(StratumId, StateClassId, r1 = standing_model / standing)], by = c("StratumId", "StateClassId"))
 cat(sprintf("\nMature snags, model / measured over %d cells with targets: median %.2f -> %.2f; under 0.8 in %d -> %d cells; plot-weighted median %.2f -> %.2f\n", nrow(k),
             median(k$r0), median(k$r1), sum(k$r0 < 0.8), sum(k$r1 < 0.8), k[, median(rep(r0, pmin(n, 500)))], k[, median(rep(r1, pmin(n, 500)))]))

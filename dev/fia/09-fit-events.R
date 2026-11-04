@@ -14,8 +14,9 @@
 # 06 and 07 into dev/fia/out-cal-events.
 # Usage: Rscript dev/fia/09-fit-events.R
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
 suppressPackageStartupMessages(library(data.table))
-pkg <- "F:/lucasCore"; RS <- "C:/Program Files/R/R-4.6.1/bin/Rscript.exe"
+RS <- file.path(R.home("bin"), "Rscript")
 e <- fread(file.path(pkg, "defaults/stockflow/event-pathways.csv"), na.strings = "", colClasses = "character")
 FIRE <- "Fire: High Severity [Type]"; CUT <- "Forest Harvest: Forest Clearcut [Type]"
 emis <- function(from, group, total, age = NA_character_) {   # three emission rows (CO2, CO, CH4) for a pool

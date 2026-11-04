@@ -16,7 +16,7 @@ Columbia), Aspen/Birch to Boreal Shield West: Loblolly/Shortleaf Pine in Georgia
 lucasBuilder 2.0.4 (the original package) had this as a scenario sheet, "Spatial Unit and Species Type" (lucasbuilder_CrosswalkSpecies):
 CBM ecozone, admin boundary and species type per stratum (optional), secondary/tertiary stratum (optional) and state class, plus an
 optional average temperature overriding the climate value - with project lists of CBM ecozones, admin boundaries and species types.
-Its CONUS library (F:/lucas-builder/lucasbuilder-conus-fia-update.ssim) had 132 rows, stratum x class, with a temperature on every row,
+Its CONUS library (lucasbuilder-conus-fia-update.ssim) had 132 rows, stratum x class, with a temperature on every row,
 though each class used one ecozone everywhere. It also had Spin-up (per stratum x class: historical and most recent disturbance,
 return interval, number of cycles, maximum age), Disturbance (CBM disturbance type -> ST-Sim transition group), Carbon Stock (CBM stock
 -> ST-Sim stock type) and Merchantable Volume Curve (user volume curves by stratum x class x age).

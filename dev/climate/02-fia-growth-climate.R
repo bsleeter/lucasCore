@@ -8,10 +8,12 @@
 # beta = 1: the index's sensitivity is right; 0: growth does not follow it; between: an empirical damping of that index.
 # Also fit with ecodivision x forest-type intercepts (absorbs curve bias) and by region.
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages(library(data.table))
-OUT <- "F:/lucasCore/dev/climate"; ST2HA <- 2.2417   # short tons/acre -> Mg/ha
-x <- as.data.table(readRDS("F:/lucas-master/Data Sources/FIA/USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds"))
-d <- as.data.table(readRDS("F:/lucas-master/Data Sources/FIA/USGS_forest_conditions_dstrbcd_and_trtcd_20240213.Rds"))
+OUT <- file.path(pkg, "dev/climate"); ST2HA <- 2.2417   # short tons/acre -> Mg/ha
+x <- as.data.table(readRDS(file.path(DS, "FIA/USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds")))
+d <- as.data.table(readRDS(file.path(DS, "FIA/USGS_forest_conditions_dstrbcd_and_trtcd_20240213.Rds")))
 x <- merge(x, d[, .(plt_cn, condid, dstrbcd1, trtcd1)], by = c("plt_cn", "condid"), all.x = TRUE)
 x[, `:=`(p = paste(statecd, unitcd, countycd, plot, sep = "-"), GEOID = statecd * 1000 + countycd, C = c_total_all_live_trees_short_tons_per_acre * ST2HA)]
 x[, nc := .N, by = .(p, invyr)]
@@ -23,9 +25,9 @@ pr <- pr[dt %between% c(3, 15) & fortyp_grp == ftg0 & dstrbcd1 %in% c(0, NA) & t
 cat(sprintf("pairs: %d consecutive visits, %d kept (single condition, same type, undisturbed, untreated, age consistent)\n", n0, nrow(pr)))
 
 # expected growth from the stage 2 carbon curve (ecodivision name x state class name)
-cc <- fread("F:/lucasCore/dev/libs/carbon-curves.csv")[, .(StratumId, StateClassId, Age, TotalLive)]
-eco <- fread("F:/lucas-master/Data Sources/FIA/EcoDivision_Strata.csv", colClasses = "character")
-cw <- fread("F:/lucasCore/defaults/growth/forest-type-crosswalk.csv", colClasses = "character")
+cc <- fread(file.path(pkg, "dev/libs/carbon-curves.csv"))[, .(StratumId, StateClassId, Age, TotalLive)]
+eco <- fread(file.path(DS, "FIA/EcoDivision_Strata.csv"), colClasses = "character")
+cw <- fread(file.path(pkg, "defaults/growth/forest-type-crosswalk.csv"), colClasses = "character")
 cwl <- cw[, .(g = as.integer(strsplit(FiaTypeGroups, "|", fixed = TRUE)[[1]])), by = .(StateClassId, StateClassName)]
 cwl[, own := as.integer(StateClassId) == g]; setorder(cwl, g, -own); cwl <- cwl[!duplicated(g)]
 pr[, eco_name := eco$StratumName[match(ecodiv, eco$ecodiv)]]

@@ -2,23 +2,25 @@
 # carbon is not reliable). Parameters per cell (>= 200 FIA plots) or per forest type: decay multipliers for snag, cwd, floor (log scale,
 # 0.05-20) and the share of stands whose last disturbance was a clearcut (else high-severity fire); then the soil multiplier so that the
 # belowground pools, averaged over the disturbance cycle, match the cell's mean gSSURGO carbon.
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(data.table); library(parallel); library(terra) })
-for (f in c("growth.R", "flows.R", "dom.R")) source(file.path("F:/lucasCore/src", f))
-cbm <- "F:/lucasCore/defaults/cbm"; sfd <- "F:/lucasCore/defaults/stockflow"; out_dir <- "F:/lucasCore/dev/growth"
-cc <- fread("F:/lucasCore/dev/libs/carbon-curves.csv"); cw <- fread("F:/lucasCore/defaults/growth/forest-type-crosswalk.csv", colClasses = "character")
-dens <- fread("F:/lucasCore/defaults/growth/merch-carbon-density.csv", colClasses = "character")
+for (f in c("growth.R", "flows.R", "dom.R")) source(file.path(file.path(pkg, "src"), f))
+cbm <- file.path(pkg, "defaults/cbm"); sfd <- file.path(pkg, "defaults/stockflow"); out_dir <- file.path(pkg, "dev/growth")
+cc <- fread(file.path(pkg, "dev/libs/carbon-curves.csv")); cw <- fread(file.path(pkg, "defaults/growth/forest-type-crosswalk.csv"), colClasses = "character")
+dens <- fread(file.path(pkg, "defaults/growth/merch-carbon-density.csv"), colClasses = "character")
 fo <- fread(file.path(sfd, "stsim_FlowOrder.csv")); ev <- fread(file.path(sfd, "event-pathways.csv"), na.strings = "")
 clim <- fread(file.path(out_dir, "out_ecodiv_climate.csv"), colClasses = c(ecodiv = "character"))
-codes <- fread("F:/lucas-master/Data Sources/FIA/EcoDivision_Strata.csv", colClasses = "character")[!duplicated(ecodiv)]
-st <- fread("F:/lucasCore/defaults/stsim/stsim_Stratum.csv")
+codes <- fread(file.path(DS, "FIA/EcoDivision_Strata.csv"), colClasses = "character")[!duplicated(ecodiv)]
+st <- fread(file.path(pkg, "defaults/stsim/stsim_Stratum.csv"))
 codes[, Stratum := st$Name[match(as.integer(StratumId), st$Id)]]
-ri_tab <- fread("F:/lucasCore/defaults/spinup/return-interval.csv")
+ri_tab <- fread(file.path(pkg, "defaults/spinup/return-interval.csv"))
 
 # ---- soil targets: mean gSSURGO carbon (Mg C/ha; zeros are unmapped) per ecodivision x forest type on the CONUS 1km grid ----
 tgt_file <- file.path(out_dir, "out_soil_targets.csv")
 if (!file.exists(tgt_file)) {
-  ic <- "F:/lucas-master/Models/CONUS 1km/Data/Initial Conditions/"; P <- rast(paste0(ic, "PrimaryStrata.tif")); Fz <- rast(paste0(ic, "ForestTypeGroupFilled.tif"))
-  s <- rast("F:/lucas-master/Data Sources/gSSURGO/gssurgo_soc_0_999.tif"); NAflag(s) <- 0
+  ic <- paste0(Sys.getenv("LUCAS_CONUS1KM_INITIAL_CONDITIONS"), "/"); P <- rast(paste0(ic, "PrimaryStrata.tif")); Fz <- rast(paste0(ic, "ForestTypeGroupFilled.tif"))
+  s <- rast(file.path(DS, "gSSURGO/gssurgo_soc_0_999.tif")); NAflag(s) <- 0
   s1 <- project(s, P, method = "average") * 0.01
   z <- data.table(P = values(P, mat = FALSE), F = values(Fz, mat = FALSE), soc = values(s1, mat = FALSE))[!is.na(P) & !is.na(F) & !is.na(soc) & soc > 0]
   t <- z[, .(soil_target = mean(soc), cells_1km = .N), by = .(StratumId = P, sc = F)]
@@ -26,7 +28,7 @@ if (!file.exists(tgt_file)) {
 soil_t <- fread(tgt_file); soil_t[, sc := as.character(sc)]
 
 # ---- FIA dead carbon (latest visit, undisturbed, untreated) ----
-D <- "F:/lucas-master/Data Sources/FIA/"
+D <- file.path(DS, "FIA/")
 x <- as.data.table(readRDS(paste0(D, "USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds")))
 x <- merge(x, as.data.table(readRDS(paste0(D, "USGS_forest_conditions_dstrbcd_and_trtcd_20240213.Rds"))), by = c("plt_cn", "condid"))
 x <- x[dstrbcd1 %in% 0 & trtcd1 %in% 0 & !is.na(stdage) & stdage >= 1 & stdage <= 300 & invyr >= 1997]

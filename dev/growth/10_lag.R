@@ -4,12 +4,14 @@
 #   L0     no lag (plain Weibull onset)
 #   Lfit   lag fitted per forest type (shared by its ecodivisions), 0-40 yr
 # (A) empirical onset: share of plots with any merchantable volume, by age; (B) 5-fold CV grouped by plot, bias by age band.
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(data.table); library(parallel) })
-source("F:/lucasCore/src/growth.R")
-D <- "F:/lucas-master/Data Sources/FIA/"
+source(file.path(pkg, "src/growth.R"))
+D <- file.path(DS, "FIA/")
 opt <- list(MinInventoryYear = 1997, VolumeCapQuantile = 0.999, Penalty = 0.01, MinPlotsEcodivision = 5)
 x <- growth_data(paste0(D, "USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds"), paste0(D, "USGS_forest_conditions_dstrbcd_and_trtcd_20240213.Rds"), opt)
-cw <- fread("F:/lucasCore/defaults/growth/forest-type-crosswalk.csv", colClasses = "character")
+cw <- fread(file.path(pkg, "defaults/growth/forest-type-crosswalk.csv"), colClasses = "character")
 sets <- unique(cw[, .(set = FiaTypeGroups, name = StateClassName)], by = "set")
 grp <- function(s) as.integer(strsplit(s, ";")[[1]])
 
@@ -19,7 +21,7 @@ on <- rbindlist(lapply(seq_len(nrow(sets)), function(i) { d <- x[fortyp_grp %in%
   b[, cs := frollmean(share, 3, align = "center")]
   data.table(type = sets$name[i], plots_age_le20 = d[stdage <= 20, .N], vol_1_5 = round(d[stdage <= 5, mean(vol)], 1), vol_6_10 = round(d[stdage %in% 6:10, mean(vol)], 1),
              vol_11_15 = round(d[stdage %in% 11:15, mean(vol)], 1), age50 = b[cs >= 0.5, suppressWarnings(min(age))], age90 = b[cs >= 0.9, suppressWarnings(min(age))]) }))
-fwrite(on, "F:/lucasCore/dev/growth/out_exp10_onset.csv"); cat("(A) onset of merchantable volume\n"); print(on[order(age50)])
+fwrite(on, file.path(pkg, "dev/growth/out_exp10_onset.csv")); cat("(A) onset of merchantable volume\n"); print(on[order(age50)])
 
 # ---- (B) cross-validation ----
 fit_single_L <- function(t, v, lag) { A0 <- max(quantile(v, .95), 5); best <- NULL
@@ -60,7 +62,7 @@ invisible(clusterEvalQ(cl, library(data.table)))
 t0 <- Sys.time(); R <- parLapply(cl, seq_len(nrow(sets)), run_set); stopCluster(cl)
 cat(sprintf("\n(B) %.1f min\n", as.numeric(Sys.time() - t0, units = "mins")))
 P <- rbindlist(lapply(R, `[[`, "pred")); LG <- rbindlist(lapply(R, `[[`, "lag"))
-saveRDS(P, "F:/lucasCore/dev/growth/out_exp10_pred.rds"); fwrite(LG, "F:/lucasCore/dev/growth/out_exp10_lags.csv")
+saveRDS(P, file.path(pkg, "dev/growth/out_exp10_pred.rds")); fwrite(LG, file.path(pkg, "dev/growth/out_exp10_lags.csv"))
 P[, band := cut(stdage, c(0, 10, 20, 30, 50, 100, 400), labels = c("1-10", "11-20", "21-30", "31-50", "51-100", ">100"))]
 cat("overall\n"); print(P[, .(rmse = round(sqrt(mean((vol - pred)^2)), 2), bias = round(mean(pred - vol), 2)), by = variant])
 cat("\nbias by age band (m3/ha; observed mean in brackets)\n")

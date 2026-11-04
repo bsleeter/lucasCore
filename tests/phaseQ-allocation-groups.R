@@ -8,9 +8,10 @@
 # projected change went by 2023 land cover (and, for harvest, by owner).
 # Usage: Rscript tests/phaseQ-allocation-groups.R [--build=5] [--historical=7] [--years=10] [--resolution=30]
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table); library(terra) })
 a <- commandArgs(TRUE); opt <- function(k, d) { m <- grep(sprintf("^--%s=", k), a, value = TRUE); if (length(m)) sub(sprintf("^--%s=", k), "", m[1]) else d }
-f <- "F:/lucasCore/dev/libs/lucasCore-suitability.ssim"; RS <- "C:/Program Files/R/R-4.6.1/bin/Rscript.exe"
+f <- file.path(pkg, "dev/libs/lucasCore-suitability.ssim"); RS <- file.path(R.home("bin"), "Rscript")
 bid <- as.integer(opt("build", 5)); hid <- as.integer(opt("historical", 7)); YRS <- opt("years", "10"); RES <- opt("resolution", "30")
 L <- ssimLibrary(f)
 logl <- function(R) trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]])
@@ -18,7 +19,7 @@ ds <- function(R, s) as.data.table(datasheet(R, s, lookupsAsFactors = FALSE))
 runit <- function(id) { t0 <- Sys.time(); R <- tryCatch(run(scenario(L, id)), error = function(e) NULL)
   if (is.null(R)) { r <- as.data.table(scenario(L, summary = TRUE))[IsResult == "Yes" & ParentId == id]; if (nrow(r)) cat(tail(logl(scenario(L, max(r$ScenarioId))), 60), sep = "\n"); stop("run failed: ", id) }
   cat(sprintf("%s took %.1f min (result %d)\n", name(scenario(L, id)), as.numeric(Sys.time() - t0, units = "mins"), scenarioId(R))); R }
-tool <- function(script, args) { out <- system2(RS, c(file.path("F:/lucasCore/tools", script), shQuote(f), shQuote(args)), stdout = TRUE, stderr = TRUE)
+tool <- function(script, args) { out <- system2(RS, c(file.path(file.path(pkg, "tools"), script), shQuote(f), shQuote(args)), stdout = TRUE, stderr = TRUE)
   out <- out[!grepl("Warning|undetermined|^In ssimLibrary|row names|short variable", out)]; cat(out, sep = "\n"); id <- as.integer(tail(out, 1)); if (is.na(id)) stop(script, " failed"); id }
 
 sid <- tool("new-projection-setup.R", c(sprintf("--build=%d", bid), "--method=Fitted", "--name=Projection Setup (all groups)", "--replace",

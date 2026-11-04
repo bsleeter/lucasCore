@@ -23,7 +23,7 @@ log <- c("RunLog", "SyncroSim Version: 3.1.29.0", "Packages:", "core -> 3.1.29",
   "START TRANSFORMER: 1 - Study Area and Strata", "Strata: primary = FIA ecodivisions; secondary = States; tertiary = Federal Lands",
   "Study area: County: Placer California (40 x 60 cells of 1000 m)", "1 Study Area - study area has cells: pass 2000 cells",
   "1 - Study Area and Strata post processing => Total time: 00:00:00", "1 - Study Area and Strata Total time: 00:01:10", "END TRANSFORMER: 1 - Study Area and Strata",
-  "START TRANSFORMER: 3 - Carbon Flows", "FIA DataMart: cached tables (F:/lucas-master/Data Sources/FIA/DataMart/fia-conditions.rds)",
+  "START TRANSFORMER: 3 - Carbon Flows", "FIA DataMart: cached tables (D:/example/Data Sources/FIA/DataMart/fia-conditions.rds)",
   "Decay calibration: 56 cells, 12 with >= 200 FIA plots (own fit)", "3 Carbon Flows - decay fits: pass 56 cells", "3 - Carbon Flows Total time: 00:02:00",
   "END TRANSFORMER: 3 - Carbon Flows", "SIMULATION COMPLETE", "Total simulation time: 00:03:10")
 lg <- md_parse_log(log)

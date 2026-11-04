@@ -10,8 +10,10 @@
 # against the cell's model / measured snag ratio. Writes dev/fia/out-z7/snag-agents.csv. Read-only.
 # Usage: Rscript dev/fia/22-snag-shortfall.R
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages(library(data.table))
-dm <- "F:/lucas-master/Data Sources/FIA/DataMart"; out <- "F:/lucasCore/dev/fia/out-z7"; LB <- 0.000453592 * 2.471   # lb/ac -> Mg/ha
+dm <- file.path(DS, "FIA/DataMart"); out <- file.path(pkg, "dev/fia/out-z7"); LB <- 0.000453592 * 2.471   # lb/ac -> Mg/ha
 ST <- c("AZ", "CA", "CO", "ID", "MT", "NM", "NV", "OR", "UT", "WA", "WY")
 cc <- readRDS(file.path(dm, "fia-conditions.rds"))$cond[, .(PLT_CN = plt_cn, CONDID = as.integer(condid), ecodiv, fortyp_grp = as.integer(fortyp_grp), stdage = as.numeric(stdage), invyr)]
 tr <- rbindlist(lapply(ST, function(s) {

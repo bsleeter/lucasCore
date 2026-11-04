@@ -9,9 +9,11 @@
 # Leave-one-site-out skill: predict a site's RWI from (1) raw Miami, (2) Miami damped by its ecodivision beta (fitted without the
 # site), (3) the (B) response with its ecodivision coefficients (fitted without the site). Writes dev/climate/itrdb-full-*.csv.
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(data.table); library(terra) })
 for (v in c("PROJ_LIB", "PROJ_DATA", "GDAL_DATA")) if (grepl("syncro", tolower(Sys.getenv(v)))) Sys.unsetenv(v)
-OUT <- "F:/lucasCore/dev/climate"; PR <- "F:/lucas-master/Data Sources/Climate/prism/annual-us25m"
+OUT <- file.path(pkg, "dev/climate"); PR <- file.path(DS, "Climate/prism/annual-us25m")
 YRS <- 1895:2023
 tfile <- function(v, y) file.path(PR, v, sprintf("prism_%s_us_25m_%d.tif", v, y))
 miss <- c(YRS[!file.exists(tfile("tmean", YRS))], YRS[!file.exists(tfile("ppt", YRS))]); if (length(miss)) stop("PRISM files missing: ", paste(unique(miss), collapse = ", "))

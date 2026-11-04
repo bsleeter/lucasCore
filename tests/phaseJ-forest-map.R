@@ -5,11 +5,12 @@
 # stages 1, 5, 3, 4, 8 for the study area, one per Forest Type Map. Compares forest type areas and initial carbon.
 # Usage: Rscript tests/phaseJ-forest-map.R [--units="County: Placer California"]
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
 a <- commandArgs(TRUE); opt <- function(k, d) { m <- grep(sprintf("^--%s=", k), a, value = TRUE); if (length(m)) sub(sprintf("^--%s=", k), "", m[1]) else d }
-D <- "F:/lucasCore/dev/libs"; UNITS <- opt("units", "County: Placer California")
+D <- file.path(pkg, "dev/libs"); UNITS <- opt("units", "County: Placer California")
 f <- file.path(D, "lucasCore-forest-map.ssim"); unlink(c(f, paste0(f, c(".data", ".temp", ".backup"))), recursive = TRUE)
-file.copy("F:/lucasCore/Starter/LUCAS Core (CONUS).ssim", f)
+file.copy(file.path(pkg, "Starter/LUCAS Core (CONUS).ssim"), f)
 L <- ssimLibrary(f); P <- rsyncrosim::project(L, "Definitions"); sc <- as.data.table(scenario(L, summary = TRUE))
 sfd <- sc[Name == "Stock-Flow Definitions", ScenarioId]
 logl <- function(R) trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]])

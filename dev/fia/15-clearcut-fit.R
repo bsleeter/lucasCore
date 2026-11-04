@@ -12,8 +12,9 @@
 # scaled by its mean. Writes dev/fia/event-pathways-fitted2.csv and reruns 06 and 07 into dev/fia/out-cal-clearcut.
 # Usage: Rscript dev/fia/15-clearcut-fit.R
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
 suppressPackageStartupMessages({ library(data.table); library(DBI) })
-pkg <- "F:/lucasCore"; RS <- "C:/Program Files/R/R-4.6.1/bin/Rscript.exe"
+RS <- file.path(R.home("bin"), "Rscript")
 for (f in c("growth.R", "flows.R", "dom.R", "calibrate.R")) source(file.path(pkg, "src", f))
 r <- readRDS(file.path(pkg, "dev/fia/out-cal-share/calibration.rds"))
 obs <- fread(file.path(pkg, "dev/fia/out-cal-share/young-stand-replacing.csv"))[kind == "harvest" & sc %in% c(370L, 220L) & years != "(20,30]"]

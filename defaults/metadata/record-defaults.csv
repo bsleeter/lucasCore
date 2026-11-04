@@ -5,7 +5,7 @@
 "Doi","https://doi.org/10.5066/PLACEHOLDER","TRUE","Reserved through the USGS Science Data Portal (or the ScienceBase Data Release Tool); written as the full https://doi.org/ URL in the citation onlink and the Distribution networkr."
 "MetadataId","USGS:PLACEHOLDER","TRUE","ScienceBase assigns the metadata record identifier and registers it in the Asset Identifier Service; it goes in the theme keyword set ""USGS Metadata Identifier""."
 "MethodsCitation","Sleeter, B.M., in preparation, Methods paper describing the LUCAS model built with lucasCore: peer-reviewed journal article.","TRUE","SM 502.8 requires derived data to cite a peer-reviewed methods product; the methods paper is developed concurrently (user, 2026-11-02)."
-"SoftwareCitation","Sleeter, B.M., 2026, lucasCore: a SyncroSim package that builds LUCAS land-use and carbon models (version {version}): GitHub software repository, https://github.com/bsleeter/lucasCore.","FALSE","Cites the GitHub release until lucasCore has its own SM 502.11 software release with a DOI (user, 2026-11-02)."
+"SoftwareCitation","Sleeter, B.M., 2026, lucasCore: a SyncroSim package that builds LUCAS land-use and carbon models (version {version}): U.S. Geological Survey software release, https://code.usgs.gov/LUCC/lucasCore.","FALSE","Cites the USGS software release (SM 502.11); use the DOI URL once it is reserved."
 "ContactPerson","PLACEHOLDER point of contact","TRUE","From the Release Information page."
 "ContactOrg","PLACEHOLDER organization","TRUE","The point of contact's organization on the People list."
 "ContactAddress","PLACEHOLDER street address","TRUE","Placeholder contact details, as the user asked (2026-11-02)."

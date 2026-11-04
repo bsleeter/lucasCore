@@ -1,10 +1,12 @@
 # Prepare FIA condition data for growth-curve experiments: one row per plot-condition visit, with candidate filters as flags
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(data.table) })
-D <- "F:/lucas-master/Data Sources/FIA/"
+D <- file.path(DS, "FIA/")
 x <- as.data.table(readRDS(paste0(D, "USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds")))
 d <- as.data.table(readRDS(paste0(D, "USGS_forest_conditions_dstrbcd_and_trtcd_20240213.Rds")))
 x <- merge(x, d, by = c("plt_cn", "condid"), all.x = TRUE)
-cw <- fread("F:/lucasCore/defaults/growth/forest-type-crosswalk.csv")
+cw <- fread(file.path(pkg, "defaults/growth/forest-type-crosswalk.csv"))
 x[, pid := sprintf("%02d-%d-%03d-%05d", statecd, unitcd, countycd, plot)]            # unique plot (plot numbers repeat across counties)
 x[, vol := net_merchantable_bole_wood_vol_live_trees_cuft_per_acre * 0.0699725]       # ft3/ac -> m3/ha
 x[, sc := cw$StateClassId[match(fortyp_grp, cw$FiaTypeGroups)]]                       # 201 shares 200's data; set below
@@ -18,7 +20,7 @@ setorder(x, pid, condid, -invyr); x[, latest := !duplicated(paste(pid, condid))]
 x[, ecodiv := as.character(ecodiv)]
 keep <- c("pid", "condid", "invyr", "statecd", "ecodiv", "fortyp_grp", "sc", "stdage", "vol", "undisturbed", "untreated", "cond1", "age_ok", "vol_ok", "latest")
 x <- x[, ..keep]
-saveRDS(x, "F:/lucasCore/dev/growth/fia_prepared.rds")
+saveRDS(x, file.path(pkg, "dev/growth/fia_prepared.rds"))
 cat("rows", nrow(x), " plots", uniqueN(x$pid), "\n")
 base <- x[undisturbed & age_ok & vol_ok]
 cat("undisturbed, age 1-400, vol cap:", nrow(base), "; + untreated:", base[untreated == TRUE, .N], "; + latest visit:", base[untreated & latest, .N], "; + condid 1 only:", base[untreated & latest & cond1, .N], "\n")

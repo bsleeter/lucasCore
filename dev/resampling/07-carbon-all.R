@@ -5,8 +5,9 @@
 # result 9) of the cells the modal map puts in that class in the same county (the study area's mean where the county has none).
 # Not a model run: forest type, age and stand structure are not redone. Read-only.
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
 suppressPackageStartupMessages({ library(terra); library(data.table) })
-pkg <- "F:/lucasCore"; cache <- file.path(pkg, "dev/resampling/cache"); lib <- file.path(pkg, "dev/libs/LUCAS P26 Demo Library.ssim.data")
+cache <- file.path(pkg, "dev/resampling/cache"); lib <- file.path(pkg, "dev/libs/LUCAS P26 Demo Library.ssim.data")
 te <- values(rast(file.path(lib, "Scenario-9/stsim_OutputAverageSpatialStockGroup/avgstkg_628.it0.ts1985.tif")), mat = FALSE)
 m <- values(rast(file.path(cache, "shares_1985.tif"))[["modal"]], mat = FALSE); a <- values(rast(file.path(cache, "allmatch_1985.tif")), mat = FALSE)
 cty <- values(rast(file.path(lib, "Scenario-2/stsim_InitialConditionsSpatial/SecondaryStrata.tif")), mat = FALSE)

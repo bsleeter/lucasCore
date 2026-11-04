@@ -1,7 +1,7 @@
 # =============================================================================
 # strata-from-home.R - one-off (2026-11-02): the strata presets read their polygons from Data Sources Home
 # =============================================================================
-# Before this the presets named files on the build machine (F:/lucas-master/Data Sources/...), so nobody else could run stage 1
+# Before this the presets named files on the build machine, so nobody else could run stage 1
 # or a Data Download for a study area. This
 #   - writes ListFiles for the presets whose unit lists were built from their polygons (HUC6, HUC8, EPA Level III, pyromes), taken
 #     from the unit list the package ships (defaults/library/project/stsim_SecondaryStratum.csv), so the names and ids stay the same

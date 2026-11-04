@@ -10,8 +10,10 @@
 #   test          fitted on 1986-2012; the map built from 2012 conditions is scored on 2013-2023 development (out of sample)
 # Reuses 01's cache (cropped NLCD, epoch and static predictors). Usage: Rscript dev/urban/03-urban-refit-p26.R
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(terra); library(sf); library(data.table); library(mgcv); library(parallel); library(ggplot2) })
-DS <- "F:/lucas-master/Data Sources"; OUT <- "F:/lucasCore/dev/urban"; CA <- file.path(OUT, "cache")
+DS <- DS; OUT <- file.path(pkg, "dev/urban"); CA <- file.path(OUT, "cache")
 terraOptions(progress = 0, memfrac = 0.5); t00 <- Sys.time(); say <- function(...) cat(format(Sys.time(), "%H:%M"), sprintf(...), "\n")
 YRS <- 1985:2023; EPOCHS <- seq(1985, 2020, 5); DEVALL <- 21:24; NCTRL <- 25000L
 M <- rast(file.path(CA, "mask.tif"))

@@ -7,7 +7,7 @@
 #      by trial on 2026-10-24
 # Usage: Rscript tests/unit-auto-tiles.R
 # =============================================================================
-suppressPackageStartupMessages({ library(data.table); library(terra) }); pkg <- "F:/lucasCore"; ok <- TRUE
+suppressPackageStartupMessages({ library(data.table); library(terra) }); pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/"); ok <- TRUE
 expect <- function(what, cond, detail = "") { cat(sprintf("%s  %s %s\n", if (isTRUE(cond)) "PASS" else "FAIL", what, detail)); if (!isTRUE(cond)) ok <<- FALSE }
 # the tile helpers alone (shared.R needs a running SyncroSim scenario): evaluate only their definitions
 ex <- parse(file.path(pkg, "src", "shared.R")); keep <- c("TILE_LEVELS", "tile_level", "pack_tiles", "tile_summary", "TILE_JOB_GB", "TILE_CELL_KB", "auto_tiles", "tile_notes")

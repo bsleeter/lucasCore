@@ -38,7 +38,8 @@ where <- c(`0` = "Stock-Flow Definitions; also first in the Build pipeline (writ
   `9` = "Projection Setup; also Build for a continuous run (mode 1) and a projection scenario that starts from a historical run (mode 2)",
   `10` = "Projection Setup", `11` = "Projection Climate (one scenario per LOCA2 run)", `12` = "Build (last in its pipeline)",
   `13` = "A scenario on an ST-Sim run result", `14` = "A scenario on several ST-Sim run results",
-  `15` = "Data Download: its own scenario (Study Area and Data Download pages), run before the Build; no dependencies")
+  `15` = "Data Download: its own scenario (Study Area and Data Download pages), run before the Build; no dependencies",
+  `16` = "A scenario on a Build result; optional, since stage 17 writes the same record", `17` = "A scenario on a Build result and its runs")
 desc <- c(`0` = "Writes the fixed LUCAS stock-flow definitions from defaults/stockflow: flow pathway diagram, flow order, flow and stock type groups, output options and filters.",
   `1` = "Makes the model grid at the Build cell size, cuts it to the study area, and writes the primary (FIA ecodivision), secondary and tertiary strata rasters.",
   `2` = "Fits merchantable volume curves and the live-tree carbon curves (CBM pools) for every forest state class and FIA ecodivision.",
@@ -54,7 +55,9 @@ desc <- c(`0` = "Writes the fixed LUCAS stock-flow definitions from defaults/sto
   `12` = "Draws the publication figures (PNG) of a Build result.",
   `13` = "Draws report figures (PNG) of one ST-Sim run on a lucasCore Build.",
   `14` = "Draws figures (PNG) and two summary tables (carbon, land change) that compare ST-Sim runs on one Build.",
-  `15` = "Fetches the national datasets into Data Sources Home for the Study Area plus a buffer: the region's clips in regions/<name>, the shared national copies at the top, or every dataset whole (Home layout National). Write-once, with a manifest and files.csv checksums; a blank Data Sources path reads the home.")
+  `15` = "Fetches the national datasets into Data Sources Home for the Study Area plus a buffer: the region's clips in regions/<name>, the shared national copies at the top, or every dataset whole (Home layout National). Write-once, with a manifest and files.csv checksums; a blank Data Sources path reads the home.",
+  `16` = "Writes the FGDC CSDGM metadata record of a Build and checks it with the USGS metadata parser (mp).",
+  `17` = "Writes a USGS data release folder from a Build and its runs: tables, maps, metadata records, a review packet and a backup of the library.")
 
 # ---- drawing helpers --------------------------------------------------------
 wrap2 <- function(s) { if (nchar(s) <= 19) return(s); sp <- gregexpr(" ", s)[[1]]; k <- sp[which.min(abs(sp - nchar(s) / 2))]
@@ -162,8 +165,7 @@ add(box(622, 804, 352, 130, "Scenario · pipeline ST-Sim", "Projection run"), en
     TX(638, 868, "Depends on Projection Setup, Projection Climate", "txt"), TX(638, 883, "and the Build result. Mode 1: one continuous run;", "txt"),
     TX(638, 898, "mode 2 starts from a historical run's final maps.", "txt"), TX(638, 920, "tools/new-projection.R", "mono"))
 add(PATH("M974,869 H996", "dep"))
-add(box(998, 622, 230, 312, "Scenarios · on run results", "Figures and comparison"), block(13, 1027, 690), block(14, 1027, 790),
-    TX(1014, 882, "13 maps one run; 14 compares", "txt"), TX(1014, 897, "runs and writes carbon and", "txt"), TX(1014, 912, "land change summaries.", "txt"))
+add(box(998, 602, 230, 332, "Scenarios · on results", "Figures, records, release"), block(13, 1027, 666), block(14, 1027, 732), block(16, 1027, 798), block(17, 1027, 864))
 
 # ---- ST-Sim inputs and reports ---------------------------------------------
 stsim <- list(

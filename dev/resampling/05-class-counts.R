@@ -6,14 +6,16 @@
 # gross change that a 150 m map can be compared with. Read-only; no package code is changed.
 # Usage: Rscript dev/resampling/05-class-counts.R
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(terra); library(sf); library(parallel) })
-pkg <- "F:/lucasCore"; out <- file.path(pkg, "dev/resampling/cache")
-nlcd <- "F:/lucas-master/Data Sources/NLCD/Annual NLCD"; build <- file.path(pkg, "dev/libs/LUCAS P26 Demo Library.ssim.data/Scenario-2")
+out <- file.path(pkg, "dev/resampling/cache")
+nlcd <- file.path(DS, "NLCD/Annual NLCD"); build <- file.path(pkg, "dev/libs/LUCAS P26 Demo Library.ssim.data/Scenario-2")
 years <- 1985:2023; CLS <- c(11, 12, 21, 22, 23, 24, 31, 41, 42, 43, 52, 71, 81, 82, 90, 95)
 for (e in parse(file.path(pkg, "src/shared.R")))
   if (is.call(e) && identical(as.character(e[[1]]), "<-") && as.character(e[[2]]) %in% c("MODEL_CRS", "model_lattice", "grid_blocks")) eval(e, globalenv())
 R <- rast(file.path(build, "stsim_InitialConditionsSpatial", "StateClass.tif"))
-L <- model_lattice(st_transform(read_sf("F:/lucas-master/Data Sources/FIA/EcoDivision_map/EcoDivisions_Dissolve.shp"), MODEL_CRS), res(R)[1])
+L <- model_lattice(st_transform(read_sf(file.path(DS, "FIA/EcoDivision_map/EcoDivisions_Dissolve.shp")), MODEL_CRS), res(R)[1])
 Rw <- wrap(R); Lw <- wrap(L)
 cl <- makeCluster(8)   # the P26 historical run is using 17 cores
 clusterExport(cl, c("grid_blocks", "Rw", "Lw", "nlcd", "out", "CLS"))

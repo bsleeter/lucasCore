@@ -7,14 +7,15 @@
 #    from a fitted library, pipeline 0, 1, 5, 2, 3, 4, 6, 7, 8. Stage 0 writes the stock-flow definitions into the result.
 # 3. A historical ST-Sim run on the Build result alone (tools/new-historical.R finds no Stock-Flow Definitions scenario and uses none).
 # Usage: Rscript tests/phaseX-studio-library.R [--units="County: Placer California"] [--resolution=1000] [--end=1990]
-#                                              [--curves="F:/lucasCore/dev/libs/lucasCore-forest-map.ssim"]
+#                                              [--curves=file.path(pkg, "dev/libs/lucasCore-forest-map.ssim")]
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
 a <- commandArgs(TRUE); opt <- function(k, d) { m <- grep(sprintf("^--%s=", k), a, value = TRUE); if (length(m)) sub(sprintf("^--%s=", k), "", m[1]) else d }
 UNITS <- opt("units", "County: Placer California"); RES <- as.integer(opt("resolution", 1000)); Y1 <- as.integer(opt("end", 1990))
-CURVES <- opt("curves", "F:/lucasCore/dev/libs/lucasCore-forest-map.ssim")
-RS <- "C:/Program Files/R/R-4.6.1/bin/Rscript.exe"; starter <- "F:/lucasCore/Starter/LUCAS Core (CONUS).ssim"
-f <- "F:/lucasCore/dev/libs/lucasCore-studio-library.ssim"; unlink(c(f, paste0(f, c(".data", ".temp", ".backup"))), recursive = TRUE)
+CURVES <- opt("curves", file.path(pkg, "dev/libs/lucasCore-forest-map.ssim"))
+RS <- file.path(R.home("bin"), "Rscript"); starter <- file.path(pkg, "Starter/LUCAS Core (CONUS).ssim")
+f <- file.path(pkg, "dev/libs/lucasCore-studio-library.ssim"); unlink(c(f, paste0(f, c(".data", ".temp", ".backup"))), recursive = TRUE)
 logl <- function(R) trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]])
 
 # ---- 1. the library -------------------------------------------------------------------------------------------------------
@@ -23,7 +24,7 @@ L <- ssimLibrary(f); P <- rsyncrosim::project(L, "Definitions")
 st <- as.data.table(datasheet(P, "lucasCore_LibrarySetup")); cat("Library Setup:", st$Status, "\n")
 S0 <- rsyncrosim::project(ssimLibrary(starter), "Definitions")
 norm <- function(x) { x <- as.data.table(lapply(as.data.frame(x), function(v) { v <- as.character(v); v[is.na(v) | v == ""] <- "<NA>"; v })); if (ncol(x)) setorderv(x, names(x)); x }
-man <- rbind(fread("F:/lucasCore/defaults/stsim/manifest.csv"), fread("F:/lucasCore/defaults/library/project/manifest.csv"), fill = TRUE)[Scope == "Project" & Datasheet != "lucasCore_DataSource"]   # the starter leaves Data Sources blank
+man <- rbind(fread(file.path(pkg, "defaults/stsim/manifest.csv")), fread(file.path(pkg, "defaults/library/project/manifest.csv")), fill = TRUE)[Scope == "Project" & Datasheet != "lucasCore_DataSource"]   # the starter leaves Data Sources blank
 same <- vapply(man$Datasheet, function(sh) isTRUE(all.equal(norm(suppressWarnings(datasheet(P, sh, lookupsAsFactors = FALSE))),
                                                             norm(suppressWarnings(datasheet(S0, sh, lookupsAsFactors = FALSE))), check.attributes = FALSE)), TRUE)
 cat(sprintf("project sheets identical to the starter: %d of %d%s\n", sum(same), length(same), if (all(same)) "" else paste(":", paste(names(same)[!same], collapse = ", "))))
@@ -46,7 +47,7 @@ sf <- vapply(c("stsim_FlowPathwayDiagram", "stsim_FlowPathway", "stsim_FlowOrder
 build_ok <- nrow(v) > 0 && all(v$Status == "Pass") && all(sf > 0) && !any(grepl("[Failure]", lg, fixed = TRUE))
 
 # ---- 3. the historical run -------------------------------------------------------------------------------------------------
-out <- system2(RS, c("F:/lucasCore/tools/new-historical.R", shQuote(f), sprintf("--build=%d", scenarioId(RB))), stdout = TRUE, stderr = TRUE)
+out <- system2(RS, c(file.path(pkg, "tools/new-historical.R"), shQuote(f), sprintf("--build=%d", scenarioId(RB))), stdout = TRUE, stderr = TRUE)
 cat(grep("created|error|Error", out, value = TRUE), sep = "\n"); hid <- as.integer(tail(out, 1))
 H <- scenario(ssimLibrary(f), hid); print(dependency(H)[, c("ScenarioId", "Name")])
 t0 <- Sys.time(); RH <- run(H); cat(sprintf("historical run took %.1f min\n", as.numeric(Sys.time() - t0, units = "mins")))

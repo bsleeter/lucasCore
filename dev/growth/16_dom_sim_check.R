@@ -1,16 +1,18 @@
 # Experiment 16: the DOM simulator at CBM default decay (PRISM temperature) against FIA dead carbon, a few cells
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages(library(data.table))
-for (f in c("growth.R", "flows.R", "dom.R")) source(file.path("F:/lucasCore/src", f))
-cbm <- "F:/lucasCore/defaults/cbm"; sf <- "F:/lucasCore/defaults/stockflow"
-cc <- fread("F:/lucasCore/dev/libs/carbon-curves.csv"); cw <- fread("F:/lucasCore/defaults/growth/forest-type-crosswalk.csv", colClasses = "character")
-dens <- fread("F:/lucasCore/defaults/growth/merch-carbon-density.csv", colClasses = "character")
+for (f in c("growth.R", "flows.R", "dom.R")) source(file.path(file.path(pkg, "src"), f))
+cbm <- file.path(pkg, "defaults/cbm"); sf <- file.path(pkg, "defaults/stockflow")
+cc <- fread(file.path(pkg, "dev/libs/carbon-curves.csv")); cw <- fread(file.path(pkg, "defaults/growth/forest-type-crosswalk.csv"), colClasses = "character")
+dens <- fread(file.path(pkg, "defaults/growth/merch-carbon-density.csv"), colClasses = "character")
 fo <- fread(file.path(sf, "stsim_FlowOrder.csv")); ev <- fread(file.path(sf, "event-pathways.csv"), na.strings = "")
-clim <- fread("F:/lucasCore/dev/growth/out_ecodiv_climate.csv", colClasses = c(ecodiv = "character"))
-codes <- fread("F:/lucas-master/Data Sources/FIA/EcoDivision_Strata.csv", colClasses = "character"); st <- fread("F:/lucasCore/defaults/stsim/stsim_Stratum.csv")
+clim <- fread(file.path(pkg, "dev/growth/out_ecodiv_climate.csv"), colClasses = c(ecodiv = "character"))
+codes <- fread(file.path(DS, "FIA/EcoDivision_Strata.csv"), colClasses = "character"); st <- fread(file.path(pkg, "defaults/stsim/stsim_Stratum.csv"))
 # event flow sums per live pool (should be 1: no live carbon left behind)
 for (g in c("Fire: High Severity [Type]", "Forest Harvest: Forest Clearcut [Type]")) {
   s <- ev[TransitionGroupId == g & FromStockTypeId %in% LIVE_POOLS, .(sum = sum(as.numeric(Multiplier))), by = .(FromStockTypeId, FromAgeMin)]; cat(g, ":", paste(sprintf("%s %.3f", s$FromStockTypeId, s$sum), collapse = "; "), "\n") }
-D <- "F:/lucas-master/Data Sources/FIA/"
+D <- file.path(DS, "FIA/")
 x <- as.data.table(readRDS(paste0(D, "USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds")))
 x <- merge(x, as.data.table(readRDS(paste0(D, "USGS_forest_conditions_dstrbcd_and_trtcd_20240213.Rds"))), by = c("plt_cn", "condid"))
 x <- x[dstrbcd1 %in% 0 & trtcd1 %in% 0 & !is.na(stdage) & stdage >= 1 & stdage <= 300 & invyr >= 1997]

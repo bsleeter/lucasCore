@@ -10,8 +10,9 @@
 #           if stratum + blank class ranks below class: S-A 10 | T-A 20 | S-B 40 | T-B 50
 # Usage: Rscript dev/stsim/02-stratum-row-precedence.R   (writes dev/stsim/stratum-row-precedence.ssim, rebuilt each run)
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
 suppressPackageStartupMessages({ library(rsyncrosim) })
-f <- "F:/lucasCore/dev/stsim/stratum-row-precedence.ssim"; unlink(c(f, paste0(f, c(".data", ".temp", ".backup"))), recursive = TRUE)
+f <- file.path(pkg, "dev/stsim/stratum-row-precedence.ssim"); unlink(c(f, paste0(f, c(".data", ".temp", ".backup"))), recursive = TRUE)
 L <- ssimLibrary(f, packages = "stsim"); P <- rsyncrosim::project(L, "Definitions"); S <- scenario(P, "Stratum precedence")
 sv <- function(x, d) saveDatasheet(if (grepl("^stsim_(Stratum|StateLabel|StateClass|TransitionType|StockType|FlowType|StateAttributeType)$", d)) P else S, x, d)
 sv(data.frame(Name = c("S", "T")), "stsim_Stratum")

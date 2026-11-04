@@ -8,8 +8,10 @@
 # cells with the most plots. Writes dev/nfcms/out/grouping-test.csv.
 # Usage: Rscript tests/phaseZ6-dom-grouping.R
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
-f <- "F:/lucasCore/dev/libs/lucasCore-suitability.ssim"; L <- ssimLibrary(f); ok <- TRUE
+f <- file.path(pkg, "dev/libs/lucasCore-suitability.ssim"); L <- ssimLibrary(f); ok <- TRUE
 ds <- function(R, s) as.data.table(datasheet(R, s, lookupsAsFactors = FALSE))
 expect <- function(what, cond, detail = "") { cat(sprintf("%s  %s %s\n", if (isTRUE(cond)) "PASS" else "FAIL", what, detail)); if (!isTRUE(cond)) ok <<- FALSE }
 logs <- function(R, pat) { lg <- trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]]); unique(lg[grepl(pat, lg)]) }
@@ -39,10 +41,10 @@ pools <- function(R, dc) { x <- ds(R, "lucasCore_InitialStockCurve"); x[, cut :=
   x[, wt := ifelse(cut, w, 1 - w)][, band := cut(Age, B)]
   x[!is.na(band), .(standing = sum(wt * (SnagStem + SnagBranch)) / sum(wt), down = sum(wt * (AGM + BGF)) / sum(wt), floor = sum(wt * (AGVF + AGF + AGS)) / sum(wt)), by = .(StratumId, StateClassId, band)] }
 pn <- pools(R, dn); po <- pools(scenario(L, 47), d0)
-eco <- as.data.table(sf::st_drop_geometry(sf::read_sf("F:/lucas-master/Data Sources/FIA/EcoDivision_map/EcoDivisions_Dissolve.shp")))[, .(ecodiv = as.character(ecodiv), StrtmId)]
+eco <- as.data.table(sf::st_drop_geometry(sf::read_sf(file.path(DS, "FIA/EcoDivision_map/EcoDivisions_Dissolve.shp"))))[, .(ecodiv = as.character(ecodiv), StrtmId)]
 stl <- ds(rsyncrosim::project(L, 1), "stsim_Stratum"); scl <- ds(rsyncrosim::project(L, 1), "stsim_StateClass")
-u <- as.data.table(readRDS("F:/lucas-master/Data Sources/FIA/USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds"))
-dd <- as.data.table(readRDS("F:/lucas-master/Data Sources/FIA/USGS_forest_conditions_dstrbcd_and_trtcd_20240213.Rds"))
+u <- as.data.table(readRDS(file.path(DS, "FIA/USGS_carbon_density_and_merchVol_on_forest_conditions_CONUS_20240212.Rds")))
+dd <- as.data.table(readRDS(file.path(DS, "FIA/USGS_forest_conditions_dstrbcd_and_trtcd_20240213.Rds")))
 u <- merge(u, dd, by = c("plt_cn", "condid"))[dstrbcd1 %in% 0 & trtcd1 %in% 0 & !is.na(stdage) & stdage >= 1 & invyr >= 1997 & invyr < 9999]
 u[, pid := paste(statecd, unitcd, countycd, plot)]; setorder(u, pid, condid, -invyr); u <- u[!duplicated(paste(pid, condid))]
 k <- 2.2417; u[, band := cut(stdage, B)][, StratumId := stl$Name[match(eco$StrtmId[match(as.character(ecodiv), eco$ecodiv)], as.integer(stl$Id))]]
@@ -58,5 +60,5 @@ err <- function(a, b, w) sqrt(sum(w * (a - b)^2) / sum(w))
 cat(sprintf("\nPlot-weighted RMSE against FIA over every cell x band with >= 10 plots (Mg C/ha), FIA-consistent pools: down %.1f -> %.1f, floor %.1f -> %.1f, standing %.1f -> %.1f\n",
             cmp[n >= 10, err(down_old, down, n)], cmp[n >= 10, err(down_new, down, n)], cmp[n >= 10, err(floor_old, floor, n)], cmp[n >= 10, err(floor_new, floor, n)],
             cmp[n >= 10, err(standing_old, standing, n)], cmp[n >= 10, err(standing_new, standing, n)]))
-fwrite(cmp, "F:/lucasCore/dev/nfcms/out/grouping-test.csv")
+dir.create(file.path(pkg, "dev/nfcms/out"), showWarnings = FALSE, recursive = TRUE); fwrite(cmp, file.path(pkg, "dev/nfcms/out/grouping-test.csv"))
 cat(if (ok) "phaseZ6: all checks pass\n" else "phaseZ6: FAILURES\n")

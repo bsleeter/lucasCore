@@ -11,8 +11,10 @@
 # emission (out-cal-events: the mature-stand calibration with the fitted event table). Writes dev/fia/out-cal-events/snag-fall.csv.
 # Usage: Rscript dev/fia/12-snag-fall.R
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(data.table); library(DBI) })
-pkg <- "F:/lucasCore"; dm <- "F:/lucas-master/Data Sources/FIA/DataMart"; ECODIV <- "M260"
+dm <- file.path(DS, "FIA/DataMart"); ECODIV <- "M260"
 TYPES <- c(`370` = "California Mixed Conifer", `260` = "Fir/Spruce/Mountain Hemlock", `220` = "Ponderosa Pine", `920` = "Western Oak")
 tr <- fread(file.path(dm, "CA_TREE.csv"), select = c("CN", "PREV_TRE_CN", "PLT_CN", "CONDID", "STATUSCD", "STANDING_DEAD_CD", "AGENTCD", "DECAYCD", "DIA", "TPA_UNADJ", "CARBON_AG", "RECONCILECD"),
             colClasses = list(character = c("CN", "PREV_TRE_CN", "PLT_CN")))

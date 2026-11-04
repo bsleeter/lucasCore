@@ -9,8 +9,9 @@
 #   C  the same setup with Run Settings tiles = 1: a one-tile mask, so the Build's tiles are not inherited
 # Usage: Rscript tests/phaseW2-build-tiles.R
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table); library(terra) })
-f <- "F:/lucasCore/dev/libs/lucasCore-suitability.ssim"; RS <- "C:/Program Files/R/R-4.6.1/bin/Rscript.exe"
+f <- file.path(pkg, "dev/libs/lucasCore-suitability.ssim"); RS <- file.path(R.home("bin"), "Rscript")
 L <- ssimLibrary(f); ok <- TRUE
 ds <- function(R, s) as.data.table(datasheet(R, s, lookupsAsFactors = FALSE))
 expect <- function(what, cond, detail = "") { cat(sprintf("%s  %s %s\n", if (isTRUE(cond)) "PASS" else "FAIL", what, detail)); if (!isTRUE(cond)) ok <<- FALSE }
@@ -33,7 +34,7 @@ if (!is.null(mA)) {
   expect("A: no tertiary unit is split between tiles", data.table(t = Tr[land], k = mA[land])[, uniqueN(k), by = t][, all(V1 == 1)]) }
 
 # ---- B and C: stage 9 follows the Build, or runs one job --------------------------------------------------------------------
-tool <- function(script, args) { out <- system2(RS, c(file.path("F:/lucasCore/tools", script), shQuote(f), shQuote(args)), stdout = TRUE, stderr = TRUE)
+tool <- function(script, args) { out <- system2(RS, c(file.path(file.path(pkg, "tools"), script), shQuote(f), shQuote(args)), stdout = TRUE, stderr = TRUE)
   out <- out[!grepl("Warning|undetermined|^In ssimLibrary|row names|short variable", out)]; id <- as.integer(tail(out, 1)); if (is.na(id)) { cat(out, sep = "\n"); stop(script, " failed") }; id }
 sid <- tool("new-projection-setup.R", c("--build=47", "--historical=49", "--method=None", "--name=Projection Setup (Build tiles test)", "--replace"))
 S <- scenario(L, sid)

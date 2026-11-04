@@ -7,8 +7,9 @@
 # for the cells P26 uses. Writes dev/fia/stage2-compare.csv.
 # Usage: Rscript tests/phaseZ5-fia-datamart.R [--reuse-usgs]
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
-f <- "F:/lucasCore/dev/libs/lucasCore-suitability.ssim"; L <- ssimLibrary(f); ok <- TRUE
+f <- file.path(pkg, "dev/libs/lucasCore-suitability.ssim"); L <- ssimLibrary(f); ok <- TRUE
 ds <- function(R, s) as.data.table(datasheet(R, s, lookupsAsFactors = FALSE))
 expect <- function(what, cond, detail = "") { cat(sprintf("%s  %s %s\n", if (isTRUE(cond)) "PASS" else "FAIL", what, detail)); if (!isTRUE(cond)) ok <<- FALSE }
 logs <- function(R, pat) { lg <- trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]]); unique(lg[grepl(pat, lg)]) }
@@ -42,5 +43,5 @@ cat("\nAll cells:\n"); print(s(m)); cat("\nP26's ecodivisions:\n"); print(s(m[St
 cat("\nP26's main forest types, Mediterranean Mountains (volume m3/ha; live carbon Mg C/ha):\n")
 print(m[StratumId == "Mediterranean Mountains" & grepl("Mixed Conifer|Western Oak|Fir/Spruce|Ponderosa|Lodgepole", StateClassId),
         .(StateClassId = sub("Forest: ", "", StateClassId), Age, vol_u = round(MerchantableVolume_u), vol_d = round(MerchantableVolume_d), live_u = round(live_u, 1), live_d = round(live_d, 1))][order(StateClassId, Age)])
-fwrite(m, "F:/lucasCore/dev/fia/stage2-compare.csv")
+dir.create(file.path(pkg, "dev/fia"), showWarnings = FALSE, recursive = TRUE); fwrite(m, file.path(pkg, "dev/fia/stage2-compare.csv"))
 cat(if (ok) "phaseZ5: all checks pass\n" else "phaseZ5: FAILURES\n")

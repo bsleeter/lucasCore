@@ -5,9 +5,11 @@
 # (RWI) and of the Miami multiplier; slope of RWI on Miami (1 = Miami's interannual sensitivity matches ring growth); and RWI on the
 # precipitation ratio (this year and last year) and temperature anomaly. Summaries by ecodivision.
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(data.table); library(terra) })
 for (v in c("PROJ_LIB", "PROJ_DATA", "GDAL_DATA")) if (grepl("syncro", tolower(Sys.getenv(v)))) Sys.unsetenv(v)
-OUT <- "F:/lucasCore/dev/climate"; PR <- "F:/lucas-master/Data Sources/Climate/prism"
+OUT <- file.path(pkg, "dev/climate"); PR <- file.path(DS, "Climate/prism")
 sites <- fread(file.path(OUT, "itrdb-sites.csv"))[n_since1985 >= 15 & !is.na(lat)]
 ser <- fread(file.path(OUT, "itrdb-series.csv"))[site %in% sites$site & year >= 1984]
 pf <- function(var, y) Sys.glob(file.path(PR, "annual", var, "*", sprintf("PRISM_*_%d_bil.bil", y)))[1]

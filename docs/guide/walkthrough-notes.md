@@ -11,7 +11,7 @@ found along the way are batched here and fixed while Studio is closed (the page 
    the .ssimpkg, which a folder link skips. Check how a .ssimpkg install records it; if so, the released package will not show it.
 2. DONE 2026-10-28 (package.xml displayNames: Data Sources, Stratum Sources, Climate Replicates (LOCA2)). Was: **Project tree labels cut off** (Figure 1.12): "Stratum Sources (study areas, secondary and ..." and "Climate Replicates (LOCA2
    ensemble membe...". Shorten the displayNames (put the detail in the page instead).
-3. DONE and installed 2026-10-28 (re-grab Figure 1.15; names and notes in defaults/library/data-sources.csv Name, Note columns) - user 2026-10-28: one row per dataset = short name (bracketed detail and " - ..." dropped; full name, source and link in a tooltip), a fixed-width path box aligned across groups, Browse, a Download button instead of the link line, the found mark. Was: **Data Sources page: path boxes too narrow and not aligned** (Figure 1.15): every path is cut off after ~25 characters ("F:/lucas-master/Data Sources/FI..."),
+3. DONE and installed 2026-10-28 (re-grab Figure 1.15; names and notes in defaults/library/data-sources.csv Name, Note columns) - user 2026-10-28: one row per dataset = short name (bracketed detail and " - ..." dropped; full name, source and link in a tooltip), a fixed-width path box aligned across groups, Browse, a Download button instead of the link line, the found mark. Was: **Data Sources page: path boxes too narrow and not aligned** (Figure 1.15): every path is cut off after ~25 characters ("<Data Sources>/FI..."),
    and the boxes start at three different x positions. Give the path column a fixed, wider width (or show the end of the path), with a
    tooltip of the full path.
 4. MOOT (the link line is gone; the tooltip shows the source). Was: **FIA DataMart Folder link text** mentions only Growth Curve Options; it is now needed by the FIA measured dead wood method
@@ -148,7 +148,7 @@ found along the way are batched here and fixed while Studio is closed (the page 
 ## Data Download captures to take (2026-11-02)
 
 The Guide's new section 1.6 (and the revised 1.5) has placeholders marked **Capture: Figure 1.nn** in the Claude Doc. In the P26 guide
-library (`dev/libs/LUCAS P26 Northern Sierra Nevada.ssim`), with Data Sources Home `F:/lucasCore/dev/libs/Data Sources`:
+library (`dev/libs/LUCAS P26 Northern Sierra Nevada.ssim`), with Data Sources Home `dev/libs/Data Sources`:
 
 | Figure | Where | Show and mark |
 | --- | --- | --- |

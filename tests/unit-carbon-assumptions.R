@@ -9,7 +9,7 @@
 #   5. stage 3's Carbon Method labels map to the right options, old and new
 # Usage: Rscript tests/unit-carbon-assumptions.R
 # =============================================================================
-suppressPackageStartupMessages(library(data.table)); pkg <- "F:/lucasCore"; ok <- TRUE
+suppressPackageStartupMessages(library(data.table)); pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/"); ok <- TRUE
 expect <- function(what, cond, detail = "") { cat(sprintf("%s  %s %s\n", if (isTRUE(cond)) "PASS" else "FAIL", what, detail)); if (!isTRUE(cond)) ok <<- FALSE }
 source(file.path(pkg, "src", "flows.R")); source(file.path(pkg, "src", "dom.R"))
 rd <- function(...) fread(file.path(pkg, "defaults", ...), colClasses = "character", na.strings = "")

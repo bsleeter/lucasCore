@@ -4,10 +4,12 @@
 # EVT 2016, with EVT 2001 where 2016 is "Recently ..." (as stage 5), crosswalked to forest type groups; area by forest type x EVT.
 # Usage: Rscript dev/crosswalk/01-evt-by-forest-type.R [pyrome number, default 26]
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(terra); library(sf); library(data.table) })
 for (v in c("PROJ_LIB", "PROJ_DATA", "GDAL_DATA")) if (grepl("syncro", tolower(Sys.getenv(v)))) Sys.unsetenv(v)
 a <- commandArgs(TRUE); PY <- if (length(a)) as.integer(a[1]) else 26L
-DS <- "F:/lucas-master/Data Sources/"; DF <- "F:/lucasCore/defaults/landcover/"; OUT <- "F:/lucasCore/dev/crosswalk"
+DS <- file.path(DS, ""); DF <- file.path(pkg, "defaults/landcover/"); OUT <- file.path(pkg, "dev/crosswalk")
 py <- read_sf(paste0(DS, "Pyromes/Data/Pyromes_CONUS_20200206.shp")); py <- py[py$PYROME == PY, ]
 e16 <- rast(paste0(DS, "EVT/LF2016_EVT_200_CONUS/LF2016_EVT_200_CONUS/Tif/LC16_EVT_200.tif")); e01 <- rast(paste0(DS, "EVT/US_105_EVT/US_105_EVT/Tif/us_105evt.tif"))
 pv <- vect(st_transform(py, crs(e16)))

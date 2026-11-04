@@ -7,8 +7,9 @@
 # classes those cells come from.
 # Usage: Rscript dev/resampling/03-carbon-effect.R [method]   (default thresh_0.3; any method of 02-compare-methods.R)
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
 suppressPackageStartupMessages({ library(terra); library(data.table) })
-pkg <- "F:/lucasCore"; cache <- file.path(pkg, "dev/resampling/cache"); km2 <- 0.0225
+cache <- file.path(pkg, "dev/resampling/cache"); km2 <- 0.0225
 a <- commandArgs(TRUE); want <- if (length(a)) a[1] else "thresh_0.3"
 te <- values(rast(file.path(pkg, "dev/libs/LUCAS P26 Demo Library.ssim.data/Scenario-9/stsim_OutputAverageSpatialStockGroup/avgstkg_628.it0.ts1985.tif")), mat = FALSE)
 s <- rast(file.path(cache, "shares_1985.tif")); m <- values(s[["modal"]], mat = FALSE); d <- values(s[["dev"]], mat = FALSE)

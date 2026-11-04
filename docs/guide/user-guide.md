@@ -1,6 +1,6 @@
 # lucasCore User Guide
 
-*A snapshot of the lucasCore User Guide, exported 2026-11-04. Also as a [web page](https://bsleeter.github.io/lucasCore/guide/), beside the [package](https://bsleeter.github.io/lucasCore/blueprint/) and [data](https://bsleeter.github.io/lucasCore/blueprint/data.html) blueprints.*
+*A snapshot of the lucasCore User Guide, exported 2026-11-04. Also as a [web page](index.html), beside the [package](../blueprint/index.html) and [data](../blueprint/data.html) blueprints.*
 
 How to build and run a LUCAS land-use and carbon model with the lucasCore SyncroSim package, walked through on the Northern Sierra Nevada pyrome (P26) at 150 m.
 
@@ -67,7 +67,7 @@ The **Local Packages** tab lists every package installed on this computer, with 
 
 > Several versions of a package can sit side by side in this list (stsim 4.3.8, 4.5.3 and 4.5.4 above). Each library records the version it uses.
 
-> **For package developers.** To run lucasCore straight from a source folder, so that edits to its scripts take effect without reinstalling, register the folder instead, with Studio closed: `"C:\Program Files\SyncroSim\SyncroSim.PackageManager.exe" --xinstall="F:\lucasCore"`. Never edit the folder while a scenario is running. `tools\build_ssimpkg.ps1` makes the package file from the committed source.
+> **For package developers.** To run lucasCore straight from a source folder, so that edits to its scripts take effect without reinstalling, register the folder instead, with Studio closed: `"C:\Program Files\SyncroSim\SyncroSim.PackageManager.exe" --xinstall="<path to the folder>"`. Never edit the folder while a scenario is running. `tools\build_ssimpkg.ps1` makes the package file from the committed source.
 
 ### 1.2 Create an empty library
 
@@ -79,10 +79,10 @@ The **Local Packages** tab lists every package installed on this computer, with 
 
 *Figure 1.5. File > New > Empty Library.*
 
-4. In the dialog that opens, give the library a name and a folder. For the example: folder F:\\lucasCore\\dev\\libs, name `LUCAS P26 Northern Sierra Nevada`.
+4. In the dialog that opens, give the library a name and a folder. For the example: a folder of your choice, name `LUCAS P26 Northern Sierra Nevada`.
 5. Click **OK**. The library opens in the Explorer with one project, **Definitions**, holding one empty scenario, **\[1\] New Scenario**. Chapter 3 makes it the Build.
 
-![The Explorer of the new library: LUCAS P26 Northern Sierra Nevada marked 5, its Definitions project, and \[1\] New Scenario outlined](images/fig-1.6.png)
+![The Explorer of the new library: LUCAS P26 Northern Sierra Nevada marked 5, its Definitions project, and \[1\] New Scenario outlined; the folder in the title bar is greyed out here](images/fig-1.6.png)
 
 *Figure 1.6. The new library in the Explorer, with its Definitions project and one empty scenario.*
 
@@ -192,7 +192,7 @@ The stages read national data from disk, and there are two ways to give a librar
 7. The mark at the end says where the dataset will be read from. **✓ home** means the home holds it; when the copy is in a region's folder the mark names it, for example **✓ home: regions/Pyrome-P26-Northern-Sierra-Nevada**. Hover the mark for the folder, the region it was downloaded for and its status. A set path shows a green tick, or a red cross for a path that does not exist on this machine. A blank path with nothing in the home reads **default**, **package copy** (the ecodivisions ship with lucasCore) or **user-supplied** (no public source).
 8. A dataset whose home also holds a newer edition gets an edition drop-down at the end of its row. A library reads the edition it first read until you change it here (section 1.6.8).
 
-![The Data Sources page with a home set: the LUCAS Core (model builder) tab marked 1, Data Sources 2, the Data Sources Home row with F:/lucasCore/dev/libs/Data Sources marked 3, the blank Annual NLCD path box 4, its Browse 5 and Download 6 buttons, and its mark, home: regions/Pyrome-P26-Northern-Sierra-Nevada, marked 7; every Land cover row reads the same, and FIA Ecodivisions reads package copy](images/fig-1.15.png)
+![The Data Sources page with a home set: the LUCAS Core (model builder) tab marked 1, Data Sources 2, the Data Sources Home row, its folder greyed out here, marked 3, the blank Annual NLCD path box 4, its Browse 5 and Download 6 buttons, and its mark, home: regions/Pyrome-P26-Northern-Sierra-Nevada, marked 7; every Land cover row reads the same, and FIA Ecodivisions reads package copy](images/fig-1.15.png)
 
 *Figure 1.15. Data Sources with a home set: every path is blank, and the marks show each dataset in the home, most in the P26 region's folder.*
 
@@ -250,7 +250,7 @@ Data Sources/                      Data Sources Home
 3. In **Description**, record the region, the datasets and the home. For the example:
 
 ```
-Data Download for P26 Northern Sierra Nevada (Pyrome P26 + 10 km), By region, into Data Sources Home F:/lucasCore/dev/libs/Data Sources (regions/Pyrome-P26-Northern-Sierra-Nevada). Every dataset the stage can fetch; years 1985 to the latest each source has; LOCA2 CanESM5 r1i1p1f1, SSP2-4.5 and SSP5-8.5. Pipeline: stage 15 alone. No dependencies. Run with Check only first.
+Data Download for P26 Northern Sierra Nevada (Pyrome P26 + 10 km), By region, into Data Sources Home <your folder> (regions/Pyrome-P26-Northern-Sierra-Nevada). Every dataset the stage can fetch; years 1985 to the latest each source has; LOCA2 CanESM5 r1i1p1f1, SSP2-4.5 and SSP5-8.5. Pipeline: stage 15 alone. No dependencies. Run with Check only first.
 ```
 
 4. Choose **Pipeline**, and add one stage: **15 - Data Download**.
@@ -276,7 +276,7 @@ Choose **LUCAS Core > Data Download**. The page has five groups.
 3. **Home layout**: **By region** (the default) puts the region's clips in `regions/<name>` and the shared copies at the top. **National** ignores the Study Area and keeps every dataset whole at the top, for a home that will serve many study areas (section 1.6.7).
 4. **Region name**: blank takes the name from the Study Area units, here `Pyrome-P26-Northern-Sierra-Nevada`. The line under it lists the regions the home already holds. Reusing a name adds to that region only when its Study Area matches.
 
-![The Data Download page, Region group: Data Download marked 1, the home folder F:/lucasCore/dev/libs/Data Sources marked 2, the buffer of 10 km 3, Home layout By region 4 and the blank Region name box 5](images/fig-1.17.png)
+![The Data Download page, Region group: Data Download marked 1, the home folder, greyed out here, marked 2, the buffer of 10 km 3, Home layout By region 4 and the blank Region name box 5](images/fig-1.17.png)
 
 *Figure 1.17. Where the download goes.*
 
@@ -370,9 +370,9 @@ A library keeps reading the edition it first read; a Build never switches by its
 
 A lucasCore model is a chain of scenarios. Two **preparation** scenarios run lucasCore stages and write inputs; **runs** are ST-Sim alone and take every input from their dependencies. A dependency supplies whole data feeds, so the order of a scenario's dependencies matters: where two dependencies hold the same feed, the one listed first wins.
 
-[![The package blueprint: lucasCore's scenarios and stages](../blueprint/lucascore-blueprint.png)](https://bsleeter.github.io/lucasCore/blueprint/)
+[![The package blueprint: lucasCore's scenarios and stages](../blueprint/lucascore-blueprint.png)](../blueprint/index.html)
 
-*The scenario chain, from the [package blueprint](https://bsleeter.github.io/lucasCore/blueprint/) (the interactive diagram of the guide's Claude Doc does not export).*
+*The scenario chain, from the [package blueprint](../blueprint/index.html).*
 
 The Build is made once per study area. The historical run is made once per Build. A Projection Setup is made once per historical run it starts from and per set of projection rules; any number of projections (climate scenarios, iterations, years) then run on it.
 
@@ -718,7 +718,7 @@ Studio opens the **Run Monitor** tab when a run starts.
 
 5. The status bar at the bottom of the window shows a progress bar and the stage running now, for example "1 - Study Area and Strata". The run log (section 4.3) gives the time each stage took.
 
-![The status bar at the bottom of Studio, marked 5, with the progress bar and 1 - Study Area and Strata](images/fig-4.4.png)
+![The status bar at the bottom of Studio, marked 5, with the progress bar and 1 - Study Area and Strata; the package folder is greyed out here](images/fig-4.4.png)
 
 *Figure 4.4. The stage running now.*
 
@@ -1808,7 +1808,7 @@ The worked example is the Puget Lowlands model (EPA Level III ecoregion Puget Lo
 
 Each step is a scenario of its own, run on a finished result.
 
-![The Explorer tree of the Puget Lowlands library, with scenarios grouped in Data Release, Figures and Metadata folders, and Download Data, Build and Historical below them](images/fig-B.1.png)
+![The Explorer tree of the Puget Lowlands library, with scenarios grouped in Data Release, Figures and Metadata folders, and Download Data, Build and Historical below them; the folder in the title bar is greyed out here](images/fig-B.1.png)
 
 *Figure B.1. Puget's scenarios. The folders are optional: drag scenarios into them to keep the tree tidy.*
 
@@ -1886,7 +1886,7 @@ Metadata must not interpret results. Say what the release holds and how it was m
 
 *Figure B.5. The pipeline: stage 17 alone, with Inherit values unticked.*
 
-![The Data Release page, with the Historical run and Add a run marked 4, the release folder marked 5 and Maps every marked 6](images/fig-B.6.png)
+![The Data Release page, with the Historical run and Add a run marked 4, the release folder, greyed out here, marked 5 and Maps every marked 6](images/fig-B.6.png)
 
 *Figure B.6. The Data Release page. Puget's draft maps every 5 years.*
 
@@ -1904,7 +1904,7 @@ Start with a Draft. Run with a new empty folder each time.
 
 The result's **Build Results > Data Release** lists the folder, the runs, the files and their size, what mp found, and what is still a placeholder or drafted. **Release Contents** lists every file.
 
-![The Data Release output of result 19: historical run, 76 files, 4.806 GB, 3 records with 0 errors and 0 warnings, and the placeholders still to supply](images/fig-B.7.png)
+![The Data Release output of result 19: the release folder greyed out here, historical run, 76 files, 4.806 GB, 3 records with 0 errors and 0 warnings, and the placeholders still to supply](images/fig-B.7.png)
 
 *Figure B.7. The output of Puget's draft.*
 
@@ -1988,7 +1988,7 @@ Placeholders do not fail this stage, so you can run it at any point. It has no r
 
 To have records checked by mp, set **Metadata parser (mp)** on the project's **Data Sources** page, under Data Sources Home, to `mp.exe` (**Browse...**; **Download** opens USGS's page for it). The path is kept in the home folder's `settings.csv`, not in the library, because it belongs to this machine. Without it, the stages try the environment variable `LUCAS_MP` and then the PATH; if they find no mp the records are still written, and the output says mp did not run. An error from mp fails the stage.
 
-![The Data Sources page of the Definitions project, with the Metadata parser (mp) row outlined: the path to mp.exe, Browse and Download](images/fig-B.10.png)
+![The Data Sources page of the Definitions project, with the Metadata parser (mp) row outlined: the path to mp.exe, greyed out here like the Data Sources Home above it, then Browse and Download](images/fig-B.10.png)
 
 *Figure B.10. The path to mp.exe on the Data Sources page.*
 

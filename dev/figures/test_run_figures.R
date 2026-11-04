@@ -3,9 +3,10 @@
 # =============================================================================
 # Usage: Rscript dev/figures/test_run_figures.R <library.ssim> <run result id> <build result id> [out dir]
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
 suppressPackageStartupMessages({ library(data.table); library(terra); library(sf); library(DBI); library(RSQLite) })
-a <- commandArgs(TRUE); lib <- a[1]; rid <- as.integer(a[2]); bid <- as.integer(a[3]); out <- if (length(a) >= 4) a[4] else "F:/lucasCore/dev/figures/out-run"
-source("F:/lucasCore/src/figures.R"); source("F:/lucasCore/src/run-figures.R")
+a <- commandArgs(TRUE); lib <- a[1]; rid <- as.integer(a[2]); bid <- as.integer(a[3]); out <- if (length(a) >= 4) a[4] else file.path(pkg, "dev/figures/out-run")
+source(file.path(pkg, "src/figures.R")); source(file.path(pkg, "src/run-figures.R"))
 con <- dbConnect(SQLite(), lib, flags = SQLITE_RO); q <- function(s, ...) as.data.table(dbGetQuery(con, sprintf(s, ...)))
 ic <- q("SELECT StateClassFileName FROM stsim_InitialConditionsSpatial WHERE ScenarioId = %d", bid)
 grid <- rast(file.path(paste0(lib, ".data"), sprintf("Scenario-%d", bid), "stsim_InitialConditionsSpatial", basename(ic$StateClassFileName[1])))

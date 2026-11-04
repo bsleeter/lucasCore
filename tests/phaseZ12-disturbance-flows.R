@@ -13,8 +13,9 @@
 # on the balance check.
 # Usage: Rscript tests/phaseZ12-disturbance-flows.R      (REUSE=1 rechecks the last runs)
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
-f <- "F:/lucasCore/dev/libs/lucasCore-suitability.ssim"; L <- ssimLibrary(f); ok <- TRUE
+f <- file.path(pkg, "dev/libs/lucasCore-suitability.ssim"); L <- ssimLibrary(f); ok <- TRUE
 ds <- function(R, s) as.data.table(datasheet(R, s, lookupsAsFactors = FALSE))
 expect <- function(what, cond, detail = "") { cat(sprintf("%s  %s %s\n", if (isTRUE(cond)) "PASS" else "FAIL", what, detail)); if (!isTRUE(cond)) ok <<- FALSE }
 logs <- function(R, pat) { lg <- trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]]); unique(lg[grepl(pat, lg)]) }
@@ -70,7 +71,7 @@ wo <- fp[TransitionGroupId == FIRE & FromStateClassId == WO & FromStockTypeId ==
 expect("Western Oak fire stem snags 0.20 x 0.65 / 0.545 for stands 11+", nrow(wo) == 1 && abs(wo$Multiplier - round(0.2 * 0.65 / 0.545, 6)) < 1e-9)
 
 # ---- the spin-up uses them -------------------------------------------------------------------------------------------------
-say <- function(...) invisible(); for (s in c("flows.R", "dom.R")) source(file.path("F:/lucasCore/src", s))
+say <- function(...) invisible(); for (s in c("flows.R", "dom.R")) source(file.path(file.path(pkg, "src"), s))
 ev <- ds(RC, "stsim_FlowPathway")[!is.na(TransitionGroupId)]
 other <- setdiff(unique(ds(RC, "lucasCore_OutputDecayCalibration")$StratumId), e1)[1]
 k1 <- disturbance_matrices(ev, FIRE, MC, 50, e1)$Dd["AGS", "AGS"]; k2 <- disturbance_matrices(ev, FIRE, MC, 50, other)$Dd["AGS", "AGS"]

@@ -10,8 +10,9 @@
 # 2.0 C and elsewhere unchanged; every other cell's turnover and decay rates are identical; the run log lists the changed rows.
 # Usage: Rscript tests/phaseZ8-cbm-crosswalk.R
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
-f <- "F:/lucasCore/dev/libs/lucasCore-suitability.ssim"; L <- ssimLibrary(f); ok <- TRUE
+f <- file.path(pkg, "dev/libs/lucasCore-suitability.ssim"); L <- ssimLibrary(f); ok <- TRUE
 ds <- function(R, s) as.data.table(datasheet(R, s, lookupsAsFactors = FALSE))
 expect <- function(what, cond, detail = "") { cat(sprintf("%s  %s %s\n", if (isTRUE(cond)) "PASS" else "FAIL", what, detail)); if (!isTRUE(cond)) ok <<- FALSE }
 logs <- function(R, pat) { lg <- trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]]); unique(lg[grepl(pat, lg)]) }
@@ -37,7 +38,7 @@ fol <- lob[FlowGroupId == "Biomass Turnover: Foliage -> AG Very Fast [Type]"]; s
 expect("Loblolly foliage turnover is Taiga Plains' everywhere", nrow(fol) > 0 && all(fol$Value_changed < fol$Value_base), sprintf("%.3f -> %.3f (%d cells)", fol$Value_base[1], fol$Value_changed[1], nrow(fol)))
 expect("Loblolly stem turnover is Taiga Plains' (0.006)", nrow(stem) > 0 && all(abs(stem$Value_changed - 0.006) < 1e-6), sprintf("%.4f -> %.4f", stem$Value_base[1], stem$Value_changed[1]))
 df <- m[StateClassId == "Forest: Douglas-fir Group" & FlowGroupId == "Emission: AG Very Fast -> Atmosphere [Type]"]
-par <- fread("F:/lucasCore/defaults/cbm/tblDOMParametersDefault.csv")[SoilPoolID == 0]
+par <- fread(file.path(pkg, "defaults/cbm/tblDOMParametersDefault.csv"))[SoilPoolID == 0]
 want <- min(1, par$OrganicMatterDecayRate * exp((2 - par$ReferenceTemp) * log(par$Q10) * 0.1)) * par$PropToAtmosphere
 expect("Douglas-fir litter decay in Marine Mountains is CBM's at 2.0 C", isTRUE(all.equal(df[StratumId == "Marine Mountains", Value_changed], want, tolerance = 1e-6)),
        sprintf("%.4f -> %.4f (want %.4f)", df[StratumId == "Marine Mountains", Value_base], df[StratumId == "Marine Mountains", Value_changed], want))

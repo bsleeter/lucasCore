@@ -13,7 +13,7 @@ box <- function(x, y, w, h, eyebrow, name = NULL) paste0(sprintf('<rect class="b
 defs <- '<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker></defs>'
 # stage families (both drawings colour a stage, its chips and its wires by these)
 fam <- c(`0` = "setup", `1` = "setup", `2` = "carbon", `3` = "carbon", `4` = "carbon", `8` = "carbon", `5` = "land", `6` = "land",
-         `9` = "land", `10` = "land", `7` = "climate", `11` = "climate", `12` = "fig", `13` = "fig", `14` = "fig", `15` = "setup")
+         `9` = "land", `10` = "land", `7` = "climate", `11` = "climate", `12` = "fig", `13` = "fig", `14` = "fig", `15` = "setup", `16` = "fig", `17` = "fig")
 
 rules <- "
 .bg{fill:var(--bg)} .box{fill:var(--surface);stroke:var(--line);stroke-width:1}
@@ -52,17 +52,18 @@ svg_head <- function(W, H, title) paste0(sprintf('<svg xmlns="http://www.w3.org/
 # the print figure: light tokens inside the SVG (CDATA, since the font URL has &)
 standalone_svg <- function(head, body) paste0(head, "\n<style><![CDATA[@import url('", gf, "');\nsvg{", fonts, light, "}", rules, "]]></style>\n", body, "\n</svg>\n")
 fill <- function(t, k, v) paste(strsplit(t, k, fixed = TRUE)[[1]], collapse = v)
-# the pages are standalone documents served by GitHub Pages from docs/ (docs/.nojekyll: served as is). The nav uses the Pages URLs,
-# so it also works from a copy of the page somewhere else
-SITE <- "https://bsleeter.github.io/lucasCore/"
-PAGES <- paste0(SITE, "blueprint/")
-REPO <- "https://github.com/bsleeter/lucasCore"
+# the pages are standalone documents served from docs/ (docs/.nojekyll: served as is).
+#
+# links between the pages are relative, so they work wherever the folder is served
+
+REPO <- "https://code.usgs.gov/LUCC/lucasCore"
 page_head <- '<!doctype html>\n<html lang="en">\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
 # the three public pages: the User Guide (docs/guide/build-guide.R) and the two blueprints
 nav <- function(current) { l <- c(guide = "User Guide", package = "Package blueprint", data = "Data blueprint")
-  href <- c(guide = paste0(SITE, "guide/"), package = PAGES, data = paste0(PAGES, "data.html"))
+  up <- if (current == "guide") "../blueprint/" else ""   # the guide sits in guide/, the blueprints in blueprint/
+  href <- c(guide = if (current == "guide") "index.html" else "../guide/index.html", package = paste0(up, "index.html"), data = paste0(up, "data.html"))
   a <- vapply(names(l), function(k) sprintf('<a href="%s"%s>%s</a>', href[[k]], if (k == current) ' aria-current="page"' else "", l[[k]]), "")
-  paste0('<nav class="links" aria-label="lucasCore documentation">', paste(a, collapse = ""), sprintf('<a href="%s">Source on GitHub</a>', REPO), '</nav>') }
+  paste0('<nav class="links" aria-label="lucasCore documentation">', paste(a, collapse = ""), sprintf('<a href="%s">Source code</a>', REPO), '</nav>') }
 fill_page <- function(tpl, svg_inline, json, version, n, current) {
   p <- fill(fill(fill(fill(fill(fill(tpl, "{{RULES}}", rules), "{{LIGHT}}", light), "{{DARK}}", dark), "{{FONTS}}", fonts), "{{SVG}}", svg_inline), "{{DATA}}", json)
   paste0(page_head, fill(fill(fill(p, "{{VERSION}}", version), "{{N}}", as.character(n)), "{{NAV}}", nav(current))) }

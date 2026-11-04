@@ -7,15 +7,16 @@
 # Then tools/new-historical.R --bookend-maps: a 3-year timing run first, then 1985-2023.
 # Usage: Rscript tests/phaseL-p26-150m.R [--skip-build=<build result id>] [--no-timing]
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
 a <- commandArgs(TRUE); opt <- function(k, d) { m <- grep(sprintf("^--%s=", k), a, value = TRUE); if (length(m)) sub(sprintf("^--%s=", k), "", m[1]) else d }
-f <- "F:/lucasCore/dev/libs/lucasBuild-P26-150m.ssim"; RS <- "C:/Program Files/R/R-4.6.1/bin/Rscript.exe"
-CURVES <- "F:/lucasCore/dev/libs/lucasCore-forest-map.ssim"
+f <- file.path(pkg, "dev/libs/lucasBuild-P26-150m.ssim"); RS <- file.path(R.home("bin"), "Rscript")
+CURVES <- file.path(pkg, "dev/libs/lucasCore-forest-map.ssim")
 logl <- function(R) trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]])
 mins <- function(t0) as.numeric(Sys.time() - t0, units = "mins")
 bid <- as.integer(opt("skip-build", NA))
 if (is.na(bid)) {
-  unlink(c(f, paste0(f, c(".data", ".temp", ".backup"))), recursive = TRUE); file.copy("F:/lucasCore/Starter/LUCAS Core (CONUS).ssim", f)
+  unlink(c(f, paste0(f, c(".data", ".temp", ".backup"))), recursive = TRUE); file.copy(file.path(pkg, "Starter/LUCAS Core (CONUS).ssim"), f)
   L <- ssimLibrary(f); sc <- as.data.table(scenario(L, summary = TRUE)); B <- scenario(L, sc[Name == "Build", ScenarioId])
   saveDatasheet(B, data.frame(UnitId = "Pyrome: P26 Northern Sierra Nevada"), "lucasCore_StudyArea")
   saveDatasheet(B, data.frame(Resolution = 150L, SecondarySourceId = "Counties", TertiarySourceId = "Pyromes", StartYear = 1985L, EndYear = 2023L), "lucasCore_BuildOptions")
@@ -31,7 +32,7 @@ if (is.na(bid)) {
 }
 L <- ssimLibrary(f)
 hist <- function(name, extra = character()) {
-  out <- system2(RS, c("F:/lucasCore/tools/new-historical.R", shQuote(f), sprintf("--build=%d", bid), "--bookend-maps", "--replace", sprintf("--name=%s", shQuote(name)), extra), stdout = TRUE, stderr = TRUE)
+  out <- system2(RS, c(file.path(pkg, "tools/new-historical.R"), shQuote(f), sprintf("--build=%d", bid), "--bookend-maps", "--replace", sprintf("--name=%s", shQuote(name)), extra), stdout = TRUE, stderr = TRUE)
   out <- out[!grepl("Warning|undetermined|^In ssimLibrary", out)]; cat(out, sep = "\n"); id <- as.integer(tail(out, 1)); if (is.na(id)) stop("tools/new-historical.R failed"); scenario(L, id) }
 runit <- function(H) { t0 <- Sys.time(); R <- tryCatch(run(H), error = function(e) { cat("RUN FAILED:", conditionMessage(e), "\n"); NULL })
   if (is.null(R)) { r <- as.data.table(scenario(L, summary = TRUE))[IsResult == "Yes"]; cat(tail(logl(scenario(L, max(r$ScenarioId))), 40), sep = "\n"); stop("run failed") }

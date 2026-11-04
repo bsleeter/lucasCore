@@ -5,17 +5,19 @@
 #   climate   pooled fit with an asymptote per ecodivision and shared shape; log(A) regressed on ecodivision climate
 #             (PRISM 1991-2020 normals: mean temperature, log precipitation), weighted by plots; >= 3 ecodivisions, else conus
 #   nearest   the climatically nearest ecodivision with >= 100 plots (standardised temperature and log precipitation): its own fit
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(data.table); library(parallel) })
-source("F:/lucasCore/dev/growth/curves.R")
+source(file.path(pkg, "dev/growth/curves.R"))
 FORM <- "weibull_t10"; F <- FORMS[[FORM]]
-x <- readRDS("F:/lucasCore/dev/growth/fia_prepared.rds")[undisturbed & untreated & age_ok & vol_ok & latest & sc != 201]
+x <- readRDS(file.path(pkg, "dev/growth/fia_prepared.rds"))[undisturbed & untreated & age_ok & vol_ok & latest & sc != 201]
 
 # ecodivision climate (cached): PRISM normals averaged over each ecodivision polygon
-cf <- "F:/lucasCore/dev/growth/out_ecodiv_climate.csv"
+cf <- file.path(pkg, "dev/growth/out_ecodiv_climate.csv")
 if (!file.exists(cf)) { suppressPackageStartupMessages({ library(terra); library(sf) })
-  pr <- "F:/lucas-master/Data Sources/Climate/prism/normals/"
+  pr <- file.path(DS, "Climate/prism/normals/")
   tm <- rast(Sys.glob(paste0(pr, "PRISM_tmean_30yr_normal_4kmM4_annual_bil/*.bil"))[1]); pp <- rast(Sys.glob(paste0(pr, "PRISM_ppt_30yr_normal_4kmM4_annual_bil/*.bil"))[1])
-  eco <- vect(st_transform(read_sf("F:/lucas-master/Data Sources/FIA/EcoDivision_map/EcoDivisions_Dissolve.shp"), crs(tm)))
+  eco <- vect(st_transform(read_sf(file.path(DS, "FIA/EcoDivision_map/EcoDivisions_Dissolve.shp")), crs(tm)))
   cl0 <- data.table(ecodiv = eco$ecodiv, mat = terra::extract(tm, eco, fun = mean, na.rm = TRUE)[, 2], map = terra::extract(pp, eco, fun = mean, na.rm = TRUE)[, 2])
   cl0 <- cl0[, .(mat = mean(mat), map = mean(map)), by = ecodiv]; fwrite(cl0, cf) }
 clim <- fread(cf, colClasses = c(ecodiv = "character")); clim[, `:=`(z_t = (mat - mean(mat)) / sd(mat), z_p = (log(map) - mean(log(map))) / sd(log(map)))]
@@ -46,7 +48,7 @@ run_ftg <- function(g) { d <- x[sc == g]; cs <- d[, .N, by = ecodiv][N >= 100]$e
 cl <- makeCluster(min(20, detectCores() - 2)); clusterExport(cl, c("x", "FORM", "F", "FORMS", "fit_form", "predict_form", "clim", "sister_of", "fit_shared_A"))
 invisible(clusterEvalQ(cl, library(data.table)))
 r <- rbindlist(parLapply(cl, sort(unique(x$sc)), run_ftg)); stopCluster(cl)
-fwrite(r, "F:/lucasCore/dev/growth/out_exp6_fallback.csv")
+fwrite(r, file.path(pkg, "dev/growth/out_exp6_fallback.csv"))
 s <- r[, .(cells = .N, rmse = sqrt(weighted.mean(rmse^2, n)), bias = weighted.mean(bias, n)), by = method]
 w <- r[method != "own", .SD[which.min(rmse)], by = .(sc, ecodiv)][, .N, by = method]; s[w, best_in_cells := i.N, on = "method"]
 r[, rel := rmse / rmse[method == "own"] - 1, by = .(sc, ecodiv)]

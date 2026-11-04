@@ -11,8 +11,9 @@
 # Atm 30; if any class row hides every blank row of the event for that class, Snag 20 and Atm 0. Class B shows the blank rows alone. Stocks are reported per unit area of each class.
 # Usage: Rscript dev/stsim/01-flow-row-precedence.R   (writes dev/stsim/flow-row-precedence.ssim, deleted and rebuilt each run)
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
 suppressPackageStartupMessages({ library(rsyncrosim) })
-f <- "F:/lucasCore/dev/stsim/flow-row-precedence.ssim"; unlink(c(f, paste0(f, c(".data", ".temp", ".backup"))), recursive = TRUE)
+f <- file.path(pkg, "dev/stsim/flow-row-precedence.ssim"); unlink(c(f, paste0(f, c(".data", ".temp", ".backup"))), recursive = TRUE)
 L <- ssimLibrary(f, packages = "stsim"); P <- rsyncrosim::project(L, "Definitions"); S <- scenario(P, "Precedence test")
 sv <- function(x, d) saveDatasheet(if (grepl("^stsim_(Stratum|StateLabel|StateClass|TransitionType|StockType|FlowType|StateAttributeType)$", d)) P else S, x, d)
 sv(data.frame(Name = "S"), "stsim_Stratum")

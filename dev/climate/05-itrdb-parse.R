@@ -4,9 +4,11 @@
 # Writes dev/climate/itrdb-sites.csv (site, lat, lon, elevation, species, years, ecodivision, FIA forest type group of the species
 # where known) and dev/climate/itrdb-series.csv (site, year, standard ring-width index, sample depth).
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(data.table); library(terra) })
 for (v in c("PROJ_LIB", "PROJ_DATA", "GDAL_DATA")) if (grepl("syncro", tolower(Sys.getenv(v)))) Sys.unsetenv(v)
-D <- "F:/lucas-master/Data Sources/ITRDB/chronologies"; OUT <- "F:/lucasCore/dev/climate"
+D <- file.path(DS, "ITRDB/chronologies"); OUT <- file.path(pkg, "dev/climate")
 fs <- list.files(D, "-crn-noaa[.]txt$", full.names = TRUE)
 meta <- function(l, k) { m <- grep(sprintf("^#\\s*%s:", k), l, value = TRUE); if (!length(m)) return(NA_character_); trimws(sub(sprintf("^#\\s*%s:", k), "", m[1])) }
 rd <- lapply(fs, function(f) { l <- readLines(f, warn = FALSE, encoding = "UTF-8")
@@ -22,7 +24,7 @@ rd <- lapply(fs, function(f) { l <- readLines(f, warn = FALSE, encoding = "UTF-8
 sites <- rbindlist(lapply(rd, `[[`, 1)); ser <- rbindlist(lapply(rd, `[[`, 2))
 ser <- ser[!is.na(rwi) & rwi >= 0]
 # ecodivision of each site
-eco <- vect("F:/lucas-master/Data Sources/FIA/EcoDivision_map/EcoDivisions_Dissolve.shp")
+eco <- vect(file.path(DS, "FIA/EcoDivision_map/EcoDivisions_Dissolve.shp"))
 pts <- project(vect(sites[!is.na(lat) & !is.na(lon)], geom = c("lon", "lat"), crs = "EPSG:4326"), crs(eco))
 e <- extract(eco[, "StrtmNm"], pts); sites[!is.na(lat) & !is.na(lon), ecodiv := e$StrtmNm]
 sites <- merge(sites, ser[, .(n_years = .N, y_last = max(year), n_since1985 = sum(year >= 1985), med_depth = as.numeric(median(depth, na.rm = TRUE))), by = site], by = "site", all.x = TRUE)

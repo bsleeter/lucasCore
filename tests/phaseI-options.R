@@ -6,12 +6,13 @@
 # D: stages 1, 5 with one crosswalk row edited (EVT 2016 7030 -> California Mixed Conifer); compare its state classes with A.
 # Usage: Rscript tests/phaseI-options.R [--curves=dev/libs/lucasCore-starter-County-Placer-California.ssim] [--units="County: Placer California"]
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
 a <- commandArgs(TRUE); opt <- function(k, d) { m <- grep(sprintf("^--%s=", k), a, value = TRUE); if (length(m)) sub(sprintf("^--%s=", k), "", m[1]) else d }
-D <- "F:/lucasCore/dev/libs"; UNITS <- opt("units", "County: Placer California")
+D <- file.path(pkg, "dev/libs"); UNITS <- opt("units", "County: Placer California")
 CURVES <- normalizePath(opt("curves", file.path(D, "lucasCore-starter-County-Placer-California.ssim")), winslash = "/")
 f <- file.path(D, "lucasCore-options.ssim"); unlink(c(f, paste0(f, c(".data", ".temp", ".backup"))), recursive = TRUE)
-file.copy("F:/lucasCore/Starter/LUCAS Core (CONUS).ssim", f)
+file.copy(file.path(pkg, "Starter/LUCAS Core (CONUS).ssim"), f)
 L <- ssimLibrary(f); P <- rsyncrosim::project(L, "Definitions"); sc <- as.data.table(scenario(L, summary = TRUE))
 sfd <- sc[Name == "Stock-Flow Definitions", ScenarioId]
 logl <- function(R) trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]])
@@ -37,7 +38,7 @@ opt_run <- function(k, name) { S <- rsyncrosim::scenario(P, name); dependency(S)
 rB <- opt_run(2, "B: FIA dead pools, CBM-default soil"); rC <- opt_run(3, "C: CBM defaults")
 
 S <- rsyncrosim::scenario(P, "D: crosswalk edit")
-xw <- fread("F:/lucasCore/defaults/landcover/land-cover-crosswalks.csv", na.strings = ""); xw[Source == "EVT 2016" & Code == 7030, StateClassId := "Forest: California Mixed Conifer Group"]
+xw <- fread(file.path(pkg, "defaults/landcover/land-cover-crosswalks.csv"), na.strings = ""); xw[Source == "EVT 2016" & Code == 7030, StateClassId := "Forest: California Mixed Conifer Group"]
 saveDatasheet(S, as.data.frame(xw[, .(Source, Code, Description, StateClassId, Note)]), "lucasCore_LandCoverCrosswalk")
 saveDatasheet(S, units, "lucasCore_StudyArea"); saveDatasheet(S, data.frame(StageNameId = stA[1:2], RunOrder = 1:2), "core_Pipeline")
 description(S) <- "tests/phaseI-options.R scenario D: stages 1, 5 with EVT 2016 7030 (Lower Montane Conifer) mapped to California Mixed Conifer instead of Western Oak."

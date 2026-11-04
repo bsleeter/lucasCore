@@ -7,15 +7,16 @@
 # historical run's.
 # Usage: Rscript tests/phaseN-mode2.R [--build=4] [--historical=<result id>] [--years=10]
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
 a <- commandArgs(TRUE); opt <- function(k, d) { m <- grep(sprintf("^--%s=", k), a, value = TRUE); if (length(m)) sub(sprintf("^--%s=", k), "", m[1]) else d }
-f <- "F:/lucasCore/dev/libs/lucasCore-projection.ssim"; RS <- "C:/Program Files/R/R-4.6.1/bin/Rscript.exe"
+f <- file.path(pkg, "dev/libs/lucasCore-projection.ssim"); RS <- file.path(R.home("bin"), "Rscript")
 bid <- as.integer(opt("build", 4)); hid <- as.integer(opt("historical", NA)); YRS <- opt("years", "10")
 L <- ssimLibrary(f)
 logl <- function(R) trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]])
 mins <- function(t0) as.numeric(Sys.time() - t0, units = "mins")
 ds <- function(R, s) as.data.table(datasheet(R, s, lookupsAsFactors = FALSE))
-tool <- function(script, args) { out <- system2(RS, c(file.path("F:/lucasCore/tools", script), shQuote(f), args), stdout = TRUE, stderr = TRUE)
+tool <- function(script, args) { out <- system2(RS, c(file.path(file.path(pkg, "tools"), script), shQuote(f), args), stdout = TRUE, stderr = TRUE)
   out <- out[!grepl("Warning|undetermined|^In ssimLibrary", out)]; cat(out, sep = "\n"); id <- as.integer(tail(out, 1)); if (is.na(id)) stop(script, " failed"); id }
 runit <- function(id) { t0 <- Sys.time(); R <- tryCatch(run(scenario(L, id)), error = function(e) NULL)
   if (is.null(R)) { r <- as.data.table(scenario(L, summary = TRUE))[IsResult == "Yes" & ParentId == id]; if (nrow(r)) cat(tail(logl(scenario(L, max(r$ScenarioId))), 50), sep = "\n"); stop("run failed") }
@@ -42,5 +43,5 @@ top <- c("Urbanization", "Intensification", "Ag Expansion", "Ag Contraction", "F
 cat(sprintf("\nmean annual area (km2/yr): historical run 1986-%d vs projection %d-%d\n", yh, min(py), max(py))); print(cmp[TransitionGroupId %in% top][, Ratio := round(Projected / Historical, 2)][])
 tot <- ds(RP, "stsim_OutputStock")[StockGroupId == "Total Ecosystem", .(Tg = sum(Amount) / 1e6), by = .(Iteration, Timestep)]
 cat("\nTotal Ecosystem carbon in the projection (Tg):\n"); print(dcast(tot, Timestep ~ Iteration, value.var = "Tg"))
-saveRDS(list(hand = hand, cmp = cmp, hist = hid, proj = scenarioId(RP)), "F:/lucasCore/dev/libs/test-mode2.rds")
+saveRDS(list(hand = hand, cmp = cmp, hist = hid, proj = scenarioId(RP)), file.path(pkg, "dev/libs/test-mode2.rds"))
 cat("MODE 2 DONE historical", hid, "projection", scenarioId(RP), "\n")

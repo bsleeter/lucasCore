@@ -3,14 +3,14 @@
 # =============================================================================
 # Stage 10 fetches NCCPI for its fitting region by itself when Data Source NccpiFile is blank; this makes a file to point NccpiFile at
 # (EPSG:5070, on the NLCD 30 m lattice, masked to the buffered region). The download logic is src/nccpi.R.
-# Usage: Rscript tools/fetch-nccpi.R --pyrome=26 [--buffer=10000] [--out="F:/lucas-master/Data Sources/gSSURGO/nccpi3all_P26.tif"]
+# Usage: Rscript tools/fetch-nccpi.R --pyrome=26 [--buffer=10000] [--out="<Data Sources>/gSSURGO/nccpi3all_P26.tif"]   (Data Sources folder: LUCAS_DATA_HOME)
 #        Rscript tools/fetch-nccpi.R --vector=<polygons> [--buffer=...] --out=...
 # =============================================================================
 suppressPackageStartupMessages({ library(terra); library(jsonlite) })
 a <- commandArgs(TRUE); opt <- function(k, d) { m <- grep(sprintf("^--%s=", k), a, value = TRUE); if (length(m)) sub(sprintf("^--%s=", k), "", m[1]) else d }
 here <- tryCatch(dirname(normalizePath(sub("--file=", "", grep("--file=", commandArgs(FALSE), value = TRUE)))), error = function(e) "tools")
 source(file.path(here, "..", "src", "nccpi.R"))
-DS <- "F:/lucas-master/Data Sources"; buf <- as.numeric(opt("buffer", 10000))
+DS <- Sys.getenv("LUCAS_DATA_HOME"); if (!nzchar(DS)) stop("set LUCAS_DATA_HOME to the Data Sources folder"); buf <- as.numeric(opt("buffer", 10000))
 py <- opt("pyrome", NA)
 if (!is.na(py)) { v <- vect(file.path(DS, "Pyromes", "Data", "Pyromes_CONUS_20200206.shp")); v <- v[v$PYROME == as.integer(py)]
   out <- opt("out", file.path(DS, "gSSURGO", sprintf("nccpi3all_P%s.tif", py)))

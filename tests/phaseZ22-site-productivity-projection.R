@@ -11,12 +11,13 @@
 # Build's forest-area mean multiplier.
 # Usage: Rscript tests/phaseZ22-site-productivity-projection.R      (REUSE=1 reuses each run that already exists)
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table); library(terra) })
-f <- "F:/lucasCore/dev/libs/lucasCore-suitability.ssim"; RS <- "C:/Program Files/R/R-4.6.1/bin/Rscript.exe"; SETUP <- 122L
+f <- file.path(pkg, "dev/libs/lucasCore-suitability.ssim"); RS <- file.path(R.home("bin"), "Rscript"); SETUP <- 122L
 L <- suppressWarnings(ssimLibrary(f)); ok <- TRUE; reuse <- Sys.getenv("REUSE") == "1"
 expect <- function(what, cond, detail = "") { cat(sprintf("%s  %s %s\n", if (isTRUE(cond)) "PASS" else "FAIL", what, detail)); if (!isTRUE(cond)) ok <<- FALSE }
 logs <- function(R, pat) { lg <- trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]]); unique(lg[grepl(pat, lg)]) }
-tool <- function(script, args) { out <- system2(RS, c(file.path("F:/lucasCore/tools", script), shQuote(f), shQuote(args)), stdout = TRUE, stderr = TRUE)
+tool <- function(script, args) { out <- system2(RS, c(file.path(file.path(pkg, "tools"), script), shQuote(f), shQuote(args)), stdout = TRUE, stderr = TRUE)
   id <- suppressWarnings(as.integer(tail(out, 1))); if (is.na(id)) { cat(out, sep = "\n"); stop(script, " failed") }; id }
 sc <- function() as.data.table(scenario(L, summary = TRUE))
 newest <- function(nm) { s <- sc()[IsResult == "Yes" & (Name == nm | startsWith(Name, paste0(nm, " ([")))]; if (nrow(s)) max(s$ScenarioId) else NA_integer_ }

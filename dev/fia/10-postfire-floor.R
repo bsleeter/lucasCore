@@ -8,9 +8,10 @@
 # Compared with the measured floor after high-severity fire (07). Read-only.
 # Usage: Rscript dev/fia/10-postfire-floor.R [forest type group, default 370]
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
 suppressPackageStartupMessages({ library(data.table); library(sf); library(terra); library(DBI) })
 a <- commandArgs(TRUE); g0 <- if (length(a)) as.integer(a[1]) else 370L
-pkg <- "F:/lucasCore"; for (f in c("growth.R", "flows.R", "dom.R", "calibrate.R")) source(file.path(pkg, "src", f))
+for (f in c("growth.R", "flows.R", "dom.R", "calibrate.R")) source(file.path(pkg, "src", f))
 r <- readRDS(file.path(pkg, "dev/fia/out-cal-events/calibration.rds")); k <- r$cells[sc == g0]; mu <- as.list(r$M[[as.character(g0)]]$mult)
 lib <- file.path(pkg, "dev/libs/LUCAS P26 Demo Library.ssim"); con <- dbConnect(RSQLite::SQLite(), lib, flags = RSQLite::SQLITE_RO)
 scl <- as.data.table(dbGetQuery(con, "SELECT StateClassId, Name, Id FROM stsim_StateClass")); stl <- as.data.table(dbGetQuery(con, "SELECT StratumId, Name FROM stsim_Stratum"))

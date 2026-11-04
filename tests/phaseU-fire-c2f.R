@@ -6,15 +6,16 @@
 # the burned area by severity and year; checks that the fire group's size distribution is gone.
 # Usage: Rscript tests/phaseU-fire-c2f.R [--setup=58] [--historical=49] [--years=5]
 # =============================================================================
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
 a <- commandArgs(TRUE); opt <- function(k, d) { m <- grep(sprintf("^--%s=", k), a, value = TRUE); if (length(m)) sub(sprintf("^--%s=", k), "", m[1]) else d }
-f <- "F:/lucasCore/dev/libs/lucasCore-suitability.ssim"; RS <- "C:/Program Files/R/R-4.6.1/bin/Rscript.exe"
+f <- file.path(pkg, "dev/libs/lucasCore-suitability.ssim"); RS <- file.path(R.home("bin"), "Rscript")
 sid <- as.integer(opt("setup", 58)); hid <- as.integer(opt("historical", 49)); YRS <- opt("years", "5")
-C2F <- "F:/lucas-master/Models/lucasFireC2F Dev/lucasFireC2F Sierra Nevada & Foothills.ssim"
+C2F <- Sys.getenv("LUCAS_FIRE_LIBRARY"); if (!nzchar(C2F)) stop("set LUCAS_FIRE_LIBRARY to a lucasFireC2F library with fire seasons")
 L <- ssimLibrary(f)
 logl <- function(R) trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]])
 ds <- function(R, s) as.data.table(datasheet(R, s, lookupsAsFactors = FALSE))
-out <- system2(RS, c("F:/lucasCore/tools/new-projection.R", shQuote(f), shQuote(c(sprintf("--historical=%d", hid), "--stage9", sprintf("--build=%d", sid), sprintf("--years=%s", YRS),
+out <- system2(RS, c(file.path(pkg, "tools/new-projection.R"), shQuote(f), shQuote(c(sprintf("--historical=%d", hid), "--stage9", sprintf("--build=%d", sid), sprintf("--years=%s", YRS),
                "--replace", "--name=Projection (fire C2F seasons)"))), stdout = TRUE, stderr = TRUE)
 pid <- as.integer(tail(out[!grepl("Warning|undetermined|^In ssimLibrary", out)], 1)); if (is.na(pid)) { cat(out, sep = "\n"); stop("new-projection.R failed") }
 S <- scenario(L, pid)

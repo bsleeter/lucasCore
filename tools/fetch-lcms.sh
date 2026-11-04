@@ -8,7 +8,7 @@
 # Usage: bash tools/fetch-lcms.sh [first_year] [last_year]
 # =============================================================================
 set -u
-OUT="F:/lucas-master/Data Sources/LCMS/v2025-11"; BASE="https://data.fs.usda.gov/geodata/LCMS"
+OUT="${LUCAS_DATA_HOME:?set LUCAS_DATA_HOME to the Data Sources folder}/LCMS/v2025-11"; BASE="https://data.fs.usda.gov/geodata/LCMS"
 Y0=${1:-1985}; Y1=${2:-2025}
 mkdir -p "$OUT/Change_Annual"
 curl -sS -L -C - -o "$OUT/LCMS_v2025-11_Methods.pdf" "https://data.fs.usda.gov/geodata/rastergateway/LCMS/LCMS_v2025-11_Methods.pdf"

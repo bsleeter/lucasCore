@@ -6,10 +6,11 @@
 #             a penalised least-squares fit, lambda chosen by cross-validation - partial pooling without nlme's convergence fragility
 #   nlme      nonlinear mixed model: random asymptote by ecodivision (where it converges)
 # And leave-one-ecodivision-out for well-sampled cells: how good is the fallback for a cell with NO data?
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
 suppressPackageStartupMessages({ library(data.table); library(parallel) })
-source("F:/lucasCore/dev/growth/curves.R")
+source(file.path(pkg, "dev/growth/curves.R"))
 a <- commandArgs(TRUE); FORM <- if (length(a)) a[1] else "richards"; NMIN <- 100
-x <- readRDS("F:/lucasCore/dev/growth/fia_prepared.rds")
+x <- readRDS(file.path(pkg, "dev/growth/fia_prepared.rds"))
 x <- x[undisturbed & untreated & age_ok & vol_ok & latest & sc != 201]
 x[, fold := fold_ids(pid)]
 F <- FORMS[[FORM]]; pn <- names(F$start(100)[[1]])
@@ -58,7 +59,7 @@ invisible(clusterEvalQ(cl, library(data.table)))
 t0 <- Sys.time()
 P <- rbindlist(parLapply(cl, sort(unique(x$sc)), run_ftg)); LO <- rbindlist(parLapply(cl, sort(unique(x$sc)), loeo)); stopCluster(cl)
 cat(sprintf("%s: %.1f min\n", FORM, as.numeric(Sys.time() - t0, units = "mins")))
-fwrite(P, sprintf("F:/lucasCore/dev/growth/out_exp2_pred_%s.csv", FORM)); fwrite(LO, sprintf("F:/lucasCore/dev/growth/out_exp2_loeo_%s.csv", FORM))
+fwrite(P, sprintf(file.path(pkg, "dev/growth/out_exp2_pred_%s.csv"), FORM)); fwrite(LO, sprintf(file.path(pkg, "dev/growth/out_exp2_loeo_%s.csv"), FORM))
 P[, nc := .N, by = .(sc, ecodiv)][, size := cut(nc, c(0, 30, 100, 300, 1000, Inf), labels = c("<30", "30-100", "100-300", "300-1000", ">1000"))]
 long <- melt(P, id.vars = c("sc", "ecodiv", "vol", "size"), measure.vars = c("cell", "conus", "s0", "s1", "s3", "s10"), variable.name = "method", value.name = "pred")
 print(dcast(long[, .(rmse = sqrt(mean((vol - pred)^2, na.rm = TRUE))), by = .(size, method)], size ~ method, value.var = "rmse"))

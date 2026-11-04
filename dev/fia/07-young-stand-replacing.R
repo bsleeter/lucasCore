@@ -10,8 +10,10 @@
 # Mediterranean Mountains, P26's four main types. Writes dev/fia/out-cal/young-stand-replacing.csv and a figure. Read-only.
 # Usage: Rscript dev/fia/07-young-stand-replacing.R
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages(library(data.table))
-pkg <- "F:/lucasCore"; dm <- "F:/lucas-master/Data Sources/FIA/DataMart"; out <- Sys.getenv("LUCAS_CAL_OUT", file.path(pkg, "dev/fia/out-cal"))
+dm <- file.path(DS, "FIA/DataMart"); out <- Sys.getenv("LUCAS_CAL_OUT", file.path(pkg, "dev/fia/out-cal"))
 r <- readRDS(file.path(out, "calibration.rds")); ECODIV <- "M260"
 TYPES <- c(`370` = "California Mixed Conifer", `260` = "Fir/Spruce/Mountain Hemlock", `220` = "Ponderosa Pine", `920` = "Western Oak")
 LB <- 0.000453592 * 2.471

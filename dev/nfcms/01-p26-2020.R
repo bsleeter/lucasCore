@@ -12,10 +12,12 @@
 # total, per forest state class and per county, and cell by cell. Writes dev/nfcms/out/ (CSVs, difference rasters). Read-only.
 # Usage: Rscript dev/nfcms/01-p26-2020.R [run result id, default 14] [year, default 2020]
 # =============================================================================
+pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))); while (!file.exists(file.path(d, "package.xml")) && dirname(d) != d) d <- dirname(d); d })   # the package folder
+DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(terra); library(data.table); library(DBI) })
 a <- commandArgs(TRUE); rid <- if (length(a) >= 1) as.integer(a[1]) else 14L; yr <- if (length(a) >= 2) as.integer(a[2]) else 2020L
-lib <- "F:/lucasCore/dev/libs/LUCAS P26 Demo Library.ssim"; dd <- paste0(lib, ".data"); nf <- "F:/lucas-master/Data Sources/NFCMS/v3/Data/PSW"
-out <- "F:/lucasCore/dev/nfcms/out"; dir.create(out, showWarnings = FALSE, recursive = TRUE); t0 <- Sys.time()
+lib <- file.path(pkg, "dev/libs/LUCAS P26 Demo Library.ssim"); dd <- paste0(lib, ".data"); nf <- file.path(DS, "NFCMS/v3/Data/PSW")
+out <- file.path(pkg, "dev/nfcms/out"); dir.create(out, showWarnings = FALSE, recursive = TRUE); t0 <- Sys.time()
 con <- dbConnect(RSQLite::SQLite(), lib, flags = RSQLite::SQLITE_RO)
 avg <- as.data.table(dbGetQuery(con, sprintf("SELECT g.Name, o.Filename FROM stsim_OutputAverageSpatialStockGroup o JOIN stsim_StockGroup g ON g.StockGroupId = o.StockGroupId
                                              WHERE o.ScenarioId = %d AND o.Timestep = %d", rid, yr)))

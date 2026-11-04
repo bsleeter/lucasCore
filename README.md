@@ -2,29 +2,55 @@
 
 SyncroSim 3 add-on to ST-Sim (stsim 4.5.x) that builds LUCAS land-use and carbon models from national datasets: FIA growth
 curves, CBM carbon parameters, spatial initial conditions, historical transitions, climate multipliers and initial stocks.
-Version 1.0.1 ([release](https://github.com/bsleeter/lucasCore/releases/tag/v1.0.1)). Plan: https://claude.ai/code/artifact/b04aa2f8-a1c2-4a73-99dc-672c8918139d
+A newer version of this software may be available. See https://code.usgs.gov/LUCC/lucasCore/-/releases to view all releases.
 
-- **[User Guide](https://bsleeter.github.io/lucasCore/guide/)**: a step-by-step walkthrough in SyncroSim Studio, from
-  installing the package to building, running and comparing models (also [in the repo](docs/guide/user-guide.md))
-- **[Package blueprint](https://bsleeter.github.io/lucasCore/blueprint/)**: the 16 stages, the scenarios they run in, and the
-  datasheets they pass to each other and to ST-Sim ([static figure](docs/blueprint/lucascore-blueprint.png))
-- **[Data blueprint](https://bsleeter.github.io/lucasCore/blueprint/data.html)**: the national datasets in the Data Sources sheet,
-  the stages that read each one, and the setting that switches it ([static figure](docs/blueprint/lucascore-data-blueprint.png))
+- **[User Guide](docs/guide/user-guide.md)**: a step-by-step walkthrough in SyncroSim Studio, from installing the package to
+  building, running and comparing models
+- **[Package blueprint](docs/blueprint/lucascore-blueprint.png)**: the stages, the scenarios they run in, and the datasheets they
+  pass to each other and to ST-Sim
+- **[Data blueprint](docs/blueprint/lucascore-data-blueprint.png)**: the national datasets in the Data Sources sheet, the stages
+  that read each one, and the setting that switches it
+- **[Changelog](CHANGELOG.md)**, **[Contributing](CONTRIBUTING.md)**, **[License](LICENSE.md)**, **[Disclaimer](DISCLAIMER.md)**
+
+## Citation
+
+Sleeter, B.M., 2026, lucasCore: a SyncroSim package that builds LUCAS land-use and carbon models, U.S. Geological Survey Software
+Release, https://code.usgs.gov/LUCC/lucasCore.
+
+## Related publications and data
+
+- The national datasets lucasCore reads are cited one by one in [defaults/metadata/citations.csv](defaults/metadata/citations.csv).
+  Each model record and data release cites the ones its Build used.
+- Carbon parameters take CBM-CFS3 defaults (Natural Resources Canada); see [defaults/cbm/README.md](defaults/cbm/README.md). The
+  methods are set out in [docs/carbon-assumptions.md](docs/carbon-assumptions.md) and [docs/carbon-build-process.md](docs/carbon-build-process.md).
+- A methods paper describing the LUCAS model built with lucasCore is in preparation.
+
+## Use of artificial intelligence
+
+Artificial intelligence was used to write this software. Claude (Anthropic; Claude Opus 5.5, through Claude Code) wrote code, tests
+and documentation under the direction of the author, who set the requirements and the scientific decisions and checked the results.
+[DISCLAIMER.md](DISCLAIMER.md) states the review status of this version.
 
 ## Install
 
-Download `lucasCore-1.0.1.ssimpkg` from the [v1.0.1 release](https://github.com/bsleeter/lucasCore/releases/tag/v1.0.1), then in
+Download `lucasCore-<version>.ssimpkg` from the [Releases page](https://code.usgs.gov/LUCC/lucasCore/-/releases), then in
 SyncroSim Studio choose File > Local Packages > Install from File and pick it (User Guide, section 1.1). Needs SyncroSim 3.1.9 or
-later with ST-Sim 4.5.4, and R 4.6 with rsyncrosim, terra, sf, data.table, mgcv and jsonlite.
+later with ST-Sim 4.5.4, and R 4.6 with rsyncrosim, terra, sf, data.table, mgcv, jsonlite, curl, xml2, DBI and RSQLite.
 
 **Development install**, running the scripts from a checkout of this repository:
 
 ```
-"C:\Program Files\SyncroSim\SyncroSim.PackageManager.exe" --xinstall="F:\lucasCore"
+"C:\Program Files\SyncroSim\SyncroSim.PackageManager.exe" --xinstall="<path to this folder>"
 ```
 
 `--xinstall` registers the folder, so SyncroSim runs the scripts in `src/` where they are. Close SyncroSim Studio first. In Studio,
 tick lucasCore under File > Local Packages. lucasCore runs on the installed R; it needs no conda environment.
+
+## Development records
+
+`dev/` holds the analyses behind the package's methods and fitted values, with their findings in `dev/fia/FINDINGS.md`, `dev/nfcms/FINDINGS.md` and
+`dev/resampling/FINDINGS.md`. The package does not run them. A release carries the ones the code and tables cite (`tools/release-dev-files.txt`). They are
+records of how a result was reached, run from this folder, and many read national data or libraries that are not in the repository.
 
 ## Start a model
 
@@ -79,7 +105,7 @@ crosswalks stage 5 uses, editable per scenario (`defaults/landcover/README.md`).
 The starter is made by `tools/new-library.R`, which can also make or update any library directly:
 
 ```
-Rscript tools/new-library.R "F:/path/My Model.ssim" [--rebuild-strata] [--rebuild-climate]
+Rscript tools/new-library.R "<folder>/My Model.ssim" [--rebuild-strata] [--rebuild-climate]
 ```
 
 It writes the stsim definitions from `defaults/stsim`; every polygon source in `defaults/strata/presets.csv` as a Stratum Sources row,
@@ -100,13 +126,32 @@ stage: SyncroSim discards project-scope sheets that a stage saves during a run.
 | 7 - Climate Multipliers | `src/7-climate-multipliers.R`, `src/loca2.R` | Growth and decomposition multipliers: PRISM historical, LOCA2 projections (Climate Options) |
 | 8 - Initial Stock Maps | `src/8-initial-stocks-spatial.R` | The 14 carbon pools of every cell as ST-Sim initial stocks |
 | 9 - Projection Transitions | `src/9-projection-transitions.R` | Projection targets and multiplier maps that resample whole historical years (only with a projection); with Projection Start, the starting maps of a stand-alone projection |
+| 10 - Transition Suitability | `src/10-transition-suitability.R` | Transition suitability maps from a logistic GAM on the annual NLCD record |
+| 11 - Projection Climate | `src/11-projection-climate.R` | Climate multipliers for a projection, in a scenario of its own |
+| 12 - Build Figures | `src/12-build-figures.R` | Report figures of a Build |
+| 13 - Run Figures | `src/13-run-figures.R` | Report figures of an ST-Sim run |
+| 14 - Compare Runs | `src/14-compare-runs.R` | Tables and figures that compare runs |
+| 15 - Data Download | `src/15-data-download.R` | Fetches the national datasets a Build reads into the Data Sources Home |
+| 16 - Model Record | `src/16-model-record.R` | The FGDC metadata record of a Build, as an optional quick check |
+| 17 - Data Release | `src/17-data-release.R` | A USGS data release folder from a Build and its runs: tables, maps, metadata, checks and a review packet |
 
 Pipeline order: 1, 5, 2, 3, 4, 6, 7, 8, 9. Every stage ends with validation checks (`lucasCore_OutputValidation`); a check that cannot be
 computed fails.
 
 ## Test
 
-Each test builds a new library in `dev/libs` (a newly added stage is not visible to an existing library while the package version
+The plain-R tests need no SyncroSim library and run in seconds: `Rscript tests/unit-<name>.R`. A few of them read national data and
+report it when it is missing. The repository holds no test datasets: tests make small tables in a temporary folder, or read the
+national datasets from the Data Sources folder. Where things are comes from environment variables:
+
+| Variable | Meaning | Needed by |
+|---|---|---|
+| `LUCAS_DATA_HOME` | The Data Sources folder (default `dev/libs/Data Sources` in this folder) | Tests and tools that read national data directly |
+| `LUCAS_CONUS1KM_INITIAL_CONDITIONS` | Initial Conditions folder of the earlier CONUS 1 km model | `tests/phaseA-smoke.R`, comparison with States strata |
+| `LUCAS_FIRE_LIBRARY` | A lucasFireC2F library with fire seasons | `tests/phaseU-fire-c2f.R` |
+| `LUCASBUILDER_DATA` | The Data folder of the earlier lucasbuilder model | `dev/growth/11_young_carbon.R` |
+
+Each full-stage test below builds a new library in `dev/libs` (a newly added stage is not visible to an existing library while the package version
 is unchanged). `--units` takes Study Area units, comma-separated (default "County: Placer California", about 3,900 km2 over two ecodivisions; tests run in minutes).
 
 | Test | Runs | Time (California, 1 km) |
