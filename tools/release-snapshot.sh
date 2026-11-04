@@ -3,22 +3,39 @@
 #
 # Usage: tools/release-snapshot.sh --scan-only [--with-dev] [--ref=<commit or tree>]
 #        tools/release-snapshot.sh <empty folder outside this repository> [--with-dev] [--ref=<commit or tree>]
+#        tools/release-snapshot.sh --sync=<the release repository> [--message="<text>"] [--with-dev] [--ref=<commit or tree>]
 #
 # Of dev/, only the files in tools/release-dev-files.txt go (--with-dev keeps all of it).
 # With a folder: extracts the commit (HEAD by default) without the files listed in EXCLUDE, scans it, and on a clean scan makes
 # it a new git repository with one commit. Pushing it is left to you. The repository this runs in is not changed.
+# With --sync: makes an existing release repository match the commit, as one new commit on its main branch, after a clean scan.
+# It refuses a release repository with uncommitted work, off main, or with a release candidate branch (a name like 1.1.0): from
+# Request Peer Review on, changes go on that branch where reviewers can follow them. Pushing is left to you.
 # Exit status: 0 clean, 1 something to look at, 2 wrong use.
 set -u
-REF=HEAD; OUT=""; DEV=0
+REF=HEAD; OUT=""; DEV=0; SYNC=""; MSG=""
 for a in "$@"; do case "$a" in
   --scan-only) ;;
   --with-dev) DEV=1 ;;
   --ref=*) REF="${a#--ref=}" ;;
+  --sync=*) SYNC="${a#--sync=}" ;;
+  --message=*) MSG="${a#--message=}" ;;
   -*) echo "unknown option $a" >&2; exit 2 ;;
   *) OUT="$a" ;;
 esac; done
 
 ROOT="$(git -C "$(dirname "$0")" rev-parse --show-toplevel)" || exit 2
+if [ -n "$SYNC" ]; then
+  [ -z "$OUT" ] || { echo "give a folder or --sync, not both" >&2; exit 2; }
+  [ -e "$SYNC/.git" ] || { echo "$SYNC is not a git repository" >&2; exit 2; }
+  SYNC="$(git -C "$SYNC" rev-parse --show-toplevel)" || exit 2
+  [ "$SYNC" != "$ROOT" ] || { echo "--sync must name the release repository, not this one" >&2; exit 2; }
+  [ -z "$(git -C "$SYNC" status --porcelain)" ] || { echo "$SYNC has uncommitted work: commit or discard it first" >&2; exit 2; }
+  [ "$(git -C "$SYNC" branch --show-current)" = main ] || { echo "$SYNC is not on main" >&2; exit 2; }
+  RC="$(git -C "$SYNC" for-each-ref --format='%(refname:short)' refs/heads refs/remotes refs/tags | grep -E '(^|/)[0-9]+\.[0-9]+\.[0-9]+$')"
+  [ -z "$RC" ] || { echo "$SYNC has a release candidate ($RC): make further changes on that branch, where reviewers can follow them" >&2; exit 2; }
+  [ -n "$MSG" ] || MSG="Update from the development repository ($(git -C "$ROOT" rev-parse --short "$REF"))"
+fi
 # development records that are not part of the software
 EXCLUDE=("docs/guide/source" "docs/guide/build-guide.R" "docs/How to Publish a Software Release.txt")
 
@@ -58,6 +75,16 @@ grep -rIoE '\bdev/[a-z]+(/[A-Za-z0-9_.-]+)*' src defaults tools docs/carbon-assu
 
 echo "files: $(find . -type f | wc -l)  size: $(du -sh . | cut -f1)  images to check by eye: $(find . -name '*.png' | wc -l)"
 BAD=0; [ -s "$BADFILE" ] && BAD=1
+if [ -n "$SYNC" ]; then
+  if [ "$BAD" != 0 ]; then echo "not syncing: see above. $SYNC is unchanged" >&2; exit 1; fi
+  find "$SYNC" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+  cp -a . "$SYNC"/ && cd "$SYNC" && git add -A || exit 2
+  if git diff --cached --quiet; then echo "$SYNC already matches $REF: nothing to commit"; exit 0; fi
+  git commit -q -m "$MSG" || exit 2
+  git log -1 --format="committed %h %s" | cut -c1-120; git show --stat --format= HEAD | tail -1
+  echo "Look it over with: git -C \"$SYNC\" show --stat. Then push it with: git -C \"$SYNC\" push"
+  exit 0
+fi
 if [ -z "$OUT" ]; then exit "$BAD"; fi
 if [ "$BAD" != 0 ]; then echo "not making a repository: see above" >&2; exit 1; fi
 mkdir -p "$OUT" && [ -z "$(ls -A "$OUT")" ] || { echo "$OUT must be an empty folder" >&2; exit 2; }

@@ -24,8 +24,9 @@ Target: `https://code.usgs.gov/LUCC/lucasCore`, version 1.1.0. Capitalization of
 
 ## Phase 1: repository
 
-- [ ] Project in the LUCC group, private, empty
-- [ ] First push (`tools/release-snapshot.sh <empty folder>`, then add the remote and push)
+- [x] Project in the LUCC group, not public
+- [x] First push (`tools/release-snapshot.sh <empty folder>`, then add the remote and push)
+- [ ] Last resync before peer review: commit here, `tools/release-snapshot.sh --sync=<release copy>`, then push from the release copy. It stops working once a release candidate branch exists
 - [x] Versioned description of changes: `CHANGELOG.md`
 - [x] Drafts: `README.md`, `code.json`, `LICENSE.md`, `DISCLAIMER.md` (provisional wording)
 - [x] Test datasets documented: the repository holds none (README, Test)
