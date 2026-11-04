@@ -7,7 +7,9 @@
 # The columns exported are exactly those of defaults/metadata/data-dictionary.csv: rl_check_tables compares each header with it.
 # ScienceBase holds 100 files per item, so each map variable of a run is one zip of its yearly cloud-optimized GeoTIFFs.
 # Metadata must not interpret results (USGS model-output guidance, 2018): the records say what was done and what was compared, not what it means.
-# What only a person can supply comes from record-defaults.csv until the Release Information page exists (Phase 4); content$draft lists it.
+# What only a person can supply comes from the Release Information page (rl_read_info), over record-defaults.csv; what is still missing is listed in draft.
+# Release status: a Draft lists it; Provisional and Approved fail on it. The metadata identifier goes on the parent record only: ScienceBase assigns each
+# item its own, so the run and model records carry none rather than a copy of the parent's.
 # =============================================================================
 suppressPackageStartupMessages({ library(data.table); library(DBI); library(RSQLite) })
 if (!exists("md_model_content")) stop("source src/metadata.R and src/metadata-record.R before src/release.R")
@@ -224,7 +226,35 @@ rl_run_content <- function(model, run, facts, tables, maps, cmp, runlog, defs, d
   x }
 
 # The parent record: the release as a whole
-rl_parent_content <- function(model, runs, where) {
+# The Release Information page and its people, as fields of record-defaults.csv and of the parent record (Phase 4). sid: the scenario holding the page
+rl_read_info <- function(con, sid) {
+  sid <- as.integer(sid); info <- list()
+  got <- function(t) dbExistsTable(con, t)
+  if (got("lucasCore_ReleaseInformation")) { i <- dbGetQuery(con, sprintf("SELECT * FROM lucasCore_ReleaseInformation WHERE ScenarioId = %d", sid))
+    if (nrow(i)) info <- lapply(as.list(i[1, setdiff(names(i), c("ScenarioId", "ReleaseInformationId")), drop = FALSE]), as.character) }
+  code <- suppressWarnings(as.integer(info$ReleaseStatus %||% NA)); info$ReleaseStatus <- if (is.na(code)) "Draft" else c("Draft", "Provisional", "Approved")[code]
+  blank <- function(v) length(v) != 1 || is.na(v) || !nzchar(trimws(v))
+  if (got("lucasCore_Person") && got("lucasCore_ReleaseOriginator")) {
+    o <- dbGetQuery(con, sprintf("SELECT p.* FROM lucasCore_ReleaseOriginator o JOIN lucasCore_Person p ON p.PersonId = o.PersonId WHERE o.ScenarioId = %d ORDER BY o.SortOrder IS NULL, o.SortOrder, o.ReleaseOriginatorId", sid))
+    if (nrow(o)) { info$Originator <- paste(o$Name, collapse = "; ")
+      who <- vapply(seq_len(nrow(o)), function(k) paste(c(o$Name[k], if (!blank(o$Organization[k])) o$Organization[k], if (!blank(o$Orcid[k])) paste("ORCID", o$Orcid[k])), collapse = ", "), "")
+      if (any(!is.na(o$Orcid) | !is.na(o$Organization))) info$Credit <- sub("[.]*$", ".", paste0("Originators: ", paste(who, collapse = "; "))) }
+    if (!blank(info$ContactPersonId)) { p <- dbGetQuery(con, sprintf("SELECT * FROM lucasCore_Person WHERE PersonId = %d", as.integer(info$ContactPersonId)))
+      if (nrow(p)) { map <- c(ContactPerson = "Name", ContactOrg = "Organization", ContactAddress = "Address", ContactCity = "City", ContactState = "State", ContactPostal = "PostalCode", ContactPhone = "Phone")
+        for (f in names(map)) info[[f]] <- as.character(p[[map[[f]]]][1])
+        if (blank(info$ContactEmail)) info$ContactEmail <- as.character(p$Email[1]) } } }
+  info }
+
+rl_no_id <- function(x) { x$theme <- Filter(function(t) t$thesaurus != "USGS Metadata Identifier", x$theme); x }
+
+# What is still to supply for the whole release: the placeholders, and the release text the generator drafted
+rl_to_supply <- function(model, info) {
+  d <- setdiff(model$draft, c("drafted: title", "drafted: abstract", "drafted: purpose"))
+  for (k in c("Title", "Abstract", "Purpose")) if (!md_supplied(info, k)) d <- c(d, paste("drafted: release", tolower(k)))
+  if (!md_supplied(info, "IpdsNumber")) d <- c(d, "to supply: IpdsNumber")
+  d }
+
+rl_parent_content <- function(model, runs, where, info = NULL) {
   x <- model; y0 <- min(vapply(runs, function(r) r$years[1], 0)); y1 <- max(vapply(runs, function(r) r$years[2], 0))
   x$citation$title <- sprintf("LUCAS simulations of land use and carbon in %s, %s-%s", where, y0, y1)
   x$abstract <- paste(sprintf("This data release holds %d simulation%s of land use and carbon in %s made with the LUCAS model (lucasCore package for ST-Sim in SyncroSim): %s.", length(runs), if (length(runs) > 1) "s" else "", where,
@@ -232,6 +262,11 @@ rl_parent_content <- function(model, runs, where) {
                       "It holds the model record, each simulation's tables and maps with its own record, the figures and the model archive.")
   x$purpose <- "To make the simulations available with the model, inputs and settings that produced them."
   x$supplinf <- "See README.txt for the folders and contents.csv for every file, with its size and SHA-256 checksum."
+  if (md_supplied(info, "Title")) x$citation$title <- trimws(info$Title)
+  if (md_supplied(info, "Abstract")) x$abstract <- trimws(info$Abstract)
+  if (md_supplied(info, "Purpose")) x$purpose <- trimws(info$Purpose)
+  if (md_supplied(info, "RevisionNotes")) x$supplinf <- paste0(x$supplinf, " Revision notes: ", trimws(info$RevisionNotes))
+  if (md_supplied(info, "AssociatedPublications")) x$supplinf <- paste0(x$supplinf, " Associated publications: ", trimws(info$AssociatedPublications))
   x$time <- list(begdate = as.character(y0), enddate = as.character(y1), current = "model output")
   x$draft <- c(setdiff(model$draft, c("drafted: title", "drafted: abstract", "drafted: purpose")), "drafted: release title, abstract, purpose")
   x$quality$sources <- list(rl_model_source(model)); x$quality$steps <- list(list(desc = "The release folder was written by the lucasCore Data Release stage from the simulations' result scenarios.", srcused = "Model record", date = format(Sys.Date(), "%Y%m%d")))
@@ -282,7 +317,7 @@ rl_write_compare <- function(con, id, runs, out, dict) {
     list(file = f, path = file.path(out, f), rows = nrow(e), ranges = rng, columns = names(e)) }) }
 
 rl_compare_content <- function(parent, stats, dict, where, runs) {
-  x <- parent; x$citation$title <- sprintf("Comparison of LUCAS simulations of %s", where)
+  x <- rl_no_id(parent); x$citation$title <- sprintf("Comparison of LUCAS simulations of %s", where)
   x$abstract <- paste0("Figures and summary tables comparing these simulations: ", paste(vapply(runs, `[[`, "", "name"), collapse = "; "), ".")
   x$purpose <- "To set the simulations side by side."; x$supplinf <- NA_character_
   x$quality$complete <- "One row per simulation in each table."; x$entities <- lapply(stats, function(s) rl_entity(dict, s$file, s))
@@ -326,7 +361,7 @@ rl_contents <- function(out, rows = list()) {
   fwrite(d, file.path(out, "contents.csv")); d }
 
 # content checks (the mp check comes on top). Each row: Check, Pass, Detail
-RL_DRAFT_CHECK <- "no placeholder or drafted text is left"   # stage 17 lists it and does not fail on it until Phase 4
+RL_DRAFT_CHECK <- "no placeholder or drafted text is left"   # a Draft release lists it; stage 17 fails on it for Provisional and Approved
 rl_checks <- function(contents, defs, stats_issues, xml, draft, maps_check) {
   a <- function(check, pass, detail = "") data.table(Check = check, Pass = isTRUE(pass), Detail = paste(detail, collapse = "; "))
   by_item <- contents[, .N, by = .(item = sub("^([^/]+/[^/]+)/.*$", "\\1", file))]; big <- contents[bytes > 30e9]
@@ -339,11 +374,12 @@ rl_checks <- function(contents, defs, stats_issues, xml, draft, maps_check) {
         a("no machine path in a record", !any(grepl("[A-Za-z]:[/\\\\][A-Za-z]", raw)), head(grep("[A-Za-z]:[/\\\\][A-Za-z]", raw, value = TRUE), 3)),
         a(RL_DRAFT_CHECK, !length(draft), draft)) }
 
-rl_release <- function(lib, build, runs, out, dir, every = 1L, years = NULL, maps = TRUE, archive = TRUE, console = NA_character_, say = message) {
+rl_release <- function(lib, build, runs, out, dir, every = 1L, years = NULL, maps = TRUE, archive = TRUE, console = NA_character_, say = message, info_scenario = NA_integer_) {
   lib <- normalizePath(lib, winslash = "/"); data <- paste0(lib, ".data"); dict <- md_dictionary(dir)
   dir.create(out, showWarnings = FALSE, recursive = TRUE)
-  facts <- md_build_facts(lib, build); model <- md_model_content(facts, dir)
   con <- rl_ro(lib); on.exit(dbDisconnect(con))
+  info <- if (is.na(info_scenario)) NULL else rl_read_info(con, info_scenario)
+  facts <- md_build_facts(lib, build); whole <- md_model_content(facts, dir, info); model <- rl_no_id(whole)
   R <- rl_unique_slugs(lapply(runs, function(r) rl_run_info(con, r)))
   where <- paste(sub("^[^:]+: ", "", facts$study_area), collapse = ", "); if (!nzchar(where)) where <- "the conterminous United States"
   home_mp <- md_mp_default(facts$home); xml <- character(); issues <- character(); checks <- list(ok = list(), detail = list())
@@ -382,12 +418,12 @@ rl_release <- function(lib, build, runs, out, dir, every = 1L, years = NULL, map
   fig <- rl_copy_figures(con, data, unlist(found), loc); say(sprintf("%d figures copied, from results %s", length(fig), paste(unlist(found), collapse = ", ")))
 
   # the parent, the archive, the readme and the contents
-  parent <- rl_parent_content(model, R, where); xml <- c(xml, rl_write_xml(parent, file.path(out, "release.xml")))
+  parent <- rl_parent_content(whole, R, where, info); xml <- c(xml, rl_write_xml(parent, file.path(out, "release.xml")))
   if (length(found$compare)) { cs <- rl_write_compare(con, found$compare, R, file.path(out, "comparison"), dict); issues <- c(issues, rl_check_tables(cs, dict))
     xml <- c(xml, rl_write_xml(rl_compare_content(parent, cs, dict, where, R), file.path(out, "comparison", "comparison.xml"))) }
   if (archive) { a <- rl_archive(lib, file.path(out, "archive"), console); say(sprintf("Model archive: %s", paste(basename(a), collapse = ", "))) }
-  draft <- unique(c(model$draft)); writeLines(rl_readme(parent, R, draft, out), file.path(out, "README.txt"))
+  draft <- unique(rl_to_supply(model, info)); writeLines(rl_readme(parent, R, draft, out), file.path(out, "README.txt"))
   contents <- rl_contents(out); chk <- rl_checks(contents, defs, issues, xml, draft, checks)
   mp <- rbindlist(lapply(xml, function(f) { m <- md_mp(f, home_mp); if (is.null(m) || !nrow(m)) NULL else cbind(Record = sub(paste0(out, "/"), "", f, fixed = TRUE), m) }))
   if (!nrow(mp)) mp <- data.table(Record = character(), Level = character(), Message = character())   # none found: no NA row, and sum(Level == "Error") is 0
-  list(out = out, runs = R, contents = contents, checks = chk, mp = mp, records = xml, draft = draft, mp_found = !is.na(home_mp) && file.exists(home_mp)) }
+  list(out = out, runs = R, contents = contents, checks = chk, mp = mp, records = xml, draft = draft, status = info$ReleaseStatus %||% "Draft", ipds = info$IpdsNumber %||% NA_character_, mp_found = !is.na(home_mp) && file.exists(home_mp)) }

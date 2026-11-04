@@ -7,8 +7,8 @@
 #                                   CSDGM now (md_csdgm), ISO 19115 later, from the same list
 # md_csdgm(content)                 the CSDGM XML document (xml2), elements in the order the standard sets
 # md_mp(xml, mp)                    runs the USGS metadata parser (mp) on a written record: one row per Error or Warning
-# What only a person can supply (names, contact, DOI, abstract wording) comes from defaults/metadata/record-defaults.csv until the
-# Release Information page exists (Phase 4). content$draft lists every element still a placeholder or drafted by the generator, and
+# What only a person can supply (names, contact, DOI, abstract wording) comes from the Release Information page in a release (info, from
+# rl_read_info), over defaults/metadata/record-defaults.csv. content$draft lists every element still a placeholder or drafted by the generator, and
 # content$notes what the generator had to infer; a final release must have neither (Phase 5).
 # Metadata must not interpret results (USGS model-output guidance, 2018): drafted text says what was done, never what it means.
 # =============================================================================
@@ -100,6 +100,16 @@ md_write_record <- function(lib, sid, out, dir, file = "model.xml") {
 
 # ---- the content model -----------------------------------------------------------------------------------------------------
 md_record_defaults <- function(dir) { x <- md_read(dir, "record-defaults.csv"); x[, Placeholder := toupper(Placeholder) == "TRUE"]; x }
+# Is a field of the Release Information page filled in? (no page: info is NULL, and nothing is)
+md_supplied <- function(info, f) { v <- info[[f]]; length(v) == 1 && !is.na(v) && nzchar(trimws(v)) }
+# The page over the defaults: a field supplied stops being a placeholder. With a page the originators and contact are required, because the
+# defaults name the package's author, not this release's people.
+md_apply_info <- function(def, info) {
+  if (is.null(info)) return(def)
+  for (f in intersect(names(info), def$Field)) if (md_supplied(info, f)) { v <- trimws(info[[f]]); def[Field == f, `:=`(Value = v, Placeholder = FALSE)] }
+  for (f in c("Originator", "ContactPerson")) if (!md_supplied(info, f)) def[Field == f, Placeholder := TRUE]
+  def }
+md_split_keys <- function(v) { k <- trimws(strsplit(v, ";", fixed = TRUE)[[1]]); k[nzchar(k)] }
 md_keywords <- function(dir) md_read(dir, "keywords.csv")
 md_use_constraints <- function(dir) md_read(dir, "use-constraints.csv")
 
@@ -123,8 +133,8 @@ md_source <- function(cit, column, accessed, contribution, by_hand = FALSE) {
        typesrc = "Online", time = c1$PubDate, current = "publication date", contribution = contribution)
 }
 
-md_model_content <- function(facts, dir) {
-  def <- md_record_defaults(dir); D <- function(f) def[Field == f, Value][1]
+md_model_content <- function(facts, dir, info = NULL) {
+  def <- md_apply_info(md_record_defaults(dir), info); D <- function(f) def[Field == f, Value][1]
   draft <- character(); notes <- character()
   ph <- def[Placeholder == TRUE, Field]; if (length(ph)) draft <- c(draft, paste("placeholder:", ph))
   b <- facts$build; g <- facts$grid; lg <- facts$log; v <- facts$validation
@@ -157,8 +167,9 @@ md_model_content <- function(facts, dir) {
   kw <- md_keywords(dir)
   theme <- lapply(unique(kw$Thesaurus), function(t) list(thesaurus = t, keys = kw[Thesaurus == t, Term]))
   theme <- c(theme, list(list(thesaurus = "USGS Metadata Identifier", keys = D("MetadataId"))))
+  if (md_supplied(info, "ThemeKeywords")) theme <- c(theme, list(list(thesaurus = "None", keys = md_split_keys(info$ThemeKeywords))))
   place <- list(list(thesaurus = "Common geographic areas", keys = c("United States", facts$states)),
-                list(thesaurus = "None", keys = sub("^[^:]+: ", "", units)))
+                list(thesaurus = "None", keys = unique(c(sub("^[^:]+: ", "", units), if (md_supplied(info, "PlaceKeywords")) md_split_keys(info$PlaceKeywords)))))
   if (!length(facts$states)) notes <- c(notes, "no states found for the place keywords (no TIGER states in Data Sources Home)")
 
   # lineage sources: Data Sources Used, else inferred from the home's manifests
@@ -229,18 +240,22 @@ md_model_content <- function(facts, dir) {
   overview <- list(eaover = "The model's classifications (state classes, transition groups and types, stock and flow types and groups, and strata) are defined in definitions.csv; the columns of the tables a release exports are defined in data-dictionary.csv. Both accompany this record.",
                    eadetcit = "lucasCore package tables defaults/metadata/definitions.csv and data-dictionary.csv.")
 
-  today <- format(Sys.Date(), "%Y%m%d")
+  today <- format(Sys.Date(), "%Y%m%d"); origin <- md_split_keys(D("Originator"))
+  pubdate <- today
+  if (md_supplied(info, "PubDate")) { if (md_valid_date(trimws(info$PubDate))) pubdate <- trimws(info$PubDate) else draft <- c(draft, "invalid: PubDate (write YYYYMMDD)") }
+  liability <- if (!is.null(info) && !identical(info$ReleaseStatus, "Approved")) D("LiabilityProvisional") else D("Liability")
   list(
-    citation = list(origin = trimws(strsplit(D("Originator"), ";", fixed = TRUE)[[1]]), pubdate = today, title = title,
-                    edition = NA_character_, geoform = "raster digital data", pubplace = D("PubPlace"), publish = D("Publisher"),
-                    othercit = NA_character_, onlink = D("Doi"),
-                    lworkcit = list(origin = "Sleeter, B.M.", pubdate = "Unpublished material", title = D("MethodsCitation"),
+    citation = list(origin = origin, pubdate = pubdate, title = title,
+                    edition = if (md_supplied(info, "Version")) trimws(info$Version) else if (is.null(info)) NA_character_ else "1.0",
+                    geoform = "raster digital data", pubplace = D("PubPlace"), publish = D("Publisher"),
+                    othercit = NA_character_, onlink = c(D("Doi"), if (md_supplied(info, "LandingPage")) trimws(info$LandingPage)),
+                    lworkcit = list(origin = origin[1], pubdate = "Unpublished material", title = D("MethodsCitation"),
                                     geoform = "publication", othercit = NA_character_, onlink = character())),
     abstract = abstract, purpose = purpose, supplinf = supplinf,
     time = list(begdate = as.character(y0), enddate = as.character(y1), current = "ground condition"),
     status = list(progress = "Complete", update = "None planned"),
     bounding = list(west = round(g$west, 4), east = round(g$east, 4), north = round(g$north, 4), south = round(g$south, 4)),
-    theme = theme, place = place, accconst = D("AccessConstraints"), useconst = useconst, contact = contact,
+    theme = theme, place = place, accconst = D("AccessConstraints"), useconst = useconst, contact = contact, datacred = if (md_supplied(info, "Credit")) info$Credit else NA_character_,
     native = sprintf("SyncroSim %s; ST-Sim %s; lucasCore %s; %s", lg$syncrosim %||% "?", lg$stsim %||% "?", version, lg$software %||% "R"),
     crossref = list(origin = "Sleeter, B.M.", pubdate = substr(lg$date %||% today, 1, 4), title = gsub("{version}", version, D("SoftwareCitation"), fixed = TRUE),
                     geoform = "software", othercit = NA_character_, onlink = "https://github.com/bsleeter/lucasCore"),
@@ -250,7 +265,7 @@ md_model_content <- function(facts, dir) {
     distribution = list(contact = list(org = D("DistributorOrg"), addrtype = "mailing and physical", address = D("DistributorAddress"),
                                        city = D("DistributorCity"), state = D("DistributorState"), postal = D("DistributorPostal"),
                                        country = "US", phone = D("DistributorPhone"), email = D("DistributorEmail")),
-                        liability = D("Liability"), formname = "GeoTIFF; CSV", network = D("Doi"), fees = "None"),
+                        liability = liability, formname = "GeoTIFF; CSV", network = D("Doi"), fees = "None"),
     metadata = list(date = today, contact = contact, standard = "FGDC Content Standard for Digital Geospatial Metadata", version = "FGDC-STD-001-1998"),
     draft = draft, notes = notes)
 }
@@ -286,6 +301,7 @@ md_csdgm <- function(x) {
   for (t in x$place) { pl <- add(kw, "place"); add(pl, "placekt", t$thesaurus); for (k in t$keys) add(pl, "placekey", k) }
   add(id, "accconst", x$accconst); add(id, "useconst", x$useconst)
   cntinfo(add(id, "ptcontac"), x$contact)
+  opt(id, "datacred", x$datacred)
   add(id, "native", x$native)
   citeinfo(add(id, "crossref"), x$crossref)
 

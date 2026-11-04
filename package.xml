@@ -75,6 +75,19 @@
 		<column name="Description" displayName="Rates it sets" dataType="String" isOptional="True"/>
 	</dataSheet>
 
+	<dataSheet name="Person" displayName="People" dataScope="Project" displayMember="Name" viewClassName="lucasCoreUI.PeopleView" viewClassAssembly="lucasCoreUI">
+		<!-- to-do 14, Phase 4: people a release can name, so that each release picks them. CSDGM requires an address, phone and email in every contact -->
+		<column name="Name" displayName="Name (as cited: Sleeter, B.M.)" dataType="String"/>
+		<column name="Orcid" displayName="ORCID" dataType="String" isOptional="True"/>
+		<column name="Organization" dataType="String" isOptional="True"/>
+		<column name="Address" dataType="String" isOptional="True"/>
+		<column name="City" dataType="String" isOptional="True"/>
+		<column name="State" dataType="String" isOptional="True"/>
+		<column name="PostalCode" displayName="Postal code" dataType="String" isOptional="True"/>
+		<column name="Phone" dataType="String" isOptional="True"/>
+		<column name="Email" dataType="String" isOptional="True"/>
+	</dataSheet>
+
 	<dataSheet name="StratumSource" displayName="Stratum Sources" dataScope="Project" displayMember="Name" viewClassName="lucasCoreUI.StratumSourcesView" viewClassAssembly="lucasCoreUI">
 		<!-- written by tools/new-library.R from defaults/strata/presets.csv; add a custom row and run new-library.R with the rebuild-strata flag.
 		     The stsim Secondary and Tertiary Strata lists hold every unit of every row (stages cannot write project lists). -->
@@ -865,6 +878,35 @@
 		<column name="MapEvery" displayName="Maps every (years; blank or 1 = every year)" dataType="Integer" isOptional="True"/>
 	</dataSheet>
 
+	<dataSheet name="ReleaseInformation" displayName="Release Information" isSingleRow="True" viewClassName="lucasCoreUI.ReleaseInformationView" viewClassAssembly="lucasCoreUI">
+		<!-- stage 17 (to-do 14, Phase 4): what only a person can supply. Blank = the drafted text or package default, listed as still to supply. The originators are in ReleaseOriginator, on the same page -->
+		<column name="ReleaseStatus" displayName="Release status" dataType="Integer" validationType="List" formula1="1:Draft|2:Provisional|3:Approved" defaultValue="1" isOptional="True"/>
+		<column name="Title" dataType="String" isOptional="True"/>
+		<column name="Abstract" dataType="String" isOptional="True"/>
+		<column name="Purpose" dataType="String" isOptional="True"/>
+		<column name="ContactPersonId" displayName="Point of contact" dataType="Integer" validationType="Datasheet" formula1="lucasCore_Person" isOptional="True"/>
+		<column name="ContactEmail" displayName="Contact email (group address; blank = the person's)" dataType="String" isOptional="True"/>
+		<column name="Publisher" dataType="String" isOptional="True"/>
+		<column name="PubPlace" displayName="Publication place" dataType="String" isOptional="True"/>
+		<column name="PubDate" displayName="Publication date (YYYYMMDD; blank = today)" dataType="String" isOptional="True"/>
+		<column name="Version" displayName="Version (blank = 1.0)" dataType="String" isOptional="True"/>
+		<column name="RevisionNotes" displayName="Revision notes" dataType="String" isOptional="True"/>
+		<column name="Doi" displayName="Data DOI (full https://doi.org/ address)" dataType="String" isOptional="True"/>
+		<column name="LandingPage" displayName="Landing page" dataType="String" isOptional="True"/>
+		<column name="MetadataId" displayName="Metadata identifier of the parent record" dataType="String" isOptional="True"/>
+		<column name="IpdsNumber" displayName="IPDS number" dataType="String" isOptional="True"/>
+		<column name="MethodsCitation" displayName="Methods citation" dataType="String" isOptional="True"/>
+		<column name="AssociatedPublications" displayName="Associated publications" dataType="String" isOptional="True"/>
+		<column name="ThemeKeywords" displayName="More theme keywords (separated by ;)" dataType="String" isOptional="True"/>
+		<column name="PlaceKeywords" displayName="More place keywords (separated by ;)" dataType="String" isOptional="True"/>
+	</dataSheet>
+
+	<dataSheet name="ReleaseOriginator" displayName="Release Originators">
+		<!-- stage 17: the release's originators in citation order, picked from the project's People; edited on the Release Information page -->
+		<column name="PersonId" displayName="Originator" dataType="Integer" validationType="Datasheet" formula1="lucasCore_Person"/>
+		<column name="SortOrder" displayName="Citation order" dataType="Integer" isOptional="True"/>
+	</dataSheet>
+
 	<dataSheet name="DataReleaseRun" displayName="Data Release Runs">
 		<!-- stage 17: the runs to release, one row each (result scenario Ids in this library); edited on the Data Release page -->
 		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer"/>
@@ -1201,6 +1243,8 @@
 	<transformer name="DataRelease" displayName="17 - Data Release" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/17-data-release.R">
 		<dataSheet name="DataReleaseOptions" type="Input"/>
 		<dataSheet name="DataReleaseRun" type="Input"/>
+		<dataSheet name="ReleaseInformation" type="Input"/>
+		<dataSheet name="ReleaseOriginator" type="Input"/>
 		<dataSheet name="OutputDataRelease" type="Output"/>
 		<dataSheet name="OutputReleaseContents" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
@@ -1214,6 +1258,7 @@
 		<group name="lucasCoreGroup" displayName="LUCAS Core">
 			<item name="DataSource"/>
 			<item name="StratumSource"/>
+			<item name="Person"/>
 			<item name="ClimateScenario"/>
 			<item name="ClimateModel"/>
 			<item name="ClimateReplicate"/>
@@ -1254,6 +1299,7 @@
 			<item name="CompareRunOptions"/>
 			<item name="DataDownloadOptions"/>
 			<item name="DataReleaseOptions"/>
+			<item name="ReleaseInformation"/>
 			<group name="lucasCoreCrosswalks" displayName="Crosswalks">
 				<item name="LandCoverCrosswalk"/>
 			</group>

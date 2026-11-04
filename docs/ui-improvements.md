@@ -332,7 +332,7 @@ Pushed: everything through the v1.0.1 release (2026-11-02: strata polygons and n
    commit for the record. Tested on a copy of Puget Lowlands result 6: 0 mp errors, same XML as the tool.
    Phase 3 (2026-11-03): Stage 17 - Data Release, `src/release.R`, `src/17-data-release.R`, `tools/data-release.R`, `ui/DataReleaseView.cs`,
    `tests/unit-release.R` (43 checks), `tests/phaseZ-data-release.R`. The writer passes on P26 from the tool (runs 54, 65, 66, 67: 7 records, mp 0 errors, 0 warnings).
-   NOT yet run: the stage itself, the page in Studio, the backup during a run, every-year maps. They need a finished run in a library it may write to.
+   Stage tested end to end on Puget Lowlands 2026-11-03. Phase 4 (2026-11-03): Release Information page and project People list (`ui/ReleaseInformationView.cs`, sheets Person, ReleaseInformation, ReleaseOriginator), `rl_read_info`, release status Draft/Provisional/Approved (a blank fails the last two), `tests/phaseZ-release-information.R` on a copy of Puget (15 checks); the guide has section 7.5. Phase 5 (review packet) is next.
    Existing libraries need tools/sync-library.R --schema-only for the new sheets. The 2026-10-25 scope below
    still holds. TO DO (user, 2026-10-25). Completed runs need FGDC-compliant metadata (CSDGM,
    FGDC-STD-001-1998, as USGS data releases use; XML), in two layers:
