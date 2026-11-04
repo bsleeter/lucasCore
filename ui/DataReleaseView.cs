@@ -44,11 +44,17 @@ namespace lucasCoreUI
             c.Controls.Add(m_state);
             AddGroup(Group("Runs to release", c));
 
-            var f = Form();
+            // each note sits under its control: beside a wide control it gets a thin column, and the frame cut off the note and the row below it
+            var f = Column();
+            Func<string, Label> cap = t => { var l = Caption(t); l.AutoSize = false; l.Width = 92; l.Height = 24; return l; };
+            Func<string, Label> note = t => { var l = Note(t); l.Margin = new Padding(98, 0, 3, 10); return l; };
             var browse = new Button { Text = "Browse...", AutoSize = true };
-            var pick = Row(); pick.Controls.Add(m_folder); pick.Controls.Add(browse);
-            FormRow(f, "Release folder", pick, "Blank = a folder named after the library, beside it. Holds the data, so it can be large.");
-            FormRow(f, "Maps every", m_every, "years; blank or 1 = every year. The first and last years are always mapped.");
+            var pick = Row(); pick.Controls.Add(cap("Release folder")); pick.Controls.Add(m_folder); pick.Controls.Add(browse);
+            f.Controls.Add(pick);
+            f.Controls.Add(note("Blank = a folder named after the library, beside it. Holds the data, so it can be large."));
+            var every = Row(); every.Controls.Add(cap("Maps every")); every.Controls.Add(m_every);
+            f.Controls.Add(every);
+            f.Controls.Add(note("Years; blank or 1 = every year. The first and last years are always mapped."));
             AddGroup(Group("What to write", f));
             EndGroups();
 
