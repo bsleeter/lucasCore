@@ -22,4 +22,17 @@ print(rec[, .(BuildResult, File = basename(FileName), Mp)])
 x <- if (nrow(rec) == 1 && file.exists(rec$FileName)) xml2::read_xml(rec$FileName) else NULL
 ok <- !is.null(x) && rec$BuildResult == id && length(xml2::xml_find_all(x, ".//srcinfo")) == length(used) && nrow(v) == 2 && all(v$Status == "Pass") && !any(grepl("[Failure]", lg, fixed = TRUE))
 cat("native:", if (!is.null(x)) xml2::xml_text(xml2::xml_find_first(x, ".//native")), "\n")
+# the record belongs to whoever runs the model: blank, it names no one; with the page, it names them
+tx <- function(d, p) xml2::xml_text(xml2::xml_find_all(d, p))
+blank <- !is.null(x) && all(grepl("PLACEHOLDER", c(tx(x, ".//idinfo/citation/citeinfo/origin"), tx(x, ".//ptcontac//cntper")))) && any(grepl("placeholder: Originator", rec$ToSupply, fixed = TRUE))
+cat("page blank: names no one, and says so:", blank, "\n")
+saveDatasheet(P, data.frame(Name = "Tester, A.", Organization = "Test Science Center", Address = "1 Test Road", City = "Testville", State = "WA", PostalCode = "98000", Phone = "555-555-0100", Email = "tester@example.org"), "lucasCore_Person")
+S2 <- rsyncrosim::scenario(P, "Model Record (test, person)"); dependency(S2) <- id
+saveDatasheet(S2, data.frame(StageNameId = "16 - Model Record", RunOrder = 1L), "core_Pipeline")
+saveDatasheet(S2, data.frame(PersonId = "Tester, A.", SortOrder = 1L), "lucasCore_ReleaseOriginator")
+saveDatasheet(S2, data.frame(ContactPersonId = "Tester, A."), "lucasCore_ReleaseInformation")
+R2 <- run(S2); rec2 <- as.data.table(datasheet(R2, "lucasCore_OutputModelRecord", lookupsAsFactors = FALSE)); x2 <- xml2::read_xml(rec2$FileName)
+person <- identical(tx(x2, ".//idinfo/citation/citeinfo/origin"), "Tester, A.") && tx(x2, ".//ptcontac//cntper") == "Tester, A." && tx(x2, ".//ptcontac//cntorg") == "Test Science Center" && tx(x2, ".//ptcontac//cntemail") == "tester@example.org" && !grepl("placeholder: Originator|placeholder: ContactOrg", rec2$ToSupply)
+cat("page filled: names that person:", person, "\n"); cat("still to supply:", rec2$ToSupply, "\n")
+ok <- ok && blank && person
 cat(if (ok) "MODEL RECORD OK\n" else "MODEL RECORD FAILED\n")

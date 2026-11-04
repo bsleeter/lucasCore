@@ -92,22 +92,40 @@ md_build_facts <- function(lib, sid) {
 }
 
 # Writes a Build result's record into `out` and runs mp on it, for stage 12 and tools/model-record.R. The record's name carries the result id
-md_write_record <- function(lib, sid, out, dir, file = "model.xml") {
-  facts <- md_build_facts(lib, sid); x <- md_model_content(facts, dir)
+md_write_record <- function(lib, sid, out, dir, file = "model.xml", info_scenario = NA_integer_) {
+  info <- NULL; if (!is.na(info_scenario)) { con <- DBI::dbConnect(RSQLite::SQLite(), lib, flags = RSQLite::SQLITE_RO); info <- md_read_info(con, info_scenario); DBI::dbDisconnect(con) }
+  facts <- md_build_facts(lib, sid); x <- md_model_content(facts, dir, info)
   dir.create(out, showWarnings = FALSE, recursive = TRUE); f <- file.path(out, file); xml2::write_xml(md_csdgm(x), f)
   list(file = f, content = x, mp = md_mp(f, md_mp_default(facts$home)))
 }
 
 # ---- the content model -----------------------------------------------------------------------------------------------------
 md_record_defaults <- function(dir) { x <- md_read(dir, "record-defaults.csv"); x[, Placeholder := toupper(Placeholder) == "TRUE"]; x }
+# The Release Information page and its people, as fields of record-defaults.csv. sid: the scenario holding the page (a Model Record or Data Release scenario)
+md_read_info <- function(con, sid) {
+  sid <- as.integer(sid); info <- list()
+  got <- function(t) DBI::dbExistsTable(con, t)
+  if (got("lucasCore_ReleaseInformation")) { i <- DBI::dbGetQuery(con, sprintf("SELECT * FROM lucasCore_ReleaseInformation WHERE ScenarioId = %d", sid))
+    if (nrow(i)) info <- lapply(as.list(i[1, setdiff(names(i), c("ScenarioId", "ReleaseInformationId")), drop = FALSE]), as.character) }
+  code <- suppressWarnings(as.integer(info$ReleaseStatus %||% NA)); info$ReleaseStatus <- if (is.na(code)) "Draft" else c("Draft", "Provisional", "Approved")[code]
+  blank <- function(v) length(v) != 1 || is.na(v) || !nzchar(trimws(v))
+  if (got("lucasCore_Person") && got("lucasCore_ReleaseOriginator")) {
+    o <- DBI::dbGetQuery(con, sprintf("SELECT p.* FROM lucasCore_ReleaseOriginator o JOIN lucasCore_Person p ON p.PersonId = o.PersonId WHERE o.ScenarioId = %d ORDER BY o.SortOrder IS NULL, o.SortOrder, o.ReleaseOriginatorId", sid))
+    if (nrow(o)) { info$Originator <- paste(o$Name, collapse = "; ")
+      who <- vapply(seq_len(nrow(o)), function(k) paste(c(o$Name[k], if (!blank(o$Organization[k])) o$Organization[k], if (!blank(o$Orcid[k])) paste("ORCID", o$Orcid[k])), collapse = ", "), "")
+      if (any(!is.na(o$Orcid) | !is.na(o$Organization))) info$Credit <- sub("[.]*$", ".", paste0("Originators: ", paste(who, collapse = "; "))) }
+    if (!blank(info$ContactPersonId)) { p <- DBI::dbGetQuery(con, sprintf("SELECT * FROM lucasCore_Person WHERE PersonId = %d", as.integer(info$ContactPersonId)))
+      if (nrow(p)) { map <- c(ContactPerson = "Name", ContactOrg = "Organization", ContactAddress = "Address", ContactCity = "City", ContactState = "State", ContactPostal = "PostalCode", ContactPhone = "Phone")
+        for (f in names(map)) info[[f]] <- as.character(p[[map[[f]]]][1])
+        if (blank(info$ContactEmail)) info$ContactEmail <- as.character(p$Email[1]) } } }
+  info }
+
 # Is a field of the Release Information page filled in? (no page: info is NULL, and nothing is)
 md_supplied <- function(info, f) { v <- info[[f]]; length(v) == 1 && !is.na(v) && nzchar(trimws(v)) }
-# The page over the defaults: a field supplied stops being a placeholder. With a page the originators and contact are required, because the
-# defaults name the package's author, not this release's people.
+# The page over the defaults: a field supplied stops being a placeholder. The people are always this run's: the defaults hold placeholders, never a name.
 md_apply_info <- function(def, info) {
   if (is.null(info)) return(def)
   for (f in intersect(names(info), def$Field)) if (md_supplied(info, f)) { v <- trimws(info[[f]]); def[Field == f, `:=`(Value = v, Placeholder = FALSE)] }
-  for (f in c("Originator", "ContactPerson")) if (!md_supplied(info, f)) def[Field == f, Placeholder := TRUE]
   def }
 md_split_keys <- function(v) { k <- trimws(strsplit(v, ";", fixed = TRUE)[[1]]); k[nzchar(k)] }
 md_keywords <- function(dir) md_read(dir, "keywords.csv")

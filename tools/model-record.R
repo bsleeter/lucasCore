@@ -15,7 +15,7 @@ out <- arg("out"); if (is.na(out)) out <- file.path(dirname(normalizePath(lib, w
 if (!is.na(arg("mp"))) options(lucas.mp = arg("mp"))
 dir.create(out, showWarnings = FALSE, recursive = TRUE)
 
-r <- md_write_record(lib, sid, out, file.path(pkg, "defaults", "metadata")); x <- r$content; f <- r$file; m <- r$mp
+r <- md_write_record(lib, sid, out, file.path(pkg, "defaults", "metadata"), info_scenario = if (is.na(arg("info"))) NA_integer_ else as.integer(arg("info"))); x <- r$content; f <- r$file; m <- r$mp
 cat(sprintf("model record: %s (%d lineage sources, %d process steps)\n", f, length(x$quality$sources), length(x$quality$steps)))
 cat("still to supply:\n", paste0("  ", x$draft, "\n"), sep = "")
 if (length(x$notes)) cat("notes:\n", paste0("  ", x$notes, "\n"), sep = "")

@@ -63,7 +63,7 @@ namespace lucasCoreUI
             var radios = Row();
             radios.Controls.Add(Option(m_status, 1, "Draft")); radios.Controls.Add(Option(m_status, 2, "Provisional")); radios.Controls.Add(Option(m_status, 3, "Approved"));
             st.Controls.Add(radios);
-            st.Controls.Add(Note("Draft: the folder is written and what is missing is listed, so a blank never stops you. Provisional and Approved: the stage fails while anything below is missing. Approved takes the USGS approved-data statement; the others take the provisional one."));
+            st.Controls.Add(Note("Draft: what is missing is listed, so a blank never stops you. Provisional and Approved: the Data Release stage fails while anything below is missing. Approved takes the USGS approved-data statement; the others take the provisional one. A Model Record scenario reads the people, publication and identifiers from this page too."));
             st.Controls.Add(m_toSupply);
             AddGroup(Group("Release status", st));
 
@@ -79,7 +79,7 @@ namespace lucasCoreUI
             p.Controls.Add(m_table);
             var ar = Row(); ar.Controls.Add(m_add); p.Controls.Add(ar);
             p.Controls.Add(m_noPeople);
-            Field(p, "Point of contact", m_contact, "Every record names this person. CSDGM requires an address, phone and email, so fill them in on the People list.");
+            Field(p, "Point of contact", m_contact, "Every record names this person. CSDGM requires an organization, address, phone and email, so fill them in on the People list.");
             Field(p, "Contact email", Entry("ContactEmail", 320, 1), "A shared group address, which SM 502.7 asks for so the contact outlives staff changes. Blank = the person's email.");
             AddGroup(Group("People", p));
 
@@ -212,7 +212,7 @@ namespace lucasCoreUI
             if (c == null) m.Add("point of contact");
             else
             {
-                foreach (string[] f in new[] { new[] { "Address", "contact address" }, new[] { "City", "contact city" }, new[] { "State", "contact state" }, new[] { "PostalCode", "contact postal code" }, new[] { "Phone", "contact phone" } })
+                foreach (string[] f in new[] { new[] { "Organization", "contact organization" }, new[] { "Address", "contact address" }, new[] { "City", "contact city" }, new[] { "State", "contact state" }, new[] { "PostalCode", "contact postal code" }, new[] { "Phone", "contact phone" } })
                     if (Show(c[f[0]]).Trim().Length == 0) m.Add(f[1]);
                 if (Show(Value("ContactEmail")).Trim().Length == 0 && Show(c["Email"]).Trim().Length == 0) m.Add("contact email");
             }
@@ -248,7 +248,7 @@ namespace lucasCoreUI
         public PeopleView()
         {
             this.SuspendLayout();
-            AddGroup(Group("Who this list is for", Note("The people a data release can name as originators or its point of contact, on the Release Information page. Write the name as it is cited (Sleeter, B.M.). A point of contact needs an address, phone and email, because FGDC metadata requires them in every contact.")));
+            AddGroup(Group("Who this list is for", Note("The people a data release can name as originators or its point of contact, on the Release Information page. Write the name as it is cited (Sleeter, B.M.). A point of contact needs an organization, address, phone and email, because FGDC metadata requires them in every contact.")));
             AddGroup(Group("People", m_grid));
             EndGroups();
             this.ResumeLayout(false);

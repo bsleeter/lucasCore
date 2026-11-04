@@ -378,12 +378,12 @@ The Build is made once per study area. The historical run is made once per Build
 | --- | --- | --- | --- |
 | Data Download (once per region) | stage 15 | none | The datasets, into Data Sources Home (section 1.6); Download Results in the library |
 | Build | stages 0, 1, 5, 2, 3, 4, 6, 7, 8 | none | Stock-flow definitions, strata and initial conditions, growth curves, carbon flows, spin-up stocks, historical transitions, historical (PRISM) climate multipliers, initial stock maps |
-| Model Record | stage 16 | Build result | The Build's FGDC metadata record (section 4.6) |
+| Model Record | stage 16 | Build result | Optional check of the Build's FGDC metadata record, which stage 17 also writes (Appendix B) |
 | Historical run | ST-Sim | Build result | Land cover, transitions and carbon, start to end year |
 | Projection Setup | stages 9, 10 | Build result | Projection transitions and fire to the end year in Run Settings, suitability surfaces, and the historical run's final state as the projection's starting maps |
 | Projection Climate (one per climate future) | stage 11 | Build result | Climate multipliers of the projection years from one LOCA2 scenario, climate model and replicate |
 | Projection | ST-Sim | Projection Setup result, Projection Climate result, Build result | Land cover, transitions and carbon, historical end to projection end |
-| Data Release | stage 17 | Build result | A folder for a USGS data release: the runs' tables and maps, metadata records and a backup of the library (section 7.5) |
+| Data Release | stage 17 | Build result | Optional, for USGS releases. A folder with the runs' tables and maps, metadata records, a review packet and a backup of the library (Appendix B) |
 
 > Why runs stand alone: an ST-Sim-only scenario can be rerun, copied for another climate scenario and run side by side with others under multiprocessing (sections 5.3 and 7.3). A scenario that runs lucasCore stages and then ST-Sim in one pipeline cannot run beside other scenarios.
 
@@ -875,20 +875,6 @@ The export names each file after its result scenario, for example `scn4.Fig02_la
 &#91;image: Figure 8 of the P26 Build: stacked bar charts of the area burned each year by severity, peaking in 2021, and the area harvested each year by clearcut and selection\]
 
 *Figure 4.22. Disturbance history, 1986 to 2023: (a) area burned each year by MTBS severity class and (b) area harvested each year by clearcut and selection (LCMS tree removal).*
-
-### 4.6 Model Record: the Build's FGDC metadata
-
-Stage 16 writes the Build's metadata record in the FGDC CSDGM standard: what the model covers, every dataset the Build read (from **Data Sources Used**) as a cited source, every stage as a process step, the validation checks, and the definitions of the state classes. It needs the Build's run log, which exists only once the Build has ended, so it has a scenario of its own.
-
-1. Create a new scenario and name it `Model Record`.
-2. Drag the Build result onto it, so the result appears under its **Dependencies** folder.
-3. On **General > Pipeline**, untick **Inherit values** if it is ticked, choose **No Data**, and add one stage: **16 - Model Record**.
-4. Run the scenario. It takes about a minute.
-5. Open the result's **Build Results > Model Record**. It lists the record, what the USGS metadata parser (mp) found, what is still a placeholder or drafted (the DOI and your contact details, for example), and anything the record had to infer. **Export > LUCAS Core > Model Record** saves the XML to a folder.
-
-To have the record checked by mp, set **Metadata parser (mp)** on the project's **Data Sources** page, under Data Sources Home, to `mp.exe` (**Browse...**; **Download** opens USGS's page for it). The path is kept in the home folder's `settings.csv`, not in the library, because it belongs to this machine. Without it, stage 16 tries the environment variable `LUCAS_MP` and then the PATH; if it finds no mp the record is still written, and the page says mp did not run. An error from mp fails the stage.
-
-> A library made before this stage existed does not list it: run `tools/sync-library.R` on the library first, with Studio closed.
 
 ## 5. The historical run
 
@@ -1611,57 +1597,6 @@ The land change summary (Figure 7.31) shows that the three projections harvest a
 
 *Figure 7.31. The land change summary of the comparison (also the Compare Land Change Summary output).*
 
-### 7.5 Data release (stage 17)
-
-Stage 17 turns a Build and its finished runs into a folder ready for a USGS data release: each run's tables and maps, an FGDC metadata record for the release, the model and each run, the figures, a data dictionary, checksums and a backup of the library. It uploads nothing: you upload the folder to ScienceBase yourself. The data review, the metadata review and the approval stay with people.
-
-First put the people on the project's list, once:
-
-1. In the project's properties, open **LUCAS Core > People** and add one row per person. Write the name as it is cited (`Sleeter, B.M.`). The ORCID and organization go in the record's credit. A point of contact also needs an address, phone and email, because FGDC metadata requires them in every contact.
-
-Then make the release:
-
-2. Create a new scenario and name it `Data Release`.
-3. Drag the Build result onto it, so the result appears under its **Dependencies** folder.
-4. On **General > Pipeline**, untick **Inherit values** if it is ticked, choose **No Data**, and add one stage: **17 - Data Release**.
-5. On the **LUCAS Core (model builder)** tab, open **Data Release**. Click **Add a run** once for each historical run and projection to release, and pick each from its drop-down. The release folder must be empty or new; blank puts it beside the library. Maps are written for every year unless you set **Maps every**.
-6. Open **Release Information**. The line under **Release status** lists what is still missing, and updates as you fill the page in. A blank wording field takes text the stage drafts, and a blank publisher, place, date or version takes the default shown under it.
-7. Save and run.
-
-The release status decides what a blank does:
-
-| Release status | With something missing | Disclaimer in the records |
-| --- | --- | --- |
-| Draft | The folder is written, and the README and the Data Release output list what is missing | Provisional |
-| Provisional | The stage fails, after writing the folder so that you can read the list | Provisional |
-| Approved | The stage fails, after writing the folder so that you can read the list | Approved |
-
-A run is a good first draft with the page blank. Run it with a new empty folder each time, because the stage will not write into a folder that already holds files.
-
-The folder holds:
-
-| Item | What it is |
-| --- | --- |
-| `README.txt` | What is here, and in a draft what is still to supply |
-| `release.xml` | The parent metadata record, which takes the page's title, abstract and purpose |
-| `contents.csv` | Every file, with its size and SHA-256 checksum |
-| `model/` | The model record, `definitions.csv`, `data-dictionary.csv`, `validation.csv`, `data-sources-used.csv` and the Build figures |
-| `historical/<run>/`, `projections/<run>/` | Each run's record, its tables, one zip per map variable, and its figures if Run Figures has been run |
-| `comparison/` | The Compare Runs figures and tables, if a comparison of these runs exists |
-| `archive/` | The library backup and how to rerun it |
-| `review/` | For the reviewers. Do not upload it; it is not in contents.csv |
-
-Each run's record and the model record keep their own generated wording, which states only what was done. They name the same people as the parent. Two fields are handled differently:
-
-- **Metadata identifier** is optional: in a ScienceBase release the Data Release team assigns it during publication. If you have one, it goes on the parent record only.
-- **IPDS number** is required before a Provisional or Approved release, but stays out of the published records. The stage writes it to its run log.
-
-The stage's own checks are in the result's Validation output: the columns match the data dictionary, every name has a definition, the table's area matches the state class map, no folder or file passes ScienceBase's limits, no machine path appears in a record, and the USGS metadata parser (mp) finds no errors. mp runs if its path is set on the Data Sources page. A library made before this stage needs `tools/sync-library.R --schema-only` first.
-
-The stage also checks the files it wrote: each map zip opens, the maps' projection and no-data value, the bounding coordinates against the maps, every table read in full for duplicate rows, stray spaces, encoding errors and column types, the dates, keywords and statements in the records, and that every file is named in a record. A Draft lists any that fail in the run log. On a Provisional or Approved release they fail the stage, and they appear in the Validation output.
-
-The `review/` folder is the packet for your data and metadata reviewers. Open `reviewer-summary.html` first. It gives what the release holds, how it was made, simulated against recorded areas, the limits to weigh, and what is still to supply. `data-review-checklist.html` and `metadata-review-checklist.html` are the USGS checklists, with the stage's finding and its evidence beside each item it could check. The stage never ticks a box. The other items, such as whether anything in the release is interpretive, are marked for the reviewer, and the reviews are recorded in IPDS. The checks are also in `checks.csv`, what mp found is in `mp-report.csv`, and `records-as-text/` holds each record in readable form when mp is available. Two findings are advice and never fail the stage: file names over the 35 characters the checklist suggests, and links that do not answer.
-
 ## 8. Viewing results in SyncroSim
 
 Results can be viewed without leaving SyncroSim Studio in two ways: the lucasCore figures, drawn by stages 12, 13 and 14 (section 8.1), and the charts and maps you build yourself from a run's ST-Sim output (section 8.2).
@@ -1858,3 +1793,210 @@ Besides the inputs they write for ST-Sim, the lucasCore stages save summary tabl
 **Figures and comparisons** (stages 12 to 14): **Build Figures (PNG)**, **Run Figures (PNG)** and **Compare Figures (PNG)** open in the figure viewer (section 8.1). Stage 14 also writes **Compare Carbon Summary** and **Compare Land Change Summary** (section 7.4).
 
 **Validation.** Every stage adds its checks to **Validation**: one row per check, with the stage, what was checked, **Pass** or **Fail**, and the numbers behind it. The same lines are in the run log. Look here first when a result looks wrong.
+
+## Appendix B. USGS metadata and data release
+
+This appendix is for USGS staff. You do not need any of it to build or run a model. Stages 16 and 17 write FGDC metadata and a data release folder that follow USGS Fundamental Science Practices (Survey Manuals 502.7 and 502.8). Their wording, disclaimers and checklists are USGS's, including the publisher, the CC0 statement and ScienceBase as distributor, so anyone else would need to change them.
+
+The stages prepare a release. They do not do the rest: people still write the abstract, review the data and the metadata, approve the release and upload it.
+
+The worked example is the Puget Lowlands model (EPA Level III ecoregion Puget Lowland), which is smaller than the guide's Northern Sierra example. Its results are Build `[6]`, Historical run `[13]`, Run Figures `[17]` and Data Release `[19]`.
+
+### B.1 The order of the work
+
+Each step is a scenario of its own, run on a finished result.
+
+&#91;image: The Explorer tree of the Puget Lowlands library, with scenarios grouped in Data Release, Figures and Metadata folders, and Download Data, Build and Historical below them\]
+
+*Figure B.1. Puget's scenarios. The folders are optional: drag scenarios into them to keep the tree tidy.*
+
+| Step | Scenario | Pipeline | Depends on | Notes |
+| --- | --- | --- | --- | --- |
+| 1 | Build | stages 0 to 8 | none | Section 3 and section 4 |
+| 2 | Historical run, and any projections | ST-Sim | Build result | Section 5 and section 7 |
+| 3 | Build Figures | stage 12 | Build result | Section 4.5. Goes in the release's `model/figures` |
+| 4 | Run Figures | stage 13 | Build result | Section 5.6. One per run, picked on its page. Goes in the run's `figures` folder |
+| 5 | Compare Runs | stage 14 | Build result | Section 7.4. Only with two or more runs, picked on its page. Puget has one, so it skips this |
+| 6 | People and Release Information | none | none | Pages to fill in: sections B.2 and B.3 |
+| 7 | Data Release | stage 17 | Build result | Section B.4. Run this last |
+
+Stage 17 takes the newest figures that exist when it runs, so draw them first. It also writes the model record, so a release does not need stage 16. Stage 16 is an optional quick check of that record (section B.7).
+
+> A library made before these stages existed does not list them: close Studio and run `tools/sync-library.R --schema-only` on the library first.
+
+Set the path to `mp.exe`, the USGS metadata parser, once, as section B.7 describes. Without it the records are still written, but they are not checked.
+
+### B.2 The People list
+
+Originators and the point of contact are picked from a list kept in the project, so each release picks them rather than retyping them. The package holds no names: a record names whoever you put here.
+
+1. In the Definitions project's settings, choose the **LUCAS Core (model builder)** tab, then **LUCAS Core > People**.
+2. Add one row per person. Write the name as it is cited (`Sleeter, B.M.`).
+3. Add each person's ORCID and organization. They go in the record's credit, because FGDC metadata has no place for them on an originator.
+4. For the point of contact, also fill in the address, city, state, postal code, phone and email. FGDC metadata requires them in every contact.
+
+&#91;image: The People page of the Definitions project, with columns for name, ORCID, organization, city, state, postal code, phone and email\]
+
+*Figure B.2. The People list, with one person. The contact details are blanked in this figure.*
+
+### B.3 The Release Information page
+
+Create the Data Release scenario first (steps 1 to 3 of section B.4), then open **Release Information** on its **LUCAS Core (model builder)** tab. The line under **Release status** lists what is still missing and updates as you fill in the page.
+
+| Field | If you leave it blank |
+| --- | --- |
+| Release status | Draft |
+| Title, Abstract, Purpose | The stage drafts them from the study area, years and runs. Rewrite them for a real release. They go on the release's parent record; each run's record and the model record keep their own factual wording |
+| Originators | Listed as still to supply. Add them in citation order: to move someone down, remove and add them again |
+| Point of contact | Listed as still to supply |
+| Contact email | The person's email. SM 502.7 asks for a shared group address, so that the contact outlives staff changes |
+| Publisher, Publication place | U.S. Geological Survey; Reston, VA |
+| Publication date | The day the stage runs. Write dates as YYYYMMDD |
+| Version | 1.0. Add revision notes for a later version |
+| Data DOI | Listed as still to supply. Write the full `https://doi.org/` address |
+| Landing page | Left out. Only needed if the DOI does not resolve to the release's page |
+| Metadata identifier | Left out. In a ScienceBase release, the Data Release team assigns it during publication. One you type goes on the parent record only |
+| IPDS number | Listed as still to supply. It stays out of the published records and goes in the review packet |
+| Methods citation | Listed as still to supply. SM 502.8 requires a peer-reviewed product describing the methods of derived data |
+| Associated publications, More theme and place keywords | Left out. USGS Thesaurus terms and the study area's places go in by themselves |
+
+Metadata must not interpret results. Say what the release holds and how it was made, and cite the publication that interprets it.
+
+&#91;image: The top of the Release Information page, with Draft selected and a red line listing what is still to supply, above the Title, Abstract and Purpose boxes\]
+
+*Figure B.3. Release Information. The red line lists what is still to supply.*
+
+&#91;image: The same page scrolled down, with the People group outlined: an originator, Add an originator, the point of contact and the contact email\]
+
+*Figure B.4. The people on the page, picked from the People list.*
+
+### B.4 Run the Data Release
+
+1. Create a new scenario and name it `Data Release`.
+2. Drag the Build result onto it, so the result appears under its **Dependencies** folder.
+3. On **General > Pipeline** (3), untick **Inherit values** if it is ticked, choose **No Data**, and add one stage: **17 - Data Release**.
+4. On the **LUCAS Core (model builder)** tab, open **Data Release**. Click **Add a run** (4) once for each historical run and projection to release, and pick each from its drop-down.
+5. Choose the **Release folder** (5). It must be empty or new, because the stage will not mix two releases; blank puts it beside the library.
+6. Set **Maps every** (6) if you want fewer maps while drafting. Blank or 1 writes every year, which a real release should. The first and last years are always mapped.
+7. Fill in **Release Information** (section B.3), then save and run.
+
+&#91;image: The General tab of the Data Release scenario, with Pipeline marked 3, 17 - Data Release as the only stage, and Inherit values unticked\]
+
+*Figure B.5. The pipeline: stage 17 alone, with Inherit values unticked.*
+
+&#91;image: The Data Release page, with the Historical run and Add a run marked 4, the release folder marked 5 and Maps every marked 6\]
+
+*Figure B.6. The Data Release page. Puget's draft maps every 5 years.*
+
+Puget's draft, with maps every 5 years, took about 5 minutes and wrote 76 files, 4.81 GB. With maps every year it took about 13 minutes and wrote 7 GB. Most of that is the library backup, which was 3.6 GB.
+
+The release status decides what a blank does:
+
+| Release status | With something missing or a check not passed | Disclaimer in the records |
+| --- | --- | --- |
+| Draft | The folder is written. The README, the run log and the Data Release output list what is missing | Provisional |
+| Provisional | The stage fails, after writing the folder so that you can read the list | Provisional |
+| Approved | The stage fails, after writing the folder so that you can read the list | Approved |
+
+Start with a Draft. Run with a new empty folder each time.
+
+The result's **Build Results > Data Release** lists the folder, the runs, the files and their size, what mp found, and what is still a placeholder or drafted. **Release Contents** lists every file.
+
+&#91;image: The Data Release output of result 19: historical run, 76 files, 4.806 GB, 3 records with 0 errors and 0 warnings, and the placeholders still to supply\]
+
+*Figure B.7. The output of Puget's draft.*
+
+### B.5 What the release folder holds
+
+| Item | What it is |
+| --- | --- |
+| `README.txt` | What is here, and in a draft what is still to supply |
+| `release.xml` | The parent metadata record |
+| `contents.csv` | Every file, with its size and SHA-256 checksum |
+| `model/` | The model record `model.xml`, `definitions.csv`, `data-dictionary.csv`, `validation.csv`, `data-sources-used.csv` and the Build figures |
+| `historical/<run>/`, `projections/<run>/` | Each run's record `run.xml`, its tables, its maps and its figures |
+| `comparison/` | The figures and tables of the newest Compare Runs result whose runs are all in this release |
+| `archive/` | The library backup (`.ssimbak`) and how to rerun it |
+| `review/` | For the reviewers. Do not upload it. It is not in `contents.csv` |
+
+The tables are CSV. Each map variable of a run is one zip of yearly cloud-optimized GeoTIFFs in EPSG:5070, with -9999 as no data, because ScienceBase allows 100 files per item and about 30 GB per file. Puget's run has 42 map zips.
+
+&#91;image: The release folder in File Explorer: archive, historical, model and review folders, then contents, README and release files, with the review folder outlined\]
+
+*Figure B.8. Puget's release folder. Everything but the outlined* `review` *folder gets uploaded.*
+
+### B.6 The review packet and reviews
+
+A data release needs one data review and one metadata review, by people who did not make the data, recorded in IPDS. Give your reviewers the folder with its `review/` folder.
+
+| File in `review/` | What it is |
+| --- | --- |
+| `reviewer-summary.html` | Start here: what the release holds, how it was made, simulated against recorded areas, the limits to weigh and what is still to supply |
+| `data-review-checklist.html`, `metadata-review-checklist.html` | The USGS checklists, word for word, with the stage's finding and evidence beside each item it could check |
+| `checks.csv`, `checklist-answers.csv` | The same, as tables |
+| `mp-report.csv` | What the metadata parser found |
+| `records-as-text/` | Each record in readable form, when mp is available |
+
+The stage never ticks a box. Of the items that apply, it answers about half (47 of 87 for Puget). The others, such as whether anything in the release is interpretive, are marked **For the reviewer**.
+
+The stage's checks cover the files it wrote: map zips open and maps have the right projection and no-data value (one map from each zip), bounding coordinates match the maps, every table is read in full for duplicates, stray spaces, encoding errors and column types, dates, keywords and statements are in order, and every file is named in a record. Two findings are advice only and never fail the stage: file names over the 35 characters the checklist suggests, and links that do not answer. Try those links by hand, because some servers refuse scripts.
+
+For Puget's draft, 22 of the 24 must-pass checks passed. The two that did not were the placeholder DOI and the missing methods citation. The summary lists three transition groups more than 10% from the record: Forest Harvest (2,634 km² simulated against 3,298 recorded), Ag Contraction (452 against 669) and Ag Expansion (166 against 79). These are for reviewers to weigh. They do not fail the stage, and the published records state the numbers without comment.
+
+&#91;image: The reviewer's summary page for Puget's draft: what the release holds, how it was made, key numbers, limits to weigh, what the checks found and what is still to supply, with the checks that did not pass outlined\]
+
+*Figure B.9. The reviewer's summary for Puget's draft, with the two checks that did not pass outlined.*
+
+### B.7 Check the model record before a release (stage 16)
+
+You do not need this stage to make a release, because stage 17 writes the same record. Use it to check the record while you work on it: it takes about a minute, needs no run, and writes one file rather than a whole release folder. Stage 16 writes the Build's metadata record in the FGDC CSDGM standard: what the model covers, every dataset the Build read (from **Data Sources Used**) as a cited source, every stage as a process step, the validation checks, and the definitions of the state classes. It needs the Build's run log, which exists only once the Build has ended, so it has a scenario of its own.
+
+The record describes the Build: the model's inputs and how they were made. It does not describe a run, and it holds no data. Run records (`run.xml`) and the release's parent record come only from stage 17. These are the parts of the record, with Puget's as the example:
+
+| Part of the record | What it holds | Puget's |
+| --- | --- | --- |
+| Identification | Title, abstract and purpose, drafted from the Build; originators, point of contact, DOI and methods citation; years covered, bounding coordinates and keywords | 17,142 km² in 761,845 cells of 150 m, 1985 to 2023 |
+| Data quality | The Build's validation checks, and a statement of completeness | 80 checks, all passed |
+| Lineage: sources | Every dataset the Build read, as a citation | 18 datasets |
+| Lineage: process steps | Each Build stage, with the data sources it read, the software versions and its run time | 9 stages |
+| Spatial reference | The grid and the projection | 2157 rows by 1075 columns, NAD83 Conus Albers |
+| Entities and attributes | The definitions of the state classes | `definitions.csv`, 6 attributes |
+| Distribution and metadata | The distributor, the disclaimer and the record's own contact | U.S. Geological Survey defaults |
+
+The title, abstract and purpose on the Release Information page do not reach this record. They belong to a release's parent record.
+
+1. Create a new scenario and name it `Model Record`.
+2. Drag the Build result onto it, so the result appears under its **Dependencies** folder.
+3. On **General > Pipeline**, untick **Inherit values** if it is ticked, choose **No Data**, and add one stage: **16 - Model Record**.
+4. On **Release Information**, pick the originators and point of contact (sections B.2 and B.3). Left blank, the record names no one and lists them as still to supply.
+5. Run the scenario. It takes about a minute.
+6. Open the result's **Build Results > Model Record**. It lists the record, what mp found, what is still a placeholder or drafted, and anything the record had to infer. **Export > LUCAS Core > Model Record** saves the XML to a folder.
+
+The Model Record output has one row:
+
+| Column | What it tells you |
+| --- | --- |
+| Build result | The result the record describes. With several results among the dependencies, it describes the first and says so in the run log |
+| Record (XML) | The record itself, `model-record-<id>.xml`. A release holds the same record as `model/model.xml` |
+| USGS metadata parser (mp) | The errors and warnings mp found, or that mp did not run |
+| Still placeholder or drafted | **placeholder**: a value only you can supply, such as the DOI or the contact's address. **drafted**: wording the stage wrote for you to review |
+| What the record had to infer | Problems to look into: validation checks that did not pass, a dataset with no citation or a badly formed citation date, a state class with no definition, no states for the place keywords, or a Build too old to list the datasets it read. Blank when there are none |
+
+Placeholders do not fail this stage, so you can run it at any point. It has no release status: only stage 17 enforces that everything is supplied.
+
+To have records checked by mp, set **Metadata parser (mp)** on the project's **Data Sources** page, under Data Sources Home, to `mp.exe` (**Browse...**; **Download** opens USGS's page for it). The path is kept in the home folder's `settings.csv`, not in the library, because it belongs to this machine. Without it, the stages try the environment variable `LUCAS_MP` and then the PATH; if they find no mp the records are still written, and the output says mp did not run. An error from mp fails the stage.
+
+&#91;image: The Data Sources page of the Definitions project, with the Metadata parser (mp) row outlined: the path to mp.exe, Browse and Download\]
+
+*Figure B.10. The path to mp.exe on the Data Sources page.*
+
+### B.8 From the folder to a published release
+
+1. Run a Draft and read the packet yourself. Fix what it finds.
+2. Reserve the DOI through the USGS Science Data Portal, and get your IPDS number.
+3. Fill in the DOI, IPDS number, methods citation, wording and people. Set the status to **Provisional**, choose a new empty folder, and run again. With everything supplied, the README no longer says DRAFT.
+4. Send the folder to your data and metadata reviewers, with `review/`. Reconcile their comments, and rerun if anything changes.
+5. After approval in IPDS, set the status to **Approved** if the release is final, and run once more into a new empty folder.
+6. Upload the folder to ScienceBase by hand, without `review/`. Files over 500 MB need the cloud uploader rather than the form. Contact ScienceBase for a release over about 1 TB.
+
+A data release that cites lucasCore should cite it as released software. Until lucasCore has a USGS software release with a DOI, the records cite its GitHub repository.

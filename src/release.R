@@ -226,24 +226,7 @@ rl_run_content <- function(model, run, facts, tables, maps, cmp, runlog, defs, d
   x }
 
 # The parent record: the release as a whole
-# The Release Information page and its people, as fields of record-defaults.csv and of the parent record (Phase 4). sid: the scenario holding the page
-rl_read_info <- function(con, sid) {
-  sid <- as.integer(sid); info <- list()
-  got <- function(t) dbExistsTable(con, t)
-  if (got("lucasCore_ReleaseInformation")) { i <- dbGetQuery(con, sprintf("SELECT * FROM lucasCore_ReleaseInformation WHERE ScenarioId = %d", sid))
-    if (nrow(i)) info <- lapply(as.list(i[1, setdiff(names(i), c("ScenarioId", "ReleaseInformationId")), drop = FALSE]), as.character) }
-  code <- suppressWarnings(as.integer(info$ReleaseStatus %||% NA)); info$ReleaseStatus <- if (is.na(code)) "Draft" else c("Draft", "Provisional", "Approved")[code]
-  blank <- function(v) length(v) != 1 || is.na(v) || !nzchar(trimws(v))
-  if (got("lucasCore_Person") && got("lucasCore_ReleaseOriginator")) {
-    o <- dbGetQuery(con, sprintf("SELECT p.* FROM lucasCore_ReleaseOriginator o JOIN lucasCore_Person p ON p.PersonId = o.PersonId WHERE o.ScenarioId = %d ORDER BY o.SortOrder IS NULL, o.SortOrder, o.ReleaseOriginatorId", sid))
-    if (nrow(o)) { info$Originator <- paste(o$Name, collapse = "; ")
-      who <- vapply(seq_len(nrow(o)), function(k) paste(c(o$Name[k], if (!blank(o$Organization[k])) o$Organization[k], if (!blank(o$Orcid[k])) paste("ORCID", o$Orcid[k])), collapse = ", "), "")
-      if (any(!is.na(o$Orcid) | !is.na(o$Organization))) info$Credit <- sub("[.]*$", ".", paste0("Originators: ", paste(who, collapse = "; "))) }
-    if (!blank(info$ContactPersonId)) { p <- dbGetQuery(con, sprintf("SELECT * FROM lucasCore_Person WHERE PersonId = %d", as.integer(info$ContactPersonId)))
-      if (nrow(p)) { map <- c(ContactPerson = "Name", ContactOrg = "Organization", ContactAddress = "Address", ContactCity = "City", ContactState = "State", ContactPostal = "PostalCode", ContactPhone = "Phone")
-        for (f in names(map)) info[[f]] <- as.character(p[[map[[f]]]][1])
-        if (blank(info$ContactEmail)) info$ContactEmail <- as.character(p$Email[1]) } } }
-  info }
+rl_read_info <- function(con, sid) md_read_info(con, sid)   # in metadata-record.R, which stage 16 reads too
 
 rl_no_id <- function(x) { x$theme <- Filter(function(t) t$thesaurus != "USGS Metadata Identifier", x$theme); x }
 

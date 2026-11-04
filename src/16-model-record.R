@@ -4,7 +4,8 @@
 # Writes src/metadata-record.R's record of the Build result this scenario depends on, and saves it to Model Record with what mp said, what is
 # still a placeholder or drafted, and what the record had to infer. Export > LUCAS Core > Model Record saves the XML to a folder.
 # It reads the Build's run log, which exists only once that run has ended, so this stage has a scenario of its own: pipeline stage 16 alone,
-# dependency the Build result. tools/model-record.R writes the same record outside a run.
+# dependency the Build result. tools/model-record.R writes the same record outside a run. The people are whoever runs it: the scenario's Release Information page, from
+# the project's People list; left blank they are listed as still to supply, and the record names no one.
 # mp runs when the Data Sources page names it (or LUCAS_MP does, or it is on the PATH); an error from mp fails the stage, and no mp only says so.
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
@@ -18,7 +19,7 @@ if (!length(id)) fail("no Build result: add the Build result as this scenario's 
 if (length(id) > 1) say("%d results among the dependencies: the record describes the first, %d", length(id), id[1])
 progressBar()
 
-r <- md_write_record(main_library(), id[1], file.path(TD(), "ModelRecord"), pkg_file("defaults", "metadata"), sprintf("model-record-%d.xml", id[1]))
+r <- md_write_record(main_library(), id[1], file.path(TD(), "ModelRecord"), pkg_file("defaults", "metadata"), sprintf("model-record-%d.xml", id[1]), info_scenario = rsyncrosim::scenarioId(scn))
 m <- r$mp; x <- r$content; bad <- if (is.null(m)) 0L else sum(m$Level == "Error")
 mp <- if (is.null(m)) "not run: mp not found (set it on the Data Sources page)" else paste(c(sprintf("%d errors, %d warnings", bad, sum(m$Level == "Warning")), head(m$Message, 5)), collapse = "; ")
 say("Model record: %s for Build result %d, %d lineage sources, %d process steps; mp %s", basename(r$file), id[1], length(x$quality$sources), length(x$quality$steps), mp)

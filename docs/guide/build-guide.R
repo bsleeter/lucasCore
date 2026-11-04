@@ -34,7 +34,7 @@ blobs <- regmatches(html, gregexpr('src="blob/[0-9a-f-]+"', html))[[1]]; blobs <
 if (length(md_img) != length(blobs)) stop(sprintf("the Markdown export has %d images and the HTML export %d", length(md_img), length(blobs)))
 if (!all(blobs %in% map$blob) || any(!nzchar(map$asset[match(blobs, map$blob)]))) stop("blob-assets.csv does not map every image blob to an asset")
 after <- substring(md, md_img + attr(md_img, "match.length"), md_img + attr(md_img, "match.length") + 120)
-num <- sub("^\\s*\\*Figure ([0-9]+(\\.[0-9]+)*[a-z]?)\\..*$", "\\1", after)
+num <- sub("^\\s*\\*Figure (([0-9]+|[A-Z])(\\.[0-9]+)*[a-z]?)\\..*$", "\\1", after)   # 4.15, 1.6a, or an appendix's B.3
 name <- ifelse(grepl("^\\s*\\*Figure", after), paste0("fig-", num, ".png"), sprintf("img-%03d.png", seq_along(after)))
 if (anyDuplicated(name)) stop("two images take the same figure name: ", paste(unique(name[duplicated(name)]), collapse = ", "))
 asset <- map$asset[match(blobs, map$blob)]

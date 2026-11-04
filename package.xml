@@ -1246,6 +1246,8 @@
 	</transformer>
 
 	<transformer name="ModelRecord" displayName="16 - Model Record" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/16-model-record.R">
+		<dataSheet name="ReleaseInformation" type="Input"/>
+		<dataSheet name="ReleaseOriginator" type="Input"/>
 		<dataSheet name="OutputModelRecord" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>

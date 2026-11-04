@@ -130,6 +130,7 @@ ok("no people: originator and contact are to supply", all(d0[Field %in% c("Origi
 d1 <- md_apply_info(md_record_defaults(dir), i1)
 ok("supplied fields stop being placeholders", !any(d1[Field %in% c("Doi", "MetadataId", "ContactCity", "ContactEmail", "Originator"), Placeholder]))
 ok("a field not supplied stays one", d1[Field == "MethodsCitation", Placeholder])
+ok("the defaults name no one as originator or contact", !any(grepl("Sleeter", md_record_defaults(dir)[Field %in% c("Originator", "ContactPerson"), Value])) && all(md_record_defaults(dir)[Field %in% c("Originator", "ContactPerson", "ContactOrg"), Placeholder]))
 ok("no page: defaults unchanged", identical(md_apply_info(md_record_defaults(dir), NULL), md_record_defaults(dir)))
 base <- list(citation = list(title = "drafted"), abstract = "d", purpose = "dp", supplinf = "", time = list(), quality = list(), overview = list(), distribution = list(), theme = list(list(thesaurus = "USGS Metadata Identifier", keys = "x"), list(thesaurus = "T", keys = "k")), draft = c("placeholder: MethodsCitation", "drafted: title", "drafted: abstract", "drafted: purpose"))
 pr <- list(list(name = "H", kind = "historical", years = c(1985, 2023)))
