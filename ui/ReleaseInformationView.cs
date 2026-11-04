@@ -94,7 +94,7 @@ namespace lucasCoreUI
             var d = Column();
             Field(d, "Data DOI", Entry("Doi", Wide, 1), "The full https://doi.org/ address, reserved through the USGS Science Data Portal.");
             Field(d, "Landing page", Entry("LandingPage", Wide, 1), "Optional: the release's page, if it is not what the DOI resolves to.");
-            Field(d, "Metadata identifier", Entry("MetadataId", 320, 1), "The parent record's, from ScienceBase. The run and model records carry none here: ScienceBase assigns each item its own.");
+            Field(d, "Metadata identifier", Entry("MetadataId", 320, 1), "Optional: in a ScienceBase release the Data Release team assigns it during publication. If you have one, it goes on the parent record only.");
             Field(d, "IPDS number", Entry("IpdsNumber", 320, 1), "Required before a final release. It stays out of the published records.");
             Field(d, "Methods citation", Entry("MethodsCitation", Wide, 3), "The peer-reviewed product that describes the methods, which SM 502.8 requires for derived data.");
             Field(d, "Associated publications", Entry("AssociatedPublications", Wide, 2), "Optional.");
@@ -216,7 +216,7 @@ namespace lucasCoreUI
                     if (Show(c[f[0]]).Trim().Length == 0) m.Add(f[1]);
                 if (Show(Value("ContactEmail")).Trim().Length == 0 && Show(c["Email"]).Trim().Length == 0) m.Add("contact email");
             }
-            need("Doi", "DOI"); need("MetadataId", "metadata identifier"); need("IpdsNumber", "IPDS number"); need("MethodsCitation", "methods citation");
+            need("Doi", "DOI"); need("IpdsNumber", "IPDS number"); need("MethodsCitation", "methods citation");
             return string.Join(", ", m);
         }
 

@@ -45,11 +45,17 @@ ok("every check passes, the to-supply check among them", nrow(va) >= 8 && all(va
 db <- DBI::dbConnect(RSQLite::SQLite(), lib, flags = RSQLite::SQLITE_RO); ts <- DBI::dbGetQuery(db, sprintf("SELECT ToSupply FROM lucasCore_OutputDataRelease WHERE ScenarioId = %d", ra))$ToSupply; DBI::dbDisconnect(db)
 ok("the stage records nothing left to supply", length(ts) == 1 && (is.na(ts) || !nzchar(ts)))
 
+rv <- file.path(da, "review"); s <- paste(readLines(file.path(rv, "reviewer-summary.html"), warn = FALSE, encoding = "UTF-8"), collapse = "\n")
+ok("the packet is written, with the IPDS number, and stays out of contents.csv", all(file.exists(file.path(rv, c("data-review-checklist.html", "metadata-review-checklist.html", "checks.csv", "mp-report.csv")))) && grepl("IP-000000", s, fixed = TRUE) && !any(grepl("^review/", fread(file.path(da, "contents.csv"))$file)))
+rc <- fread(file.path(rv, "checks.csv")); ok("every must-pass review check passed, and is in Validation", all(rc[level == "must", pass] %in% TRUE) && all(rc[level == "must", what] %in% va$Check))
+ok("records as text from mp", length(list.files(file.path(rv, "records-as-text"))) == length(others) + 1L)
+
 # ---- B: a blank DOI on an Approved release -----------------------------------------------------------------------------------
 db <- file.path(out, "b"); rb <- go("Release Information (test B)", NA_character_, db)
 rs <- rsyncrosim::scenario(L, summary = TRUE); st <- as.data.table(rs)[ScenarioId == rb]
 capture.output(l <- runLog(rsyncrosim::scenario(L, rb))); lg <- paste(l, collapse = "\n")
 ok("Approved with a blank DOI fails the stage, and says so", grepl("no placeholder or drafted text is left: FAIL", lg, fixed = TRUE) && grepl("placeholder: Doi", lg, fixed = TRUE))
 ok("the folder is written, so the list can be read", any(grepl("^DRAFT", readLines(file.path(db, "README.txt"), warn = FALSE))))
+ok("the packet is written too, and shows the failure", grepl("Not passed", paste(readLines(file.path(db, "review", "reviewer-summary.html"), warn = FALSE), collapse = " "), fixed = TRUE))
 
 cat(sprintf("%d checks, %d failed\n", n, bad)); cat(if (bad) "RELEASE INFORMATION FAILED\n" else "RELEASE INFORMATION OK\n")

@@ -20,9 +20,11 @@ capture.output(rl <- runLog(R)); lg <- trimws(strsplit(paste(rl, collapse = "\n"
 cat(unique(lg[grepl("Release:|Still placeholder|17 Data Release -|Failure|Model archive", lg)]), sep = "\n")
 v <- as.data.table(datasheet(R, "lucasCore_OutputValidation"))[Stage == "17 Data Release"]
 ct <- as.data.table(datasheet(R, "lucasCore_OutputReleaseContents", lookupsAsFactors = FALSE))
-files <- list.files(out, recursive = TRUE); files <- setdiff(files, "contents.csv")
+files <- list.files(out, recursive = TRUE); files <- setdiff(files, "contents.csv"); files <- files[!startsWith(files, "review/")]
 sums <- nrow(ct) > 0 && all(vapply(seq_len(min(nrow(ct), 20)), function(i) identical(ct$Sha256[i], digest::digest(file = file.path(out, ct$File[i]), algo = "sha256")), TRUE))
 ok <- nrow(v) > 0 && all(v$Status == "Pass") && setequal(files, ct$File) && sums && file.exists(file.path(out, "release.xml")) && file.exists(file.path(out, "model", "model.xml")) &&
-  length(grep("(historical|projections)/[^/]+/run.xml$", files)) == length(runs) && length(grep("^archive/.*[.]ssimbak$", files)) >= 1
+  length(grep("(historical|projections)/[^/]+/run.xml$", files)) == length(runs) && length(grep("^archive/.*[.]ssimbak$", files)) >= 1 &&
+  all(file.exists(file.path(out, "review", c("reviewer-summary.html", "data-review-checklist.html", "metadata-review-checklist.html", "checks.csv"))))
+ok <- ok && !grepl("PLACEHOLDER", paste(xml2::xml_text(xml2::xml_find_all(xml2::read_xml(file.path(out, "release.xml")), "//theme[themekt='USGS Metadata Identifier']/themekey")), collapse = ""), fixed = TRUE)
 cat(sprintf("%d files, %d checks\n", length(files), nrow(v)))
 cat(if (ok) "DATA RELEASE OK\n" else "DATA RELEASE FAILED\n")

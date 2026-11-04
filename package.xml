@@ -893,7 +893,7 @@
 		<column name="RevisionNotes" displayName="Revision notes" dataType="String" isOptional="True"/>
 		<column name="Doi" displayName="Data DOI (full https://doi.org/ address)" dataType="String" isOptional="True"/>
 		<column name="LandingPage" displayName="Landing page" dataType="String" isOptional="True"/>
-		<column name="MetadataId" displayName="Metadata identifier of the parent record" dataType="String" isOptional="True"/>
+		<column name="MetadataId" displayName="Metadata identifier of the parent record (optional)" dataType="String" isOptional="True"/>
 		<column name="IpdsNumber" displayName="IPDS number" dataType="String" isOptional="True"/>
 		<column name="MethodsCitation" displayName="Methods citation" dataType="String" isOptional="True"/>
 		<column name="AssociatedPublications" displayName="Associated publications" dataType="String" isOptional="True"/>

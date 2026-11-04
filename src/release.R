@@ -8,8 +8,8 @@
 # ScienceBase holds 100 files per item, so each map variable of a run is one zip of its yearly cloud-optimized GeoTIFFs.
 # Metadata must not interpret results (USGS model-output guidance, 2018): the records say what was done and what was compared, not what it means.
 # What only a person can supply comes from the Release Information page (rl_read_info), over record-defaults.csv; what is still missing is listed in draft.
-# Release status: a Draft lists it; Provisional and Approved fail on it. The metadata identifier goes on the parent record only: ScienceBase assigns each
-# item its own, so the run and model records carry none rather than a copy of the parent's.
+# Release status: a Draft lists it; Provisional and Approved fail on it. The metadata identifier is optional: in a ScienceBase release the Data Release team assigns
+# it during publication (Metadata Review Checklist 2.6). One typed on the page goes on the parent record only; no record carries a placeholder or a copy.
 # =============================================================================
 suppressPackageStartupMessages({ library(data.table); library(DBI); library(RSQLite) })
 if (!exists("md_model_content")) stop("source src/metadata.R and src/metadata-record.R before src/release.R")
@@ -249,13 +249,13 @@ rl_no_id <- function(x) { x$theme <- Filter(function(t) t$thesaurus != "USGS Met
 
 # What is still to supply for the whole release: the placeholders, and the release text the generator drafted
 rl_to_supply <- function(model, info) {
-  d <- setdiff(model$draft, c("drafted: title", "drafted: abstract", "drafted: purpose"))
+  d <- setdiff(model$draft, c("drafted: title", "drafted: abstract", "drafted: purpose", "placeholder: MetadataId"))
   for (k in c("Title", "Abstract", "Purpose")) if (!md_supplied(info, k)) d <- c(d, paste("drafted: release", tolower(k)))
   if (!md_supplied(info, "IpdsNumber")) d <- c(d, "to supply: IpdsNumber")
   d }
 
 rl_parent_content <- function(model, runs, where, info = NULL) {
-  x <- model; y0 <- min(vapply(runs, function(r) r$years[1], 0)); y1 <- max(vapply(runs, function(r) r$years[2], 0))
+  x <- if (md_supplied(info, "MetadataId")) model else rl_no_id(model); y0 <- min(vapply(runs, function(r) r$years[1], 0)); y1 <- max(vapply(runs, function(r) r$years[2], 0))
   x$citation$title <- sprintf("LUCAS simulations of land use and carbon in %s, %s-%s", where, y0, y1)
   x$abstract <- paste(sprintf("This data release holds %d simulation%s of land use and carbon in %s made with the LUCAS model (lucasCore package for ST-Sim in SyncroSim): %s.", length(runs), if (length(runs) > 1) "s" else "", where,
                               paste(vapply(runs, function(r) sprintf("%s (%s, %s-%s)", r$name, r$kind, r$years[1], r$years[2]), ""), collapse = "; ")),
@@ -272,7 +272,7 @@ rl_parent_content <- function(model, runs, where, info = NULL) {
   x$quality$sources <- list(rl_model_source(model)); x$quality$steps <- list(list(desc = "The release folder was written by the lucasCore Data Release stage from the simulations' result scenarios.", srcused = "Model record", date = format(Sys.Date(), "%Y%m%d")))
   x$quality$attracc <- "See each simulation's record."; x$quality$logic <- "See each simulation's record."
   x$quality$complete <- "Every simulation named in the abstract, whole, with the products listed in contents.csv."
-  x$entities <- list(); x$overview$eaover <- "Each table and map is described in its simulation's record; names and codes in model/definitions.csv and columns in model/data-dictionary.csv."
+  x$entities <- list(); x$overview$eaover <- "Each table and map is described in its simulation's record; names and codes in model/definitions.csv and columns in model/data-dictionary.csv. The release also holds README.txt (the folders and how to cite the release), contents.csv (every file with its size and SHA-256 checksum), release.xml, and in model/ the records and tables model.xml, validation.csv (the Build's checks) and data-sources-used.csv (the datasets the Build read). The figures folders hold PNG figures drawn from the tables. archive/ holds the SyncroSim library backup (.ssimbak) and how-to-rerun.txt; each simulation has its run.xml, and a comparison of simulations its comparison.xml."
   x$distribution$formname <- "CSV; zip of cloud-optimized GeoTIFF; PNG; XML"
   x }
 
@@ -349,12 +349,13 @@ rl_readme <- function(parent, runs, draft, out) { there <- function(...) dir.exi
   vapply(runs, function(r) sprintf("%-17s %s, %s-%s: run.xml, %s", paste0(r$folder, "/", r$slug, "/"), r$kind, r$years[1], r$years[2],
     paste(c("tables/", if (there(r$folder, r$slug, "maps")) "maps/", if (there(r$folder, r$slug, "figures")) "figures/"), collapse = ", ")), ""),
   if (there("comparison")) "comparison/       comparison figures and tables, where the runs were compared",
-  if (there("archive")) "archive/          the SyncroSim library backup and how to rerun it", "",
+  if (there("archive")) "archive/          the SyncroSim library backup and how to rerun it",
+  "review/           for the reviewers: DO NOT upload this folder (it is not in contents.csv)", "",
   if (any(vapply(runs, function(r) there(r$folder, r$slug, "maps"), TRUE))) c("Maps: each zip in maps/ holds one variable's yearly cloud-optimized GeoTIFFs, EPSG:5070, no data -9999.", "File names give the variable, the group, the run and the year.", ""),
   "How to cite: see the citation in release.xml.") }
 
 rl_contents <- function(out, rows = list()) {
-  f <- list.files(out, recursive = TRUE, all.files = FALSE); f <- f[f != "contents.csv"]
+  f <- list.files(out, recursive = TRUE, all.files = FALSE); f <- f[f != "contents.csv" & !startsWith(f, "review/")]   # review/ is not published
   d <- data.table(file = f, product = sub("/.*$", "", f), bytes = file.size(file.path(out, f)))
   d[!grepl("/", file), product := "release"]
   d[, sha256 := vapply(file.path(out, file), function(p) digest::digest(file = p, algo = "sha256"), "")]
@@ -374,7 +375,7 @@ rl_checks <- function(contents, defs, stats_issues, xml, draft, maps_check) {
         a("no machine path in a record", !any(grepl("[A-Za-z]:[/\\\\][A-Za-z]", raw)), head(grep("[A-Za-z]:[/\\\\][A-Za-z]", raw, value = TRUE), 3)),
         a(RL_DRAFT_CHECK, !length(draft), draft)) }
 
-rl_release <- function(lib, build, runs, out, dir, every = 1L, years = NULL, maps = TRUE, archive = TRUE, console = NA_character_, say = message, info_scenario = NA_integer_) {
+rl_release <- function(lib, build, runs, out, dir, every = 1L, years = NULL, maps = TRUE, archive = TRUE, console = NA_character_, say = message, info_scenario = NA_integer_, links = TRUE) {
   lib <- normalizePath(lib, winslash = "/"); data <- paste0(lib, ".data"); dict <- md_dictionary(dir)
   dir.create(out, showWarnings = FALSE, recursive = TRUE)
   con <- rl_ro(lib); on.exit(dbDisconnect(con))
@@ -382,7 +383,7 @@ rl_release <- function(lib, build, runs, out, dir, every = 1L, years = NULL, map
   facts <- md_build_facts(lib, build); whole <- md_model_content(facts, dir, info); model <- rl_no_id(whole)
   R <- rl_unique_slugs(lapply(runs, function(r) rl_run_info(con, r)))
   where <- paste(sub("^[^:]+: ", "", facts$study_area), collapse = ", "); if (!nzchar(where)) where <- "the conterminous United States"
-  home_mp <- md_mp_default(facts$home); xml <- character(); issues <- character(); checks <- list(ok = list(), detail = list())
+  home_mp <- md_mp_default(facts$home); xml <- character(); issues <- character(); checks <- list(ok = list(), detail = list()); compare <- list()
 
   # the model
   mdir <- file.path(out, "model"); dir.create(mdir, showWarnings = FALSE)
@@ -406,7 +407,7 @@ rl_release <- function(lib, build, runs, out, dir, every = 1L, years = NULL, map
     if (maps) say(sprintf("%d map zips, %d maps", nrow(m), sum(m$Maps)))
     k <- rl_map_table_check(con, fm, r$id, facts$grid$cell^2 / 1e4); checks$ok <- c(checks$ok, k$ok); checks$detail <- c(checks$detail, sprintf("%s: %s", r$slug, k$detail))
     invisible(capture.output(rl <- rsyncrosim::runLog(rsyncrosim::scenario(L, r$id)))); lg <- md_parse_log(unlist(strsplit(paste(rl, collapse = "\n"), "\r?\n")))
-    cmp <- if (r$kind == "historical") rl_transition_compare(con, build, r$id) else data.table()
+    cmp <- if (r$kind == "historical") rl_transition_compare(con, build, r$id) else data.table(); compare[[r$name]] <- cmp
     xml <- c(xml, rl_write_xml(rl_run_content(model, r, facts, st, m, cmp, lg, defs, dict, where), file.path(d, "run.xml")))
   }
 
@@ -426,4 +427,8 @@ rl_release <- function(lib, build, runs, out, dir, every = 1L, years = NULL, map
   contents <- rl_contents(out); chk <- rl_checks(contents, defs, issues, xml, draft, checks)
   mp <- rbindlist(lapply(xml, function(f) { m <- md_mp(f, home_mp); if (is.null(m) || !nrow(m)) NULL else cbind(Record = sub(paste0(out, "/"), "", f, fixed = TRUE), m) }))
   if (!nrow(mp)) mp <- data.table(Record = character(), Level = character(), Message = character())   # none found: no NA row, and sum(Level == "Error") is 0
-  list(out = out, runs = R, contents = contents, checks = chk, mp = mp, records = xml, draft = draft, status = info$ReleaseStatus %||% "Draft", ipds = info$IpdsNumber %||% NA_character_, mp_found = !is.na(home_mp) && file.exists(home_mp)) }
+  say("Review packet: checking the files")
+  review <- rl_review_checks(out, contents, xml, R, defs, dict, chk, info %||% list(), links)
+  rl_review_packet(out, dir, contents, review, mp, R, compare, facts, model, parent, draft, info %||% list(), xml, home_mp)
+  say(sprintf("Review packet: review/, %d of %d must-pass checks passed", sum(review[Level == "must", Pass] %in% TRUE), sum(review$Level == "must")))
+  list(out = out, runs = R, contents = contents, checks = chk, review = review, mp = mp, records = xml, draft = draft, status = info$ReleaseStatus %||% "Draft", ipds = info$IpdsNumber %||% NA_character_, mp_found = !is.na(home_mp) && file.exists(home_mp)) }

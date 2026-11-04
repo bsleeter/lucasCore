@@ -5,7 +5,7 @@
 # =============================================================================
 suppressPackageStartupMessages({ library(data.table); library(DBI); library(RSQLite); library(terra); library(xml2) })
 pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
-for (f in c("datahome.R", "metadata.R", "metadata-record.R", "release.R")) source(file.path(pkg, "src", f))
+for (f in c("datahome.R", "metadata.R", "metadata-record.R", "release.R", "release-review.R")) source(file.path(pkg, "src", f))
 dir <- file.path(pkg, "defaults", "metadata"); dict <- md_dictionary(dir)
 a <- commandArgs(TRUE); mp <- sub("^--mp=", "", grep("^--mp=", a, value = TRUE)); if (length(mp)) options(lucas.mp = mp)
 n <- 0L; bad <- 0L
@@ -137,6 +137,8 @@ pc <- rl_parent_content(base, pr, "Here", i1)
 ok("the page's wording goes on the parent; a blank stays drafted", pc$citation$title == "My title" && pc$abstract == "My abstract" && grepl("available", pc$purpose))
 ok("revision notes go in the parent", grepl("Fixed maps.", pc$supplinf, fixed = TRUE))
 ok("the run and model records carry no identifier", length(rl_no_id(base)$theme) == 1 && rl_no_id(base)$theme[[1]]$thesaurus == "T")
+ok("the parent keeps a supplied identifier and drops a placeholder", length(pc$theme) == 2 && length(rl_parent_content(base, pr, "Here", list())$theme) == 1)
+ok("the identifier is never to supply: ScienceBase assigns it", !"placeholder: MetadataId" %in% rl_to_supply(modifyList(base, list(draft = "placeholder: MetadataId")), i1))
 sup <- rl_to_supply(base, i1)
 ok("to supply: the placeholder, the blank purpose, IPDS; not the supplied title", setequal(sup, c("placeholder: MethodsCitation", "drafted: release purpose", "to supply: IpdsNumber")))
 dbDisconnect(pcon)
