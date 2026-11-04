@@ -13,7 +13,7 @@ transitions.csv,year,"Simulation year in which the transitions happened.",intege
 transitions.csv,primary_stratum,"Primary stratum (FIA ecological division).",text,,definitions.csv kind Stratum,
 transitions.csv,secondary_stratum,"Secondary stratum unit.",text,,definitions.csv kind Stratum,NA
 transitions.csv,tertiary_stratum,"Tertiary stratum unit.",text,,definitions.csv kind Stratum,NA
-transitions.csv,transition_group,"Transition group (land-use change or disturbance).",text,,definitions.csv kind TransitionGroup,
+transitions.csv,transition_group,"Transition group (land-use change or disturbance). Groups overlap (a group and its [Type] members count the same area), so do not add across groups.",text,,definitions.csv kind TransitionGroup,
 transitions.csv,area_ha,"Area that made a transition of the group in the year.",real,hectares,0 or more,
 stocks.csv,run,"Short name of the simulation run.",text,,run names in the release,
 stocks.csv,iteration,"Monte Carlo iteration of the run.",integer,,1 to the run's iterations,
@@ -22,7 +22,7 @@ stocks.csv,primary_stratum,"Primary stratum (FIA ecological division).",text,,de
 stocks.csv,secondary_stratum,"Secondary stratum unit.",text,,definitions.csv kind Stratum,NA
 stocks.csv,tertiary_stratum,"Tertiary stratum unit.",text,,definitions.csv kind Stratum,NA
 stocks.csv,state_class,"State class holding the carbon.",text,,definitions.csv kind StateClass,
-stocks.csv,stock_group,"Carbon stock group (pool or sum of pools).",text,,definitions.csv kind StockGroup,
+stocks.csv,stock_group,"Carbon stock group (pool or sum of pools). Groups overlap (Total Ecosystem holds the others), so do not add across groups.",text,,definitions.csv kind StockGroup,
 stocks.csv,carbon_t,"Carbon in the stock group.",real,metric tons of carbon,0 or more,
 flows.csv,run,"Short name of the simulation run.",text,,run names in the release,
 flows.csv,iteration,"Monte Carlo iteration of the run.",integer,,1 to the run's iterations,
@@ -31,8 +31,8 @@ flows.csv,primary_stratum,"Primary stratum (FIA ecological division).",text,,def
 flows.csv,secondary_stratum,"Secondary stratum unit.",text,,definitions.csv kind Stratum,NA
 flows.csv,tertiary_stratum,"Tertiary stratum unit.",text,,definitions.csv kind Stratum,NA
 flows.csv,state_class,"State class the flow comes from.",text,,definitions.csv kind StateClass,
-flows.csv,transition_type,"Transition type that triggered the flow; blank for annual (baseline) flows such as growth and decay.",text,,definitions.csv kind TransitionType,NA
-flows.csv,flow_group,"Carbon flow group.",text,,definitions.csv kind FlowGroup,
+flows.csv,transition_type,"Transition type that triggered the flow; NA for annual (baseline) flows such as growth and decay.",text,,definitions.csv kind TransitionType,NA
+flows.csv,flow_group,"Carbon flow group. Groups overlap, so do not add across groups.",text,,definitions.csv kind FlowGroup,
 flows.csv,carbon_t,"Carbon moved by the flow group in the year. CO2e groups are in metric tons of CO2 equivalent.",real,metric tons of carbon (CO2e groups: metric tons CO2e),any real number (net groups may be negative),
 definitions.csv,kind,"What the row defines: StateClass, TransitionGroup, TransitionType, StockType, StockGroup, FlowType, FlowGroup or Stratum.",text,,the eight kinds,
 definitions.csv,name,"The name as it appears in the tables.",text,,,
@@ -50,6 +50,31 @@ validation.csv,stage,"Stage that ran the check.",text,,lucasCore stage names,
 validation.csv,check,"What the check tests.",text,,,
 validation.csv,status,"Result of the check.",text,"PASS, FAIL or WARN",,
 validation.csv,detail,"Numbers or names behind the result.",text,,,NA
+compare-carbon.csv,run,"Short name of the simulation run.",text,,run names in the release,
+compare-carbon.csv,role,"The run's part in the comparison.",text,,"History, Baseline or Run",
+compare-carbon.csv,start_year,"First year of the run.",integer,year,,
+compare-carbon.csv,end_year,"Last year of the run.",integer,year,,
+compare-carbon.csv,carbon_start,"Total ecosystem carbon at the start.",real,teragrams of carbon,,
+compare-carbon.csv,carbon_end,"Total ecosystem carbon at the end.",real,teragrams of carbon,,
+compare-carbon.csv,carbon_change,"End minus start.",real,teragrams of carbon,,
+compare-carbon.csv,vs_baseline,"End minus the baseline run's end.",real,teragrams of carbon,,NA
+compare-carbon.csv,biomass_change,"Change in live biomass carbon.",real,teragrams of carbon,,NA
+compare-carbon.csv,dom_soil_change,"Change in dead wood, litter and soil carbon.",real,teragrams of carbon,,NA
+compare-carbon.csv,npp,"Mean net primary productivity.",real,teragrams of carbon per year,,NA
+compare-carbon.csv,nep,"Mean net ecosystem productivity.",real,teragrams of carbon per year,,NA
+compare-carbon.csv,lulc_loss,"Mean losses to land-use and land-cover change: fire emissions and harvest.",real,teragrams of carbon per year,,NA
+compare-carbon.csv,nbp,"Mean net biome productivity.",real,teragrams of carbon per year,,NA
+compare-land.csv,run,"Short name of the simulation run.",text,,run names in the release,
+compare-land.csv,role,"The run's part in the comparison.",text,,"History, Baseline or Run",
+compare-land.csv,start_year,"First year of the run.",integer,year,,
+compare-land.csv,end_year,"Last year of the run.",integer,year,,
+compare-land.csv,fire,"Area burned, summed over the years.",real,square kilometers,,
+compare-land.csv,harvest,"Forest harvested, summed over the years.",real,square kilometers,,
+compare-land.csv,urbanization,"Area urbanized, summed over the years.",real,square kilometers,,
+compare-land.csv,forest_change,"Change in forest area, start to end.",real,square kilometers,,
+compare-land.csv,developed_change,"Change in developed area, start to end.",real,square kilometers,,
 state-class-<run>-<year>.tif,value,"State class code of each model cell at the end of the year. The codes are listed with their names in definitions.csv (kind StateClass, column code).",integer,,definitions.csv kind StateClass code,-9999
 age-<run>-<year>.tif,value,"Stand age (years since the last stand-replacing event) of each model cell at the end of the year.",integer,years,0 or more,-9999
-carbon-<group>-<run>-<year>.tif,value,"Carbon in the stock group in each model cell at the end of the year.",real,metric tons of carbon per hectare,0 or more,-9999
+transition-<group>-<run>-<year>.tif,value,"Transition of the group in each model cell in the year: the code of the transition type (definitions.csv kind TransitionType, column code); 0 = none.",integer,,definitions.csv kind TransitionType code,-9999
+carbon-<group>-<run>-<year>.tif,value,"Carbon in the stock group in each model cell at the end of the year, the mean across iterations.",real,metric tons of carbon per hectare,0 or more,-9999
+flow-<group>-<run>-<year>.tif,value,"Carbon moved by the flow group in each model cell in the year, the mean across iterations. CO2e groups are in metric tons of CO2 equivalent per hectare per year.",real,metric tons of carbon per hectare per year (CO2e groups: metric tons CO2e per hectare per year),any real number,-9999

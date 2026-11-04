@@ -319,6 +319,7 @@ md_csdgm <- function(x) {
       dv <- add(at, "attrdomv")
       if (a$domain$type == "enum") { xml_remove(dv); for (v1 in a$domain$values) { ed <- add(add(at, "attrdomv"), "edom")
           add(ed, "edomv", v1$value); add(ed, "edomvd", v1$definition); add(ed, "edomvds", v1$source) } }
+      else if (a$domain$type == "range") { rd <- add(dv, "rdom"); add(rd, "rdommin", a$domain$min); add(rd, "rdommax", a$domain$max); opt(rd, "attrunit", a$domain$units) }
       else add(dv, "udom", a$domain$text)
     }
   }

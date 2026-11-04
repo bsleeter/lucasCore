@@ -1,0 +1,125 @@
+# =============================================================================
+# unit-release.R - src/release.R on a small made-up library: tables, maps, definitions, the comparison, the records (to-do 14, Phase 3)
+# =============================================================================
+# Plain R, no SyncroSim. Usage: Rscript tests/unit-release.R [--mp=<path to mp.exe>]
+# =============================================================================
+suppressPackageStartupMessages({ library(data.table); library(DBI); library(RSQLite); library(terra); library(xml2) })
+pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
+for (f in c("datahome.R", "metadata.R", "metadata-record.R", "release.R")) source(file.path(pkg, "src", f))
+dir <- file.path(pkg, "defaults", "metadata"); dict <- md_dictionary(dir)
+a <- commandArgs(TRUE); mp <- sub("^--mp=", "", grep("^--mp=", a, value = TRUE)); if (length(mp)) options(lucas.mp = mp)
+n <- 0L; bad <- 0L
+ok <- function(what, cond) { n <<- n + 1L; if (!isTRUE(cond)) { bad <<- bad + 1L; cat("FAIL:", what, "\n") } }
+
+# ---- a library of one project, one run -------------------------------------------------------------------------------------
+tmp <- tempfile("release"); dir.create(tmp); lib <- file.path(tmp, "t.ssim"); con <- dbConnect(SQLite(), lib)
+w <- function(t, ...) dbWriteTable(con, t, data.frame(..., check.names = FALSE), overwrite = TRUE)
+w("core_Scenario", ScenarioId = c(1L, 2L, 3L, 4L), Name = c("Hist", "Hist ([1] @ 01-Jan-2026 1:00 AM)", "Proj", "Proj ([3] @ 01-Jan-2026 2:00 AM)"))
+w("core_ScenarioResult", ScenarioId = c(1L, 3L), ResultId = c(2L, 4L))
+w("core_ScenarioDependency", ScenarioId = 3L, DependencyId = 9L, Priority = 1L)
+w("lucasCore_ProjectionStart", ScenarioId = 9L, HistoricalScenarioId = 2L)
+w("core_SpatialMultiprocessing", SpatialMultiprocessingId = 1L, ScenarioId = 2L, MaskFileName = NA_character_)
+w("stsim_Stratum", StratumId = 1L, Name = "Div A", Description = NA_character_)
+w("stsim_SecondaryStratum", SecondaryStratumId = 1:2, Name = c("County: Used", "County: Unused"), Description = NA_character_)
+w("stsim_TertiaryStratum", TertiaryStratumId = 1L, Name = "Federal: BLM", Description = NA_character_)
+w("stsim_StateClass", StateClassId = 1:2, Name = c("Forest: Oak", "Barren: All"), Id = c(11L, 12L), Description = c(NA, "my barren"))
+w("stsim_TransitionGroup", TransitionGroupId = 1:3, Name = c("Fire", "Fire: High [Type]", "Urbanization"), Description = NA_character_)
+w("stsim_TransitionType", TransitionTypeId = 1L, Name = "Fire: High", Id = 300L, Description = "High severity fire.")
+w("stsim_StockType", StockTypeId = 1L, Name = "Soil", Description = "Soil pool.")
+w("stsim_StockGroup", StockGroupId = 1:2, Name = c("Total Ecosystem", "Soil [Type]"), Description = c("All pools.", NA))
+w("stsim_FlowType", FlowTypeId = 1L, Name = "Decay", Description = "Decay.")
+w("stsim_FlowGroup", FlowGroupId = 1L, Name = "Emission: Total", Description = "Emissions.")
+w("stsim_OutputStratumState", ScenarioId = 2L, Iteration = 1L, Timestep = c(2000L, 2000L, 2001L), StratumId = 1L, SecondaryStratumId = 1L, TertiaryStratumId = c(1L, 1L, NA), StateClassId = c(1L, 1L, 2L), Amount = c(1, 2, 3))
+w("stsim_OutputStratumTransition", ScenarioId = 2L, Iteration = 1L, Timestep = 2001L, StratumId = 1L, SecondaryStratumId = 1L, TertiaryStratumId = 1L, TransitionGroupId = c(1L, 2L), Amount = c(100, 100))
+w("stsim_OutputStock", ScenarioId = 2L, Iteration = 1L, Timestep = 2000L, StratumId = 1L, SecondaryStratumId = 1L, TertiaryStratumId = 1L, StateClassId = 1L, StockGroupId = 1L, Amount = 10.123456)
+w("stsim_OutputFlow", ScenarioId = 2L, Iteration = 1L, Timestep = 2001L, FromStratumId = 1L, FromSecondaryStratumId = 1L, FromTertiaryStratumId = 1L, FromStateClassId = 1L, TransitionTypeId = c(NA, 1L), FlowGroupId = 1L, Amount = c(-1, 2))
+w("lucasCore_OutputTransitionSummary", ScenarioId = 7L, Timestep = c(2001L, 2001L, 1999L), TransitionGroup = c("Fire: High [Type]", "Fire: Low [Type]", "Fire: Low [Type]"), Area = c(1, 2, 50))
+dbDisconnect(con); con <- rl_ro(lib)
+
+# ---- runs --------------------------------------------------------------------------------------------------------------------
+ok("slug: lower case, no spaces or symbols", rl_slug("P26 - Projection: [Type] x") == "p26-projection-type-x")
+h <- rl_run_info(con, 2L)
+ok("a run with no projection start is historical", h$kind == "historical" && h$folder == "historical" && h$slug == "hist")
+ok("run years and iterations", identical(as.numeric(h$years), c(2000, 2001)) && h$iterations[2] == 1)
+ok("settings name the years", grepl("Simulated 2000 to 2001, 1 iteration[.]", h$settings))
+ok("result without output stops", inherits(tryCatch(rl_run_info(con, 1L), error = function(e) e), "error"))
+ok("a projection start found through the parent's dependency", rl_history(con, 4L) == 2L)
+two <- rl_unique_slugs(list(list(id = 5L, slug = "a"), list(id = 6L, slug = "a"), list(id = 7L, slug = "b")))
+ok("two results of one scenario get their ids", identical(vapply(two, `[[`, "", "slug"), c("a-5", "a-6", "b")))
+
+# ---- tables ----------------------------------------------------------------------------------------------------------------
+td <- file.path(tmp, "tables"); dir.create(td)
+st <- lapply(c("state-classes.csv", "transitions.csv", "stocks.csv", "flows.csv"), function(t) rl_write_table(con, t, 2L, "hist", td))
+ok("the columns are the dictionary's", !length(rl_check_tables(st, dict)))
+ok("a wrong column is reported", length(rl_check_tables(list(list(file = "stocks.csv", columns = "x")), dict)) == 1)
+s1 <- fread(file.path(td, "state-classes.csv"), na.strings = "NA")
+ok("rows of one group are summed", nrow(s1) == 2 && s1[year == 2000, area_ha] == 3)
+ok("a missing stratum is NA", is.na(s1[year == 2001, tertiary_stratum]))
+ok("the run's name is in the run column", all(s1$run == "hist"))
+ok("the range is what was written", identical(st[[1]]$ranges$area_ha, c(3, 3)) && identical(as.numeric(st[[1]]$ranges$year), c(2000, 2001)))
+ok("amounts are rounded to 4 places", fread(file.path(td, "stocks.csv"))$carbon_t == 10.1235)
+f1 <- fread(file.path(td, "flows.csv"), na.strings = "NA")
+ok("an annual flow has NA for its type, a triggered one its name", is.na(f1[carbon_t == -1, transition_type]) && f1[carbon_t == 2, transition_type] == "Fire: High")
+ok("a chunked table has every row", { x <- rl_write_table(con, "state-classes.csv", 2L, "hist", td, chunk = 1L); x$rows == 2 && nrow(fread(x$path)) == 2 && identical(x$columns, md_columns(dict, "state-classes.csv")$Column) })
+
+# ---- definitions ---------------------------------------------------------------------------------------------------------
+d <- rl_definitions(con, dir, 2L)
+ok("only the strata the runs hold", "County: Used" %in% d$name && !"County: Unused" %in% d$name)
+ok("state classes carry their map codes", identical(d[kind == "StateClass", code], c(11L, 12L)))
+ok("the library's own description wins", d[name == "Barren: All", definition] == "my barren")
+ok("a [Type] group takes its type's definition", grepl("High severity fire", d[name == "Fire: High [Type]", definition]))
+ok("a stock [Type] group too", grepl("Soil pool", d[name == "Soil [Type]", definition]))
+
+# ---- the comparison ----------------------------------------------------------------------------------------------------
+cmp <- rl_transition_compare(con, 7L, 2L)
+ok("the record rolls up to the family", nrow(cmp) == 1 && cmp$TransitionGroup == "Fire" && cmp$Recorded == 3)
+ok("simulated hectares become km2", cmp$Simulated == 1)
+ok("record years outside the run are left out", !any(cmp$Recorded > 3))
+
+# ---- maps ----------------------------------------------------------------------------------------------------------------
+data <- paste0(lib, ".data"); s2 <- file.path(data, "Scenario-2")
+ras <- function(v) { r <- rast(nrows = 4, ncols = 4, xmin = 0, xmax = 600, ymin = 0, ymax = 600, crs = "EPSG:5070"); values(r) <- v; r }
+for (x in c("stsim_OutputSpatialState", "stsim_OutputSpatialTransition", "stsim_OutputAverageSpatialStockGroup")) dir.create(file.path(s2, x), recursive = TRUE)
+for (y in 2000:2001) { writeRaster(ras(c(NA, rep(11L, 15))), file.path(s2, "stsim_OutputSpatialState", sprintf("sc.it1.ts%d.tif", y)), datatype = "INT4S")
+  writeRaster(ras(c(NA, rep(5.5, 15))), file.path(s2, "stsim_OutputAverageSpatialStockGroup", sprintf("avgstkg_1.it0.ts%d.tif", y)), datatype = "FLT4S") }
+writeRaster(ras(c(NA, 0, 300, rep(0L, 13))), file.path(s2, "stsim_OutputSpatialTransition", "tg_1.it1.ts2001.tif"), datatype = "INT4S")
+fm <- rl_map_files(data, 2L); ok("every map file is listed", nrow(fm) == 5)
+ok("group ids and years are read", fm[Variable == "transition", GroupId] == 1L && fm[Variable == "transition", Year] == 2001L)
+ok("a chosen year narrows the maps", nrow(rl_map_files(data, 2L, 2000L)) == 2)
+ok("a run with no maps has none", nrow(rl_map_files(data, 99L)) == 0)
+md <- file.path(tmp, "maps"); m <- rl_write_maps(fm, con, "hist", md)
+ok("one zip per variable and group", setequal(m$File, c("state-class-hist.zip", "transition-fire-hist.zip", "carbon-total-ecosystem-hist.zip")) && all(file.exists(m$Path)))
+ok("the range of the values is kept", m[Variable == "carbon", Min] == 5.5 && m[Variable == "transition", Max] == 300)
+u <- file.path(tmp, "u"); dir.create(u); unzip(file.path(md, "carbon-total-ecosystem-hist.zip"), exdir = u)
+ok("the zip holds one map per year", setequal(list.files(u), c("carbon-total-ecosystem-hist-2000.tif", "carbon-total-ecosystem-hist-2001.tif")))
+r1 <- rast(file.path(u, "carbon-total-ecosystem-hist-2000.tif")); ds <- describe(sources(r1))
+ok("a COG with no data -9999", any(grepl("LAYOUT=COG", ds)) && any(grepl("NoData Value=-9999", ds)))
+ok("values and no data survive", is.na(values(r1)[1]) && values(r1)[2] == 5.5)
+ok("no working folder is left", !length(setdiff(list.files(md), m$File)))
+fi <- copy(fm)[Variable == "state-class"][, Iteration := 2L]; fm2 <- rbind(fm[Variable == "state-class"], fi)
+m2 <- rl_write_maps(fm2, con, "hist", file.path(tmp, "maps2")); u2 <- file.path(tmp, "u2"); dir.create(u2); unzip(m2$Path[1], exdir = u2)
+ok("several iterations carry -it in the name", all(grepl("-it[12]-", list.files(u2))) && length(list.files(u2)) == 4)
+k <- rl_map_table_check(con, fm, 2L, 3); ok("the table against the map: 15 cells", identical(k$ok, FALSE) && grepl("2001", k$detail))
+k <- rl_map_table_check(con, fm, 2L, 3 / 15); ok("equal area passes", isTRUE(k$ok))
+
+# ---- entities, the writer and the checks --------------------------------------------------------------------------------
+e <- rl_entity(dict, "stocks.csv", st[[3]])
+ok("a number column has a range domain", e$attrs[[which(vapply(e$attrs, `[[`, "", "label") == "carbon_t")]]$domain$type == "range")
+ok("a text column keeps the dictionary's domain", e$attrs[[which(vapply(e$attrs, `[[`, "", "label") == "state_class")]]$domain$type == "unrep")
+ok("every exported map variable is in the dictionary", all(vapply(c("state-class-<run>-<year>.tif", "age-<run>-<year>.tif", "transition-<group>-<run>-<year>.tif", "carbon-<group>-<run>-<year>.tif", "flow-<group>-<run>-<year>.tif"), function(f) nrow(md_columns(dict, f)) == 1, TRUE)))
+ctn <- data.table(file = c("historical/a/run.xml", "README.txt"), product = c("historical", "release"), bytes = c(10, 31e9))
+x1 <- tempfile(fileext = ".xml"); writeLines("<a>F:/lucasCore/secret</a>", x1)
+ch <- rl_checks(ctn, data.table(name = "x", definition = NA_character_), "bad column", x1, "placeholder: Doi", list(ok = list(FALSE), detail = list("d")))
+ok("every check fails when it should", nrow(ch) == 7 && sum(!ch$Pass) == 6)   # the 100 files check is the one that passes here
+ok("the machine path is found", !ch[grepl("machine path", Check), Pass])
+ok("a check never holds NA", !anyNA(ch$Pass))
+# the README lists only what the folder holds
+rd <- file.path(tmp, "readme-test"); dir.create(file.path(rd, "historical", "h1", "tables"), recursive = TRUE)
+rr <- list(list(folder = "historical", slug = "h1", kind = "historical", years = c(1985, 1990))); pa <- list(citation = list(title = "T"), abstract = "A")
+t1 <- rl_readme(pa, rr, character(), rd)
+ok("README: no comparison, archive, maps or figures in a folder without them", !any(grepl("^comparison/|^archive/|^Maps:|maps/|figures/", t1)))
+for (d in c("comparison", "archive", "historical/h1/maps", "historical/h1/figures")) dir.create(file.path(rd, d), recursive = TRUE)
+t2 <- rl_readme(pa, rr, character(), rd)
+ok("README: each is listed once it is there", all(vapply(c("^comparison/", "^archive/", "^Maps:", "tables/, maps/, figures/"), function(p) any(grepl(p, t2)), TRUE)))
+dbDisconnect(con); unlink(tmp, recursive = TRUE)
+cat(sprintf("%d checks, %d failed\n", n, bad)); if (bad) quit(status = 1)
