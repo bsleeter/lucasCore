@@ -5,7 +5,7 @@ Ideas for the lucasCore pages in SyncroSim Studio, collected during the P26 user
 ## Priorities (2026-11-02)
 
 The open items in order. Item numbers are ids and do not change; this table is the order. The rule from 2026-10-25 still holds: items
-that change the model itself (its inputs or results) come first, and anything built on P26's results (the demo bundle, metadata, the
+that change the model itself (its inputs or results) come first, and anything built on P26's results (metadata, the
 guide's numbers and figures) after them, so it is redone only once. Within that, quick usability fixes go first.
 
 | Order | Item | Changes results? | Why here | Depends on |
@@ -17,20 +17,19 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | ~~1~~ | ~~37 P26 rerun and guide refresh~~ DONE 2026-10-31 | Its own results | Build [53], Historical [54], projections [65]-[67], Compare [71]; guide numbers, figures and grabs; GitHub snapshot rebuilt | 34, 32 |
 | ~~5~~ | ~~12 Data Download stage~~ DONE 2026-11-02 | No (P26 from downloaded data matches [53] where the data are the same) | Phases 1-6, region folders, write-once, editions, national paths; guide 1.6 and blueprints | 35 |
 | 1 | 14 FGDC metadata | No | User order 2026-11-02: first. Plan (a working document, not in this repository) (phases 0-6; decisions settled 2026-11-02: CSDGM first, one release per Build, maps every year, model archive always, ScienceBase folder by hand; Phase 0 done with the user 2026-11-02; Phase 1 built 2026-11-02: defaults/metadata definitions, data dictionary, citations, src/metadata.R, tests/unit-metadata-definitions.R; citation questions in the plan); lineage from the home's manifest and each Build's Data Sources Used | 12 (done) |
-| 2 | 13 Downloadable sample library, Calaveras: fully built and operational | No | User order 2026-11-02: second, before the open science. Built with today's carbon method (rebuilt when 39 changes it); a Calaveras Data Download gives its home; ships with 14's metadata records | 14 |
 | 3 | 39 Grassland, shrubland and wetland carbon: options beyond today's crude method | Yes | User order 2026-11-02: third, with the other open science items (user: explore additional options).  Step 1 (rates on a page) and the diagram view done; the diagram shows emergent wetland rates settling far above their starting pools; suspect values (emergent wetland growth 31, irrigated grass 9.19 Mg C/ha/yr), root turnover splits; the science options (user to decide) | - |
 | open science, user to place | 46 CO2 fertilization | Yes, as an option (off by default) | Added 2026-11-04. Growth has no CO2 response, and its size is similar to the climate penalty in the projections | - |
 | 3 | 43 Historical harvest 12% short: minimum ages in the historical period | Yes (historical harvest, start ages) | Options offered 2026-10-31, user to decide: apply the minimum ages only in projections, or resample start ages from the median | 34 |
 | 4 | 42 Fill prompt names the grassland tables by their old names | No | A wording fix in the Carbon Method page | - |
 | 5 | 31 Copy Carbon Assumptions; SoilGrids option | No (an option) | Convenience and one more soil source | - |
-| ~~any~~ | ~~45 Stratum Sources polygons from Data Download~~ DONE 2026-11-02 | No | Needed before 13 (others could not run stage 1) | 12 |
+| ~~any~~ | ~~45 Stratum Sources polygons from Data Download~~ DONE 2026-11-02 | No | Others could not run stage 1 | 12 |
 | any | 44 Data Download follow-ups | No | Small; (b) the National test runs overnight | 12 |
 | any | 33 Leftovers inside done items | Some | Small, independent; (7) guide 1.4 and (1) deep links any time; (8) and (17) larger | - |
 | later | 26 Guide chapter 9, Troubleshooting | No | After beta testers (user) | beta |
 | later | 36 Guide: Advanced Features (site productivity comparison) | No | After the items above (user); needs a P26 Build with Site productivity on | 35, 37 |
 | later | 38 Stand-replacing insect and disease events | Yes | Option B of 32 (user: eventually); background mortality already excludes them | 32 |
 
-Done since the 2026-10-25 order: 6, 7, 8, 9, 11a, 12, 15-25, 28-30, 32, 34, 35, 37, 40, 41 (item 27 removed by the user).
+Done since the 2026-10-25 order: 6, 7, 8, 9, 11a, 12, 15-25, 28-30, 32, 34, 35, 37, 40, 41 (item 27 removed by the user; item 13, the Calaveras demo bundle, removed by the user 2026-11-04: the Puget library can serve as the demo).
 Pushed: everything through the v1.0.1 release (2026-11-02: strata polygons and no build-machine paths; v1.0.0 the same day); the repo is public, so push only when the user asks.
 
 1. **Data Sources page** - DONE 2026-10-24. Custom view (`ui/DataSourcesView.cs`) groups the paths by category (study area, land
@@ -266,60 +265,6 @@ Pushed: everything through the v1.0.1 release (2026-11-02: strata polygons and n
    - **Robustness**: resumable downloads, size or checksum checks so a half-finished file never counts as present, clear messages for
      login/manual datasets. CONUS-wide sets are tens to hundreds of GB; clipping is the default wherever a service allows it.
    - Downloads and clipping in R (terra, as the stages already do), so it is an ordinary Rscript stage.
-13. **Demo bundle: Calaveras County** - PLANNED 2026-10-29 (user: P26 is too large for a demo library; Calaveras has a good mix of
-   land change). Replaces the P26 bundle below, whose notes on contents, layout, script and hosting still apply.
-   - **Study area**: Calaveras County, CA (GEOID 06009), 2,686 km2, 88 x 64 km. Annual NLCD 1985-2023: developed 97 -> 151 km2
-     (+56%), conifer -184 km2, shrub +173 km2, grass/herbaceous -52 km2 (fire, much of it the 2015 Butte Fire). Two pyromes (P26 1,286
-     km2, P29 1,399 km2; P29's fire model is weaker, AUC 0.56 vs WRC 0.78) and two ecodivisions (M260 2,466 km2, 260 219 km2).
-   - **Resolution: 270 m** (proposed): a multiple of the 30 m sources and FSim's 270 m grid, 37,000 cells. Estimated from P26's 0.6 ms
-     per cell per year (8 h, 1.2 M cells, 39 years, one job): historical run ~15 min, projection ~10 min; 150 m would be ~45 and ~35
-     min. Build ~15-20 min (10 with copied curves) and Projection Setup 5-10 min hardly depend on cell size (stage 2's national FIA fit
-     is 13 min in any library; stages 5-7 read 30 m sources). Whole demo ~50 min at 270 m, ~2 h at 150 m. Use Area-matched resampling
-     (modal keeps about a third of the developed area). One county = one spatial tile; iterations can run as separate jobs.
-     **Test first** (after the P26 reruns, in a new library, never the P26 guide library): a Calaveras Build at 270 m and a 5-year run,
-     to see whether small grids carry a fixed per-timestep cost.
-   - **Delivery, both options (user):** (1) a **finished demo library** (zipped .ssim + data folder: Build, historical run, Projection
-     Setup, three projections, every figure); browse results, copy a projection and change its settings, add a climate future (stage 11
-     with a small LOCA2 clip) - ST-Sim runs need no Data Sources. Can ship before the package changes below. (2) a **Data folder** so a
-     user can follow the guide from an empty library and repeat the Build.
-   - **What the Data folder holds**: county + 10 km buffer for stages 5, 7 and 11 (NLCD, LANDFIRE, LCMS, RCMAP, C-CAP, stand age,
-     soils, roads, PRISM monthly, LOCA2 clip, strata layers); both pyromes for the fire stages 6 and 9 (FSim, FPA-FOD, MTBS, fire
-     perimeters); a fitting region larger than the county for stage 10 (neighbouring counties or the two pyromes; it needs at least 30
-     events per surface).
-   - **Growth curves and carbon rates from scratch**: they need national data (stage 2 fits each forest type to all its plots in the
-     country, then each ecodivision's deviation), but the national tables are small once derived. Ship `FIA/DataMart/` holding only the
-     caches `fia-conditions.rds` (74 MB) and `fia-deadwood.rds` (12 MB) instead of the 15 GB of state CSVs, plus the CONUS PRISM annual
-     normals (tmean, ppt) and the national ecodivision shapefile. Stages 2 and 3 then fit the curves and the measured dead-wood
-     calibration for real with the same national data as the demo Build (FIA Data = DataMart in the demo Build; package default stays
-     .Rds). Optional: the two USGS .Rds files (55 MB) for the default route. **Package change needed**: src/fia.R fia_datamart and
-     fia_dead_wood accept a cache with no CSVs ("tables only" mode, logging the build date and state count), with a unit test; only
-     when no runs are going. Shorter routes for the guide: Growth Curve Options > Copy from another library (the demo library), and
-     Carbon Method = CBM defaults (no FIA; shows how much the calibration matters).
-   - **Also needed for option 2**: item 12's Data Sources Home (paths relative to one folder, so the unzipped bundle resolves with
-     nothing to browse to); clear stage failures when a clipped file does not cover what a stage needs; tools/make-demo-bundle.R that
-     cuts everything, writes README (source, vintage, citation, terms) and manifest, and proves that a fresh library built only from the
-     bundle reproduces the demo Build's areas and initial carbon.
-   - **Hosting**: expected well under 2 GB at 270 m (a GitHub release asset); otherwise Zenodo or ScienceBase with a DOI. Check the
-     terms of PRISM, LOCA2 and NASA CMS stand age; FIA and most other inputs are federal and free to redistribute.
-   **Earlier plan (P26 demo data bundle)** - TO DO (user, 2026-10-25). A stand-alone, shippable set of the input data for the P26 Northern Sierra
-   Nevada example, so a new user can install lucasCore, unzip the bundle and follow the guide end to end without downloading anything.
-   A one-off for a reproducible example, not part of the model or the package.
-   - **Contents**: every Data Sources input the P26 Build, historical run, Projection Setup and Projection Climate read, clipped to P26
-     plus a buffer (the same rule as item 12, so the fitting region, pyrome and edge effects are covered): Annual NLCD, LANDFIRE EVT /
-     disturbance / FRI / elevation / roads, RCMAP, C-CAP, forest type groups, CMS stand age, MTBS, LCMS, NIFC perimeters, FSim, FPA-FOD,
-     PRISM, gSSURGO soil carbon, NCCPI, WUI, forest ownership, the strata layers (ecodivisions, counties, federal lands, pyromes), and the
-     FIA condition tables cut to the plots P26's curves use (CA/NV, or the ecodivisions it touches). LOCA2: a small set (e.g. one or two
-     models, SSP2-4.5 and SSP3-7.0, one member) rather than all ten.
-   - **Layout**: the item 12 home-folder layout and manifest, so the bundle drops in as the Data Sources Home and every path resolves
-     with nothing to browse to. If item 12 is not built yet, ship with a short script or a library already pointing at the folder.
-   - **Built by a script** (e.g. tools/make-demo-bundle.R, outside the package's stages): reads the P26 extent, clips each source from the
-     developer's national copies, writes the layout + manifest, a README (what each file is, source, vintage, citation, licence/terms),
-     and checks that a fresh library built from the bundle alone reproduces the P26 Build (same state class areas and initial carbon).
-   - **Optional extras**: the finished P26 Demo Library (Build, historical run, figures) for users who only want to explore results;
-     the guide's screenshots refer to it.
-   - **Packaging and hosting**: one zip (or a few), size to measure; GitHub release assets are capped at 2 GB per file, so a larger bundle
-     goes to a data repository (Zenodo, ScienceBase) with a DOI, linked from the README and the guide's chapter 1. Check each dataset's
-     terms allow redistribution of a clip, with attribution.
 14. **FGDC metadata for the model and its outputs** - PLANNED 2026-10-31 as a metadata and data release generator following USGS
    FSP (SM 502.7 and 502.8 as reissued 2026-06-01): implementation plan at (a working document, not in this repository) (one
    content model, CSDGM writer, model record, stage 15 Data Release, Release Information page, mp and content checks, review packet,
@@ -355,7 +300,6 @@ Pushed: everything through the v1.0.1 release (2026-11-02: strata polygons and n
      access constraints, citation/DOI, keywords (with thesauri), so the stage fills everything else automatically.
    - **Validation**: run the USGS metadata parser (mp) on every record and report errors in the stage's checks; consider an ISO 19115
      export later from the same content.
-   - Fits with item 13: the P26 demo bundle and a data release of P26 results would ship with these records.
 15. **Run Settings page: two bugs** - FIXED 2026-10-25 (b: the strata names now come from the dependencies' Build Options when the scenario has none) (found setting up the P26 Projection Setup). (a) The stand-alone run list was empty: it read Project.Scenarios, which holds no results (they are in Project.Results); now reads Project.Results and rereads when the drop-down opens. It was also
    built once when the page loads (ProjectionRunView.LoadDataFeed), so a historical run that finishes while the scenario is open is
    missing until the tab is closed and reopened: rebuild the list when the drop-down opens. (b) The tile strata labels read Build Options
