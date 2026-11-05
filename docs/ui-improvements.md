@@ -11,7 +11,7 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | Order | Item | Changes results? | Why here | Depends on |
 | --- | --- | --- | --- | --- |
 | ~~1~~ | ~~22 Automatic spatial tiles~~ DONE 2026-10-29 | No | Small and self-contained; users otherwise need to know the region to pick Tiles | - |
-| ~~2~~ | ~~35 TreeMap: forest type, stand age, site productivity (with 10)~~ DONE 2026-10-30 | Yes, as options (off by default) | Code, pages, figure, tests and P26 sync done; its guide content is item 36 | - |
+| ~~2~~ | ~~35 TreeMap: forest type, stand age, site productivity (with 10)~~ DONE 2026-10-30 | Yes, as options (off by default) | Code, pages, figure, tests and P26 sync done | - |
 | ~~3~~ | ~~34 Minimum harvest ages~~ DONE 2026-10-30 | Yes (projections; stage 6 start ages) | FIA values lowered to the study area's mapped cuts; selection at least 10 yr under clearcut | 35's age source |
 | ~~1~~ | ~~32 Carbon open science issues~~ DONE 2026-10-30 | Yes | Stem turnover fitted to FIA background mortality (snags now match); duff bound harmless; California event shares hold nationally | - |
 | ~~1~~ | ~~37 P26 rerun and guide refresh~~ DONE 2026-10-31 | Its own results | Build [53], Historical [54], projections [65]-[67], Compare [71]; guide numbers, figures and grabs; GitHub snapshot rebuilt | 34, 32 |
@@ -21,16 +21,12 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | open science, user to place | 46 CO2 fertilization | Yes, as an option (off by default) | Added 2026-11-04. Growth has no CO2 response, and its size is similar to the climate penalty in the projections | - |
 | 3 | 43 Historical harvest 12% short: minimum ages in the historical period | Yes (historical harvest, start ages) | Options offered 2026-10-31, user to decide: apply the minimum ages only in projections, or resample start ages from the median | 34 |
 | 4 | 42 Fill prompt names the grassland tables by their old names | No | A wording fix in the Carbon Method page | - |
-| 5 | 31 Copy Carbon Assumptions; SoilGrids option | No (an option) | Convenience and one more soil source | - |
 | ~~any~~ | ~~45 Stratum Sources polygons from Data Download~~ DONE 2026-11-02 | No | Others could not run stage 1 | 12 |
-| any | 44 Data Download follow-ups | No | Small; (b) the National test runs overnight | 12 |
-| any | 33 Leftovers inside done items | Some | Small, independent; (7) guide 1.4 and (1) deep links any time; (8) and (17) larger | - |
-| later | 26 Guide chapter 9, Troubleshooting | No | After beta testers (user) | beta |
-| later | 36 Guide: Advanced Features (site productivity comparison) | No | After the items above (user); needs a P26 Build with Site productivity on | 35, 37 |
-| later | 38 Stand-replacing insect and disease events | Yes | Option B of 32 (user: eventually); background mortality already excludes them | 32 |
 | later | 47 Example libraries by region and resolution | No (each holds its own results) | Added 2026-11-04, replaces 13. Best built after the open science items, since each carbon change dates them | 14, restore test |
+| any | 48 Say gNATSGO, not gSSURGO, throughout the package | No numbers, some text in outputs | Added 2026-11-04. Best before a data release, since the wording reaches run logs and the SoilSource column | - |
+| any | 49 Test national mode end to end | No | Added 2026-11-04. Never run end to end; fills about 175 GB overnight | 12 (done) |
 
-Done since the 2026-10-25 order: 6, 7, 8, 9, 11a, 12, 15-25, 28-30, 32, 34, 35, 37, 40, 41 (item 27 removed by the user; item 13, the Calaveras demo bundle, removed by the user 2026-11-04; which library serves as the demo is undecided, not Puget, which has no fire, and the user will come back to it).
+Done since the 2026-10-25 order: 6, 7, 8, 9, 11a, 12, 15-25, 28-30, 32, 34, 35, 37, 40, 41 (item 27 removed by the user; item 13, the Calaveras demo bundle, removed by the user 2026-11-04; which library serves as the demo is undecided, not Puget, which has no fire, and the user will come back to it; items 26, 31, 33, 36, 38 and 44 removed by the user 2026-11-04, their text is in git history).
 Pushed: everything through the v1.0.1 release (2026-11-02: strata polygons and no build-machine paths; v1.0.0 the same day); the repo is public, so push only when the user asks.
 
 1. **Data Sources page** - DONE 2026-10-24. Custom view (`ui/DataSourcesView.cs`) groups the paths by category (study area, land
@@ -182,7 +178,7 @@ Pushed: everything through the v1.0.1 release (2026-11-02: strata polygons and n
    overnight). Also: Data Sources Used output (every Build stage: datasets read, where from, checksums); NLCD WCS tile corners fixed
    (a thin last tile row landed a row high); the Data Sources page finds regions and shows marks whole; dataset rows on the Data
    Download page say how each comes and its P26 size; LOCA2 Rescan reads the home. Guide section 1.6 (Figures 1.15-1.21) and both
-   blueprints updated. Plans: (a working document, not in this repository). Follow-ups are item 44. History below.
+   blueprints updated. Plans: (a working document, not in this repository). History below.
    PLANNED 2026-10-31: implementation plan at
    (a working document, not in this repository) (every one of the 27 Data Sources researched: 10 clipped by the source - NLCD WCS,
    LANDFIRE LFPS, NIFC REST, C-CAP and gNATSGO windowed reads; 12 whole files clipped after; 1 Earthdata login; 4 with no public
@@ -389,8 +385,6 @@ Pushed: everything through the v1.0.1 release (2026-11-02: strata polygons and n
     0.5%; tighten it to an exact match (within rounding) or remove it - user's choice. The guide's sentence about it is already gone.
 25. **Guide: P26 numbers after the reruns** - DONE 2026-10-29 (ids, 7.2-7.4 numbers, Figures 7.8-7.11 and 7.28-7.31, six re-grabs). Update 7.2 (projection start 443.2 -> 444.3 Tg C), the 7.3 timings if they change,
     7.4's tables and figures, and Appendix A where it quotes projection results.
-26. **Guide chapter 9, Troubleshooting** (chapter 10 before the 2026-10-29 renumbering) - LATER (user, 2026-10-29: after beta testers have used the guide; their problems feed it). Still a placeholder; include the Validation outputs and the failures met so far
-    (dependency order, a Boolean stored as 1, result pages greyed out, spatial multiprocessing mask).
 28. **Mature age per forest type** - DONE 2026-10-29 (Carbon Assumptions: Mature Age by Forest Type; docs/carbon-assumptions.md). Was (left over from 18/21): Decay Calibration Settings has one mature age (60) and one
     disturbance-free window (30 yr) for every type; stands reach a steady dead-wood level at very different ages (oak woodland and
     lodgepole sooner, fir/spruce and mixed conifer later). Add an optional per-forest-type (and per-ecodivision) row, blank = the
@@ -404,22 +398,6 @@ Pushed: everything through the v1.0.1 release (2026-11-02: strata polygons and n
     and splits, each dead pool's base rate x temperature effect x multiplier, emitted vs passed on, snag fall, fire and clearcut shares,
     mean temperature, Q10, key growth curve values) with each value's source (CBM default, calibrated, measured, user); a read-only page
     on the Build result with ecodivision and forest type drop-downs shows them.
-31. **Carbon Assumptions: copy from another library** - TO DO (planned 2026-10-27, as Growth Curve Options' copy), and the **SoilGrids**
-    option for Soil Organic Carbon (user, 2026-10-28).
-    **SoilGrids scoped 2026-10-30** (user asked for the level of effort). Today one soil map, Data Sources: gSSURGO Soil Organic Carbon
-    (gssurgo_soc_0_999.tif, g C/m2), is used in two places: stage 5 averages it per ecodivision x forest type into Soil Targets (stage
-    3 calibrates soil decay so the spin-up's deep soil matches them), and stage 8 fills it into non-forest cells. Carbon Method: Soil
-    Organic Carbon = gSSURGO | CBM defaults. SoilGrids 2.0 (ISRIC, 250 m, global, CC-BY 4.0) has no ready 0-100 cm stock (its "ocs"
-    layer is 0-30 cm); a matching stock is soc x bulk density x (1 - coarse fragments) x thickness over its 0-5, 5-15, 15-30, 30-60
-    and 60-100 cm layers (15 rasters, Homolosine, cloud-optimized VRTs). Plan: (1) tools/build-soilgrids-soc.R: download the CONUS
-    window once, compute 0-100 cm SOC in g C/m2 (and its Q0.05/Q0.95 range from the uncertainty layers), write one GeoTIFF on the
-    gSSURGO grid conventions (~0.5 day, mostly download); (2) Data Sources: SoilGrids Soil Organic Carbon file (schema change ->
-    sync-library); (3) stage 5 writes a target per source (a second column in Soil Targets), stage 8 fills non-forest from the chosen
-    source, stage 3 picks by Carbon Method; Soil Organic Carbon list gains "SoilGrids (soil decay calibrated to its soil organic
-    carbon)"; Carbon Method page and Data Sources page entries (~0.5-1 day); (4) tests on Placer, and a P26 comparison of the two
-    targets per ecodivision x type (~0.5 day). Total ~1.5-2 days. Known difference to expect: SoilGrids runs higher than SSURGO in
-    forests and mountains; gSSURGO has gaps (unmapped areas) that SoilGrids would fill - a "gSSURGO, SoilGrids where missing" choice
-    is cheap once both exist. A first look (download the P26 window only, compare targets) needs the user's OK to download.
 32. **Carbon open science issues** - DONE 2026-10-30 (raised 2026-10-27): snags short in 96 cells even at the lowest snag decay (inputs or fall
     rate; user offered to look); duff multiplier at its 20 bound in 19 cells; the fitted fire/clearcut transfers and fire snag shares
     are California-fitted but applied everywhere.
@@ -461,18 +439,7 @@ Pushed: everything through the v1.0.1 release (2026-11-02: strata polygons and n
     0.06, southeastern low-carbon stands, likely salvaged); down logs gained ~0 everywhere; forest floor kept 0.18-0.29 vs 0.18.
     Clearcut (1,000 pairs): snags left 0.00-0.04 and median down logs gained 0.00-0.05 of the wood before everywhere, as M260 and the
     model (0.02); only the means differ (Subtropical 0.74, Warm Continental 2.8: a few site-preparation piles); forest floor kept
-    0.42-1.1 (M260 0.66). The M260 fits stand; regional overrides stay possible in Disturbance Flows and Fire Snag Share. Item 32 DONE;
-    option B is item 38.
-38. **Stand-replacing insect and disease events (to-do 32 option B)** - LATER (user, 2026-10-30: "eventually"). Background mortality
-    is now stem turnover fitted to FIA without stand-replacing losses (item 32). B adds only the stand-replacing (>= 70% of live
-    carbon) insect and disease events as discrete spatial events, so nothing is counted twice: a transition group with maps (LANDFIRE
-    Annual Disturbance insect/disease types and severity, which stage 6 already reads; ADS/IDS; LCMS slow loss; Meddens & Hicke for a
-    check) and pathways; the Insect flow rows already in defaults/stockflow/event-pathways.csv. Where it matters most: lodgepole and
-    aspen in Temperate Steppe Mountains, lodgepole in Marine Mountains (34-38% of their mortality is stand-replacing).
-33. **Leftovers inside done items** - TO DO: (1) Data Sources deep links into the USFS Research Data Archive; (7) guide 1.4 on
-    multiprocessing for tiled runs (check against the P26 setup); (8) a full P26 Build + historical run with Area-matched resampling to
-    compare carbon, transitions and figures, and matching the state class splits within NLCD classes (forest type, shrub/grass,
-    wetland types), still modal; (17) Monte Carlo bands and sign-agreement maps in Compare Runs.
+    0.42-1.1 (M260 0.66). The M260 fits stand; regional overrides stay possible in Disturbance Flows and Fire Snag Share. Item 32 DONE.
 34. **Calibrate the minimum harvest ages** - TO DO (scoped 2026-10-29, user: matters for projections, where cut cells must meet it; method
     not chosen yet). Today defaults/transitions/pathways/harvest.csv gives Forest Clearcut one AgeMin per forest type, copied from the
     CONUS 1 km build (20-161 yr: mixed conifer 92, redwood and Other Western Softwood 161); the selection types have none. Stage 9 uses
@@ -522,7 +489,7 @@ Pushed: everything through the v1.0.1 release (2026-11-02: strata polygons and n
     Page checked in Studio (user, 2026-10-30). Not done: P26 needs a Build + Historical rerun to pick it up (initial ages and carbon change);
     guide section for the page.
 35. **TreeMap: forest type, stand age and site productivity from one map** - DONE 2026-10-30 (planned 2026-10-29; user: use TreeMap; combines item 10;
-    full plan in docs/treemap-plan.md). **Phase 0 done 2026-10-29: go** (site class moves carbon at age around stage 2's own curves, mixed conifer m 1.59 -> 0.52 from site class 2 to 6; every P26 TreeMap pixel gets a site class with all 48 states' COND; Climate and Site Productivity flow multiplier types multiply in ST-Sim, untyped climate rows still work; details in the plan). Choices (user): TreeMap 2016, multipliers by type x ecodivision, Site Productivity off by default. **Step 1 schema-free part done** (src/treemap.R, tests/unit-treemap.R); **Step 2 done 2026-10-30** (ac971f3: TreeMap as Forest Type Map and Stand Age Source in stage 5; new columns need tools/sync-library.R --reference=dev/libs/sync-reference.ssim). P26 synced 2026-10-30. **Step 3 done** (site class multipliers in stage 2, Build Results > Site Productivity). **Step 4 stage 5 half done** (site class share maps). **Steps 4-6 done** (stage 8: cell multiplier, Site Productivity flow multiplier, scaled initial stocks; stages 7/11 tag Climate). **Step 7 pages done** (Build Options: Growth > Site productivity; Build Results > Site Productivity page). **Stage 12 Site productivity figure done** (pages checked in Studio). **Projection carry-over tested** (fixed: stages read dependencies from the run's parent). **P26 synced for the multiplier types 2026-10-30** (Climate, Site Productivity; sync-library read the one-column CSV wrong, fixed). Guide 3.3 updated (Build Options grab, Stand age and Growth steps). The rest of the guide work is item 36.
+    full plan in docs/treemap-plan.md). **Phase 0 done 2026-10-29: go** (site class moves carbon at age around stage 2's own curves, mixed conifer m 1.59 -> 0.52 from site class 2 to 6; every P26 TreeMap pixel gets a site class with all 48 states' COND; Climate and Site Productivity flow multiplier types multiply in ST-Sim, untyped climate rows still work; details in the plan). Choices (user): TreeMap 2016, multipliers by type x ecodivision, Site Productivity off by default. **Step 1 schema-free part done** (src/treemap.R, tests/unit-treemap.R); **Step 2 done 2026-10-30** (ac971f3: TreeMap as Forest Type Map and Stand Age Source in stage 5; new columns need tools/sync-library.R --reference=dev/libs/sync-reference.ssim). P26 synced 2026-10-30. **Step 3 done** (site class multipliers in stage 2, Build Results > Site Productivity). **Step 4 stage 5 half done** (site class share maps). **Steps 4-6 done** (stage 8: cell multiplier, Site Productivity flow multiplier, scaled initial stocks; stages 7/11 tag Climate). **Step 7 pages done** (Build Options: Growth > Site productivity; Build Results > Site Productivity page). **Stage 12 Site productivity figure done** (pages checked in Studio). **Projection carry-over tested** (fixed: stages read dependencies from the run's parent). **P26 synced for the multiplier types 2026-10-30** (Climate, Site Productivity; sync-library read the one-column CSV wrong, fixed). Guide 3.3 updated (Build Options grab, Stand age and Growth steps).
     **Why.** Every cell of one forest type, ecodivision and age grows on the same curve; only the climate multipliers (stages 7 and 11)
     vary growth in space. TreeMap (USFS, 30 m) gives each forest pixel an imputed FIA plot; through the plot's FIA condition the pixel
     carries forest type (FORTYPCD), stand age (STDAGE) and site class (SITECLCD, 1 = 225+ to 7 = 0-19 cu ft/ac/yr), consistent with
@@ -557,24 +524,6 @@ Pushed: everything through the v1.0.1 release (2026-11-02: strata polygons and n
     **Other sources considered.** NFCMS Forest Productivity (PSW_ForestProductivity.tif, 30 m, values 0-10, legend unknown); gSSURGO
     forest productivity tables (not on disk); LANDFIRE has no productivity layer (canopy height / stand age as a site index proxy is
     a possible check only).
-36. **Guide: Advanced Features chapter, starting with site productivity** - PLANNED 2026-10-30 (user: keep the guide's walkthrough as
-    the basic approach, all defaults; advanced options go in their own chapter; do the other to-do items first, then return).
-    **Why a separate chapter.** Site Productivity is off by default, so the walkthrough shows what a new user gets; redoing it with
-    the option on would change every number in it (439 Tg C, run times, figures, projections) for no gain to a basic user, and the
-    option is not yet run on P26. Shown next to the basic Build, it also shows what the option changes.
-    **Chapter outline.** (1) What the TreeMap options are: Forest type map = TreeMap, Stand age = TreeMap, Site productivity = TreeMap
-    site class; the data they need (Data Sources: TreeMap Folder, FIA DataMart COND tables) and that older libraries need
-    tools/sync-library.R. (2) Make the variant: copy the P26 Build to "P26 - Build (site productivity)", Site productivity on, nothing
-    else changed; run it. (3) Read it: Build Results > Site Productivity (multipliers by forest type, ecodivision and site class),
-    the stage 12 Site productivity figure (multiplier map, mean site class map), Initial Stock Summary against the basic Build.
-    (4) Compare: a historical run 1985-2023 on each Build, then Compare Runs (stage 14) on the two: carbon stocks and growth by year,
-    by forest type and by area. Optionally the same projection on each. Later candidates for the chapter: Growth Inputs and Mature
-    Age by Forest Type (now in 3.6), TreeMap forest type and stand age, Area-matched resampling.
-    **Runs needed (in the P26 guide library, so ask first; only the user creates scenarios there).** The site productivity Build at
-    150 m (about as long as the basic Build), its historical run, a Compare Runs scenario; grabs of the Build Options with Site
-    productivity on, the Site Productivity page, the figure and the comparison figures.
-    **Open questions.** Which comparison figures make the point (stocks by year, growth by forest type, a difference map?); whether
-    the chapter also covers TreeMap forest type and stand age, which change the initial map itself.
 37. **P26 rerun and guide refresh** - DONE 2026-10-31. The first historical rerun (result 52) lost half its fire and urbanization:
     stage 6 wrote harvest-age pathways per ecodivision for two forest types, and ST-Sim then dropped those classes' blank-stratum
     pathways. Fixed (58ed57b, 737328c; user rule: strata are used everywhere or nowhere, so with any ecodivision harvest age every
@@ -590,7 +539,7 @@ Pushed: everything through the v1.0.1 release (2026-11-02: strata polygons and n
     Historical run in the user's guide library (the user runs them, or asks Claude to); then the guide's P26 numbers and figures
     (initial carbon 439 Tg C, run times, Build figures, Historical Transition Summary, projections), and a guide section on the
     Minimum Harvest Age page with a grab (the options, the rows, Build Results > Minimum Harvest Ages). Site Productivity stays off in
-    the walkthrough (item 36 covers it).
+    the walkthrough.
     **2026-10-30: the user is running the P26 Build and Historical run in Studio** (item 32 done: stem turnover changed too). Checks
     after: the Build's Validation all Pass; stage 3's log "Live Turnover: ... rows from the package" (if it says "from Carbon
     Assumptions", P26's Carbon Assumptions scenario has its own Live Turnover rows, which win: Fill on the Carbon Method page replaces
@@ -657,14 +606,6 @@ Pushed: everything through the v1.0.1 release (2026-11-02: strata polygons and n
     little after an earlier clearcut. Options: apply the minimum ages only in projections (the record's cuts are fixed history), or
     resample start ages from the median rather than raising them to the minimum; either changes start ages and initial carbon, so it
     goes with a rerun.
-44. **Data Download follow-ups** - TO DO (from item 12, 2026-11-02). (a) Guide Figure 1.22, the Data Sources edition drop-down, once a
-    home holds a second edition (placeholder and caption were taken out of the doc; add both back with the image). (b) National mode end
-    to end: fill a national home (about 175 GB, overnight; MRLC served about 1.3 MB/s) and run stage 1 on P26 and P29 against it.
-    (c) Log messages and comments in stages 3, 5 and 8 still say gSSURGO (the labels say gNATSGO). (d) Test scenarios 14, 15, 16, 22
-    and 24 in the phase 6 Download library and 12-18 in download-test.ssim: keep as regression checks or delete. (e) The older guide
-    library backup (LUCAS P26 Northern Sierra Nevada.ssim.bak-20261102-0804, 3.4 GB) can go. (f) The P26 home's NLCD files keep the
-    WCS edge row (row 12000, in the buffer, outside what the Build reads); a fresh download is right. (g) PARKED (user): fetch FIA
-    DataMart only for the states a study area needs.
 45. **Stratum Sources polygons from Data Download** - DONE 2026-11-02 (user: "a major omission"; nobody without the build machine
     could run stage 1 or a Data Download for a study area: every preset but the ecodivisions named a file under the build machine).
     Data Download fetches them first, national, at the top of the home (study-area/): StatesFile (TIGER 2009), CountiesFile (TIGER
@@ -725,3 +666,18 @@ Pushed: everything through the v1.0.1 release (2026-11-02: strata polygons and n
     or similar. A coarser version of a region could be the small entry point; a results-only download would be a new stage 17 option.
   - **For the user to decide:** which regions and resolutions; whether each is a formal USGS data release with its own review, or some are
     informal examples; where the catalog lives.
+
+48. **Say gNATSGO, not gSSURGO, throughout the package** - TO DO (user, 2026-11-04). The soil data the package reads and downloads is gNATSGO
+    (gSSURGO with its gaps filled), and some labels already say so (Soil Organic Carbon list, Data Sources page), but gSSURGO remains elsewhere.
+    Git grep counts: src 31 (3-carbon-flows 12, 8-initial-stocks-spatial 6, 5-initial-conditions 4, calibrate 4, dom 2, figures 2,
+    download-sources 1), guide 8, docs/carbon-assumptions.md 4, README 3, docs/carbon-build-process.md 2, tests 10, tools 2, defaults 4, package.xml 1.
+  - **It reaches outputs, not only comments:** run log lines (stages 3, 5, 8) and the SoilSource text in stage 3's rate table
+    ("Forest type median (no gSSURGO target)"), so results run after the change read differently from older ones. Numbers do not change.
+  - **Check before changing:** the text match on the Soil Organic Carbon choice in src/3-carbon-flows.R (line 186) still works; tests that
+    match the old wording; and keep the mentions that are correct: package.xml's "gSSURGO also reads" (a gSSURGO file still works) and
+    data-sources.csv's "gSSURGO with its gaps filled". Done when the only gSSURGO left describes that relationship. Mirror any guide change in docs/guide/source.
+  - **Timing:** src/ and package.xml edits wait until no run is going.
+
+49. **Test national mode end to end** - TO DO (user, 2026-11-04; carried over from item 44). Fill a national home (about 175 GB, overnight; MRLC
+    served about 1.3 MB/s), then run stage 1 on P26 and P29 against it. Done when both pass and their study areas match the same regions built
+    from regional downloads; report what differs. Needs enough free disk and an overnight window, and RCMAP still comes by hand (see <home>/supplied).
