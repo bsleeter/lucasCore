@@ -29,7 +29,7 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | later | 36 Guide: Advanced Features (site productivity comparison) | No | After the items above (user); needs a P26 Build with Site productivity on | 35, 37 |
 | later | 38 Stand-replacing insect and disease events | Yes | Option B of 32 (user: eventually); background mortality already excludes them | 32 |
 
-Done since the 2026-10-25 order: 6, 7, 8, 9, 11a, 12, 15-25, 28-30, 32, 34, 35, 37, 40, 41 (item 27 removed by the user; item 13, the Calaveras demo bundle, removed by the user 2026-11-04: the Puget library can serve as the demo).
+Done since the 2026-10-25 order: 6, 7, 8, 9, 11a, 12, 15-25, 28-30, 32, 34, 35, 37, 40, 41 (item 27 removed by the user; item 13, the Calaveras demo bundle, removed by the user 2026-11-04; which library serves as the demo is undecided, not Puget, which has no fire, and the user will come back to it).
 Pushed: everything through the v1.0.1 release (2026-11-02: strata polygons and no build-machine paths; v1.0.0 the same day); the repo is public, so push only when the user asks.
 
 1. **Data Sources page** - DONE 2026-10-24. Custom view (`ui/DataSourcesView.cs`) groups the paths by category (study area, land
