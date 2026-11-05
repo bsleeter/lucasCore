@@ -18,22 +18,38 @@ loca2_files <- function(folder, gcm, member, run, var) {
 loca2_has_run <- function(folder, gcm, member, ssp)
   all(vapply(c("historical", ssp), function(r) all(vapply(c("pr", "tasmax", "tasmin"), function(v) nrow(loca2_files(folder, gcm, member, r, v)) > 0, TRUE)), TRUE))
 
+# one monthly file as a raster, longitudes shifted to -180..180
+loca2_rast <- function(f) {
+  r <- terra::rast(f); e <- terra::ext(r)
+  if (terra::xmax(e) > 180) terra::ext(r) <- terra::ext(terra::xmin(e) - 360, terra::xmax(e) - 360, terra::ymin(e), terra::ymax(e))
+  r }
+
+# one file per period. A home's LOCA2 folder serves all its regions, so it can hold the west cut (".west.monthly.nc") and the CONUS
+# file of the same run and years: take the file that covers the most of `win`, and on a tie the smaller cut, which reads faster
+loca2_best <- function(fs, win) {
+  if (!nrow(fs)) return(fs)
+  ex <- lapply(fs$file, function(f) terra::ext(loca2_rast(f)))
+  span <- function(a0, a1, b0, b1) max(0, min(a1, b1) - max(a0, b0))
+  cover <- vapply(ex, function(e) span(terra::xmin(e), terra::xmax(e), terra::xmin(win), terra::xmax(win)) * span(terra::ymin(e), terra::ymax(e), terra::ymin(win), terra::ymax(win)), 0)
+  area <- vapply(ex, function(e) (terra::xmax(e) - terra::xmin(e)) * (terra::ymax(e) - terra::ymin(e)), 0)
+  o <- order(fs$y0, fs$y1, -round(cover, 6), area); o <- o[cover[o] > 0]
+  unique(fs[o], by = c("y0", "y1")) }
+
 # annual series of "tmean" (C) or "ppt" (mm) for the years asked, cropped to `win` (a lon/lat extent), one layer per year named by year
 loca2_annual <- function(folder, gcm, member, ssp, var, years, win) {
   run_of <- function(y) if (y <= 2014) "historical" else ssp
   read_var <- function(v) {
     out <- list()
-    for (run in unique(vapply(years, run_of, ""))) { yrs <- years[vapply(years, run_of, "") == run]; fs <- loca2_files(folder, gcm, member, run, v)
+    for (run in unique(vapply(years, run_of, ""))) { yrs <- years[vapply(years, run_of, "") == run]; fs <- loca2_best(loca2_files(folder, gcm, member, run, v), win)
       for (i in seq_len(nrow(fs))) { want <- yrs[yrs >= fs$y0[i] & yrs <= fs$y1[i]]; if (!length(want)) next
-        r <- terra::rast(fs$file[i]); e <- terra::ext(r)
-        if (terra::xmax(e) > 180) terra::ext(r) <- terra::ext(terra::xmin(e) - 360, terra::xmax(e) - 360, terra::ymin(e), terra::ymax(e))
+        r <- loca2_rast(fs$file[i])
         tm <- terra::time(r); yy <- as.integer(format(tm, "%Y")); keep <- which(yy %in% want)
         r <- terra::crop(r[[keep]], win); tm <- tm[keep]; yy <- yy[keep]
         if (v == "pr") { mo <- as.integer(format(tm, "%m")); days <- as.integer(format(as.Date(paste(yy + (mo == 12), mo %% 12 + 1, 1, sep = "-")) - 1, "%d"))
           r <- r * (days * 86400) }   # one value per layer: mm in each month
         out[[length(out) + 1]] <- terra::tapp(r, index = yy, fun = if (v == "pr") "sum" else "mean") } }
     miss <- setdiff(years, as.integer(sub("^X", "", unlist(lapply(out, names)))))
-    if (length(miss)) stop(sprintf("LOCA2 %s %s %s %s: no monthly data for %s", gcm, member, ssp, v, paste(range(miss), collapse = "-")), call. = FALSE)
+    if (length(miss)) stop(sprintf("LOCA2 %s %s %s %s: no monthly data over the study window for %s", gcm, member, ssp, v, paste(range(miss), collapse = "-")), call. = FALSE)
     x <- terra::rast(out); names(x) <- sub("^X", "", names(x)); x[[as.character(years)]] }
   if (var == "ppt") return(read_var("pr"))
   (read_var("tasmax") + read_var("tasmin")) / 2 - 273.15 }
