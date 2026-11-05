@@ -19,6 +19,7 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | 1 | 14 FGDC metadata | No | User order 2026-11-02: first. Plan (a working document, not in this repository) (phases 0-6; decisions settled 2026-11-02: CSDGM first, one release per Build, maps every year, model archive always, ScienceBase folder by hand; Phase 0 done with the user 2026-11-02; Phase 1 built 2026-11-02: defaults/metadata definitions, data dictionary, citations, src/metadata.R, tests/unit-metadata-definitions.R; citation questions in the plan); lineage from the home's manifest and each Build's Data Sources Used | 12 (done) |
 | 2 | 13 Downloadable sample library, Calaveras: fully built and operational | No | User order 2026-11-02: second, before the open science. Built with today's carbon method (rebuilt when 39 changes it); a Calaveras Data Download gives its home; ships with 14's metadata records | 14 |
 | 3 | 39 Grassland, shrubland and wetland carbon: options beyond today's crude method | Yes | User order 2026-11-02: third, with the other open science items (user: explore additional options).  Step 1 (rates on a page) and the diagram view done; the diagram shows emergent wetland rates settling far above their starting pools; suspect values (emergent wetland growth 31, irrigated grass 9.19 Mg C/ha/yr), root turnover splits; the science options (user to decide) | - |
+| open science, user to place | 46 CO2 fertilization | Yes, as an option (off by default) | Added 2026-11-04. Growth has no CO2 response, and its size is similar to the climate penalty in the projections | - |
 | 3 | 43 Historical harvest 12% short: minimum ages in the historical period | Yes (historical harvest, start ages) | Options offered 2026-10-31, user to decide: apply the minimum ages only in projections, or resample start ages from the median | 34 |
 | 4 | 42 Fill prompt names the grassland tables by their old names | No | A wording fix in the Carbon Method page | - |
 | 5 | 31 Copy Carbon Assumptions; SoilGrids option | No (an option) | Convenience and one more soil source | - |
@@ -732,3 +733,30 @@ Pushed: everything through the v1.0.1 release (2026-11-02: strata polygons and n
     tests/unit-strata-home.R, tests/phaseZ26-strata-home.R (stage 1 on P26, home vs the old local files). Then (same day, user):
     package.xml lost its 24 Data Sources defaults (F: paths): a blank path reads the home or the package, else stops saying to run a
     Data Download; so a new library no longer scans the build machine's LOCA2 folder (the shipped lists, then Rescan).
+
+46. **CO2 fertilization** - TO DO, open science (user, 2026-11-04: how can we introduce the effect of CO2 fertilization into the model?).
+    Today no growth pathway responds to CO2, so projected growth carries the climate penalty with no offset, and the SSPs differ only
+    through climate. Nothing is built; the proposal below is a starting point and its literature values are from memory, to verify.
+  - **Proposed form:** the standard beta factor, `multiplier = 1 + beta x ln(CO2 in year t / CO2 reference)`, with one flow multiplier per
+    growth flow group and year, under its own Flow Multiplier Type ("CO2"), like Climate and Site Productivity. It does not vary across the
+    map, so non-spatial rows in stsim_FlowMultiplier may do; check that they combine with the spatial multipliers as expected. Dead pools
+    follow through larger litter inputs, with no change to decay.
+  - **Reference year (the main trap):** the growth curves are fitted to FIA plots, so they already hold the CO2 of those measurements.
+    The reference must be the CO2 of the plots' measurement years, not preindustrial, or the effect is counted twice. Before that window the
+    multiplier falls below 1, so decide whether it applies in the historical period too, and test the stage 13 hand-over.
+  - **No overlap found in the climate terms, to confirm:** the tree-ring response comes from standardized ring-width indices, whose long-term
+    trend is largely removed, and Miami NPP is a climatology with no CO2 term. Check that the standardization used does remove it.
+  - **Beta is the uncertainty, so run it as a range:** FACE experiments gave about +23% NPP in young stands at about 550 ppm (Norby 2005;
+    beta about 0.6), but the response faded under nitrogen limitation (Oak Ridge; Norby 2010), mature stands responded little or not at all
+    (EucFACE; Ellsworth 2017, Jiang 2020), and tree rings often show better water-use efficiency without more growth (Penuelas 2011, van der
+    Sleen 2015). Choices: one beta with low/central/high cases (0 = today), or by functional type. Possible refinements: lower in mature
+    stands, on nitrogen-poor sites, and for C4 grasses, with more response where water limits growth.
+  - **Size against the climate signal:** at about 530 ppm by 2050 (to check against the SSP table) from a 400 ppm reference, beta 0.3 gives
+    about +8% and beta 0.6 about +17%. Puget's forest climate multipliers in 2041-50 are 0.90-0.94 (results 30, 32, 33), so the same size and
+    able to change the sign of a growth trend.
+  - **Inputs and options:** CO2 by year from observations (NOAA) and the SSP concentrations (Meinshausen 2020), shipped in defaults/climate
+    with citations, so no download. Climate Options gets a CO2 effect (None by default, so results do not change) and beta. Stage 11 reads
+    the run's SSP. A run with no climate (constant climate) needs a stated choice: probably no CO2 either.
+  - **Testing:** FIA remeasurement failed a placebo test for annual climate sensitivity (defaults/climate/README.md), so it is unlikely to
+    isolate a CO2 trend. Report results as a sensitivity range, with the unit tests checking the multiplier against hand values.
+  - **For the user to decide:** whether it applies in the historical period; which betas; whether beta varies by stand age or type.
