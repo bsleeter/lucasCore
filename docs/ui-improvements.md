@@ -28,6 +28,7 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | later | 26 Guide chapter 9, Troubleshooting | No | After beta testers (user) | beta |
 | later | 36 Guide: Advanced Features (site productivity comparison) | No | After the items above (user); needs a P26 Build with Site productivity on | 35, 37 |
 | later | 38 Stand-replacing insect and disease events | Yes | Option B of 32 (user: eventually); background mortality already excludes them | 32 |
+| later | 47 Example libraries by region and resolution | No (each holds its own results) | Added 2026-11-04, replaces 13. Best built after the open science items, since each carbon change dates them | 14, restore test |
 
 Done since the 2026-10-25 order: 6, 7, 8, 9, 11a, 12, 15-25, 28-30, 32, 34, 35, 37, 40, 41 (item 27 removed by the user; item 13, the Calaveras demo bundle, removed by the user 2026-11-04; which library serves as the demo is undecided, not Puget, which has no fire, and the user will come back to it).
 Pushed: everything through the v1.0.1 release (2026-11-02: strata polygons and no build-machine paths; v1.0.0 the same day); the repo is public, so push only when the user asks.
@@ -704,3 +705,23 @@ Pushed: everything through the v1.0.1 release (2026-11-02: strata polygons and n
   - **Testing:** FIA remeasurement failed a placebo test for annual climate sensitivity (defaults/climate/README.md), so it is unlikely to
     isolate a CO2 trend. Report results as a sensitivity range, with the unit tests checking the multiplier against hand values.
   - **For the user to decide:** whether it applies in the historical period; which betas; whether beta varies by stand age or type.
+
+47. **Example libraries by region and resolution** - TO DO, idea stage (user, 2026-11-04; replaces item 13). A range of libraries, already
+    run and able to be rerun, covering different regions and resolutions. Users pick the one that matches their interest: geography, land
+    cover, major transitions or model resolution.
+  - **No separate demo code (user):** each library is a data release (stage 17), whose archive is a `.ssimbak` of the whole library, with its
+    tables, maps, figures, metadata and rerun instructions.
+  - **Must pass first:** restore an archive into a new library and run a parent scenario, ideally on another computer (user: later).
+    tests/phaseZ-data-release.R only checks that the `.ssimbak` exists, so `how-to-rerun.txt` is unproven. The archive holds no Data Sources
+    Home inputs, so the test should also show what can rerun without a Data Download.
+  - **Keeping them current:** each library is tied to a package version and carbon method, so items 39 and 46 date them. Build the full set
+    after the open science items settle, with one or two until then, and treat each as a fixed, versioned release that states its package version.
+  - **Catalog:** one page or table: region, resolution, main land cover, main transitions, fire or not, run years, scenarios, download size,
+    package version. Fill it from each release's model record and contents where they hold the fields (not yet checked).
+  - **A possible first set (to decide):** P26 Northern Sierra Nevada (fire, forest; matches the guide; built and run), Puget Lowlands (urbanization,
+    harvest, marine climate, no fire; built), one region at a second resolution (needs a build), and a region outside the West, such as agriculture
+    or southeastern plantation forestry (needs a build, and tests the package beyond the western regions it has run on).
+  - **Size and hosting:** Puget's archive was 3.6 GB before its projections, over GitHub's 2 GB limit per release file, so host on ScienceBase
+    or similar. A coarser version of a region could be the small entry point; a results-only download would be a new stage 17 option.
+  - **For the user to decide:** which regions and resolutions; whether each is a formal USGS data release with its own review, or some are
+    informal examples; where the catalog lives.
