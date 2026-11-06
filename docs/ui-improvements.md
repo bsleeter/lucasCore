@@ -183,8 +183,16 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     settings and CO2 Betas table, results, the Puget test, how to separate CO2 from climate, sync-library) and a pointer in 7.3
     step 12 (Claude Doc rev 461); Figure 7.22, the user's screenshot of the CO2 page (captures/7.3k-co2-page.png), with figures
     7.22-7.31 renumbered to 7.23-7.32 (rev 475). The repo snapshot (docs/guide) is not rebuilt.
-  - **Still to do:** the per-age-band check (growth by age band
-    in a test library); sync-library and the CO2 type for the other libraries when they move.
+  - **Age-band check 2026-11-06 (dev/co2/age-band-test.R, synthetic ST-Sim library dev/libs/co2-age-test.ssim):** cells of ages 10,
+    25, 26, 100, 101 in five strata; stage 11's three row shapes (blank-stratum bands, stratum x band, one blank row) with year 1 and
+    year 2 values, and a 0.5 blank-type row. All four variants (0.5 untyped, 0.5 per class, 0.5 alone, 0.5 and CO2 on two groups
+    holding the same flow) exact on 30 of 30 rows. The year-t multiplier is the band of the cell's age at the start of year t (a cell
+    aged 25 takes band 1 in year 1, band 2 in year 2). stsim_OutputFlow lists a flow once per group it belongs to: sum one group.
+  - **P26 synced 2026-11-06** (user request): moved to 1.1.0, SyncroSim update, sync-library (CO2 columns and type, Pasture and
+    Cropland attributes; Ag Change types were there). Backups .bak-20261106-v101 (before the move) and .bak-20261106-1303. Its
+    climate scenarios now read blank CO2 fertilization as Central when rerun; its results are unchanged until then. The user said every
+    other dev library except Puget is a throw-away test library: no sync owed there.
+  - **Still to do:** a release (version bump, .ssimpkg).
 
 47. **Example libraries by region and resolution** - TO DO, idea stage (user, 2026-11-04; replaces item 13). A range of libraries, already
     run and able to be rerun, covering different regions and resolutions. Users pick the one that matches their interest: geography, land
@@ -234,9 +242,8 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
   - **Checks:** map counts (mapped against sustained, by pair), the replay check, then a Build and historical run.
 
 51. **After the 1.1.0 release** - TO DO, added 2026-11-05. What the release left, in no fixed order:
-  - **P26 guide library:** move it to 1.1.0 (`SyncroSim.Console --add --package --pkg=lucasCore --ver=1.1.0 --lib=...`; the user runs it,
-    it is the user's library), run sync-library for the Pasture and Cropland attributes and the Ag Change types, then rebuild and rerun.
-  - **Other dev libraries** (test, schema-ref, Data Download, older P26 copies) still name 1.0.1 and show lucasCore missing until moved.
+  - **P26 guide library:** moved to 1.1.0 and synced 2026-11-06 (item 46); still to rebuild and rerun.
+  - **Other dev libraries:** throw-away test libraries (user, 2026-11-06); no move or sync needed.
   - **Puget parents on old Build 6:** Build Figures (7), Build Record (9), Historical Figures (16), Data Release (18) and Compare
     Projections (42) depend on Build 6; repoint them to 58 before their next run. The climate scenarios (23-25) depend on Build 6 too;
     that is harmless (their Build 6 rows match 58 exactly), but rebuild them on 58 at some point.
