@@ -179,7 +179,10 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     genus choices) only for species they lack. Changed: Aspen/Birch 0.59 -> 0.85, Alder/Maple 0.54 -> 0.76, Elm/Ash/Cottonwood
     0.21 -> 0.27, others 0.03 or less. Puget's result 71/73 used the old shares; scenario 70's CO2 Betas table holds the old defaults
     (Load the defaults refreshes it; it will ask, since the rows now differ).
-  - **Still to do:** a User Guide section; the per-age-band check (growth by age band
+  - **User Guide 2026-11-06:** new section 7.3.1 CO2 fertilization (equation, default beta table, ECM and age weighting, the page
+    settings and CO2 Betas table, results, the Puget test, how to separate CO2 from climate, sync-library) and a pointer in 7.3
+    step 12 (Claude Doc rev 461). The repo snapshot (docs/guide) is not rebuilt.
+  - **Still to do:** the per-age-band check (growth by age band
     in a test library); sync-library and the CO2 type for the other libraries when they move.
 
 47. **Example libraries by region and resolution** - TO DO, idea stage (user, 2026-11-04; replaces item 13). A range of libraries, already
