@@ -15,8 +15,12 @@
 # =============================================================================
 
 CO2_SERIES <- c("None", "Low", "Central", "High")
-CO2_BANDS <- function(bands) ifelse(is.na(bands$AgeMax), sprintf("%d+", as.integer(bands$AgeMin)), sprintf("%d-%d", as.integer(bands$AgeMin), suppressWarnings(as.integer(bands$AgeMax))))
-CO2_BAND_LABELS <- c("0-25", "26-50", "51-75", "76-100", "101+")
+# age band labels "1 (0-25)" ... "5 (101+)": the band number first, so a grid sorted by the label lists them in age order
+# (package.xml's Age Band list uses the same labels; the plain ranges "0-25" ... are still read)
+CO2_BANDS <- function(bands) sprintf("%d (%s)", as.integer(bands$AgeBand), ifelse(is.na(bands$AgeMax), sprintf("%d+", as.integer(bands$AgeMin)),
+                                                                                  sprintf("%d-%d", as.integer(bands$AgeMin), suppressWarnings(as.integer(bands$AgeMax)))))
+CO2_BAND_RANGES <- c("0-25", "26-50", "51-75", "76-100", "101+")
+CO2_BAND_LABELS <- sprintf("%d (%s)", seq_along(CO2_BAND_RANGES), CO2_BAND_RANGES)
 
 # the Climate page's CO2 Fertilization value (the list's number or its label; blank = Central) as a series name
 co2_series_name <- function(v) {
@@ -26,8 +30,8 @@ co2_series_name <- function(v) {
   if (!length(m)) stop(sprintf("CO2 Fertilization '%s' is not one of %s", v, paste(CO2_SERIES, collapse = ", "))); m }
 
 # CO2 Betas table age bands (the list's number or label) as band numbers; blank stays NA
-co2_band_id <- function(v) { v <- as.character(v); n <- suppressWarnings(as.integer(v)); l <- match(trimws(v), CO2_BAND_LABELS)
-  out <- ifelse(!is.na(l), l, n); if (any(!is.na(v) & nzchar(v) & is.na(out))) stop(sprintf("unknown age band: %s", paste(unique(v[!is.na(v) & is.na(out)]), collapse = ", ")))
+co2_band_id <- function(v) { v <- trimws(as.character(v)); n <- suppressWarnings(as.integer(v)); l <- match(v, CO2_BAND_LABELS); r <- match(v, CO2_BAND_RANGES)
+  out <- ifelse(!is.na(l), l, ifelse(!is.na(r), r, n)); if (any(!is.na(v) & nzchar(v) & is.na(out))) stop(sprintf("unknown age band: %s", paste(unique(v[!is.na(v) & is.na(out)]), collapse = ", ")))
   as.integer(out) }
 
 # the CO2 of years for an SSP folder code (ssp245 ...), years up to 2014 from the historical series

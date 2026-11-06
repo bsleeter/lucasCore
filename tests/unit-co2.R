@@ -33,7 +33,9 @@ sc <- co2_series(tab, "ssp585", 2024:2100, 2023, cap = 600)
 check("the ceiling holds CO2 at 600 ppm", max(sc$Used) == 600 && max(sc$CO2) > 1000)
 check("an unknown SSP stops", inherits(tryCatch(co2_series(tab, "ssp999", 2024, 2023), error = function(e) e), "error"))
 check("series names: blank = Central, 1 = None, 'high' = High", co2_series_name(NA) == "Central" && co2_series_name(1L) == "None" && co2_series_name("high") == "High")
-check("age bands from number or label", identical(co2_band_id(c("2", "101+", NA)), c(2L, 5L, NA)))
+check("age bands from number, label or plain range", identical(co2_band_id(c("2", "5 (101+)", "101+", NA)), c(2L, 5L, 5L, NA)))
+check("age band labels sort in age order (the CO2 Betas grid sorts by label)", identical(sort(CO2_BAND_LABELS), CO2_BAND_LABELS) && identical(CO2_BANDS(bands), CO2_BAND_LABELS))
+check("package.xml lists the same age band labels", grepl(paste(sprintf("%d:%s", 1:5, CO2_BAND_LABELS), collapse = "|"), paste(readLines("package.xml", warn = FALSE), collapse = "\n"), fixed = TRUE))
 
 # ---- betas ------------------------------------------------------------------------------------------------------------------
 st <- c("Marine", "Marine Mountains")

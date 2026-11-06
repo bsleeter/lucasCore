@@ -328,7 +328,7 @@
 	<dataSheet name="Co2Adjustment" displayName="CO2 Betas">
 		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
 		<column name="StratumId" displayName="Stratum (blank = all)" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="stsim_Stratum"/>
-		<column name="AgeBand" displayName="Age Band (blank = all)" dataType="Integer" isOptional="True" validationType="List" formula1="1:0-25|2:26-50|3:51-75|4:76-100|5:101+"/>
+		<column name="AgeBand" displayName="Age Band (blank = all)" dataType="Integer" isOptional="True" validationType="List" formula1="1:1 (0-25)|2:2 (26-50)|3:3 (51-75)|4:4 (76-100)|5:5 (101+)"/>
 		<column name="Beta" displayName="Beta (per ln CO2)" dataType="Double" format="0.000"/>
 		<validation validationType="Unique" columns="StateClassId|StratumId|AgeBand"/>
 	</dataSheet>
