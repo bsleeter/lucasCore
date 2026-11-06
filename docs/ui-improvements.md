@@ -160,15 +160,21 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     0/0.20/0.35, the rest as reviewed) as the starting point. Both the age taper (AgeMin/AgeMax rows) and the mycorrhizal
     weighting (ECM basal-area share per forest type from FIA tree records and the Jo et al. 2019 species list) go in the first
     build. The No Climate projection gets no CO2 fertilization (it stays the true baseline).
-  - **Built 2026-11-06, not yet run in a library:** src/co2.R and stage 11 (CO2 rows in stsim_FlowMultiplier with the Build's rows
+  - **Built 2026-11-06:** src/co2.R and stage 11 (CO2 rows in stsim_FlowMultiplier with the Build's rows
     copied over), the Climate page's CO2 group (series, ceiling, reference, Beta Adjustments grid), defaults/climate/co2-*.csv (SSP CO2
     from RCMIP v5.1.0, betas, classes, age bands, ECM shares from tools/make_co2_ecm_share.R), tests/unit-co2.R (33 checks pass).
     Departures from the plan: the user rows adjust any series rather than a separate "User" series; the ECM shares use a genus-level
     mycorrhizal table written for lucasCore (co2-mycorrhiza-genus.csv; dual AM/ECM genera count half), not the Jo et al. 2019 species
     list itself, which is still to compare; the reference CO2 defaults to the SSP's value in the historical end year.
-  - **Still to do:** a stage 11 run and a projection (sync-library for the three new Climate columns; Studio closed for the DLL); check
-    the CO2 rows take effect in ST-Sim (growth up by the multiplier at each age band); a User Guide section; compare the genus table
-    with Jo et al. 2019.
+  - **Run test 2026-11-06 (Puget Lowlands, with the user's OK; future tests go in a test library):** climate scenario 70 -> result
+    71 (stage 11, 5.5 min; ACCESS-CM2 SSP2-4.5 to 2050, Central; CO2 426.1 -> 506.9 ppm, reference 423.1 = SSP2-4.5 2023; 5,562 CO2
+    rows + the Build's 154,406 rows; 2050 multipliers forest 1.030-1.081, shrub 1.027, grassland 1.054, wetlands 1.036). Projection
+    72 -> result 73 against result 65 (same climate, no CO2): growth ratio 1.001 in 2024, 1.012 in 2030, 1.031 in 2040, 1.048 in
+    2050 (forest 1.049, non-forest 1.050, wetland 1.036 = exactly the emergent multiplier, so the rows take effect in ST-Sim).
+    Ecosystem carbon 2050: 365.32 vs 363.11 Tg C (+2.2 Tg; biomass +1.7, dead organic matter +0.5). Puget also got sync-library
+    (Co2 columns, CO2 type; backups .bak-20261106-0958 and -0959) - scenarios 70-73 and the backups await the user's keep/delete.
+  - **Still to do:** a User Guide section; compare the genus table with Jo et al. 2019; the per-age-band check (growth by age band
+    in a test library); sync-library and the CO2 type for the other libraries when they move.
 
 47. **Example libraries by region and resolution** - TO DO, idea stage (user, 2026-11-04; replaces item 13). A range of libraries, already
     run and able to be rerun, covering different regions and resolutions. Users pick the one that matches their interest: geography, land
