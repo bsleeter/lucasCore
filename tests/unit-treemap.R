@@ -4,7 +4,7 @@
 #   1. fia_sites: every state's forested conditions with site class; the second call reads the cache and gives the same table
 #   2. treemap_plots on a made-up attribute table: TreeMap's type wins over a larger condition; otherwise the largest; a plot FIA
 #      does not have stays unmatched
-#   3. P26 (read only): TreeMap over the latest P26 Build's study area reproduces phase 0 (21.0 M pixels, every one joined with a
+#   3. P26 (read only; TreeMap2016.tif from LUCAS_TREEMAP, else the home's land-cover/treemap, else skipped): TreeMap over the latest P26 Build's study area reproduces phase 0 (21.0 M pixels, every one joined with a
 #      site class, stand age on about 94.5%, 6,377 plots)
 # Usage: Rscript tests/unit-treemap.R
 # =============================================================================
@@ -13,7 +13,8 @@ DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))
 suppressPackageStartupMessages({ library(data.table); library(terra) }); ok <- TRUE
 expect <- function(what, cond, detail = "") { cat(sprintf("%s  %s %s\n", if (isTRUE(cond)) "PASS" else "FAIL", what, detail)); if (!isTRUE(cond)) ok <<- FALSE }
 source(file.path(pkg, "src", "treemap.R"))
-dm <- file.path(DS, "FIA/DataMart"); tmd <- file.path(DS, "TreeMap/Data")
+dm <- file.path(DS, "forest/fia-datamart")   # the Data Sources Home layout (defaults/library/data-sources.csv)
+tmd <- Sys.getenv("LUCAS_TREEMAP", file.path(DS, "land-cover/treemap"))   # TreeMap2016.tif and its .vat.dbf
 
 # 1. the site cache
 t0 <- Sys.time(); s1 <- fia_sites(dm); t1 <- as.numeric(Sys.time() - t0, units = "secs")
@@ -36,7 +37,7 @@ expect("a plot FIA does not have stays unmatched", p[Value == 3, is.na(condid) &
 
 # 3. P26
 lib <- file.path(pkg, "dev/libs/LUCAS P26 Northern Sierra Nevada.ssim")
-if (file.exists(lib)) {
+if (!file.exists(file.path(tmd, "TreeMap2016.tif"))) { cat("SKIP  P26 check: no TreeMap2016.tif in", tmd, "(set LUCAS_TREEMAP)\n") } else if (file.exists(lib)) {
   con <- DBI::dbConnect(RSQLite::SQLite(), lib, flags = RSQLite::SQLITE_RO)
   ic <- DBI::dbGetQuery(con, "SELECT ScenarioId, StratumFileName FROM stsim_InitialConditionsSpatial WHERE StratumFileName IS NOT NULL ORDER BY ScenarioId DESC LIMIT 1"); DBI::dbDisconnect(con)
   P <- rast(file.path(paste0(lib, ".data"), paste0("Scenario-", ic$ScenarioId), "stsim_InitialConditionsSpatial", ic$StratumFileName))
