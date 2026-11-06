@@ -6,9 +6,10 @@
 #   forest classes          stage 4's Initial Stock Curves: ecodivision x forest class x last disturbance x stand age (age capped at the
 #                           curves' maximum)
 #   forested wetland        defaults/initialstocks/wetland-forested-{fire,harvest}.csv, by class x age (the CONUS 1km build's tables)
-#   grass/shrub, emergent   defaults/initialstocks/grassland-shrubland.csv and emergent-wetland.csv, by class
-#   wetland                 (the same build tables; they come from the build's non-forest spin-up with the non-forest flows stage 3
-#                           also uses)
+#   grass/shrub             defaults/initialstocks/grassland-shrubland.csv, by class (the build's table, from its non-forest spin-up
+#                           with the non-forest flows stage 3 also uses)
+#   emergent wetland        defaults/initialstocks/emergent-wetland.csv, by ecodivision and class: the steady state of stage 3's
+#                           regional rates, and Deep Soil = the soil 30-100 cm (tools/make_emergent_wetland.R; to-do 39 step 1)
 #   everything else         0 (developed, agriculture, barren, water, ice)
 #   last disturbance        high-severity fire where an interagency fire perimeter of 1900 to the start year covers the cell, otherwise
 #                           clearcut (the build's rule; with few early perimeters in the East, eastern forest is mostly post-harvest), or
@@ -75,7 +76,8 @@ key <- paste(sname, cname, last, pmin(pmax(round(vA), 0), amax))
 m <- match(key[isF], fk)
 check(STAGE, "every forest cell finds its ecodivision x class x last disturbance x age in the stock curves", !anyNA(m),
       sprintf("%d of %d forest cells unmatched (e.g. %s)", sum(is.na(m)), sum(isF), paste(head(unique(key[isF][is.na(m)]), 3), collapse = "; ")))
-out[which(isF)[!is.na(m)], ] <- as.matrix(cv[m[!is.na(m)], st$CurveColumn, with = FALSE]); src_of[isF] <- "stock curves (stage 4)"
+cc <- which(!is.na(st$CurveColumn))   # Deep Soil has no curve column: forest starts with none
+out[which(isF)[!is.na(m)], cc] <- as.matrix(cv[m[!is.na(m)], st$CurveColumn[cc], with = FALSE]); src_of[isF] <- "stock curves (stage 4)"
 
 # ---- Site Productivity (Build Options; to-do 35, docs/treemap-plan.md) ------------------------------------------------------
 # A forest cell's growth multiplier = sum over FIA site classes of the share of its TreeMap pixels in the class (stage 5) x its forest
@@ -107,14 +109,15 @@ if (site_on) {
   write_stsim(data.table(FlowGroupId = fg, FlowMultiplierTypeId = "Site Productivity",
                          MultiplierFileName = write_raster(setValues(rast(P), ifelse(land, mult, NA)), "SiteProductivity.tif", "FLT4S")), "FlowSpatialMultiplier", append = TRUE)
 }
-# legacy class tables: by class (and age for forested wetland)
+# class tables: by class (and age for forested wetland, and ecodivision where the table has a StratumID column)
 lt <- function(f) { x <- read_default("initialstocks", f); setnames(x, gsub("ID$", "Id", names(x)))
   x[, `:=`(Value = as.numeric(Value), AgeMin = suppressWarnings(as.integer(AgeMin)))][StateAttributeTypeId %in% st$Attribute] }
 fill_class <- function(tab, cells, by_age = FALSE, label) {
   if (!any(cells)) return(invisible())
-  w <- dcast(tab, if (by_age) StateClassId + AgeMin ~ StateAttributeTypeId else StateClassId ~ StateAttributeTypeId, value.var = "Value", fun.aggregate = sum)
-  k <- if (by_age) paste(cname[cells], pmin(pmax(round(vA[cells]), 0), max(w$AgeMin))) else cname[cells]
-  mm <- match(k, if (by_age) paste(w$StateClassId, w$AgeMin) else w$StateClassId)
+  by_eco <- "StratumId" %in% names(tab)
+  w <- dcast(tab, as.formula(paste(paste(c(if (by_eco) "StratumId", "StateClassId", if (by_age) "AgeMin"), collapse = " + "), "~ StateAttributeTypeId")), value.var = "Value", fun.aggregate = sum)
+  k <- paste(if (by_eco) sname[cells] else "", cname[cells], if (by_age) pmin(pmax(round(vA[cells]), 0), max(w$AgeMin)) else "")
+  mm <- match(k, paste(if (by_eco) w$StratumId else "", w$StateClassId, if (by_age) w$AgeMin else ""))
   check(STAGE, sprintf("every %s cell finds its class in the table", label), !anyNA(mm), sprintf("%d unmatched (%s)", sum(is.na(mm)), paste(head(unique(k[is.na(mm)]), 3), collapse = "; ")))
   for (j in seq_len(nrow(st))) if (st$Attribute[j] %in% names(w)) out[which(cells)[!is.na(mm)], j] <<- w[[st$Attribute[j]]][mm[!is.na(mm)]]
   src_of[cells] <<- label }
@@ -139,8 +142,9 @@ progressBar()
 
 # ---- checks, summary, outputs -----------------------------------------------------------------------------------------
 check(STAGE, "every land cell has every pool, none negative", !anyNA(out[land, ]) && all(out[land, ] >= 0), sprintf("%d NA, %d negative", sum(is.na(out[land, ])), sum(out[land, ] < 0, na.rm = TRUE)))
-live <- grep("^Biomass", st$StockTypeId); dom <- setdiff(seq_len(nrow(st)), c(live, bgs))
-d <- data.table(S = vS, src = src_of, fire = postfire, live = rowSums(out[, live]), dom = rowSums(out[, dom]), soil = out[, bgs])[land]
+soil_j <- which(st$StockTypeId %in% c("DOM: Belowground Slow", "Deep Soil"))   # soil = BG Slow + Deep Soil
+live <- grep("^Biomass", st$StockTypeId); dom <- setdiff(seq_len(nrow(st)), c(live, soil_j))
+d <- data.table(S = vS, src = src_of, fire = postfire, live = rowSums(out[, live]), dom = rowSums(out[, dom]), soil = rowSums(out[, soil_j, drop = FALSE]))[land]
 summ <- d[, .(Cells = .N, PostFire = round(mean(fire), 3), Live = round(mean(live), 1), Dom = round(mean(dom), 1), Soil = round(mean(soil), 1),
               TotalTg = round(sum(live + dom + soil) * cell_ha / 1e6, 2), Source = src[1]), by = S][order(-TotalTg)]
 summ[, StateClassId := scl$Name[match(S, as.integer(scl$Id))]]

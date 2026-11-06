@@ -11,7 +11,7 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | Order | Item | Changes results? | Why here | Depends on |
 | --- | --- | --- | --- | --- |
 | 1 | 14 FGDC metadata | No | User order 2026-11-02: first. Plan (a working document, not in this repository) (phases 0-6; decisions settled 2026-11-02: CSDGM first, one release per Build, maps every year, model archive always, ScienceBase folder by hand; Phase 0 done with the user 2026-11-02; Phase 1 built 2026-11-02: defaults/metadata definitions, data dictionary, citations, src/metadata.R, tests/unit-metadata-definitions.R; citation questions in the plan); lineage from the home's manifest and each Build's Data Sources Used | 12 (done) |
-| 3 | 39 Grassland, shrubland and wetland carbon: options beyond today's crude method | Yes | User order 2026-11-02: third, with the other open science items (user: explore additional options).  Step 1 (rates on a page) and the diagram view done; the diagram shows emergent wetland rates settling far above their starting pools; suspect values (emergent wetland growth 31, irrigated grass 9.19 Mg C/ha/yr), root turnover splits; the science options (user to decide) | - |
+| 3 | 39 Grassland, shrubland and wetland carbon: options beyond today's crude method | Yes | User order 2026-11-02: third, with the other open science items (user: explore additional options).  Step 1 (rates on a page) and the diagram view done; the diagram shows emergent wetland rates settling far above their starting pools; suspect values (emergent wetland growth 31, irrigated grass 9.19 Mg C/ha/yr), root turnover splits. Review done 2026-11-06 (dev/nonforest/review). Revised approach accepted the same day: one stage 3 solver (measured stocks as targets, growth from data, rates solved; IPCC, IBIS or data as the target source), IPCC factors for soil change on conversion, carbon for pasture and cropland. Nine steps; step 1, the emergent wetland fix, is next | - |
 | release | 46 CO2 fertilization | Yes, in projections with a Projection Climate result (Central by default; None turns it off) | Added 2026-11-04; built, tested (Puget run, age-band check), documented (guide 7.3.1) and pushed 2026-11-06. Left: a release | - |
 | later | 47 Example libraries by region and resolution | No (each holds its own results) | Added 2026-11-04, replaces 13. Best built after the open science items, since each carbon change dates them | 14, restore test |
 | any | 49 Test national mode end to end | No | Added 2026-11-04. Never run end to end; fills about 175 GB overnight | 12 (done) |
@@ -95,6 +95,182 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     root turnover half to AG fast (above ground), and annual grass half its fine root turnover to AG very fast.
     Diagram follow-up DONE 2026-10-31 (8a7fc0c, user): CO2 and water leave each pool as arrows (curving up to the atmosphere,
     sideways to water), sized by flux; guide Figure 3.17. Left as is (user): BG slow's "water" label sits on the curve to deep soil.
+  - **Plan 2026-11-06 (user: a selectable IPCC defaults option, and open to a third built from literature or external data).**
+    SUPERSEDED the same day by the revised approach below (after the review). Kept for its findings on the code; its three separate
+    rate sets became target sources for one solver.
+    - **What there is today:** one rate set (the CONUS 1 km build's, from IBIS), with the same values in every ecodivision. The
+      cbm-defaults and fia-measured presets hold identical nonforest-growth.csv and nonforest-rates.csv files, so the non-forest choice
+      does not depend on the dead organic matter method. Starting pools are package tables only (stage 8, defaults/initialstocks), so a
+      changed rate leaves the pools out of step. Soil is gNATSGO soc0_999 (the whole profile) only where a class's soil is 0, which
+      never happens for grass or shrub.
+    - **The selector:** a new column on the Carbon Method page, "Grassland, Shrubland and Wetland Carbon": 1 LUCAS CONUS (IBIS),
+      the default, with results unchanged; 2 IPCC Tier 1 defaults; 3 literature and regional data. Fill loads the option's preset
+      into Non-Forest Growth, Non-Forest Rates and the new starting-pool sheet. Presets go in
+      defaults/carbon-assumptions/nonforest/<option>/, apart from the dead organic matter methods. Rows a user adds still override the
+      preset, as they do now.
+    - **Phase 1, the framework (needed by both new options):**
+      - A Non-Forest Initial Stocks sheet (class, ecodivision optional, pool, Mg C/ha) for stage 8.
+      - A "Starting pools" choice: the option's table, or the steady state of the rates in use. The steady-state solve already exists
+        in the diagram view (ui/NonForestBudget.cs); port it to R. With the second choice, any edited rate also moves the starting
+        pools, which fixes the emergent wetland mismatch (rates settle at live 36 and dead 49 Mg C/ha against starting pools of 4.9
+        and 17.4).
+      - Tests: option 1 reproduces today's 65,246 rates, 11,609 growth values and starting pools exactly. The steady state of option
+        1's grass and shrub rates matches the package tables (already seen in the diagram view).
+    - **Phase 2, IPCC Tier 1.** IPCC gives stocks, not flux rates: Tier 1 assumes grassland biomass and dead organic matter do not
+      change, and soil moves toward a new equilibrium over 20 years after land-use change. So the option sets the stocks from IPCC
+      and derives rates that hold them at steady state.
+      - Keys: IPCC climate zone (2019 Refinement Vol 4 Ch 3 decision tree, from PRISM temperature and precipitation, plus
+        elevation) and IPCC soil class (HAC, LAC, sandy, spodic, volcanic, wetland, from the gNATSGO/SSURGO taxonomy). Both vary
+        within an ecodivision: use the majority zone per ecodivision for rates, and set starting soil per cell.
+      - Biomass: grassland above- and belowground biomass by climate zone (2006 Vol 4 Table 6.4, updated in 2019, with a root:shoot
+        ratio), carbon fraction 0.47. Shrubland values must be found; the 2019 Refinement's woody vegetation tables are the first place
+        to look.
+      - Growth: above-ground NPP = above-ground biomass (it turns over every year); below-ground NPP = root biomass x root turnover.
+        This is a modelling choice; IPCC gives no grassland NPP.
+      - Soil: SOCref (0-30 cm, 2019 Table 2.3) x F_LU x F_MG x F_I (Table 6.2 for grassland). Soil decay is solved so the steady
+        state equals the target.
+      - **Depth mismatch:** IPCC SOCref is 0-30 cm, while gNATSGO soc0_999 and the current tables are the whole profile. Choose:
+        the soil pool is 0-30 cm only, or deeper carbon is held as an inert remainder.
+      - Wetlands: 2013 Wetlands Supplement. Coastal (Ch 4): tidal marsh biomass, soil stock and a soil carbon accumulation rate
+        (burial, as the existing Stabilization flows). Inland mineral (Ch 5): no CO2 stock change at Tier 1. Wetland CH4 is not in the
+        model today; leave it out or add it as a flux.
+      - Land-use change: IPCC moves soil linearly over 20 years; LUCAS moves it exponentially at the new class's decay rate. Measure
+        how far apart they are.
+      - Ship the tables with citations (defaults/carbon-assumptions/nonforest/ipcc/) and a script that derives the rates
+        (tools/make_nonforest_ipcc.R). Check every value against the documents, as was done for the CO2 review.
+    - **Phase 3, literature and regional data.** A review like the CO2 one picks the sources. Starting candidates:
+      - Grass and shrub growth: RAP NPP partitioned into herbaceous and woody (30 m, yearly since 1986) and RAP herbaceous biomass.
+        RAP growth could also replace Miami NPP as the yearly climate signal for these classes.
+      - Root:shoot and root turnover: Mokany et al. 2006; Gill and Jackson 2000.
+      - Shrub biomass: sagebrush and chaparral allometry studies; litter and dead wood from LANDFIRE FCCS fuelbeds.
+      - Soil: gNATSGO per cell, with soil decay calibrated to it, as forests already are.
+      - Wetlands: CCRCN soil cores and accretion rates, Holmquist et al. 2018 (tidal wetland soil carbon), EPA NWCA 2011 soil carbon
+        (Nahlik and Fennessy 2016), and marsh NPP studies.
+      - Build it as a stage 3 step: stocks are the targets and rates are solved to steady state, so it reruns per region from the Data
+        Download. It is not a fixed table.
+    - **Phase 4, compare and document:** run all three options on P26 and Puget (in copies). Compare starting stocks, NPP,
+      heterotrophic respiration and net flux by class against RAP and NWCA where they overlap. Show each option in the diagram view.
+      Add a guide section.
+    - **Scope decided by the user 2026-11-06:**
+      - **Agriculture is in:** pasture and cropland get rates and starting pools in options 2 and 3 (IPCC cropland Ch 5 and grassland
+        Ch 6 factors; crop biomass removed at harvest each year). Option 1 keeps today's agriculture (zero biomass, gNATSGO soil). Ag
+        Change transitions then move soil carbon toward the new class's equilibrium.
+      - **Soil depth, inert deep remainder:** IPCC sets the active 0-30 cm soil; the carbon below 30 cm (gNATSGO whole profile minus
+        0-30 cm) is held unchanged, so totals stay comparable across options. It goes in the existing Deep Soil stock (user,
+        2026-11-06), which has no outflows and is already in the DOM: Soil and Total Ecosystem groups, the output filters and the
+        metadata definitions. Today only emergent wetlands use it: BG Slow -> Deep Soil stabilization (0.19 of BG Slow's loss in Estuarine
+        Emergent, 0.25 in Palustrine Emergent), starting at 0. So stage 8 needs Deep Soil added to defaults/initialstocks/stock-types.csv
+        to set its starting value. In wetlands the remainder and the buried carbon share the pool.
+      - **IPCC keys:** rates by ecodivision (its majority climate zone, in the existing sheets' ecodivision column); starting soil per
+        cell from the cell's climate zone and soil class.
+      - **Option 3 is a stage 3 build from data:** stocks from RAP, gNATSGO and the wetland datasets are the targets, and the rates are
+        solved per region at each Build. It is not a fixed table. The sources need the Data Download (stage 15).
+    - **Review done 2026-11-06** ("Nonforest carbon stocks and rates", dev/nonforest/review/reports/, with notes in research_notes/;
+      not committed). The IPCC values were read from the primary PDFs, and three were spot-checked again (2019 SOCref W2 HAC 24,
+      inland wetland W2 74, high-intensity grazing F_MG 0.90).
+      - **IPCC grassland:** Table 6.4 biomass and Table 6.1 root:shoot confirmed, with no 2019 change. Carbon fraction 0.47
+        herbaceous, 0.50 woody. Growth = 1.8 x peak aboveground biomass (Ch 11 Table 11.1a perennial grass R_S 0.80), so natural
+        perennial grass grows 1.35-2.29 Mg C/ha/yr by zone. Fine root turnover is 0.20-0.29/yr.
+      - **IPCC soil:** the 2019 SOCref values replace 2006's; dry zones are lower (W2 HAC 38 -> 24). Dead organic matter in non-forest
+        land is zero at Tier 1, so litter needs decay of at least 1/yr. Soil classes come from the EPA US inventory crosswalk (Annex
+        3.12, Table A-185).
+      - **Gaps IPCC does not fill:** no temperate shrub biomass, no tidal marsh aboveground biomass, no burial for undisturbed marsh
+        (0.91 is a rewetted-marsh factor). The IPCC option borrows labelled literature values for these (sage growth 0.65/1.16/3.9,
+        chaparral 1.5/3.0/5.0 Mg C/ha/yr).
+      - **Verdicts on today's values:** sage, chaparral, annual and natural perennial grass hold up (perennial grass is high in dry
+        zones). Emergent wetlands are 2-6 times too high: growth 31 (evidence 3-15), soil 609 (about 270 to 1 m), live and dead pools
+        settling at 36 and 49 (evidence 4-12 and 1-5). Irrigated perennial 9.19 fits only California alfalfa; pasture is 4-7. Pasture
+        counts as grassland in IPCC, so it should carry grassland biomass.
+      - **Option 3 data:** RAP partitioned NPP (30 m, 1986-present, CC0; no agriculture), gNATSGO, NASS county yields with the USDA
+        Tech. Bull. 1939 Table 3-5 coefficients (not MODIS NPP, which underestimates cropland), and Byrd 2018, NWCA, CCRCN and Wang 2019
+        for wetlands.
+      - **Structural:** Deep Soil has no outflow, so wetland burial should be a target flux (about 1-1.6 Mg C/ha/yr) rather than fixed
+        shares of BG Slow's loss.
+      - **Still open:** which root turnover to use, chaparral root:shoot, Non-sage shrub (no data), shrub litter decay rates, the
+        pasture management factor, cropland growth in the IPCC option, the wetland 0-30 cm and deeper split, the IPCC climate-zone
+        raster, and the 2019 wetlands chapter (Vol 4 Ch 7, not read).
+  - **Revised approach (user accepted 2026-11-06: "love this approach").** One stage 3 calibration for grass, shrub, wetland, pasture
+    and cropland, built like the forest one: measured stocks are the targets, growth comes from data, and the rates are solved so each
+    class holds its targets. IPCC, IBIS and regional data are sources of targets for that solver, not separate rate tables, because
+    IPCC Tier 1 gives stocks and stock change factors but no growth or rates. The 2026-11-06 scope decisions still hold (agriculture in,
+    Deep Soil for the soil below 30 cm, IPCC keys by ecodivision with soil per cell). Steps, in build order:
+    1. **Emergent wetlands first** (the largest error, and the most carbon per hectare). Growth about 3-8 Mg C/ha/yr (estuarine above
+       palustrine); soil about 270 Mg C/ha to 1 m for estuarine (Holmquist 2018) and 150-250 for palustrine (NWCA West); fast litter
+       decay; burial into Deep Soil as a set yearly rate (about 1.0-1.6 Mg C/ha/yr, Wang 2019, the Pacific values 1.04-1.10) in place
+       of the 0.19 and 0.25 shares of BG Slow's loss. Starting pools at the steady state of these rates. Can ship before the rest.
+       - **By region (user, 2026-11-06).** Today's emergent wetland values come from field measurements in coastal Louisiana (user;
+         the user doubts them). They are identical in every ecodivision (palustrine net growth 31.24 in Hot Continental, Marine and
+         the rest). Louisiana marshes measured 6-38 Mg C/ha/yr total production (Hill and Roberts, PMC5696422), about 3/4 of it below
+         ground, so 31 is a real top-site Gulf value but not a class average, and not a value for the West. The values vary by
+         ecodivision through the sheets' existing ecodivision rows:
+         - **Live biomass:** Byrd et al. 2018 30 m tidal marsh aboveground biomass (six regions including Puget Sound, San Francisco
+           Bay and Louisiana; USGS data release v2.0, public domain) where it covers a cell, else the ecodivision mean.
+         - **Growth:** peak aboveground biomass plus root turnover, with root:shoot by region (2.6 Louisiana Spartina, 4-5
+           northeastern marshes; Darby and Turner 2008, not confirmed).
+         - **Soil:** estuarine from Holmquist 2018 and the CCRCN cores by region; palustrine from NWCA 2011 by region (to 120 cm:
+           West 216, Interior Plains 195, Coastal Plains 198, Eastern Mountains and Upper Midwest 478 Mg C/ha).
+         - **Burial into Deep Soil:** Wang et al. 2019 by region (Mg C/ha/yr: Pacific Northwest 1.10, California 1.04, CONUS mean
+           1.62, Gulf and Mid-Atlantic higher).
+         - **Palustrine separate from estuarine:** lower growth and burial, no tidal sediment supply. Western palustrine emergent is
+           mostly wet meadow and farmed or diked wetland, so it takes the low end. Methane matters more here than in saline marsh;
+           it is not modelled today.
+         - The Louisiana values stay as the Gulf coast end of the range, used where the data say so.
+         - **Weakest part:** inland palustrine growth outside the Delta and the Gulf, which has little data; those rows rest on NWCA
+           soil and an inferred growth rate, and are flagged that way.
+       - **Decided by the user 2026-11-06:** the new values are the package default (today's kept as legacy for the step 3 choice);
+         soil to 1 m, split at 30 cm (BG Slow 0-30 cm, Deep Soil starts with 30-100 cm); palustrine burial a low flagged rate (0.5
+         Mg C/ha/yr West and Interior Plains, 1.0 eastern and Gulf coastal plains). Flow order rules must be followed (user).
+       - **CORRECTION 2026-11-06:** in ST-Sim's flow order, today's emergent rates DO hold the package's starting pools (foliage 0.755,
+         fine roots 4.14, AG and BG litter 3.32 and 14.06, BG Slow 620 vs the table's 609): growth runs at order 1 and dieback at 6, so
+         year-end live carbon is small. The "settle at live 36 and dead 49" above (and in the review) came from the diagram view's
+         continuous steady-state solve, which ignores flow order; the diagram view needs the ordered solve too (ui/NonForestBudget.cs).
+         Today's real faults stand: growth 31, soil about 609, and burial 3.0 Mg C/ha/yr into Deep Soil (2-3x measured).
+       - **Built 2026-11-06 (not run in SyncroSim yet; not committed):**
+         - src/nonforest-solve.R: one year as ST-Sim steps it (flow order from stsim_FlowOrder.csv; flows of one order from the stocks
+           at the start of their step, as the package's ApplyEquallyRankedSimultaneously = TRUE; a rate is the flow's [Type] value times
+           any "<pool> ->" total-loss value), the steady state, and nf_fit_emergent: each pool's total loss and the burial share by a
+           bounded root search so the ordered steady state hits peak live carbon (year-end + the year's growth), year-end litter and
+           BG Slow, and the burial flux. The litter and BG Slow loss shares (emission, lateral transport, decay to BG Slow) are kept.
+         - defaults/stockflow/emergent-wetland-regions.csv (targets by class and region, each with its source) and
+           emergent-wetland-ecodivisions.csv (each ecodivision's estuarine and palustrine region).
+         - tools/make_emergent_wetland.R writes the emergent rows of nonforest-multipliers-wetland.csv and nonforest-net-growth.csv,
+           initialstocks/emergent-wetland.csv (now by ecodivision, with Deep Soil) and stockflow/emergent-wetland-fit.csv; keeps the old
+           rows in defaults/stockflow/legacy-ibis/; removes the emergent rows from both carbon method presets (a class-wide row would
+           override the ecodivision values). All 38 fits converge; no pool dies back fully. Examples: Pacific Northwest estuarine root
+           turnover 0.61/yr, soil loss 0.020/yr, burial share 0.50; West palustrine 0.75, 0.017, 0.39.
+         - Stage 8: emergent starting pools by ecodivision; Deep Soil in initialstocks/stock-types.csv (no forest curve column: forest
+           starts with none); the summary counts Deep Soil as soil.
+         - tools/sync-library.R step 7: removes emergent rows a filled sheet still holds at the legacy values; changed rows are kept.
+         - tests/unit-nonforest-solve.R: 22 checks pass (the order rules, hand cases with growth before and after turnover, the legacy
+           rates reproduce the legacy pools, every new table's sums, steady state and burial). tests/unit-carbon-assumptions.R passes.
+         - Left: a SyncroSim run (stages 3 and 8 on a test library; SyncroSim runs the package from F:\lucasCore, not this worktree),
+           the diagram view's ordered solve, and the guide.
+    2. **Use only the pools each class has.** Keep the shared stock types; turn off the flows that do not apply. Grass: foliage, fine
+       roots, AG and BG fast litter, soil. Shrub: add woody stems and coarse roots. Wetland: add burial to Deep Soil. Fewer unknowns
+       for the solver, and a readable diagram view.
+    3. **The solver.** Per class and ecodivision: growth from RAP (rangeland) or NASS yields (cropland, hay); live stocks from RAP
+       biomass or the shrub literature; soil from gNATSGO per cell, with soil decay calibrated per cell as for forests. Each pool's loss
+       rate = inflow / target stock. Starting pools come from the same solve, so rates and stocks cannot drift apart. Spin up with the
+       historical disturbance (fire return interval, conversion history), as forests do, where a class is not at equilibrium (invaded
+       sage, degraded rangeland, recently converted land). Target sources: data (the default for the new method), IPCC (reference
+       stocks in place of gNATSGO, for an inventory-consistent run), or IBIS (today's values, kept as the legacy option).
+    4. **Soil change on conversion from IPCC factors.** gNATSGO measures soil under today's land use; IPCC gives the relative effect of
+       use (cultivated cropland 0.69-0.77 of native grassland over 20 years, high-intensity grazing 0.90, 2019 Tables 5.5 and 6.2). A
+       cropland cell's native target is its gNATSGO soil divided by the cropland factor, and Ag Change transitions move soil toward
+       the new class's target. This is the response land-use scenarios most need, and it barely exists today.
+    5. **Growth that varies across the map.** RAP's 30 m long-term mean growth written as a spatial multiplier on non-forest growth,
+       the way Site Productivity works for forests.
+    6. **Carbon for pasture and cropland.** Pasture: grassland biomass with a grazing removal. Cropland: growth from NASS county yields
+       and the USDA Tech. Bull. 1939 Table 3-5 coefficients, a harvest removal each year, residue to litter.
+    7. **A climate response fitted to RAP.** RAP's yearly growth 1986-2023 against PRISM fits the yearly climate response for grass
+       and shrub, in place of the Miami NPP climatology; test it with the placebo check the tree-ring response went through. The step
+       most likely to change projections.
+    8. **Shrub growth by age.** Chaparral regrows for 20+ years after fire and sage for decades, so growth by age after fire (the
+       Non-Forest Growth sheet already has an age column) in place of a constant rate at equilibrium. Matters most in P26.
+    9. **Validation throughout,** against data the calibration did not use: RaCA soil carbon, AmeriFlux grassland and sagebrush sites,
+       and the US greenhouse gas inventory's grassland and cropland soil change totals.
+    - Still open from the review: root turnover, chaparral root:shoot, Non-sage shrub (no data), shrub litter decay rates, the pasture
+      management factor, the wetland 0-30 cm and deeper split, the IPCC climate-zone raster.
 46. **CO2 fertilization** - TO DO, open science (user, 2026-11-04: how can we introduce the effect of CO2 fertilization into the model?).
     Today no growth pathway responds to CO2, so projected growth carries the climate penalty with no offset, and the SSPs differ only
     through climate. Nothing is built; the proposal below is a starting point and its literature values are from memory, to verify.
