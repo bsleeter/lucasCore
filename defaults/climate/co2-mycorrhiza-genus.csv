@@ -19,18 +19,26 @@ Carya,1,ECM,
 Tilia,1,ECM,
 Coccoloba,1,ECM,
 Pisonia,1,ECM,
+Guapira,1,ECM,as Jo et al. 2019
+Casuarina,1,ECM,as Jo et al. 2019
+Cercocarpus,1,ECM,as Jo et al. 2019
+Populus,1,ECM,as Jo et al. 2019 (also forms AM)
+Salix,1,ECM,as Jo et al. 2019 (also forms AM)
+Alnus,1,ECM,as Jo et al. 2019 (also forms AM; actinorhizal N fixer)
+Eucalyptus,1,ECM,as Jo et al. 2019 (also forms AM)
+Corymbia,1,ECM,as Eucalyptus
 Arbutus,1,ECM,arbutoid mycorrhiza (ECM-like)
 Arctostaphylos,1,ECM,arbutoid mycorrhiza (ECM-like)
 Xylococcus,1,ECM,arbutoid mycorrhiza (ECM-like)
-Populus,0.5,dual,AM and ECM; counted half
-Salix,0.5,dual,AM and ECM; counted half
-Alnus,0.5,dual,AM and ECM (and actinorhizal N fixer); counted half
-Eucalyptus,0.5,dual,AM and ECM; counted half
-Corymbia,0.5,dual,AM and ECM; counted half
+Gleditsia,0.5,dual,as Jo et al. 2019 (AM+EM): counted half
 Leptospermum,0.5,dual,AM and ECM; counted half
 Melaleuca,0.5,dual,AM and ECM; counted half
-Rhododendron,1,ErM,ericoid: organic-N acquiring like ECM
-Vaccinium,1,ErM,ericoid: organic-N acquiring like ECM
-Kalmia,1,ErM,ericoid: organic-N acquiring like ECM
-Oxydendrum,1,ErM,ericoid: organic-N acquiring like ECM
-Lyonia,1,ErM,ericoid: organic-N acquiring like ECM
+Rhododendron,,ErM,ericoid: left out of the share (as Jo et al. 2019)
+Vaccinium,,ErM,ericoid: left out of the share (as Jo et al. 2019)
+Kalmia,,ErM,ericoid: left out of the share (as Jo et al. 2019)
+Oxydendrum,,ErM,ericoid: left out of the share (as Jo et al. 2019)
+Lyonia,,ErM,ericoid: left out of the share (as Jo et al. 2019)
+Ailanthus,,NM,non-mycorrhizal: left out of the share (as Jo et al. 2019)
+Gymnocladus,,NM,non-mycorrhizal: left out of the share (as Jo et al. 2019)
+Paulownia,,NM,non-mycorrhizal: left out of the share (as Jo et al. 2019)
+Elaeagnus,,NM,non-mycorrhizal: left out of the share (as Jo et al. 2019)

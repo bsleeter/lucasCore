@@ -14,6 +14,9 @@ check("every class type has betas", all(c(setdiff(cl$Type, "Forest"), "Forest", 
 check("Low <= Central <= High for every type", betas[, all(Low <= Central & Central <= High)])
 check("the accepted Central table (2026-11-06): forest 0.25, shrub 0.15, grass 0.30, pasture 0.35, crops 0.20, wetlands 0.20",
       isTRUE(all.equal(betas[match(c("Forest", "Shrub", "Grassland", "Pasture", "Crops", "Woody wetland", "Emergent wetland"), Type), Central], c(0.25, 0.15, 0.30, 0.35, 0.20, 0.20, 0.20))))
+jo <- d("co2-mycorrhiza-species.csv")
+check("the Jo et al. 2019 species list: 379 codes; quaking aspen (746) EM, red maple (316) AM, honey locust (552) half, sourwood (711) left out",
+      nrow(jo) == 379 && jo[SPCD == 746, Ecm] == 1 && jo[SPCD == 316, Ecm] == 0 && jo[SPCD == 552, Ecm] == 0.5 && is.na(jo[SPCD == 711, Ecm]))
 check("ECM shares are between 0 and 1 and name forest classes", ecm[, all(between(EcmShare, 0, 1)) && all(startsWith(StateClassId, "Forest:"))])
 check("the age bands cover every age once", bands$AgeMin[1] == 0 && all(bands$AgeMin[-1] == head(bands$AgeMax, -1) + 1) && is.na(tail(bands$AgeMax, 1)))
 check("Meinshausen 2020 SSP CO2 in 2100: 602.8 / 867.2 / 1135.2 ppm", isTRUE(all.equal(co2_ppm(tab, "ssp245", 2100), 602.78)) &&

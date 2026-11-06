@@ -52,9 +52,15 @@ projection does not depend on a Projection Climate result, so it has no CO2 effe
   rates, so its rows change nothing unless a library gives it growth.
 - `co2-ecm-share.csv`: each forest type group's ectomycorrhizal share of live basal area, by ecodivision where FIA has 30 or more
   conditions, else CONUS (StratumId blank). Built by `tools/make_co2_ecm_share.R` from the FIA DataMart TREE tables (live trees,
-  DIA >= 1 in, inventories 2010-) and `co2-mycorrhiza-genus.csv` (a genus-level assignment: listed genera are ECM, arbutoid or ericoid
-  (= 1) or dual AM/ECM (= 0.5); every other genus is AM). A forest class's beta is `share x ECM + (1 - share) x AM`, for young and for
-  mature stands; a forest class with no share takes the "Forest" row at every age.
+  DIA >= 1 in, inventories 2010-). Each tree's type comes from `co2-mycorrhiza-species.csv`, the species list of Jo et al. 2019
+  (Sci. Adv. 5:eaav6358, doi:10.1126/sciadv.aav6358; data doi:10.4231/R76D5R7S, `data_tree_sp_myc_type.xlsx`, CC0; 379 FIA species
+  codes): EM = 1, AM = 0, AM+EM = 0.5, and ericoid (ERM) and non-mycorrhizal (NM) trees left out of the share, as Jo et al. computed
+  AM / (AM + EM) basal area. A species not on that list takes its genus from `co2-mycorrhiza-genus.csv` (written for lucasCore,
+  following Jo et al.'s genus choices; genera it does not list are AM). Compared 2026-11-06 with the genus table alone: Jo et al. count
+  poplars, aspens, willows, alders and eucalypts as ECM (the genus table had counted them half), which raised Aspen/Birch from 0.59 to
+  0.85, Alder/Maple from 0.54 to 0.76 and Elm/Ash/Cottonwood from 0.21 to 0.27; every other forest type moved 0.03 or less.
+  A forest class's beta is `share x ECM + (1 - share) x AM`, for young and for mature stands; a forest class with no share takes the
+  "Forest" row at every age.
 - `co2-age-bands.csv`: forest betas taper with stand age: the young value at 0-25 years, two thirds and one third of the way to the
   mature value at 26-50 and 51-75, the mature value from 76. No study gives an age threshold; this is a modelling choice (the review).
 

@@ -1,171 +1,171 @@
 StateClassId,StratumId,Conditions,EcmShare
-Forest: Alder/Maple Group,,1270,0.542
-Forest: Alder/Maple Group,Marine,215,0.402
-Forest: Alder/Maple Group,Marine Mountains,931,0.577
-Forest: Alder/Maple Group,Mediterranean,35,0.426
-Forest: Alder/Maple Group,Mediterranean Mountains,80,0.553
-Forest: Aspen/Birch Group,,18798,0.586
-Forest: Aspen/Birch Group,Hot Continental,1522,0.513
-Forest: Aspen/Birch Group,Hot Continental Mountains,45,0.483
-Forest: Aspen/Birch Group,Mediterranean Mountains,37,0.631
-Forest: Aspen/Birch Group,Prairie,38,0.525
-Forest: Aspen/Birch Group,Temperate Desert,190,0.614
-Forest: Aspen/Birch Group,Temperate Desert Mountains,234,0.64
-Forest: Aspen/Birch Group,Temperate Steppe,84,0.512
-Forest: Aspen/Birch Group,Temperate Steppe Mountains,1574,0.648
-Forest: Aspen/Birch Group,Tropical/Subtropical Steppe,51,0.66
-Forest: Aspen/Birch Group,Warm Continental,14128,0.565
-Forest: Aspen/Birch Group,Warm Continental Mountains,833,0.782
-Forest: California Mixed Conifer Group,,2376,0.844
-Forest: California Mixed Conifer Group,Mediterranean Mountains,2370,0.844
-Forest: Douglas-fir Group,,15548,0.937
-Forest: Douglas-fir Group,Marine,574,0.867
-Forest: Douglas-fir Group,Marine Mountains,7442,0.933
-Forest: Douglas-fir Group,Mediterranean,221,0.77
-Forest: Douglas-fir Group,Mediterranean Mountains,1189,0.934
-Forest: Douglas-fir Group,Temperate Desert,131,0.972
-Forest: Douglas-fir Group,Temperate Desert Mountains,88,0.944
-Forest: Douglas-fir Group,Temperate Steppe,95,0.97
-Forest: Douglas-fir Group,Temperate Steppe Mountains,5639,0.971
-Forest: Douglas-fir Group,Tropical/Subtropical Steppe,46,0.953
-Forest: Douglas-fir Group,Tropical/Subtropical Steppe Mountains,103,0.968
-Forest: Elm/Ash/Cottonwood Group,,18511,0.206
-Forest: Elm/Ash/Cottonwood Group,Hot Continental,5327,0.164
-Forest: Elm/Ash/Cottonwood Group,Hot Continental Mountains,260,0.179
-Forest: Elm/Ash/Cottonwood Group,Marine,52,0.363
-Forest: Elm/Ash/Cottonwood Group,Marine Mountains,54,0.572
-Forest: Elm/Ash/Cottonwood Group,Prairie,2685,0.193
-Forest: Elm/Ash/Cottonwood Group,Subtropical,4757,0.223
-Forest: Elm/Ash/Cottonwood Group,Subtropical Mountains,67,0.241
-Forest: Elm/Ash/Cottonwood Group,Temperate Steppe,544,0.268
-Forest: Elm/Ash/Cottonwood Group,Temperate Steppe Mountains,90,0.603
-Forest: Elm/Ash/Cottonwood Group,Tropical/Subtropical Steppe,165,0.288
-Forest: Elm/Ash/Cottonwood Group,Warm Continental,4309,0.215
-Forest: Elm/Ash/Cottonwood Group,Warm Continental Mountains,109,0.36
-Forest: Exotic Hardwoods Group,,979,0.145
-Forest: Exotic Hardwoods Group,Hot Continental,215,0.123
-Forest: Exotic Hardwoods Group,Hot Continental Mountains,44,0.14
-Forest: Exotic Hardwoods Group,Prairie,91,0.068
-Forest: Exotic Hardwoods Group,Subtropical,510,0.173
-Forest: Exotic Hardwoods Group,Temperate Steppe,73,0.014
-Forest: Exotic Softwoods Group,,431,0.863
-Forest: Exotic Softwoods Group,Hot Continental,136,0.849
-Forest: Exotic Softwoods Group,Warm Continental,241,0.86
-Forest: Exotic Softwoods Group,Warm Continental Mountains,30,0.897
-Forest: Fir/Spruce/Mountain Hemlock Group,,10078,0.973
-Forest: Fir/Spruce/Mountain Hemlock Group,Marine Mountains,2595,0.969
-Forest: Fir/Spruce/Mountain Hemlock Group,Mediterranean Mountains,831,0.985
-Forest: Fir/Spruce/Mountain Hemlock Group,Temperate Desert,67,0.964
-Forest: Fir/Spruce/Mountain Hemlock Group,Temperate Desert Mountains,188,0.931
-Forest: Fir/Spruce/Mountain Hemlock Group,Temperate Steppe Mountains,6232,0.976
-Forest: Fir/Spruce/Mountain Hemlock Group,Tropical/Subtropical Steppe,40,0.935
-Forest: Fir/Spruce/Mountain Hemlock Group,Tropical/Subtropical Steppe Mountains,66,0.968
-Forest: Hemlock/Sitka Spruce Group,,2305,0.775
-Forest: Hemlock/Sitka Spruce Group,Marine,66,0.433
-Forest: Hemlock/Sitka Spruce Group,Marine Mountains,1778,0.839
-Forest: Hemlock/Sitka Spruce Group,Temperate Steppe Mountains,438,0.514
-Forest: Loblolly/Shortleaf Pine Group,,41026,0.869
-Forest: Loblolly/Shortleaf Pine Group,Hot Continental,1175,0.861
-Forest: Loblolly/Shortleaf Pine Group,Hot Continental Mountains,836,0.862
+Forest: Alder/Maple Group,,1270,0.761
+Forest: Alder/Maple Group,Marine,215,0.561
+Forest: Alder/Maple Group,Marine Mountains,931,0.817
+Forest: Alder/Maple Group,Mediterranean,35,0.646
+Forest: Alder/Maple Group,Mediterranean Mountains,80,0.699
+Forest: Aspen/Birch Group,,18798,0.851
+Forest: Aspen/Birch Group,Hot Continental,1522,0.826
+Forest: Aspen/Birch Group,Hot Continental Mountains,45,0.664
+Forest: Aspen/Birch Group,Mediterranean Mountains,37,0.988
+Forest: Aspen/Birch Group,Prairie,38,0.919
+Forest: Aspen/Birch Group,Temperate Desert,190,0.988
+Forest: Aspen/Birch Group,Temperate Desert Mountains,234,0.998
+Forest: Aspen/Birch Group,Temperate Steppe,84,0.896
+Forest: Aspen/Birch Group,Temperate Steppe Mountains,1574,0.994
+Forest: Aspen/Birch Group,Tropical/Subtropical Steppe,51,0.994
+Forest: Aspen/Birch Group,Warm Continental,14128,0.832
+Forest: Aspen/Birch Group,Warm Continental Mountains,833,0.84
+Forest: California Mixed Conifer Group,,2376,0.845
+Forest: California Mixed Conifer Group,Mediterranean Mountains,2370,0.845
+Forest: Douglas-fir Group,,15548,0.945
+Forest: Douglas-fir Group,Marine,574,0.88
+Forest: Douglas-fir Group,Marine Mountains,7442,0.942
+Forest: Douglas-fir Group,Mediterranean,221,0.775
+Forest: Douglas-fir Group,Mediterranean Mountains,1189,0.935
+Forest: Douglas-fir Group,Temperate Desert,131,0.988
+Forest: Douglas-fir Group,Temperate Desert Mountains,88,0.959
+Forest: Douglas-fir Group,Temperate Steppe,95,0.975
+Forest: Douglas-fir Group,Temperate Steppe Mountains,5639,0.975
+Forest: Douglas-fir Group,Tropical/Subtropical Steppe,46,0.967
+Forest: Douglas-fir Group,Tropical/Subtropical Steppe Mountains,103,0.983
+Forest: Elm/Ash/Cottonwood Group,,18511,0.27
+Forest: Elm/Ash/Cottonwood Group,Hot Continental,5327,0.224
+Forest: Elm/Ash/Cottonwood Group,Hot Continental Mountains,260,0.199
+Forest: Elm/Ash/Cottonwood Group,Marine,52,0.584
+Forest: Elm/Ash/Cottonwood Group,Marine Mountains,54,0.81
+Forest: Elm/Ash/Cottonwood Group,Prairie,2685,0.271
+Forest: Elm/Ash/Cottonwood Group,Subtropical,4757,0.282
+Forest: Elm/Ash/Cottonwood Group,Subtropical Mountains,67,0.267
+Forest: Elm/Ash/Cottonwood Group,Temperate Steppe,544,0.522
+Forest: Elm/Ash/Cottonwood Group,Temperate Steppe Mountains,90,0.917
+Forest: Elm/Ash/Cottonwood Group,Tropical/Subtropical Steppe,165,0.37
+Forest: Elm/Ash/Cottonwood Group,Warm Continental,4309,0.243
+Forest: Elm/Ash/Cottonwood Group,Warm Continental Mountains,109,0.374
+Forest: Exotic Hardwoods Group,,965,0.179
+Forest: Exotic Hardwoods Group,Hot Continental,212,0.187
+Forest: Exotic Hardwoods Group,Hot Continental Mountains,42,0.288
+Forest: Exotic Hardwoods Group,Prairie,91,0.084
+Forest: Exotic Hardwoods Group,Subtropical,506,0.193
+Forest: Exotic Hardwoods Group,Temperate Steppe,69,0.038
+Forest: Exotic Softwoods Group,,431,0.872
+Forest: Exotic Softwoods Group,Hot Continental,136,0.856
+Forest: Exotic Softwoods Group,Warm Continental,241,0.872
+Forest: Exotic Softwoods Group,Warm Continental Mountains,30,0.902
+Forest: Fir/Spruce/Mountain Hemlock Group,,10078,0.979
+Forest: Fir/Spruce/Mountain Hemlock Group,Marine Mountains,2595,0.97
+Forest: Fir/Spruce/Mountain Hemlock Group,Mediterranean Mountains,831,0.986
+Forest: Fir/Spruce/Mountain Hemlock Group,Temperate Desert,67,0.997
+Forest: Fir/Spruce/Mountain Hemlock Group,Temperate Desert Mountains,188,0.989
+Forest: Fir/Spruce/Mountain Hemlock Group,Temperate Steppe Mountains,6232,0.982
+Forest: Fir/Spruce/Mountain Hemlock Group,Tropical/Subtropical Steppe,40,0.999
+Forest: Fir/Spruce/Mountain Hemlock Group,Tropical/Subtropical Steppe Mountains,66,0.989
+Forest: Hemlock/Sitka Spruce Group,,2305,0.785
+Forest: Hemlock/Sitka Spruce Group,Marine,66,0.454
+Forest: Hemlock/Sitka Spruce Group,Marine Mountains,1778,0.849
+Forest: Hemlock/Sitka Spruce Group,Temperate Steppe Mountains,438,0.517
+Forest: Loblolly/Shortleaf Pine Group,,41023,0.869
+Forest: Loblolly/Shortleaf Pine Group,Hot Continental,1175,0.862
+Forest: Loblolly/Shortleaf Pine Group,Hot Continental Mountains,836,0.86
 Forest: Loblolly/Shortleaf Pine Group,Prairie,211,0.893
-Forest: Loblolly/Shortleaf Pine Group,Subtropical,37039,0.867
+Forest: Loblolly/Shortleaf Pine Group,Subtropical,37036,0.867
 Forest: Loblolly/Shortleaf Pine Group,Subtropical Mountains,1760,0.93
-Forest: Lodgepole Pine Group,,4575,0.994
+Forest: Lodgepole Pine Group,,4575,0.997
 Forest: Lodgepole Pine Group,Marine Mountains,1187,0.997
-Forest: Lodgepole Pine Group,Mediterranean Mountains,314,0.992
-Forest: Lodgepole Pine Group,Temperate Desert,30,0.987
-Forest: Lodgepole Pine Group,Temperate Steppe Mountains,3025,0.994
+Forest: Lodgepole Pine Group,Mediterranean Mountains,314,0.993
+Forest: Lodgepole Pine Group,Temperate Desert,30,0.997
+Forest: Lodgepole Pine Group,Temperate Steppe Mountains,3025,0.997
 Forest: Longleaf/Slash Pine Group,,8513,0.901
 Forest: Longleaf/Slash Pine Group,Savanna,72,0.666
 Forest: Longleaf/Slash Pine Group,Subtropical,8439,0.903
-Forest: Maple/Beech/Birch Group,,28720,0.437
-Forest: Maple/Beech/Birch Group,Hot Continental,5505,0.356
-Forest: Maple/Beech/Birch Group,Hot Continental Mountains,2020,0.434
-Forest: Maple/Beech/Birch Group,Prairie,99,0.339
-Forest: Maple/Beech/Birch Group,Subtropical,69,0.3
-Forest: Maple/Beech/Birch Group,Warm Continental,14127,0.4
-Forest: Maple/Beech/Birch Group,Warm Continental Mountains,6876,0.551
-Forest: Oak/Gum/Cypress Group,,16058,0.304
-Forest: Oak/Gum/Cypress Group,Hot Continental,307,0.391
-Forest: Oak/Gum/Cypress Group,Hot Continental Mountains,34,0.498
-Forest: Oak/Gum/Cypress Group,Prairie,254,0.585
-Forest: Oak/Gum/Cypress Group,Savanna,212,0.057
-Forest: Oak/Gum/Cypress Group,Subtropical,15120,0.3
-Forest: Oak/Gum/Cypress Group,Subtropical Mountains,65,0.6
-Forest: Oak/Gum/Cypress Group,Tropical/Subtropical Steppe,59,0.538
-Forest: Oak/Hickory Group,,90783,0.594
-Forest: Oak/Hickory Group,Hot Continental,32487,0.591
-Forest: Oak/Hickory Group,Hot Continental Mountains,14688,0.623
-Forest: Oak/Hickory Group,Prairie,6519,0.557
-Forest: Oak/Hickory Group,Subtropical,27279,0.56
-Forest: Oak/Hickory Group,Subtropical Mountains,1418,0.734
-Forest: Oak/Hickory Group,Temperate Steppe,511,0.416
-Forest: Oak/Hickory Group,Temperate Steppe Mountains,52,0.9
+Forest: Maple/Beech/Birch Group,,28719,0.448
+Forest: Maple/Beech/Birch Group,Hot Continental,5505,0.364
+Forest: Maple/Beech/Birch Group,Hot Continental Mountains,2019,0.434
+Forest: Maple/Beech/Birch Group,Prairie,99,0.347
+Forest: Maple/Beech/Birch Group,Subtropical,69,0.301
+Forest: Maple/Beech/Birch Group,Warm Continental,14127,0.416
+Forest: Maple/Beech/Birch Group,Warm Continental Mountains,6876,0.557
+Forest: Oak/Gum/Cypress Group,,16058,0.308
+Forest: Oak/Gum/Cypress Group,Hot Continental,307,0.392
+Forest: Oak/Gum/Cypress Group,Hot Continental Mountains,34,0.497
+Forest: Oak/Gum/Cypress Group,Prairie,254,0.59
+Forest: Oak/Gum/Cypress Group,Savanna,212,0.058
+Forest: Oak/Gum/Cypress Group,Subtropical,15120,0.304
+Forest: Oak/Gum/Cypress Group,Subtropical Mountains,65,0.608
+Forest: Oak/Gum/Cypress Group,Tropical/Subtropical Steppe,59,0.539
+Forest: Oak/Hickory Group,,90758,0.598
+Forest: Oak/Hickory Group,Hot Continental,32478,0.596
+Forest: Oak/Hickory Group,Hot Continental Mountains,14681,0.617
+Forest: Oak/Hickory Group,Prairie,6519,0.58
+Forest: Oak/Hickory Group,Subtropical,27270,0.557
+Forest: Oak/Hickory Group,Subtropical Mountains,1418,0.735
+Forest: Oak/Hickory Group,Temperate Steppe,511,0.462
+Forest: Oak/Hickory Group,Temperate Steppe Mountains,52,0.903
 Forest: Oak/Hickory Group,Tropical/Subtropical Desert,83,0.166
-Forest: Oak/Hickory Group,Tropical/Subtropical Steppe,1094,0.61
-Forest: Oak/Hickory Group,Warm Continental,6309,0.649
-Forest: Oak/Hickory Group,Warm Continental Mountains,327,0.78
-Forest: Oak/Pine Group,,18097,0.654
-Forest: Oak/Pine Group,Hot Continental,2568,0.613
-Forest: Oak/Pine Group,Hot Continental Mountains,1277,0.752
-Forest: Oak/Pine Group,Prairie,446,0.381
-Forest: Oak/Pine Group,Subtropical,11357,0.636
+Forest: Oak/Hickory Group,Tropical/Subtropical Steppe,1094,0.611
+Forest: Oak/Hickory Group,Warm Continental,6309,0.681
+Forest: Oak/Hickory Group,Warm Continental Mountains,327,0.785
+Forest: Oak/Pine Group,,18092,0.659
+Forest: Oak/Pine Group,Hot Continental,2568,0.619
+Forest: Oak/Pine Group,Hot Continental Mountains,1276,0.746
+Forest: Oak/Pine Group,Prairie,446,0.391
+Forest: Oak/Pine Group,Subtropical,11353,0.634
 Forest: Oak/Pine Group,Subtropical Mountains,715,0.801
-Forest: Oak/Pine Group,Temperate Steppe,80,0.214
-Forest: Oak/Pine Group,Warm Continental,1412,0.741
-Forest: Oak/Pine Group,Warm Continental Mountains,219,0.707
-Forest: Other Western Softwood Group,,2280,0.578
+Forest: Oak/Pine Group,Temperate Steppe,80,0.226
+Forest: Oak/Pine Group,Warm Continental,1412,0.798
+Forest: Oak/Pine Group,Warm Continental Mountains,219,0.719
+Forest: Other Western Softwood Group,,2280,0.583
 Forest: Other Western Softwood Group,Marine Mountains,96,0.819
-Forest: Other Western Softwood Group,Mediterranean Mountains,721,0.443
-Forest: Other Western Softwood Group,Temperate Desert,683,0.199
-Forest: Other Western Softwood Group,Temperate Desert Mountains,32,0.981
-Forest: Other Western Softwood Group,Temperate Steppe Mountains,703,0.844
-Forest: Pinyon/Juniper Group,,14587,0.301
-Forest: Pinyon/Juniper Group,Mediterranean Mountains,224,0.664
+Forest: Other Western Softwood Group,Mediterranean Mountains,721,0.444
+Forest: Other Western Softwood Group,Temperate Desert,683,0.211
+Forest: Other Western Softwood Group,Temperate Desert Mountains,32,0.996
+Forest: Other Western Softwood Group,Temperate Steppe Mountains,703,0.848
+Forest: Pinyon/Juniper Group,,14587,0.308
+Forest: Pinyon/Juniper Group,Mediterranean Mountains,224,0.669
 Forest: Pinyon/Juniper Group,Prairie,166,0.081
-Forest: Pinyon/Juniper Group,Temperate Desert,2704,0.31
-Forest: Pinyon/Juniper Group,Temperate Desert Mountains,2096,0.403
+Forest: Pinyon/Juniper Group,Temperate Desert,2704,0.317
+Forest: Pinyon/Juniper Group,Temperate Desert Mountains,2096,0.429
 Forest: Pinyon/Juniper Group,Temperate Steppe,737,0.24
-Forest: Pinyon/Juniper Group,Temperate Steppe Mountains,1149,0.367
-Forest: Pinyon/Juniper Group,Tropical/Subtropical Desert,961,0.188
+Forest: Pinyon/Juniper Group,Temperate Steppe Mountains,1149,0.375
+Forest: Pinyon/Juniper Group,Tropical/Subtropical Desert,961,0.194
 Forest: Pinyon/Juniper Group,Tropical/Subtropical Steppe,4854,0.226
 Forest: Pinyon/Juniper Group,Tropical/Subtropical Steppe Mountains,1673,0.345
-Forest: Ponderosa Pine Group,,8985,0.966
-Forest: Ponderosa Pine Group,Marine Mountains,1806,0.974
-Forest: Ponderosa Pine Group,Mediterranean Mountains,1284,0.939
-Forest: Ponderosa Pine Group,Temperate Desert,259,0.959
-Forest: Ponderosa Pine Group,Temperate Desert Mountains,36,0.928
-Forest: Ponderosa Pine Group,Temperate Steppe,697,0.918
-Forest: Ponderosa Pine Group,Temperate Steppe Mountains,3863,0.982
-Forest: Ponderosa Pine Group,Tropical/Subtropical Steppe,360,0.949
-Forest: Ponderosa Pine Group,Tropical/Subtropical Steppe Mountains,667,0.96
-Forest: Redwood Group,,265,0.201
-Forest: Redwood Group,Mediterranean,251,0.196
-Forest: Spruce/Fir Group,,14263,0.682
-Forest: Spruce/Fir Group,Hot Continental,198,0.713
+Forest: Ponderosa Pine Group,,8985,0.968
+Forest: Ponderosa Pine Group,Marine Mountains,1806,0.975
+Forest: Ponderosa Pine Group,Mediterranean Mountains,1284,0.94
+Forest: Ponderosa Pine Group,Temperate Desert,259,0.966
+Forest: Ponderosa Pine Group,Temperate Desert Mountains,36,0.945
+Forest: Ponderosa Pine Group,Temperate Steppe,697,0.919
+Forest: Ponderosa Pine Group,Temperate Steppe Mountains,3863,0.984
+Forest: Ponderosa Pine Group,Tropical/Subtropical Steppe,360,0.956
+Forest: Ponderosa Pine Group,Tropical/Subtropical Steppe Mountains,667,0.961
+Forest: Redwood Group,,265,0.204
+Forest: Redwood Group,Mediterranean,251,0.199
+Forest: Spruce/Fir Group,,14263,0.69
+Forest: Spruce/Fir Group,Hot Continental,198,0.716
 Forest: Spruce/Fir Group,Hot Continental Mountains,76,0.907
-Forest: Spruce/Fir Group,Temperate Steppe Mountains,53,0.982
-Forest: Spruce/Fir Group,Warm Continental,11153,0.617
-Forest: Spruce/Fir Group,Warm Continental Mountains,2783,0.841
-Forest: Tanoak/Laurel Group,,806,0.842
-Forest: Tanoak/Laurel Group,Marine Mountains,95,0.806
-Forest: Tanoak/Laurel Group,Mediterranean,312,0.752
-Forest: Tanoak/Laurel Group,Mediterranean Mountains,399,0.938
-Forest: Tropical Hardwoods Group,,451,0.127
-Forest: Tropical Hardwoods Group,Savanna,126,0.094
-Forest: Tropical Hardwoods Group,Subtropical,325,0.136
-Forest: Western Larch Group,,753,0.935
+Forest: Spruce/Fir Group,Temperate Steppe Mountains,53,1
+Forest: Spruce/Fir Group,Warm Continental,11153,0.628
+Forest: Spruce/Fir Group,Warm Continental Mountains,2783,0.845
+Forest: Tanoak/Laurel Group,,806,0.847
+Forest: Tanoak/Laurel Group,Marine Mountains,95,0.825
+Forest: Tanoak/Laurel Group,Mediterranean,312,0.754
+Forest: Tanoak/Laurel Group,Mediterranean Mountains,399,0.942
+Forest: Tropical Hardwoods Group,,451,0.131
+Forest: Tropical Hardwoods Group,Savanna,126,0.11
+Forest: Tropical Hardwoods Group,Subtropical,325,0.137
+Forest: Western Larch Group,,753,0.937
 Forest: Western Larch Group,Marine Mountains,53,0.996
-Forest: Western Larch Group,Temperate Steppe Mountains,696,0.929
-Forest: Western Oak Group,,2865,0.941
-Forest: Western Oak Group,Marine Mountains,92,0.984
-Forest: Western Oak Group,Mediterranean,305,0.896
-Forest: Western Oak Group,Mediterranean Mountains,2421,0.946
+Forest: Western Larch Group,Temperate Steppe Mountains,696,0.932
+Forest: Western Oak Group,,2865,0.943
+Forest: Western Oak Group,Marine Mountains,92,0.987
+Forest: Western Oak Group,Mediterranean,305,0.897
+Forest: Western Oak Group,Mediterranean Mountains,2421,0.947
 Forest: Western White Pine Group,,88,0.976
 Forest: Western White Pine Group,Mediterranean Mountains,64,0.991
-Forest: White/Red/Jack Pine Group,,8765,0.894
-Forest: White/Red/Jack Pine Group,Hot Continental,1863,0.889
-Forest: White/Red/Jack Pine Group,Hot Continental Mountains,531,0.859
-Forest: White/Red/Jack Pine Group,Subtropical,48,0.75
-Forest: White/Red/Jack Pine Group,Warm Continental,5581,0.906
-Forest: White/Red/Jack Pine Group,Warm Continental Mountains,717,0.86
+Forest: White/Red/Jack Pine Group,,8765,0.903
+Forest: White/Red/Jack Pine Group,Hot Continental,1863,0.894
+Forest: White/Red/Jack Pine Group,Hot Continental Mountains,531,0.857
+Forest: White/Red/Jack Pine Group,Subtropical,48,0.744
+Forest: White/Red/Jack Pine Group,Warm Continental,5581,0.919
+Forest: White/Red/Jack Pine Group,Warm Continental Mountains,717,0.865

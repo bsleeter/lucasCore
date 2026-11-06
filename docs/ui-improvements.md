@@ -163,9 +163,7 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
   - **Built 2026-11-06:** src/co2.R and stage 11 (CO2 rows in stsim_FlowMultiplier with the Build's rows
     copied over), the Climate page's CO2 group (series, ceiling, reference; CO2 Betas table loaded with the series' defaults for the study area's strata, user decision 2026-11-06, reloaded on a series switch), defaults/climate/co2-*.csv (SSP CO2
     from RCMIP v5.1.0, betas, classes, age bands, ECM shares from tools/make_co2_ecm_share.R), tests/unit-co2.R (33 checks pass).
-    Departures from the plan: the user rows adjust any series rather than a separate "User" series; the ECM shares use a genus-level
-    mycorrhizal table written for lucasCore (co2-mycorrhiza-genus.csv; dual AM/ECM genera count half), not the Jo et al. 2019 species
-    list itself, which is still to compare; the reference CO2 defaults to the SSP's value in the historical end year.
+    Departures from the plan: the user rows adjust any series rather than a separate "User" series; the reference CO2 defaults to the SSP's value in the historical end year.
   - **Run test 2026-11-06 (Puget Lowlands, with the user's OK; future tests go in a test library):** climate scenario 70 -> result
     71 (stage 11, 5.5 min; ACCESS-CM2 SSP2-4.5 to 2050, Central; CO2 426.1 -> 506.9 ppm, reference 423.1 = SSP2-4.5 2023; 5,562 CO2
     rows + the Build's 154,406 rows; 2050 multipliers forest 1.030-1.081, shrub 1.027, grassland 1.054, wetlands 1.036). Projection
@@ -174,7 +172,14 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     Ecosystem carbon 2050: 365.32 vs 363.11 Tg C (+2.2 Tg; biomass +1.7, dead organic matter +0.5). Puget also got sync-library
     (Co2 columns, CO2 type; backups .bak-20261106-0958 and -0959) - scenarios 70-73 and the backups await the user's keep/delete.
   - **Studio check 2026-11-06:** the user opened the CO2 page with the loaded CO2 Betas table and said it "looks great".
-  - **Still to do:** a User Guide section; compare the genus table with Jo et al. 2019; the per-age-band check (growth by age band
+  - **Jo et al. 2019 comparison (2026-11-06, user request):** their species list (PURR doi:10.4231/R76D5R7S, CC0; 379 FIA codes)
+    agreed with the genus table on 345 of 374 typed species. The 29 differences: poplars, aspens, willows, alders and eucalypts EM
+    (the genus table counted them half), Cercocarpus, Casuarina and Guapira EM, Gleditsia AM+EM; ERM and NM trees left out of the
+    share. The ECM shares now use their list first (defaults/climate/co2-mycorrhiza-species.csv), the genus table (aligned with their
+    genus choices) only for species they lack. Changed: Aspen/Birch 0.59 -> 0.85, Alder/Maple 0.54 -> 0.76, Elm/Ash/Cottonwood
+    0.21 -> 0.27, others 0.03 or less. Puget's result 71/73 used the old shares; scenario 70's CO2 Betas table holds the old defaults
+    (Load the defaults refreshes it; it will ask, since the rows now differ).
+  - **Still to do:** a User Guide section; the per-age-band check (growth by age band
     in a test library); sync-library and the CO2 type for the other libraries when they move.
 
 47. **Example libraries by region and resolution** - TO DO, idea stage (user, 2026-11-04; replaces item 13). A range of libraries, already
