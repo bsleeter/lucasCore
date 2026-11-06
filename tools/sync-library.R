@@ -12,7 +12,7 @@
 #   4. project definitions the package defaults gained (stsim State Attribute Types, Flow Multiplier Types): added through rsyncrosim
 #   5. the stock group memberships of non-result scenarios (the Stock-Flow Definitions scenario), set to the package defaults
 #   6. the Carbon Assumptions lists and scenario (see --carbon-assumptions)
-#   7. emergent wetland rows a filled Grassland, Shrubland and Wetland Carbon sheet still holds at the old class-wide values: removed,
+#   7. (run in SQL right after step 3) emergent wetland rows a filled Grassland, Shrubland and Wetland Carbon sheet still holds at the old class-wide values: removed,
 #      so the package's ecodivision values apply (to-do 39 step 1)
 # --columns-only: step 2 alone (a new column; no stages, definitions or Carbon Assumptions scenario), for a library being documented.
 # --schema-only: steps 2 and 3 (new columns and new stages), nothing else.
@@ -65,6 +65,30 @@ if (dry) dbRollback(con) else dbCommit(con)
 cat(sprintf("%s %d column(s) and %d stage(s)\n", if (dry) "would add" else "added", added, nst))
 if ("--schema-only" %in% a) { cat("--schema-only: nothing else changed\n"); quit(save = "no") }
 
+# ---- 7. emergent wetlands by ecodivision (to-do 39 step 1, 2026-11-06), run here in SQL (one query, not two reads per scenario): a
+# Grassland, Shrubland and Wetland Carbon sheet filled before then holds the old class-wide emergent rows (the CONUS 1 km build's),
+# which would override the package's ecodivision values. In scenarios that are not results, rows still equal to those legacy values
+# are removed; a row a user changed is kept and counted.
+if (all(c("lucasCore_NonForestRate", "lucasCore_NonForestGrowth") %in% dbListTables(con))) {
+  EMC <- c("Wetland: Estuarine Emergent", "Wetland: Palustrine Emergent")
+  leg <- function(f) fread(file.path(pkg, "defaults", "stockflow", "legacy-ibis", sprintf("preset-fia-measured-%s.csv", f)), colClasses = "character", na.strings = "")
+  inn <- paste0("('", paste(EMC, collapse = "','"), "')")
+  rr <- as.data.table(dbGetQuery(con, sprintf("SELECT r.NonForestRateId id, r.ScenarioId, c.Name cls, g.Name grp, r.Value v FROM lucasCore_NonForestRate r
+    JOIN stsim_StateClass c ON r.StateClassId = c.StateClassId JOIN stsim_FlowGroup g ON r.FlowGroupId = g.FlowGroupId
+    WHERE c.Name IN %s AND r.StratumId IS NULL AND r.AgeMin IS NULL AND r.ScenarioId NOT IN (SELECT ResultId FROM core_ScenarioResult)", inn)))
+  rg <- as.data.table(dbGetQuery(con, sprintf("SELECT r.NonForestGrowthId id, r.ScenarioId, c.Name cls, r.NetGrowth v FROM lucasCore_NonForestGrowth r
+    JOIN stsim_StateClass c ON r.StateClassId = c.StateClassId
+    WHERE c.Name IN %s AND r.StratumId IS NULL AND r.AgeMin IS NULL AND r.ScenarioId NOT IN (SELECT ResultId FROM core_ScenarioResult)", inn)))
+  lr <- leg("nonforest-rates"); lg <- leg("nonforest-growth")
+  rr[, legacy := abs(v - as.numeric(lr$Value[match(paste(cls, grp), paste(lr$StateClassId, lr$FlowGroupId))])) < 1e-9]
+  rg[, legacy := abs(v - as.numeric(lg$NetGrowth[match(cls, lg$StateClassId)])) < 1e-9]
+  rr[is.na(legacy), legacy := FALSE]; rg[is.na(legacy), legacy := FALSE]
+  if (!dry) { if (any(rr$legacy)) dbExecute(con, sprintf("DELETE FROM lucasCore_NonForestRate WHERE NonForestRateId IN (%s)", paste(rr[legacy == TRUE, id], collapse = ",")))
+              if (any(rg$legacy)) dbExecute(con, sprintf("DELETE FROM lucasCore_NonForestGrowth WHERE NonForestGrowthId IN (%s)", paste(rg[legacy == TRUE, id], collapse = ","))) }
+  cat(sprintf("emergent wetland rows at the legacy class-wide values: %s %d rate and %d growth rows in %d scenario(s); %d changed rows kept\n",
+              if (dry) "would remove" else "removed", sum(rr$legacy), sum(rg$legacy), uniqueN(c(rr[legacy == TRUE, ScenarioId], rg[legacy == TRUE, ScenarioId])),
+              sum(!rr$legacy) + sum(!rg$legacy))) }
+
 # ---- 4. project definitions the package defaults gained --------------------------------------------------------------------
 if (!dry) { dbDisconnect(con); on.exit(dbDisconnect(ref))
   suppressPackageStartupMessages(library(rsyncrosim))
@@ -92,7 +116,7 @@ if (!dry) { dbDisconnect(con); on.exit(dbDisconnect(ref))
   sm <- as.data.table(scenario(L, summary = TRUE)); want_m <- fread(file.path(pkg, "defaults", "stockflow", "stsim_StockTypeGroupMembership.csv"), na.strings = "")
   key <- function(d) sort(paste(d$StockTypeId, d$StockGroupId))
   for (sid in sm[IsResult == "No", ScenarioId]) { S <- scenario(L, sid)
-    have_m <- as.data.table(datasheet(S, "stsim_StockTypeGroupMembership", lookupsAsFactors = FALSE, optional = TRUE))
+    have_m <- tryCatch(as.data.table(datasheet(S, "stsim_StockTypeGroupMembership", lookupsAsFactors = FALSE, optional = TRUE)), error = function(e) { cat(sprintf("scenario %d: stock group memberships unreadable, skipped (%s)\n", sid, conditionMessage(e))); data.table() })
     if (!nrow(have_m) || identical(key(have_m), key(want_m))) next
     saveDatasheet(S, as.data.frame(want_m[, .(StockTypeId, StockGroupId)]), "stsim_StockTypeGroupMembership", append = FALSE)
     cat(sprintf("stock group memberships of scenario %d (%s) updated to the package's (%d rows)\n", sid, sm[ScenarioId == sid, Name], nrow(want_m))) }
@@ -110,23 +134,5 @@ if (!dry) { dbDisconnect(con); on.exit(dbDisconnect(ref))
     filled <- fill_carbon_assumptions(ca, pkg)
     if (length(filled)) cat(sprintf("Carbon Assumptions scenario %d %s: filled %s%s\n", scenarioId(ca), if (!have_ca) "created" else "kept", paste(filled, collapse = ", "),
                                     if (!have_ca) " - add it to each Build's dependencies" else "")) }
-  # ---- 7. emergent wetlands by ecodivision (to-do 39 step 1, 2026-11-06): a Grassland, Shrubland and Wetland Carbon sheet filled
-  # before then holds the old class-wide emergent rows (the CONUS 1 km build's), which would override the package's ecodivision values.
-  # Rows still equal to those legacy values are removed; a row a user changed is kept and listed.
-  leg <- rbindlist(lapply(c("nonforest-rates", "nonforest-growth"), function(f) fread(file.path(pkg, "defaults", "stockflow", "legacy-ibis", sprintf("preset-fia-measured-%s.csv", f)),
-                                                                                       colClasses = "character", na.strings = "")[, sheet := f]), fill = TRUE)
-  EMC <- c("Wetland: Estuarine Emergent", "Wetland: Palustrine Emergent"); sm <- as.data.table(scenario(L, summary = TRUE))
-  for (sid in sm[IsResult == "No", ScenarioId]) { S <- scenario(L, sid)
-    for (sh in c("NonForestRate", "NonForestGrowth")) { full <- paste0("lucasCore_", sh); vc <- if (sh == "NonForestRate") "Value" else "NetGrowth"
-      x <- as.data.table(suppressWarnings(datasheet(S, full, lookupsAsFactors = FALSE, optional = TRUE))); if (!nrow(x)) next
-      em <- x$StateClassId %in% EMC; if (!any(em)) next
-      lg <- leg[sheet == if (sh == "NonForestRate") "nonforest-rates" else "nonforest-growth"]
-      k_x <- paste(x$StateClassId, if (sh == "NonForestRate") x$FlowGroupId else "", is.na(x$StratumId) & is.na(x$AgeMin))
-      k_l <- paste(lg$StateClassId, if (sh == "NonForestRate") lg$FlowGroupId else "", TRUE)
-      legacy <- em & !is.na(match(k_x, k_l)) & abs(as.numeric(x[[vc]]) - as.numeric(lg[[vc]][match(k_x, k_l)])) < 1e-9
-      if (!any(legacy)) next
-      if (!"--dry-run" %in% a) saveDatasheet(S, as.data.frame(x[!legacy]), full, append = FALSE)
-      cat(sprintf("scenario %d (%s) %s: %d legacy emergent wetland rows removed (the package's ecodivision values apply)%s\n", sid, sm[ScenarioId == sid, Name], sh, sum(legacy),
-                  if (any(em & !legacy)) sprintf("; %d changed emergent rows kept", sum(em & !legacy)) else "")) } }
   st <- levels(datasheet(scenario(L, as.data.table(scenario(L, summary = TRUE))$ScenarioId[1]), "core_Pipeline", lookupsAsFactors = TRUE, optional = TRUE)$StageNameId)
   cat("stages now:", paste(st, collapse = " | "), "\n") }
