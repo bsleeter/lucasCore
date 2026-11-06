@@ -17,3 +17,5 @@ Carbon Initial Conditions: Snag Stem,Carbon Initial Conditions,,
 Net Growth,Net Growth,,
 Developed,State Class,,"1 on developed state classes (NLCD 21-24), written by stage 10: the developed share around a cell drives its adjacency multiplier"
 Agriculture,State Class,,"1 on agriculture state classes (NLCD 81, 82), written by stage 10: the agriculture share around a cell drives the adjacency multiplier of agriculture expansion"
+Pasture,State Class,,"1 on Agriculture: Pasture (NLCD 81), written by stage 10: the pasture share around a cell drives the adjacency multiplier of Ag Change: Cropland to Pasture"
+Cropland,State Class,,"1 on Agriculture: Cropland (NLCD 82), written by stage 10: the cropland share around a cell drives the adjacency multiplier of Ag Change: Pasture to Cropland"

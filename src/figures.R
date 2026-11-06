@@ -178,7 +178,7 @@ build_figures <- function(I, outdir) {
     if (any(pools == "Live biomass")) P[[2]] <- mp(sum_of(names(I$stocks)[pools == "Live biomass"]), RAMP_C, "Live biomass carbon (Mg C/ha)", "stem, foliage, other wood and roots")
     if (any(pools == "Soil")) P[[length(P) + 1]] <- mp(sum_of(names(I$stocks)[pools == "Soil"]), RAMP_SOIL, "Soil carbon (Mg C/ha)", "belowground pools; classes of equal area", equal = FALSE)
     map_figure("initial_carbon", sprintf("Initial carbon stocks, %s", I$years[1]), P,
-      sprintf("Carbon in the start year (%s): %.1f Tg C in the study area. (a, b) Classes in even steps between each map's 1st and 99.5th percentiles; the end classes are open. (c) Classes of roughly equal area: forest soil starts at its type's gSSURGO mean (stage 3 calibrates decay to it), so it varies little within a type, and other land takes gSSURGO directly.%s", I$years[1], totTg, relief)) }
+      sprintf("Carbon in the start year (%s): %.1f Tg C in the study area. (a, b) Classes in even steps between each map's 1st and 99.5th percentiles; the end classes are open. (c) Classes of roughly equal area: forest soil starts at its type's gNATSGO mean (stage 3 calibrates decay to it), so it varies little within a type, and other land takes gNATSGO directly.%s", I$years[1], totTg, relief)) }
 
   # ---- maps: site productivity (to-do 35) ----------------------------------------------------------------------------------------
   if (!is.null(I$site)) {
@@ -236,7 +236,7 @@ build_figures <- function(I, outdir) {
                 Duff = "DuffDecayMultiplier", Soil = "SoilDecayMultiplier")
     } else { pc <- c(Snag = "#8c510a", `Down wood` = "#d8b365", `Forest floor` = "#5ab4ac", Soil = "#01665e")
       cols <- c(Snag = "SnagDecayMultiplier", `Down wood` = "DownWoodDecayMultiplier", `Forest floor` = "ForestFloorDecayMultiplier", Soil = "SoilDecayMultiplier") }
-    chart_figure("decay_calibration", "Dead organic matter calibration", if (meas) "Decay rate multipliers by forest type, calibrated in stage 3 to FIA's measured snags, down logs, fine woody debris, litter and duff in mature stands (snag, down log and fine woody debris rates shared by the ecodivision) and soil to gSSURGO; 1 = the CBM-CFS3 default. Snag fall is set separately from remeasured dead trees." else "Decay rate multipliers of the snag, down wood, forest floor and soil pools by forest type, calibrated in stage 3 so spin-up carbon matches FIA and gSSURGO; 1 = the CBM-CFS3 default.",
+    chart_figure("decay_calibration", "Dead organic matter calibration", if (meas) "Decay rate multipliers by forest type, calibrated in stage 3 to FIA's measured snags, down logs, fine woody debris, litter and duff in mature stands (snag, down log and fine woody debris rates shared by the ecodivision) and soil to gNATSGO; 1 = the CBM-CFS3 default. Snag fall is set separately from remeasured dead trees." else "Decay rate multipliers of the snag, down wood, forest floor and soil pools by forest type, calibrated in stage 3 so spin-up carbon matches FIA and gNATSGO; 1 = the CBM-CFS3 default.",
       1, ne, h = 300 + 70 * max(dc[, .N, by = StratumId]$N), draw = function() {
         for (i in seq_along(eco)) { x <- dc[StratumId == eco[i]]; x <- x[order(x$SoilDecayMultiplier)]; ny <- nrow(x)
           par(mar = c(4.5, if (i == 1) 13 else 1, 3, 1))
@@ -261,7 +261,7 @@ build_figures <- function(I, outdir) {
       barplot(mm, col = cl, border = NA, space = .15, xaxt = "n", add = TRUE, axes = FALSE)
       at <- if (length(yrs) <= 15) seq_along(yrs) else which(yrs %% 5 == 0); axis(1, at = b[at], labels = yrs[at], cex.axis = .75)
       ptitle(i, fam); top_legend(rownames(mm), fill = cl) }
-    fams <- intersect(c("Urbanization", "Intensification", "Ag Expansion", "Ag Contraction"), unique(tr$Family))
+    fams <- intersect(c("Urbanization", "Intensification", "Ag Expansion", "Ag Contraction", "Ag Change"), unique(tr$Family))
     if (length(fams)) chart_figure("land_use_change", "Historical land-use change", sprintf("Annual area of each land-use transition group, %s-%s, from annual NLCD (stage 6), by member type.", min(yrs), max(yrs)),
       ceiling(length(fams) / 2), min(2, length(fams)), draw = function() for (i in seq_along(fams)) stack(tr, fams[i], c(), i))
     dfam <- intersect(c("Fire", "Forest Harvest", "Insect"), unique(tr$Family))

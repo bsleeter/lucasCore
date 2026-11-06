@@ -21,7 +21,7 @@ cover_group <- function(x) { g <- sub(":.*$", "", x); g[grepl("^Forest", x)] <- 
   g[!g %in% c("Forest", "Shrubland", "Grassland", "Agriculture", "Developed", "Wetland", "Water")] <- "Barren and other"; g }
 COVER_COLS <- c(Forest = "#2b8152", Shrubland = "#c9a26b", Grassland = "#e6d77a", Agriculture = "#d98b3a", Developed = "#c0392b",
                 Wetland = "#5aa9b8", Water = "#3b6ea8", `Barren and other` = "#a3a3a3")
-FAMILIES <- c("Urbanization", "Intensification", "Ag Expansion", "Ag Contraction", "Fire", "Forest Harvest")
+FAMILIES <- c("Urbanization", "Intensification", "Ag Expansion", "Ag Contraction", "Ag Change", "Fire", "Forest Harvest")
 RAMP_CHG <- colorRampPalette(c("#7a3b12", "#c98b4f", "#efd9b4", "#f5f2ec", "#cfe3b8", "#6fae74", "#1f5f3f"))
 
 # ---- the run's tables and maps ---------------------------------------------------------------------------------------------

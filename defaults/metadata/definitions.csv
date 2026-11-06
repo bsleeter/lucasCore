@@ -26,7 +26,7 @@ StateClass,Wetland: Estuarine Emergent,Start-year NLCD Emergent Herbaceous Wetla
 TransitionGroup,Urbanization,Natural or agricultural cells that become developed: the cell's most common annual NLCD class changes to 21-24 from one year to the next.,NlcdFolder
 TransitionGroup,Intensification,"Developed cells that move to a higher NLCD development intensity (21 to 22, 23 or 24; 22 to 23 or 24; 23 to 24).",NlcdFolder
 TransitionGroup,Ag Expansion,Natural cells that become agriculture: the cell's most common annual NLCD class changes to 81 or 82.,NlcdFolder
-TransitionGroup,Ag Change,All agricultural expansion and contraction transitions together.,NlcdFolder
+TransitionGroup,Ag Change,Agricultural cells that change between pasture and cropland (the annual NLCD class goes from 81 to 82 or 82 to 81).,NlcdFolder
 TransitionGroup,Ag Contraction,Agricultural cells that stop being agriculture (the most common annual NLCD class leaves 81 or 82). Each cell returns to the nearest natural state class of the start year.,NlcdFolder
 TransitionGroup,Ag Contraction: Cropland,Ag Contraction from Agriculture: Cropland (NLCD 82).,NlcdFolder
 TransitionGroup,Ag Contraction: Pasture,Ag Contraction from Agriculture: Pasture (NLCD 81).,NlcdFolder
@@ -62,6 +62,7 @@ TransitionType,Forest Harvest: Forest Selection 85%,Partial harvest removing abo
 TransitionType,Forest Harvest: Salvage Logging,Harvest of trees killed by a disturbance. Defined in the harvest pathways; it has no mapped source and a zero target in the historical model.,
 TransitionType,Insect: *,Insect and disease mortality of {*}. Defined in the package's type list; no pathway uses it in the default model.,
 TransitionType,Restoration Wetland: *,Conversion to Wetland: {*}. Defined in the package's type list; no pathway uses it in the default model.,
+TransitionType,Ag Change: *,Agricultural cells that change class: {*}.,NlcdFolder
 TransitionType,Wetland Change: *,Wetland change {*}. Defined in the package's type list; no pathway uses it in the default model.,
 TransitionType,Succession Post Fire: *,Post-fire shrubland returns to Forest: {*}. Defined in the package's type list; no pathway uses it in the default model.,
 StockType,Aquatic,Carbon moved out of the ecosystem to water bodies by lateral transport (a sink outside the ecosystem).,

@@ -24,6 +24,7 @@ namespace lucasCoreUI
         private readonly RadioButton m_continuous = new RadioButton { Text = "Continuous: the projection follows the historical years in the same run", AutoSize = true };
         private readonly RadioButton m_standAlone = new RadioButton { Text = "Stand-alone: start from the final year of a historical run", AutoSize = true };
         private readonly ComboBox m_hist = List(360);
+        private readonly ComboBox m_targets = List(360);
         private readonly CheckBox m_allYears = new CheckBox { Text = "All historical transition years", AutoSize = true, Margin = new Padding(3, 5, 18, 3) };
         private readonly TextBox m_from = Box(60), m_to = Box(60);
         private readonly TextBox m_iter = Box(60), m_seed = Box(60);
@@ -58,6 +59,11 @@ namespace lucasCoreUI
             var y = Row(); y.Controls.Add(m_allYears); y.Controls.Add(Caption("or from")); y.Controls.Add(m_from); y.Controls.Add(Caption("to")); y.Controls.Add(m_to); years.Controls.Add(y);
             AddGroup(Group("Historical years drawn (reference period)", years));
 
+            var tg = Column();
+            var tr = Row(); tr.Controls.Add(Caption("Target areas from:")); tr.Controls.Add(m_targets); tg.Controls.Add(tr);
+            tg.Controls.Add(Wrapped("A historical run: each Target group's area in a drawn year is what that run realized in the year, unit by unit, so the projection continues at the rate the historical period could reproduce (the maps also hold change the model cannot place). Choose the historical run on this Build. Blank: the historical maps.", 640));
+            AddGroup(Group("Transition targets", tg));
+
             var it = Form();
             FormRow(it, "Iterations:", m_iter, "Monte Carlo runs: each draws its own sequence of historical years");
             FormRow(it, "Random seed:", m_seed, "the same seed gives the same draws");
@@ -80,6 +86,8 @@ namespace lucasCoreUI
             m_standAlone.CheckedChanged += (s, e) => { if (!Refreshing && m_standAlone.Checked) { m_wantStandAlone = true; RefreshControls(); } };
             m_hist.DropDown += (s, e) => { int n = m_runs.Count; LoadRuns(); if (m_runs.Count != n) RefreshControls(); };
             m_hist.SelectionChangeCommitted += (s, e) => { var i = m_hist.SelectedItem as Item; Write(Start, "HistoricalScenarioId", i == null ? DBNull.Value : i.Key); RefreshControls(); };
+            m_targets.DropDown += (s, e) => { int n = m_runs.Count; LoadRuns(); if (m_runs.Count != n) RefreshControls(); };
+            m_targets.SelectionChangeCommitted += (s, e) => { var i = m_targets.SelectedItem as Item; Write("TargetsScenarioId", i == null ? DBNull.Value : i.Key); RefreshControls(); };
             m_allYears.CheckedChanged += (s, e) => { if (Refreshing) return; m_customYears = !m_allYears.Checked; if (m_allYears.Checked) { Write("ReferenceStartYear", DBNull.Value); Write("ReferenceEndYear", DBNull.Value); } RefreshControls(); };
             BindNumber(m_from, () => Sheet, "ReferenceStartYear", true); BindNumber(m_to, () => Sheet, "ReferenceEndYear", true);
             BindNumber(m_iter, () => Sheet, "Iterations", true); BindNumber(m_seed, () => Sheet, "RandomSeed", true);
@@ -164,6 +172,15 @@ namespace lucasCoreUI
             for (int k = 1; k < m_hist.Items.Count; k++) if (hid != DBNull.Value && Convert.ToInt32(((Item)m_hist.Items[k]).Key) == Convert.ToInt32(hid)) idx = k;
             if (hid != DBNull.Value && idx == 0) { m_hist.Items.Add(new Item { Key = hid, Name = string.Format("[{0}] (not in this project)", hid) }); idx = m_hist.Items.Count - 1; }
             m_hist.SelectedIndex = idx; m_hist.EndUpdate();
+
+            object tid = DBNull.Value; try { tid = Value("TargetsScenarioId"); } catch (Exception) { }   // a library not yet synced has no such column
+            m_targets.BeginUpdate(); m_targets.Items.Clear();
+            m_targets.Items.Add(new Item { Key = DBNull.Value, Name = "(the historical maps)" });
+            foreach (Item i in m_runs) m_targets.Items.Add(i);
+            int tix = 0;
+            for (int k = 1; k < m_targets.Items.Count; k++) if (tid != DBNull.Value && Convert.ToInt32(((Item)m_targets.Items[k]).Key) == Convert.ToInt32(tid)) tix = k;
+            if (tid != DBNull.Value && tix == 0) { m_targets.Items.Add(new Item { Key = tid, Name = string.Format("[{0}] (not in this project)", tid) }); tix = m_targets.Items.Count - 1; }
+            m_targets.SelectedIndex = tix; m_targets.EndUpdate();
 
             object rs = Value("ReferenceStartYear"), re = Value("ReferenceEndYear");
             bool all = rs == DBNull.Value && re == DBNull.Value && !m_customYears;

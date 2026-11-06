@@ -3,6 +3,8 @@ Urbanization,Target,Secondary,,Land use,1|2|3,"all four urbanization types: one 
 Intensification,Target,Secondary,,Land use,,developed land only (pathways)
 Ag Expansion,Target,Secondary,,Land use,1|2|3,
 Ag Contraction,Target,Secondary,,Land use,,destination class: the stage 6 nearest-natural-class gates stay on
+Ag Change: Cropland to Pasture [Type],Target,Secondary,,Land use,,"its own area per county and year from the drawn historical year, placed by adjacency to pasture (Projection Allocation)"
+Ag Change: Pasture to Cropland [Type],Target,Secondary,,Land use,,placed by adjacency to cropland
 Forest Harvest: Forest Clearcut [Type],Target,Secondary,,Harvest,1|2,harvest draws its own years; not on GAP 1-2
 Forest Harvest: Forest Selection [Type],Target,Secondary,,Harvest,1|2,
 Fire,Probability,,Pyromes,Fire,,"burned fraction of the pyrome's burnable area in the year drawn, one rate map per severity type; fire crosses county lines"

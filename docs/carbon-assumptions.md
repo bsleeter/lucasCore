@@ -39,7 +39,7 @@ return interval, number of cycles, maximum age), Disturbance (CBM disturbance ty
 | Decay calibration choice (measured / condition pools / CBM defaults) | 3 | Carbon Options | yes |
 | Calibration settings: mature age 60, no fire/cut in 30 yr, 30 plots for own litter/duff fit, 200 snags for own fall rate, multiplier range 0.05-20, regional vs per-type scope | 3 | src/3-carbon-flows.R, src/calibrate.R | Carbon Assumptions: Decay Calibration Settings (2026-10-28) |
 | The fitted decay multipliers and snag fall rates | 3 | Decay Calibration output | Carbon Assumptions: Fixed Decay Multipliers (2026-10-28); read-out still to do (to-do 20) |
-| Soil targets (gSSURGO per cell) | 3 | stage 5 output, else defaults/spinup/soil-targets.csv | no |
+| Soil targets (gNATSGO per cell) | 3 | stage 5 output, else defaults/spinup/soil-targets.csv | no |
 | Disturbance transfers (each event: share of each pool to each pool / atmosphere / harvest) | 3, 4, runs | defaults/stockflow/event-pathways.csv | Carbon Assumptions: Disturbance Flows (fire, clearcut; 2026-10-28) |
 | High-severity fire snag share per forest type | 3, 4 | defaults/spinup/fire-snag-share.csv | Carbon Assumptions: Fire Snag Share (2026-10-28) |
 | Spin-up historical disturbance (high-severity fire) and last disturbances (fire, clearcut) | 4 | src/4-initial-stocks.R | Carbon Assumptions: Spin-up (2026-10-28) |
@@ -85,8 +85,8 @@ calibrated, measured, user).
 
 - 2026-10-27 **CBM Crosswalk done**: project lists CBM Ecozones and CBM Species Types (with the rates each sets); scenario sheet CBM
   Crosswalk (ecodivision optional, forest type, ecozone, species type, optional mean temperature) in a Carbon Assumptions scenario that
-  tools/new-library.R creates filled with the package default and the starter's Build depends on; tools/sync-library.R adds both to an
-  existing library (then add the scenario to the Build's dependencies). Stage 3 resolves each cell's row (ecodivision row first), logs
+  tools/new-library.R creates filled with the package default and the starter's Build depends on; tools/sync-library.R adds the lists to an
+  existing library, and the scenario only with --carbon-assumptions since 2026-11-05 (then add it to the Build's dependencies). Stage 3 resolves each cell's row (ecodivision row first), logs
   rows that differ from the package default, and falls back to the package default without the dependency. Admin boundary left out:
   nothing in lucasCore uses it. Test: tests/phaseZ8-cbm-crosswalk.R. A library made in Studio gets the lists but no Carbon Assumptions
   scenario (stage 3 then uses the package default) - the user can create one or copy it from the starter.
@@ -135,9 +135,9 @@ calibrated, measured, user).
   phaseZ7 exactly; mature age 80 / 20 yr: 101,001 vs 126,465 mature plots; min snags 500: 90 vs 120 cells with their own fall rate;
   max 10 caps every calibrated multiplier; fixed snag 1 gives mixed conifer the CBM snag decay rates).
 - 2026-10-28 **Carbon Method with presets** (user decisions: two methods, FIA measured dead wood and CBM defaults; soil organic carbon kept
-  as its own choice, gSSURGO or CBM, SoilGrids planned). Carbon Options moved from the Build into Carbon Assumptions as the Carbon Method
+  as its own choice, gNATSGO or CBM, SoilGrids planned). Carbon Options moved from the Build into Carbon Assumptions as the Carbon Method
   page (first in the group): dead organic matter (4 FIA measured, 3 CBM; 1 and 2 stay in the list for older libraries - a value missing
-  from a list cannot be read - but are not offered), Soil Organic Carbon (new column; blank = gSSURGO with FIA, CBM with CBM), and a Fill
+  from a list cannot be read - but are not offered), Soil Organic Carbon (new column; blank = gNATSGO with FIA, CBM with CBM), and a Fill
   button that loads defaults/carbon-assumptions/<method>/<sheet>.csv into all eight sheets (tools/make_carbon_presets.R writes them:
   fia-measured = fitted fire/clearcut flows, fitted snag shares, settings written out; cbm-defaults = the LUCAS CONUS 1km fire/clearcut
   flows, restored as defaults/stockflow/event-pathways-lucas.csv, no snag shares, no settings). A scenario never filled (CBM Crosswalk,
@@ -147,7 +147,7 @@ calibrated, measured, user).
   the LUCAS table: DOM -> DOM is LULC: Transfer DOM. Precedence measured (phaseZ14): a scenario's own Carbon Method wins, else the first
   dependency with rows - so leave it unset on the Build (the starter no longer sets it there). Tests: tests/unit-carbon-assumptions.R
   (no SyncroSim, 1 s) and tests/phaseZ14-carbon-method.R (empty FIA = filled FIA exactly; empty CBM = filled CBM; CBM writes the LUCAS
-  rows; gSSURGO soil with CBM dead wood). Running scenarios of one library at once from separate R processes or one multi-scenario
+  rows; gNATSGO soil with CBM dead wood). Running scenarios of one library at once from separate R processes or one multi-scenario
   console call failed (database locked / exit 65535): a follow-up.
 - 2026-10-29 **Mature Age by Forest Type, Growth Inputs and the Carbon Rates read-out** (to-dos 28-30, for the v1.0.0 release; none changes
   results until a user edits a row). Mature Age by Forest Type: per forest type, optionally per ecodivision (that row wins), the mature

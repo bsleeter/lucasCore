@@ -9,3 +9,5 @@ Ag Contraction: Cropland,Fitted,Ag Contraction,81|82,31|41|42|43|52|71|90|95,No,
 Ag Contraction: Pasture,Fitted,Ag Contraction,81|82,31|41|42|43|52|71|90|95,No,Auto,
 Forest Harvest: Forest Clearcut [Type],Fitted,Clearcut,41|42|43,LCMS:standrep,No,Auto,LCMS Tree Removal on forest that becomes shrub or grass (the stage 6 clearcut source)
 Forest Harvest: Forest Selection [Type],Fitted,Selection,41|42|43,LCMS:partial,No,Auto,LCMS Tree Removal on forest that stays forest (the stage 6 selection source)
+Ag Change: Cropland to Pasture [Type],Adjacency,Ag Change to Pasture,82,81,Yes,Auto,"cropland -> pasture: adjacency to pasture only (no covariates), the curve read from the annual maps"
+Ag Change: Pasture to Cropland [Type],Adjacency,Ag Change to Cropland,81,82,Yes,Auto,pasture -> cropland: adjacency to cropland only

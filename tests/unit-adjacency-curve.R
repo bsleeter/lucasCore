@@ -1,0 +1,25 @@
+# Fast test of the adjacency curve (no SyncroSim). Run: Rscript tests/unit-adjacency-curve.R (from the package root)
+suppressPackageStartupMessages({ library(data.table); library(terra) })
+source("src/adjacency-curve.R")
+fails <- 0L; n <- 0L
+check <- function(what, ok) { n <<- n + 1L; if (!isTRUE(ok)) fails <<- fails + 1L; cat(if (isTRUE(ok)) "PASS " else "FAIL ", what, "\n", sep = "") }
+# a 5 x 5 grid: pasture (81) on the left column, cropland (82) elsewhere; next year the two cropland cells beside the pasture become pasture
+a <- rast(nrows = 5, ncols = 5, xmin = 0, xmax = 750, ymin = 0, ymax = 750, crs = "EPSG:5070"); values(a) <- rep(c(81L, 82L, 82L, 82L, 82L), 5)
+b <- a; vb <- values(b, mat = FALSE); vb[c(2, 7)] <- 81L; values(b) <- vb
+w <- matrix(1, 3, 3)
+x <- adjacency_counts(a, b, src = 82L, to = 81L, attr = 81L, w = w)
+check("every cropland cell is counted once", sum(x$counts$N) == 20)
+check("the two changes are events", sum(x$counts$Events) == 2 && setequal(x$events, c(2, 7)))
+check("cells with no pasture around them are in bin 0", x$counts[Bin == 0, N] == 15 && x$counts[Bin == 0, Events] == 0)
+check("the changes are in the bin of their pasture share (3/9 or 2/6 rounds up to 0.4)", x$counts[Events > 0, all(Bin == 0.4)])
+cv <- adjacency_curve(x$counts, min_n = 1)
+check("the curve runs 0 to 1 by 0.1", isTRUE(all.equal(cv$AttributeValue, seq(0, 1, 0.1))))
+check("it is 1 at its highest and never falls with more neighbours", max(cv$Amount) == 1 && all(diff(cv$Amount) >= 0))
+check("no neighbours: no change seen, so 0", cv[AttributeValue == 0, Amount] == 0)
+cs <- data.table(Bin = c(0, 0.1, 0.5, 0.9), N = c(1000L, 1000L, 1000L, 10L), Events = c(1L, 10L, 40L, 0L))
+cv2 <- adjacency_curve(cs, min_n = 50)
+check("a bin with too few cells takes the bin below (no drop at 0.9)", cv2[AttributeValue == 0.9, Amount] == 1)
+check("rates scale to the highest (0.001 / 0.04 at 0)", isTRUE(all.equal(cv2[AttributeValue == 0, Amount], 0.025)))
+check("an empty bin between takes the one below", cv2[AttributeValue == 0.3, Amount] == cv2[AttributeValue == 0.1, Amount])
+check("no events at all: a flat curve of 1", all(adjacency_curve(data.table(Bin = 0, N = 100L, Events = 0L))$Amount == 1))
+cat(sprintf("%d checks, %d failed\n", n, fails)); if (fails) quit(status = 1)

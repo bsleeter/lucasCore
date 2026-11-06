@@ -19,3 +19,5 @@ Fire: Medium Severity [Type],Mtbs,3,
 Fire: High Severity [Type],Mtbs,4,
 Forest Harvest: Forest Clearcut [Type],Lcms,9>standrep,"LCMS Tree Removal on last year's forest that NLCD shows as shrub or grass that year or within two (user decision 2026-10-23; was the NLCD rule 41|42|43>52|71)"
 Forest Harvest: Forest Selection [Type],Lcms,9>partial,"LCMS Tree Removal on last year's forest that stays forest (was LANDFIRE Thinning, 1999 on only)"
+Ag Change: Cropland to Pasture [Type],NlcdChange,82>81,the cell goes from 82 to 81
+Ag Change: Pasture to Cropland [Type],NlcdChange,81>82,the cell goes from 81 to 82

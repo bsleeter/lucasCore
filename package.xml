@@ -200,13 +200,14 @@
 		<column name="SpatialTiles" displayName="Spatial Multiprocessing Tiles (blank = the Build's; 1 = one job; 0 = automatic)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
 		<column name="SpatialTilesStrata" displayName="Spatial Tiles Strata (tiles are whole units of this Build Options strata level; every Target group uses it)" dataType="Integer" validationType="List" formula1="1:Primary|2:Secondary|3:Tertiary" defaultValue="2" isOptional="True"/>
 		<column name="HistoricalTypeShares" displayName="Weight a named group's types by their historical shares (default; off = the spatial allocation decides)" dataType="Boolean" defaultValue="-1" isOptional="True"/>
+		<column name="TargetsScenarioId" displayName="Targets From Historical Run (result scenario Id: each Target group's area is what that run realized; blank = the historical maps)" dataType="Integer" isOptional="True"/>
 	</dataSheet>
 
 	<!-- stage 10: where projected transitions go (user decisions 2026-10-22: fitted regression or the old rules, chosen per group) -->
 	<dataSheet name="ProjectionAllocation" displayName="Projection Allocation (where transitions go)">
 		<!-- one row per transition group; a group without a row is placed at random within its strata. An empty sheet uses defaults/projection/allocation.csv -->
 		<column name="TransitionGroupId" displayName="Transition Group" dataType="Integer" validationType="Datasheet" formula1="stsim_TransitionGroup"/>
-		<column name="Method" dataType="Integer" validationType="List" formula1="1:Fitted (regression on the historical record)|2:Rules (WUI and PAD weights)|3:None (random within its strata)" defaultValue="1"/>
+		<column name="Method" dataType="Integer" validationType="List" formula1="1:Fitted (regression on the historical record)|2:Rules (WUI and PAD weights)|3:None (random within its strata)|4:Adjacency (the share of a class around the cell only)" defaultValue="1"/>
 		<column name="Surface" displayName="Surface (groups with the same name share one)" dataType="String"/>
 		<column name="SourceClasses" displayName="Source Classes (NLCD codes a cell has the year before, e.g. 41|42|43; blank = not developed, water or ice)" dataType="String" isOptional="True"/>
 		<column name="EventClasses" displayName="Event Classes (NLCD codes the change goes to, e.g. 22|23|24; or LCMS:standrep, LCMS:partial, LANDFIRE:type)" dataType="String" isOptional="True"/>

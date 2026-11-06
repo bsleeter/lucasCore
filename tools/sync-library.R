@@ -13,7 +13,8 @@
 #   5. the stock group memberships of non-result scenarios (the Stock-Flow Definitions scenario), set to the package defaults
 # --columns-only: step 2 alone (a new column; no stages, definitions or Carbon Assumptions scenario), for a library being documented.
 # --schema-only: steps 2 and 3 (new columns and new stages), nothing else.
-# Close the library in SyncroSim Studio first. Usage: Rscript tools/sync-library.R <library.ssim> [--dry-run] [--columns-only | --schema-only] [--reference=<library.ssim>]
+# --carbon-assumptions: in step 6, also make a Carbon Assumptions scenario when the library has none (by default none is made).
+# Close the library in SyncroSim Studio first. Usage: Rscript tools/sync-library.R <library.ssim> [--dry-run] [--columns-only | --schema-only] [--reference=<library.ssim>] [--carbon-assumptions]
 # =============================================================================
 suppressPackageStartupMessages({ library(DBI); library(RSQLite); library(data.table) })
 a <- commandArgs(TRUE); pos <- a[!grepl("^--", a)]; dry <- "--dry-run" %in% a
@@ -74,6 +75,13 @@ if (!dry) { dbDisconnect(con); on.exit(dbDisconnect(ref))
   miss_t <- want_t[!Name %in% fmt$Name]
   if (nrow(miss_t)) { saveDatasheet(P, as.data.frame(miss_t[, intersect(names(miss_t), names(fmt)), with = FALSE]), "stsim_FlowMultiplierType", append = TRUE)
     cat("added Flow Multiplier Types:", paste(miss_t$Name, collapse = ", "), "\n") } else cat("Flow Multiplier Types up to date\n")
+  # Transition Types and their groups (2026-11-05: Ag Change, the exchange of pasture and cropland): stage 6 reads them from the pathways
+  ttp <- as.data.table(datasheet(P, "stsim_TransitionType")); want_tt <- fread(file.path(pkg, "defaults", "stsim", "stsim_TransitionType.csv"), sep = ",", na.strings = "")
+  miss_tt <- want_tt[!Name %in% ttp$Name & startsWith(Name, "Ag Change")]
+  if (nrow(miss_tt)) { saveDatasheet(P, as.data.frame(miss_tt[, intersect(names(miss_tt), names(ttp)), with = FALSE]), "stsim_TransitionType", append = TRUE)
+    want_g <- fread(file.path(pkg, "defaults", "stsim", "stsim_TransitionTypeGroup.csv"), sep = ",", na.strings = "")[TransitionTypeId %in% miss_tt$Name, .(TransitionTypeId, TransitionGroupId)]
+    saveDatasheet(P, as.data.frame(want_g), "stsim_TransitionTypeGroup", append = TRUE)
+    cat("added Transition Types:", paste(miss_tt$Name, collapse = ", "), "\n") } else cat("Ag Change Transition Types up to date\n")
   # ---- 5. stock group memberships of non-result scenarios (the Stock-Flow Definitions scenario) -----------------------------------
   # stage 0 writes the package's memberships only into a Build without them; a library made by new-library.R carries its own copy in the
   # Stock-Flow Definitions scenario, so a change of the package's groups (2026-10-26: DOM: Litter = the forest floor incl. AG Slow, as
@@ -91,10 +99,13 @@ if (!dry) { dbDisconnect(con); on.exit(dbDisconnect(ref))
   for (sh in c("lucasCore_CbmEcozone", "lucasCore_CbmSpeciesType")) if (!nrow(suppressWarnings(datasheet(P, sh, optional = TRUE)))) {
     v <- fread(file.path(pkg, "defaults", "library", "project", paste0(sh, ".csv")), colClasses = "character"); saveDatasheet(P, as.data.frame(v), sh, append = FALSE, force = TRUE)
     cat(sprintf("%s: %d rows added\n", sh, nrow(v))) }
-  source(file.path(pkg, "tools", "carbon-assumptions.R")); sm <- as.data.table(scenario(L, summary = TRUE)); new_ca <- !"Carbon Assumptions" %in% sm$Name
-  ca <- if (new_ca) scenario(P, "Carbon Assumptions") else scenario(L, sm[Name == "Carbon Assumptions", ScenarioId][1])
-  filled <- fill_carbon_assumptions(ca, pkg)
-  if (length(filled)) cat(sprintf("Carbon Assumptions scenario %d %s: filled %s%s\n", scenarioId(ca), if (new_ca) "created" else "kept", paste(filled, collapse = ", "),
-                                  if (new_ca) " - add it to each Build's dependencies" else ""))
+  # a Carbon Assumptions scenario only with --carbon-assumptions (2026-11-05: three syncs added an unasked one to libraries whose Builds
+  # hold those rows themselves, the P26 guide library among them; the user had each deleted). Without it, an existing one is filled, none made.
+  source(file.path(pkg, "tools", "carbon-assumptions.R")); sm <- as.data.table(scenario(L, summary = TRUE)); have_ca <- "Carbon Assumptions" %in% sm$Name
+  if (!have_ca && !"--carbon-assumptions" %in% a) cat("no Carbon Assumptions scenario made (add --carbon-assumptions to make one)\n") else {
+    ca <- if (!have_ca) scenario(P, "Carbon Assumptions") else scenario(L, sm[Name == "Carbon Assumptions", ScenarioId][1])
+    filled <- fill_carbon_assumptions(ca, pkg)
+    if (length(filled)) cat(sprintf("Carbon Assumptions scenario %d %s: filled %s%s\n", scenarioId(ca), if (!have_ca) "created" else "kept", paste(filled, collapse = ", "),
+                                    if (!have_ca) " - add it to each Build's dependencies" else "")) }
   st <- levels(datasheet(scenario(L, as.data.table(scenario(L, summary = TRUE))$ScenarioId[1]), "core_Pipeline", lookupsAsFactors = TRUE, optional = TRUE)$StageNameId)
   cat("stages now:", paste(st, collapse = " | "), "\n") }

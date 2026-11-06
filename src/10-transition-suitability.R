@@ -42,7 +42,7 @@ sched <- read_ds("OutputProjectionSchedule"); if (!nrow(sched)) fail("no project
 al <- read_ds("ProjectionAllocation")
 if (!nrow(al)) { al <- read_default("projection", "allocation.csv"); al_src <- "defaults/projection/allocation.csv" } else al_src <- "the Projection Allocation sheet"
 al[, Method := sub(" .*", "", Method)]; al[, Adjacency := toupper(as.character(Adjacency)) %in% c("YES", "TRUE", "-1", "1")]
-al <- al[Method %in% c("Fitted", "Rules")]
+al <- al[Method %in% c("Fitted", "Rules", "Adjacency")]
 if (!nrow(al)) { say("Projection Allocation: every group None - stage 9's maps stay"); progressBar(type = "end"); finish_checks(); quit(save = "no") }
 so <- read_ds("SuitabilityOptions")
 res_f <- nz(so$FitResolution, 30L); if (res_f %% 30 != 0) fail("Suitability Options: the fitting resolution must be a multiple of 30 m (NLCD)")
@@ -265,7 +265,10 @@ for (sname in unique(al$Surface)) {
   to <- if (is.na(lft) && is.na(lck)) suppressWarnings(codes_of(gs$EventClasses[1])) else integer()
   if (meth == "Fitted" && is.na(lft) && is.na(lck) && (!length(to) || anyNA(to))) fail("Projection Allocation: surface %s needs Event Classes (NLCD codes, LANDFIRE:<type> or LCMS:standrep|partial)", sname)
   # adjacency in the run: developed share for developed events, agriculture share for agriculture events
-  attr_k <- if (length(to) && all(to %in% DEV)) "Developed" else if (length(to) && all(to %in% 81:82)) "Agriculture" else NA_character_
+  # (Method Adjacency: the share of the class the cell becomes - pasture for cropland to pasture, cropland for the reverse)
+  attr_k <- if (meth == "Adjacency") c(`81` = "Pasture", `82` = "Cropland")[as.character(to[1])] else if (length(to) && all(to %in% DEV)) "Developed" else if (length(to) && all(to %in% 81:82)) "Agriculture" else NA_character_
+  if (meth == "Adjacency" && (!length(sc) || length(to) != 1 || is.na(attr_k))) fail("Projection Allocation: an Adjacency surface (%s) needs Source Classes and one Event Class, 81 or 82", sname)
+  if (meth == "Adjacency") adj <- TRUE
   if (adj && is.na(attr_k)) { say("%s: adjacency applies to developed or agriculture events only - off", sname); adj <- FALSE }
   share_k <- c(Developed = "DevShare", Agriculture = "AgShare")[attr_k]
   # NLCD agriculture flicker (pasture <-> grass or wetland: 45% of P26's ag expansion pixels were agriculture within 5 years): an
@@ -273,7 +276,25 @@ for (sname in unique(al$Surface)) {
   # source classes within N years, is no event (and no control)
   fk <- if (length(to) && all(to %in% 81:82)) "return" else if (length(sc) && all(sc %in% 81:82)) "bounce" else NA_character_
   if (!is.na(fk) && flick_n > 0) say("%s: agriculture flicker filter - %s within %d years dropped", sname, if (fk == "return") "re-expansion onto recent agriculture" else "contraction that reverts", flick_n)
-  if (meth == "Fitted") {
+  if (meth == "Adjacency") {
+    # Adjacency only (Ag Change, user decision 2026-11-05): every allowed cell weighs 1, and ST-Sim's adjacency multiplier, read from the
+    # model grid's annual maps, does the placing (src/adjacency-curve.R); no covariates, no fitting region
+    source(pkg_file("src", "adjacency-curve.R"))
+    wm <- focalMat(rast(P), adj_r, "circle"); wm[wm > 0] <- 1
+    cnt <- list(); ps <- list(); fl <- function(y) rast(nl$FileName[nl$Year == y])
+    for (y in (y0 + 1):y1) { x <- adjacency_counts(fl(y - 1), fl(y), sc, to, to, wm); cnt[[length(cnt) + 1]] <- x$counts
+      ps[[length(ps) + 1]] <- data.table(Year = y, Cells = patch_sizes(x$events, ncol(P)) * (res_m / res_f)^2) }
+    acv <- adjacency_curve(rbindlist(cnt)); patches[[sname]] <- rbindlist(ps)
+    nev <- sum(acv$Events); say("%s: %d events (%.1f km2), %d-%d; rate per 1,000 cells a year by %s share within %g m: %s", sname, nev, nev * res_m^2 / 1e6, y0 + 1, y1,
+      tolower(attr_k), adj_r, paste(sprintf("%.1f", 1000 * acv$Rate[c(1, 2, 3, 6, 11)]), c("(0)", "(0.1)", "(0.2)", "(0.5)", "(1)"), collapse = ", "))
+    if (nev < 10) say("%s: only %d events: the curve is uncertain", sname, nev)
+    surf <- mask(init(rast(P), 1), P)
+    for (g in gs$TransitionGroupId) { adj_set[[g]] <- data.table(TransitionGroupId = g, StateAttributeTypeId = attr_k, NeighborhoodRadius = adj_r, UpdateFrequency = adj_up)
+      adj_mult[[g]] <- data.table(TransitionGroupId = g, AttributeValue = acv$AttributeValue, Amount = acv$Amount) }
+    out_sum[[length(out_sum) + 1]] <- data.table(Surface = sname, Item = c("Events (km2)", "Rate at no neighbours (per 1,000 cells a year)", "Highest rate (per 1,000 cells a year)"),
+      Value = c(nev * res_m^2 / 1e6, 1000 * acv$Rate[1], 1000 * max(acv$Rate)), Note = sprintf("%s share within %g m, model grid, %d-%d", attr_k, adj_r, y0 + 1, y1))
+    out_curve[[length(out_curve) + 1]] <- data.table(Surface = sname, Covariate = paste(attr_k, "share"), X = acv$AttributeValue, Effect = log(pmax(acv$Amount, 1e-6)))
+  } else if (meth == "Fitted") {
     terms <- terms_for(sname); if (!length(terms)) fail("Suitability Covariates: no covariate is switched on for surface %s", sname)
     a <- list(nl = setNames(vapply(YRS, nl_c, ""), YRS), lp = lapply(setNames(YRS[-1], YRS[-1]), function(y) layer_paths(y - 1)), bf = setNames(vapply((y0 - burn_w):y1, bf, ""), (y0 - burn_w):y1),
               lf = if (!is.na(lft)) setNames(vapply(YRS[-1], lf_c, "", t = lft), YRS[-1]) else NULL, reg = reg_file(sname), gap = cf("gap"), sc = sc, nots = NOT_SOURCE, exg = exg,
@@ -391,7 +412,7 @@ sm_out <- rbind(sm[!(TransitionGroupId %in% al$TransitionGroupId & Timestep == y
 write_stsim(sm_out, "TransitionSpatialMultiplier")
 if (length(adj_set)) {
   # the state attributes adjacency reads: 1 on developed (NLCD 21-24) or agriculture (81, 82) classes
-  scl <- stsim_list("StateClass"); used <- unique(rbindlist(adj_set)$StateAttributeTypeId); ATTR <- list(Developed = DEV, Agriculture = c(81L, 82L))
+  scl <- stsim_list("StateClass"); used <- unique(rbindlist(adj_set)$StateAttributeTypeId); ATTR <- list(Developed = DEV, Agriculture = c(81L, 82L), Pasture = 81L, Cropland = 82L)
   sav <- as.data.table(datasheet(scn, "stsim_StateAttributeValue", optional = TRUE, lookupsAsFactors = FALSE))
   if (nrow(sav)) sav <- sav[!StateAttributeTypeId %in% names(ATTR)]
   dv <- rbindlist(lapply(used, function(k) data.table(StateClassId = scl$Name, StateAttributeTypeId = k, Value = as.numeric(as.integer(scl$Id) %in% ATTR[[k]]))))

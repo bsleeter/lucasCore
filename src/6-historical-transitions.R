@@ -5,8 +5,8 @@
 # Intensification, Wildfire, Forest Clearcut and Forest Selection chunks (L1272-2180) of "Build LUCAS Model CONUS Annual NLCD FIA
 # Update.Rmd", and the clearcut minimum-age part of its StandAgeCMS chunk (L2376-2392). defaults/transitions/sources.csv says where each
 # transition group's multiplier comes from:
-#   NlcdGain / NlcdLoss  the modal annual NLCD on the model grid (stage 5) gains or loses the classes (1 = changed, 0 = not); land-use
-#                        change is mapped where the cell's class changes, as in the state class map
+#   NlcdGain / NlcdLoss / NlcdChange  the annual NLCD on the model grid (stage 5): a cell is on (1) when its class pair from the year before
+#                        belongs to the group in the transition pathways, where each pair has one group (src/transition-pairs.R)
 #   NaturalVeg           each type of the group may only reach the nearest natural state class of the start year (ag contraction)
 #   Mtbs                 MTBS burn severity
 #   NlcdClearcut         the modal annual NLCD goes from forest to shrub or grass and most of the cell did not burn (MTBS) that year or
@@ -35,7 +35,7 @@
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
 suppressPackageStartupMessages({ library(terra); library(sf); library(parallel) })
 STAGE <- "6 Historical Transitions"
-progressBar(type = "begin", totalSteps = 8)
+progressBar(type = "begin", totalSteps = 9)
 
 src <- read_data_sources(c("EcodivisionFile", "NlcdFolder", "MtbsSeverityFolder", "LandfireDisturbanceFolder", "LcmsFolder"))
 opt <- read_ds("BuildOptions"); y0 <- opt$StartYear[1]; y1 <- opt$EndYear[1]; yrs <- (y0 + 1):y1
@@ -60,7 +60,8 @@ pw <- rbindlist(lapply(pf, function(f) { x <- fread(f, colClasses = "character",
   x[, Set := tools::file_path_sans_ext(basename(f))] }), fill = TRUE)
 badc <- setdiff(c(pw$StateClassIdSource, pw$StateClassIdDest), scl$Name); badt <- setdiff(pw$TransitionTypeId, ttl$Name)
 check(STAGE, "pathway state classes and transition types are in the stsim lists", !length(badc) && !length(badt),
-      paste(c(if (length(badc)) paste("classes:", paste(badc, collapse = "; ")), if (length(badt)) paste("types:", paste(badt, collapse = "; "))), collapse = " | "))
+      paste(c(if (length(badc)) paste("classes:", paste(badc, collapse = "; ")), if (length(badt)) paste("types:", paste(badt, collapse = "; ")),
+              if (length(badc) || length(badt)) "a library made before they were added needs tools/sync-library.R"), collapse = " | "))
 if (length(badc) || length(badt)) finish_checks()
 num <- function(x) suppressWarnings(as.numeric(x))
 tr <- pw[, .(StateClassIdSource, StateClassIdDest, TransitionTypeId, Probability = num(Probability), Proportion = num(Proportion), AgeMin = num(AgeMin),
@@ -98,14 +99,27 @@ progressBar()
 
 # ---- land-use change from the modal annual NLCD (stage 5) ----------------------------------------------------------------
 off_file <- write_raster(mask(init(P, 0), P), "Off.tif", "INT1U")
-lu <- so[Source %in% c("NlcdGain", "NlcdLoss")]; lu[, Key := paste(Source, Classes)]
+# Each class pair belongs to one group, as in the pathways (user rule 2026-11-05: a map built from the class reached or left alone counted
+# Puget's cells going to developed or between pasture and cropland as Ag Contraction, ten times its real area)
+source(pkg_file("src", "transition-pairs.R")); source(pkg_file("src", "recover-area.R"))
+lu <- so[Source %in% c("NlcdGain", "NlcdLoss", "NlcdChange")]
+pairs <- transition_pairs(pw, lu$TransitionGroupId, grp_types); clash <- transition_pair_clashes(pairs)
+check(STAGE, "every land-use class pair belongs to one transition group", !nrow(clash), paste(clash[, sprintf("%d to %d: %s", From, To, Groups)], collapse = "; "))
 layers <- list()   # one row per group and year: the multiplier file (NA when nothing happened) and its source
-for (k in unique(lu$Key)) { s <- lu[Key == k][1]; cl <- codes(s$Classes)
-  for (y in yrs) { a <- N[[as.character(y - 1)]] %in% cl; b <- N[[as.character(y)]] %in% cl
-    r <- mask(if (s$Source == "NlcdGain") !a & b else a & !b, P)
-    f <- if (global(r, "sum", na.rm = TRUE)[[1]] > 0) write_raster(r, sprintf("%s-%s_%d.tif", s$Source, gsub("|", "-", s$Classes, fixed = TRUE), y), "INT1U") else NA_character_
-    layers[[length(layers) + 1]] <- data.table(Timestep = y, TransitionGroupId = lu[Key == k, TransitionGroupId], Source = s$Source, File = f) } }
-say("Land-use change: %d groups from the modal NLCD", nrow(lu))
+lu_on <- list(); lu_twice <- 0L; land0 <- !is.na(values(P, mat = FALSE))
+held <- as.integer(values(N[[as.character(y0)]], mat = FALSE))   # the class the model holds: pairs start from it (transition-pairs.R held_next)
+NV <- setNames(lapply(as.character(y0:y1), function(k) as.integer(values(N[[k]], mat = FALSE))), y0:y1); lu_brief <- 0
+for (y in yrs) { a <- held; b <- NV[[as.character(y)]]; hits <- integer(length(a))
+  later <- NV[as.character(intersect((y + 1):(y + LU_PERSIST), y0:y1))]; brief <- reverts(a, later)   # 3-year persistence (transition-pairs.R)
+  for (i in seq_len(nrow(lu))) { g <- lu$TransitionGroupId[i]; on0 <- land0 & pair_cells(a, b, pairs, g); on <- on0 & !brief; lu_brief <- lu_brief + sum(on0 & brief); hits <- hits + on
+    f <- NA_character_
+    if (any(on)) { v <- as.integer(on); v[!land0] <- NA_integer_
+      f <- write_raster(setValues(rast(P), v), sprintf("%s-%s_%d.tif", lu$Source[i], gsub("[^A-Za-z0-9]+", "-", sub(TYPE_SUFFIX, "", g, fixed = TRUE)), y), "INT1U") }
+    layers[[length(layers) + 1]] <- data.table(Timestep = y, TransitionGroupId = g, Source = lu$Source[i], File = f) }
+  lu_twice <- lu_twice + sum(hits > 1L); lu_on[[as.character(y)]] <- which(hits > 0L); held <- held_next(held, b, hits > 0L) }
+say("Land-use change: cells whose held class differs from the %d map (changes with no pathway): %.1f km2", y1, sum(held != as.integer(values(N[[as.character(y1)]], mat = FALSE)), na.rm = TRUE) * cell_km2)
+check(STAGE, "no cell is on in two land-use groups in one year", lu_twice == 0L, sprintf("%d cell-years", lu_twice))
+say("Land-use change: %d groups from the annual NLCD's class pairs (%d cell changes); %.1f km2 of change left out as it reversed within %d years", nrow(lu), sum(lengths(lu_on)), lu_brief * cell_km2, LU_PERSIST)
 progressBar()
 
 # ---- 30 m disturbances: fraction of each cell's 30 m pixels, one year per worker ------------------------------------------
@@ -300,6 +314,46 @@ if (nrow(hg)) {
   say("Harvest minimum age: %d cells cut (first cut: %d selection, %d clearcut); %d start ages raised, by %.0f years on average (median %.0f)",
       sum(cut), first[["selection"]], first[["clearcut"]], sum(raise), if (any(raise)) mean(req[raise] - vA[raise]) else 0, if (any(raise)) median(req[raise] - vA[raise]) else 0)
   for (t in unique(cn[raise])) say("  %s: %d cells raised by %.0f years on average", sub("^Forest: ", "", t), sum(raise & cn == t), mean((req - vA)[raise & cn == t]))
+}
+
+# ---- 30 m disturbances on cells that cannot take them: masked, then placed nearby (user decision 2026-11-05) ------------------------
+# The initial state class map sets which cells a transition can leave. A fraction of a cell with no pathway for the group is taken off it and
+# put on the nearest cells of the same secondary stratum unit that have a pathway, room in the year (one transition per cell per timestep) and
+# the minimum age. Land cover and the state class map do not change. Harvest only (clearcut, then selection): fire keeps the MTBS perimeters and
+# severities where they are (user decision 2026-11-05), burning open space and low intensity developed land through their own pathways and
+# leaving the little that falls on other classes unburned. The fire's share of each cell still takes up the cell's room for harvest.
+frac <- layers[Source %in% c("Landfire", "Lcms") & !is.na(File) & Timestep %in% yrs]
+fire_room <- layers[Source == "Mtbs" & !is.na(File) & Timestep %in% yrs]
+moved <- data.table(Timestep = integer(), TransitionGroupId = character(), Lost = numeric(), Placed = numeric(), Unplaced = numeric())
+if (nrow(frac)) {
+  vU <- if ("SecondaryStratumFileName" %in% names(ic) && !is.na(ic$SecondaryStratumFileName[1])) values(rast(ic$SecondaryStratumFileName[1]), mat = FALSE) else ifelse(land, 1, NA)
+  vU[!land] <- NA; offs <- recover_offsets(res_m / 1000); can_g <- setNames(lapply(unique(frac$TransitionGroupId), elig_cells), unique(frac$TransitionGroupId))
+  vAge0 <- if (exists("vA2")) vA2 else vA; prR <- rep(0, length(vS)); lastR <- rep(NA_real_, length(vS)); kms <- list(); amts <- list()
+  frac[, kind := hg$kind[match(TransitionGroupId, hg$TransitionGroupId)]]; frac[, ord := fifelse(is.na(kind), 1L, fifelse(kind == "clearcut", 2L, 3L))]
+  for (y in yrs) { fy <- frac[Timestep == y][order(ord)]; if (!nrow(fy)) next
+    vals <- lapply(fy$File, function(p) values(rast(p), mat = FALSE))
+    tot <- rep(0, length(vS)); for (i in seq_len(nrow(fy))) { w <- vals[[i]]; w[is.na(w) | !can_g[[fy$TransitionGroupId[i]]]] <- 0; tot <- tot + w }
+    for (p in fire_room[Timestep == y, File]) { w <- values(rast(p), mat = FALSE); w[is.na(w)] <- 0; tot <- tot + w }
+    room <- pmax(0, 1 - tot); room[!land] <- 0; room[lu_on[[as.character(y)]]] <- 0
+    age <- vAge0 + (y - y0 - 1); rs <- !is.na(lastR) & prR >= 0.5; age[rs] <- (y - lastR - 1)[rs]
+    for (i in seq_len(nrow(fy))) { g <- fy$TransitionGroupId[i]; ok <- can_g[[g]]
+      if (!is.na(fy$kind[i])) { vm <- vMin[[g]]; ok <- ok & !is.na(vm) & !is.na(age) & age >= vm }
+      r <- recover_area(vals[[i]], can_g[[g]], ok, vU, room, nrow(P), ncol(P), offs); room <- r$room; vals[[i]] <- r$v
+      if (r$lost > 0) { writeRaster(setValues(rast(P), r$v), fy$File[i], overwrite = TRUE, datatype = "FLT4S", gdal = c("COMPRESS=DEFLATE", "TILED=YES"))
+        moved <- rbind(moved, data.table(Timestep = y, TransitionGroupId = g, Lost = r$lost * cell_km2, Placed = r$placed * cell_km2, Unplaced = r$unplaced * cell_km2))
+        kms[[length(kms) + 1]] <- r$km; amts[[length(amts) + 1]] <- r$amount }
+      if (identical(fy$kind[i], "clearcut")) { w <- vals[[i]]; on <- !is.na(w) & w > 0; prR[on] <- 1 - (1 - prR[on]) * (1 - w[on]); lastR[on] <- y } } }
+  if (nrow(moved)) { for (x in split(moved, by = "TransitionGroupId")) say("%s: %.1f km2 on cells with no pathway, %.1f km2 placed nearby, %.1f km2 not placed", x$TransitionGroupId[1], sum(x$Lost), sum(x$Placed), sum(x$Unplaced))
+    d <- data.table(km = unlist(kms), a = unlist(amts))[order(km)][, cum := cumsum(a) / sum(a)]
+    if (nrow(d)) say("Placed within: median %.2f km, 90%% %.2f km, farthest %.2f km", d[cum >= 0.5, km][1], d[cum >= 0.9, km][1], max(d$km)) }
+  check(STAGE, "area taken off cells with no pathway is placed or reported", abs(sum(moved$Lost) - sum(moved$Placed) - sum(moved$Unplaced)) < 1e-6, sprintf("%.2f km2 lost, %.2f placed, %.2f not placed", sum(moved$Lost), sum(moved$Placed), sum(moved$Unplaced)))
+  bad <- frac[, { w <- values(rast(File), mat = FALSE); .(left = sum(w[!can_g[[TransitionGroupId]]], na.rm = TRUE), top = max(w, na.rm = TRUE)) }, by = .(Timestep, TransitionGroupId, File)]
+  check(STAGE, "no 30 m disturbance is left on a cell with no pathway", sum(bad$left) == 0, sprintf("%.3f cell units", sum(bad$left)))
+  check(STAGE, "30 m disturbance multipliers are still between 0 and 1", max(bad$top) <= 1 + 1e-6, sprintf("max %.4f", max(bad$top)))
+}
+progressBar()
+
+if (nrow(hg)) {
   # blocked, expected area: a cut on a cell not yet reset (chance 1 - pr) is blocked if the raised start age has not reached the minimum;
   # one on a reset cell (chance pr) if the years since its last clearcut have not
   last <- rep(NA_real_, length(vS)); pr <- rep(0, length(vS)); after <- 0
@@ -360,8 +414,10 @@ src_ids <- function(g) sid(unique(pw[TransitionTypeId %in% grp_types(g), StateCl
 fits_prev <- function(g, y) { s <- src_ids(g); lu <- intersect(s, LU); n <- values(N[[as.character(y - 1)]], mat = FALSE)
   (n %in% lu) | (any(!s %in% LU) & !(n %in% LU)) }
 summ <- layers[!is.na(File), { v <- values(rast(File), mat = FALSE); v[is.na(v)] <- 0
-  if (Source %in% c("NlcdGain", "NlcdLoss")) v[!fits_prev(TransitionGroupId, Timestep)] <- 0
+  if (Source %in% c("NlcdGain", "NlcdLoss", "NlcdChange")) v[!fits_prev(TransitionGroupId, Timestep)] <- 0
   .(Area = sum(v) * cell_km2, Cells = sum(v > 0), IneligibleArea = sum(v[!el[[TransitionGroupId]]]) * cell_km2) }, by = .(Timestep, TransitionGroupId, Source)]
+# a 30 m disturbance's cells with no pathway were emptied above, so the column holds what they carried before it was moved
+if (nrow(moved)) summ[moved, on = .(Timestep, TransitionGroupId), IneligibleArea := i.Lost]
 if (!is.null(age_blocked)) summ <- merge(summ, age_blocked, by = c("Timestep", "TransitionGroupId"), all.x = TRUE) else summ[, AgeBlockedArea := NA_real_]
 tot <- summ[, .(Area = sum(Area), Inel = sum(IneligibleArea), Blocked = sum(AgeBlockedArea, na.rm = TRUE), Years = .N), by = .(TransitionGroupId, Source)][order(Source, TransitionGroupId)]
 for (i in seq_len(nrow(tot))) with(tot[i], say("%s (%s): %.0f km2 over %d years with any; %.1f%% on classes with no pathway%s", TransitionGroupId, Source, Area, Years,

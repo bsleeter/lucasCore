@@ -177,6 +177,18 @@ first_time <- function(g, y) { f <- hist_file(g, y); if (is.na(f) || !grepl("^Nl
   n <- nlcd_year(y); p <- nlcd_prev(y); h <- had_before(y); lv <- match(n, DEV)
   again <- (!is.na(lv) & !(p %in% DEV) & h$dev) | (!is.na(lv) & p %in% DEV & h$lev >= lv) | (n %in% c(81L, 82L) & h$ag)
   !again }
+# Projection Options > Targets From Historical Run (user decision 2026-11-05): every Target group's area per unit and reference year is what
+# that run realized there, so the projection continues at the rate the historical period could reproduce; blank = the historical maps
+tgt_run <- if ("TargetsScenarioId" %in% names(po)) nz(po$TargetsScenarioId, NA) else NA
+TR <- NULL
+if (!is.na(tgt_run)) { source(pkg_file("src", "targets-from-run.R"))
+  RL <- ssimLibrary(main_library()); RS <- tryCatch(rsyncrosim::scenario(RL, as.integer(tgt_run)), error = function(e) NULL)
+  if (is.null(RS)) fail("Projection Options: Targets From Historical Run %s is not a scenario of this library", tgt_run)
+  TR <- as.data.table(datasheet(RS, "stsim_OutputStratumTransition", lookupsAsFactors = FALSE, optional = TRUE))
+  if (!nrow(TR)) fail("Projection Options: historical run %s has no transition output (run it first; its Transitions output must be on)", tgt_run)
+  miss_y <- setdiff(ref, unique(TR$Timestep))
+  check(STAGE, "the historical run for the targets covers the reference period", !length(miss_y), if (length(miss_y)) sprintf("no output for %s", paste(range(miss_y), collapse = "-")) else sprintf("run %s, %d iterations", tgt_run, uniqueN(TR$Iteration)))
+  say("Targets from historical run [%s] %s: what it realized in %d-%d, the mean of %d iteration(s)", tgt_run, rsyncrosim::name(RS), rs, re, uniqueN(TR$Iteration)) }
 progressBar()
 
 # strata for targets, units for rates, GAP status
@@ -212,7 +224,19 @@ if (tiles > 1) { chg <- pt[Method == "Target" & StrataLevel != tile_lvl, Transit
 tg <- pt[Method == "Target"]; new_tt <- list(); new_sm <- list(); rates <- list(); allow_files <- list()
 for (i in seq_len(nrow(tg))) { g <- tg$TransitionGroupId[i]; L <- tg$StrataLevel[i]; u <- lev[[L]]; units <- sort(unique(u[land])); ms <- mem[[g]]
   # area per unit and historical year, in the target's amount units: the sum of the members' areas
-  am <- lapply(ms, function(m) { a <- vapply(ref, function(y) { v <- hist_vals(m, y) * fits_prev(m, y) * first_time(m, y); vapply(units, function(k) sum(v[land & u == k]), 0) }, numeric(length(units)))
+  am <- lapply(ms, function(m) {
+    if (!is.null(TR)) { un <- lev_list[[L]]$Name[match(units, as.integer(lev_list[[L]]$Id))]; M <- realized_area(TR, m, lev_col[[L]], un, units, ref)
+      if (isTRUE(attr(M, "unmatched") > 0)) say("%s: %.2f km2 realized outside this projection's %s units, left out", m, attr(M, "unmatched") / cell_amt * cell_km2, L)
+      # first-time gains only, as for the maps (user, 2026-11-05): the run realizes a gain each time the flickering map shows it, so a gain
+      # group's realized area keeps the share of the unit and year's mapped gains that were the cell's first (first_time below)
+      gain <- vapply(ref, function(y) { f <- hist_file(m, y); !is.na(f) && grepl("^NlcdGain", basename(f)) }, TRUE)
+      if (any(gain)) { M0 <- M
+        for (j in which(gain)) { y <- ref[j]; v <- hist_vals(m, y) * fits_prev(m, y); v1 <- v * first_time(m, y)
+          all_k <- vapply(units, function(k) sum(v[land & u == k]), 0); first_k <- vapply(units, function(k) sum(v1[land & u == k]), 0)
+          M[, j] <- M[, j] * ifelse(all_k > 0, first_k / all_k, 1) }
+        if (sum(M0) > 0) say("%s: first-time gains are %.0f%% of what the run realized", m, 100 * sum(M) / sum(M0)) }
+      return(M) }
+    a <- vapply(ref, function(y) { v <- hist_vals(m, y) * fits_prev(m, y) * first_time(m, y); vapply(units, function(k) sum(v[land & u == k]), 0) }, numeric(length(units)))
     matrix(a, nrow = length(units), dimnames = list(units, ref)) * cell_amt })
   a <- Reduce(`+`, am)
   dr <- sched[SamplingSet == tg$SamplingSet[i]]
@@ -247,7 +271,7 @@ for (i in seq_len(nrow(tg))) { g <- tg$TransitionGroupId[i]; L <- tg$StrataLevel
   el <- elig(g); share <- if (length(ex)) sum(el & !(gap %in% ex)) / max(1, sum(el)) else 1
   rates[[g]] <- data.table(TransitionGroup = g, Method = "Target", Unit = nm, MeanArea = rowMeans(a) / cell_amt * cell_km2,
                            MinArea = apply(a, 1, min) / cell_amt * cell_km2, MaxArea = apply(a, 1, max) / cell_amt * cell_km2, AllowedShare = share)
-  say("%s: target by %s (%d units), mean %.2f km2/yr over %d-%d%s", g, L, length(units), sum(rowMeans(a)) / cell_amt * cell_km2, rs, re,
+  say("%s: target by %s (%d units), mean %.2f km2/yr over %d-%d (%s)%s", g, L, length(units), sum(rowMeans(a)) / cell_amt * cell_km2, rs, re, if (is.null(TR)) "the historical maps" else sprintf("realized in run %s", tgt_run),
       if (length(ex)) sprintf("; %.0f%% of eligible land allowed (not GAP %s)", 100 * share, paste(ex, collapse = ", ")) else "") }
 progressBar()
 
