@@ -1,0 +1,44 @@
+StateClassId,Type,FlowGroupId
+Agriculture: Cropland,Crops,Net Growth Forest: Total
+Wetland: Estuarine Emergent,Emergent wetland,Net Growth Wetland: Total
+Wetland: Palustrine Emergent,Emergent wetland,Net Growth Wetland: Total
+Forest: Alder/Maple Group,Forest,Net Growth Forest: Total
+Forest: Aspen/Birch Group,Forest,Net Growth Forest: Total
+Forest: California Mixed Conifer Group,Forest,Net Growth Forest: Total
+Forest: Douglas-fir Group,Forest,Net Growth Forest: Total
+Forest: Elm/Ash/Cottonwood Group,Forest,Net Growth Forest: Total
+Forest: Exotic Hardwoods Group,Forest,Net Growth Forest: Total
+Forest: Exotic Softwoods Group,Forest,Net Growth Forest: Total
+Forest: Fir/Spruce/Mountain Hemlock Group,Forest,Net Growth Forest: Total
+Forest: Hemlock/Sitka Spruce Group,Forest,Net Growth Forest: Total
+Forest: Loblolly/Shortleaf Pine Group,Forest,Net Growth Forest: Total
+Forest: Lodgepole Pine Group,Forest,Net Growth Forest: Total
+Forest: Longleaf/Slash Pine Group,Forest,Net Growth Forest: Total
+Forest: Maple/Beech/Birch Group,Forest,Net Growth Forest: Total
+Forest: Oak/Gum/Cypress Group,Forest,Net Growth Forest: Total
+Forest: Oak/Hickory Group,Forest,Net Growth Forest: Total
+Forest: Oak/Pine Group,Forest,Net Growth Forest: Total
+Forest: Other Western Hardwoods Group,Forest,Net Growth Forest: Total
+Forest: Other Western Softwood Group,Forest,Net Growth Forest: Total
+Forest: Pinyon/Juniper Group,Forest,Net Growth Forest: Total
+Forest: Ponderosa Pine Group,Forest,Net Growth Forest: Total
+Forest: Redwood Group,Forest,Net Growth Forest: Total
+Forest: Spruce/Fir Group,Forest,Net Growth Forest: Total
+Forest: Tanoak/Laurel Group,Forest,Net Growth Forest: Total
+Forest: Tropical Hardwoods Group,Forest,Net Growth Forest: Total
+Forest: Western Larch Group,Forest,Net Growth Forest: Total
+Forest: Western Oak Group,Forest,Net Growth Forest: Total
+Forest: Western White Pine Group,Forest,Net Growth Forest: Total
+Forest: White/Red/Jack Pine Group,Forest,Net Growth Forest: Total
+Grassland: Annual,Grassland,Net Growth Non Forest: Total
+Grassland: Irrigated Perennial,Grassland,Net Growth Non Forest: Total
+Grassland: Natural Perennial,Grassland,Net Growth Non Forest: Total
+Agriculture: Pasture,Pasture,Net Growth Forest: Total
+Shrubland: Chaparral,Shrub,Net Growth Non Forest: Total
+Shrubland: Invaded Sage Steppe,Shrub,Net Growth Non Forest: Total
+Shrubland: Native Sage Steppe,Shrub,Net Growth Non Forest: Total
+Shrubland: Non-sage,Shrub,Net Growth Non Forest: Total
+Shrubland: Post Fire Shrub,Shrub,Net Growth Non Forest: Total
+Shrubland: Sage,Shrub,Net Growth Non Forest: Total
+Wetland: Estuarine Forested,Woody wetland,Net Growth Forest: Total
+Wetland: Palustrine Forested,Woody wetland,Net Growth Forest: Total

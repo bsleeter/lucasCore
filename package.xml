@@ -311,12 +311,32 @@
 	<!-- stage 11: the LOCA2 run whose climate drives projections. A Projection Climate scenario depends on a Build result (strata, the
 	     historical end year and the Climate Options effects) and writes the flow multipliers of the projection years; projections
 	     depend on it after the Projection Setup, so one Build and one Projection Setup serve any number of climate futures -->
-	<dataSheet name="ProjectionClimate" displayName="Climate" isSingleRow="True" viewClassName="lucasCoreUI.ProjectionClimateView" viewClassAssembly="lucasCoreUI">
+	<dataSheet name="ProjectionClimate" displayName="Climate" isSingleRow="True">
 		<column name="ClimateScenarioId" displayName="Scenario (SSP)" dataType="Integer" validationType="Datasheet" formula1="lucasCore_ClimateScenario"/>
 		<column name="ClimateModelId" displayName="Climate Model" dataType="Integer" validationType="Datasheet" formula1="lucasCore_ClimateModel"/>
 		<column name="ClimateReplicateId" displayName="Replicate (blank = lowest-numbered with the scenario)" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="lucasCore_ClimateReplicate"/>
 		<column name="EndYear" displayName="Last Year (blank = 2100)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="LessEqual" formula1="2100"/>
+		<!-- CO2 fertilization (to-do 46, src/co2.R): growth x (1 + beta ln(CO2 / reference CO2)) from the SSP's CO2. Blank series = Central -->
+		<column name="Co2Series" displayName="CO2 Fertilization (blank = Central)" dataType="Integer" isOptional="True" validationType="List" formula1="1:None|2:Low|3:Central|4:High" defaultValue="3"/>
+		<column name="Co2Ceiling" displayName="CO2 Ceiling (ppm; blank = none)" dataType="Double" isOptional="True"/>
+		<column name="Co2Reference" displayName="Reference CO2 (ppm; blank = the SSP's CO2 in the historical end year)" dataType="Double" isOptional="True"/>
 	</dataSheet>
+
+	<!-- CO2 Beta Adjustments: rows that replace betas of the chosen series (not None). Blank stratum = every stratum, blank age band = every
+	     band; a stratum row wins over a blank-stratum row, a band row over a blank-band row -->
+	<dataSheet name="Co2Adjustment" displayName="CO2 Beta Adjustments">
+		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="StratumId" displayName="Stratum (blank = all)" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="stsim_Stratum"/>
+		<column name="AgeBand" displayName="Age Band (blank = all)" dataType="Integer" isOptional="True" validationType="List" formula1="1:0-25|2:26-50|3:51-75|4:76-100|5:101+"/>
+		<column name="Beta" displayName="Beta (per ln CO2)" dataType="Double" format="0.000"/>
+		<validation validationType="Unique" columns="StateClassId|StratumId|AgeBand"/>
+	</dataSheet>
+
+	<!-- the Climate page of a Projection Climate scenario (ui/ProjectionClimateView.cs): the LOCA2 run and CO2 fertilization -->
+	<dataFeed name="ProjectionClimatePage" displayName="Climate" viewClassName="lucasCoreUI.ProjectionClimateView" viewClassAssembly="lucasCoreUI">
+		<dataSheet name="ProjectionClimate"/>
+		<dataSheet name="Co2Adjustment"/>
+	</dataFeed>
 
 	<!-- Carbon Assumptions (to-do 21; docs/carbon-assumptions.md): kept in their own scenario that Builds depend on. CBM Crosswalk: the CBM-CFS3
 	     ecozone and species type each forest type takes its live turnover and snag rates from, optionally per ecodivision (a row for an
@@ -771,6 +791,26 @@
 		<column name="Max" displayName="Cell Maximum" dataType="Double" format="0.000"/>
 	</dataSheet>
 
+	<!-- stage 11: the CO2 betas applied (one row per state class x stratum x age band) and the CO2 series -->
+	<dataSheet name="OutputCo2Beta" displayName="CO2 Fertilization Betas">
+		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="StratumId" displayName="Stratum" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum"/>
+		<column name="AgeBand" displayName="Age Band" dataType="String"/>
+		<column name="VegetationType" displayName="Vegetation Type" dataType="String"/>
+		<column name="EcmShare" displayName="ECM Share of Basal Area" dataType="Double" format="0.000" isOptional="True"/>
+		<column name="Beta" displayName="Beta (per ln CO2)" dataType="Double" format="0.000"/>
+		<column name="Source" dataType="String"/>
+		<column name="LastMultiplier" displayName="Multiplier in the Last Year" dataType="Double" format="0.000"/>
+	</dataSheet>
+	<dataSheet name="OutputCo2Series" displayName="CO2 Series">
+		<column name="Timestep" dataType="Integer"/>
+		<column name="Scenario" dataType="String"/>
+		<column name="Co2" displayName="CO2 (ppm)" dataType="Double" format="0.00"/>
+		<column name="Co2Used" displayName="CO2 Used (after the ceiling)" dataType="Double" format="0.00"/>
+		<column name="Reference" displayName="Reference CO2 (ppm)" dataType="Double" format="0.00"/>
+		<column name="LnRatio" displayName="ln(CO2 / Reference)" dataType="Double" format="0.0000"/>
+	</dataSheet>
+
 	<dataSheet name="OutputInitialStockSummary" displayName="Initial Stock Summary">
 		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
 		<column name="Cells" dataType="Integer"/>
@@ -1183,8 +1223,12 @@
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="ClimateOptions" type="Input"/>
 		<dataSheet name="ProjectionClimate" type="Input"/>
+		<dataSheet name="Co2Adjustment" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
 		<dataSheet name="stsim_FlowSpatialMultiplier" type="Output"/>
+		<dataSheet name="stsim_FlowMultiplier" type="Output"/>
+		<dataSheet name="OutputCo2Beta" type="Output"/>
+		<dataSheet name="OutputCo2Series" type="Output"/>
 		<dataSheet name="OutputClimateSummary" type="Both"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
@@ -1306,7 +1350,7 @@
 				<item name="ProjectionTransitions"/>
 				<item name="SpatialAllocation"/>
 				<item name="FireOptions"/>
-				<item name="ProjectionClimate"/>
+				<item name="ProjectionClimatePage"/>
 			</group>
 			<item name="RunFigureOptions"/>
 			<item name="CompareRunOptions"/>
@@ -1338,6 +1382,8 @@
 				<item name="OutputSuitabilityMap"/>
 				<item name="OutputPatchSize"/>
 				<item name="OutputClimateSummary"/>
+				<item name="OutputCo2Beta"/>
+				<item name="OutputCo2Series"/>
 				<item name="OutputInitialStockSummary"/>
 				<item name="OutputReturnInterval"/>
 				<item name="OutputSoilTarget"/>

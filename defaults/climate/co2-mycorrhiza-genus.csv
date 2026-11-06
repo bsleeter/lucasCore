@@ -1,0 +1,36 @@
+Genus,Ecm,Type,Note
+Abies,1,ECM,
+Picea,1,ECM,
+Pinus,1,ECM,
+Tsuga,1,ECM,
+Pseudotsuga,1,ECM,
+Larix,1,ECM,
+Cedrus,1,ECM,
+Quercus,1,ECM,
+Fagus,1,ECM,
+Castanea,1,ECM,
+Chrysolepis,1,ECM,
+Lithocarpus,1,ECM,FIA tanoak (Notholithocarpus)
+Betula,1,ECM,
+Carpinus,1,ECM,
+Ostrya,1,ECM,
+Corylus,1,ECM,
+Carya,1,ECM,
+Tilia,1,ECM,
+Coccoloba,1,ECM,
+Pisonia,1,ECM,
+Arbutus,1,ECM,arbutoid mycorrhiza (ECM-like)
+Arctostaphylos,1,ECM,arbutoid mycorrhiza (ECM-like)
+Xylococcus,1,ECM,arbutoid mycorrhiza (ECM-like)
+Populus,0.5,dual,AM and ECM; counted half
+Salix,0.5,dual,AM and ECM; counted half
+Alnus,0.5,dual,AM and ECM (and actinorhizal N fixer); counted half
+Eucalyptus,0.5,dual,AM and ECM; counted half
+Corymbia,0.5,dual,AM and ECM; counted half
+Leptospermum,0.5,dual,AM and ECM; counted half
+Melaleuca,0.5,dual,AM and ECM; counted half
+Rhododendron,1,ErM,ericoid: organic-N acquiring like ECM
+Vaccinium,1,ErM,ericoid: organic-N acquiring like ECM
+Kalmia,1,ErM,ericoid: organic-N acquiring like ECM
+Oxydendrum,1,ErM,ericoid: organic-N acquiring like ECM
+Lyonia,1,ErM,ericoid: organic-N acquiring like ECM

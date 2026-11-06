@@ -31,12 +31,19 @@ namespace lucasCoreUI
         private readonly Button m_rescan = new Button { Text = "Rescan LOCA2 folder", AutoSize = true, Margin = new Padding(3, 6, 12, 3) };
         private readonly Label m_scan = new Label { AutoSize = true, MaximumSize = new Size(560, 0), ForeColor = SystemColors.GrayText, Margin = new Padding(3, 10, 3, 3) };
         private List<Item> m_scenarios = new List<Item>(), m_models = new List<Item>(), m_replicates = new List<Item>();
+        // CO2 fertilization (to-do 46, src/co2.R)
+        private readonly ComboBox m_co2 = List(180);
+        private readonly TextBox m_ceiling = Box(70);
+        private readonly TextBox m_reference = Box(70);
+        private readonly Panel m_adjust = GridHost(170);
+        private readonly Label m_co2note = new Label { AutoSize = true, MaximumSize = new Size(640, 0), ForeColor = SystemColors.GrayText, Margin = new Padding(3, 6, 3, 3) };
+        private static readonly string[] Co2Names = { "None", "Low", "Central (default)", "High" };
 
         public ProjectionClimateView()
         {
             this.SuspendLayout();
             var how = Column();
-            how.Controls.Add(Note("A Projection Climate scenario depends on a Build result and runs stage 11 alone. It writes the climate flow multipliers of the projection years (the Build's historical end + 1 to the last year), using the climate effects chosen in the Build's Climate Options. Projections then depend on the Projection Setup, then this result, then the Build."));
+            how.Controls.Add(Note("A Projection Climate scenario depends on a Build result and runs stage 11 alone. It writes the climate flow multipliers of the projection years (the Build's historical end + 1 to the last year), using the climate effects chosen in the Build's Climate Options, and the CO2 fertilization multipliers of the same years. Projections then depend on the Projection Setup, then this result, then the Build."));
             AddGroup(Group("How this works", how));
 
             var run = Column();
@@ -49,7 +56,23 @@ namespace lucasCoreUI
             run.Controls.Add(m_runs);
             var scan = Row(); scan.Controls.Add(m_rescan); scan.Controls.Add(m_scan); run.Controls.Add(scan);
             AddGroup(Group("LOCA2 run", run));
+
+            var co2 = Column();
+            co2.Controls.Add(Note("Growth of forest, shrubland, grassland, wetland and agriculture is multiplied by 1 + beta x ln(CO2 / reference CO2), with CO2 from the chosen scenario (SSP) and beta by vegetation type, from the literature review (to-do 46). Forest betas mix the ectomycorrhizal (ECM) and arbuscular values by the forest type's ECM share of FIA basal area, and taper with stand age from young (0-25 years) to mature (76 and older). The reference is the CO2 of the Build's historical end year, because the growth curves already carry the CO2 of the FIA years. A projection that does not depend on this result (No Climate) has no CO2 effect."));
+            var cf = Form();
+            FormRow(cf, "CO2 fertilization:", m_co2, "Central: forest 0.25 (0.45 young ECM to 0.15 mature AM), shrub 0.15, grassland 0.30, emergent wetland 0.20. Low and High: the review's range. None: no CO2 effect.");
+            FormRow(cf, "CO2 ceiling (ppm):", m_ceiling, "blank = none; e.g. 600 holds the effect at 600 ppm (no forest experiment went above about 600)");
+            FormRow(cf, "Reference CO2 (ppm):", m_reference, "blank = the SSP's CO2 in the historical end year");
+            co2.Controls.Add(cf);
+            co2.Controls.Add(Note("Beta adjustments (optional): each row replaces the chosen series' beta for a state class, in one stratum and one age band or (blank) all of them. Per ln CO2: 0.1 is about 2% more growth per 100 ppm from 425 ppm."));
+            co2.Controls.Add(m_adjust);
+            co2.Controls.Add(m_co2note);
+            AddGroup(Group("CO2 fertilization", co2));
             EndGroups();
+            foreach (string n in Co2Names) m_co2.Items.Add(n);
+            m_co2.SelectionChangeCommitted += (s, e) => { Write("Co2Series", m_co2.SelectedIndex + 1); RefreshControls(); };
+            BindNumber(m_ceiling, () => Sheet, "Co2Ceiling", false);
+            BindNumber(m_reference, () => Sheet, "Co2Reference", false);
             m_scenario.SelectionChangeCommitted += (s, e) => { Write("ClimateScenarioId", Key(m_scenario)); RefreshControls(); };
             m_model.SelectionChangeCommitted += (s, e) => { Write("ClimateModelId", Key(m_model)); RefreshControls(); };
             m_replicate.SelectionChangeCommitted += (s, e) => { Write("ClimateReplicateId", Key(m_replicate)); RefreshControls(); };
@@ -72,6 +95,7 @@ namespace lucasCoreUI
         {
             base.LoadDataFeed(dataFeed);
             LoadLists();
+            LoadGrid(m_adjust, "lucasCore_Co2Adjustment");
             m_scan.Text = "The lists show the runs in Data Sources: LOCA2 Folder when the library was made. After adding or removing runs there, rescan.";
             RefreshControls();
         }
@@ -132,6 +156,13 @@ namespace lucasCoreUI
             IEnumerable<Item> reps = members == null ? m_replicates : m_replicates.Where(r => members.Contains(r.Name, StringComparer.OrdinalIgnoreCase) || (rid != DBNull.Value && Convert.ToInt32(r.Key) == Convert.ToInt32(rid)));
             Fill(m_replicate, members != null && members.Count > 0 ? string.Format("Lowest-numbered ({0})", members.OrderBy(x => x, StringComparer.Ordinal).First()) : "Lowest-numbered (default)", reps, rid);
             m_last.Text = Show(Value("EndYear"));
+            int co2 = IntValue("Co2Series", 3);
+            m_co2.SelectedIndex = co2 >= 1 && co2 <= 4 ? co2 - 1 : 2;
+            m_ceiling.Text = Show(Value("Co2Ceiling"));
+            m_reference.Text = Show(Value("Co2Reference"));
+            m_ceiling.Enabled = m_reference.Enabled = m_adjust.Enabled = co2 != 1;
+            m_co2note.Text = co2 == 1 ? "CO2 fertilization is off: the projection's growth does not respond to CO2."
+                                      : "Stage 11 writes the betas it used to Build Results > CO2 Fertilization Betas, and the CO2 series to CO2 Series.";
             m_rescan.Enabled = !(this.Scenario != null && this.Scenario.IsResult) && this.ShouldEnableView();
 
             if (model == null) m_runs.Text = m_models.Count == 0 ? "No LOCA2 runs are listed in this library (Climate Models is empty)." : "";

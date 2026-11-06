@@ -1,0 +1,12 @@
+Type,Low,Central,High,Note
+Forest ECM young,0.20,0.45,0.65,"young aggrading FACE stands (Norby et al. 2005; Walker et al. 2021): full value at ages 0-25"
+Forest ECM mature,0.05,0.30,0.45,"BIFoR mature oak wood (beta about 0.33); the floor from age 76"
+Forest AM young,0.10,0.30,0.65,"AM trees respond less where N limits (Terrer et al. 2016)"
+Forest AM mature,0.00,0.15,0.35,"EucFACE and Swiss mature stands near 0"
+Forest,0.05,0.25,0.55,"a forest class with no ECM share (all ages); Terrer et al. 2019 biomass beta about 0.23"
+Shrub,0.00,0.15,0.40,"Nevada Desert FACE about 0 in dry years; Mojave and chaparral evidence weak"
+Grassland,0.10,0.30,0.60,"Pan et al. 2022 +13% (beta about 0.34); PHACE +33%; Jasper Ridge and TasFACE about 0"
+Pasture,0.15,0.35,0.55,"managed C3 grass-legume swards (SwissFACE, NZ FACE)"
+Crops,0.10,0.20,0.30,"C3 crop FACE gains with field stress; C4 (31.5% of US principal crop area) about 0"
+Woody wetland,0.00,0.20,0.30,"no experiment: inferred from forest and emergent wetland"
+Emergent wetland,0.00,0.20,0.35,"Smithsonian marsh: C3 sedge +20%, C4 grass declined"

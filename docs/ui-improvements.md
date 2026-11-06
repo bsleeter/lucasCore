@@ -160,7 +160,15 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     0/0.20/0.35, the rest as reviewed) as the starting point. Both the age taper (AgeMin/AgeMax rows) and the mycorrhizal
     weighting (ECM basal-area share per forest type from FIA tree records and the Jo et al. 2019 species list) go in the first
     build. The No Climate projection gets no CO2 fertilization (it stays the true baseline).
-  - **All design decisions made; ready to build.**
+  - **Built 2026-11-06, not yet run in a library:** src/co2.R and stage 11 (CO2 rows in stsim_FlowMultiplier with the Build's rows
+    copied over), the Climate page's CO2 group (series, ceiling, reference, Beta Adjustments grid), defaults/climate/co2-*.csv (SSP CO2
+    from RCMIP v5.1.0, betas, classes, age bands, ECM shares from tools/make_co2_ecm_share.R), tests/unit-co2.R (33 checks pass).
+    Departures from the plan: the user rows adjust any series rather than a separate "User" series; the ECM shares use a genus-level
+    mycorrhizal table written for lucasCore (co2-mycorrhiza-genus.csv; dual AM/ECM genera count half), not the Jo et al. 2019 species
+    list itself, which is still to compare; the reference CO2 defaults to the SSP's value in the historical end year.
+  - **Still to do:** a stage 11 run and a projection (sync-library for the three new Climate columns; Studio closed for the DLL); check
+    the CO2 rows take effect in ST-Sim (growth up by the multiplier at each age band); a User Guide section; compare the genus table
+    with Jo et al. 2019.
 
 47. **Example libraries by region and resolution** - TO DO, idea stage (user, 2026-11-04; replaces item 13). A range of libraries, already
     run and able to be rerun, covering different regions and resolutions. Users pick the one that matches their interest: geography, land

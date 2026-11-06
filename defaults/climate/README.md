@@ -34,3 +34,32 @@ models as the historical years, against the climate model's OWN 1991-2020 normal
 This delta method removes the model's bias against PRISM (ACCESS-CM2 over California: 11.7 C and 446 mm vs PRISM 11.9 C and 478 mm),
 so the historical and projected series join at the end year on the same meaning of 1.0. The precomputed LOCA2 rasters in the LOCA2
 folders (x100 integers, 6 km grid, 1981-2010 normal) are not used.
+
+## CO2 fertilization (stage 11, to-do 46)
+
+A Projection Climate scenario's Climate page also sets CO2 fertilization (None / Low / Central / High; blank = Central). Growth of
+every class in `co2-classes.csv` is multiplied, in each projection year, by `1 + beta x ln(CO2 / reference CO2)` (floored at 0), as a
+"CO2" Flow Multiplier Type on its growth flow group, so it multiplies with the climate and Site Productivity multipliers. The No Climate
+projection does not depend on a Projection Climate result, so it has no CO2 effect (user decision 2026-11-06).
+
+- `co2-ssp.csv`: global annual mean CO2 (ppm) of the CMIP6 SSPs, 2015-2100, and the historical series 2000-2014 (Meinshausen et al.
+  2020, GMD, doi:10.5194/gmd-13-3571-2020), taken from the RCMIP v5.1.0 annual means (Nicholls et al. 2020, Zenodo
+  doi:10.5281/zenodo.4589756, `rcmip-concentrations-annual-means-v5-1-0.csv`, World rows). The Scenario column is the LOCA2 folder code.
+- `co2-betas.csv`: beta per ln CO2 (Low / Central / High) by vegetation type, from the literature review "CO2 fertilization betas for
+  LUCAS" (2026-11-05/06; values checked against the primary papers), accepted by the user 2026-11-06. The betas match biomass
+  production (the growth flow into live pools), not GPP and not stock change.
+- `co2-classes.csv`: each state class's vegetation type and growth flow group. Agriculture has no growth in the package's carbon
+  rates, so its rows change nothing unless a library gives it growth.
+- `co2-ecm-share.csv`: each forest type group's ectomycorrhizal share of live basal area, by ecodivision where FIA has 30 or more
+  conditions, else CONUS (StratumId blank). Built by `tools/make_co2_ecm_share.R` from the FIA DataMart TREE tables (live trees,
+  DIA >= 1 in, inventories 2010-) and `co2-mycorrhiza-genus.csv` (a genus-level assignment: listed genera are ECM, arbutoid or ericoid
+  (= 1) or dual AM/ECM (= 0.5); every other genus is AM). A forest class's beta is `share x ECM + (1 - share) x AM`, for young and for
+  mature stands; a forest class with no share takes the "Forest" row at every age.
+- `co2-age-bands.csv`: forest betas taper with stand age: the young value at 0-25 years, two thirds and one third of the way to the
+  mature value at 26-50 and 51-75, the mature value from 76. No study gives an age threshold; this is a modelling choice (the review).
+
+The reference CO2 is the SSP's CO2 in the Build's historical end year (the growth curves are fitted to FIA remeasurements that already
+carry the historical CO2), or a ppm given on the page. An optional ceiling holds CO2 at that ppm (600 = no extrapolation beyond the
+FACE experiments). CO2 Beta Adjustments rows replace betas of the chosen series by state class, optionally one stratum and one age
+band. Stage 11 writes the betas it used to CO2 Fertilization Betas and the series to CO2 Series. Because its flow multiplier rows hide
+the Build's, it copies the Build's stsim_FlowMultiplier rows (stage 3's carbon rates) into its result with the CO2 rows.
