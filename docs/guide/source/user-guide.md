@@ -416,7 +416,7 @@ The Build turns national data into everything an ST-Sim run needs for one study 
 Build for the Northern Sierra Nevada pyrome (P26) at 150 m, 1985-2023, historical only.
 Strata: primary FIA ecodivisions; secondary Counties, tertiary Federal Lands. Forest types from the USFS forest type group maps.
 Climate: tree-ring forest growth, Miami NPP non-forest growth, Q10 decomposition.
-Carbon: FIA measured dead wood, gSSURGO soil (Carbon Assumptions pages). Growth curves fitted in this Build (stage 2).
+Carbon: FIA measured dead wood, gNATSGO soil (Carbon Assumptions pages). Growth curves fitted in this Build (stage 2).
 Dependencies: none. Pipeline: stages 0, 1, 5, 2, 3, 4, 6, 7, 8.
 ```
 
@@ -563,7 +563,7 @@ The carbon assumptions are the rates and settings stages 3 and 4 use: how each l
 
 1. Under **Carbon Assumptions**, choose **Carbon Method** (1).
 2. **Dead organic matter** (2). **FIA measured dead wood** (default) calibrates the decay of snags, down logs, fine woody debris, litter and duff to FIA's measured dead wood in mature stands; snag fall comes from remeasured dead trees, and the fire and clearcut flows are fitted to FIA plots after those events. It needs FIA CONUS in Data Sources. **CBM defaults** uses the CBM-CFS3 default decay and snag fall rates with the LUCAS fire and clearcut flows, as the CONUS 1 km model did. Here FIA measured dead wood.
-3. **Soil organic carbon** (3). **gSSURGO** calibrates soil decay so the spin-up's soil carbon matches each ecodivision and forest type's mean gSSURGO soil organic carbon; **CBM defaults** leaves soil carbon to the spin-up. Here gSSURGO.
+3. **Soil organic carbon** (3). **gNATSGO** calibrates soil decay so the spin-up's soil carbon matches each ecodivision and forest type's mean gNATSGO soil organic carbon; **CBM defaults** leaves soil carbon to the spin-up. Here gNATSGO.
 4. Click **Fill with the FIA measured dead wood rows** (4). Until you do, the line beside the button says the sheets are empty: a run would still use the method's rows, but you could not see or edit them.
 
 &#91;image: The Carbon Method page of the P26 Build: Carbon Method marked 1, FIA measured dead wood 2, gSSURGO 3, the Fill button 4, and the line beside it, saying the sheets have rows, outlined\]
@@ -574,7 +574,7 @@ The carbon assumptions are the rates and settings stages 3 and 4 use: how each l
 
 &#91;image: The confirmation dialog listing the Carbon Assumptions pages Fill replaces, with OK marked 5\]
 
-*Figure 3.9. Fill replaces the rows of every Carbon Assumptions page. Non-Forest Growth and Non-Forest Rates are the two tables of the Grassland, Shrubland and Wetland Carbon page.*
+*Figure 3.9. Fill replaces the rows of every Carbon Assumptions page. This screenshot's prompt shows the older names, Non-Forest Growth and Non-Forest Rates, for the two tables of the Grassland, Shrubland and Wetland Carbon page.*
 
 6. The line now reads **Filled with the FIA measured dead wood rows** (6).
 
@@ -654,7 +654,7 @@ The line above the drawing (26) totals the budget: NPP, what leaves as CO2, to w
 
 *Figure 3.18. Spin-up with an empty sheet: the LANDFIRE intervals of Build \[53\] for each ecodivision and forest type.*
 
-**Fixed Decay Multipliers** (33). Each dead pool decays at CBM-CFS3's rate for its temperature times a multiplier, which stage 3 calibrates for each ecodivision and forest type: snags, down logs, fine woody debris, litter and duff to FIA's measurements in mature stands, and soil to gSSURGO (with CBM defaults the multipliers stay 1). Fill writes nothing here. The page lists the newest Build result's multipliers (34), with where each was fitted and how many FIA plots it rests on. To fix one instead, select it and press **Fix the selected value** (35): a row with the calibrated value appears in the rows table (36), ready to edit. A fixed value is shaded on the page, and the pools fitted after it (snags, then down logs; fine woody debris, then litter, then duff; then soil) refit around it at the next Build. In P26 snags, down logs and fine woody debris are fitted per ecodivision (1.65, 0.82 and 2.26 in Mediterranean Mountains), litter and duff per forest type.
+**Fixed Decay Multipliers** (33). Each dead pool decays at CBM-CFS3's rate for its temperature times a multiplier, which stage 3 calibrates for each ecodivision and forest type: snags, down logs, fine woody debris, litter and duff to FIA's measurements in mature stands, and soil to gNATSGO (with CBM defaults the multipliers stay 1). Fill writes nothing here. The page lists the newest Build result's multipliers (34), with where each was fitted and how many FIA plots it rests on. To fix one instead, select it and press **Fix the selected value** (35): a row with the calibrated value appears in the rows table (36), ready to edit. A fixed value is shaded on the page, and the pools fitted after it (snags, then down logs; fine woody debris, then litter, then duff; then soil) refit around it at the next Build. In P26 snags, down logs and fine woody debris are fitted per ecodivision (1.65, 0.82 and 2.26 in Mediterranean Mountains), litter and duff per forest type.
 
 &#91;image: The Fixed Decay Multipliers page with an empty sheet: Fixed Decay Multipliers marked 33, the line naming Build result \[53\], the table of ecodivisions and forest types with Fitted at, FIA plots and the multipliers for snags, down logs, fine woody debris, litter, duff, forest floor and soil marked 34, the Fix the selected value button marked 35, and the empty rows table marked 36\]
 
@@ -764,10 +764,10 @@ The finished run adds a result scenario under the Build in the Explorer, here **
 - **Land cover (stage 5, section 3.3.1).** Area in the wrong class 28 km² in 1985 and 65 km² in 2023, a mean of 47 km² (Modal: 1,078 km²). Developed land grows from 876 to 1,121 km², against 876 to 1,108 km² in the 30 m NLCD; 184 km² of cells flip between classes.
 - **Forest (stage 5).** 883,048 forest cells, 72.7% of the land; spin-up return intervals (LANDFIRE replacement-severity fire) of 140 to 311 years, median 186.
 - **Growth curves (stage 2).** 532 curves (28 forest types x 19 ecodivisions), of which the study area's two ecodivisions use 56.
-- **Carbon (stage 3).** The decay calibration cut the misfit to FIA measured dead wood by 96% (median of the 56 cells), and the spin-up's soil carbon matches gSSURGO (62 against 62 Mg C/ha).
+- **Carbon (stage 3).** The decay calibration cut the misfit to FIA measured dead wood by 96% (median of the 56 cells), and the spin-up's soil carbon matches gNATSGO (62 against 62 Mg C/ha).
 - **Initial carbon (stage 8).** 0.44 Pg C: live 0.20, dead organic matter 0.07, soil 0.18. Forest means 100, 29 and 69 Mg C/ha.
 
-**Initial Stock Summary.** **Build Results > Initial Stock Summary** (12) gives the 1985 carbon by state class: its cells, the share whose last disturbance was a fire, mean live, dead organic matter and soil carbon (Mg C/ha), total carbon (Tg C, 13) and where the stocks came from (the stock curves for forest, fixed values for grassland and shrubland, gSSURGO for wetlands). In P26, California Mixed Conifer holds 246 of the 442 Tg C.
+**Initial Stock Summary.** **Build Results > Initial Stock Summary** (12) gives the 1985 carbon by state class: its cells, the share whose last disturbance was a fire, mean live, dead organic matter and soil carbon (Mg C/ha), total carbon (Tg C, 13) and where the stocks came from (the stock curves for forest, fixed values for grassland and shrubland, gNATSGO for wetlands). In P26, California Mixed Conifer holds 246 of the 442 Tg C.
 
 &#91;image: The result's Build Results > Initial Stock Summary page marked 12: a row per state class with Cells, Share Post-Fire, Mean Live, Mean Dead Organic Matter, Mean Soil, Total Carbon marked 13 and Source; California mixed conifer holds 246 Tg C\]
 
@@ -870,7 +870,7 @@ The export names each file after its result scenario, for example `scn4.Fig02_la
 
 &#91;image: Figure 3 of the P26 Build: maps of initial total ecosystem carbon (441.6 Tg C), live biomass carbon and soil carbon in Mg C per hectare, on shaded relief\]
 
-*Figure 4.21. Initial carbon stocks in 1985: (a) total ecosystem carbon, 442 Tg C in the study area, (b) live biomass and (c) soil carbon. (a) and (b) are classed in even steps; (c) in classes of roughly equal area, because forest soil starts at its forest type's gSSURGO mean and so bunches between 66 and 75 Mg C/ha.*
+*Figure 4.21. Initial carbon stocks in 1985: (a) total ecosystem carbon, 442 Tg C in the study area, (b) live biomass and (c) soil carbon. (a) and (b) are classed in even steps; (c) in classes of roughly equal area, because forest soil starts at its forest type's gNATSGO mean and so bunches between 66 and 75 Mg C/ha.*
 
 &#91;image: Figure 8 of the P26 Build: stacked bar charts of the area burned each year by severity, peaking in 2021, and the area harvested each year by clearcut and selection\]
 
@@ -1436,7 +1436,7 @@ Each climate future is its own small scenario on the Build result, so one Build 
 
 *Figure 7.13. The Projection Climate pipeline: stage 11 alone.*
 
-12. On the **LUCAS Core (model builder)** tab, open **Projection > Climate** (16) and choose the LOCA2 run (17): the **Scenario (SSP)**, the **Climate Model** (the line below the fields lists the SSPs and replicates that model has), and the **Replicate** (blank = the lowest-numbered replicate with that SSP). Set **Last Year** to at least the projection's end year (blank = 2100). The P26 example uses SSP2-4.5, CanESM5, r1i1p1f1, to 2050. **Rescan LOCA2 folder** updates the lists after runs are added to or removed from the LOCA2 folder.
+12. On the **LUCAS Core (model builder)** tab, open **Projection > Climate** (16) and choose the LOCA2 run (17): the **Scenario (SSP)**, the **Climate Model** (the line below the fields lists the SSPs and replicates that model has), and the **Replicate** (blank = the lowest-numbered replicate with that SSP). Set **Last Year** to at least the projection's end year (blank = 2100). The P26 example uses SSP2-4.5, CanESM5, r1i1p1f1, to 2050. **Rescan LOCA2 folder** updates the lists after runs are added to or removed from the LOCA2 folder. The page's CO2 fertilization group (section 7.3.1) is Central unless you change it.
 
 &#91;image: The climate scenario's Projection > Climate page, Climate marked 16, and the LOCA2 run marked 17: Scenario SSP2-4.5, Climate model CanESM5, Replicate r1i1p1f1, Last year 2050, the line CanESM5 runs: SSP2-4.5, SSP3-7.0, SSP5-8.5, each r1i1p1f1, and the Rescan LOCA2 folder button\]
 
@@ -1508,6 +1508,53 @@ The **Run Monitor** lists both scenarios (26), each with its own result (`[23]` 
 
 *Figure 7.21. Two climate projections running at once: 5 tile jobs each.*
 
+#### 7.3.1 CO2 fertilization
+
+A Projection Climate scenario also lets growth respond to rising CO2. With the default, **Central**, growth under SSP2-4.5 is 3 to 8% higher by 2050 than the same climate future without CO2. Only projections that depend on a Projection Climate result get the effect; a projection at normal climate (section 7.1) has none.
+
+In each projection year stage 11 multiplies the growth of forest, shrubland, grassland and wetland classes by:
+
+```latex
+m_t = 1 + \beta \ln\left(\frac{CO_{2,t}}{CO_{2,ref}}\right)
+```
+
+CO2 is the SSP's global annual mean (Meinshausen et al. 2020, the concentrations CMIP6 used). The reference is the CO2 of the Build's historical end year, 423 ppm for 2023 under SSP2-4.5. Only the rise after the historical end counts, because the growth curves are fitted to FIA remeasurements that already carry the historical CO2. The multiplier is its own Flow Multiplier Type, **CO2**, so it multiplies with the climate and site productivity multipliers.
+
+The betas come from a review of free-air CO2 enrichment (FACE) experiments, global syntheses and inventory studies. They match biomass production, the growth flow into the live pools, not photosynthesis and not the stock change.
+
+| Vegetation type | Low | Central | High |
+| --- | --- | --- | --- |
+| Forest, ectomycorrhizal (ECM), age 0-25 | 0.20 | 0.45 | 0.65 |
+| Forest, ECM, age 76 and older | 0.05 | 0.30 | 0.45 |
+| Forest, arbuscular (AM), age 0-25 | 0.10 | 0.30 | 0.65 |
+| Forest, AM, age 76 and older | 0.00 | 0.15 | 0.35 |
+| Forest type with no ECM share | 0.05 | 0.25 | 0.55 |
+| Shrubland | 0.00 | 0.15 | 0.40 |
+| Grassland | 0.10 | 0.30 | 0.60 |
+| Woody wetland | 0.00 | 0.20 | 0.30 |
+| Emergent wetland | 0.00 | 0.20 | 0.35 |
+| Pasture | 0.15 | 0.35 | 0.55 |
+| Cropland | 0.10 | 0.20 | 0.30 |
+
+A forest type's beta mixes the ECM and AM rows by its ECM share of live basal area in FIA, by ecodivision where FIA has 30 or more plots (the species types of [Jo et al. 2019](https://doi.org/10.1126/sciadv.aav6358)). Douglas-fir is 0.94 ECM and takes nearly the ECM values; Redwood is 0.20 ECM. Forest betas taper with stand age, from the young value at 0-25 years, two thirds and one third of the way at 26-50 and 51-75, to the mature value from 76. No study gives an age threshold, so the taper is a modelling choice. Agriculture has no growth in the package's carbon rates, so its betas change nothing unless a library gives it growth. A beta of 0.10 is about 2% more growth per 100 ppm from 425 ppm.
+
+The **CO2 fertilization** group of **Projection > Climate** sets the effect:
+
+- **CO2 fertilization**: None, Low, Central or High (blank = Central). None turns the effect off.
+- **CO2 ceiling (ppm)**: blank = none. A ceiling holds CO2 at that level; 600 ppm keeps the effect within the range of the forest experiments.
+- **Reference CO2 (ppm)**: blank = the SSP's CO2 in the historical end year.
+- **CO2 Betas**: the chosen series' betas, loaded for the strata of the Build the scenario depends on: one row per class, a row per age band for forest, and a row per stratum where a forest type's ECM share differs by ecodivision. Edit a row to change a beta; a class with no row takes the series' default. Choosing another series reloads the table, asking first if it was edited; **Load the defaults** reloads it on demand.
+
+&#91;image: The CO2 fertilization group of the Climate page\]
+
+*Figure 7.22. The CO2 fertilization group of the Climate page (Puget Lowlands, scenario 70): Central, no ceiling, the reference from the SSP, and the CO2 Betas table loaded for the study area's two ecodivisions.*
+
+The result's **CO2 Fertilization Betas** sheet lists every beta stage 11 used, its ECM share, its source (marked edited when it differs from the default) and its multiplier in the last year. **CO2 Series** gives each year's CO2, the reference and ln(CO2 / reference). The run log gives each vegetation type's beta range and last-year multiplier.
+
+In the Puget Lowlands test (ACCESS-CM2, SSP2-4.5, to 2050, Central), CO2 rose from 426 to 507 ppm. The 2050 multipliers were 1.03 to 1.08 for forest, 1.03 for shrubland, 1.05 for grassland and 1.04 for wetlands. Against the same climate future without CO2, growth was 1.2% higher in 2030 and 4.8% higher in 2050, and ecosystem carbon in 2050 was 365.3 Tg C against 363.1 (+2.2 Tg C: 1.7 live, 0.5 dead organic matter).
+
+To separate the CO2 effect from the climate's, make two Projection Climate scenarios of the same LOCA2 run, one with **CO2 fertilization** None and one with Central, and a projection on each. Stage 11 copies the Build's flow multipliers into its result along with the CO2 rows, so rerun the Projection Climate scenario after rerunning the Build. Climate results made before CO2 fertilization was added (November 2026) have no CO2 rows. In an older library, run `tools/sync-library.R` first; it adds the page's columns and the CO2 type.
+
 ### 7.4 Comparing runs (stage 14)
 
 Stage 14 draws one set of figures that puts several runs side by side:
@@ -1524,29 +1571,29 @@ Like Run Figures (section 5.6), it is a scenario of its own that depends on the 
 
 &#91;image: The New Scenario dialog with the name Compare Projection Scenarios typed in the Name box, marked 28\]
 
-*Figure 7.22. Naming the comparison scenario.*
+*Figure 7.23. Naming the comparison scenario.*
 
 2. Add the Build result as its dependency: drag `[53] P26 - Build (...)` from the Build's **Results** folder onto the new scenario (29). It appears under **Dependencies** (30). Stage 14 takes the model grid from it; the runs to compare are chosen on the scenario's own page.
 
 &#91;image: The Explorer with \[32\] Compare Projection Scenarios in the Figures folder, marked 29, and the Build result \[53\] under its Dependencies folder, marked 30\]
 
-*Figure 7.23. The comparison scenario in the Figures folder, with the Build result as its only dependency.*
+*Figure 7.24. The comparison scenario in the Figures folder, with the Build result as its only dependency.*
 
 3. On **General > Pipeline** (32), untick **Inherit values** and choose **No Data** when Studio asks (31). Then add **14 - Compare Runs** as the only stage, with Run Order 1 (33).
 
 &#91;image: The Data Options dialog with No Data, Copy Data and Cancel buttons; No Data is marked 31\]
 
-*Figure 7.24. Studio asks what to do with the pipeline it inherited: choose No Data.*
+*Figure 7.25. Studio asks what to do with the pipeline it inherited: choose No Data.*
 
 &#91;image: The scenario's General tab with Pipeline selected, marked 32, and one stage, 14 - Compare Runs with Run Order 1, marked 33\]
 
-*Figure 7.25. The comparison scenario's pipeline: stage 14 alone.*
+*Figure 7.26. The comparison scenario's pipeline: stage 14 alone.*
 
 4. On the **LUCAS Core (model builder)** tab, open **Compare Runs** (34). The page starts empty. Click **Add a run** (35) once for each run to compare.
 
 &#91;image: The Compare Runs page with its note, no runs yet, the Compare Runs page in the tree marked 34 and the Add a run button marked 35\]
 
-*Figure 7.26. The Compare Runs page before any run is added.*
+*Figure 7.27. The Compare Runs page before any run is added.*
 
 5. Each run gets a line. Set it up from left to right:
 
@@ -1560,7 +1607,7 @@ Like Run Figures (section 5.6), it is a scenario of its own that depends on the 
 
 &#91;image: The Compare Runs page with three runs: \[67\] CanESM ssp245, \[66\] CanESM ssp585 and \[65\] No Climate. Marks: 36 the remove buttons, 37 the run drop-downs, 38 the Baseline ticks with No Climate ticked, 39 the Colour swatches set to auto, 40 the labels, 41 the Add a run button\]
 
-*Figure 7.27. The three P26 projections set up for comparison, with the no-climate run as the baseline.*
+*Figure 7.28. The three P26 projections set up for comparison, with the no-climate run as the baseline.*
 
 The historical run does not need a line. Stage 14 finds the historical run each projection started from (through its Projection Setup's Projection Start; for P26, result `[54]`). It draws that run in black from 1985 to the projections' start year, and the projections in colour after it. Add the historical run only to give it its own label or colour.
 
@@ -1577,25 +1624,25 @@ The P26 comparison is result `[71]`. It took 61 s and drew 9 figures. Its log li
 
 &#91;image: Figure 1 of the comparison: (a) total ecosystem carbon from 1985 to 2050, the historical run in black and the three projections in colour after 2023, ending at 452 (No Climate), 447 (SSP5-8.5) and 446 Tg C (SSP2-4.5); (b) each climate run minus No Climate, -4.9 and -6.1 Tg C in 2050, with SSP5-8.5 lowest, about -12, in 2041\]
 
-*Figure 7.28. Total ecosystem carbon in the P26 runs, and each climate run's difference from the no-climate baseline.*
+*Figure 7.29. Total ecosystem carbon in the P26 runs, and each climate run's difference from the no-climate baseline.*
 
-In P26, both climate futures end with less carbon than the no-climate run (Figure 7.28): 6.1 Tg C less under SSP2-4.5, and 4.9 Tg C less under SSP5-8.5. SSP5-8.5 is the lower of the two until about 2044, about 12 Tg C below the baseline in 2041. It then gains on the baseline, because its growth rises in the last decade. The difference map (Figure 7.29) shows where these gaps lie in 2050.
+In P26, both climate futures end with less carbon than the no-climate run (Figure 7.29): 6.1 Tg C less under SSP2-4.5, and 4.9 Tg C less under SSP5-8.5. SSP5-8.5 is the lower of the two until about 2044, about 12 Tg C below the baseline in 2041. It then gains on the baseline, because its growth rises in the last decade. The difference map (Figure 7.30) shows where these gaps lie in 2050.
 
 &#91;image: Figure 2 of the comparison: three maps of P26 in 2050. (a) No Climate total ecosystem carbon, 452.3 Tg C; (b) SSP5-8.5 minus No Climate, -4.9 Tg C; (c) SSP2-4.5 minus No Climate, -6.0 Tg C; brown less carbon, green more\]
 
-*Figure 7.29. Total ecosystem carbon in 2050: the baseline, and each climate run minus the baseline.*
+*Figure 7.30. Total ecosystem carbon in 2050: the baseline, and each climate run minus the baseline.*
 
-The carbon summary (Figure 7.30) shows why. Both climate runs grow more than the baseline: NPP averages 11.3 Tg C per year against 10.9, and live biomass gains 7.2 and 9.6 Tg C against 3.2. But warmer years also speed decay, so dead wood, litter and soil lose 13 to 14 Tg C, against 2.7 Tg C in the baseline. The loss to fire and harvest is about 1.6 Tg C per year in every run, so net biome productivity turns slightly negative under both climate futures.
+The carbon summary (Figure 7.31) shows why. Both climate runs grow more than the baseline: NPP averages 11.3 Tg C per year against 10.9, and live biomass gains 7.2 and 9.6 Tg C against 3.2. But warmer years also speed decay, so dead wood, litter and soil lose 13 to 14 Tg C, against 2.7 Tg C in the baseline. The loss to fire and harvest is about 1.6 Tg C per year in every run, so net biome productivity turns slightly negative under both climate futures.
 
 &#91;image: Figure 8 of the comparison, the carbon summary: one row per run with carbon at the start and end, change, difference from the baseline, live biomass change, dead wood, litter and soil change, and mean NPP, NEP, losses and NBP\]
 
-*Figure 7.30. The carbon summary of the comparison (also the Compare Carbon Summary output).*
+*Figure 7.31. The carbon summary of the comparison (also the Compare Carbon Summary output).*
 
-The land change summary (Figure 7.31) shows that the three projections harvest and urbanize the same area, lose about the same forest (118 to 120 km²) and gain the same developed land (172 km²). They burn the same area too, except that the SSP2-4.5 run's 2031 fire year burned 3,096 of the 3,602 km² drawn, so it burned 9,438 km² in all against 9,942. Climate changes growth and decay here, not the disturbance amounts.
+The land change summary (Figure 7.32) shows that the three projections harvest and urbanize the same area, lose about the same forest (118 to 120 km²) and gain the same developed land (172 km²). They burn the same area too, except that the SSP2-4.5 run's 2031 fire year burned 3,096 of the 3,602 km² drawn, so it burned 9,438 km² in all against 9,942. Climate changes growth and decay here, not the disturbance amounts.
 
 &#91;image: Figure 9 of the comparison, the land change summary: one row per run with the area burned, harvested and urbanized and the change in forest and developed area\]
 
-*Figure 7.31. The land change summary of the comparison (also the Compare Land Change Summary output).*
+*Figure 7.32. The land change summary of the comparison (also the Compare Land Change Summary output).*
 
 ## 8. Viewing results in SyncroSim
 
@@ -1765,7 +1812,7 @@ Besides the inputs they write for ST-Sim, the lucasCore stages save summary tabl
 | Land Cover Layers | OutputLandCoverLayers | 5 | The forest type, grassland and shrubland type, wetland type and "forest in any year" maps behind the state classes. |
 | Annual NLCD (model grid) | OutputNlcdAnnual | 5 | The NLCD land cover map of each year, resampled to the model grid; stage 6 reads the change between years. |
 | Spin-up Return Intervals | OutputReturnInterval | 5 | The replacement-fire return interval used to spin up each ecodivision and state class. |
-| Soil Carbon Targets (gSSURGO) | OutputSoilTarget | 5 | Mean soil organic carbon by ecodivision and state class, the target the spin-up is calibrated to. |
+| Soil Carbon Targets (gNATSGO) | OutputSoilTarget | 5 | Mean soil organic carbon by ecodivision and state class, the target the spin-up is calibrated to. |
 | Growth Curve Parameters | OutputGrowthParameter | 2 | The fitted merchantable volume curve of each ecodivision and state class: method, FIA plots, lag and parameters. |
 | Carbon Curve Parameters | OutputCarbonParameter | 2 | The fitted live carbon curve and how it splits into foliage, roots and merchantable wood. |
 | Growth Curve Report | OutputGrowthReport | 2 | A PDF of every growth curve against its FIA plots. |

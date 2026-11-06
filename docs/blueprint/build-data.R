@@ -74,7 +74,7 @@ D <- list(
     u(2, "Ecodivision climate for the growth curves"), u(3, "Ecodivision climate for the decay calibration"),
     u(7, "Annual temperature and precipitation for the historical climate multipliers", "Climate Options"))),
   list("Climate", "Loca2Folder", "LOCA2", "GCM / member / SSP", list(
-    u(11, "Projected climate of one scenario, model and replicate", "Projection > Climate"))),
+    u(11, "Projected climate of one scenario, model and replicate (its SSP also sets the CO2 of the CO2 fertilization multiplier)", "Projection > Climate"))),
   list("Covariates", "RoadsFile", "LANDFIRE roads", "LF2023 · 30 m", list(u(10, "Distance to roads covariate", "Suitability Covariates"))),
   list("Covariates", "ElevationFile", "LANDFIRE elevation", "LF2020 · 30 m", list(
     u(9, "Slope selectivity of projected fire (burned share by slope)", "Fire > Slope Selectivity (default on)"),
@@ -98,7 +98,7 @@ S <- list(
   `9` = list("9", "Projection Transitions", "Projection transition targets, fire sizes and slope selectivity", "Projection Options; Projection Transitions; Fire"),
   `10` = list("10", "Transition Suitability", "Surfaces that place projected transitions, with adjacency and patch sizes", "Projection Allocation; Suitability Options and Covariates; Rule Weights"),
   `7` = list("7", "Climate Multipliers", "Historical climate flow multipliers on growth and decomposition", "Climate Options (forest and non-forest growth, decomposition)"),
-  `11` = list("11", "Projection Climate", "Projection climate flow multipliers", "Projection > Climate (LOCA2 scenario, model, replicate)"),
+  `11` = list("11", "Projection Climate", "Projection climate and CO2 fertilization flow multipliers", "Projection > Climate (LOCA2 scenario, model, replicate; CO2 fertilization series, ceiling, reference, CO2 Betas)"),
   `12` = list("12–14", "Build, Run and Compare Figures", "PNG figures of a Build, a run, and a run comparison", "Run Figures; Compare Runs"))
 scripts <- list(`2` = c("2-growth-curves.R", "fia.R"), `3` = c("3-carbon-flows.R", "fia.R"), `10` = c("10-transition-suitability.R", "nccpi.R"),
                 `12` = c("12-build-figures.R", "13-run-figures.R", "14-compare-runs.R"))
