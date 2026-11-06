@@ -120,7 +120,37 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     the run's SSP. A run with no climate (constant climate) needs a stated choice: probably no CO2 either.
   - **Testing:** FIA remeasurement failed a placebo test for annual climate sensitivity (defaults/climate/README.md), so it is unlikely to
     isolate a CO2 trend. Report results as a sensitivity range, with the unit tests checking the multiplier against hand values.
-  - **For the user to decide:** whether it applies in the historical period; which betas; whether beta varies by stand age or type.
+  - **Decided by the user 2026-11-05:**
+    - **Projections only:** the FIA data behind the growth curves already hold the CO2 effect of their measurement years, so historical runs
+      get no CO2 multiplier. The multiplier is 1 at the reference (the projection start, or the CO2 of the FIA measurement window) and
+      grows from there.
+    - **Betas from the science:** a thorough review of the latest CO2 enrichment findings sets the default beta range and how it varies by
+      the model's vegetation types (forest type groups, shrub, grass, wetland, agriculture).
+    - **Defaults grounded, users can adjust:** given the large uncertainty, the reviewed values are the defaults, with optional user
+      adjustments (for example low, central and high cases, or per-type betas on a page).
+    - The approach follows the user's own earlier Global Change Biology study, which applied a CO2 fertilization effect in LUCAS:
+      an annual multiplier, in several versions (one per CO2 enrichment assumption), that scaled base growth the way the Climate and
+      Site Productivity multipliers do now. So here: one CO2 multiplier series per year and per assumption (low, central, high, or
+      user betas), as its own Flow Multiplier Type on the growth flows; the run picks the series.
+  - **Literature review done 2026-11-05** ("CO2 fertilization betas for LUCAS", reports/ in the lucas-master session worktree; notes
+    beside it in research_notes/). Recommendations, beta per ln CO2, low/central/high:
+    - Match biomass production (NPP into the live pools), not GPP (0.5-0.7) or stock change (about 0.25): stage 3's growth flow is the
+      gross inflow to the live pools.
+    - Forest young ECM 0.20/0.45/0.65, young AM 0.10/0.30/0.65, mature ECM 0.05/0.30/0.45, mature AM, mixed or low-P 0.00/0.15/0.35,
+      single default 0.05/0.25/0.55. Shrub 0/0.15/0.40; grassland 0.10/0.30/0.60 (no C3/C4 split: BioCON reversed over 20 years); pasture
+      0.15/0.35/0.55; crops 0.10/0.25/0.40; woody wetland 0/0.20/0.30 (no experiment); emergent wetland 0.10/0.25/0.45.
+    - Build in type and age (young under about 40 years); leave nitrogen, phosphorus, water and a 600 ppm cap to user settings.
+    - Central forest beta 0.25 gives 2100 multipliers 1.09 / 1.18 / 1.25 (SSP2-4.5 / 3-7.0 / 5-8.5).
+    - Sleeter et al. 2019 (GCB, doi:10.1111/gcb.14677): linear in ppm, 2.7-13.6% per 100 ppm (beta about 0.12-0.62, Medium 0.35),
+      from 2002 (historical too), one beta for every class, not in the main scenarios. The new defaults sit a little lower for forests and
+      well lower for shrub and grass.
+    - Options: None/Low/Central/High/User series (Central the default), a per-type user beta table with stratum overrides, a CO2 cap,
+      the reference CO2 shown; No Climate gets no CO2 by default.
+    - **Before fixing the defaults, check:** the SSP 2100 concentrations (603/867/1,135 ppm were recalled), Terrer 2019's CO2 scenario,
+      the Keenan 2023 conflict (0.50 log-log vs 13.5%), several non-forest effect sizes (about 25 values flagged in the report), the
+      forest type group to ECM/AM mapping, and whether ST-Sim flow multipliers can be keyed by age group.
+  - **Still to decide:** accept the review's table (or adjust it); age split and mycorrhizal split in or out; the No Climate run's CO2
+    choice.
 
 47. **Example libraries by region and resolution** - TO DO, idea stage (user, 2026-11-04; replaces item 13). A range of libraries, already
     run and able to be rerun, covering different regions and resolutions. Users pick the one that matches their interest: geography, land
