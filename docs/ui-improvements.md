@@ -181,7 +181,8 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     (Load the defaults refreshes it; it will ask, since the rows now differ).
   - **User Guide 2026-11-06:** new section 7.3.1 CO2 fertilization (equation, default beta table, ECM and age weighting, the page
     settings and CO2 Betas table, results, the Puget test, how to separate CO2 from climate, sync-library) and a pointer in 7.3
-    step 12 (Claude Doc rev 461). The repo snapshot (docs/guide) is not rebuilt.
+    step 12 (Claude Doc rev 461); Figure 7.22, the user's screenshot of the CO2 page (captures/7.3k-co2-page.png), with figures
+    7.22-7.31 renumbered to 7.23-7.32 (rev 475). The repo snapshot (docs/guide) is not rebuilt.
   - **Still to do:** the per-age-band check (growth by age band
     in a test library); sync-library and the CO2 type for the other libraries when they move.
 
