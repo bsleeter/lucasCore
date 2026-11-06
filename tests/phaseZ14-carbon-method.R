@@ -7,7 +7,7 @@
 #   cbm-empty   empty sheets, method CBM defaults on the Carbon Assumptions; the Builds have no Carbon Method of their own (a
 #               scenario's own row wins over a dependency's, measured 2026-10-28)
 #   cbm-filled  filled with the cbm-defaults preset (tools/carbon-assumptions.R)  = cbm-empty, exactly
-#   cbm-soil    cbm-filled + Soil Organic Carbon = gSSURGO: soil multipliers calibrated, every other multiplier still 1
+#   cbm-soil    cbm-filled + Soil Organic Carbon = gNATSGO: soil multipliers calibrated, every other multiplier still 1
 # Checks also: cbm runs write the LUCAS fire and clearcut rows of the CONUS 1 km build (defaults/stockflow/event-pathways-lucas.csv),
 # no per-type fire snag rows, every decay multiplier 1 and soil from CBM.
 # Usage: Rscript tests/phaseZ14-carbon-method.R      (REUSE=1 rechecks the last runs)
@@ -64,6 +64,6 @@ expect("cbm runs write the LUCAS fire and clearcut rows, no class rows", identic
 dc <- ds(R[["cbm-filled"]], "lucasCore_OutputDecayCalibration"); M5 <- c("SnagDecayMultiplier", "DownWoodDecayMultiplier", "FineWoodyDecayMultiplier", "LitterDecayMultiplier", "DuffDecayMultiplier")
 expect("cbm-filled: every decay multiplier 1, soil CBM", all(as.matrix(dc[, ..M5]) == 1) && all(dc$SoilDecayMultiplier == 1) && all(dc$SoilSource == "CBM default"))
 ds4 <- ds(R[["cbm-soil"]], "lucasCore_OutputDecayCalibration")
-expect("cbm-soil: soil calibrated to gSSURGO, the other multipliers still 1", all(as.matrix(ds4[, ..M5]) == 1) && any(ds4$SoilDecayMultiplier != 1) && any(ds4$SoilSource == "gSSURGO target"),
+expect("cbm-soil: soil calibrated to gNATSGO, the other multipliers still 1", all(as.matrix(ds4[, ..M5]) == 1) && any(ds4$SoilDecayMultiplier != 1) && any(ds4$SoilSource == "gNATSGO target"),
        sprintf("soil multiplier median %.2f", median(ds4$SoilDecayMultiplier)))
 cat(if (ok) "\nALL PASS\n" else "\nSOME CHECKS FAILED\n")

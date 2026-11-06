@@ -97,9 +97,9 @@ or copied from a result scenario of another lucasCore library (Growth Curves = C
 Library path and, optionally, the Source Result Scenario Id; seconds instead of minutes).
 
 Two more choices sit beside them. **Carbon Method** (first page of the Carbon Assumptions scenario the Build depends on): dead organic
-matter from FIA measured dead wood (default) or CBM defaults (the CONUS 1km model's way), soil organic carbon from gSSURGO or CBM, and a
+matter from FIA measured dead wood (default) or CBM defaults (the CONUS 1km model's way), soil organic carbon from gNATSGO or CBM, and a
 Fill button that writes the method's rows into the other Carbon Assumptions sheets (`defaults/carbon-assumptions/<method>`); stage 3 logs
-spin-up soil against gSSURGO either way. **Land Cover Crosswalks** (Crosswalks group): the EVT 2016, RCMAP, C-CAP and USFS forest type group
+spin-up soil against gNATSGO either way. **Land Cover Crosswalks** (Crosswalks group): the EVT 2016, RCMAP, C-CAP and USFS forest type group
 crosswalks stage 5 uses, editable per scenario (`defaults/landcover/README.md`).
 
 The starter is made by `tools/new-library.R`, which can also make or update any library directly:
@@ -119,7 +119,7 @@ stage: SyncroSim discards project-scope sheets that a stage saves during a run.
 |---|---|---|
 | 1 - Study Area and Strata | `src/1-study-area.R`, `src/strata.R` | Model lattice; study area from any source; primary = FIA ecodivisions (fixed); secondary and tertiary from Build Options |
 | 2 - Fit Growth Curves | `src/2-growth-curves.R`, `src/growth.R`, `src/carbon.R` | Merchantable volume and live-tree carbon curves by forest type x ecodivision, fitted to FIA |
-| 3 - Carbon Flows | `src/3-carbon-flows.R`, `src/flows.R`, `src/dom.R`, `src/calibrate.R` | Net growth, turnover, DOM decay calibrated to FIA dead carbon and gSSURGO soil; non-forest and event flows |
+| 3 - Carbon Flows | `src/3-carbon-flows.R`, `src/flows.R`, `src/dom.R`, `src/calibrate.R` | Net growth, turnover, DOM decay calibrated to FIA dead carbon and gNATSGO soil; non-forest and event flows |
 | 4 - Spin-up and Initial Stocks | `src/4-initial-stocks.R` | CBM spin-up: all 14 pools by age after high-severity fire or clearcut |
 | 5 - Initial Conditions | `src/5-initial-conditions.R` | Annual NLCD on the grid; state class and stand age maps; return intervals and soil targets for stage 3 |
 | 6 - Historical Transitions | `src/6-historical-transitions.R` | Transition pathways and annual spatial multipliers (NLCD land use and clearcut, MTBS fire, LANDFIRE thinning) |

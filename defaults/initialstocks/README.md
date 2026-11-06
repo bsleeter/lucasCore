@@ -7,4 +7,4 @@
 
 All four are the CONUS 1km build's tables (`Data/State Attributes/State Attributes - Initial Stocks *.csv`), from its
 non-forest spin-up with the same non-forest flows stage 3 copies. Forest pools come from stage 4. Developed, agriculture, barren, water
-and ice start at zero except soil (belowground slow), which takes gSSURGO wherever a class's value is zero.
+and ice start at zero except soil (belowground slow), which takes gNATSGO wherever a class's value is zero.

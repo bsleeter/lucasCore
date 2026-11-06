@@ -8,7 +8,7 @@ Spin-up disturbances: historical = Fire: High Severity; most recent = a fitted m
 Carbon Assumptions: Spin-up (2026-10-28) overrides the interval per forest type (optionally per ecodivision) and can end a share of
 the historical cycles by clearcut; this file stays the fallback when stage 5 has not run.
 
-`soil-targets.csv`: mean gSSURGO soil organic carbon (Mg C/ha; `gssurgo_soc_0_999.tif` x 0.01, zeros = unmapped) per ecodivision x
+`soil-targets.csv`: mean gNATSGO soil organic carbon (Mg C/ha; `gssurgo_soc_0_999.tif` x 0.01, zeros = unmapped) per ecodivision x
 forest state class, over the 1 km cells of the CONUS 1km model's forest type map (`ForestTypeGroupFilled.tif`); 173 cells, median 82,
 up to 1,099 on organic soils. Stage 3b fits each cell's soil decay so the belowground pools, averaged over the disturbance cycle, match
 it; cells not listed take their forest type's median soil multiplier. FIA soil carbon is not used (user 2026-10-20: not reliable).

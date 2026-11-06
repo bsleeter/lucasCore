@@ -17,7 +17,7 @@ L <- ssimLibrary(f); P <- rsyncrosim::project(L, "Definitions"); sc <- as.data.t
 sfd <- sc[Name == "Stock-Flow Definitions", ScenarioId]
 logl <- function(R) trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]])
 show <- function(R, name) { lg <- logl(R); cat(sprintf("\n==== %s\n", name))
-  cat(paste(unique(lg[grepl("Carbon Options|Land Cover Crosswalks|  EVT|Soil vs gSSURGO|Decay calibration took|crosswalk row|Initial carbon|Total time: [0-9]|Failure|rror", lg) & !grepl("post processing|saving results", lg)]), collapse = "\n"), "\n")
+  cat(paste(unique(lg[grepl("Carbon Options|Land Cover Crosswalks|  EVT|Soil vs gNATSGO|Decay calibration took|crosswalk row|Initial carbon|Total time: [0-9]|Failure|rror", lg) & !grepl("post processing|saving results", lg)]), collapse = "\n"), "\n")
   v <- as.data.table(datasheet(R, "lucasCore_OutputValidation")); ok <- nrow(v) > 0 && all(v$Status == "Pass") && !any(grepl("[Failure]", lg, fixed = TRUE))
   if (!ok && nrow(v)) print(v[Status != "Pass"]); ok }
 units <- data.frame(UnitId = trimws(strsplit(UNITS, ",")[[1]]))

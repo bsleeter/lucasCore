@@ -13,9 +13,9 @@
 #   last disturbance        high-severity fire where an interagency fire perimeter of 1900 to the start year covers the cell, otherwise
 #                           clearcut (the build's rule; with few early perimeters in the East, eastern forest is mostly post-harvest), or
 #                           high-severity fire for the forest types Carbon Assumptions: Spin-up sets so
-#   soil (BG slow)          gSSURGO wherever the class's value is 0 (the build's rule). Forest keeps its spin-up value: stage 3
-#                           calibrated soil decay to each ecodivision x class's mean gSSURGO, so forest cells start at the class's
-#                           gSSURGO mean and in balance with their decay rates
+#   soil (BG slow)          gNATSGO wherever the class's value is 0 (the build's rule). Forest keeps its spin-up value: stage 3
+#                           calibrated soil decay to each ecodivision x class's mean gNATSGO, so forest cells start at the class's
+#                           gNATSGO mean and in balance with their decay rates
 # Stand age is the stage 6 map when it ran (clearcut minimum age applied), else stage 5's.
 # Needs stages 4 and 5 (6 recommended): same pipeline, or dependencies on their results.
 # =============================================================================
@@ -82,7 +82,7 @@ out[which(isF)[!is.na(m)], ] <- as.matrix(cv[m[!is.na(m)], st$CurveColumn, with 
 # type x ecodivision's multiplier for the class (stage 2); a cell without TreeMap pixels keeps 1. It becomes the Site Productivity flow
 # spatial multiplier on forest growth, which multiplies with the Climate one in each cell, so the cell's live carbon follows m x its
 # curve. Its starting live and dead carbon are scaled by m too (their inputs all come from live carbon and decay is first order); the
-# deep soil (belowground slow, calibrated to gSSURGO) is not. Non-forest cells stay 1 (a cell that becomes forest later grows at 1).
+# deep soil (belowground slow, calibrated to gNATSGO) is not. Non-forest cells stay 1 (a cell that becomes forest later grows at 1).
 spv <- opt$SiteProductivity[1]
 site_on <- !is.null(spv) && !is.na(spv) && (identical(suppressWarnings(as.integer(spv)), 2L) || startsWith(as.character(spv), "TreeMap"))
 if (site_on) {
@@ -127,13 +127,13 @@ ew <- lt("emergent-wetland.csv"); fill_class(ew, land & cname %in% unique(ew$Sta
 src_of[land & is.na(src_of)] <- "zero (developed, agriculture, barren, water, ice)"
 progressBar()
 
-# ---- soil: gSSURGO where the class's belowground slow is 0 -----------------------------------------------------------------
+# ---- soil: gNATSGO where the class's belowground slow is 0 -----------------------------------------------------------------
 So <- crop(rast(src$SoilCarbonFile), project(as.polygons(ext(P) + 3000, crs = crs(P)), crs(rast(src$SoilCarbonFile))))
 So <- classify(So, cbind(-Inf, 0, NA), include.lowest = TRUE)   # 0 and the undeclared -1920 no-data value are missing (as stage 5)
 vSo <- values(project(So, P, method = "average") * 0.01, mat = FALSE)
 bgs <- which(st$StockTypeId == "DOM: Belowground Slow"); sub_ <- land & out[, bgs] == 0 & !is.na(vSo)
 out[sub_, bgs] <- vSo[sub_]
-say("Soil: gSSURGO used for %d cells whose class has no belowground slow carbon (%s)", sum(sub_), paste(names(table(src_of[sub_])), collapse = ", "))
+say("Soil: gNATSGO used for %d cells whose class has no belowground slow carbon (%s)", sum(sub_), paste(names(table(src_of[sub_])), collapse = ", "))
 out[!land, ] <- NA
 progressBar()
 

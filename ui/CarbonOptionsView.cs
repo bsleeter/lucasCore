@@ -39,10 +39,16 @@ namespace lucasCoreUI
             new[] { "lucasCore_DecayCalibrationSetting", "decay-calibration-settings", "Decay Calibration Settings" },
             new[] { "lucasCore_MatureAge", "mature-age", "Mature Age by Forest Type" },
             new[] { "lucasCore_FixedDecayMultiplier", "fixed-decay-multipliers", "Fixed Decay Multipliers" },
-            new[] { "lucasCore_NonForestGrowth", "nonforest-growth", "Non-Forest Growth" },
-            new[] { "lucasCore_NonForestRate", "nonforest-rates", "Non-Forest Rates" } };
+            new[] { "lucasCore_NonForestGrowth", "nonforest-growth", "Grassland, Shrubland and Wetland Carbon: growth" },
+            new[] { "lucasCore_NonForestRate", "nonforest-rates", "Grassland, Shrubland and Wetland Carbon: rates" } };
         // a scenario counts as filled when any of these has rows (stage 3's rule)
         private static readonly string[] Key = { "lucasCore_CbmCrosswalk", "lucasCore_DomParameter", "lucasCore_DisturbanceFlow" };
+        // the pages Fill writes, for its prompt: the two grassland tables are one page (to-do 42, 2026-11-05: the prompt named them by
+        // their old sheet names, Non-Forest Growth and Non-Forest Rates)
+        private static IEnumerable<string> PageNames()
+        {
+            return Sheets.Select(x => x[2].IndexOf(": ", StringComparison.Ordinal) > 0 ? x[2].Substring(0, x[2].IndexOf(": ", StringComparison.Ordinal)) + " (growth and rates)" : x[2]).Distinct();
+        }
 
         public CarbonOptionsView()
         {
@@ -81,7 +87,7 @@ namespace lucasCoreUI
 
         private void Fill()
         {
-            if (MessageBox.Show(this, string.Format("Replace the rows of {0} with the {1} rows?", string.Join(", ", Sheets.Select(x => x[2])), MethodName),
+            if (MessageBox.Show(this, string.Format("Replace the rows of {0} with the {1} rows?", string.Join(", ", PageNames()), MethodName),
                                 "Carbon Method", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) != DialogResult.OK) return;
             var problems = new List<string>();
             foreach (string[] x in Sheets)

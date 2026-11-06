@@ -80,7 +80,7 @@ rows get Site Productivity. Stages cannot write project sheets, so the new types
 libraries get them, existing ones through tools/sync-library.R (P26 included, before its next Build).
 
 **Initial stocks.** Stage 8 reads live and dead carbon from the curves by age; scale live and dead organic matter by m (all their
-inputs are proportional to live carbon and decay is first order), not the deep soil (gSSURGO). Otherwise a good site would start with
+inputs are proportional to live carbon and decay is first order), not the deep soil (gNATSGO). Otherwise a good site would start with
 average carbon and grow fast.
 
 **One join.** src/treemap.R: TreeMap raster + attribute table (CN = PLT_CN) -> FIA condition (the forested condition whose FORTYPCD

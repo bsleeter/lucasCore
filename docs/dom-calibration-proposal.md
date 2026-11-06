@@ -47,7 +47,7 @@ turnover inputs and decay, which is what the decay rates control. Calibrate on c
 vary by forest type eventually) and no recorded fire or harvest at the plot in the past 30 years.
 
 **Five multipliers** (snags; down logs = AG Medium + BG Fast; fine woody debris = AG Fast; litter = AG Very Fast; duff = AG Slow), plus
-soil to gSSURGO as today. Dead coarse roots (BG Fast) have no measurement and ride with down logs.
+soil to gNATSGO as today. Dead coarse roots (BG Fast) have no measurement and ride with down logs.
 
 **Regional and forest type terms** (user decision 2026-10-27). Decay is a property of the region (climate) more than of the stand, so
 snag, down log and fine woody debris multipliers are fitted once per ecodivision, jointly over its forest types. Leaf litter and duff

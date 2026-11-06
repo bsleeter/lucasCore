@@ -71,14 +71,14 @@ cbm <- file.path(pkg, "defaults", "cbm"); sp <- rd("cbm", "species-crosswalk.csv
 r <- turnover_rates(sp$StateClassId, TRUE, 0.1, cbm, sp$EcoBoundaryId, sp$SpeciesTypeId); dp <- dom_parameters(dom_parameter_default(cbm))
 mult <- list(snag = 0.8, cwd = 1.3, fwd = 2, litter = 0.5, duff = 1.1, soil = 0.7)
 v <- scale_decay(set_snag_fall(dom_flow_values(r, TRUE, 8, cbm, dp = dp), 0.06), mult, SNAG_FALL_FLOWS)
-x <- rate_rows(v, r, dp, 8, mult, "litter", "Ecodivision", "gSSURGO target", "Cell (300 snags)")
+x <- rate_rows(v, r, dp, 8, mult, "litter", "Ecodivision", "gNATSGO target", "Cell (300 snags)")
 expect("one row per flow, rate = the value the model runs with", nrow(x) == length(v) && identical(x$Rate, unname(v)))
 d <- x[!is.na(BaseRate)]; k <- names(DOM_POOLS)[match(d$FromStockTypeId, DOM_POOLS)]; share <- ifelse(d$Process == "Emission", dp$patm[k], 1 - dp$patm[k])
 tot <- x[, .(t = sum(Rate)), by = FromStockTypeId]; capped <- d$FromStockTypeId %in% tot[t > 1 - 1e-9, FromStockTypeId]
 expect("decay rows: rate = base x temperature effect x multiplier x share", max(abs((d$BaseRate * d$TemperatureEffect * d$Multiplier * share - d$Rate)[!capped])) < 1e-12, sprintf("%d rows", sum(!capped)))
 src <- function(pool, proc) x[FromStockTypeId == DOM_POOLS[[pool]] & Process == proc, Source][1]
-expect("sources: litter fixed by the user, soil from gSSURGO, snag fall measured, turnover CBM",
-       grepl("fixed by the user", src("AGVF", "Decay")) && grepl("gSSURGO", src("BGS", "Emission")) && grepl("^Measured snag fall", src("SnagStem", "Transfer")) &&
+expect("sources: litter fixed by the user, soil from gNATSGO, snag fall measured, turnover CBM",
+       grepl("fixed by the user", src("AGVF", "Decay")) && grepl("gNATSGO", src("BGS", "Emission")) && grepl("^Measured snag fall", src("SnagStem", "Transfer")) &&
        grepl("calibrated \\(Ecodivision\\)", src("AGM", "Decay")) && all(grepl("^CBM", x[Process == "Biomass Turnover", Source])),
        paste(unique(x$Source), collapse = " | "))
 ru <- turnover_rates(sp$StateClassId, TRUE, 0.1, cbm, sp$EcoBoundaryId, sp$SpeciesTypeId, list(FoliageTurnover = 0.2))

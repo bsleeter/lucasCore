@@ -11,7 +11,7 @@ intervals and soil targets).
 2. Data Sources: point the paths at the national data; for the dead-wood calibration also set the FIA DataMart Folder (all states'
    PLOT, COND, TREE and COND_DWM_CALC tables plus FIADB_REFERENCE, about 15 GB).
 3. Carbon Assumptions: on its Carbon Method page pick the dead organic matter method (FIA measured dead wood or CBM defaults) and the
-   soil source (gSSURGO or CBM), press Fill to see the rows, and add the scenario to the Build's dependencies - first, and with no
+   soil source (gNATSGO or CBM), press Fill to see the rows, and add the scenario to the Build's dependencies - first, and with no
    Carbon Method on the Build itself (a scenario's own rows win, then the first dependency that has them).
 4. Build: set Study Area, Build Options, Growth Curve Options, and run (California at 1 km about 50 minutes).
 5. Projections: Projection Setup (stages 9-10) on the Build result, one Projection Climate (stage 11) per LOCA2 future, then the
@@ -35,7 +35,7 @@ intervals and soil targets).
 | Live turnover (foliage, branch, stem, roots) | CBM defaults for the type's mapped Canadian ecozone and species (defaults/cbm) | no |
 | Dead pool decay | CBM base rate x Q10 temperature effect at the ecodivision's mean temperature x a fitted multiplier | yes |
 | Snag fall | FIA remeasured standing dead trees, per type x ecodivision (else type) | measured |
-| Soil decay | fitted so spin-up soil matches gSSURGO | yes |
+| Soil decay | fitted so spin-up soil matches gNATSGO | yes |
 | Fire and clearcut transfers | event table fitted to FIA plots after those events, plus a per-type fire snag share | yes, California plots only |
 
 Dead pool decay, Carbon Method "FIA measured dead wood" (default; the other method is CBM defaults, no calibration):

@@ -1,7 +1,7 @@
 # =============================================================================
 # phaseF-pipeline.R - the whole build pipeline for a study area in a new library: stages 1, 5, 2, 3, 4, 6, 7, 8
 # =============================================================================
-# Strata and initial conditions first (so stage 3 calibrates with stage 5's return intervals and gSSURGO targets), then growth curves,
+# Strata and initial conditions first (so stage 3 calibrates with stage 5's return intervals and gNATSGO targets), then growth curves,
 # carbon flows, spin-up, historical transitions, climate multipliers and initial stock maps. The result scenario holds every input an
 # ST-Sim historical run needs except Run Control.
 # Usage: Rscript tests/phaseF-pipeline.R [--units="County: Placer California"]  (Study Area units, comma-separated) [--dir=dev/libs]
@@ -16,7 +16,7 @@ if (system2(file.path(R.home("bin"), "Rscript.exe"), c("tools/new-library.R", sh
 L <- ssimLibrary(f); P <- rsyncrosim::project(L, "Definitions"); sc <- scenario(L, summary = TRUE)
 S <- rsyncrosim::scenario(P, paste("Build:", UNITS)); dependency(S) <- sc$ScenarioId[sc$Name == "Stock-Flow Definitions"]
 description(S) <- paste("Full build pipeline (tests/phaseF-pipeline.R) for", UNITS, "with package defaults: stages 1 (strata), 5 (initial conditions),",
-                        "2 (growth curves), 3 (carbon flows, calibrated with stage 5's return intervals and gSSURGO targets), 4 (spin-up), 6 (historical",
+                        "2 (growth curves), 3 (carbon flows, calibrated with stage 5's return intervals and gNATSGO targets), 4 (spin-up), 6 (historical",
                         "transitions), 7 (climate multipliers, historical PRISM, tree-ring forest growth) and 8 (initial stock maps). Depends on Stock-Flow Definitions.")
 saveDatasheet(S, data.frame(UnitId = trimws(strsplit(UNITS, ",")[[1]])), "lucasCore_StudyArea")
 stages <- c("1 - Study Area and Strata", "5 - Initial Conditions", "2 - Fit Growth Curves", "3 - Carbon Flows", "4 - Spin-up and Initial Stocks",

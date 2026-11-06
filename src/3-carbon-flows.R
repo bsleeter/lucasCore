@@ -10,7 +10,7 @@
 # proposal.md: FIA down woody material in mature stands, regional snag / down log / fine woody debris decay, litter and duff per forest
 # type, snag fall from remeasured dead trees, fire as the spin-up's last disturbance), calibrated to FIA condition pools (snags, down
 # wood, floor; the earlier default), FIA condition pools with CBM-default soil, or CBM defaults throughout (the CONUS 1km build's way).
-# The measured and condition-pool calibrations fit soil to gSSURGO; every option logs spin-up soil against it. High-severity fire and
+# The measured and condition-pool calibrations fit soil to gNATSGO; every option logs spin-up soil against it. High-severity fire and
 # clearcut flows come from Carbon Assumptions: Disturbance Flows, and fire's snag share per forest type from Fire Snag Share (else the
 # package defaults), written as event rows whatever the option.
 # Needs the Live-Tree Carbon Curves of stage 2 (same pipeline, or a dependency on a stage 2 result).
@@ -45,7 +45,7 @@ eco <- eco[!is.na(Stratum)]
 say("Ecodivision mean annual temperature (PRISM): %s", paste(sprintf("%s %.1f C", eco$ecodiv, eco$temp), collapse = ", "))
 progressBar()
 
-# ---- 3b: calibrate DOM decay (src/calibrate.R): snags, down wood, forest floor to FIA; soil to gSSURGO ----------------------
+# ---- 3b: calibrate DOM decay (src/calibrate.R): snags, down wood, forest floor to FIA; soil to gNATSGO ----------------------
 # Carbon Assumptions - Decay Calibration Settings (to-do 18): each blank value = the default here
 CAL <- list(mature_age = 60L, exclusion = 30L, min_dwm = 30L, min_snags = 200L, min_plots_cell = 200L, mult_min = 0.05, mult_max = 20, soil_min = 0.02, soil_max = 50)
 CAL_COLS <- c(mature_age = "MatureAge", exclusion = "ExclusionYears", min_dwm = "MinPlotsOwnFit", min_snags = "MinSnagsOwnRate", min_plots_cell = "MinPlotsConditionPools",
@@ -169,25 +169,25 @@ cells[, plots := dat$obs[, .(n = sum(n)), by = .(sc, ecodiv)][cells, on = c("sc"
 # the study area: calibrate and write flows only for its ecodivisions (every forest type in them, so a cell that changes type during a
 # run still has flows). Each ecodivision x type is calibrated on its own FIA plots, so these values are the same as a CONUS build's;
 # the forest-type fallback for cells with few plots stays pooled over every ecodivision of the type (all_cells). Only the soil
-# multiplier of a cell with no gSSURGO target (a median over its type's cells) now comes from the study area's cells.
+# multiplier of a cell with no gNATSGO target (a median over its type's cells) now comes from the study area's cells.
 all_cells <- cells; study <- study_ecodivisions()
 if (!is.null(study)) { cells <- cells[Stratum %in% study]
   say("Study area: %d of %d ecodivisions (%s): %d of %d ecodivision x forest type cells", length(study), uniqueN(all_cells$Stratum),
       paste(study, collapse = ", "), nrow(cells), nrow(all_cells)) }
-say("Decay calibration: %d cells, %d with >= %d FIA plots (own fit), %d with a gSSURGO soil target; return intervals %d-%d yr",
+say("Decay calibration: %d cells, %d with >= %d FIA plots (own fit), %d with a gNATSGO soil target; return intervals %d-%d yr",
     nrow(cells), cells[plots >= MIN_PLOTS_CELL, .N], MIN_PLOTS_CELL, cells[!is.na(soil_target), .N], min(cells$ri), max(cells$ri))
 # Carbon Method (sheet CarbonOptions, on the Carbon Assumptions scenario): dead organic matter 4 = FIA measured dead wood (default from
 # 2026-10-27, to-do 19; src/calibrate.R cal_fit_measured; needs the FIA DataMart Folder with the <ST>_COND_DWM_CALC tables), 3 = CBM
 # defaults (no calibration - the CONUS 1km build's way); 1 and 2 (FIA condition pools, no longer offered, 2026-10-28) still run in older
-# libraries. A pool that is not calibrated keeps multiplier 1. Soil organic carbon: 1 = soil decay calibrated to gSSURGO, 2 = CBM
-# defaults; blank = gSSURGO with options 1 and 4, CBM with 2 and 3 (as before the choice existed).
+# libraries. A pool that is not calibrated keeps multiplier 1. Soil organic carbon: 1 = soil decay calibrated to gNATSGO, 2 = CBM
+# defaults; blank = gNATSGO with options 1 and 4, CBM with 2 and 3 (as before the choice existed).
 # (copt and dom_mode are read above, before Live Turnover)
 sm0 <- if ("SoilCarbonModel" %in% names(copt)) copt$SoilCarbonModel[1] else NA
-soil_mode <- if (is.null(sm0) || is.na(sm0)) (if (dom_mode %in% c(1L, 4L)) 1L else 2L) else if (is.numeric(sm0)) as.integer(sm0) else if (grepl("^gSSURGO|^gNATSGO", sm0)) 1L else if (grepl("^CBM", sm0)) 2L else NA_integer_
+soil_mode <- if (is.null(sm0) || is.na(sm0)) (if (dom_mode %in% c(1L, 4L)) 1L else 2L) else if (is.numeric(sm0)) as.integer(sm0) else if (grepl("^gNATSGO|^gSSURGO", sm0)) 1L else if (grepl("^CBM", sm0)) 2L else NA_integer_
 if (is.na(soil_mode)) fail("Carbon Method: unrecognised Soil Organic Carbon choice '%s'", sm0)
 say("Carbon Method: dead organic matter = %s; soil organic carbon = %s", c("calibrated to FIA condition pools (snags, down wood, floor; older option)", "FIA condition pools (older option)",
     "CBM defaults (no calibration)", "FIA measured dead wood (down woody material and snags in mature stands; regional decay)")[dom_mode],
-    c("soil decay calibrated to gSSURGO", "CBM defaults (from the spin-up)")[soil_mode])
+    c("soil decay calibrated to gNATSGO", "CBM defaults (from the spin-up)")[soil_mode])
 # A Carbon Assumptions scenario nobody filled (made in Studio, the Fill button never pressed): CBM Crosswalk, Dead Organic Matter
 # Parameters and Disturbance Flows all empty. Stage 3 then takes every sheet from the method's preset files (defaults/carbon-assumptions/
 # <method>, tools/make_carbon_presets.R - the rows the Fill button writes). Once filled, an empty sheet means what it says (no fire snag
@@ -308,20 +308,20 @@ mult_i <- function(i) if (dom_mode %in% 3:4) list(snag = cells$m_snag[i], cwd = 
   list(snag = cells$m_snag[i], cwd = cells$m_cwd[i], floor = cells$m_floor[i])
 w_i <- function(i) if (is.na(cells$clearcut[i])) 0 else cells$clearcut[i]     # uncalibrated or measured: cycles of high-severity fire only
 parallel::clusterExport(cl, c("cells", "mult_i", "w_i", "dom_mode"), envir = environment())
-if (soil_mode == 1L) {   # Soil Organic Carbon: gSSURGO
+if (soil_mode == 1L) {   # Soil Organic Carbon: gNATSGO
   free <- which(is.na(cells$fx_soil)); cells[, m_soil := NA_real_]
   if (length(free)) cells[free, m_soil := unlist(parallel::parLapply(cl, free, function(i) cal_soil(cells[i], ctx, mult_i(i), w_i(i))))]
-  cells[, SoilSource := ifelse(is.na(m_soil), ifelse(is.na(soil_target), "Forest type median (no gSSURGO target)", "Forest type median (target unreachable)"), "gSSURGO target")]
+  cells[, SoilSource := ifelse(is.na(m_soil), ifelse(is.na(soil_target), "Forest type median (no gNATSGO target)", "Forest type median (target unreachable)"), "gNATSGO target")]
   cells[is.na(m_soil), m_soil := median(cells[sc == .BY$sc, m_soil], na.rm = TRUE), by = sc]
   cells[is.na(m_soil), m_soil := median(cells$m_soil, na.rm = TRUE)]
 } else cells[, `:=`(m_soil = 1, SoilSource = "CBM default")]
 cells[!is.na(fx_soil), `:=`(m_soil = fx_soil, SoilSource = "User (Carbon Assumptions: Fixed Decay Multipliers)")]
 parallel::clusterExport(cl, "cells", envir = environment())
-# how far spin-up soil sits from gSSURGO: cycle-averaged belowground carbon (BG very fast + fast + slow) vs the cell's gSSURGO mean
+# how far spin-up soil sits from gNATSGO: cycle-averaged belowground carbon (BG very fast + fast + slow) vs the cell's gNATSGO mean
 cells[, eq_bg := unlist(parallel::parLapply(cl, seq_len(nrow(cells)), function(i) cal_bg(cells[i], ctx, c(mult_i(i), list(soil = cells$m_soil[i])), w_i(i))))]
 parallel::stopCluster(cl)
 gs <- cells[!is.na(soil_target)]
-if (nrow(gs)) say("Soil vs gSSURGO: spin-up belowground carbon %.0f vs gSSURGO %.0f Mg C/ha (medians over %d cells; ratio median %.2f, range %.2f-%.2f)",
+if (nrow(gs)) say("Soil vs gNATSGO: spin-up belowground carbon %.0f vs gNATSGO %.0f Mg C/ha (medians over %d cells; ratio median %.2f, range %.2f-%.2f)",
                   median(gs$eq_bg), median(gs$soil_target), nrow(gs), median(gs$eq_bg / gs$soil_target), min(gs$eq_bg / gs$soil_target), max(gs$eq_bg / gs$soil_target))
 if (dom_mode == 4L) say("Decay calibration took %.1f min; median misfit reduction %.0f%%; median multipliers snag %.2f, down logs %.2f, fine woody debris %.2f, litter %.2f, duff %.2f, soil %.2f; stem snag fall %.3f /yr",
                         as.numeric(Sys.time() - t0, units = "mins"), 100 * median(red), median(cells$m_snag), median(cells$m_cwd), median(cells$m_fwd), median(cells$m_litter),

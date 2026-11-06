@@ -18,13 +18,13 @@ DOM_POOLS <- c(AGVF = "DOM: Aboveground Very Fast", BGVF = "DOM: Belowground Ver
 #   standing dead  CARBON_AG of standing dead trees                                        Snag Stem + Snag Branch
 #   down dead      CARBON_DOWN_DEAD: wood > 3 in on the ground, stumps and their roots     AG Medium (down stems) + BG Fast (dead coarse roots)
 #   litter         CARBON_LITTER: the forest floor - litter, fine woody debris, humus       AG Very Fast + AG Fast (branch litter) + AG Slow (humus)
-#   soil           mineral soil, no roots (matched to gSSURGO, not FIA)                     BG Very Fast + BG Slow
+#   soil           mineral soil, no roots (matched to gNATSGO, not FIA)                     BG Very Fast + BG Slow
 # The LUCAS stock groups pool the same way (DOM: Standing Deadwood, DOM: Down Deadwood, DOM: Litter, DOM: Soil + Deep Soil).
 FIA_DOM <- list(standing_dead = c("SnagStem", "SnagBranch"), down_dead = c("AGM", "BGF"), litter = c("AGVF", "AGF", "AGS"), soil = c("BGVF", "BGS"))
 # calibration groups: which pools' outflows (decay, emission, and snag fall unless it is fixed) each multiplier scales. The measured
 # calibration (to-do 19, 2026-10-27) has one multiplier per pool FIA's down woody material plots measure: snags, down logs (AG medium,
 # with the unmeasured dead coarse roots), fine woody debris (AG fast), litter (AG very fast) and duff (AG slow); the modelled-target
-# calibration has snags, down wood and one forest floor multiplier (AG very fast + fast + slow). Soil (BG very fast + slow) to gSSURGO.
+# calibration has snags, down wood and one forest floor multiplier (AG very fast + fast + slow). Soil (BG very fast + slow) to gNATSGO.
 DECAY_GROUPS <- list(snag = c("SnagStem", "SnagBranch"), cwd = c("AGM", "BGF"), fwd = "AGF", litter = "AGVF", duff = "AGS",
                      floor = c("AGVF", "AGF", "AGS"), soil = c("BGVF", "BGS"))
 # snag fall: in the measured calibration a fixed rate from FIA's remeasured standing dead trees (set_snag_fall), outside the snag multiplier

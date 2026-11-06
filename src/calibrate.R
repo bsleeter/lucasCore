@@ -1,13 +1,13 @@
 # =============================================================================
 # calibrate.R - stage 3b: calibrate DOM decay to observed dead carbon (experiment 17, 2026-10-20); no SyncroSim calls
 # =============================================================================
-# Targets: FIA standing dead (measured), down dead and litter (FIA's national model estimates) by stand age band; soil to gSSURGO
+# Targets: FIA standing dead (measured), down dead and litter (FIA's national model estimates) by stand age band; soil to gNATSGO
 # (user 2026-10-20: FIA soil carbon is not reliable). Parameters per cell (>= MinPlots FIA plots) or per forest type (its cells with
 # plots pooled): decay multipliers for snags (decay, emission and fall), down wood (AG medium + BG fast), forest floor (AG very fast +
 # fast + slow) - the pools grouped as FIADB defines its pools (src/dom.R FIA_DOM, 2026-10-26; before, AG fast counted as down wood and
 # BG fast as soil) - on a log scale within [0.05, 20], and the share of stands whose last disturbance was a clearcut rather than
 # high-severity fire. Then one soil multiplier per cell so mineral soil (BG very fast + slow), averaged over the disturbance cycle,
-# matches the cell's mean gSSURGO carbon.
+# matches the cell's mean gNATSGO carbon.
 # Known limitation (accepted 2026-10-20): down dead cannot match at every age - after a clearcut the model drops all branches and tops
 # into down wood (too much in young stands) while mature stands get too little; the fitted clearcut share sits near 1.
 # =============================================================================
@@ -69,7 +69,7 @@ cal_fit <- function(rows, ctx, dat) {
                     lower = c(rep(log(b$mult[1]), 3), -6), upper = c(rep(log(b$mult[2]), 3), 6), control = list(maxit = 300))
   list(snag = exp(o$par[1]), cwd = exp(o$par[2]), floor = exp(o$par[3]), clearcut = stats::plogis(o$par[4]), loss0 = l0, loss1 = o$value) }
 
-# cycle-averaged mineral soil carbon (FIA_DOM$soil: BG very fast + slow; dead coarse roots are down dead), the quantity matched to gSSURGO, of one cell for given multipliers
+# cycle-averaged mineral soil carbon (FIA_DOM$soil: BG very fast + slow; dead coarse roots are down dead), the quantity matched to gNATSGO, of one cell for given multipliers
 cal_bg <- function(k, ctx, mult, w) { S <- cal_setup(k, ctx); d <- cal_dom(S, ctx$fo, mult, w)
   mean(rowSums(d[1:min(S$k$ri, nrow(d)), FIA_DOM$soil, drop = FALSE])) }
 
@@ -89,7 +89,7 @@ cal_soil <- function(k, ctx, mult, w) {
 # a young stand's are mostly what its last fire or harvest left. Snag fall is fixed from remeasured standing dead trees (snag_fall_rates),
 # so the snag multiplier fits only decay while standing. The spin-up's last disturbance is high-severity fire. Decay is regional (user
 # decision 2026-10-27): snag, down log and fine woody debris multipliers are shared by an ecodivision's forest types, litter and duff
-# multipliers are per forest type (cal_fit_measured). Soil to gSSURGO afterwards (cal_soil), as before.
+# multipliers are per forest type (cal_fit_measured). Soil to gNATSGO afterwards (cal_soil), as before.
 MEAS_POOLS <- c("standing", "cwd", "fwd", "litter", "duff")
 MEAS_SIM <- list(standing = c("SnagStem", "SnagBranch"), cwd = "AGM", fwd = "AGF", litter = "AGVF", duff = "AGS")   # dead roots are not on the transects
 MEAS_RECENT <- 30   # default exclusion years (Decay Calibration Settings)

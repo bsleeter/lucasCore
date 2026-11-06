@@ -12,7 +12,7 @@
 #   * one Douglas-fir class (200; user decision 2026-10-21): coastal vs inland is carried by the ecodivision of its curves
 #   * the clearcut minimum-age rule needs the clearcut maps and moves to stage 6
 # Also writes the annual NLCD at the model's resolution (stage 6 builds the transitions from it), and per ecodivision x forest class
-# the replacement-fire return interval (LANDFIRE FRI_REPLAC) and the mean gSSURGO soil carbon that stage 3 calibrates with.
+# the replacement-fire return interval (LANDFIRE FRI_REPLAC) and the mean gNATSGO soil carbon that stage 3 calibrates with.
 # Needs stage 1 (same pipeline, or a dependency on its result).
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
@@ -252,11 +252,11 @@ A <- fill_modal(mask(A, m), m, round(global(A, "mean", na.rm = TRUE)[[1]]))
 A <- mask(ifel(forest, max(A, 1), 0), m)
 progressBar()
 
-# ---- per ecodivision x forest class: replacement-fire return interval and mean gSSURGO soil carbon ---------------------
+# ---- per ecodivision x forest class: replacement-fire return interval and mean gNATSGO soil carbon ---------------------
 fri <- lc("LF16_FRI_200.csv")
 Fr <- classify(crop_to(rast(src$FriFile)), cbind(as.integer(fri$Value), ifelse(fri$FRI_REPLAC > 0, as.numeric(fri$FRI_REPLAC), NA)), others = NA)
 Fr <- project(Fr, R, method = "average")
-# gSSURGO soc 0-999 (g C/m2): 0 and its undeclared no-data value (-1920, the CONUS median: ocean and unmapped areas) are missing
+# gNATSGO soc 0-999 (g C/m2): 0 and its undeclared no-data value (-1920, the CONUS median: ocean and unmapped areas) are missing
 So <- crop_to(rast(src$SoilCarbonFile)); So <- classify(So, cbind(-Inf, 0, NA), include.lowest = TRUE); So <- project(So, R, method = "average") * 0.01
 z <- data.table(P = values(P, mat = FALSE), S = values(S, mat = FALSE), fri = values(Fr, mat = FALSE), soil = values(So, mat = FALSE))[!is.na(P) & S >= 100]
 z[, `:=`(StratumId = stl$Name[match(P, as.integer(stl$Id))], StateClassId = scl$Name[match(S, as.integer(scl$Id))])]
@@ -276,7 +276,7 @@ check(STAGE, "forest cells have an age of at least 1 and other cells 0", all(vA[
 check(STAGE, "every forest ecodivision x class has a return interval", nrow(ri) == nrow(fc), sprintf("%d of %d", nrow(ri), nrow(fc)))
 say("Forest cells: %d (%.1f%% of land); natural cells made forest by the any-year rule: %d; developed/ag/water/ice kept: %d",
     sum(vF == 1, na.rm = TRUE), 100 * mean(vF[!is.na(vP)] == 1), sum(!is.na(v0) & !(v0 %in% 41:43) & vS >= 100 & !lu, na.rm = TRUE), sum(lu))
-say("Return intervals: %d cells, %d-%d yr (median %d); gSSURGO soil targets: %d cells, median %.0f Mg C/ha",
+say("Return intervals: %d cells, %d-%d yr (median %d); gNATSGO soil targets: %d cells, median %.0f Mg C/ha",
     nrow(ri), min(ri$ReturnInterval), max(ri$ReturnInterval), as.integer(median(ri$ReturnInterval)), nrow(st), median(st$SoilTarget))
 progressBar()
 
