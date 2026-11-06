@@ -138,19 +138,26 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       gross inflow to the live pools.
     - Forest young ECM 0.20/0.45/0.65, young AM 0.10/0.30/0.65, mature ECM 0.05/0.30/0.45, mature AM, mixed or low-P 0.00/0.15/0.35,
       single default 0.05/0.25/0.55. Shrub 0/0.15/0.40; grassland 0.10/0.30/0.60 (no C3/C4 split: BioCON reversed over 20 years); pasture
-      0.15/0.35/0.55; crops 0.10/0.25/0.40; woody wetland 0/0.20/0.30 (no experiment); emergent wetland 0.10/0.25/0.45.
-    - Build in type and age (young under about 40 years); leave nitrogen, phosphorus, water and a 600 ppm cap to user settings.
-    - Central forest beta 0.25 gives 2100 multipliers 1.09 / 1.18 / 1.25 (SSP2-4.5 / 3-7.0 / 5-8.5).
+      0.15/0.35/0.55; crops 0.10/0.20/0.30 (revised: C4 about 38% of cropland without hay, NASS 2024); woody wetland 0/0.20/0.30 (no
+      experiment); emergent wetland 0.00/0.20/0.35 (revised: GCReW sedge about +20%, the C4 grass declined).
+    - Build in type and age: no published age threshold, so a taper (full young beta below about 20-30 years, falling to a non-zero
+      mature floor by about 100 years) in age-banded stsim_FlowMultiplier rows (AgeMin/AgeMax); a modelling choice. Mycorrhizal type
+      by forest type: apply the Jo et al. 2019 species list to FIA tree records and weight the ECM and AM betas by ECM basal-area share
+      (groups 500, 800 and 180 are mixed; several ECM groups hold AM cedar or juniper types). Leave nitrogen, phosphorus, water and a
+      600 ppm cap to user settings.
+    - Central forest beta 0.25 gives 2100 multipliers 1.087 / 1.178 / 1.245 (SSP2-4.5 / 3-7.0 / 5-8.5: 602.8 / 867.2 / 1135.2 ppm,
+      Meinshausen 2020 Table 5) from 425.6 ppm (NOAA global mean 2025); the model uses its projection start year's CO2.
+    - **Checked against the papers 2026-11-05:** about 31 flagged values, now each CONFIRMED, CORRECTED or STILL UNVERIFIED in the
+      report's table (the checks are verify_*.md in research_notes). Corrected: Wang 2020, Davis 2022, Keenan 2023 (beta 0.62 linear),
+      Terrer 2019 (375 to 625 ppm, log beta 0.23), PHACE, the marsh, scrub oak, Hawaii (reference 2010). Still unverified: Duke +11% with N,
+      some ambient CO2 levels, per-crop FACE numbers, the FIADB type codes and species tables, the woody wetland ratio.
     - Sleeter et al. 2019 (GCB, doi:10.1111/gcb.14677): linear in ppm, 2.7-13.6% per 100 ppm (beta about 0.12-0.62, Medium 0.35),
       from 2002 (historical too), one beta for every class, not in the main scenarios. The new defaults sit a little lower for forests and
       well lower for shrub and grass.
     - Options: None/Low/Central/High/User series (Central the default), a per-type user beta table with stratum overrides, a CO2 cap,
       the reference CO2 shown; No Climate gets no CO2 by default.
-    - **Before fixing the defaults, check:** the SSP 2100 concentrations (603/867/1,135 ppm were recalled), Terrer 2019's CO2 scenario,
-      the Keenan 2023 conflict (0.50 log-log vs 13.5%), several non-forest effect sizes (about 25 values flagged in the report), the
-      forest type group to ECM/AM mapping, and whether ST-Sim flow multipliers can be keyed by age group.
-  - **Still to decide:** accept the review's table (or adjust it); age split and mycorrhizal split in or out; the No Climate run's CO2
-    choice.
+  - **Still to decide:** accept the review's table (or adjust it); the age taper and mycorrhizal weighting in or out; the No Climate
+    run's CO2 choice.
 
 47. **Example libraries by region and resolution** - TO DO, idea stage (user, 2026-11-04; replaces item 13). A range of libraries, already
     run and able to be rerun, covering different regions and resolutions. Users pick the one that matches their interest: geography, land
