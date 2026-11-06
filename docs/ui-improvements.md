@@ -13,12 +13,12 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | 1 | 14 FGDC metadata | No | User order 2026-11-02: first. Plan (a working document, not in this repository) (phases 0-6; decisions settled 2026-11-02: CSDGM first, one release per Build, maps every year, model archive always, ScienceBase folder by hand; Phase 0 done with the user 2026-11-02; Phase 1 built 2026-11-02: defaults/metadata definitions, data dictionary, citations, src/metadata.R, tests/unit-metadata-definitions.R; citation questions in the plan); lineage from the home's manifest and each Build's Data Sources Used | 12 (done) |
 | 3 | 39 Grassland, shrubland and wetland carbon: options beyond today's crude method | Yes | User order 2026-11-02: third, with the other open science items (user: explore additional options).  Step 1 (rates on a page) and the diagram view done; the diagram shows emergent wetland rates settling far above their starting pools; suspect values (emergent wetland growth 31, irrigated grass 9.19 Mg C/ha/yr), root turnover splits; the science options (user to decide) | - |
 | open science, user to place | 46 CO2 fertilization | Yes, as an option (off by default) | Added 2026-11-04. Growth has no CO2 response, and its size is similar to the climate penalty in the projections | - |
-| done, follow-ups | 43 Historical harvest short (and every land-use transition): built and verified on Puget 2026-11-05, released in 1.1.0 | Yes (historical and projected land change) | Left: P26 resync (Pasture and Cropland attributes) and rerun; stage 6's "% on classes with no pathway" log line still uses the start-year class | sync-library (done 2026-11-05) |
 | later | 47 Example libraries by region and resolution | No (each holds its own results) | Added 2026-11-04, replaces 13. Best built after the open science items, since each carbon change dates them | 14, restore test |
 | any | 49 Test national mode end to end | No | Added 2026-11-04. Never run end to end; fills about 175 GB overnight | 12 (done) |
+| next | 51 After the 1.1.0 release: P26 to 1.1.0 and rerun, Puget parents to Build 58, guide sections, code.usgs.gov resync, safeguards | Only the P26 rerun | Added 2026-11-05: what the release left | 43 (done) |
 | open, paused | 50 Water, wetland and barren change | Yes (historical and projected land change, wetland carbon) | Added 2026-11-05. Not modelled today; P26 swaps about 150 km2 each way between water and land (reservoirs), Puget has river bars, ponds and shoreline wetland change | - |
 
-Finished items were removed from this list on 2026-11-05 at the user's request: 1-12, 15-25, 28-30, 32, 34, 35, 37, 40, 41, 42, 45, 48 (42 the Fill prompt's grassland table names and 48 gNATSGO wording, both done 2026-11-05; item 10 went into 35; the text is in git history). Removed by the user without being done: 13, the Calaveras demo bundle (which library serves as the demo is undecided, not Puget, which has no fire), and 26, 27, 31, 33, 36, 38, 44.
+Finished items were removed from this list on 2026-11-05 at the user's request: 1-12, 15-25, 28-30, 32, 34, 35, 37, 40, 41, 42, 43, 45, 48 (42 the Fill prompt's grassland table names and 48 gNATSGO wording, both done 2026-11-05; 43 the historical land-use and harvest shortfall, verified on Puget and released in 1.1.0, its follow-ups in 51; item 10 went into 35; the text is in git history). Removed by the user without being done: 13, the Calaveras demo bundle (which library serves as the demo is undecided, not Puget, which has no fire), and 26, 27, 31, 33, 36, 38, 44.
 Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions by class pair, Ag Change, targets from a historical run, USGS release files, data release stages 16-17; v1.0.1 2026-11-02, v1.0.0 the same day); the repo is public, so push only when the user asks.
 
 14. **FGDC metadata for the model and its outputs** - PLANNED 2026-10-31 as a metadata and data release generator following USGS
@@ -95,36 +95,6 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     root turnover half to AG fast (above ground), and annual grass half its fine root turnover to AG very fast.
     Diagram follow-up DONE 2026-10-31 (8a7fc0c, user): CO2 and water leave each pool as arrows (curving up to the atmosphere,
     sideways to water), sized by flux; guide Figure 3.17. Left as is (user): BG slow's "water" label sits on the curve to deep soil.
-43. **Historical harvest short, and every land-use transition's area** - DECIDED, BUILT and VERIFIED 2026-11-05 (released in 1.1.0).
-    Puget Lowlands, Build 58 / historical run 59 against Build 6 / run 13, 1986-2023: urbanization, intensification, Ag Expansion,
-    Ag Contraction and Ag Change all 100-103% of mapped (Ag Contraction was 452 km2 against 669 mapped by the old maps, 68 by the new);
-    harvest 87% of mapped (was 80%), with 303 km2 of cuts below the minimum age (was 251); 2023 carbon 382.0 Tg C (was 384.6).
-    Projection Setup 63 (start and targets from run 59) and projections 64-67: every target within 2% except cropland to pasture
-    (94-97% of 27 km2). Stage 10 bug found on the way: an Adjacency surface listed before a Fitted one overwrote the covariates. The 2026-10-31 options (minimum ages in projections only; resample start ages) were dropped: the trace showed start ages
-    cannot recover the blocked cuts, all on stands regrowing after a clearcut. Trace on Puget (Build 6, run 13) and P26 (53, 54): harvest 20%
-    and 12% short; cuts on cells with no forest pathway (Puget 320 km2, P26 106) came from area matching keeping regrown forest in its old
-    class; second cuts (251, 112) were mostly the same 30 m pixel flagged again within 2 years (139, 67), real short rotations and different
-    pixels in one cell; the rest unexplained (93, 74). The land-use maps were wrong too: built from the class reached or left, Puget's Ag
-    Contraction counted 669 km2 where its class pairs give 70. Decisions (user):
-  - **Land-use maps by class pair:** each pair of the transition pathways belongs to one group, and stage 6's maps follow it, from the class the
-    model holds (a change with no pathway leaves it), with a 3-year persistence rule (a change undone within 3 years does not count; package
-    constant LU_PERSIST). src/transition-pairs.R; tests/unit-transition-pairs.R.
-  - **Ag Change:** pasture to cropland and back, its own group with two types and pathways; in projections each type its own Target, placed by
-    adjacency to the class it becomes (Projection Allocation Method 4 Adjacency, curve read from the maps: src/adjacency-curve.R,
-    tests/unit-adjacency-curve.R); state attributes Pasture and Cropland.
-  - **Harvest:** minimum ages kept; cuts on cells with no forest pathway moved to the nearest forest cells of the same unit with room and age
-    (src/recover-area.R, tests/unit-recover-area.R; Puget 90% within 0.35 km); the rest accepted (Puget about 10% of mapped harvest, P26 8%).
-  - **Fire:** Developed Open Space and Low Intensity may burn (they do, in the WUI); fire stays where MTBS mapped it; the little on other
-    classes is accepted; no carbon change (developed land holds no live carbon).
-  - **Projection targets:** Projection Options > Targets From Historical Run: every Target group's area per unit and year is what that run
-    realized (src/targets-from-run.R, tests/unit-targets-from-run.R; Run Settings page), gain groups scaled to their first-time share; so the
-    projection continues at what the historical period could reproduce.
-  - **Also:** tools/sync-library.R adds the Ag Change types and makes a Carbon Assumptions scenario only with --carbon-assumptions; Puget and
-    P26 synced 2026-11-05 (need it again for the Pasture and Cropland attributes). Placer 1 km test: tests/phaseZ27, phaseZ28.
-  - **Open:** urbanization realized 86-89% of its map on Placer (as before), not traced; a replay check in stage 6 (reachable area per group
-    before any run) if shortfalls keep coming up; Ag Change and the log's "% on classes with no pathway" line (start-year classes, misleading
-    for land-use groups) still to word.
-
 46. **CO2 fertilization** - TO DO, open science (user, 2026-11-04: how can we introduce the effect of CO2 fertilization into the model?).
     Today no growth pathway responds to CO2, so projected growth carries the climate penalty with no offset, and the SSPs differ only
     through climate. Nothing is built; the proposal below is a starting point and its literature values are from memory, to verify.
@@ -198,3 +168,21 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     record: a coastal scenario would be a separate option.
   - **Optional:** C-CAP coastal change (1975-2016) for estuarine wetland change in coastal regions, after the NLCD version works.
   - **Checks:** map counts (mapped against sustained, by pair), the replay check, then a Build and historical run.
+
+51. **After the 1.1.0 release** - TO DO, added 2026-11-05. What the release left, in no fixed order:
+  - **P26 guide library:** move it to 1.1.0 (`SyncroSim.Console --add --package --pkg=lucasCore --ver=1.1.0 --lib=...`; the user runs it,
+    it is the user's library), run sync-library for the Pasture and Cropland attributes and the Ag Change types, then rebuild and rerun.
+  - **Other dev libraries** (test, schema-ref, Data Download, older P26 copies) still name 1.0.1 and show lucasCore missing until moved.
+  - **Puget parents on old Build 6:** Build Figures (7), Build Record (9), Historical Figures (16), Data Release (18) and Compare
+    Projections (42) depend on Build 6; repoint them to 58 before their next run. The climate scenarios (23-25) depend on Build 6 too;
+    that is harmless (their Build 6 rows match 58 exactly), but rebuild them on 58 at some point.
+  - **Puget Recent set:** deleted by the user 2026-11-05, to be rebuilt on Build 58 / run 59.
+  - **User Guide:** add Ag Change, Run Settings "Target areas from" and the Adjacency allocation method; then rebuild the docs/guide
+    snapshot.
+  - **code.usgs.gov:** resync the release copy (`bash tools/release-snapshot.sh --sync=F:/lucasCore-release`, then the user pushes).
+  - **Stage 6 log:** "% on classes with no pathway" still uses the start-year class (reads far too high for intensification).
+  - **Stage 9/10 safeguard:** fail or warn when Projection Start and "Target areas from" name different historical runs (setup 60 started
+    from run 13 with targets from run 59); and sync-library could add default rows for new groups to sheets that already have rows (setup
+    21 had no Ag Change rows).
+  - **Uncommitted:** `dev/fire/01-projection-fire-maps.R` (the lucasFire library path after the move).
+  - Checked 2026-11-05: a new 1.1.0 library gets Pasture and Cropland and the Ag Change types and groups from the package.
