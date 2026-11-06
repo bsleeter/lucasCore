@@ -157,8 +157,10 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     - Options: None/Low/Central/High/User series (Central the default), a per-type user beta table with stratum overrides, a CO2 cap,
       the reference CO2 shown; No Climate gets no CO2 by default.
   - **Decided 2026-11-06:** the user accepted the review's revised default table (crops 0.10/0.20/0.30, emergent wetland
-    0/0.20/0.35, the rest as reviewed) as the starting point.
-  - **Still to decide:** the age taper and mycorrhizal weighting in or out; the No Climate run's CO2 choice.
+    0/0.20/0.35, the rest as reviewed) as the starting point. Both the age taper (AgeMin/AgeMax rows) and the mycorrhizal
+    weighting (ECM basal-area share per forest type from FIA tree records and the Jo et al. 2019 species list) go in the first
+    build.
+  - **Still to decide:** the No Climate run's CO2 choice.
 
 47. **Example libraries by region and resolution** - TO DO, idea stage (user, 2026-11-04; replaces item 13). A range of libraries, already
     run and able to be rerun, covering different regions and resolutions. Users pick the one that matches their interest: geography, land
