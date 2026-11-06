@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using SyncroSim.Core;
@@ -35,7 +36,10 @@ namespace lucasCoreUI
         private readonly ComboBox m_co2 = List(180);
         private readonly TextBox m_ceiling = Box(70);
         private readonly TextBox m_reference = Box(70);
-        private readonly Panel m_adjust = GridHost(170);
+        private readonly Panel m_adjust = GridHost(320);
+        private readonly Button m_defaults = new Button { Text = "Load the defaults", AutoSize = true, Margin = new Padding(3, 3, 12, 3) };
+        private const string BetaSheet = "lucasCore_Co2Adjustment";
+        private string m_loaded = "";
         private readonly Label m_co2note = new Label { AutoSize = true, MaximumSize = new Size(640, 0), ForeColor = SystemColors.GrayText, Margin = new Padding(3, 6, 3, 3) };
         private static readonly string[] Co2Names = { "None", "Low", "Central (default)", "High" };
 
@@ -64,13 +68,14 @@ namespace lucasCoreUI
             FormRow(cf, "CO2 ceiling (ppm):", m_ceiling, "blank = none; e.g. 600 holds the effect at 600 ppm (no forest experiment went above about 600)");
             FormRow(cf, "Reference CO2 (ppm):", m_reference, "blank = the SSP's CO2 in the historical end year");
             co2.Controls.Add(cf);
-            co2.Controls.Add(Note("Beta adjustments (optional): each row replaces the chosen series' beta for a state class, in one stratum and one age band or (blank) all of them. Per ln CO2: 0.1 is about 2% more growth per 100 ppm from 425 ppm."));
+            co2.Controls.Add(Note("CO2 betas (per ln CO2): the chosen series' values, loaded from the package defaults for the strata of the Build this scenario depends on. Edit a row to change it; blank stratum = every stratum, blank age band = every age. A row for one stratum or age band wins over a blank one. A class with no row takes the series' default. Switching the series reloads the table (asking first if it was edited). A beta of 0.1 is about 2% more growth per 100 ppm from 425 ppm."));
+            var dr = Row(); dr.Controls.Add(m_defaults); dr.Controls.Add(m_co2note); co2.Controls.Add(dr);
             co2.Controls.Add(m_adjust);
-            co2.Controls.Add(m_co2note);
             AddGroup(Group("CO2 fertilization", co2));
             EndGroups();
             foreach (string n in Co2Names) m_co2.Items.Add(n);
-            m_co2.SelectionChangeCommitted += (s, e) => { Write("Co2Series", m_co2.SelectedIndex + 1); RefreshControls(); };
+            m_co2.SelectionChangeCommitted += (s, e) => ChangeSeries(m_co2.SelectedIndex + 1);
+            m_defaults.Click += (s, e) => { int cur = IntValue("Co2Series", 3); if (cur != 1 && (!Edited(cur) || Confirm(cur))) LoadBetas(cur); RefreshControls(); };
             BindNumber(m_ceiling, () => Sheet, "Co2Ceiling", false);
             BindNumber(m_reference, () => Sheet, "Co2Reference", false);
             m_scenario.SelectionChangeCommitted += (s, e) => { Write("ClimateScenarioId", Key(m_scenario)); RefreshControls(); };
@@ -82,6 +87,93 @@ namespace lucasCoreUI
         }
 
         private static object Key(ComboBox c) { var i = c.SelectedItem as Item; return i == null ? DBNull.Value : i.Key; }
+
+        // ---- CO2 betas (defaults/climate/co2-default-betas.csv, tools/make_co2_default_betas.R) ---------------------------------
+        private bool CanEdit { get { return this.Scenario != null && !this.Scenario.IsResult && this.ShouldEnableView(); } }
+        private static readonly string[] SeriesColumn = { null, null, "Low", "Central", "High" };   // by Co2Series value (1 = None)
+
+        // the study area's primary strata (ecodivisions), from the Build result this scenario depends on; empty when there is none yet
+        private List<string> StudyStrata()
+        {
+            var s = new List<string>();
+            try
+            {
+                if (this.Scenario == null) return s;
+                foreach (Scenario d in this.Scenario.Dependencies)
+                {
+                    DataSheet ds = d.GetDataSheet("lucasCore_OutputStrataSummary"); if (ds == null) continue;
+                    foreach (DataRow r in ds.GetData().Rows)
+                        if (r.RowState != DataRowState.Deleted && Convert.ToString(r["Level"]) == "Primary") s.Add(Convert.ToString(r["Name"]));
+                    if (s.Count > 0) break;
+                }
+            }
+            catch (Exception) { s.Clear(); }
+            return s.Distinct().ToList();
+        }
+
+        // the rows the page loads for a series: StateClassId, StratumId, AgeBand, Beta (as text). A forest class with ecodivision ECM shares
+        // gets a row per study-area stratum and band, unless every stratum has the same values (then one blank-stratum set)
+        private List<string[]> Expected(int series)
+        {
+            var rows = new List<string[]>();
+            string file = Defaults.PackageFile("defaults", "climate", "co2-default-betas.csv");
+            if (series < 2 || series > 4 || !File.Exists(file)) return rows;
+            List<string[]> csv = Defaults.ReadCsv(file);
+            int c = Array.IndexOf(csv[0], SeriesColumn[series]);
+            var data = csv.Skip(1).Select(r => new { Cls = r[0], Str = r[1], Band = r[2], Beta = r[c] }).ToList();
+            List<string> strata = StudyStrata();
+            foreach (var cls in data.Select(x => x.Cls).Distinct())
+            {
+                var us = data.Where(x => x.Cls == cls && x.Str.Length == 0).ToList();
+                var loc = data.Where(x => x.Cls == cls && strata.Contains(x.Str)).ToList();
+                Func<string, string, string> beta = (st, band) => { var l = loc.FirstOrDefault(x => x.Str == st && x.Band == band); return l != null ? l.Beta : us.First(x => x.Band == band).Beta; };
+                bool same = loc.Count == 0 || us.All(u => strata.Select(st => beta(st, u.Band)).Distinct().Count() == 1);
+                if (same) foreach (var u in us) rows.Add(new[] { cls, "", u.Band, loc.Count == 0 ? u.Beta : beta(strata[0], u.Band) });
+                else foreach (string st in strata) foreach (var u in us) rows.Add(new[] { cls, st, u.Band, beta(st, u.Band) });
+            }
+            return rows;
+        }
+
+        private static string Num(string s) { double v; return double.TryParse(s, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out v) ? Math.Round(v, 4).ToString("R", System.Globalization.CultureInfo.InvariantCulture) : s; }
+
+        // whether the table holds anything other than the series' defaults (empty = not edited)
+        private bool Edited(int series)
+        {
+            DataSheet ds = this.DataFeed.GetDataSheet(BetaSheet); if (ds == null || !ds.HasData()) return false;
+            if (series < 2) return true;
+            DataSheetColumn[] cols = new[] { "StateClassId", "StratumId", "AgeBand", "Beta" }.Select(n => ds.Columns.Cast<DataSheetColumn>().First(x => x.Name == n)).ToArray();
+            var have = ds.GetData().Rows.Cast<DataRow>().Where(r => r.RowState != DataRowState.Deleted)
+                .Select(r => string.Join("|", cols.Select((col, i) => i == 3 ? Num(Defaults.Display(col, r[col.Name])) : Defaults.Display(col, r[col.Name])))).OrderBy(x => x, StringComparer.Ordinal).ToList();
+            var want = Expected(series).Select(r => string.Join("|", r[0], r[1], r[2], Num(r[3]))).OrderBy(x => x, StringComparer.Ordinal).ToList();
+            return !have.SequenceEqual(want);
+        }
+
+        private bool Confirm(int series)
+        {
+            return MessageBox.Show(this, string.Format("The CO2 betas table has been edited. Replace it with the {0} defaults?", SeriesColumn[series]), "CO2 betas",
+                                   MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
+        }
+
+        private void LoadBetas(int series)
+        {
+            DataSheet ds = this.DataFeed.GetDataSheet(BetaSheet); if (ds == null) return;
+            var rows = new List<string[]> { new[] { "StateClassId", "StratumId", "AgeBand", "Beta" } };
+            rows.AddRange(Expected(series));
+            List<string> problems = Defaults.LoadRows(ds, rows, null);
+            m_loaded = problems.Count == 0 ? string.Format("Loaded the {0} defaults ({1} rows).", SeriesColumn[series], rows.Count - 1)
+                                                 : string.Format("Loaded the {0} defaults; {1} rows did not match this library (first: {2}).", SeriesColumn[series], problems.Count, problems[0]);
+        }
+
+        // a new series: reload the table from its defaults when it holds the old series' defaults (or nothing), else ask
+        private void ChangeSeries(int series)
+        {
+            int old = IntValue("Co2Series", 3);
+            if (series == old) return;
+            bool load = series != 1 && (!Edited(old) || Confirm(series));
+            Write("Co2Series", series);
+            if (load) LoadBetas(series);
+            RefreshControls();
+        }
 
         private static List<Item> Read(Project p, string sheet, string key, bool runs)
         {
@@ -95,7 +187,10 @@ namespace lucasCoreUI
         {
             base.LoadDataFeed(dataFeed);
             LoadLists();
-            LoadGrid(m_adjust, "lucasCore_Co2Adjustment");
+            int cur = IntValue("Co2Series", 3);
+            DataSheet bs = this.DataFeed.GetDataSheet(BetaSheet);
+            if (CanEdit && cur != 1 && bs != null && !bs.HasData()) LoadBetas(cur);
+            LoadGrid(m_adjust, BetaSheet);
             m_scan.Text = "The lists show the runs in Data Sources: LOCA2 Folder when the library was made. After adding or removing runs there, rescan.";
             RefreshControls();
         }
@@ -161,8 +256,9 @@ namespace lucasCoreUI
             m_ceiling.Text = Show(Value("Co2Ceiling"));
             m_reference.Text = Show(Value("Co2Reference"));
             m_ceiling.Enabled = m_reference.Enabled = m_adjust.Enabled = co2 != 1;
+            m_defaults.Enabled = co2 != 1 && CanEdit;
             m_co2note.Text = co2 == 1 ? "CO2 fertilization is off: the projection's growth does not respond to CO2."
-                                      : "Stage 11 writes the betas it used to Build Results > CO2 Fertilization Betas, and the CO2 series to CO2 Series.";
+                           : (m_loaded.Length > 0 ? m_loaded + " " : "") + "Stage 11 writes the betas it used to Build Results > CO2 Fertilization Betas.";
             m_rescan.Enabled = !(this.Scenario != null && this.Scenario.IsResult) && this.ShouldEnableView();
 
             if (model == null) m_runs.Text = m_models.Count == 0 ? "No LOCA2 runs are listed in this library (Climate Models is empty)." : "";

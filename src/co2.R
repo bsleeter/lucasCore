@@ -11,7 +11,7 @@
 # accepted 2026-11-06) by the class's vegetation type (co2-classes.csv). Forest classes mix the ECM and AM betas by the class's ECM
 # share of live basal area (co2-ecm-share.csv, by ecodivision where FIA has 30+ conditions, else CONUS; tools/make_co2_ecm_share.R)
 # and taper with stand age from the young to the mature value (co2-age-bands.csv). A forest class with no ECM share takes the
-# "Forest" row at every age. Beta Adjustments rows replace values of the chosen series. No rsyncrosim here: tests source it.
+# "Forest" row at every age. CO2 Betas table rows (the Climate page loads the defaults there) replace values. No rsyncrosim here.
 # =============================================================================
 
 CO2_SERIES <- c("None", "Low", "Central", "High")
@@ -25,7 +25,7 @@ co2_series_name <- function(v) {
   m <- CO2_SERIES[tolower(CO2_SERIES) == tolower(trimws(as.character(v)))]
   if (!length(m)) stop(sprintf("CO2 Fertilization '%s' is not one of %s", v, paste(CO2_SERIES, collapse = ", "))); m }
 
-# CO2 Beta Adjustments age bands (the list's number or label) as band numbers; blank stays NA
+# CO2 Betas table age bands (the list's number or label) as band numbers; blank stays NA
 co2_band_id <- function(v) { v <- as.character(v); n <- suppressWarnings(as.integer(v)); l <- match(trimws(v), CO2_BAND_LABELS)
   out <- ifelse(!is.na(l), l, n); if (any(!is.na(v) & nzchar(v) & is.na(out))) stop(sprintf("unknown age band: %s", paste(unique(v[!is.na(v) & is.na(out)]), collapse = ", ")))
   as.integer(out) }
@@ -62,16 +62,33 @@ co2_betas <- function(classes, strata, series, betas, bands, ecm, adjust = NULL)
   if (any(f)) { s <- g$EcmShare[f]
     young <- s * b("Forest ECM young") + (1 - s) * b("Forest AM young"); mature <- s * b("Forest ECM mature") + (1 - s) * b("Forest AM mature")
     g[f, Beta := mature + w * (young - mature)] }
-  g[, Source := data.table::fifelse(f, "ECM share and age", "type")]
+  g[, Source := data.table::fifelse(f, "ECM share and age", "type")]; d0 <- data.table::copy(g$Beta)   # a copy: := changes g in place
   if (!is.null(adjust) && nrow(adjust)) {
     a <- data.table::as.data.table(adjust)[!is.na(StateClassId) & !is.na(Beta)]
     for (lv in list(c(FALSE, FALSE), c(FALSE, TRUE), c(TRUE, FALSE), c(TRUE, TRUE))) {
       s <- a[(!is.na(StratumId)) == lv[1] & (!is.na(AgeBand)) == lv[2]]
       for (i in seq_len(nrow(s))) { r <- s[i]
         hit <- g$StateClassId == r$StateClassId & (is.na(r$StratumId) | g$StratumId == r$StratumId) & (is.na(r$AgeBand) | g$AgeBand == r$AgeBand)
-        g[hit, `:=`(Beta = as.numeric(r$Beta), Source = "Beta Adjustments")] } } }
+        g[hit, Beta := as.numeric(r$Beta)] } } }
   g[, Beta := round(Beta, 4)]
+  # a table row that changes the default is marked; one that repeats it keeps the default's source
+  if (!is.null(adjust) && nrow(adjust)) g[abs(Beta - round(d0, 4)) > 1e-6, Source := "CO2 Betas table (edited)"]
   g[, .(StateClassId, StratumId, AgeBand, Type, FlowGroupId, EcmShare, Beta, Source)] }
+
+# the default betas of every series (defaults/climate/co2-default-betas.csv, loaded by the Climate page): StateClassId, StratumId
+# (blank = CONUS ECM share, every stratum), AgeBand (label, blank = every age), Low, Central, High. Ecodivision rows only for forest
+# classes with an ecodivision ECM share
+co2_default_table <- function(classes, betas, bands, ecm) {
+  ed <- sort(unique(ecm[!is.na(StratumId), StratumId])); us <- "(CONUS)"
+  one <- function(s) { b <- co2_betas(classes, c(us, ed), s, betas, bands, ecm)[, .(StateClassId, StratumId, AgeBand, Type, Beta)]; setnames(b, "Beta", s); b }
+  x <- Reduce(function(a, b) merge(a, b, by = c("StateClassId", "StratumId", "AgeBand", "Type")), lapply(CO2_SERIES[-1], one))
+  loc <- unique(ecm[!is.na(StratumId), .(StateClassId, StratumId)])
+  x <- x[StratumId == us | paste(StateClassId, StratumId) %in% paste(loc$StateClassId, loc$StratumId)]
+  # one row for a class whose betas do not change with age
+  flat <- x[StratumId == us, .(f = all(uniqueN(Low) == 1, uniqueN(Central) == 1, uniqueN(High) == 1)), by = StateClassId][f == TRUE, StateClassId]
+  x <- x[!(StateClassId %in% flat & AgeBand > 1)]
+  x[, `:=`(AgeBand = ifelse(StateClassId %in% flat, NA_character_, CO2_BAND_LABELS[AgeBand]), StratumId = ifelse(StratumId == us, NA_character_, StratumId))]
+  x[order(StateClassId, !is.na(StratumId), StratumId, match(AgeBand, CO2_BAND_LABELS)), .(StateClassId, StratumId, AgeBand, Low, Central, High)] }
 
 # stsim_FlowMultiplier rows (type "CO2") for the betas and series: a class with one beta everywhere gets blank stratum and age rows,
 # one that varies only by age gets blank-stratum band rows, else every stratum x band is written (no blank fallbacks: a specific

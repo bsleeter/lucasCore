@@ -108,7 +108,7 @@ if (co2_choice == "None") say("CO2 fertilization: None (growth does not respond 
   adj <- as.data.table(datasheet(scn, ds("Co2Adjustment"), optional = TRUE, lookupsAsFactors = FALSE))
   if (nrow(adj)) { adj[, AgeBand := co2_band_id(AgeBand)]
     bad <- adj[!StateClassId %in% cl$StateClassId, unique(StateClassId)]
-    check(STAGE, "every CO2 Beta Adjustments row names a class that grows (forest, shrubland, grassland, wetland, agriculture)", !length(bad), paste(bad, collapse = "; ")) }
+    check(STAGE, "every CO2 Betas row names a class that grows (forest, shrubland, grassland, wetland, agriculture)", !length(bad), paste(bad, collapse = "; ")) }
   bands <- rdc("co2-age-bands.csv")
   bt <- co2_betas(cl, strata, co2_choice, rdc("co2-betas.csv"), bands, rdc("co2-ecm-share.csv"), if (nrow(adj)) adj else NULL)
   rows <- co2_rows(bt, ser, bands)
@@ -118,7 +118,7 @@ if (co2_choice == "None") say("CO2 fertilization: None (growth does not respond 
       ser$CO2[nrow(ser)], last, if (!is.na(cap)) sprintf(", held at the %.0f ppm ceiling", cap) else "", ser$Ref[1],
       if (!is.na(refp)) "the Climate page" else sprintf("the SSP's %d CO2", y1))
   for (ty in unique(bt$Type)) with(bt[Type == ty], say("  %s: beta %.3f-%.3f; multiplier in %d %.3f-%.3f", ty, min(Beta), max(Beta), last, min(LastMultiplier), max(LastMultiplier)))
-  if (nrow(adj)) say("  CO2 Beta Adjustments: %d rows replaced %d of %d betas", nrow(adj), bt[Source == "Beta Adjustments", .N], nrow(bt))
+  say("  CO2 Betas table: %s", if (nrow(adj)) sprintf("%d rows; %d of %d betas differ from the %s defaults", nrow(adj), bt[Source == "CO2 Betas table (edited)", .N], nrow(bt), co2_choice) else sprintf("empty, so the %s defaults", co2_choice))
   say("CO2 fertilization: %d flow multiplier rows (%d classes, %d strata, age bands for forest)", nrow(rows), uniqueN(rows$StateClassId), length(strata))
   co2 <- list(rows = rows, bt = bt, ser = ser)
 }

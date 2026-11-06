@@ -6,12 +6,12 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
 
 ### Added
 - CO2 fertilization of growth in projections (stage 11, to-do 46): the Climate page of a Projection Climate scenario chooses a series
-  (None / Low / Central / High, Central by default), an optional CO2 ceiling and reference CO2, and optional beta adjustments. Growth
+  (None / Low / Central / High, Central by default), an optional CO2 ceiling and reference CO2, and a table of its betas. Growth
   is multiplied by 1 + beta ln(CO2 / the CO2 of the historical end year), with CO2 from the SSP (Meinshausen et al. 2020) and beta by
   vegetation type from a literature review; forest betas mix ECM and AM values by each forest type's ECM share of FIA basal area and
-  taper with stand age. New CO2 Flow Multiplier Type, CO2 Beta Adjustments sheet, and CO2 Fertilization Betas and CO2 Series results.
+  taper with stand age. New CO2 Flow Multiplier Type; a CO2 Betas table on the page, loaded with the chosen series' defaults for the study area's strata and editable; CO2 Fertilization Betas and CO2 Series results.
   The No Climate projection has no CO2 effect.
-- tools/make_co2_ecm_share.R: the ECM shares from the FIA DataMart tree tables.
+- tools/make_co2_ecm_share.R (the ECM shares from the FIA DataMart tree tables) and tools/make_co2_default_betas.R (the table the page loads).
 
 ### Changed
 - Stage 11 runs when every climate effect is None, for CO2 alone, and copies the Build's flow multipliers into its result when it

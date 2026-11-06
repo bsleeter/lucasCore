@@ -60,6 +60,9 @@ projection does not depend on a Projection Climate result, so it has no CO2 effe
 
 The reference CO2 is the SSP's CO2 in the Build's historical end year (the growth curves are fitted to FIA remeasurements that already
 carry the historical CO2), or a ppm given on the page. An optional ceiling holds CO2 at that ppm (600 = no extrapolation beyond the
-FACE experiments). CO2 Beta Adjustments rows replace betas of the chosen series by state class, optionally one stratum and one age
+FACE experiments). The Climate page loads the chosen series' betas into its CO2 Betas table (`co2-default-betas.csv`, written by
+`tools/make_co2_default_betas.R` from the four tables above: one blank-stratum row per class and forest age band at the CONUS ECM
+share, and ecodivision rows for forest classes whose share differs; the page keeps the rows of the study area's strata). Users edit
+the table to change a beta; switching the series reloads it (asking first if it was edited). Its rows replace betas by state class, optionally one stratum and one age
 band. Stage 11 writes the betas it used to CO2 Fertilization Betas and the series to CO2 Series. Because its flow multiplier rows hide
 the Build's, it copies the Build's stsim_FlowMultiplier rows (stage 3's carbon rates) into its result with the CO2 rows.

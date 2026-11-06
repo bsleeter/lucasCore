@@ -161,7 +161,7 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     weighting (ECM basal-area share per forest type from FIA tree records and the Jo et al. 2019 species list) go in the first
     build. The No Climate projection gets no CO2 fertilization (it stays the true baseline).
   - **Built 2026-11-06:** src/co2.R and stage 11 (CO2 rows in stsim_FlowMultiplier with the Build's rows
-    copied over), the Climate page's CO2 group (series, ceiling, reference, Beta Adjustments grid), defaults/climate/co2-*.csv (SSP CO2
+    copied over), the Climate page's CO2 group (series, ceiling, reference; CO2 Betas table loaded with the series' defaults for the study area's strata, user decision 2026-11-06, reloaded on a series switch), defaults/climate/co2-*.csv (SSP CO2
     from RCMIP v5.1.0, betas, classes, age bands, ECM shares from tools/make_co2_ecm_share.R), tests/unit-co2.R (33 checks pass).
     Departures from the plan: the user rows adjust any series rather than a separate "User" series; the ECM shares use a genus-level
     mycorrhizal table written for lucasCore (co2-mycorrhiza-genus.csv; dual AM/ECM genera count half), not the Jo et al. 2019 species

@@ -78,9 +78,14 @@ namespace lucasCoreUI
         // replaces the sheet's rows; returns what could not be matched (empty = all rows loaded)
         public static List<string> Load(DataSheet ds, string file, Dictionary<string, string> rename)
         {
+            if (!File.Exists(file)) return new List<string> { "not found: " + file };
+            return LoadRows(ds, ReadCsv(file), rename);
+        }
+
+        // the same from rows in memory (rows[0] = the header): a page that picks rows from a defaults CSV (the CO2 betas)
+        public static List<string> LoadRows(DataSheet ds, List<string[]> rows, Dictionary<string, string> rename)
+        {
             var problems = new List<string>();
-            if (!File.Exists(file)) { problems.Add("not found: " + file); return problems; }
-            List<string[]> rows = ReadCsv(file);
             if (rows.Count == 0) return problems;
             string[] head = rows[0].Select(h => rename != null && rename.ContainsKey(h) ? rename[h] : h).ToArray();
             var cols = new Dictionary<int, DataSheetColumn>();
@@ -106,6 +111,23 @@ namespace lucasCoreUI
             }
             finally { ds.EndAddRows(); }
             return problems;
+        }
+
+        // a stored value as the CSVs write it: a lookup's name, a list column's label, else the value (numbers invariant)
+        public static string Display(DataSheetColumn col, object v)
+        {
+            if (v == null || v == DBNull.Value) return "";
+            if (col.ValidationTable != null)
+            {
+                ValidationTable vt = col.ValidationTable;
+                foreach (DataRow r in vt.DataSource.Rows)
+                    if (r.RowState != DataRowState.Deleted && System.Convert.ToString(r[vt.ValueMember]) == System.Convert.ToString(v)) return System.Convert.ToString(r[vt.DisplayMember]);
+                return System.Convert.ToString(v);
+            }
+            if (!string.IsNullOrEmpty(col.Formula1) && col.Formula1.Contains(":") && col.Formula1.Contains("|"))
+                foreach (string item in col.Formula1.Split('|')) { int k = item.IndexOf(':'); if (k > 0 && item.Substring(0, k) == System.Convert.ToString(v)) return item.Substring(k + 1); }
+            if (v is double) return ((double)v).ToString("R", System.Globalization.CultureInfo.InvariantCulture);
+            return System.Convert.ToString(v, System.Globalization.CultureInfo.InvariantCulture);
         }
     }
 }

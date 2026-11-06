@@ -54,6 +54,27 @@ check("a band row changes only that band", all(ba[StateClassId == "Forest: Dougl
       identical(ba[StateClassId == "Forest: Douglas-fir Group" & AgeBand > 1, Beta], bt[StateClassId == "Forest: Douglas-fir Group" & AgeBand > 1, Beta]))
 check("None is not a beta series", inherits(tryCatch(co2_betas(cl, st, "None", betas, bands, ecm), error = function(e) e), "error"))
 
+# ---- the CO2 Betas table the Climate page loads (defaults/climate/co2-default-betas.csv) ------------------------------------
+dt <- d("co2-default-betas.csv")
+check("co2-default-betas.csv matches the tables (rerun tools/make_co2_default_betas.R if not)",
+      isTRUE(all.equal(dt, co2_default_table(cl, betas, bands, ecm), check.attributes = FALSE)))
+# what ui/ProjectionClimateView.cs Expected() loads for a series and the study area's strata
+page_rows <- function(series, strata) rbindlist(lapply(unique(dt$StateClassId), function(c) {
+  us <- dt[StateClassId == c & is.na(StratumId)]; loc <- dt[StateClassId == c & StratumId %in% strata]
+  val <- function(st, band) { l <- loc[StratumId == st & identical(AgeBand, AgeBand) & ((is.na(AgeBand) & is.na(band)) | AgeBand %in% band)]; if (nrow(l)) l[[series]] else us[(is.na(AgeBand) & is.na(band)) | AgeBand %in% band][[series]] }
+  same <- !nrow(loc) || all(vapply(seq_len(nrow(us)), function(i) uniqueN(vapply(strata, function(st) val(st, us$AgeBand[i]), 0)) == 1, TRUE))
+  if (same) data.table(StateClassId = c, StratumId = NA_character_, AgeBand = us$AgeBand, Beta = if (nrow(loc)) vapply(us$AgeBand, function(b) val(strata[1], b), 0) else us[[series]])
+  else rbindlist(lapply(strata, function(st) data.table(StateClassId = c, StratumId = st, AgeBand = us$AgeBand, Beta = vapply(us$AgeBand, function(b) val(st, b), 0)))) }))
+for (sr in c("Low", "Central", "High")) {
+  pr <- page_rows(sr, st)[, AgeBand := co2_band_id(AgeBand)]
+  b0 <- co2_betas(cl, st, sr, betas, bands, ecm); b1 <- co2_betas(cl, st, sr, betas, bands, ecm, pr)
+  check(sprintf("%s: the page's table gives stage 11 the same betas, none marked edited", sr), isTRUE(all.equal(b0$Beta, b1$Beta)) && !any(b1$Source == "CO2 Betas table (edited)")) }
+pr <- page_rows("Central", st)
+check("the page's table: one row per class (and band for forest) where strata agree, per stratum where the ECM share differs",
+      pr[StateClassId == "Shrubland: Chaparral", .N] == 1 && pr[StateClassId == "Forest: Hemlock/Sitka Spruce Group", all(!is.na(StratumId)) && .N == 10])
+check("an edited row is marked edited", { e <- copy(pr)[, AgeBand := co2_band_id(AgeBand)][StateClassId == "Shrubland: Chaparral", Beta := 0.05]
+  co2_betas(cl, st, "Central", betas, bands, ecm, e)[StateClassId == "Shrubland: Chaparral", all(Source == "CO2 Betas table (edited)") && all(Beta == 0.05)] })
+
 # ---- flow multiplier rows ---------------------------------------------------------------------------------------------------
 r <- co2_rows(bt, s0, bands)
 check("rows are type CO2, every projection year", all(r$FlowMultiplierTypeId == "CO2") && setequal(r$Timestep, 2024:2100))

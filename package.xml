@@ -322,9 +322,10 @@
 		<column name="Co2Reference" displayName="Reference CO2 (ppm; blank = the SSP's CO2 in the historical end year)" dataType="Double" isOptional="True"/>
 	</dataSheet>
 
-	<!-- CO2 Beta Adjustments: rows that replace betas of the chosen series (not None). Blank stratum = every stratum, blank age band = every
+	<!-- CO2 Betas: the betas of the chosen series (not None), loaded by the Climate page from defaults/climate/co2-default-betas.csv for the
+	     study area's strata and editable; a class with no row takes the series' default. Blank stratum = every stratum, blank age band = every
 	     band; a stratum row wins over a blank-stratum row, a band row over a blank-band row -->
-	<dataSheet name="Co2Adjustment" displayName="CO2 Beta Adjustments">
+	<dataSheet name="Co2Adjustment" displayName="CO2 Betas">
 		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
 		<column name="StratumId" displayName="Stratum (blank = all)" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="stsim_Stratum"/>
 		<column name="AgeBand" displayName="Age Band (blank = all)" dataType="Integer" isOptional="True" validationType="List" formula1="1:0-25|2:26-50|3:51-75|4:76-100|5:101+"/>
