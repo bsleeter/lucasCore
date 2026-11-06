@@ -173,6 +173,7 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     2050 (forest 1.049, non-forest 1.050, wetland 1.036 = exactly the emergent multiplier, so the rows take effect in ST-Sim).
     Ecosystem carbon 2050: 365.32 vs 363.11 Tg C (+2.2 Tg; biomass +1.7, dead organic matter +0.5). Puget also got sync-library
     (Co2 columns, CO2 type; backups .bak-20261106-0958 and -0959) - scenarios 70-73 and the backups await the user's keep/delete.
+  - **Studio check 2026-11-06:** the user opened the CO2 page with the loaded CO2 Betas table and said it "looks great".
   - **Still to do:** a User Guide section; compare the genus table with Jo et al. 2019; the per-age-band check (growth by age band
     in a test library); sync-library and the CO2 type for the other libraries when they move.
 
