@@ -25,6 +25,17 @@ expect("a map for every stock type of stage 8's list, Deep Soil included", seteq
 val <- function(fn) values(rast(fn), mat = FALSE)
 ds <- val(new[StockTypeId == "Deep Soil", RasterFileName]); land <- !is.na(ds)
 expect("Deep Soil is 0 on every land cell (no emergent cells; forest starts with none)", any(land) && all(ds[land] == 0), sprintf("%d land cells, max %.3g", sum(land), max(ds[land])))
-gap <- vapply(intersect(old$StockTypeId, new$StockTypeId), function(k) max(abs(val(new[StockTypeId == k, RasterFileName]) - val(old[StockTypeId == k, RasterFileName])), na.rm = TRUE), 1)
-expect("every other pool's map is the Build's own stage 8 map", all(gap < 1e-4), paste(sprintf("%s %.2g", names(gap)[gap >= 1e-4], gap[gap >= 1e-4]), collapse = "; "))
+# Build 47 (2026-10-23) predates the Shrubland: Non-sage fix of 2026-10-30 (dev/nonforest/01-nonsage-fix.R), which changed that
+# class's starting pools: its cells are left out of the comparison and checked against the fixed table instead
+ic <- as.data.table(datasheet(scenario(L, 47), "stsim_InitialConditionsSpatial", lookupsAsFactors = FALSE))
+scl <- as.data.table(datasheet(P1, "stsim_StateClass", includeKey = TRUE)); idc <- intersect(c("ID", "Id"), names(scl))[1]
+cls <- scl$Name[match(val(ic$StateClassFileName), scl[[idc]])]; ns <- cls %in% "Shrubland: Non-sage"
+expect("every state class of the map is named", !anyNA(cls[land]))
+gap <- vapply(intersect(old$StockTypeId, new$StockTypeId), function(k) max(abs(val(new[StockTypeId == k, RasterFileName]) - val(old[StockTypeId == k, RasterFileName]))[!ns], na.rm = TRUE), 1)
+expect(sprintf("every other pool's map is the Build's own stage 8 map (%d Non-sage cells left out)", sum(ns)), all(gap < 1e-4), paste(sprintf("%s %.2g", names(gap)[gap >= 1e-4], gap[gap >= 1e-4]), collapse = "; "))
+gs <- fread(file.path(pkg, "defaults/initialstocks/grassland-shrubland.csv"))[StateClassID == "Shrubland: Non-sage"]
+stl <- fread(file.path(pkg, "defaults/initialstocks/stock-types.csv"))
+nsg <- vapply(seq_len(nrow(gs)), function(i) { k <- stl$StockTypeId[match(gs$StateAttributeTypeID[i], stl$Attribute)]; if (is.na(k) || !k %in% new$StockTypeId || !any(ns)) return(0)
+  x <- val(new[StockTypeId == k, RasterFileName])[ns]; if (k == "DOM: Belowground Slow" && gs$Value[i] == 0) return(0); max(abs(x - gs$Value[i])) }, 1)
+expect("Non-sage cells start at the fixed table's pools", all(nsg < 1e-3), sprintf("largest gap %.3g", max(nsg)))
 cat(if (ok) "\nALL PASS\n" else "\nSOME CHECKS FAILED\n")

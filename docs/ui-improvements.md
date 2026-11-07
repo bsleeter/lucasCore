@@ -243,8 +243,22 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
          - tools/sync-library.R step 7: removes emergent rows a filled sheet still holds at the legacy values; changed rows are kept.
          - tests/unit-nonforest-solve.R: 22 checks pass (the order rules, hand cases with growth before and after turnover, the legacy
            rates reproduce the legacy pools, every new table's sums, steady state and burial). tests/unit-carbon-assumptions.R passes.
-         - Left: a SyncroSim run (stages 3 and 8 on a test library; SyncroSim runs the package from F:\lucasCore, not this worktree),
-           the diagram view's ordered solve, and the guide.
+         - **Tested in SyncroSim 2026-11-06 (merged to main a6b5d7f and after; not pushed):**
+           - dev/nonforest/02-emergent-stsim-check.R, real ST-Sim on the package's emergent tables (synthetic library, five
+             ecodivisions, 30 years, no transitions): PASS. Every pool holds its fitted value (largest relative gap 2.2e-6) and Deep Soil
+             gains each region's burial rate every year (largest gap 6.7e-6), so the solver's flow order rules are ST-Sim's.
+           - tests/phaseZ25-nonforest-carbon.R on lucasCore-suitability.ssim: ALL PASS (stage 3 writes the new package values, 65,246
+             rates and 11,609 net growth values; scenario rows still land only where meant).
+           - tests/phaseZ28-stage8-deep-soil.R (new): ALL PASS. Stage 8 writes a Deep Soil map (0 here: Placer has no emergent cells);
+             every other pool matches Build 47's own stage 8 maps except the 131 Shrubland: Non-sage cells, which match the
+             2026-10-30 fixed table (Build 47 predates that fix).
+           - The test library was on lucasCore 1.0.1, which SyncroSim no longer has: moved to 1.1.0 as P26 was (core_Package version,
+             then SyncroSim.Console --update), synced (full, then --schema-only --reference=dev/libs/sync-reference-20261106.ssim for
+             the CO2 columns the starter lacks). Backups .bak-20261106-1533, -1543, -1618.
+           - sync-library step 7 runs as one SQL query (two SyncroSim reads per scenario were too slow), and step 5 now skips a
+             scenario whose stock group memberships cannot be read instead of stopping. Dry run on P26: 92 rate and 2 growth legacy
+             emergent rows in one scenario would be removed, so P26 must be synced before its rerun (item 51).
+         - Left: the diagram view's ordered solve (ui/NonForestBudget.cs), the guide, and a Build on a region with emergent cells.
     2. **Use only the pools each class has.** Keep the shared stock types; turn off the flows that do not apply. Grass: foliage, fine
        roots, AG and BG fast litter, soil. Shrub: add woody stems and coarse roots. Wetland: add burial to Deep Soil. Fewer unknowns
        for the solver, and a readable diagram view.
