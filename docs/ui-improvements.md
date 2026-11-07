@@ -343,7 +343,18 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
           Seen, not item 39's grass and shrub work: cropland, developed, water and barren cells take gNATSGO soc0_999 (the whole
           profile) into BG Slow with no Deep Soil split - cropland median 103, 821 Delta peat cells above 300 Mg C/ha, water cells
           median 142; the pasture and cropland step of the plan should split them like the grass and shrub classes.
-        - **Left:** a historical run of the Solano library (how the pools behave over time, fire in chaparral); the guide (grass,
+        - **Solano historical run 2026-11-07** (scenario 14, result 15, 1985-2023, 1 iteration, 22.6 min). Per hectare of each class:
+          estuarine emergent live 2.4 throughout (no climate multiplier), BG Slow steady (98 -> 100), Deep Soil +1.04/yr (131 -> 170.6,
+          California burial exactly); palustrine Deep Soil +0.49/yr (118 -> 136.7). Grass live 2.3-5.8 with the precipitation multiplier
+          (lows 1990, 2020), litter 1-2, soil steady. Chaparral NPP 0.33-2.81 a year, mean about 1.6 (the literature's mature growth);
+          high-severity fire in 2015 and 2020 (1,488 and 3,531 ha study-wide) took chaparral live 12.3 -> 6.9 Mg C/ha, back to 8.9 by
+          2023. Land change mixes class means: cropland returned to grass brings its whole-profile BG Slow (about 150) and no Deep Soil,
+          grass turned to cropland takes its Deep Soil along (cropland Deep 0 -> 3) - the cropland soil issue above.
+          **Found:** only chaparral has its own fire rows, and only for high severity. Low and medium fire on chaparral, and every fire
+          on grass and the other shrubs, use the all-class (forest) rows: medium severity kills 53.5% of roots (chaparral high severity
+          25%), and high severity on grass kills 95% of roots (perennial grass resprouts). In this run medium and low fire moved 56,657
+          Mg C in chaparral against 32,517 for high. Grass and shrub fire rows by severity are needed.
+        - **Left:** grass and shrub fire rows by severity (above); the guide (grass,
           shrub, chaparral and emergent wetland sections); the P26 rebuild in item 51 (synced 2026-11-06, not yet rebuilt: the final
           runs stay as they are for now); eastern grass and shrub data; the Non-sage class has no data of its own.
       - **Open:** eastern grass and shrub rest on few untreed cells and RAP is built for rangelands; growth by age after fire (step 8);
