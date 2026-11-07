@@ -20,7 +20,7 @@ suppressPackageStartupMessages({ library(terra); library(sf); library(parallel) 
 STAGE <- "5 Initial Conditions"
 progressBar(type = "begin", totalSteps = 9)
 
-src <- read_data_sources(c("EcodivisionFile", "NlcdFolder", "Evt2016File", "CcapFile", "StandAgeFile", "FriFile", "SoilCarbonFile"))
+src <- read_data_sources(c("EcodivisionFile", "NlcdFolder", "Evt2016File", "CcapFile", "FriFile", "SoilCarbonFile"))   # StandAgeFile is read only for NASA CMS stand age (below): TreeMap needs no CMS map
 src$RcmapFile <- read_data_sources("RcmapFile", optional = TRUE)$RcmapFile   # western US only: none (or no overlap) = NLCD types
 opt <- read_ds("BuildOptions"); y0 <- opt$StartYear[1]; y1 <- opt$EndYear[1]
 ic <- as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", optional = TRUE, lookupsAsFactors = FALSE))
@@ -232,7 +232,7 @@ if (identical(asrc, "TreeMap")) {
   A <- round(project(a30, R, method = "average"))
   say("Stand age: TreeMap 2016 (FIA plot stand age moved from each plot's inventory year, %d-%d, to %d)", min(ok$invyr), max(ok$invyr), y0)
 } else {
-  A <- project(crop_to(rast(src$StandAgeFile)), R, method = "average")
+  A <- project(crop_to(rast(read_data_sources("StandAgeFile")$StandAgeFile)), R, method = "average")
   A <- round(A - (1990 - y0))
   say("Stand age: NASA CMS Forest Age 1990, moved to %d", y0)
 }
