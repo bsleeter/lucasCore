@@ -220,10 +220,11 @@ files <- vapply(seq_len(nrow(st)), function(j) write_raster(setValues(rast(P), o
 write_stsim(data.table(StockTypeId = st$StockTypeId, RasterFileName = files), "InitialStockSpatial")
 # rerun on its own (tools/quick-test.R), this result takes a copy of the Build's Initial Conditions Spatial maps but not their
 # Properties sheet; the two are one feed, which a dependency supplies whole, so a run on this result found the maps without their
-# grid ("Object reference not set", 2026-11-07). Writing the Properties here keeps the feed whole (in a Build they are already here)
+# grid ("Object reference not set", 2026-11-07). Saving the maps' row again makes SyncroSim write their Properties, as stages 1 and
+# 5 do (Properties cannot be saved directly: its negative Albers corner fails validation); in a Build they are already here
 icp <- as.data.table(datasheet(scn, "stsim_InitialConditionsSpatialProperties", optional = TRUE))
-if (!nrow(icp)) for (d in run_dependencies()) { icp <- as.data.table(datasheet(rsyncrosim::scenario(ssimLibrary(main_library()), d), "stsim_InitialConditionsSpatialProperties", optional = TRUE))
-  if (nrow(icp)) { write_stsim(icp, "InitialConditionsSpatialProperties"); say("Initial Conditions Spatial Properties: copied from scenario %d, so the maps' feed is whole", d); break } }
+if (!nrow(icp)) { saveDatasheet(scn, as.data.frame(ic[1, intersect(names(ic), c("StratumFileName", "SecondaryStratumFileName", "TertiaryStratumFileName", "StateClassFileName", "AgeFileName")), with = FALSE]), "stsim_InitialConditionsSpatial")
+  say("Initial Conditions Spatial: saved again in this result so SyncroSim writes its Properties (a rerun of stage 8 on its own)") }
 write_ds(summ[, .(StateClassId, Cells, PostFire, Live, Dom, Soil, TotalTg, Source)], "OutputInitialStockSummary")
 progressBar()
 finish_checks()
