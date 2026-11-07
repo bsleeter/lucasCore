@@ -328,9 +328,24 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
           wetland rates and 13,509 growth values, chaparral by age included); phaseZ28 ALL PASS (819 grass, shrub and chaparral cells at
           their pools, chaparral by age, largest gap 1.7e-6; every other cell = Build 47); phaseZ29 ALL PASS (34 chaparral cells, 8 burned
           since 1900 with a median of 26 years since fire, the rest 85).
-        - **Left:** the guide (grass, shrub, chaparral and emergent wetland sections); a Build and run on a region with chaparral and
-          emergent wetlands (P26: sync-library first, then the rebuild in item 51); eastern grass and shrub data; the Non-sage class has no
-          data of its own.
+        - **Solano test library (2026-11-06):** user, "we are not ready to update the P26 final runs yet ... a smaller testing library
+          with a lot of grass, shrub, and wetland". `dev/libs/lucasCore-test-Solano.ssim` (throw-away; Solano County, 250 m, 1985-2023,
+          34,568 cells; starter scenarios, Stand Age Source TreeMap since the CMS age needs an Earthdata login, FIA Data = DataMart). Build
+          result 13 passes every stage (32.6 min). Starting pools, Mg C/ha (live / dead / soil 0-30 / deep / total): annual grass
+          7,256 cells 4.6 / 3.6 / 30.1 / 35.1 / 73.5; natural perennial 4,945 cells 4.7 / 3.8 / 27.4 / 35.8 / 71.6; estuarine emergent
+          (Suisun Marsh) 2,590 cells 2.4 / 3.0 / 96 / 131 / 232; palustrine emergent 1,280 cells 1.2 / 3.0 / 76 / 118 / 198; chaparral
+          483 cells, 78% burned since 1900 (median 21 years), live 4.6 at 0-5 years rising to 17 at 21+, dead 8.8 just after fire;
+          Non-sage 178 cells 15.5 / 8.2 / 33.8 / 27.3 / 85. Stage 3 writes chaparral's own fire flows (foliage 95% burned, other wood
+          55% burned and 45% to snag branch, roots 75% survive, dead pools 80% burned, AG slow 50%). Study area 28.3 Tg C.
+          Three bugs found and fixed on the way: stage 5 read the CMS stand age path with TreeMap chosen (e6992a7); the Carbon
+          Assumptions fill dropped StateClassId from Disturbance Flows, so a new library's chaparral fire rows became duplicate
+          all-class rows (a5cb318); and the data home's lost download records (item 52).
+          Seen, not item 39's grass and shrub work: cropland, developed, water and barren cells take gNATSGO soc0_999 (the whole
+          profile) into BG Slow with no Deep Soil split - cropland median 103, 821 Delta peat cells above 300 Mg C/ha, water cells
+          median 142; the pasture and cropland step of the plan should split them like the grass and shrub classes.
+        - **Left:** a historical run of the Solano library (how the pools behave over time, fire in chaparral); the guide (grass,
+          shrub, chaparral and emergent wetland sections); the P26 rebuild in item 51 (synced 2026-11-06, not yet rebuilt: the final
+          runs stay as they are for now); eastern grass and shrub data; the Non-sage class has no data of its own.
       - **Open:** eastern grass and shrub rest on few untreed cells and RAP is built for rangelands; growth by age after fire (step 8);
         live and litter targets (RAP biomass, shrub literature, FCCS) not yet used.
     2. **Use only the pools each class has.** Keep the shared stock types; turn off the flows that do not apply. Grass: foliage, fine
