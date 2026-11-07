@@ -200,7 +200,7 @@ run_dataset <- function(h, ctx, layout, check_only = FALSE) {
   fr <- files_rows(ctx$store, col, path, sha = TRUE); write_files(ctx$store, fr)
   # a region's download is a national copy only when whole files were kept: a source that clips (NLCD, LANDFIRE, perimeters,
   # gNATSGO, stand age tiles) gives the region alone, Keep national copies or not
-  by_source <- isTRUE(h$method %in% c("wcs", "lfps", "rest", "stac", "login"))
+  by_source <- isTRUE(h$method %in% c("wcs", "lfps", "rest", "stac", "login")) || isTRUE(h$clips)
   copy <- if (is.null(ctx$region$poly) || isTRUE(h$national) || (ctx$keep && !by_source)) "national" else "clipped"
   src <- layout[Column == col]
   write_manifest(ctx$store, data.table::data.table(Column = col, Dataset = h$name, Source = src$Source, Version = if (!is.null(h$version)) h$version else src$Version,

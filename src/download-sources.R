@@ -424,6 +424,26 @@ download_handlers <- function() {
     finish = function(ctx, items) { dest <- file.path(ctx$place, items$file[1])
       clip_raster(if (clipping(ctx)) paste0("/vsicurl/", CCAP) else items$dest[1], dest, if (clipping(ctx)) ctx$region else list(poly = NULL)) })
 
+  # ---- RAP partitioned NPP v3 (Robinson et al. 2019; CC0): one 4-band 30 m cloud-optimized GeoTIFF a year from 1986 (annual
+  # herbaceous, perennial herbaceous, shrub, tree; value / 1000 = Mg C/ha/yr; 65535 no data), each read for the region where it
+  # sits. About 75 GB a year for CONUS, so not fetched whole. Grows like NLCD: a rerun asking for more years fetches only those.
+  # Stage 8 reads 2014-2023 (Grass and Shrub Productivity); all years kept for a climate response fitted to RAP (to-do 39 step 7)
+  H$RapNppFolder <- list(column = "RapNppFolder", name = "RAP vegetation NPP v3", version = "RAP vegetation NPP v3", method = "cog", clips = TRUE,
+    note = "Read for the region only from the University of Montana's cloud-optimized GeoTIFFs (bands: annual herbaceous, perennial herbaceous, shrub, tree NPP; value / 1000 = Mg C/ha/yr; 65535 no data)",
+    plan = function(ctx) {
+      if (whole_conus(ctx)) stop("RAP NPP is about 75 GB a year for all of CONUS and is read for a region only: run the Data Download with a Study Area (Home layout By region)", call. = FALSE)
+      last <- as.integer(format(Sys.Date(), "%Y")); cand <- years_of(ctx, 1986:last)
+      y <- cand[!vapply(sprintf(RAP_NPP, cand), url_gone, TRUE)]
+      if (!length(y)) stop("RAP lists no NPP years for these years", call. = FALSE)
+      data.table::data.table(year = y, url = sprintf(RAP_NPP, y), file = sprintf("rap-npp-v3-%d.tif", y), fetch = FALSE) },
+    have = function(ctx, items) recorded(ctx, "RapNppFolder", file.path(ctx$place, items$file)),
+    finish = function(ctx, items) { dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE)
+      for (i in seq_len(nrow(items))) { for (k in 1:4) { ok <- tryCatch({ clip_raster(paste0("/vsicurl/", items$url[i]), file.path(ctx$place, items$file[i]), ctx$region); TRUE },
+            error = function(e) { ctx$log(sprintf("  RAP NPP %d: %s (try %d)", items$year[i], conditionMessage(e), k)); FALSE }); if (ok) break; Sys.sleep(10 * k) }
+        if (!ok) stop(sprintf("RAP NPP %d could not be read", items$year[i]), call. = FALSE)
+        ctx$log(sprintf("  RAP NPP %d", items$year[i])) }
+      ctx$place })
+
   # ---- gNATSGO (Planetary Computer): soil organic carbon and crop productivity, the region's 10 m tiles cropped; for all of
   # CONUS every tile (357, about 10 GB a layer) fetched and written as one 10 m GeoTIFF ---------------------------------------
   gnatsgo <- function(column, name, asset, out, note) list(column = column, name = name, version = "gNATSGO July 2020 (gnatsgo-rasters)", method = "stac", note = note,
@@ -469,6 +489,7 @@ LFPS <- "https://lfps.usgs.gov/api"
 NIFC <- sprintf("https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/%s/FeatureServer/0", c("InterAgencyFirePerimeterHistory_1979_And_Prior_Read_Only",
   "InteragencyFirePerimeterHistory_1980s_Read_Only", "InteragencyFirePerimeterHistory_1990s_Read_Only", "InteragencyFirePerimeterHistor_2000s_Read_Only",
   "InteragencyFirePerimeterHistory_2010s_Read_Only", "InterAgencyFirePerimeterHistory_2020s_Read_Only"))
+RAP_NPP <- "https://rangeland.ntsg.umt.edu/data/rap/rap-vegetation-npp/v3/vegetation-npp-v3-%d.tif"
 CCAP <- "https://ocmgeodatastor1.blob.core.windows.net/ccap/bulk_download/C-CAP_Regional_30-meter_Data/C-CAP_Regional_Land_Cover_Classification/CONUS/conus_2001_ccap_landcover.tif"
 PC_STAC <- "https://planetarycomputer.microsoft.com/api/stac/v1"
 # national files (Home layout National; checked 2026-11-02)

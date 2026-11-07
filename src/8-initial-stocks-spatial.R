@@ -130,6 +130,46 @@ gs <- lt("grassland-shrubland.csv"); fill_class(gs, land & cname %in% unique(gs$
 cp <- lt("chaparral.csv"); fill_class(cp, land & cname %in% unique(cp$StateClassId), TRUE, "chaparral (by age since fire)")
 ew <- lt("emergent-wetland.csv"); fill_class(ew, land & cname %in% unique(ew$StateClassId), FALSE, "emergent wetland")
 src_of[land & is.na(src_of)] <- "zero (developed, agriculture, barren, water, ice)"
+
+# ---- Grass and Shrub Productivity (Build Options; to-do 39 step 5) ---------------------------------------------------------
+# The grass and shrub counterpart of Site Productivity: a cell's growth multiplier = its RAP herbaceous + shrub NPP (mean of
+# RAP_YEARS, the years the class targets were sampled from) / its ecodivision x class target NPP (defaults/stockflow/
+# grass-shrub-targets.csv, the NPP its growth rows hold; tools/make_grass_shrub.R). As in the targets, 30 m pixels RAP sees as mostly
+# trees (tree NPP > herb + shrub) are left out; a cell with none left keeps 1, and the multiplier is capped at 0.3-2.5 as forest's
+# is. It becomes the Grass and Shrub Productivity flow spatial multiplier on Net Growth Non Forest: Total (it multiplies with the
+# Climate one), and the cell's starting live and dead carbon are scaled by it (inputs all come from growth, decay is first order);
+# its soil (BG Slow and Deep Soil) keeps the class mean, as forest's does (user, 2026-11-07). Cells of other classes stay 1.
+gpv <- opt$GrassShrubProductivity[1]
+gs_on <- !is.null(gpv) && !is.na(gpv) && (identical(suppressWarnings(as.integer(gpv)), 2L) || startsWith(as.character(gpv), "RAP"))
+if (gs_on) {
+  RAP_YEARS <- 2014:2023; CAP <- c(0.3, 2.5)
+  if (!"Grass and Shrub Productivity" %in% stsim_list("FlowMultiplierType")$Name) fail("Grass and Shrub Productivity: the library has no Flow Multiplier Type 'Grass and Shrub Productivity' - run tools/sync-library.R on it")
+  rap <- read_data_sources("RapNppFolder")$RapNppFolder
+  rf <- file.path(rap, sprintf("rap-npp-v3-%d.tif", RAP_YEARS)); miss <- RAP_YEARS[!file.exists(rf)]
+  if (length(miss)) fail("Grass and Shrub Productivity: RAP NPP Folder (%s) lacks %s; run a Data Download with RapNppFolder for years %d-%d", rap, paste(miss, collapse = ", "), min(RAP_YEARS), max(RAP_YEARS))
+  tg <- read_default("stockflow", "grass-shrub-targets.csv")[, NPP := as.numeric(NPP)]
+  isGS <- land & cname %in% unique(tg$StateClassId)
+  # the 30 m mean over the years, herb + shrub, treed pixels out, then each cell's mean of the pixels left
+  r0 <- rast(rf[1]); win <- project(as.polygons(ext(P) + 1000, crs = crs(P)), crs(r0))
+  acc <- NULL; for (f in rf) { r <- classify(crop(rast(f), win, snap = "out"), cbind(65535, NA)); acc <- if (is.null(acc)) r else acc + r }
+  acc <- acc / length(rf) / 1000   # Mg C/ha/yr
+  herb <- acc[[1]] + acc[[2]] + acc[[3]]; herb <- mask(herb, acc[[4]] > herb, maskvalues = 1)
+  vN <- values(project(herb, P, method = "average"), mat = FALSE)
+  tnpp <- tg$NPP[match(paste(sname, cname), paste(tg$StratumId, tg$StateClassId))]
+  gmult <- rep(1, ncell(P)); use <- isGS & !is.na(vN) & !is.na(tnpp) & tnpp > 0
+  gmult[use] <- pmin(pmax(vN[use] / tnpp[use], CAP[1]), CAP[2])
+  check(STAGE, "grass and shrub productivity: every grass and shrub cell's multiplier is finite and within 0.3-2.5", all(is.finite(gmult[isGS]) & gmult[isGS] >= CAP[1] - 1e-9 & gmult[isGS] <= CAP[2] + 1e-9))
+  soilj <- which(st$StockTypeId %in% c("DOM: Belowground Slow", "Deep Soil"))
+  out[isGS, -soilj] <- out[isGS, -soilj] * gmult[isGS]
+  gsum <- data.table(cls = cname[isGS], m = gmult[isGS], has = use[isGS])[, .(Cells = .N, NoRap = round(100 * mean(!has), 1), Mean = round(mean(m), 2),
+            P10 = round(quantile(m, 0.1), 2), P90 = round(quantile(m, 0.9), 2), Capped = round(100 * mean(m <= CAP[1] + 1e-9 | m >= CAP[2] - 1e-9), 1)), by = cls][order(-Cells)]
+  say("Grass and shrub productivity (RAP NPP %d-%d): %d cells, multiplier mean %.2f; %.1f%% keep 1 (no RAP pixels left, or no target); their starting live and dead carbon scaled the same way",
+      min(RAP_YEARS), max(RAP_YEARS), sum(isGS), mean(gmult[isGS]), 100 * mean(!use[isGS]))
+  for (i in seq_len(nrow(gsum))) with(gsum[i], say("  %s: %d cells, mean %.2f (10%% %.2f, 90%% %.2f), %.1f%% without RAP, %.1f%% at the cap", cls, Cells, Mean, P10, P90, NoRap, Capped))
+  fg <- "Net Growth Non Forest: Total"; if (!fg %in% stsim_list("FlowGroup")$Name) fail("Grass and Shrub Productivity: flow group '%s' not found", fg)
+  write_stsim(data.table(FlowGroupId = fg, FlowMultiplierTypeId = "Grass and Shrub Productivity",
+                         MultiplierFileName = write_raster(setValues(rast(P), ifelse(land, gmult, NA)), "GrassShrubProductivity.tif", "FLT4S")), "FlowSpatialMultiplier", append = TRUE)
+}
 progressBar()
 
 # ---- soil: gNATSGO where the class's belowground slow is 0 -----------------------------------------------------------------

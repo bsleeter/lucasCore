@@ -40,6 +40,7 @@ namespace lucasCoreUI
         private readonly ComboBox m_resample = new ComboBox();
         private readonly ComboBox m_age = new ComboBox();
         private readonly ComboBox m_site = new ComboBox();
+        private readonly ComboBox m_grassShrub = new ComboBox();
         private readonly CheckBox m_tiled = new CheckBox { Text = "Split runs into tiles:", AutoSize = true, Margin = new Padding(3, 5, 6, 3) };
         private readonly TextBox m_tiles = new TextBox();
         private readonly ComboBox m_tileLevel = new ComboBox();
@@ -114,6 +115,8 @@ namespace lucasCoreUI
             GroupBox gGrowth = Group("Growth", out r,
                 Note("Site productivity scales each forest cell's growth by how productive its land is, on top of the climate multipliers. TreeMap gives every forest pixel an FIA plot and its site class (1 = 225+ ... 7 = 0-19 cubic feet per acre per year). Stage 2 turns each forest type and ecodivision's site classes into growth multipliers (the plots' live carbon over the growth curve at their age: Build Results > Site Productivity), stage 5 maps each cell's share of every class (Site Class Shares), and stage 8 combines them into the cell's multiplier, scales the cell's starting live and dead carbon by it, and writes it as a Site Productivity flow multiplier on forest growth. Older libraries need tools/sync-library.R first, for the Climate and Site Productivity Flow Multiplier Types."));
             r.Controls.Add(Caption("Site productivity:")); r.Controls.Add(List(m_site, 200));
+            r.Controls.Add(Note("Grass and shrub productivity does the same for grassland and shrubland cells: each cell's growth is scaled by its RAP herbaceous and shrub NPP (mean of 2014-2023, 30 m pixels RAP sees as mostly trees left out) over its ecodivision and class mean, the value its growth already holds, capped at 0.3-2.5. Stage 8 scales the cell's starting live and dead carbon by it (soil keeps the class mean) and writes it as a Grass and Shrub Productivity flow multiplier on non-forest growth. Data Sources: RAP vegetation NPP v3 Folder (a Data Download for the region fetches it). Older libraries need tools/sync-library.R first, for its Flow Multiplier Type."));
+            r.Controls.Add(Caption("Grass and shrub productivity:")); r.Controls.Add(List(m_grassShrub, 200));
 
             foreach (GroupBox g in new[] { gGrid, gHist, gStrata, gCover, gGrowth, gTiles }) { m_root.RowStyles.Add(new RowStyle(SizeType.AutoSize)); m_root.Controls.Add(g); }
 
@@ -153,6 +156,9 @@ namespace lucasCoreUI
             m_site.DisplayMember = "Name"; m_site.ValueMember = "Value";
             m_site.DataSource = new List<Item> { new Item { Value = 1, Name = "None" }, new Item { Value = 2, Name = "TreeMap site class" } };
             this.SetComboBoxBinding(m_site, "SiteProductivity");
+            m_grassShrub.DisplayMember = "Name"; m_grassShrub.ValueMember = "Value";
+            m_grassShrub.DataSource = new List<Item> { new Item { Value = 1, Name = "None" }, new Item { Value = 2, Name = "RAP NPP (2014-2023)" } };
+            this.SetComboBoxBinding(m_grassShrub, "GrassShrubProductivity");
             m_resample.DisplayMember = "Name"; m_resample.ValueMember = "Value";
             m_resample.DataSource = new List<Item> { new Item { Value = 1, Name = "Modal (most common 30 m class)" }, new Item { Value = 2, Name = "Area-matched (30 m class areas per secondary unit)" } };
             this.SetComboBoxBinding(m_resample, "LandCoverResampling");
