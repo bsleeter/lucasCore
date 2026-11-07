@@ -180,9 +180,16 @@ download_handlers <- function() {
                                                                  file = sprintf("prism_%s_us_25m_%d.zip", var, year))]
       n <- data.table::data.table(var = c("tmean", "ppt"), year = NA_integer_, url = sprintf("https://data.prism.oregonstate.edu/normals/us/4km/%s/monthly/prism_%s_us_25m_2020_avg_30y.zip", c("tmean", "ppt"), c("tmean", "ppt")),
                                   file = sprintf("prism_%s_us_25m_2020_avg_30y.zip", c("tmean", "ppt")))
-      rbind(a, n)[, fetch := TRUE][] },
+      # monthly precipitation (2026-11-07, to-do 39 step 7): the October-September water year of the RAP fit grass and shrub response;
+      # the region's years from the October before the first, and 1990-2020 for the water-year normal
+      y0 <- min(years_of(ctx, 1895:last)); ym <- sort(unique(c(max(y0 - 1L, 1981L):last, 1990:2020)))
+      m <- data.table::CJ(year = ym, mon = 1:12)[, .(var = "ppt", year, url = sprintf("https://data.prism.oregonstate.edu/time_series/us/an/4km/ppt/monthly/%d/prism_ppt_us_25m_%d%02d.zip", year, year, mon),
+                                                       file = sprintf("prism_ppt_us_25m_%d%02d.zip", year, mon), monthly = TRUE)]
+      rbind(a[, monthly := FALSE], n[, monthly := FALSE], m)[, fetch := TRUE][] },
+    # in place = the tif a zip unpacks to, at its recorded size: a rerun fetches only what is new (the monthly files, first time)
+    have = function(ctx, items) recorded(ctx, "PrismFolder", file.path(ctx$place, prism_dir(items), sub("[.]zip$", ".tif", items$file))),
     finish = function(ctx, items) {
-      for (i in seq_len(nrow(items))) utils::unzip(items$dest[i], exdir = if (is.na(items$year[i])) file.path(ctx$place, "normals") else file.path(ctx$place, "annual-us25m", items$var[i]))
+      d <- prism_dir(items); for (i in seq_len(nrow(items))) utils::unzip(items$dest[i], exdir = file.path(ctx$place, d[i]))
       ctx$place })
 
   # ---- LOCA2: monthly pr, tasmax, tasmin of each model's historical and SSP runs. The UCSD regional cut when the region
@@ -489,6 +496,8 @@ LFPS <- "https://lfps.usgs.gov/api"
 NIFC <- sprintf("https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/%s/FeatureServer/0", c("InterAgencyFirePerimeterHistory_1979_And_Prior_Read_Only",
   "InteragencyFirePerimeterHistory_1980s_Read_Only", "InteragencyFirePerimeterHistory_1990s_Read_Only", "InteragencyFirePerimeterHistor_2000s_Read_Only",
   "InteragencyFirePerimeterHistory_2010s_Read_Only", "InterAgencyFirePerimeterHistory_2020s_Read_Only"))
+# where a PRISM item unpacks: the normals, monthly precipitation, or the annual files of its variable
+prism_dir <- function(items) ifelse(is.na(items$year), "normals", ifelse(items$monthly %in% TRUE, "monthly-us25m/ppt", file.path("annual-us25m", items$var)))
 RAP_NPP <- "https://rangeland.ntsg.umt.edu/data/rap/rap-vegetation-npp/v3/vegetation-npp-v3-%d.tif"
 CCAP <- "https://ocmgeodatastor1.blob.core.windows.net/ccap/bulk_download/C-CAP_Regional_30-meter_Data/C-CAP_Regional_Land_Cover_Classification/CONUS/conus_2001_ccap_landcover.tif"
 PC_STAC <- "https://planetarycomputer.microsoft.com/api/stac/v1"
