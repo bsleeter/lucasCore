@@ -303,7 +303,7 @@
 
 	<dataSheet name="ClimateOptions" displayName="Climate Options" isSingleRow="True" viewClassName="lucasCoreUI.ClimateOptionsView" viewClassAssembly="lucasCoreUI">
 		<column name="ForestGrowthModel" displayName="Forest Growth (None = normal climate every year)" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP|3:Tree ring" defaultValue="3"/>
-		<column name="NonForestGrowthModel" displayName="Non-Forest Growth" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP" defaultValue="2"/>
+		<column name="NonForestGrowthModel" displayName="Non-Forest Growth" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP|3:RAP fit" defaultValue="2"/>
 		<column name="DecompositionModel" displayName="Decomposition" dataType="Integer" validationType="List" formula1="1:None|2:Q10" defaultValue="2"/>
 		<!-- legacy (libraries made before 2026-10-24): the LOCA2 run is now chosen in a Projection Climate scenario (stage 11); stage 7 no longer reads these -->
 		<column name="ClimateScenarioId" displayName="Projection Scenario (legacy)" dataType="Integer" isOptional="True" isVisible="False" validationType="Datasheet" formula1="lucasCore_ClimateScenario"/>

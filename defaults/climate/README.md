@@ -2,7 +2,7 @@
 
 - `flow-multipliers.csv`: the flow groups of each climate effect (role), and for decomposition the CBM DOM pools whose Q10 applies.
   Climate Options (scenario sheet) picks each role's model: forest growth None / Miami NPP / Tree ring (default), non-forest growth
-  None / Miami NPP (default), decomposition None / Q10 (default). None writes no multiplier: the flow runs at normal climate.
+  None / Miami NPP (default) / RAP fit, decomposition None / Q10 (default). None writes no multiplier: the flow runs at normal climate.
 - `tree-ring-coefficients.csv`: the tree-ring forest growth response by FIA ecodivision (stsim stratum name and Id):
   `multiplier = 1 + PrecipCoef (P/Pn - 1) + PrecipLagCoef (P last year/Pn - 1) + TempCoef (T - Tn)`, floored at 0, with Pn and Tn the
   1991-2020 mean of the same PRISM files. Built by `tools/make_tree_ring_coefficients.R`: standard ring-width indices of 1,288 CONUS
@@ -17,7 +17,16 @@ r 0.42), mostly through last year's precipitation, which matters as much as this
 the most climate-sensitive part of growth and ITRDB sites were chosen for climate sensitivity, so these coefficients are upper bounds on
 the sensitivity of total growth. FIA remeasurement could not test annual sensitivity: every design failed a placebo test (dev/climate/01-04).
 
-Tree rings say nothing about grassland and shrubland growth, which keeps Miami NPP.
+Tree rings say nothing about grassland and shrubland growth. For those, `rap-climate-coefficients.csv` (2026-11-07, to-do 39
+step 7) holds the same form fitted to RAP vegetation NPP v3 (Robinson et al. 2019): yearly NPP 1986-2023 at 1,140 grass and shrub
+sample windows (`dev/nonforest/04-rap-climate-sample.R`), each window and life form's NPP over its 1991-2020 mean regressed on PRISM at
+the window (`dev/nonforest/05-rap-climate-fit.R`), pooled by ecodivision with a random-effects mean (`tools/make_rap_climate_coefficients.R`).
+The model uses the LifeForm `All` rows: one climate multiplier map per flow group and year, and every grass and shrub class grows through
+Net Growth Non Forest: Total; the Annual grass, Perennial grass and Shrub rows are kept for reference (perennial grass and shrub fitted
+nearly the same). Ecodivisions with fewer than 5 window fits take the CONUS pool. Predicting each window from the other windows' pool,
+the RAP fit beats the window's own mean in 75-80% of windows and Miami NPP in 23-31% (Miami swings 1.0-1.4 times the observed change);
+with the years' climate shuffled the precipitation coefficients fall to about 0. Climate Options: Non-Forest Growth = RAP fit uses it;
+Miami NPP stays the default for now.
 
 ## Projections (LOCA2)
 

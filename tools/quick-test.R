@@ -7,10 +7,10 @@
 #      appends to a shared sheet carries the result's rows over first (stage 8: the Flow Spatial Multipliers; stage 11 does the same)
 #   2. "Quick test: <N> years": tools/new-historical.R --build=<1's result> --also=<the Build result> --years=N
 # and runs both, printing the result ids and minutes. Inputs come from the Build result as it ran: to test an option, change it in
-# the Build scenario and use --options, which copies that scenario's Build Options into the quick test first.
+# the Build scenario and use --options, which copies that scenario's Build Options and Climate Options into the quick test first.
 # Usage: Rscript tools/quick-test.R <library.ssim> --stages=8[,3,...] [--build=<Build result id>] [--years=10] [--options] [--no-run]
 #   --build    the Build result to start from (default: the newest result whose name starts with "Build")
-#   --options  the Build scenario's current Build Options (its parent's), not the result's copy
+#   --options  the Build scenario's current Build Options and Climate Options (its parent's), not the result's copies
 #   --no-run   make the scenarios only
 # =============================================================================
 suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
@@ -31,7 +31,7 @@ names_all <- levels(datasheet(S, "core_Pipeline", lookupsAsFactors = TRUE, optio
 pick <- vapply(stg, function(k) { m <- grep(sprintf("^%s - ", k), names_all, value = TRUE); if (length(m) != 1) stop(sprintf("--stages: no single stage numbered %s", k)); m }, "")
 saveDatasheet(S, data.frame(StageNameId = pick, RunOrder = seq_along(pick)), "core_Pipeline")
 if ("--options" %in% a) { par <- sc[ScenarioId == bid, ParentId]; if (is.na(par)) stop("--options: the Build result has no parent scenario")
-  saveDatasheet(S, datasheet(scenario(L, par), "lucasCore_BuildOptions"), "lucasCore_BuildOptions") }
+  for (sh in c("lucasCore_BuildOptions", "lucasCore_ClimateOptions")) { x <- datasheet(scenario(L, par), sh); if (nrow(x)) saveDatasheet(S, x, sh) } }
 description(S) <- sprintf("Quick test (tools/quick-test.R): reruns %s on top of Build result %d, which supplies everything else.", paste(pick, collapse = "; "), bid)
 cat(sprintf("scenario %d: %s, on Build result %d\n", scenarioId(S), paste(pick, collapse = "; "), bid))
 if ("--no-run" %in% a) quit(save = "no")

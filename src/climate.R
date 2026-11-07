@@ -3,11 +3,13 @@
 # =============================================================================
 # Climate Options picks the model of each effect; defaults/climate/flow-multipliers.csv lists the flow groups of each:
 #   Forest growth      None | Miami NPP | Tree ring (default)
-#   Non-forest growth  None | Miami NPP (default)
+#   Non-forest growth  None | Miami NPP (default) | RAP fit
 #   Decomposition      None | Q10 (default)
 #   Miami NPP   forest NPP = min(f(MAT), f(MAP)), non-forest NPP = f(MAP) (Lieth 1975); multiplier = year / normal
 #   Tree ring   1 + PrecipCoef (P/Pn - 1) + PrecipLagCoef (P last year/Pn - 1) + TempCoef (T - Tn), coefficients by ecodivision
 #               (defaults/climate/tree-ring-coefficients.csv, tools/make_tree_ring_coefficients.R)
+#   RAP fit     the same form on grass and shrub growth, fitted to RAP NPP 1986-2023 at 1,140 sample windows, coefficients by
+#               ecodivision (defaults/climate/rap-climate-coefficients.csv, LifeForm All; tools/make_rap_climate_coefficients.R)
 #   Q10         Q10 ^ ((T - Tn) / 10), Q10 read from the CBM DOM table for the listed pools (the same values stage 3 uses)
 #   None        no multiplier: the flow runs at normal climate every year
 # Every multiplier is an anomaly against the 1991-2020 normal of its own data, so 1.0 means "the climate the curves and decay rates
@@ -19,7 +21,7 @@ climate_flows <- function(co, stage) {
   choice <- function(v, labels) { v <- v[1]; if (is.null(v) || is.na(v)) return(NA_character_)
     if (is.numeric(v)) labels[v] else labels[match(tolower(v), tolower(labels))] }
   model <- c(ForestGrowth = choice(co$ForestGrowthModel, c("None", "Miami NPP", "Tree ring")),
-             NonForestGrowth = choice(co$NonForestGrowthModel, c("None", "Miami NPP")),
+             NonForestGrowth = choice(co$NonForestGrowthModel, c("None", "Miami NPP", "RAP fit")),
              Decomposition = choice(co$DecompositionModel, c("None", "Q10")))
   if (anyNA(model)) fail("Climate Options: unrecognised choice for %s", paste(names(model)[is.na(model)], collapse = ", "))
   fm <- read_default("climate", "flow-multipliers.csv"); fg <- stsim_list("FlowGroup")$Name
@@ -28,7 +30,7 @@ climate_flows <- function(co, stage) {
   say("Climate Options: forest growth = %s; non-forest growth = %s; decomposition = %s", model[["ForestGrowth"]], model[["NonForestGrowth"]], model[["Decomposition"]])
   fm[Model != "None"] }
 
-# the parameters the models need on the model grid P: Q10 by flow group, tree-ring coefficients by primary stratum
+# the parameters the models need on the model grid P: Q10 by flow group, tree-ring and RAP fit coefficients by primary stratum
 climate_params <- function(fm, P, stage) {
   # Q10s from Carbon Assumptions: Dead Organic Matter Parameters (to-do 21; package default = CBM-CFS3's). The pools of one climate flow
   # group must share a Q10; where ecodivision rows give a group a different Q10, it is a raster on the model grid (P holds stratum ids).
@@ -46,17 +48,19 @@ climate_params <- function(fm, P, stage) {
     if (!any(dif)) return(base)
     say("%s: Q10 %.3g, by ecodivision %s", fm$FlowGroupId[i], base, paste(sprintf("%s %.3g", ss[dif], qs[dif]), collapse = ", "))
     classify(P, cbind(as.integer(stl$Id[match(ss[dif], stl$Name)]), qs[dif]), others = base) }), fm$FlowGroupId)
-  coef_r <- NULL
-  if ("Tree ring" %in% fm$Model) {
-    tc <- read_default("climate", "tree-ring-coefficients.csv")
+  # the linear models (tree ring for forest, RAP fit for grass and shrub): coefficient rasters by primary stratum
+  lin <- list(`Tree ring` = list(f = "tree-ring-coefficients.csv", what = "tree-ring"), `RAP fit` = list(f = "rap-climate-coefficients.csv", what = "RAP fit"))
+  coef <- list()
+  for (md in intersect(names(lin), fm$Model)) {
+    tc <- read_default("climate", lin[[md]]$f); if ("LifeForm" %in% names(tc)) tc <- tc[LifeForm == "All"]
     ids <- as.integer(terra::unique(P)[[1]]); miss <- setdiff(ids, as.integer(tc$Id))
-    check(stage, "every ecodivision has tree-ring coefficients", !length(miss), paste("strata without:", paste(miss, collapse = ", ")))
-    coef_r <- lapply(c(bp = "PrecipCoef", bl = "PrecipLagCoef", bt = "TempCoef"), function(k) classify(P, cbind(as.integer(tc$Id), as.numeric(tc[[k]])), others = NA))
+    check(stage, sprintf("every ecodivision has %s coefficients", lin[[md]]$what), !length(miss), paste("strata without:", paste(miss, collapse = ", ")))
+    coef[[md]] <- lapply(c(bp = "PrecipCoef", bl = "PrecipLagCoef", bt = "TempCoef"), function(k) classify(P, cbind(as.integer(tc$Id), as.numeric(tc[[k]])), others = NA))
     used <- tc[as.integer(Id) %in% ids]
-    say("Tree-ring coefficients (precip, last year's precip, temperature): %s",
+    say("%s coefficients (precip, last year's precip, temperature): %s", md,
         paste(sprintf("%s %s/%s/%s (%s)", used$StratumId, used$PrecipCoef, used$PrecipLagCoef, used$TempCoef, used$Source), collapse = "; "))
   }
-  list(q10 = q10, coef_r = coef_r) }
+  list(q10 = q10, coef = coef, coef_r = coef[["Tree ring"]]) }
 
 miami <- function(t, p, forest) { if (!forest) return(6116 * (1 - exp(-6.05e-5 * p)))
   min(2540 / (1 + exp(1.584 - 0.0622 * t)), (0.551 * p^1.055) / exp(0.000306 * p)) }
@@ -78,9 +82,9 @@ climate_emitter <- function(fm, P, prm) {
   e$emit <- function(y, Ty, Py, Pl, Tn, Pn, nrm, climate) {
     tr_terms <- NULL
     for (j in seq_len(nrow(fm))) { g <- fm$FlowGroupId[j]; md <- fm$Model[j]
-      r <- if (md == "Tree ring") {
+      r <- if (md %in% c("Tree ring", "RAP fit")) { cf <- prm$coef[[md]]
         if (is.null(tr_terms)) tr_terms <- list(pr = to_grid(Py / Pn), pl = to_grid(Pl / Pn), ta = to_grid(Ty - Tn, fill = 0))
-        max(1 + prm$coef_r$bp * (tr_terms$pr - 1) + prm$coef_r$bl * (tr_terms$pl - 1) + prm$coef_r$bt * tr_terms$ta, 0)
+        max(1 + cf$bp * (tr_terms$pr - 1) + cf$bl * (tr_terms$pl - 1) + cf$bt * tr_terms$ta, 0)
       } else if (md == "Miami NPP") { forest <- fm$Role[j] == "ForestGrowth"; to_grid(miami(Ty, Py, forest) / nrm[[if (forest) "forest" else "nonforest"]])
       } else { q <- prm$q10[[g]]; if (inherits(q, "SpatRaster")) q^(to_grid(Ty - Tn, fill = 0) / 10) else to_grid(q^((Ty - Tn) / 10)) }   # Q10 by ecodivision: a raster
       if (!is.null(attr(r, "unfilled"))) e$unfilled <- max(e$unfilled, attr(r, "unfilled"))

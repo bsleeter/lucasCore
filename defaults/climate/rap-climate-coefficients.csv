@@ -1,0 +1,77 @@
+StratumId,Id,LifeForm,Windows,Source,PrecipCoef,PrecipLagCoef,TempCoef
+Hot Continental,220,All,37,ecodivision,0.1687,0.1423,0.034
+Hot Continental Mountains,2201,All,19,ecodivision,0.4845,0.6738,0.0319
+Marine,240,All,13,ecodivision,-0.1446,0.2506,0.0097
+Marine Mountains,2401,All,63,ecodivision,0.0236,0.0417,0.034
+Mediterranean,260,All,135,ecodivision,0.1032,-0.0172,-0.0135
+Mediterranean Mountains,2601,All,132,ecodivision,0.1878,-0.0015,0.0204
+Prairie,250,All,71,ecodivision,0.2822,0.1135,-0.0047
+Savanna,410,All,28,ecodivision,0.3059,0.4162,0.0242
+Subtropical,230,All,36,ecodivision,0.2202,0.189,0.1131
+Subtropical Mountains,2301,All,17,ecodivision,0.1967,0.1881,-0.0105
+Temperate Desert,340,All,114,ecodivision,0.495,0.1982,-0.0152
+Temperate Desert Mountains,3401,All,94,ecodivision,0.5294,0.2844,0.0066
+Temperate Steppe,330,All,103,ecodivision,0.4898,0.154,0.002
+Temperate Steppe Mountains,3301,All,126,ecodivision,0.3437,0.1063,0.0433
+Tropical/Subtropical Desert,320,All,102,ecodivision,0.5177,0.3057,-0.0101
+Tropical/Subtropical Steppe,310,All,118,ecodivision,0.5156,0.1802,0.0396
+Tropical/Subtropical Steppe Mountains,3101,All,118,ecodivision,0.4263,0.0795,0.0845
+Warm Continental,210,All,61,ecodivision,0.2087,0.0292,0.0501
+Warm Continental Mountains,2101,All,6,ecodivision,0.3508,0.511,0.1003
+Hot Continental,220,Annual grass,0,CONUS life form,0.2878,0.0445,-0.0014
+Hot Continental Mountains,2201,Annual grass,0,CONUS life form,0.2878,0.0445,-0.0014
+Marine,240,Annual grass,0,CONUS life form,0.2878,0.0445,-0.0014
+Marine Mountains,2401,Annual grass,7,ecodivision,0.0455,0.0318,0.0105
+Mediterranean,260,Annual grass,54,ecodivision,0.1205,-0.0282,-0.0108
+Mediterranean Mountains,2601,Annual grass,43,ecodivision,0.2042,-0.0089,0.0237
+Prairie,250,Annual grass,0,CONUS life form,0.2878,0.0445,-0.0014
+Savanna,410,Annual grass,0,CONUS life form,0.2878,0.0445,-0.0014
+Subtropical,230,Annual grass,0,CONUS life form,0.2878,0.0445,-0.0014
+Subtropical Mountains,2301,Annual grass,0,CONUS life form,0.2878,0.0445,-0.0014
+Temperate Desert,340,Annual grass,19,ecodivision,0.5228,0.1769,-0.0452
+Temperate Desert Mountains,3401,Annual grass,17,ecodivision,0.6767,0.3554,-0.0202
+Temperate Steppe,330,Annual grass,7,ecodivision,0.5626,0.1413,-0.0048
+Temperate Steppe Mountains,3301,Annual grass,11,ecodivision,0.5047,0.1446,0.0035
+Tropical/Subtropical Desert,320,Annual grass,24,ecodivision,0.6636,0.4338,0.0132
+Tropical/Subtropical Steppe,310,Annual grass,7,ecodivision,0.6954,0.0782,0.0779
+Tropical/Subtropical Steppe Mountains,3101,Annual grass,5,ecodivision,0.3224,0.2286,-0.1902
+Warm Continental,210,Annual grass,0,CONUS life form,0.2878,0.0445,-0.0014
+Warm Continental Mountains,2101,Annual grass,0,CONUS life form,0.2878,0.0445,-0.0014
+Hot Continental,220,Perennial grass,27,ecodivision,0.193,0.1415,0.0402
+Hot Continental Mountains,2201,Perennial grass,17,ecodivision,0.5222,0.714,0.0123
+Marine,240,Perennial grass,4,CONUS life form,0.3383,0.1078,0.0242
+Marine Mountains,2401,Perennial grass,24,ecodivision,0.0354,0.0509,0.0292
+Mediterranean,260,Perennial grass,41,ecodivision,0.1135,-0.0156,-0.0221
+Mediterranean Mountains,2601,Perennial grass,40,ecodivision,0.2059,-0.0178,0.0253
+Prairie,250,Perennial grass,60,ecodivision,0.2715,0.0939,-0.0081
+Savanna,410,Perennial grass,5,ecodivision,0.3161,0.3549,0.024
+Subtropical,230,Perennial grass,16,ecodivision,0.1951,0.1561,0.1315
+Subtropical Mountains,2301,Perennial grass,15,ecodivision,0.1876,0.1843,-0.0255
+Temperate Desert,340,Perennial grass,36,ecodivision,0.4746,0.1936,-0.0101
+Temperate Desert Mountains,3401,Perennial grass,18,ecodivision,0.4667,0.2644,0.0064
+Temperate Steppe,330,Perennial grass,60,ecodivision,0.4879,0.1521,0.0018
+Temperate Steppe Mountains,3301,Perennial grass,56,ecodivision,0.3676,0.1062,0.0557
+Tropical/Subtropical Desert,320,Perennial grass,19,ecodivision,0.4739,0.3006,-0.0721
+Tropical/Subtropical Steppe,310,Perennial grass,53,ecodivision,0.5332,0.1886,0.0424
+Tropical/Subtropical Steppe Mountains,3101,Perennial grass,53,ecodivision,0.4551,0.0983,0.0894
+Warm Continental,210,Perennial grass,33,ecodivision,0.2291,0.0625,0.0609
+Warm Continental Mountains,2101,Perennial grass,3,CONUS life form,0.3383,0.1078,0.0242
+Hot Continental,220,Shrub,10,ecodivision,0.0983,0.1449,0.0142
+Hot Continental Mountains,2201,Shrub,2,CONUS life form,0.3378,0.1231,0.0251
+Marine,240,Shrub,9,ecodivision,-0.0517,0.3166,0.0117
+Marine Mountains,2401,Shrub,32,ecodivision,0.0054,0.0366,0.0492
+Mediterranean,260,Shrub,40,ecodivision,0.0742,-0.0059,-0.0102
+Mediterranean Mountains,2601,Shrub,49,ecodivision,0.1611,0.0161,0.0153
+Prairie,250,Shrub,11,ecodivision,0.3629,0.2281,0.0431
+Savanna,410,Shrub,23,ecodivision,0.3068,0.4286,0.0262
+Subtropical,230,Shrub,20,ecodivision,0.2457,0.2244,0.1013
+Subtropical Mountains,2301,Shrub,2,CONUS life form,0.3378,0.1231,0.0251
+Temperate Desert,340,Shrub,59,ecodivision,0.5005,0.2088,-0.0101
+Temperate Desert Mountains,3401,Shrub,59,ecodivision,0.5083,0.2711,0.0116
+Temperate Steppe,330,Shrub,36,ecodivision,0.4799,0.1591,0.0025
+Temperate Steppe Mountains,3301,Shrub,59,ecodivision,0.2928,0.0992,0.0402
+Tropical/Subtropical Desert,320,Shrub,59,ecodivision,0.4828,0.2627,0.006
+Tropical/Subtropical Steppe,310,Shrub,58,ecodivision,0.4881,0.179,0.0338
+Tropical/Subtropical Steppe Mountains,3101,Shrub,60,ecodivision,0.4052,0.0618,0.0887
+Warm Continental,210,Shrub,28,ecodivision,0.1869,-0.0073,0.0392
+Warm Continental Mountains,2101,Shrub,3,CONUS life form,0.3378,0.1231,0.0251
