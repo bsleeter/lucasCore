@@ -354,7 +354,21 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
           on grass and the other shrubs, use the all-class (forest) rows: medium severity kills 53.5% of roots (chaparral high severity
           25%), and high severity on grass kills 95% of roots (perennial grass resprouts). In this run medium and low fire moved 56,657
           Mg C in chaparral against 32,517 for high. Grass and shrub fire rows by severity are needed.
-        - **Left:** grass and shrub fire rows by severity (above); the guide (grass,
+        - **One soil definition and fire by severity (built 2026-11-07, main b51cf4c; user: "wetlands should be the only class with
+          the Deep Soil pool ... issues if different classes define their soil pool differently"; wetland soil all in BG Slow).**
+          BG Slow holds a cell's whole soil in every class: grass and shrub fit it to gNATSGO soc0_999 (as forest, agriculture and
+          developed already were; soil loss 0.002-0.004 /yr, slower than the 0-30 cm fit), emergent wetlands to the regional soil to
+          1 m; Deep Soil starts at 0 and gains only wetland burial. Fire: defaults/stockflow/nonforest-fire.csv (every grass, shrub and
+          emergent class x High / Medium / Low; chaparral High stays in chaparral-age.csv; all inference) -> tools/make_nonforest_fire.R
+          writes high severity into both Disturbance Flows presets and medium and low into event-pathways.csv as class rows covering
+          every all-class pair (a class row hides the all-class row of its pair: chaparral's wood split 0.55 / 0.45 exactly in the
+          run). Stage 3 adds a class's preset rows to a filled sheet that has none for it. Tests: unit-nonforest-solve 33 of 33;
+          unit-carbon-assumptions ALL PASS (new: every class covers every pair at every severity); 02-emergent-stsim-check PASS in
+          real ST-Sim (largest gap 9.3e-4 Mg C/ha, burial 4.4e-6, chaparral 2.2e-5). Solano rebuilt (Build result 16, 73 of 73 checks
+          pass) and rerun (result 18): Deep Soil 0 outside wetlands (cropland no longer picks it up), estuarine Deep Soil +1.04 /yr,
+          no grass roots killed by fire (8,851 Mg C before in low-severity annual grass fire alone), chaparral medium and low fire
+          kill 1,342 and 0 Mg C of roots (6,759 and 3,353 before); chaparral live 10.6 Mg C/ha in 2023 (8.9 before).
+        - **Left:** a literature pass on the fire shares; the guide (grass,
           shrub, chaparral and emergent wetland sections); the P26 rebuild in item 51 (synced 2026-11-06, not yet rebuilt: the final
           runs stay as they are for now); eastern grass and shrub data; the Non-sage class has no data of its own.
       - **Open:** eastern grass and shrub rest on few untreed cells and RAP is built for rangelands; growth by age after fire (step 8);
