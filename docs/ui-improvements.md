@@ -422,8 +422,19 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
          Leave-one-window-out: the RAP response beats the window's own mean in 75-80% of windows (Miami NPP in 23-31%: it swings 1.0-1.4
          times the observed variation, the RAP response 0.4 times); RMSE 0.18-0.20 against Miami's 0.26-0.32. Placebo (20 shuffled-year
          draws): precipitation coefficients -0.007 to -0.005, 95% within +-0.065. Perennial and shrub responses nearly equal: RAP's
-         partition may share one signal across life forms. Left: wire it in (Climate Options Non-Forest Growth = RAP fit, a
-         coefficients table beside the tree-ring one), and a Solano quick test against Miami.
+         partition may share one signal across life forms.
+       - **Wired in 2026-11-07 (main, not pushed).** Climate Options: Non-Forest Growth = None / Miami NPP (default) / RAP fit.
+         defaults/climate/rap-climate-coefficients.csv (tools/make_rap_climate_coefficients.R): the model uses LifeForm All, one
+         response per ecodivision (one climate map per flow group and year, and every grass and shrub class grows through Net Growth
+         Non Forest: Total); life-form rows kept for reference. Marine's precipitation coefficient is negative (-0.14).
+         tests/unit-rap-climate.R 9 pass.
+       - **Solano quick test (stages 7, 8 + 1985-1995; 3.9 + 6.7 min).** The study-area non-forest multiplier's year-to-year SD
+         1986-2023 is 0.038 with the RAP fit against 0.332 with Miami (1990: 0.96 against 0.56). In the Mediterranean windows RAP's
+         own NPP varies with SD 0.15 of its mean; Miami swings 2.4 times that and beats the window's mean in 3% of windows, the RAP
+         fit 0.33 times and beats it in 72%. So Miami is clearly wrong there, but the RAP fit catches only a third of the variation:
+         Mediterranean coefficients are small (precipitation 0.12-0.15, last year's about 0). Likely cause: calendar-year
+         precipitation, where Mediterranean grass grows on the October-September water year (autumn rain of one calendar year feeds
+         the next spring). Next: refit on water-year precipitation (needs PRISM monthly, not in the home).
     8. **Shrub growth by age.** Chaparral regrows for 20+ years after fire and sage for decades, so growth by age after fire (the
        Non-Forest Growth sheet already has an age column) in place of a constant rate at equilibrium. Matters most in P26.
     9. **Validation throughout,** against data the calibration did not use: RaCA soil carbon, AmeriFlux grassland and sagebrush sites,
