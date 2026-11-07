@@ -71,23 +71,41 @@ pr <- unlist(lapply(c("cbm-defaults", "fia-measured"), function(m) c(rd("carbon-
 check("the carbon method presets hold no emergent rows (they would override the ecodivision values)", !any(pr %in% EM))
 check("Deep Soil is in stage 8's stock list with no forest curve column", { s <- st[StockTypeId == "Deep Soil"]; nrow(s) == 1 && is.na(s$CurveColumn) })
 
-# ---- grassland and shrubland by ecodivision (tools/make_grass_shrub.R) ------------------------------------------------------------
-gm <- rd("stockflow", "nonforest-multipliers-grassland-shrubland.csv"); gl <- rd("stockflow", "legacy-ibis", "grass-shrub-multipliers.csv")
-gi <- rd("initialstocks", "grassland-shrubland.csv"); gt <- rd("stockflow", "grass-shrub-targets.csv"); GS <- sort(unique(gm$StateClassId))
-check("a grass and shrub target for every ecodivision x class", nrow(gt) == uniqueN(gm$StratumId) * length(GS) && !anyNA(as.numeric(gt$NPP)) && !anyNA(as.numeric(gt$Soil0to30)))
-dif <- merge(gm, gl, by = c("StratumId", "StateClassId", "FlowGroupId"), suffixes = c("", "0"))[as.numeric(Value) != as.numeric(Value0)]
-check("only BG Slow's outflow rates differ from the legacy grass and shrub rates", nrow(dif) > 0 && all(dif$FlowGroupId == "Emission: BG Slow -> Atmosphere [Type]"))
-check("grass and shrub Net Growth = the target NPP", all(merge(ng[StateClassId %in% GS, .(StratumId, StateClassId, v = as.numeric(Value))], gt[, .(StratumId, StateClassId, t = as.numeric(NPP))])[, abs(v - t) < 1e-9]))
-gw <- 0; gs <- 0
-for (i in seq_len(nrow(gt))) { e <- gt$StratumId[i]; cls <- gt$StateClassId[i]
+# ---- grassland and shrubland by ecodivision, literature rates (tools/make_grass_shrub.R; to-do 39, 2026-11-06) --------------------
+gm <- rd("stockflow", "nonforest-multipliers-grassland-shrubland.csv"); gi <- rd("initialstocks", "grassland-shrubland.csv"); gt <- rd("stockflow", "grass-shrub-targets.csv")
+gf <- rd("stockflow", "grass-shrub-fit.csv"); lit <- rd("stockflow", "grass-shrub-literature.csv"); GS <- sort(unique(gm$StateClassId)); CHAP <- "Shrubland: Chaparral"
+check("a grass and shrub target and fit for every ecodivision x class", nrow(gt) == uniqueN(gm$StratumId) * length(GS) && nrow(gf) == nrow(gt))
+sh <- function(cls) { r <- lit[StateClassId == cls]; while (!is.na(r$RatesOf)) r <- lit[StateClassId == r$RatesOf]; as.numeric(c(r$ShareFoliage, r$ShareWood, r$ShareFineRoot, r$ShareCoarseRoot)) }
+NGG <- paste("Net Growth Non Forest: Atmosphere ->", c("Foliage", "Other Wood", "Fine Roots", "Coarse Roots"), "[Type]")
+ok_sh <- all(vapply(setdiff(GS, CHAP), function(cls) { x <- gm[StateClassId == cls & is.na(AgeMin) & FlowGroupId %in% NGG]; all(abs(as.numeric(x$Value[match(NGG, x$FlowGroupId)]) - sh(cls)) < 1e-6) }, TRUE))
+check("each class's growth split is the literature table's (no IBIS share)", ok_sh)
+ngg <- ng[StateClassId %in% setdiff(GS, CHAP)]
+check("grass and shrub Net Growth = RAP NPP (chaparral: by age)", all(merge(ngg[, .(StratumId, StateClassId, v = as.numeric(Value))], gt[, .(StratumId, StateClassId, t = as.numeric(NPP))])[, abs(v - t) < 1e-9]) &&
+      ng[StateClassId == CHAP, uniqueN(AgeMin)] == 101)
+sp <- gm[grepl("^Net Growth Non Forest", FlowGroupId), .(s = sum(as.numeric(Value))), by = .(StratumId, StateClassId, AgeMin)]
+check("growth splits add to 1 at every age", all(abs(sp$s - 1) < 1e-5))
+gw <- 0
+for (i in which(gt$StateClassId != CHAP)) { e <- gt$StratumId[i]; cls <- gt$StateClassId[i]
   ss <- nf_steady(nf_flows(pa[FromStratumId == e & FromStateClassId == cls], gm[StratumId == e & StateClassId == cls, .(FlowGroupId, Value)], memb, ord), as.numeric(gt$NPP[i]))
   x <- gi[StratumID == e & StateClassID == cls][, .(pool = st$StockTypeId[match(StateAttributeTypeID, st$Attribute)], v = as.numeric(Value))]
-  pl <- intersect(x$pool, names(ss$stock)); gw <- max(gw, max(abs(ss$stock[pl] - x[match(pl, pool), v])))
-  gs <- max(gs, abs(ss$stock[["DOM: Belowground Slow"]] - as.numeric(gt$Soil0to30[i])), abs(x[pool == "Deep Soil", v] - as.numeric(gt$DeepSoil[i]))) }
+  pl <- intersect(x$pool, names(ss$stock)); gw <- max(gw, max(abs(ss$stock[pl] - x[match(pl, pool), v]))) }
 check(sprintf("grass and shrub starting pools are the steady state of the written rates (largest gap %.1e Mg C/ha)", gw), gw < 1e-3)
-check(sprintf("BG Slow holds the gNATSGO 0-30 cm target and Deep Soil starts with the rest of the profile (largest gap %.1e)", gs), gs < 0.01)
+fit_ok <- gf[StateClassId != CHAP, all(abs(as.numeric(Soil0to30) - as.numeric(gt$Soil0to30[match(paste(StratumId, StateClassId), paste(gt$StratumId, gt$StateClassId))])) < 0.01)]
+check("BG Slow holds the gNATSGO 0-30 cm target", fit_ok)
+# chaparral: one year at age A from the pools at age A gives the pools at age A + 1 (rates and growth looked up at age A)
+cp <- rd("initialstocks", "chaparral.csv"); cg <- ng[StateClassId == CHAP]; e <- "Mediterranean"; p <- pa[FromStratumId == e & FromStateClassId == CHAP]
+pool_at <- function(a) { x <- cp[StratumID == e & as.integer(AgeMin) == a]; setNames(as.numeric(x$Value), st$StockTypeId[match(x$StateAttributeTypeID, st$Attribute)]) }
+rates_at <- function(a) { m <- gm[StratumId == e & StateClassId == CHAP]; m[is.na(AgeMin) | as.integer(AgeMin) == min(a, 100)][!(is.na(AgeMin) & FlowGroupId %in% m[!is.na(AgeMin), FlowGroupId]), .(FlowGroupId, Value)] }
+step <- function(a) { mp <- nf_annual_map(nf_flows(p, rates_at(a), memb, ord), as.numeric(cg[StratumId == e & as.integer(AgeMin) == min(a, 100), Value]))
+  S <- pool_at(a); x <- setNames(rep(0, length(mp$pools)), mp$pools); x[intersect(names(S), mp$pools)] <- S[intersect(names(S), mp$pools)]; (mp$M %*% x + mp$c)[, 1] }
+cw <- max(vapply(c(0, 1, 5, 20, 60, 98), function(a) { y <- step(a); z <- pool_at(a + 1); k <- intersect(names(z), names(y)); max(abs(y[k] - z[k])) }, 1))
+check(sprintf("chaparral: a year at age A takes the age-A pools to the age-(A+1) pools (largest gap %.1e Mg C/ha)", cw), cw < 1e-3)
+ag <- vapply(c(0, 10, 30, 100), function(a) { s <- pool_at(a); sum(s[c("Biomass: Foliage", "Biomass: Other Wood")]) }, 1)
+check(sprintf("chaparral aboveground live rises with age to the curve's maximum (%s Mg C/ha at 0, 10, 30, 100)", paste(round(ag, 2), collapse = ", ")), all(diff(ag) > 0) && ag[1] < 0.5)
+df <- rd("carbon-assumptions", "fia-measured", "disturbance-flows.csv")[StateClassId == CHAP]
+check("chaparral fire rows in the presets, no pool losing more than it holds", nrow(df) > 0 && df[, .(s = sum(as.numeric(Share))), by = FromStockTypeId][, all(s <= 1 + 1e-9)] &&
+      abs(df[FromStockTypeId == "Biomass: Fine Root", sum(as.numeric(Share))] - 0.25) < 1e-6)
 pr2 <- unlist(lapply(c("cbm-defaults", "fia-measured"), function(m) c(rd("carbon-assumptions", m, "nonforest-rates.csv")$StateClassId, rd("carbon-assumptions", m, "nonforest-growth.csv")$StateClassId)))
-check("the presets hold no grass or shrub rows", !any(pr2 %in% GS))
-check("Post Fire Shrub takes Non-sage's targets", all(gt[StateClassId == "Shrubland: Post Fire Shrub", grepl("Non-sage targets", Source)]))
+check("the presets hold no grass or shrub rate rows", !any(pr2 %in% GS))
 
 cat(sprintf("\n%d of %d checks passed\n", n - fails, n)); if (fails) quit(status = 1)

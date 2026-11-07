@@ -33,3 +33,21 @@ StratumId,StateClassId,Disturbance,AgeMin,FromStockTypeId,ToStockTypeId,Share
 ,,High-severity fire,11,Biomass: Merchantable,DOM: Snag Stem,0.98
 ,,High-severity fire,11,Biomass: Other Wood,Atmosphere,0.05
 ,,High-severity fire,11,Biomass: Other Wood,DOM: Snag Branch,0.93
+,Shrubland: Chaparral,High-severity fire,,Biomass: Coarse Root,DOM: Aboveground Fast,0
+,Shrubland: Chaparral,High-severity fire,,Biomass: Coarse Root,DOM: Belowground Fast,0.25
+,Shrubland: Chaparral,High-severity fire,,Biomass: Fine Root,Atmosphere,0
+,Shrubland: Chaparral,High-severity fire,,Biomass: Fine Root,DOM: Aboveground Very Fast,0
+,Shrubland: Chaparral,High-severity fire,,Biomass: Fine Root,DOM: Belowground Very Fast,0.25
+,Shrubland: Chaparral,High-severity fire,,DOM: Aboveground Fast,Atmosphere,0.8
+,Shrubland: Chaparral,High-severity fire,,DOM: Aboveground Medium,Atmosphere,0.8
+,Shrubland: Chaparral,High-severity fire,,DOM: Aboveground Slow,Atmosphere,0.5
+,Shrubland: Chaparral,High-severity fire,,DOM: Aboveground Very Fast,Atmosphere,0.8
+,Shrubland: Chaparral,High-severity fire,,DOM: Belowground Very Fast,Atmosphere,0
+,Shrubland: Chaparral,High-severity fire,,DOM: Snag Branch,Atmosphere,0.8
+,Shrubland: Chaparral,High-severity fire,,DOM: Snag Stem,Atmosphere,0.8
+,Shrubland: Chaparral,High-severity fire,,Biomass: Foliage,Atmosphere,0.95
+,Shrubland: Chaparral,High-severity fire,,Biomass: Foliage,DOM: Aboveground Very Fast,0.05
+,Shrubland: Chaparral,High-severity fire,,Biomass: Merchantable,Atmosphere,0
+,Shrubland: Chaparral,High-severity fire,,Biomass: Merchantable,DOM: Snag Stem,0
+,Shrubland: Chaparral,High-severity fire,,Biomass: Other Wood,Atmosphere,0.55
+,Shrubland: Chaparral,High-severity fire,,Biomass: Other Wood,DOM: Snag Branch,0.45

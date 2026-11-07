@@ -6,8 +6,8 @@
 #   forest classes          stage 4's Initial Stock Curves: ecodivision x forest class x last disturbance x stand age (age capped at the
 #                           curves' maximum)
 #   forested wetland        defaults/initialstocks/wetland-forested-{fire,harvest}.csv, by class x age (the CONUS 1km build's tables)
-#   grass/shrub             defaults/initialstocks/grassland-shrubland.csv, by class (the build's table, from its non-forest spin-up
-#                           with the non-forest flows stage 3 also uses)
+#   grass/shrub             defaults/initialstocks/grassland-shrubland.csv, by ecodivision and class: the steady state of stage 3's
+#                           rates (tools/make_grass_shrub.R); chaparral from initialstocks/chaparral.csv by ecodivision and age since fire
 #   emergent wetland        defaults/initialstocks/emergent-wetland.csv, by ecodivision and class: the steady state of stage 3's
 #                           regional rates, and Deep Soil = the soil 30-100 cm (tools/make_emergent_wetland.R; to-do 39 step 1)
 #   everything else         0 (developed, agriculture, barren, water, ice)
@@ -126,6 +126,8 @@ isWF <- land & cname %in% wf_cls
 fill_class(lt("wetland-forested-fire.csv"), isWF & postfire, TRUE, "forested wetland (post-fire)")
 fill_class(lt("wetland-forested-harvest.csv"), isWF & !postfire, TRUE, "forested wetland (post-harvest)")
 gs <- lt("grassland-shrubland.csv"); fill_class(gs, land & cname %in% unique(gs$StateClassId), FALSE, "grassland/shrubland")
+# chaparral by ecodivision and age (years since fire, from stage 5; to-do 39): the pools after a high-severity fire grown on that long
+cp <- lt("chaparral.csv"); fill_class(cp, land & cname %in% unique(cp$StateClassId), TRUE, "chaparral (by age since fire)")
 ew <- lt("emergent-wetland.csv"); fill_class(ew, land & cname %in% unique(ew$StateClassId), FALSE, "emergent wetland")
 src_of[land & is.na(src_of)] <- "zero (developed, agriculture, barren, water, ice)"
 progressBar()

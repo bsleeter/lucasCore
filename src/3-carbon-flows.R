@@ -203,6 +203,12 @@ if (!ca_filled) say("Carbon Assumptions: the sheets are empty (never filled) - u
 ev_def <- fread(pkg_file("defaults", "stockflow", "event-pathways.csv"), colClasses = "character", na.strings = "")[, FromStratumId := as.character(FromStratumId)]
 dfl <- as.data.table(datasheet(scn, ds("DisturbanceFlow"), optional = TRUE, lookupsAsFactors = FALSE)); df_src <- "Carbon Assumptions"
 if (!nrow(dfl)) { dfl <- preset("disturbance-flows"); df_src <- sprintf("the %s preset (the sheet is empty)", basename(preset_dir)) }
+# chaparral's own high-severity fire (to-do 39, 2026-11-06: roots and burls survive, wood stays standing; tools/make_grass_shrub.R): a
+# sheet filled before then has no chaparral rows, so it takes the preset's
+CHAP_FIRE <- "Shrubland: Chaparral"
+if (CHAP_FIRE %in% scl$Name && !any(as.character(dfl$StateClassId) %in% CHAP_FIRE)) {
+  add <- preset("disturbance-flows")[StateClassId %in% CHAP_FIRE]
+  if (nrow(add)) { dfl <- rbind(dfl[, lapply(.SD, as.character)], add[, lapply(.SD, as.character)], fill = TRUE); say("Disturbance Flows: %d chaparral high-severity fire rows from the %s preset (the sheet has none)", nrow(add), basename(preset_dir)) } }
 dfl[, `:=`(StratumId = as.character(StratumId), StateClassId = as.character(StateClassId), Disturbance = as.character(Disturbance),
            AgeMin = suppressWarnings(as.integer(AgeMin)), Share = as.numeric(Share))]
 dfl[Disturbance %in% c("1", "2"), Disturbance := names(DF_GROUPS)[as.integer(Disturbance)]]

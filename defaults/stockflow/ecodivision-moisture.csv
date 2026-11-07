@@ -1,0 +1,20 @@
+StratumId,Moisture,Note
+Hot Continental,Moist,IPCC moist (precipitation above potential evapotranspiration) taken from the ecodivision's climate: inference
+Hot Continental Mountains,Moist,inference
+Marine,Moist,inference
+Marine Mountains,Moist,inference
+Mediterranean,Dry,dry summers: inference
+Mediterranean Mountains,Dry,inference
+Prairie,Moist,tallgrass prairie: inference
+Savanna,Moist,inference
+Subtropical,Moist,inference
+Subtropical Mountains,Moist,inference
+Temperate Desert,Dry,inference
+Temperate Desert Mountains,Dry,inference
+Temperate Steppe,Dry,shortgrass steppe: inference
+Temperate Steppe Mountains,Dry,inference
+Tropical/Subtropical Desert,Dry,inference
+Tropical/Subtropical Steppe,Dry,inference
+Tropical/Subtropical Steppe Mountains,Dry,inference
+Warm Continental,Moist,inference
+Warm Continental Mountains,Moist,inference

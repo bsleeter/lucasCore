@@ -58,16 +58,43 @@ nf_simulate <- function(f, growth, S0, years) {
 # For classes without "<pool> ->" total-loss groups (grassland, shrubland): every "[Type]" group of a flow out of the pool is multiplied
 # by one factor, keeping their split (emission, decay, transfer), found by a bounded root search on the ordered steady state. Returns
 # the group values and the factor; stops if no factor (rates up to 1) reaches the target.
-nf_fit_pool <- function(path, mult, memb, order, growth, pool, target) {
+# pool may be several pools: their outflows share the factor and the target is their summed stock (litter pools fitted as one); `over`
+# names the pools whose stock counts toward the target when that differs from the pools scaled (e.g. scale every fast dead pool, count
+# the aboveground ones)
+nf_fit_pool <- function(path, mult, memb, order, growth, pool, target, over = pool, only = NULL) {
+  m <- copy(mult)[, Value := as.numeric(Value)]
+  grp <- intersect(paste(unique(path[FromStockTypeId %in% pool, FlowTypeId]), "[Type]"), m[Value > 0, FlowGroupId])
+  if (!is.null(only)) grp <- intersect(grp, only)   # fit these outflows only (e.g. AG Slow's emission, keeping its fixed transfer)
+  if (!length(grp)) stop("no flow out of ", paste(pool, collapse = ", "))
+  v0 <- m[match(grp, FlowGroupId), Value]
+  stock <- function() { s <- nf_steady(nf_flows(path, m, memb, order), growth)$stock; sum(s[intersect(over, names(s))]) }
+  gap <- function(f) { m[match(grp, FlowGroupId), Value := v0 * f]; stock() - target }
+  hi <- 1 / max(v0); g_lo <- gap(1e-6); g_hi <- gap(hi)
+  if (sign(g_lo) == sign(g_hi)) stop(sprintf("%s: no loss rate up to 1 holds %.3f Mg C/ha (%.3f at the fastest)", paste(pool, collapse = ", "), target, g_hi + target))
+  f <- uniroot(gap, c(1e-6, hi), f.lower = g_lo, f.upper = g_hi, tol = 1e-13)$root; gap(f)
+  list(mult = m, factor = f, groups = grp) }
+
+# set every outflow of a pool to a fixed total (shares kept): e.g. annual dieback of grass foliage (1)
+nf_set_loss <- function(path, mult, pool, total) {
   m <- copy(mult)[, Value := as.numeric(Value)]
   grp <- intersect(paste(unique(path[FromStockTypeId == pool, FlowTypeId]), "[Type]"), m[Value > 0, FlowGroupId])
   if (!length(grp)) stop("no flow out of ", pool)
-  v0 <- m[match(grp, FlowGroupId), Value]
-  gap <- function(f) { m[match(grp, FlowGroupId), Value := v0 * f]; nf_steady(nf_flows(path, m, memb, order), growth)$stock[[pool]] - target }
-  hi <- 1 / max(v0); g_lo <- gap(1e-6); g_hi <- gap(hi)
-  if (sign(g_lo) == sign(g_hi)) stop(sprintf("%s: no loss rate up to 1 holds %.2f Mg C/ha", pool, target))
-  f <- uniroot(gap, c(1e-6, hi), f.lower = g_lo, f.upper = g_hi, tol = 1e-13)$root; gap(f)
-  list(mult = m, factor = f, groups = grp) }
+  v0 <- m[match(grp, FlowGroupId), Value]; m[match(grp, FlowGroupId), Value := v0 * total / sum(v0)]; m }
+
+# ---- age: a growth curve by age and the pools along it after a stand-replacing fire --------------------------------------------
+# One year at age a (ST-Sim: transitions, then flows; a flow multiplier or state attribute by age is looked up at the cell's age that
+# year): `rates_at(a)` gives that year's group values and `growth_at(a)` its Net Growth. A fire moves each stock by the event fractions
+# `fire` (From, To, share; To may be outside the pools) before the year at age 0. Returns the stocks at the start of each age 0..max:
+# a cell whose age is A at the start of a year holds the stocks the previous year (age A - 1) left; age 0 = just after the fire.
+nf_after_fire <- function(path, memb, order, rates_at, growth_at, S0, fire, max_age) {
+  S <- S0
+  for (k in seq_len(nrow(fire))) { f <- fire$From[k]; if (!f %in% names(S)) next
+    amt <- S0[[f]] * fire$Share[k]; S[f] <- S[f] - amt; if (fire$To[k] %in% names(S)) S[fire$To[k]] <- S[fire$To[k]] + amt }
+  out <- vector("list", max_age + 1); out[[1]] <- S
+  for (a in 0:(max_age - 1)) { m <- nf_annual_map(nf_flows(path, rates_at(a), memb, order), growth_at(a))
+    x <- setNames(rep(0, length(m$pools)), m$pools); x[intersect(names(S), m$pools)] <- S[intersect(names(S), m$pools)]
+    x <- (m$M %*% x + m$c)[, 1]; S[names(x)] <- x; out[[a + 2]] <- S }
+  rbindlist(lapply(seq_along(out), function(i) data.table(Age = i - 1L, pool = names(out[[i]]), Value = unname(out[[i]])))) }
 
 # ---- emergent wetlands: the rates that hold a class at its targets --------------------------------------------------------------
 # Pools: Foliage and Fine Root (growth), AG and BG Very Fast (litter), BG Slow (soil 0-30 cm), Deep Soil (burial sink), Aquatic.

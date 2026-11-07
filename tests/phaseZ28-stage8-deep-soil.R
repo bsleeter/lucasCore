@@ -31,13 +31,16 @@ cls <- unname(key("stsim_StateClass")[as.character(val(ic$StateClassFileName))])
 ds <- val(new[StockTypeId == "Deep Soil", RasterFileName]); land <- !is.na(ds)
 expect("every land cell's ecodivision and state class are named", !anyNA(cls[land]) && !anyNA(eco[land]))
 stl <- fread(file.path(pkg, "defaults/initialstocks/stock-types.csv"))
-tab <- rbind(fread(file.path(pkg, "defaults/initialstocks/grassland-shrubland.csv")), fread(file.path(pkg, "defaults/initialstocks/emergent-wetland.csv")))
+tab <- rbind(fread(file.path(pkg, "defaults/initialstocks/grassland-shrubland.csv")), fread(file.path(pkg, "defaults/initialstocks/emergent-wetland.csv")),
+             fread(file.path(pkg, "defaults/initialstocks/chaparral.csv")))   # chaparral by age since fire (AgeMin), the others by class
 tab[, pool := stl$StockTypeId[match(StateAttributeTypeID, stl$Attribute)]]
 nf <- land & cls %in% tab$StateClassID
+age <- val(ic$AgeFileName); tab[, key := paste(StratumID, StateClassID, ifelse(is.na(AgeMin), "", AgeMin))]
+amax <- max(tab$AgeMin, na.rm = TRUE); ckey <- paste(eco, cls, ifelse(cls %in% tab[!is.na(AgeMin), StateClassID], pmin(pmax(round(age), 0), amax), ""))
 cat(sprintf("%d land cells: %d grassland, shrubland or emergent wetland (%s)\n", sum(land), sum(nf), paste(names(table(cls[nf])), table(cls[nf]), collapse = ", ")))
 gtab <- 0; gold <- 0
 for (k in new$StockTypeId) { x <- val(new[StockTypeId == k, RasterFileName])
-  w <- tab[pool == k]; e <- w$Value[match(paste(eco, cls), paste(w$StratumID, w$StateClassID))]; e[is.na(e) & nf] <- 0
+  w <- tab[pool == k]; e <- w$Value[match(ckey, w$key)]; e[is.na(e) & nf] <- 0
   if (k == "DOM: Belowground Slow") e[nf & e == 0] <- NA   # a 0 class value takes gNATSGO (stage 8's rule); none of these classes has one
   gtab <- max(gtab, max(abs(x[nf] - e[nf]), na.rm = TRUE))
   if (k %in% old$StockTypeId) gold <- max(gold, max(abs(x[land & !nf] - val(old[StockTypeId == k, RasterFileName])[land & !nf]), na.rm = TRUE)) }

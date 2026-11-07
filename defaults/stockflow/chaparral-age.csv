@@ -1,0 +1,15 @@
+Parameter,Value,Source
+AgMax,11,Aboveground live carbon at maturity (Mg C/ha) at the class's CONUS mean NPP: chamise 21.3 Mg/ha in stands over 30 years x 0.5 (Bohlman et al. 2018 doi 10.3120/0024-9637-65.1.28; full text); scaled by each ecodivision's RAP NPP
+AgRate,0.09,Curve 1 - exp(-0.09 x age): fitted to Bohlman 2018 chamise means (6.7 / 19.2 / 21.3 Mg/ha at 1-10 / 11-30 / >30 yr); inference. Mixed or Ceanothus chaparral (22 x (1 - exp(-0.15 x age))^3) is the high case
+FoliageMature,0.12,Foliage share of aboveground live at maturity: chamise 11-13% (Riggan et al. 1988 doi 10.2307/2937023; Bohlman 2018)
+FoliageYoung,0.25,Foliage share = FoliageMature + FoliageYoung x exp(-FoliageDecline x age): 0.34 at age 1 (scrub oak 37% one year after fire; Riggan 1988); curve is inference
+FoliageDecline,0.15,see FoliageYoung
+RootShoot,0.6,Belowground / aboveground live at maturity: stand value 0.6 (Kummerow et al. 1977; Miller and Ng 1977; via Bohlman 2018; second-hand)
+FineRootShare,0.25,Share of root carbon in fine roots: inference (no measured split for western shrubs)
+RootSurvival,0.75,Share of live roots (and burls) surviving a high-severity fire: resprouter-dominated chamise (resprouting 10-98% by species; Keeley 2006); inference
+SnagToLive,0.35,Standing dead (snag branches) / aboveground live at maturity (Bohlman 2018 dead/live 0.30-0.39)
+FireFoliage,0.95,Share of foliage combusted by high-severity fire (rest to AG very fast litter): inference
+FireWood,0.55,Share of aboveground wood combusted (rest stays standing as snag branches): inference (30-75% of biomass is available fuel; Regelbrugge and Conard 1996)
+FireDead,0.8,Share of litter (AG very fast and fast) and standing dead combusted: inference
+FireAgSlow,0.5,Share of AG Slow combusted: inference
+AgeMax,100,Ages 0-99 one row each; 100 and over take the mature values

@@ -42,7 +42,9 @@ expect("fire snag share rows equal the earlier implementation's", identical(o$k,
 pre <- function(m, s) fread(file.path(pkg, "defaults", "carbon-assumptions", m, paste0(s, ".csv")), colClasses = "character", na.strings = "")
 for (m in c("fia-measured", "cbm-defaults")) { p <- pre(m, "disturbance-flows"); src <- events_to_sheet(if (m == "fia-measured") ev else lucas)
   ky <- function(x) sort(x[, paste(Disturbance, AgeMin, FromStockTypeId, ToStockTypeId, as.numeric(Share))])
-  expect(sprintf("%s preset Disturbance Flows = its event table", m), identical(ky(p), ky(src)), sprintf("%d rows", nrow(p))) }
+  # the all-classes rows are the event table's; chaparral has its own high-severity fire rows since 2026-11-06 (tools/make_grass_shrub.R)
+  expect(sprintf("%s preset Disturbance Flows (all classes) = its event table", m), identical(ky(p[is.na(StateClassId)]), ky(src)), sprintf("%d rows", nrow(p[is.na(StateClassId)])))
+  expect(sprintf("%s preset has chaparral's own high-severity fire rows", m), p[StateClassId %in% "Shrubland: Chaparral" & Disturbance == "High-severity fire", .N] > 0) }
 expect("fia-measured preset Fire Snag Share = defaults/spinup/fire-snag-share.csv", nrow(pre("fia-measured", "fire-snag-share")) == nrow(rd("spinup", "fire-snag-share.csv")))
 expect("cbm-defaults preset has no fire snag shares or calibration settings", !nrow(pre("cbm-defaults", "fire-snag-share")) && !nrow(pre("cbm-defaults", "decay-calibration-settings")))
 for (m in c("fia-measured", "cbm-defaults")) expect(sprintf("%s preset CBM Crosswalk = defaults/cbm/species-crosswalk.csv", m), nrow(pre(m, "cbm-crosswalk")) == nrow(rd("cbm", "species-crosswalk.csv")))
