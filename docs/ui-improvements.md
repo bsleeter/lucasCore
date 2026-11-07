@@ -288,7 +288,12 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
         lose their grass and shrub rows; sync-library step 7 removes legacy grass and shrub rows too.
       - **Tests:** tests/unit-nonforest-solve.R 29 of 29 (grass and shrub: only BG Slow's outflow changed, Net Growth = NPP, pools =
         steady state within 5e-5, soil targets met). dev/nonforest/02-emergent-stsim-check.R with five grass and shrub classes added:
-        PASS in real ST-Sim over 30 years (largest gap 1.1e-4 Mg C/ha, the 4-decimal rounding of the starting pools).
+        PASS in real ST-Sim over 30 years (largest gap 1.1e-4 Mg C/ha, the 4-decimal rounding of the starting pools). In SyncroSim on
+        lucasCore-suitability.ssim: tests/phaseZ25-nonforest-carbon.R ALL PASS; tests/phaseZ28-stage8-deep-soil.R ALL PASS (819 grass and
+        shrub cells start at their ecodivision x class pools, Deep Soil included, largest gap 1.7e-6; every other cell = Build 47).
+      - **Next (user, 2026-11-06):** fit the live and dead pools as well, chaparral by age, and keep IBIS out of this option (literature
+        values only; IBIS stays the legacy choice). A research pass on litter and root decay, the fate of decomposed carbon, live
+        turnover and allocation, and chaparral after fire is running first ("Grass and shrub turnover and decay").
       - **Open:** eastern grass and shrub rest on few untreed cells and RAP is built for rangelands; growth by age after fire (step 8);
         live and litter targets (RAP biomass, shrub literature, FCCS) not yet used.
     2. **Use only the pools each class has.** Keep the shared stock types; turn off the flows that do not apply. Grass: foliage, fine
