@@ -396,6 +396,19 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
        Non-Forest Growth sheet already has an age column) in place of a constant rate at equilibrium. Matters most in P26.
     9. **Validation throughout,** against data the calibration did not use: RaCA soil carbon, AmeriFlux grassland and sagebrush sites,
        and the US greenhouse gas inventory's grassland and cropland soil change totals.
+    10. **Emergent wetlands vary across the map (planned 2026-11-07, user: at least look at these as options).** Emergent wetlands
+        have no spatial or climate multiplier today; growth, burial and soil are one value per ecodivision x class. Candidates, from
+        memory and not yet checked (data release, coverage, access):
+        - Tidal marsh growth: Byrd et al. 2018 (USGS), 30 m CONUS tidal marsh aboveground carbon from Landsat and field plots, as a
+          multiplier the way RAP is for grass and shrub (cell / ecodivision x class mean, filled to nearby cells). It is standing
+          biomass, not growth: assumes growth scales with biomass (reasonable for marsh grasses that turn over yearly).
+        - Tidal marsh soil: Holmquist et al. 2018, 30 m tidal wetland soil carbon to 1 m, in place of the regional value; soil decay
+          then per cell or calibrated to the ecodivision mean, as forest's is.
+        - Inland (palustrine) marsh: no national productivity map fit for wetlands (RAP misreads flooded vegetation; MODIS NPP is
+          500 m and poor over wetlands). The NWI water regime (temporarily, seasonally, semi-permanently flooded) could modify decay
+          and burial instead of growth; the decay difference by regime would come from thin literature.
+        - A climate response for wetland decomposition (temperature), which likely matters more for projections than either map.
+        Order if adopted: tidal growth and soil first (same pattern as step 5), then NWI water regime, then the climate response.
     - Still open from the review: root turnover, chaparral root:shoot, Non-sage shrub (no data), shrub litter decay rates, the pasture
       management factor, the wetland 0-30 cm and deeper split, the IPCC climate-zone raster.
 46. **CO2 fertilization** - TO DO, open science (user, 2026-11-04: how can we introduce the effect of CO2 fertilization into the model?).
