@@ -15,6 +15,9 @@
 #   --bookend-maps  all maps (state class, age, transitions, stock groups) in the first and last year only, no flow maps: for fine
 #                   resolutions, where yearly maps of every group run to many GB
 #   --replace       delete an existing scenario of the same name first
+#   --also=<id,...> further result scenarios to depend on after the build (a quick test: --build=<the rerun of a few stages>
+#                   --also=<the Build result>; tools/quick-test.R)
+#   --years=N       run only the first N years (testing)
 #   --historical-only  stop at the historical end even when the build has a projection (the run that seeds stand-alone projections;
 #                   with --bookend-maps it maps the historical end year, which tools/new-projection.R starts from)
 # Prints the new scenario id on the last line.
@@ -27,7 +30,12 @@ sc <- as.data.table(scenario(L, summary = TRUE))
 bid <- as.integer(opt("build", NA))
 if (is.na(bid)) { b <- sc[IsResult == "Yes" & grepl("Build", Name, fixed = TRUE)]; if (!nrow(b)) stop("no Build result in the library: run a Build scenario first"); bid <- max(b$ScenarioId) }
 if (!bid %in% sc[IsResult == "Yes", ScenarioId]) stop(sprintf("scenario %d is not a result scenario", bid))
-B <- scenario(L, bid); n <- function(s) nrow(suppressWarnings(datasheet(B, s, optional = TRUE)))
+# --also: further result scenarios after the build, in priority order (a quick test: a rerun of a few Build stages first, then the Build)
+also <- as.integer(strsplit(opt("also", ""), ",")[[1]]); also <- also[!is.na(also)]
+for (x in also) if (!x %in% sc[IsResult == "Yes", ScenarioId]) stop(sprintf("--also: scenario %d is not a result scenario", x))
+bids <- c(bid, also); BB <- lapply(bids, function(i) scenario(L, i))
+n <- function(s) sum(vapply(BB, function(B) nrow(suppressWarnings(datasheet(B, s, optional = TRUE))), 1L))
+first_with <- function(s) { for (B in BB) { x <- suppressWarnings(as.data.table(datasheet(B, s, optional = TRUE))); if (nrow(x)) return(x) }; data.table() }
 # the stock-flow definitions: in the Build result when its pipeline ran stage 0 (a library made in Studio), else the Stock-Flow
 # Definitions scenario of a starter copy or new-library.R library, as a second dependency
 sfd <- sc[Name == "Stock-Flow Definitions" & IsResult == "No", ScenarioId][1]
@@ -41,21 +49,23 @@ miss <- names(need)[vapply(names(need), n, 1L) == 0]
 if (length(miss)) stop(sprintf("Build result %d lacks %s: run stages %s in it", bid, paste(miss, collapse = ", "), paste(unique(need[miss]), collapse = ", ")))
 if (!n("stsim_FlowSpatialMultiplier")) cat("note: the build has no climate flow multipliers (stage 7 not run, or Climate Options all None): the run uses normal climate\n")
 # the years the build used (a blank Build Options sheet means the package defaults): stage 5's annual NLCD covers StartYear-EndYear
-ny <- as.data.table(datasheet(B, "lucasCore_OutputNlcdAnnual"))$Year
+ny <- first_with("lucasCore_OutputNlcdAnnual")$Year
 if (!length(ny)) stop(sprintf("Build result %d has no annual NLCD table: run stage 5 in it", bid)); y0 <- min(ny); y1 <- max(ny)
 # mode 1: when the build ran stage 9 (a projection), the run continues through the projection end with the schedule's iterations
-ps <- suppressWarnings(as.data.table(datasheet(B, "lucasCore_OutputProjectionSchedule", optional = TRUE)))
+ps <- first_with("lucasCore_OutputProjectionSchedule")
 yh <- y1; pit <- NA_integer_
 if ("--historical-only" %in% a) ps <- ps[0]   # mode 2: only the historical years, to seed stand-alone projections (tools/new-projection.R)
 if (nrow(ps)) { y1 <- max(ps$Timestep); pit <- max(ps$Iteration) }
 kind <- if (nrow(ps)) "Historical and Projection" else "Historical"
+# --years=N: a short run for testing, the first N years only (no projection)
+yn <- as.integer(opt("years", NA)); if (!is.na(yn)) { if (nrow(ps)) stop("--years: the build has a projection; add --historical-only"); y1 <- min(y1, y0 + yn); yh <- y1 }
 
 nm <- opt("name", sprintf("%s %d-%d", kind, y0, y1))
 if (nrow(sc[Name == nm & IsResult == "No"])) { if (!"--replace" %in% a) stop(sprintf("scenario '%s' exists (use --replace)", nm))
   for (i in sc[Name == nm & IsResult == "No", ScenarioId]) delete(L, scenario = i, force = TRUE) }
 # the build first: a dependency supplies whole data feeds, and Flow Pathways (diagram + pathways) is one feed that both scenarios hold;
 # with Stock-Flow Definitions first, its diagram-only feed wins and the run has no flow pathways (no flows at all; found 2026-10-21)
-S <- rsyncrosim::scenario(P, nm); dependency(S) <- c(bid, sfd)
+S <- rsyncrosim::scenario(P, nm); dependency(S) <- c(bids, sfd)
 it <- as.integer(opt("iterations", if (is.na(pit)) 1L else pit))
 if (!is.na(pit) && it > pit) stop(sprintf("the build's projection schedule has %d iterations: run at most that many (Projection Options sets it)", pit))
  ev <- as.integer(opt("raster-every", 1))

@@ -78,13 +78,25 @@ check(STAGE, "every forest cell finds its ecodivision x class x last disturbance
       sprintf("%d of %d forest cells unmatched (e.g. %s)", sum(is.na(m)), sum(isF), paste(head(unique(key[isF][is.na(m)]), 3), collapse = "; ")))
 cc <- which(!is.na(st$CurveColumn))   # Deep Soil has no curve column: forest starts with none
 out[which(isF)[!is.na(m)], cc] <- as.matrix(cv[m[!is.na(m)], st$CurveColumn[cc], with = FALSE]); src_of[isF] <- "stock curves (stage 4)"
+source(pkg_file("src", "productivity-fill.R"))
+
+# ---- stage 8 rerun on its own (a scenario depending on a Build result, for a quick test) ---------------------------------------
+# Its productivity rows below would hide the Build's Flow Spatial Multipliers (a scenario's own rows hide a dependency's), the
+# Climate ones of stage 7 included, so when this scenario has none of its own the dependency's other rows come along first
+gpv0 <- opt$GrassShrubProductivity[1]; spv0 <- opt$SiteProductivity[1]
+if (any(vapply(list(spv0, gpv0), function(v) !is.null(v) && !is.na(v) && !identical(suppressWarnings(as.integer(v)), 1L) && !identical(as.character(v), "None"), TRUE))) {
+  own <- as.data.table(datasheet(scn, "stsim_FlowSpatialMultiplier", optional = TRUE, lookupsAsFactors = FALSE))
+  if (!nrow(own)) { dm <- dependency_multipliers(setdiff(stsim_list("FlowMultiplierType")$Name, c("Site Productivity", "Grass and Shrub Productivity")))
+    if (!is.null(dm)) { write_stsim(dm[, intersect(names(dm), c("Timestep", "FlowGroupId", "FlowMultiplierTypeId", "MultiplierFileName")), with = FALSE], "FlowSpatialMultiplier")
+      say("Flow Spatial Multipliers: %d rows of the dependency carried over (%s), so the productivity rows do not hide them", nrow(dm), paste(unique(dm$FlowMultiplierTypeId), collapse = ", ")) } } }
 
 # ---- Site Productivity (Build Options; to-do 35, docs/treemap-plan.md) ------------------------------------------------------
 # A forest cell's growth multiplier = sum over FIA site classes of the share of its TreeMap pixels in the class (stage 5) x its forest
-# type x ecodivision's multiplier for the class (stage 2); a cell without TreeMap pixels keeps 1. It becomes the Site Productivity flow
-# spatial multiplier on forest growth, which multiplies with the Climate one in each cell, so the cell's live carbon follows m x its
-# curve. Its starting live and dead carbon are scaled by m too (their inputs all come from live carbon and decay is first order); the
-# deep soil (belowground slow, calibrated to gNATSGO) is not. Non-forest cells stay 1 (a cell that becomes forest later grows at 1).
+# type x ecodivision's multiplier for the class (stage 2). It becomes the Site Productivity flow spatial multiplier on forest growth,
+# which multiplies with the Climate one in each cell, so the cell's live carbon follows m x its curve. Its starting live and dead
+# carbon are scaled by m too (their inputs all come from live carbon and decay is first order); the deep soil (belowground slow,
+# calibrated to gNATSGO) is not. Every other land cell, forest without TreeMap pixels included, takes the multiplier of the forest
+# cells near it (src/productivity-fill.R; 2026-11-07), so a cell that becomes forest during a run grows like the forest around it.
 spv <- opt$SiteProductivity[1]
 site_on <- !is.null(spv) && !is.na(spv) && (identical(suppressWarnings(as.integer(spv)), 2L) || startsWith(as.character(spv), "TreeMap"))
 if (site_on) {
@@ -93,18 +105,24 @@ if (site_on) {
   if (nrow(shs) != 7) fail("Site Productivity: no site class shares - run stage 5 with Site Productivity on (same pipeline)")
   if (!nrow(spm)) fail("Site Productivity: no multipliers - run stage 2 with Site Productivity on (same pipeline)")
   if (!"Site Productivity" %in% stsim_list("FlowMultiplierType")$Name) fail("Site Productivity: the library has no Flow Multiplier Type 'Site Productivity' - run tools/sync-library.R on it")
-  fpath <- function(fn) if (file.exists(fn)) fn else file.path(paste0(main_library(), ".data"), sprintf("Scenario-%d", scenarioId(scn)), ds("OutputSiteClassMap"), basename(fn))
+  # the share maps sit in this result's folder, or in a dependency's when only stage 8 is rerun
+  fpath <- function(fn) { if (file.exists(fn)) return(fn)
+    p <- file.path(paste0(main_library(), ".data"), sprintf("Scenario-%d", c(scenarioId(scn), run_dependencies())), ds("OutputSiteClassMap"), basename(fn))
+    if (any(file.exists(p))) p[file.exists(p)][1] else fail("Site Productivity: site class share map %s not found", basename(fn)) }
   X <- values(rast(vapply(shs[order(SiteClass), FileName], fpath, "")), mat = TRUE)
   wk <- dcast(spm, StratumId + StateClassId ~ SiteClass, value.var = "Multiplier")
   M <- as.matrix(wk[match(paste(sname, cname), paste(wk$StratumId, wk$StateClassId)), as.character(1:7), with = FALSE])
   has <- rowSums(!is.na(X)) > 0 & !is.na(M[, 1])
   mult <- rep(1, ncell(P)); use <- isF & has; mult[use] <- rowSums(X[use, , drop = FALSE] * M[use, , drop = FALSE], na.rm = TRUE)
-  check(STAGE, "site productivity: every forest cell's multiplier is finite and within 0.3-2.5", all(is.finite(mult[isF]) & mult[isF] >= 0.3 - 1e-9 & mult[isF] <= 2.5 + 1e-9))
+  fl <- fill_multiplier(P, mult, use, land & !use); mult <- fl$mult
+  check(STAGE, "site productivity: every land cell's multiplier is finite and within 0.3-2.5", all(is.finite(mult[land]) & mult[land] >= 0.3 - 1e-9 & mult[land] <= 2.5 + 1e-9))
   bgs0 <- which(st$StockTypeId == "DOM: Belowground Slow")
   out[isF, -bgs0] <- out[isF, -bgs0] * mult[isF]
   qs <- stats::quantile(mult[isF], c(0.1, 0.5, 0.9))
-  say("Site productivity: forest cells' growth multiplier mean %.2f (10%% %.2f, median %.2f, 90%% %.2f); %.1f%% of forest cells without TreeMap pixels keep 1; their starting live and dead carbon scaled the same way",
-      mean(mult[isF]), qs[1], qs[2], qs[3], 100 * mean(!has[isF]))
+  say("Site productivity: forest cells' growth multiplier mean %.2f (10%% %.2f, median %.2f, 90%% %.2f); %.1f%% of forest cells have no TreeMap pixels (%.1f%% of them filled from nearby forest); their starting live and dead carbon scaled the same way",
+      mean(mult[isF]), qs[1], qs[2], qs[3], 100 * mean(!has[isF]), if (any(isF & !has)) 100 * mean(fl$filled[isF & !has]) else 0)
+  say("Site productivity: %.1f%% of the other land cells filled from forest within 10 km of the same ecodivision (mean %.2f); the rest keep 1",
+      100 * mean(fl$filled[land & !isF]), if (any(fl$filled[land & !isF])) mean(mult[land & !isF & fl$filled]) else 1)
   fg <- "Net Growth Forest: Total"; if (!fg %in% stsim_list("FlowGroup")$Name) fail("Site Productivity: flow group '%s' not found", fg)
   write_stsim(data.table(FlowGroupId = fg, FlowMultiplierTypeId = "Site Productivity",
                          MultiplierFileName = write_raster(setValues(rast(P), ifelse(land, mult, NA)), "SiteProductivity.tif", "FLT4S")), "FlowSpatialMultiplier", append = TRUE)
@@ -138,7 +156,9 @@ src_of[land & is.na(src_of)] <- "zero (developed, agriculture, barren, water, ic
 # trees (tree NPP > herb + shrub) are left out; a cell with none left keeps 1, and the multiplier is capped at 0.3-2.5 as forest's
 # is. It becomes the Grass and Shrub Productivity flow spatial multiplier on Net Growth Non Forest: Total (it multiplies with the
 # Climate one), and the cell's starting live and dead carbon are scaled by it (inputs all come from growth, decay is first order);
-# its soil (BG Slow and Deep Soil) keeps the class mean, as forest's does (user, 2026-11-07). Cells of other classes stay 1.
+# its soil (BG Slow and Deep Soil) keeps the class mean, as forest's does (user, 2026-11-07). Every other land cell, and a grass or
+# shrub cell without RAP pixels, takes the multiplier of the grass and shrub cells near it (src/productivity-fill.R), cells at the
+# 0.3 floor (RAP sees them nearly bare: fallow or graded land mapped as grass) not passed on.
 gpv <- opt$GrassShrubProductivity[1]
 gs_on <- !is.null(gpv) && !is.na(gpv) && (identical(suppressWarnings(as.integer(gpv)), 2L) || startsWith(as.character(gpv), "RAP"))
 if (gs_on) {
@@ -158,14 +178,17 @@ if (gs_on) {
   tnpp <- tg$NPP[match(paste(sname, cname), paste(tg$StratumId, tg$StateClassId))]
   gmult <- rep(1, ncell(P)); use <- isGS & !is.na(vN) & !is.na(tnpp) & tnpp > 0
   gmult[use] <- pmin(pmax(vN[use] / tnpp[use], CAP[1]), CAP[2])
-  check(STAGE, "grass and shrub productivity: every grass and shrub cell's multiplier is finite and within 0.3-2.5", all(is.finite(gmult[isGS]) & gmult[isGS] >= CAP[1] - 1e-9 & gmult[isGS] <= CAP[2] + 1e-9))
+  gfl <- fill_multiplier(P, gmult, use & gmult > CAP[1] + 1e-9, land & !use); gmult <- gfl$mult
+  check(STAGE, "grass and shrub productivity: every land cell's multiplier is finite and within 0.3-2.5", all(is.finite(gmult[land]) & gmult[land] >= CAP[1] - 1e-9 & gmult[land] <= CAP[2] + 1e-9))
   soilj <- which(st$StockTypeId %in% c("DOM: Belowground Slow", "Deep Soil"))
   out[isGS, -soilj] <- out[isGS, -soilj] * gmult[isGS]
   gsum <- data.table(cls = cname[isGS], m = gmult[isGS], has = use[isGS])[, .(Cells = .N, NoRap = round(100 * mean(!has), 1), Mean = round(mean(m), 2),
             P10 = round(quantile(m, 0.1), 2), P90 = round(quantile(m, 0.9), 2), Capped = round(100 * mean(m <= CAP[1] + 1e-9 | m >= CAP[2] - 1e-9), 1)), by = cls][order(-Cells)]
-  say("Grass and shrub productivity (RAP NPP %d-%d): %d cells, multiplier mean %.2f; %.1f%% keep 1 (no RAP pixels left, or no target); their starting live and dead carbon scaled the same way",
+  say("Grass and shrub productivity (RAP NPP %d-%d): %d cells, multiplier mean %.2f; %.1f%% have no RAP pixels left (filled from nearby grass and shrub); their starting live and dead carbon scaled the same way",
       min(RAP_YEARS), max(RAP_YEARS), sum(isGS), mean(gmult[isGS]), 100 * mean(!use[isGS]))
   for (i in seq_len(nrow(gsum))) with(gsum[i], say("  %s: %d cells, mean %.2f (10%% %.2f, 90%% %.2f), %.1f%% without RAP, %.1f%% at the cap", cls, Cells, Mean, P10, P90, NoRap, Capped))
+  say("Grass and shrub productivity: %.1f%% of the other land cells filled from grass and shrub within 10 km of the same ecodivision (mean %.2f); the rest keep 1",
+      100 * mean(gfl$filled[land & !isGS]), if (any(gfl$filled[land & !isGS])) mean(gmult[land & !isGS & gfl$filled]) else 1)
   fg <- "Net Growth Non Forest: Total"; if (!fg %in% stsim_list("FlowGroup")$Name) fail("Grass and Shrub Productivity: flow group '%s' not found", fg)
   write_stsim(data.table(FlowGroupId = fg, FlowMultiplierTypeId = "Grass and Shrub Productivity",
                          MultiplierFileName = write_raster(setValues(rast(P), ifelse(land, gmult, NA)), "GrassShrubProductivity.tif", "FLT4S")), "FlowSpatialMultiplier", append = TRUE)
