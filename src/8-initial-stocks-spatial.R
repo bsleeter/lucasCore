@@ -80,15 +80,16 @@ cc <- which(!is.na(st$CurveColumn))   # Deep Soil has no curve column: forest st
 out[which(isF)[!is.na(m)], cc] <- as.matrix(cv[m[!is.na(m)], st$CurveColumn[cc], with = FALSE]); src_of[isF] <- "stock curves (stage 4)"
 source(pkg_file("src", "productivity-fill.R"))
 
-# ---- stage 8 rerun on its own (a scenario depending on a Build result, for a quick test) ---------------------------------------
-# Its productivity rows below would hide the Build's Flow Spatial Multipliers (a scenario's own rows hide a dependency's), the
-# Climate ones of stage 7 included, so when this scenario has none of its own the dependency's other rows come along first
-gpv0 <- opt$GrassShrubProductivity[1]; spv0 <- opt$SiteProductivity[1]
-if (any(vapply(list(spv0, gpv0), function(v) !is.null(v) && !is.na(v) && !identical(suppressWarnings(as.integer(v)), 1L) && !identical(as.character(v), "None"), TRUE))) {
-  own <- as.data.table(datasheet(scn, "stsim_FlowSpatialMultiplier", optional = TRUE, lookupsAsFactors = FALSE))
-  if (!nrow(own)) { dm <- dependency_multipliers(setdiff(stsim_list("FlowMultiplierType")$Name, c("Site Productivity", "Grass and Shrub Productivity")))
-    if (!is.null(dm)) { write_stsim(dm[, intersect(names(dm), c("Timestep", "FlowGroupId", "FlowMultiplierTypeId", "MultiplierFileName")), with = FALSE], "FlowSpatialMultiplier")
-      say("Flow Spatial Multipliers: %d rows of the dependency carried over (%s), so the productivity rows do not hide them", nrow(dm), paste(unique(dm$FlowMultiplierTypeId), collapse = ", ")) } } }
+# a productivity multiplier's Flow Spatial Multiplier row: this type's row replaced, every other row kept. When stage 8 is rerun on
+# its own on a Build result (tools/quick-test.R) the result already holds the Build's rows, this type's included, and a second row of
+# one flow group and type stops ST-Sim ("Object reference not set", 2026-11-07); in a Build the sheet holds stage 7's Climate rows
+put_multiplier <- function(type, fg, file) {
+  x <- as.data.table(datasheet(scn, "stsim_FlowSpatialMultiplier", optional = TRUE, lookupsAsFactors = FALSE))
+  if (nrow(x) && "FlowMultiplierTypeId" %in% names(x) && any(x$FlowMultiplierTypeId %in% type)) {
+    x <- x[!FlowMultiplierTypeId %in% type, intersect(names(x), c("Timestep", "FlowGroupId", "FlowMultiplierTypeId", "MultiplierFileName")), with = FALSE]
+    write_stsim(rbind(x, data.table(FlowGroupId = fg, FlowMultiplierTypeId = type, MultiplierFileName = file), fill = TRUE), "FlowSpatialMultiplier")
+    say("%s: replaced the row of the result this stage reran on (%d other Flow Spatial Multiplier rows kept)", type, nrow(x))
+  } else write_stsim(data.table(FlowGroupId = fg, FlowMultiplierTypeId = type, MultiplierFileName = file), "FlowSpatialMultiplier", append = TRUE) }
 
 # ---- Site Productivity (Build Options; to-do 35, docs/treemap-plan.md) ------------------------------------------------------
 # A forest cell's growth multiplier = sum over FIA site classes of the share of its TreeMap pixels in the class (stage 5) x its forest
@@ -124,8 +125,7 @@ if (site_on) {
   say("Site productivity: %.1f%% of the other land cells filled from forest within 10 km of the same ecodivision (mean %.2f); the rest keep 1",
       100 * mean(fl$filled[land & !isF]), if (any(fl$filled[land & !isF])) mean(mult[land & !isF & fl$filled]) else 1)
   fg <- "Net Growth Forest: Total"; if (!fg %in% stsim_list("FlowGroup")$Name) fail("Site Productivity: flow group '%s' not found", fg)
-  write_stsim(data.table(FlowGroupId = fg, FlowMultiplierTypeId = "Site Productivity",
-                         MultiplierFileName = write_raster(setValues(rast(P), ifelse(land, mult, NA)), "SiteProductivity.tif", "FLT4S")), "FlowSpatialMultiplier", append = TRUE)
+  put_multiplier("Site Productivity", fg, write_raster(setValues(rast(P), ifelse(land, mult, NA)), "SiteProductivity.tif", "FLT4S"))
 }
 # class tables: by class (and age for forested wetland, and ecodivision where the table has a StratumID column)
 lt <- function(f) { x <- read_default("initialstocks", f); setnames(x, gsub("ID$", "Id", names(x)))
@@ -190,8 +190,7 @@ if (gs_on) {
   say("Grass and shrub productivity: %.1f%% of the other land cells filled from grass and shrub within 10 km of the same ecodivision (mean %.2f); the rest keep 1",
       100 * mean(gfl$filled[land & !isGS]), if (any(gfl$filled[land & !isGS])) mean(gmult[land & !isGS & gfl$filled]) else 1)
   fg <- "Net Growth Non Forest: Total"; if (!fg %in% stsim_list("FlowGroup")$Name) fail("Grass and Shrub Productivity: flow group '%s' not found", fg)
-  write_stsim(data.table(FlowGroupId = fg, FlowMultiplierTypeId = "Grass and Shrub Productivity",
-                         MultiplierFileName = write_raster(setValues(rast(P), ifelse(land, gmult, NA)), "GrassShrubProductivity.tif", "FLT4S")), "FlowSpatialMultiplier", append = TRUE)
+  put_multiplier("Grass and Shrub Productivity", fg, write_raster(setValues(rast(P), ifelse(land, gmult, NA)), "GrassShrubProductivity.tif", "FLT4S"))
 }
 progressBar()
 
