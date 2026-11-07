@@ -12,7 +12,7 @@
 #   5. finish       the handler unpacks and clips into the dataset's place under the home folder (src/datahome.R); national
 #                   copies are clipped to the region unless Keep national copies is ticked
 #   6. record       files.csv gets each file's size and sha256, the manifest one row (status, region, source, version, DOI);
-#                   the downloaded archives are deleted
+#                   records/ a copy of both (src/datahome.R, home_restore_records); the downloaded archives are deleted
 # A dataset that fails is recorded failed with its error, and the others go on. No rsyncrosim here: the stage passes `log`.
 # =============================================================================
 
@@ -208,6 +208,7 @@ run_dataset <- function(h, ctx, layout, check_only = FALSE) {
     Units = ctx$region$units, BufferKm = ctx$region$buffer_km, Xmin = ctx$region$box[1], Ymin = ctx$region$box[2], Xmax = ctx$region$box[3], Ymax = ctx$region$box[4],
     Files = nrow(fr), Bytes = sprintf("%.0f", sum(as.numeric(fr$Bytes))), Downloaded = format(Sys.time(), "%Y-%m-%dT%H:%M:%S"), Status = "done",
     Note = if ("note" %in% names(items)) items$note[1] else if (!is.null(h$note)) h$note else NA_character_))
+  write_record(ctx$store, col)   # the same rows in records/, which a folder copy takes along (to-do 52)
   unlink(ctx$dl, recursive = TRUE)
   log(sprintf("%s: done, %d files, %.0f MB at %s", h$name, nrow(fr), sum(as.numeric(fr$Bytes)) / 1e6, substring(path, nchar(ctx$home) + 2)))
   out("done", nrow(fr), sum(as.numeric(fr$Bytes)) / 1e6, held_in(where)) }

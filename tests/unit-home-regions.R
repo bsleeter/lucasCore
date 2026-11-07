@@ -106,4 +106,24 @@ expect("growing adds two years", r$Status == "done" && length(g1) == 5)
 expect("growing leaves the first three byte for byte", identical(g0, g1[names(g0)]))
 expect("files.csv lists all five", nrow(read_files(file.path(home, "regions/P26"))[Column == "TestFolder"]) == 5)
 
+# ---- records/ (to-do 52): tables lost, files in place ------------------------------------------------------------------------
+# 2026-11-04: the home was copied folders only; the top-level manifest.csv and files.csv stayed behind and 9 GB was fetched again
+expect("a done dataset keeps its rows in records/", all(file.exists(record_files(home, "TestNational"))) && all(file.exists(record_files(file.path(home, "regions/P26"), "TestFile"))))
+top0 <- read_manifest(home); invisible(file.remove(file.path(home, c("manifest.csv", "files.csv"))))
+rp <- file.path(home, "regions/P26"); p0 <- read_files(rp); invisible(file.remove(file.path(rp, "files.csv")))   # a region that lost only files.csv
+expect("with the tables gone the national dataset is not up to date", !dataset_up_to_date(home, "TestNational", region(P26, "P26")))
+msg <- character(); got <- home_restore_records(home, function(x) msg <<- c(msg, x))
+expect("restore puts the top rows back", setequal(got, top0[Status == "done", Column]) && identical(read_manifest(home)[Column == "TestNational", Copy], "national"))
+expect("restore says what it restored", any(grepl("restored the manifest.csv and files.csv rows of", msg)))
+expect("restore puts a region's files.csv rows back", "TestFile" %in% home_restore_records(rp, function(x) invisible()) && setequal(read_files(rp)$Path, p0$Path))
+fetched <- FALSE; H_watch <- modifyList(H_nat, list(plan = function(ctx) { fetched <<- TRUE; H_nat$plan(ctx) }))
+expect("after the restore a rerun skips without planning a fetch", run_dataset(H_watch, a, layout)$Status == "skipped" && !fetched)
+# a file changed since its record: not restored, and the rerun fetches
+invisible(file.remove(file.path(home, c("manifest.csv", "files.csv")))); writeLines("CONUS, changed", file.path(home, "t/national/n.tif"))
+msg <- character(); got <- home_restore_records(home, function(x) msg <<- c(msg, x))
+expect("a dataset whose file changed size is not restored", !"TestNational" %in% got && any(grepl("TestNational: .*not restored", msg)))
+# an existing done row with no record (a home filled before records/) gets one
+invisible(file.remove(record_files(rp, "TestFolder"))); home_restore_records(rp, function(x) invisible())
+expect("a done dataset without a record gets one", all(file.exists(record_files(rp, "TestFolder"))))
+
 cat(sprintf("\n%d passed, %d failed\n", ok, bad)); if (bad) quit(status = 1)

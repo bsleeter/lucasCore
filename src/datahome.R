@@ -74,6 +74,38 @@ write_manifest <- function(home, rows) {
   .write_home_table(home, "manifest.csv", MANIFEST_COLS, read_manifest(home), rows) }
 write_files <- function(home, rows) .write_home_table(home, "files.csv", FILES_COLS, read_files(home), rows)
 
+# ---- records/: a copy of each dataset's rows (to-do 52) -----------------------------------------------------------------
+# manifest.csv and files.csv are the only record that a dataset is in place, and they sit loose at the top of a folder: on
+# 2026-11-04 the home was copied to E:/lucasData folders only, the top-level tables were left behind, and the next Data Download
+# fetched about 9 GB already there. So each done dataset's rows are also kept in <folder>/records/<Column>-manifest.csv and
+# <Column>-files.csv, a folder that a folder copy takes along, and restored from there when the tables lack them.
+record_files <- function(home, column) file.path(home, "records", paste0(column, c("-manifest.csv", "-files.csv")))
+write_record <- function(home, column) {
+  m <- read_manifest(home)[Column == column & Status == "done"]; f <- read_files(home)[Column == column]
+  if (!nrow(m) || !nrow(f)) return(invisible(FALSE))
+  dir.create(file.path(home, "records"), showWarnings = FALSE); p <- record_files(home, column)
+  for (i in 1:2) { tmp <- paste0(p[i], ".tmp"); data.table::fwrite(if (i == 1) m else f, tmp); file.rename(tmp, p[i]) }
+  invisible(TRUE) }
+
+# restore the rows of every dataset whose record is in records/ while the tables lack them (no done manifest row, or no files.csv
+# rows), when every recorded file is on disk at its recorded size; a done dataset with no record yet gets one. Returns the
+# restored columns; `log` says what was restored and what could not be (a file missing or of another size)
+home_restore_records <- function(home, log = message, label = home) {
+  if (is.null(home) || !dir.exists(home)) return(invisible(character()))
+  m <- read_manifest(home); f <- read_files(home)
+  for (k in m[Status == "done" & Column %in% f$Column, Column]) if (!all(file.exists(record_files(home, k)))) write_record(home, k)
+  recs <- sub("-manifest\\.csv$", "", list.files(file.path(home, "records"), pattern = "-manifest\\.csv$"))
+  done <- character()
+  for (k in recs) { if (nrow(m[Column == k & Status == "done"]) && nrow(f[Column == k])) next
+    p <- record_files(home, k); if (!file.exists(p[2])) next
+    rm <- .home_table(file.path(home, "records"), basename(p[1]), MANIFEST_COLS); rf <- .home_table(file.path(home, "records"), basename(p[2]), FILES_COLS)
+    on <- file.path(home, rf$Path); bad <- !file.exists(on) | file.size(on) != as.numeric(rf$Bytes)
+    if (!nrow(rm) || !nrow(rf) || any(bad)) { log(sprintf("%s: records/%s holds its rows, but %d of %d files are missing or another size: not restored", k, basename(p[1]), sum(bad), nrow(rf))); next }
+    write_files(home, rf); write_manifest(home, rm); done <- c(done, k) }
+  if (length(done)) log(sprintf("%s: restored the manifest.csv and files.csv rows of %d datasets from records/ (every file in place at its recorded size): %s",
+                                label, length(done), paste(done, collapse = ", ")))
+  invisible(done) }
+
 # the file rows of one dataset as on disk now: every file under its home place, path relative to the home folder. sha256 only
 # when asked (it reads every byte)
 files_rows <- function(home, column, path, sha = FALSE) {
@@ -180,6 +212,7 @@ home_to_region <- function(home, name, pkgdir, dry = FALSE, log = message) {
   # the tables: rows move with their files (written region first, so a stop leaves the rows where the files are)
   .write_home_table(dest, "files.csv", FILES_COLS, read_files(dest), f[Column %in% cols])
   .write_home_table(dest, "manifest.csv", MANIFEST_COLS, read_manifest(dest), m[Column %in% cols])
+  for (k in cols) { write_record(dest, k); old <- record_files(home, k); file.remove(old[file.exists(old)]) }
   for (nm in c("files.csv", "manifest.csv")) { x <- if (nm == "files.csv") f[!Column %in% cols] else m[!Column %in% cols]
     tmp <- file.path(home, paste0(nm, ".tmp")); data.table::fwrite(x, tmp); file.rename(tmp, file.path(home, nm)) }
   fr <- read_files(dest)[Column %in% cols]; p <- file.path(dest, fr$Path)

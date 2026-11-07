@@ -5,7 +5,9 @@
 # dataset: found (the path), missing, or how many files match when it should be one; and the manifest's status and region when the
 # Data Download stage wrote one. --create makes the empty folder layout (nothing is moved or deleted). --to-region=<name> moves a home
 # laid out before regions (its clipped datasets at the top) into regions/<name>, national copies staying (--dry lists the moves).
-# Usage: Rscript tools/data-home.R <home folder> [--create] [--to-region=<name> [--dry]]
+# --restore puts back the manifest.csv and files.csv rows that
+# records/ holds a copy of, where the tables lost them and every file is in place at its recorded size (to-do 52).
+# Usage: Rscript tools/data-home.R <home folder> [--create] [--restore] [--to-region=<name> [--dry]]
 # =============================================================================
 suppressPackageStartupMessages(library(data.table))
 a <- commandArgs(TRUE); pos <- a[!grepl("^--", a)]
@@ -16,6 +18,8 @@ home <- normalizePath(pos[1], winslash = "/", mustWork = FALSE)
 if ("--create" %in% a) { made <- home_create(home, pkg); cat(sprintf("made %d folders in %s\n", length(made), home)) }
 if (!dir.exists(home)) stop("no such folder: ", home)
 tr <- sub("^--to-region=", "", grep("^--to-region=", a, value = TRUE))
+# --restore: put back manifest.csv and files.csv rows from records/ where the tables lost them and the files are in place (to-do 52)
+if ("--restore" %in% a) for (d in c(home, home_regions(home))) home_restore_records(d, function(x) cat(x, "\n", sep = ""), home_label(home, d))
 if (length(tr)) { home_to_region(home, tr[1], pkg, dry = "--dry" %in% a, log = function(x) cat(x, "\n", sep = "")); if ("--dry" %in% a) quit(save = "no") }
 s <- home_status(home, pkg); m <- read_manifest(home)
 s <- merge(s, m[, .(Column, Status, Copy, Units, BufferKm, Downloaded)], by = "Column", all.x = TRUE, sort = FALSE)

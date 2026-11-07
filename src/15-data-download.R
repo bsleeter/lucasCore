@@ -34,6 +34,11 @@ layout <- home_layout(env$PackageDirectory)
 logf <- file.path(home, "logs", sprintf("download-%s.log", format(Sys.time(), "%Y%m%d-%H%M%S")))
 log <- function(x) { say("%s", x); cat(format(Sys.time(), "%H:%M:%S "), x, "\n", sep = "", file = logf, append = TRUE) }
 
+# the tables' rows lost while the datasets' files are still in place (a home copied without its top-level files, to-do 52) come
+# back from records/ before anything is checked: at the top, in every region folder and in every edition folder
+for (d in c(home, home_regions(home), Sys.glob(file.path(c(home, home_regions(home)), "editions", "*"))))
+  home_restore_records(d, log, home_label(home, d))
+
 # ---- the datasets asked ----------------------------------------------------------------------------------------------------
 H <- download_handlers()
 asked <- trimws(strsplit(o("Datasets", ""), ",")[[1]]); asked <- asked[nzchar(asked)]

@@ -10,9 +10,8 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 
 | Order | Item | Changes results? | Why here | Depends on |
 | --- | --- | --- | --- | --- |
-| 1 | 52 Data home loses its download records | No | User 2026-11-06: top of the list. A Data Download fetched about 9 GB of national data already in the home (FIA DataMart, 1.5 hours) because the top-level manifest and files.csv rows had gone | - |
-| 2 | 14 FGDC metadata | No | User order 2026-11-02: first. Plan (a working document, not in this repository) (phases 0-6; decisions settled 2026-11-02: CSDGM first, one release per Build, maps every year, model archive always, ScienceBase folder by hand; Phase 0 done with the user 2026-11-02; Phase 1 built 2026-11-02: defaults/metadata definitions, data dictionary, citations, src/metadata.R, tests/unit-metadata-definitions.R; citation questions in the plan); lineage from the home's manifest and each Build's Data Sources Used | 12 (done) |
-| 3 | 39 Grassland, shrubland and wetland carbon: options beyond today's crude method | Yes | User order 2026-11-02: third, with the other open science items (user: explore additional options).  Step 1 (rates on a page) and the diagram view done; the diagram shows emergent wetland rates settling far above their starting pools; suspect values (emergent wetland growth 31, irrigated grass 9.19 Mg C/ha/yr), root turnover splits. Review done 2026-11-06 (dev/nonforest/review). Revised approach accepted the same day: one stage 3 solver (measured stocks as targets, growth from data, rates solved; IPCC, IBIS or data as the target source), IPCC factors for soil change on conversion, carbon for pasture and cropland. Nine steps; step 1, the emergent wetland fix, is next | - |
+| 1 | 14 FGDC metadata | No | User order 2026-11-02: first. Plan (a working document, not in this repository) (phases 0-6; decisions settled 2026-11-02: CSDGM first, one release per Build, maps every year, model archive always, ScienceBase folder by hand; Phase 0 done with the user 2026-11-02; Phase 1 built 2026-11-02: defaults/metadata definitions, data dictionary, citations, src/metadata.R, tests/unit-metadata-definitions.R; citation questions in the plan); lineage from the home's manifest and each Build's Data Sources Used | 12 (done) |
+| 2 | 39 Grassland, shrubland and wetland carbon: options beyond today's crude method | Yes | User order 2026-11-02: third, with the other open science items (user: explore additional options).  Step 1 (rates on a page) and the diagram view done; the diagram shows emergent wetland rates settling far above their starting pools; suspect values (emergent wetland growth 31, irrigated grass 9.19 Mg C/ha/yr), root turnover splits. Review done 2026-11-06 (dev/nonforest/review). Revised approach accepted the same day: one stage 3 solver (measured stocks as targets, growth from data, rates solved; IPCC, IBIS or data as the target source), IPCC factors for soil change on conversion, carbon for pasture and cropland. Nine steps; step 1, the emergent wetland fix, is next | - |
 | release | 46 CO2 fertilization | Yes, in projections with a Projection Climate result (Central by default; None turns it off) | Added 2026-11-04; built, tested (Puget run, age-band check), documented (guide 7.3.1) and pushed 2026-11-06. Left: a release | - |
 | later | 47 Example libraries by region and resolution | No (each holds its own results) | Added 2026-11-04, replaces 13. Best built after the open science items, since each carbon change dates them | 14, restore test |
 | any | 49 Test national mode end to end | No | Added 2026-11-04. Never run end to end; fills about 175 GB overnight | 12 (done) |
@@ -562,7 +561,7 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
   - **Uncommitted:** `dev/fire/01-projection-fire-maps.R` (the lucasFire library path after the move).
   - Checked 2026-11-05: a new 1.1.0 library gets Pasture and Cropland and the Ag Change types and groups from the package.
 
-52. **Data home loses its download records** - TO DO, top priority (user, 2026-11-06: leave it for now, but first on the list). The
+52. **Data home loses its download records** - DONE 2026-11-07 (user, 2026-11-06: leave it for now, but first on the list). The
   Solano Data Download (2026-11-06, `E:/lucasData`) fetched about 9 GB of national datasets that were already in the home: FIA DataMart
   (3.2 GB, 1.5 hours), TIGER counties, EPA ecoregions, WBD watersheds, PAD-US and LOCA2. Pyromes was fetched again on 2026-11-04 at 16:29.
   The files were intact (139 FIA files identical and kept; 54 "unrecorded files left by an unfinished download" replaced); what was lost
@@ -571,3 +570,22 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
   16:29 that day. Find what rewrote or truncated the top-level records (a Data Download into a region folder, a test, the Data Sources
   page, a concurrent run), fix it, and consider a fallback: treat a dataset as present when every planned file is already in place with a
   known size, instead of fetching it again.
+  - **Cause (found 2026-11-07): not the code.** `E:/lucasData` itself was created at 15:15:09 on 2026-11-04, and every folder in it,
+    the logs included (the Nov 1 logs have creation time 15:17:45), between 15:15 and 15:17: the home was copied to E: folder by folder,
+    and the three files at its top (`manifest.csv`, `files.csv`, `settings.csv`) were not copied. `settings.csv` was written new at
+    16:28 (the LANDFIRE email typed again), and the 16:29 download fetched every national dataset again ("8 files already in place,
+    identical: kept" for each). The region folders' tables were inside folders, so they came along and nothing was fetched for them.
+    No writer of the tables (`.write_home_table`, `home_to_region`, stage 15, the tests, which use a temporary home) can drop rows of
+    another dataset.
+  - **Fix: a copy of each dataset's rows inside a folder.** A done dataset's manifest row and files.csv rows are also written to
+    `<folder>/records/<Column>-manifest.csv` and `<Column>-files.csv` (src/datahome.R `write_record`, called by `run_dataset` after it
+    records; `home_to_region` moves them with the rows). Stage 15 starts with `home_restore_records` on the top, every region and every
+    edition folder: rows the tables lack come back from records/ when every recorded file is on disk at its recorded size (else it
+    says which dataset could not be restored, and that dataset is fetched as before), and a done dataset with no record yet gets one,
+    so an existing home is covered at its next Data Download. `Rscript tools/data-home.R <home> --restore` does the same by hand.
+    Not done: treating files in place as present with no record at all; their version and region cannot be known from the files.
+  - Tested: tests/unit-home-regions.R (37 pass, 7 new): with both top tables removed and a region's files.csv removed, the rows come
+    back, and a rerun skips without planning a fetch; a file of another size is not restored; a done row without a record gets one.
+    The real home: `tools/data-home.R E:/lucasData --restore` wrote the records of all 14 top datasets and of every region's.
+  - Guide: section on Data Sources Home (the paragraph on `manifest.csv` and `files.csv`) needs a sentence on `records/` and on
+    copying a home whole (the Claude Doc; left for the user).
