@@ -65,13 +65,15 @@ if (dry) dbRollback(con) else dbCommit(con)
 cat(sprintf("%s %d column(s) and %d stage(s)\n", if (dry) "would add" else "added", added, nst))
 if ("--schema-only" %in% a) { cat("--schema-only: nothing else changed\n"); quit(save = "no") }
 
-# ---- 7. emergent wetlands by ecodivision (to-do 39 step 1, 2026-11-06), run here in SQL (one query, not two reads per scenario): a
-# Grassland, Shrubland and Wetland Carbon sheet filled before then holds the old class-wide emergent rows (the CONUS 1 km build's),
-# which would override the package's ecodivision values. In scenarios that are not results, rows still equal to those legacy values
-# are removed; a row a user changed is kept and counted.
+# ---- 7. emergent wetlands, grassland and shrubland by ecodivision (to-do 39, 2026-11-06), run here in SQL (one query, not two reads per
+# scenario): a Grassland, Shrubland and Wetland Carbon sheet filled before then holds the old class-wide rows of these classes (the
+# CONUS 1 km build's), which would override the package's ecodivision values. In scenarios that are not results, rows still equal to
+# those legacy values are removed; a row a user changed is kept and counted.
 if (all(c("lucasCore_NonForestRate", "lucasCore_NonForestGrowth") %in% dbListTables(con))) {
-  EMC <- c("Wetland: Estuarine Emergent", "Wetland: Palustrine Emergent")
-  leg <- function(f) fread(file.path(pkg, "defaults", "stockflow", "legacy-ibis", sprintf("preset-fia-measured-%s.csv", f)), colClasses = "character", na.strings = "")
+  legdir <- file.path(pkg, "defaults", "stockflow", "legacy-ibis")
+  leg <- function(f) rbindlist(lapply(c(sprintf("preset-fia-measured-%s.csv", f), sprintf("preset-fia-measured-%s-grass-shrub.csv", f)), function(x)
+    if (file.exists(file.path(legdir, x))) fread(file.path(legdir, x), colClasses = "character", na.strings = "")), fill = TRUE)
+  EMC <- unique(c(leg("nonforest-rates")$StateClassId, leg("nonforest-growth")$StateClassId))
   inn <- paste0("('", paste(EMC, collapse = "','"), "')")
   rr <- as.data.table(dbGetQuery(con, sprintf("SELECT r.NonForestRateId id, r.ScenarioId, c.Name cls, g.Name grp, r.Value v FROM lucasCore_NonForestRate r
     JOIN stsim_StateClass c ON r.StateClassId = c.StateClassId JOIN stsim_FlowGroup g ON r.FlowGroupId = g.FlowGroupId
@@ -85,7 +87,7 @@ if (all(c("lucasCore_NonForestRate", "lucasCore_NonForestGrowth") %in% dbListTab
   rr[is.na(legacy), legacy := FALSE]; rg[is.na(legacy), legacy := FALSE]
   if (!dry) { if (any(rr$legacy)) dbExecute(con, sprintf("DELETE FROM lucasCore_NonForestRate WHERE NonForestRateId IN (%s)", paste(rr[legacy == TRUE, id], collapse = ",")))
               if (any(rg$legacy)) dbExecute(con, sprintf("DELETE FROM lucasCore_NonForestGrowth WHERE NonForestGrowthId IN (%s)", paste(rg[legacy == TRUE, id], collapse = ","))) }
-  cat(sprintf("emergent wetland rows at the legacy class-wide values: %s %d rate and %d growth rows in %d scenario(s); %d changed rows kept\n",
+  cat(sprintf("grassland, shrubland and emergent wetland rows at the legacy class-wide values: %s %d rate and %d growth rows in %d scenario(s); %d changed rows kept\n",
               if (dry) "would remove" else "removed", sum(rr$legacy), sum(rg$legacy), uniqueN(c(rr[legacy == TRUE, ScenarioId], rg[legacy == TRUE, ScenarioId])),
               sum(!rr$legacy) + sum(!rg$legacy))) }
 

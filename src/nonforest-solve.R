@@ -54,6 +54,21 @@ nf_simulate <- function(f, growth, S0, years) {
   for (y in seq_len(years)) S <- (m$M %*% S + m$c)[, 1]
   S }
 
+# ---- any class: scale one pool's outflow rates so its steady stock hits a target ------------------------------------------------
+# For classes without "<pool> ->" total-loss groups (grassland, shrubland): every "[Type]" group of a flow out of the pool is multiplied
+# by one factor, keeping their split (emission, decay, transfer), found by a bounded root search on the ordered steady state. Returns
+# the group values and the factor; stops if no factor (rates up to 1) reaches the target.
+nf_fit_pool <- function(path, mult, memb, order, growth, pool, target) {
+  m <- copy(mult)[, Value := as.numeric(Value)]
+  grp <- intersect(paste(unique(path[FromStockTypeId == pool, FlowTypeId]), "[Type]"), m[Value > 0, FlowGroupId])
+  if (!length(grp)) stop("no flow out of ", pool)
+  v0 <- m[match(grp, FlowGroupId), Value]
+  gap <- function(f) { m[match(grp, FlowGroupId), Value := v0 * f]; nf_steady(nf_flows(path, m, memb, order), growth)$stock[[pool]] - target }
+  hi <- 1 / max(v0); g_lo <- gap(1e-6); g_hi <- gap(hi)
+  if (sign(g_lo) == sign(g_hi)) stop(sprintf("%s: no loss rate up to 1 holds %.2f Mg C/ha", pool, target))
+  f <- uniroot(gap, c(1e-6, hi), f.lower = g_lo, f.upper = g_hi, tol = 1e-13)$root; gap(f)
+  list(mult = m, factor = f, groups = grp) }
+
 # ---- emergent wetlands: the rates that hold a class at its targets --------------------------------------------------------------
 # Pools: Foliage and Fine Root (growth), AG and BG Very Fast (litter), BG Slow (soil 0-30 cm), Deep Soil (burial sink), Aquatic.
 # Targets (Mg C/ha, Mg C/ha/yr): NPP, ag_share (share of NPP to foliage), foliage and roots as PEAK live carbon (what field studies

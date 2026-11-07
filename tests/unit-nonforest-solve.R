@@ -71,4 +71,23 @@ pr <- unlist(lapply(c("cbm-defaults", "fia-measured"), function(m) c(rd("carbon-
 check("the carbon method presets hold no emergent rows (they would override the ecodivision values)", !any(pr %in% EM))
 check("Deep Soil is in stage 8's stock list with no forest curve column", { s <- st[StockTypeId == "Deep Soil"]; nrow(s) == 1 && is.na(s$CurveColumn) })
 
+# ---- grassland and shrubland by ecodivision (tools/make_grass_shrub.R) ------------------------------------------------------------
+gm <- rd("stockflow", "nonforest-multipliers-grassland-shrubland.csv"); gl <- rd("stockflow", "legacy-ibis", "grass-shrub-multipliers.csv")
+gi <- rd("initialstocks", "grassland-shrubland.csv"); gt <- rd("stockflow", "grass-shrub-targets.csv"); GS <- sort(unique(gm$StateClassId))
+check("a grass and shrub target for every ecodivision x class", nrow(gt) == uniqueN(gm$StratumId) * length(GS) && !anyNA(as.numeric(gt$NPP)) && !anyNA(as.numeric(gt$Soil0to30)))
+dif <- merge(gm, gl, by = c("StratumId", "StateClassId", "FlowGroupId"), suffixes = c("", "0"))[as.numeric(Value) != as.numeric(Value0)]
+check("only BG Slow's outflow rates differ from the legacy grass and shrub rates", nrow(dif) > 0 && all(dif$FlowGroupId == "Emission: BG Slow -> Atmosphere [Type]"))
+check("grass and shrub Net Growth = the target NPP", all(merge(ng[StateClassId %in% GS, .(StratumId, StateClassId, v = as.numeric(Value))], gt[, .(StratumId, StateClassId, t = as.numeric(NPP))])[, abs(v - t) < 1e-9]))
+gw <- 0; gs <- 0
+for (i in seq_len(nrow(gt))) { e <- gt$StratumId[i]; cls <- gt$StateClassId[i]
+  ss <- nf_steady(nf_flows(pa[FromStratumId == e & FromStateClassId == cls], gm[StratumId == e & StateClassId == cls, .(FlowGroupId, Value)], memb, ord), as.numeric(gt$NPP[i]))
+  x <- gi[StratumID == e & StateClassID == cls][, .(pool = st$StockTypeId[match(StateAttributeTypeID, st$Attribute)], v = as.numeric(Value))]
+  pl <- intersect(x$pool, names(ss$stock)); gw <- max(gw, max(abs(ss$stock[pl] - x[match(pl, pool), v])))
+  gs <- max(gs, abs(ss$stock[["DOM: Belowground Slow"]] - as.numeric(gt$Soil0to30[i])), abs(x[pool == "Deep Soil", v] - as.numeric(gt$DeepSoil[i]))) }
+check(sprintf("grass and shrub starting pools are the steady state of the written rates (largest gap %.1e Mg C/ha)", gw), gw < 1e-3)
+check(sprintf("BG Slow holds the gNATSGO 0-30 cm target and Deep Soil starts with the rest of the profile (largest gap %.1e)", gs), gs < 0.01)
+pr2 <- unlist(lapply(c("cbm-defaults", "fia-measured"), function(m) c(rd("carbon-assumptions", m, "nonforest-rates.csv")$StateClassId, rd("carbon-assumptions", m, "nonforest-growth.csv")$StateClassId)))
+check("the presets hold no grass or shrub rows", !any(pr2 %in% GS))
+check("Post Fire Shrub takes Non-sage's targets", all(gt[StateClassId == "Shrubland: Post Fire Shrub", grepl("Non-sage targets", Source)]))
+
 cat(sprintf("\n%d of %d checks passed\n", n - fails, n)); if (fails) quit(status = 1)

@@ -266,6 +266,31 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
            grass and chaparral land on their starting tables to 4 decimals (soil within 0.15%; chaparral dead 29.8, which the old solve
            put at 33.8). The page note says so. lucasCoreUI.dll rebuilt; not yet opened in Studio.
          - Left: the guide, and a Build on a region with emergent cells.
+    - **Grassland and shrubland by ecodivision (built 2026-11-06).** User decisions: growth and soil together; one package table by
+      ecodivision (not solved at each Build); ecodivision x class means; today's IBIS values kept as legacy; alfalfa and irrigated
+      pasture are Agriculture: Pasture (step 6), not Grassland: Irrigated Perennial.
+      - **Sample** (dev/nonforest/03-grass-shrub-sample.R, user OK to fetch): 60 windows of 3 x 3 km per ecodivision (1,140), every
+        NLCD 2001 grass (71) and shrub (52) cell classed as stage 5 does (RCMAP 1985 vegetation state, from the user's
+        E:/lucasData/supplied zip; elsewhere 71 -> Natural Perennial, 52 -> Non-sage). Read remotely at the windows only: RAP rangeland
+        NPP v3 (CC0; README: bands annual herb, perennial herb, shrub, tree, kg C/m2, raw / 1000 = Mg C/ha/yr; not for agricultural
+        land) mean of 2014-2023, and gNATSGO soc0_30 and soc0_999 (Planetary Computer). Cells RAP sees as mostly trees (tree NPP > herb +
+        shrub) are left out: 73-99% of the cells in Marine, Savanna, Subtropical, the Continental ecodivisions and their Mountains.
+      - **CONUS class means** (NPP Mg C/ha/yr; soil 0-30 / whole profile Mg C/ha; today's growth): Natural Perennial 2.67, 31 / 74 (2.31);
+        Annual 2.80, 27 / 58 (0.95); Irrigated Perennial 2.86, 32 / 83 (9.19; 507 cells); Chaparral 3.19, 25 / 40 (3.84); Native Sage
+        Steppe 1.26, 24 / 47; Invaded Sage Steppe 0.93, 17 / 37; Sage 0.49, 16 / 31 (0.99); Non-sage 1.22, 20 / 45. Starting soil falls:
+        natural grass 92 -> 74 whole profile, chaparral 75 -> 40.
+      - **tools/make_grass_shrub.R**: an ecodivision keeps its own value with >= 5 windows and >= 500 cells (85 of 171), else the class's
+        CONUS mean (86; all of Irrigated Perennial); Post Fire Shrub takes Non-sage's targets; thin eastern samples and Irrigated
+        Perennial are flagged in defaults/stockflow/grass-shrub-targets.csv. Net Growth = NPP; today's turnover, litter rates and growth
+        split kept; only BG Slow's outflow (Emission: BG Slow -> Atmosphere, 342 rows) is refitted (src/nonforest-solve.R nf_fit_pool:
+        all of a pool's outflow rates scaled by one factor, ordered steady state) to hold the 0-30 cm soil: 0.0009-0.023/yr. Starting
+        pools = the steady state; Deep Soil starts with the soil below 30 cm. Legacy rows in defaults/stockflow/legacy-ibis/; presets
+        lose their grass and shrub rows; sync-library step 7 removes legacy grass and shrub rows too.
+      - **Tests:** tests/unit-nonforest-solve.R 29 of 29 (grass and shrub: only BG Slow's outflow changed, Net Growth = NPP, pools =
+        steady state within 5e-5, soil targets met). dev/nonforest/02-emergent-stsim-check.R with five grass and shrub classes added:
+        PASS in real ST-Sim over 30 years (largest gap 1.1e-4 Mg C/ha, the 4-decimal rounding of the starting pools).
+      - **Open:** eastern grass and shrub rest on few untreed cells and RAP is built for rangelands; growth by age after fire (step 8);
+        live and litter targets (RAP biomass, shrub literature, FCCS) not yet used.
     2. **Use only the pools each class has.** Keep the shared stock types; turn off the flows that do not apply. Grass: foliage, fine
        roots, AG and BG fast litter, soil. Shrub: add woody stems and coarse roots. Wetland: add burial to Deep Soil. Fewer unknowns
        for the solver, and a readable diagram view.

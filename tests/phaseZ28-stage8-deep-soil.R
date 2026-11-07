@@ -1,10 +1,10 @@
 # =============================================================================
 # phaseZ28-stage8-deep-soil.R - stage 8 with Deep Soil and emergent wetland starting pools by ecodivision (to-do 39 step 1, 2026-11-06)
 # =============================================================================
-# On the test library lucasCore-suitability.ssim (Placer County, 1 km; it has no emergent wetland cells): stage 8 alone on Build
-# result 47. Checks: stage 8's checks pass; it writes a Deep Soil map, zero on every land cell (forest has no Deep Soil curve column
-# and no emergent cell is there); every other pool's map is the Build's own stage 8 map, cell for cell. The emergent values
-# themselves are checked in real ST-Sim by dev/nonforest/02-emergent-stsim-check.R.
+# On the test library lucasCore-suitability.ssim (Placer County, 1 km; grass and shrub, no emergent wetland cells): stage 8 alone on Build
+# result 47. Checks: stage 8 passes its checks and writes a Deep Soil map; grass, shrub and emergent cells start at the package tables
+# for their ecodivision and class; every other cell matches Build 47 cell for cell (forest Deep Soil 0). The rates themselves
+# are checked in real ST-Sim by dev/nonforest/02-emergent-stsim-check.R.
 # Usage: Rscript tests/phaseZ28-stage8-deep-soil.R      (REUSE=1 reuses the run when it exists)
 # =============================================================================
 pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
@@ -23,19 +23,26 @@ lg <- trimws(strsplit(paste(runLog(R), collapse = "\n"), "\n")[[1]]); cat(unique
 new <- as.data.table(datasheet(R, "stsim_InitialStockSpatial", lookupsAsFactors = FALSE)); old <- as.data.table(datasheet(scenario(L, 47), "stsim_InitialStockSpatial", lookupsAsFactors = FALSE))
 expect("a map for every stock type of stage 8's list, Deep Soil included", setequal(new$StockTypeId, fread(file.path(pkg, "defaults/initialstocks/stock-types.csv"))$StockTypeId) && "Deep Soil" %in% new$StockTypeId)
 val <- function(fn) values(rast(fn), mat = FALSE)
-ds <- val(new[StockTypeId == "Deep Soil", RasterFileName]); land <- !is.na(ds)
-expect("Deep Soil is 0 on every land cell (no emergent cells; forest starts with none)", any(land) && all(ds[land] == 0), sprintf("%d land cells, max %.3g", sum(land), max(ds[land])))
-# Build 47 (2026-10-23) predates the Shrubland: Non-sage fix of 2026-10-30 (dev/nonforest/01-nonsage-fix.R), which changed that
-# class's starting pools: its cells are left out of the comparison and checked against the fixed table instead
+# grassland, shrubland and emergent wetland cells start at the package tables' pools for their ecodivision and class (by ecodivision
+# since 2026-11-06: tools/make_emergent_wetland.R, tools/make_grass_shrub.R); every other cell's pools are Build 47's, cell for cell
 ic <- as.data.table(datasheet(scenario(L, 47), "stsim_InitialConditionsSpatial", lookupsAsFactors = FALSE))
-scl <- as.data.table(datasheet(P1, "stsim_StateClass", includeKey = TRUE)); idc <- intersect(c("ID", "Id"), names(scl))[1]
-cls <- scl$Name[match(val(ic$StateClassFileName), scl[[idc]])]; ns <- cls %in% "Shrubland: Non-sage"
-expect("every state class of the map is named", !anyNA(cls[land]))
-gap <- vapply(intersect(old$StockTypeId, new$StockTypeId), function(k) max(abs(val(new[StockTypeId == k, RasterFileName]) - val(old[StockTypeId == k, RasterFileName]))[!ns], na.rm = TRUE), 1)
-expect(sprintf("every other pool's map is the Build's own stage 8 map (%d Non-sage cells left out)", sum(ns)), all(gap < 1e-4), paste(sprintf("%s %.2g", names(gap)[gap >= 1e-4], gap[gap >= 1e-4]), collapse = "; "))
-gs <- fread(file.path(pkg, "defaults/initialstocks/grassland-shrubland.csv"))[StateClassID == "Shrubland: Non-sage"]
+key <- function(sh) { x <- as.data.table(datasheet(P1, sh, includeKey = TRUE)); setNames(x$Name, x[[intersect(c("ID", "Id"), names(x))[1]]]) }
+cls <- unname(key("stsim_StateClass")[as.character(val(ic$StateClassFileName))]); eco <- unname(key("stsim_Stratum")[as.character(val(ic$StratumFileName))])
+ds <- val(new[StockTypeId == "Deep Soil", RasterFileName]); land <- !is.na(ds)
+expect("every land cell's ecodivision and state class are named", !anyNA(cls[land]) && !anyNA(eco[land]))
 stl <- fread(file.path(pkg, "defaults/initialstocks/stock-types.csv"))
-nsg <- vapply(seq_len(nrow(gs)), function(i) { k <- stl$StockTypeId[match(gs$StateAttributeTypeID[i], stl$Attribute)]; if (is.na(k) || !k %in% new$StockTypeId || !any(ns)) return(0)
-  x <- val(new[StockTypeId == k, RasterFileName])[ns]; if (k == "DOM: Belowground Slow" && gs$Value[i] == 0) return(0); max(abs(x - gs$Value[i])) }, 1)
-expect("Non-sage cells start at the fixed table's pools", all(nsg < 1e-3), sprintf("largest gap %.3g", max(nsg)))
+tab <- rbind(fread(file.path(pkg, "defaults/initialstocks/grassland-shrubland.csv")), fread(file.path(pkg, "defaults/initialstocks/emergent-wetland.csv")))
+tab[, pool := stl$StockTypeId[match(StateAttributeTypeID, stl$Attribute)]]
+nf <- land & cls %in% tab$StateClassID
+cat(sprintf("%d land cells: %d grassland, shrubland or emergent wetland (%s)\n", sum(land), sum(nf), paste(names(table(cls[nf])), table(cls[nf]), collapse = ", ")))
+gtab <- 0; gold <- 0
+for (k in new$StockTypeId) { x <- val(new[StockTypeId == k, RasterFileName])
+  w <- tab[pool == k]; e <- w$Value[match(paste(eco, cls), paste(w$StratumID, w$StateClassID))]; e[is.na(e) & nf] <- 0
+  if (k == "DOM: Belowground Slow") e[nf & e == 0] <- NA   # a 0 class value takes gNATSGO (stage 8's rule); none of these classes has one
+  gtab <- max(gtab, max(abs(x[nf] - e[nf]), na.rm = TRUE))
+  if (k %in% old$StockTypeId) gold <- max(gold, max(abs(x[land & !nf] - val(old[StockTypeId == k, RasterFileName])[land & !nf]), na.rm = TRUE)) }
+expect(sprintf("grass, shrub and emergent cells start at their ecodivision x class pools, Deep Soil included (largest gap %.1e Mg C/ha)", gtab), gtab < 1e-3)
+expect(sprintf("every other cell's pools are Build 47's own stage 8 maps (largest gap %.1e)", gold), gold < 1e-4)
+expect("Deep Soil is 0 on every other land cell (forest has no Deep Soil curve column)", all(ds[land & !nf] == 0))
+expect("Deep Soil is above 0 on the grass and shrub cells (the soil below 30 cm)", sum(nf) > 0 && mean(ds[nf] > 0) > 0.95, sprintf("%.0f%% above 0", 100 * mean(ds[nf] > 0)))
 cat(if (ok) "\nALL PASS\n" else "\nSOME CHECKS FAILED\n")
