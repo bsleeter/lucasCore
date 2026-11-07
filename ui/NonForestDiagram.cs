@@ -180,9 +180,12 @@ namespace lucasCoreUI
                     var ed = h.Value; var b = Budget;
                     text = ed.Kind == "Net growth"
                         ? string.Format("Net growth to {0}: {1:0.#}% of {2} = {3} Mg C/ha/yr{4}", b.P[ed.To].Label.ToLower(), ed.Entered * 100, Num(b.Growth), Num(ed.Flux), ed.Yours ? " (this page's row)" : "")
-                        : string.Format("{0}: {1} to {2}\n{3} {4} x {5} Mg C/ha = {6} Mg C/ha/yr{7}", ed.Kind, b.P[ed.From].Label.ToLower(), ed.To == "ATM" ? "the atmosphere" : ed.To == "AQ" ? "water" : b.P[ed.To].Label.ToLower(),
+                        : string.Format("{0}: {1} to {2}\n{3} {4} x {5} Mg C/ha = {6} Mg C/ha/yr{7}{8}", ed.Kind, b.P[ed.From].Label.ToLower(), ed.To == "ATM" ? "the atmosphere" : ed.To == "AQ" ? "water" : b.P[ed.To].Label.ToLower(),
                             b.Totals.Contains(ed.From) && ed.Kind != "Biomass Turnover" ? "share " + RateText(ed.Entered) + " of loss " + RateText(b.P[ed.From].Total) + "/yr =" : "rate", RateText(ed.Rate) + "/yr",
-                            Num(b.P[ed.From].Stock), Num(ed.Flux), ed.Yours ? "\n(set by this page's rows)" : "");
+                            Num(ed.Base), Num(ed.Flux),
+                            // ST-Sim computes a flow from the pool's stock at the start of its step in the year's flow order
+                            Math.Abs(ed.Base - b.P[ed.From].Stock) > 1e-6 ? string.Format("\n(the pool's stock at flow order {0}; {1} Mg C/ha at year end)", ed.Order == double.MaxValue ? "last" : ed.Order.ToString("0.##", CultureInfo.InvariantCulture), Num(b.P[ed.From].Stock)) : "",
+                            ed.Yours ? "\n(set by this page's rows)" : "");
                     break;
                 }
             if (text != m_tipText) { m_tipText = text; if (text.Length > 0) m_tip.Show(text, this, e.X + 14, e.Y + 14); else m_tip.Hide(this); }

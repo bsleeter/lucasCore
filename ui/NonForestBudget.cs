@@ -5,9 +5,13 @@
 // ecodivision, class and flow, and per age for forested wetlands), then this scenario's rows on top, the more specific last - a class's
 // row for every ecodivision and age, then for one age (matching the package row's age), then for one ecodivision, then for both.
 // Rates are per year; Net Growth groups split net growth among the live pools; for emergent wetlands a "<pool> ->" group is the pool's
-// total yearly loss and the flows out of it are shares of that loss. The steady state solves each pool in flow order: stock = inputs /
-// total loss rate; deep soil only accumulates. With the package rates it lands near the Build's starting pools, which came from a
-// spin-up with the same rates.
+// total yearly loss and the flows out of it are shares of that loss. The steady state is ST-Sim's (to-do 39, 2026-11-06; as
+// src/nonforest-solve.R): a year runs in flow order (defaults/stockflow/stsim_FlowOrder.csv), the flows of one order computed from the
+// stocks at the start of their step (ApplyEquallyRankedSimultaneously = TRUE), so one year is an affine map S -> M S + c and the steady
+// state solves (I - M) S = c over the pools that lose carbon. A pool's stock is its year-end value; each flux is what one year at the
+// steady state moves, from the stock at the start of that flow's step (Edge.Base). Deep soil only accumulates. With the package rates
+// it lands on the Build's starting pools. (Before 2026-11-06 this solved stock = inputs / loss, which ignores the order: emergent
+// wetlands, which grow at order 1 and die back at 6, showed live 36 and dead 49 Mg C/ha instead of ST-Sim's 4.9 and 17.4.)
 // =============================================================================
 using System;
 using System.Collections.Generic;
@@ -35,7 +39,7 @@ namespace lucasCoreUI
         private static readonly Regex Flow = new Regex(@"^(Net Growth[^:]*|Biomass Turnover|Decay|Emission|Transfer|Lateral Transport|Stabilization): (.+?) -> (.+?) \[Type\]$");
         private static readonly Regex Total = new Regex(@"^(.+?) ->$");
 
-        public class Edge { public string Kind, From, To, Group; public double Entered, Rate, Flux; public bool Yours; }
+        public class Edge { public string Kind, From, To, Group; public double Entered, Rate, Flux, Base, Order; public bool Yours; }
         public class Pool { public string Key, Label; public int Col; public bool Above; public double Stock, In, Out, Co2, Aquatic, Total; }
 
         public double Growth; public bool GrowthYours, Emergent, AgeVarying;
@@ -46,6 +50,7 @@ namespace lucasCoreUI
         // ---- package tables, read once --------------------------------------------------------------------------------------
         private class Row { public int? Min, Max; public string Flow; public double V; }
         private static Dictionary<string, List<Row>> s_rates, s_growth;
+        private static Dictionary<string, double> s_order;   // flow type -> flow order
         private static string Key(string eco, string cls) { return eco + "|" + cls; }
         private static int? Int(string s) { int v; return int.TryParse(s, out v) ? v : (int?)null; }
 
@@ -67,7 +72,12 @@ namespace lucasCoreUI
                 string k = Key(r[2].Trim(), r[5].Trim()); List<Row> l; if (!growth.TryGetValue(k, out l)) growth[k] = l = new List<Row>();
                 l.Add(new Row { Min = Int(r[7]), Max = Int(r[8]), Flow = "Net Growth", V = v });
             }
-            s_rates = rates; s_growth = growth;
+            var order = new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase);
+            foreach (string[] r in Defaults.ReadCsv(Defaults.PackageFile("defaults", "stockflow", "stsim_FlowOrder.csv")).Skip(1))
+            {
+                double v; if (r.Length >= 4 && double.TryParse(r[3], NumberStyles.Float, CultureInfo.InvariantCulture, out v)) order[r[2].Trim()] = v;
+            }
+            s_rates = rates; s_growth = growth; s_order = order;
         }
 
         // the classes the package has values for in an ecodivision (by name)
@@ -140,19 +150,85 @@ namespace lucasCoreUI
                 if (!m.Success || !Names.TryGetValue(m.Groups[2].Value, out a) || !Names.TryGetValue(m.Groups[3].Value, out t)) continue;
                 string kind = m.Groups[1].Value.StartsWith("Net Growth") ? "Net growth" : m.Groups[1].Value;
                 double v = kv.Value.Key, rate = kind != "Net growth" && kind != "Biomass Turnover" && total.ContainsKey(a) ? total[a] * v : v;
-                b.Edges.Add(new Edge { Kind = kind, From = a, To = t, Group = kv.Key, Entered = v, Rate = rate, Yours = kv.Value.Value });
+                double ord; string ft = kv.Key.EndsWith(" [Type]") ? kv.Key.Substring(0, kv.Key.Length - 7) : kv.Key;
+                b.Edges.Add(new Edge { Kind = kind, From = a, To = t, Group = kv.Key, Entered = v, Rate = rate, Yours = kv.Value.Value,
+                                       Order = s_order.TryGetValue(ft, out ord) ? ord : double.MaxValue });   // a flow with no order runs last
             }
-            // inputs and losses in flow order
-            foreach (Edge e in b.Edges.Where(x => x.Kind == "Net growth" && b.P.ContainsKey(x.To))) { e.Flux = b.Growth * e.Rate; b.P[e.To].In += e.Flux; }
             foreach (Edge e in b.Edges.Where(x => x.Kind != "Net growth" && b.P.ContainsKey(x.From))) b.P[e.From].Out += e.Rate;
-            foreach (string[] p in Pools)
-            {
-                Pool q = b.P[p[0]];
-                foreach (Edge e in b.Edges.Where(x => x.To == q.Key && x.Kind != "Net growth" && b.P.ContainsKey(x.From))) { e.Flux = e.Rate * b.P[e.From].Stock; q.In += e.Flux; }
-                q.Stock = q.Key == "DS" || q.Out <= 0 ? 0 : q.In / q.Out;
-                foreach (Edge e in b.Edges.Where(x => x.From == q.Key)) { e.Flux = e.Rate * q.Stock; if (e.To == "ATM") q.Co2 += e.Flux; if (e.To == "AQ") q.Aquatic += e.Flux; }
-            }
+            b.Solve();
             return b;
+        }
+
+        // ST-Sim's year in flow order: the steady state of the affine map S -> M S + c, then one year from it for the fluxes
+        private void Solve()
+        {
+            List<string> keys = Pools.Select(p => p[0]).ToList(); int n = keys.Count;
+            var at = new Dictionary<string, int>(); for (int i = 0; i < n; i++) at[keys[i]] = i;
+            List<Edge> live = Edges.Where(e => e.Rate != 0 && (e.Kind == "Net growth" ? at.ContainsKey(e.To) : at.ContainsKey(e.From))).ToList();
+            List<double> orders = live.Select(e => e.Order).Distinct().OrderBy(x => x).ToList();
+            double[,] M = Identity(n); double[] c = new double[n];
+            foreach (double o in orders)
+            {
+                double[,] A = Identity(n); double[] g = new double[n];
+                foreach (Edge e in live.Where(x => x.Order == o))
+                {
+                    if (e.Kind == "Net growth") { g[at[e.To]] += Growth * e.Rate; continue; }
+                    int f = at[e.From]; A[f, f] -= e.Rate; int t; if (at.TryGetValue(e.To, out t)) A[t, f] += e.Rate;
+                }
+                M = Mul(A, M); double[] c2 = new double[n];
+                for (int i = 0; i < n; i++) { double s = g[i]; for (int j = 0; j < n; j++) s += A[i, j] * c[j]; c2[i] = s; }
+                c = c2;
+            }
+            // the pools that lose carbon settle; Deep Soil and pools without a loss are sinks (start at 0, their yearly gain is In)
+            List<int> k = Enumerable.Range(0, n).Where(i => keys[i] != "DS" && P[keys[i]].Out > 0).ToList();
+            double[] S = new double[n];
+            if (k.Count > 0)
+            {
+                var Q = new double[k.Count, k.Count + 1];
+                for (int r = 0; r < k.Count; r++) { for (int s = 0; s < k.Count; s++) Q[r, s] = (r == s ? 1 : 0) - M[k[r], k[s]]; Q[r, k.Count] = c[k[r]]; }
+                double[] x = Gauss(Q, k.Count);
+                for (int r = 0; r < k.Count; r++) S[k[r]] = Math.Max(0, x[r]);
+            }
+            foreach (Pool p in P.Values) { p.Stock = S[at[p.Key]]; p.In = 0; p.Co2 = 0; p.Aquatic = 0; }
+            // one year from the steady state: each flow from the stocks at the start of its order's step
+            double[] cur = (double[])S.Clone();
+            foreach (double o in orders)
+            {
+                double[] start = (double[])cur.Clone();
+                foreach (Edge e in live.Where(x => x.Order == o))
+                {
+                    double amt; if (e.Kind == "Net growth") { e.Base = 0; amt = Growth * e.Rate; } else { e.Base = start[at[e.From]]; amt = e.Rate * e.Base; cur[at[e.From]] -= amt; }
+                    e.Flux = amt; int t;
+                    if (at.TryGetValue(e.To, out t)) { cur[t] += amt; P[e.To].In += amt; }
+                    else if (e.Kind != "Net growth") { if (e.To == "ATM") P[e.From].Co2 += amt; if (e.To == "AQ") P[e.From].Aquatic += amt; }
+                }
+            }
+            foreach (Edge e in Edges.Where(x => x.Rate == 0)) { e.Flux = 0; e.Base = 0; }
+        }
+
+        private static double[,] Identity(int n) { var m = new double[n, n]; for (int i = 0; i < n; i++) m[i, i] = 1; return m; }
+        private static double[,] Mul(double[,] a, double[,] b)
+        {
+            int n = a.GetLength(0); var m = new double[n, n];
+            for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) { double s = 0; for (int l = 0; l < n; l++) s += a[i, l] * b[l, j]; m[i, j] = s; }
+            return m;
+        }
+        // Gaussian elimination with partial pivoting on an n x (n + 1) augmented matrix
+        private static double[] Gauss(double[,] q, int n)
+        {
+            for (int col = 0; col < n; col++)
+            {
+                int piv = col; for (int r = col + 1; r < n; r++) if (Math.Abs(q[r, col]) > Math.Abs(q[piv, col])) piv = r;
+                if (Math.Abs(q[piv, col]) < 1e-300) continue;
+                if (piv != col) for (int j = 0; j <= n; j++) { double tmp = q[col, j]; q[col, j] = q[piv, j]; q[piv, j] = tmp; }
+                for (int r = 0; r < n; r++)
+                {
+                    if (r == col) continue; double f = q[r, col] / q[col, col]; if (f == 0) continue;
+                    for (int j = col; j <= n; j++) q[r, j] -= f * q[col, j];
+                }
+            }
+            var x = new double[n]; for (int i = 0; i < n; i++) x[i] = Math.Abs(q[i, i]) < 1e-300 ? 0 : q[i, n] / q[i, i];
+            return x;
         }
 
         public double Sum(Func<Pool, bool> which, Func<Pool, double> what) { return P.Values.Where(which).Sum(what); }

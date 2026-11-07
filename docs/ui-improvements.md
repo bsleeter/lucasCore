@@ -258,7 +258,14 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
            - sync-library step 7 runs as one SQL query (two SyncroSim reads per scenario were too slow), and step 5 now skips a
              scenario whose stock group memberships cannot be read instead of stopping. Dry run on P26: 92 rate and 2 growth legacy
              emergent rows in one scenario would be removed, so P26 must be synced before its rerun (item 51).
-         - Left: the diagram view's ordered solve (ui/NonForestBudget.cs), the guide, and a Build on a region with emergent cells.
+         - **Diagram view fixed 2026-11-06** (ui/NonForestBudget.cs Solve): the year in ST-Sim's flow order, as src/nonforest-solve.R
+           (stsim_FlowOrder.csv; same-order flows from the stocks at the start of their step), steady state by Gaussian elimination,
+           then one year from it for each arrow's flux; the tooltip shows the stock a flow is computed from and its flow order when
+           that differs from the year-end stock. Checked with a console harness on the package tables: Marine estuarine emergent
+           foliage 1.2, fine roots 2.197, litter 1 and 2, soil 111, burial 1.10 (the new starting pools exactly); natural perennial
+           grass and chaparral land on their starting tables to 4 decimals (soil within 0.15%; chaparral dead 29.8, which the old solve
+           put at 33.8). The page note says so. lucasCoreUI.dll rebuilt; not yet opened in Studio.
+         - Left: the guide, and a Build on a region with emergent cells.
     2. **Use only the pools each class has.** Keep the shared stock types; turn off the flows that do not apply. Grass: foliage, fine
        roots, AG and BG fast litter, soil. Shrub: add woody stems and coarse roots. Wetland: add burial to Deep Soil. Fewer unknowns
        for the solver, and a readable diagram view.
