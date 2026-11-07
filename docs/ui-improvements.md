@@ -294,6 +294,35 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       - **Next (user, 2026-11-06):** fit the live and dead pools as well, chaparral by age, and keep IBIS out of this option (literature
         values only; IBIS stays the legacy choice). A research pass on litter and root decay, the fate of decomposed carbon, live
         turnover and allocation, and chaparral after fire is running first ("Grass and shrub turnover and decay").
+      - **Built 2026-11-06 (main 7d59da5; not pushed).** Report: dev/nonforest/review/reports/Grass and shrub turnover and decay.md (4
+        research threads; register of 60+ values with status). User decisions: adopt its six revisions (sage foliage share 0.14; Irrigated
+        Perennial root:shoot 1.7; chaparral root:shoot 0.6, foliage share falling with age to 0.12, mature litter 7, standing dead 0.35 x
+        aboveground live); one chaparral class on the chamise curve (mixed / Ceanothus as the high case); Native Sage Steppe scales with
+        NPP (Sage's rates). Found: the dead-pool emission shares called IBIS are CBM-CFS3's defaults (0.815 / 0.83), so they are kept and
+        cited as CBM.
+        - defaults/stockflow/grass-shrub-literature.csv (per class: growth split, live turnover, root and litter decay, snag share, litter
+          and AG Slow targets, sources) and chaparral-age.csv. tools/make_grass_shrub.R sets every rate from them (k -> 1 - exp(-k) a year;
+          grass foliage dies back yearly; fine roots -> BG very fast, coarse -> BG fast, wood -> snag branches and AG fast), solves AG very
+          fast decay (litter target over AG very fast + fast), AG Slow emission (CBM: decay fully emitted + 0.006/yr to BG Slow) and BG
+          Slow emission (gNATSGO 0-30 cm), and keeps no IBIS value. Classes with RatesOf take the source class's rates whole.
+        - Chaparral: live by age 11 x s x (1 - exp(-0.09 (a + 1))) (s = ecodivision NPP / CONUS mean), foliage share 0.12 + 0.25 exp(-0.15
+          (a + 1)), roots 0.6 x mature aboveground with 75% alive after fire; Net Growth and growth split by age (ages 0-99, 100+ mature);
+          95.5% of wood turnover stays standing (fitted to standing dead 0.35 x live); its own high-severity fire rows (foliage 95% burned,
+          wood 55% burned and the rest standing, litter and snags 80%, AG Slow 50%, 25% of roots killed) in both Disturbance Flows presets,
+          and stage 3 adds them to a filled sheet that has none. Starting pools by age (initialstocks/chaparral.csv) from that fire on a
+          mature stand and regrowth. Stage 5: chaparral cells get their years since the last fire perimeter (start year - 1900 if none).
+          Fire pathways: only high-severity fire resets chaparral's age (medium and low leave the stand alive).
+        - Medians (Mg C/ha): Natural Perennial live 3.1 dry / 6.4 moist (aboveground 0.6-1.1), Sage live 3.5 (aboveground 1.0, litter
+          0.32), chaparral mature live 17.6 (aboveground 11, litter 7, standing dead 3.85).
+        - Tests: tests/unit-nonforest-solve.R 32 of 32 (growth splits are the literature's; pools = steady state; chaparral's age-A pools
+          step to age A + 1); unit-carbon-assumptions ALL PASS; dev/nonforest/02-emergent-stsim-check.R in real ST-Sim PASS (chaparral cells
+          at ages 0, 5, 30, 80, 2 follow the R run for 30 years to 9.8e-6). New tests/phaseZ29-chaparral-age.R (stage 5).
+        - **Decided by the user 2026-11-06:** chaparral keeps the literature's mature growth (1.6 Mg C/ha/yr at the CONUS mean, against
+          RAP's 3.19, which likely includes mixed and Ceanothus stands; chamise literature about 2), scaled by each ecodivision's RAP NPP.
+          The grass and sage-family litter target counts leaf and fine litter only (AG very fast; fine woody debris follows its literature
+          rate): sage leaf litter then decays at k 0.29/yr (literature 0.1-0.7; it was 2.1 when the target also counted AG fast), with
+          total surface litter 0.63 Mg C/ha (0.32 leaf + 0.31 fine woody). Chaparral's 7.0 still counts AG very fast + fast (k 0.09).
+          Grass litter decays at k 0.66-0.89, a little above litterbag values: a calibration term for grazing and photodegradation.
       - **Open:** eastern grass and shrub rest on few untreed cells and RAP is built for rangelands; growth by age after fire (step 8);
         live and litter targets (RAP biomass, shrub literature, FCCS) not yet used.
     2. **Use only the pools each class has.** Keep the shared stock types; turn off the flows that do not apply. Grass: foliage, fine

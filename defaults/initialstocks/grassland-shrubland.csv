@@ -38,7 +38,7 @@ Hot Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Ste
 Hot Continental,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.1159
 Hot Continental,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Hot Continental,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Hot Continental,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8841
+Hot Continental,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Hot Continental,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.106
 Hot Continental,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,17.349
 Hot Continental,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.5398
@@ -52,7 +52,7 @@ Hot Continental,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Snag S
 Hot Continental,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.7891
 Hot Continental,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Hot Continental,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.7742
-Hot Continental,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.0368
+Hot Continental,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8259
 Hot Continental,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.8664
 Hot Continental,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,23.6689
 Hot Continental,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.676
@@ -66,7 +66,7 @@ Hot Continental,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Snag St
 Hot Continental,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Fast,,,1.7826
 Hot Continental,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Hot Continental,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Slow,,,1.749
-Hot Continental,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.083
+Hot Continental,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,1.8656
 Hot Continental,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Fast,,,1.9572
 Hot Continental,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Slow,,,41.5438
 Hot Continental,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Very Fast,,,1.527
@@ -80,7 +80,7 @@ Hot Continental,Shrubland: Non-sage,Carbon Initial Conditions: Snag Stem,,,0
 Hot Continental,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Fast,,,1.7826
 Hot Continental,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Medium,,,0
 Hot Continental,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Slow,,,1.749
-Hot Continental,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,0.083
+Hot Continental,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,1.8656
 Hot Continental,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Fast,,,1.9572
 Hot Continental,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Slow,,,41.5438
 Hot Continental,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Very Fast,,,1.527
@@ -94,7 +94,7 @@ Hot Continental,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Snag Stem,
 Hot Continental,Shrubland: Sage,Carbon Initial Conditions: Aboveground Fast,,,0.3058
 Hot Continental,Shrubland: Sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Hot Continental,Shrubland: Sage,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Hot Continental,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0142
+Hot Continental,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.32
 Hot Continental,Shrubland: Sage,Carbon Initial Conditions: Belowground Fast,,,0.3357
 Hot Continental,Shrubland: Sage,Carbon Initial Conditions: Belowground Slow,,,15.8289
 Hot Continental,Shrubland: Sage,Carbon Initial Conditions: Belowground Very Fast,,,0.2619
@@ -144,7 +144,7 @@ Hot Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions
 Hot Continental Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.1159
 Hot Continental Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Hot Continental Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Hot Continental Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8841
+Hot Continental Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Hot Continental Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.106
 Hot Continental Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,17.349
 Hot Continental Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.5398
@@ -158,7 +158,7 @@ Hot Continental Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditio
 Hot Continental Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.7891
 Hot Continental Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Hot Continental Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.7742
-Hot Continental Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.0368
+Hot Continental Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8259
 Hot Continental Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.8664
 Hot Continental Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,23.6689
 Hot Continental Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.676
@@ -172,7 +172,7 @@ Hot Continental Mountains,Shrubland: Native Sage Steppe,Carbon Initial Condition
 Hot Continental Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Fast,,,2.3718
 Hot Continental Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Hot Continental Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Slow,,,2.3272
-Hot Continental Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.1105
+Hot Continental Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,2.4823
 Hot Continental Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Fast,,,2.6042
 Hot Continental Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Slow,,,115.4507
 Hot Continental Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Very Fast,,,2.0317
@@ -186,7 +186,7 @@ Hot Continental Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Snag St
 Hot Continental Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Fast,,,2.3718
 Hot Continental Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Medium,,,0
 Hot Continental Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Slow,,,2.3272
-Hot Continental Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,0.1105
+Hot Continental Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,2.4823
 Hot Continental Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Fast,,,2.6042
 Hot Continental Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Slow,,,115.4507
 Hot Continental Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Very Fast,,,2.0317
@@ -200,7 +200,7 @@ Hot Continental Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: 
 Hot Continental Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Fast,,,0.3058
 Hot Continental Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Hot Continental Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Hot Continental Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0142
+Hot Continental Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.32
 Hot Continental Mountains,Shrubland: Sage,Carbon Initial Conditions: Belowground Fast,,,0.3357
 Hot Continental Mountains,Shrubland: Sage,Carbon Initial Conditions: Belowground Slow,,,15.8289
 Hot Continental Mountains,Shrubland: Sage,Carbon Initial Conditions: Belowground Very Fast,,,0.2619
@@ -250,7 +250,7 @@ Marine,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Marine,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.1159
 Marine,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Marine,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Marine,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8841
+Marine,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Marine,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.106
 Marine,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,17.349
 Marine,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.5398
@@ -264,7 +264,7 @@ Marine,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Snag Stem,,,0
 Marine,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.7891
 Marine,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Marine,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.7742
-Marine,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.0368
+Marine,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8259
 Marine,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.8664
 Marine,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,23.6689
 Marine,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.676
@@ -278,7 +278,7 @@ Marine,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Snag Stem,,,0
 Marine,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Fast,,,1.7755
 Marine,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Marine,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Slow,,,1.742
-Marine,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0827
+Marine,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,1.8582
 Marine,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Fast,,,1.9494
 Marine,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Slow,,,72.4347
 Marine,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Very Fast,,,1.5209
@@ -292,7 +292,7 @@ Marine,Shrubland: Non-sage,Carbon Initial Conditions: Snag Stem,,,0
 Marine,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Fast,,,1.7755
 Marine,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Medium,,,0
 Marine,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Slow,,,1.742
-Marine,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,0.0827
+Marine,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,1.8582
 Marine,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Fast,,,1.9494
 Marine,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Slow,,,72.4347
 Marine,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Very Fast,,,1.5209
@@ -306,7 +306,7 @@ Marine,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Snag Stem,,,0
 Marine,Shrubland: Sage,Carbon Initial Conditions: Aboveground Fast,,,0.3058
 Marine,Shrubland: Sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Marine,Shrubland: Sage,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Marine,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0142
+Marine,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.32
 Marine,Shrubland: Sage,Carbon Initial Conditions: Belowground Fast,,,0.3357
 Marine,Shrubland: Sage,Carbon Initial Conditions: Belowground Slow,,,15.8289
 Marine,Shrubland: Sage,Carbon Initial Conditions: Belowground Very Fast,,,0.2619
@@ -356,7 +356,7 @@ Marine Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Snag St
 Marine Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.1159
 Marine Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Marine Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Marine Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8841
+Marine Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Marine Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.106
 Marine Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,17.349
 Marine Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.5398
@@ -370,7 +370,7 @@ Marine Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Snag 
 Marine Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.6387
 Marine Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Marine Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.6267
-Marine Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.0298
+Marine Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.6685
 Marine Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.7013
 Marine Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,25.6868
 Marine Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.5471
@@ -384,7 +384,7 @@ Marine Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Snag S
 Marine Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Fast,,,0.9682
 Marine Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Marine Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Slow,,,0.9499
-Marine Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0451
+Marine Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,1.0133
 Marine Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Fast,,,1.063
 Marine Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Slow,,,43.8053
 Marine Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Very Fast,,,0.8293
@@ -398,7 +398,7 @@ Marine Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Snag Stem,,,0
 Marine Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Fast,,,0.9682
 Marine Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Medium,,,0
 Marine Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Slow,,,0.9499
-Marine Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,0.0451
+Marine Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,1.0133
 Marine Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Fast,,,1.063
 Marine Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Slow,,,43.8053
 Marine Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Very Fast,,,0.8293
@@ -412,7 +412,7 @@ Marine Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Snag Stem
 Marine Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Fast,,,0.3058
 Marine Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Marine Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Marine Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0142
+Marine Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.32
 Marine Mountains,Shrubland: Sage,Carbon Initial Conditions: Belowground Fast,,,0.3357
 Marine Mountains,Shrubland: Sage,Carbon Initial Conditions: Belowground Slow,,,15.8289
 Marine Mountains,Shrubland: Sage,Carbon Initial Conditions: Belowground Very Fast,,,0.2619
@@ -462,7 +462,7 @@ Mediterranean,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Stem,
 Mediterranean,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.1159
 Mediterranean,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Mediterranean,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Mediterranean,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8841
+Mediterranean,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Mediterranean,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.106
 Mediterranean,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,17.349
 Mediterranean,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.5398
@@ -476,7 +476,7 @@ Mediterranean,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Snag Ste
 Mediterranean,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.7891
 Mediterranean,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Mediterranean,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.7742
-Mediterranean,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.0368
+Mediterranean,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8259
 Mediterranean,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.8664
 Mediterranean,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,23.6689
 Mediterranean,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.676
@@ -490,7 +490,7 @@ Mediterranean,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Snag Stem
 Mediterranean,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Fast,,,2.4465
 Mediterranean,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Mediterranean,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Slow,,,2.4005
-Mediterranean,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.114
+Mediterranean,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,2.5605
 Mediterranean,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Fast,,,2.6862
 Mediterranean,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Slow,,,45.0769
 Mediterranean,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Very Fast,,,2.0957
@@ -504,7 +504,7 @@ Mediterranean,Shrubland: Non-sage,Carbon Initial Conditions: Snag Stem,,,0
 Mediterranean,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Fast,,,2.4465
 Mediterranean,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Medium,,,0
 Mediterranean,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Slow,,,2.4005
-Mediterranean,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,0.114
+Mediterranean,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,2.5605
 Mediterranean,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Fast,,,2.6862
 Mediterranean,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Slow,,,45.0769
 Mediterranean,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Very Fast,,,2.0957
@@ -518,7 +518,7 @@ Mediterranean,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Snag Stem,,,
 Mediterranean,Shrubland: Sage,Carbon Initial Conditions: Aboveground Fast,,,0.3058
 Mediterranean,Shrubland: Sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Mediterranean,Shrubland: Sage,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Mediterranean,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0142
+Mediterranean,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.32
 Mediterranean,Shrubland: Sage,Carbon Initial Conditions: Belowground Fast,,,0.3357
 Mediterranean,Shrubland: Sage,Carbon Initial Conditions: Belowground Slow,,,15.8289
 Mediterranean,Shrubland: Sage,Carbon Initial Conditions: Belowground Very Fast,,,0.2619
@@ -568,7 +568,7 @@ Mediterranean Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: 
 Mediterranean Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.1481
 Mediterranean Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Mediterranean Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.3835
-Mediterranean Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,1.1301
+Mediterranean Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,1.2782
 Mediterranean Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.1355
 Mediterranean Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,18.551
 Mediterranean Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.69
@@ -582,7 +582,7 @@ Mediterranean Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions
 Mediterranean Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.6863
 Mediterranean Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Mediterranean Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.6734
-Mediterranean Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.032
+Mediterranean Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.7183
 Mediterranean Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.7536
 Mediterranean Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,18.9988
 Mediterranean Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.5879
@@ -596,7 +596,7 @@ Mediterranean Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions:
 Mediterranean Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Fast,,,1.2066
 Mediterranean Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Mediterranean Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Slow,,,1.1839
-Mediterranean Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0562
+Mediterranean Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,1.2628
 Mediterranean Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Fast,,,1.3248
 Mediterranean Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Slow,,,32.3026
 Mediterranean Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Very Fast,,,1.0336
@@ -610,7 +610,7 @@ Mediterranean Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Snag Stem
 Mediterranean Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Fast,,,1.2066
 Mediterranean Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Medium,,,0
 Mediterranean Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Slow,,,1.1839
-Mediterranean Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,0.0562
+Mediterranean Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,1.2628
 Mediterranean Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Fast,,,1.3248
 Mediterranean Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Slow,,,32.3026
 Mediterranean Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Very Fast,,,1.0336
@@ -624,7 +624,7 @@ Mediterranean Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Sn
 Mediterranean Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Fast,,,0.5701
 Mediterranean Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Mediterranean Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Slow,,,0.5593
-Mediterranean Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0266
+Mediterranean Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.5966
 Mediterranean Mountains,Shrubland: Sage,Carbon Initial Conditions: Belowground Fast,,,0.6259
 Mediterranean Mountains,Shrubland: Sage,Carbon Initial Conditions: Belowground Slow,,,22.2759
 Mediterranean Mountains,Shrubland: Sage,Carbon Initial Conditions: Belowground Very Fast,,,0.4883
@@ -674,7 +674,7 @@ Prairie,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Prairie,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.1159
 Prairie,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Prairie,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Prairie,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8841
+Prairie,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Prairie,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.106
 Prairie,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,17.349
 Prairie,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.5398
@@ -688,7 +688,7 @@ Prairie,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Snag Stem,,,0
 Prairie,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.7891
 Prairie,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Prairie,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.7742
-Prairie,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.0368
+Prairie,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8259
 Prairie,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.8664
 Prairie,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,23.6689
 Prairie,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.676
@@ -702,7 +702,7 @@ Prairie,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Snag Stem,,,0
 Prairie,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Fast,,,2.6113
 Prairie,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Prairie,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Slow,,,2.5621
-Prairie,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.1216
+Prairie,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,2.7329
 Prairie,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Fast,,,2.8671
 Prairie,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Slow,,,36.0978
 Prairie,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Very Fast,,,2.2369
@@ -716,7 +716,7 @@ Prairie,Shrubland: Non-sage,Carbon Initial Conditions: Snag Stem,,,0
 Prairie,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Fast,,,2.6113
 Prairie,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Medium,,,0
 Prairie,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Slow,,,2.5621
-Prairie,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,0.1216
+Prairie,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,2.7329
 Prairie,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Fast,,,2.8671
 Prairie,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Slow,,,36.0978
 Prairie,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Very Fast,,,2.2369
@@ -730,7 +730,7 @@ Prairie,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Snag Stem,,,0
 Prairie,Shrubland: Sage,Carbon Initial Conditions: Aboveground Fast,,,0.3058
 Prairie,Shrubland: Sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Prairie,Shrubland: Sage,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Prairie,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0142
+Prairie,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.32
 Prairie,Shrubland: Sage,Carbon Initial Conditions: Belowground Fast,,,0.3357
 Prairie,Shrubland: Sage,Carbon Initial Conditions: Belowground Slow,,,15.8289
 Prairie,Shrubland: Sage,Carbon Initial Conditions: Belowground Very Fast,,,0.2619
@@ -780,7 +780,7 @@ Savanna,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Savanna,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.1159
 Savanna,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Savanna,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Savanna,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8841
+Savanna,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Savanna,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.106
 Savanna,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,17.349
 Savanna,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.5398
@@ -794,7 +794,7 @@ Savanna,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Snag Stem,,,0
 Savanna,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.7891
 Savanna,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Savanna,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.7742
-Savanna,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.0368
+Savanna,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8259
 Savanna,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.8664
 Savanna,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,23.6689
 Savanna,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.676
@@ -808,7 +808,7 @@ Savanna,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Snag Stem,,,0
 Savanna,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Fast,,,2.8144
 Savanna,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Savanna,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Slow,,,2.7614
-Savanna,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.1311
+Savanna,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,2.9455
 Savanna,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Fast,,,3.09
 Savanna,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Slow,,,36.604
 Savanna,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Very Fast,,,2.4108
@@ -822,7 +822,7 @@ Savanna,Shrubland: Non-sage,Carbon Initial Conditions: Snag Stem,,,0
 Savanna,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Fast,,,2.8144
 Savanna,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Medium,,,0
 Savanna,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Slow,,,2.7614
-Savanna,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,0.1311
+Savanna,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,2.9455
 Savanna,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Fast,,,3.09
 Savanna,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Slow,,,36.604
 Savanna,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Very Fast,,,2.4108
@@ -836,7 +836,7 @@ Savanna,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Snag Stem,,,0
 Savanna,Shrubland: Sage,Carbon Initial Conditions: Aboveground Fast,,,0.3058
 Savanna,Shrubland: Sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Savanna,Shrubland: Sage,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Savanna,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0142
+Savanna,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.32
 Savanna,Shrubland: Sage,Carbon Initial Conditions: Belowground Fast,,,0.3357
 Savanna,Shrubland: Sage,Carbon Initial Conditions: Belowground Slow,,,15.8289
 Savanna,Shrubland: Sage,Carbon Initial Conditions: Belowground Very Fast,,,0.2619
@@ -886,7 +886,7 @@ Subtropical,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Stem,,,
 Subtropical,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.1159
 Subtropical,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Subtropical,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Subtropical,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8841
+Subtropical,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Subtropical,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.106
 Subtropical,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,17.349
 Subtropical,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.5398
@@ -900,7 +900,7 @@ Subtropical,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Snag Stem,
 Subtropical,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.7891
 Subtropical,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Subtropical,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.7742
-Subtropical,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.0368
+Subtropical,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8259
 Subtropical,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.8664
 Subtropical,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,23.6689
 Subtropical,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.676
@@ -914,7 +914,7 @@ Subtropical,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Snag Stem,,
 Subtropical,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Fast,,,2.1373
 Subtropical,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Subtropical,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Slow,,,2.097
-Subtropical,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0996
+Subtropical,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,2.2368
 Subtropical,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Fast,,,2.3466
 Subtropical,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Slow,,,24.5661
 Subtropical,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Very Fast,,,1.8308
@@ -928,7 +928,7 @@ Subtropical,Shrubland: Non-sage,Carbon Initial Conditions: Snag Stem,,,0
 Subtropical,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Fast,,,2.1373
 Subtropical,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Medium,,,0
 Subtropical,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Slow,,,2.097
-Subtropical,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,0.0996
+Subtropical,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,2.2368
 Subtropical,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Fast,,,2.3466
 Subtropical,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Slow,,,24.5661
 Subtropical,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Very Fast,,,1.8308
@@ -942,7 +942,7 @@ Subtropical,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Snag Stem,,,0
 Subtropical,Shrubland: Sage,Carbon Initial Conditions: Aboveground Fast,,,0.3058
 Subtropical,Shrubland: Sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Subtropical,Shrubland: Sage,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Subtropical,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0142
+Subtropical,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.32
 Subtropical,Shrubland: Sage,Carbon Initial Conditions: Belowground Fast,,,0.3357
 Subtropical,Shrubland: Sage,Carbon Initial Conditions: Belowground Slow,,,15.8289
 Subtropical,Shrubland: Sage,Carbon Initial Conditions: Belowground Very Fast,,,0.2619
@@ -992,7 +992,7 @@ Subtropical Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Sn
 Subtropical Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.1159
 Subtropical Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Subtropical Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Subtropical Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8841
+Subtropical Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Subtropical Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.106
 Subtropical Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,17.349
 Subtropical Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.5398
@@ -1006,7 +1006,7 @@ Subtropical Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: 
 Subtropical Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.7891
 Subtropical Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Subtropical Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.7742
-Subtropical Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.0368
+Subtropical Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8259
 Subtropical Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.8664
 Subtropical Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,23.6689
 Subtropical Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.676
@@ -1020,7 +1020,7 @@ Subtropical Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: S
 Subtropical Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Fast,,,3.1091
 Subtropical Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Subtropical Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Slow,,,3.0506
-Subtropical Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.1448
+Subtropical Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,3.254
 Subtropical Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Fast,,,3.4137
 Subtropical Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Slow,,,15.433
 Subtropical Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Very Fast,,,2.6633
@@ -1034,7 +1034,7 @@ Subtropical Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Snag Stem,,
 Subtropical Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Fast,,,3.1091
 Subtropical Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Medium,,,0
 Subtropical Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Slow,,,3.0506
-Subtropical Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,0.1448
+Subtropical Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,3.254
 Subtropical Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Fast,,,3.4137
 Subtropical Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Slow,,,15.433
 Subtropical Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Very Fast,,,2.6633
@@ -1048,7 +1048,7 @@ Subtropical Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Snag
 Subtropical Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Fast,,,0.3058
 Subtropical Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Subtropical Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Subtropical Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0142
+Subtropical Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.32
 Subtropical Mountains,Shrubland: Sage,Carbon Initial Conditions: Belowground Fast,,,0.3357
 Subtropical Mountains,Shrubland: Sage,Carbon Initial Conditions: Belowground Slow,,,15.8289
 Subtropical Mountains,Shrubland: Sage,Carbon Initial Conditions: Belowground Very Fast,,,0.2619
@@ -1098,7 +1098,7 @@ Temperate Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Snag St
 Temperate Desert,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.1391
 Temperate Desert,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Temperate Desert,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.36
-Temperate Desert,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,1.0611
+Temperate Desert,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,1.2002
 Temperate Desert,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.1273
 Temperate Desert,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,15.8943
 Temperate Desert,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.6478
@@ -1112,7 +1112,7 @@ Temperate Desert,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Snag 
 Temperate Desert,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.7251
 Temperate Desert,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Temperate Desert,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.7115
-Temperate Desert,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.0338
+Temperate Desert,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.7589
 Temperate Desert,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.7962
 Temperate Desert,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,19.8777
 Temperate Desert,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.6212
@@ -1126,7 +1126,7 @@ Temperate Desert,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Snag S
 Temperate Desert,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Fast,,,0.3761
 Temperate Desert,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Temperate Desert,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Slow,,,0.369
-Temperate Desert,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0175
+Temperate Desert,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.3936
 Temperate Desert,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Fast,,,0.413
 Temperate Desert,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Slow,,,11.345
 Temperate Desert,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Very Fast,,,0.3222
@@ -1140,7 +1140,7 @@ Temperate Desert,Shrubland: Non-sage,Carbon Initial Conditions: Snag Stem,,,0
 Temperate Desert,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Fast,,,0.3761
 Temperate Desert,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Medium,,,0
 Temperate Desert,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Slow,,,0.369
-Temperate Desert,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,0.0175
+Temperate Desert,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,0.3936
 Temperate Desert,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Fast,,,0.413
 Temperate Desert,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Slow,,,11.345
 Temperate Desert,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Very Fast,,,0.3222
@@ -1154,7 +1154,7 @@ Temperate Desert,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Snag Stem
 Temperate Desert,Shrubland: Sage,Carbon Initial Conditions: Aboveground Fast,,,0.3251
 Temperate Desert,Shrubland: Sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Temperate Desert,Shrubland: Sage,Carbon Initial Conditions: Aboveground Slow,,,0.319
-Temperate Desert,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0151
+Temperate Desert,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.3403
 Temperate Desert,Shrubland: Sage,Carbon Initial Conditions: Belowground Fast,,,0.357
 Temperate Desert,Shrubland: Sage,Carbon Initial Conditions: Belowground Slow,,,12.7627
 Temperate Desert,Shrubland: Sage,Carbon Initial Conditions: Belowground Very Fast,,,0.2785
@@ -1204,7 +1204,7 @@ Temperate Desert Mountains,Grassland: Natural Perennial,Carbon Initial Condition
 Temperate Desert Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.0924
 Temperate Desert Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Temperate Desert Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.2393
-Temperate Desert Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.7051
+Temperate Desert Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.7976
 Temperate Desert Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.0846
 Temperate Desert Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,17.3198
 Temperate Desert Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.4305
@@ -1218,7 +1218,7 @@ Temperate Desert Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditi
 Temperate Desert Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.6925
 Temperate Desert Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Temperate Desert Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.6794
-Temperate Desert Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.0323
+Temperate Desert Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.7247
 Temperate Desert Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.7603
 Temperate Desert Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,26.4961
 Temperate Desert Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.5932
@@ -1232,7 +1232,7 @@ Temperate Desert Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditio
 Temperate Desert Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Fast,,,0.6285
 Temperate Desert Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Temperate Desert Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Slow,,,0.6167
-Temperate Desert Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0293
+Temperate Desert Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.6578
 Temperate Desert Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Fast,,,0.6901
 Temperate Desert Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Slow,,,26.3265
 Temperate Desert Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Very Fast,,,0.5384
@@ -1246,7 +1246,7 @@ Temperate Desert Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Snag S
 Temperate Desert Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Fast,,,0.6285
 Temperate Desert Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Medium,,,0
 Temperate Desert Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Slow,,,0.6167
-Temperate Desert Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,0.0293
+Temperate Desert Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,0.6578
 Temperate Desert Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Fast,,,0.6901
 Temperate Desert Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Slow,,,26.3265
 Temperate Desert Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Very Fast,,,0.5384
@@ -1260,7 +1260,7 @@ Temperate Desert Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions:
 Temperate Desert Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Fast,,,0.2909
 Temperate Desert Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Temperate Desert Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Slow,,,0.2854
-Temperate Desert Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0136
+Temperate Desert Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.3045
 Temperate Desert Mountains,Shrubland: Sage,Carbon Initial Conditions: Belowground Fast,,,0.3194
 Temperate Desert Mountains,Shrubland: Sage,Carbon Initial Conditions: Belowground Slow,,,16.682
 Temperate Desert Mountains,Shrubland: Sage,Carbon Initial Conditions: Belowground Very Fast,,,0.2492
@@ -1310,7 +1310,7 @@ Temperate Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Snag St
 Temperate Steppe,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.1159
 Temperate Steppe,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Temperate Steppe,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Temperate Steppe,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8841
+Temperate Steppe,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Temperate Steppe,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.106
 Temperate Steppe,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,17.349
 Temperate Steppe,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.5398
@@ -1324,7 +1324,7 @@ Temperate Steppe,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Snag 
 Temperate Steppe,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,1.1326
 Temperate Steppe,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Temperate Steppe,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,1.1112
-Temperate Steppe,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.0528
+Temperate Steppe,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,1.1853
 Temperate Steppe,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,1.2435
 Temperate Steppe,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,19.8844
 Temperate Steppe,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.9702
@@ -1338,7 +1338,7 @@ Temperate Steppe,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Snag S
 Temperate Steppe,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Fast,,,1.2152
 Temperate Steppe,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Temperate Steppe,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Slow,,,1.1923
-Temperate Steppe,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0566
+Temperate Steppe,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,1.2718
 Temperate Steppe,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Fast,,,1.3343
 Temperate Steppe,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Slow,,,29.7599
 Temperate Steppe,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Very Fast,,,1.041
@@ -1352,7 +1352,7 @@ Temperate Steppe,Shrubland: Non-sage,Carbon Initial Conditions: Snag Stem,,,0
 Temperate Steppe,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Fast,,,1.2152
 Temperate Steppe,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Medium,,,0
 Temperate Steppe,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Slow,,,1.1923
-Temperate Steppe,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,0.0566
+Temperate Steppe,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,1.2718
 Temperate Steppe,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Fast,,,1.3343
 Temperate Steppe,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Slow,,,29.7599
 Temperate Steppe,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Very Fast,,,1.041
@@ -1366,7 +1366,7 @@ Temperate Steppe,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Snag Stem
 Temperate Steppe,Shrubland: Sage,Carbon Initial Conditions: Aboveground Fast,,,0.3058
 Temperate Steppe,Shrubland: Sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Temperate Steppe,Shrubland: Sage,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Temperate Steppe,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0142
+Temperate Steppe,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.32
 Temperate Steppe,Shrubland: Sage,Carbon Initial Conditions: Belowground Fast,,,0.3357
 Temperate Steppe,Shrubland: Sage,Carbon Initial Conditions: Belowground Slow,,,15.8289
 Temperate Steppe,Shrubland: Sage,Carbon Initial Conditions: Belowground Very Fast,,,0.2619
@@ -1416,7 +1416,7 @@ Temperate Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Condition
 Temperate Steppe Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.279
 Temperate Steppe Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Temperate Steppe Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.7223
-Temperate Steppe Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,2.1286
+Temperate Steppe Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,2.4077
 Temperate Steppe Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.2553
 Temperate Steppe Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,30.8037
 Temperate Steppe Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,1.2996
@@ -1430,7 +1430,7 @@ Temperate Steppe Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditi
 Temperate Steppe Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,1.021
 Temperate Steppe Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Temperate Steppe Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,1.0017
-Temperate Steppe Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.0476
+Temperate Steppe Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,1.0685
 Temperate Steppe Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,1.121
 Temperate Steppe Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,31.0903
 Temperate Steppe Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.8746
@@ -1444,7 +1444,7 @@ Temperate Steppe Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditio
 Temperate Steppe Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Fast,,,1.1856
 Temperate Steppe Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Temperate Steppe Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Slow,,,1.1633
-Temperate Steppe Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0552
+Temperate Steppe Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,1.2408
 Temperate Steppe Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Fast,,,1.3017
 Temperate Steppe Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Slow,,,38.2859
 Temperate Steppe Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Very Fast,,,1.0156
@@ -1458,7 +1458,7 @@ Temperate Steppe Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Snag S
 Temperate Steppe Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Fast,,,1.1856
 Temperate Steppe Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Medium,,,0
 Temperate Steppe Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Slow,,,1.1633
-Temperate Steppe Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,0.0552
+Temperate Steppe Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,1.2408
 Temperate Steppe Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Fast,,,1.3017
 Temperate Steppe Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Slow,,,38.2859
 Temperate Steppe Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Very Fast,,,1.0156
@@ -1472,7 +1472,7 @@ Temperate Steppe Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions:
 Temperate Steppe Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Fast,,,0.4351
 Temperate Steppe Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Temperate Steppe Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Slow,,,0.4269
-Temperate Steppe Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0203
+Temperate Steppe Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.4554
 Temperate Steppe Mountains,Shrubland: Sage,Carbon Initial Conditions: Belowground Fast,,,0.4777
 Temperate Steppe Mountains,Shrubland: Sage,Carbon Initial Conditions: Belowground Slow,,,13.8807
 Temperate Steppe Mountains,Shrubland: Sage,Carbon Initial Conditions: Belowground Very Fast,,,0.3727
@@ -1522,7 +1522,7 @@ Tropical/Subtropical Desert,Grassland: Natural Perennial,Carbon Initial Conditio
 Tropical/Subtropical Desert,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.1159
 Tropical/Subtropical Desert,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Tropical/Subtropical Desert,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Tropical/Subtropical Desert,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8841
+Tropical/Subtropical Desert,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Tropical/Subtropical Desert,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.106
 Tropical/Subtropical Desert,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,17.349
 Tropical/Subtropical Desert,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.5398
@@ -1536,7 +1536,7 @@ Tropical/Subtropical Desert,Shrubland: Invaded Sage Steppe,Carbon Initial Condit
 Tropical/Subtropical Desert,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.7891
 Tropical/Subtropical Desert,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Tropical/Subtropical Desert,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.7742
-Tropical/Subtropical Desert,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.0368
+Tropical/Subtropical Desert,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8259
 Tropical/Subtropical Desert,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.8664
 Tropical/Subtropical Desert,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,23.6689
 Tropical/Subtropical Desert,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.676
@@ -1550,7 +1550,7 @@ Tropical/Subtropical Desert,Shrubland: Native Sage Steppe,Carbon Initial Conditi
 Tropical/Subtropical Desert,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Fast,,,0.3304
 Tropical/Subtropical Desert,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Tropical/Subtropical Desert,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Slow,,,0.3242
-Tropical/Subtropical Desert,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0154
+Tropical/Subtropical Desert,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.3458
 Tropical/Subtropical Desert,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Fast,,,0.3628
 Tropical/Subtropical Desert,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Slow,,,10.6809
 Tropical/Subtropical Desert,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Very Fast,,,0.283
@@ -1564,7 +1564,7 @@ Tropical/Subtropical Desert,Shrubland: Non-sage,Carbon Initial Conditions: Snag 
 Tropical/Subtropical Desert,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Fast,,,0.3304
 Tropical/Subtropical Desert,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Medium,,,0
 Tropical/Subtropical Desert,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Slow,,,0.3242
-Tropical/Subtropical Desert,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,0.0154
+Tropical/Subtropical Desert,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,0.3458
 Tropical/Subtropical Desert,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Fast,,,0.3628
 Tropical/Subtropical Desert,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Slow,,,10.6809
 Tropical/Subtropical Desert,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Very Fast,,,0.283
@@ -1578,7 +1578,7 @@ Tropical/Subtropical Desert,Shrubland: Post Fire Shrub,Carbon Initial Conditions
 Tropical/Subtropical Desert,Shrubland: Sage,Carbon Initial Conditions: Aboveground Fast,,,0.3058
 Tropical/Subtropical Desert,Shrubland: Sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Tropical/Subtropical Desert,Shrubland: Sage,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Tropical/Subtropical Desert,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0142
+Tropical/Subtropical Desert,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.32
 Tropical/Subtropical Desert,Shrubland: Sage,Carbon Initial Conditions: Belowground Fast,,,0.3357
 Tropical/Subtropical Desert,Shrubland: Sage,Carbon Initial Conditions: Belowground Slow,,,15.8289
 Tropical/Subtropical Desert,Shrubland: Sage,Carbon Initial Conditions: Belowground Very Fast,,,0.2619
@@ -1628,7 +1628,7 @@ Tropical/Subtropical Steppe,Grassland: Natural Perennial,Carbon Initial Conditio
 Tropical/Subtropical Steppe,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.1159
 Tropical/Subtropical Steppe,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Tropical/Subtropical Steppe,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Tropical/Subtropical Steppe,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8841
+Tropical/Subtropical Steppe,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Tropical/Subtropical Steppe,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.106
 Tropical/Subtropical Steppe,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,17.349
 Tropical/Subtropical Steppe,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.5398
@@ -1642,7 +1642,7 @@ Tropical/Subtropical Steppe,Shrubland: Invaded Sage Steppe,Carbon Initial Condit
 Tropical/Subtropical Steppe,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.485
 Tropical/Subtropical Steppe,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Tropical/Subtropical Steppe,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.4759
-Tropical/Subtropical Steppe,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.0226
+Tropical/Subtropical Steppe,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.5076
 Tropical/Subtropical Steppe,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.5325
 Tropical/Subtropical Steppe,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,13.8622
 Tropical/Subtropical Steppe,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.4155
@@ -1656,7 +1656,7 @@ Tropical/Subtropical Steppe,Shrubland: Native Sage Steppe,Carbon Initial Conditi
 Tropical/Subtropical Steppe,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Fast,,,1.0926
 Tropical/Subtropical Steppe,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Tropical/Subtropical Steppe,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Slow,,,1.072
-Tropical/Subtropical Steppe,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0509
+Tropical/Subtropical Steppe,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,1.1435
 Tropical/Subtropical Steppe,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Fast,,,1.1996
 Tropical/Subtropical Steppe,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Slow,,,18.6013
 Tropical/Subtropical Steppe,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Very Fast,,,0.9359
@@ -1670,7 +1670,7 @@ Tropical/Subtropical Steppe,Shrubland: Non-sage,Carbon Initial Conditions: Snag 
 Tropical/Subtropical Steppe,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Fast,,,1.0926
 Tropical/Subtropical Steppe,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Medium,,,0
 Tropical/Subtropical Steppe,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Slow,,,1.072
-Tropical/Subtropical Steppe,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,0.0509
+Tropical/Subtropical Steppe,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,1.1435
 Tropical/Subtropical Steppe,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Fast,,,1.1996
 Tropical/Subtropical Steppe,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Slow,,,18.6013
 Tropical/Subtropical Steppe,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Very Fast,,,0.9359
@@ -1684,7 +1684,7 @@ Tropical/Subtropical Steppe,Shrubland: Post Fire Shrub,Carbon Initial Conditions
 Tropical/Subtropical Steppe,Shrubland: Sage,Carbon Initial Conditions: Aboveground Fast,,,0.3058
 Tropical/Subtropical Steppe,Shrubland: Sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Tropical/Subtropical Steppe,Shrubland: Sage,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Tropical/Subtropical Steppe,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0142
+Tropical/Subtropical Steppe,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.32
 Tropical/Subtropical Steppe,Shrubland: Sage,Carbon Initial Conditions: Belowground Fast,,,0.3357
 Tropical/Subtropical Steppe,Shrubland: Sage,Carbon Initial Conditions: Belowground Slow,,,15.8289
 Tropical/Subtropical Steppe,Shrubland: Sage,Carbon Initial Conditions: Belowground Very Fast,,,0.2619
@@ -1734,7 +1734,7 @@ Tropical/Subtropical Steppe Mountains,Grassland: Natural Perennial,Carbon Initia
 Tropical/Subtropical Steppe Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.1159
 Tropical/Subtropical Steppe Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Tropical/Subtropical Steppe Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Tropical/Subtropical Steppe Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8841
+Tropical/Subtropical Steppe Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Tropical/Subtropical Steppe Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.106
 Tropical/Subtropical Steppe Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,17.349
 Tropical/Subtropical Steppe Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.5398
@@ -1748,7 +1748,7 @@ Tropical/Subtropical Steppe Mountains,Shrubland: Invaded Sage Steppe,Carbon Init
 Tropical/Subtropical Steppe Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.787
 Tropical/Subtropical Steppe Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Tropical/Subtropical Steppe Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.7722
-Tropical/Subtropical Steppe Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.0367
+Tropical/Subtropical Steppe Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8236
 Tropical/Subtropical Steppe Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.8641
 Tropical/Subtropical Steppe Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,19.4582
 Tropical/Subtropical Steppe Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.6741
@@ -1762,7 +1762,7 @@ Tropical/Subtropical Steppe Mountains,Shrubland: Native Sage Steppe,Carbon Initi
 Tropical/Subtropical Steppe Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Fast,,,0.642
 Tropical/Subtropical Steppe Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Tropical/Subtropical Steppe Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Slow,,,0.6299
-Tropical/Subtropical Steppe Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0299
+Tropical/Subtropical Steppe Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.6719
 Tropical/Subtropical Steppe Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Fast,,,0.7049
 Tropical/Subtropical Steppe Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Slow,,,16.6534
 Tropical/Subtropical Steppe Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Very Fast,,,0.55
@@ -1776,7 +1776,7 @@ Tropical/Subtropical Steppe Mountains,Shrubland: Non-sage,Carbon Initial Conditi
 Tropical/Subtropical Steppe Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Fast,,,0.642
 Tropical/Subtropical Steppe Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Medium,,,0
 Tropical/Subtropical Steppe Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Slow,,,0.6299
-Tropical/Subtropical Steppe Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,0.0299
+Tropical/Subtropical Steppe Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,0.6719
 Tropical/Subtropical Steppe Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Fast,,,0.7049
 Tropical/Subtropical Steppe Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Slow,,,16.6534
 Tropical/Subtropical Steppe Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Very Fast,,,0.55
@@ -1790,7 +1790,7 @@ Tropical/Subtropical Steppe Mountains,Shrubland: Post Fire Shrub,Carbon Initial 
 Tropical/Subtropical Steppe Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Fast,,,0.3058
 Tropical/Subtropical Steppe Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Tropical/Subtropical Steppe Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Tropical/Subtropical Steppe Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0142
+Tropical/Subtropical Steppe Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.32
 Tropical/Subtropical Steppe Mountains,Shrubland: Sage,Carbon Initial Conditions: Belowground Fast,,,0.3357
 Tropical/Subtropical Steppe Mountains,Shrubland: Sage,Carbon Initial Conditions: Belowground Slow,,,15.8289
 Tropical/Subtropical Steppe Mountains,Shrubland: Sage,Carbon Initial Conditions: Belowground Very Fast,,,0.2619
@@ -1840,7 +1840,7 @@ Warm Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Snag St
 Warm Continental,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.1159
 Warm Continental,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Warm Continental,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Warm Continental,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8841
+Warm Continental,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Warm Continental,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.106
 Warm Continental,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,17.349
 Warm Continental,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.5398
@@ -1854,7 +1854,7 @@ Warm Continental,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Snag 
 Warm Continental,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.7891
 Warm Continental,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Warm Continental,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.7742
-Warm Continental,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.0368
+Warm Continental,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8259
 Warm Continental,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.8664
 Warm Continental,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,23.6689
 Warm Continental,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.676
@@ -1868,7 +1868,7 @@ Warm Continental,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Snag S
 Warm Continental,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Fast,,,1.758
 Warm Continental,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Warm Continental,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Slow,,,1.7249
-Warm Continental,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0819
+Warm Continental,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,1.8399
 Warm Continental,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Fast,,,1.9302
 Warm Continental,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Slow,,,45.2511
 Warm Continental,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Very Fast,,,1.506
@@ -1882,7 +1882,7 @@ Warm Continental,Shrubland: Non-sage,Carbon Initial Conditions: Snag Stem,,,0
 Warm Continental,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Fast,,,1.758
 Warm Continental,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Medium,,,0
 Warm Continental,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Slow,,,1.7249
-Warm Continental,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,0.0819
+Warm Continental,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,1.8399
 Warm Continental,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Fast,,,1.9302
 Warm Continental,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Slow,,,45.2511
 Warm Continental,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Very Fast,,,1.506
@@ -1896,7 +1896,7 @@ Warm Continental,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Snag Stem
 Warm Continental,Shrubland: Sage,Carbon Initial Conditions: Aboveground Fast,,,0.3058
 Warm Continental,Shrubland: Sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Warm Continental,Shrubland: Sage,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Warm Continental,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0142
+Warm Continental,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.32
 Warm Continental,Shrubland: Sage,Carbon Initial Conditions: Belowground Fast,,,0.3357
 Warm Continental,Shrubland: Sage,Carbon Initial Conditions: Belowground Slow,,,15.8289
 Warm Continental,Shrubland: Sage,Carbon Initial Conditions: Belowground Very Fast,,,0.2619
@@ -1946,7 +1946,7 @@ Warm Continental Mountains,Grassland: Natural Perennial,Carbon Initial Condition
 Warm Continental Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.1159
 Warm Continental Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Warm Continental Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Warm Continental Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8841
+Warm Continental Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Warm Continental Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.106
 Warm Continental Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,17.349
 Warm Continental Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.5398
@@ -1960,7 +1960,7 @@ Warm Continental Mountains,Shrubland: Invaded Sage Steppe,Carbon Initial Conditi
 Warm Continental Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Fast,,,0.7891
 Warm Continental Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Medium,,,0
 Warm Continental Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Slow,,,0.7742
-Warm Continental Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.0368
+Warm Continental Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Aboveground Very Fast,,,0.8259
 Warm Continental Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Fast,,,0.8664
 Warm Continental Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Slow,,,23.6689
 Warm Continental Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditions: Belowground Very Fast,,,0.676
@@ -1974,7 +1974,7 @@ Warm Continental Mountains,Shrubland: Native Sage Steppe,Carbon Initial Conditio
 Warm Continental Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Fast,,,0.7637
 Warm Continental Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Warm Continental Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Slow,,,0.7494
-Warm Continental Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0356
+Warm Continental Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.7993
 Warm Continental Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Fast,,,0.8386
 Warm Continental Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Slow,,,19.6471
 Warm Continental Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Belowground Very Fast,,,0.6542
@@ -1988,7 +1988,7 @@ Warm Continental Mountains,Shrubland: Non-sage,Carbon Initial Conditions: Snag S
 Warm Continental Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Fast,,,0.7637
 Warm Continental Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Medium,,,0
 Warm Continental Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Slow,,,0.7494
-Warm Continental Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,0.0356
+Warm Continental Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Aboveground Very Fast,,,0.7993
 Warm Continental Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Fast,,,0.8386
 Warm Continental Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Slow,,,19.6471
 Warm Continental Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions: Belowground Very Fast,,,0.6542
@@ -2002,7 +2002,7 @@ Warm Continental Mountains,Shrubland: Post Fire Shrub,Carbon Initial Conditions:
 Warm Continental Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Fast,,,0.3058
 Warm Continental Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Medium,,,0
 Warm Continental Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Slow,,,0.3
-Warm Continental Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.0142
+Warm Continental Mountains,Shrubland: Sage,Carbon Initial Conditions: Aboveground Very Fast,,,0.32
 Warm Continental Mountains,Shrubland: Sage,Carbon Initial Conditions: Belowground Fast,,,0.3357
 Warm Continental Mountains,Shrubland: Sage,Carbon Initial Conditions: Belowground Slow,,,15.8289
 Warm Continental Mountains,Shrubland: Sage,Carbon Initial Conditions: Belowground Very Fast,,,0.2619

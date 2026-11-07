@@ -119,8 +119,11 @@ lit_rates <- function(cls, moisture, shares = NULL) {
 refnpp <- setNames(conus$NPP, conus$StateClassId); refnpp[["Shrubland: Post Fire Shrub"]] <- refnpp[["Shrubland: Non-sage"]]
 path_of <- function(e, cls) pa[FromStratumId == e & FromStateClassId == cls]
 loss_of <- function(p, m, pool) { g <- intersect(paste(unique(p[FromStockTypeId == pool, FlowTypeId]), "[Type]"), m$FlowGroupId); sum(m[FlowGroupId %in% g, Value]) }
+# the litter target counts leaf and fine litter (AG very fast) for grass and the sage family (user 2026-11-06: Nagy et al. 2021 measured
+# litter; fine woody debris follows its literature rate on its own), and AG very fast + fast for chaparral (its litter stocks include
+# fine woody litter: Bohlman 2018, Riggan 1988)
 fit_litter_slow <- function(p, m, npp, r) {
-  m <- nf_fit_pool(p, m, memb, ord, npp, AGVF, as.numeric(r$AgLitter), over = c(AGVF, AGF))$mult
+  m <- nf_fit_pool(p, m, memb, ord, npp, AGVF, as.numeric(r$AgLitter), over = if (identical(r$StateClassId, "Shrubland: Chaparral")) c(AGVF, AGF) else AGVF)$mult
   nf_fit_pool(p, m, memb, ord, npp, AGS, as.numeric(r$AgSlow), only = TY("Emission: AG Slow -> Atmosphere"))$mult }
 
 # ---- chaparral by age (defaults/stockflow/chaparral-age.csv) ----------------------------------------------------------------
