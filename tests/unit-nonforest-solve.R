@@ -63,7 +63,9 @@ for (i in seq_len(nrow(fit))) {
 check(sprintf("starting pools are the steady state of the written rates (largest gap %.1e Mg C/ha)", worst), worst < 1e-3)
 check(sprintf("burial into Deep Soil hits each region's target (largest gap %.2f%%)", 100 * bworst), bworst < 1e-3)
 ds <- merge(ini[StateAttributeTypeID == "Carbon Initial Conditions: Deep Soil", .(StratumId = StratumID, StateClassId = StateClassID, ds = as.numeric(Value))], fit[, .(StratumId, StateClassId, Region)])
-check("Deep Soil starts with the region's 30-100 cm soil", all(merge(ds, reg[, .(StateClassId, Region, t = as.numeric(Soil30to100))], by = c("StateClassId", "Region"))[, ds == t]))
+check("Deep Soil starts at 0 (one soil definition: BG Slow holds the soil to 1 m; Deep Soil is burial during a run; user 2026-11-07)", all(ds$ds == 0))
+bs <- merge(ini[StateAttributeTypeID == "Carbon Initial Conditions: Belowground Slow", .(StratumId = StratumID, StateClassId = StateClassID, b = as.numeric(Value))], fit[, .(StratumId, StateClassId, Region)])
+check("BG Slow starts with the region's soil to 1 m (0-30 + 30-100 cm)", all(merge(bs, reg[, .(StateClassId, Region, t = as.numeric(Soil0to30) + as.numeric(Soil30to100))], by = c("StateClassId", "Region"))[, abs(b / t - 1) < 1e-3]))   # within 0.1%: the rates are written to 6 decimals
 check("Pacific values: Marine estuarine burial 1.10, Mediterranean 1.04 (Wang et al. 2019)",
       isTRUE(all.equal(as.numeric(fit[StratumId == "Marine" & StateClassId == EM[1], Burial]), 1.10, tolerance = 1e-3)) &&
       isTRUE(all.equal(as.numeric(fit[StratumId == "Mediterranean" & StateClassId == EM[1], Burial]), 1.04, tolerance = 1e-3)))
@@ -90,8 +92,8 @@ for (i in which(gt$StateClassId != CHAP)) { e <- gt$StratumId[i]; cls <- gt$Stat
   x <- gi[StratumID == e & StateClassID == cls][, .(pool = st$StockTypeId[match(StateAttributeTypeID, st$Attribute)], v = as.numeric(Value))]
   pl <- intersect(x$pool, names(ss$stock)); gw <- max(gw, max(abs(ss$stock[pl] - x[match(pl, pool), v]))) }
 check(sprintf("grass and shrub starting pools are the steady state of the written rates (largest gap %.1e Mg C/ha)", gw), gw < 1e-3)
-fit_ok <- gf[StateClassId != CHAP, all(abs(as.numeric(Soil0to30) - as.numeric(gt$Soil0to30[match(paste(StratumId, StateClassId), paste(gt$StratumId, gt$StateClassId))])) < 0.01)]
-check("BG Slow holds the gNATSGO 0-30 cm target", fit_ok)
+fit_ok <- gf[StateClassId != CHAP, all(abs(as.numeric(Soil) - as.numeric(gt$Soil0to999[match(paste(StratumId, StateClassId), paste(gt$StratumId, gt$StateClassId))])) < 0.01)]
+check("BG Slow holds the gNATSGO whole-profile target, and Deep Soil starts at 0", fit_ok && all(as.numeric(gi[StateAttributeTypeID == "Carbon Initial Conditions: Deep Soil", Value]) == 0))
 # chaparral: one year at age A from the pools at age A gives the pools at age A + 1 (rates and growth looked up at age A)
 cp <- rd("initialstocks", "chaparral.csv"); cg <- ng[StateClassId == CHAP]; e <- "Mediterranean"; p <- pa[FromStratumId == e & FromStateClassId == CHAP]
 pool_at <- function(a) { x <- cp[StratumID == e & as.integer(AgeMin) == a]; setNames(as.numeric(x$Value), st$StockTypeId[match(x$StateAttributeTypeID, st$Attribute)]) }

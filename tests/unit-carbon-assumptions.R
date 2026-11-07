@@ -45,6 +45,18 @@ for (m in c("fia-measured", "cbm-defaults")) { p <- pre(m, "disturbance-flows");
   # the all-classes rows are the event table's; chaparral has its own high-severity fire rows since 2026-11-06 (tools/make_grass_shrub.R)
   expect(sprintf("%s preset Disturbance Flows (all classes) = its event table", m), identical(ky(p[is.na(StateClassId)]), ky(src)), sprintf("%d rows", nrow(p[is.na(StateClassId)])))
   expect(sprintf("%s preset has chaparral's own high-severity fire rows", m), p[StateClassId %in% "Shrubland: Chaparral" & Disturbance == "High-severity fire", .N] > 0) }
+# grass, shrub and emergent wetland fire by severity (tools/make_nonforest_fire.R, 2026-11-07): every class of nonforest-fire.csv has
+# rows of its own for each severity, covering every from -> to pair the all-class rows use (a class row hides the all-class row of
+# its pair; a missing pair would let forest's flow through)
+nfc <- unique(rd("stockflow", "nonforest-fire.csv")$StateClassId)
+pk <- function(x) unique(paste(x$FromStockTypeId, sub("^Atmosphere: .*", "Atmosphere", x$ToStockTypeId)))
+cov_ok <- vapply(c("Fire: Medium Severity [Type]", "Fire: Low Severity [Type]"), function(g) { gen <- pk(ev[TransitionGroupId == g & is.na(FromStateClassId)])
+  all(vapply(nfc, function(cls) all(gen %in% pk(ev[TransitionGroupId == g & FromStateClassId %in% cls])), TRUE)) }, TRUE)
+for (m in c("fia-measured", "cbm-defaults")) { p <- pre(m, "disturbance-flows"); gen <- pk(p[Disturbance == "High-severity fire" & is.na(StateClassId)])
+  cov_ok <- c(cov_ok, all(vapply(nfc, function(cls) all(gen %in% pk(p[Disturbance == "High-severity fire" & StateClassId %in% cls])), TRUE))) }
+expect(sprintf("every grass, shrub and emergent wetland class (%d) has its own fire rows at every severity, covering every all-class pair", length(nfc)), all(cov_ok))
+roots <- ev[TransitionGroupId == "Fire: Medium Severity [Type]" & FromStateClassId %in% "Grassland: Natural Perennial" & FromStockTypeId == "Biomass: Fine Root", sum(as.numeric(Multiplier))]
+expect("medium-severity fire kills no perennial grass roots (forest's rows killed 53.5%)", roots == 0, sprintf("%.3f", roots))
 expect("fia-measured preset Fire Snag Share = defaults/spinup/fire-snag-share.csv", nrow(pre("fia-measured", "fire-snag-share")) == nrow(rd("spinup", "fire-snag-share.csv")))
 expect("cbm-defaults preset has no fire snag shares or calibration settings", !nrow(pre("cbm-defaults", "fire-snag-share")) && !nrow(pre("cbm-defaults", "decay-calibration-settings")))
 for (m in c("fia-measured", "cbm-defaults")) expect(sprintf("%s preset CBM Crosswalk = defaults/cbm/species-crosswalk.csv", m), nrow(pre(m, "cbm-crosswalk")) == nrow(rd("cbm", "species-crosswalk.csv")))

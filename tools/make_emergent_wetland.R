@@ -8,7 +8,9 @@
 # Deep Soil), and writes:
 #   defaults/stockflow/nonforest-multipliers-wetland.csv  emergent rows: growth split, turnover, each pool's total loss, burial share
 #   defaults/stockflow/nonforest-net-growth.csv          emergent rows: Net Growth = NPP
-#   defaults/initialstocks/emergent-wetland.csv          by ecodivision and class: the fitted steady state, Deep Soil = soil 30-100 cm
+#   defaults/initialstocks/emergent-wetland.csv          by ecodivision and class: the fitted steady state. BG Slow holds the soil to 1 m
+#                                                        (0-30 + 30-100 cm) and Deep Soil starts at 0, so a cell's soil means the same in
+#                                                        every class (user 2026-11-07); Deep Soil gains only the carbon buried during a run
 #   defaults/stockflow/emergent-wetland-fit.csv          one row per ecodivision x class: targets, fitted rates, burial share
 # The values these replace (the CONUS 1 km build's, from coastal Louisiana field data via IBIS; the same in every ecodivision) are kept
 # once in defaults/stockflow/legacy-ibis/ for the step 3 target-source choice. The carbon method presets lose their emergent rows, so a
@@ -48,18 +50,18 @@ for (i in seq_len(nrow(eco))) for (cls in EMERGENT) {
   t <- reg[StateClassId == cls & Region == r]; if (nrow(t) != 1) stop(sprintf("no targets for %s in region %s", cls, r))
   p <- pa[FromStratumId == e & FromStateClassId == cls]; m0 <- leg_m[StratumId == e & StateClassId == cls, .(FlowGroupId, Value)]
   tg <- list(npp = t$NPP, ag_share = t$AgShare, foliage = t$PeakFoliage, roots = t$PeakFoliage * t$RootShoot, ag_litter = t$AgLitter,
-             bg_litter = t$BgLitter, soil = t$Soil0to30, burial = t$Burial)
+             bg_litter = t$BgLitter, soil = t$Soil0to30 + t$Soil30to100, burial = t$Burial)
   fit <- nf_fit_emergent(p, m0, memb, ord, tg)
   m1 <- fit$mult[, Value := round(Value, 6)]
   # starting pools: the steady state of the rates as written (rounded), so a Build starts where the rates hold it
   ss <- nf_steady(nf_flows(p, m1, memb, ord), t$NPP)
   newm[[length(newm) + 1]] <- m1[, `:=`(StratumId = e, StateClassId = cls)]
-  pools[[length(pools) + 1]] <- data.table(StratumID = e, StateClassID = cls, pool = c(names(ss$stock), "Deep Soil"), Value = c(ss$stock, t$Soil30to100))
+  pools[[length(pools) + 1]] <- data.table(StratumID = e, StateClassID = cls, pool = c(names(ss$stock), "Deep Soil"), Value = c(ss$stock, 0))
   g <- NF_EMERGENT; v <- function(x) m1[FlowGroupId == x, Value]
   fits[[length(fits) + 1]] <- data.table(StratumId = e, StateClassId = cls, Region = r, NPP = t$NPP, PeakLive = round(tg$foliage + tg$roots, 3),
     FoliageTurnover = v(g$k_fol), RootTurnover = v(g$k_root), AgLitterLoss = v(g$k_ag), BgLitterLoss = v(g$k_bg), SoilLoss = v(g$k_soil),
     BurialShare = v(g$burial), SoilEmissionShare = v(g$soil_emit), Burial = round(ss$sink[["Deep Soil"]], 4), Aquatic = round(ss$sink[["Aquatic"]], 4),
-    YearEndLive = round(sum(ss$stock[c("Biomass: Foliage", "Biomass: Fine Root")]), 3), Soil0to30 = round(ss$stock[["DOM: Belowground Slow"]], 2),
+    YearEndLive = round(sum(ss$stock[c("Biomass: Foliage", "Biomass: Fine Root")]), 3), Soil = round(ss$stock[["DOM: Belowground Slow"]], 2),
     Dieback = paste(fit$dieback, collapse = "; ")) }
 fits <- rbindlist(fits); newm <- rbindlist(newm); pools <- rbindlist(pools)
 
@@ -79,6 +81,6 @@ wr(fits, "stockflow", "emergent-wetland-fit.csv")
 for (m in c("cbm-defaults", "fia-measured")) for (f in c("nonforest-rates", "nonforest-growth")) {
   x <- rd("carbon-assumptions", m, paste0(f, ".csv")); wr(x[!StateClassId %in% EMERGENT], "carbon-assumptions", m, paste0(f, ".csv")) }
 
-cat(sprintf("Fitted %d ecodivision x class budgets; NPP %.1f-%.1f, burial %.2f-%.2f Mg C/ha/yr, soil 0-30 cm %.0f-%.0f Mg C/ha\n",
-            nrow(fits), min(fits$NPP), max(fits$NPP), min(fits$Burial), max(fits$Burial), min(fits$Soil0to30), max(fits$Soil0to30)))
+cat(sprintf("Fitted %d ecodivision x class budgets; NPP %.1f-%.1f, burial %.2f-%.2f Mg C/ha/yr, soil to 1 m %.0f-%.0f Mg C/ha\n",
+            nrow(fits), min(fits$NPP), max(fits$NPP), min(fits$Burial), max(fits$Burial), min(fits$Soil), max(fits$Soil)))
 print(unique(fits[, !c("StratumId")]), nrows = 50)

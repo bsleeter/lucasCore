@@ -10,12 +10,12 @@
 #   rates     literature only (defaults/stockflow/grass-shrub-literature.csv and chaparral-age.csv; the report "Grass and shrub turnover
 #             and decay", user decisions 2026-11-06): growth split, live turnover and dead pool decay; CBM-CFS3's split of each dead
 #             pool's loss; litter decay, AG Slow emission and soil decay solved so the ordered steady state (src/nonforest-solve.R)
-#             holds the litter, AG Slow and gNATSGO 0-30 cm soil targets. Chaparral grows by age (see below). No IBIS value is used.
-#   pools     the steady state of those rates (chaparral: by age after a high-severity fire); Deep Soil starts with the soil below
-#             30 cm (whole profile - 0-30 cm)
+#             holds the litter, AG Slow and gNATSGO whole-profile soil targets. Chaparral grows by age (see below). No IBIS value is used.
+#   pools     the steady state of those rates (chaparral: by age after a high-severity fire). BG Slow holds the whole soil profile
+#             (gNATSGO soc0_999), as it does for forest, agriculture and developed land; Deep Soil starts at 0 (user 2026-11-07: one soil
+#             definition for every class; only wetland burial adds to Deep Soil)
 # Writes the grass and shrub rows of defaults/stockflow/nonforest-multipliers-grassland-shrubland.csv and nonforest-net-growth.csv,
-# defaults/initialstocks/grassland-shrubland.csv (by ecodivision, with Deep Soil), initialstocks/chaparral.csv (by ecodivision and age),
-# chaparral's high-severity fire rows in both Disturbance Flows presets (defaults/carbon-assumptions/<method>/disturbance-flows.csv),
+# defaults/initialstocks/grassland-shrubland.csv (by ecodivision), initialstocks/chaparral.csv (by ecodivision and age),
 # defaults/stockflow/grass-shrub-targets.csv (the targets with their source and counts), grass-shrub-fit.csv and
 # chaparral-growth-by-age.csv. Today's IBIS values are kept once in defaults/stockflow/legacy-ibis/ (the legacy choice); the carbon
 # method presets lose their grass and shrub rows (a class-wide row would override the ecodivision values). Rerunning is harmless.
@@ -52,7 +52,7 @@ own <- s[, agg(.SD), by = StratumId]; conus <- agg(s)
 tg <- CJ(StratumId = ECO, StateClassId = GS)
 tg[, src := ifelse(StateClassId == "Shrubland: Post Fire Shrub", "Shrubland: Non-sage", StateClassId)]
 tg <- merge(tg, own, by.x = c("StratumId", "src"), by.y = c("StratumId", "StateClassId"), all.x = TRUE)
-tg[, Source := fifelse(!is.na(Windows) & Windows >= MIN_WINDOWS & Cells >= MIN_CELLS & is.finite(NPP) & is.finite(Soil0to30), "ecodivision sample", "CONUS class mean")]
+tg[, Source := fifelse(!is.na(Windows) & Windows >= MIN_WINDOWS & Cells >= MIN_CELLS & is.finite(NPP) & is.finite(Soil0to999), "ecodivision sample", "CONUS class mean")]
 cm <- conus[match(tg$src, StateClassId)]; fb <- which(tg$Source == "CONUS class mean")
 for (k in c("NPP", "NppTree", "Soil0to30", "Soil0to999", "Windows", "Cells")) set(tg, i = fb, j = k, value = cm[[k]][fb])
 tg[src != StateClassId, Source := paste(Source, "(Non-sage targets)")]
@@ -61,8 +61,9 @@ tr <- fread("dev/nonforest/03-grass-shrub-sample.csv")[is.na(error), .(share = s
 tg[, TreedShare := round(tr$share[match(StratumId, tr$StratumId)], 2)]
 tg[startsWith(Source, "ecodivision") & TreedShare > 0.7, Source := paste(Source, "- few untreed cells (most of the ecodivision's NLCD 2001 grass and shrub is trees by 2014-2023)")]
 tg[StateClassId == "Grassland: Irrigated Perennial", Source := paste(Source, "- small sample (RAP is not meant for irrigated land; alfalfa and irrigated pasture are Agriculture: Pasture)")]
-if (anyNA(tg$NPP) || anyNA(tg$Soil0to30)) stop("no targets for: ", paste(unique(tg[is.na(NPP) | is.na(Soil0to30), src]), collapse = "; "))
-tg[, Deep := pmax(0, Soil0to999 - Soil0to30)][, NPP := round(NPP, 4)]   # NPP as written, so the fit and the table agree
+if (anyNA(tg$NPP) || anyNA(tg$Soil0to999)) stop("no targets for: ", paste(unique(tg[is.na(NPP) | is.na(Soil0to999), src]), collapse = "; "))
+# the soil target is the whole profile, in BG Slow (user 2026-11-07); Deep Soil starts at 0 (it is wetland burial only)
+tg[, Deep := 0][, NPP := round(NPP, 4)]   # NPP as written, so the fit and the table agree
 
 
 # ---- literature rates (defaults/stockflow/grass-shrub-literature.csv; report "Grass and shrub turnover and decay", user 2026-11-06) ----
@@ -201,7 +202,7 @@ fits <- list(); newm <- list(); pools <- list(); chap_g <- list(); chap_p <- lis
 for (i in seq_len(nrow(tg))) {
   e <- tg$StratumId[i]; cls <- tg$StateClassId[i]; p <- path_of(e, cls); m0 <- refs[[paste(cls, tg$Moisture[i])]]
   scale <- tg$NPP[i] / refnpp[[cls]]; npp <- if (cls == CHAP) chap_ref$npp * scale else tg$NPP[i]
-  m1 <- nf_fit_pool(p, m0, memb, ord, npp, BGS, tg$Soil0to30[i])$mult; m1[, Value := signif(Value, 8)]
+  m1 <- nf_fit_pool(p, m0, memb, ord, npp, BGS, tg$Soil0to999[i])$mult; m1[, Value := signif(Value, 8)]
   ss <- nf_steady(nf_flows(p, m1, memb, ord), npp)
   newm[[i]] <- copy(m1)[, `:=`(StratumId = e, StateClassId = cls)]
   if (cls == CHAP) { ca <- chap_age(e, scale, m1, tg$Deep[i]); chap_g[[e]] <- ca$growth[, StratumId := e]; chap_p[[e]] <- ca$pools[, StratumID := e] }
@@ -210,7 +211,7 @@ for (i in seq_len(nrow(tg))) {
   fits[[i]] <- data.table(StratumId = e, StateClassId = cls, Moisture = tg$Moisture[i], RapNPP = round(tg$NPP[i], 4), ModelNPP = round(npp, 4),
                           Live = round(sum(lv), 3), Aboveground = round(sum(lv[intersect(c(FOL, WOOD), names(lv))]), 3), Roots = round(sum(lv[intersect(c(FR, CR), names(lv))]), 3),
                           AgLitter = round(sum(st0[intersect(c(AGVF, AGF), names(st0))]), 3), StandingDead = round(sum(st0[intersect(c(SB, SS), names(st0))]), 3),
-                          AgSlow = round(st0[[AGS]], 3), Soil0to30 = round(st0[[BGS]], 2), DeepSoil = round(tg$Deep[i], 2),
+                          AgSlow = round(st0[[AGS]], 3), Soil = round(st0[[BGS]], 2), DeepSoil = round(tg$Deep[i], 2),
                           AgVeryFastDecay = signif(loss_of(p, m1, AGVF), 4), AgSlowEmission = signif(m1[FlowGroupId == TY("Emission: AG Slow -> Atmosphere"), Value], 4),
                           SoilEmission = signif(loss_of(p, m1, BGS), 4)) }
 fits <- rbindlist(fits); newm <- rbindlist(newm); pools <- rbindlist(pools); chap_g <- rbindlist(chap_g); chap_p <- rbindlist(chap_p)
@@ -237,8 +238,8 @@ wr(out[order(StratumID, StateClassID, StateAttributeTypeID)], "initialstocks", "
 chap_p <- chap_p[pool %in% names(attr_of)][, `:=`(StateClassID = CHAP, StateAttributeTypeID = attr_of[pool])]
 wr(chap_p[, .(StratumID, StateClassID, StateAttributeTypeID, AgeMin = as.character(Age), AgeMax = as.character(ifelse(Age == AGE_MAX, NA, Age)), Value = as.character(round(pmax(Value, 0), 4)))][
   order(StratumID, StateAttributeTypeID, as.integer(AgeMin))], "initialstocks", "chaparral.csv")
-for (m in c("cbm-defaults", "fia-measured")) { x <- rd("carbon-assumptions", m, "disturbance-flows.csv")
-  wr(rbind(x[!(StateClassId %in% CHAP & Disturbance == "High-severity fire")], FIRE$rows), "carbon-assumptions", m, "disturbance-flows.csv") }
+# chaparral's fire rows (and every other grass, shrub and emergent wetland class's) are written by tools/make_nonforest_fire.R from
+# defaults/stockflow/nonforest-fire.csv and chaparral-age.csv; FIRE above is the same high-severity fire, for the starting pools
 wr(tg[, .(StratumId, StateClassId, Source, Moisture, Windows, Cells, TreedCellsLeftOut = Treed, EcodivisionTreedShare = TreedShare, NPP = round(NPP, 4), NppTree = round(NppTree, 4),
           Soil0to30 = round(Soil0to30, 2), Soil0to999 = round(Soil0to999, 2), DeepSoil = round(Deep, 2))], "stockflow", "grass-shrub-targets.csv")
 wr(fits, "stockflow", "grass-shrub-fit.csv")

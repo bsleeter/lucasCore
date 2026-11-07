@@ -38,6 +38,150 @@ StratumId,StateClassId,Disturbance,AgeMin,FromStockTypeId,ToStockTypeId,Share
 ,,Clearcut,,DOM: Aboveground Very Fast,Atmosphere,0.29
 ,,Clearcut,,DOM: Aboveground Slow,Atmosphere,0.29
 ,,Clearcut,,DOM: Aboveground Medium,Atmosphere,0.5
+,Grassland: Annual,High-severity fire,,Biomass: Coarse Root,DOM: Aboveground Fast,0
+,Grassland: Annual,High-severity fire,,Biomass: Coarse Root,DOM: Belowground Fast,0
+,Grassland: Annual,High-severity fire,,Biomass: Fine Root,Atmosphere,0
+,Grassland: Annual,High-severity fire,,Biomass: Fine Root,DOM: Aboveground Very Fast,0
+,Grassland: Annual,High-severity fire,,Biomass: Fine Root,DOM: Belowground Very Fast,0
+,Grassland: Annual,High-severity fire,,DOM: Aboveground Fast,Atmosphere,0.9
+,Grassland: Annual,High-severity fire,,DOM: Aboveground Medium,Atmosphere,0.3
+,Grassland: Annual,High-severity fire,,DOM: Aboveground Slow,Atmosphere,0.3
+,Grassland: Annual,High-severity fire,,DOM: Aboveground Very Fast,Atmosphere,0.9
+,Grassland: Annual,High-severity fire,,DOM: Belowground Very Fast,Atmosphere,0
+,Grassland: Annual,High-severity fire,,DOM: Snag Branch,Atmosphere,0.8
+,Grassland: Annual,High-severity fire,,DOM: Snag Stem,Atmosphere,0.8
+,Grassland: Annual,High-severity fire,,Biomass: Foliage,Atmosphere,0.95
+,Grassland: Annual,High-severity fire,,Biomass: Foliage,DOM: Aboveground Very Fast,0.05
+,Grassland: Annual,High-severity fire,,Biomass: Merchantable,Atmosphere,0
+,Grassland: Annual,High-severity fire,,Biomass: Merchantable,DOM: Snag Stem,0
+,Grassland: Annual,High-severity fire,,Biomass: Other Wood,Atmosphere,0
+,Grassland: Annual,High-severity fire,,Biomass: Other Wood,DOM: Snag Branch,0
+,Grassland: Natural Perennial,High-severity fire,,Biomass: Coarse Root,DOM: Aboveground Fast,0
+,Grassland: Natural Perennial,High-severity fire,,Biomass: Coarse Root,DOM: Belowground Fast,0
+,Grassland: Natural Perennial,High-severity fire,,Biomass: Fine Root,Atmosphere,0
+,Grassland: Natural Perennial,High-severity fire,,Biomass: Fine Root,DOM: Aboveground Very Fast,0
+,Grassland: Natural Perennial,High-severity fire,,Biomass: Fine Root,DOM: Belowground Very Fast,0
+,Grassland: Natural Perennial,High-severity fire,,DOM: Aboveground Fast,Atmosphere,0.9
+,Grassland: Natural Perennial,High-severity fire,,DOM: Aboveground Medium,Atmosphere,0.3
+,Grassland: Natural Perennial,High-severity fire,,DOM: Aboveground Slow,Atmosphere,0.3
+,Grassland: Natural Perennial,High-severity fire,,DOM: Aboveground Very Fast,Atmosphere,0.9
+,Grassland: Natural Perennial,High-severity fire,,DOM: Belowground Very Fast,Atmosphere,0
+,Grassland: Natural Perennial,High-severity fire,,DOM: Snag Branch,Atmosphere,0.8
+,Grassland: Natural Perennial,High-severity fire,,DOM: Snag Stem,Atmosphere,0.8
+,Grassland: Natural Perennial,High-severity fire,,Biomass: Foliage,Atmosphere,0.95
+,Grassland: Natural Perennial,High-severity fire,,Biomass: Foliage,DOM: Aboveground Very Fast,0.05
+,Grassland: Natural Perennial,High-severity fire,,Biomass: Merchantable,Atmosphere,0
+,Grassland: Natural Perennial,High-severity fire,,Biomass: Merchantable,DOM: Snag Stem,0
+,Grassland: Natural Perennial,High-severity fire,,Biomass: Other Wood,Atmosphere,0
+,Grassland: Natural Perennial,High-severity fire,,Biomass: Other Wood,DOM: Snag Branch,0
+,Grassland: Irrigated Perennial,High-severity fire,,Biomass: Coarse Root,DOM: Aboveground Fast,0
+,Grassland: Irrigated Perennial,High-severity fire,,Biomass: Coarse Root,DOM: Belowground Fast,0
+,Grassland: Irrigated Perennial,High-severity fire,,Biomass: Fine Root,Atmosphere,0
+,Grassland: Irrigated Perennial,High-severity fire,,Biomass: Fine Root,DOM: Aboveground Very Fast,0
+,Grassland: Irrigated Perennial,High-severity fire,,Biomass: Fine Root,DOM: Belowground Very Fast,0
+,Grassland: Irrigated Perennial,High-severity fire,,DOM: Aboveground Fast,Atmosphere,0.9
+,Grassland: Irrigated Perennial,High-severity fire,,DOM: Aboveground Medium,Atmosphere,0.3
+,Grassland: Irrigated Perennial,High-severity fire,,DOM: Aboveground Slow,Atmosphere,0.3
+,Grassland: Irrigated Perennial,High-severity fire,,DOM: Aboveground Very Fast,Atmosphere,0.9
+,Grassland: Irrigated Perennial,High-severity fire,,DOM: Belowground Very Fast,Atmosphere,0
+,Grassland: Irrigated Perennial,High-severity fire,,DOM: Snag Branch,Atmosphere,0.8
+,Grassland: Irrigated Perennial,High-severity fire,,DOM: Snag Stem,Atmosphere,0.8
+,Grassland: Irrigated Perennial,High-severity fire,,Biomass: Foliage,Atmosphere,0.95
+,Grassland: Irrigated Perennial,High-severity fire,,Biomass: Foliage,DOM: Aboveground Very Fast,0.05
+,Grassland: Irrigated Perennial,High-severity fire,,Biomass: Merchantable,Atmosphere,0
+,Grassland: Irrigated Perennial,High-severity fire,,Biomass: Merchantable,DOM: Snag Stem,0
+,Grassland: Irrigated Perennial,High-severity fire,,Biomass: Other Wood,Atmosphere,0
+,Grassland: Irrigated Perennial,High-severity fire,,Biomass: Other Wood,DOM: Snag Branch,0
+,Shrubland: Sage,High-severity fire,,Biomass: Coarse Root,DOM: Aboveground Fast,0
+,Shrubland: Sage,High-severity fire,,Biomass: Coarse Root,DOM: Belowground Fast,0.9
+,Shrubland: Sage,High-severity fire,,Biomass: Fine Root,Atmosphere,0
+,Shrubland: Sage,High-severity fire,,Biomass: Fine Root,DOM: Aboveground Very Fast,0
+,Shrubland: Sage,High-severity fire,,Biomass: Fine Root,DOM: Belowground Very Fast,0.9
+,Shrubland: Sage,High-severity fire,,DOM: Aboveground Fast,Atmosphere,0.85
+,Shrubland: Sage,High-severity fire,,DOM: Aboveground Medium,Atmosphere,0.4
+,Shrubland: Sage,High-severity fire,,DOM: Aboveground Slow,Atmosphere,0.4
+,Shrubland: Sage,High-severity fire,,DOM: Aboveground Very Fast,Atmosphere,0.85
+,Shrubland: Sage,High-severity fire,,DOM: Belowground Very Fast,Atmosphere,0
+,Shrubland: Sage,High-severity fire,,DOM: Snag Branch,Atmosphere,0.8
+,Shrubland: Sage,High-severity fire,,DOM: Snag Stem,Atmosphere,0.8
+,Shrubland: Sage,High-severity fire,,Biomass: Foliage,Atmosphere,0.95
+,Shrubland: Sage,High-severity fire,,Biomass: Foliage,DOM: Aboveground Very Fast,0.05
+,Shrubland: Sage,High-severity fire,,Biomass: Merchantable,Atmosphere,0.6
+,Shrubland: Sage,High-severity fire,,Biomass: Merchantable,DOM: Snag Stem,0.4
+,Shrubland: Sage,High-severity fire,,Biomass: Other Wood,Atmosphere,0.6
+,Shrubland: Sage,High-severity fire,,Biomass: Other Wood,DOM: Snag Branch,0.4
+,Shrubland: Native Sage Steppe,High-severity fire,,Biomass: Coarse Root,DOM: Aboveground Fast,0
+,Shrubland: Native Sage Steppe,High-severity fire,,Biomass: Coarse Root,DOM: Belowground Fast,0.6
+,Shrubland: Native Sage Steppe,High-severity fire,,Biomass: Fine Root,Atmosphere,0
+,Shrubland: Native Sage Steppe,High-severity fire,,Biomass: Fine Root,DOM: Aboveground Very Fast,0
+,Shrubland: Native Sage Steppe,High-severity fire,,Biomass: Fine Root,DOM: Belowground Very Fast,0.6
+,Shrubland: Native Sage Steppe,High-severity fire,,DOM: Aboveground Fast,Atmosphere,0.85
+,Shrubland: Native Sage Steppe,High-severity fire,,DOM: Aboveground Medium,Atmosphere,0.4
+,Shrubland: Native Sage Steppe,High-severity fire,,DOM: Aboveground Slow,Atmosphere,0.4
+,Shrubland: Native Sage Steppe,High-severity fire,,DOM: Aboveground Very Fast,Atmosphere,0.85
+,Shrubland: Native Sage Steppe,High-severity fire,,DOM: Belowground Very Fast,Atmosphere,0
+,Shrubland: Native Sage Steppe,High-severity fire,,DOM: Snag Branch,Atmosphere,0.8
+,Shrubland: Native Sage Steppe,High-severity fire,,DOM: Snag Stem,Atmosphere,0.8
+,Shrubland: Native Sage Steppe,High-severity fire,,Biomass: Foliage,Atmosphere,0.95
+,Shrubland: Native Sage Steppe,High-severity fire,,Biomass: Foliage,DOM: Aboveground Very Fast,0.05
+,Shrubland: Native Sage Steppe,High-severity fire,,Biomass: Merchantable,Atmosphere,0.6
+,Shrubland: Native Sage Steppe,High-severity fire,,Biomass: Merchantable,DOM: Snag Stem,0.4
+,Shrubland: Native Sage Steppe,High-severity fire,,Biomass: Other Wood,Atmosphere,0.6
+,Shrubland: Native Sage Steppe,High-severity fire,,Biomass: Other Wood,DOM: Snag Branch,0.4
+,Shrubland: Invaded Sage Steppe,High-severity fire,,Biomass: Coarse Root,DOM: Aboveground Fast,0
+,Shrubland: Invaded Sage Steppe,High-severity fire,,Biomass: Coarse Root,DOM: Belowground Fast,0.3
+,Shrubland: Invaded Sage Steppe,High-severity fire,,Biomass: Fine Root,Atmosphere,0
+,Shrubland: Invaded Sage Steppe,High-severity fire,,Biomass: Fine Root,DOM: Aboveground Very Fast,0
+,Shrubland: Invaded Sage Steppe,High-severity fire,,Biomass: Fine Root,DOM: Belowground Very Fast,0.3
+,Shrubland: Invaded Sage Steppe,High-severity fire,,DOM: Aboveground Fast,Atmosphere,0.9
+,Shrubland: Invaded Sage Steppe,High-severity fire,,DOM: Aboveground Medium,Atmosphere,0.4
+,Shrubland: Invaded Sage Steppe,High-severity fire,,DOM: Aboveground Slow,Atmosphere,0.4
+,Shrubland: Invaded Sage Steppe,High-severity fire,,DOM: Aboveground Very Fast,Atmosphere,0.9
+,Shrubland: Invaded Sage Steppe,High-severity fire,,DOM: Belowground Very Fast,Atmosphere,0
+,Shrubland: Invaded Sage Steppe,High-severity fire,,DOM: Snag Branch,Atmosphere,0.8
+,Shrubland: Invaded Sage Steppe,High-severity fire,,DOM: Snag Stem,Atmosphere,0.8
+,Shrubland: Invaded Sage Steppe,High-severity fire,,Biomass: Foliage,Atmosphere,0.95
+,Shrubland: Invaded Sage Steppe,High-severity fire,,Biomass: Foliage,DOM: Aboveground Very Fast,0.05
+,Shrubland: Invaded Sage Steppe,High-severity fire,,Biomass: Merchantable,Atmosphere,0.6
+,Shrubland: Invaded Sage Steppe,High-severity fire,,Biomass: Merchantable,DOM: Snag Stem,0.4
+,Shrubland: Invaded Sage Steppe,High-severity fire,,Biomass: Other Wood,Atmosphere,0.6
+,Shrubland: Invaded Sage Steppe,High-severity fire,,Biomass: Other Wood,DOM: Snag Branch,0.4
+,Shrubland: Non-sage,High-severity fire,,Biomass: Coarse Root,DOM: Aboveground Fast,0
+,Shrubland: Non-sage,High-severity fire,,Biomass: Coarse Root,DOM: Belowground Fast,0.5
+,Shrubland: Non-sage,High-severity fire,,Biomass: Fine Root,Atmosphere,0
+,Shrubland: Non-sage,High-severity fire,,Biomass: Fine Root,DOM: Aboveground Very Fast,0
+,Shrubland: Non-sage,High-severity fire,,Biomass: Fine Root,DOM: Belowground Very Fast,0.5
+,Shrubland: Non-sage,High-severity fire,,DOM: Aboveground Fast,Atmosphere,0.85
+,Shrubland: Non-sage,High-severity fire,,DOM: Aboveground Medium,Atmosphere,0.4
+,Shrubland: Non-sage,High-severity fire,,DOM: Aboveground Slow,Atmosphere,0.4
+,Shrubland: Non-sage,High-severity fire,,DOM: Aboveground Very Fast,Atmosphere,0.85
+,Shrubland: Non-sage,High-severity fire,,DOM: Belowground Very Fast,Atmosphere,0
+,Shrubland: Non-sage,High-severity fire,,DOM: Snag Branch,Atmosphere,0.8
+,Shrubland: Non-sage,High-severity fire,,DOM: Snag Stem,Atmosphere,0.8
+,Shrubland: Non-sage,High-severity fire,,Biomass: Foliage,Atmosphere,0.95
+,Shrubland: Non-sage,High-severity fire,,Biomass: Foliage,DOM: Aboveground Very Fast,0.05
+,Shrubland: Non-sage,High-severity fire,,Biomass: Merchantable,Atmosphere,0.6
+,Shrubland: Non-sage,High-severity fire,,Biomass: Merchantable,DOM: Snag Stem,0.4
+,Shrubland: Non-sage,High-severity fire,,Biomass: Other Wood,Atmosphere,0.6
+,Shrubland: Non-sage,High-severity fire,,Biomass: Other Wood,DOM: Snag Branch,0.4
+,Shrubland: Post Fire Shrub,High-severity fire,,Biomass: Coarse Root,DOM: Aboveground Fast,0
+,Shrubland: Post Fire Shrub,High-severity fire,,Biomass: Coarse Root,DOM: Belowground Fast,0.5
+,Shrubland: Post Fire Shrub,High-severity fire,,Biomass: Fine Root,Atmosphere,0
+,Shrubland: Post Fire Shrub,High-severity fire,,Biomass: Fine Root,DOM: Aboveground Very Fast,0
+,Shrubland: Post Fire Shrub,High-severity fire,,Biomass: Fine Root,DOM: Belowground Very Fast,0.5
+,Shrubland: Post Fire Shrub,High-severity fire,,DOM: Aboveground Fast,Atmosphere,0.85
+,Shrubland: Post Fire Shrub,High-severity fire,,DOM: Aboveground Medium,Atmosphere,0.4
+,Shrubland: Post Fire Shrub,High-severity fire,,DOM: Aboveground Slow,Atmosphere,0.4
+,Shrubland: Post Fire Shrub,High-severity fire,,DOM: Aboveground Very Fast,Atmosphere,0.85
+,Shrubland: Post Fire Shrub,High-severity fire,,DOM: Belowground Very Fast,Atmosphere,0
+,Shrubland: Post Fire Shrub,High-severity fire,,DOM: Snag Branch,Atmosphere,0.8
+,Shrubland: Post Fire Shrub,High-severity fire,,DOM: Snag Stem,Atmosphere,0.8
+,Shrubland: Post Fire Shrub,High-severity fire,,Biomass: Foliage,Atmosphere,0.95
+,Shrubland: Post Fire Shrub,High-severity fire,,Biomass: Foliage,DOM: Aboveground Very Fast,0.05
+,Shrubland: Post Fire Shrub,High-severity fire,,Biomass: Merchantable,Atmosphere,0.6
+,Shrubland: Post Fire Shrub,High-severity fire,,Biomass: Merchantable,DOM: Snag Stem,0.4
+,Shrubland: Post Fire Shrub,High-severity fire,,Biomass: Other Wood,Atmosphere,0.6
+,Shrubland: Post Fire Shrub,High-severity fire,,Biomass: Other Wood,DOM: Snag Branch,0.4
 ,Shrubland: Chaparral,High-severity fire,,Biomass: Coarse Root,DOM: Aboveground Fast,0
 ,Shrubland: Chaparral,High-severity fire,,Biomass: Coarse Root,DOM: Belowground Fast,0.25
 ,Shrubland: Chaparral,High-severity fire,,Biomass: Fine Root,Atmosphere,0
@@ -52,7 +196,43 @@ StratumId,StateClassId,Disturbance,AgeMin,FromStockTypeId,ToStockTypeId,Share
 ,Shrubland: Chaparral,High-severity fire,,DOM: Snag Stem,Atmosphere,0.8
 ,Shrubland: Chaparral,High-severity fire,,Biomass: Foliage,Atmosphere,0.95
 ,Shrubland: Chaparral,High-severity fire,,Biomass: Foliage,DOM: Aboveground Very Fast,0.05
-,Shrubland: Chaparral,High-severity fire,,Biomass: Merchantable,Atmosphere,0
-,Shrubland: Chaparral,High-severity fire,,Biomass: Merchantable,DOM: Snag Stem,0
+,Shrubland: Chaparral,High-severity fire,,Biomass: Merchantable,Atmosphere,0.55
+,Shrubland: Chaparral,High-severity fire,,Biomass: Merchantable,DOM: Snag Stem,0.45
 ,Shrubland: Chaparral,High-severity fire,,Biomass: Other Wood,Atmosphere,0.55
 ,Shrubland: Chaparral,High-severity fire,,Biomass: Other Wood,DOM: Snag Branch,0.45
+,Wetland: Estuarine Emergent,High-severity fire,,Biomass: Coarse Root,DOM: Aboveground Fast,0
+,Wetland: Estuarine Emergent,High-severity fire,,Biomass: Coarse Root,DOM: Belowground Fast,0
+,Wetland: Estuarine Emergent,High-severity fire,,Biomass: Fine Root,Atmosphere,0
+,Wetland: Estuarine Emergent,High-severity fire,,Biomass: Fine Root,DOM: Aboveground Very Fast,0
+,Wetland: Estuarine Emergent,High-severity fire,,Biomass: Fine Root,DOM: Belowground Very Fast,0
+,Wetland: Estuarine Emergent,High-severity fire,,DOM: Aboveground Fast,Atmosphere,0.8
+,Wetland: Estuarine Emergent,High-severity fire,,DOM: Aboveground Medium,Atmosphere,0
+,Wetland: Estuarine Emergent,High-severity fire,,DOM: Aboveground Slow,Atmosphere,0
+,Wetland: Estuarine Emergent,High-severity fire,,DOM: Aboveground Very Fast,Atmosphere,0.8
+,Wetland: Estuarine Emergent,High-severity fire,,DOM: Belowground Very Fast,Atmosphere,0
+,Wetland: Estuarine Emergent,High-severity fire,,DOM: Snag Branch,Atmosphere,0
+,Wetland: Estuarine Emergent,High-severity fire,,DOM: Snag Stem,Atmosphere,0
+,Wetland: Estuarine Emergent,High-severity fire,,Biomass: Foliage,Atmosphere,0.9
+,Wetland: Estuarine Emergent,High-severity fire,,Biomass: Foliage,DOM: Aboveground Very Fast,0.1
+,Wetland: Estuarine Emergent,High-severity fire,,Biomass: Merchantable,Atmosphere,0
+,Wetland: Estuarine Emergent,High-severity fire,,Biomass: Merchantable,DOM: Snag Stem,0
+,Wetland: Estuarine Emergent,High-severity fire,,Biomass: Other Wood,Atmosphere,0
+,Wetland: Estuarine Emergent,High-severity fire,,Biomass: Other Wood,DOM: Snag Branch,0
+,Wetland: Palustrine Emergent,High-severity fire,,Biomass: Coarse Root,DOM: Aboveground Fast,0
+,Wetland: Palustrine Emergent,High-severity fire,,Biomass: Coarse Root,DOM: Belowground Fast,0
+,Wetland: Palustrine Emergent,High-severity fire,,Biomass: Fine Root,Atmosphere,0
+,Wetland: Palustrine Emergent,High-severity fire,,Biomass: Fine Root,DOM: Aboveground Very Fast,0
+,Wetland: Palustrine Emergent,High-severity fire,,Biomass: Fine Root,DOM: Belowground Very Fast,0
+,Wetland: Palustrine Emergent,High-severity fire,,DOM: Aboveground Fast,Atmosphere,0.8
+,Wetland: Palustrine Emergent,High-severity fire,,DOM: Aboveground Medium,Atmosphere,0
+,Wetland: Palustrine Emergent,High-severity fire,,DOM: Aboveground Slow,Atmosphere,0
+,Wetland: Palustrine Emergent,High-severity fire,,DOM: Aboveground Very Fast,Atmosphere,0.8
+,Wetland: Palustrine Emergent,High-severity fire,,DOM: Belowground Very Fast,Atmosphere,0
+,Wetland: Palustrine Emergent,High-severity fire,,DOM: Snag Branch,Atmosphere,0
+,Wetland: Palustrine Emergent,High-severity fire,,DOM: Snag Stem,Atmosphere,0
+,Wetland: Palustrine Emergent,High-severity fire,,Biomass: Foliage,Atmosphere,0.9
+,Wetland: Palustrine Emergent,High-severity fire,,Biomass: Foliage,DOM: Aboveground Very Fast,0.1
+,Wetland: Palustrine Emergent,High-severity fire,,Biomass: Merchantable,Atmosphere,0
+,Wetland: Palustrine Emergent,High-severity fire,,Biomass: Merchantable,DOM: Snag Stem,0
+,Wetland: Palustrine Emergent,High-severity fire,,Biomass: Other Wood,Atmosphere,0
+,Wetland: Palustrine Emergent,High-severity fire,,Biomass: Other Wood,DOM: Snag Branch,0
