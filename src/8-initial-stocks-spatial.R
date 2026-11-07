@@ -218,6 +218,12 @@ say("Initial carbon: %.2f Pg C (live %.2f, dead organic matter %.2f, soil %.2f);
     mean(d[!is.na(S) & S >= 100, live]), mean(d[!is.na(S) & S >= 100, dom]), mean(d[!is.na(S) & S >= 100, soil]))
 files <- vapply(seq_len(nrow(st)), function(j) write_raster(setValues(rast(P), out[, j]), sprintf("%s.tif", gsub("[^A-Za-z0-9]+", "-", st$StockTypeId[j])), "FLT4S"), "")
 write_stsim(data.table(StockTypeId = st$StockTypeId, RasterFileName = files), "InitialStockSpatial")
+# rerun on its own (tools/quick-test.R), this result takes a copy of the Build's Initial Conditions Spatial maps but not their
+# Properties sheet; the two are one feed, which a dependency supplies whole, so a run on this result found the maps without their
+# grid ("Object reference not set", 2026-11-07). Writing the Properties here keeps the feed whole (in a Build they are already here)
+icp <- as.data.table(datasheet(scn, "stsim_InitialConditionsSpatialProperties", optional = TRUE))
+if (!nrow(icp)) for (d in run_dependencies()) { icp <- as.data.table(datasheet(rsyncrosim::scenario(ssimLibrary(main_library()), d), "stsim_InitialConditionsSpatialProperties", optional = TRUE))
+  if (nrow(icp)) { write_stsim(icp, "InitialConditionsSpatialProperties"); say("Initial Conditions Spatial Properties: copied from scenario %d, so the maps' feed is whole", d); break } }
 write_ds(summ[, .(StateClassId, Cells, PostFire, Live, Dom, Soil, TotalTg, Source)], "OutputInitialStockSummary")
 progressBar()
 finish_checks()
