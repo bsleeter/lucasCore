@@ -323,6 +323,13 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
           rate): sage leaf litter then decays at k 0.29/yr (literature 0.1-0.7; it was 2.1 when the target also counted AG fast), with
           total surface litter 0.63 Mg C/ha (0.32 leaf + 0.31 fine woody). Chaparral's 7.0 still counts AG very fast + fast (k 0.09).
           Grass litter decays at k 0.66-0.89, a little above litterbag values: a calibration term for grazing and photodegradation.
+        - **SyncroSim tests (lucasCore-suitability.ssim, main 7a7e77d):** phaseZ25 ALL PASS (stage 3 writes all 74,746 grass, shrub and
+          wetland rates and 13,509 growth values, chaparral by age included); phaseZ28 ALL PASS (819 grass, shrub and chaparral cells at
+          their pools, chaparral by age, largest gap 1.7e-6; every other cell = Build 47); phaseZ29 ALL PASS (34 chaparral cells, 8 burned
+          since 1900 with a median of 26 years since fire, the rest 85).
+        - **Left:** the guide (grass, shrub, chaparral and emergent wetland sections); a Build and run on a region with chaparral and
+          emergent wetlands (P26: sync-library first, then the rebuild in item 51); eastern grass and shrub data; the Non-sage class has no
+          data of its own.
       - **Open:** eastern grass and shrub rest on few untreed cells and RAP is built for rangelands; growth by age after fire (step 8);
         live and litter targets (RAP biomass, shrub literature, FCCS) not yet used.
     2. **Use only the pools each class has.** Keep the shared stock types; turn off the flows that do not apply. Grass: foliage, fine
