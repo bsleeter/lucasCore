@@ -39,3 +39,6 @@ dev/fia/out-cal-share/*.png
 dev/fia/out-cal-clearcut/*.rds
 dev/fia/out-cal-clearcut/*.png
 dev/stsim/*.ssim*
+
+# the RAP climate sample (25 MB; rebuilt from the window crops in the data home by 04-rap-climate-sample.R)
+dev/nonforest/04-rap-climate-sample*.csv

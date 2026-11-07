@@ -387,11 +387,43 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
        the new class's target. This is the response land-use scenarios most need, and it barely exists today.
     5. **Growth that varies across the map.** RAP's 30 m long-term mean growth written as a spatial multiplier on non-forest growth,
        the way Site Productivity works for forests.
+       - **Built 2026-11-07 (b486314, 8e160ba and fixes; main, not pushed).** User decisions: soil keeps the class mean (as forest);
+         RAP fetched 1986 on; off by default. Build Options: Grass and Shrub Productivity = None / RAP NPP (2014-2023). Stage 8: a
+         grass or shrub cell's multiplier = its RAP herb + shrub NPP (2014-2023 mean, treed 30 m pixels out) / its ecodivision x class
+         target NPP, capped 0.3-2.5; starting live and dead carbon scaled by it; Flow Multiplier Type Grass and Shrub Productivity on
+         Net Growth Non Forest: Total; stage 11 carries it into projections. New Data Sources column RapNppFolder, Data Download
+         handler (COGs read for the region, one 4-band file a year; never whole for CONUS, 75 GB a year). Solano: 40 years, 5.75 GB
+         (the region box is 160 x 145 km, not the county; the 20 MB a year estimate was wrong).
+       - **Neighbourhood fill, both multipliers (user, 2026-11-07).** A cell that became forest, grass or shrub during a run grew at
+         1, since each map only covered its own type at the start year. Now every land cell takes the inverse-distance weighted mean
+         of nearby source cells of its ecodivision (2 km at the grid, then 10 km at about 1 km; else 1); grass cells at the 0.3 floor
+         (RAP sees them nearly bare: fallow or graded land mapped as grass, 5% of Solano's) are not passed on. src/productivity-fill.R,
+         tests/unit-productivity-fill.R (9 pass). Solano: 99.2% of other land cells filled (mean 1.01).
+       - **Solano.** Multiplier mean 1.06: Annual 1.00, Natural Perennial 1.15, Chaparral 0.90, Non-sage 1.39, Irrigated Perennial
+         0.63. Quick test (stage 8 + 1985-1995) against the run without it: live carbon follows the class means through the run
+         (Natural Perennial +15-23%, Non-sage +30%, Chaparral -12%, Annual unchanged); soil within 2%.
+       - **Quick tests (user, 2026-11-07: rerun only the changed stages, 5-10 historical years).** tools/quick-test.R <lib>
+         --stages=8 [--build=<id>] [--years=10]: reruns only those stages on a Build result, then a short run (new-historical.R --also,
+         --years). Solano: 2.3 + 6.6 min, against 35 + 23 for a full Build and run. Stage 8 alone needed two fixes: it replaces its
+         productivity row (the result already holds the Build's, and two rows of one group and type stop ST-Sim), and it saves the
+         Initial Conditions Spatial row again so SyncroSim writes the Properties sheet (one feed with the maps; a result holding the
+         maps without it failed with "Object reference not set").
     6. **Carbon for pasture and cropland.** Pasture: grassland biomass with a grazing removal. Cropland: growth from NASS county yields
        and the USDA Tech. Bull. 1939 Table 3-5 coefficients, a harvest removal each year, residue to litter.
     7. **A climate response fitted to RAP.** RAP's yearly growth 1986-2023 against PRISM fits the yearly climate response for grass
        and shrub, in place of the Miami NPP climatology; test it with the placebo check the tree-ring response went through. The step
        most likely to change projections.
+       - **Fitted 2026-11-07 (dev, not yet in the model).** dev/nonforest/04-rap-climate-sample.R: RAP NPP every year 1986-2023 at
+         the 1,140 grass and shrub windows (27.5 min; 1 window failed), PRISM at each centre; raw window crops kept in the home
+         (derived/rap-npp-windows, 4.2 GB; user: no full 30 m CONUS archive, about 3 TB). dev/nonforest/05-rap-climate-fit.R: the
+         tree-ring form per window and life form (Annual grass, Perennial grass, Shrub), NPP over its 1991-2020 mean, pooled by
+         ecodivision (DerSimonian-Laird; under 5 windows the CONUS pool). CONUS pools: precipitation 0.29 / 0.34 / 0.34, last year's
+         0.04 / 0.11 / 0.12, temperature -0.001 / 0.024 / 0.025 per degree (annual / perennial / shrub); Mediterranean low (0.07-0.21).
+         Leave-one-window-out: the RAP response beats the window's own mean in 75-80% of windows (Miami NPP in 23-31%: it swings 1.0-1.4
+         times the observed variation, the RAP response 0.4 times); RMSE 0.18-0.20 against Miami's 0.26-0.32. Placebo (20 shuffled-year
+         draws): precipitation coefficients -0.007 to -0.005, 95% within +-0.065. Perennial and shrub responses nearly equal: RAP's
+         partition may share one signal across life forms. Left: wire it in (Climate Options Non-Forest Growth = RAP fit, a
+         coefficients table beside the tree-ring one), and a Solano quick test against Miami.
     8. **Shrub growth by age.** Chaparral regrows for 20+ years after fire and sage for decades, so growth by age after fire (the
        Non-Forest Growth sheet already has an age column) in place of a constant rate at equilibrium. Matters most in P26.
     9. **Validation throughout,** against data the calibration did not use: RaCA soil carbon, AmeriFlux grassland and sagebrush sites,
