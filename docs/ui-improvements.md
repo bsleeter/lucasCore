@@ -462,6 +462,15 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
          for a constant 1.0. Rerunning stage 7 on its own first failed in ST-Sim ("Object reference"): its result held the Initial
          Conditions maps without Properties and hid stage 8's productivity multipliers. Fixed: keep_ic_properties() (shared.R) in
          stages 7 and 8, and stage 7 carries dependency productivity rows over as stage 11 does.
+       - **Default and projection test (2026-11-07, user: make RAP the default; keep the modeled multipliers over the historical).**
+         Non-Forest Growth now defaults to RAP fit (package.xml, the Climate Options page; lucasCoreUI.dll rebuilt). Libraries whose
+         Climate Options row already says Miami NPP keep it. The historical years stay on the fitted response from PRISM, not RAP's
+         observed yearly NPP (decided: one model for historical and projection years). Solano stage 11 test (CanESM5 r1i1p1f1
+         SSP2-4.5, 2024-2035, 2.7 min; result 52): every check passes; the non-forest multiplier's study-area mean by year is
+         0.90-1.20, SD 0.097 (PRISM years 0.090), mean 0.979; cells 0.73-1.38; the last historical decade 0.974 -> the first
+         projected 0.975, so no step at the join. A projection-climate scenario on a quick-test result (stage 7 alone) needs the
+         full Build result as a second dependency: CO2 fertilization reads stage 3's flow multipliers. Not run: an ST-Sim projection
+         (needs a full historical run and a Projection Setup); the multipliers enter it through the same sheet as historical years.
     8. **Shrub growth by age.** Chaparral regrows for 20+ years after fire and sage for decades, so growth by age after fire (the
        Non-Forest Growth sheet already has an age column) in place of a constant rate at equilibrium. Matters most in P26.
     9. **Validation throughout,** against data the calibration did not use: RaCA soil carbon, AmeriFlux grassland and sagebrush sites,
