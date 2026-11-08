@@ -410,6 +410,21 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
          maps without it failed with "Object reference not set").
     6. **Carbon for pasture and cropland.** Pasture: grassland biomass with a grazing removal. Cropland: growth from NASS county yields
        and the USDA Tech. Bull. 1939 Table 3-5 coefficients, a harvest removal each year, residue to litter.
+       - **Plan (user, 2026-11-07).** Cropland stays one class for annual crops, crop differences carried by a Cropland
+         Productivity flow spatial multiplier (USDA Cropland Data Layer crop type x NASS county yields, relative to the ecodivision's
+         cropland mean, neighbourhood-filled like the grass and shrub one); live biomass back to about zero each year (harvest leaves
+         the system as a new harvest flow; residue to the fast litter pools, roots to the belowground pools); soil target its own
+         gNATSGO value with decay calibrated to hold it; IPCC factors on conversion (step 4); no climate response at first
+         (irrigation, and NASS yield trends would need removing). Pasture carries grassland biomass, NASS hay yields for growth,
+         hay and grazing removal.
+       - **Orchards split out (user, 2026-11-07):** a new woody perennial crop class (CDL orchard crops: almonds, walnuts,
+         pistachios, citrus, stone fruit, apples, olives, pecans, ...) on NLCD cultivated crops cells. Growth by age like forest,
+         a removal-and-replant transition at the end of a 20-30 year rotation, prunings to litter or removed, fruit harvested;
+         cropland <-> orchard conversion as an Ag Change type. Vineyards stay in cropland: small standing wood (about 5-12 Mg C/ha,
+         from memory, to check) against orchards' 30-60, mostly pruned each year. Before the CDL: hold its earliest year back to
+         1985 unless a better historical source turns up (California county crop reports and DWR land-use surveys are candidates).
+         Open: orchard demand in projections (own target from county acreage trends, or a share of cropland); starting ages (CDL
+         first-seen year or an assumed spread); orchard growth curves by crop group (literature).
     7. **A climate response fitted to RAP.** RAP's yearly growth 1986-2023 against PRISM fits the yearly climate response for grass
        and shrub, in place of the Miami NPP climatology; test it with the placebo check the tree-ring response went through. The step
        most likely to change projections.
