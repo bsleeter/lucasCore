@@ -9,8 +9,10 @@
 #   2. every column of a lucasCore_ / stsim_ / core_ table in the starter that the library's table lacks: ALTER TABLE ADD COLUMN
 #   3. every lucasCore transformer and stage name the library lacks, with its stage value: new ids from the library's own id counter
 #      (core_Sequence)
-#   4. project definitions the package defaults gained (stsim State Attribute Types, Flow Multiplier Types): added through rsyncrosim
-#   5. the stock group memberships of non-result scenarios (the Stock-Flow Definitions scenario), set to the package defaults
+#   4. project definitions the package defaults gained (stsim State Attribute Types, Flow Multiplier Types, Stock and Flow Types, Flow
+#      Groups): added through rsyncrosim
+#   5. the stock group memberships of non-result scenarios (the Stock-Flow Definitions scenario), set to the package defaults; the rows
+#      their flow type groups, flow order, pathway diagram and output filters lack, appended
 #   6. the Carbon Assumptions lists and scenario (see --carbon-assumptions)
 #   7. (run in SQL right after step 3) emergent wetland rows a filled Grassland, Shrubland and Wetland Carbon sheet still holds at the old class-wide values: removed,
 #      so the package's ecodivision values apply (to-do 39 step 1)
@@ -112,6 +114,12 @@ if (!dry) { dbDisconnect(con); on.exit(dbDisconnect(ref))
     want_g <- fread(file.path(pkg, "defaults", "stsim", "stsim_TransitionTypeGroup.csv"), sep = ",", na.strings = "")[TransitionTypeId %in% miss_tt$Name, .(TransitionTypeId, TransitionGroupId)]
     saveDatasheet(P, as.data.frame(want_g), "stsim_TransitionTypeGroup", append = TRUE)
     cat("added Transition Types:", paste(miss_tt$Name, collapse = ", "), "\n") } else cat("Ag Change Transition Types up to date\n")
+  # Stock Types, Flow Types and Flow Groups (2026-11-07: Agriculture Sector, Net Growth Agriculture and Harvest, to-do 39 step 6)
+  for (sh in c("stsim_StockType", "stsim_FlowType", "stsim_FlowGroup")) {
+    have <- as.data.table(datasheet(P, sh)); want <- fread(file.path(pkg, "defaults", "stsim", paste0(sh, ".csv")), sep = ",", na.strings = "")
+    miss <- want[!Name %in% have$Name]
+    if (nrow(miss)) { saveDatasheet(P, as.data.frame(miss[, intersect(names(miss), names(have)), with = FALSE]), sh, append = TRUE)
+      cat(sprintf("added %s: %s\n", sub("stsim_", "", sh), paste(miss$Name, collapse = ", "))) } else cat(sprintf("%s up to date\n", sub("stsim_", "", sh))) }
   # ---- 5. stock group memberships of non-result scenarios (the Stock-Flow Definitions scenario) -----------------------------------
   # stage 0 writes the package's memberships only into a Build without them; a library made by new-library.R carries its own copy in the
   # Stock-Flow Definitions scenario, so a change of the package's groups (2026-10-26: DOM: Litter = the forest floor incl. AG Slow, as
@@ -123,6 +131,18 @@ if (!dry) { dbDisconnect(con); on.exit(dbDisconnect(ref))
     if (!nrow(have_m) || identical(key(have_m), key(want_m))) next
     saveDatasheet(S, as.data.frame(want_m[, .(StockTypeId, StockGroupId)]), "stsim_StockTypeGroupMembership", append = FALSE)
     cat(sprintf("stock group memberships of scenario %d (%s) updated to the package's (%d rows)\n", sid, sm[ScenarioId == sid, Name], nrow(want_m))) }
+  # the rows the package's other stock-flow sheets gained (2026-11-07: the agriculture flows' order, groups, diagram place and output
+  # filters, to-do 39 step 6), appended to the non-result scenarios that hold the sheet; rows a user changed are kept
+  sf <- list(stsim_FlowTypeGroupMembership = c("FlowTypeId", "FlowGroupId"), stsim_FlowOrder = "FlowTypeId", stsim_FlowPathwayDiagram = "StockTypeId",
+             stsim_OutputFilterFlows = "FlowGroupId", stsim_OutputFilterStocks = "StockGroupId")
+  for (sh in names(sf)) { want <- fread(file.path(pkg, "defaults", "stockflow", paste0(sh, ".csv")), na.strings = ""); k <- sf[[sh]]
+    for (sid in sm[IsResult == "No", ScenarioId]) { S <- scenario(L, sid)
+      have <- tryCatch(as.data.table(datasheet(S, sh, lookupsAsFactors = FALSE, optional = TRUE)), error = function(e) data.table())
+      if (!nrow(have)) next
+      miss <- want[!do.call(paste, want[, k, with = FALSE]) %in% do.call(paste, have[, k, with = FALSE])]
+      if (!nrow(miss)) next
+      saveDatasheet(S, as.data.frame(miss[, intersect(names(miss), names(have)), with = FALSE]), sh, append = TRUE)
+      cat(sprintf("%s of scenario %d (%s): %d rows added\n", sh, sid, sm[ScenarioId == sid, Name], nrow(miss))) } }
   # ---- 6. Carbon Assumptions (to-do 21, 2026-10-27): the CBM ecozone and species type lists, and a Carbon Assumptions scenario (as
   # tools/new-library.R makes) whose empty sheets get the package defaults (tools/carbon-assumptions.R). Builds use it once it is one of
   # their dependencies.

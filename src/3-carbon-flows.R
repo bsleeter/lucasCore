@@ -402,14 +402,14 @@ rd <- function(f) { x <- fread(pkg_file("defaults", "stockflow", f), colClasses 
   x[, which(vapply(x, function(v) any(!is.na(v)), TRUE)), with = FALSE] }
 fp_forest <- rbindlist(lapply(cw$StateClass, function(c0) FOREST_PATHWAYS[, .(FromStateClassId = c0, FromStockTypeId = From, ToStockTypeId = To,
                                                                                 StateAttributeTypeId = Attribute, FlowTypeId = FlowType, Multiplier = 1)]))
-fp <- rbind(fp_forest, rd("nonforest-pathways.csv"), ev_all[, which(vapply(ev_all, function(v) any(!is.na(v)), TRUE)), with = FALSE], fill = TRUE)   # events with the per-type fire rows
+fp <- rbind(fp_forest, rd("nonforest-pathways.csv"), rd("nonforest-pathways-agriculture.csv"), ev_all[, which(vapply(ev_all, function(v) any(!is.na(v)), TRUE)), with = FALSE], fill = TRUE)   # events with the per-type fire rows
 # Carbon Assumptions - Grassland, Shrubland and Wetland Carbon (to-do 39, 2026-10-30): the package's non-forest rates (the CONUS 1 km
 # build's, from IBIS; one value per class, the same in every ecodivision, except the forested wetlands' growth curve and age-varying
 # growth split) with the scenario's rows on top, the more specific last: a class's row for every ecodivision and age, then for one age,
 # then for one ecodivision, then for both. Growth: Net Growth (Mg C/ha/yr). Rates: the growth split (Net Growth groups, shares that add
 # to 1), live turnover and dead pool decay, emission and transfer (per year); for emergent wetlands a "<pool> ->" group is the pool's
 # total yearly loss and the flows out of it are shares of that loss, adding to 1. The initial pools stay the package's tables (stage 8).
-gs_m <- rbind(rd("nonforest-multipliers-grassland-shrubland.csv"), rd("nonforest-multipliers-wetland.csv"), fill = TRUE); nf_g <- rd("nonforest-net-growth.csv")
+gs_m <- rbind(rd("nonforest-multipliers-grassland-shrubland.csv"), rd("nonforest-multipliers-wetland.csv"), rd("nonforest-multipliers-agriculture.csv"), fill = TRUE); nf_g <- rd("nonforest-net-growth.csv")
 if (!"AgeMin" %in% names(gs_m)) gs_m[, AgeMin := NA_character_]
 if (!"AgeMin" %in% names(nf_g)) nf_g[, AgeMin := NA_character_]
 gsr <- as.data.table(datasheet(scn, ds("NonForestRate"), optional = TRUE, lookupsAsFactors = FALSE))
@@ -425,7 +425,7 @@ put_rows <- function(x, r, keys, vr, vx = "Value") {
 if (nrow(gsr)) {
   gsr <- gsr[!is.na(StateClassId) & !is.na(FlowGroupId) & !is.na(Value)]
   bad <- gsr[!paste(StateClassId, FlowGroupId) %in% gs_m[, paste(StateClassId, FlowGroupId)]]
-  check(STAGE, "every non-forest rate row names a grassland, shrubland or wetland class and one of its flows", !nrow(bad), paste(head(unique(bad[, paste(StateClassId, FlowGroupId)]), 5), collapse = "; "))
+  check(STAGE, "every non-forest rate row names a grassland, shrubland, wetland or agriculture class and one of its flows", !nrow(bad), paste(head(unique(bad[, paste(StateClassId, FlowGroupId)]), 5), collapse = "; "))
   put_rows(gs_m, gsr, c("StateClassId", "FlowGroupId"), "Value") }
 if (nrow(gsg)) put_rows(nf_g, gsg[!is.na(StateClassId) & !is.na(NetGrowth)], "StateClassId", "NetGrowth")
 dr <- sum(as.numeric(gs_m$Value) != as.numeric(gs0$Value)); dg <- sum(as.numeric(nf_g$Value) != as.numeric(ng0$Value))
@@ -446,6 +446,15 @@ fm <- rbind(fm_g, fm_d, gs_m, rd("nonforest-multipliers-other.csv"), fill = TRUE
 # integers x 100; stage 7 writes true multipliers, so there are none: a run without climate multipliers runs at normal climate)
 sav <- rbind(ng, nf_g, fill = TRUE)
 for (k in c("Iteration", "Timestep")) for (x in list(fp, fm, sav)) if (k %in% names(x)) x[, (k) := NULL]
+# cropland and pasture growth varies by year (to-do 39 step 6, user 2026-11-07): the Crop Yield flow multiplier on Net Growth
+# Agriculture: Total = the ecodivision's NASS yield index (defaults/stockflow/ag-crop-yield.csv, tools/make_agriculture.R; 1.0 = the
+# level the rates were solved at); ST-Sim keeps a timestep's value until the next, so the row after the last NASS year (the mean index
+# of its last 10 years) holds for every later year and for projections
+cy <- rd("ag-crop-yield.csv")
+if (nrow(cy)) {
+  if (!"Crop Yield" %in% stsim_list("FlowMultiplierType")$Name) fail("the library has no Flow Multiplier Type 'Crop Yield': run tools/sync-library.R on it")
+  fm <- rbind(fm, cy[, .(Timestep, StratumId, StateClassId, FlowGroupId = "Net Growth Agriculture: Total", FlowMultiplierTypeId = "Crop Yield", Value)], fill = TRUE)
+  say("Crop Yield: %d yearly cropland and pasture growth multipliers, %s-%s (range %.2f-%.2f)", nrow(cy), min(cy$Timestep), max(cy$Timestep), min(as.numeric(cy$Value)), max(as.numeric(cy$Value))) }
 
 # every flow type, flow group, stock type and state class named must exist in the library's definitions
 ft <- stsim_list("FlowType")$Name; fg <- stsim_list("FlowGroup")$Name; stt <- stsim_list("StockType")$Name

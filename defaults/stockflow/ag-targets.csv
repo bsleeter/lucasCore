@@ -1,0 +1,39 @@
+StratumId,StateClassId,NppSource,HarvestedHa,Counties,NPP,AgShare,HarvestShare,ProjectionIndex,SoilSource,Windows,Cells,Soil0to30,Soil0to999,Harvest,AgLitter,RootLitter,AgSlow,SoilEmission
+Hot Continental,Agriculture: Cropland,ecodivision NASS,20299440,790,5.7481,0.8429,0.4389,1.2542,ecodivision sample,54,269996,60.65,136.01,2.5231,1.351,0.891,0.2,0.001138
+Hot Continental,Agriculture: Pasture,ecodivision NASS,3107588,603,4.3665,0.5348,0.508,1.1126,ecodivision sample,58,127964,38.89,82.03,1.7513,0.34,2.471,0.5,0.004247
+Hot Continental Mountains,Agriculture: Cropland,ecodivision NASS,538434,171,6.9167,0.8437,0.5885,1.1962,ecodivision sample,47,125628,36.58,60.94,4.0704,1.027,1.066,0.2,0.003035
+Hot Continental Mountains,Agriculture: Pasture,ecodivision NASS,611311,155,3.9165,0.5348,0.508,1.073,ecodivision sample,60,170629,31.66,57.33,1.5708,0.305,2.216,0.5,0.005456
+Marine,Agriculture: Cropland,ecodivision NASS,23428,19,7.7526,0.8328,0.4469,1.0638,ecodivision sample,47,152467,79.51,201.18,3.465,1.741,1.279,0.2,0.001101
+Marine,Agriculture: Pasture,ecodivision NASS,43433,28,4.131,0.5348,0.508,0.9589,ecodivision sample,60,223798,77.29,177.56,1.6568,0.321,2.338,0.5,0.001857
+Marine Mountains,Agriculture: Cropland,ecodivision NASS,64679,29,6.5987,0.847,0.5049,0.8598,ecodivision sample,42,83854,38.46,97.25,3.3319,1.314,0.996,0.2,0.001777
+Marine Mountains,Agriculture: Pasture,ecodivision NASS,141852,44,4.851,0.5348,0.508,1.0042,ecodivision sample,57,91240,82.26,195.37,1.9456,0.377,2.745,0.5,0.001979
+Mediterranean,Agriculture: Cropland,ecodivision NASS,469079,35,9.7101,0.8345,0.521,1.0582,ecodivision sample,53,275306,32.59,100.24,5.0591,1.772,1.585,0.2,0.002737
+Mediterranean,Agriculture: Pasture,CONUS class mean,15,1,4.1229,0.5348,0.508,1.0124,ecodivision sample,41,91074,84.97,215.67,1.6536,0.321,2.333,0.5,0.001526
+Mediterranean Mountains,Agriculture: Cropland,ecodivision NASS,347823,51,9.1603,0.8356,0.5089,1.0645,ecodivision sample,42,159906,41.89,94.81,4.6614,1.742,1.485,0.2,0.002713
+Mediterranean Mountains,Agriculture: Pasture,ecodivision NASS,36289,10,5.295,0.5348,0.508,1.0485,ecodivision sample,52,125567,48.67,113.39,2.1237,0.412,2.996,0.5,0.00372
+Prairie,Agriculture: Cropland,ecodivision NASS,28601950,513,5.4773,0.8431,0.4203,1.231,ecodivision sample,50,278983,69.4,175.51,2.3019,1.348,0.847,0.2,0.000839
+Prairie,Agriculture: Pasture,ecodivision NASS,2008826,358,4.1451,0.5348,0.508,1.0909,ecodivision sample,57,157889,36.5,108.9,1.6625,0.323,2.346,0.5,0.003038
+Savanna,Agriculture: Cropland,ecodivision NASS,92430,4,14.6464,0.8475,0.6356,1.161,ecodivision sample,57,284671,183.14,828.3,9.3092,1.806,2.204,0.2,0.00046
+Savanna,Agriculture: Pasture,CONUS class mean,,,4.1229,0.5348,0.508,1.0124,ecodivision sample,40,110242,43.41,166.36,1.6536,0.321,2.333,0.5,0.001978
+Subtropical,Agriculture: Cropland,ecodivision NASS,11505129,727,4.1456,0.8426,0.3909,1.2782,ecodivision sample,47,213020,29.73,81.52,1.6206,1.09,0.644,0.2,0.001375
+Subtropical,Agriculture: Pasture,ecodivision NASS,604810,263,3.6697,0.5348,0.508,0.9957,ecodivision sample,48,133392,28.04,77.93,1.4718,0.286,2.077,0.5,0.003763
+Subtropical Mountains,Agriculture: Cropland,ecodivision NASS,16673,20,2.8542,0.8398,0.3685,1.2776,ecodivision sample,27,41798,28.59,73.74,1.0517,0.783,0.451,0.2,0.001071
+Subtropical Mountains,Agriculture: Pasture,ecodivision NASS,53231,8,2.8169,0.5348,0.508,1.095,ecodivision sample,60,217425,25.93,60.52,1.1298,0.219,1.594,0.5,0.003731
+Temperate Desert,Agriculture: Cropland,ecodivision NASS,1692962,126,5.9295,0.839,0.3895,1.0791,ecodivision sample,53,241436,28.34,74.95,2.3095,1.551,0.942,0.2,0.002181
+Temperate Desert,Agriculture: Pasture,ecodivision NASS,993480,131,6.3739,0.5348,0.508,1.0486,ecodivision sample,44,88693,40.82,96.73,2.5564,0.496,3.607,0.5,0.005243
+Temperate Desert Mountains,Agriculture: Cropland,CONUS class mean,9718,27,4.9895,0.8432,0.4226,1.2094,ecodivision sample,50,146194,26.55,75.38,2.1086,1.221,0.772,0.2,0.001781
+Temperate Desert Mountains,Agriculture: Pasture,ecodivision NASS,109315,30,5.6584,0.5348,0.508,1.038,ecodivision sample,56,101416,68.54,174.86,2.2694,0.44,3.202,0.5,0.002577
+Temperate Steppe,Agriculture: Cropland,ecodivision NASS,22045655,384,3.984,0.8443,0.3953,1.1229,ecodivision sample,57,314353,53.75,131.01,1.5748,1.041,0.612,0.2,0.0008139
+Temperate Steppe,Agriculture: Pasture,ecodivision NASS,3827735,376,3.4091,0.5348,0.508,0.8833,ecodivision sample,43,86595,60.65,142.92,1.3673,0.265,1.929,0.5,0.001908
+Temperate Steppe Mountains,Agriculture: Cropland,ecodivision NASS,764368,152,4.502,0.851,0.3849,1.1281,ecodivision sample,47,156658,46.47,105.51,1.7329,1.221,0.661,0.2,0.001092
+Temperate Steppe Mountains,Agriculture: Pasture,ecodivision NASS,909992,169,4.1766,0.5348,0.508,0.9019,ecodivision sample,57,135963,55.63,119.79,1.6751,0.325,2.364,0.5,0.002783
+Tropical/Subtropical Desert,Agriculture: Cropland,ecodivision NASS,238978,43,5.7344,0.8323,0.3698,1.0127,ecodivision sample,48,226468,14.99,51.88,2.1207,1.544,0.948,0.2,0.003174
+Tropical/Subtropical Desert,Agriculture: Pasture,ecodivision NASS,31822,34,9.405,0.5348,0.508,0.9825,ecodivision sample,39,23395,24.72,76.48,3.7721,0.732,5.322,0.5,0.009765
+Tropical/Subtropical Steppe,Agriculture: Cropland,ecodivision NASS,3373375,182,2.837,0.8478,0.3815,1.0711,ecodivision sample,46,229602,34.26,102.95,1.0823,0.77,0.426,0.2,0.0007247
+Tropical/Subtropical Steppe,Agriculture: Pasture,ecodivision NASS,140683,198,5.5931,0.5348,0.508,1.0623,ecodivision sample,49,118183,24.15,87.33,2.2432,0.435,3.165,0.5,0.0051
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,CONUS class mean,3600,20,4.9895,0.8432,0.4226,1.2094,ecodivision sample,44,83778,15.87,55.74,2.1086,1.221,0.772,0.2,0.002408
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,CONUS class mean,9525,28,4.1229,0.5348,0.508,1.0124,ecodivision sample,42,37998,54.61,154.2,1.6536,0.321,2.333,0.5,0.002134
+Warm Continental,Agriculture: Cropland,ecodivision NASS,1260153,184,6.908,0.8436,0.5954,1.24,ecodivision sample,52,158033,61.07,113.64,4.1127,0.998,1.066,0.2,0.001627
+Warm Continental,Agriculture: Pasture,ecodivision NASS,1099120,138,3.5976,0.5348,0.508,1.0228,ecodivision sample,60,116276,71.33,120.25,1.4429,0.28,2.036,0.5,0.002391
+Warm Continental Mountains,Agriculture: Cropland,ecodivision NASS,30811,14,11.5349,0.8484,0.7341,1.113,ecodivision sample,38,35950,74.92,151.7,8.468,0.767,1.725,0.2,0.001968
+Warm Continental Mountains,Agriculture: Pasture,ecodivision NASS,56235,14,3.5833,0.5348,0.508,0.938,ecodivision sample,60,108440,82.64,149.25,1.4372,0.279,2.028,0.5,0.001919

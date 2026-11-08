@@ -1,0 +1,1549 @@
+StratumId,StateClassId,Timestep,Value
+Hot Continental,Agriculture: Cropland,1984,0.7525
+Hot Continental,Agriculture: Cropland,1985,0.8269
+Hot Continental,Agriculture: Cropland,1986,0.8283
+Hot Continental,Agriculture: Cropland,1987,0.8456
+Hot Continental,Agriculture: Cropland,1988,0.5733
+Hot Continental,Agriculture: Cropland,1989,0.8176
+Hot Continental,Agriculture: Cropland,1990,0.8485
+Hot Continental,Agriculture: Cropland,1991,0.75
+Hot Continental,Agriculture: Cropland,1992,0.8977
+Hot Continental,Agriculture: Cropland,1993,0.775
+Hot Continental,Agriculture: Cropland,1994,0.9472
+Hot Continental,Agriculture: Cropland,1995,0.8271
+Hot Continental,Agriculture: Cropland,1996,0.8205
+Hot Continental,Agriculture: Cropland,1997,0.8924
+Hot Continental,Agriculture: Cropland,1998,0.9403
+Hot Continental,Agriculture: Cropland,1999,0.9037
+Hot Continental,Agriculture: Cropland,2000,0.9783
+Hot Continental,Agriculture: Cropland,2001,0.9604
+Hot Continental,Agriculture: Cropland,2002,0.8619
+Hot Continental,Agriculture: Cropland,2003,0.9485
+Hot Continental,Agriculture: Cropland,2004,1.0733
+Hot Continental,Agriculture: Cropland,2005,1.0365
+Hot Continental,Agriculture: Cropland,2006,1.0662
+Hot Continental,Agriculture: Cropland,2007,1.0018
+Hot Continental,Agriculture: Cropland,2008,1.0316
+Hot Continental,Agriculture: Cropland,2009,1.1107
+Hot Continental,Agriculture: Cropland,2010,1.0953
+Hot Continental,Agriculture: Cropland,2011,1.0507
+Hot Continental,Agriculture: Cropland,2012,0.8729
+Hot Continental,Agriculture: Cropland,2013,1.1277
+Hot Continental,Agriculture: Cropland,2014,1.1857
+Hot Continental,Agriculture: Cropland,2015,1.16
+Hot Continental,Agriculture: Cropland,2016,1.2151
+Hot Continental,Agriculture: Cropland,2017,1.2304
+Hot Continental,Agriculture: Cropland,2018,1.2524
+Hot Continental,Agriculture: Cropland,2019,1.1745
+Hot Continental,Agriculture: Cropland,2020,1.2289
+Hot Continental,Agriculture: Cropland,2021,1.2965
+Hot Continental,Agriculture: Cropland,2022,1.2831
+Hot Continental,Agriculture: Cropland,2023,1.2837
+Hot Continental,Agriculture: Cropland,2024,1.2796
+Hot Continental,Agriculture: Cropland,2025,1.2982
+Hot Continental,Agriculture: Cropland,2026,1.2542
+Hot Continental Mountains,Agriculture: Cropland,1984,0.9264
+Hot Continental Mountains,Agriculture: Cropland,1985,0.9165
+Hot Continental Mountains,Agriculture: Cropland,1986,0.792
+Hot Continental Mountains,Agriculture: Cropland,1987,0.7322
+Hot Continental Mountains,Agriculture: Cropland,1988,0.5881
+Hot Continental Mountains,Agriculture: Cropland,1989,0.8931
+Hot Continental Mountains,Agriculture: Cropland,1990,0.9115
+Hot Continental Mountains,Agriculture: Cropland,1991,0.645
+Hot Continental Mountains,Agriculture: Cropland,1992,0.9929
+Hot Continental Mountains,Agriculture: Cropland,1993,0.7878
+Hot Continental Mountains,Agriculture: Cropland,1994,0.9885
+Hot Continental Mountains,Agriculture: Cropland,1995,0.858
+Hot Continental Mountains,Agriculture: Cropland,1996,1.0214
+Hot Continental Mountains,Agriculture: Cropland,1997,0.8389
+Hot Continental Mountains,Agriculture: Cropland,1998,0.8868
+Hot Continental Mountains,Agriculture: Cropland,1999,0.6527
+Hot Continental Mountains,Agriculture: Cropland,2000,1.0713
+Hot Continental Mountains,Agriculture: Cropland,2001,0.9297
+Hot Continental Mountains,Agriculture: Cropland,2002,0.6943
+Hot Continental Mountains,Agriculture: Cropland,2003,0.947
+Hot Continental Mountains,Agriculture: Cropland,2004,1.1489
+Hot Continental Mountains,Agriculture: Cropland,2005,1.0093
+Hot Continental Mountains,Agriculture: Cropland,2006,1.0405
+Hot Continental Mountains,Agriculture: Cropland,2007,0.9564
+Hot Continental Mountains,Agriculture: Cropland,2008,1.0826
+Hot Continental Mountains,Agriculture: Cropland,2009,1.1775
+Hot Continental Mountains,Agriculture: Cropland,2010,0.9944
+Hot Continental Mountains,Agriculture: Cropland,2011,0.8961
+Hot Continental Mountains,Agriculture: Cropland,2012,1.0933
+Hot Continental Mountains,Agriculture: Cropland,2013,1.2428
+Hot Continental Mountains,Agriculture: Cropland,2014,1.2644
+Hot Continental Mountains,Agriculture: Cropland,2015,1.259
+Hot Continental Mountains,Agriculture: Cropland,2016,1.0535
+Hot Continental Mountains,Agriculture: Cropland,2017,1.3481
+Hot Continental Mountains,Agriculture: Cropland,2018,1.2013
+Hot Continental Mountains,Agriculture: Cropland,2019,1.2582
+Hot Continental Mountains,Agriculture: Cropland,2020,1.114
+Hot Continental Mountains,Agriculture: Cropland,2021,1.3346
+Hot Continental Mountains,Agriculture: Cropland,2022,1.1269
+Hot Continental Mountains,Agriculture: Cropland,2023,1.2609
+Hot Continental Mountains,Agriculture: Cropland,2024,1.0252
+Hot Continental Mountains,Agriculture: Cropland,2025,1.2389
+Hot Continental Mountains,Agriculture: Cropland,2026,1.1962
+Marine,Agriculture: Cropland,1984,0.8783
+Marine,Agriculture: Cropland,1985,0.8605
+Marine,Agriculture: Cropland,1986,0.9459
+Marine,Agriculture: Cropland,1987,0.865
+Marine,Agriculture: Cropland,1988,1.0122
+Marine,Agriculture: Cropland,1989,0.9335
+Marine,Agriculture: Cropland,1990,0.9478
+Marine,Agriculture: Cropland,1991,0.947
+Marine,Agriculture: Cropland,1992,0.949
+Marine,Agriculture: Cropland,1993,0.9383
+Marine,Agriculture: Cropland,1994,1.0056
+Marine,Agriculture: Cropland,1995,0.9804
+Marine,Agriculture: Cropland,1996,0.9823
+Marine,Agriculture: Cropland,1997,0.9459
+Marine,Agriculture: Cropland,1998,0.8523
+Marine,Agriculture: Cropland,1999,0.9232
+Marine,Agriculture: Cropland,2000,0.9501
+Marine,Agriculture: Cropland,2001,0.9608
+Marine,Agriculture: Cropland,2002,1.0143
+Marine,Agriculture: Cropland,2003,0.9866
+Marine,Agriculture: Cropland,2004,0.978
+Marine,Agriculture: Cropland,2005,0.9619
+Marine,Agriculture: Cropland,2006,0.9342
+Marine,Agriculture: Cropland,2007,1.0028
+Marine,Agriculture: Cropland,2008,1.0741
+Marine,Agriculture: Cropland,2009,1.0563
+Marine,Agriculture: Cropland,2010,1.1035
+Marine,Agriculture: Cropland,2011,1.1606
+Marine,Agriculture: Cropland,2012,1.1088
+Marine,Agriculture: Cropland,2013,1.1059
+Marine,Agriculture: Cropland,2014,1.0593
+Marine,Agriculture: Cropland,2015,1.099
+Marine,Agriculture: Cropland,2016,1.1421
+Marine,Agriculture: Cropland,2017,0.8534
+Marine,Agriculture: Cropland,2018,0.9215
+Marine,Agriculture: Cropland,2019,1.1634
+Marine,Agriculture: Cropland,2020,1.1312
+Marine,Agriculture: Cropland,2021,1.1468
+Marine,Agriculture: Cropland,2022,1.1759
+Marine,Agriculture: Cropland,2023,1.0596
+Marine,Agriculture: Cropland,2025,0.9807
+Marine,Agriculture: Cropland,2026,1.0638
+Marine Mountains,Agriculture: Cropland,1984,0.9828
+Marine Mountains,Agriculture: Cropland,1985,0.9345
+Marine Mountains,Agriculture: Cropland,1986,0.9823
+Marine Mountains,Agriculture: Cropland,1987,1.0351
+Marine Mountains,Agriculture: Cropland,1988,1.1193
+Marine Mountains,Agriculture: Cropland,1989,1.0386
+Marine Mountains,Agriculture: Cropland,1990,1.0599
+Marine Mountains,Agriculture: Cropland,1991,1.0162
+Marine Mountains,Agriculture: Cropland,1992,1.0063
+Marine Mountains,Agriculture: Cropland,1993,1.0498
+Marine Mountains,Agriculture: Cropland,1994,1.0789
+Marine Mountains,Agriculture: Cropland,1995,1.0904
+Marine Mountains,Agriculture: Cropland,1996,1.0363
+Marine Mountains,Agriculture: Cropland,1997,1.0372
+Marine Mountains,Agriculture: Cropland,1998,1.0015
+Marine Mountains,Agriculture: Cropland,1999,0.9342
+Marine Mountains,Agriculture: Cropland,2000,1.018
+Marine Mountains,Agriculture: Cropland,2001,0.8819
+Marine Mountains,Agriculture: Cropland,2002,0.9299
+Marine Mountains,Agriculture: Cropland,2003,1.0211
+Marine Mountains,Agriculture: Cropland,2004,1.0109
+Marine Mountains,Agriculture: Cropland,2005,0.9815
+Marine Mountains,Agriculture: Cropland,2006,0.9781
+Marine Mountains,Agriculture: Cropland,2007,1.0027
+Marine Mountains,Agriculture: Cropland,2008,1.1454
+Marine Mountains,Agriculture: Cropland,2009,1.0989
+Marine Mountains,Agriculture: Cropland,2010,1.1843
+Marine Mountains,Agriculture: Cropland,2011,1.2265
+Marine Mountains,Agriculture: Cropland,2012,1.1649
+Marine Mountains,Agriculture: Cropland,2013,0.9895
+Marine Mountains,Agriculture: Cropland,2014,0.7777
+Marine Mountains,Agriculture: Cropland,2015,0.9508
+Marine Mountains,Agriculture: Cropland,2016,0.9749
+Marine Mountains,Agriculture: Cropland,2017,0.7788
+Marine Mountains,Agriculture: Cropland,2018,0.885
+Marine Mountains,Agriculture: Cropland,2019,0.8589
+Marine Mountains,Agriculture: Cropland,2020,0.8227
+Marine Mountains,Agriculture: Cropland,2021,0.7133
+Marine Mountains,Agriculture: Cropland,2022,0.9809
+Marine Mountains,Agriculture: Cropland,2023,0.8033
+Marine Mountains,Agriculture: Cropland,2025,0.9207
+Marine Mountains,Agriculture: Cropland,2026,0.8598
+Mediterranean,Agriculture: Cropland,1984,0.8476
+Mediterranean,Agriculture: Cropland,1985,0.8933
+Mediterranean,Agriculture: Cropland,1986,0.9228
+Mediterranean,Agriculture: Cropland,1987,0.977
+Mediterranean,Agriculture: Cropland,1988,0.8901
+Mediterranean,Agriculture: Cropland,1989,0.9565
+Mediterranean,Agriculture: Cropland,1990,0.9532
+Mediterranean,Agriculture: Cropland,1991,0.9873
+Mediterranean,Agriculture: Cropland,1992,1.0036
+Mediterranean,Agriculture: Cropland,1993,0.9902
+Mediterranean,Agriculture: Cropland,1994,0.989
+Mediterranean,Agriculture: Cropland,1995,0.9139
+Mediterranean,Agriculture: Cropland,1996,0.9389
+Mediterranean,Agriculture: Cropland,1997,0.981
+Mediterranean,Agriculture: Cropland,1998,0.8593
+Mediterranean,Agriculture: Cropland,1999,0.9776
+Mediterranean,Agriculture: Cropland,2000,1.0003
+Mediterranean,Agriculture: Cropland,2001,1.003
+Mediterranean,Agriculture: Cropland,2002,1.0294
+Mediterranean,Agriculture: Cropland,2003,0.9754
+Mediterranean,Agriculture: Cropland,2004,1.0684
+Mediterranean,Agriculture: Cropland,2005,0.9762
+Mediterranean,Agriculture: Cropland,2006,0.9738
+Mediterranean,Agriculture: Cropland,2007,1.0431
+Mediterranean,Agriculture: Cropland,2008,1.0354
+Mediterranean,Agriculture: Cropland,2009,1.0544
+Mediterranean,Agriculture: Cropland,2010,1.0315
+Mediterranean,Agriculture: Cropland,2011,1.0385
+Mediterranean,Agriculture: Cropland,2012,1.0538
+Mediterranean,Agriculture: Cropland,2013,1.0479
+Mediterranean,Agriculture: Cropland,2014,1.0532
+Mediterranean,Agriculture: Cropland,2015,1.0269
+Mediterranean,Agriculture: Cropland,2016,1.0785
+Mediterranean,Agriculture: Cropland,2017,1.0124
+Mediterranean,Agriculture: Cropland,2018,1.0606
+Mediterranean,Agriculture: Cropland,2019,1.004
+Mediterranean,Agriculture: Cropland,2020,1.0849
+Mediterranean,Agriculture: Cropland,2021,1.0957
+Mediterranean,Agriculture: Cropland,2022,1.0441
+Mediterranean,Agriculture: Cropland,2023,1.0237
+Mediterranean,Agriculture: Cropland,2024,1.051
+Mediterranean,Agriculture: Cropland,2025,1.1272
+Mediterranean,Agriculture: Cropland,2026,1.0582
+Mediterranean Mountains,Agriculture: Cropland,1984,0.8411
+Mediterranean Mountains,Agriculture: Cropland,1985,0.8832
+Mediterranean Mountains,Agriculture: Cropland,1986,0.9174
+Mediterranean Mountains,Agriculture: Cropland,1987,0.9523
+Mediterranean Mountains,Agriculture: Cropland,1988,0.8858
+Mediterranean Mountains,Agriculture: Cropland,1989,0.9282
+Mediterranean Mountains,Agriculture: Cropland,1990,0.9524
+Mediterranean Mountains,Agriculture: Cropland,1991,0.9967
+Mediterranean Mountains,Agriculture: Cropland,1992,0.9866
+Mediterranean Mountains,Agriculture: Cropland,1993,0.9849
+Mediterranean Mountains,Agriculture: Cropland,1994,0.9757
+Mediterranean Mountains,Agriculture: Cropland,1995,0.8915
+Mediterranean Mountains,Agriculture: Cropland,1996,0.927
+Mediterranean Mountains,Agriculture: Cropland,1997,0.9719
+Mediterranean Mountains,Agriculture: Cropland,1998,0.8492
+Mediterranean Mountains,Agriculture: Cropland,1999,0.9721
+Mediterranean Mountains,Agriculture: Cropland,2000,0.9965
+Mediterranean Mountains,Agriculture: Cropland,2001,0.9946
+Mediterranean Mountains,Agriculture: Cropland,2002,1.0373
+Mediterranean Mountains,Agriculture: Cropland,2003,0.9742
+Mediterranean Mountains,Agriculture: Cropland,2004,1.0772
+Mediterranean Mountains,Agriculture: Cropland,2005,0.9728
+Mediterranean Mountains,Agriculture: Cropland,2006,0.9823
+Mediterranean Mountains,Agriculture: Cropland,2007,1.0538
+Mediterranean Mountains,Agriculture: Cropland,2008,1.0435
+Mediterranean Mountains,Agriculture: Cropland,2009,1.0621
+Mediterranean Mountains,Agriculture: Cropland,2010,1.0124
+Mediterranean Mountains,Agriculture: Cropland,2011,1.0293
+Mediterranean Mountains,Agriculture: Cropland,2012,1.0567
+Mediterranean Mountains,Agriculture: Cropland,2013,1.0828
+Mediterranean Mountains,Agriculture: Cropland,2014,1.0679
+Mediterranean Mountains,Agriculture: Cropland,2015,1.0396
+Mediterranean Mountains,Agriculture: Cropland,2016,1.0696
+Mediterranean Mountains,Agriculture: Cropland,2017,1.0291
+Mediterranean Mountains,Agriculture: Cropland,2018,1.0692
+Mediterranean Mountains,Agriculture: Cropland,2019,1.0181
+Mediterranean Mountains,Agriculture: Cropland,2020,1.1091
+Mediterranean Mountains,Agriculture: Cropland,2021,1.0889
+Mediterranean Mountains,Agriculture: Cropland,2022,1.066
+Mediterranean Mountains,Agriculture: Cropland,2023,1.0365
+Mediterranean Mountains,Agriculture: Cropland,2024,1.0456
+Mediterranean Mountains,Agriculture: Cropland,2025,1.1129
+Mediterranean Mountains,Agriculture: Cropland,2026,1.0645
+Prairie,Agriculture: Cropland,1984,0.7215
+Prairie,Agriculture: Cropland,1985,0.8639
+Prairie,Agriculture: Cropland,1986,0.8631
+Prairie,Agriculture: Cropland,1987,0.8593
+Prairie,Agriculture: Cropland,1988,0.5837
+Prairie,Agriculture: Cropland,1989,0.7925
+Prairie,Agriculture: Cropland,1990,0.8284
+Prairie,Agriculture: Cropland,1991,0.7672
+Prairie,Agriculture: Cropland,1992,0.9354
+Prairie,Agriculture: Cropland,1993,0.6819
+Prairie,Agriculture: Cropland,1994,0.9871
+Prairie,Agriculture: Cropland,1995,0.7866
+Prairie,Agriculture: Cropland,1996,0.9055
+Prairie,Agriculture: Cropland,1997,0.897
+Prairie,Agriculture: Cropland,1998,0.9531
+Prairie,Agriculture: Cropland,1999,0.9384
+Prairie,Agriculture: Cropland,2000,0.9506
+Prairie,Agriculture: Cropland,2001,0.9485
+Prairie,Agriculture: Cropland,2002,0.9312
+Prairie,Agriculture: Cropland,2003,0.9419
+Prairie,Agriculture: Cropland,2004,1.1144
+Prairie,Agriculture: Cropland,2005,1.0248
+Prairie,Agriculture: Cropland,2006,1.0301
+Prairie,Agriculture: Cropland,2007,1.0623
+Prairie,Agriculture: Cropland,2008,1.0715
+Prairie,Agriculture: Cropland,2009,1.1251
+Prairie,Agriculture: Cropland,2010,1.0608
+Prairie,Agriculture: Cropland,2011,1.0157
+Prairie,Agriculture: Cropland,2012,0.8929
+Prairie,Agriculture: Cropland,2013,1.0844
+Prairie,Agriculture: Cropland,2014,1.1613
+Prairie,Agriculture: Cropland,2015,1.1919
+Prairie,Agriculture: Cropland,2016,1.2718
+Prairie,Agriculture: Cropland,2017,1.2505
+Prairie,Agriculture: Cropland,2018,1.2064
+Prairie,Agriculture: Cropland,2019,1.2027
+Prairie,Agriculture: Cropland,2020,1.2132
+Prairie,Agriculture: Cropland,2021,1.2268
+Prairie,Agriculture: Cropland,2022,1.1814
+Prairie,Agriculture: Cropland,2023,1.2126
+Prairie,Agriculture: Cropland,2024,1.2562
+Prairie,Agriculture: Cropland,2025,1.2887
+Prairie,Agriculture: Cropland,2026,1.231
+Savanna,Agriculture: Cropland,1984,0.9104
+Savanna,Agriculture: Cropland,1985,0.9216
+Savanna,Agriculture: Cropland,1986,0.9274
+Savanna,Agriculture: Cropland,1987,0.905
+Savanna,Agriculture: Cropland,1988,0.8859
+Savanna,Agriculture: Cropland,1989,0.884
+Savanna,Agriculture: Cropland,1990,0.9999
+Savanna,Agriculture: Cropland,1991,0.9823
+Savanna,Agriculture: Cropland,1992,0.9346
+Savanna,Agriculture: Cropland,1993,0.9587
+Savanna,Agriculture: Cropland,1994,0.9423
+Savanna,Agriculture: Cropland,1995,0.9691
+Savanna,Agriculture: Cropland,1996,0.9288
+Savanna,Agriculture: Cropland,1997,1.0344
+Savanna,Agriculture: Cropland,1998,1.1243
+Savanna,Agriculture: Cropland,1999,0.9812
+Savanna,Agriculture: Cropland,2000,1.0473
+Savanna,Agriculture: Cropland,2001,0.9813
+Savanna,Agriculture: Cropland,2002,1.0909
+Savanna,Agriculture: Cropland,2003,1.0987
+Savanna,Agriculture: Cropland,2004,0.9627
+Savanna,Agriculture: Cropland,2005,0.8649
+Savanna,Agriculture: Cropland,2006,0.9785
+Savanna,Agriculture: Cropland,2007,0.9894
+Savanna,Agriculture: Cropland,2008,0.9072
+Savanna,Agriculture: Cropland,2009,0.9911
+Savanna,Agriculture: Cropland,2010,0.9251
+Savanna,Agriculture: Cropland,2011,1.0486
+Savanna,Agriculture: Cropland,2012,1.0244
+Savanna,Agriculture: Cropland,2013,0.9657
+Savanna,Agriculture: Cropland,2014,1.0725
+Savanna,Agriculture: Cropland,2015,1.1889
+Savanna,Agriculture: Cropland,2016,1.1247
+Savanna,Agriculture: Cropland,2017,1.163
+Savanna,Agriculture: Cropland,2018,1.1951
+Savanna,Agriculture: Cropland,2026,1.161
+Subtropical,Agriculture: Cropland,1984,0.7729
+Subtropical,Agriculture: Cropland,1985,0.77
+Subtropical,Agriculture: Cropland,1986,0.6827
+Subtropical,Agriculture: Cropland,1987,0.7395
+Subtropical,Agriculture: Cropland,1988,0.7653
+Subtropical,Agriculture: Cropland,1989,0.7834
+Subtropical,Agriculture: Cropland,1990,0.7478
+Subtropical,Agriculture: Cropland,1991,0.7926
+Subtropical,Agriculture: Cropland,1992,0.8938
+Subtropical,Agriculture: Cropland,1993,0.7119
+Subtropical,Agriculture: Cropland,1994,0.9165
+Subtropical,Agriculture: Cropland,1995,0.8111
+Subtropical,Agriculture: Cropland,1996,0.9162
+Subtropical,Agriculture: Cropland,1997,0.8787
+Subtropical,Agriculture: Cropland,1998,0.7801
+Subtropical,Agriculture: Cropland,1999,0.8266
+Subtropical,Agriculture: Cropland,2000,0.9092
+Subtropical,Agriculture: Cropland,2001,0.9966
+Subtropical,Agriculture: Cropland,2002,0.8668
+Subtropical,Agriculture: Cropland,2003,1.013
+Subtropical,Agriculture: Cropland,2004,1.0556
+Subtropical,Agriculture: Cropland,2005,1.0134
+Subtropical,Agriculture: Cropland,2006,1.0352
+Subtropical,Agriculture: Cropland,2007,0.9982
+Subtropical,Agriculture: Cropland,2008,1.0476
+Subtropical,Agriculture: Cropland,2009,1.0769
+Subtropical,Agriculture: Cropland,2010,0.987
+Subtropical,Agriculture: Cropland,2011,1.0461
+Subtropical,Agriculture: Cropland,2012,1.1645
+Subtropical,Agriculture: Cropland,2013,1.2251
+Subtropical,Agriculture: Cropland,2014,1.2727
+Subtropical,Agriculture: Cropland,2015,1.2026
+Subtropical,Agriculture: Cropland,2016,1.1901
+Subtropical,Agriculture: Cropland,2017,1.2948
+Subtropical,Agriculture: Cropland,2018,1.2371
+Subtropical,Agriculture: Cropland,2019,1.2431
+Subtropical,Agriculture: Cropland,2020,1.2678
+Subtropical,Agriculture: Cropland,2021,1.3294
+Subtropical,Agriculture: Cropland,2022,1.2603
+Subtropical,Agriculture: Cropland,2023,1.3399
+Subtropical,Agriculture: Cropland,2024,1.3008
+Subtropical,Agriculture: Cropland,2025,1.3188
+Subtropical,Agriculture: Cropland,2026,1.2782
+Subtropical Mountains,Agriculture: Cropland,1984,0.8742
+Subtropical Mountains,Agriculture: Cropland,1985,0.8221
+Subtropical Mountains,Agriculture: Cropland,1986,0.7922
+Subtropical Mountains,Agriculture: Cropland,1987,0.8055
+Subtropical Mountains,Agriculture: Cropland,1988,0.8032
+Subtropical Mountains,Agriculture: Cropland,1989,0.8322
+Subtropical Mountains,Agriculture: Cropland,1990,0.77
+Subtropical Mountains,Agriculture: Cropland,1991,0.8462
+Subtropical Mountains,Agriculture: Cropland,1992,0.9586
+Subtropical Mountains,Agriculture: Cropland,1993,0.7016
+Subtropical Mountains,Agriculture: Cropland,1994,1.0466
+Subtropical Mountains,Agriculture: Cropland,1995,0.7081
+Subtropical Mountains,Agriculture: Cropland,1996,1.0753
+Subtropical Mountains,Agriculture: Cropland,1997,1.0263
+Subtropical Mountains,Agriculture: Cropland,1998,0.6973
+Subtropical Mountains,Agriculture: Cropland,1999,0.7612
+Subtropical Mountains,Agriculture: Cropland,2000,0.8087
+Subtropical Mountains,Agriculture: Cropland,2001,1.0305
+Subtropical Mountains,Agriculture: Cropland,2002,0.9568
+Subtropical Mountains,Agriculture: Cropland,2003,1.117
+Subtropical Mountains,Agriculture: Cropland,2004,1.1388
+Subtropical Mountains,Agriculture: Cropland,2005,0.9511
+Subtropical Mountains,Agriculture: Cropland,2006,0.9602
+Subtropical Mountains,Agriculture: Cropland,2007,1.0599
+Subtropical Mountains,Agriculture: Cropland,2008,1.0776
+Subtropical Mountains,Agriculture: Cropland,2009,1.0291
+Subtropical Mountains,Agriculture: Cropland,2010,1.1025
+Subtropical Mountains,Agriculture: Cropland,2011,1.0093
+Subtropical Mountains,Agriculture: Cropland,2012,1.0203
+Subtropical Mountains,Agriculture: Cropland,2013,1.2826
+Subtropical Mountains,Agriculture: Cropland,2014,1.2783
+Subtropical Mountains,Agriculture: Cropland,2015,1.1813
+Subtropical Mountains,Agriculture: Cropland,2016,1.0404
+Subtropical Mountains,Agriculture: Cropland,2017,1.5927
+Subtropical Mountains,Agriculture: Cropland,2018,1.2185
+Subtropical Mountains,Agriculture: Cropland,2019,0.7912
+Subtropical Mountains,Agriculture: Cropland,2020,1.4341
+Subtropical Mountains,Agriculture: Cropland,2021,1.1679
+Subtropical Mountains,Agriculture: Cropland,2022,1.3575
+Subtropical Mountains,Agriculture: Cropland,2023,1.5559
+Subtropical Mountains,Agriculture: Cropland,2024,1.383
+Subtropical Mountains,Agriculture: Cropland,2025,1.2346
+Subtropical Mountains,Agriculture: Cropland,2026,1.2776
+Temperate Desert,Agriculture: Cropland,1984,0.9127
+Temperate Desert,Agriculture: Cropland,1985,0.8043
+Temperate Desert,Agriculture: Cropland,1986,0.8486
+Temperate Desert,Agriculture: Cropland,1987,0.9402
+Temperate Desert,Agriculture: Cropland,1988,0.941
+Temperate Desert,Agriculture: Cropland,1989,0.8573
+Temperate Desert,Agriculture: Cropland,1990,0.9415
+Temperate Desert,Agriculture: Cropland,1991,0.8737
+Temperate Desert,Agriculture: Cropland,1992,0.9058
+Temperate Desert,Agriculture: Cropland,1993,1.0125
+Temperate Desert,Agriculture: Cropland,1994,0.9661
+Temperate Desert,Agriculture: Cropland,1995,0.9962
+Temperate Desert,Agriculture: Cropland,1996,1.0337
+Temperate Desert,Agriculture: Cropland,1997,1.0562
+Temperate Desert,Agriculture: Cropland,1998,1.0239
+Temperate Desert,Agriculture: Cropland,1999,0.957
+Temperate Desert,Agriculture: Cropland,2000,1.0359
+Temperate Desert,Agriculture: Cropland,2001,0.9054
+Temperate Desert,Agriculture: Cropland,2002,0.9104
+Temperate Desert,Agriculture: Cropland,2003,0.9606
+Temperate Desert,Agriculture: Cropland,2004,1.0379
+Temperate Desert,Agriculture: Cropland,2005,1.0401
+Temperate Desert,Agriculture: Cropland,2006,1.0526
+Temperate Desert,Agriculture: Cropland,2007,1.0197
+Temperate Desert,Agriculture: Cropland,2008,1.0148
+Temperate Desert,Agriculture: Cropland,2009,1.0568
+Temperate Desert,Agriculture: Cropland,2010,1.0993
+Temperate Desert,Agriculture: Cropland,2011,1.1567
+Temperate Desert,Agriculture: Cropland,2012,1.1187
+Temperate Desert,Agriculture: Cropland,2013,1.0964
+Temperate Desert,Agriculture: Cropland,2014,0.9394
+Temperate Desert,Agriculture: Cropland,2015,0.9721
+Temperate Desert,Agriculture: Cropland,2016,1.1108
+Temperate Desert,Agriculture: Cropland,2017,1.1308
+Temperate Desert,Agriculture: Cropland,2018,1.1076
+Temperate Desert,Agriculture: Cropland,2019,1.0804
+Temperate Desert,Agriculture: Cropland,2020,1.1599
+Temperate Desert,Agriculture: Cropland,2021,0.8281
+Temperate Desert,Agriculture: Cropland,2022,1.0974
+Temperate Desert,Agriculture: Cropland,2023,0.9728
+Temperate Desert,Agriculture: Cropland,2024,1.2011
+Temperate Desert,Agriculture: Cropland,2025,1.1021
+Temperate Desert,Agriculture: Cropland,2026,1.0791
+Temperate Desert Mountains,Agriculture: Cropland,1984,0.7755
+Temperate Desert Mountains,Agriculture: Cropland,1985,0.8509
+Temperate Desert Mountains,Agriculture: Cropland,1986,0.8418
+Temperate Desert Mountains,Agriculture: Cropland,1987,0.8616
+Temperate Desert Mountains,Agriculture: Cropland,1988,0.6729
+Temperate Desert Mountains,Agriculture: Cropland,1989,0.801
+Temperate Desert Mountains,Agriculture: Cropland,1990,0.8557
+Temperate Desert Mountains,Agriculture: Cropland,1991,0.8002
+Temperate Desert Mountains,Agriculture: Cropland,1992,0.9187
+Temperate Desert Mountains,Agriculture: Cropland,1993,0.7694
+Temperate Desert Mountains,Agriculture: Cropland,1994,0.9618
+Temperate Desert Mountains,Agriculture: Cropland,1995,0.8214
+Temperate Desert Mountains,Agriculture: Cropland,1996,0.8971
+Temperate Desert Mountains,Agriculture: Cropland,1997,0.9143
+Temperate Desert Mountains,Agriculture: Cropland,1998,0.9538
+Temperate Desert Mountains,Agriculture: Cropland,1999,0.9371
+Temperate Desert Mountains,Agriculture: Cropland,2000,0.9522
+Temperate Desert Mountains,Agriculture: Cropland,2001,0.9594
+Temperate Desert Mountains,Agriculture: Cropland,2002,0.8925
+Temperate Desert Mountains,Agriculture: Cropland,2003,0.9627
+Temperate Desert Mountains,Agriculture: Cropland,2004,1.075
+Temperate Desert Mountains,Agriculture: Cropland,2005,1.0327
+Temperate Desert Mountains,Agriculture: Cropland,2006,1.0142
+Temperate Desert Mountains,Agriculture: Cropland,2007,1.0346
+Temperate Desert Mountains,Agriculture: Cropland,2008,1.0526
+Temperate Desert Mountains,Agriculture: Cropland,2009,1.1148
+Temperate Desert Mountains,Agriculture: Cropland,2010,1.0777
+Temperate Desert Mountains,Agriculture: Cropland,2011,1.024
+Temperate Desert Mountains,Agriculture: Cropland,2012,0.9543
+Temperate Desert Mountains,Agriculture: Cropland,2013,1.1017
+Temperate Desert Mountains,Agriculture: Cropland,2014,1.1567
+Temperate Desert Mountains,Agriculture: Cropland,2015,1.1598
+Temperate Desert Mountains,Agriculture: Cropland,2016,1.2337
+Temperate Desert Mountains,Agriculture: Cropland,2017,1.2086
+Temperate Desert Mountains,Agriculture: Cropland,2018,1.2026
+Temperate Desert Mountains,Agriculture: Cropland,2019,1.1911
+Temperate Desert Mountains,Agriculture: Cropland,2020,1.2045
+Temperate Desert Mountains,Agriculture: Cropland,2021,1.1872
+Temperate Desert Mountains,Agriculture: Cropland,2022,1.175
+Temperate Desert Mountains,Agriculture: Cropland,2023,1.204
+Temperate Desert Mountains,Agriculture: Cropland,2024,1.223
+Temperate Desert Mountains,Agriculture: Cropland,2025,1.2642
+Temperate Desert Mountains,Agriculture: Cropland,2026,1.2094
+Temperate Steppe,Agriculture: Cropland,1984,0.8602
+Temperate Steppe,Agriculture: Cropland,1985,0.9034
+Temperate Steppe,Agriculture: Cropland,1986,0.9018
+Temperate Steppe,Agriculture: Cropland,1987,0.9209
+Temperate Steppe,Agriculture: Cropland,1988,0.8343
+Temperate Steppe,Agriculture: Cropland,1989,0.7785
+Temperate Steppe,Agriculture: Cropland,1990,0.935
+Temperate Steppe,Agriculture: Cropland,1991,0.8873
+Temperate Steppe,Agriculture: Cropland,1992,0.93
+Temperate Steppe,Agriculture: Cropland,1993,0.8704
+Temperate Steppe,Agriculture: Cropland,1994,0.9695
+Temperate Steppe,Agriculture: Cropland,1995,0.8367
+Temperate Steppe,Agriculture: Cropland,1996,0.945
+Temperate Steppe,Agriculture: Cropland,1997,0.9558
+Temperate Steppe,Agriculture: Cropland,1998,1.063
+Temperate Steppe,Agriculture: Cropland,1999,1.0261
+Temperate Steppe,Agriculture: Cropland,2000,0.9287
+Temperate Steppe,Agriculture: Cropland,2001,0.9714
+Temperate Steppe,Agriculture: Cropland,2002,0.8532
+Temperate Steppe,Agriculture: Cropland,2003,0.9917
+Temperate Steppe,Agriculture: Cropland,2004,1.0319
+Temperate Steppe,Agriculture: Cropland,2005,1.0452
+Temperate Steppe,Agriculture: Cropland,2006,0.902
+Temperate Steppe,Agriculture: Cropland,2007,1.0347
+Temperate Steppe,Agriculture: Cropland,2008,1.0541
+Temperate Steppe,Agriculture: Cropland,2009,1.1496
+Temperate Steppe,Agriculture: Cropland,2010,1.1173
+Temperate Steppe,Agriculture: Cropland,2011,0.9797
+Temperate Steppe,Agriculture: Cropland,2012,0.9934
+Temperate Steppe,Agriculture: Cropland,2013,1.046
+Temperate Steppe,Agriculture: Cropland,2014,1.1051
+Temperate Steppe,Agriculture: Cropland,2015,1.1222
+Temperate Steppe,Agriculture: Cropland,2016,1.2682
+Temperate Steppe,Agriculture: Cropland,2017,1.0923
+Temperate Steppe,Agriculture: Cropland,2018,1.1539
+Temperate Steppe,Agriculture: Cropland,2019,1.2272
+Temperate Steppe,Agriculture: Cropland,2020,1.1605
+Temperate Steppe,Agriculture: Cropland,2021,0.9535
+Temperate Steppe,Agriculture: Cropland,2022,1.0038
+Temperate Steppe,Agriculture: Cropland,2023,1.066
+Temperate Steppe,Agriculture: Cropland,2024,1.1031
+Temperate Steppe,Agriculture: Cropland,2025,1.2004
+Temperate Steppe,Agriculture: Cropland,2026,1.1229
+Temperate Steppe Mountains,Agriculture: Cropland,1984,0.847
+Temperate Steppe Mountains,Agriculture: Cropland,1985,0.7496
+Temperate Steppe Mountains,Agriculture: Cropland,1986,0.8518
+Temperate Steppe Mountains,Agriculture: Cropland,1987,0.9663
+Temperate Steppe Mountains,Agriculture: Cropland,1988,0.8492
+Temperate Steppe Mountains,Agriculture: Cropland,1989,0.8909
+Temperate Steppe Mountains,Agriculture: Cropland,1990,0.9299
+Temperate Steppe Mountains,Agriculture: Cropland,1991,0.9187
+Temperate Steppe Mountains,Agriculture: Cropland,1992,0.9061
+Temperate Steppe Mountains,Agriculture: Cropland,1993,1.038
+Temperate Steppe Mountains,Agriculture: Cropland,1994,0.8998
+Temperate Steppe Mountains,Agriculture: Cropland,1995,1.0135
+Temperate Steppe Mountains,Agriculture: Cropland,1996,0.9567
+Temperate Steppe Mountains,Agriculture: Cropland,1997,1.0197
+Temperate Steppe Mountains,Agriculture: Cropland,1998,1.009
+Temperate Steppe Mountains,Agriculture: Cropland,1999,0.9439
+Temperate Steppe Mountains,Agriculture: Cropland,2000,0.9704
+Temperate Steppe Mountains,Agriculture: Cropland,2001,0.8833
+Temperate Steppe Mountains,Agriculture: Cropland,2002,0.8798
+Temperate Steppe Mountains,Agriculture: Cropland,2003,0.88
+Temperate Steppe Mountains,Agriculture: Cropland,2004,1.0769
+Temperate Steppe Mountains,Agriculture: Cropland,2005,1.0526
+Temperate Steppe Mountains,Agriculture: Cropland,2006,0.9972
+Temperate Steppe Mountains,Agriculture: Cropland,2007,0.9442
+Temperate Steppe Mountains,Agriculture: Cropland,2008,0.9728
+Temperate Steppe Mountains,Agriculture: Cropland,2009,1.0791
+Temperate Steppe Mountains,Agriculture: Cropland,2010,1.1183
+Temperate Steppe Mountains,Agriculture: Cropland,2011,1.0909
+Temperate Steppe Mountains,Agriculture: Cropland,2012,1.0435
+Temperate Steppe Mountains,Agriculture: Cropland,2013,1.0725
+Temperate Steppe Mountains,Agriculture: Cropland,2014,1.0575
+Temperate Steppe Mountains,Agriculture: Cropland,2015,1.0391
+Temperate Steppe Mountains,Agriculture: Cropland,2016,1.1664
+Temperate Steppe Mountains,Agriculture: Cropland,2017,1.1346
+Temperate Steppe Mountains,Agriculture: Cropland,2018,1.1512
+Temperate Steppe Mountains,Agriculture: Cropland,2019,1.1888
+Temperate Steppe Mountains,Agriculture: Cropland,2020,1.2934
+Temperate Steppe Mountains,Agriculture: Cropland,2021,0.8094
+Temperate Steppe Mountains,Agriculture: Cropland,2022,1.1244
+Temperate Steppe Mountains,Agriculture: Cropland,2023,1.1391
+Temperate Steppe Mountains,Agriculture: Cropland,2024,1.0751
+Temperate Steppe Mountains,Agriculture: Cropland,2025,1.1989
+Temperate Steppe Mountains,Agriculture: Cropland,2026,1.1281
+Tropical/Subtropical Desert,Agriculture: Cropland,1984,0.9443
+Tropical/Subtropical Desert,Agriculture: Cropland,1985,0.9245
+Tropical/Subtropical Desert,Agriculture: Cropland,1986,0.9271
+Tropical/Subtropical Desert,Agriculture: Cropland,1987,0.9726
+Tropical/Subtropical Desert,Agriculture: Cropland,1988,0.9022
+Tropical/Subtropical Desert,Agriculture: Cropland,1989,0.9113
+Tropical/Subtropical Desert,Agriculture: Cropland,1990,0.9104
+Tropical/Subtropical Desert,Agriculture: Cropland,1991,0.9163
+Tropical/Subtropical Desert,Agriculture: Cropland,1992,0.8713
+Tropical/Subtropical Desert,Agriculture: Cropland,1993,0.9416
+Tropical/Subtropical Desert,Agriculture: Cropland,1994,0.9476
+Tropical/Subtropical Desert,Agriculture: Cropland,1995,0.8729
+Tropical/Subtropical Desert,Agriculture: Cropland,1996,0.9638
+Tropical/Subtropical Desert,Agriculture: Cropland,1997,0.9832
+Tropical/Subtropical Desert,Agriculture: Cropland,1998,0.9693
+Tropical/Subtropical Desert,Agriculture: Cropland,1999,1.0218
+Tropical/Subtropical Desert,Agriculture: Cropland,2000,1.0633
+Tropical/Subtropical Desert,Agriculture: Cropland,2001,1.0233
+Tropical/Subtropical Desert,Agriculture: Cropland,2002,1.0954
+Tropical/Subtropical Desert,Agriculture: Cropland,2003,1.0193
+Tropical/Subtropical Desert,Agriculture: Cropland,2004,1.0889
+Tropical/Subtropical Desert,Agriculture: Cropland,2005,1.037
+Tropical/Subtropical Desert,Agriculture: Cropland,2006,1.0718
+Tropical/Subtropical Desert,Agriculture: Cropland,2007,1.1346
+Tropical/Subtropical Desert,Agriculture: Cropland,2008,1.088
+Tropical/Subtropical Desert,Agriculture: Cropland,2009,1.0925
+Tropical/Subtropical Desert,Agriculture: Cropland,2010,0.9433
+Tropical/Subtropical Desert,Agriculture: Cropland,2011,1.1077
+Tropical/Subtropical Desert,Agriculture: Cropland,2012,0.9398
+Tropical/Subtropical Desert,Agriculture: Cropland,2013,1.1375
+Tropical/Subtropical Desert,Agriculture: Cropland,2014,1.0962
+Tropical/Subtropical Desert,Agriculture: Cropland,2015,0.9429
+Tropical/Subtropical Desert,Agriculture: Cropland,2016,1.012
+Tropical/Subtropical Desert,Agriculture: Cropland,2017,1.0829
+Tropical/Subtropical Desert,Agriculture: Cropland,2018,1.1213
+Tropical/Subtropical Desert,Agriculture: Cropland,2019,0.6089
+Tropical/Subtropical Desert,Agriculture: Cropland,2020,1.041
+Tropical/Subtropical Desert,Agriculture: Cropland,2021,1.0107
+Tropical/Subtropical Desert,Agriculture: Cropland,2022,1.1821
+Tropical/Subtropical Desert,Agriculture: Cropland,2023,1.0374
+Tropical/Subtropical Desert,Agriculture: Cropland,2024,1.0143
+Tropical/Subtropical Desert,Agriculture: Cropland,2025,1.0165
+Tropical/Subtropical Desert,Agriculture: Cropland,2026,1.0127
+Tropical/Subtropical Steppe,Agriculture: Cropland,1984,0.8348
+Tropical/Subtropical Steppe,Agriculture: Cropland,1985,0.8913
+Tropical/Subtropical Steppe,Agriculture: Cropland,1986,0.805
+Tropical/Subtropical Steppe,Agriculture: Cropland,1987,0.9596
+Tropical/Subtropical Steppe,Agriculture: Cropland,1988,0.9029
+Tropical/Subtropical Steppe,Agriculture: Cropland,1989,0.7746
+Tropical/Subtropical Steppe,Agriculture: Cropland,1990,0.9319
+Tropical/Subtropical Steppe,Agriculture: Cropland,1991,0.8796
+Tropical/Subtropical Steppe,Agriculture: Cropland,1992,1.0042
+Tropical/Subtropical Steppe,Agriculture: Cropland,1993,0.9797
+Tropical/Subtropical Steppe,Agriculture: Cropland,1994,0.8674
+Tropical/Subtropical Steppe,Agriculture: Cropland,1995,0.8111
+Tropical/Subtropical Steppe,Agriculture: Cropland,1996,0.9511
+Tropical/Subtropical Steppe,Agriculture: Cropland,1997,0.9883
+Tropical/Subtropical Steppe,Agriculture: Cropland,1998,0.9866
+Tropical/Subtropical Steppe,Agriculture: Cropland,1999,1.0054
+Tropical/Subtropical Steppe,Agriculture: Cropland,2000,0.8742
+Tropical/Subtropical Steppe,Agriculture: Cropland,2001,0.9351
+Tropical/Subtropical Steppe,Agriculture: Cropland,2002,0.933
+Tropical/Subtropical Steppe,Agriculture: Cropland,2003,0.9229
+Tropical/Subtropical Steppe,Agriculture: Cropland,2004,1.127
+Tropical/Subtropical Steppe,Agriculture: Cropland,2005,1.167
+Tropical/Subtropical Steppe,Agriculture: Cropland,2006,1.0266
+Tropical/Subtropical Steppe,Agriculture: Cropland,2007,1.3203
+Tropical/Subtropical Steppe,Agriculture: Cropland,2008,1.0711
+Tropical/Subtropical Steppe,Agriculture: Cropland,2009,1.0434
+Tropical/Subtropical Steppe,Agriculture: Cropland,2010,1.2012
+Tropical/Subtropical Steppe,Agriculture: Cropland,2011,0.903
+Tropical/Subtropical Steppe,Agriculture: Cropland,2012,1.0523
+Tropical/Subtropical Steppe,Agriculture: Cropland,2013,1.022
+Tropical/Subtropical Steppe,Agriculture: Cropland,2014,1.0207
+Tropical/Subtropical Steppe,Agriculture: Cropland,2015,1.0687
+Tropical/Subtropical Steppe,Agriculture: Cropland,2016,1.1412
+Tropical/Subtropical Steppe,Agriculture: Cropland,2017,1.162
+Tropical/Subtropical Steppe,Agriculture: Cropland,2018,1.0406
+Tropical/Subtropical Steppe,Agriculture: Cropland,2019,1.0291
+Tropical/Subtropical Steppe,Agriculture: Cropland,2020,1.017
+Tropical/Subtropical Steppe,Agriculture: Cropland,2021,1.1436
+Tropical/Subtropical Steppe,Agriculture: Cropland,2022,1.0254
+Tropical/Subtropical Steppe,Agriculture: Cropland,2023,1.0361
+Tropical/Subtropical Steppe,Agriculture: Cropland,2024,1.0271
+Tropical/Subtropical Steppe,Agriculture: Cropland,2025,1.0893
+Tropical/Subtropical Steppe,Agriculture: Cropland,2026,1.0711
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,1984,0.7755
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,1985,0.8509
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,1986,0.8418
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,1987,0.8616
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,1988,0.6729
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,1989,0.801
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,1990,0.8557
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,1991,0.8002
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,1992,0.9187
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,1993,0.7694
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,1994,0.9618
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,1995,0.8214
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,1996,0.8971
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,1997,0.9143
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,1998,0.9538
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,1999,0.9371
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2000,0.9522
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2001,0.9594
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2002,0.8925
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2003,0.9627
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2004,1.075
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2005,1.0327
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2006,1.0142
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2007,1.0346
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2008,1.0526
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2009,1.1148
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2010,1.0777
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2011,1.024
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2012,0.9543
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2013,1.1017
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2014,1.1567
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2015,1.1598
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2016,1.2337
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2017,1.2086
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2018,1.2026
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2019,1.1911
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2020,1.2045
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2021,1.1872
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2022,1.175
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2023,1.204
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2024,1.223
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2025,1.2642
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,2026,1.2094
+Warm Continental,Agriculture: Cropland,1984,0.7718
+Warm Continental,Agriculture: Cropland,1985,0.8103
+Warm Continental,Agriculture: Cropland,1986,0.8477
+Warm Continental,Agriculture: Cropland,1987,0.8753
+Warm Continental,Agriculture: Cropland,1988,0.5818
+Warm Continental,Agriculture: Cropland,1989,0.765
+Warm Continental,Agriculture: Cropland,1990,0.8686
+Warm Continental,Agriculture: Cropland,1991,0.8448
+Warm Continental,Agriculture: Cropland,1992,0.7465
+Warm Continental,Agriculture: Cropland,1993,0.6623
+Warm Continental,Agriculture: Cropland,1994,0.9626
+Warm Continental,Agriculture: Cropland,1995,0.8701
+Warm Continental,Agriculture: Cropland,1996,0.8306
+Warm Continental,Agriculture: Cropland,1997,0.9469
+Warm Continental,Agriculture: Cropland,1998,0.9454
+Warm Continental,Agriculture: Cropland,1999,1.0301
+Warm Continental,Agriculture: Cropland,2000,0.9657
+Warm Continental,Agriculture: Cropland,2001,0.9003
+Warm Continental,Agriculture: Cropland,2002,0.9767
+Warm Continental,Agriculture: Cropland,2003,0.9971
+Warm Continental,Agriculture: Cropland,2004,0.9083
+Warm Continental,Agriculture: Cropland,2005,1.029
+Warm Continental,Agriculture: Cropland,2006,1.0163
+Warm Continental,Agriculture: Cropland,2007,0.9278
+Warm Continental,Agriculture: Cropland,2008,1.0652
+Warm Continental,Agriculture: Cropland,2009,1.0528
+Warm Continental,Agriculture: Cropland,2010,1.1829
+Warm Continental,Agriculture: Cropland,2011,1.1091
+Warm Continental,Agriculture: Cropland,2012,1.0931
+Warm Continental,Agriculture: Cropland,2013,1.053
+Warm Continental,Agriculture: Cropland,2014,1.0941
+Warm Continental,Agriculture: Cropland,2015,1.2047
+Warm Continental,Agriculture: Cropland,2016,1.2476
+Warm Continental,Agriculture: Cropland,2017,1.2016
+Warm Continental,Agriculture: Cropland,2018,1.2364
+Warm Continental,Agriculture: Cropland,2019,1.1118
+Warm Continental,Agriculture: Cropland,2020,1.2247
+Warm Continental,Agriculture: Cropland,2021,1.2734
+Warm Continental,Agriculture: Cropland,2022,1.2871
+Warm Continental,Agriculture: Cropland,2023,1.2836
+Warm Continental,Agriculture: Cropland,2024,1.223
+Warm Continental,Agriculture: Cropland,2025,1.3108
+Warm Continental,Agriculture: Cropland,2026,1.24
+Warm Continental Mountains,Agriculture: Cropland,1984,0.8144
+Warm Continental Mountains,Agriculture: Cropland,1985,0.8537
+Warm Continental Mountains,Agriculture: Cropland,1986,0.8482
+Warm Continental Mountains,Agriculture: Cropland,1987,0.9306
+Warm Continental Mountains,Agriculture: Cropland,1988,0.8375
+Warm Continental Mountains,Agriculture: Cropland,1989,0.8863
+Warm Continental Mountains,Agriculture: Cropland,1990,0.8822
+Warm Continental Mountains,Agriculture: Cropland,1991,0.8678
+Warm Continental Mountains,Agriculture: Cropland,1992,0.9067
+Warm Continental Mountains,Agriculture: Cropland,1993,0.8836
+Warm Continental Mountains,Agriculture: Cropland,1994,0.9456
+Warm Continental Mountains,Agriculture: Cropland,1995,0.838
+Warm Continental Mountains,Agriculture: Cropland,1996,0.9078
+Warm Continental Mountains,Agriculture: Cropland,1997,0.91
+Warm Continental Mountains,Agriculture: Cropland,1998,0.9508
+Warm Continental Mountains,Agriculture: Cropland,1999,1.0132
+Warm Continental Mountains,Agriculture: Cropland,2000,0.8329
+Warm Continental Mountains,Agriculture: Cropland,2001,1.0033
+Warm Continental Mountains,Agriculture: Cropland,2002,0.8318
+Warm Continental Mountains,Agriculture: Cropland,2003,1.0435
+Warm Continental Mountains,Agriculture: Cropland,2004,1.0783
+Warm Continental Mountains,Agriculture: Cropland,2005,1.0764
+Warm Continental Mountains,Agriculture: Cropland,2006,1.0534
+Warm Continental Mountains,Agriculture: Cropland,2007,1.0626
+Warm Continental Mountains,Agriculture: Cropland,2008,1.1733
+Warm Continental Mountains,Agriculture: Cropland,2009,1.0248
+Warm Continental Mountains,Agriculture: Cropland,2010,1.1276
+Warm Continental Mountains,Agriculture: Cropland,2011,1.0011
+Warm Continental Mountains,Agriculture: Cropland,2012,1.0614
+Warm Continental Mountains,Agriculture: Cropland,2013,0.9757
+Warm Continental Mountains,Agriculture: Cropland,2014,1.1122
+Warm Continental Mountains,Agriculture: Cropland,2015,1.1308
+Warm Continental Mountains,Agriculture: Cropland,2016,1.1092
+Warm Continental Mountains,Agriculture: Cropland,2017,1.0801
+Warm Continental Mountains,Agriculture: Cropland,2018,1.1474
+Warm Continental Mountains,Agriculture: Cropland,2019,1.083
+Warm Continental Mountains,Agriculture: Cropland,2020,1.1312
+Warm Continental Mountains,Agriculture: Cropland,2021,1.1386
+Warm Continental Mountains,Agriculture: Cropland,2022,1.0608
+Warm Continental Mountains,Agriculture: Cropland,2023,1.1811
+Warm Continental Mountains,Agriculture: Cropland,2024,1.1502
+Warm Continental Mountains,Agriculture: Cropland,2025,1.0488
+Warm Continental Mountains,Agriculture: Cropland,2026,1.113
+Hot Continental,Agriculture: Pasture,1984,1.0328
+Hot Continental,Agriculture: Pasture,1985,1.0323
+Hot Continental,Agriculture: Pasture,1986,1.0051
+Hot Continental,Agriculture: Pasture,1987,0.9672
+Hot Continental,Agriculture: Pasture,1988,0.7077
+Hot Continental,Agriculture: Pasture,1989,0.9124
+Hot Continental,Agriculture: Pasture,1990,0.9681
+Hot Continental,Agriculture: Pasture,1991,0.963
+Hot Continental,Agriculture: Pasture,1992,0.9741
+Hot Continental,Agriculture: Pasture,1993,0.9512
+Hot Continental,Agriculture: Pasture,1994,1.0061
+Hot Continental,Agriculture: Pasture,1995,1.007
+Hot Continental,Agriculture: Pasture,1996,0.9768
+Hot Continental,Agriculture: Pasture,1997,0.9848
+Hot Continental,Agriculture: Pasture,1998,1.0326
+Hot Continental,Agriculture: Pasture,1999,0.9613
+Hot Continental,Agriculture: Pasture,2000,1.0821
+Hot Continental,Agriculture: Pasture,2001,1.0039
+Hot Continental,Agriculture: Pasture,2002,0.958
+Hot Continental,Agriculture: Pasture,2003,1.0316
+Hot Continental,Agriculture: Pasture,2004,1.0881
+Hot Continental,Agriculture: Pasture,2005,1.0098
+Hot Continental,Agriculture: Pasture,2006,1.0748
+Hot Continental,Agriculture: Pasture,2007,0.8396
+Hot Continental,Agriculture: Pasture,2008,0.9365
+Hot Continental,Agriculture: Pasture,2009,1.0019
+Hot Continental,Agriculture: Pasture,2010,0.9951
+Hot Continental,Agriculture: Pasture,2011,0.9863
+Hot Continental,Agriculture: Pasture,2012,0.8672
+Hot Continental,Agriculture: Pasture,2013,0.9648
+Hot Continental,Agriculture: Pasture,2014,1.0303
+Hot Continental,Agriculture: Pasture,2015,1.0107
+Hot Continental,Agriculture: Pasture,2016,1.0832
+Hot Continental,Agriculture: Pasture,2017,1.0471
+Hot Continental,Agriculture: Pasture,2018,0.9979
+Hot Continental,Agriculture: Pasture,2020,1.1677
+Hot Continental,Agriculture: Pasture,2021,1.1702
+Hot Continental,Agriculture: Pasture,2022,1.1176
+Hot Continental,Agriculture: Pasture,2023,1.0859
+Hot Continental,Agriculture: Pasture,2024,1.194
+Hot Continental,Agriculture: Pasture,2025,1.1495
+Hot Continental,Agriculture: Pasture,2026,1.1126
+Hot Continental Mountains,Agriculture: Pasture,1984,0.946
+Hot Continental Mountains,Agriculture: Pasture,1985,1.0072
+Hot Continental Mountains,Agriculture: Pasture,1986,0.8731
+Hot Continental Mountains,Agriculture: Pasture,1987,0.899
+Hot Continental Mountains,Agriculture: Pasture,1988,0.8123
+Hot Continental Mountains,Agriculture: Pasture,1989,0.9676
+Hot Continental Mountains,Agriculture: Pasture,1990,1.0301
+Hot Continental Mountains,Agriculture: Pasture,1991,0.8606
+Hot Continental Mountains,Agriculture: Pasture,1992,1.0309
+Hot Continental Mountains,Agriculture: Pasture,1993,0.9466
+Hot Continental Mountains,Agriculture: Pasture,1994,0.9831
+Hot Continental Mountains,Agriculture: Pasture,1995,0.9683
+Hot Continental Mountains,Agriculture: Pasture,1996,1.0316
+Hot Continental Mountains,Agriculture: Pasture,1997,0.9273
+Hot Continental Mountains,Agriculture: Pasture,1998,0.9614
+Hot Continental Mountains,Agriculture: Pasture,1999,0.7999
+Hot Continental Mountains,Agriculture: Pasture,2000,1.0991
+Hot Continental Mountains,Agriculture: Pasture,2001,0.9532
+Hot Continental Mountains,Agriculture: Pasture,2002,0.8587
+Hot Continental Mountains,Agriculture: Pasture,2003,1.1505
+Hot Continental Mountains,Agriculture: Pasture,2004,1.1633
+Hot Continental Mountains,Agriculture: Pasture,2005,1.0876
+Hot Continental Mountains,Agriculture: Pasture,2006,1.1933
+Hot Continental Mountains,Agriculture: Pasture,2007,0.9359
+Hot Continental Mountains,Agriculture: Pasture,2008,1.0325
+Hot Continental Mountains,Agriculture: Pasture,2009,1.0553
+Hot Continental Mountains,Agriculture: Pasture,2010,0.8873
+Hot Continental Mountains,Agriculture: Pasture,2011,1.0293
+Hot Continental Mountains,Agriculture: Pasture,2012,1.0148
+Hot Continental Mountains,Agriculture: Pasture,2013,1.0933
+Hot Continental Mountains,Agriculture: Pasture,2014,1.0704
+Hot Continental Mountains,Agriculture: Pasture,2015,1.0573
+Hot Continental Mountains,Agriculture: Pasture,2016,1.0898
+Hot Continental Mountains,Agriculture: Pasture,2017,1.0784
+Hot Continental Mountains,Agriculture: Pasture,2018,1.0509
+Hot Continental Mountains,Agriculture: Pasture,2026,1.073
+Marine,Agriculture: Pasture,1984,1.0248
+Marine,Agriculture: Pasture,1985,0.9769
+Marine,Agriculture: Pasture,1986,1.0125
+Marine,Agriculture: Pasture,1987,0.9458
+Marine,Agriculture: Pasture,1988,0.9666
+Marine,Agriculture: Pasture,1989,0.9882
+Marine,Agriculture: Pasture,1990,0.9748
+Marine,Agriculture: Pasture,1991,0.9634
+Marine,Agriculture: Pasture,1992,0.9469
+Marine,Agriculture: Pasture,1993,1.0505
+Marine,Agriculture: Pasture,1994,1.0273
+Marine,Agriculture: Pasture,1995,1.0568
+Marine,Agriculture: Pasture,1996,1.0736
+Marine,Agriculture: Pasture,1997,1.056
+Marine,Agriculture: Pasture,1998,1.1618
+Marine,Agriculture: Pasture,1999,1.0265
+Marine,Agriculture: Pasture,2000,0.9535
+Marine,Agriculture: Pasture,2001,0.981
+Marine,Agriculture: Pasture,2002,1.0867
+Marine,Agriculture: Pasture,2003,1.0547
+Marine,Agriculture: Pasture,2004,1.091
+Marine,Agriculture: Pasture,2005,1.0376
+Marine,Agriculture: Pasture,2006,1.025
+Marine,Agriculture: Pasture,2007,1.0023
+Marine,Agriculture: Pasture,2008,0.9729
+Marine,Agriculture: Pasture,2009,1.1026
+Marine,Agriculture: Pasture,2010,0.974
+Marine,Agriculture: Pasture,2011,0.9693
+Marine,Agriculture: Pasture,2012,0.9291
+Marine,Agriculture: Pasture,2013,0.9253
+Marine,Agriculture: Pasture,2014,0.934
+Marine,Agriculture: Pasture,2015,0.8569
+Marine,Agriculture: Pasture,2016,1.0274
+Marine,Agriculture: Pasture,2017,0.9318
+Marine,Agriculture: Pasture,2018,0.9174
+Marine,Agriculture: Pasture,2026,0.9589
+Marine Mountains,Agriculture: Pasture,1984,0.9844
+Marine Mountains,Agriculture: Pasture,1985,1.0009
+Marine Mountains,Agriculture: Pasture,1986,1.0622
+Marine Mountains,Agriculture: Pasture,1987,1.0249
+Marine Mountains,Agriculture: Pasture,1988,0.9913
+Marine Mountains,Agriculture: Pasture,1989,0.9861
+Marine Mountains,Agriculture: Pasture,1990,0.9749
+Marine Mountains,Agriculture: Pasture,1991,0.9565
+Marine Mountains,Agriculture: Pasture,1992,0.9162
+Marine Mountains,Agriculture: Pasture,1993,0.9659
+Marine Mountains,Agriculture: Pasture,1994,0.9408
+Marine Mountains,Agriculture: Pasture,1995,1.0278
+Marine Mountains,Agriculture: Pasture,1996,0.9947
+Marine Mountains,Agriculture: Pasture,1997,1.0128
+Marine Mountains,Agriculture: Pasture,1998,1.089
+Marine Mountains,Agriculture: Pasture,1999,0.9354
+Marine Mountains,Agriculture: Pasture,2000,0.9395
+Marine Mountains,Agriculture: Pasture,2001,0.9156
+Marine Mountains,Agriculture: Pasture,2002,1.0034
+Marine Mountains,Agriculture: Pasture,2003,1.0207
+Marine Mountains,Agriculture: Pasture,2004,1.0631
+Marine Mountains,Agriculture: Pasture,2005,1.0191
+Marine Mountains,Agriculture: Pasture,2006,1.0673
+Marine Mountains,Agriculture: Pasture,2007,0.9923
+Marine Mountains,Agriculture: Pasture,2008,0.9709
+Marine Mountains,Agriculture: Pasture,2009,1.1007
+Marine Mountains,Agriculture: Pasture,2010,0.9954
+Marine Mountains,Agriculture: Pasture,2011,1.0459
+Marine Mountains,Agriculture: Pasture,2012,0.9658
+Marine Mountains,Agriculture: Pasture,2013,0.9861
+Marine Mountains,Agriculture: Pasture,2014,0.9789
+Marine Mountains,Agriculture: Pasture,2015,1.0432
+Marine Mountains,Agriculture: Pasture,2016,1.1697
+Marine Mountains,Agriculture: Pasture,2017,0.9619
+Marine Mountains,Agriculture: Pasture,2018,0.8811
+Marine Mountains,Agriculture: Pasture,2026,1.0042
+Mediterranean,Agriculture: Pasture,1984,0.9913
+Mediterranean,Agriculture: Pasture,1985,1.0189
+Mediterranean,Agriculture: Pasture,1986,1.0296
+Mediterranean,Agriculture: Pasture,1987,0.9945
+Mediterranean,Agriculture: Pasture,1988,0.8498
+Mediterranean,Agriculture: Pasture,1989,0.9384
+Mediterranean,Agriculture: Pasture,1990,0.9752
+Mediterranean,Agriculture: Pasture,1991,0.9833
+Mediterranean,Agriculture: Pasture,1992,1.0056
+Mediterranean,Agriculture: Pasture,1993,0.9986
+Mediterranean,Agriculture: Pasture,1994,1.0247
+Mediterranean,Agriculture: Pasture,1995,1.052
+Mediterranean,Agriculture: Pasture,1996,1.0078
+Mediterranean,Agriculture: Pasture,1997,1.0069
+Mediterranean,Agriculture: Pasture,1998,1.0409
+Mediterranean,Agriculture: Pasture,1999,1.0309
+Mediterranean,Agriculture: Pasture,2000,1.0282
+Mediterranean,Agriculture: Pasture,2001,0.9997
+Mediterranean,Agriculture: Pasture,2002,0.9344
+Mediterranean,Agriculture: Pasture,2003,0.997
+Mediterranean,Agriculture: Pasture,2004,1.0557
+Mediterranean,Agriculture: Pasture,2005,1.0224
+Mediterranean,Agriculture: Pasture,2006,0.9925
+Mediterranean,Agriculture: Pasture,2007,0.9714
+Mediterranean,Agriculture: Pasture,2008,0.9876
+Mediterranean,Agriculture: Pasture,2009,1.0271
+Mediterranean,Agriculture: Pasture,2010,1.0195
+Mediterranean,Agriculture: Pasture,2011,1.018
+Mediterranean,Agriculture: Pasture,2012,0.9074
+Mediterranean,Agriculture: Pasture,2013,0.987
+Mediterranean,Agriculture: Pasture,2014,1.0259
+Mediterranean,Agriculture: Pasture,2015,1.0352
+Mediterranean,Agriculture: Pasture,2016,1.0689
+Mediterranean,Agriculture: Pasture,2017,1.0301
+Mediterranean,Agriculture: Pasture,2018,0.9956
+Mediterranean,Agriculture: Pasture,2020,1.0385
+Mediterranean,Agriculture: Pasture,2021,0.9369
+Mediterranean,Agriculture: Pasture,2022,1.0003
+Mediterranean,Agriculture: Pasture,2023,0.9457
+Mediterranean,Agriculture: Pasture,2024,1.0456
+Mediterranean,Agriculture: Pasture,2025,1.0505
+Mediterranean,Agriculture: Pasture,2026,1.0124
+Mediterranean Mountains,Agriculture: Pasture,1984,0.9033
+Mediterranean Mountains,Agriculture: Pasture,1985,0.882
+Mediterranean Mountains,Agriculture: Pasture,1986,0.9083
+Mediterranean Mountains,Agriculture: Pasture,1987,0.9232
+Mediterranean Mountains,Agriculture: Pasture,1988,0.878
+Mediterranean Mountains,Agriculture: Pasture,1989,0.9182
+Mediterranean Mountains,Agriculture: Pasture,1990,0.91
+Mediterranean Mountains,Agriculture: Pasture,1991,0.925
+Mediterranean Mountains,Agriculture: Pasture,1992,0.8828
+Mediterranean Mountains,Agriculture: Pasture,1993,0.9997
+Mediterranean Mountains,Agriculture: Pasture,1994,0.9669
+Mediterranean Mountains,Agriculture: Pasture,1995,0.9786
+Mediterranean Mountains,Agriculture: Pasture,1996,1.0264
+Mediterranean Mountains,Agriculture: Pasture,1997,1.0667
+Mediterranean Mountains,Agriculture: Pasture,1998,1.1501
+Mediterranean Mountains,Agriculture: Pasture,1999,0.9694
+Mediterranean Mountains,Agriculture: Pasture,2000,1.0231
+Mediterranean Mountains,Agriculture: Pasture,2001,0.8643
+Mediterranean Mountains,Agriculture: Pasture,2002,0.9926
+Mediterranean Mountains,Agriculture: Pasture,2003,1.0589
+Mediterranean Mountains,Agriculture: Pasture,2004,1.0572
+Mediterranean Mountains,Agriculture: Pasture,2005,1.0164
+Mediterranean Mountains,Agriculture: Pasture,2006,0.9932
+Mediterranean Mountains,Agriculture: Pasture,2007,0.9909
+Mediterranean Mountains,Agriculture: Pasture,2008,1.0169
+Mediterranean Mountains,Agriculture: Pasture,2009,1.0668
+Mediterranean Mountains,Agriculture: Pasture,2010,0.9574
+Mediterranean Mountains,Agriculture: Pasture,2011,1.1152
+Mediterranean Mountains,Agriculture: Pasture,2012,1.0512
+Mediterranean Mountains,Agriculture: Pasture,2013,1.1647
+Mediterranean Mountains,Agriculture: Pasture,2014,1.0656
+Mediterranean Mountains,Agriculture: Pasture,2015,1.035
+Mediterranean Mountains,Agriculture: Pasture,2016,1.2096
+Mediterranean Mountains,Agriculture: Pasture,2017,1.0151
+Mediterranean Mountains,Agriculture: Pasture,2018,0.9206
+Mediterranean Mountains,Agriculture: Pasture,2026,1.0485
+Prairie,Agriculture: Pasture,1984,0.9998
+Prairie,Agriculture: Pasture,1985,1.1126
+Prairie,Agriculture: Pasture,1986,1.1169
+Prairie,Agriculture: Pasture,1987,1.0054
+Prairie,Agriculture: Pasture,1988,0.7433
+Prairie,Agriculture: Pasture,1989,0.8812
+Prairie,Agriculture: Pasture,1990,0.9703
+Prairie,Agriculture: Pasture,1991,0.9577
+Prairie,Agriculture: Pasture,1992,1.0479
+Prairie,Agriculture: Pasture,1993,0.9256
+Prairie,Agriculture: Pasture,1994,1.001
+Prairie,Agriculture: Pasture,1995,1.0437
+Prairie,Agriculture: Pasture,1996,0.9944
+Prairie,Agriculture: Pasture,1997,0.9769
+Prairie,Agriculture: Pasture,1998,0.9877
+Prairie,Agriculture: Pasture,1999,1.0554
+Prairie,Agriculture: Pasture,2000,0.9734
+Prairie,Agriculture: Pasture,2001,0.955
+Prairie,Agriculture: Pasture,2002,0.9389
+Prairie,Agriculture: Pasture,2003,0.9764
+Prairie,Agriculture: Pasture,2004,1.0508
+Prairie,Agriculture: Pasture,2005,0.9952
+Prairie,Agriculture: Pasture,2006,0.8679
+Prairie,Agriculture: Pasture,2007,1.0334
+Prairie,Agriculture: Pasture,2008,1.082
+Prairie,Agriculture: Pasture,2009,1.0735
+Prairie,Agriculture: Pasture,2010,1.0462
+Prairie,Agriculture: Pasture,2011,0.9511
+Prairie,Agriculture: Pasture,2012,0.8014
+Prairie,Agriculture: Pasture,2013,0.9843
+Prairie,Agriculture: Pasture,2014,1.0196
+Prairie,Agriculture: Pasture,2015,1.0768
+Prairie,Agriculture: Pasture,2016,1.1014
+Prairie,Agriculture: Pasture,2017,1.0458
+Prairie,Agriculture: Pasture,2018,0.9679
+Prairie,Agriculture: Pasture,2020,1.1355
+Prairie,Agriculture: Pasture,2021,1.0026
+Prairie,Agriculture: Pasture,2022,1.0663
+Prairie,Agriculture: Pasture,2023,1.0344
+Prairie,Agriculture: Pasture,2024,1.2109
+Prairie,Agriculture: Pasture,2025,1.2534
+Prairie,Agriculture: Pasture,2026,1.0909
+Savanna,Agriculture: Pasture,1984,0.9913
+Savanna,Agriculture: Pasture,1985,1.0189
+Savanna,Agriculture: Pasture,1986,1.0296
+Savanna,Agriculture: Pasture,1987,0.9945
+Savanna,Agriculture: Pasture,1988,0.8498
+Savanna,Agriculture: Pasture,1989,0.9384
+Savanna,Agriculture: Pasture,1990,0.9752
+Savanna,Agriculture: Pasture,1991,0.9833
+Savanna,Agriculture: Pasture,1992,1.0056
+Savanna,Agriculture: Pasture,1993,0.9986
+Savanna,Agriculture: Pasture,1994,1.0247
+Savanna,Agriculture: Pasture,1995,1.052
+Savanna,Agriculture: Pasture,1996,1.0078
+Savanna,Agriculture: Pasture,1997,1.0069
+Savanna,Agriculture: Pasture,1998,1.0409
+Savanna,Agriculture: Pasture,1999,1.0309
+Savanna,Agriculture: Pasture,2000,1.0282
+Savanna,Agriculture: Pasture,2001,0.9997
+Savanna,Agriculture: Pasture,2002,0.9344
+Savanna,Agriculture: Pasture,2003,0.997
+Savanna,Agriculture: Pasture,2004,1.0557
+Savanna,Agriculture: Pasture,2005,1.0224
+Savanna,Agriculture: Pasture,2006,0.9925
+Savanna,Agriculture: Pasture,2007,0.9714
+Savanna,Agriculture: Pasture,2008,0.9876
+Savanna,Agriculture: Pasture,2009,1.0271
+Savanna,Agriculture: Pasture,2010,1.0195
+Savanna,Agriculture: Pasture,2011,1.018
+Savanna,Agriculture: Pasture,2012,0.9074
+Savanna,Agriculture: Pasture,2013,0.987
+Savanna,Agriculture: Pasture,2014,1.0259
+Savanna,Agriculture: Pasture,2015,1.0352
+Savanna,Agriculture: Pasture,2016,1.0689
+Savanna,Agriculture: Pasture,2017,1.0301
+Savanna,Agriculture: Pasture,2018,0.9956
+Savanna,Agriculture: Pasture,2020,1.0385
+Savanna,Agriculture: Pasture,2021,0.9369
+Savanna,Agriculture: Pasture,2022,1.0003
+Savanna,Agriculture: Pasture,2023,0.9457
+Savanna,Agriculture: Pasture,2024,1.0456
+Savanna,Agriculture: Pasture,2025,1.0505
+Savanna,Agriculture: Pasture,2026,1.0124
+Subtropical,Agriculture: Pasture,1984,0.9341
+Subtropical,Agriculture: Pasture,1985,1.0652
+Subtropical,Agriculture: Pasture,1986,0.9582
+Subtropical,Agriculture: Pasture,1987,0.9547
+Subtropical,Agriculture: Pasture,1988,0.8736
+Subtropical,Agriculture: Pasture,1989,0.9936
+Subtropical,Agriculture: Pasture,1990,0.7714
+Subtropical,Agriculture: Pasture,1991,0.9547
+Subtropical,Agriculture: Pasture,1992,0.9715
+Subtropical,Agriculture: Pasture,1993,0.9397
+Subtropical,Agriculture: Pasture,1994,1.0711
+Subtropical,Agriculture: Pasture,1995,0.9539
+Subtropical,Agriculture: Pasture,1996,1.0479
+Subtropical,Agriculture: Pasture,1997,0.9888
+Subtropical,Agriculture: Pasture,1998,0.9458
+Subtropical,Agriculture: Pasture,1999,0.9315
+Subtropical,Agriculture: Pasture,2000,0.9543
+Subtropical,Agriculture: Pasture,2001,1.0514
+Subtropical,Agriculture: Pasture,2002,0.9576
+Subtropical,Agriculture: Pasture,2003,1.1441
+Subtropical,Agriculture: Pasture,2004,1.1548
+Subtropical,Agriculture: Pasture,2005,1.1179
+Subtropical,Agriculture: Pasture,2006,0.91
+Subtropical,Agriculture: Pasture,2007,0.856
+Subtropical,Agriculture: Pasture,2008,1.0379
+Subtropical,Agriculture: Pasture,2009,1.087
+Subtropical,Agriculture: Pasture,2010,0.9674
+Subtropical,Agriculture: Pasture,2011,0.9912
+Subtropical,Agriculture: Pasture,2012,1.0256
+Subtropical,Agriculture: Pasture,2013,1.0986
+Subtropical,Agriculture: Pasture,2014,1.0952
+Subtropical,Agriculture: Pasture,2015,1.1202
+Subtropical,Agriculture: Pasture,2016,1.0184
+Subtropical,Agriculture: Pasture,2017,1.0247
+Subtropical,Agriculture: Pasture,2018,1.0615
+Subtropical,Agriculture: Pasture,2020,1.1296
+Subtropical,Agriculture: Pasture,2021,0.9645
+Subtropical,Agriculture: Pasture,2022,0.927
+Subtropical,Agriculture: Pasture,2023,0.8825
+Subtropical,Agriculture: Pasture,2024,0.8504
+Subtropical,Agriculture: Pasture,2025,1.1026
+Subtropical,Agriculture: Pasture,2026,0.9957
+Subtropical Mountains,Agriculture: Pasture,1984,0.9493
+Subtropical Mountains,Agriculture: Pasture,1985,1.1185
+Subtropical Mountains,Agriculture: Pasture,1986,1.0003
+Subtropical Mountains,Agriculture: Pasture,1987,1.0121
+Subtropical Mountains,Agriculture: Pasture,1988,0.8279
+Subtropical Mountains,Agriculture: Pasture,1989,1.1585
+Subtropical Mountains,Agriculture: Pasture,1990,0.863
+Subtropical Mountains,Agriculture: Pasture,1991,0.9901
+Subtropical Mountains,Agriculture: Pasture,1992,1.1165
+Subtropical Mountains,Agriculture: Pasture,1993,1.0716
+Subtropical Mountains,Agriculture: Pasture,1994,1.1447
+Subtropical Mountains,Agriculture: Pasture,1995,0.9614
+Subtropical Mountains,Agriculture: Pasture,1996,1.0413
+Subtropical Mountains,Agriculture: Pasture,1997,1.0973
+Subtropical Mountains,Agriculture: Pasture,1998,0.8006
+Subtropical Mountains,Agriculture: Pasture,1999,0.9902
+Subtropical Mountains,Agriculture: Pasture,2000,1.068
+Subtropical Mountains,Agriculture: Pasture,2001,0.9687
+Subtropical Mountains,Agriculture: Pasture,2002,1.1477
+Subtropical Mountains,Agriculture: Pasture,2003,0.9654
+Subtropical Mountains,Agriculture: Pasture,2004,0.9646
+Subtropical Mountains,Agriculture: Pasture,2005,0.8504
+Subtropical Mountains,Agriculture: Pasture,2006,0.7241
+Subtropical Mountains,Agriculture: Pasture,2007,1.2233
+Subtropical Mountains,Agriculture: Pasture,2011,0.5659
+Subtropical Mountains,Agriculture: Pasture,2012,0.8285
+Subtropical Mountains,Agriculture: Pasture,2013,0.9299
+Subtropical Mountains,Agriculture: Pasture,2014,1.1091
+Subtropical Mountains,Agriculture: Pasture,2015,1.1576
+Subtropical Mountains,Agriculture: Pasture,2016,1.1204
+Subtropical Mountains,Agriculture: Pasture,2017,1.2246
+Subtropical Mountains,Agriculture: Pasture,2018,0.9401
+Subtropical Mountains,Agriculture: Pasture,2026,1.095
+Temperate Desert,Agriculture: Pasture,1984,0.8503
+Temperate Desert,Agriculture: Pasture,1985,0.8756
+Temperate Desert,Agriculture: Pasture,1986,0.9002
+Temperate Desert,Agriculture: Pasture,1987,0.9153
+Temperate Desert,Agriculture: Pasture,1988,0.9048
+Temperate Desert,Agriculture: Pasture,1989,0.9342
+Temperate Desert,Agriculture: Pasture,1990,0.9564
+Temperate Desert,Agriculture: Pasture,1991,0.9357
+Temperate Desert,Agriculture: Pasture,1992,0.9443
+Temperate Desert,Agriculture: Pasture,1993,0.9862
+Temperate Desert,Agriculture: Pasture,1994,0.969
+Temperate Desert,Agriculture: Pasture,1995,1.0345
+Temperate Desert,Agriculture: Pasture,1996,1.0006
+Temperate Desert,Agriculture: Pasture,1997,1.0337
+Temperate Desert,Agriculture: Pasture,1998,1.0748
+Temperate Desert,Agriculture: Pasture,1999,1.022
+Temperate Desert,Agriculture: Pasture,2000,1.022
+Temperate Desert,Agriculture: Pasture,2001,0.9933
+Temperate Desert,Agriculture: Pasture,2002,0.9811
+Temperate Desert,Agriculture: Pasture,2003,1.0053
+Temperate Desert,Agriculture: Pasture,2004,1.0278
+Temperate Desert,Agriculture: Pasture,2005,1.0565
+Temperate Desert,Agriculture: Pasture,2006,1.0432
+Temperate Desert,Agriculture: Pasture,2007,1.0359
+Temperate Desert,Agriculture: Pasture,2008,1.036
+Temperate Desert,Agriculture: Pasture,2009,1.048
+Temperate Desert,Agriculture: Pasture,2010,1.023
+Temperate Desert,Agriculture: Pasture,2011,1.0436
+Temperate Desert,Agriculture: Pasture,2012,1.0002
+Temperate Desert,Agriculture: Pasture,2013,1.0009
+Temperate Desert,Agriculture: Pasture,2014,1.0045
+Temperate Desert,Agriculture: Pasture,2015,1.0456
+Temperate Desert,Agriculture: Pasture,2016,1.0916
+Temperate Desert,Agriculture: Pasture,2017,1.0285
+Temperate Desert,Agriculture: Pasture,2018,1.0258
+Temperate Desert,Agriculture: Pasture,2026,1.0486
+Temperate Desert Mountains,Agriculture: Pasture,1984,0.9327
+Temperate Desert Mountains,Agriculture: Pasture,1985,0.9347
+Temperate Desert Mountains,Agriculture: Pasture,1986,0.9459
+Temperate Desert Mountains,Agriculture: Pasture,1987,0.9655
+Temperate Desert Mountains,Agriculture: Pasture,1988,0.9318
+Temperate Desert Mountains,Agriculture: Pasture,1989,0.9158
+Temperate Desert Mountains,Agriculture: Pasture,1990,0.8964
+Temperate Desert Mountains,Agriculture: Pasture,1991,0.9171
+Temperate Desert Mountains,Agriculture: Pasture,1992,0.9427
+Temperate Desert Mountains,Agriculture: Pasture,1993,1.0246
+Temperate Desert Mountains,Agriculture: Pasture,1994,1.0181
+Temperate Desert Mountains,Agriculture: Pasture,1995,1.0437
+Temperate Desert Mountains,Agriculture: Pasture,1996,1.0264
+Temperate Desert Mountains,Agriculture: Pasture,1997,1.0454
+Temperate Desert Mountains,Agriculture: Pasture,1998,1.0668
+Temperate Desert Mountains,Agriculture: Pasture,1999,1.0637
+Temperate Desert Mountains,Agriculture: Pasture,2000,0.9918
+Temperate Desert Mountains,Agriculture: Pasture,2001,0.9864
+Temperate Desert Mountains,Agriculture: Pasture,2002,0.8929
+Temperate Desert Mountains,Agriculture: Pasture,2003,0.9815
+Temperate Desert Mountains,Agriculture: Pasture,2004,0.993
+Temperate Desert Mountains,Agriculture: Pasture,2005,1.0705
+Temperate Desert Mountains,Agriculture: Pasture,2006,1.0442
+Temperate Desert Mountains,Agriculture: Pasture,2007,1.0285
+Temperate Desert Mountains,Agriculture: Pasture,2008,1.0736
+Temperate Desert Mountains,Agriculture: Pasture,2009,1.0979
+Temperate Desert Mountains,Agriculture: Pasture,2010,0.9865
+Temperate Desert Mountains,Agriculture: Pasture,2011,1.0126
+Temperate Desert Mountains,Agriculture: Pasture,2012,0.9917
+Temperate Desert Mountains,Agriculture: Pasture,2013,0.9786
+Temperate Desert Mountains,Agriculture: Pasture,2014,0.9503
+Temperate Desert Mountains,Agriculture: Pasture,2015,1.0672
+Temperate Desert Mountains,Agriculture: Pasture,2016,1.0142
+Temperate Desert Mountains,Agriculture: Pasture,2017,1.0062
+Temperate Desert Mountains,Agriculture: Pasture,2018,1.0936
+Temperate Desert Mountains,Agriculture: Pasture,2026,1.038
+Temperate Steppe,Agriculture: Pasture,1984,0.9819
+Temperate Steppe,Agriculture: Pasture,1985,1.011
+Temperate Steppe,Agriculture: Pasture,1986,1.0802
+Temperate Steppe,Agriculture: Pasture,1987,1.0664
+Temperate Steppe,Agriculture: Pasture,1988,1.0345
+Temperate Steppe,Agriculture: Pasture,1989,0.9544
+Temperate Steppe,Agriculture: Pasture,1990,1.004
+Temperate Steppe,Agriculture: Pasture,1991,1.0345
+Temperate Steppe,Agriculture: Pasture,1992,1.0685
+Temperate Steppe,Agriculture: Pasture,1993,1.1076
+Temperate Steppe,Agriculture: Pasture,1994,1.0795
+Temperate Steppe,Agriculture: Pasture,1995,1.1385
+Temperate Steppe,Agriculture: Pasture,1996,1.036
+Temperate Steppe,Agriculture: Pasture,1997,1.0124
+Temperate Steppe,Agriculture: Pasture,1998,1.0864
+Temperate Steppe,Agriculture: Pasture,1999,1.1592
+Temperate Steppe,Agriculture: Pasture,2000,1.0244
+Temperate Steppe,Agriculture: Pasture,2001,1.0501
+Temperate Steppe,Agriculture: Pasture,2002,0.858
+Temperate Steppe,Agriculture: Pasture,2003,0.9599
+Temperate Steppe,Agriculture: Pasture,2004,1.0432
+Temperate Steppe,Agriculture: Pasture,2005,1.0519
+Temperate Steppe,Agriculture: Pasture,2006,0.9246
+Temperate Steppe,Agriculture: Pasture,2007,1.0721
+Temperate Steppe,Agriculture: Pasture,2008,0.9545
+Temperate Steppe,Agriculture: Pasture,2009,1.0314
+Temperate Steppe,Agriculture: Pasture,2010,1.0764
+Temperate Steppe,Agriculture: Pasture,2011,1.0665
+Temperate Steppe,Agriculture: Pasture,2012,0.8801
+Temperate Steppe,Agriculture: Pasture,2013,0.9811
+Temperate Steppe,Agriculture: Pasture,2014,1.0218
+Temperate Steppe,Agriculture: Pasture,2015,1.0121
+Temperate Steppe,Agriculture: Pasture,2016,1.0349
+Temperate Steppe,Agriculture: Pasture,2017,0.9889
+Temperate Steppe,Agriculture: Pasture,2018,0.9867
+Temperate Steppe,Agriculture: Pasture,2020,0.8187
+Temperate Steppe,Agriculture: Pasture,2021,0.5729
+Temperate Steppe,Agriculture: Pasture,2022,0.9054
+Temperate Steppe,Agriculture: Pasture,2023,0.8113
+Temperate Steppe,Agriculture: Pasture,2024,0.8987
+Temperate Steppe,Agriculture: Pasture,2025,0.9324
+Temperate Steppe,Agriculture: Pasture,2026,0.8833
+Temperate Steppe Mountains,Agriculture: Pasture,1984,0.9607
+Temperate Steppe Mountains,Agriculture: Pasture,1985,0.9134
+Temperate Steppe Mountains,Agriculture: Pasture,1986,1.0013
+Temperate Steppe Mountains,Agriculture: Pasture,1987,0.9894
+Temperate Steppe Mountains,Agriculture: Pasture,1988,0.904
+Temperate Steppe Mountains,Agriculture: Pasture,1989,0.9645
+Temperate Steppe Mountains,Agriculture: Pasture,1990,1.0014
+Temperate Steppe Mountains,Agriculture: Pasture,1991,1.0254
+Temperate Steppe Mountains,Agriculture: Pasture,1992,0.996
+Temperate Steppe Mountains,Agriculture: Pasture,1993,1.0587
+Temperate Steppe Mountains,Agriculture: Pasture,1994,0.9978
+Temperate Steppe Mountains,Agriculture: Pasture,1995,1.0911
+Temperate Steppe Mountains,Agriculture: Pasture,1996,0.9908
+Temperate Steppe Mountains,Agriculture: Pasture,1997,1.0754
+Temperate Steppe Mountains,Agriculture: Pasture,1998,1.0864
+Temperate Steppe Mountains,Agriculture: Pasture,1999,1.0253
+Temperate Steppe Mountains,Agriculture: Pasture,2000,0.957
+Temperate Steppe Mountains,Agriculture: Pasture,2001,0.9679
+Temperate Steppe Mountains,Agriculture: Pasture,2002,0.9595
+Temperate Steppe Mountains,Agriculture: Pasture,2003,0.9596
+Temperate Steppe Mountains,Agriculture: Pasture,2004,1.0063
+Temperate Steppe Mountains,Agriculture: Pasture,2005,1.0343
+Temperate Steppe Mountains,Agriculture: Pasture,2006,1.0566
+Temperate Steppe Mountains,Agriculture: Pasture,2007,1.0031
+Temperate Steppe Mountains,Agriculture: Pasture,2008,0.998
+Temperate Steppe Mountains,Agriculture: Pasture,2009,1.0462
+Temperate Steppe Mountains,Agriculture: Pasture,2010,1.0117
+Temperate Steppe Mountains,Agriculture: Pasture,2011,1.0176
+Temperate Steppe Mountains,Agriculture: Pasture,2012,0.9907
+Temperate Steppe Mountains,Agriculture: Pasture,2013,1.0102
+Temperate Steppe Mountains,Agriculture: Pasture,2014,1.0291
+Temperate Steppe Mountains,Agriculture: Pasture,2015,1.0636
+Temperate Steppe Mountains,Agriculture: Pasture,2016,1.1006
+Temperate Steppe Mountains,Agriculture: Pasture,2017,1.0546
+Temperate Steppe Mountains,Agriculture: Pasture,2018,0.9817
+Temperate Steppe Mountains,Agriculture: Pasture,2021,1.1405
+Temperate Steppe Mountains,Agriculture: Pasture,2022,0.7453
+Temperate Steppe Mountains,Agriculture: Pasture,2023,0.7449
+Temperate Steppe Mountains,Agriculture: Pasture,2024,0.8178
+Temperate Steppe Mountains,Agriculture: Pasture,2025,0.6301
+Temperate Steppe Mountains,Agriculture: Pasture,2026,0.9019
+Tropical/Subtropical Desert,Agriculture: Pasture,1984,0.9536
+Tropical/Subtropical Desert,Agriculture: Pasture,1985,0.9763
+Tropical/Subtropical Desert,Agriculture: Pasture,1986,0.9102
+Tropical/Subtropical Desert,Agriculture: Pasture,1987,0.9144
+Tropical/Subtropical Desert,Agriculture: Pasture,1988,0.9508
+Tropical/Subtropical Desert,Agriculture: Pasture,1989,0.9824
+Tropical/Subtropical Desert,Agriculture: Pasture,1990,1.0106
+Tropical/Subtropical Desert,Agriculture: Pasture,1991,0.9343
+Tropical/Subtropical Desert,Agriculture: Pasture,1992,1.0194
+Tropical/Subtropical Desert,Agriculture: Pasture,1993,1.0318
+Tropical/Subtropical Desert,Agriculture: Pasture,1994,1.0742
+Tropical/Subtropical Desert,Agriculture: Pasture,1995,1.0509
+Tropical/Subtropical Desert,Agriculture: Pasture,1996,0.998
+Tropical/Subtropical Desert,Agriculture: Pasture,1997,1.035
+Tropical/Subtropical Desert,Agriculture: Pasture,1998,0.9835
+Tropical/Subtropical Desert,Agriculture: Pasture,1999,1.0244
+Tropical/Subtropical Desert,Agriculture: Pasture,2000,1.0203
+Tropical/Subtropical Desert,Agriculture: Pasture,2001,1.0063
+Tropical/Subtropical Desert,Agriculture: Pasture,2002,0.9886
+Tropical/Subtropical Desert,Agriculture: Pasture,2003,1.0508
+Tropical/Subtropical Desert,Agriculture: Pasture,2004,1.0723
+Tropical/Subtropical Desert,Agriculture: Pasture,2005,0.9957
+Tropical/Subtropical Desert,Agriculture: Pasture,2006,1.0671
+Tropical/Subtropical Desert,Agriculture: Pasture,2007,0.9959
+Tropical/Subtropical Desert,Agriculture: Pasture,2008,0.9005
+Tropical/Subtropical Desert,Agriculture: Pasture,2009,1.0053
+Tropical/Subtropical Desert,Agriculture: Pasture,2010,0.9252
+Tropical/Subtropical Desert,Agriculture: Pasture,2011,1.0095
+Tropical/Subtropical Desert,Agriculture: Pasture,2012,0.8183
+Tropical/Subtropical Desert,Agriculture: Pasture,2013,0.9999
+Tropical/Subtropical Desert,Agriculture: Pasture,2014,0.9647
+Tropical/Subtropical Desert,Agriculture: Pasture,2015,1.0555
+Tropical/Subtropical Desert,Agriculture: Pasture,2016,1.0428
+Tropical/Subtropical Desert,Agriculture: Pasture,2017,1.0399
+Tropical/Subtropical Desert,Agriculture: Pasture,2018,1.021
+Tropical/Subtropical Desert,Agriculture: Pasture,2020,0.9558
+Tropical/Subtropical Desert,Agriculture: Pasture,2021,1.0104
+Tropical/Subtropical Desert,Agriculture: Pasture,2022,1.108
+Tropical/Subtropical Desert,Agriculture: Pasture,2023,1.0351
+Tropical/Subtropical Desert,Agriculture: Pasture,2024,0.8579
+Tropical/Subtropical Desert,Agriculture: Pasture,2025,0.7721
+Tropical/Subtropical Desert,Agriculture: Pasture,2026,0.9825
+Tropical/Subtropical Steppe,Agriculture: Pasture,1984,0.9264
+Tropical/Subtropical Steppe,Agriculture: Pasture,1985,1.0232
+Tropical/Subtropical Steppe,Agriculture: Pasture,1986,0.9432
+Tropical/Subtropical Steppe,Agriculture: Pasture,1987,0.9397
+Tropical/Subtropical Steppe,Agriculture: Pasture,1988,0.914
+Tropical/Subtropical Steppe,Agriculture: Pasture,1989,0.9128
+Tropical/Subtropical Steppe,Agriculture: Pasture,1990,0.9579
+Tropical/Subtropical Steppe,Agriculture: Pasture,1991,0.9959
+Tropical/Subtropical Steppe,Agriculture: Pasture,1992,1.0659
+Tropical/Subtropical Steppe,Agriculture: Pasture,1993,1.0445
+Tropical/Subtropical Steppe,Agriculture: Pasture,1994,1.0292
+Tropical/Subtropical Steppe,Agriculture: Pasture,1995,1.0055
+Tropical/Subtropical Steppe,Agriculture: Pasture,1996,1.0394
+Tropical/Subtropical Steppe,Agriculture: Pasture,1997,1.073
+Tropical/Subtropical Steppe,Agriculture: Pasture,1998,1.0429
+Tropical/Subtropical Steppe,Agriculture: Pasture,1999,1.0612
+Tropical/Subtropical Steppe,Agriculture: Pasture,2000,1.0493
+Tropical/Subtropical Steppe,Agriculture: Pasture,2001,1.0403
+Tropical/Subtropical Steppe,Agriculture: Pasture,2002,0.9707
+Tropical/Subtropical Steppe,Agriculture: Pasture,2003,0.9089
+Tropical/Subtropical Steppe,Agriculture: Pasture,2004,0.9499
+Tropical/Subtropical Steppe,Agriculture: Pasture,2005,0.9972
+Tropical/Subtropical Steppe,Agriculture: Pasture,2006,0.9637
+Tropical/Subtropical Steppe,Agriculture: Pasture,2007,1.0335
+Tropical/Subtropical Steppe,Agriculture: Pasture,2008,0.721
+Tropical/Subtropical Steppe,Agriculture: Pasture,2009,1.0102
+Tropical/Subtropical Steppe,Agriculture: Pasture,2010,0.9702
+Tropical/Subtropical Steppe,Agriculture: Pasture,2011,0.9832
+Tropical/Subtropical Steppe,Agriculture: Pasture,2012,0.9872
+Tropical/Subtropical Steppe,Agriculture: Pasture,2013,0.8299
+Tropical/Subtropical Steppe,Agriculture: Pasture,2014,1.0241
+Tropical/Subtropical Steppe,Agriculture: Pasture,2015,1.023
+Tropical/Subtropical Steppe,Agriculture: Pasture,2016,0.9484
+Tropical/Subtropical Steppe,Agriculture: Pasture,2017,1.0509
+Tropical/Subtropical Steppe,Agriculture: Pasture,2018,0.9391
+Tropical/Subtropical Steppe,Agriculture: Pasture,2020,1.2026
+Tropical/Subtropical Steppe,Agriculture: Pasture,2021,1.1597
+Tropical/Subtropical Steppe,Agriculture: Pasture,2022,1.2501
+Tropical/Subtropical Steppe,Agriculture: Pasture,2023,0.9387
+Tropical/Subtropical Steppe,Agriculture: Pasture,2024,0.9078
+Tropical/Subtropical Steppe,Agriculture: Pasture,2025,1.1635
+Tropical/Subtropical Steppe,Agriculture: Pasture,2026,1.0623
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,1984,0.9913
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,1985,1.0189
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,1986,1.0296
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,1987,0.9945
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,1988,0.8498
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,1989,0.9384
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,1990,0.9752
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,1991,0.9833
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,1992,1.0056
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,1993,0.9986
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,1994,1.0247
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,1995,1.052
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,1996,1.0078
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,1997,1.0069
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,1998,1.0409
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,1999,1.0309
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2000,1.0282
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2001,0.9997
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2002,0.9344
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2003,0.997
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2004,1.0557
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2005,1.0224
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2006,0.9925
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2007,0.9714
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2008,0.9876
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2009,1.0271
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2010,1.0195
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2011,1.018
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2012,0.9074
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2013,0.987
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2014,1.0259
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2015,1.0352
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2016,1.0689
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2017,1.0301
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2018,0.9956
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2020,1.0385
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2021,0.9369
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2022,1.0003
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2023,0.9457
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2024,1.0456
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2025,1.0505
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,2026,1.0124
+Warm Continental,Agriculture: Pasture,1984,1.2026
+Warm Continental,Agriculture: Pasture,1985,1.1326
+Warm Continental,Agriculture: Pasture,1986,1.17
+Warm Continental,Agriculture: Pasture,1987,1.0538
+Warm Continental,Agriculture: Pasture,1988,0.7451
+Warm Continental,Agriculture: Pasture,1989,1.0096
+Warm Continental,Agriculture: Pasture,1990,1.0187
+Warm Continental,Agriculture: Pasture,1991,1.0869
+Warm Continental,Agriculture: Pasture,1992,0.9476
+Warm Continental,Agriculture: Pasture,1993,0.9683
+Warm Continental,Agriculture: Pasture,1994,1.0758
+Warm Continental,Agriculture: Pasture,1995,1.0593
+Warm Continental,Agriculture: Pasture,1996,1.0255
+Warm Continental,Agriculture: Pasture,1997,1.0446
+Warm Continental,Agriculture: Pasture,1998,1.0262
+Warm Continental,Agriculture: Pasture,1999,1.0197
+Warm Continental,Agriculture: Pasture,2000,1.0678
+Warm Continental,Agriculture: Pasture,2001,0.9673
+Warm Continental,Agriculture: Pasture,2002,0.9887
+Warm Continental,Agriculture: Pasture,2003,0.9005
+Warm Continental,Agriculture: Pasture,2004,0.9957
+Warm Continental,Agriculture: Pasture,2005,0.8839
+Warm Continental,Agriculture: Pasture,2006,0.9696
+Warm Continental,Agriculture: Pasture,2007,0.8719
+Warm Continental,Agriculture: Pasture,2008,0.9764
+Warm Continental,Agriculture: Pasture,2009,0.8828
+Warm Continental,Agriculture: Pasture,2010,1.0115
+Warm Continental,Agriculture: Pasture,2011,1.0919
+Warm Continental,Agriculture: Pasture,2012,0.9568
+Warm Continental,Agriculture: Pasture,2013,0.9374
+Warm Continental,Agriculture: Pasture,2014,1.0305
+Warm Continental,Agriculture: Pasture,2015,1.0153
+Warm Continental,Agriculture: Pasture,2016,1.0425
+Warm Continental,Agriculture: Pasture,2017,1.0355
+Warm Continental,Agriculture: Pasture,2018,0.9903
+Warm Continental,Agriculture: Pasture,2026,1.0228
+Warm Continental Mountains,Agriculture: Pasture,1984,1.0579
+Warm Continental Mountains,Agriculture: Pasture,1985,1.105
+Warm Continental Mountains,Agriculture: Pasture,1986,1.1103
+Warm Continental Mountains,Agriculture: Pasture,1987,1.1201
+Warm Continental Mountains,Agriculture: Pasture,1988,1.0613
+Warm Continental Mountains,Agriculture: Pasture,1989,1.0317
+Warm Continental Mountains,Agriculture: Pasture,1990,1.0483
+Warm Continental Mountains,Agriculture: Pasture,1991,0.9557
+Warm Continental Mountains,Agriculture: Pasture,1992,0.9751
+Warm Continental Mountains,Agriculture: Pasture,1993,0.9821
+Warm Continental Mountains,Agriculture: Pasture,1994,1.1444
+Warm Continental Mountains,Agriculture: Pasture,1995,1.0109
+Warm Continental Mountains,Agriculture: Pasture,1996,1.0643
+Warm Continental Mountains,Agriculture: Pasture,1997,1.0441
+Warm Continental Mountains,Agriculture: Pasture,1998,1.0419
+Warm Continental Mountains,Agriculture: Pasture,1999,1.036
+Warm Continental Mountains,Agriculture: Pasture,2000,1.0291
+Warm Continental Mountains,Agriculture: Pasture,2001,1.0527
+Warm Continental Mountains,Agriculture: Pasture,2002,1.0176
+Warm Continental Mountains,Agriculture: Pasture,2003,0.9632
+Warm Continental Mountains,Agriculture: Pasture,2004,1.1498
+Warm Continental Mountains,Agriculture: Pasture,2005,0.8056
+Warm Continental Mountains,Agriculture: Pasture,2006,0.9306
+Warm Continental Mountains,Agriculture: Pasture,2007,1.0046
+Warm Continental Mountains,Agriculture: Pasture,2008,1.044
+Warm Continental Mountains,Agriculture: Pasture,2009,0.8621
+Warm Continental Mountains,Agriculture: Pasture,2010,0.8557
+Warm Continental Mountains,Agriculture: Pasture,2011,0.9843
+Warm Continental Mountains,Agriculture: Pasture,2012,0.9832
+Warm Continental Mountains,Agriculture: Pasture,2013,1.0748
+Warm Continental Mountains,Agriculture: Pasture,2014,0.9265
+Warm Continental Mountains,Agriculture: Pasture,2015,0.7711
+Warm Continental Mountains,Agriculture: Pasture,2016,0.7215
+Warm Continental Mountains,Agriculture: Pasture,2017,1.027
+Warm Continental Mountains,Agriculture: Pasture,2018,1.0654
+Warm Continental Mountains,Agriculture: Pasture,2026,0.938

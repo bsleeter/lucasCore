@@ -53,3 +53,6 @@ Iteration,Timestep,FlowTypeId,Order
 ,,Transfer: AG Slow -> BG Slow,6.7
 ,,Transfer: Snag Branch -> AG Fast,3
 ,,Transfer: Snag Stem -> AG Medium,3
+,,Net Growth Agriculture: Atmosphere -> Fine Roots,1
+,,Net Growth Agriculture: Atmosphere -> Foliage,1
+,,Harvest: Foliage -> Agriculture Sector,2

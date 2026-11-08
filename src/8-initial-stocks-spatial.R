@@ -10,7 +10,9 @@
 #                           rates (tools/make_grass_shrub.R); chaparral from initialstocks/chaparral.csv by ecodivision and age since fire
 #   emergent wetland        defaults/initialstocks/emergent-wetland.csv, by ecodivision and class: the steady state of stage 3's
 #                           regional rates, and Deep Soil = the soil 30-100 cm (tools/make_emergent_wetland.R; to-do 39 step 1)
-#   everything else         0 (developed, agriculture, barren, water, ice)
+#   cropland, pasture       defaults/initialstocks/agriculture.csv, by ecodivision and class: the steady state of stage 3's rates
+#                           (tools/make_agriculture.R; to-do 39 step 6), soil the class's gNATSGO mean
+#   everything else         0 (developed, barren, water, ice)
 #   last disturbance        high-severity fire where an interagency fire perimeter of 1900 to the start year covers the cell, otherwise
 #                           clearcut (the build's rule; with few early perimeters in the East, eastern forest is mostly post-harvest), or
 #                           high-severity fire for the forest types Carbon Assumptions: Spin-up sets so
@@ -147,7 +149,10 @@ gs <- lt("grassland-shrubland.csv"); fill_class(gs, land & cname %in% unique(gs$
 # chaparral by ecodivision and age (years since fire, from stage 5; to-do 39): the pools after a high-severity fire grown on that long
 cp <- lt("chaparral.csv"); fill_class(cp, land & cname %in% unique(cp$StateClassId), TRUE, "chaparral (by age since fire)")
 ew <- lt("emergent-wetland.csv"); fill_class(ew, land & cname %in% unique(ew$StateClassId), FALSE, "emergent wetland")
-src_of[land & is.na(src_of)] <- "zero (developed, agriculture, barren, water, ice)"
+# cropland and pasture by ecodivision (to-do 39 step 6): the steady state of stage 3's rates (tools/make_agriculture.R); soil the class
+# mean under the class (gNATSGO), as grass and shrub
+ag <- lt("agriculture.csv"); fill_class(ag, land & cname %in% unique(ag$StateClassId), FALSE, "agriculture")
+src_of[land & is.na(src_of)] <- "zero (developed, barren, water, ice)"
 
 # ---- Grass and Shrub Productivity (Build Options; to-do 39 step 5) ---------------------------------------------------------
 # The grass and shrub counterpart of Site Productivity: a cell's growth multiplier = its RAP herbaceous + shrub NPP (mean of

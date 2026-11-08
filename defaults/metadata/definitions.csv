@@ -132,3 +132,6 @@ Stratum,Pyrome: *,"Secondary or tertiary stratum: the pyrome {*}, a region of si
 Stratum,Federal: *,"Secondary or tertiary stratum: fee land owned by {*} (PAD-US 4.0 owner; BIA = tribal land), or Non Federal.",PadusFile
 Stratum,GAP: *,"Secondary or tertiary stratum: PAD-US 4.0 GAP status {*} (the most protected status where designations overlap), or Not in PAD-US.",PadusFile
 Stratum,Ecodivision: *,"Secondary or tertiary stratum: the FIA ecological division {*} (ECOMAP 2007 divisions, dissolved).",EcodivisionFile
+StockType,Agriculture Sector,"Carbon removed from cropland and pasture each year by crop harvest and hay and grazing removal (a sink outside the ecosystem).",
+FlowType,Net Growth Agriculture: *,"Annual uptake of carbon by cropland and pasture into the live pool named after the arrow ({*}): NASS county yields converted to growth with USDA Tech. Bull. 1939 Table 3-3 coefficients, varying by year through the Crop Yield flow multiplier.",
+FlowType,Harvest: Foliage -> Agriculture Sector,"Crop harvest and hay and grazing removal: the harvested share of the year's aboveground growth, removed from the ecosystem.",

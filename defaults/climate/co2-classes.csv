@@ -1,5 +1,5 @@
 StateClassId,Type,FlowGroupId
-Agriculture: Cropland,Crops,Net Growth Forest: Total
+Agriculture: Cropland,Crops,Net Growth Agriculture: Total
 Wetland: Estuarine Emergent,Emergent wetland,Net Growth Wetland: Total
 Wetland: Palustrine Emergent,Emergent wetland,Net Growth Wetland: Total
 Forest: Alder/Maple Group,Forest,Net Growth Forest: Total
@@ -33,7 +33,7 @@ Forest: White/Red/Jack Pine Group,Forest,Net Growth Forest: Total
 Grassland: Annual,Grassland,Net Growth Non Forest: Total
 Grassland: Irrigated Perennial,Grassland,Net Growth Non Forest: Total
 Grassland: Natural Perennial,Grassland,Net Growth Non Forest: Total
-Agriculture: Pasture,Pasture,Net Growth Forest: Total
+Agriculture: Pasture,Pasture,Net Growth Agriculture: Total
 Shrubland: Chaparral,Shrub,Net Growth Non Forest: Total
 Shrubland: Invaded Sage Steppe,Shrub,Net Growth Non Forest: Total
 Shrubland: Native Sage Steppe,Shrub,Net Growth Non Forest: Total

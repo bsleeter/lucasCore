@@ -22,3 +22,4 @@ DOM: Peat,
 DOM: Snag Branch,Carbon in DOM with input from the Merchantable biomass pool; default decay rate is half the default decay rate for the medium pool to the stem snag pool
 DOM: Snag Stem,Carbon in DOM with input from the Merchantable biomass pool; default decay rate is half the default decay rate for the medium pool to the stem snag pool
 Forestry Sector,Used only for transition triggered flows
+Agriculture Sector,Carbon removed from cropland and pasture by crop harvest and hay and grazing removal

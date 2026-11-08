@@ -93,3 +93,8 @@ Transfer: AG Slow -> BG Slow [Type],Yes,No,No
 Transfer: Snag Branch -> AG Fast [Type],Yes,No,No
 Transfer: Snag Stem -> AG Medium [Type],Yes,No,No
 Transfer: Total,Yes,No,No
+Net Growth Agriculture: Atmosphere -> Fine Roots [Type],Yes,No,No
+Net Growth Agriculture: Atmosphere -> Foliage [Type],Yes,No,No
+Net Growth Agriculture: Total,Yes,No,No
+Harvest: Foliage -> Agriculture Sector [Type],Yes,No,No
+Harvest: Agriculture,Yes,Yes,Yes

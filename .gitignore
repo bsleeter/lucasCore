@@ -42,3 +42,4 @@ dev/stsim/*.ssim*
 
 # the RAP climate sample (25 MB; rebuilt from the window crops in the data home by 04-rap-climate-sample.R)
 dev/nonforest/04-rap-climate-sample*.csv
+dev/agriculture/02-nass-county-npp.csv

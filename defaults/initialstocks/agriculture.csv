@@ -1,0 +1,267 @@
+StratumID,StateClassID,StateAttributeTypeID,AgeMin,AgeMax,Value
+Hot Continental,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Slow,,,0.2
+Hot Continental,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Very Fast,,,1.3512
+Hot Continental,Agriculture: Cropland,Carbon Initial Conditions: Belowground Slow,,,136.0136
+Hot Continental,Agriculture: Cropland,Carbon Initial Conditions: Belowground Very Fast,,,0.891
+Hot Continental,Agriculture: Cropland,Carbon Initial Conditions: Deep Soil,,,0
+Hot Continental,Agriculture: Cropland,Carbon Initial Conditions: Fine Roots,,,0
+Hot Continental,Agriculture: Cropland,Carbon Initial Conditions: Foliage,,,0
+Hot Continental,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Slow,,,0.5
+Hot Continental,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Very Fast,,,0.3397
+Hot Continental,Agriculture: Pasture,Carbon Initial Conditions: Belowground Slow,,,82.0299
+Hot Continental,Agriculture: Pasture,Carbon Initial Conditions: Belowground Very Fast,,,2.471
+Hot Continental,Agriculture: Pasture,Carbon Initial Conditions: Deep Soil,,,0
+Hot Continental,Agriculture: Pasture,Carbon Initial Conditions: Fine Roots,,,0
+Hot Continental,Agriculture: Pasture,Carbon Initial Conditions: Foliage,,,0
+Hot Continental Mountains,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Slow,,,0.2
+Hot Continental Mountains,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Very Fast,,,1.0274
+Hot Continental Mountains,Agriculture: Cropland,Carbon Initial Conditions: Belowground Slow,,,60.9449
+Hot Continental Mountains,Agriculture: Cropland,Carbon Initial Conditions: Belowground Very Fast,,,1.0661
+Hot Continental Mountains,Agriculture: Cropland,Carbon Initial Conditions: Deep Soil,,,0
+Hot Continental Mountains,Agriculture: Cropland,Carbon Initial Conditions: Fine Roots,,,0
+Hot Continental Mountains,Agriculture: Cropland,Carbon Initial Conditions: Foliage,,,0
+Hot Continental Mountains,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Slow,,,0.5
+Hot Continental Mountains,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Very Fast,,,0.3047
+Hot Continental Mountains,Agriculture: Pasture,Carbon Initial Conditions: Belowground Slow,,,57.3274
+Hot Continental Mountains,Agriculture: Pasture,Carbon Initial Conditions: Belowground Very Fast,,,2.2164
+Hot Continental Mountains,Agriculture: Pasture,Carbon Initial Conditions: Deep Soil,,,0
+Hot Continental Mountains,Agriculture: Pasture,Carbon Initial Conditions: Fine Roots,,,0
+Hot Continental Mountains,Agriculture: Pasture,Carbon Initial Conditions: Foliage,,,0
+Marine,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Slow,,,0.2
+Marine,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Very Fast,,,1.741
+Marine,Agriculture: Cropland,Carbon Initial Conditions: Belowground Slow,,,201.1762
+Marine,Agriculture: Cropland,Carbon Initial Conditions: Belowground Very Fast,,,1.2786
+Marine,Agriculture: Cropland,Carbon Initial Conditions: Deep Soil,,,0
+Marine,Agriculture: Cropland,Carbon Initial Conditions: Fine Roots,,,0
+Marine,Agriculture: Cropland,Carbon Initial Conditions: Foliage,,,0
+Marine,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Slow,,,0.5
+Marine,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Very Fast,,,0.3214
+Marine,Agriculture: Pasture,Carbon Initial Conditions: Belowground Slow,,,177.5572
+Marine,Agriculture: Pasture,Carbon Initial Conditions: Belowground Very Fast,,,2.3378
+Marine,Agriculture: Pasture,Carbon Initial Conditions: Deep Soil,,,0
+Marine,Agriculture: Pasture,Carbon Initial Conditions: Fine Roots,,,0
+Marine,Agriculture: Pasture,Carbon Initial Conditions: Foliage,,,0
+Marine Mountains,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Slow,,,0.2
+Marine Mountains,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Very Fast,,,1.3137
+Marine Mountains,Agriculture: Cropland,Carbon Initial Conditions: Belowground Slow,,,97.2544
+Marine Mountains,Agriculture: Cropland,Carbon Initial Conditions: Belowground Very Fast,,,0.9958
+Marine Mountains,Agriculture: Cropland,Carbon Initial Conditions: Deep Soil,,,0
+Marine Mountains,Agriculture: Cropland,Carbon Initial Conditions: Fine Roots,,,0
+Marine Mountains,Agriculture: Cropland,Carbon Initial Conditions: Foliage,,,0
+Marine Mountains,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Slow,,,0.5
+Marine Mountains,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Very Fast,,,0.3774
+Marine Mountains,Agriculture: Pasture,Carbon Initial Conditions: Belowground Slow,,,195.3745
+Marine Mountains,Agriculture: Pasture,Carbon Initial Conditions: Belowground Very Fast,,,2.7452
+Marine Mountains,Agriculture: Pasture,Carbon Initial Conditions: Deep Soil,,,0
+Marine Mountains,Agriculture: Pasture,Carbon Initial Conditions: Fine Roots,,,0
+Marine Mountains,Agriculture: Pasture,Carbon Initial Conditions: Foliage,,,0
+Mediterranean,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Slow,,,0.2
+Mediterranean,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Very Fast,,,1.7718
+Mediterranean,Agriculture: Cropland,Carbon Initial Conditions: Belowground Slow,,,100.241
+Mediterranean,Agriculture: Cropland,Carbon Initial Conditions: Belowground Very Fast,,,1.5848
+Mediterranean,Agriculture: Cropland,Carbon Initial Conditions: Deep Soil,,,0
+Mediterranean,Agriculture: Cropland,Carbon Initial Conditions: Fine Roots,,,0
+Mediterranean,Agriculture: Cropland,Carbon Initial Conditions: Foliage,,,0
+Mediterranean,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Slow,,,0.5
+Mediterranean,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Very Fast,,,0.3208
+Mediterranean,Agriculture: Pasture,Carbon Initial Conditions: Belowground Slow,,,215.6749
+Mediterranean,Agriculture: Pasture,Carbon Initial Conditions: Belowground Very Fast,,,2.3332
+Mediterranean,Agriculture: Pasture,Carbon Initial Conditions: Deep Soil,,,0
+Mediterranean,Agriculture: Pasture,Carbon Initial Conditions: Fine Roots,,,0
+Mediterranean,Agriculture: Pasture,Carbon Initial Conditions: Foliage,,,0
+Mediterranean Mountains,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Slow,,,0.2
+Mediterranean Mountains,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Very Fast,,,1.7419
+Mediterranean Mountains,Agriculture: Cropland,Carbon Initial Conditions: Belowground Slow,,,94.8092
+Mediterranean Mountains,Agriculture: Cropland,Carbon Initial Conditions: Belowground Very Fast,,,1.4853
+Mediterranean Mountains,Agriculture: Cropland,Carbon Initial Conditions: Deep Soil,,,0
+Mediterranean Mountains,Agriculture: Cropland,Carbon Initial Conditions: Fine Roots,,,0
+Mediterranean Mountains,Agriculture: Cropland,Carbon Initial Conditions: Foliage,,,0
+Mediterranean Mountains,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Slow,,,0.5
+Mediterranean Mountains,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Very Fast,,,0.412
+Mediterranean Mountains,Agriculture: Pasture,Carbon Initial Conditions: Belowground Slow,,,113.3928
+Mediterranean Mountains,Agriculture: Pasture,Carbon Initial Conditions: Belowground Very Fast,,,2.9965
+Mediterranean Mountains,Agriculture: Pasture,Carbon Initial Conditions: Deep Soil,,,0
+Mediterranean Mountains,Agriculture: Pasture,Carbon Initial Conditions: Fine Roots,,,0
+Mediterranean Mountains,Agriculture: Pasture,Carbon Initial Conditions: Foliage,,,0
+Prairie,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Slow,,,0.2
+Prairie,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Very Fast,,,1.348
+Prairie,Agriculture: Cropland,Carbon Initial Conditions: Belowground Slow,,,175.5147
+Prairie,Agriculture: Cropland,Carbon Initial Conditions: Belowground Very Fast,,,0.8475
+Prairie,Agriculture: Cropland,Carbon Initial Conditions: Deep Soil,,,0
+Prairie,Agriculture: Cropland,Carbon Initial Conditions: Fine Roots,,,0
+Prairie,Agriculture: Cropland,Carbon Initial Conditions: Foliage,,,0
+Prairie,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Slow,,,0.5
+Prairie,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Very Fast,,,0.3225
+Prairie,Agriculture: Pasture,Carbon Initial Conditions: Belowground Slow,,,108.903
+Prairie,Agriculture: Pasture,Carbon Initial Conditions: Belowground Very Fast,,,2.3457
+Prairie,Agriculture: Pasture,Carbon Initial Conditions: Deep Soil,,,0
+Prairie,Agriculture: Pasture,Carbon Initial Conditions: Fine Roots,,,0
+Prairie,Agriculture: Pasture,Carbon Initial Conditions: Foliage,,,0
+Savanna,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Slow,,,0.2
+Savanna,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Very Fast,,,1.8059
+Savanna,Agriculture: Cropland,Carbon Initial Conditions: Belowground Slow,,,828.3044
+Savanna,Agriculture: Cropland,Carbon Initial Conditions: Belowground Very Fast,,,2.2039
+Savanna,Agriculture: Cropland,Carbon Initial Conditions: Deep Soil,,,0
+Savanna,Agriculture: Cropland,Carbon Initial Conditions: Fine Roots,,,0
+Savanna,Agriculture: Cropland,Carbon Initial Conditions: Foliage,,,0
+Savanna,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Slow,,,0.5
+Savanna,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Very Fast,,,0.3208
+Savanna,Agriculture: Pasture,Carbon Initial Conditions: Belowground Slow,,,166.3556
+Savanna,Agriculture: Pasture,Carbon Initial Conditions: Belowground Very Fast,,,2.3332
+Savanna,Agriculture: Pasture,Carbon Initial Conditions: Deep Soil,,,0
+Savanna,Agriculture: Pasture,Carbon Initial Conditions: Fine Roots,,,0
+Savanna,Agriculture: Pasture,Carbon Initial Conditions: Foliage,,,0
+Subtropical,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Slow,,,0.2
+Subtropical,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Very Fast,,,1.0898
+Subtropical,Agriculture: Cropland,Carbon Initial Conditions: Belowground Slow,,,81.5168
+Subtropical,Agriculture: Cropland,Carbon Initial Conditions: Belowground Very Fast,,,0.6436
+Subtropical,Agriculture: Cropland,Carbon Initial Conditions: Deep Soil,,,0
+Subtropical,Agriculture: Cropland,Carbon Initial Conditions: Fine Roots,,,0
+Subtropical,Agriculture: Cropland,Carbon Initial Conditions: Foliage,,,0
+Subtropical,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Slow,,,0.5
+Subtropical,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Very Fast,,,0.2855
+Subtropical,Agriculture: Pasture,Carbon Initial Conditions: Belowground Slow,,,77.9264
+Subtropical,Agriculture: Pasture,Carbon Initial Conditions: Belowground Very Fast,,,2.0767
+Subtropical,Agriculture: Pasture,Carbon Initial Conditions: Deep Soil,,,0
+Subtropical,Agriculture: Pasture,Carbon Initial Conditions: Fine Roots,,,0
+Subtropical,Agriculture: Pasture,Carbon Initial Conditions: Foliage,,,0
+Subtropical Mountains,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Slow,,,0.2
+Subtropical Mountains,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Very Fast,,,0.7829
+Subtropical Mountains,Agriculture: Cropland,Carbon Initial Conditions: Belowground Slow,,,73.7419
+Subtropical Mountains,Agriculture: Cropland,Carbon Initial Conditions: Belowground Very Fast,,,0.4511
+Subtropical Mountains,Agriculture: Cropland,Carbon Initial Conditions: Deep Soil,,,0
+Subtropical Mountains,Agriculture: Cropland,Carbon Initial Conditions: Fine Roots,,,0
+Subtropical Mountains,Agriculture: Cropland,Carbon Initial Conditions: Foliage,,,0
+Subtropical Mountains,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Slow,,,0.5
+Subtropical Mountains,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Very Fast,,,0.2192
+Subtropical Mountains,Agriculture: Pasture,Carbon Initial Conditions: Belowground Slow,,,60.517
+Subtropical Mountains,Agriculture: Pasture,Carbon Initial Conditions: Belowground Very Fast,,,1.5941
+Subtropical Mountains,Agriculture: Pasture,Carbon Initial Conditions: Deep Soil,,,0
+Subtropical Mountains,Agriculture: Pasture,Carbon Initial Conditions: Fine Roots,,,0
+Subtropical Mountains,Agriculture: Pasture,Carbon Initial Conditions: Foliage,,,0
+Temperate Desert,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Slow,,,0.2
+Temperate Desert,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Very Fast,,,1.5513
+Temperate Desert,Agriculture: Cropland,Carbon Initial Conditions: Belowground Slow,,,74.9517
+Temperate Desert,Agriculture: Cropland,Carbon Initial Conditions: Belowground Very Fast,,,0.9415
+Temperate Desert,Agriculture: Cropland,Carbon Initial Conditions: Deep Soil,,,0
+Temperate Desert,Agriculture: Cropland,Carbon Initial Conditions: Fine Roots,,,0
+Temperate Desert,Agriculture: Cropland,Carbon Initial Conditions: Foliage,,,0
+Temperate Desert,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Slow,,,0.5
+Temperate Desert,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Very Fast,,,0.4959
+Temperate Desert,Agriculture: Pasture,Carbon Initial Conditions: Belowground Slow,,,96.7281
+Temperate Desert,Agriculture: Pasture,Carbon Initial Conditions: Belowground Very Fast,,,3.607
+Temperate Desert,Agriculture: Pasture,Carbon Initial Conditions: Deep Soil,,,0
+Temperate Desert,Agriculture: Pasture,Carbon Initial Conditions: Fine Roots,,,0
+Temperate Desert,Agriculture: Pasture,Carbon Initial Conditions: Foliage,,,0
+Temperate Desert Mountains,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Slow,,,0.2
+Temperate Desert Mountains,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Very Fast,,,1.2212
+Temperate Desert Mountains,Agriculture: Cropland,Carbon Initial Conditions: Belowground Slow,,,75.3842
+Temperate Desert Mountains,Agriculture: Cropland,Carbon Initial Conditions: Belowground Very Fast,,,0.7719
+Temperate Desert Mountains,Agriculture: Cropland,Carbon Initial Conditions: Deep Soil,,,0
+Temperate Desert Mountains,Agriculture: Cropland,Carbon Initial Conditions: Fine Roots,,,0
+Temperate Desert Mountains,Agriculture: Cropland,Carbon Initial Conditions: Foliage,,,0
+Temperate Desert Mountains,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Slow,,,0.5
+Temperate Desert Mountains,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Very Fast,,,0.4402
+Temperate Desert Mountains,Agriculture: Pasture,Carbon Initial Conditions: Belowground Slow,,,174.8555
+Temperate Desert Mountains,Agriculture: Pasture,Carbon Initial Conditions: Belowground Very Fast,,,3.2021
+Temperate Desert Mountains,Agriculture: Pasture,Carbon Initial Conditions: Deep Soil,,,0
+Temperate Desert Mountains,Agriculture: Pasture,Carbon Initial Conditions: Fine Roots,,,0
+Temperate Desert Mountains,Agriculture: Pasture,Carbon Initial Conditions: Foliage,,,0
+Temperate Steppe,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Slow,,,0.2
+Temperate Steppe,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Very Fast,,,1.0412
+Temperate Steppe,Agriculture: Cropland,Carbon Initial Conditions: Belowground Slow,,,131.0058
+Temperate Steppe,Agriculture: Cropland,Carbon Initial Conditions: Belowground Very Fast,,,0.6117
+Temperate Steppe,Agriculture: Cropland,Carbon Initial Conditions: Deep Soil,,,0
+Temperate Steppe,Agriculture: Cropland,Carbon Initial Conditions: Fine Roots,,,0
+Temperate Steppe,Agriculture: Cropland,Carbon Initial Conditions: Foliage,,,0
+Temperate Steppe,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Slow,,,0.5
+Temperate Steppe,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Very Fast,,,0.2652
+Temperate Steppe,Agriculture: Pasture,Carbon Initial Conditions: Belowground Slow,,,142.9162
+Temperate Steppe,Agriculture: Pasture,Carbon Initial Conditions: Belowground Very Fast,,,1.9292
+Temperate Steppe,Agriculture: Pasture,Carbon Initial Conditions: Deep Soil,,,0
+Temperate Steppe,Agriculture: Pasture,Carbon Initial Conditions: Fine Roots,,,0
+Temperate Steppe,Agriculture: Pasture,Carbon Initial Conditions: Foliage,,,0
+Temperate Steppe Mountains,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Slow,,,0.2
+Temperate Steppe Mountains,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Very Fast,,,1.2213
+Temperate Steppe Mountains,Agriculture: Cropland,Carbon Initial Conditions: Belowground Slow,,,105.509
+Temperate Steppe Mountains,Agriculture: Cropland,Carbon Initial Conditions: Belowground Very Fast,,,0.6615
+Temperate Steppe Mountains,Agriculture: Cropland,Carbon Initial Conditions: Deep Soil,,,0
+Temperate Steppe Mountains,Agriculture: Cropland,Carbon Initial Conditions: Fine Roots,,,0
+Temperate Steppe Mountains,Agriculture: Cropland,Carbon Initial Conditions: Foliage,,,0
+Temperate Steppe Mountains,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Slow,,,0.5
+Temperate Steppe Mountains,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Very Fast,,,0.325
+Temperate Steppe Mountains,Agriculture: Pasture,Carbon Initial Conditions: Belowground Slow,,,119.7875
+Temperate Steppe Mountains,Agriculture: Pasture,Carbon Initial Conditions: Belowground Very Fast,,,2.3636
+Temperate Steppe Mountains,Agriculture: Pasture,Carbon Initial Conditions: Deep Soil,,,0
+Temperate Steppe Mountains,Agriculture: Pasture,Carbon Initial Conditions: Fine Roots,,,0
+Temperate Steppe Mountains,Agriculture: Pasture,Carbon Initial Conditions: Foliage,,,0
+Tropical/Subtropical Desert,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Slow,,,0.2
+Tropical/Subtropical Desert,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Very Fast,,,1.5435
+Tropical/Subtropical Desert,Agriculture: Cropland,Carbon Initial Conditions: Belowground Slow,,,51.8765
+Tropical/Subtropical Desert,Agriculture: Cropland,Carbon Initial Conditions: Belowground Very Fast,,,0.9484
+Tropical/Subtropical Desert,Agriculture: Cropland,Carbon Initial Conditions: Deep Soil,,,0
+Tropical/Subtropical Desert,Agriculture: Cropland,Carbon Initial Conditions: Fine Roots,,,0
+Tropical/Subtropical Desert,Agriculture: Cropland,Carbon Initial Conditions: Foliage,,,0
+Tropical/Subtropical Desert,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Slow,,,0.5
+Tropical/Subtropical Desert,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Very Fast,,,0.7318
+Tropical/Subtropical Desert,Agriculture: Pasture,Carbon Initial Conditions: Belowground Slow,,,76.484
+Tropical/Subtropical Desert,Agriculture: Pasture,Carbon Initial Conditions: Belowground Very Fast,,,5.3223
+Tropical/Subtropical Desert,Agriculture: Pasture,Carbon Initial Conditions: Deep Soil,,,0
+Tropical/Subtropical Desert,Agriculture: Pasture,Carbon Initial Conditions: Fine Roots,,,0
+Tropical/Subtropical Desert,Agriculture: Pasture,Carbon Initial Conditions: Foliage,,,0
+Tropical/Subtropical Steppe,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Slow,,,0.2
+Tropical/Subtropical Steppe,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Very Fast,,,0.7699
+Tropical/Subtropical Steppe,Agriculture: Cropland,Carbon Initial Conditions: Belowground Slow,,,102.9488
+Tropical/Subtropical Steppe,Agriculture: Cropland,Carbon Initial Conditions: Belowground Very Fast,,,0.4259
+Tropical/Subtropical Steppe,Agriculture: Cropland,Carbon Initial Conditions: Deep Soil,,,0
+Tropical/Subtropical Steppe,Agriculture: Cropland,Carbon Initial Conditions: Fine Roots,,,0
+Tropical/Subtropical Steppe,Agriculture: Cropland,Carbon Initial Conditions: Foliage,,,0
+Tropical/Subtropical Steppe,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Slow,,,0.5
+Tropical/Subtropical Steppe,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Very Fast,,,0.4352
+Tropical/Subtropical Steppe,Agriculture: Pasture,Carbon Initial Conditions: Belowground Slow,,,87.3331
+Tropical/Subtropical Steppe,Agriculture: Pasture,Carbon Initial Conditions: Belowground Very Fast,,,3.1652
+Tropical/Subtropical Steppe,Agriculture: Pasture,Carbon Initial Conditions: Deep Soil,,,0
+Tropical/Subtropical Steppe,Agriculture: Pasture,Carbon Initial Conditions: Fine Roots,,,0
+Tropical/Subtropical Steppe,Agriculture: Pasture,Carbon Initial Conditions: Foliage,,,0
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Slow,,,0.2
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Very Fast,,,1.2212
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,Carbon Initial Conditions: Belowground Slow,,,55.7365
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,Carbon Initial Conditions: Belowground Very Fast,,,0.7719
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,Carbon Initial Conditions: Deep Soil,,,0
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,Carbon Initial Conditions: Fine Roots,,,0
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,Carbon Initial Conditions: Foliage,,,0
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Slow,,,0.5
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Very Fast,,,0.3208
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,Carbon Initial Conditions: Belowground Slow,,,154.1963
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,Carbon Initial Conditions: Belowground Very Fast,,,2.3332
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,Carbon Initial Conditions: Deep Soil,,,0
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,Carbon Initial Conditions: Fine Roots,,,0
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,Carbon Initial Conditions: Foliage,,,0
+Warm Continental,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Slow,,,0.2
+Warm Continental,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Very Fast,,,0.9979
+Warm Continental,Agriculture: Cropland,Carbon Initial Conditions: Belowground Slow,,,113.6411
+Warm Continental,Agriculture: Cropland,Carbon Initial Conditions: Belowground Very Fast,,,1.0659
+Warm Continental,Agriculture: Cropland,Carbon Initial Conditions: Deep Soil,,,0
+Warm Continental,Agriculture: Cropland,Carbon Initial Conditions: Fine Roots,,,0
+Warm Continental,Agriculture: Cropland,Carbon Initial Conditions: Foliage,,,0
+Warm Continental,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Slow,,,0.5
+Warm Continental,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Very Fast,,,0.2799
+Warm Continental,Agriculture: Pasture,Carbon Initial Conditions: Belowground Slow,,,120.2482
+Warm Continental,Agriculture: Pasture,Carbon Initial Conditions: Belowground Very Fast,,,2.0359
+Warm Continental,Agriculture: Pasture,Carbon Initial Conditions: Deep Soil,,,0
+Warm Continental,Agriculture: Pasture,Carbon Initial Conditions: Fine Roots,,,0
+Warm Continental,Agriculture: Pasture,Carbon Initial Conditions: Foliage,,,0
+Warm Continental Mountains,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Slow,,,0.2
+Warm Continental Mountains,Agriculture: Cropland,Carbon Initial Conditions: Aboveground Very Fast,,,0.767
+Warm Continental Mountains,Agriculture: Cropland,Carbon Initial Conditions: Belowground Slow,,,151.7045
+Warm Continental Mountains,Agriculture: Cropland,Carbon Initial Conditions: Belowground Very Fast,,,1.7253
+Warm Continental Mountains,Agriculture: Cropland,Carbon Initial Conditions: Deep Soil,,,0
+Warm Continental Mountains,Agriculture: Cropland,Carbon Initial Conditions: Fine Roots,,,0
+Warm Continental Mountains,Agriculture: Cropland,Carbon Initial Conditions: Foliage,,,0
+Warm Continental Mountains,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Slow,,,0.5
+Warm Continental Mountains,Agriculture: Pasture,Carbon Initial Conditions: Aboveground Very Fast,,,0.2788
+Warm Continental Mountains,Agriculture: Pasture,Carbon Initial Conditions: Belowground Slow,,,149.2509
+Warm Continental Mountains,Agriculture: Pasture,Carbon Initial Conditions: Belowground Very Fast,,,2.0278
+Warm Continental Mountains,Agriculture: Pasture,Carbon Initial Conditions: Deep Soil,,,0
+Warm Continental Mountains,Agriculture: Pasture,Carbon Initial Conditions: Fine Roots,,,0
+Warm Continental Mountains,Agriculture: Pasture,Carbon Initial Conditions: Foliage,,,0

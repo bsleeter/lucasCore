@@ -1,0 +1,33 @@
+Commodity,Class,Util,Unit,LbPerUnit,Crop,StateClassId,DryMatter,HarvestIndex,RootShoot,Note
+BARLEY,ALL CLASSES,ALL UTILIZATION PRACTICES,BU,48,Barley,Agriculture: Cropland,0.865,0.46,0.11,
+BEANS,"DRY EDIBLE, INCL CHICKPEAS",ALL UTILIZATION PRACTICES,CWT,100,Beans,Agriculture: Cropland,0.84,0.46,0.08,to 2018
+BEANS,"DRY EDIBLE, (EXCL CHICKPEAS)",ALL UTILIZATION PRACTICES,CWT,100,Beans,Agriculture: Cropland,0.84,0.46,0.08,from 2020
+CHICKPEAS,ALL CLASSES,ALL UTILIZATION PRACTICES,CWT,100,Beans,Agriculture: Cropland,0.84,0.46,0.08,from 2020 only (to 2018 inside BEANS INCL CHICKPEAS); Beans coefficients
+LENTILS,ALL CLASSES,ALL UTILIZATION PRACTICES,CWT,100,Beans,Agriculture: Cropland,0.84,0.46,0.08,Beans coefficients (a pulse)
+PEAS,DRY EDIBLE,ALL UTILIZATION PRACTICES,CWT,100,Beans,Agriculture: Cropland,0.84,0.46,0.08,Beans coefficients (a pulse)
+CORN,ALL CLASSES,GRAIN,BU,56,Corn grain,Agriculture: Cropland,0.86,0.53,0.18,
+CORN,ALL CLASSES,SILAGE,TONS,2000,Corn silage,Agriculture: Cropland,0.74,0.95,0.18,
+COTTON,UPLAND,ALL UTILIZATION PRACTICES,480 LB BALES,480,Cotton,Agriculture: Cropland,0.92,0.40,0.17,NASS reports lint; Table 3-3 does not say whether its harvest index is on lint or seed cotton (lint assumed: may understate cotton biomass)
+COTTON,PIMA,ALL UTILIZATION PRACTICES,480 LB BALES,480,Cotton,Agriculture: Cropland,0.92,0.40,0.17,as upland
+OATS,ALL CLASSES,ALL UTILIZATION PRACTICES,BU,32,Oats,Agriculture: Cropland,0.865,0.52,0.40,
+PEANUTS,ALL CLASSES,ALL UTILIZATION PRACTICES,LB,1,Peanuts,Agriculture: Cropland,0.91,0.40,0.07,
+POTATOES,ALL CLASSES,ALL UTILIZATION PRACTICES,CWT,100,Potatoes,Agriculture: Cropland,0.20,0.50,0.07,
+SWEET POTATOES,ALL CLASSES,ALL UTILIZATION PRACTICES,CWT,100,Potatoes,Agriculture: Cropland,0.20,0.50,0.07,Potatoes coefficients
+RICE,ALL CLASSES,ALL UTILIZATION PRACTICES,CWT,100,Rice,Agriculture: Cropland,0.91,0.42,0.22,
+RYE,ALL CLASSES,ALL UTILIZATION PRACTICES,BU,56,Rye,Agriculture: Cropland,0.90,0.50,0.14,
+SORGHUM,ALL CLASSES,GRAIN,BU,56,Sorghum grain,Agriculture: Cropland,0.86,0.44,0.18,
+SORGHUM,ALL CLASSES,SILAGE,TONS,2000,Sorghum silage,Agriculture: Cropland,0.74,0.95,0.18,
+SOYBEANS,ALL CLASSES,ALL UTILIZATION PRACTICES,BU,60,Soybean,Agriculture: Cropland,0.875,0.42,0.19,
+SUGARBEETS,ALL CLASSES,ALL UTILIZATION PRACTICES,TONS,2000,Sugarbeets,Agriculture: Cropland,0.15,0.40,0.43,
+SUGARCANE,ALL CLASSES,SUGAR,TONS,2000,Sugarcane,Agriculture: Cropland,0.258,0.75,0.18,
+SUNFLOWER,OIL TYPE,ALL UTILIZATION PRACTICES,LB,1,Sunflower,Agriculture: Cropland,0.91,0.27,0.06,
+SUNFLOWER,NON-OIL TYPE,ALL UTILIZATION PRACTICES,LB,1,Sunflower,Agriculture: Cropland,0.91,0.27,0.06,
+CANOLA,ALL CLASSES,ALL UTILIZATION PRACTICES,LB,1,Sunflower,Agriculture: Cropland,0.91,0.27,0.06,Sunflower coefficients (an oilseed; not in Table 3-3)
+FLAXSEED,ALL CLASSES,ALL UTILIZATION PRACTICES,BU,56,Sunflower,Agriculture: Cropland,0.91,0.27,0.06,Sunflower coefficients (an oilseed; not in Table 3-3)
+SAFFLOWER,ALL CLASSES,ALL UTILIZATION PRACTICES,LB,1,Sunflower,Agriculture: Cropland,0.91,0.27,0.06,Sunflower coefficients (an oilseed; not in Table 3-3)
+TOBACCO,*,ALL UTILIZATION PRACTICES,LB,1,Tobacco,Agriculture: Cropland,0.80,0.60,0.80,every tobacco type (NASS has no all-classes row)
+WHEAT,WINTER,ALL UTILIZATION PRACTICES,BU,60,Wheat,Agriculture: Cropland,0.865,0.39,0.20,
+WHEAT,"SPRING, (EXCL DURUM)",ALL UTILIZATION PRACTICES,BU,60,Wheat,Agriculture: Cropland,0.865,0.39,0.20,
+WHEAT,"SPRING, DURUM",ALL UTILIZATION PRACTICES,BU,60,Wheat,Agriculture: Cropland,0.865,0.39,0.20,
+HAY,ALFALFA,ALL UTILIZATION PRACTICES,TONS,2000,Alfalfa hay,Agriculture: Pasture,0.87,0.95,0.87,NLCD 81 Pasture/Hay includes legumes planted for hay
+HAY,(EXCL ALFALFA),ALL UTILIZATION PRACTICES,TONS,2000,Nonlegume hay,Agriculture: Pasture,0.87,0.95,0.87,

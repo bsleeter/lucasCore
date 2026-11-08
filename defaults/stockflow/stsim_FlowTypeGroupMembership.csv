@@ -310,3 +310,24 @@ Transfer: Snag Branch -> AG Fast,Q10 Slow Flows,1
 Transfer: Snag Branch -> AG Fast,Transfer: Total,1
 Transfer: Snag Stem -> AG Medium,Q10 Slow Flows,1
 Transfer: Snag Stem -> AG Medium,Transfer: Total,1
+Net Growth Agriculture: Atmosphere -> Fine Roots,Net Biome Productivity,1
+Net Growth Agriculture: Atmosphere -> Fine Roots,Net Biome Productivity (CO2e),3.67
+Net Growth Agriculture: Atmosphere -> Fine Roots,Net Ecosystem Productivity,1
+Net Growth Agriculture: Atmosphere -> Fine Roots,Net Ecosystem Productivity (CO2e),3.67
+Net Growth Agriculture: Atmosphere -> Fine Roots,Net Growth Agriculture: Total,1
+Net Growth Agriculture: Atmosphere -> Fine Roots,Net Growth: Total,1
+Net Growth Agriculture: Atmosphere -> Fine Roots,Net Growth: Total (CO2e),3.67
+Net Growth Agriculture: Atmosphere -> Fine Roots,Net Primary Productivity,1
+Net Growth Agriculture: Atmosphere -> Fine Roots,Net Primary Productivity (CO2e),3.67
+Net Growth Agriculture: Atmosphere -> Foliage,Net Biome Productivity,1
+Net Growth Agriculture: Atmosphere -> Foliage,Net Biome Productivity (CO2e),3.67
+Net Growth Agriculture: Atmosphere -> Foliage,Net Ecosystem Productivity,1
+Net Growth Agriculture: Atmosphere -> Foliage,Net Ecosystem Productivity (CO2e),3.67
+Net Growth Agriculture: Atmosphere -> Foliage,Net Growth Agriculture: Total,1
+Net Growth Agriculture: Atmosphere -> Foliage,Net Growth: Total,1
+Net Growth Agriculture: Atmosphere -> Foliage,Net Growth: Total (CO2e),3.67
+Net Growth Agriculture: Atmosphere -> Foliage,Net Primary Productivity,1
+Net Growth Agriculture: Atmosphere -> Foliage,Net Primary Productivity (CO2e),3.67
+Harvest: Foliage -> Agriculture Sector,Harvest: Agriculture,1
+Harvest: Foliage -> Agriculture Sector,Net Biome Productivity,-1
+Harvest: Foliage -> Agriculture Sector,Net Biome Productivity (CO2e),-3.67
