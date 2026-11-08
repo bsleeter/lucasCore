@@ -26,7 +26,6 @@ source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.
 suppressPackageStartupMessages({ library(terra); library(sf) })
 STAGE <- "8 Initial Stocks Spatial"
 progressBar(type = "begin", totalSteps = 5)
-
 src <- read_data_sources(c("FirePerimeterHistoryFile", "SoilCarbonFile"))
 opt <- read_ds("BuildOptions"); y0 <- opt$StartYear[1]
 ic <- as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", optional = TRUE, lookupsAsFactors = FALSE))
@@ -43,7 +42,6 @@ land <- !is.na(values(P, mat = FALSE)); vP <- values(P, mat = FALSE); vS <- valu
 cname <- scl$Name[match(vS, as.integer(scl$Id))]; sname <- stl$Name[match(vP, as.integer(stl$Id))]
 cell_ha <- (res(P)[1] / 100)^2
 progressBar()
-
 # ---- last disturbance: interagency fire perimeters, 1900 to the start year --------------------------------------------------
 fp <- read_fire_perimeters(src$FirePerimeterHistoryFile, 1900, y0)
 fp <- st_make_valid(st_transform(fp, crs(P)))
@@ -68,7 +66,6 @@ if (nrow(sp) && "LastDisturbanceUnburned" %in% names(sp) && any(!is.na(sp$LastDi
 last <- ifelse(postfire, "Fire: High Severity [Type]", "Forest Harvest: Forest Clearcut [Type]")
 say("Last disturbance: %.1f%% of land cells post-fire, the rest post-clearcut", 100 * mean(postfire[land]))
 progressBar()
-
 # ---- pools by class -----------------------------------------------------------------------------------------------------
 out <- matrix(0, ncell(P), nrow(st), dimnames = list(NULL, st$StockTypeId)); src_of <- rep(NA_character_, ncell(P))
 # forest: stage 4 curves
@@ -81,7 +78,6 @@ check(STAGE, "every forest cell finds its ecodivision x class x last disturbance
 cc <- which(!is.na(st$CurveColumn))   # Deep Soil has no curve column: forest starts with none
 out[which(isF)[!is.na(m)], cc] <- as.matrix(cv[m[!is.na(m)], st$CurveColumn[cc], with = FALSE]); src_of[isF] <- "stock curves (stage 4)"
 source(pkg_file("src", "productivity-fill.R"))
-
 # a productivity multiplier's Flow Spatial Multiplier row: this type's row replaced, every other row kept. When stage 8 is rerun on
 # its own on a Build result (tools/quick-test.R) the result already holds the Build's rows, this type's included, and a second row of
 # one flow group and type stops ST-Sim ("Object reference not set", 2026-11-07); in a Build the sheet holds stage 7's Climate rows
@@ -92,7 +88,6 @@ put_multiplier <- function(type, fg, file) {
     write_stsim(rbind(x, data.table(FlowGroupId = fg, FlowMultiplierTypeId = type, MultiplierFileName = file), fill = TRUE), "FlowSpatialMultiplier")
     say("%s: replaced the row of the result this stage reran on (%d other Flow Spatial Multiplier rows kept)", type, nrow(x))
   } else write_stsim(data.table(FlowGroupId = fg, FlowMultiplierTypeId = type, MultiplierFileName = file), "FlowSpatialMultiplier", append = TRUE) }
-
 # ---- Site Productivity (Build Options; to-do 35, docs/treemap-plan.md) ------------------------------------------------------
 # A forest cell's growth multiplier = sum over FIA site classes of the share of its TreeMap pixels in the class (stage 5) x its forest
 # type x ecodivision's multiplier for the class (stage 2). It becomes the Site Productivity flow spatial multiplier on forest growth,
@@ -153,7 +148,6 @@ ew <- lt("emergent-wetland.csv"); fill_class(ew, land & cname %in% unique(ew$Sta
 # mean under the class (gNATSGO), as grass and shrub
 ag <- lt("agriculture.csv"); fill_class(ag, land & cname %in% unique(ag$StateClassId), FALSE, "agriculture")
 src_of[land & is.na(src_of)] <- "zero (developed, barren, water, ice)"
-
 # ---- Grass and Shrub Productivity (Build Options; to-do 39 step 5) ---------------------------------------------------------
 # The grass and shrub counterpart of Site Productivity: a cell's growth multiplier = its RAP herbaceous + shrub NPP (mean of
 # RAP_YEARS, the years the class targets were sampled from) / its ecodivision x class target NPP (defaults/stockflow/
@@ -197,7 +191,6 @@ if (gs_on) {
   fg <- "Net Growth Non Forest: Total"; if (!fg %in% stsim_list("FlowGroup")$Name) fail("Grass and Shrub Productivity: flow group '%s' not found", fg)
   put_multiplier("Grass and Shrub Productivity", fg, write_raster(setValues(rast(P), ifelse(land, gmult, NA)), "GrassShrubProductivity.tif", "FLT4S"))
 }
-
 # ---- Cropland Productivity (Build Options; to-do 39 step 6, user 2026-11-07) -------------------------------------------------
 # The agriculture counterpart: each 30 m Cropland Data Layer pixel of CDL_YEARS takes its county's NASS growth of its crop group
 # (defaults/stockflow/ag-county-crop-npp.csv: the 1985-2023 mean, yields converted with USDA Tech. Bull. 1939 coefficients;
@@ -217,7 +210,9 @@ if (cp_on) {
   if (!"Cropland Productivity" %in% stsim_list("FlowMultiplierType")$Name) fail("Cropland Productivity: the library has no Flow Multiplier Type 'Cropland Productivity' - run tools/sync-library.R on it")
   cs <- read_data_sources(c("CdlFolder", "CountiesFile"))
   cf <- file.path(cs$CdlFolder, sprintf("%d_30m_cdls.tif", CDL_YEARS)); miss <- CDL_YEARS[!file.exists(cf)]
-  if (length(miss)) fail("Cropland Productivity: Cropland Data Layer Folder (%s) lacks %s; run a Data Download with CdlFolder for years %d-%d", cs$CdlFolder, paste(miss, collapse = ", "), min(CDL_YEARS), max(CDL_YEARS))
+  # a year the folder lacks is left out of the mean, with a warning (2026-11-07: the 2022 national zip would not download); none is an error
+  if (length(miss) == length(CDL_YEARS)) fail("Cropland Productivity: Cropland Data Layer Folder (%s) has none of %d-%d; run a Data Download with CdlFolder", cs$CdlFolder, min(CDL_YEARS), max(CDL_YEARS))
+  if (length(miss)) { say("Cropland Productivity: WARNING - the Cropland Data Layer Folder lacks %s; the map averages the other %d years", paste(miss, collapse = ", "), length(CDL_YEARS) - length(miss)); cf <- cf[file.exists(cf)] }
   xw <- read_default("stockflow", "cdl-crops.csv")[!is.na(Group) & nzchar(Group)]
   cg <- read_default("stockflow", "ag-county-crop-npp.csv")[, NPP := as.numeric(NPP)]; eg <- read_default("stockflow", "ag-ecodivision-crop-npp.csv")[, NPP := as.numeric(NPP)]
   tg <- read_default("stockflow", "ag-targets.csv")[, NPP := as.numeric(NPP)]
@@ -261,7 +256,6 @@ if (cp_on) {
   put_multiplier("Cropland Productivity", fg, write_raster(setValues(rast(P), ifelse(land, cmult, NA)), "CroplandProductivity.tif", "FLT4S"))
 }
 progressBar()
-
 # ---- soil: gNATSGO where the class's belowground slow is 0 -----------------------------------------------------------------
 So <- crop(rast(src$SoilCarbonFile), project(as.polygons(ext(P) + 3000, crs = crs(P)), crs(rast(src$SoilCarbonFile))))
 So <- classify(So, cbind(-Inf, 0, NA), include.lowest = TRUE)   # 0 and the undeclared -1920 no-data value are missing (as stage 5)
@@ -271,7 +265,6 @@ out[sub_, bgs] <- vSo[sub_]
 say("Soil: gNATSGO used for %d cells whose class has no belowground slow carbon (%s)", sum(sub_), paste(names(table(src_of[sub_])), collapse = ", "))
 out[!land, ] <- NA
 progressBar()
-
 # ---- checks, summary, outputs -----------------------------------------------------------------------------------------
 check(STAGE, "every land cell has every pool, none negative", !anyNA(out[land, ]) && all(out[land, ] >= 0), sprintf("%d NA, %d negative", sum(is.na(out[land, ])), sum(out[land, ] < 0, na.rm = TRUE)))
 soil_j <- which(st$StockTypeId %in% c("DOM: Belowground Slow", "Deep Soil"))   # soil = BG Slow + Deep Soil
