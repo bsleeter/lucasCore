@@ -130,5 +130,9 @@ for (f in c("county", "ecodivision")) wr(fread(sprintf("dev/agriculture/02-nass-
 # user 2026-11-08): the map takes these county values only, with no fallback
 if (file.exists("dev/agriculture/05-cac-county-crop-npp.csv")) wr(fread("dev/agriculture/05-cac-county-crop-npp.csv", colClasses = list(character = "GEOID")), "stockflow", "ag-cac-county-crop-npp.csv") else
   cat("dev/agriculture/05-cac-county-crop-npp.csv not found: ag-cac-county-crop-npp.csv not written\n")
+# each California county's yearly crop mix, every crop at its fixed county rate (dev/agriculture/06-cac-county-crop-mix.R; the Crop Mix
+# multiplier, user 2026-11-08)
+if (file.exists("dev/agriculture/06-cac-county-crop-mix.csv")) wr(fread("dev/agriculture/06-cac-county-crop-mix.csv", colClasses = list(character = "GEOID")), "stockflow", "ag-cac-county-crop-mix.csv") else
+  cat("dev/agriculture/06-cac-county-crop-mix.csv not found: ag-cac-county-crop-mix.csv not written\n")
 # (2026-11-08: the map is divided by the ecodivision's NASS level, NPP above, so ag-cdl-ecodivision-npp.csv is no longer written)
 if (file.exists(d("stockflow", "ag-cdl-ecodivision-npp.csv"))) invisible(file.remove(d("stockflow", "ag-cdl-ecodivision-npp.csv")))

@@ -132,7 +132,7 @@ progressBar()
 # ---- outputs: the projection years only (the Build's summary rows are not carried into this result) ------------------------
 if (nrow(out$rows) && "Climate" %in% stsim_list("FlowMultiplierType")$Name) out$rows[, FlowMultiplierTypeId := "Climate"]
 # this scenario's rows hide the Build's, so the Build's Site Productivity and Grass and Shrub Productivity multipliers (stage 8) come along
-spm <- dependency_multipliers(c("Site Productivity", "Grass and Shrub Productivity", "Cropland Productivity", "Crop Harvest"))
+spm <- dependency_multipliers(c("Site Productivity", "Grass and Shrub Productivity", "Cropland Productivity", "Crop Harvest", "Crop Mix"))
 spv <- opt$SiteProductivity[1]
 if (is.null(spm) && !is.null(spv) && !is.na(spv) && (identical(suppressWarnings(as.integer(spv)), 2L) || startsWith(as.character(spv), "TreeMap")))
   fail("Site Productivity is on in the Build Options, but no dependency has its flow multiplier: depend on a Build result that ran stage 8")

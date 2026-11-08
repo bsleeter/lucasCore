@@ -84,10 +84,11 @@ source(pkg_file("src", "productivity-fill.R"))
 # reference not set", 2026-11-07); in a Build the sheet holds stage 7's Climate rows. One save: a stage's second save of a sheet is not
 # kept (2026-11-07: Cropland Productivity, saved after Grass and Shrub Productivity, never reached ST-Sim)
 .fsm_new <- list()
-put_multiplier <- function(type, fg, file) .fsm_new[[type]] <<- data.table(FlowGroupId = fg, FlowMultiplierTypeId = type, MultiplierFileName = file)
+# (a type with yearly maps passes its rows: Timestep, FlowGroupId, FlowMultiplierTypeId, MultiplierFileName)
+put_multiplier <- function(type, fg = NULL, file = NULL, rows = NULL) .fsm_new[[type]] <<- if (is.null(rows)) data.table(FlowGroupId = fg, FlowMultiplierTypeId = type, MultiplierFileName = file) else rows
 put_multipliers_save <- function() {
   if (!length(.fsm_new)) return(invisible())
-  new <- rbindlist(.fsm_new); x <- as.data.table(datasheet(scn, "stsim_FlowSpatialMultiplier", optional = TRUE, lookupsAsFactors = FALSE))
+  new <- rbindlist(.fsm_new, fill = TRUE); x <- as.data.table(datasheet(scn, "stsim_FlowSpatialMultiplier", optional = TRUE, lookupsAsFactors = FALSE))
   # stage 8 writes the sheet as an output only (package.xml): declared as an input too, a rerun's saves were not kept when a
   # dependency held the sheet (2026-11-08). In a Build the sheet holds stage 7's rows; rerun on its own, the dependency's rows are
   # carried over (with their files' full paths), as stage 7 and stage 11 do
@@ -98,7 +99,7 @@ put_multipliers_save <- function() {
   say("Flow Spatial Multipliers: %s written (%d other rows kept)", paste(new$FlowMultiplierTypeId, collapse = ", "), nrow(x))
   # (an output sheet reads back empty until the stage ends, so the rows cannot be checked here; tests/unit-agriculture.R checks the
   # code path, and a run's result holds them)
-  check(STAGE, "each productivity multiplier has one Flow Spatial Multiplier row", !anyDuplicated(new$FlowMultiplierTypeId) && all(file.exists(new$MultiplierFileName))) }
+  check(STAGE, "each productivity multiplier has one Flow Spatial Multiplier row a year and flow group", !anyDuplicated(new[, .(if ("Timestep" %in% names(new)) Timestep else NA, FlowGroupId, FlowMultiplierTypeId)]) && all(file.exists(new$MultiplierFileName))) }
 # ---- Site Productivity (Build Options; to-do 35, docs/treemap-plan.md) ------------------------------------------------------
 # A forest cell's growth multiplier = sum over FIA site classes of the share of its TreeMap pixels in the class (stage 5) x its forest
 # type x ecodivision's multiplier for the class (stage 2). It becomes the Site Productivity flow spatial multiplier on forest growth,
@@ -279,6 +280,49 @@ if (cp_on) {
   for (i in seq_len(nrow(hsum))) with(hsum[i], say("  %s: %d cells, mean %.2f (10%% %.2f, 90%% %.2f), harvested share of foliage %.3f", cls, Cells, Mean, P10, P90, Rate))
   hg <- "Harvest: Agriculture"; if (!hg %in% stsim_list("FlowGroup")$Name) fail("Crop Harvest: flow group '%s' not found - run tools/sync-library.R", hg)
   put_multiplier("Crop Harvest", hg, write_raster(setValues(rast(P), ifelse(land, hmult, NA)), "CropHarvest.tif", "FLT4S"))
+  # Crop Mix (user 2026-11-08: vary the crop mix through time). The two maps above hold the crops of the CDL years; a California
+  # county's yearly crop mix comes from the County Agricultural Commissioners' reports (ag-cac-county-crop-mix.csv: every crop at its
+  # fixed county rate, so only the mix and harvested area change; dev/agriculture/06-cac-county-crop-mix.R). Growth multiplier of year y
+  # = (the county's NPP / its cropland on the model's annual NLCD in y) / the same over CDL_YEARS; harvest multiplier = (harvest / AG in
+  # y) / the same over CDL_YEARS. A year outside the reports takes the nearest one's; the year after the reports end is 1 (the maps'
+  # mix). On every land cell of the county except NLCD pasture (81), which keeps 1, as does every cell outside California; the harvest
+  # one is capped so the cell's rate stays <= 1. One map a year on Net Growth Agriculture: Total and on Harvest: Agriculture.
+  mx <- read_default("stockflow", "ag-cac-county-crop-mix.csv")
+  if (!"Crop Mix" %in% stsim_list("FlowMultiplierType")$Name) fail("Crop Mix: the library has no Flow Multiplier Type 'Crop Mix' - run tools/sync-library.R on it")
+  nl <- read_ds("OutputNlcdAnnual"); vK <- vC   # the county (co row) of each model cell
+  mx <- mx[GEOID %in% co$GEOID][, k := co$k[match(GEOID, co$GEOID)]][, c("NPP", "AG", "Harvest") := lapply(.SD, as.numeric), .SDcols = c("NPP", "AG", "Harvest")][, Year := as.integer(Year)]
+  if (nrow(mx) && nrow(nl)) {
+    y1 <- opt$EndYear[1]; yrs <- y0:y1; ny <- nl$Year[nl$Year %in% yrs]
+    # each county's cropland area (cells) on the model's annual NLCD, years without a map taking the nearest year's
+    ca <- rbindlist(lapply(ny, function(y) { v <- values(rast(nl$FileName[match(y, nl$Year)]), mat = FALSE)
+      data.table(k = vK, v = v)[land & !is.na(k), .(crop = sum(v == 82, na.rm = TRUE)), by = k][, Year := y] }))
+    near <- function(y, have) have[pmax(1, findInterval(y, have))]   # the nearest earlier year (the first year for earlier ones)
+    grid <- CJ(k = unique(mx$k), Year = sort(unique(c(yrs, CDL_YEARS))))
+    grid[, ry := { h <- sort(unique(mx$Year)); h[pmin(length(h), pmax(1, findInterval(Year, h)))] }]
+    grid[, ny := near(Year, sort(ny))]
+    grid <- merge(mx[, .(k, ry = Year, NPP, AG, Harvest)][grid, on = .(k, ry)], ca[, .(k, ny = Year, crop)], by = c("k", "ny"))
+    grid <- grid[!is.na(NPP) & crop > 0][, `:=`(G = NPP / crop, S = Harvest / AG)]
+    base <- grid[Year %in% CDL_YEARS & ry %in% CDL_YEARS, .(bG = mean(G), bS = sum(Harvest) / sum(AG)), by = k]
+    grid <- base[grid, on = "k", nomatch = 0][, `:=`(iG = pmin(pmax(G / bG, CAP[1]), CAP[2]), iH = pmin(pmax(S / bS, CAP[1]), CAP[2]))]
+    last <- max(mx$Year); myrs <- yrs[yrs <= last]
+    rows <- list(); ones <- write_raster(setValues(rast(P), ifelse(land, 1, NA)), "CropMix_1.tif", "FLT4S")
+    for (y in myrs) { g <- grid[Year == y]; if (!nrow(g)) next
+      v <- values(rast(nl$FileName[match(near(y, sort(ny)), nl$Year)]), mat = FALSE)
+      on <- land & !is.na(vK) & vK %in% g$k & !(v %in% 81)
+      mG <- rep(1, ncell(P)); mH <- rep(1, ncell(P)); j <- match(vK[on], g$k)
+      mG[on] <- g$iG[j]; hr1 <- hmult[on] * fifelse(is.na(trate[on]), 0, trate[on]); mH[on] <- pmin(g$iH[j], fifelse(hr1 > 0, 1 / hr1, Inf))
+      rows[[length(rows) + 1]] <- data.table(Timestep = y, FlowGroupId = c(fg, hg), FlowMultiplierTypeId = "Crop Mix",
+        MultiplierFileName = c(write_raster(setValues(rast(P), ifelse(land, mG, NA)), sprintf("CropMixGrowth_%d.tif", y), "FLT4S"),
+                               write_raster(setValues(rast(P), ifelse(land, mH, NA)), sprintf("CropMixHarvest_%d.tif", y), "FLT4S"))) }
+    if (length(rows)) {
+      rows <- rbindlist(rows); rows <- rbind(rows, data.table(Timestep = last + 1, FlowGroupId = c(fg, hg), FlowMultiplierTypeId = "Crop Mix", MultiplierFileName = ones))
+      put_multiplier("Crop Mix", rows = rows)
+      s <- grid[Year %in% myrs, .(G = mean(iG), H = mean(iH)), by = .(p = fifelse(Year < min(CDL_YEARS), "before", "CDL years"))]
+      say("Crop mix (County Agricultural Commissioners' reports, %d counties): %d-%d, growth multiplier mean %.2f before %d and %.2f in the CDL years, harvest %.2f and %.2f",
+          uniqueN(grid$k), min(myrs), max(myrs), s[p == "before", G], min(CDL_YEARS), s[p == "CDL years", G], s[p == "before", H], s[p == "CDL years", H])
+      check(STAGE, "crop mix: every map is finite and positive", all(is.finite(grid$iG) & grid$iG > 0 & is.finite(grid$iH) & grid$iH > 0))
+    }
+  } else say("Crop mix: no California county in the study area (or no annual NLCD table); no Crop Mix multiplier")
 }
 progressBar()
 # ---- soil: gNATSGO where the class's belowground slow is 0 -----------------------------------------------------------------
