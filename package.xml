@@ -1095,6 +1095,7 @@
 		<dataSheet name="DomParameter" type="Input"/>
 		<dataSheet name="CarbonCurve" type="Input"/>
 		<dataSheet name="CarbonOptions" type="Input"/>
+		<dataSheet name="GrowthOptions" type="Input"/>
 		<dataSheet name="CbmCrosswalk" type="Input"/>
 		<dataSheet name="stsim_FlowPathwayDiagram" type="Input"/>
 		<dataSheet name="OutputReturnInterval" type="Input"/>
