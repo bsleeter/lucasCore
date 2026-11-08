@@ -435,6 +435,16 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
          Mediterranean coefficients are small (precipitation 0.12-0.15, last year's about 0). Likely cause: calendar-year
          precipitation, where Mediterranean grass grows on the October-September water year (autumn rain of one calendar year feeds
          the next spring). Next: refit on water-year precipitation (needs PRISM monthly, not in the home).
+       - **Water year (built 2026-11-07, user OK).** The PRISM Data Download now also fetches monthly precipitation (from two years
+         before the region's first, and 1990-2020; 516 files, 1.4 GB at the top of the home), with a have() check so a rerun fetches
+         only what is new. Refit on October-September water years: better everywhere (Mediterranean r 0.33 -> 0.39, share of variation
+         0.33 -> 0.39, beats the mean in 78% of windows; elsewhere r 0.45 -> 0.49); CONUS precipitation 0.39, last year's 0.04,
+         temperature 0.03; Mediterranean 0.11 and Mediterranean Mountains 0.21. Stage 7 sums PRISM monthly, stage 11 LOCA2 monthly
+         (loca2_annual "ppt_wy"); tree ring stays on calendar years. Solano quick test: SD of the yearly multiplier 0.047 (calendar
+         0.038, Miami 0.332), against RAP's own 0.15 in Mediterranean windows. The linear response stays cautious there: total rain,
+         even by water year, explains little of Mediterranean grass growth (timing within the season matters).
+         Possible next step (not decided): use RAP's observed yearly NPP anomaly directly as the historical multiplier (the region's
+         RapNppFolder already holds 1986 on), and the RAP fit only for projections.
     8. **Shrub growth by age.** Chaparral regrows for 20+ years after fire and sage for decades, so growth by age after fire (the
        Non-Forest Growth sheet already has an age column) in place of a constant rate at equilibrium. Matters most in P26.
     9. **Validation throughout,** against data the calibration did not use: RaCA soil carbon, AmeriFlux grassland and sagebrush sites,
