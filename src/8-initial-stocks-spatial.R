@@ -222,11 +222,12 @@ if (gs_on) {
 cpv <- opt$CropProductivity[1]
 cp_on <- !is.null(cpv) && !is.na(cpv) && (identical(suppressWarnings(as.integer(cpv)), 2L) || startsWith(as.character(cpv), "CDL"))
 if (cp_on) {
-  CDL_YEARS <- 2014:2023; CAP <- c(0.3, 2.5); AGC <- c("Agriculture: Cropland", "Agriculture: Pasture")
+  CDL_YEARS <- 2014:2025; CAP <- c(0.3, 2.5); AGC <- c("Agriculture: Cropland", "Agriculture: Pasture")
   if (!"Cropland Productivity" %in% stsim_list("FlowMultiplierType")$Name) fail("Cropland Productivity: the library has no Flow Multiplier Type 'Cropland Productivity' - run tools/sync-library.R on it")
   cs <- read_data_sources(c("CdlFolder", "CountiesFile"))
   cf <- file.path(cs$CdlFolder, sprintf("%d_30m_cdls.tif", CDL_YEARS)); miss <- CDL_YEARS[!file.exists(cf)]
-  # a year the folder lacks is left out of the mean, with a warning (2026-11-07: the 2022 national zip would not download); none is an error
+  # a year the folder lacks is left out of the mean, with a warning (2026-11-07: the 2022 national zip would not download; 2026-11-08: the
+  # user placed 2022, 2024 and 2025 in the folder - 2025 is NASS's nearest-neighbour 30 m version of its 10 m layer); none is an error
   if (length(miss) == length(CDL_YEARS)) fail("Cropland Productivity: Cropland Data Layer Folder (%s) has none of %d-%d; run a Data Download with CdlFolder", cs$CdlFolder, min(CDL_YEARS), max(CDL_YEARS))
   if (length(miss)) { say("Cropland Productivity: WARNING - the Cropland Data Layer Folder lacks %s; the map averages the other %d years", paste(miss, collapse = ", "), length(CDL_YEARS) - length(miss)); cf <- cf[file.exists(cf)] }
   source(pkg_file("src", "cropland.R"))
