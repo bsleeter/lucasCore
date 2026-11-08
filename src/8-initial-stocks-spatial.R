@@ -88,13 +88,17 @@ put_multiplier <- function(type, fg, file) .fsm_new[[type]] <<- data.table(FlowG
 put_multipliers_save <- function() {
   if (!length(.fsm_new)) return(invisible())
   new <- rbindlist(.fsm_new); x <- as.data.table(datasheet(scn, "stsim_FlowSpatialMultiplier", optional = TRUE, lookupsAsFactors = FALSE))
+  # stage 8 writes the sheet as an output only (package.xml): declared as an input too, a rerun's saves were not kept when a
+  # dependency held the sheet (2026-11-08). In a Build the sheet holds stage 7's rows; rerun on its own, the dependency's rows are
+  # carried over (with their files' full paths), as stage 7 and stage 11 do
+  if (!nrow(x)) { d <- dependency_multipliers(stsim_list("FlowMultiplierType")$Name); if (!is.null(d)) { x <- d; say("Flow Spatial Multipliers: %d rows carried over from the dependency", nrow(d)) } }
   if (nrow(x)) x <- x[if ("FlowMultiplierTypeId" %in% names(x)) !FlowMultiplierTypeId %in% new$FlowMultiplierTypeId else TRUE,
                      intersect(names(x), c("Timestep", "FlowGroupId", "FlowMultiplierTypeId", "MultiplierFileName")), with = FALSE]
   write_stsim(rbind(x, new, fill = TRUE), "FlowSpatialMultiplier")
   say("Flow Spatial Multipliers: %s written (%d other rows kept)", paste(new$FlowMultiplierTypeId, collapse = ", "), nrow(x))
-  chk <- as.data.table(datasheet(scn, "stsim_FlowSpatialMultiplier", optional = TRUE, lookupsAsFactors = FALSE))
-  for (ty in new$FlowMultiplierTypeId) check(STAGE, sprintf("the %s multiplier is in the Flow Spatial Multipliers", ty),
-                                             nrow(chk) > 0 && sum(chk$FlowMultiplierTypeId == ty, na.rm = TRUE) == 1, sprintf("%d rows", nrow(chk))) }
+  # (an output sheet reads back empty until the stage ends, so the rows cannot be checked here; tests/unit-agriculture.R checks the
+  # code path, and a run's result holds them)
+  check(STAGE, "each productivity multiplier has one Flow Spatial Multiplier row", !anyDuplicated(new$FlowMultiplierTypeId) && all(file.exists(new$MultiplierFileName))) }
 # ---- Site Productivity (Build Options; to-do 35, docs/treemap-plan.md) ------------------------------------------------------
 # A forest cell's growth multiplier = sum over FIA site classes of the share of its TreeMap pixels in the class (stage 5) x its forest
 # type x ecodivision's multiplier for the class (stage 2). It becomes the Site Productivity flow spatial multiplier on forest growth,
