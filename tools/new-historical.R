@@ -16,7 +16,7 @@
 #                   resolutions, where yearly maps of every group run to many GB
 #   --replace       delete an existing scenario of the same name first
 #   --also=<id,...> further result scenarios to depend on after the build (a quick test: --build=<the rerun of a few stages>
-#                   --also=<the Build result>; tools/quick-test.R)
+#                   --also=<Stock-Flow Definitions>,<the Build result>; tools/quick-test.R: the library's current definitions first)
 #   --years=N       run only the first N years (testing)
 #   --historical-only  stop at the historical end even when the build has a projection (the run that seeds stand-alone projections;
 #                   with --bookend-maps it maps the historical end year, which tools/new-projection.R starts from)
@@ -32,7 +32,7 @@ if (is.na(bid)) { b <- sc[IsResult == "Yes" & grepl("Build", Name, fixed = TRUE)
 if (!bid %in% sc[IsResult == "Yes", ScenarioId]) stop(sprintf("scenario %d is not a result scenario", bid))
 # --also: further result scenarios after the build, in priority order (a quick test: a rerun of a few Build stages first, then the Build)
 also <- as.integer(strsplit(opt("also", ""), ",")[[1]]); also <- also[!is.na(also)]
-for (x in also) if (!x %in% sc[IsResult == "Yes", ScenarioId]) stop(sprintf("--also: scenario %d is not a result scenario", x))
+for (x in also) if (!x %in% sc[IsResult == "Yes" | Name == "Stock-Flow Definitions", ScenarioId]) stop(sprintf("--also: scenario %d is not a result scenario or the Stock-Flow Definitions", x))
 bids <- c(bid, also); BB <- lapply(bids, function(i) scenario(L, i))
 n <- function(s) sum(vapply(BB, function(B) nrow(suppressWarnings(datasheet(B, s, optional = TRUE))), 1L))
 first_with <- function(s) { for (B in BB) { x <- suppressWarnings(as.data.table(datasheet(B, s, optional = TRUE))); if (nrow(x)) return(x) }; data.table() }

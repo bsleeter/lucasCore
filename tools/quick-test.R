@@ -5,7 +5,7 @@
 #   1. "Quick test: stages <s>": depends on a Build result, pipeline = only the given stages; it reads everything else from that
 #      result (the result holds the Build's inputs and every stage's outputs). Its own outputs hide the result's, so a stage that
 #      appends to a shared sheet carries the result's rows over first (stage 8: the Flow Spatial Multipliers; stage 11 does the same)
-#   2. "Quick test: <N> years": tools/new-historical.R --build=<1's result> --also=<the Build result> --years=N
+#   2. "Quick test: <N> years": tools/new-historical.R --build=<1's result> --also=<Stock-Flow Definitions>,<the Build result> --years=N
 # and runs both, printing the result ids and minutes. Inputs come from the Build result as it ran: to test an option, change it in
 # the Build scenario and use --options, which copies that scenario's options sheets into the quick test first.
 # Usage: Rscript tools/quick-test.R <library.ssim> --stages=8[,3,...] [--build=<Build result id>] [--years=10] [--options] [--no-run]
@@ -26,7 +26,11 @@ yrs <- as.integer(opt("years", 10))
 
 # 1. the stages
 S <- rsyncrosim::scenario(P, sprintf("Quick test: stages %s", paste(stg, collapse = ", ")))
-dependency(S) <- bid
+# the library's Stock-Flow Definitions scenario first, when it has one: tools/sync-library.R keeps it current, while the Build result
+# holds the stock-flow definitions of its own day (2026-11-07: ST-Sim refused a pathway to the new Agriculture Sector stock, which
+# the Build's flow diagram lacked; a stage cannot add rows to its input sheets: SyncroSim keeps the dependency's)
+sfd <- sc[Name == "Stock-Flow Definitions" & IsResult == "No", ScenarioId][1]
+dependency(S) <- c(if (!is.na(sfd)) sfd, bid)
 names_all <- levels(datasheet(S, "core_Pipeline", lookupsAsFactors = TRUE, optional = TRUE)$StageNameId)
 pick <- vapply(stg, function(k) { m <- grep(sprintf("^%s - ", k), names_all, value = TRUE); if (length(m) != 1) stop(sprintf("--stages: no single stage numbered %s", k)); m }, "")
 saveDatasheet(S, data.frame(StageNameId = pick, RunOrder = seq_along(pick)), "core_Pipeline")
@@ -44,7 +48,7 @@ t0 <- Sys.time(); R1 <- run(S); r1 <- scenarioId(R1)
 cat(sprintf("stages: %.1f min, result %d\n", as.numeric(difftime(Sys.time(), t0, units = "mins")), r1))
 
 # 2. the short run
-rs <- system2(file.path(R.home("bin"), "Rscript"), c(shQuote(file.path(here, "new-historical.R")), shQuote(lib), sprintf("--build=%d", r1), sprintf("--also=%d", bid),
+rs <- system2(file.path(R.home("bin"), "Rscript"), c(shQuote(file.path(here, "new-historical.R")), shQuote(lib), sprintf("--build=%d", r1), sprintf("--also=%s", paste(c(if (!is.na(sfd)) sfd, bid), collapse = ",")),
               sprintf("--years=%d", yrs), "--historical-only", "--raster-every=0", "--replace", shQuote(sprintf("--name=Quick test: %d years", yrs))), stdout = TRUE, stderr = TRUE)
 cat(rs, sep = "\n"); hid <- suppressWarnings(as.integer(trimws(tail(rs, 1)))); if (is.na(hid)) stop("new-historical.R did not make the run")
 t0 <- Sys.time(); R2 <- run(scenario(L, hid)); cat(sprintf("historical: %.1f min, result %d\n", as.numeric(difftime(Sys.time(), t0, units = "mins")), scenarioId(R2)))
