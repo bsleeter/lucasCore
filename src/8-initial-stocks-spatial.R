@@ -198,7 +198,8 @@ if (gs_on) {
 # crop takes both crops' growth; fallow and idle cropland counts 0 (NASS yields are per harvested acre, NLCD cropland includes
 # fallow); classes NASS does not survey (vegetables, fruit and nuts, vineyards, grassland/pasture, non-crop land) are left out
 # (defaults/stockflow/cdl-crops.csv; user 2026-11-07). A cell's growth is the mean over its pixels and years; its multiplier = that
-# / its ecodivision x class growth (ag-targets.csv, the NPP its growth rows hold), capped at 0.3-2.5 as the other productivity
+# / the same estimate's ecodivision x class mean (ag-cdl-ecodivision-npp.csv, from a national sample of windows; user 2026-11-07:
+# normalize by ecodivision, so the NASS level the growth rows hold stays the ecodivision's mean), capped at 0.3-2.5 as the other productivity
 # multipliers. It becomes the Cropland Productivity flow spatial multiplier on Net Growth Agriculture: Total (it multiplies with
 # Crop Yield and CO2), and the cell's starting litter is scaled by it (soil keeps the class mean). Cropland and pasture cells
 # without surveyed crops, and every other land cell (for land that becomes agriculture), take the multiplier of the agriculture
@@ -213,32 +214,24 @@ if (cp_on) {
   # a year the folder lacks is left out of the mean, with a warning (2026-11-07: the 2022 national zip would not download); none is an error
   if (length(miss) == length(CDL_YEARS)) fail("Cropland Productivity: Cropland Data Layer Folder (%s) has none of %d-%d; run a Data Download with CdlFolder", cs$CdlFolder, min(CDL_YEARS), max(CDL_YEARS))
   if (length(miss)) { say("Cropland Productivity: WARNING - the Cropland Data Layer Folder lacks %s; the map averages the other %d years", paste(miss, collapse = ", "), length(CDL_YEARS) - length(miss)); cf <- cf[file.exists(cf)] }
-  xw <- read_default("stockflow", "cdl-crops.csv")[!is.na(Group) & nzchar(Group)]
-  cg <- read_default("stockflow", "ag-county-crop-npp.csv")[, NPP := as.numeric(NPP)]; eg <- read_default("stockflow", "ag-ecodivision-crop-npp.csv")[, NPP := as.numeric(NPP)]
-  tg <- read_default("stockflow", "ag-targets.csv")[, NPP := as.numeric(NPP)]
+  source(pkg_file("src", "cropland.R"))
+  xw <- read_default("stockflow", "cdl-crops.csv"); cg <- read_default("stockflow", "ag-county-crop-npp.csv"); eg <- read_default("stockflow", "ag-ecodivision-crop-npp.csv")
+  # the divisor: the same CDL-based growth's ecodivision mean (dev/agriculture/03-cdl-ecodivision-sample.R; user 2026-11-07: normalize
+  # by ecodivision), so the map only spreads growth within the ecodivision and the NASS level the growth rows hold stays its mean
+  cn <- read_default("stockflow", "ag-cdl-ecodivision-npp.csv")[, CdlNPP := as.numeric(CdlNPP)]
   isAG <- land & cname %in% AGC
   r0 <- rast(cf[1]); win <- project(as.polygons(ext(P) + 1000, crs = crs(P)), crs(r0)); g30 <- crop(r0, win, snap = "out")
   # counties on the 30 m window, and each county's ecodivision (its most common one on the model grid) for the fallback
   co <- vect(cs$CountiesFile); co <- crop(project(co, crs(r0)), win); co$k <- seq_len(nrow(co))
   ck <- rasterize(co, g30, "k"); vC <- values(project(rasterize(co, P, "k"), P, method = "near"), mat = FALSE)
   ce <- data.table(k = vC, e = sname)[!is.na(k) & !is.na(e), .N, by = .(k, e)][order(-N)][, .SD[1], by = k]
-  # every (county, CDL code) pair's growth: the sum over the code's crop groups ("A|B": a double crop) of the county, ecodivision or CONUS value
-  gm <- eg[, .(NPP = mean(NPP)), by = Group]
-  val <- function(geoid, eco, grp) { v <- cg[GEOID == geoid & Group == grp, NPP]; if (length(v) && is.finite(v[1])) return(v[1])
-    v <- eg[StratumId == eco & Group == grp, NPP]; if (length(v) && is.finite(v[1])) return(v[1]); gm[Group == grp, NPP] }
-  codes <- as.integer(xw$Code)
-  tab <- CJ(k = co$k, code = codes)[, geoid := co$GEOID[k]][, eco := ce$e[match(k, ce$k)]]
-  tab[, npp := mapply(function(g, e, cd) { grp <- strsplit(xw$Group[match(cd, codes)], "|", fixed = TRUE)[[1]]
-    if (identical(grp, "Fallow")) return(0); sum(vapply(grp, function(x) val(g, e, x), 0)) }, geoid, eco, code)]
-  if (anyNA(tab$npp)) fail("Cropland Productivity: no NASS growth for crop groups %s", paste(unique(xw$Group[match(tab[is.na(npp), code], codes)]), collapse = ", "))
-  key <- ck * 1000   # county index x 1000 + CDL code
+  # every (county, CDL code) pair's growth (src/cropland.R), then each year's pixels averaged onto the model grid
+  lk <- tryCatch(cdl_lookup(co$GEOID, ce$e[match(co$k, ce$k)], xw, cg, eg), error = function(e) fail("Cropland Productivity: %s", conditionMessage(e)))
   acc <- NULL; nyr <- NULL
-  for (f in cf) { r <- crop(rast(f), win, snap = "out"); r <- classify(r, cbind(setdiff(0:255, codes), NA))
-    pv <- classify(key + r, cbind(tab$k * 1000 + tab$code, tab$npp), others = NA)
-    m <- project(pv, P, method = "average"); vm <- values(m, mat = FALSE)
+  for (f in cf) { vm <- values(project(cdl_npp(crop(rast(f), win, snap = "out"), ck, lk), P, method = "average"), mat = FALSE)
     acc <- if (is.null(acc)) ifelse(is.na(vm), 0, vm) else acc + ifelse(is.na(vm), 0, vm); nyr <- if (is.null(nyr)) !is.na(vm) + 0 else nyr + !is.na(vm) }
   vN <- ifelse(nyr > 0, acc / nyr, NA)
-  tnpp <- tg$NPP[match(paste(sname, cname), paste(tg$StratumId, tg$StateClassId))]
+  tnpp <- cn$CdlNPP[match(paste(sname, cname), paste(cn$StratumId, cn$StateClassId))]
   cmult <- rep(1, ncell(P)); use <- isAG & !is.na(vN) & !is.na(tnpp) & tnpp > 0
   cmult[use] <- pmin(pmax(vN[use] / tnpp[use], CAP[1]), CAP[2])
   cfl <- fill_multiplier(P, cmult, use & cmult > CAP[1] + 1e-9, land & !use); cmult <- cfl$mult
