@@ -8,9 +8,12 @@
 #   Miami NPP   forest NPP = min(f(MAT), f(MAP)), non-forest NPP = f(MAP) (Lieth 1975); multiplier = year / normal
 #   Tree ring   1 + PrecipCoef (P/Pn - 1) + PrecipLagCoef (P last year/Pn - 1) + TempCoef (T - Tn), coefficients by ecodivision
 #               (defaults/climate/tree-ring-coefficients.csv, tools/make_tree_ring_coefficients.R)
-#   RAP fit     the same form on grass and shrub growth, fitted to RAP NPP 1986-2023 at 1,140 sample windows, coefficients by
-#               ecodivision (defaults/climate/rap-climate-coefficients.csv, LifeForm All; tools/make_rap_climate_coefficients.R); P is
-#               the October-September water year (PRISM monthly; LOCA2 monthly in projections), which fits better everywhere
+#   RAP fit     grass and shrub growth fitted to RAP NPP 1986-2023 at the sample windows, by ecodivision, half variance-scaled
+#               (defaults/climate/rap-climate-coefficients.csv; tools/make_rap_climate_coefficients.R, dev/nonforest/07-...):
+#               1 + sum_k (Coef_k + AridCoef_k ar) s_k + (PrecipLagCoef + PrecipLagAridCoef ar) pl + TempCoef (T - Tn), floored at 0;
+#               s_k = (season k's rain - its normal) / the water year's normal, for Oct-Dec, Jan-Mar, Apr-Jun, Jul-Sep of the
+#               October-September water year; pl = last water year / normal - 1; ar = log(water-year normal / 500 mm), clamped to the
+#               range the ecodivision's fit saw. PRISM monthly in stage 7; LOCA2 monthly in stage 11
 #   Q10         Q10 ^ ((T - Tn) / 10), Q10 read from the CBM DOM table for the listed pools (the same values stage 3 uses)
 #   None        no multiplier: the flow runs at normal climate every year
 # Every multiplier is an anomaly against the 1991-2020 normal of its own data, so 1.0 means "the climate the curves and decay rates
@@ -50,18 +53,33 @@ climate_params <- function(fm, P, stage) {
     say("%s: Q10 %.3g, by ecodivision %s", fm$FlowGroupId[i], base, paste(sprintf("%s %.3g", ss[dif], qs[dif]), collapse = ", "))
     classify(P, cbind(as.integer(stl$Id[match(ss[dif], stl$Name)]), qs[dif]), others = base) }), fm$FlowGroupId)
   # the linear models (tree ring for forest, RAP fit for grass and shrub): coefficient rasters by primary stratum
-  lin <- list(`Tree ring` = list(f = "tree-ring-coefficients.csv", what = "tree-ring"), `RAP fit` = list(f = "rap-climate-coefficients.csv", what = "RAP fit"))
+  lin <- list(`Tree ring` = list(f = "tree-ring-coefficients.csv", what = "tree-ring",
+                                  cols = c(bp = "PrecipCoef", bl = "PrecipLagCoef", bt = "TempCoef")),
+              `RAP fit` = list(f = "rap-climate-coefficients.csv", what = "RAP fit", cols = RAP_COEF))
   coef <- list()
   for (md in intersect(names(lin), fm$Model)) {
-    tc <- read_default("climate", lin[[md]]$f); if ("LifeForm" %in% names(tc)) tc <- tc[LifeForm == "All"]
+    tc <- read_default("climate", lin[[md]]$f)
     ids <- as.integer(terra::unique(P)[[1]]); miss <- setdiff(ids, as.integer(tc$Id))
     check(stage, sprintf("every ecodivision has %s coefficients", lin[[md]]$what), !length(miss), paste("strata without:", paste(miss, collapse = ", ")))
-    coef[[md]] <- lapply(c(bp = "PrecipCoef", bl = "PrecipLagCoef", bt = "TempCoef"), function(k) classify(P, cbind(as.integer(tc$Id), as.numeric(tc[[k]])), others = NA))
+    cols <- lin[[md]]$cols; nocol <- setdiff(cols, names(tc))
+    check(stage, sprintf("%s has every coefficient column", lin[[md]]$f), !length(nocol), paste(nocol, collapse = ", "))
+    coef[[md]] <- lapply(cols, function(k) classify(P, cbind(as.integer(tc$Id), as.numeric(tc[[k]])), others = NA))
     used <- tc[as.integer(Id) %in% ids]
-    say("%s coefficients (precip, last year's precip, temperature): %s", md,
+    if (md == "Tree ring") say("%s coefficients (precip, last year's precip, temperature): %s", md,
         paste(sprintf("%s %s/%s/%s (%s)", used$StratumId, used$PrecipCoef, used$PrecipLagCoef, used$TempCoef, used$Source), collapse = "; "))
+    else say("RAP fit coefficients (Oct-Dec, Jan-Mar, Apr-Jun, Jul-Sep rain; last year's; temperature; scale): %s",
+        paste(sprintf("%s %s/%s/%s/%s/%s/%s x%s (%s)", used$StratumId, used$OndCoef, used$JfmCoef, used$AmjCoef, used$JasCoef, used$PrecipLagCoef,
+                      used$TempCoef, used$Scale, used$Source), collapse = "; "))
   }
   list(q10 = q10, coef = coef, coef_r = coef[["Tree ring"]]) }
+
+# the RAP fit columns of defaults/climate/rap-climate-coefficients.csv, by the names emit() uses
+RAP_COEF <- c(ond = "OndCoef", jfm = "JfmCoef", amj = "AmjCoef", jas = "JasCoef", bl = "PrecipLagCoef", bt = "TempCoef",
+              ond_a = "OndAridCoef", jfm_a = "JfmAridCoef", amj_a = "AmjAridCoef", bl_a = "PrecipLagAridCoef", amin = "AridMin", amax = "AridMax")
+RAP_SEASONS <- list(ond = 10:12, jfm = 1:3, amj = 4:6, jas = 7:9)   # months of the water year ending in year y: ond is of y - 1
+
+# what emit() takes for RAP fit: S, the year's rain by season (a list by RAP_SEASONS); S1, last year's; Sn, the 1991-2020 normals
+rap_water_year <- function(S, S1, Sn) list(S = S, Sn = Sn, Pn = Reduce(`+`, Sn), Pl = Reduce(`+`, S1))
 
 miami <- function(t, p, forest) { if (!forest) return(6116 * (1 - exp(-6.05e-5 * p)))
   min(2540 / (1 + exp(1.584 - 0.0622 * t)), (0.551 * p^1.055) / exp(0.000306 * p)) }
@@ -79,17 +97,21 @@ climate_emitter <- function(fm, P, prm) {
     r <- mask(project(x, P, method = "bilinear"), P); n <- global(is.na(r) & !is.na(P), "sum")[[1]]
     r <- mask(cover(r, init(P, fill)), P); attr(r, "unfilled") <- n; r }
   # Ty, Py: the year's annual mean temperature and precipitation; Pl: last year's precipitation; Tn, Pn: the 1991-2020 normal of the same
-  # data; nrm: the normal's Miami NPP; wy: list(Py, Pl, Pn) of October-September water years, which RAP fit uses (it was fitted on them)
+  # data; nrm: the normal's Miami NPP; wy: the water years RAP fit uses (rap_water_year()): S, the year's seasonal rain (a list by
+  # RAP_SEASONS), Sn their 1991-2020 normals, Pn the water-year normal, Pl last water year's rain
   e$emit <- function(y, Ty, Py, Pl, Tn, Pn, nrm, climate, wy = NULL) {
-    terms <- list()
-    lin_terms <- function(md) { k <- if (md == "RAP fit") "wy" else "cal"
-      if (is.null(terms[[k]])) { p <- if (k == "wy") wy else list(Py = Py, Pl = Pl, Pn = Pn)
-        if (is.null(p)) stop("RAP fit needs water-year precipitation (emit(wy = ...))")
-        terms[[k]] <<- list(pr = to_grid(p$Py / p$Pn), pl = to_grid(p$Pl / p$Pn), ta = to_grid(Ty - Tn, fill = 0)) }
-      terms[[k]] }
+    tr <- NULL   # the tree-ring terms, made once a year for every forest flow group
     for (j in seq_len(nrow(fm))) { g <- fm$FlowGroupId[j]; md <- fm$Model[j]
-      r <- if (md %in% c("Tree ring", "RAP fit")) { cf <- prm$coef[[md]]; tt <- lin_terms(md)
-        max(1 + cf$bp * (tt$pr - 1) + cf$bl * (tt$pl - 1) + cf$bt * tt$ta, 0)
+      r <- if (md == "Tree ring") { cf <- prm$coef[[md]]
+        if (is.null(tr)) tr <- list(pr = to_grid(Py / Pn), pl = to_grid(Pl / Pn), ta = to_grid(Ty - Tn, fill = 0))
+        max(1 + cf$bp * (tr$pr - 1) + cf$bl * (tr$pl - 1) + cf$bt * tr$ta, 0)
+      } else if (md == "RAP fit") { cf <- prm$coef[[md]]
+        if (is.null(wy)) stop("RAP fit needs water-year precipitation (emit(wy = ...))")
+        ar <- max(min(to_grid(log(wy$Pn / 500), fill = 0), cf$amax), cf$amin)
+        s <- lapply(names(RAP_SEASONS), function(k) to_grid((wy$S[[k]] - wy$Sn[[k]]) / wy$Pn, fill = 0)); names(s) <- names(RAP_SEASONS)
+        pl <- to_grid(wy$Pl / wy$Pn - 1, fill = 0)
+        max(1 + (cf$ond + cf$ond_a * ar) * s$ond + (cf$jfm + cf$jfm_a * ar) * s$jfm + (cf$amj + cf$amj_a * ar) * s$amj + cf$jas * s$jas +
+              (cf$bl + cf$bl_a * ar) * pl + cf$bt * to_grid(Ty - Tn, fill = 0), 0)
       } else if (md == "Miami NPP") { forest <- fm$Role[j] == "ForestGrowth"; to_grid(miami(Ty, Py, forest) / nrm[[if (forest) "forest" else "nonforest"]])
       } else { q <- prm$q10[[g]]; if (inherits(q, "SpatRaster")) q^(to_grid(Ty - Tn, fill = 0) / 10) else to_grid(q^((Ty - Tn) / 10)) }   # Q10 by ecodivision: a raster
       if (!is.null(attr(r, "unfilled"))) e$unfilled <- max(e$unfilled, attr(r, "unfilled"))

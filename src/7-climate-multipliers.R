@@ -46,14 +46,16 @@ wyp <- NULL
 if ("RAP fit" %in% fm$Model) {
   mf <- function(y, m) file.path(src$PrismFolder, "monthly-us25m", "ppt", sprintf("prism_ppt_us_25m_%d%02d.tif", y, m))
   wy_files <- function(y) c(mf(y - 1, 10:12), mf(y, 1:9))
+  sea_files <- function(y, k) if (k == "ond") mf(y - 1, RAP_SEASONS[[k]]) else mf(y, RAP_SEASONS[[k]])
   wneed <- unique(c(y0 - 1, years, 1991:2020)); wmiss <- unlist(lapply(wneed, function(y) { f <- wy_files(y); basename(f[!file.exists(f)]) }))
   if (length(wmiss)) fail("RAP fit: PRISM monthly precipitation missing under %s/monthly-us25m/ppt (%d files, e.g. %s): rerun the Data Download with PrismFolder", src$PrismFolder, length(wmiss), paste(head(wmiss, 3), collapse = ", "))
-  wyP <- function(y) sum(rast(lapply(wy_files(y), cut)))
-  wyp <- list(Pn = mean(rast(lapply(1991:2020, wyP))), Pl = wyP(y0 - 1))
-  say("RAP fit: water-year precipitation (October-September) from PRISM monthly, %d-%d; normal = mean of water years 1991-2020", y0 - 1, y1) }
+  seas <- function(y) sapply(names(RAP_SEASONS), function(k) sum(rast(lapply(sea_files(y, k), cut))), simplify = FALSE)
+  NS <- lapply(1991:2020, seas); Sn <- sapply(names(RAP_SEASONS), function(k) mean(rast(lapply(NS, `[[`, k))), simplify = FALSE); rm(NS)
+  wyp <- seas(y0 - 1)
+  say("RAP fit: water-year precipitation (October-September) by season from PRISM monthly, %d-%d; normals = water years 1991-2020", y0 - 1, y1) }
 for (y in years) { Ty <- cut(pf("tmean", y)); Py <- cut(pf("ppt", y))
-  wy <- if (is.null(wyp)) NULL else { wyp$Py <- wyP(y); list(Py = wyp$Py, Pl = wyp$Pl, Pn = wyp$Pn) }
-  em$emit(y, Ty, Py, Pl, Tn, Pn, nrm, "PRISM", wy); Pl <- Py; if (!is.null(wyp)) wyp$Pl <- wyp$Py }
+  wy <- NULL; if (!is.null(wyp)) { Sy <- seas(y); wy <- rap_water_year(Sy, wyp, Sn); wyp <- Sy }
+  em$emit(y, Ty, Py, Pl, Tn, Pn, nrm, "PRISM", wy); Pl <- Py }
 progressBar()
 
 # ---- checks ---------------------------------------------------------------------------------------------------------
