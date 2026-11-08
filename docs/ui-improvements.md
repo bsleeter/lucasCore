@@ -445,6 +445,23 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
          even by water year, explains little of Mediterranean grass growth (timing within the season matters).
          Possible next step (not decided): use RAP's observed yearly NPP anomaly directly as the historical multiplier (the region's
          RapNppFolder already holds 1986 on), and the RAP fit only for projections.
+       - **Calibrated to RAP's variation (built 2026-11-07, user: stay with the RAP fit, use seasons + aridity half-scaled).**
+         dev/nonforest/06-rap-climate-explore.R compared five forms by leave-one-window-out prediction; the best everywhere (model SD)
+         splits the water year's rain into Oct-Dec / Jan-Mar / Apr-Jun / Jul-Sep anomalies, keeps last water year and temperature,
+         and lets the rain slopes vary with aridity (log of the water-year normal / 500 mm), one fit over all life forms per
+         ecodivision: Mediterranean r 0.39 -> 0.43, beats the mean 73 -> 84%; elsewhere r 0.50 -> 0.53, 75 -> 83%. It still
+         reproduces only about half of RAP's SD; scaling the response by k^0.5 (k = RAP's SD over the fit's, 1.2-2.4 by ecodivision)
+         reproduces about three quarters at 4-7% more RMSE (beats the mean in 57-69%); full matching beats it in only 27-45%.
+         Built: dev/nonforest/07-rap-climate-seasonal-fit.R, tools/make_rap_climate_coefficients.R (10 coefficients, AridMin/AridMax,
+         Scale; ecodivisions with fewer than 30 windows take CONUS, since the small fits turned rain slopes strongly negative at one
+         end of their aridity range); src/climate.R clamps aridity to the fit's range and floors at 0; stage 7 sums seasons from PRISM
+         monthly, stage 11 from LOCA2 monthly (loca2_annual "ppt_seasons", one read; seasons sum to the water year exactly across the
+         2014/2015 file split). tests/unit-rap-climate.R 11 pass. Stage 11 not yet run end to end.
+         Solano quick test (stage 7 alone + 1985-1995; 2.5 + 6.7 min): the study-area multiplier's yearly SD 1986-2023 is 0.090
+         (0.047 before, Miami 0.332), against RAP's own Solano SD of 0.134; r with RAP's yearly ratio 0.41; RMSE 0.130 against 0.138
+         for a constant 1.0. Rerunning stage 7 on its own first failed in ST-Sim ("Object reference"): its result held the Initial
+         Conditions maps without Properties and hid stage 8's productivity multipliers. Fixed: keep_ic_properties() (shared.R) in
+         stages 7 and 8, and stage 7 carries dependency productivity rows over as stage 11 does.
     8. **Shrub growth by age.** Chaparral regrows for 20+ years after fire and sage for decades, so growth by age after fire (the
        Non-Forest Growth sheet already has an age column) in place of a constant rate at equilibrium. Matters most in P26.
     9. **Validation throughout,** against data the calibration did not use: RaCA soil carbon, AmeriFlux grassland and sagebrush sites,
