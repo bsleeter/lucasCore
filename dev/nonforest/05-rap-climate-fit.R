@@ -15,21 +15,27 @@
 #   placebo  the same fit with the years' climate shuffled (one permutation for all windows, so spatial patterns stay): coefficients
 #            should be about 0; repeated PLACEBO times
 # Writes dev/nonforest/05-rap-climate-{window-fits,pooled,skill,placebo}.csv.
-# Usage: Rscript dev/nonforest/05-rap-climate-fit.R
+# Usage: [PRECIP=water|calendar] Rscript dev/nonforest/05-rap-climate-fit.R   (calendar writes 05-rap-climate-*-calendar.csv)
 # =============================================================================
 pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), "..", ".."), winslash = "/")
 suppressPackageStartupMessages(library(data.table))
 MIN_CELLS <- 50; MIN_YEARS <- 30; MIN_WINDOWS <- 5; PLACEBO <- 20; NORMAL <- 1991:2020; OUT <- file.path(pkg, "dev", "nonforest")
+SFX <- if (Sys.getenv("PRECIP", "water") == "calendar") "-calendar" else ""   # the calendar-year fit is written beside the water-year one
 s <- fread(file.path(OUT, "04-rap-climate-sample.csv"))[is.na(error) | error == ""]
 s[, LifeForm := fifelse(StateClassId == "Grassland: Annual", "Annual grass", fifelse(startsWith(StateClassId, "Grassland"), "Perennial grass", fifelse(startsWith(StateClassId, "Shrubland"), "Shrub", NA_character_)))]
 s <- s[!is.na(LifeForm)]
 # one row per window x life form x year: the cell-weighted mean NPP of its classes
-d <- s[, .(cells = sum(cells), npp = weighted.mean(NppAnnual + NppPerennial + NppShrub, nppCells, na.rm = TRUE), Ppt = Ppt[1], PptLag = PptLag[1], Tmean = Tmean[1],
+d <- s[, .(cells = sum(cells), npp = weighted.mean(NppAnnual + NppPerennial + NppShrub, nppCells, na.rm = TRUE), Ppt = Ppt[1], PptLag = PptLag[1], WyPpt = WyPpt[1], WyPptLag = WyPptLag[1], WyPptNormal = WyPptNormal[1], Tmean = Tmean[1],
            PptNormal = PptNormal[1], TmeanNormal = TmeanNormal[1]), by = .(StratumId, window, LifeForm, Year)]
 d <- d[cells >= MIN_CELLS & is.finite(npp) & !is.na(Ppt) & !is.na(PptLag)]
 d[, nppNormal := mean(npp[Year %in% NORMAL]), by = .(StratumId, window, LifeForm)]
 d <- d[nppNormal > 0.05]   # windows with almost no growth give ratios of noise
-d[, `:=`(ratio = npp / nppNormal, pratio = Ppt / PptNormal, pratio_lag = PptLag / PptNormal, tanom = Tmean - TmeanNormal)]
+# precipitation of the calendar year, or (PRECIP=water, the default since 2026-11-07) of the October-September water year
+PRECIP <- Sys.getenv("PRECIP", "water"); if (!PRECIP %in% c("water", "calendar")) stop("PRECIP: water or calendar")
+if (PRECIP == "water") d[, `:=`(pratio = WyPpt / WyPptNormal, pratio_lag = WyPptLag / WyPptNormal)] else d[, `:=`(pratio = Ppt / PptNormal, pratio_lag = PptLag / PptNormal)]
+d[, `:=`(ratio = npp / nppNormal, tanom = Tmean - TmeanNormal)]; d <- d[is.finite(pratio) & is.finite(pratio_lag)]
+cat("precipitation:", PRECIP, "year
+")
 miami_nf <- function(p) 6116 * (1 - exp(-6.05e-5 * p)); d[, miami := miami_nf(Ppt) / miami_nf(PptNormal)]
 d[, n := .N, by = .(StratumId, window, LifeForm)]; d <- d[n >= MIN_YEARS]
 cat(sprintf("%d windows x life forms, %d window-years\n", uniqueN(d[, paste(StratumId, window, LifeForm)]), nrow(d)))
@@ -73,6 +79,6 @@ cat("\nPlacebo (climate of shuffled years), CONUS pools: mean and 95% range over
 print(merge(pl[, .(placebo_bp = sprintf("%.3f (%.3f, %.3f)", mean(PrecipCoef), quantile(PrecipCoef, .025), quantile(PrecipCoef, .975)),
                    placebo_bt = sprintf("%.4f (%.4f, %.4f)", mean(TempCoef), quantile(TempCoef, .025), quantile(TempCoef, .975))), by = LifeForm],
             conus[, .(LifeForm, real_bp = round(PrecipCoef, 3), real_bt = round(TempCoef, 4))], by = "LifeForm"))
-fwrite(wf, file.path(OUT, "05-rap-climate-window-fits.csv")); fwrite(rbind(conus[, StratumId := "CONUS"][, Source := "CONUS life form"], eco, fill = TRUE), file.path(OUT, "05-rap-climate-pooled.csv"))
-fwrite(sk, file.path(OUT, "05-rap-climate-skill.csv")); fwrite(pl, file.path(OUT, "05-rap-climate-placebo.csv"))
+fwrite(wf, file.path(OUT, paste0("05-rap-climate-window-fits", SFX, ".csv"))); fwrite(rbind(conus[, StratumId := "CONUS"][, Source := "CONUS life form"], eco, fill = TRUE), file.path(OUT, paste0("05-rap-climate-pooled", SFX, ".csv")))
+fwrite(sk, file.path(OUT, paste0("05-rap-climate-skill", SFX, ".csv"))); fwrite(pl, file.path(OUT, paste0("05-rap-climate-placebo", SFX, ".csv")))
 cat("wrote dev/nonforest/05-rap-climate-*.csv\n")

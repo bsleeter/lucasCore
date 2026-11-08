@@ -73,7 +73,12 @@ if (nrow(fm)) {
       as.numeric(Sys.time() - t0, units = "mins"), global(LTn, "mean", na.rm = TRUE)[[1]], global(LPn, "mean", na.rm = TRUE)[[1]])
   em <- climate_emitter(fm, P, prm)
   lnrm <- climate_normals(LTn, LPn); Pl <- PP[[as.character(y1)]]
-  for (y in years) { Ty <- TT[[as.character(y)]]; Py <- PP[[as.character(y)]]; em$emit(y, Ty, Py, Pl, LTn, LPn, lnrm, label); Pl <- Py }
+  # RAP fit: October-September water years from the same monthly files, against the model's own water-year normal
+  WP <- NULL; if ("RAP fit" %in% fm$Model) { WP <- la("ppt_wy", c(y1, years)); WPn <- mean(la("ppt_wy", 1991:2020)); WPl <- WP[[as.character(y1)]]
+    say("RAP fit: water-year precipitation from %s monthly", label) }
+  for (y in years) { Ty <- TT[[as.character(y)]]; Py <- PP[[as.character(y)]]
+    wy <- if (is.null(WP)) NULL else list(Py = WP[[as.character(y)]], Pl = WPl, Pn = WPn)
+    em$emit(y, Ty, Py, Pl, LTn, LPn, lnrm, label, wy); Pl <- Py; if (!is.null(WP)) WPl <- WP[[as.character(y)]] }
 }
 progressBar()
 

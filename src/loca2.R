@@ -35,21 +35,27 @@ loca2_best <- function(fs, win) {
   o <- order(fs$y0, fs$y1, -round(cover, 6), area); o <- o[cover[o] > 0]
   unique(fs[o], by = c("y0", "y1")) }
 
-# annual series of "tmean" (C) or "ppt" (mm) for the years asked, cropped to `win` (a lon/lat extent), one layer per year named by year
+# annual series of "tmean" (C), "ppt" (mm) or "ppt_wy" (mm in the October-September water year ending in the year) for the years
+# asked, cropped to `win` (a lon/lat extent), one layer per year named by year
 loca2_annual <- function(folder, gcm, member, ssp, var, years, win) {
   run_of <- function(y) if (y <= 2014) "historical" else ssp
+  wy <- var == "ppt_wy"; cal <- if (wy) sort(unique(c(years - 1L, years))) else years   # a water year takes October-December of the year before
   read_var <- function(v) {
     out <- list()
-    for (run in unique(vapply(years, run_of, ""))) { yrs <- years[vapply(years, run_of, "") == run]; fs <- loca2_best(loca2_files(folder, gcm, member, run, v), win)
+    for (run in unique(vapply(cal, run_of, ""))) { yrs <- cal[vapply(cal, run_of, "") == run]; fs <- loca2_best(loca2_files(folder, gcm, member, run, v), win)
       for (i in seq_len(nrow(fs))) { want <- yrs[yrs >= fs$y0[i] & yrs <= fs$y1[i]]; if (!length(want)) next
         r <- loca2_rast(fs$file[i])
         tm <- terra::time(r); yy <- as.integer(format(tm, "%Y")); keep <- which(yy %in% want)
         r <- terra::crop(r[[keep]], win); tm <- tm[keep]; yy <- yy[keep]
         if (v == "pr") { mo <- as.integer(format(tm, "%m")); days <- as.integer(format(as.Date(paste(yy + (mo == 12), mo %% 12 + 1, 1, sep = "-")) - 1, "%d"))
           r <- r * (days * 86400) }   # one value per layer: mm in each month
+        if (wy) { mo <- as.integer(format(tm, "%m")); yy <- yy + (mo >= 10L) }
         out[[length(out) + 1]] <- terra::tapp(r, index = yy, fun = if (v == "pr") "sum" else "mean") } }
-    miss <- setdiff(years, as.integer(sub("^X", "", unlist(lapply(out, names)))))
+    x <- terra::rast(out); names(x) <- sub("^X", "", names(x))
+    # a water year split between two files (the historical run's October-December 2014, the SSP's 2015) is summed back together
+    if (wy && anyDuplicated(names(x))) { nn <- names(x); x <- terra::tapp(x, index = nn, fun = "sum"); names(x) <- sub("^X", "", names(x)) }
+    miss <- setdiff(years, as.integer(names(x)))
     if (length(miss)) stop(sprintf("LOCA2 %s %s %s %s: no monthly data over the study window for %s", gcm, member, ssp, v, paste(range(miss), collapse = "-")), call. = FALSE)
-    x <- terra::rast(out); names(x) <- sub("^X", "", names(x)); x[[as.character(years)]] }
-  if (var == "ppt") return(read_var("pr"))
+    x[[as.character(years)]] }
+  if (var %in% c("ppt", "ppt_wy")) return(read_var("pr"))
   (read_var("tasmax") + read_var("tasmin")) / 2 - 273.15 }

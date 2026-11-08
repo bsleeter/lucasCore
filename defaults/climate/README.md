@@ -26,7 +26,9 @@ Net Growth Non Forest: Total; the Annual grass, Perennial grass and Shrub rows a
 nearly the same). Ecodivisions with fewer than 5 window fits take the CONUS pool. Predicting each window from the other windows' pool,
 the RAP fit beats the window's own mean in 75-80% of windows and Miami NPP in 23-31% (Miami swings 1.0-1.4 times the observed change);
 with the years' climate shuffled the precipitation coefficients fall to about 0. Climate Options: Non-Forest Growth = RAP fit uses it;
-Miami NPP stays the default for now.
+Miami NPP stays the default for now. Precipitation is the October-September water year (PRISM monthly, `monthly-us25m/ppt`; LOCA2 monthly in
+projections): against calendar years it fits better everywhere (Mediterranean r 0.33 -> 0.39, elsewhere 0.45 -> 0.49); the
+calendar-year fit is kept in `dev/nonforest/05-rap-climate-*-calendar.csv`.
 
 ## Projections (LOCA2)
 

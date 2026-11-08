@@ -9,7 +9,8 @@
 #   Tree ring   1 + PrecipCoef (P/Pn - 1) + PrecipLagCoef (P last year/Pn - 1) + TempCoef (T - Tn), coefficients by ecodivision
 #               (defaults/climate/tree-ring-coefficients.csv, tools/make_tree_ring_coefficients.R)
 #   RAP fit     the same form on grass and shrub growth, fitted to RAP NPP 1986-2023 at 1,140 sample windows, coefficients by
-#               ecodivision (defaults/climate/rap-climate-coefficients.csv, LifeForm All; tools/make_rap_climate_coefficients.R)
+#               ecodivision (defaults/climate/rap-climate-coefficients.csv, LifeForm All; tools/make_rap_climate_coefficients.R); P is
+#               the October-September water year (PRISM monthly; LOCA2 monthly in projections), which fits better everywhere
 #   Q10         Q10 ^ ((T - Tn) / 10), Q10 read from the CBM DOM table for the listed pools (the same values stage 3 uses)
 #   None        no multiplier: the flow runs at normal climate every year
 # Every multiplier is an anomaly against the 1991-2020 normal of its own data, so 1.0 means "the climate the curves and decay rates
@@ -78,13 +79,17 @@ climate_emitter <- function(fm, P, prm) {
     r <- mask(project(x, P, method = "bilinear"), P); n <- global(is.na(r) & !is.na(P), "sum")[[1]]
     r <- mask(cover(r, init(P, fill)), P); attr(r, "unfilled") <- n; r }
   # Ty, Py: the year's annual mean temperature and precipitation; Pl: last year's precipitation; Tn, Pn: the 1991-2020 normal of the same
-  # data; nrm: the normal's Miami NPP
-  e$emit <- function(y, Ty, Py, Pl, Tn, Pn, nrm, climate) {
-    tr_terms <- NULL
+  # data; nrm: the normal's Miami NPP; wy: list(Py, Pl, Pn) of October-September water years, which RAP fit uses (it was fitted on them)
+  e$emit <- function(y, Ty, Py, Pl, Tn, Pn, nrm, climate, wy = NULL) {
+    terms <- list()
+    lin_terms <- function(md) { k <- if (md == "RAP fit") "wy" else "cal"
+      if (is.null(terms[[k]])) { p <- if (k == "wy") wy else list(Py = Py, Pl = Pl, Pn = Pn)
+        if (is.null(p)) stop("RAP fit needs water-year precipitation (emit(wy = ...))")
+        terms[[k]] <<- list(pr = to_grid(p$Py / p$Pn), pl = to_grid(p$Pl / p$Pn), ta = to_grid(Ty - Tn, fill = 0)) }
+      terms[[k]] }
     for (j in seq_len(nrow(fm))) { g <- fm$FlowGroupId[j]; md <- fm$Model[j]
-      r <- if (md %in% c("Tree ring", "RAP fit")) { cf <- prm$coef[[md]]
-        if (is.null(tr_terms)) tr_terms <- list(pr = to_grid(Py / Pn), pl = to_grid(Pl / Pn), ta = to_grid(Ty - Tn, fill = 0))
-        max(1 + cf$bp * (tr_terms$pr - 1) + cf$bl * (tr_terms$pl - 1) + cf$bt * tr_terms$ta, 0)
+      r <- if (md %in% c("Tree ring", "RAP fit")) { cf <- prm$coef[[md]]; tt <- lin_terms(md)
+        max(1 + cf$bp * (tt$pr - 1) + cf$bl * (tt$pl - 1) + cf$bt * tt$ta, 0)
       } else if (md == "Miami NPP") { forest <- fm$Role[j] == "ForestGrowth"; to_grid(miami(Ty, Py, forest) / nrm[[if (forest) "forest" else "nonforest"]])
       } else { q <- prm$q10[[g]]; if (inherits(q, "SpatRaster")) q^(to_grid(Ty - Tn, fill = 0) / 10) else to_grid(q^((Ty - Tn) / 10)) }   # Q10 by ecodivision: a raster
       if (!is.null(attr(r, "unfilled"))) e$unfilled <- max(e$unfilled, attr(r, "unfilled"))

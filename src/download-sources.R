@@ -182,7 +182,7 @@ download_handlers <- function() {
                                   file = sprintf("prism_%s_us_25m_2020_avg_30y.zip", c("tmean", "ppt")))
       # monthly precipitation (2026-11-07, to-do 39 step 7): the October-September water year of the RAP fit grass and shrub response;
       # the region's years from the October before the first, and 1990-2020 for the water-year normal
-      y0 <- min(years_of(ctx, 1895:last)); ym <- sort(unique(c(max(y0 - 1L, 1981L):last, 1990:2020)))
+      y0 <- min(years_of(ctx, 1895:last)); ym <- sort(unique(c(max(y0 - 2L, 1981L):last, 1990:2020)))   # the first year's lag needs October two years before
       m <- data.table::CJ(year = ym, mon = 1:12)[, .(var = "ppt", year, url = sprintf("https://data.prism.oregonstate.edu/time_series/us/an/4km/ppt/monthly/%d/prism_ppt_us_25m_%d%02d.zip", year, year, mon),
                                                        file = sprintf("prism_ppt_us_25m_%d%02d.zip", year, mon), monthly = TRUE)]
       rbind(a[, monthly := FALSE], n[, monthly := FALSE], m)[, fetch := TRUE][] },

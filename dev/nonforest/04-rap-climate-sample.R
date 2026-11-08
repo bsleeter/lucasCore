@@ -9,7 +9,8 @@
 #            (2014-2023 mean tree NPP > herb + shrub) are left out, as in the targets
 #   NPP      RAP vegetation NPP v3 (Robinson et al. 2019; CC0) every year of YEARS, bands annual herbaceous, perennial herbaceous,
 #            shrub, tree (Mg C/ha/yr = raw / 1000), the mean over the window's cells of each class
-#   climate  PRISM annual precipitation and mean temperature (current release, annual-us25m) at the window centre for YEARS and the
+#   climate  PRISM annual precipitation and mean temperature (current release, annual-us25m), and water-year (October-September)
+#            precipitation from PRISM monthly (monthly-us25m), at the window centre for YEARS and the
 #            year before the first (the lag), and the 1991-2020 normals
 # The raw RAP crop of every window (all bands, all years, RAP's own lon/lat grid) is kept in RAP_WINDOWS, one GeoTIFF per window, so a
 # refit or another class rule never reads RAP again (user, 2026-11-07: keep what is downloaded; the full 30 m CONUS archive, about 3 TB,
@@ -42,6 +43,17 @@ clim <- rbindlist(lapply(yy, function(y) data.table(centres[, .(StratumId, windo
 nrm <- data.table(centres[, .(StratumId, window)], PptNormal = ex(Sys.glob(file.path(PRISM, "normals", "prism_ppt_us_25m_2020_avg_30y.tif"))),
                   TmeanNormal = ex(Sys.glob(file.path(PRISM, "normals", "prism_tmean_us_25m_2020_avg_30y.tif"))))
 cat(sprintf("PRISM: %d window-years; %d windows without a value\n", nrow(clim), clim[is.na(Ppt), uniqueN(paste(StratumId, window))]))
+# water-year precipitation (October of the year before to September; 2026-11-07): Mediterranean grass grows on autumn and winter rain,
+# which a calendar year splits between two growing seasons. From PRISM monthly (monthly-us25m/ppt); normal = the mean of water years
+# 1991-2020
+wy_years <- c(min(YEARS) - 1, YEARS); mons <- unique(unlist(lapply(c(wy_years, 1991:2020), function(y) c(sprintf("%d%02d", y - 1, 10:12), sprintf("%d%02d", y, 1:9)))))
+mf <- vapply(mons, function(m) { f <- Sys.glob(file.path(PRISM, "monthly-us25m", "ppt", sprintf("prism_ppt_us_25m_%s.tif", m))); if (length(f) != 1) stop("PRISM monthly ppt ", m, ": ", length(f), " files"); f }, "")
+mv <- as.matrix(terra::extract(rast(mf), project(pts, crs(rast(mf[1]))), method = "bilinear", ID = FALSE)); colnames(mv) <- mons
+wy <- function(y) rowSums(mv[, c(sprintf("%d%02d", y - 1, 10:12), sprintf("%d%02d", y, 1:9)), drop = FALSE])
+wyc <- rbindlist(lapply(wy_years, function(y) data.table(centres[, .(StratumId, window)], Year = y, WyPpt = wy(y))))
+nrm[, WyPptNormal := Reduce(`+`, lapply(1991:2020, wy)) / 30]
+clim <- merge(clim, wyc, by = c("StratumId", "window", "Year"), all.x = TRUE)
+cat(sprintf("PRISM water years %d-%d from %d monthly files\n", min(wy_years), max(wy_years), length(mf)))
 
 # ---- one window -------------------------------------------------------------------------------------------------------------
 retry <- function(f, n = 6) { for (i in seq_len(n)) { r <- tryCatch(f(), error = function(e) e); if (!inherits(r, "error")) return(r); Sys.sleep(2^i + runif(1, 0, 2)) }; stop(conditionMessage(r)) }
@@ -80,6 +92,6 @@ out <- rbindlist(res, fill = TRUE); if (!"error" %in% names(out)) out[, error :=
 cat(sprintf("%.1f min; %d window x class x year rows; %d windows failed\n", as.numeric(Sys.time() - t0, units = "mins"), nrow(out[is.na(error)]), out[!is.na(error), uniqueN(paste(StratumId, window))]))
 if (any(!is.na(out$error))) print(head(out[!is.na(error), .(StratumId, window, error = substr(error, 1, 150))], 10))
 out <- merge(out, clim, by = c("StratumId", "window", "Year"), all.x = TRUE)
-lag <- clim[, .(StratumId, window, Year = Year + 1L, PptLag = Ppt)]; out <- merge(out, lag, by = c("StratumId", "window", "Year"), all.x = TRUE)
+lag <- clim[, .(StratumId, window, Year = Year + 1L, PptLag = Ppt, WyPptLag = WyPpt)]; out <- merge(out, lag, by = c("StratumId", "window", "Year"), all.x = TRUE)
 out <- merge(out, nrm, by = c("StratumId", "window"), all.x = TRUE)
 fwrite(out, OUT); cat("wrote", OUT, "\n")
