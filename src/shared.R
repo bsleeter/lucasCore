@@ -221,6 +221,17 @@ dependency_multipliers <- function(type) {
       if (nrow(x)) return(x[, MultiplierFileName := file.path(paste0(main_library(), ".data"), sprintf("Scenario-%d", id), "stsim_FlowSpatialMultiplier", basename(MultiplierFileName))][]) } }
   NULL }
 
+# A stage rerun on its own (tools/quick-test.R) takes a copy of the Build's Initial Conditions Spatial maps but not their Properties
+# sheet; the two are one feed, which a dependency supplies whole, so a run on the result found the maps without their grid ("Object
+# reference not set", 2026-11-07). Saving the maps' row again makes SyncroSim write their Properties, as stages 1 and 5 do
+# (Properties cannot be saved directly: its negative Albers corner fails validation). In a Build they are already there.
+keep_ic_properties <- function(scn, ic, stage) {
+  if (!nrow(ic)) return(invisible())
+  icp <- as.data.table(datasheet(scn, "stsim_InitialConditionsSpatialProperties", optional = TRUE))
+  if (nrow(icp)) return(invisible())
+  saveDatasheet(scn, as.data.frame(ic[1, intersect(names(ic), c("StratumFileName", "SecondaryStratumFileName", "TertiaryStratumFileName", "StateClassFileName", "AgeFileName")), with = FALSE]), "stsim_InitialConditionsSpatial")
+  say("Initial Conditions Spatial: saved again in this result so SyncroSim writes its Properties (stage %s rerun on its own)", stage) }
+
 # the rows of one sheet in this scenario's first dependency that has any (lookups as names), or NULL: stage 11's CO2 flow multipliers
 # carry the Build's stsim_FlowMultiplier rows over, as its climate rows carry the Site Productivity row
 dependency_rows <- function(sheet) {

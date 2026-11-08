@@ -68,7 +68,13 @@ progressBar()
 
 # ---- outputs ----------------------------------------------------------------------------------------------------------
 if ("Climate" %in% stsim_list("FlowMultiplierType")$Name) out$rows[, FlowMultiplierTypeId := "Climate"]   # its own Flow Multiplier Type, so stage 8's Site Productivity multiplies with it (a library without the type: tools/sync-library.R)
+# rerun on its own (tools/quick-test.R), this result's rows hide the Build's: bring its Site Productivity and Grass and Shrub
+# Productivity multipliers (stage 8) along. In a Build the dependencies hold none, and stage 8 replaces its own types after this
+spm <- dependency_multipliers(c("Site Productivity", "Grass and Shrub Productivity"))
+if (!is.null(spm)) { out$rows <- rbind(out$rows, spm[, intersect(names(spm), c("Timestep", "FlowGroupId", "FlowMultiplierTypeId", "MultiplierFileName")), with = FALSE], fill = TRUE)
+  say("%s: the dependency's flow multiplier carried over (%s)", paste(unique(spm$FlowMultiplierTypeId), collapse = " and "), paste(unique(spm$FlowGroupId), collapse = ", ")) }
 write_stsim(out$rows, "FlowSpatialMultiplier")
+keep_ic_properties(scn, ic, 7)
 write_ds(summ[, .(Timestep, FlowGroup, Model, Climate, Mean = round(Mean, 4), Min, Max)], "OutputClimateSummary")
 progressBar()
 finish_checks()

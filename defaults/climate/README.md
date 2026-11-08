@@ -18,17 +18,26 @@ the most climate-sensitive part of growth and ITRDB sites were chosen for climat
 the sensitivity of total growth. FIA remeasurement could not test annual sensitivity: every design failed a placebo test (dev/climate/01-04).
 
 Tree rings say nothing about grassland and shrubland growth. For those, `rap-climate-coefficients.csv` (2026-11-07, to-do 39
-step 7) holds the same form fitted to RAP vegetation NPP v3 (Robinson et al. 2019): yearly NPP 1986-2023 at 1,140 grass and shrub
-sample windows (`dev/nonforest/04-rap-climate-sample.R`), each window and life form's NPP over its 1991-2020 mean regressed on PRISM at
-the window (`dev/nonforest/05-rap-climate-fit.R`), pooled by ecodivision with a random-effects mean (`tools/make_rap_climate_coefficients.R`).
-The model uses the LifeForm `All` rows: one climate multiplier map per flow group and year, and every grass and shrub class grows through
-Net Growth Non Forest: Total; the Annual grass, Perennial grass and Shrub rows are kept for reference (perennial grass and shrub fitted
-nearly the same). Ecodivisions with fewer than 5 window fits take the CONUS pool. Predicting each window from the other windows' pool,
-the RAP fit beats the window's own mean in 75-80% of windows and Miami NPP in 23-31% (Miami swings 1.0-1.4 times the observed change);
-with the years' climate shuffled the precipitation coefficients fall to about 0. Climate Options: Non-Forest Growth = RAP fit uses it;
-Miami NPP stays the default for now. Precipitation is the October-September water year (PRISM monthly, `monthly-us25m/ppt`; LOCA2 monthly in
-projections): against calendar years it fits better everywhere (Mediterranean r 0.33 -> 0.39, elsewhere 0.45 -> 0.49); the
-calendar-year fit is kept in `dev/nonforest/05-rap-climate-*-calendar.csv`.
+step 7) is fitted to RAP vegetation NPP v3 (Robinson et al. 2019): yearly NPP 1986-2023 at the grass and shrub sample windows
+(`dev/nonforest/04-rap-climate-sample.R`), each window and life form's NPP over its 1991-2020 mean, regressed on PRISM at the window.
+The form (`dev/nonforest/07-rap-climate-seasonal-fit.R`, chosen in `06-rap-climate-explore.R` by leave-one-window-out prediction):
+
+  `multiplier = 1 + sum_k (Coef_k + AridCoef_k ar) s_k + (PrecipLagCoef + PrecipLagAridCoef ar) pl + TempCoef (T - Tn)`, floored at 0
+
+with s_k the rain of season k of the October-September water year (Oct-Dec, Jan-Mar, Apr-Jun, Jul-Sep; no aridity term for
+Jul-Sep) minus its 1991-2020 normal, over the water year's normal; pl last water year's rain over the normal, minus 1; and
+ar = log(water-year normal / 500 mm), clamped to `AridMin`-`AridMax`, the range the ecodivision's fit saw. One fit over every life
+form per ecodivision (one climate map per flow group and year; every grass and shrub class grows through Net Growth Non Forest:
+Total; separate life-form fits predicted no better). Ecodivisions with fewer than 30 windows take the CONUS fit (with 10 terms the
+small ones' rain slopes turned strongly negative at one end of their aridity range).
+
+The fit reproduces about half of RAP's year-to-year SD (correlation 0.43 in Mediterranean windows, 0.53 elsewhere). The coefficients
+are scaled by `Scale` = k^0.5, k = RAP's SD over the fit's in the ecodivision (1.2-2.4): about three quarters of RAP's variation, at
+4-7% more RMSE and beating the window's own mean in 57-69% of windows (84% unscaled). Fully matching RAP's SD would cost far more
+(beats the mean in 27-45%), and part of RAP's variation is likely retrieval noise. Earlier forms (calendar-year and water-year
+total rain, `05-rap-climate-fit.R`) reproduced 0.33-0.45 of the variation. Climate Options: Non-Forest Growth = RAP fit uses it; Miami
+NPP stays the default for now. Rain is PRISM monthly (`monthly-us25m/ppt`) in stage 7 and LOCA2 monthly (`loca2_annual("ppt_seasons")`)
+in stage 11, against each source's own 1991-2020 seasonal normals.
 
 ## Projections (LOCA2)
 
