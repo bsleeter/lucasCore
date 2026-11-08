@@ -1,0 +1,206 @@
+GEOID,StateClassId,Group,NPP,AG,Harvest,Years,MeanHa
+06001,Agriculture: Cropland,Grapes,2.4749,1.9038,0.8567,35,894
+06001,Agriculture: Cropland,Tree nuts,5.2146,4.0112,0.8022,10,57
+06001,Agriculture: Cropland,Vegetables,1.2001,1.091,0.5455,8,244
+06005,Agriculture: Cropland,Grapes,2.1929,1.6868,0.7591,35,1297
+06005,Agriculture: Cropland,Tree fruit,6.6841,5.1416,1.7996,11,21
+06005,Agriculture: Cropland,Tree nuts,3.919,3.0146,0.6029,35,170
+06005,Agriculture: Cropland,Vegetables,0.9884,0.8986,0.4493,4,18
+06007,Agriculture: Cropland,Tree fruit,6.2264,4.7895,1.6763,35,6192
+06007,Agriculture: Cropland,Tree nuts,8.0138,6.1645,1.716,35,26574
+06007,Agriculture: Cropland,Vegetables,2.083,1.8936,0.9468,10,462
+06009,Agriculture: Cropland,Grapes,1.8063,1.3895,0.6253,35,201
+06009,Agriculture: Cropland,Tree fruit,0.9471,0.7285,0.255,34,102
+06009,Agriculture: Cropland,Tree nuts,4.3493,3.3456,0.6691,35,296
+06011,Agriculture: Cropland,Grapes,5.5909,4.3007,1.9353,10,768
+06011,Agriculture: Cropland,Tomatoes,4.0202,3.6547,2.1928,35,7502
+06011,Agriculture: Cropland,Tree fruit,5.1197,3.9383,1.3784,35,1105
+06011,Agriculture: Cropland,Tree nuts,6.5607,5.0467,1.7495,35,16299
+06011,Agriculture: Cropland,Vegetables,0.2827,0.257,0.1285,23,5108
+06013,Agriculture: Cropland,Grapes,2.7013,2.0779,0.9351,35,646
+06013,Agriculture: Cropland,Tomatoes,4.3368,3.9425,2.3655,35,1196
+06013,Agriculture: Cropland,Tree fruit,3.5005,2.6927,0.9424,35,757
+06013,Agriculture: Cropland,Tree nuts,6.1245,4.7112,0.9422,35,459
+06013,Agriculture: Cropland,Vegetables,5.8618,4.9667,1.803,35,1605
+06017,Agriculture: Cropland,Grapes,1.8127,1.3944,0.6275,35,606
+06017,Agriculture: Cropland,Tree fruit,4.383,3.3715,1.18,35,553
+06017,Agriculture: Cropland,Tree nuts,2.6623,2.048,0.4096,34,90
+06017,Agriculture: Cropland,Vegetables,2.988,2.7163,1.3582,5,35
+06019,Agriculture: Cropland,Grapes,5.8562,4.5047,2.0271,35,82855
+06019,Agriculture: Cropland,Tomatoes,4.1327,3.757,2.2542,35,42531
+06019,Agriculture: Cropland,Tree fruit,5.9572,4.5824,1.6038,35,27484
+06019,Agriculture: Cropland,Tree nuts,7.3483,5.6526,2.5831,35,54921
+06019,Agriculture: Cropland,Vegetables,3.3808,3.0703,1.6687,35,26357
+06021,Agriculture: Cropland,Grapes,4.6899,3.6076,1.6234,24,450
+06021,Agriculture: Cropland,Tomatoes,4.3377,3.9434,2.366,5,627
+06021,Agriculture: Cropland,Tree fruit,4.7981,3.6909,1.2918,35,4778
+06021,Agriculture: Cropland,Tree nuts,6.8994,5.3072,1.6021,35,17928
+06021,Agriculture: Cropland,Vegetables,0.7349,0.6681,0.3341,23,867
+06023,Agriculture: Cropland,Tomatoes,0.9829,0.8936,0.5361,9,5
+06023,Agriculture: Cropland,Tree fruit,1.4251,1.0962,0.3837,9,21
+06023,Agriculture: Cropland,Vegetables,1.6649,1.4359,0.5578,9,30
+06025,Agriculture: Cropland,Tomatoes,3.0569,2.779,1.6674,15,1607
+06025,Agriculture: Cropland,Tree fruit,2.9183,2.2448,0.7857,28,203
+06025,Agriculture: Cropland,Vegetables,3.7557,3.4411,2.0344,35,21342
+06027,Agriculture: Cropland,Vegetables,5.7295,5.4454,3.7645,11,39
+06029,Agriculture: Cropland,Grapes,6.2553,4.8118,2.1653,35,34249
+06029,Agriculture: Cropland,Tomatoes,4.1676,3.7887,2.2732,30,3104
+06029,Agriculture: Cropland,Tree fruit,6.199,4.7685,1.669,35,17465
+06029,Agriculture: Cropland,Tree nuts,7.1683,5.5141,2.4245,35,69547
+06029,Agriculture: Cropland,Vegetables,4.4512,4.1421,2.504,35,13982
+06031,Agriculture: Cropland,Grapes,7.0424,5.4172,2.4378,35,2226
+06031,Agriculture: Cropland,Tomatoes,4.7733,4.3394,2.6036,35,7429
+06031,Agriculture: Cropland,Tree fruit,4.8669,3.7437,1.3103,35,2970
+06031,Agriculture: Cropland,Tree nuts,8.7206,6.7082,1.8714,35,13062
+06031,Agriculture: Cropland,Vegetables,3.0286,2.7461,1.3708,27,2100
+06033,Agriculture: Cropland,Grapes,2.81,2.1615,0.9727,35,2353
+06033,Agriculture: Cropland,Tree fruit,8.5891,6.607,2.3125,35,1415
+06033,Agriculture: Cropland,Tree nuts,2.9339,2.2568,0.4514,35,1962
+06033,Agriculture: Cropland,Vegetables,1.3157,1.1961,0.5981,12,63
+06035,Agriculture: Cropland,Vegetables,0.0611,0.0555,0.0278,13,101
+06037,Agriculture: Cropland,Grapes,1.9961,1.5355,0.691,20,113
+06037,Agriculture: Cropland,Tomatoes,1.1712,1.0647,0.6388,6,12
+06037,Agriculture: Cropland,Tree fruit,5.857,4.5054,1.5769,25,325
+06037,Agriculture: Cropland,Vegetables,4.4273,4.0986,2.4101,27,1510
+06039,Agriculture: Cropland,Grapes,5.8634,4.5103,2.0296,35,31742
+06039,Agriculture: Cropland,Tomatoes,4.7739,4.3399,2.604,17,1888
+06039,Agriculture: Cropland,Tree fruit,5.5565,4.2743,1.496,35,6241
+06039,Agriculture: Cropland,Tree nuts,6.3566,4.8897,2.2439,35,38133
+06039,Agriculture: Cropland,Vegetables,3.5919,3.2654,1.6327,14,888
+06041,Agriculture: Cropland,Grapes,0.9356,0.7197,0.3238,22,62
+06041,Agriculture: Cropland,Vegetables,3.2691,2.9719,1.4859,13,91
+06043,Agriculture: Cropland,Grapes,0.7647,0.5882,0.2647,31,32
+06043,Agriculture: Cropland,Tree fruit,2.3177,1.7829,0.624,20,74
+06045,Agriculture: Cropland,Grapes,2.5771,1.9824,0.8921,35,5809
+06045,Agriculture: Cropland,Tree fruit,9.8616,7.5858,2.655,35,1034
+06045,Agriculture: Cropland,Tree nuts,1.4016,1.0781,0.2156,3,49
+06045,Agriculture: Cropland,Vegetables,3.3962,3.0874,1.5437,7,139
+06047,Agriculture: Cropland,Grapes,5.6948,4.3807,1.9713,35,5470
+06047,Agriculture: Cropland,Tomatoes,3.3177,3.0161,1.8097,35,9414
+06047,Agriculture: Cropland,Tree fruit,7.2122,5.5478,1.9417,35,4024
+06047,Agriculture: Cropland,Tree nuts,5.5028,4.2329,2.2009,35,38214
+06047,Agriculture: Cropland,Vegetables,2.2105,2.0095,1.0048,35,3893
+06049,Agriculture: Cropland,Vegetables,3.6017,3.3632,2.0729,31,1025
+06051,Agriculture: Cropland,Grapes,2.3835,1.8335,0.8251,4,6
+06051,Agriculture: Cropland,Vegetables,4.1106,3.9146,2.7394,15,355
+06053,Agriculture: Cropland,Grapes,2.6681,2.0524,0.9236,35,14579
+06053,Agriculture: Cropland,Tomatoes,1.9581,1.7801,1.068,30,1062
+06053,Agriculture: Cropland,Tree fruit,7.7435,5.9565,2.0848,19,108
+06053,Agriculture: Cropland,Tree nuts,6.1213,4.7087,0.9417,24,145
+06053,Agriculture: Cropland,Vegetables,2.6757,2.3775,1.4083,35,7291
+06055,Agriculture: Cropland,Grapes,2.3016,1.7705,0.7967,35,15025
+06055,Agriculture: Cropland,Tree fruit,1.1141,0.857,0.3,18,72
+06055,Agriculture: Cropland,Tree nuts,2.025,1.5577,0.3115,22,116
+06055,Agriculture: Cropland,Vegetables,2.4554,2.2322,1.1161,1,10
+06057,Agriculture: Cropland,Grapes,2.6684,2.0526,0.9237,35,107
+06057,Agriculture: Cropland,Tree fruit,1.3297,1.0228,0.358,9,29
+06057,Agriculture: Cropland,Vegetables,2.4554,2.2322,1.1161,1,36
+06059,Agriculture: Cropland,Tomatoes,3.1366,2.8515,1.7109,30,190
+06059,Agriculture: Cropland,Tree fruit,8.9791,6.907,2.4175,30,459
+06059,Agriculture: Cropland,Vegetables,2.3807,2.0821,0.9293,31,835
+06061,Agriculture: Cropland,Grapes,1.7196,1.3227,0.5952,35,65
+06061,Agriculture: Cropland,Tree fruit,1.6286,1.2528,0.4385,35,235
+06061,Agriculture: Cropland,Tree nuts,9.4025,7.2327,1.4465,33,581
+06063,Agriculture: Cropland,Vegetables,2.4554,2.2322,1.1161,1,6
+06065,Agriculture: Cropland,Grapes,3.8953,2.9964,1.3484,35,5534
+06065,Agriculture: Cropland,Tomatoes,1.8699,1.6999,1.02,34,162
+06065,Agriculture: Cropland,Tree fruit,5.8909,4.5314,1.586,35,3098
+06065,Agriculture: Cropland,Tree nuts,4.5618,3.5091,0.7018,6,31
+06065,Agriculture: Cropland,Vegetables,3.6487,3.2884,1.7024,35,7649
+06067,Agriculture: Cropland,Grapes,4.7587,3.6606,1.6472,35,8317
+06067,Agriculture: Cropland,Tomatoes,3.2091,2.9174,1.7504,35,2081
+06067,Agriculture: Cropland,Tree fruit,9.9136,7.6258,2.669,35,2672
+06067,Agriculture: Cropland,Tree nuts,8.0989,6.2299,1.246,27,298
+06067,Agriculture: Cropland,Vegetables,2.605,2.2989,1.0852,30,1053
+06069,Agriculture: Cropland,Grapes,2.6938,2.0722,0.9325,35,1249
+06069,Agriculture: Cropland,Tomatoes,3.8511,3.501,2.1006,35,910
+06069,Agriculture: Cropland,Tree fruit,3.1542,2.4263,0.8492,35,952
+06069,Agriculture: Cropland,Tree nuts,4.6446,3.5728,0.7146,35,1085
+06069,Agriculture: Cropland,Vegetables,3.687,3.38,1.8485,34,1794
+06071,Agriculture: Cropland,Grapes,2.3431,1.8024,0.8111,35,537
+06071,Agriculture: Cropland,Tomatoes,1.3595,1.2359,0.7416,33,6
+06071,Agriculture: Cropland,Tree fruit,5.7533,4.4256,1.549,35,1622
+06071,Agriculture: Cropland,Tree nuts,1.2541,0.9647,0.1929,25,116
+06071,Agriculture: Cropland,Vegetables,2.8728,2.5163,1.0737,35,187
+06073,Agriculture: Cropland,Grapes,1.775,1.3654,0.6144,35,185
+06073,Agriculture: Cropland,Tomatoes,2.7375,2.4886,1.4932,33,1044
+06073,Agriculture: Cropland,Tree fruit,6.8344,5.2572,1.84,35,3320
+06073,Agriculture: Cropland,Vegetables,2.7125,2.4341,1.1514,35,1127
+06075,Agriculture: Cropland,Vegetables,4.9197,4.4725,2.2362,1,0
+06077,Agriculture: Cropland,Grapes,4.3621,3.3555,1.51,35,31877
+06077,Agriculture: Cropland,Tomatoes,3.3586,3.0532,1.8319,35,13467
+06077,Agriculture: Cropland,Tree fruit,3.7773,2.9057,1.017,35,9752
+06077,Agriculture: Cropland,Tree nuts,8.517,6.5516,2.2953,35,38591
+06077,Agriculture: Cropland,Vegetables,2.2986,1.9514,0.9468,35,12445
+06079,Agriculture: Cropland,Grapes,2.6232,2.0179,0.908,35,9973
+06079,Agriculture: Cropland,Tomatoes,1.517,1.3791,0.8274,13,30
+06079,Agriculture: Cropland,Tree fruit,5.5043,4.2341,1.4819,29,421
+06079,Agriculture: Cropland,Tree nuts,1.7471,1.3439,0.2688,35,1359
+06079,Agriculture: Cropland,Vegetables,3.1175,2.8849,1.666,34,1761
+06081,Agriculture: Cropland,Grapes,4.4997,3.4613,1.5576,23,37
+06081,Agriculture: Cropland,Vegetables,2.3003,2.0912,1.0456,35,251
+06083,Agriculture: Cropland,Grapes,2.3846,1.8343,0.8254,35,6163
+06083,Agriculture: Cropland,Tomatoes,2.8815,2.6195,1.5717,4,185
+06083,Agriculture: Cropland,Tree nuts,6.5987,5.0759,1.0152,11,283
+06083,Agriculture: Cropland,Vegetables,2.9794,2.7286,1.4985,35,2254
+06085,Agriculture: Cropland,Grapes,2.0593,1.5841,0.7128,35,660
+06085,Agriculture: Cropland,Tomatoes,3.4776,3.1615,1.8969,35,620
+06085,Agriculture: Cropland,Tree fruit,2.8988,2.2299,0.7805,35,683
+06085,Agriculture: Cropland,Tree nuts,6.6376,5.1059,1.0212,35,199
+06085,Agriculture: Cropland,Vegetables,3.9878,3.5369,1.6036,35,2269
+06087,Agriculture: Cropland,Grapes,1.4471,1.1132,0.5009,35,174
+06087,Agriculture: Cropland,Tree fruit,9.22,7.0923,2.4823,35,1243
+06087,Agriculture: Cropland,Vegetables,3.4909,3.1735,1.5868,15,951
+06089,Agriculture: Cropland,Grapes,1.5237,1.1721,0.5274,12,68
+06089,Agriculture: Cropland,Tree nuts,7.8852,6.0656,1.2131,35,420
+06091,Agriculture: Cropland,Vegetables,2.4554,2.2322,1.1161,1,6
+06093,Agriculture: Cropland,Tree fruit,2.7619,2.1245,0.7436,4,20
+06093,Agriculture: Cropland,Vegetables,4.588,4.3694,3.058,35,481
+06095,Agriculture: Cropland,Grapes,2.9332,2.2563,1.0153,35,1275
+06095,Agriculture: Cropland,Tomatoes,3.7276,3.3887,2.0332,35,5989
+06095,Agriculture: Cropland,Tree fruit,4.5442,3.4955,1.2234,35,1292
+06095,Agriculture: Cropland,Tree nuts,6.9703,5.3617,1.1059,35,4323
+06095,Agriculture: Cropland,Vegetables,1.4549,1.3215,0.6605,25,799
+06097,Agriculture: Cropland,Grapes,2.4709,1.9007,0.8553,35,18577
+06097,Agriculture: Cropland,Tree fruit,5.2352,4.0271,1.4095,35,1682
+06097,Agriculture: Cropland,Tree nuts,1.6139,1.2415,0.2483,20,114
+06097,Agriculture: Cropland,Vegetables,3.1273,2.843,1.4215,13,239
+06099,Agriculture: Cropland,Grapes,6.0697,4.669,2.101,35,5227
+06099,Agriculture: Cropland,Tomatoes,3.7257,3.387,2.0322,32,7328
+06099,Agriculture: Cropland,Tree fruit,7.4062,5.6971,1.994,35,6982
+06099,Agriculture: Cropland,Tree nuts,6.9515,5.3473,2.3699,35,58800
+06099,Agriculture: Cropland,Vegetables,2.2567,2.0531,1.0335,35,3143
+06101,Agriculture: Cropland,Tomatoes,3.5412,3.2193,1.9316,34,5238
+06101,Agriculture: Cropland,Tree fruit,6.6093,5.0841,1.7794,35,11626
+06101,Agriculture: Cropland,Tree nuts,8.7839,6.7568,1.4176,35,10426
+06101,Agriculture: Cropland,Vegetables,1.3527,1.2288,0.6126,32,2502
+06103,Agriculture: Cropland,Grapes,3.0868,2.3745,1.0685,17,66
+06103,Agriculture: Cropland,Tree fruit,4.6006,3.5389,1.2386,35,5832
+06103,Agriculture: Cropland,Tree nuts,8.4859,6.5276,1.3055,35,9974
+06103,Agriculture: Cropland,Vegetables,2.5444,2.3131,1.1565,16,30
+06105,Agriculture: Cropland,Grapes,3.3277,2.5598,1.1519,20,31
+06107,Agriculture: Cropland,Grapes,6.3746,4.9036,2.2066,35,26246
+06107,Agriculture: Cropland,Tomatoes,1.4765,1.3422,0.8053,19,215
+06107,Agriculture: Cropland,Tree fruit,6.2289,4.7915,1.677,35,58253
+06107,Agriculture: Cropland,Tree nuts,8.2673,6.3595,1.8972,35,32163
+06107,Agriculture: Cropland,Vegetables,2.784,2.4891,1.1584,35,1268
+06109,Agriculture: Cropland,Tree fruit,2.8202,2.1694,0.7593,9,53
+06109,Agriculture: Cropland,Vegetables,1.2538,1.1398,0.5699,3,7
+06111,Agriculture: Cropland,Tomatoes,4.177,3.7972,2.2783,35,609
+06111,Agriculture: Cropland,Tree fruit,7.4735,5.7489,2.0121,35,3439
+06111,Agriculture: Cropland,Tree nuts,0.8914,0.6857,0.1371,3,237
+06111,Agriculture: Cropland,Vegetables,4.1562,3.7556,1.8864,35,2241
+06113,Agriculture: Cropland,Grapes,4.4946,3.4574,1.5558,35,3570
+06113,Agriculture: Cropland,Tomatoes,3.6701,3.3365,2.0019,35,18136
+06113,Agriculture: Cropland,Tree fruit,5.4409,4.1853,1.4649,35,1435
+06113,Agriculture: Cropland,Tree nuts,6.4763,4.9818,1.2989,35,9114
+06113,Agriculture: Cropland,Vegetables,1.9247,1.7446,0.8711,26,3191
+06115,Agriculture: Cropland,Grapes,1.1318,0.8706,0.3918,14,70
+06115,Agriculture: Cropland,Tree fruit,7.0449,5.4192,1.8967,35,6139
+06115,Agriculture: Cropland,Tree nuts,10.3067,7.9283,1.6808,35,4476
+06115,Agriculture: Cropland,Vegetables,0.7986,0.726,0.363,4,363
+06991,Agriculture: Cropland,Grapes,3.589,2.7608,1.2423,29,1083
+06991,Agriculture: Cropland,Tomatoes,3.6359,3.3054,1.9832,29,1468
+06991,Agriculture: Cropland,Tree fruit,5.2753,4.058,1.4203,29,3615
+06991,Agriculture: Cropland,Tree nuts,9.7255,7.4811,7.3371,29,2546
+06991,Agriculture: Cropland,Vegetables,4.5827,4.3092,2.8672,30,13551

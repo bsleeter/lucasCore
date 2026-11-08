@@ -79,11 +79,14 @@ setorder(ed, StateClassId, StratumId, YEAR); fwrite(ed, file.path(OUT, "02-nass-
 print(ed[YEAR %between% c(1985, 2023), .(level = round(level[1], 2), agShare = round(agShare[1], 3), harvShare = round(harvShare[1], 3), npp_1985_94 = round(mean(npp[YEAR <= 1994]), 2),
                                           npp_2014_23 = round(mean(npp[YEAR >= 2014]), 2), cv = round(sd(npp) / mean(npp), 3), kha = round(mean(ha) / 1000), mixCovered_min = round(min(mixCovered), 2)), by = .(StateClassId, StratumId)], nrows = 60)
 # ---- by crop group, for the Cropland Productivity map (stage 8: each Cropland Data Layer pixel takes its county's value of its
-# crop): the BASE-years mean of each county's and ecodivision's crop group NPP, weighted by harvested ha (grain and silage together)
+# crop): the BASE-years mean of each county's and ecodivision's crop group NPP, aboveground growth (AG) and harvest, Mg C/ha/yr,
+# weighted by harvested ha (grain and silage together); Harvest / AG is the group's harvested share of its aboveground growth (the
+# Crop Harvest map)
 grp <- function(x) fcase(x %in% c("Corn grain", "Corn silage"), "Corn", x %in% c("Sorghum grain", "Sorghum silage"), "Sorghum", default = x)
 w[, Group := grp(Crop)]; ec[, Group := grp(Crop)]
-cg <- w[YEAR %in% BASE, .(NPP = round(sum(npp * ha) / sum(ha), 4), Years = uniqueN(YEAR)), by = .(GEOID, StateClassId, Group)]
-eg <- ec[YEAR %in% BASE, .(NPP = round(sum(npp * ha) / sum(ha), 4), Years = uniqueN(YEAR)), by = .(StratumId, StateClassId, Group)]
+gsum <- function(d) d[, .(NPP = round(sum(npp * ha) / sum(ha), 4), AG = round(sum(agC * ha) / sum(ha), 4), Harvest = round(sum(harvC * ha) / sum(ha), 4), Years = uniqueN(YEAR))]
+cg <- w[YEAR %in% BASE, gsum(.SD), by = .(GEOID, StateClassId, Group)]
+eg <- ec[YEAR %in% BASE, gsum(.SD), by = .(StratumId, StateClassId, Group)]
 fwrite(cg, file.path(OUT, "02-nass-county-crop-npp.csv")); fwrite(eg, file.path(OUT, "02-nass-ecodivision-crop-npp.csv"))
 cat(sprintf("%d county x crop group and %d ecodivision x crop group values (%d-%d means)\n", nrow(cg), nrow(eg), min(BASE), max(BASE)))
 cat("wrote dev/agriculture/02-nass-county-npp.csv, 02-nass-ecodivision-npp.csv, 02-nass-county-crop-npp.csv and 02-nass-ecodivision-crop-npp.csv\n")

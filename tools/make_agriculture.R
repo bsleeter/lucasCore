@@ -20,8 +20,8 @@
 #             the level the rates were solved at); the year after the last NASS year it holds ProjectionIndex (the mean of the last
 #             10 NASS years), which projections keep.
 # Writes defaults/stockflow/nonforest-pathways-agriculture.csv, nonforest-multipliers-agriculture.csv, ag-targets.csv, ag-crop-yield.csv,
-# the agriculture rows of nonforest-net-growth.csv, ag-county-crop-npp.csv and ag-ecodivision-crop-npp.csv (crop group growth for the
-# Cropland Productivity map), and defaults/initialstocks/agriculture.csv (the steady state); removes the old zero
+# the agriculture rows of nonforest-net-growth.csv, ag-county-crop-npp.csv, ag-ecodivision-crop-npp.csv and ag-cac-county-crop-npp.csv (crop group growth for the
+# Cropland Productivity and Crop Harvest maps), and defaults/initialstocks/agriculture.csv (the steady state); removes the old zero
 # agriculture rows from nonforest-multipliers-other.csv. Rerunning is harmless.
 # =============================================================================
 suppressPackageStartupMessages(library(data.table))
@@ -123,21 +123,12 @@ print(fits[, .(n = .N, NPP = round(median(NPP), 2), Harvest = round(median(Harve
 cat(sprintf("yearly Crop Yield index %d-%d; projection index (mean of the last %d NASS years) %s\n", min(yr$Timestep), last, INDEX_LAST,
             paste(tg[, sprintf("%s %.2f-%.2f", sub("Agriculture: ", "", StateClassId[1]), min(ProjectionIndex), max(ProjectionIndex)), by = StateClassId]$V1, collapse = "; ")))
 # the crop group growth the Cropland Productivity map looks up (stage 8; dev/agriculture/02-nass-county-npp.R): by county and by
-# ecodivision, 1985-2023 means per harvested ha
+# ecodivision, 1985-2023 means per harvested ha of NPP, aboveground growth and harvest (the Crop Harvest map)
 for (f in c("county", "ecodivision")) wr(fread(sprintf("dev/agriculture/02-nass-%s-crop-npp.csv", f), colClasses = list(character = if (f == "county") "GEOID" else NULL)),
                                          "stockflow", sprintf("ag-%s-crop-npp.csv", f))
-# the CDL-based growth's ecodivision mean the Cropland Productivity map is divided by (dev/agriculture/03-cdl-ecodivision-sample.R;
-# user 2026-11-07: normalize by ecodivision): pixel-years with a value, by ecodivision and class; an ecodivision with fewer than
-# MIN_PIXELS takes the class's CONUS mean
-if (file.exists("dev/agriculture/03-cdl-ecodivision-sample.csv")) {
-  MIN_PIXELS <- 50000L; s3 <- fread("dev/agriculture/03-cdl-ecodivision-sample.csv"); if ("error" %in% names(s3)) s3 <- s3[is.na(error) | error == ""]
-  own <- s3[, .(Windows = uniqueN(window), Pixels = sum(pixels), Valued = sum(valued), CdlNPP = sum(sum) / sum(valued)), by = .(StratumId, StateClassId)]
-  cus <- s3[, .(CdlNPP = sum(sum) / sum(valued)), by = StateClassId]
-  cn <- merge(CJ(StratumId = ECO, StateClassId = AG), own, by = c("StratumId", "StateClassId"), all.x = TRUE)
-  cn[, Source := fifelse(!is.na(Valued) & Valued >= MIN_PIXELS, "ecodivision sample", "CONUS class mean")]
-  cn[Source != "ecodivision sample", CdlNPP := cus$CdlNPP[match(StateClassId, cus$StateClassId)]]
-  cn[, `:=`(ValuedShare = round(Valued / Pixels, 3), CdlNPP = round(CdlNPP, 4))]
-  cn <- merge(cn, tg[, .(StratumId, StateClassId, NassNPP = NPP)], by = c("StratumId", "StateClassId"))
-  wr(cn[, .(StratumId, StateClassId, Source, Windows, Pixels, ValuedShare, CdlNPP, NassNPP)], "stockflow", "ag-cdl-ecodivision-npp.csv")
-  print(cn[, .(StratumId = substr(StratumId, 1, 30), StateClassId, Source, ValuedShare, CdlNPP, NassNPP = round(NassNPP, 2))])
-} else cat("dev/agriculture/03-cdl-ecodivision-sample.csv not found: ag-cdl-ecodivision-npp.csv not written\n")
+# California's County Agricultural Commissioners' growth of the crops NASS's survey leaves out (dev/agriculture/05-cac-county-crop-npp.R;
+# user 2026-11-08): the map takes these county values only, with no fallback
+if (file.exists("dev/agriculture/05-cac-county-crop-npp.csv")) wr(fread("dev/agriculture/05-cac-county-crop-npp.csv", colClasses = list(character = "GEOID")), "stockflow", "ag-cac-county-crop-npp.csv") else
+  cat("dev/agriculture/05-cac-county-crop-npp.csv not found: ag-cac-county-crop-npp.csv not written\n")
+# (2026-11-08: the map is divided by the ecodivision's NASS level, NPP above, so ag-cdl-ecodivision-npp.csv is no longer written)
+if (file.exists(d("stockflow", "ag-cdl-ecodivision-npp.csv"))) invisible(file.remove(d("stockflow", "ag-cdl-ecodivision-npp.csv")))

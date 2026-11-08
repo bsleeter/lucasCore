@@ -208,13 +208,17 @@ if (gs_on) {
 # tools/make_agriculture.R), else the county's ecodivision's (ag-ecodivision-crop-npp.csv), else the group's CONUS mean; a double
 # crop takes both crops' growth; fallow and idle cropland counts 0 (NASS yields are per harvested acre, NLCD cropland includes
 # fallow); classes NASS does not survey (vegetables, fruit and nuts, vineyards, grassland/pasture, non-crop land) are left out
-# (defaults/stockflow/cdl-crops.csv; user 2026-11-07). A cell's growth is the mean over its pixels and years; its multiplier = that
-# / the same estimate's ecodivision x class mean (ag-cdl-ecodivision-npp.csv, from a national sample of windows; user 2026-11-07:
-# normalize by ecodivision, so the NASS level the growth rows hold stays the ecodivision's mean), capped at 0.3-2.5 as the other productivity
-# multipliers. It becomes the Cropland Productivity flow spatial multiplier on Net Growth Agriculture: Total (it multiplies with
+# (defaults/stockflow/cdl-crops.csv; user 2026-11-07); in California, tomatoes, vegetables, tree fruit, tree nuts and grapes take the
+# county's growth from the County Agricultural Commissioners' reports (ag-cac-county-crop-npp.csv; user 2026-11-08). A cell's growth is
+# the mean over its pixels and years; its multiplier = that / the ecodivision x class growth the rows hold (ag-targets.csv NPP; user
+# 2026-11-08: county scale, so each cell grows at its own crops' county rates; it was the CDL estimate's ecodivision mean, which
+# raised Solano's cropland by 1.46), capped at 0.3-2.5 as the other productivity multipliers. It becomes the Cropland Productivity flow spatial multiplier on Net Growth Agriculture: Total (it multiplies with
 # Crop Yield and CO2), and the cell's starting litter is scaled by it (soil keeps the class mean). Cropland and pasture cells
 # without surveyed crops, and every other land cell (for land that becomes agriculture), take the multiplier of the agriculture
 # cells near it (src/productivity-fill.R).
+# Crop Harvest (user 2026-11-08), on Harvest: Agriculture: the cell's harvested share of aboveground growth (the sum over its pixels
+# and years of each crop's county harvest / its aboveground growth) / the ecodivision x class harvest rate the rows hold
+# (nonforest-multipliers-agriculture.csv), capped at 0.3-2.5 and so the rate stays <= 1; filled as Cropland Productivity.
 cpv <- opt$CropProductivity[1]
 cp_on <- !is.null(cpv) && !is.na(cpv) && (identical(suppressWarnings(as.integer(cpv)), 2L) || startsWith(as.character(cpv), "CDL"))
 if (cp_on) {
@@ -227,9 +231,11 @@ if (cp_on) {
   if (length(miss)) { say("Cropland Productivity: WARNING - the Cropland Data Layer Folder lacks %s; the map averages the other %d years", paste(miss, collapse = ", "), length(CDL_YEARS) - length(miss)); cf <- cf[file.exists(cf)] }
   source(pkg_file("src", "cropland.R"))
   xw <- read_default("stockflow", "cdl-crops.csv"); cg <- read_default("stockflow", "ag-county-crop-npp.csv"); eg <- read_default("stockflow", "ag-ecodivision-crop-npp.csv")
-  # the divisor: the same CDL-based growth's ecodivision mean (dev/agriculture/03-cdl-ecodivision-sample.R; user 2026-11-07: normalize
-  # by ecodivision), so the map only spreads growth within the ecodivision and the NASS level the growth rows hold stays its mean
-  cn <- read_default("stockflow", "ag-cdl-ecodivision-npp.csv")[, CdlNPP := as.numeric(CdlNPP)]
+  rg <- read_default("stockflow", "ag-cac-county-crop-npp.csv")
+  if (!"Crop Harvest" %in% stsim_list("FlowMultiplierType")$Name) fail("Cropland Productivity: the library has no Flow Multiplier Type 'Crop Harvest' - run tools/sync-library.R on it")
+  # the divisors: the ecodivision x class growth and harvest rate the agriculture rows hold
+  cn <- read_default("stockflow", "ag-targets.csv")[, NPP := as.numeric(NPP)]
+  hr <- read_default("stockflow", "nonforest-multipliers-agriculture.csv")[FlowGroupId == "Harvest: Foliage -> Agriculture Sector [Type]", .(StratumId, StateClassId, Rate = as.numeric(Value))]
   isAG <- land & cname %in% AGC
   r0 <- rast(cf[1]); win <- project(as.polygons(ext(P) + 1000, crs = crs(P)), crs(r0)); g30 <- crop(r0, win, snap = "out")
   # counties on the 30 m window, and each county's ecodivision (its most common one on the model grid) for the fallback
@@ -237,12 +243,14 @@ if (cp_on) {
   ck <- rasterize(co, g30, "k"); vC <- values(project(rasterize(co, P, "k"), P, method = "near"), mat = FALSE)
   ce <- data.table(k = vC, e = sname)[!is.na(k) & !is.na(e), .N, by = .(k, e)][order(-N)][, .SD[1], by = k]
   # every (county, CDL code) pair's growth (src/cropland.R), then each year's pixels averaged onto the model grid
-  lk <- tryCatch(cdl_lookup(co$GEOID, ce$e[match(co$k, ce$k)], xw, cg, eg), error = function(e) fail("Cropland Productivity: %s", conditionMessage(e)))
-  acc <- NULL; nyr <- NULL
-  for (f in cf) { vm <- values(project(cdl_npp(crop(rast(f), win, snap = "out"), ck, lk), P, method = "average"), mat = FALSE)
-    acc <- if (is.null(acc)) ifelse(is.na(vm), 0, vm) else acc + ifelse(is.na(vm), 0, vm); nyr <- if (is.null(nyr)) !is.na(vm) + 0 else nyr + !is.na(vm) }
-  vN <- ifelse(nyr > 0, acc / nyr, NA)
-  tnpp <- cn$CdlNPP[match(paste(sname, cname), paste(cn$StratumId, cn$StateClassId))]
+  lk <- tryCatch(cdl_lookup(co$GEOID, ce$e[match(co$k, ce$k)], xw, cg, eg, rg), error = function(e) fail("Cropland Productivity: %s", conditionMessage(e)))
+  acc <- matrix(0, ncell(P), 3); nyr <- rep(0, ncell(P))
+  for (f in cf) { r30 <- crop(rast(f), win, snap = "out")
+    vm <- values(project(c(cdl_npp(r30, ck, lk, "NPP"), cdl_npp(r30, ck, lk, "AG"), cdl_npp(r30, ck, lk, "Harvest")), P, method = "average"))
+    ok <- !is.na(vm[, 1]); acc[ok, ] <- acc[ok, ] + vm[ok, ]; nyr <- nyr + ok }
+  vN <- ifelse(nyr > 0, acc[, 1] / nyr, NA); vR <- ifelse(nyr > 0 & acc[, 2] > 0, acc[, 3] / acc[, 2], NA)
+  tnpp <- cn$NPP[match(paste(sname, cname), paste(cn$StratumId, cn$StateClassId))]
+  trate <- hr$Rate[match(paste(sname, cname), paste(hr$StratumId, hr$StateClassId))]
   cmult <- rep(1, ncell(P)); use <- isAG & !is.na(vN) & !is.na(tnpp) & tnpp > 0
   cmult[use] <- pmin(pmax(vN[use] / tnpp[use], CAP[1]), CAP[2])
   cfl <- fill_multiplier(P, cmult, use & cmult > CAP[1] + 1e-9, land & !use); cmult <- cfl$mult
@@ -258,6 +266,18 @@ if (cp_on) {
       100 * mean(cfl$filled[land & !isAG]), if (any(cfl$filled[land & !isAG])) mean(cmult[land & !isAG & cfl$filled]) else 1)
   fg <- "Net Growth Agriculture: Total"; if (!fg %in% stsim_list("FlowGroup")$Name) fail("Cropland Productivity: flow group '%s' not found - run tools/sync-library.R", fg)
   put_multiplier("Cropland Productivity", fg, write_raster(setValues(rast(P), ifelse(land, cmult, NA)), "CroplandProductivity.tif", "FLT4S"))
+  # Crop Harvest: the cell's harvested share of aboveground growth over the rate the rows hold
+  hmult <- rep(1, ncell(P)); huse <- isAG & !is.na(vR) & !is.na(trate) & trate > 0
+  hmult[huse] <- pmin(pmax(vR[huse] / trate[huse], CAP[1]), CAP[2], 1 / trate[huse])
+  hfl <- fill_multiplier(P, hmult, huse, land & !huse); hmult <- hfl$mult
+  check(STAGE, "crop harvest: every land cell's multiplier is finite and positive, and no agriculture cell harvests more than its foliage",
+        all(is.finite(hmult[land]) & hmult[land] > 0) && all(is.na(trate[isAG]) | hmult[isAG] * trate[isAG] <= 1 + 1e-9))
+  hsum <- data.table(cls = cname[isAG], m = hmult[isAG], r = hmult[isAG] * trate[isAG])[, .(Cells = .N, Mean = round(mean(m), 2), Rate = round(mean(r, na.rm = TRUE), 3),
+            P10 = round(quantile(m, 0.1), 2), P90 = round(quantile(m, 0.9), 2)), by = cls][order(-Cells)]
+  say("Crop harvest (CDL x county harvested share): %d cells, multiplier mean %.2f", sum(isAG), mean(hmult[isAG]))
+  for (i in seq_len(nrow(hsum))) with(hsum[i], say("  %s: %d cells, mean %.2f (10%% %.2f, 90%% %.2f), harvested share of foliage %.3f", cls, Cells, Mean, P10, P90, Rate))
+  hg <- "Harvest: Agriculture"; if (!hg %in% stsim_list("FlowGroup")$Name) fail("Crop Harvest: flow group '%s' not found - run tools/sync-library.R", hg)
+  put_multiplier("Crop Harvest", hg, write_raster(setValues(rast(P), ifelse(land, hmult, NA)), "CropHarvest.tif", "FLT4S"))
 }
 progressBar()
 # ---- soil: gNATSGO where the class's belowground slow is 0 -----------------------------------------------------------------

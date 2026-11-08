@@ -47,17 +47,59 @@ Code,Class,Group,Note
 240,Dbl Crop Soybeans/Oats,Soybean|Oats,two crops a year
 241,Dbl Crop Corn/Soybeans,Corn|Soybean,two crops a year
 254,Dbl Crop Barley/Soybeans,Barley|Soybean,two crops a year
-12,Sweet Corn,,not in Table 3-3 (a processing vegetable): left out
+12,Sweet Corn,Vegetables,county reports - California only (user 2026-11-08)
 14,Mint,,no NASS county yield: left out
 29,Millet,,no NASS county yield: left out
 39,Buckwheat,,no NASS county yield: left out
 44,Other Crops,,left out
-47,Misc Vegs & Fruits,,vegetables and fruit: left out (user 2026-11-07)
+47,Misc Vegs & Fruits,Vegetables,county reports - California only (user 2026-11-08)
 58,Clover/Wildflowers,,no NASS county yield: left out
 59,Sod/Grass Seed,,left out
 60,Switchgrass,,left out
 62,Pasture/Grass,,grazed: no yield (left out)
-69,Grapes,,vineyards: left out (user 2026-11-07)
+69,Grapes,Grapes,county reports - California only (user 2026-11-08)
 176,Grassland/Pasture,,grazed: no yield (left out)
 181,Pasture/Hay,,no crop named: left out
 224,Vetch,,no NASS county yield: left out
+54,Tomatoes,Tomatoes,county reports - California only (user 2026-11-08)
+66,Cherries,Tree fruit,county reports - California only (user 2026-11-08)
+67,Peaches,Tree fruit,county reports - California only (user 2026-11-08)
+68,Apples,Tree fruit,county reports - California only (user 2026-11-08)
+71,Other Tree Crops,Tree fruit,county reports - California only (user 2026-11-08)
+72,Citrus,Tree fruit,county reports - California only (user 2026-11-08)
+74,Pecans,Tree nuts,county reports - California only (user 2026-11-08)
+75,Almonds,Tree nuts,county reports - California only (user 2026-11-08)
+76,Walnuts,Tree nuts,county reports - California only (user 2026-11-08)
+77,Pears,Tree fruit,county reports - California only (user 2026-11-08)
+204,Pistachios,Tree nuts,county reports - California only (user 2026-11-08)
+210,Prunes,Tree fruit,county reports - California only (user 2026-11-08)
+211,Olives,Tree fruit,county reports - California only (user 2026-11-08)
+212,Oranges,Tree fruit,county reports - California only (user 2026-11-08)
+215,Avocados,Tree fruit,county reports - California only (user 2026-11-08)
+217,Pomegranates,Tree fruit,county reports - California only (user 2026-11-08)
+218,Nectarines,Tree fruit,county reports - California only (user 2026-11-08)
+220,Plums,Tree fruit,county reports - California only (user 2026-11-08)
+223,Apricots,Tree fruit,county reports - California only (user 2026-11-08)
+221,Strawberries,Vegetables,county reports - California only (user 2026-11-08)
+242,Blueberries,Tree fruit,county reports - California only (user 2026-11-08)
+48,Watermelons,Vegetables,county reports - California only (user 2026-11-08)
+49,Onions,Vegetables,county reports - California only (user 2026-11-08)
+50,Cucumbers,Vegetables,county reports - California only (user 2026-11-08)
+206,Carrots,Vegetables,county reports - California only (user 2026-11-08)
+207,Asparagus,Vegetables,county reports - California only (user 2026-11-08)
+208,Garlic,Vegetables,county reports - California only (user 2026-11-08)
+209,Cantaloupes,Vegetables,county reports - California only (user 2026-11-08)
+213,Honeydew Melons,Vegetables,county reports - California only (user 2026-11-08)
+214,Broccoli,Vegetables,county reports - California only (user 2026-11-08)
+216,Peppers,Vegetables,county reports - California only (user 2026-11-08)
+219,Greens,Vegetables,county reports - California only (user 2026-11-08)
+222,Squash,Vegetables,county reports - California only (user 2026-11-08)
+227,Lettuce,Vegetables,county reports - California only (user 2026-11-08)
+229,Pumpkins,Vegetables,county reports - California only (user 2026-11-08)
+243,Cabbage,Vegetables,county reports - California only (user 2026-11-08)
+244,Cauliflower,Vegetables,county reports - California only (user 2026-11-08)
+245,Celery,Vegetables,county reports - California only (user 2026-11-08)
+246,Radishes,Vegetables,county reports - California only (user 2026-11-08)
+247,Turnips,Vegetables,county reports - California only (user 2026-11-08)
+248,Eggplants,Vegetables,county reports - California only (user 2026-11-08)
+249,Gourds,Vegetables,county reports - California only (user 2026-11-08)

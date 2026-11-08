@@ -1,6 +1,8 @@
 # =============================================================================
 # 03-cdl-ecodivision-sample.R - the CDL-based cropland and pasture growth of each ecodivision, which Cropland Productivity is divided by
 # =============================================================================
+# (2026-11-08: no longer the divisor - stage 8 divides by the ecodivision's NASS level, ag-targets.csv NPP, so each cell grows at its
+# own crops' county rates; kept as the record of the ecodivision CDL means.)
 # (user 2026-11-07: normalize by ecodivision.) Stage 8's Cropland Productivity map gives each cell the mean growth of its Cropland Data
 # Layer pixels (src/cropland.R: each pixel's crop takes its county's NASS growth; fallow 0; crops NASS does not survey left out). That
 # estimate and the NASS level the growth rows hold (ag-targets.csv) are measured differently (fallow, unsurveyed crops), so the map is

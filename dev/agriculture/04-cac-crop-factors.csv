@@ -1,5 +1,5 @@
 Pattern,Group,DM,HI,RS,Source
-^WHEAT,Grain,0.865,0.39,0.20,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
+^WHEAT|^TRITICALE,Grain,0.865,0.39,0.20,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
 ^BARLEY,Grain,0.865,0.46,0.11,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
 ^OATS,Grain,0.865,0.52,0.40,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
 ^CORN GRAIN|^CORN WHITE|^CORN POPCORN,Grain,0.86,0.53,0.18,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
@@ -9,7 +9,7 @@ Pattern,Group,DM,HI,RS,Source
 ^BEANS DRY|^BEANS SEED,Beans,0.84,0.46,0.08,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
 ^SEED ALFALFA,Seed,0.90,0.10,0.87,provisional - to check
 ^HAY ALFALFA,Hay,0.87,0.95,0.87,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
-^HAY GRAIN,Hay,0.87,0.95,0.40,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
+^HAY GRAIN|^HAY SUDAN,Hay,0.87,0.95,0.40,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
 ^HAY WILD|^HAY OTHER,Hay,0.87,0.60,1.00,provisional - to check
 ^SILAGE|^CORN SILAGE,Silage,0.35,0.95,0.18,provisional - to check
 ^SUGAR BEETS,Sugarbeets,0.15,0.40,0.43,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)

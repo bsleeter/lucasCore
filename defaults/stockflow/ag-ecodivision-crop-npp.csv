@@ -1,225 +1,225 @@
-StratumId,StateClassId,Group,NPP,Years
-Hot Continental,Agriculture: Cropland,Barley,2.9679,39
-Hot Continental,Agriculture: Cropland,Beans,1.6355,34
-Hot Continental,Agriculture: Cropland,Corn,8.1595,39
-Hot Continental,Agriculture: Cropland,Cotton,2.5922,39
-Hot Continental,Agriculture: Cropland,Oats,2.3109,39
-Hot Continental,Agriculture: Cropland,Potatoes,7.1549,31
-Hot Continental,Agriculture: Cropland,Rice,8.2831,38
-Hot Continental,Agriculture: Cropland,Rye,1.6341,15
-Hot Continental,Agriculture: Cropland,Sorghum,5.2038,37
-Hot Continental,Agriculture: Cropland,Soybean,3.2813,39
-Hot Continental,Agriculture: Cropland,Sugarbeets,11.4961,34
-Hot Continental,Agriculture: Cropland,Sunflower,2.3293,32
-Hot Continental,Agriculture: Cropland,Tobacco,2.5136,34
-Hot Continental,Agriculture: Cropland,Wheat,4.5828,39
-Hot Continental,Agriculture: Pasture,Alfalfa hay,5.4582,38
-Hot Continental,Agriculture: Pasture,Nonlegume hay,3.5963,38
-Hot Continental Mountains,Agriculture: Cropland,Barley,3.3894,39
-Hot Continental Mountains,Agriculture: Cropland,Corn,8.8285,39
-Hot Continental Mountains,Agriculture: Cropland,Cotton,2.6442,23
-Hot Continental Mountains,Agriculture: Cropland,Oats,2.1874,39
-Hot Continental Mountains,Agriculture: Cropland,Peanuts,2.2233,1
-Hot Continental Mountains,Agriculture: Cropland,Potatoes,4.846,28
-Hot Continental Mountains,Agriculture: Cropland,Rice,8.1357,39
-Hot Continental Mountains,Agriculture: Cropland,Rye,1.5263,6
-Hot Continental Mountains,Agriculture: Cropland,Sorghum,3.9928,35
-Hot Continental Mountains,Agriculture: Cropland,Soybean,2.9416,39
-Hot Continental Mountains,Agriculture: Cropland,Tobacco,2.2616,34
-Hot Continental Mountains,Agriculture: Cropland,Wheat,4.0824,39
-Hot Continental Mountains,Agriculture: Pasture,Alfalfa hay,5.2139,34
-Hot Continental Mountains,Agriculture: Pasture,Nonlegume hay,3.6181,34
-Marine,Agriculture: Cropland,Barley,3.7973,32
-Marine,Agriculture: Cropland,Corn,21.4039,24
-Marine,Agriculture: Cropland,Oats,3.4566,38
-Marine,Agriculture: Cropland,Potatoes,7.6251,27
-Marine,Agriculture: Cropland,Wheat,6.9803,36
-Marine,Agriculture: Pasture,Alfalfa hay,7.1251,34
-Marine,Agriculture: Pasture,Nonlegume hay,3.8142,34
-Marine Mountains,Agriculture: Cropland,Barley,3.6707,37
-Marine Mountains,Agriculture: Cropland,Beans,1.6579,1
-Marine Mountains,Agriculture: Cropland,Corn,20.2949,31
-Marine Mountains,Agriculture: Cropland,Oats,3.3427,38
-Marine Mountains,Agriculture: Cropland,Potatoes,8.2028,27
-Marine Mountains,Agriculture: Cropland,Sugarbeets,11.4206,11
-Marine Mountains,Agriculture: Cropland,Wheat,4.874,39
-Marine Mountains,Agriculture: Pasture,Alfalfa hay,7.0328,34
-Marine Mountains,Agriculture: Pasture,Nonlegume hay,3.8578,34
-Mediterranean,Agriculture: Cropland,Barley,2.94,38
-Mediterranean,Agriculture: Cropland,Beans,1.904,28
-Mediterranean,Agriculture: Cropland,Corn,18.5328,39
-Mediterranean,Agriculture: Cropland,Cotton,4.3748,38
-Mediterranean,Agriculture: Cropland,Oats,2.8431,26
-Mediterranean,Agriculture: Cropland,Rice,10.8097,39
-Mediterranean,Agriculture: Cropland,Sorghum,5.5627,12
-Mediterranean,Agriculture: Cropland,Sugarbeets,14.13,24
-Mediterranean,Agriculture: Cropland,Sunflower,2.2417,1
-Mediterranean,Agriculture: Cropland,Wheat,6.2159,39
-Mediterranean,Agriculture: Pasture,Alfalfa hay,4.3188,2
-Mediterranean,Agriculture: Pasture,Nonlegume hay,4.0237,29
-Mediterranean Mountains,Agriculture: Cropland,Barley,3.2668,38
-Mediterranean Mountains,Agriculture: Cropland,Beans,1.9359,28
-Mediterranean Mountains,Agriculture: Cropland,Corn,20.9443,39
-Mediterranean Mountains,Agriculture: Cropland,Cotton,4.3948,38
-Mediterranean Mountains,Agriculture: Cropland,Oats,2.8761,26
-Mediterranean Mountains,Agriculture: Cropland,Potatoes,8.8767,27
-Mediterranean Mountains,Agriculture: Cropland,Rice,10.8575,39
-Mediterranean Mountains,Agriculture: Cropland,Sorghum,5.7475,11
-Mediterranean Mountains,Agriculture: Cropland,Sugarbeets,15.0576,28
-Mediterranean Mountains,Agriculture: Cropland,Sunflower,2.2249,1
-Mediterranean Mountains,Agriculture: Cropland,Wheat,6.0331,39
-Mediterranean Mountains,Agriculture: Pasture,Alfalfa hay,7.5151,34
-Mediterranean Mountains,Agriculture: Pasture,Nonlegume hay,3.7543,34
-Prairie,Agriculture: Cropland,Barley,2.8875,39
-Prairie,Agriculture: Cropland,Beans,1.4458,38
-Prairie,Agriculture: Cropland,Corn,8.1314,39
-Prairie,Agriculture: Cropland,Cotton,2.3721,39
-Prairie,Agriculture: Cropland,Oats,2.2499,39
-Prairie,Agriculture: Cropland,Peanuts,2.2891,36
-Prairie,Agriculture: Cropland,Potatoes,3.9811,29
-Prairie,Agriculture: Cropland,Rice,8.8783,39
-Prairie,Agriculture: Cropland,Rye,1.532,24
-Prairie,Agriculture: Cropland,Sorghum,4.7017,39
-Prairie,Agriculture: Cropland,Soybean,3.2438,39
-Prairie,Agriculture: Cropland,Sugarbeets,11.6032,34
-Prairie,Agriculture: Cropland,Sugarcane,14.1681,34
-Prairie,Agriculture: Cropland,Sunflower,2.5306,39
-Prairie,Agriculture: Cropland,Tobacco,2.6147,24
-Prairie,Agriculture: Cropland,Wheat,3.235,39
-Prairie,Agriculture: Pasture,Alfalfa hay,5.9522,38
-Prairie,Agriculture: Pasture,Nonlegume hay,2.8846,38
-Savanna,Agriculture: Cropland,Sugarcane,14.6424,34
-Subtropical,Agriculture: Cropland,Barley,3.4598,39
-Subtropical,Agriculture: Cropland,Corn,6.8222,39
-Subtropical,Agriculture: Cropland,Cotton,2.8238,39
-Subtropical,Agriculture: Cropland,Oats,2.1774,35
-Subtropical,Agriculture: Cropland,Peanuts,3.7532,39
-Subtropical,Agriculture: Cropland,Potatoes,3.6717,39
-Subtropical,Agriculture: Cropland,Rice,8.2444,39
-Subtropical,Agriculture: Cropland,Rye,1.3139,24
-Subtropical,Agriculture: Cropland,Sorghum,4.7697,39
-Subtropical,Agriculture: Cropland,Soybean,2.5894,39
-Subtropical,Agriculture: Cropland,Sugarcane,12.4237,34
-Subtropical,Agriculture: Cropland,Sunflower,2.833,2
-Subtropical,Agriculture: Cropland,Tobacco,2.6389,34
-Subtropical,Agriculture: Cropland,Wheat,3.9145,39
-Subtropical,Agriculture: Pasture,Alfalfa hay,5.4475,37
-Subtropical,Agriculture: Pasture,Nonlegume hay,3.6799,38
-Subtropical Mountains,Agriculture: Cropland,Corn,5.2318,37
-Subtropical Mountains,Agriculture: Cropland,Cotton,2.4233,12
-Subtropical Mountains,Agriculture: Cropland,Oats,1.9341,8
-Subtropical Mountains,Agriculture: Cropland,Peanuts,2.1751,16
-Subtropical Mountains,Agriculture: Cropland,Rice,7.0675,26
-Subtropical Mountains,Agriculture: Cropland,Rye,1.1338,11
-Subtropical Mountains,Agriculture: Cropland,Sorghum,3.4893,21
-Subtropical Mountains,Agriculture: Cropland,Soybean,1.8767,39
-Subtropical Mountains,Agriculture: Cropland,Wheat,2.7971,33
-Subtropical Mountains,Agriculture: Pasture,Alfalfa hay,5.1503,26
-Subtropical Mountains,Agriculture: Pasture,Nonlegume hay,2.7988,31
-Temperate Desert,Agriculture: Cropland,Barley,3.9147,39
-Temperate Desert,Agriculture: Cropland,Beans,2.0279,34
-Temperate Desert,Agriculture: Cropland,Corn,14.4736,39
-Temperate Desert,Agriculture: Cropland,Oats,2.6641,33
-Temperate Desert,Agriculture: Cropland,Potatoes,9.0334,34
-Temperate Desert,Agriculture: Cropland,Sorghum,4.7375,12
-Temperate Desert,Agriculture: Cropland,Sugarbeets,15.5209,34
-Temperate Desert,Agriculture: Cropland,Sunflower,1.4319,5
-Temperate Desert,Agriculture: Cropland,Wheat,4.789,39
-Temperate Desert,Agriculture: Pasture,Alfalfa hay,7.7358,34
-Temperate Desert,Agriculture: Pasture,Nonlegume hay,2.9766,34
-Temperate Desert Mountains,Agriculture: Cropland,Barley,4.2764,32
-Temperate Desert Mountains,Agriculture: Cropland,Beans,1.8128,20
-Temperate Desert Mountains,Agriculture: Cropland,Corn,15.5836,25
-Temperate Desert Mountains,Agriculture: Cropland,Oats,2.7302,24
-Temperate Desert Mountains,Agriculture: Cropland,Potatoes,5.4414,2
-Temperate Desert Mountains,Agriculture: Cropland,Sorghum,4.7462,9
-Temperate Desert Mountains,Agriculture: Cropland,Wheat,3.3522,26
-Temperate Desert Mountains,Agriculture: Pasture,Alfalfa hay,6.8741,34
-Temperate Desert Mountains,Agriculture: Pasture,Nonlegume hay,3.0422,34
-Temperate Steppe,Agriculture: Cropland,Barley,2.5364,39
-Temperate Steppe,Agriculture: Cropland,Beans,1.5652,39
-Temperate Steppe,Agriculture: Cropland,Corn,7.8036,39
-Temperate Steppe,Agriculture: Cropland,Cotton,2.229,39
-Temperate Steppe,Agriculture: Cropland,Oats,1.9397,39
-Temperate Steppe,Agriculture: Cropland,Peanuts,3.5205,37
-Temperate Steppe,Agriculture: Cropland,Potatoes,6.9327,34
-Temperate Steppe,Agriculture: Cropland,Rye,1.7181,24
-Temperate Steppe,Agriculture: Cropland,Sorghum,4.3459,39
-Temperate Steppe,Agriculture: Cropland,Soybean,2.8744,39
-Temperate Steppe,Agriculture: Cropland,Sugarbeets,12.5078,34
-Temperate Steppe,Agriculture: Cropland,Sunflower,2.4736,39
-Temperate Steppe,Agriculture: Cropland,Wheat,2.8834,39
-Temperate Steppe,Agriculture: Pasture,Alfalfa hay,4.4166,38
-Temperate Steppe,Agriculture: Pasture,Nonlegume hay,2.4737,38
-Temperate Steppe Mountains,Agriculture: Cropland,Barley,3.2545,39
-Temperate Steppe Mountains,Agriculture: Cropland,Beans,1.4933,39
-Temperate Steppe Mountains,Agriculture: Cropland,Corn,13.1809,39
-Temperate Steppe Mountains,Agriculture: Cropland,Oats,2.3677,39
-Temperate Steppe Mountains,Agriculture: Cropland,Potatoes,7.3134,34
-Temperate Steppe Mountains,Agriculture: Cropland,Rye,1.6861,3
-Temperate Steppe Mountains,Agriculture: Cropland,Sorghum,2.6304,24
-Temperate Steppe Mountains,Agriculture: Cropland,Soybean,1.3648,8
-Temperate Steppe Mountains,Agriculture: Cropland,Sugarbeets,13.4338,34
-Temperate Steppe Mountains,Agriculture: Cropland,Sunflower,2.4063,30
-Temperate Steppe Mountains,Agriculture: Cropland,Wheat,4.3365,39
-Temperate Steppe Mountains,Agriculture: Pasture,Alfalfa hay,5.0393,37
-Temperate Steppe Mountains,Agriculture: Pasture,Nonlegume hay,2.8975,37
-Tropical/Subtropical Desert,Agriculture: Cropland,Barley,4.9007,29
-Tropical/Subtropical Desert,Agriculture: Cropland,Beans,2.052,22
-Tropical/Subtropical Desert,Agriculture: Cropland,Corn,14.7245,38
-Tropical/Subtropical Desert,Agriculture: Cropland,Cotton,3.9425,39
-Tropical/Subtropical Desert,Agriculture: Cropland,Oats,1.7641,25
-Tropical/Subtropical Desert,Agriculture: Cropland,Peanuts,4.1761,19
-Tropical/Subtropical Desert,Agriculture: Cropland,Potatoes,5.9945,17
-Tropical/Subtropical Desert,Agriculture: Cropland,Rice,8.7995,6
-Tropical/Subtropical Desert,Agriculture: Cropland,Sorghum,4.528,35
-Tropical/Subtropical Desert,Agriculture: Cropland,Sugarbeets,18.3189,27
-Tropical/Subtropical Desert,Agriculture: Cropland,Wheat,7.1883,39
-Tropical/Subtropical Desert,Agriculture: Pasture,Alfalfa hay,10.6731,38
-Tropical/Subtropical Desert,Agriculture: Pasture,Nonlegume hay,5.6524,35
-Tropical/Subtropical Steppe,Agriculture: Cropland,Barley,3.1859,29
-Tropical/Subtropical Steppe,Agriculture: Cropland,Beans,0.54,33
-Tropical/Subtropical Steppe,Agriculture: Cropland,Corn,8.1809,39
-Tropical/Subtropical Steppe,Agriculture: Cropland,Cotton,1.967,39
-Tropical/Subtropical Steppe,Agriculture: Cropland,Oats,1.4967,39
-Tropical/Subtropical Steppe,Agriculture: Cropland,Peanuts,3.6875,39
-Tropical/Subtropical Steppe,Agriculture: Cropland,Potatoes,7.6588,17
-Tropical/Subtropical Steppe,Agriculture: Cropland,Rice,7.7537,21
-Tropical/Subtropical Steppe,Agriculture: Cropland,Rye,1.1497,24
-Tropical/Subtropical Steppe,Agriculture: Cropland,Sorghum,3.3392,39
-Tropical/Subtropical Steppe,Agriculture: Cropland,Soybean,2.7772,39
-Tropical/Subtropical Steppe,Agriculture: Cropland,Sugarbeets,11.5891,13
-Tropical/Subtropical Steppe,Agriculture: Cropland,Sugarcane,14.1757,34
-Tropical/Subtropical Steppe,Agriculture: Cropland,Sunflower,2.0378,33
-Tropical/Subtropical Steppe,Agriculture: Cropland,Wheat,2.2208,39
-Tropical/Subtropical Steppe,Agriculture: Pasture,Alfalfa hay,7.8146,38
-Tropical/Subtropical Steppe,Agriculture: Pasture,Nonlegume hay,3.0468,38
-Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,Barley,5.0777,18
-Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,Corn,16.705,31
-Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,Cotton,3.4623,39
-Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,Oats,1.9706,5
-Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,Potatoes,5.6661,5
-Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,Sorghum,5.1898,23
-Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,Wheat,4.0952,26
-Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,Alfalfa hay,8.5967,37
-Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,Nonlegume hay,3.6747,36
-Warm Continental,Agriculture: Cropland,Barley,2.5859,39
-Warm Continental,Agriculture: Cropland,Beans,1.4718,34
-Warm Continental,Agriculture: Cropland,Corn,9.1346,39
-Warm Continental,Agriculture: Cropland,Oats,2.1557,39
-Warm Continental,Agriculture: Cropland,Potatoes,6.8178,31
-Warm Continental,Agriculture: Cropland,Rye,1.6593,15
-Warm Continental,Agriculture: Cropland,Soybean,2.8863,39
-Warm Continental,Agriculture: Cropland,Sugarbeets,10.7561,34
-Warm Continental,Agriculture: Cropland,Sunflower,2.1978,30
-Warm Continental,Agriculture: Cropland,Tobacco,3.1775,8
-Warm Continental,Agriculture: Cropland,Wheat,4.0584,39
-Warm Continental,Agriculture: Pasture,Alfalfa hay,4.2268,34
-Warm Continental,Agriculture: Pasture,Nonlegume hay,3.0823,34
-Warm Continental Mountains,Agriculture: Cropland,Corn,12.1809,39
-Warm Continental Mountains,Agriculture: Cropland,Oats,2.3119,38
-Warm Continental Mountains,Agriculture: Cropland,Potatoes,6.2106,6
-Warm Continental Mountains,Agriculture: Cropland,Soybean,3.3584,24
-Warm Continental Mountains,Agriculture: Cropland,Wheat,3.8229,32
-Warm Continental Mountains,Agriculture: Pasture,Alfalfa hay,4.369,34
-Warm Continental Mountains,Agriculture: Pasture,Nonlegume hay,3.3088,34
+StratumId,StateClassId,Group,NPP,AG,Harvest,Years
+Hot Continental,Agriculture: Cropland,Barley,2.9679,2.6738,1.2299,39
+Hot Continental,Agriculture: Cropland,Beans,1.6355,1.5143,0.6966,34
+Hot Continental,Agriculture: Cropland,Corn,8.1595,6.9148,3.93,39
+Hot Continental,Agriculture: Cropland,Cotton,2.5922,2.2155,0.8862,39
+Hot Continental,Agriculture: Cropland,Oats,2.3109,1.6506,0.8583,39
+Hot Continental,Agriculture: Cropland,Potatoes,7.1549,6.6868,3.3434,31
+Hot Continental,Agriculture: Cropland,Rice,8.2831,6.7894,2.8516,38
+Hot Continental,Agriculture: Cropland,Rye,1.6341,1.4334,0.7167,15
+Hot Continental,Agriculture: Cropland,Sorghum,5.2038,4.41,1.9406,37
+Hot Continental,Agriculture: Cropland,Soybean,3.2813,2.7574,1.1581,39
+Hot Continental,Agriculture: Cropland,Sugarbeets,11.4961,8.0392,3.2157,34
+Hot Continental,Agriculture: Cropland,Sunflower,2.3293,2.1975,0.5933,32
+Hot Continental,Agriculture: Cropland,Tobacco,2.5136,1.3965,0.8379,34
+Hot Continental,Agriculture: Cropland,Wheat,4.5828,3.819,1.4894,39
+Hot Continental,Agriculture: Pasture,Alfalfa hay,5.4582,2.9188,2.7729,38
+Hot Continental,Agriculture: Pasture,Nonlegume hay,3.5963,1.9231,1.827,38
+Hot Continental Mountains,Agriculture: Cropland,Barley,3.3894,3.0535,1.4046,39
+Hot Continental Mountains,Agriculture: Cropland,Corn,8.8285,7.4818,5.6194,39
+Hot Continental Mountains,Agriculture: Cropland,Cotton,2.6442,2.26,0.904,23
+Hot Continental Mountains,Agriculture: Cropland,Oats,2.1874,1.5624,0.8125,39
+Hot Continental Mountains,Agriculture: Cropland,Peanuts,2.2233,2.0779,0.8311,1
+Hot Continental Mountains,Agriculture: Cropland,Potatoes,4.846,4.529,2.2645,28
+Hot Continental Mountains,Agriculture: Cropland,Rice,8.1357,6.6686,2.8008,39
+Hot Continental Mountains,Agriculture: Cropland,Rye,1.5263,1.3389,0.6694,6
+Hot Continental Mountains,Agriculture: Cropland,Sorghum,3.9928,3.3838,1.4889,35
+Hot Continental Mountains,Agriculture: Cropland,Soybean,2.9416,2.4719,1.0382,39
+Hot Continental Mountains,Agriculture: Cropland,Tobacco,2.2616,1.2564,0.7539,34
+Hot Continental Mountains,Agriculture: Cropland,Wheat,4.0824,3.402,1.3268,39
+Hot Continental Mountains,Agriculture: Pasture,Alfalfa hay,5.2139,2.7882,2.6488,34
+Hot Continental Mountains,Agriculture: Pasture,Nonlegume hay,3.6181,1.9348,1.8381,34
+Marine,Agriculture: Cropland,Barley,3.7973,3.421,1.5737,32
+Marine,Agriculture: Cropland,Corn,21.4039,18.1389,17.1052,24
+Marine,Agriculture: Cropland,Oats,3.4566,2.469,1.2839,38
+Marine,Agriculture: Cropland,Potatoes,7.6251,7.1263,3.5631,27
+Marine,Agriculture: Cropland,Wheat,6.9803,5.8169,2.2686,36
+Marine,Agriculture: Pasture,Alfalfa hay,7.1251,3.8102,3.6197,34
+Marine,Agriculture: Pasture,Nonlegume hay,3.8142,2.0397,1.9377,34
+Marine Mountains,Agriculture: Cropland,Barley,3.6707,3.3069,1.5212,37
+Marine Mountains,Agriculture: Cropland,Beans,1.6579,1.5351,0.7061,1
+Marine Mountains,Agriculture: Cropland,Corn,20.2949,17.1991,15.646,31
+Marine Mountains,Agriculture: Cropland,Oats,3.3427,2.3877,1.2416,38
+Marine Mountains,Agriculture: Cropland,Potatoes,8.2028,7.6661,3.8331,27
+Marine Mountains,Agriculture: Cropland,Sugarbeets,11.4206,7.9865,3.1946,11
+Marine Mountains,Agriculture: Cropland,Wheat,4.874,4.0617,1.584,39
+Marine Mountains,Agriculture: Pasture,Alfalfa hay,7.0328,3.7609,3.5728,34
+Marine Mountains,Agriculture: Pasture,Nonlegume hay,3.8578,2.063,1.9598,34
+Mediterranean,Agriculture: Cropland,Barley,2.94,2.6486,1.2184,38
+Mediterranean,Agriculture: Cropland,Beans,1.904,1.763,0.811,28
+Mediterranean,Agriculture: Cropland,Corn,18.5328,15.7057,13.7393,39
+Mediterranean,Agriculture: Cropland,Cotton,4.3748,3.7392,1.4957,38
+Mediterranean,Agriculture: Cropland,Oats,2.8431,2.0308,1.056,26
+Mediterranean,Agriculture: Cropland,Rice,10.8097,8.8604,3.7214,39
+Mediterranean,Agriculture: Cropland,Sorghum,5.5627,4.7141,2.0742,12
+Mediterranean,Agriculture: Cropland,Sugarbeets,14.13,9.8811,3.9524,24
+Mediterranean,Agriculture: Cropland,Sunflower,2.2417,2.1148,0.571,1
+Mediterranean,Agriculture: Cropland,Wheat,6.2159,5.1799,2.0202,39
+Mediterranean,Agriculture: Pasture,Alfalfa hay,4.3188,2.3095,2.1941,2
+Mediterranean,Agriculture: Pasture,Nonlegume hay,4.0237,2.1517,2.0441,29
+Mediterranean Mountains,Agriculture: Cropland,Barley,3.2668,2.9431,1.3538,38
+Mediterranean Mountains,Agriculture: Cropland,Beans,1.9359,1.7925,0.8246,28
+Mediterranean Mountains,Agriculture: Cropland,Corn,20.9443,17.7494,16.2291,39
+Mediterranean Mountains,Agriculture: Cropland,Cotton,4.3948,3.7562,1.5025,38
+Mediterranean Mountains,Agriculture: Cropland,Oats,2.8761,2.0543,1.0683,26
+Mediterranean Mountains,Agriculture: Cropland,Potatoes,8.8767,8.296,4.148,27
+Mediterranean Mountains,Agriculture: Cropland,Rice,10.8575,8.8996,3.7378,39
+Mediterranean Mountains,Agriculture: Cropland,Sorghum,5.7475,4.8708,2.1431,11
+Mediterranean Mountains,Agriculture: Cropland,Sugarbeets,15.0576,10.5298,4.2119,28
+Mediterranean Mountains,Agriculture: Cropland,Sunflower,2.2249,2.099,0.5667,1
+Mediterranean Mountains,Agriculture: Cropland,Wheat,6.0331,5.0276,1.9608,39
+Mediterranean Mountains,Agriculture: Pasture,Alfalfa hay,7.5151,4.0188,3.8178,34
+Mediterranean Mountains,Agriculture: Pasture,Nonlegume hay,3.7543,2.0076,1.9073,34
+Prairie,Agriculture: Cropland,Barley,2.8875,2.6014,1.1966,39
+Prairie,Agriculture: Cropland,Beans,1.4458,1.3387,0.6158,38
+Prairie,Agriculture: Cropland,Corn,8.1314,6.891,3.7154,39
+Prairie,Agriculture: Cropland,Cotton,2.3721,2.0274,0.811,39
+Prairie,Agriculture: Cropland,Oats,2.2499,1.6071,0.8357,39
+Prairie,Agriculture: Cropland,Peanuts,2.2891,2.1393,0.8557,36
+Prairie,Agriculture: Cropland,Potatoes,3.9811,3.7207,1.8603,29
+Prairie,Agriculture: Cropland,Rice,8.8783,7.2773,3.0565,39
+Prairie,Agriculture: Cropland,Rye,1.532,1.3439,0.6719,24
+Prairie,Agriculture: Cropland,Sorghum,4.7017,3.9845,1.8048,39
+Prairie,Agriculture: Cropland,Soybean,3.2438,2.7259,1.1449,39
+Prairie,Agriculture: Cropland,Sugarbeets,11.6032,8.1141,3.2456,34
+Prairie,Agriculture: Cropland,Sugarcane,14.1681,12.0069,9.0052,34
+Prairie,Agriculture: Cropland,Sunflower,2.5306,2.3874,0.6446,39
+Prairie,Agriculture: Cropland,Tobacco,2.6147,1.4526,0.8716,24
+Prairie,Agriculture: Cropland,Wheat,3.235,2.6958,1.0514,39
+Prairie,Agriculture: Pasture,Alfalfa hay,5.9522,3.183,3.0238,38
+Prairie,Agriculture: Pasture,Nonlegume hay,2.8846,1.5426,1.4654,38
+Savanna,Agriculture: Cropland,Sugarcane,14.6424,12.4088,9.3066,34
+Subtropical,Agriculture: Cropland,Barley,3.4598,3.1169,1.4338,39
+Subtropical,Agriculture: Cropland,Corn,6.8222,5.7815,3.1316,39
+Subtropical,Agriculture: Cropland,Cotton,2.8238,2.4135,0.9654,39
+Subtropical,Agriculture: Cropland,Oats,2.1774,1.5553,0.8088,35
+Subtropical,Agriculture: Cropland,Peanuts,3.7532,3.5076,1.4031,39
+Subtropical,Agriculture: Cropland,Potatoes,3.6717,3.4315,1.7157,39
+Subtropical,Agriculture: Cropland,Rice,8.2444,6.7577,2.8382,39
+Subtropical,Agriculture: Cropland,Rye,1.3139,1.1525,0.5763,24
+Subtropical,Agriculture: Cropland,Sorghum,4.7697,4.0422,1.7785,39
+Subtropical,Agriculture: Cropland,Soybean,2.5894,2.1759,0.9139,39
+Subtropical,Agriculture: Cropland,Sugarcane,12.4237,10.5286,7.8964,34
+Subtropical,Agriculture: Cropland,Sunflower,2.833,2.6726,0.7216,2
+Subtropical,Agriculture: Cropland,Tobacco,2.6389,1.466,0.8796,34
+Subtropical,Agriculture: Cropland,Wheat,3.9145,3.2621,1.2722,39
+Subtropical,Agriculture: Pasture,Alfalfa hay,5.4475,2.9131,2.7674,37
+Subtropical,Agriculture: Pasture,Nonlegume hay,3.6799,1.9679,1.8695,38
+Subtropical Mountains,Agriculture: Cropland,Corn,5.2318,4.4338,2.3499,37
+Subtropical Mountains,Agriculture: Cropland,Cotton,2.4233,2.0712,0.8285,12
+Subtropical Mountains,Agriculture: Cropland,Oats,1.9341,1.3815,0.7184,8
+Subtropical Mountains,Agriculture: Cropland,Peanuts,2.1751,2.0328,0.8131,16
+Subtropical Mountains,Agriculture: Cropland,Rice,7.0675,5.7931,2.4331,26
+Subtropical Mountains,Agriculture: Cropland,Rye,1.1338,0.9946,0.4973,11
+Subtropical Mountains,Agriculture: Cropland,Sorghum,3.4893,2.957,1.3011,21
+Subtropical Mountains,Agriculture: Cropland,Soybean,1.8767,1.5771,0.6624,39
+Subtropical Mountains,Agriculture: Cropland,Wheat,2.7971,2.3309,0.909,33
+Subtropical Mountains,Agriculture: Pasture,Alfalfa hay,5.1503,2.7542,2.6165,26
+Subtropical Mountains,Agriculture: Pasture,Nonlegume hay,2.7988,1.4967,1.4219,31
+Temperate Desert,Agriculture: Cropland,Barley,3.9147,3.5268,1.6223,39
+Temperate Desert,Agriculture: Cropland,Beans,2.0279,1.8777,0.8637,34
+Temperate Desert,Agriculture: Cropland,Corn,14.4736,12.2658,9.6928,39
+Temperate Desert,Agriculture: Cropland,Oats,2.6641,1.903,0.9895,33
+Temperate Desert,Agriculture: Cropland,Potatoes,9.0334,8.4424,4.2212,34
+Temperate Desert,Agriculture: Cropland,Sorghum,4.7375,4.0148,1.7665,12
+Temperate Desert,Agriculture: Cropland,Sugarbeets,15.5209,10.8538,4.3415,34
+Temperate Desert,Agriculture: Cropland,Sunflower,1.4319,1.3509,0.3647,5
+Temperate Desert,Agriculture: Cropland,Wheat,4.789,3.9908,1.5564,39
+Temperate Desert,Agriculture: Pasture,Alfalfa hay,7.7358,4.1368,3.93,34
+Temperate Desert,Agriculture: Pasture,Nonlegume hay,2.9766,1.5918,1.5122,34
+Temperate Desert Mountains,Agriculture: Cropland,Barley,4.2764,3.8526,1.7722,32
+Temperate Desert Mountains,Agriculture: Cropland,Beans,1.8128,1.6785,0.7721,20
+Temperate Desert Mountains,Agriculture: Cropland,Corn,15.5836,13.2065,11.9729,25
+Temperate Desert Mountains,Agriculture: Cropland,Oats,2.7302,1.9502,1.0141,24
+Temperate Desert Mountains,Agriculture: Cropland,Potatoes,5.4414,5.0854,2.5427,2
+Temperate Desert Mountains,Agriculture: Cropland,Sorghum,4.7462,4.0222,1.7698,9
+Temperate Desert Mountains,Agriculture: Cropland,Wheat,3.3522,2.7935,1.0895,26
+Temperate Desert Mountains,Agriculture: Pasture,Alfalfa hay,6.8741,3.676,3.4922,34
+Temperate Desert Mountains,Agriculture: Pasture,Nonlegume hay,3.0422,1.6268,1.5455,34
+Temperate Steppe,Agriculture: Cropland,Barley,2.5364,2.285,1.0511,39
+Temperate Steppe,Agriculture: Cropland,Beans,1.5652,1.4493,0.6667,39
+Temperate Steppe,Agriculture: Cropland,Corn,7.8036,6.6133,3.7035,39
+Temperate Steppe,Agriculture: Cropland,Cotton,2.229,1.9051,0.7621,39
+Temperate Steppe,Agriculture: Cropland,Oats,1.9397,1.3855,0.7205,39
+Temperate Steppe,Agriculture: Cropland,Peanuts,3.5205,3.2902,1.3161,37
+Temperate Steppe,Agriculture: Cropland,Potatoes,6.9327,6.4792,3.2396,34
+Temperate Steppe,Agriculture: Cropland,Rye,1.7181,1.5071,0.7536,24
+Temperate Steppe,Agriculture: Cropland,Sorghum,4.3459,3.683,1.7106,39
+Temperate Steppe,Agriculture: Cropland,Soybean,2.8744,2.4155,1.0145,39
+Temperate Steppe,Agriculture: Cropland,Sugarbeets,12.5078,8.7467,3.4987,34
+Temperate Steppe,Agriculture: Cropland,Sunflower,2.4736,2.3336,0.6301,39
+Temperate Steppe,Agriculture: Cropland,Wheat,2.8834,2.4028,0.9371,39
+Temperate Steppe,Agriculture: Pasture,Alfalfa hay,4.4166,2.3618,2.2437,38
+Temperate Steppe,Agriculture: Pasture,Nonlegume hay,2.4737,1.3228,1.2567,38
+Temperate Steppe Mountains,Agriculture: Cropland,Barley,3.2545,2.932,1.3487,39
+Temperate Steppe Mountains,Agriculture: Cropland,Beans,1.4933,1.3827,0.636,39
+Temperate Steppe Mountains,Agriculture: Cropland,Corn,13.1809,11.1703,9.1428,39
+Temperate Steppe Mountains,Agriculture: Cropland,Oats,2.3677,1.6912,0.8794,39
+Temperate Steppe Mountains,Agriculture: Cropland,Potatoes,7.3134,6.8349,3.4175,34
+Temperate Steppe Mountains,Agriculture: Cropland,Rye,1.6861,1.479,0.7395,3
+Temperate Steppe Mountains,Agriculture: Cropland,Sorghum,2.6304,2.2292,0.9808,24
+Temperate Steppe Mountains,Agriculture: Cropland,Soybean,1.3648,1.1469,0.4817,8
+Temperate Steppe Mountains,Agriculture: Cropland,Sugarbeets,13.4338,9.3943,3.7577,34
+Temperate Steppe Mountains,Agriculture: Cropland,Sunflower,2.4063,2.2701,0.6129,30
+Temperate Steppe Mountains,Agriculture: Cropland,Wheat,4.3365,3.6137,1.4093,39
+Temperate Steppe Mountains,Agriculture: Pasture,Alfalfa hay,5.0393,2.6948,2.5601,37
+Temperate Steppe Mountains,Agriculture: Pasture,Nonlegume hay,2.8975,1.5494,1.472,37
+Tropical/Subtropical Desert,Agriculture: Cropland,Barley,4.9007,4.4151,2.0309,29
+Tropical/Subtropical Desert,Agriculture: Cropland,Beans,2.052,1.9,0.874,22
+Tropical/Subtropical Desert,Agriculture: Cropland,Corn,14.7245,12.4784,10.0051,38
+Tropical/Subtropical Desert,Agriculture: Cropland,Cotton,3.9425,3.3697,1.3479,39
+Tropical/Subtropical Desert,Agriculture: Cropland,Oats,1.7641,1.2601,0.6553,25
+Tropical/Subtropical Desert,Agriculture: Cropland,Peanuts,4.1761,3.9029,1.5612,19
+Tropical/Subtropical Desert,Agriculture: Cropland,Potatoes,5.9945,5.6023,2.8011,17
+Tropical/Subtropical Desert,Agriculture: Cropland,Rice,8.7995,7.2127,3.0293,6
+Tropical/Subtropical Desert,Agriculture: Cropland,Sorghum,4.528,3.8373,1.6884,35
+Tropical/Subtropical Desert,Agriculture: Cropland,Sugarbeets,18.3189,12.8104,5.1242,27
+Tropical/Subtropical Desert,Agriculture: Cropland,Wheat,7.1883,5.9903,2.3362,39
+Tropical/Subtropical Desert,Agriculture: Pasture,Alfalfa hay,10.6731,5.7076,5.4222,38
+Tropical/Subtropical Desert,Agriculture: Pasture,Nonlegume hay,5.6524,3.0227,2.8715,35
+Tropical/Subtropical Steppe,Agriculture: Cropland,Barley,3.1859,2.8702,1.3203,29
+Tropical/Subtropical Steppe,Agriculture: Cropland,Beans,0.54,0.5,0.23,33
+Tropical/Subtropical Steppe,Agriculture: Cropland,Corn,8.1809,6.933,3.9434,39
+Tropical/Subtropical Steppe,Agriculture: Cropland,Cotton,1.967,1.6812,0.6725,39
+Tropical/Subtropical Steppe,Agriculture: Cropland,Oats,1.4967,1.0691,0.5559,39
+Tropical/Subtropical Steppe,Agriculture: Cropland,Peanuts,3.6875,3.4462,1.3785,39
+Tropical/Subtropical Steppe,Agriculture: Cropland,Potatoes,7.6588,7.1578,3.5789,17
+Tropical/Subtropical Steppe,Agriculture: Cropland,Rice,7.7537,6.3555,2.6693,21
+Tropical/Subtropical Steppe,Agriculture: Cropland,Rye,1.1497,1.0085,0.5042,24
+Tropical/Subtropical Steppe,Agriculture: Cropland,Sorghum,3.3392,2.8298,1.2455,39
+Tropical/Subtropical Steppe,Agriculture: Cropland,Soybean,2.7772,2.3338,0.9802,39
+Tropical/Subtropical Steppe,Agriculture: Cropland,Sugarbeets,11.5891,8.1042,3.2417,13
+Tropical/Subtropical Steppe,Agriculture: Cropland,Sugarcane,14.1757,12.0133,9.01,34
+Tropical/Subtropical Steppe,Agriculture: Cropland,Sunflower,2.0378,1.9224,0.5191,33
+Tropical/Subtropical Steppe,Agriculture: Cropland,Wheat,2.2208,1.8507,0.7218,39
+Tropical/Subtropical Steppe,Agriculture: Pasture,Alfalfa hay,7.8146,4.1789,3.97,38
+Tropical/Subtropical Steppe,Agriculture: Pasture,Nonlegume hay,3.0468,1.6293,1.5478,38
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,Barley,5.0777,4.5745,2.1043,18
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,Corn,16.705,14.1568,12.5972,31
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,Cotton,3.4623,2.9592,1.1837,39
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,Oats,1.9706,1.4076,0.7319,5
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,Potatoes,5.6661,5.2954,2.6477,5
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,Sorghum,5.1898,4.3982,1.9352,23
+Tropical/Subtropical Steppe Mountains,Agriculture: Cropland,Wheat,4.0952,3.4127,1.3309,26
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,Alfalfa hay,8.5967,4.5971,4.3673,37
+Tropical/Subtropical Steppe Mountains,Agriculture: Pasture,Nonlegume hay,3.6747,1.9651,1.8668,36
+Warm Continental,Agriculture: Cropland,Barley,2.5859,2.3296,1.0716,39
+Warm Continental,Agriculture: Cropland,Beans,1.4718,1.3627,0.6269,34
+Warm Continental,Agriculture: Cropland,Corn,9.1346,7.7412,5.8442,39
+Warm Continental,Agriculture: Cropland,Oats,2.1557,1.5398,0.8007,39
+Warm Continental,Agriculture: Cropland,Potatoes,6.8178,6.3718,3.1859,31
+Warm Continental,Agriculture: Cropland,Rye,1.6593,1.4555,0.7278,15
+Warm Continental,Agriculture: Cropland,Soybean,2.8863,2.4255,1.0187,39
+Warm Continental,Agriculture: Cropland,Sugarbeets,10.7561,7.5218,3.0087,34
+Warm Continental,Agriculture: Cropland,Sunflower,2.1978,2.0734,0.5598,30
+Warm Continental,Agriculture: Cropland,Tobacco,3.1775,1.7653,1.0592,8
+Warm Continental,Agriculture: Cropland,Wheat,4.0584,3.382,1.319,39
+Warm Continental,Agriculture: Pasture,Alfalfa hay,4.2268,2.2603,2.1473,34
+Warm Continental,Agriculture: Pasture,Nonlegume hay,3.0823,1.6483,1.5659,34
+Warm Continental Mountains,Agriculture: Cropland,Corn,12.1809,10.3228,9.0829,39
+Warm Continental Mountains,Agriculture: Cropland,Oats,2.3119,1.6513,0.8587,38
+Warm Continental Mountains,Agriculture: Cropland,Potatoes,6.2106,5.8043,2.9021,6
+Warm Continental Mountains,Agriculture: Cropland,Soybean,3.3584,2.8222,1.1853,24
+Warm Continental Mountains,Agriculture: Cropland,Wheat,3.8229,3.1857,1.2424,32
+Warm Continental Mountains,Agriculture: Pasture,Alfalfa hay,4.369,2.3364,2.2196,34
+Warm Continental Mountains,Agriculture: Pasture,Nonlegume hay,3.3088,1.7694,1.6809,34
