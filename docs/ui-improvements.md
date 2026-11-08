@@ -436,6 +436,42 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
          pasture. Cropland is NLCD 82 Cultivated Crops: annual crops (corn, soybeans, vegetables, tobacco, cotton), perennial woody
          crops (orchards and vineyards) and all actively tilled land. Start-year 81 and 82 cells keep their class (stage 5); Ag
          Expansion, Contraction and Change come from the Annual NLCD's gains and losses of 81 and 82 (defaults/transitions/sources.csv).
+       - **Built 2026-11-07 (main, not pushed; user: start building; Agriculture Sector stock; yields vary by year).**
+         - Growth: dev/agriculture/02-nass-county-npp.R reads the NASS Quick Stats crops bulk file (qs.crops_20261106, 1.13 GB, in
+           the home under agriculture/nass; county survey PRODUCTION and AREA HARVESTED 1984-2025, 481,000 county x year x crop
+           rows) and converts yields with USDA Tech. Bull. 1939 (2nd ed. 2024) Ch 3 Table 3-3 (dry matter, harvest index,
+           root:shoot; read from the PDF, which pdftotext's -raw mode lays out correctly) and Table 3-4's carbon fraction 0.45:
+           defaults/stockflow/ag-crop-coefficients.csv. Field crops are cropland, alfalfa and other hay pasture. The crop mix is
+           held at each ecodivision's 1985-2023 mean area and the yearly value is a yield index: the survey's mix shifts as series
+           end (California lost most of its cotton, wheat and barley), which doubled a plain yearly mean there. Cotton: lint
+           converted to seed cotton at 0.38 (from memory, to check). Cropland level median 5.75 Mg C/ha/yr (Prairie 5.5,
+           Mediterranean 9.7, Temperate Steppe 4.0); pasture 4.1; corn-belt growth +50% from 1985-94 to 2014-23. Not covered:
+           vegetables, fruit and nuts, grazed-only pasture.
+         - Soil: dev/agriculture/01-ag-soil-sample.R, gNATSGO under NLCD 2021 81 and 82 cells in 1,140 windows of 3 x 3 km (4.1
+           min, none failed); cropland whole profile 52-201 Mg C/ha by ecodivision, Savanna 828 (Florida sugarcane on peat).
+         - Model: tools/make_agriculture.R. The pools each class has (foliage, fine roots, AG and BG very fast litter, AG Slow, BG
+           Slow); growth at flow order 1 (Net Growth Agriculture: Atmosphere -> Foliage / Fine Roots, group Net Growth Agriculture:
+           Total); harvest at order 2 (Harvest: Foliage -> Agriculture Sector, group Harvest: Agriculture, -1 in Net Biome
+           Productivity): cropland the NASS harvested share, pasture 0.75 of aboveground (assumed, between hay 0.95 and grazing);
+           the rest dies back (live carbon 0 at year end). Litter decay from defaults/stockflow/ag-literature.csv (residue k 1.0
+           and cropland AG Slow 0.2 assumed); AG Slow and BG Slow emission solved to hold AgSlow and the gNATSGO soil. Yearly Crop
+           Yield flow multiplier (new type) on Net Growth Agriculture: Total from the NASS index, the mean of the last 10 NASS
+           years after 2025. Starting pools: defaults/initialstocks/agriculture.csv (soil the class mean, as grass and shrub).
+           CO2 fertilization now acts on the agriculture growth group. The old zero agriculture rows are gone from
+           nonforest-multipliers-other.csv. tests/unit-agriculture.R 22 pass.
+         - Plumbing: new stock, flow types, groups and flow multiplier type in defaults/stsim and the stock-flow sheets;
+           tools/sync-library.R adds them to a library and appends the rows a non-result scenario's flow order, groups, diagram and
+           filters lack. Stage 3 now declares Growth Options as an input (a rerun of stage 3 alone fell back to the default FIA
+           source). tools/quick-test.R copies every Build-stage options sheet and puts the library's Stock-Flow Definitions ahead
+           of the Build result (ST-Sim refused the harvest pathway: Build 20's diagram predates the Agriculture Sector stock, and a
+           stage cannot add rows to its own input sheets).
+         - Solano quick test (stages 3 and 8 on Build 20, result 58; 1985-1995, result 60; 4 + 7 min): cropland growth 8.6-9.7 Mg
+           C/ha/yr by year (Mediterranean), harvest 4.5-5.1, live carbon 0 at year end, litter about 1.6 above and 1.5 below
+           ground, AG Slow 0.2, Net Biome Productivity -0.4 to +0.4 a year (about 0 on average, as expected for cropland remaining
+           cropland); pasture growth 3.5-4.3, harvest 1.4-1.7, NBP -0.3 to +0.2. Class-mean soil drifts only as cells join and
+           leave a class (pasture 215 -> 180 as cropland soils move in).
+         - Next: the Cropland Productivity map (CDL x NASS, phase 2), Ag Expansion's plough-in for grass and shrub (phase 3), and
+           checks: the cotton lint factor, pasture removal, residue decay.
     7. **A climate response fitted to RAP.** RAP's yearly growth 1986-2023 against PRISM fits the yearly climate response for grass
        and shrub, in place of the Miami NPP climatology; test it with the placebo check the tree-ring response went through. The step
        most likely to change projections.
