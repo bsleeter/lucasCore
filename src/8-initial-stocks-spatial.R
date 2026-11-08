@@ -83,11 +83,14 @@ source(pkg_file("src", "productivity-fill.R"))
 # one flow group and type stops ST-Sim ("Object reference not set", 2026-11-07); in a Build the sheet holds stage 7's Climate rows
 put_multiplier <- function(type, fg, file) {
   x <- as.data.table(datasheet(scn, "stsim_FlowSpatialMultiplier", optional = TRUE, lookupsAsFactors = FALSE))
-  if (nrow(x) && "FlowMultiplierTypeId" %in% names(x) && any(x$FlowMultiplierTypeId %in% type)) {
-    x <- x[!FlowMultiplierTypeId %in% type, intersect(names(x), c("Timestep", "FlowGroupId", "FlowMultiplierTypeId", "MultiplierFileName")), with = FALSE]
-    write_stsim(rbind(x, data.table(FlowGroupId = fg, FlowMultiplierTypeId = type, MultiplierFileName = file), fill = TRUE), "FlowSpatialMultiplier")
-    say("%s: replaced the row of the result this stage reran on (%d other Flow Spatial Multiplier rows kept)", type, nrow(x))
-  } else write_stsim(data.table(FlowGroupId = fg, FlowMultiplierTypeId = type, MultiplierFileName = file), "FlowSpatialMultiplier", append = TRUE) }
+  # the whole sheet is written: an appended row was lost when the sheet held the result's rows (2026-11-07: Cropland Productivity,
+  # the second multiplier of a stage 8 rerun, never reached ST-Sim)
+  had <- nrow(x) && "FlowMultiplierTypeId" %in% names(x) && any(x$FlowMultiplierTypeId %in% type)
+  if (nrow(x)) x <- x[if ("FlowMultiplierTypeId" %in% names(x)) !FlowMultiplierTypeId %in% type else TRUE, intersect(names(x), c("Timestep", "FlowGroupId", "FlowMultiplierTypeId", "MultiplierFileName")), with = FALSE]
+  write_stsim(rbind(x, data.table(FlowGroupId = fg, FlowMultiplierTypeId = type, MultiplierFileName = file), fill = TRUE), "FlowSpatialMultiplier")
+  say("%s: %s its Flow Spatial Multiplier row (%d other rows kept)", type, if (had) "replaced" else "added", nrow(x))
+  chk <- as.data.table(datasheet(scn, "stsim_FlowSpatialMultiplier", optional = TRUE, lookupsAsFactors = FALSE))
+  check(STAGE, sprintf("the %s multiplier is in the Flow Spatial Multipliers", type), nrow(chk) && sum(chk$FlowMultiplierTypeId == type, na.rm = TRUE) == 1, sprintf("%d rows", nrow(chk))) }
 # ---- Site Productivity (Build Options; to-do 35, docs/treemap-plan.md) ------------------------------------------------------
 # A forest cell's growth multiplier = sum over FIA site classes of the share of its TreeMap pixels in the class (stage 5) x its forest
 # type x ecodivision's multiplier for the class (stage 2). It becomes the Site Productivity flow spatial multiplier on forest growth,
