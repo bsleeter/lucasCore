@@ -7,22 +7,27 @@ Pattern,Group,DM,HI,RS,Source
 ^RICE,Grain,0.91,0.42,0.22,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
 ^SAFFLOWER|^SUNFLOWER,Oilseed,0.91,0.27,0.06,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
 ^BEANS DRY|^BEANS SEED,Beans,0.84,0.46,0.08,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
-^SEED ALFALFA,Seed,0.90,0.10,0.87,provisional - to check
+^SEED ALFALFA,Seed,0.90,0.10,0.40,lit. check 2026-11-08: RS from IPCC 2019 Table 11.1a alfalfa root turnover; HI not found
 ^HAY ALFALFA,Hay,0.87,0.95,0.87,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
 ^HAY GRAIN|^HAY SUDAN,Hay,0.87,0.95,0.40,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
-^HAY WILD|^HAY OTHER,Hay,0.87,0.60,1.00,provisional - to check
-^SILAGE|^CORN SILAGE,Silage,0.35,0.95,0.18,provisional - to check
+^HAY OTHER,Hay,0.87,0.85,0.54,lit. check 2026-11-08: IPCC 2019 Tables 11.1a and 11.2
+^HAY WILD,Hay,0.87,0.85,0.80,lit. check 2026-11-08: IPCC 2019 Tables 11.1a and 11.2
+^SILAGE|^CORN SILAGE,Silage,0.35,0.95,0.18,lit. check 2026-11-08: confirmed (as-harvested DM)
 ^SUGAR BEETS,Sugarbeets,0.15,0.40,0.43,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
-^TOMATOES,Vegetable,0.055,0.60,0.10,provisional - to check
-^ASPARAGUS,Vegetable,0.07,0.30,1.00,provisional - to check
-^CORN SWEET,Vegetable,0.24,0.35,0.18,provisional - to check
+^TOMATOES,Vegetable,0.06,0.60,0.10,lit. check 2026-11-08: Zhao et al. 2021 HI 0.63; Wang 2012
+^ASPARAGUS,Vegetable,0.07,0.30,1.00,provisional - not found (HI likely too high: the fern grows unharvested)
+^CORN SWEET,Vegetable,0.30,0.45,0.18,lit. check 2026-11-08: Zhao et al. 2021
 ^MELONS|^CUCUMBERS|^SQUASH|^PUMPKINS,Vegetable,0.08,0.50,0.10,provisional - to check
-^ONIONS|^CARROTS,Vegetable,0.12,0.70,0.05,provisional - to check
-^PEPPERS|^BEANS SNAP,Vegetable,0.09,0.50,0.10,provisional - to check
+^CARROTS,Vegetable,0.125,0.65,0.05,lit. check 2026-11-08: Zhao et al. 2021
+^ONIONS,Vegetable,0.12,0.70,0.05,provisional - not found
+^BEANS SNAP,Vegetable,0.11,0.48,0.10,lit. check 2026-11-08: Zhao et al. 2021
+^PEPPERS,Vegetable,0.09,0.50,0.10,provisional - not found
 ^VEGETABLES UNSPEC|^SEED VEG,Vegetable,0.08,0.50,0.10,provisional - to check
-^GRAPES,Vine,0.22,0.45,0.30,provisional - to check
-^PEARS|^PEACHES|^APRICOTS|^CHERRIES|^PLUMS$|^APPLES|^KIWI|^PERSIMMONS|^ORANGES|^GUAVAS|^OLIVES,Fruit,0.15,0.35,0.30,provisional - to check
-^PLUMS DRIED|^FIGS DRIED,Fruit (dried),0.82,0.35,0.30,provisional - to check
-^ALMONDS ALL|^WALNUTS|^PECANS|^PISTACHIOS,Nuts,0.95,0.20,0.30,provisional - to check
+^GRAPES,Vine,0.22,0.45,0.30,lit. check 2026-11-08: confirmed - Morande et al. 2017 (fresh tons; raisin yields 8-12 t/ac are fresh); RS not found
+^PEARS|^PEACHES|^NECTARINES|^APRICOTS|^CHERRIES|^PLUMS$|^APPLES|^KIWI|^PERSIMMONS|^GUAVAS|^OLIVES,Fruit,0.14,0.40,0.30,lit. check 2026-11-08: HI Rufat and DeJong 2001 Table 1 (peach); DM USDA FoodData 0.11-0.20; RS not found
+^PLUMS DRIED|^FIGS DRIED,Fruit (dried),0.80,0.40,0.30,lit. check 2026-11-08: dried tons; HI as fresh fruit
+^ORANGES|^GRAPEFRUIT|^LEMONS|^TANGERINES|^MANDARIN,Fruit,0.13,0.15,0.30,lit. check 2026-11-08: Zhao et al. 2021 (HI 0.1-0.3)
+^ALMONDS ALL,Nuts,0.95,0.14,0.30,lit. check 2026-11-08: kernel meats; CDFA Whole Orchard Recycling Table 2 (kernel/ANPP 0.14 and root 0.30 of ANPP)
+^WALNUTS|^PECANS|^PISTACHIOS,Nuts,0.95,0.25,0.30,lit. check 2026-11-08: in-shell; HI estimated from almond kernel plus shell
 ^ALMOND HULLS,Nut hulls,0.90,0,0,harvest only - no NPP (residue of a crop already counted)
 ^STRAW,Straw,0.90,0,0,harvest only - no NPP (residue of a crop already counted)
