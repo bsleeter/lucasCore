@@ -472,6 +472,38 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
            leave a class (pasture 215 -> 180 as cropland soils move in).
          - Next: the Cropland Productivity map (CDL x NASS, phase 2), Ag Expansion's plough-in for grass and shrub (phase 3), and
            checks: the cotton lint factor, pasture removal, residue decay.
+       - **Cropland Productivity (built 2026-11-07/08, main, not pushed; user: CDL 2014-2023 nationally, fallow 0 and unsurveyed crops
+         left out, normalize by ecodivision, extend to non-agriculture cells for land use change).**
+         - Data: the Cropland Data Layer's national 30 m zips (1.6-2.0 GB a year) kept whole at the top of the home (land-cover/cdl,
+           Data Sources CdlFolder, national handler; CropScape did not answer and a remote read of a zip this size did not return).
+           2014-2021 and 2023 in; **2022 still missing**: NASS's server answers HEAD (2.07 GB) but every GET came back empty (9 tries,
+           2026-11-07); stage 8 averages the years it has with a warning. Come back to it.
+         - Method (src/cropland.R, shared by stage 8 and the sample): each pixel's CDL crop (defaults/stockflow/cdl-crops.csv, the
+           legend read from the 2014 zip's metadata) takes its county's 1985-2023 NASS growth of the crop group (ag-county-crop-npp.csv,
+           else the ecodivision's, else CONUS); double crops both; fallow 0; vegetables, orchards, vineyards, grazed land left out.
+           A cell's mean over pixels and years / the same estimate's ecodivision mean (ag-cdl-ecodivision-npp.csv, from
+           dev/agriculture/03-cdl-ecodivision-sample.R: the 1,140 soil windows, 1.4 min), capped 0.3-2.5, filled to every other land
+           cell from agriculture within 10 km of the same ecodivision. A first version divided by the NASS level (Mediterranean 9.71
+           against a CDL-based 6.66: fallow and unsurveyed land) and gave Solano 0.41; the user chose the ecodivision normalization
+           over a county one (a county one would erase the difference between counties).
+         - Build Options: Cropland Productivity (None | CDL x NASS 2014-2023, off by default); lucasCoreUI.dll rebuilt; Starter rebuilt.
+         - Two stage 8 faults found on the way: the Flow Spatial Multiplier sheet was declared input and output, and a rerun's saves of
+           it were never kept when a dependency held it (no stage 8 rerun had ever changed it; Build 20's own grass and shrub row hid
+           it). Stage 8 now writes it as an output and carries the dependency's rows itself, all productivity rows in one save.
+         - Solano: cropland multiplier mean 0.58 (10% 0.35, 90% 0.75), pasture 0.90; 88% of other land cells filled (mean 0.61).
+           Mediterranean ecodivision at 1 km: east-side San Joaquin dairy (corn silage) 2.0-2.5, Sacramento Valley rice 1.3-1.6,
+           Solano and the west Delta 0.5-1.0, west-side San Joaquin 0.3-0.6 (cotton, wheat, fallow; its almonds and pistachios are
+           left out, so it is likely too low).
+         - Validation, Solano quick test (stages 3 and 8, 1985-1995, result 87) against NASS's Solano county survey, 1986-1995 means:
+           growth 5.4 Mg C/ha/yr on NLCD cropland (9.3 without the map) against 7.7 per NASS harvested ha; harvest 2.8 against 3.4;
+           total harvest 230 against 136 thousand Mg C/yr, the model's NLCD cropland (82 thousand ha) about twice NASS's harvested
+           area of surveyed crops (40 thousand ha): the gap is orchards, tomatoes and other unsurveyed crops and fallow, which NASS's
+           survey does not count but the model grows at its neighbours' level. Yearly correlation 0.31 (the yearly signal is the
+           ecodivision's yield index, not Solano's mix).
+         - Open (user 2026-11-08: see the Solano run first): vegetables and orchards. Candidates: California County Agricultural
+           Commissioners' crop reports (every crop, county yields; Kroodsma and Field 2006 conversion factors, from memory), literature
+           growth by crop group elsewhere, or a Landsat production map as a check. The commissioners' Solano totals would also be the
+           independent check of the total.
     7. **A climate response fitted to RAP.** RAP's yearly growth 1986-2023 against PRISM fits the yearly climate response for grass
        and shrub, in place of the Miami NPP climatology; test it with the placebo check the tree-ring response went through. The step
        most likely to change projections.
