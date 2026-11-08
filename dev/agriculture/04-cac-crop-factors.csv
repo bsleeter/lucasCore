@@ -1,0 +1,28 @@
+Pattern,Group,DM,HI,RS,Source
+^WHEAT,Grain,0.865,0.39,0.20,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
+^BARLEY,Grain,0.865,0.46,0.11,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
+^OATS,Grain,0.865,0.52,0.40,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
+^CORN GRAIN|^CORN WHITE|^CORN POPCORN,Grain,0.86,0.53,0.18,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
+^SORGHUM GRAIN,Grain,0.86,0.44,0.18,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
+^RICE,Grain,0.91,0.42,0.22,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
+^SAFFLOWER|^SUNFLOWER,Oilseed,0.91,0.27,0.06,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
+^BEANS DRY|^BEANS SEED,Beans,0.84,0.46,0.08,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
+^SEED ALFALFA,Seed,0.90,0.10,0.87,provisional - to check
+^HAY ALFALFA,Hay,0.87,0.95,0.87,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
+^HAY GRAIN,Hay,0.87,0.95,0.40,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
+^HAY WILD|^HAY OTHER,Hay,0.87,0.60,1.00,provisional - to check
+^SILAGE|^CORN SILAGE,Silage,0.35,0.95,0.18,provisional - to check
+^SUGAR BEETS,Sugarbeets,0.15,0.40,0.43,Tech. Bull. 1939 Table 3-3 (as ag-crop-coefficients.csv)
+^TOMATOES,Vegetable,0.055,0.60,0.10,provisional - to check
+^ASPARAGUS,Vegetable,0.07,0.30,1.00,provisional - to check
+^CORN SWEET,Vegetable,0.24,0.35,0.18,provisional - to check
+^MELONS|^CUCUMBERS|^SQUASH|^PUMPKINS,Vegetable,0.08,0.50,0.10,provisional - to check
+^ONIONS|^CARROTS,Vegetable,0.12,0.70,0.05,provisional - to check
+^PEPPERS|^BEANS SNAP,Vegetable,0.09,0.50,0.10,provisional - to check
+^VEGETABLES UNSPEC|^SEED VEG,Vegetable,0.08,0.50,0.10,provisional - to check
+^GRAPES,Vine,0.22,0.45,0.30,provisional - to check
+^PEARS|^PEACHES|^APRICOTS|^CHERRIES|^PLUMS$|^APPLES|^KIWI|^PERSIMMONS|^ORANGES|^GUAVAS|^OLIVES,Fruit,0.15,0.35,0.30,provisional - to check
+^PLUMS DRIED|^FIGS DRIED,Fruit (dried),0.82,0.35,0.30,provisional - to check
+^ALMONDS ALL|^WALNUTS|^PECANS|^PISTACHIOS,Nuts,0.95,0.20,0.30,provisional - to check
+^ALMOND HULLS,Nut hulls,0.90,0,0,harvest only - no NPP (residue of a crop already counted)
+^STRAW,Straw,0.90,0,0,harvest only - no NPP (residue of a crop already counted)

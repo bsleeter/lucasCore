@@ -500,6 +500,16 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
            area of surveyed crops (40 thousand ha): the gap is orchards, tomatoes and other unsurveyed crops and fallow, which NASS's
            survey does not count but the model grows at its neighbours' level. Yearly correlation 0.31 (the yearly signal is the
            ecodivision's yield index, not Solano's mix).
+         - Validation against the County Agricultural Commissioners' reports (user 2026-11-08; NASS Pacific Region AgComm CSVs
+           1986-1995 in `E:/lucasData/agriculture/cac`; dev/agriculture/04-cac-county-check.R with 04-cac-crop-factors.csv), which
+           list every crop: Solano's harvested area is 79 thousand ha against the model's 82 thousand ha of NLCD cropland, so the
+           area gap with the NASS survey was the survey's coverage, not fallow. Growth 5.4 (model) against 6.6 Mg C/ha/yr (reports;
+           524 against 441 thousand Mg C/yr, model 16% low); harvest 2.8 against 2.5 (230 against 200 thousand Mg C/yr, model 15%
+           high): the model's harvested share of growth (0.52) is above the reports' (0.38). Grain, sugar beets and hay are 86% of
+           the reports' growth and use the Table 3-3 coefficients; vegetables, fruit, nuts and vines (6 thousand ha in 1986-1995)
+           use provisional factors (to check). No yearly agreement (r 0.11 growth, 0.06 harvest). Rows fixed: Solano barley 1990
+           (yield 40.5 t/ac, a units error; state yield used) and unspecified vegetables with no production (state yield). Left
+           out: irrigated pasture 8.3 thousand ha (NLCD maps 0.7 thousand ha of Solano pasture/hay) and range pasture 58 thousand ha.
          - Open (user 2026-11-08: see the Solano run first): vegetables and orchards. Candidates: California County Agricultural
            Commissioners' crop reports (every crop, county yields; Kroodsma and Field 2006 conversion factors, from memory), literature
            growth by crop group elsewhere, or a Landsat production map as a check. The commissioners' Solano totals would also be the
