@@ -510,10 +510,29 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
            use provisional factors (to check). No yearly agreement (r 0.11 growth, 0.06 harvest). Rows fixed: Solano barley 1990
            (yield 40.5 t/ac, a units error; state yield used) and unspecified vegetables with no production (state yield). Left
            out: irrigated pasture 8.3 thousand ha (NLCD maps 0.7 thousand ha of Solano pasture/hay) and range pasture 58 thousand ha.
-         - Open (user 2026-11-08: see the Solano run first): vegetables and orchards. Candidates: California County Agricultural
-           Commissioners' crop reports (every crop, county yields; Kroodsma and Field 2006 conversion factors, from memory), literature
-           growth by crop group elsewhere, or a Landsat production map as a check. The commissioners' Solano totals would also be the
-           independent check of the total.
+         - **County scale (user 2026-11-08: "build this all at the county scale").** The ecodivision rates made Solano's cropland
+           grow and harvest too much: the map was divided by the ecodivision's CDL mean (6.66) while the rows hold the NASS level
+           (9.71), raising every Solano cell 1.46 times, and the harvested share was the Mediterranean's (0.52 of growth, silage and
+           hay) where Solano's crops harvest about 0.40. Now (stage 8, src/cropland.R):
+           - Cropland Productivity is divided by the ecodivision x class NPP the rows hold (ag-targets.csv), so each cell grows at its
+             own crops' county rates (ag-cdl-ecodivision-npp.csv and the 03 sample are no longer used).
+           - Crop Harvest (new flow multiplier type, on Harvest: Agriculture): the cell's harvest / aboveground growth over its CDL
+             crops (county NASS AG and Harvest per crop group, 02 now writes them) / the ecodivision x class harvest rate, capped
+             0.3-2.5 and so the rate stays <= 1; filled as Cropland Productivity; carried over by stages 7 and 11.
+           - California: tomatoes, vegetables, tree fruit, tree nuts and grapes take the county's growth from the commissioners'
+             reports 1986-2020 (dev/agriculture/05-cac-county-crop-npp.R, ag-cac-county-crop-npp.csv; 04-cac-crop-factors.csv's
+             fruit, nut, vegetable and grape factors are provisional); elsewhere these CDL classes stay left out (no fallback).
+           - CDL years 2014-2025 (user placed 2022, 2024 and 2025 in the home 2026-11-08; 2025 is NASS's 30 m resampling of its
+             10 m layer).
+           Solano (stages 3, 8: result 91; 1985-2020 run, result 95), cropland cells: Cropland Productivity mean 0.46 (was 0.58),
+           Crop Harvest mean 0.85 (10% 0.45 in the northern grain, 90% 1.31 toward the Delta). Against the commissioners' reports:
+           2014-2020 (the CDL years) growth 378 against 356 thousand Mg C/yr (+6%; the ecodivision maps gave about +33%), harvest
+           155 against 136 (+14%; was about +82%); 1986-1995 growth 358 against 524 (-32%) and harvest 146 against 200 (-27%): the
+           maps hold today's crops (more orchards and fallow), Solano grew more sugar beets, corn and tomatoes then. No yearly
+           agreement in either period (the yearly signal is the ecodivision's NASS index).
+         - Open: the provisional fruit, nut, vegetable and grape factors; orchards and vegetables outside California (literature
+           growth by crop group, or a Landsat production map); whether to vary the crop mix through time (a CDL-less 1985-2007:
+           NLCD only); a county yearly index (Solano's NASS survey has 1-3 crops after 2014).
     7. **A climate response fitted to RAP.** RAP's yearly growth 1986-2023 against PRISM fits the yearly climate response for grass
        and shrub, in place of the Miami NPP climatology; test it with the placebo check the tree-ring response went through. The step
        most likely to change projections.
