@@ -78,19 +78,23 @@ check(STAGE, "every forest cell finds its ecodivision x class x last disturbance
 cc <- which(!is.na(st$CurveColumn))   # Deep Soil has no curve column: forest starts with none
 out[which(isF)[!is.na(m)], cc] <- as.matrix(cv[m[!is.na(m)], st$CurveColumn[cc], with = FALSE]); src_of[isF] <- "stock curves (stage 4)"
 source(pkg_file("src", "productivity-fill.R"))
-# a productivity multiplier's Flow Spatial Multiplier row: this type's row replaced, every other row kept. When stage 8 is rerun on
-# its own on a Build result (tools/quick-test.R) the result already holds the Build's rows, this type's included, and a second row of
-# one flow group and type stops ST-Sim ("Object reference not set", 2026-11-07); in a Build the sheet holds stage 7's Climate rows
-put_multiplier <- function(type, fg, file) {
-  x <- as.data.table(datasheet(scn, "stsim_FlowSpatialMultiplier", optional = TRUE, lookupsAsFactors = FALSE))
-  # the whole sheet is written: an appended row was lost when the sheet held the result's rows (2026-11-07: Cropland Productivity,
-  # the second multiplier of a stage 8 rerun, never reached ST-Sim)
-  had <- nrow(x) && "FlowMultiplierTypeId" %in% names(x) && any(x$FlowMultiplierTypeId %in% type)
-  if (nrow(x)) x <- x[if ("FlowMultiplierTypeId" %in% names(x)) !FlowMultiplierTypeId %in% type else TRUE, intersect(names(x), c("Timestep", "FlowGroupId", "FlowMultiplierTypeId", "MultiplierFileName")), with = FALSE]
-  write_stsim(rbind(x, data.table(FlowGroupId = fg, FlowMultiplierTypeId = type, MultiplierFileName = file), fill = TRUE), "FlowSpatialMultiplier")
-  say("%s: %s its Flow Spatial Multiplier row (%d other rows kept)", type, if (had) "replaced" else "added", nrow(x))
+# the productivity multipliers' Flow Spatial Multiplier rows, saved once at the end of the stage (put_multipliers_save): each type's
+# row replaces the type's row the sheet already holds, every other row kept. When stage 8 is rerun on its own on a Build result
+# (tools/quick-test.R) the result already holds the Build's rows, and a second row of one flow group and type stops ST-Sim ("Object
+# reference not set", 2026-11-07); in a Build the sheet holds stage 7's Climate rows. One save: a stage's second save of a sheet is not
+# kept (2026-11-07: Cropland Productivity, saved after Grass and Shrub Productivity, never reached ST-Sim)
+.fsm_new <- list()
+put_multiplier <- function(type, fg, file) .fsm_new[[type]] <<- data.table(FlowGroupId = fg, FlowMultiplierTypeId = type, MultiplierFileName = file)
+put_multipliers_save <- function() {
+  if (!length(.fsm_new)) return(invisible())
+  new <- rbindlist(.fsm_new); x <- as.data.table(datasheet(scn, "stsim_FlowSpatialMultiplier", optional = TRUE, lookupsAsFactors = FALSE))
+  if (nrow(x)) x <- x[if ("FlowMultiplierTypeId" %in% names(x)) !FlowMultiplierTypeId %in% new$FlowMultiplierTypeId else TRUE,
+                     intersect(names(x), c("Timestep", "FlowGroupId", "FlowMultiplierTypeId", "MultiplierFileName")), with = FALSE]
+  write_stsim(rbind(x, new, fill = TRUE), "FlowSpatialMultiplier")
+  say("Flow Spatial Multipliers: %s written (%d other rows kept)", paste(new$FlowMultiplierTypeId, collapse = ", "), nrow(x))
   chk <- as.data.table(datasheet(scn, "stsim_FlowSpatialMultiplier", optional = TRUE, lookupsAsFactors = FALSE))
-  check(STAGE, sprintf("the %s multiplier is in the Flow Spatial Multipliers", type), nrow(chk) && sum(chk$FlowMultiplierTypeId == type, na.rm = TRUE) == 1, sprintf("%d rows", nrow(chk))) }
+  for (ty in new$FlowMultiplierTypeId) check(STAGE, sprintf("the %s multiplier is in the Flow Spatial Multipliers", ty),
+                                             nrow(chk) > 0 && sum(chk$FlowMultiplierTypeId == ty, na.rm = TRUE) == 1, sprintf("%d rows", nrow(chk))) }
 # ---- Site Productivity (Build Options; to-do 35, docs/treemap-plan.md) ------------------------------------------------------
 # A forest cell's growth multiplier = sum over FIA site classes of the share of its TreeMap pixels in the class (stage 5) x its forest
 # type x ecodivision's multiplier for the class (stage 2). It becomes the Site Productivity flow spatial multiplier on forest growth,
@@ -275,6 +279,7 @@ say("Initial carbon: %.2f Pg C (live %.2f, dead organic matter %.2f, soil %.2f);
     mean(d[!is.na(S) & S >= 100, live]), mean(d[!is.na(S) & S >= 100, dom]), mean(d[!is.na(S) & S >= 100, soil]))
 files <- vapply(seq_len(nrow(st)), function(j) write_raster(setValues(rast(P), out[, j]), sprintf("%s.tif", gsub("[^A-Za-z0-9]+", "-", st$StockTypeId[j])), "FLT4S"), "")
 write_stsim(data.table(StockTypeId = st$StockTypeId, RasterFileName = files), "InitialStockSpatial")
+put_multipliers_save()
 keep_ic_properties(scn, ic, 8)
 write_ds(summ[, .(StateClassId, Cells, PostFire, Live, Dom, Soil, TotalTg, Source)], "OutputInitialStockSummary")
 progressBar()
