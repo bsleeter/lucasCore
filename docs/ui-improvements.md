@@ -410,21 +410,32 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
          maps without it failed with "Object reference not set").
     6. **Carbon for pasture and cropland.** Pasture: grassland biomass with a grazing removal. Cropland: growth from NASS county yields
        and the USDA Tech. Bull. 1939 Table 3-5 coefficients, a harvest removal each year, residue to litter.
-       - **Plan (user, 2026-11-07).** Cropland stays one class for annual crops, crop differences carried by a Cropland
-         Productivity flow spatial multiplier (USDA Cropland Data Layer crop type x NASS county yields, relative to the ecodivision's
-         cropland mean, neighbourhood-filled like the grass and shrub one); live biomass back to about zero each year (harvest leaves
-         the system as a new harvest flow; residue to the fast litter pools, roots to the belowground pools); soil target its own
-         gNATSGO value with decay calibrated to hold it; IPCC factors on conversion (step 4); no climate response at first
-         (irrigation, and NASS yield trends would need removing). Pasture carries grassland biomass, NASS hay yields for growth,
-         hay and grazing removal.
-       - **Orchards split out (user, 2026-11-07):** a new woody perennial crop class (CDL orchard crops: almonds, walnuts,
-         pistachios, citrus, stone fruit, apples, olives, pecans, ...) on NLCD cultivated crops cells. Growth by age like forest,
-         a removal-and-replant transition at the end of a 20-30 year rotation, prunings to litter or removed, fruit harvested;
-         cropland <-> orchard conversion as an Ag Change type. Vineyards stay in cropland: small standing wood (about 5-12 Mg C/ha,
-         from memory, to check) against orchards' 30-60, mostly pruned each year. Before the CDL: hold its earliest year back to
-         1985 unless a better historical source turns up (California county crop reports and DWR land-use surveys are candidates).
-         Open: orchard demand in projections (own target from county acreage trends, or a share of cropland); starting ages (CDL
-         first-seen year or an assumed spread); orchard growth curves by crop group (literature).
+       - **Plan (user, 2026-11-07, revised the same day).** Agriculture grows and decays carbon like the other classes, which also
+         fixes what today's setup gets wrong (below). Cropland stays one class (NLCD 82; orchards and vineyards stay in it for now,
+         user: ignore the orchard issue): growth from NASS county yields (USDA Tech. Bull. 1939 Table 3-5: harvest index, root:shoot,
+         residue), crop differences carried by a Cropland Productivity flow spatial multiplier (Cropland Data Layer crop type x NASS
+         yields, relative to the ecodivision's cropland mean, neighbourhood-filled like the grass and shrub one); the harvest leaves
+         the system each year as a new harvest flow; residue to the fast litter pools, roots to the belowground pools; litter decays;
+         soil target its own gNATSGO value with decay calibrated to hold it; no climate response at first (irrigation, and NASS
+         yield trends would need removing). Pasture (NLCD 81) carries grassland-like biomass, growth from NASS hay yields, with hay
+         and grazing removal. Soil change on conversion (step 4) then follows from the classes' own inputs and decay, with IPCC
+         factors as the check. Considered and set aside: crop-type classes as FORE-SCE uses (10-12 types; too many transitions and
+         pathways for a land use near carbon neutral), an orchard class, and orchard wood as a fixed stock.
+       - **What agriculture does today (checked 2026-11-07, defaults and the Solano historical run, result 18).** Ag Expansion
+         (every class to cropland or pasture) burns foliage, other wood and snags (90% CO2, 9% CO, 1% CH4), sends 80% of
+         merchantable stems to the forestry sector, and moves roots half to aboveground and half to belowground fast litter; litter
+         and soil are untouched. Ag Contraction and Ag Change trigger no flows. Cropland and pasture run with every flow multiplier
+         at 0, so nothing grows or decays there: the killed roots and the carried-over litter never decompose (Solano cropland
+         litter 0 in 1985 -> about 0.8 Mg C/ha in 2023) and converted soil keeps the natural class's level (cropland BG Slow about
+         150-155 Mg C/ha throughout, moving only as cells join or leave). Solano 1985-2023: 20,300 ha to cropland, about 24,600
+         Mg C emitted and 62,000 Mg C of roots to litter; 21,700 ha back to grass or wetland, whose soil then follows that class's
+         decay. Grass and shrub cleared for crops are burned rather than ploughed in (the CO and CH4 are likely wrong for them).
+       - **NLCD definitions (MRLC legend, checked 2026-11-07).** The model's Pasture is NLCD 81 Pasture/Hay: grasses, legumes or
+         grass-legume mixtures planted for livestock grazing or for seed or hay crops, typically perennial. Grazed rangeland that
+         is not tilled is NLCD 71 Grassland/Herbaceous (or 52 Shrub/Scrub), so it belongs to the grass and shrub classes, not
+         pasture. Cropland is NLCD 82 Cultivated Crops: annual crops (corn, soybeans, vegetables, tobacco, cotton), perennial woody
+         crops (orchards and vineyards) and all actively tilled land. Start-year 81 and 82 cells keep their class (stage 5); Ag
+         Expansion, Contraction and Change come from the Annual NLCD's gains and losses of 81 and 82 (defaults/transitions/sources.csv).
     7. **A climate response fitted to RAP.** RAP's yearly growth 1986-2023 against PRISM fits the yearly climate response for grass
        and shrub, in place of the Miami NPP climatology; test it with the placebo check the tree-ring response went through. The step
        most likely to change projections.
