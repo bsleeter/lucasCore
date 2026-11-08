@@ -1098,6 +1098,10 @@
 		<dataSheet name="GrowthOptions" type="Input"/>
 		<dataSheet name="CbmCrosswalk" type="Input"/>
 		<dataSheet name="stsim_FlowPathwayDiagram" type="Input"/>
+		<dataSheet name="stsim_FlowOrder" type="Input"/>
+		<dataSheet name="stsim_FlowTypeGroupMembership" type="Input"/>
+		<dataSheet name="stsim_OutputFilterFlows" type="Input"/>
+		<dataSheet name="stsim_OutputFilterStocks" type="Input"/>
 		<dataSheet name="OutputReturnInterval" type="Input"/>
 		<dataSheet name="OutputSoilTarget" type="Input"/>
 		<dataSheet name="stsim_FlowPathway" type="Output"/>

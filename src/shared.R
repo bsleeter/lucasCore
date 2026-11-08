@@ -43,6 +43,21 @@ read_ds <- function(name, ...) { x <- as.data.table(datasheet(scn, ds(name), opt
     for (k in names(d)) if (k %in% names(x) && is.na(x[[k]][1]) && !is.na(d[[k]][1])) x[[k]] <- d[[k]] }
   x }
 
+# the rows of the package's stock-flow definition sheets (defaults/stockflow) the scenario's lack, appended to this scenario (stage 3:
+# a rerun on a Build made before the package gained a stock or flow type; tools/sync-library.R does the same in a library's
+# Stock-Flow Definitions scenario)
+SF_KEYS <- list(stsim_FlowPathwayDiagram = "StockTypeId", stsim_FlowOrder = "FlowTypeId", stsim_FlowTypeGroupMembership = c("FlowTypeId", "FlowGroupId"),
+                stsim_OutputFilterFlows = "FlowGroupId", stsim_OutputFilterStocks = "StockGroupId")
+sf_add_missing <- function() {
+  for (sh in names(SF_KEYS)) { k <- SF_KEYS[[sh]]
+    have <- as.data.table(datasheet(scn, sh, optional = TRUE, lookupsAsFactors = FALSE)); if (!nrow(have)) next
+    want <- read_default("stockflow", paste0(sh, ".csv")); want <- want[, intersect(names(want), names(have)), with = FALSE]
+    miss <- want[!do.call(paste, want[, k, with = FALSE]) %in% do.call(paste, have[, k, with = FALSE])]
+    if (!nrow(miss)) next
+    for (j in names(miss)) if (is.numeric(have[[j]])) set(miss, j = j, value = as.numeric(miss[[j]]))
+    saveDatasheet(scn, as.data.frame(rbind(have, miss, fill = TRUE)), sh)
+    say("%s: %d rows the package gained added (%s)", sh, nrow(miss), paste(head(unique(miss[[k[1]]]), 4), collapse = "; ")) } }
+
 # the last projection year: Projection Options (Run Settings), else Build Options' legacy column (libraries made before 2026-10-24),
 # else 2100
 projection_end <- function() {
