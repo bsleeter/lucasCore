@@ -18,7 +18,8 @@
 # Also written: the area NASS covers.
 # Not covered: vegetables, fruit and nuts (few county survey rows), grazed pasture (no yield). Counties of the 2022 TIGER file:
 # Connecticut's planning regions do not match NASS's old counties (dropped).
-# Inputs: NASS (the extract, tab-separated text), COUNTIES (TIGER county shapefile). Writes dev/agriculture/02-nass-county-npp.csv
+# Inputs: NASS (the extract, tab-separated text), COUNTIES (TIGER county shapefile). Writes dev/agriculture/02-nass-county-npp.csv,
+# 02-nass-county-crop-npp.csv and 02-nass-ecodivision-crop-npp.csv (by crop group, for the Cropland Productivity map)
 # (county x year x class) and 02-nass-ecodivision-npp.csv (ecodivision x year x class).
 # Usage: NASS=<county-survey txt> COUNTIES=<shp> Rscript dev/agriculture/02-nass-county-npp.R
 # =============================================================================
@@ -77,4 +78,12 @@ ed <- merge(ed, lev, by = c("StratumId", "StateClassId"))[, `:=`(npp = level * i
 setorder(ed, StateClassId, StratumId, YEAR); fwrite(ed, file.path(OUT, "02-nass-ecodivision-npp.csv"))
 print(ed[YEAR %between% c(1985, 2023), .(level = round(level[1], 2), agShare = round(agShare[1], 3), harvShare = round(harvShare[1], 3), npp_1985_94 = round(mean(npp[YEAR <= 1994]), 2),
                                           npp_2014_23 = round(mean(npp[YEAR >= 2014]), 2), cv = round(sd(npp) / mean(npp), 3), kha = round(mean(ha) / 1000), mixCovered_min = round(min(mixCovered), 2)), by = .(StateClassId, StratumId)], nrows = 60)
-cat("wrote dev/agriculture/02-nass-county-npp.csv and 02-nass-ecodivision-npp.csv\n")
+# ---- by crop group, for the Cropland Productivity map (stage 8: each Cropland Data Layer pixel takes its county's value of its
+# crop): the BASE-years mean of each county's and ecodivision's crop group NPP, weighted by harvested ha (grain and silage together)
+grp <- function(x) fcase(x %in% c("Corn grain", "Corn silage"), "Corn", x %in% c("Sorghum grain", "Sorghum silage"), "Sorghum", default = x)
+w[, Group := grp(Crop)]; ec[, Group := grp(Crop)]
+cg <- w[YEAR %in% BASE, .(NPP = round(sum(npp * ha) / sum(ha), 4), Years = uniqueN(YEAR)), by = .(GEOID, StateClassId, Group)]
+eg <- ec[YEAR %in% BASE, .(NPP = round(sum(npp * ha) / sum(ha), 4), Years = uniqueN(YEAR)), by = .(StratumId, StateClassId, Group)]
+fwrite(cg, file.path(OUT, "02-nass-county-crop-npp.csv")); fwrite(eg, file.path(OUT, "02-nass-ecodivision-crop-npp.csv"))
+cat(sprintf("%d county x crop group and %d ecodivision x crop group values (%d-%d means)\n", nrow(cg), nrow(eg), min(BASE), max(BASE)))
+cat("wrote dev/agriculture/02-nass-county-npp.csv, 02-nass-ecodivision-npp.csv, 02-nass-county-crop-npp.csv and 02-nass-ecodivision-crop-npp.csv\n")

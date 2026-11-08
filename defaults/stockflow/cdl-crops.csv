@@ -1,0 +1,63 @@
+Code,Class,Group,Note
+1,Corn,Corn,grain and silage together (NASS county mix)
+2,Cotton,Cotton,
+3,Rice,Rice,
+4,Sorghum,Sorghum,grain and silage together
+5,Soybeans,Soybean,
+6,Sunflower,Sunflower,
+10,Peanuts,Peanuts,
+11,Tobacco,Tobacco,
+13,Pop or Orn Corn,Corn,
+21,Barley,Barley,
+22,Durum Wheat,Wheat,
+23,Spring Wheat,Wheat,
+24,Winter Wheat,Wheat,
+25,Other Small Grains,Wheat,a small grain: wheat's growth
+26,Dbl Crop WinWht/Soybeans,Wheat|Soybean,two crops a year: both crops' growth
+27,Rye,Rye,
+28,Oats,Oats,
+30,Speltz,Wheat,a small grain: wheat's growth
+31,Canola,Sunflower,an oilseed (ag-crop-coefficients.csv gives canola sunflower's coefficients)
+32,Flaxseed,Sunflower,an oilseed
+33,Safflower,Sunflower,an oilseed
+34,Rape Seed,Sunflower,an oilseed
+35,Mustard,Sunflower,an oilseed
+38,Camelina,Sunflower,an oilseed
+36,Alfalfa,Alfalfa hay,
+37,Other Hay/Non Alfalfa,Nonlegume hay,
+41,Sugarbeets,Sugarbeets,
+42,Dry Beans,Beans,
+43,Potatoes,Potatoes,
+45,Sugarcane,Sugarcane,
+46,Sweet Potatoes,Potatoes,
+51,Chick Peas,Beans,a pulse
+52,Lentils,Beans,a pulse
+53,Peas,Beans,a pulse
+61,Fallow/Idle Cropland,Fallow,no growth that year (NASS yields are per harvested acre)
+205,Triticale,Wheat,a small grain: wheat's growth
+225,Dbl Crop WinWht/Corn,Wheat|Corn,two crops a year
+226,Dbl Crop Oats/Corn,Oats|Corn,two crops a year
+228,Dbl Crop Triticale/Corn,Wheat|Corn,two crops a year
+234,Dbl Crop Durum Wht/Sorghum,Wheat|Sorghum,two crops a year
+235,Dbl Crop Barley/Sorghum,Barley|Sorghum,two crops a year
+236,Dbl Crop WinWht/Sorghum,Wheat|Sorghum,two crops a year
+237,Dbl Crop Barley/Corn,Barley|Corn,two crops a year
+238,Dbl Crop WinWht/Cotton,Wheat|Cotton,two crops a year
+239,Dbl Crop Soybeans/Cotton,Soybean|Cotton,two crops a year
+240,Dbl Crop Soybeans/Oats,Soybean|Oats,two crops a year
+241,Dbl Crop Corn/Soybeans,Corn|Soybean,two crops a year
+254,Dbl Crop Barley/Soybeans,Barley|Soybean,two crops a year
+12,Sweet Corn,,not in Table 3-3 (a processing vegetable): left out
+14,Mint,,no NASS county yield: left out
+29,Millet,,no NASS county yield: left out
+39,Buckwheat,,no NASS county yield: left out
+44,Other Crops,,left out
+47,Misc Vegs & Fruits,,vegetables and fruit: left out (user 2026-11-07)
+58,Clover/Wildflowers,,no NASS county yield: left out
+59,Sod/Grass Seed,,left out
+60,Switchgrass,,left out
+62,Pasture/Grass,,grazed: no yield (left out)
+69,Grapes,,vineyards: left out (user 2026-11-07)
+176,Grassland/Pasture,,grazed: no yield (left out)
+181,Pasture/Hay,,no crop named: left out
+224,Vetch,,no NASS county yield: left out

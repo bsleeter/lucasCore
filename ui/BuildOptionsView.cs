@@ -41,6 +41,7 @@ namespace lucasCoreUI
         private readonly ComboBox m_age = new ComboBox();
         private readonly ComboBox m_site = new ComboBox();
         private readonly ComboBox m_grassShrub = new ComboBox();
+        private readonly ComboBox m_crop = new ComboBox();
         private readonly CheckBox m_tiled = new CheckBox { Text = "Split runs into tiles:", AutoSize = true, Margin = new Padding(3, 5, 6, 3) };
         private readonly TextBox m_tiles = new TextBox();
         private readonly ComboBox m_tileLevel = new ComboBox();
@@ -117,6 +118,8 @@ namespace lucasCoreUI
             r.Controls.Add(Caption("Site productivity:")); r.Controls.Add(List(m_site, 200));
             r.Controls.Add(Note("Grass and shrub productivity does the same for grassland and shrubland cells: each cell's growth is scaled by its RAP herbaceous and shrub NPP (mean of 2014-2023, 30 m pixels RAP sees as mostly trees left out) over its ecodivision and class mean, the value its growth already holds, capped at 0.3-2.5. Stage 8 scales the cell's starting live and dead carbon by it (soil keeps the class mean) and writes it as a Grass and Shrub Productivity flow multiplier on non-forest growth. Data Sources: RAP vegetation NPP v3 Folder (a Data Download for the region fetches it). Older libraries need tools/sync-library.R first, for its Flow Multiplier Type."));
             r.Controls.Add(Caption("Grass and shrub productivity:")); r.Controls.Add(List(m_grassShrub, 200));
+            r.Controls.Add(Note("Cropland productivity does the same for cropland and pasture: each cell's crops in the Cropland Data Layer (2014-2023) take their county's NASS growth (yields converted with USDA Tech. Bull. 1939 coefficients), fallow counting as no growth and crops NASS does not survey (vegetables, orchards, vineyards) left out; the cell's mean over its ecodivision and class mean is its multiplier, capped at 0.3-2.5. Stage 8 scales the cell's starting litter by it and writes it as a Cropland Productivity flow multiplier on agriculture growth. Data Sources: Cropland Data Layer Folder (national files, about 2 GB a year). Older libraries need tools/sync-library.R first."));
+            r.Controls.Add(Caption("Cropland productivity:")); r.Controls.Add(List(m_crop, 200));
 
             foreach (GroupBox g in new[] { gGrid, gHist, gStrata, gCover, gGrowth, gTiles }) { m_root.RowStyles.Add(new RowStyle(SizeType.AutoSize)); m_root.Controls.Add(g); }
 
@@ -159,6 +162,9 @@ namespace lucasCoreUI
             m_grassShrub.DisplayMember = "Name"; m_grassShrub.ValueMember = "Value";
             m_grassShrub.DataSource = new List<Item> { new Item { Value = 1, Name = "None" }, new Item { Value = 2, Name = "RAP NPP (2014-2023)" } };
             this.SetComboBoxBinding(m_grassShrub, "GrassShrubProductivity");
+            m_crop.DisplayMember = "Name"; m_crop.ValueMember = "Value";
+            m_crop.DataSource = new List<Item> { new Item { Value = 1, Name = "None" }, new Item { Value = 2, Name = "CDL x NASS (2014-2023)" } };
+            this.SetComboBoxBinding(m_crop, "CropProductivity");
             m_resample.DisplayMember = "Name"; m_resample.ValueMember = "Value";
             m_resample.DataSource = new List<Item> { new Item { Value = 1, Name = "Modal (most common 30 m class)" }, new Item { Value = 2, Name = "Area-matched (30 m class areas per secondary unit)" } };
             this.SetComboBoxBinding(m_resample, "LandCoverResampling");

@@ -20,7 +20,8 @@
 #             the level the rates were solved at); the year after the last NASS year it holds ProjectionIndex (the mean of the last
 #             10 NASS years), which projections keep.
 # Writes defaults/stockflow/nonforest-pathways-agriculture.csv, nonforest-multipliers-agriculture.csv, ag-targets.csv, ag-crop-yield.csv,
-# the agriculture rows of nonforest-net-growth.csv, and defaults/initialstocks/agriculture.csv (the steady state); removes the old zero
+# the agriculture rows of nonforest-net-growth.csv, ag-county-crop-npp.csv and ag-ecodivision-crop-npp.csv (crop group growth for the
+# Cropland Productivity map), and defaults/initialstocks/agriculture.csv (the steady state); removes the old zero
 # agriculture rows from nonforest-multipliers-other.csv. Rerunning is harmless.
 # =============================================================================
 suppressPackageStartupMessages(library(data.table))
@@ -121,3 +122,7 @@ print(fits[, .(n = .N, NPP = round(median(NPP), 2), Harvest = round(median(Harve
                AgSlow = round(median(AgSlow), 2), Soil = round(median(Soil), 1), SoilK = signif(median(SoilEmission), 3)), by = StateClassId])
 cat(sprintf("yearly Crop Yield index %d-%d; projection index (mean of the last %d NASS years) %s\n", min(yr$Timestep), last, INDEX_LAST,
             paste(tg[, sprintf("%s %.2f-%.2f", sub("Agriculture: ", "", StateClassId[1]), min(ProjectionIndex), max(ProjectionIndex)), by = StateClassId]$V1, collapse = "; ")))
+# the crop group growth the Cropland Productivity map looks up (stage 8; dev/agriculture/02-nass-county-npp.R): by county and by
+# ecodivision, 1985-2023 means per harvested ha
+for (f in c("county", "ecodivision")) wr(fread(sprintf("dev/agriculture/02-nass-%s-crop-npp.csv", f), colClasses = list(character = if (f == "county") "GEOID" else NULL)),
+                                         "stockflow", sprintf("ag-%s-crop-npp.csv", f))

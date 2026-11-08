@@ -56,4 +56,16 @@ expect("stage 3 reads the agriculture pathways, rates and Crop Yield", all(vappl
 expect("stage 8 reads the agriculture starting pools", grepl("agriculture.csv", s8, fixed = TRUE))
 co2 <- rd("climate", "co2-classes.csv")
 expect("CO2 fertilization of cropland and pasture acts on Net Growth Agriculture: Total", all(co2[StateClassId %in% AG, FlowGroupId] == "Net Growth Agriculture: Total"))
+# Cropland Productivity (stage 8): the CDL crosswalk's crop groups have NASS growth; the option, data source and multiplier type exist
+xw <- rd("stockflow", "cdl-crops.csv"); eg <- rd("stockflow", "ag-ecodivision-crop-npp.csv"); cg <- rd("stockflow", "ag-county-crop-npp.csv")
+grp <- setdiff(unique(unlist(strsplit(na.omit(xw$Group), "|", fixed = TRUE))), "Fallow")
+expect("every CDL crop group has NASS growth by ecodivision and county", all(grp %in% eg$Group) && all(grp %in% cg$Group), paste(setdiff(grp, eg$Group), collapse = "; "))
+expect("CDL codes are unique and fallow is a group", !anyDuplicated(xw$Code) && "Fallow" %in% xw$Group)
+expect("county GEOIDs keep their leading zeros", all(nchar(cg$GEOID) == 5))
+px <- paste(readLines(file.path(pkg, "package.xml")), collapse = "\n")
+expect("package.xml has Build Options: Cropland Productivity and Data Sources: CdlFolder", grepl('name="CropProductivity"', px, fixed = TRUE) && grepl('name="CdlFolder"', px, fixed = TRUE))
+expect("Cropland Productivity is a flow multiplier type", "Cropland Productivity" %in% nm("stsim_FlowMultiplierType.csv"))
+expect("stage 8 writes the Cropland Productivity multiplier; stages 7 and 11 carry it over",
+       grepl("put_multiplier(\"Cropland Productivity\"", s8, fixed = TRUE) && all(vapply(c("7-climate-multipliers.R", "11-projection-climate.R"),
+         function(f) grepl("\"Cropland Productivity\")", paste(readLines(file.path(pkg, "src", f)), collapse = "\n"), fixed = TRUE), TRUE)))
 cat(sprintf("\n%d passed, %d failed\n", ok, bad)); if (bad) quit(status = 1)

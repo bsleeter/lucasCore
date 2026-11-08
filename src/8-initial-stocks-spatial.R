@@ -197,6 +197,69 @@ if (gs_on) {
   fg <- "Net Growth Non Forest: Total"; if (!fg %in% stsim_list("FlowGroup")$Name) fail("Grass and Shrub Productivity: flow group '%s' not found", fg)
   put_multiplier("Grass and Shrub Productivity", fg, write_raster(setValues(rast(P), ifelse(land, gmult, NA)), "GrassShrubProductivity.tif", "FLT4S"))
 }
+
+# ---- Cropland Productivity (Build Options; to-do 39 step 6, user 2026-11-07) -------------------------------------------------
+# The agriculture counterpart: each 30 m Cropland Data Layer pixel of CDL_YEARS takes its county's NASS growth of its crop group
+# (defaults/stockflow/ag-county-crop-npp.csv: the 1985-2023 mean, yields converted with USDA Tech. Bull. 1939 coefficients;
+# tools/make_agriculture.R), else the county's ecodivision's (ag-ecodivision-crop-npp.csv), else the group's CONUS mean; a double
+# crop takes both crops' growth; fallow and idle cropland counts 0 (NASS yields are per harvested acre, NLCD cropland includes
+# fallow); classes NASS does not survey (vegetables, fruit and nuts, vineyards, grassland/pasture, non-crop land) are left out
+# (defaults/stockflow/cdl-crops.csv; user 2026-11-07). A cell's growth is the mean over its pixels and years; its multiplier = that
+# / its ecodivision x class growth (ag-targets.csv, the NPP its growth rows hold), capped at 0.3-2.5 as the other productivity
+# multipliers. It becomes the Cropland Productivity flow spatial multiplier on Net Growth Agriculture: Total (it multiplies with
+# Crop Yield and CO2), and the cell's starting litter is scaled by it (soil keeps the class mean). Cropland and pasture cells
+# without surveyed crops, and every other land cell (for land that becomes agriculture), take the multiplier of the agriculture
+# cells near it (src/productivity-fill.R).
+cpv <- opt$CropProductivity[1]
+cp_on <- !is.null(cpv) && !is.na(cpv) && (identical(suppressWarnings(as.integer(cpv)), 2L) || startsWith(as.character(cpv), "CDL"))
+if (cp_on) {
+  CDL_YEARS <- 2014:2023; CAP <- c(0.3, 2.5); AGC <- c("Agriculture: Cropland", "Agriculture: Pasture")
+  if (!"Cropland Productivity" %in% stsim_list("FlowMultiplierType")$Name) fail("Cropland Productivity: the library has no Flow Multiplier Type 'Cropland Productivity' - run tools/sync-library.R on it")
+  cs <- read_data_sources(c("CdlFolder", "CountiesFile"))
+  cf <- file.path(cs$CdlFolder, sprintf("%d_30m_cdls.tif", CDL_YEARS)); miss <- CDL_YEARS[!file.exists(cf)]
+  if (length(miss)) fail("Cropland Productivity: Cropland Data Layer Folder (%s) lacks %s; run a Data Download with CdlFolder for years %d-%d", cs$CdlFolder, paste(miss, collapse = ", "), min(CDL_YEARS), max(CDL_YEARS))
+  xw <- read_default("stockflow", "cdl-crops.csv")[!is.na(Group) & nzchar(Group)]
+  cg <- read_default("stockflow", "ag-county-crop-npp.csv")[, NPP := as.numeric(NPP)]; eg <- read_default("stockflow", "ag-ecodivision-crop-npp.csv")[, NPP := as.numeric(NPP)]
+  tg <- read_default("stockflow", "ag-targets.csv")[, NPP := as.numeric(NPP)]
+  isAG <- land & cname %in% AGC
+  r0 <- rast(cf[1]); win <- project(as.polygons(ext(P) + 1000, crs = crs(P)), crs(r0)); g30 <- crop(r0, win, snap = "out")
+  # counties on the 30 m window, and each county's ecodivision (its most common one on the model grid) for the fallback
+  co <- vect(cs$CountiesFile); co <- crop(project(co, crs(r0)), win); co$k <- seq_len(nrow(co))
+  ck <- rasterize(co, g30, "k"); vC <- values(project(rasterize(co, P, "k"), P, method = "near"), mat = FALSE)
+  ce <- data.table(k = vC, e = sname)[!is.na(k) & !is.na(e), .N, by = .(k, e)][order(-N)][, .SD[1], by = k]
+  # every (county, CDL code) pair's growth: the sum over the code's crop groups ("A|B": a double crop) of the county, ecodivision or CONUS value
+  gm <- eg[, .(NPP = mean(NPP)), by = Group]
+  val <- function(geoid, eco, grp) { v <- cg[GEOID == geoid & Group == grp, NPP]; if (length(v) && is.finite(v[1])) return(v[1])
+    v <- eg[StratumId == eco & Group == grp, NPP]; if (length(v) && is.finite(v[1])) return(v[1]); gm[Group == grp, NPP] }
+  codes <- as.integer(xw$Code)
+  tab <- CJ(k = co$k, code = codes)[, geoid := co$GEOID[k]][, eco := ce$e[match(k, ce$k)]]
+  tab[, npp := mapply(function(g, e, cd) { grp <- strsplit(xw$Group[match(cd, codes)], "|", fixed = TRUE)[[1]]
+    if (identical(grp, "Fallow")) return(0); sum(vapply(grp, function(x) val(g, e, x), 0)) }, geoid, eco, code)]
+  if (anyNA(tab$npp)) fail("Cropland Productivity: no NASS growth for crop groups %s", paste(unique(xw$Group[match(tab[is.na(npp), code], codes)]), collapse = ", "))
+  key <- ck * 1000   # county index x 1000 + CDL code
+  acc <- NULL; nyr <- NULL
+  for (f in cf) { r <- crop(rast(f), win, snap = "out"); r <- classify(r, cbind(setdiff(0:255, codes), NA))
+    pv <- classify(key + r, cbind(tab$k * 1000 + tab$code, tab$npp), others = NA)
+    m <- project(pv, P, method = "average"); vm <- values(m, mat = FALSE)
+    acc <- if (is.null(acc)) ifelse(is.na(vm), 0, vm) else acc + ifelse(is.na(vm), 0, vm); nyr <- if (is.null(nyr)) !is.na(vm) + 0 else nyr + !is.na(vm) }
+  vN <- ifelse(nyr > 0, acc / nyr, NA)
+  tnpp <- tg$NPP[match(paste(sname, cname), paste(tg$StratumId, tg$StateClassId))]
+  cmult <- rep(1, ncell(P)); use <- isAG & !is.na(vN) & !is.na(tnpp) & tnpp > 0
+  cmult[use] <- pmin(pmax(vN[use] / tnpp[use], CAP[1]), CAP[2])
+  cfl <- fill_multiplier(P, cmult, use & cmult > CAP[1] + 1e-9, land & !use); cmult <- cfl$mult
+  check(STAGE, "cropland productivity: every land cell's multiplier is finite and within 0.3-2.5", all(is.finite(cmult[land]) & cmult[land] >= CAP[1] - 1e-9 & cmult[land] <= CAP[2] + 1e-9))
+  soilj <- which(st$StockTypeId %in% c("DOM: Belowground Slow", "Deep Soil"))
+  out[isAG, -soilj] <- out[isAG, -soilj] * cmult[isAG]
+  csum <- data.table(cls = cname[isAG], m = cmult[isAG], has = use[isAG])[, .(Cells = .N, NoCdl = round(100 * mean(!has), 1), Mean = round(mean(m), 2),
+            P10 = round(quantile(m, 0.1), 2), P90 = round(quantile(m, 0.9), 2), Capped = round(100 * mean(m <= CAP[1] + 1e-9 | m >= CAP[2] - 1e-9), 1)), by = cls][order(-Cells)]
+  say("Cropland productivity (CDL %d-%d x NASS county growth): %d cells, multiplier mean %.2f; %.1f%% have no surveyed crop pixels (filled from nearby cropland and pasture)",
+      min(CDL_YEARS), max(CDL_YEARS), sum(isAG), mean(cmult[isAG]), 100 * mean(!use[isAG]))
+  for (i in seq_len(nrow(csum))) with(csum[i], say("  %s: %d cells, mean %.2f (10%% %.2f, 90%% %.2f), %.1f%% without surveyed crops, %.1f%% at the cap", cls, Cells, Mean, P10, P90, NoCdl, Capped))
+  say("Cropland productivity: %.1f%% of the other land cells filled from cropland and pasture within 10 km of the same ecodivision (mean %.2f); the rest keep 1",
+      100 * mean(cfl$filled[land & !isAG]), if (any(cfl$filled[land & !isAG])) mean(cmult[land & !isAG & cfl$filled]) else 1)
+  fg <- "Net Growth Agriculture: Total"; if (!fg %in% stsim_list("FlowGroup")$Name) fail("Cropland Productivity: flow group '%s' not found - run tools/sync-library.R", fg)
+  put_multiplier("Cropland Productivity", fg, write_raster(setValues(rast(P), ifelse(land, cmult, NA)), "CroplandProductivity.tif", "FLT4S"))
+}
 progressBar()
 
 # ---- soil: gNATSGO where the class's belowground slow is 0 -----------------------------------------------------------------

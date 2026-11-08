@@ -451,6 +451,19 @@ download_handlers <- function() {
         ctx$log(sprintf("  RAP NPP %d", items$year[i])) }
       ctx$place })
 
+  # ---- USDA NASS Cropland Data Layer: one national 30 m GeoTIFF a year (in a 1.6-2.0 GB zip), kept whole at the top of the home
+  # (user 2026-11-07: 2014-2023 nationally; read remotely a zip this size does not answer, and CropScape's clip service did not).
+  # Stage 8 crops its window (Build Options: Cropland Productivity); only CDL_YEARS are fetched
+  H$CdlFolder <- list(column = "CdlFolder", name = "USDA NASS Cropland Data Layer", national = TRUE, version = "CDL 30 m national releases",
+    note = "National 30 m crop type a year (EPSG:5070; 0 background); the years 2014-2023 that stage 8 reads",
+    plan = function(ctx) { y <- intersect(years_of(ctx, 2008:2025), CDL_YEARS)
+      if (!length(y)) stop(sprintf("the Cropland Data Layer years stage 8 reads are %d-%d: ask for years that include them", min(CDL_YEARS), max(CDL_YEARS)), call. = FALSE)
+      data.table::data.table(year = y, url = sprintf(CDL_ZIP, y), file = sprintf("%d_30m_cdls.zip", y), out = sprintf("%d_30m_cdls.tif", y), fetch = TRUE) },
+    have = function(ctx, items) recorded(ctx, "CdlFolder", file.path(ctx$place, items$out)),
+    finish = function(ctx, items) { dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE)
+      for (i in seq_len(nrow(items))) { zip_tif(ctx, items$dest[i], file.path(ctx$place, items$out[i])); unlink(items$dest[i]); ctx$log(sprintf("  CDL %d (national)", items$year[i])) }
+      ctx$place })
+
   # ---- gNATSGO (Planetary Computer): soil organic carbon and crop productivity, the region's 10 m tiles cropped; for all of
   # CONUS every tile (357, about 10 GB a layer) fetched and written as one 10 m GeoTIFF ---------------------------------------
   gnatsgo <- function(column, name, asset, out, note) list(column = column, name = name, version = "gNATSGO July 2020 (gnatsgo-rasters)", method = "stac", note = note,
@@ -499,6 +512,8 @@ NIFC <- sprintf("https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/servi
 # where a PRISM item unpacks: the normals, monthly precipitation, or the annual files of its variable
 prism_dir <- function(items) ifelse(is.na(items$year), "normals", ifelse(items$monthly %in% TRUE, "monthly-us25m/ppt", file.path("annual-us25m", items$var)))
 RAP_NPP <- "https://rangeland.ntsg.umt.edu/data/rap/rap-vegetation-npp/v3/vegetation-npp-v3-%d.tif"
+CDL_ZIP <- "https://www.nass.usda.gov/sites/default/files/Research_and_Science/Cropland/Release/datasets/%d_30m_cdls.zip"
+CDL_YEARS <- 2014:2023   # the years stage 8's Cropland Productivity reads
 CCAP <- "https://ocmgeodatastor1.blob.core.windows.net/ccap/bulk_download/C-CAP_Regional_30-meter_Data/C-CAP_Regional_Land_Cover_Classification/CONUS/conus_2001_ccap_landcover.tif"
 PC_STAC <- "https://planetarycomputer.microsoft.com/api/stac/v1"
 # national files (Home layout National; checked 2026-11-02)
