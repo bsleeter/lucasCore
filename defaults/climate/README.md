@@ -2,7 +2,7 @@
 
 - `flow-multipliers.csv`: the flow groups of each climate effect (role), and for decomposition the CBM DOM pools whose Q10 applies.
   Climate Options (scenario sheet) picks each role's model: forest growth None / Miami NPP / Tree ring (default), non-forest growth
-  None / Miami NPP (default) / RAP fit, decomposition None / Q10 (default). None writes no multiplier: the flow runs at normal climate.
+  None / Miami NPP / RAP fit (default), decomposition None / Q10 (default). None writes no multiplier: the flow runs at normal climate.
 - `tree-ring-coefficients.csv`: the tree-ring forest growth response by FIA ecodivision (stsim stratum name and Id):
   `multiplier = 1 + PrecipCoef (P/Pn - 1) + PrecipLagCoef (P last year/Pn - 1) + TempCoef (T - Tn)`, floored at 0, with Pn and Tn the
   1991-2020 mean of the same PRISM files. Built by `tools/make_tree_ring_coefficients.R`: standard ring-width indices of 1,288 CONUS
@@ -35,8 +35,8 @@ The fit reproduces about half of RAP's year-to-year SD (correlation 0.43 in Medi
 are scaled by `Scale` = k^0.5, k = RAP's SD over the fit's in the ecodivision (1.2-2.4): about three quarters of RAP's variation, at
 4-7% more RMSE and beating the window's own mean in 57-69% of windows (84% unscaled). Fully matching RAP's SD would cost far more
 (beats the mean in 27-45%), and part of RAP's variation is likely retrieval noise. Earlier forms (calendar-year and water-year
-total rain, `05-rap-climate-fit.R`) reproduced 0.33-0.45 of the variation. Climate Options: Non-Forest Growth = RAP fit uses it; Miami
-NPP stays the default for now. Rain is PRISM monthly (`monthly-us25m/ppt`) in stage 7 and LOCA2 monthly (`loca2_annual("ppt_seasons")`)
+total rain, `05-rap-climate-fit.R`) reproduced 0.33-0.45 of the variation. Climate Options: Non-Forest Growth = RAP fit uses it, the
+default since 2026-11-07 (Miami NPP swings 1.0-2.4 times RAP's variation). Rain is PRISM monthly (`monthly-us25m/ppt`) in stage 7 and LOCA2 monthly (`loca2_annual("ppt_seasons")`)
 in stage 11, against each source's own 1991-2020 seasonal normals.
 
 ## Projections (LOCA2)

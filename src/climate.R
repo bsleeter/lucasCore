@@ -3,7 +3,7 @@
 # =============================================================================
 # Climate Options picks the model of each effect; defaults/climate/flow-multipliers.csv lists the flow groups of each:
 #   Forest growth      None | Miami NPP | Tree ring (default)
-#   Non-forest growth  None | Miami NPP (default) | RAP fit
+#   Non-forest growth  None | Miami NPP | RAP fit (default)
 #   Decomposition      None | Q10 (default)
 #   Miami NPP   forest NPP = min(f(MAT), f(MAP)), non-forest NPP = f(MAP) (Lieth 1975); multiplier = year / normal
 #   Tree ring   1 + PrecipCoef (P/Pn - 1) + PrecipLagCoef (P last year/Pn - 1) + TempCoef (T - Tn), coefficients by ecodivision
