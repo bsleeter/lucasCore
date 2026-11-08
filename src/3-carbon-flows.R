@@ -26,9 +26,6 @@ gopt <- as.list(read_ds("GrowthOptions"))
 cbm <- pkg_file("defaults", "cbm")
 if (!nrow(datasheet(scn, "stsim_FlowPathwayDiagram", optional = TRUE)))
   fail("no Flow Pathway Diagram: make this scenario depend on the 'Stock-Flow Definitions' scenario that tools/new-library.R creates")
-# the stock-flow definition rows the package gained since the scenario's were written (2026-11-07: the agriculture stock and flows):
-# ST-Sim refuses a pathway to a stock that is not on the diagram, so a stage 3 rerun on an older Build adds them to its own sheets
-sf_add_missing()
 cc <- as.data.table(datasheet(scn, ds("CarbonCurve"), optional = TRUE, lookupsAsFactors = FALSE))
 if (!nrow(cc)) fail("Live-Tree Carbon Curves are empty: run stage 2 first (same pipeline, or depend on a stage 2 result)")
 setnames(cc, c("StratumId", "StateClassId"), c("Stratum", "StateClass"))
