@@ -126,4 +126,17 @@ expect("a dataset whose file changed size is not restored", !"TestNational" %in%
 invisible(file.remove(record_files(rp, "TestFolder"))); home_restore_records(rp, function(x) invisible())
 expect("a done dataset without a record gets one", all(file.exists(record_files(rp, "TestFolder"))))
 
+# a Build's cache beside a dataset (FIA's fia-conditions.rds) is never recorded, and a row an earlier version recorded for one is
+# ignored, so a rebuilt cache leaves the dataset up to date (2026-11-09)
+ch <- file.path(tempdir(), "home-cache"); unlink(ch, recursive = TRUE); dir.create(file.path(ch, "forest", "fia-datamart"), recursive = TRUE)
+ch <- normalizePath(ch, winslash = "/"); dm <- file.path(ch, "forest", "fia-datamart")
+writeLines("a", file.path(dm, "AL_COND.csv")); saveRDS(1:10, file.path(dm, "fia-conditions.rds"))
+fr <- files_rows(ch, "FiaDataMartFolder", dm)
+expect("a cache file is not recorded with its dataset", identical(fr$Path, "forest/fia-datamart/AL_COND.csv"))
+write_files(ch, rbind(fr, data.table(Column = "FiaDataMartFolder", Path = "forest/fia-datamart/fia-conditions.rds", Bytes = "1", Sha256 = NA, Modified = NA)))
+write_manifest(ch, data.table(Column = "FiaDataMartFolder", Copy = "national", Status = "done"))
+saveRDS(1:1000, file.path(dm, "fia-conditions.rds"))   # rebuilt by a Build: another size than the old row says
+expect("a cache row an earlier version recorded is dropped on reading", nrow(read_files(ch)) == 1)
+expect("a rebuilt cache leaves the dataset up to date", isTRUE(dataset_up_to_date(ch, "FiaDataMartFolder", list(box = P26, poly = "polygon"))))
+
 cat(sprintf("\n%d passed, %d failed\n", ok, bad)); if (bad) quit(status = 1)

@@ -52,7 +52,12 @@ home_create <- function(home, pkgdir) {
   for (k in setdiff(cols, names(x))) x[, (k) := rep(NA_character_, nrow(x))]
   x[, cols, with = FALSE] }
 read_manifest <- function(home) .home_table(home, "manifest.csv", MANIFEST_COLS)
-read_files <- function(home) .home_table(home, "files.csv", FILES_COLS)
+# files a Build writes beside a dataset (FIA's derived tables, rebuilt when the CSVs change) are not part of it: never recorded,
+# and rows an earlier version recorded are dropped on reading, so a rebuilt cache does not make the dataset look out of date
+# (2026-11-09: E:/lucasData's FIA DataMart counted as changed after a Build rewrote fia-conditions.rds, and 3.2 GB was fetched again)
+BUILD_CACHES <- "(^|/)fia-(sites|conditions|deadwood)[.]rds$"
+not_cache <- function(x) if (nrow(x)) x[!grepl(BUILD_CACHES, Path)] else x
+read_files <- function(home) not_cache(.home_table(home, "files.csv", FILES_COLS))
 
 # settings.csv: Key,Value pairs that belong to the person filling the home folder rather than to a scenario (LfpsEmail: the address
 # LANDFIRE Product Service jobs are submitted with; the Data Download page writes it)
@@ -98,7 +103,7 @@ home_restore_records <- function(home, log = message, label = home) {
   done <- character()
   for (k in recs) { if (nrow(m[Column == k & Status == "done"]) && nrow(f[Column == k])) next
     p <- record_files(home, k); if (!file.exists(p[2])) next
-    rm <- .home_table(file.path(home, "records"), basename(p[1]), MANIFEST_COLS); rf <- .home_table(file.path(home, "records"), basename(p[2]), FILES_COLS)
+    rm <- .home_table(file.path(home, "records"), basename(p[1]), MANIFEST_COLS); rf <- not_cache(.home_table(file.path(home, "records"), basename(p[2]), FILES_COLS))
     on <- file.path(home, rf$Path); bad <- !file.exists(on) | file.size(on) != as.numeric(rf$Bytes)
     if (!nrow(rm) || !nrow(rf) || any(bad)) { log(sprintf("%s: records/%s holds its rows, but %d of %d files are missing or another size: not restored", k, basename(p[1]), sum(bad), nrow(rf))); next }
     write_files(home, rf); write_manifest(home, rm); done <- c(done, k) }
@@ -112,6 +117,7 @@ files_rows <- function(home, column, path, sha = FALSE) {
   # a file column: the file and its sidecars (a shapefile's .dbf, .shx, .prj; a raster's .aux.xml)
   f <- if (dir.exists(path)) list.files(path, recursive = TRUE, full.names = TRUE) else {
     a <- list.files(dirname(path), full.names = TRUE); a[startsWith(basename(a), paste0(tools::file_path_sans_ext(basename(path)), "."))] }
+  f <- f[!grepl(BUILD_CACHES, f)]
   if (!length(f)) return(data.table::data.table())
   i <- file.info(f, extra_cols = FALSE); rel <- substring(normalizePath(f, winslash = "/"), nchar(normalizePath(home, winslash = "/")) + 2)
   data.table::data.table(Column = column, Path = rel, Bytes = sprintf("%.0f", i$size),
