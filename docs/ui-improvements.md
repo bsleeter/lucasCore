@@ -678,6 +678,31 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
           and burial instead of growth; the decay difference by regime would come from thin literature.
         - A climate response for wetland decomposition (temperature), which likely matters more for projections than either map.
         Order if adopted: tidal growth and soil first (same pattern as step 5), then NWI water regime, then the climate response.
+        - **Checked 2026-11-08.** Byrd 2018 maps standing biomass in six regions only; a 2023 USGS release (Woltz, Stagg, Byrd,
+          Windham-Myers, Rovai and Zhu, doi 10.5066/P9I1PCLS, CC0) maps total NPP of estuarine and palustrine tidal marsh at 30 m for
+          CONUS, 2015 (aboveground one third everywhere: peak biomass, one crop a year). Holmquist 2018 soil (ORNL DAAC, needs an
+          Earthdata login) adds little over one mean density by its own paper: not taken. Decay: emergent litter already takes CBM's Q10
+          (2.0-2.65; the one marsh study, Kirwan et al. 2014, has 1.3-1.5) and wetland soil (BG Slow) none. NWI water regime: weakest.
+        - **Tidal marsh NPP built 2026-11-08 (user: "recalibrate and use the map for pattern"; main ba0d00e, not pushed).** Downloaded
+          (user OK) to <home>/wetlands/tidal-marsh-npp (163 MB zip; EEM and PEM rasters). dev/nonforest/09-tidal-marsh-npp.R ->
+          defaults/stockflow/tidal-marsh-npp.csv (by ecodivision x class). Against the model's regional values (inference: estuarine 5-8
+          picked in a 5-15 class range, the Pacific set low from memory): Subtropical 8.5 vs 8 (13,411 km2), Mediterranean 12.2 vs 6,
+          Marine 7.8-8.1 vs 5, Hot Continental 9.7 vs 8, Savanna 2.8 vs 8; tidal palustrine 8-14 vs 4-7 (the model class is mostly inland).
+          tools/make_emergent_wetland.R: estuarine NPP and peak foliage (= aboveground NPP, the map's one crop a year) from the map where
+          it holds 10 km2 or more (8 ecodivisions); palustrine keeps its regions. Savanna: map NPP 2.83 cannot supply the region's burial
+          with the soil target held, so burial gives way (user: NPP matters more): 1.62 -> 0.573 (scaled by map / region NPP). Burial is
+          its own target (Wang et al. 2019), not calibrated from soil carbon. Build Options: Tidal Marsh Productivity (None / USGS tidal
+          marsh NPP (2015)), stage 8: cell's mapped NPP / its ecodivision x class map mean, capped 0.3-2.5, on Net Growth Wetland: Total;
+          live and dead carbon scaled, soil not; no map pixels: 1. Data Sources: TidalMarshNppFolder (data-sources.csv row, Data Download
+          handler, citation). tests/unit-nonforest-solve.R 37 of 37; metadata, carbon assumptions, agriculture, CO2, strata-home pass.
+        - **Solano (option on in Build scenario 3; synced; stages 3, 5, 8 on Build 20: result 110, 12.4 min; 1985-2020: result 112, 23.5
+          min).** Every check passes. Estuarine 2,590 cells 99.9% mapped, multiplier mean 0.99 (10% 0.83, 90% 1.14); palustrine 1,280
+          cells 64% mapped (the rest inland), mean 0.89 (0.66-1.14). Estuarine growth 6.0 -> 12.1 Mg C/ha/yr against result 95; litter,
+          soil and burial about the same (the fit holds them: the extra growth decays and moves out laterally); year-end live roots 1.5 ->
+          0.04 (peak roots = foliage x root:shoot is about the year's root growth, so roots turn over yearly, as the map's own
+          one-crop assumption implies). Soil drifts down where the multiplier is below 1 (soil is not scaled): palustrine BG Slow 194.0 ->
+          190.8 by 2020 (193.6 before). Open: whether to scale soil too, or set peak roots from the release's belowground biomass layer
+          (not downloaded), which would keep live roots through the year.
     - Still open from the review: root turnover, chaparral root:shoot, Non-sage shrub (no data), shrub litter decay rates, the pasture
       management factor, the wetland 0-30 cm and deeper split, the IPCC climate-zone raster.
 46. **CO2 fertilization** - TO DO, open science (user, 2026-11-04: how can we introduce the effect of CO2 fertilization into the model?).
