@@ -118,9 +118,10 @@ download_handlers <- function() {
       ctx$place })
 
   # ---- TreeMap 2016: the raster and its attribute table (the plots), from one zip ------------------------------------
-  H$TreeMapFolder <- list(column = "TreeMapFolder", name = "TreeMap 2016", version = "2016 (RDS-2021-0074)",
+  H$TreeMapFolder <- list(column = "TreeMapFolder", name = "TreeMap 2016", version = "2016 (RDS-2021-0074)", national = TRUE,
     # fetched whole even for a region: its 4 GB raster is deflated, so a remote read streams nearly all of it, and one broke
-    # 12,000 rows in (2026-10-31); the zip comes down in minutes
+    # 12,000 rows in (2026-10-31); the zip comes down in minutes. Kept whole at the top of the home, like FIA (user, 2026-11-09):
+    # each region used to fetch the 5.4 GB zip again to keep only its clip; stage 5 crops the national raster to the study area
     plan = function(ctx) data.table::data.table(url = sprintf(BOX, "yz7h8b8v92scoqfwukjyulokaevzo6v6"), file = "TreeMap2016.zip", fetch = TRUE),
     finish = function(ctx, items) { dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE)
       zip_raster(ctx, items, 1, "Data/TreeMap2016.tif", file.path(ctx$place, "TreeMap2016.tif"))

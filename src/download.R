@@ -139,7 +139,7 @@ run_dataset <- function(h, ctx, layout, check_only = FALSE) {
   out <- function(status, files = NA_integer_, mb = NA_real_, nxt = NA_character_)
     data.table::data.table(DataSource = col, Dataset = h$name, Status = status, Files = as.integer(files), SizeMb = round(mb, 1),
                            Minutes = round(as.numeric(difftime(Sys.time(), t0, units = "mins")), 2), Next = nxt)
-  # where it goes: national copies (FIA, PRISM, LOCA2, FPA-FOD) whole at the top of the home, the rest in the region folder
+  # where it goes: national copies (FIA, PRISM, LOCA2, FPA-FOD, TreeMap, the CDL and the tidal marsh map) whole at the top of the home, the rest in the region folder
   ctx$store <- store_for(h, ctx); where <- home_label(ctx$home, ctx$store); if (isTRUE(h$national)) ctx$keep <- TRUE
   # a handler with have(ctx, items) (one TRUE per planned item already in place) can grow: a rerun asking for more (LOCA2 models,
   # scenarios, members) fetches only what is missing; without it, a covering manifest means the dataset is done
