@@ -109,7 +109,7 @@ loca2 <- { d <- as.data.table(datasheet(P, "lucasCore_DataSource", optional = TR
   home <- if (nrow(d) && "DataSourcesHome" %in% names(d)) d$DataSourcesHome[1] else NA
   if ((is.na(v) || !nzchar(v)) && !is.na(home) && nzchar(home)) {   # the Build's order (src/shared.R): the top of the home, else a region
     place <- data.table::fread(file.path(pkgdir, "defaults", "library", "data-sources.csv"), colClasses = "character")[Column == "Loca2Folder", HomePath]
-    rd <- file.path(home, "regions"); cand <- file.path(c(home, if (dir.exists(rd)) sort(list.dirs(rd, recursive = FALSE))), place)
+    regs <- file.path(home, "regions"); cand <- file.path(c(home, if (dir.exists(regs)) sort(list.dirs(regs, recursive = FALSE))), place)
     cand <- cand[dir.exists(cand) & vapply(cand, function(x) length(list.files(x)) > 0, TRUE)]; if (length(cand)) v <- cand[1] }
   # (package.xml has no default LOCA2 folder: the build machine's was removed 2026-11-02)
   opt("loca2", if (is.na(v)) "" else v) }
