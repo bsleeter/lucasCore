@@ -417,7 +417,9 @@ finish_checks <- function() {
   if (!length(.checks)) return(invisible())
   x <- rbindlist(.checks); write_ds(x, "OutputValidation", append = TRUE)
   bad <- x[Status != "Pass"]
-  if (nrow(bad)) fail("%d validation check(s) failed: %s", nrow(bad), paste(bad$Check, collapse = "; "))
+  # the error names what failed, not only which check, so the Studio failure box is enough to act on (2026-11-09)
+  if (nrow(bad)) fail("%d validation check(s) failed: %s", nrow(bad), paste(sprintf("%s%s", bad$Check,
+    ifelse(nzchar(trimws(bad$Detail)), paste0(" (", substr(trimws(bad$Detail), 1, 400), ")"), "")), collapse = "; "))
   invisible() }
 
 # the primary strata (ecodivision) names of the study area: the values of stage 1's primary strata raster, or NULL when no stage 1

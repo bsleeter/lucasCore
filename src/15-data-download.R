@@ -59,6 +59,10 @@ fetch_one <- function(k, ctx, check_only) { h <- H[[k]]
       return(data.table(DataSource = k, Dataset = h$name, Status = "needs login", Files = NA_integer_, SizeMb = NA_real_, Minutes = NA_real_, Next = conditionMessage(e))) }
     if (grepl("no file is needed", conditionMessage(e))) { log(sprintf("%s: not needed: %s", h$name, conditionMessage(e)))
       return(data.table(DataSource = k, Dataset = h$name, Status = "not needed", Files = 0L, SizeMb = NA_real_, Minutes = NA_real_, Next = conditionMessage(e))) }
+    # a file the source serves only to a browser (RCMAP 1985 on ScienceBase) is a step for the user too, not a failure (2026-11-09):
+    # the run goes on, the Build reads the dataset as missing, and the step is listed at the end of the run
+    if (grepl("^by hand:", conditionMessage(e))) { log(sprintf("%s: by hand: %s", h$name, sub("^by hand: *", "", conditionMessage(e))))
+      return(data.table(DataSource = k, Dataset = h$name, Status = "manual", Files = NA_integer_, SizeMb = NA_real_, Minutes = NA_real_, Next = substr(conditionMessage(e), 1, 400))) }
     log(sprintf("%s: FAILED: %s", h$name, conditionMessage(e))); if (!check_only) record_failure(store_for(h, ctx), h, conditionMessage(e))
     data.table(DataSource = k, Dataset = h$name, Status = "failed", Files = NA_integer_, SizeMb = NA_real_, Minutes = NA_real_,
                Next = if (grepl("^write-once|^by hand:", conditionMessage(e))) substr(conditionMessage(e), 1, 300) else sprintf("%s (rerun to resume)", substr(conditionMessage(e), 1, 300))) }) }
@@ -125,6 +129,9 @@ progressBar(type = "end")
 
 say("%s", paste(sprintf("%s %d", names(table(res$Status)), as.integer(table(res$Status))), collapse = ", "))
 if (check_only) say("Check only: %.1f GB would download", sum(res$SizeMb, na.rm = TRUE) / 1000)
+# steps left to the user (a login, a file only a browser can fetch) are listed last, where the run log ends
+todo_user <- res[Status %in% c("needs login", "manual") & grepl("^by hand:|login|token", Next)]
+for (i in seq_len(nrow(todo_user))) say("To do by you - %s: %s", todo_user$Dataset[i], sub("^by hand: *", "", todo_user$Next[i]))
 check(STAGE, "every dataset done, skipped or checked", all(res$Status %in% c("done", "skipped", "would download", "manual", "needs login", "not needed")),
       paste(res[Status == "failed", sprintf("%s: %s", DataSource, Next)], collapse = "; "))
 finish_checks()
