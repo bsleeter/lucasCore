@@ -658,6 +658,13 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
            (Rittenhouse and Sneva 1977); Invaded Sage Steppe may never return to sage (a conversion, not regrowth).
     9. **Validation throughout,** against data the calibration did not use: RaCA soil carbon, AmeriFlux grassland and sagebrush sites,
        and the US greenhouse gas inventory's grassland and cropland soil change totals.
+       - **Paused 2026-11-08 (user: "pick it up later").** Plan: no model runs needed except for the inventory totals (a CONUS run;
+         compare its per-hectare soil change after conversion from the tables instead). RaCA against the starting soil by
+         ecodivision x class (RaCA locations are blurred); AmeriFlux grassland and sagebrush towers against growth, the RAP climate
+         response and post-fire recovery, stepped in R (src/nonforest-solve.R). Nothing downloaded yet; to ask first: the RaCA SOC
+         pedons CSV (NRCS, about 0.8 MB; the full zip about 336 MB only if needed) and the EPA 1990-2022 inventory's Chapter 6 PDF and
+         LULUCF tables zip. AmeriFlux BASE files need the user's account (CC-BY-4.0): candidate sites US-Var, US-Rws, US-Rls, US-Rms,
+         US-Wkg, to confirm against the public site list.
     10. **Emergent wetlands vary across the map (planned 2026-11-07, user: at least look at these as options).** Emergent wetlands
         have no spatial or climate multiplier today; growth, burial and soil are one value per ecodivision x class. Candidates, from
         memory and not yet checked (data release, coverage, access):
