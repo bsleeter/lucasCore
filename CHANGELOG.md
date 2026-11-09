@@ -2,6 +2,13 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## 1.1.1 - 2026-11-09
+
+### Fixed
+- Every stage failed with "more columns than column names" on a machine with only a few SyncroSim packages installed. rsyncrosim
+  reads the installed-package list by turning runs of spaces into commas, so the commas in the package description added columns.
+  The description no longer has commas; tests/unit-package-description.R checks it. Libraries made with 1.1.0 open unchanged.
+
 ## 1.1.0 - 2026-11-05
 
 ### Added

@@ -3,7 +3,7 @@
     "name": "lucasCore",
     "organization": "U.S. Geological Survey",
     "description": "A SyncroSim add-on to ST-Sim that builds LUCAS land-use and carbon models from national datasets.",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "status": "Development",
     "permissions": {
       "usageType": "openSource",
