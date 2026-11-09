@@ -40,6 +40,7 @@
 		<column name="ForestOwnerFile" displayName="USFS forest ownership circa 2017, 30 m (stage 10)" dataType="String" isOptional="True"/>
 		<column name="RapNppFolder" displayName="RAP vegetation NPP v3 Folder (rap-npp-v3-year.tif; Grass and Shrub Productivity, stage 8)" dataType="String" isOptional="True"/>
 		<column name="CdlFolder" displayName="Cropland Data Layer Folder (year_30m_cdls.tif; Cropland Productivity, stage 8)" dataType="String" isOptional="True"/>
+		<column name="TidalMarshNppFolder" displayName="USGS tidal marsh NPP Folder (NPP_CONUSTidalEEM_gCm2.tif, NPP_CONUSTidalPEM_gCm2.tif; Tidal Marsh Productivity, stage 8)" dataType="String" isOptional="True"/>
 	</dataSheet>
 
 	<dataSheet name="DataSourceEdition" displayName="Data Source Editions" dataScope="Project">
@@ -142,6 +143,8 @@
 		<!-- to-do 39 step 5: a growth multiplier per grass and shrub cell from RAP NPP against its ecodivision x class target (blank = none) -->
 		<column name="GrassShrubProductivity" displayName="Grass and Shrub Productivity" dataType="Integer" validationType="List" formula1="1:None|2:RAP NPP (2014-2023)" defaultValue="1" isOptional="True"/>
 		<column name="CropProductivity" displayName="Cropland Productivity" dataType="Integer" validationType="List" formula1="1:None|2:CDL x NASS (2014-2025)" defaultValue="1" isOptional="True"/>
+		<!-- to-do 39 step 10: a growth multiplier per emergent wetland cell from the USGS tidal marsh NPP map against its ecodivision mean (blank = none) -->
+		<column name="TidalMarshProductivity" displayName="Tidal Marsh Productivity" dataType="Integer" validationType="List" formula1="1:None|2:USGS tidal marsh NPP (2015)" defaultValue="1" isOptional="True"/>
 		<!-- stage 5: how the 30 m Annual NLCD becomes the model grid (src/landcover-match.R; blank = modal, as Builds before 2026-10-26) -->
 		<column name="LandCoverResampling" displayName="Land Cover Resampling" dataType="Integer" validationType="List" formula1="1:Modal (most common 30 m class)|2:Area-matched (30 m class areas per secondary stratum unit)" defaultValue="1" isOptional="True"/>
 		<!-- spatial multiprocessing (stage 1 writes the tile mask into the Build result; runs on the Build inherit it, a projection may set its own in Run Settings) -->

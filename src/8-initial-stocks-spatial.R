@@ -209,6 +209,45 @@ if (gs_on) {
   fg <- "Net Growth Non Forest: Total"; if (!fg %in% stsim_list("FlowGroup")$Name) fail("Grass and Shrub Productivity: flow group '%s' not found", fg)
   put_multiplier("Grass and Shrub Productivity", fg, write_raster(setValues(rast(P), ifelse(land, gmult, NA)), "GrassShrubProductivity.tif", "FLT4S"))
 }
+# ---- Tidal Marsh Productivity (Build Options; to-do 39 step 10, user 2026-11-08: "recalibrate and use the map for pattern") ----
+# The emergent wetland counterpart: the USGS tidal marsh NPP map (Woltz et al. 2023, 30 m, 2015; Data Sources: TidalMarshNppFolder).
+# An estuarine emergent cell's multiplier = the mean NPP of the map's estuarine (EEM) pixels in the cell / the map's mean for its
+# ecodivision (defaults/stockflow/tidal-marsh-npp.csv, dev/nonforest/09-tidal-marsh-npp.R); palustrine emergent cells the same from the
+# palustrine (PEM) map. So the map sets the pattern within an ecodivision and the level stays the class's growth rows (which, for
+# estuarine marsh, tools/make_emergent_wetland.R already took from the map). Capped at 0.3-2.5; a cell without map pixels (inland marsh,
+# or tidal marsh the map does not hold) keeps 1, and nothing is passed to other classes. It becomes the Tidal Marsh Productivity flow
+# spatial multiplier on Net Growth Wetland: Total (every other cell 1, so forested wetlands are untouched), and the cell's starting
+# live and dead carbon are scaled by it; its soil keeps the class mean.
+tpv <- opt$TidalMarshProductivity[1]
+tm_on <- !is.null(tpv) && !is.na(tpv) && (identical(suppressWarnings(as.integer(tpv)), 2L) || startsWith(as.character(tpv), "USGS"))
+if (tm_on) {
+  CAP <- c(0.3, 2.5); TM_CLS <- c(EEM = "Wetland: Estuarine Emergent", PEM = "Wetland: Palustrine Emergent")
+  if (!"Tidal Marsh Productivity" %in% stsim_list("FlowMultiplierType")$Name) fail("Tidal Marsh Productivity: the library has no Flow Multiplier Type 'Tidal Marsh Productivity' - run tools/sync-library.R on it")
+  tdir <- read_data_sources("TidalMarshNppFolder")$TidalMarshNppFolder
+  tmt <- read_default("stockflow", "tidal-marsh-npp.csv")[, MapNPP := as.numeric(MapNPP)]
+  tmult <- rep(1, ncell(P)); thas <- rep(FALSE, ncell(P))
+  for (k in names(TM_CLS)) { isK <- land & cname == TM_CLS[[k]]; if (!any(isK)) next
+    f <- list.files(tdir, sprintf("^NPP_CONUSTidal%s_gCm2[.]tif$", k), recursive = TRUE, full.names = TRUE); f <- f[!dir.exists(f)]
+    if (length(f) != 1) fail("Tidal Marsh Productivity: TidalMarshNppFolder (%s) holds %d files NPP_CONUSTidal%s_gCm2.tif; run a Data Download with TidalMarshNppFolder", tdir, length(f), k)
+    r <- rast(f); levels(r) <- NULL; win <- project(as.polygons(ext(P) + 1000, crs = crs(P)), crs(r))
+    cr <- tryCatch(crop(r, win, snap = "out"), error = function(e) NULL)
+    if (is.null(cr)) next
+    vN <- values(project(cr / 100, P, method = "average"), mat = FALSE)   # Mg C/ha/yr
+    mn <- tmt$MapNPP[match(paste(sname, TM_CLS[[k]]), paste(tmt$StratumId, tmt$StateClassId))]
+    use <- isK & !is.na(vN) & !is.na(mn) & mn > 0
+    tmult[use] <- pmin(pmax(vN[use] / mn[use], CAP[1]), CAP[2]); thas[use] <- TRUE }
+  isTM <- land & cname %in% TM_CLS
+  check(STAGE, "tidal marsh productivity: every land cell's multiplier is finite and within 0.3-2.5", all(is.finite(tmult[land]) & tmult[land] >= CAP[1] - 1e-9 & tmult[land] <= CAP[2] + 1e-9))
+  soilj <- which(st$StockTypeId %in% c("DOM: Belowground Slow", "Deep Soil"))
+  out[isTM, -soilj] <- out[isTM, -soilj] * tmult[isTM]
+  tsum <- data.table(cls = cname[isTM], m = tmult[isTM], has = thas[isTM])[, .(Cells = .N, Mapped = round(100 * mean(has), 1), Mean = round(mean(m[has]), 2),
+            P10 = round(quantile(m[has], 0.1), 2), P90 = round(quantile(m[has], 0.9), 2)), by = cls][order(-Cells)]
+  say("Tidal marsh productivity (USGS tidal marsh NPP 2015): %d emergent wetland cells, %.1f%% with map pixels (the rest keep 1); their starting live and dead carbon scaled the same way",
+      sum(isTM), 100 * mean(thas[isTM]))
+  for (i in seq_len(nrow(tsum))) with(tsum[i], say("  %s: %d cells, %.1f%% mapped, mapped mean %.2f (10%% %.2f, 90%% %.2f)", cls, Cells, Mapped, Mean, P10, P90))
+  fg <- "Net Growth Wetland: Total"; if (!fg %in% stsim_list("FlowGroup")$Name) fail("Tidal Marsh Productivity: flow group '%s' not found", fg)
+  put_multiplier("Tidal Marsh Productivity", fg, write_raster(setValues(rast(P), ifelse(land, tmult, NA)), "TidalMarshProductivity.tif", "FLT4S"))
+}
 # ---- Cropland Productivity (Build Options; to-do 39 step 6, user 2026-11-07) -------------------------------------------------
 # The agriculture counterpart: each 30 m Cropland Data Layer pixel of CDL_YEARS takes its county's NASS growth of its crop group
 # (defaults/stockflow/ag-county-crop-npp.csv: the 1985-2023 mean, yields converted with USDA Tech. Bull. 1939 coefficients;

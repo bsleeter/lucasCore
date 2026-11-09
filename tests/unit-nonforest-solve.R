@@ -48,11 +48,13 @@ gs <- fm[StateClassId %in% EM & grepl("^Net Growth Wetland Emergent", FlowGroupI
 check("growth splits add to 1", all(abs(gs$s - 1) < 1e-5))
 sh <- fm[StateClassId %in% EM & grepl("^(Emission|Lateral Transport|Stabilization|Decay): BG Slow ->", FlowGroupId), .(s = sum(as.numeric(Value))), by = .(StratumId, StateClassId)]
 check("BG Slow's shares (emission, lateral, burial) add to 1", all(abs(sh$s - 1) < 1e-5))
-check("Net Growth = the region's NPP", all(merge(ng[StateClassId %in% EM, .(StratumId, StateClassId, v = as.numeric(Value))], fit[, .(StratumId, StateClassId, NPP = as.numeric(NPP))])[, v == NPP]))
+check("Net Growth = the fitted NPP (the region's, or the tidal marsh map's for estuarine)", all(merge(ng[StateClassId %in% EM, .(StratumId, StateClassId, v = as.numeric(Value))], fit[, .(StratumId, StateClassId, NPP = as.numeric(NPP))])[, v == NPP]))
 worst <- 0; bworst <- 0
 for (i in seq_len(nrow(fit))) {
   e <- fit$StratumId[i]; cls <- fit$StateClassId[i]; t <- reg[StateClassId == cls & Region == fit$Region[i]]
   f <- nf_flows(pa[FromStratumId == e & FromStateClassId == cls], fm[StratumId == e & StateClassId == cls, .(FlowGroupId, Value)], memb, ord)
+  t <- copy(t)[, `:=`(NPP = fit$NPP[i], PeakFoliage = fit$PeakFoliage[i])]   # estuarine NPP and peak foliage from the tidal marsh map where it holds the class
+  if (grepl("burial lowered", fit$NppSource[i])) t[, Burial := as.numeric(sub("^.* to ([0-9.]+) .*$", "\\1", fit$NppSource[i]))]   # where the map NPP cannot supply the region's burial
   ss <- nf_steady(f, as.numeric(t$NPP))
   x <- ini[StratumID == e & StateClassID == cls][, .(pool = st$StockTypeId[match(StateAttributeTypeID, st$Attribute)], v = as.numeric(Value))]
   pools <- intersect(x$pool, names(ss$stock))
@@ -128,5 +130,20 @@ check("chaparral fire rows in the presets, no pool losing more than it holds", n
       abs(df[FromStockTypeId == "Biomass: Fine Root", sum(as.numeric(Share))] - 0.25) < 1e-6)
 pr2 <- unlist(lapply(c("cbm-defaults", "fia-measured"), function(m) c(rd("carbon-assumptions", m, "nonforest-rates.csv")$StateClassId, rd("carbon-assumptions", m, "nonforest-growth.csv")$StateClassId)))
 check("the presets hold no grass or shrub rate rows", !any(pr2 %in% GS))
+
+pkg <- "."
+# tidal marsh NPP map (to-do 39 step 10): estuarine NPP from the map where it holds 10 km2 or more; Tidal Marsh Productivity in stage 8
+tmn <- rd("stockflow", "tidal-marsh-npp.csv")
+mapped <- merge(fit[StateClassId == EM[1]], tmn[as.numeric(Km2) >= 10, .(StratumId, StateClassId, MapNPP = as.numeric(MapNPP))], by = c("StratumId", "StateClassId"))
+check(sprintf("estuarine NPP and peak foliage are the tidal marsh map's in %d of the %d ecodivisions it covers (the rest with burial lowered: the map NPP cannot supply the region's); palustrine keeps its regions'", mapped[NppSource == "USGS tidal marsh map", .N], nrow(mapped)),
+      nrow(mapped) >= 5 && mapped[NppSource == "USGS tidal marsh map", .N >= 5 && all(abs(as.numeric(NPP) - round(MapNPP, 2)) < 1e-9 & abs(as.numeric(PeakFoliage) - round(MapNPP / 3, 3)) < 1e-9)] && mapped[, all(startsWith(NppSource, "USGS tidal marsh map"))] &&
+      fit[StateClassId == EM[2], all(NppSource == "region")])
+s8 <- paste(readLines(file.path(pkg, "src", "8-initial-stocks-spatial.R")), collapse = "\n"); px <- paste(readLines(file.path(pkg, "package.xml")), collapse = "\n")
+mt <- fread(file.path(pkg, "defaults", "stsim", "stsim_FlowMultiplierType.csv"), sep = ",")$Name
+check("Tidal Marsh Productivity: a Build Option, a data source, a multiplier type; stage 8 writes it on Net Growth Wetland: Total; stages 7 and 11 carry it",
+      grepl('name="TidalMarshProductivity"', px, fixed = TRUE) && grepl('name="TidalMarshNppFolder"', px, fixed = TRUE) && "Tidal Marsh Productivity" %in% mt &&
+      "TidalMarshNppFolder" %in% fread(file.path(pkg, "defaults", "library", "data-sources.csv"))$Column &&
+      grepl('put_multiplier("Tidal Marsh Productivity", fg', s8, fixed = TRUE) && grepl('fg <- "Net Growth Wetland: Total"', s8, fixed = TRUE) &&
+      all(vapply(c("7-climate-multipliers.R", "11-projection-climate.R"), function(f) grepl('"Crop Mix", "Tidal Marsh Productivity")', paste(readLines(file.path(pkg, "src", f)), collapse = "\n"), fixed = TRUE), TRUE)))
 
 cat(sprintf("\n%d of %d checks passed\n", n - fails, n)); if (fails) quit(status = 1)

@@ -76,12 +76,12 @@ expect("Cropland Productivity and Crop Harvest are flow multiplier types", all(c
 expect("stage 8 writes the Cropland Productivity and Crop Harvest multipliers; stages 7 and 11 carry them over",
        grepl("put_multiplier(\"Cropland Productivity\"", s8, fixed = TRUE) && grepl("put_multiplier(\"Crop Harvest\"", s8, fixed = TRUE) &&
          all(vapply(c("7-climate-multipliers.R", "11-projection-climate.R"),
-         function(f) grepl("\"Cropland Productivity\", \"Crop Harvest\", \"Crop Mix\")", paste(readLines(file.path(pkg, "src", f)), collapse = "\n"), fixed = TRUE), TRUE)))
+         function(f) grepl("\"Cropland Productivity\", \"Crop Harvest\", \"Crop Mix\"", paste(readLines(file.path(pkg, "src", f)), collapse = "\n"), fixed = TRUE), TRUE)))
 mxt <- rd("stockflow", "ag-cac-county-crop-mix.csv")[, c("Year", "NPP", "AG", "Harvest") := lapply(.SD, as.numeric), .SDcols = c("Year", "NPP", "AG", "Harvest")]
 expect("crop mix: California counties only, every year 1986-2020 with the CDL years 2014-2020, harvest <= AG <= NPP",
        nrow(mxt) > 1000 && all(startsWith(mxt$GEOID, "06")) && all(mxt$Year %between% c(1986, 2020)) && mxt[GEOID == "06095", all(2014:2020 %in% Year) && all(1986:2013 %in% Year)] &&
          all(mxt$Harvest <= mxt$AG + 1 & mxt$AG <= mxt$NPP + 1))
 expect("Crop Mix is a flow multiplier type; stage 8 writes it a year at a time; stages 7 and 11 carry it over",
        "Crop Mix" %in% nm("stsim_FlowMultiplierType.csv") && grepl("put_multiplier(\"Crop Mix\", rows = rows)", s8, fixed = TRUE) &&
-         all(vapply(c("7-climate-multipliers.R", "11-projection-climate.R"), function(f) grepl("\"Crop Harvest\", \"Crop Mix\")", paste(readLines(file.path(pkg, "src", f)), collapse = "\n"), fixed = TRUE), TRUE)))
+         all(vapply(c("7-climate-multipliers.R", "11-projection-climate.R"), function(f) grepl("\"Crop Harvest\", \"Crop Mix\"", paste(readLines(file.path(pkg, "src", f)), collapse = "\n"), fixed = TRUE), TRUE)))
 cat(sprintf("\n%d passed, %d failed\n", ok, bad)); if (bad) quit(status = 1)

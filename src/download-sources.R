@@ -464,6 +464,19 @@ download_handlers <- function() {
       for (i in seq_len(nrow(items))) { zip_tif(ctx, items$dest[i], file.path(ctx$place, items$out[i])); unlink(items$dest[i]); ctx$log(sprintf("  CDL %d (national)", items$year[i])) }
       ctx$place })
 
+  # ---- USGS tidal marsh NPP (Woltz et al. 2023, ScienceBase): one 163 MB zip holding a zip per map (all, estuarine, palustrine
+  # marsh); the estuarine and palustrine GeoTIFFs are unpacked and kept whole at the top of the home (they are national 30 m maps,
+  # mostly empty; stage 8 crops them) -------------------------------------------------------------------------------------------
+  H$TidalMarshNppFolder <- list(column = "TidalMarshNppFolder", name = "USGS tidal marsh NPP", national = TRUE, version = "2024 release (10.5066/P9I1PCLS), 2015 map",
+    note = "Total NPP (gC/m2/yr) of estuarine and palustrine emergent tidal marsh, 30 m CONUS, for Build Options: Tidal Marsh Productivity (stage 8)",
+    plan = function(ctx) data.table::data.table(url = "https://www.sciencebase.gov/catalog/file/get/6419e82ed34eb496d1d29caf?name=NPP_CONUSTidalMarshes.zip",
+                                                file = "NPP_CONUSTidalMarshes.zip", fetch = TRUE),
+    have = function(ctx, items) recorded(ctx, "TidalMarshNppFolder", file.path(ctx$place, sprintf("NPP_CONUSTidal%s_gCm2.tif", c("EEM", "PEM")))),
+    finish = function(ctx, items) { dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE); ex <- file.path(ctx$dl, "tidal")
+      for (k in c("EEM", "PEM")) { inner <- unzip_to(items$dest[1], ex, sprintf("NPP_CONUSTidal%s_gCm2.tif.zip", k))
+        zip_tif(ctx, inner, file.path(ctx$place, sprintf("NPP_CONUSTidal%s_gCm2.tif", k))); unlink(inner) }
+      unlink(ex, recursive = TRUE); unlink(items$dest[1]); ctx$place })
+
   # ---- gNATSGO (Planetary Computer): soil organic carbon and crop productivity, the region's 10 m tiles cropped; for all of
   # CONUS every tile (357, about 10 GB a layer) fetched and written as one 10 m GeoTIFF ---------------------------------------
   gnatsgo <- function(column, name, asset, out, note) list(column = column, name = name, version = "gNATSGO July 2020 (gnatsgo-rasters)", method = "stac", note = note,
