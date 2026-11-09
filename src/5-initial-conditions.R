@@ -252,16 +252,25 @@ A <- fill_modal(mask(A, m), m, round(global(A, "mean", na.rm = TRUE)[[1]]))
 A <- mask(ifel(forest, max(A, 1), 0), m)
 # chaparral (to-do 39, 2026-11-06: it grows by age since fire): the years since the last interagency fire perimeter of 1900 to the start
 # year over the cell's centre; never burned since 1900: the start year - 1900 (user decision; on the age curve's plateau)
-chap_id <- as.integer(scl$Id[scl$Name == "Shrubland: Chaparral"])
-isC <- if (length(chap_id)) values(S, mat = FALSE) %in% chap_id else rep(FALSE, ncell(S))
+# The sage family the same way (to-do 39 step 8, 2026-11-08: its shrubs regrow over decades after fire; defaults/stockflow/
+# shrub-age.csv), except that a cell never burned since 1900 takes its class's mature age (AgeMax), since sagebrush is still
+# recovering at the start year - 1900
+shrub_age <- read_default("stockflow", "shrub-age.csv")[StateClassId %in% scl$Name]
+AGE_CLS <- c("Shrubland: Chaparral", shrub_age$StateClassId)
+age_id <- as.integer(scl$Id[match(intersect(AGE_CLS, scl$Name), scl$Name)])
+vS0 <- values(S, mat = FALSE); isC <- vS0 %in% age_id
 if (any(isC, na.rm = TRUE)) {
   fpf <- read_data_sources("FirePerimeterHistoryFile", optional = TRUE)$FirePerimeterHistoryFile
   last <- rep(NA_real_, ncell(R))
   if (!is.na(fpf)) { fp <- read_fire_perimeters(fpf, 1900, y0); fp <- sf::st_make_valid(sf::st_transform(fp, crs(R)))
     if (nrow(fp)) last <- values(rasterize(vect(fp), R, field = "yr", fun = "max"), mat = FALSE) }
-  ca <- ifelse(is.na(last), y0 - 1900, y0 - last); va <- values(A, mat = FALSE); va[which(isC)] <- ca[which(isC)]; A <- setValues(A, va)
-  say("Chaparral age: %d cells; %.0f%% burned since 1900 (median %d years since fire), the rest %d years old%s", sum(isC, na.rm = TRUE),
-      100 * mean(!is.na(last[which(isC)])), as.integer(stats::median(ca[which(isC) & !is.na(last)])), y0 - 1900, if (is.na(fpf)) " (no fire perimeter file)" else "")
+  cn <- scl$Name[match(vS0, as.integer(scl$Id))]
+  mature <- ifelse(cn %in% shrub_age$StateClassId, pmax(y0 - 1900, as.integer(shrub_age$AgeMax[match(cn, shrub_age$StateClassId)])), y0 - 1900)
+  ca <- ifelse(is.na(last), mature, y0 - last); va <- values(A, mat = FALSE); va[which(isC)] <- ca[which(isC)]; A <- setValues(A, va)
+  for (k in intersect(AGE_CLS, unique(cn[which(isC)]))) { i <- which(isC & cn == k)
+    say("%s age: %d cells; %.0f%% burned since 1900 (median %s years since fire), the rest %d years old%s", sub("^Shrubland: ", "", k), length(i),
+        100 * mean(!is.na(last[i])), if (any(!is.na(last[i]))) as.integer(stats::median(ca[i][!is.na(last[i])])) else "-", as.integer(mature[i[1]]),
+        if (is.na(fpf)) " (no fire perimeter file)" else "") }
 }
 progressBar()
 
@@ -285,9 +294,9 @@ miss <- raster_ids_in_list(S, "StateClass")
 check(STAGE, "state class values are stsim State Class Ids", !length(miss), if (length(miss)) paste("not in the list:", paste(miss, collapse = ", ")) else "")
 lu <- !is.na(v0) & v0 %in% c(11, 12, 21:24, 81, 82)
 check(STAGE, "start-year developed, agriculture, water and ice keep their class", all(vS[lu] == v0[lu]), sprintf("%d cells", sum(lu)))
-vC <- vS %in% chap_id
-check(STAGE, "forest cells have an age of at least 1, chaparral its years since fire and other cells 0",
-      all(vA[which(vF == 1)] >= 1) && all(vA[which(vF == 0 & !vC)] == 0) && all(vA[which(vC)] >= 0 & vA[which(vC)] <= y0 - 1900))
+vC <- vS %in% age_id
+check(STAGE, "forest cells have an age of at least 1, chaparral and the sage family their years since fire and other cells 0",
+      all(vA[which(vF == 1)] >= 1) && all(vA[which(vF == 0 & !vC)] == 0) && all(vA[which(vC)] >= 0 & vA[which(vC)] <= max(y0 - 1900, as.integer(shrub_age$AgeMax))))
 check(STAGE, "every forest ecodivision x class has a return interval", nrow(ri) == nrow(fc), sprintf("%d of %d", nrow(ri), nrow(fc)))
 say("Forest cells: %d (%.1f%% of land); natural cells made forest by the any-year rule: %d; developed/ag/water/ice kept: %d",
     sum(vF == 1, na.rm = TRUE), 100 * mean(vF[!is.na(vP)] == 1), sum(!is.na(v0) & !(v0 %in% 41:43) & vS >= 100 & !lu, na.rm = TRUE), sum(lu))

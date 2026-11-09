@@ -187,6 +187,45 @@ chap_age <- function(e, scale, m, deep) {
   S0 <- nf_steady(nf_flows(p, rates_at(AGE_MAX), memb, ord), mt$npp)$stock; S0[["Deep Soil"]] <- deep
   list(growth = gr, pools = nf_after_fire(p, memb, ord, rates_at, growth_at, S0, FIRE$fire, AGE_MAX), npp = mt$npp) }
 
+# ---- the sage family by age (defaults/stockflow/shrub-age.csv; to-do 39 step 8, 2026-11-08) ------------------------------------
+# Big sagebrush is killed by fire and comes back from seed over decades; the grasses and forbs between the shrubs regrow in a year or two
+# and take the space the shrubs leave (dev/nonforest/08-shrub-fire-recovery.R: RAP NPP in MTBS perimeters against unburned cells of the
+# same class and window, 1988-2022 fires). So by years since a high-severity fire a, for each class in shrub-age.csv:
+#   Net Growth(a)  = the class's mature Net Growth x G(a): Growth0 in the fire year, Growth1 the year after, 1 from then on (RAP: total
+#                    NPP 0.8-0.9 of the unburned neighbours in the first two years, about 1 or more after)
+#   woody shares   wood and coarse roots (the shrubs' own pools) = the mature shares x W(a), W(a) = 1 - exp(-WoodyK x max(0, a + 1 - WoodyLag))
+#   other shares   foliage and fine roots take the rest, in the mature foliage : fine root ratio (the herbaceous layer filling in)
+# from AgeMax on the mature values. Turnover and decay stay the class's. Starting pools by age: the mature steady state after the
+# class's high-severity fire (defaults/stockflow/nonforest-fire.csv, which tools/make_nonforest_fire.R writes as the fire rows), grown on
+# in ST-Sim's flow order (nf_after_fire), as chaparral's.
+sa <- rd("stockflow", "shrub-age.csv"); for (k in c("AgeMax", "WoodyK", "WoodyP", "Growth0", "Growth1")) set(sa, j = k, value = as.numeric(sa[[k]]))
+# ages written: each year to 39, then 5-year bins (each holds its first age's values) to AgeMax, which holds the mature values
+age_starts <- function(amax) sort(unique(c(0:min(39, amax), if (amax >= 40) seq(40, amax, by = 5), amax)))
+SAGE_AGE <- sa$StateClassId
+nff <- rd("stockflow", "nonforest-fire.csv")
+fire_of <- function(cls) { r <- nff[StateClassId == cls & Severity == "High"]; if (!nrow(r)) stop("nonforest-fire.csv: no high-severity row for ", cls)
+  v <- function(k) as.numeric(r[[k]])
+  data.table(From = c(FOL, WOOD, AGVF, AGF, AGM, AGS, SB, SS, FOL, WOOD, FR, CR), To = c(rep("Atmosphere", 8), AGVF, SB, BGVF, BGF),
+             Share = c(v("Foliage"), v("Wood"), v("Litter"), v("Litter"), v("AgMedium"), v("AgSlow"), v("Snag"), v("Snag"), v("FoliageKilled"), v("WoodKilled"), v("RootKilled"), v("RootKilled")))[Share > 0] }
+sage_age <- function(e, cls, m, npp, deep) {
+  a_ <- sa[StateClassId == cls]; amax <- as.integer(a_$AgeMax); p <- path_of(e, cls)
+  sh <- vapply(names(POOL_OF), function(k) m[FlowGroupId == NG[[k]], Value], 1)
+  W <- function(a) (1 - exp(-a_$WoodyK * (a + 1)))^a_$WoodyP
+  G <- function(a) if (a == 0) a_$Growth0 else if (a == 1) a_$Growth1 else 1
+  A <- age_starts(amax); bin <- function(a) A[findInterval(min(a, amax), A)]
+  gr <- rbindlist(lapply(A, function(a) { w <- if (a >= amax) 1 else W(a); x <- sh; x[c("Wood", "Coarse")] <- sh[c("Wood", "Coarse")] * w
+    rest <- 1 - sum(x[c("Wood", "Coarse")]); x[c("Foliage", "Fine")] <- rest * sh[c("Foliage", "Fine")] / sum(sh[c("Foliage", "Fine")])
+    data.table(Age = a, Growth = npp * (if (a >= amax) 1 else G(a)), Foliage = x[["Foliage"]], Wood = x[["Wood"]], Fine = x[["Fine"]], Coarse = x[["Coarse"]]) }))
+  rates_at <- function(a) { r <- gr[Age == bin(a)]; x <- copy(m); for (k in names(POOL_OF)) x[FlowGroupId == NG[[k]], Value := r[[k]]]; x }
+  growth_at <- function(a) gr[Age == bin(a), Growth]
+  S0 <- nf_steady(nf_flows(p, m, memb, ord), npp)$stock; S0[["Deep Soil"]] <- deep
+  gr[, AgeTo := c(A[-1] - 1L, NA)]
+  pl <- nf_after_fire(p, memb, ord, rates_at, growth_at, S0, fire_of(cls), amax)
+  # AgeMax and older is the mature stand (a cell unburned since 1900, stage 5): the steady state itself, not the regrowth at AgeMax
+  # (96-98% of it for the sage classes, the slowest pools still filling)
+  pl[Age == amax & pool %in% names(S0), Value := S0[pool]]
+  list(growth = gr, pools = pl) }
+
 # ---- class rates, then each ecodivision x class ------------------------------------------------------------------------------
 refs <- list(); chap_ref <- NULL
 own_rates <- lit[is.na(RatesOf), StateClassId]
@@ -198,7 +237,7 @@ for (cls in intersect(GS, own_rates)) for (mo in unique(tg$Moisture)) {
 # uses Sage's turnover, so its biomass and litter follow its NPP; its AgLitter row is then not used); only its soil decay is its own
 src_of <- function(cls) { r <- lit[StateClassId == cls, RatesOf]; if (is.na(r)) cls else src_of(r) }
 for (cls in setdiff(GS, own_rates)) for (mo in unique(tg$Moisture)) refs[[paste(cls, mo)]] <- refs[[paste(src_of(cls), mo)]]
-fits <- list(); newm <- list(); pools <- list(); chap_g <- list(); chap_p <- list()
+fits <- list(); newm <- list(); pools <- list(); chap_g <- list(); chap_p <- list(); sage_g <- list(); sage_p <- list()
 for (i in seq_len(nrow(tg))) {
   e <- tg$StratumId[i]; cls <- tg$StateClassId[i]; p <- path_of(e, cls); m0 <- refs[[paste(cls, tg$Moisture[i])]]
   scale <- tg$NPP[i] / refnpp[[cls]]; npp <- if (cls == CHAP) chap_ref$npp * scale else tg$NPP[i]
@@ -206,6 +245,8 @@ for (i in seq_len(nrow(tg))) {
   ss <- nf_steady(nf_flows(p, m1, memb, ord), npp)
   newm[[i]] <- copy(m1)[, `:=`(StratumId = e, StateClassId = cls)]
   if (cls == CHAP) { ca <- chap_age(e, scale, m1, tg$Deep[i]); chap_g[[e]] <- ca$growth[, StratumId := e]; chap_p[[e]] <- ca$pools[, StratumID := e] }
+  else if (cls %in% SAGE_AGE) { sg <- sage_age(e, cls, m1, npp, tg$Deep[i]); sage_g[[i]] <- sg$growth[, `:=`(StratumId = e, StateClassId = cls)]
+    sage_p[[i]] <- sg$pools[, `:=`(StratumID = e, StateClassID = cls)] }
   else pools[[i]] <- data.table(StratumID = e, StateClassID = cls, pool = c(names(ss$stock), "Deep Soil"), Value = c(ss$stock, tg$Deep[i]))
   st0 <- ss$stock; lv <- st0[grep("^Biomass", names(st0))]
   fits[[i]] <- data.table(StratumId = e, StateClassId = cls, Moisture = tg$Moisture[i], RapNPP = round(tg$NPP[i], 4), ModelNPP = round(npp, 4),
@@ -215,20 +256,26 @@ for (i in seq_len(nrow(tg))) {
                           AgVeryFastDecay = signif(loss_of(p, m1, AGVF), 4), AgSlowEmission = signif(m1[FlowGroupId == TY("Emission: AG Slow -> Atmosphere"), Value], 4),
                           SoilEmission = signif(loss_of(p, m1, BGS), 4)) }
 fits <- rbindlist(fits); newm <- rbindlist(newm); pools <- rbindlist(pools); chap_g <- rbindlist(chap_g); chap_p <- rbindlist(chap_p)
+sage_g <- rbindlist(sage_g); sage_p <- rbindlist(sage_p)
 
 # ---- write -------------------------------------------------------------------------------------------------------------------
 fm2 <- copy(lm)[, AgeMin := as.character(AgeMin)][, AgeMax := as.character(AgeMax)]
 fm2[newm[, .(StratumId, StateClassId, FlowGroupId, v = as.character(Value))], on = .(StratumId, StateClassId, FlowGroupId), Value := i.v]
 cg <- rbindlist(lapply(names(NG), function(k) chap_g[, .(StratumId, Age, FlowGroupId = NG[[k]], Value = if (k == "Merch") 0 else get(k))]))
 cg[, `:=`(StateClassId = CHAP, AgeMin = as.character(Age), AgeMax = as.character(ifelse(Age == AGE_MAX, NA, Age)), Value = as.character(signif(Value, 8)))][, Age := NULL]
-fm2 <- rbind(fm2[!(StateClassId == CHAP & FlowGroupId %in% GROWTH_GROUPS)], cg, fill = TRUE)
+amax_of <- setNames(as.integer(sa$AgeMax), sa$StateClassId)
+sg <- rbindlist(lapply(names(NG), function(k) sage_g[, .(StratumId, StateClassId, Age, AgeTo, FlowGroupId = NG[[k]], Value = if (k == "Merch") 0 else get(k))]))
+sg[, `:=`(AgeMin = as.character(Age), AgeMax = as.character(AgeTo), Value = as.character(signif(Value, 8)))][, c("Age", "AgeTo") := NULL]
+fm2 <- rbind(fm2[!(StateClassId %in% c(CHAP, SAGE_AGE) & FlowGroupId %in% GROWTH_GROUPS)], cg, sg, fill = TRUE)
 setorder(fm2, StratumId, StateClassId, FlowGroupId, na.last = FALSE)
 wr(fm2, "stockflow", "nonforest-multipliers-grassland-shrubland.csv")
 ng[fits, on = .(StratumId, StateClassId), Value := as.character(i.ModelNPP)]
 tmpl <- ng[StateClassId == CHAP][1]
 chg <- chap_g[, .(StratumId, AgeMin = as.character(Age), AgeMax = as.character(ifelse(Age == AGE_MAX, NA, Age)), Value = as.character(round(Growth, 5)))]
 chg <- cbind(tmpl[rep(1, nrow(chg)), setdiff(names(ng), c("StratumId", "AgeMin", "AgeMax", "Value")), with = FALSE], chg)[, StateClassId := CHAP]
-ng <- rbind(ng[StateClassId != CHAP], chg, fill = TRUE)[, names(ng), with = FALSE]
+sgg <- sage_g[, .(StratumId, StateClassId, AgeMin = as.character(Age), AgeMax = as.character(AgeTo), Value = as.character(round(Growth, 5)))]
+sgg <- cbind(tmpl[rep(1, nrow(sgg)), setdiff(names(ng), c("StratumId", "StateClassId", "AgeMin", "AgeMax", "Value")), with = FALSE], sgg)
+ng <- rbind(ng[!StateClassId %in% c(CHAP, SAGE_AGE)], chg, sgg, fill = TRUE)[, names(ng), with = FALSE]
 wr(ng, "stockflow", "nonforest-net-growth.csv")
 attr_of <- setNames(st$Attribute, st$StockTypeId)
 pools[, StateAttributeTypeID := attr_of[pool]]
@@ -238,6 +285,13 @@ wr(out[order(StratumID, StateClassID, StateAttributeTypeID)], "initialstocks", "
 chap_p <- chap_p[pool %in% names(attr_of)][, `:=`(StateClassID = CHAP, StateAttributeTypeID = attr_of[pool])]
 wr(chap_p[, .(StratumID, StateClassID, StateAttributeTypeID, AgeMin = as.character(Age), AgeMax = as.character(ifelse(Age == AGE_MAX, NA, Age)), Value = as.character(round(pmax(Value, 0), 4)))][
   order(StratumID, StateAttributeTypeID, as.integer(AgeMin))], "initialstocks", "chaparral.csv")
+sage_p <- sage_p[pool %in% names(attr_of)][, StateAttributeTypeID := attr_of[pool]]
+# pools at the ages the growth rows start (each year to 39, then 5-year bins): stage 8 gives a cell the pools of its bin
+sage_p <- merge(sage_p, unique(sage_g[, .(StratumID = StratumId, StateClassID = StateClassId, Age, AgeTo)]), by = c("StratumID", "StateClassID", "Age"))
+wr(sage_p[, .(StratumID, StateClassID, StateAttributeTypeID, AgeMin = as.character(Age), AgeMax = as.character(AgeTo), Value = as.character(round(pmax(Value, 0), 4)))][
+  order(StratumID, StateClassID, StateAttributeTypeID, as.integer(AgeMin))], "initialstocks", "shrub-age.csv")
+wr(sage_g[, .(StratumId, StateClassId, Age, Growth = round(Growth, 5), FoliageShare = round(Foliage, 5), WoodShare = round(Wood, 5), FineRootShare = round(Fine, 5), CoarseRootShare = round(Coarse, 5))],
+   "stockflow", "shrub-growth-by-age.csv")
 # chaparral's fire rows (and every other grass, shrub and emergent wetland class's) are written by tools/make_nonforest_fire.R from
 # defaults/stockflow/nonforest-fire.csv and chaparral-age.csv; FIRE above is the same high-severity fire, for the starting pools
 wr(tg[, .(StratumId, StateClassId, Source, Moisture, Windows, Cells, TreedCellsLeftOut = Treed, EcodivisionTreedShare = TreedShare, NPP = round(NPP, 4), NppTree = round(NppTree, 4),

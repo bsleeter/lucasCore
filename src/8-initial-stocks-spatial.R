@@ -143,7 +143,11 @@ fill_class <- function(tab, cells, by_age = FALSE, label) {
   if (!any(cells)) return(invisible())
   by_eco <- "StratumId" %in% names(tab)
   w <- dcast(tab, as.formula(paste(paste(c(if (by_eco) "StratumId", "StateClassId", if (by_age) "AgeMin"), collapse = " + "), "~ StateAttributeTypeId")), value.var = "Value", fun.aggregate = sum)
-  k <- paste(if (by_eco) sname[cells] else "", cname[cells], if (by_age) pmin(pmax(round(vA[cells]), 0), max(w$AgeMin)) else "")
+  # by age: the row whose age is the largest at or below the cell's (tables in age bins, e.g. the sage family's 5-year bins past 39)
+  ab <- if (by_age) { cc <- cname[cells]; ag <- pmax(round(vA[cells]), 0); out_a <- ag
+    for (cl in unique(cc)) { A <- sort(unique(w[StateClassId == cl, AgeMin])); i <- which(cc == cl); if (length(A)) out_a[i] <- A[pmax(findInterval(ag[i], A), 1)] }
+    out_a } else ""
+  k <- paste(if (by_eco) sname[cells] else "", cname[cells], ab)
   mm <- match(k, paste(if (by_eco) w$StratumId else "", w$StateClassId, if (by_age) w$AgeMin else ""))
   check(STAGE, sprintf("every %s cell finds its class in the table", label), !anyNA(mm), sprintf("%d unmatched (%s)", sum(is.na(mm)), paste(head(unique(k[is.na(mm)]), 3), collapse = "; ")))
   for (j in seq_len(nrow(st))) if (st$Attribute[j] %in% names(w)) out[which(cells)[!is.na(mm)], j] <<- w[[st$Attribute[j]]][mm[!is.na(mm)]]
@@ -155,6 +159,8 @@ fill_class(lt("wetland-forested-harvest.csv"), isWF & !postfire, TRUE, "forested
 gs <- lt("grassland-shrubland.csv"); fill_class(gs, land & cname %in% unique(gs$StateClassId), FALSE, "grassland/shrubland")
 # chaparral by ecodivision and age (years since fire, from stage 5; to-do 39): the pools after a high-severity fire grown on that long
 cp <- lt("chaparral.csv"); fill_class(cp, land & cname %in% unique(cp$StateClassId), TRUE, "chaparral (by age since fire)")
+# the sage family by ecodivision and age since fire (to-do 39 step 8; tools/make_grass_shrub.R, defaults/stockflow/shrub-age.csv)
+sp <- lt("shrub-age.csv"); fill_class(sp, land & cname %in% unique(sp$StateClassId), TRUE, "sage family (by age since fire)")
 ew <- lt("emergent-wetland.csv"); fill_class(ew, land & cname %in% unique(ew$StateClassId), FALSE, "emergent wetland")
 # cropland and pasture by ecodivision (to-do 39 step 6): the steady state of stage 3's rates (tools/make_agriculture.R); soil the class
 # mean under the class (gNATSGO), as grass and shrub

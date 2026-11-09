@@ -76,18 +76,19 @@ check("Deep Soil is in stage 8's stock list with no forest curve column", { s <-
 # ---- grassland and shrubland by ecodivision, literature rates (tools/make_grass_shrub.R; to-do 39, 2026-11-06) --------------------
 gm <- rd("stockflow", "nonforest-multipliers-grassland-shrubland.csv"); gi <- rd("initialstocks", "grassland-shrubland.csv"); gt <- rd("stockflow", "grass-shrub-targets.csv")
 gf <- rd("stockflow", "grass-shrub-fit.csv"); lit <- rd("stockflow", "grass-shrub-literature.csv"); GS <- sort(unique(gm$StateClassId)); CHAP <- "Shrubland: Chaparral"
+sa <- rd("stockflow", "shrub-age.csv"); SAGE <- sa$StateClassId; BYAGE <- c(CHAP, SAGE)
 check("a grass and shrub target and fit for every ecodivision x class", nrow(gt) == uniqueN(gm$StratumId) * length(GS) && nrow(gf) == nrow(gt))
 sh <- function(cls) { r <- lit[StateClassId == cls]; while (!is.na(r$RatesOf)) r <- lit[StateClassId == r$RatesOf]; as.numeric(c(r$ShareFoliage, r$ShareWood, r$ShareFineRoot, r$ShareCoarseRoot)) }
 NGG <- paste("Net Growth Non Forest: Atmosphere ->", c("Foliage", "Other Wood", "Fine Roots", "Coarse Roots"), "[Type]")
-ok_sh <- all(vapply(setdiff(GS, CHAP), function(cls) { x <- gm[StateClassId == cls & is.na(AgeMin) & FlowGroupId %in% NGG]; all(abs(as.numeric(x$Value[match(NGG, x$FlowGroupId)]) - sh(cls)) < 1e-6) }, TRUE))
+ok_sh <- all(vapply(setdiff(GS, BYAGE), function(cls) { x <- gm[StateClassId == cls & is.na(AgeMin) & FlowGroupId %in% NGG]; all(abs(as.numeric(x$Value[match(NGG, x$FlowGroupId)]) - sh(cls)) < 1e-6) }, TRUE))
 check("each class's growth split is the literature table's (no IBIS share)", ok_sh)
-ngg <- ng[StateClassId %in% setdiff(GS, CHAP)]
+ngg <- ng[StateClassId %in% setdiff(GS, BYAGE)]
 check("grass and shrub Net Growth = RAP NPP (chaparral: by age)", all(merge(ngg[, .(StratumId, StateClassId, v = as.numeric(Value))], gt[, .(StratumId, StateClassId, t = as.numeric(NPP))])[, abs(v - t) < 1e-9]) &&
       ng[StateClassId == CHAP, uniqueN(AgeMin)] == 101)
 sp <- gm[grepl("^Net Growth Non Forest", FlowGroupId), .(s = sum(as.numeric(Value))), by = .(StratumId, StateClassId, AgeMin)]
 check("growth splits add to 1 at every age", all(abs(sp$s - 1) < 1e-5))
 gw <- 0
-for (i in which(gt$StateClassId != CHAP)) { e <- gt$StratumId[i]; cls <- gt$StateClassId[i]
+for (i in which(!gt$StateClassId %in% BYAGE)) { e <- gt$StratumId[i]; cls <- gt$StateClassId[i]
   ss <- nf_steady(nf_flows(pa[FromStratumId == e & FromStateClassId == cls], gm[StratumId == e & StateClassId == cls, .(FlowGroupId, Value)], memb, ord), as.numeric(gt$NPP[i]))
   x <- gi[StratumID == e & StateClassID == cls][, .(pool = st$StockTypeId[match(StateAttributeTypeID, st$Attribute)], v = as.numeric(Value))]
   pl <- intersect(x$pool, names(ss$stock)); gw <- max(gw, max(abs(ss$stock[pl] - x[match(pl, pool), v]))) }
@@ -104,6 +105,24 @@ cw <- max(vapply(c(0, 1, 5, 20, 60, 98), function(a) { y <- step(a); z <- pool_a
 check(sprintf("chaparral: a year at age A takes the age-A pools to the age-(A+1) pools (largest gap %.1e Mg C/ha)", cw), cw < 1e-3)
 ag <- vapply(c(0, 10, 30, 100), function(a) { s <- pool_at(a); sum(s[c("Biomass: Foliage", "Biomass: Other Wood")]) }, 1)
 check(sprintf("chaparral aboveground live rises with age to the curve's maximum (%s Mg C/ha at 0, 10, 30, 100)", paste(round(ag, 2), collapse = ", ")), all(diff(ag) > 0) && ag[1] < 0.5)
+# the sage family by age (to-do 39 step 8): growth rows each year to 39 and in 5-year bins after; pools at each bin start
+si <- rd("initialstocks", "shrub-age.csv")
+sage_ok <- vapply(SAGE, function(cls) { e <- "Temperate Desert"; p <- pa[FromStratumId == e & FromStateClassId == cls]; amax <- as.integer(sa[StateClassId == cls, AgeMax])
+  m <- gm[StratumId == e & StateClassId == cls]; A <- sort(unique(as.integer(m$AgeMin)))
+  rates_at <- function(a) { b <- A[findInterval(min(a, amax), A)]; m[is.na(AgeMin) | as.integer(AgeMin) == b][!(is.na(AgeMin) & FlowGroupId %in% m[!is.na(AgeMin), FlowGroupId]), .(FlowGroupId, Value)] }
+  g <- ng[StratumId == e & StateClassId == cls]; growth_at <- function(a) as.numeric(g[as.integer(AgeMin) == A[findInterval(min(a, amax), A)], Value])
+  pool_at <- function(a) { x <- si[StratumID == e & StateClassID == cls & as.integer(AgeMin) == a]; setNames(as.numeric(x$Value), st$StockTypeId[match(x$StateAttributeTypeID, st$Attribute)]) }
+  step <- function(S, a) { mp <- nf_annual_map(nf_flows(p, rates_at(a), memb, ord), growth_at(a)); x <- setNames(rep(0, length(mp$pools)), mp$pools)
+    x[intersect(names(S), mp$pools)] <- S[intersect(names(S), mp$pools)]; y <- (mp$M %*% x + mp$c)[, 1]; S[names(y)] <- y; S }
+  gap <- 0; for (b in intersect(c(0, 5, 20, 38, 40, 60), A[A < amax])) { nb <- A[match(b, A) + 1]; S <- pool_at(b); for (a in b:(nb - 1)) S <- step(S, a)
+    z <- pool_at(nb); k <- intersect(names(z), names(S)); gap <- max(gap, max(abs(S[k] - z[k]))) }
+  wood <- vapply(c(0, 10, 30, amax), function(a) pool_at(A[findInterval(a, A)])[["Biomass: Other Wood"]], 1)[!duplicated(pmin(c(0, 10, 30, amax), amax))]
+  mat <- m[as.integer(AgeMin) == amax & FlowGroupId %in% NGG]; mt <- gt[StratumId == e & StateClassId == cls, as.numeric(NPP)]
+  c(gap = gap, rising = all(diff(wood) > 0), mature = all(abs(as.numeric(mat$Value[match(NGG, mat$FlowGroupId)]) - sh(cls)) < 1e-6) && abs(growth_at(amax) - mt) < 1e-4,
+    later = abs(growth_at(5) - mt) < 1e-4) }, c(gap = 0, rising = 0, mature = 0, later = 0))
+check(sprintf("sage family: the age-bin pools step to the next bin's (largest gap %.1e Mg C/ha)", max(sage_ok["gap", ])), max(sage_ok["gap", ]) < 1e-3)
+check("sage family: wood rises with years since fire (surviving coarse roots die back first); at AgeMax the literature split and RAP NPP; from age 2 the mature NPP",
+      all(sage_ok[c("rising", "mature", "later"), ] == 1))
 df <- rd("carbon-assumptions", "fia-measured", "disturbance-flows.csv")[StateClassId == CHAP]
 check("chaparral fire rows in the presets, no pool losing more than it holds", nrow(df) > 0 && df[, .(s = sum(as.numeric(Share))), by = FromStockTypeId][, all(s <= 1 + 1e-9)] &&
       abs(df[FromStockTypeId == "Biomass: Fine Root", sum(as.numeric(Share))] - 0.25) < 1e-6)
