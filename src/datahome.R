@@ -55,7 +55,8 @@ read_manifest <- function(home) .home_table(home, "manifest.csv", MANIFEST_COLS)
 # files a Build writes beside a dataset (FIA's derived tables, rebuilt when the CSVs change) are not part of it: never recorded,
 # and rows an earlier version recorded are dropped on reading, so a rebuilt cache does not make the dataset look out of date
 # (2026-11-09: E:/lucasData's FIA DataMart counted as changed after a Build rewrote fia-conditions.rds, and 3.2 GB was fetched again)
-BUILD_CACHES <- "(^|/)fia-(sites|conditions|deadwood)[.]rds$"
+# A GIS tool's overview pyramid beside a raster (.ovr) is the same: no source ships one (2026-11-09: a 2023_30m_cdls.tif.ovr in the CDL)
+BUILD_CACHES <- "(^|/)fia-(sites|conditions|deadwood)[.]rds$|[.]ovr$"
 not_cache <- function(x) if (nrow(x)) x[!grepl(BUILD_CACHES, Path)] else x
 read_files <- function(home) not_cache(.home_table(home, "files.csv", FILES_COLS))
 
