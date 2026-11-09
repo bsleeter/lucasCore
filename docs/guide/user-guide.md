@@ -1,6 +1,6 @@
 # lucasCore User Guide
 
-*A snapshot of the lucasCore User Guide, exported 2026-11-06. Also as a [web page](index.html), beside the [package](../blueprint/index.html) and [data](../blueprint/data.html) blueprints.*
+*A snapshot of the lucasCore User Guide, exported 2026-11-09. Also as a [web page](index.html), beside the [package](../blueprint/index.html) and [data](../blueprint/data.html) blueprints.*
 
 How to build and run a LUCAS land-use and carbon model with the lucasCore SyncroSim package, walked through on the Northern Sierra Nevada pyrome (P26) at 150 m.
 
@@ -18,7 +18,7 @@ It is for modelers who know SyncroSim's basics (libraries, projects, scenarios, 
 - **Names.** Scenarios are named `<area> - <step>`, for example `P26 Northern Sierra Nevada - Build`, `P26 Northern Sierra Nevada - Historical 1985-2023`, `P26 Northern Sierra Nevada - Projection Setup`. SyncroSim names results after their parent with a run time stamp.
 - **Result IDs.** Dependencies point at results, not at the scenarios that made them. Write down each result's ID as you go; later steps ask for them.
 - **Preparation and runs.** lucasCore scenarios come in two kinds. Preparation scenarios run lucasCore stages and write the inputs a model needs (the Build, the Projection Setup). Runs are ST-Sim alone, with dependencies that supply every input (the historical run, each projection). Real runs are always stand-alone in this way.
-- **Package version.** Written for lucasCore 1.0.0 on SyncroSim 3.1 with ST-Sim 4.5.
+- **Package version.** Written for lucasCore 1.1 on SyncroSim 3.1.29 with ST-Sim 4.5.4. lucasCore needs SyncroSim 3.1.29 or later, the version it is tested on.
 
 **The workflow in one line.** Data Download (stage 15, once per region) → Build (stages 1-8) → Historical run (ST-Sim) → Projection Setup (stages 9-10, with the hand-over from the historical run) → Projections (ST-Sim, as many as needed).
 
@@ -29,7 +29,7 @@ A lucasCore model lives in a SyncroSim library (`.ssim` file) that uses two pack
 **Before you start**
 
 - SyncroSim Studio 3.1 or later, installed in `C:\Program Files\SyncroSim`, with the ST-Sim package (4.5.4 or later).
-- R 4.6 with the packages rsyncrosim, terra, sf, data.table, mgcv and jsonlite. SyncroSim runs every lucasCore stage in R; lucasCore needs no conda environment.
+- R 4.6 with the packages rsyncrosim (tested with 2.1.13), terra, sf, data.table, mgcv and jsonlite. SyncroSim runs every lucasCore stage in R; lucasCore needs no conda environment.
 - The national data on a local drive (section 1.5 lists each source).
 - The lucasCore package file, lucasCore-1.0.0.ssimpkg, (section 1.1).
 

@@ -16,6 +16,8 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
 ### Changed
 - Stage 11 runs when every climate effect is None, for CO2 alone, and copies the Build's flow multipliers into its result when it
   writes CO2 rows.
+- Minimum SyncroSim version raised from 3.1.9 to 3.1.29, the version lucasCore is tested on (3.1.9 was never tested). The README
+  names the rsyncrosim version tested with (2.1.13).
 
 ## 1.1.0 - 2026-11-05
 

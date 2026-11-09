@@ -44,3 +44,7 @@ dev/stsim/*.ssim*
 dev/nonforest/04-rap-climate-sample*.csv
 dev/agriculture/02-nass-county-npp.csv
 dev/agriculture/02-nass-county-crop-npp.csv
+
+# SyncroSim package metadata: the release build (tools/build_ssimpkg.ps1) writes its own into the .ssimpkg; this copy is for the
+# folder-registered development package on this machine (without it SyncroSim warns the package was "built for an undetermined version")
+.metadata

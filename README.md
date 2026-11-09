@@ -34,8 +34,9 @@ and documentation under the direction of the author, who set the requirements an
 ## Install
 
 Download `lucasCore-<version>.ssimpkg` from the [Releases page](https://code.usgs.gov/LUCC/lucasCore/-/releases), then in
-SyncroSim Studio choose File > Local Packages > Install from File and pick it (User Guide, section 1.1). Needs SyncroSim 3.1.9 or
-later with ST-Sim 4.5.4, and R 4.6 with rsyncrosim, terra, sf, data.table, mgcv, jsonlite, curl, xml2, DBI and RSQLite.
+SyncroSim Studio choose File > Local Packages > Install from File and pick it (User Guide, section 1.1). Needs SyncroSim 3.1.29 (the
+version it is tested on) or later with ST-Sim 4.5.4, and R 4.6 with rsyncrosim (tested with 2.1.13), terra, sf, data.table, mgcv, jsonlite,
+curl, xml2, DBI and RSQLite.
 
 **Development install**, running the scripts from a checkout of this repository:
 
