@@ -571,7 +571,7 @@
 		<column name="MinInventoryYear" displayName="First FIA Inventory Year" dataType="Integer" defaultValue="1997"/>
 		<column name="VolumeCapQuantile" displayName="Volume Outlier Cap (quantile within type group)" dataType="Double" defaultValue="0.999"/>
 		<!-- src/fia.R: where the FIA condition tables come from (stages 2 and 3) -->
-		<column name="FiaSource" displayName="FIA Data" dataType="Integer" validationType="List" formula1="1:USGS condition tables (.Rds)|2:FIA DataMart (state CSVs)" defaultValue="1" isOptional="True"/>
+		<column name="FiaSource" displayName="FIA Data" dataType="Integer" validationType="List" formula1="1:USGS condition tables (.Rds)|2:FIA DataMart (state CSVs)" defaultValue="2" isOptional="True"/>
 		<column name="DownDeadCarbon" displayName="Down Dead Carbon (FIA DataMart)" dataType="Integer" validationType="List" formula1="1:Adjusted to field measurements (state factors, as the USGS tables)|2:As in FIADB (model, unadjusted)" defaultValue="1" isOptional="True"/>
 	</dataSheet>
 

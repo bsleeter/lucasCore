@@ -17,7 +17,7 @@ namespace lucasCoreUI
         protected override string SheetName { get { return "lucasCore_GrowthOptions"; } }
 
         private readonly Choice m_source = new Choice("CurveSource", 1);
-        private readonly Choice m_fia = new Choice("FiaSource", 1), m_dd = new Choice("DownDeadCarbon", 1);
+        private readonly Choice m_fia = new Choice("FiaSource", 2), m_dd = new Choice("DownDeadCarbon", 1);
         private FlowLayoutPanel m_ddRow;
         private readonly TextBox m_library = new TextBox { Width = 460, Anchor = AnchorStyles.Left, Margin = new Padding(3, 3, 6, 3) };
         private readonly Button m_browse = new Button { Text = "Browse...", AutoSize = true, Margin = new Padding(3, 2, 12, 3) };
@@ -50,8 +50,8 @@ namespace lucasCoreUI
 
             var fia = Column();
             var fr = Row();
-            fr.Controls.Add(Option(m_fia, 1, "USGS condition tables (.Rds)"));
-            fr.Controls.Add(Option(m_fia, 2, "FIA DataMart (state CSVs)"));
+            fr.Controls.Add(Option(m_fia, 1, "USGS condition tables (.Rds; USGS only)"));
+            fr.Controls.Add(Option(m_fia, 2, "FIA DataMart (state CSVs; default)"));
             fia.Controls.Add(fr);
             m_ddRow = Row();
             m_ddRow.Controls.Add(Caption("Down dead carbon:"));
@@ -124,7 +124,7 @@ namespace lucasCoreUI
             m_gCopy.Enabled = copying;
             m_gFit.Enabled = !copying;
             ShowChoice(m_fia); ShowChoice(m_dd);
-            m_gFia.Enabled = !copying; m_ddRow.Enabled = IntValue("FiaSource", 1) == 2;
+            m_gFia.Enabled = !copying; m_ddRow.Enabled = IntValue("FiaSource", 2) == 2;
             ShowLibraryState();
         }
     }

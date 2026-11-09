@@ -28,10 +28,17 @@ fia_choice <- function(v, labels) { if (is.null(v) || !length(v) || is.na(v[1]))
 
 # list(cond, dist) for the Growth Curve Options row opt (a list); ecodiv_file = Data Sources: Ecodivision Map
 fia_tables <- function(opt, ecodiv_file) {
-  if (fia_choice(opt$FiaSource, FIA_SOURCES) == 1L) {
-    s <- read_data_sources(c("FiaConditionFile", "FiaDisturbanceFile"))
-    say("FIA data: the USGS condition tables (%s, %s)", basename(s$FiaConditionFile), basename(s$FiaDisturbanceFile))
-    return(list(cond = data.table::as.data.table(readRDS(s$FiaConditionFile)), dist = data.table::as.data.table(readRDS(s$FiaDisturbanceFile)))) }
+  # FIA DataMart is the default (user, 2026-11-09): the USGS tables are USGS files no new library has. A library set to the USGS tables
+  # whose files are neither set nor in Data Sources Home reads the DataMart instead, and the log says so
+  usgs <- !is.null(opt$FiaSource) && length(opt$FiaSource) && !is.na(opt$FiaSource[1]) && fia_choice(opt$FiaSource, FIA_SOURCES) == 1L
+  if (usgs) {
+    s <- read_data_sources(c("FiaConditionFile", "FiaDisturbanceFile"), optional = TRUE)
+    if (!is.na(s$FiaConditionFile) && !is.na(s$FiaDisturbanceFile)) {
+      say("FIA data: the USGS condition tables (%s, %s)", basename(s$FiaConditionFile), basename(s$FiaDisturbanceFile))
+      return(list(cond = data.table::as.data.table(readRDS(s$FiaConditionFile)), dist = data.table::as.data.table(readRDS(s$FiaDisturbanceFile)))) }
+    miss <- c("FiaConditionFile", "FiaDisturbanceFile")[is.na(c(s$FiaConditionFile, s$FiaDisturbanceFile))]
+    say("FIA data: Growth Curve Options asks for the USGS condition tables, but %s %s not set on the Data Sources page: reading the FIA DataMart instead",
+        paste(miss, collapse = " and "), if (length(miss) > 1) "are" else "is") }
   dm <- read_data_sources("FiaDataMartFolder")$FiaDataMartFolder
   x <- fia_datamart(dm, ecodiv_file)
   adjust_dd <- fia_choice(opt$DownDeadCarbon, c("Adjusted", "As")) == 1L
