@@ -530,9 +530,31 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
            155 against 136 (+14%; was about +82%); 1986-1995 growth 358 against 524 (-32%) and harvest 146 against 200 (-27%): the
            maps hold today's crops (more orchards and fallow), Solano grew more sugar beets, corn and tomatoes then. No yearly
            agreement in either period (the yearly signal is the ecodivision's NASS index).
-         - Open: the provisional fruit, nut, vegetable and grape factors; orchards and vegetables outside California (literature
-           growth by crop group, or a Landsat production map); whether to vary the crop mix through time (a CDL-less 1985-2007:
-           NLCD only); a county yearly index (Solano's NASS survey has 1-3 crops after 2014).
+         - **Crop factors checked (user 2026-11-08).** dev/agriculture/04-cac-crop-factors.csv against the literature (notes in
+           dev/nonforest/review/crop-factors-check.md, not committed; Kroodsma and Field 2006, the Wolf 2015 supplement, Monfreda 2008
+           were paywalled): almonds are kernel meats, HI 0.20 -> 0.14 (CDFA Whole Orchard Recycling inputs: kernel 0.14 of ANPP, roots
+           0.30); walnuts, pecans, pistachios in-shell, HI 0.25 (an estimate); deciduous fruit DM 0.14, HI 0.40 (Rufat and DeJong 2001);
+           citrus apart, DM 0.13, HI 0.15 (Zhao et al. 2021; lemons, grapefruit, tangerines now counted); dried plums DM 0.80; hay other
+           HI 0.85, RS 0.54, wild hay RS 0.80, seed alfalfa RS 0.40 (IPCC 2019 Tables 11.1a, 11.2); sweet corn, snap beans, carrots
+           (Zhao); tomatoes DM 0.06; grapes and silage confirmed (raisin yields of 8-12 t/ac are fresh tons). Not found: asparagus
+           (HI 0.30 likely too high), melons, onions, peppers, olives, figs, and yearly root growth of any tree crop.
+         - **Crop Mix (user 2026-11-08: vary the crop mix through time).** dev/agriculture/06-cac-county-crop-mix.R ->
+           defaults/stockflow/ag-cac-county-crop-mix.csv: each California county's yearly NPP, AG and harvest 1986-2020 with every crop
+           at its fixed county rate (so only the mix and harvested area change; yields stay with the Crop Yield index). Stage 8 divides
+           by the county's cropland on the model's annual NLCD that year and by the same over the reported CDL years (2014-2020): one
+           growth map (Net Growth Agriculture: Total) and one harvest-share map (Harvest: Agriculture) a year, 1 on NLCD pasture and
+           outside California, capped 0.3-2.5 and the harvest rate <= 1; 1985 takes 1986's, 2021 on 1 (the maps' mix). Stage 8 now
+           declares the annual NLCD sheet and, rerun on its own, finds it down the dependency chain. Solano (stages 3, 8: result 103;
+           1985-2020: result 105), against the reports with the checked factors:
+           | Solano cropland, thousand Mg C/yr | growth model / reports | harvest model / reports | yearly r growth, harvest |
+           | 1986-1995 | 522 / 521 (0%; result 95: -31%) | 189 / 202 (-6%; was -27%) | 0.60, 0.37 (was 0.11, 0.06) |
+           | 1996-2013 | 407 / 385 (+6%) | 175 / 166 (+6%) | 0.95, 0.84 |
+           | 2014-2020 | 370 / 343 (+8%; result 95: +10%) | 156 / 137 (+14%; was +13%) | 0.72, 0.89 (was -0.14, -0.17) |
+         - Open: Crop Mix outside California (the NASS county survey thins out after 2008; the Census of Agriculture in the home's
+           QuickStats file is 1997-2022 every 5 years and has no county cropland total); the reports' 2021 on (another format); the
+           factors not found; orchards and vegetables outside California (literature growth by crop group, or a Landsat production
+           map). A county yearly yield index is no longer needed in California: Crop Mix and the Crop Yield index together follow the
+           reports' years.
     7. **A climate response fitted to RAP.** RAP's yearly growth 1986-2023 against PRISM fits the yearly climate response for grass
        and shrub, in place of the Miami NPP climatology; test it with the placebo check the tree-ring response went through. The step
        most likely to change projections.
