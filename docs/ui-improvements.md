@@ -618,6 +618,44 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
          (needs a full historical run and a Projection Setup); the multipliers enter it through the same sheet as historical years.
     8. **Shrub growth by age.** Chaparral regrows for 20+ years after fire and sage for decades, so growth by age after fire (the
        Non-Forest Growth sheet already has an age column) in place of a constant rate at equilibrium. Matters most in P26.
+       - Chaparral was already by age (built 2026-11-06, item 39 step 1 notes). **The sage family built 2026-11-08 (user: "Shrub
+         growth by age"; branch 51d6a45, main fast-forwarded, not pushed).** Sage, Native and Invaded Sage Steppe, Non-sage, Post Fire Shrub.
+         - RAP chronosequence (dev/nonforest/08-shrub-fire-recovery.R; 6.7 min, the 1,140 windows' kept RAP crops, MTBS perimeters
+           1984-2023, RCMAP 1985 classes, nothing downloaded): NPP of cells in one 1988-2022 perimeter against unburned cells of the
+           class in the window that year, over the same ratio before the fire. 130 windows; 16 (Sage) to 121 (Non-sage) fires. Total
+           NPP 0.81-0.91 of unburned in the fire year and the next, 1 or more from year 2 (herbs 1.2-1.8x unburned in sage classes);
+           shrub NPP 0.47-0.64 at year 1 (perimeters hold unburned ground: 36-53% burned), then flat at about 0.7 for 30 years in the
+           sage steppe classes and back by 10-15 years in Non-sage. Chaparral total back by year 2 (the chamise curve's growth is
+           already about flat with age).
+         - Literature (dev/nonforest/review/sage-recovery-literature.md, not committed): big sagebrush is a seeder, mountain
+           sagebrush back in about 37 years (Nelson et al. 2014), Wyoming 18% at 16 years and 50-120+ (Bates et al. 2020; Baker
+           2006); RAP / NLCD shrub cover recovers too fast (Applestein and Germino 2021), so the woody curve is the literature's.
+         - Model (tools/make_grass_shrub.R; defaults/stockflow/shrub-age.csv): by years since high-severity fire a, wood and coarse
+           root shares of growth = mature x (1 - exp(-k (a + 1)))^p (Sage and Native Sage Steppe k 0.035 p 2: 25/50/90% at
+           19/34/84 years; Invaded 0.02, 1.5: 24/49/134; Non-sage 0.05, 1.5: about 8/19/50; Post Fire Shrub 0.25, 1.2: 90% in 9);
+           foliage and fine roots take the rest in their mature ratio (the herbs filling in); Net Growth x 0.6-0.8 in the fire year
+           and the next (RAP's dip over the burned share), mature from year 2. Turnover and decay stay the class's. Rows each year to
+           39, then 5-year bins to AgeMax (150; Non-sage 100, Post Fire Shrub 30): 26,410 growth-split and 5,358 Net Growth rows.
+           Starting pools by age (initialstocks/shrub-age.csv): the mature steady state after the class's high-severity fire
+           (nonforest-fire.csv) grown on; the AgeMax row is the steady state itself (regrowth reaches 96-98% of it by 150).
+           Temperate Desert Sage: wood 0 at 0, 0.02 at 10, 0.19 at 30, 0.87 at 150 Mg C/ha; foliage back to 0.27 by year 5;
+           surviving coarse roots (10%) die back for about 10 years before the new shrubs rebuild them.
+         - Stage 5 gives these cells their years since the last fire perimeter (never burned since 1900: the class's AgeMax, mature);
+           stage 8 fills them by age bin (fill_class takes the bin at or below a cell's age); high-severity fire resets their age
+           (medium and low do not; fire.csv). tests/unit-nonforest-solve.R 35 of 35 (new: bin pools step to the next bin's, gap
+           9.6e-5; wood rises; AgeMax = the literature split and RAP NPP); unit-carbon-assumptions ALL PASS; unit-agriculture 33.
+         - Solano quick test (stages 3, 5, 8 on Build result 20: result 107, 12.2 min; 1985-2020: result 109, 25.2 min; every
+           check passes). Stage 5: 178 Non-sage cells, 66% burned since 1900 (median 15 years since fire), the rest at 100;
+           chaparral 483 cells, 78% burned, median 9 (the summary line had recycled an index against a logical vector and printed
+           21; the ages themselves were right). Stage 8: every sage-family cell finds its age bin. Non-sage per hectare against
+           result 95 (the same years before this change; fire areas the same within 1%): 1985 wood 2.26 / coarse roots 7.15 (was
+           4.85 / 11.65), 2010 1.94 / 5.33 (4.44 / 11.48), 2020 after the LNU fires 0.63 / 3.74 (1.14 / 7.06); foliage and fine
+           roots a little higher (the herbs). Chaparral unchanged. Solano has no Sage or Sage Steppe cells: P26 and the Great
+           Basin are where this matters.
+         - Open, from the literature check: mature sage aboveground (1.0 Mg C/ha, Nagy et al. 2021) is at the bottom of the direct
+           harvests (Bradley et al. 2006 about 4.4-5.0; Cleary et al. 2010 3.1 at 39 years); the fire rows' root kill (Sage 90%)
+           against the literature's view that grass roots survive (about 50% of root carbon); a sage foliage share falling with age
+           (Rittenhouse and Sneva 1977); Invaded Sage Steppe may never return to sage (a conversion, not regrowth).
     9. **Validation throughout,** against data the calibration did not use: RaCA soil carbon, AmeriFlux grassland and sagebrush sites,
        and the US greenhouse gas inventory's grassland and cropland soil change totals.
     10. **Emergent wetlands vary across the map (planned 2026-11-07, user: at least look at these as options).** Emergent wetlands
