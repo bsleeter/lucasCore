@@ -1169,6 +1169,7 @@
 		<dataSheet name="stsim_InitialStockSpatial" type="Both"/>
 		<dataSheet name="OutputSiteClassMap" type="Input"/>
 		<dataSheet name="OutputSiteProductivity" type="Input"/>
+		<dataSheet name="OutputNlcdAnnual" type="Input"/>
 		<dataSheet name="stsim_FlowSpatialMultiplier" type="Output"/>
 		<dataSheet name="OutputInitialStockSummary" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>

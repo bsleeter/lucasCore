@@ -96,7 +96,7 @@ put_multipliers_save <- function() {
   if (nrow(x)) x <- x[if ("FlowMultiplierTypeId" %in% names(x)) !FlowMultiplierTypeId %in% new$FlowMultiplierTypeId else TRUE,
                      intersect(names(x), c("Timestep", "FlowGroupId", "FlowMultiplierTypeId", "MultiplierFileName")), with = FALSE]
   write_stsim(rbind(x, new, fill = TRUE), "FlowSpatialMultiplier")
-  say("Flow Spatial Multipliers: %s written (%d other rows kept)", paste(new$FlowMultiplierTypeId, collapse = ", "), nrow(x))
+  say("Flow Spatial Multipliers: %s written (%d other rows kept)", paste(unique(new$FlowMultiplierTypeId), collapse = ", "), nrow(x))
   # (an output sheet reads back empty until the stage ends, so the rows cannot be checked here; tests/unit-agriculture.R checks the
   # code path, and a run's result holds them)
   check(STAGE, "each productivity multiplier has one Flow Spatial Multiplier row a year and flow group", !anyDuplicated(new[, .(if ("Timestep" %in% names(new)) Timestep else NA, FlowGroupId, FlowMultiplierTypeId)]) && all(file.exists(new$MultiplierFileName))) }
@@ -290,6 +290,19 @@ if (cp_on) {
   mx <- read_default("stockflow", "ag-cac-county-crop-mix.csv")
   if (!"Crop Mix" %in% stsim_list("FlowMultiplierType")$Name) fail("Crop Mix: the library has no Flow Multiplier Type 'Crop Mix' - run tools/sync-library.R on it")
   nl <- read_ds("OutputNlcdAnnual"); vK <- vC   # the county (co row) of each model cell
+  # rerun on its own (tools/quick-test.R) the sheet reads empty (2026-11-08), so it comes from the dependency that holds it
+  # (a quick test on a quick test's result: the dependency's dependency, so the search walks down the chain)
+  if (!nrow(nl)) { L <- ssimLibrary(main_library()); s <- as.data.table(rsyncrosim::scenario(L, summary = TRUE))
+    deps <- function(id) { d <- suppressWarnings(as.integer(rsyncrosim::dependency(rsyncrosim::scenario(L, id))$ScenarioId))
+      if (!length(d) && "ParentId" %in% names(s)) { p <- s[ScenarioId == id, ParentId]; if (length(p) == 1 && !is.na(p)) d <- suppressWarnings(as.integer(rsyncrosim::dependency(rsyncrosim::scenario(L, p))$ScenarioId)) }
+      d }
+    todo <- run_dependencies(); seen <- integer(0)
+    while (length(todo) && length(seen) < 10) { id <- todo[1]; todo <- todo[-1]; if (id %in% seen) next; seen <- c(seen, id)
+      x <- as.data.table(datasheet(rsyncrosim::scenario(L, id), ds("OutputNlcdAnnual"), optional = TRUE, lookupsAsFactors = FALSE))
+      if (nrow(x)) { nl <- x[, FileName := file.path(paste0(main_library(), ".data"), sprintf("Scenario-%d", id), ds("OutputNlcdAnnual"), basename(FileName))][]
+        say("Crop mix: annual NLCD from dependency %d", id); break }
+      todo <- c(todo, deps(id)) } }
+  if (nrow(nl) && !all(file.exists(nl$FileName))) fail("Crop mix: the annual NLCD maps are missing (%s)", nl$FileName[!file.exists(nl$FileName)][1])
   mx <- mx[GEOID %in% co$GEOID][, k := co$k[match(GEOID, co$GEOID)]][, c("NPP", "AG", "Harvest") := lapply(.SD, as.numeric), .SDcols = c("NPP", "AG", "Harvest")][, Year := as.integer(Year)]
   if (nrow(mx) && nrow(nl)) {
     y1 <- opt$EndYear[1]; yrs <- y0:y1; ny <- nl$Year[nl$Year %in% yrs]
@@ -302,7 +315,7 @@ if (cp_on) {
     grid[, ny := near(Year, sort(ny))]
     grid <- merge(mx[, .(k, ry = Year, NPP, AG, Harvest)][grid, on = .(k, ry)], ca[, .(k, ny = Year, crop)], by = c("k", "ny"))
     grid <- grid[!is.na(NPP) & crop > 0][, `:=`(G = NPP / crop, S = Harvest / AG)]
-    base <- grid[Year %in% CDL_YEARS & ry %in% CDL_YEARS, .(bG = mean(G), bS = sum(Harvest) / sum(AG)), by = k]
+    base <- grid[Year %in% CDL_YEARS & ry == Year, .(bG = mean(G), bS = sum(Harvest) / sum(AG)), by = k]
     grid <- base[grid, on = "k", nomatch = 0][, `:=`(iG = pmin(pmax(G / bG, CAP[1]), CAP[2]), iH = pmin(pmax(S / bS, CAP[1]), CAP[2]))]
     last <- max(mx$Year); myrs <- yrs[yrs <= last]
     rows <- list(); ones <- write_raster(setValues(rast(P), ifelse(land, 1, NA)), "CropMix_1.tif", "FLT4S")
