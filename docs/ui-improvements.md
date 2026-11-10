@@ -12,7 +12,7 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | --- | --- | --- | --- | --- |
 | 1 | 14 FGDC metadata | No | User order 2026-11-02: first. Plan (a working document, not in this repository) (phases 0-6; decisions settled 2026-11-02: CSDGM first, one release per Build, maps every year, model archive always, ScienceBase folder by hand; Phase 0 done with the user 2026-11-02; Phase 1 built 2026-11-02: defaults/metadata definitions, data dictionary, citations, src/metadata.R, tests/unit-metadata-definitions.R; citation questions in the plan); lineage from the home's manifest and each Build's Data Sources Used | 12 (done) |
 | 2 | 39 Grassland, shrubland and wetland carbon: options beyond today's crude method | Yes | User order 2026-11-02: third, with the other open science items (user: explore additional options).  Step 1 (rates on a page) and the diagram view done; the diagram shows emergent wetland rates settling far above their starting pools; suspect values (emergent wetland growth 31, irrigated grass 9.19 Mg C/ha/yr), root turnover splits. Review done 2026-11-06 (dev/nonforest/review). Revised approach accepted the same day: one stage 3 solver (measured stocks as targets, growth from data, rates solved; IPCC, IBIS or data as the target source), IPCC factors for soil change on conversion, carbon for pasture and cropland. Nine steps; step 1, the emergent wetland fix, is next | - |
-| next, after the UI check | 53 Forested wetlands as wetland counterparts of three forest type groups (spruce/fir, oak/gum/cypress, elm/ash/cottonwood) | Yes (woody wetland classes, and the three upland types lose their hydric FIA plots) | Planned 2026-11-09; the user picks it up in a new session once the commits since v1.1.0 are confirmed in the UI. Three choices open (item 53) | - |
+| next | 53 Forested wetlands as wetland counterparts of three forest type groups (spruce/fir, oak/gum/cypress, elm/ash/cottonwood), with burial, peat fire and drained peat | Yes (woody wetland classes, and the three upland types lose their hydric FIA plots) | Planned 2026-11-09; choices decided 2026-11-10 (other types by region, burial, peat fire now); not started | - |
 | later | 54 Climate response for emergent wetland growth | Yes (marsh growth by year, in history and in projections, when turned on) | Added 2026-11-09 (user). Today only CO2 changes marsh growth under alternative climate futures; the response model needs a short review first (item 54) | - |
 | later | 55 Grass and shrub stocks fitted to literature (chaparral wood turnover 0.08; non-sage and native sage steppe split by RAP herb share) | Yes | Refit done 2026-11-09 (item 55); left: the RAP tests at the Sky Oaks towers, the foothill chaparral scale | - |
 | release | 46 CO2 fertilization | Yes, in projections with a Projection Climate result (Central by default; None turns it off) | Added 2026-11-04; built, tested (Puget run, age-band check), documented (guide 7.3.1) and pushed 2026-11-06. Left: a release | - |
@@ -941,12 +941,19 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     6. Tests: unit tests for the rows; a throw-away eastern test library (for example around the Great Dismal Swamp or northern
        Minnesota: Solano and Puget have almost no hydric forest); fitted rates against the review's multipliers, soil and burial
        against its targets.
-  - **Open (asked 2026-11-09, not answered):**
-    1. Woody wetland cells of the other type groups (about 23%): their own upland type, retiring Palustrine Forested (recommended),
-       or keep Palustrine Forested with its generic curve.
-    2. Burial rates: recommended spruce/fir 0.25 Mg C/ha/yr, oak/gum/cypress about 0.1, elm/ash/cottonwood none (mostly mineral
+  - **Decided (user, 2026-11-10):**
+    1. Woody wetland cells of the other type groups (about 23%; user: "assign those cells ... to one of our three forested wetland
+       classes ... which is closer or more common in that region"): each takes the twin most common among the FIA hydric forest plots
+       of its ecodivision (by condition proportion); an ecodivision with too few hydric plots to choose (the West: mostly riparian
+       cottonwood and willow) takes Elm/Ash/Cottonwood. `Wetland: Palustrine Forested` and its generic curve are retired. The cost:
+       those cells grow on the twin's curve, not their own type's (a wet aspen stand grows as spruce/fir wetland). The build prints a
+       tally of the reassigned cells by ecodivision and source group.
+    2. Burial (BG Slow -> Deep Soil): spruce/fir 0.25 Mg C/ha/yr, oak/gum/cypress 0.1, elm/ash/cottonwood none (mostly mineral
        floodplain, where the carbon is river sediment).
-    3. Peat fire (BG Slow burned on organic soils) and drained peat under cropland: recommended for a follow-up.
+    3. Peat fire and drained peat are part of this to-do, not a follow-up (user: "include now"). Organic-soil cells from gNATSGO
+       (Histosols; already downloaded) are marked; on them fire also burns BG Slow (depth of burn by severity), and woody or emergent
+       wetland converted to cropland or pasture loses soil carbon as drained organic soil. Rates from the woody wetland review plus a
+       short check of peat-fire depth of burn and the IPCC 2013 Wetlands Supplement emission factors for drained organic soils.
   - **Known limits:** mineral and organic soil are not separated within a class (oak/gum/cypress mixes both); scrub-shrub and
     pocosin cells get a tree curve; cells with no forest type pixel take a neighbour's type, which may be upland; FIA soil carbon is
     modelled, so soil targets stay gNATSGO (which overstates organic wetland soils by about 35%, Uhran et al. 2021). New runs will
