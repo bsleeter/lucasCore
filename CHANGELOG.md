@@ -2,15 +2,20 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
-## 1.2.0 - 2026-11-10
+## 1.2.0 - 2026-11-09
 
 Grassland, shrubland, wetland and agriculture carbon rebuilt from data, CO2 fertilization in projections, and library updates.
 
-**Upgrading:** install `lucasCore-1.2.0.ssimpkg`. A library made with 1.1.0 or 1.1.1 is brought up to 1.2 the first time SyncroSim
-opens it (Studio asks to update it; it keeps a backup): new columns, the agriculture stock, flows and flow groups, the new Flow
-Multiplier Types, and the stock-flow rows of a Stock-Flow Definitions scenario. tools/sync-library.R is no longer needed for that.
-Results made with 1.1 keep their values; rerun the Build to use the new non-forest carbon. Needs SyncroSim 3.1.29 or later with
-ST-Sim 4.5.4.
+**Upgrading:** install `lucasCore-1.2.0.ssimpkg` (File > Packages > Install from file in SyncroSim Studio), then update each
+library made with 1.0 or 1.1: switch its lucasCore package to 1.2.0 and let SyncroSim update it, or from a command prompt
+
+    SyncroSim.Console.exe --add --package --pkg=lucasCore --ver=1.2.0 --lib=<library.ssim>
+    SyncroSim.Console.exe --update --lib=<library.ssim> --backup
+
+(--backup keeps a .ssimbak copy in the library's .backup folder). The update adds the new columns, the agriculture stock, flows and
+flow groups, the new Flow Multiplier Types, and the stock-flow rows of a Stock-Flow Definitions scenario; tools/sync-library.R is
+no longer needed for that. Results made with 1.1 keep their values; rerun the Build to use the new non-forest carbon. Needs
+SyncroSim 3.1.29 or later with ST-Sim 4.5.4.
 
 ### Added
 - Library updates (ui/LucasCoreUpdates.cs, SyncroSim's .NET update provider): each version's schema and definition changes are applied
