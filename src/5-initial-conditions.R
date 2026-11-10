@@ -217,6 +217,23 @@ S <- ifel(S %in% c(52, 71), G, S)
 S <- ifel(ever_forest == 1 & !land_use, Fz, S)
 S <- ifel(S == 95, W, S)
 S <- ifel(S %in% c(90, 91), 90, S)
+# Forested wetlands (to-do 53): a palustrine woody wetland cell (NLCD 90, or NLCD 95 that C-CAP maps as forested or scrub-shrub
+# wetland; ever forest or not) runs as the wetland twin of its forest type group: Spruce/Fir 121, Oak/Gum/Cypress 601,
+# Elm/Ash/Cottonwood 701. A cell of another type (or none) takes the twin most common among its ecodivision's hydric FIA plots
+# (defaults/growth/wetland-forest-regions.csv, tools/make_wetland_forest_regions.R; user 2026-11-10). Estuarine forested cells
+# (C-CAP 16-17: mangroves, tidal swamps) stay Wetland: Palustrine Forested, as before.
+wf_reg <- fread(pkg_file("defaults", "growth", "wetland-forest-regions.csv"))
+wf_eco <- data.table(Id = as.integer(stl$Id), Twin = unname(c(`Wetland: Spruce/Fir Group` = 121L, `Wetland: Oak/Gum/Cypress Group` = 601L, `Wetland: Elm/Ash/Cottonwood Group` = 701L)[wf_reg$StateClassId[match(stl$Name, wf_reg$Ecodivision)]]))[, Twin := fifelse(is.na(Twin), 701L, Twin)]
+woody <- ((n0 == 90 & W != 91) | (n0 == 95 & W == 90)) & m
+tw_own <- classify(Fz, rbind(c(120, 121), c(600, 601), c(700, 701)), others = NA)
+tw <- cover(tw_own, classify(P, as.matrix(wf_eco[, .(Id, Twin)]), others = NA))
+wf_n <- global(woody, "sum", na.rm = TRUE)[[1]]
+if (wf_n > 0) {
+  t0 <- data.table(Eco = values(P, mat = FALSE), Fz = values(Fz, mat = FALSE), Tw = values(tw, mat = FALSE), Own = !is.na(values(tw_own, mat = FALSE)))[values(woody, mat = FALSE) %in% TRUE]
+  say("Forested wetlands: %d woody wetland cells, %.0f%% of their own twin's type group; the rest by ecodivision:", nrow(t0), 100 * mean(t0$Own))
+  r <- t0[!(Own), .N, by = .(Eco, Fz, Tw)][order(-N)]
+  for (j in seq_len(min(nrow(r), 12))) with(r[j], say("  %s, %s -> %s: %d cells", stl$Name[match(Eco, stl$Id)], if (is.na(Fz)) "no forest type" else scl$Name[match(Fz, scl$Id)], scl$Name[match(Tw, scl$Id)], N)) }
+S <- ifel(woody, tw, S)
 S <- mask(S, m)
 forest <- S >= 100 | S == 90
 progressBar()

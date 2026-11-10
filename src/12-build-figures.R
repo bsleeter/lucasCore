@@ -46,7 +46,7 @@ for (t in c("Grass and Shrub Productivity", "Cropland Productivity", "Crop Harve
 cm <- fsm_all[FlowMultiplierTypeId %in% "Crop Mix"]
 crop_mix <- if (nrow(cm)) { cm[, File := vapply(MultiplierFileName, find_file, "", sheet = "stsim_FlowSpatialMultiplier")]
   cm[!is.na(File), .(Timestep = as.integer(Timestep), Kind = ifelse(grepl("^Harvest", FlowGroupId), "harvest", "growth"), File)] } else NULL
-nonforest_cls <- present_cls[!grepl("^Forest:", present_cls) & !grepl("^Wetland: .*Forested", present_cls)]
+nonforest_cls <- present_cls[!is_forest_class(present_cls) & !grepl("^Wetland: .*Forested", present_cls)]
 sav <- tryCatch(as.data.table(datasheet(scn, "stsim_StateAttributeValue", optional = TRUE, lookupsAsFactors = FALSE)), error = function(e) data.table())
 nf_growth <- if (nrow(sav) && all(c("StateAttributeTypeId", "StateClassId", "StratumId", "Value") %in% names(sav)))
   sav[StateAttributeTypeId %in% "Net Growth" & StateClassId %in% nonforest_cls & StratumId %in% present_eco, .(StratumId, StateClassId, AgeMin, Value)] else NULL

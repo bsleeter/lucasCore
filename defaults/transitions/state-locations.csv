@@ -50,3 +50,6 @@ Iteration,Timestep,StratumIdSource,StateClassIdSource,StratumIdDest,StateClassId
 ,,,Wetland: Estuarine Forested,,Wetland: Estuarine Forested,,,H11
 ,,,Wetland: Palustrine Emergent,,Wetland: Palustrine Emergent,,,H12
 ,,,Wetland: Palustrine Forested,,Wetland: Palustrine Forested,,,H10
+,,,Wetland: Spruce/Fir Group,,Wetland: Spruce/Fir Group,,,H14
+,,,Wetland: Oak/Gum/Cypress Group,,Wetland: Oak/Gum/Cypress Group,,,H15
+,,,Wetland: Elm/Ash/Cottonwood Group,,Wetland: Elm/Ash/Cottonwood Group,,,H16

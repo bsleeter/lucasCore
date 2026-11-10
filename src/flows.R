@@ -99,7 +99,7 @@ dom_flow_values <- function(r, softwood, temp_c, cbm_dir, decay_mult = NULL, dp 
     "Decay: BG Fast -> BG Slow" = dec("BGF"), "Emission: BG Fast -> Atmosphere" = emi("BGF"),
     "Decay: AG Medium -> AG Slow" = dec("AGM"), "Emission: AG Medium -> Atmosphere" = emi("AGM"),
     "Emission: AG Slow -> Atmosphere" = emi("AGS"), "Transfer: AG Slow -> BG Slow" = slow_ag_bg,
-    "Emission: BG Slow -> Atmosphere" = emi("BGS"),
+    "Emission: BG Slow -> Atmosphere" = emi("BGS"), "Stabilization: BG Slow -> Deep Soil" = 0,
     "Decay: Snag Stem -> AG Slow" = dec("SnagStem"), "Emission: Snag Stem -> Atmosphere" = emi("SnagStem"), "Transfer: Snag Stem -> AG Medium" = r$stem_snag_to_dom,
     "Decay: Snag Branch -> AG Slow" = dec("SnagBranch"), "Emission: Snag Branch -> Atmosphere" = emi("SnagBranch"), "Transfer: Snag Branch -> AG Fast" = r$branch_snag_to_dom) }
 
@@ -136,7 +136,13 @@ DOM: Snag Branch,DOM: Aboveground Fast,Transfer: Snag Branch -> AG Fast,
 DOM: Snag Branch,DOM: Aboveground Slow,Decay: Snag Branch -> AG Slow,
 DOM: Snag Stem,Atmosphere,Emission: Snag Stem -> Atmosphere,
 DOM: Snag Stem,DOM: Aboveground Medium,Transfer: Snag Stem -> AG Medium,
-DOM: Snag Stem,DOM: Aboveground Slow,Decay: Snag Stem -> AG Slow,", na.strings = "")
+DOM: Snag Stem,DOM: Aboveground Slow,Decay: Snag Stem -> AG Slow,
+DOM: Belowground Slow,Deep Soil,Stabilization: BG Slow -> Deep Soil,", na.strings = "")
+# Burial (to-do 53): the forested wetland twins move BG Slow to Deep Soil at a fixed carbon rate (defaults/spinup/wetland-burial.csv,
+# Mg C/ha/yr), as a share of the class's soil target per year. The upland classes have no burial (the flow is left out of their
+# pathways). The rate is fixed: the soil multiplier calibrated to gNATSGO does not scale it.
+BURIAL_FLOW <- "Stabilization: BG Slow -> Deep Soil"
+add_burial <- function(vals, rate) { vals[[BURIAL_FLOW]] <- if (is.null(rate) || !length(rate) || is.na(rate)) 0 else rate; vals }
 
 # ---- Carbon Rates read-out (to-do 30) -----------------------------------------------------------------------------------
 # one cell's rows for the Carbon Rates output: every turnover and DOM flow it runs with (vals: the named flow values after snag fall and

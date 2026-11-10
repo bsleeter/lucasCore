@@ -27,7 +27,8 @@ eco <- unique(as.data.table(st_drop_geometry(read_sf(ds0$EcodivisionFile[1])))[,
 # one name per code: the shapefile has a second M260 polygon named "Mediterranean" (found 2026-10-30); a mountain code keeps its "Mountains" name
 eco <- eco[order(ecodiv, -(startsWith(ecodiv, "M") & grepl("Mountains$", Ecodivision)))][!duplicated(ecodiv)]
 # FIA group -> forest type: the type of that code first, else the first type that pools it
-cw <- fread(file.path(pkg, "defaults/growth/forest-type-crosswalk.csv"))[, StateClass := paste0("Forest: ", StateClassName)]
+scn <- fread(file.path(pkg, "defaults/stsim/stsim_StateClass.csv"))   # class names by Id (the forested wetland twins are "Wetland: ...")
+cw <- fread(file.path(pkg, "defaults/growth/forest-type-crosswalk.csv"))[, StateClass := scn$Name[match(StateClassId, scn$Id)]]
 g2t <- rbindlist(lapply(seq_len(nrow(cw)), function(i) data.table(grp = as.integer(strsplit(as.character(cw$FiaTypeGroups[i]), ";")[[1]]), StateClass = cw$StateClass[i], own = cw$StateClassId[i])))
 g2t <- g2t[order(grp, -(grp == own))][!duplicated(grp)]
 

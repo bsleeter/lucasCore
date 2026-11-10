@@ -163,6 +163,10 @@ if (nrow(fxd)) {
       paste(vapply(names(FX_POOLS), function(g) sprintf("%s %d cells", FX_POOLS[[g]], sum(!is.na(cells[[paste0("fx_", g)]]))), ""), collapse = ", "))
 } else say("Fixed Decay Multipliers: no rows - every pool calibrated (or CBM default)")
 cells[, soil_target := as.numeric(soil_t$SoilTarget)[match(paste(Stratum, StateClass), paste(soil_t$Stratum, soil_t$StateClass))]]
+# burial of the forested wetland twins (to-do 53): Mg C/ha/yr over the soil target = the yearly share of BG Slow
+bur <- read_default("spinup", "wetland-burial.csv")
+cells[, burial_rate := as.numeric(bur$Burial)[match(StateClass, bur$StateClass)] / soil_target][is.na(burial_rate), burial_rate := 0]
+if (any(cells$burial_rate > 0)) say("Burial (BG Slow -> Deep Soil): %s", paste(cells[burial_rate > 0, sprintf("%s %s %.5f/yr", Stratum, sub("^Wetland: ", "", StateClass), burial_rate)], collapse = "; "))
 fx <- fia_tables(gopt, src$EcodivisionFile)   # Growth Curve Options: FIA Data (src/fia.R)
 dat <- fia_dom_data(fx$cond, fx$dist, gopt, cw); rm(fx)
 cells[, plots := dat$obs[, .(n = sum(n)), by = .(sc, ecodiv)][cells, on = c("sc", "ecodiv"), n]][is.na(plots), plots := 0L]
@@ -371,8 +375,8 @@ for (i in seq_len(nrow(cells))) { s <- cells$Stratum[i]; c0 <- cells$StateClass[
   fm_g[[i]] <- rbindlist(lapply(names(LIVE_POOLS), function(pl) data.table(StratumId = s, StateClassId = c0, AgeMin = g$Age, AgeMax = amax,
                                                                            FlowGroupId = paste(GROWTH_FLOW[[pl]], "[Type]"), Value = sh[[pl]])))
   cm <- cells[Stratum == s & StateClass == c0]
-  dv <- dom_flow_values(r, k$softwood, cells$temp[i], cbm, dp = dom_parameters(dpt, s)); fixed <- character()
-  if (!is.na(cm$snag_fall)) { dv <- set_snag_fall(dv, cm$snag_fall); fixed <- SNAG_FALL_FLOWS }
+  dv <- add_burial(dom_flow_values(r, k$softwood, cells$temp[i], cbm, dp = dom_parameters(dpt, s)), cm$burial_rate); fixed <- BURIAL_FLOW
+  if (!is.na(cm$snag_fall)) { dv <- set_snag_fall(dv, cm$snag_fall); fixed <- c(fixed, SNAG_FALL_FLOWS) }
   dv <- scale_decay(dv, c(mult_i(which(cells$Stratum == s & cells$StateClass == c0)), list(soil = cm$m_soil)), fixed)
   # Carbon Rates read-out (to-do 30): the rates just built, with their sources
   fxg <- FX_USED[!is.na(unlist(cm[, paste0("fx_", FX_USED), with = FALSE]))]
@@ -381,6 +385,7 @@ for (i in seq_len(nrow(cells))) { s <- cells$Stratum[i]; c0 <- cells$StateClass[
                                 cm$Level, cm$SoilSource, if (!is.na(cm$snag_fall)) cm$SnagFallSource else NA_character_))
   fm_d[[i]] <- data.table(StratumId = s, StateClassId = c0, AgeMin = NA_integer_, AgeMax = NA_integer_, FlowGroupId = paste(names(dv), "[Type]"), Value = unname(dv)) }
 ng <- rbindlist(ng); fm_g <- rbindlist(fm_g); fm_d <- rbindlist(fm_d)
+fm_d <- fm_d[!(FlowGroupId == paste(BURIAL_FLOW, "[Type]") & Value == 0)]   # burial only where a class has it
 rates <- rbindlist(rates)
 write_ds(rates[, .(StratumId, StateClassId, Process, FromStockTypeId, ToStockTypeId, Rate = signif(Rate, 6), BaseRate = signif(BaseRate, 6), TemperatureEffect = round(TemperatureEffect, 4),
                   Multiplier = round(Multiplier, 4), MeanTemperature = round(MeanTemperature, 2), Source)], "OutputCarbonRate")
@@ -402,6 +407,7 @@ rd <- function(f) { x <- fread(pkg_file("defaults", "stockflow", f), colClasses 
   x[, which(vapply(x, function(v) any(!is.na(v)), TRUE)), with = FALSE] }
 fp_forest <- rbindlist(lapply(cw$StateClass, function(c0) FOREST_PATHWAYS[, .(FromStateClassId = c0, FromStockTypeId = From, ToStockTypeId = To,
                                                                                 StateAttributeTypeId = Attribute, FlowTypeId = FlowType, Multiplier = 1)]))
+fp_forest <- fp_forest[FlowTypeId != BURIAL_FLOW | FromStateClassId %in% cells[burial_rate > 0, unique(StateClass)]]
 fp <- rbind(fp_forest, rd("nonforest-pathways.csv"), rd("nonforest-pathways-agriculture.csv"), ev_all[, which(vapply(ev_all, function(v) any(!is.na(v)), TRUE)), with = FALSE], fill = TRUE)   # events with the per-type fire rows
 # Carbon Assumptions - Grassland, Shrubland and Wetland Carbon (to-do 39, 2026-10-30): the package's non-forest rates (the CONUS 1 km
 # build's, from IBIS; one value per class, the same in every ecodivision, except the forested wetlands' growth curve and age-varying

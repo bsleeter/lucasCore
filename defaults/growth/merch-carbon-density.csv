@@ -27,3 +27,6 @@ StateClassId,StateClassName,FiaGroupsUsed,MgCPerM3,WoodSG,BarkCarbonShare,Decidu
 950,Other Western Hardwoods Group,970,0.2458,0.4,0.171,0.061,38,ponderosa pine; Douglas-fir; white fir,1.11
 980,Tropical Hardwoods Group,980,0.2969,0.547,0.126,0.22,51,cabbage palmetto; live oak; laurel oak,0.86
 990,Exotic Hardwoods Group,990,0.2696,0.501,0.127,0.934,120,Chinese tallow; Siberian elm; ailanthus,1.17
+121,Wetland Spruce/Fir Group,120,0.2056,0.363,0.13,0.197,62,northern white-cedar; red spruce; balsam fir,22.03
+601,Wetland Oak/Gum/Cypress Group,600,0.2729,0.494,0.144,0.922,156,baldcypress; sweetgum; swamp tupelo,63.82
+701,Wetland Elm/Ash/Cottonwood Group,700,0.2519,0.461,0.127,0.955,208,silver maple; eastern cottonwood; red maple,47.66

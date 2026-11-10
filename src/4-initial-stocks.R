@@ -21,7 +21,7 @@ if (!nrow(cc)) fail("Live-Tree Carbon Curves are empty: run stage 2 first (same 
 dc <- as.data.table(datasheet(scn, ds("OutputDecayCalibration"), optional = TRUE, lookupsAsFactors = FALSE))
 if (!nrow(dc)) fail("Decay Calibration is empty: run stage 3 first (same pipeline, or depend on a stage 3 result)")
 fm <- as.data.table(datasheet(scn, "stsim_FlowMultiplier", optional = TRUE, lookupsAsFactors = FALSE))
-fm <- fm[is.na(AgeMin) & grepl("^(Biomass Turnover|Decay|Emission|Transfer):", FlowGroupId) & grepl("^Forest:", StateClassId)]
+fm <- fm[is.na(AgeMin) & grepl("^(Biomass Turnover|Decay|Emission|Transfer|Stabilization):", FlowGroupId) & is_forest_class(StateClassId)]
 if (!nrow(fm)) fail("no forest turnover and decay flow multipliers: run stage 3 first")
 setnames(cc, c("StratumId", "StateClassId"), c("Stratum", "StateClass"))
 fo <- fread(pkg_file("defaults", "stockflow", "stsim_FlowOrder.csv"))

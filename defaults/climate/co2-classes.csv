@@ -42,3 +42,6 @@ Shrubland: Post Fire Shrub,Shrub,Net Growth Non Forest: Total
 Shrubland: Sage,Shrub,Net Growth Non Forest: Total
 Wetland: Estuarine Forested,Woody wetland,Net Growth Forest: Total
 Wetland: Palustrine Forested,Woody wetland,Net Growth Forest: Total
+Wetland: Elm/Ash/Cottonwood Group,Forest,Net Growth Forest: Total
+Wetland: Oak/Gum/Cypress Group,Forest,Net Growth Forest: Total
+Wetland: Spruce/Fir Group,Forest,Net Growth Forest: Total

@@ -26,6 +26,8 @@ prj <- rsyncrosim::project()
 
 # stop with a message SyncroSim shows in the run log; log a line
 fail <- function(...) stop(sprintf(...), call. = FALSE)
+# a forest class: the upland forest type groups and their forested wetland twins (Wetland: Spruce/Fir Group etc., to-do 53)
+is_forest_class <- function(x) !is.na(x) & grepl("^(Forest: |Wetland: .+ Group$)", x)
 say  <- function(...) updateRunLog(sprintf(...))
 
 # the R version and, in a git checkout of the package, its commit: a Build logs this line and the model record reads it from the log

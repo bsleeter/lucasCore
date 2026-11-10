@@ -21,7 +21,7 @@
 # change. Output columns are the USGS tables', so growth.R, carbon.R and calibrate.R read either source alike.
 # =============================================================================
 
-FIA_METHOD <- "2026-10-26b"   # bump when the derivation changes (the cache is rebuilt)
+FIA_METHOD <- "2026-11-10"   # bump when the derivation changes (the cache is rebuilt)
 FIA_SOURCES <- c("USGS condition tables (.Rds)", "FIA DataMart (state CSVs)")
 fia_choice <- function(v, labels) { if (is.null(v) || !length(v) || is.na(v[1])) return(1L)
   if (is.numeric(v)) as.integer(v[1]) else { k <- match(TRUE, startsWith(as.character(v[1]), sub(" .*", "", labels))); if (is.na(k)) 1L else k } }
@@ -88,11 +88,18 @@ fia_reference <- function(dm) {
     td <- tempfile(); utils::unzip(z, files = f, exdir = td); data.table::fread(file.path(td, f)) }
   list(ft = rd("REF_FOREST_TYPE.csv")[, .(VALUE, TYPGRPCD)], sp = rd("REF_SPECIES.csv")[, .(SPCD, CARBON_RATIO_LIVE)]) }
 
+# Forested wetlands (to-do 53): a condition on a hydric site (physiographic class 31-39) of the Spruce/Fir, Oak/Gum/Cypress or
+# Elm/Ash/Cottonwood group takes the wetland twin's code (121, 601, 701), so every step keyed on the type group (growth fits, dead
+# wood calibration, snag fall, stem turnover, harvest ages) separates the wetland stands from the upland ones.
+FIA_HYDRIC_TWINS <- c(`120` = 121L, `600` = 601L, `700` = 701L)
+fia_hydric_group <- function(grp, physcl) { tw <- unname(FIA_HYDRIC_TWINS[as.character(grp)])
+  data.table::fifelse(!is.na(tw) & !is.na(physcl) & physcl >= 31 & physcl <= 39, as.integer(tw), as.integer(grp)) }
+
 # one state's forest conditions in the USGS tables' columns (plus the plot coordinates for the ecodivision)
 fia_state <- function(dm, s, ref) {
   f <- function(t) file.path(dm, sprintf("%s_%s.csv", s, t))
   pl <- data.table::fread(f("PLOT"), select = c("CN", "INVYR", "STATECD", "UNITCD", "COUNTYCD", "PLOT", "LAT", "LON", "MACRO_BREAKPOINT_DIA"), colClasses = list(character = "CN"))
-  cd <- data.table::fread(f("COND"), select = c("PLT_CN", "CONDID", "COND_STATUS_CD", "STDAGE", "FORTYPCD", "MICRPROP_UNADJ", "SUBPPROP_UNADJ", "MACRPROP_UNADJ",
+  cd <- data.table::fread(f("COND"), select = c("PLT_CN", "CONDID", "COND_STATUS_CD", "STDAGE", "FORTYPCD", "PHYSCLCD", "MICRPROP_UNADJ", "SUBPPROP_UNADJ", "MACRPROP_UNADJ",
                                                 "DSTRBCD1", "TRTCD1", "CARBON_DOWN_DEAD", "CARBON_LITTER", "CARBON_SOIL_ORG", "CARBON_UNDERSTORY_AG", "CARBON_UNDERSTORY_BG"),
                           colClasses = list(character = "PLT_CN"))[COND_STATUS_CD == 1]
   tr <- data.table::fread(f("TREE"), select = c("PLT_CN", "CONDID", "SPCD", "STATUSCD", "STANDING_DEAD_CD", "DIA", "TPA_UNADJ", "CARBON_AG", "CARBON_BG", "DRYBIO_FOLIAGE", "VOLCFNET"),
@@ -111,7 +118,7 @@ fia_state <- function(dm, s, ref) {
   x <- merge(merge(merge(cd, pl, by.x = "PLT_CN", by.y = "CN"), live, by = c("PLT_CN", "CONDID"), all.x = TRUE), dead, by = c("PLT_CN", "CONDID"), all.x = TRUE)
   for (k in c("ag", "bg", "fol", "vol", "dag", "dbg")) x[is.na(get(k)), (k) := 0]
   list(cond = x[, .(plt_cn = PLT_CN, condid = CONDID, statecd = STATECD, unitcd = UNITCD, countycd = COUNTYCD, plot = PLOT, invyr = INVYR, lat = LAT, lon = LON,
-                    stdage = STDAGE, fortyp_grp = ref$ft$TYPGRPCD[match(FORTYPCD, ref$ft$VALUE)],
+                    stdage = STDAGE, fortyp_grp = fia_hydric_group(ref$ft$TYPGRPCD[match(FORTYPCD, ref$ft$VALUE)], PHYSCLCD),
                     c_understory_ag_tons_per_acre = CARBON_UNDERSTORY_AG, c_understory_bg_tons_per_acre = CARBON_UNDERSTORY_BG,
                     c_understory_total_tons_per_acre = CARBON_UNDERSTORY_AG + CARBON_UNDERSTORY_BG, c_litter_tons_per_acre = CARBON_LITTER,
                     c_soil_org_tons_per_acre = CARBON_SOIL_ORG, c_down_dead_tons_per_acre = CARBON_DOWN_DEAD,

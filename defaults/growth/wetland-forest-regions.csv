@@ -1,0 +1,20 @@
+Ecodivision,StateClassId,Conditions,SpruceFirShare,OakGumCypressShare,ElmAshCottonwoodShare,OtherConditions,Source
+Hot Continental,Wetland: Elm/Ash/Cottonwood Group,466,0.099,0.064,0.837,187,most hydric FIA area of the three groups
+Hot Continental Mountains,Wetland: Elm/Ash/Cottonwood Group,9,0.321,0.12,0.559,9,fewer than 30 hydric conditions of the three: default
+Marine,Wetland: Elm/Ash/Cottonwood Group,4,0,0,1,4,fewer than 30 hydric conditions of the three: default
+Marine Mountains,Wetland: Elm/Ash/Cottonwood Group,2,0,0,1,75,fewer than 30 hydric conditions of the three: default
+Mediterranean,Wetland: Elm/Ash/Cottonwood Group,0,0,0,0,4,fewer than 30 hydric conditions of the three: default
+Mediterranean Mountains,Wetland: Elm/Ash/Cottonwood Group,1,0,0,1,11,fewer than 30 hydric conditions of the three: default
+Prairie,Wetland: Elm/Ash/Cottonwood Group,26,0,0.138,0.862,7,fewer than 30 hydric conditions of the three: default
+Savanna,Wetland: Oak/Gum/Cypress Group,73,0,0.973,0.027,34,most hydric FIA area of the three groups
+Subtropical,Wetland: Oak/Gum/Cypress Group,2281,0,0.905,0.095,1143,most hydric FIA area of the three groups
+Subtropical Mountains,Wetland: Elm/Ash/Cottonwood Group,0,0,0,0,1,fewer than 30 hydric conditions of the three: default
+Temperate Desert,Wetland: Elm/Ash/Cottonwood Group,0,0,0,0,2,fewer than 30 hydric conditions of the three: default
+Temperate Desert Mountains,Wetland: Elm/Ash/Cottonwood Group,1,0,0,1,5,fewer than 30 hydric conditions of the three: default
+Temperate Steppe,Wetland: Elm/Ash/Cottonwood Group,4,0,0,1,3,fewer than 30 hydric conditions of the three: default
+Temperate Steppe Mountains,Wetland: Elm/Ash/Cottonwood Group,6,0,0,1,84,fewer than 30 hydric conditions of the three: default
+Tropical/Subtropical Desert,Wetland: Elm/Ash/Cottonwood Group,0,0,0,0,2,fewer than 30 hydric conditions of the three: default
+Tropical/Subtropical Steppe,Wetland: Elm/Ash/Cottonwood Group,2,0,1,0,7,fewer than 30 hydric conditions of the three: default
+Tropical/Subtropical Steppe Mountains,Wetland: Elm/Ash/Cottonwood Group,0,0,0,0,1,fewer than 30 hydric conditions of the three: default
+Warm Continental,Wetland: Spruce/Fir Group,4406,0.76,0,0.24,759,most hydric FIA area of the three groups
+Warm Continental Mountains,Wetland: Spruce/Fir Group,137,0.835,0,0.165,24,most hydric FIA area of the three groups

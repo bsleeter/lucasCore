@@ -240,7 +240,7 @@ if (isTRUE(H_MAPS) && nrow(hl)) {
   seen <- list(clearcut = rep(FALSE, length(vS)), selection = rep(FALSE, length(vS))); pr <- rep(0, length(vS))
   fc <- rbindlist(lapply(seq_len(nrow(hl)), function(i) { v <- values(rast(hl$File[i]), mat = FALSE); y <- hl$Timestep[i]; k <- hl$kind[i]
     any_cut <- !is.na(v) & v > 0
-    on <- any_cut & !seen[[k]] & pr < 0.5 & !is.na(cn) & startsWith(cn, "Forest:") & !is.na(vA) & y > AGE_YEAR; seen[[k]] <<- seen[[k]] | any_cut
+    on <- any_cut & !seen[[k]] & pr < 0.5 & is_forest_class(cn) & !is.na(vA) & y > AGE_YEAR; seen[[k]] <<- seen[[k]] | any_cut
     if (k == "clearcut") pr[any_cut] <<- 1 - (1 - pr[any_cut]) * (1 - v[any_cut])
     data.table(StateClassId = cn[on], TransitionTypeId = hg$TransitionTypeId[match(hl$TransitionGroupId[i], hg$TransitionGroupId)], age = vA[on] + (y - y0 - 1), w = v[on]) }))
   if (nrow(fc)) smap <- fc[, .(Map = round(wq(age, w, 0.1)), MapArea = sum(w) * cell_km2), by = .(StateClassId, TransitionTypeId)] }

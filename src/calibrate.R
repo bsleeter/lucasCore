@@ -36,8 +36,8 @@ cal_setup <- function(k, ctx) {
   live <- as.matrix(ctx$cc[Stratum == k$Stratum & StateClass == k$StateClass][order(Age), names(LIVE_POOLS), with = FALSE])
   r <- turnover_rates(k$StateClass, sw, as.numeric(ctx$dens[StateClassId == k$sc, DeciduousShare]), ctx$cbm, k$cbm_eco, k$cbm_species, lt_user(k))   # CBM Crosswalk row and Live Turnover values when the cell has them
   vals <- dom_flow_values(r, sw, k$temp, ctx$cbm, dp = if (!is.null(ctx$dpt)) dom_parameters(ctx$dpt, k$Stratum))   # Carbon Assumptions dead pool parameters
-  fixed <- character()
-  if (!is.null(k$snag_fall) && !is.na(k$snag_fall)) { vals <- set_snag_fall(vals, k$snag_fall); fixed <- SNAG_FALL_FLOWS }   # measured snag fall
+  vals <- add_burial(vals, k$burial_rate); fixed <- BURIAL_FLOW
+  if (!is.null(k$snag_fall) && !is.na(k$snag_fall)) { vals <- set_snag_fall(vals, k$snag_fall); fixed <- c(fixed, SNAG_FALL_FLOWS) }   # measured snag fall
   list(k = k, live = live, vals = vals, fixed = fixed,
        hist = spinup_history(ctx$ev, k$StateClass, k$ri, k$hist_cc, k$Stratum),   # historical cycles (Spin-up: share ended by clearcut)
        fire = disturbance_matrices(ctx$ev, FIRE_GROUP, k$StateClass, k$ri, k$Stratum),   # the cell's own event rows (Disturbance Flows)
