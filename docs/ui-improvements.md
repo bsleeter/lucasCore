@@ -13,6 +13,7 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | 1 | 14 FGDC metadata | No | User order 2026-11-02: first. Plan (a working document, not in this repository) (phases 0-6; decisions settled 2026-11-02: CSDGM first, one release per Build, maps every year, model archive always, ScienceBase folder by hand; Phase 0 done with the user 2026-11-02; Phase 1 built 2026-11-02: defaults/metadata definitions, data dictionary, citations, src/metadata.R, tests/unit-metadata-definitions.R; citation questions in the plan); lineage from the home's manifest and each Build's Data Sources Used | 12 (done) |
 | 2 | 39 Grassland, shrubland and wetland carbon: options beyond today's crude method | Yes | User order 2026-11-02: third, with the other open science items (user: explore additional options).  Step 1 (rates on a page) and the diagram view done; the diagram shows emergent wetland rates settling far above their starting pools; suspect values (emergent wetland growth 31, irrigated grass 9.19 Mg C/ha/yr), root turnover splits. Review done 2026-11-06 (dev/nonforest/review). Revised approach accepted the same day: one stage 3 solver (measured stocks as targets, growth from data, rates solved; IPCC, IBIS or data as the target source), IPCC factors for soil change on conversion, carbon for pasture and cropland. Nine steps; step 1, the emergent wetland fix, is next | - |
 | next, after the UI check | 53 Forested wetlands as wetland counterparts of three forest type groups (spruce/fir, oak/gum/cypress, elm/ash/cottonwood) | Yes (woody wetland classes, and the three upland types lose their hydric FIA plots) | Planned 2026-11-09; the user picks it up in a new session once the commits since v1.1.0 are confirmed in the UI. Three choices open (item 53) | - |
+| later | 54 Climate response for emergent wetland growth | Yes (marsh growth by year, in history and in projections, when turned on) | Added 2026-11-09 (user). Today only CO2 changes marsh growth under alternative climate futures; the response model needs a short review first (item 54) | - |
 | release | 46 CO2 fertilization | Yes, in projections with a Projection Climate result (Central by default; None turns it off) | Added 2026-11-04; built, tested (Puget run, age-band check), documented (guide 7.3.1) and pushed 2026-11-06. Left: a release | - |
 | later | 47 Example libraries by region and resolution | No (each holds its own results) | Added 2026-11-04, replaces 13. Best built after the open science items, since each carbon change dates them | 14, restore test |
 | any | 49 Test national mode end to end | No | Added 2026-11-04. Never run end to end; fills about 175 GB overnight | 12 (done) |
@@ -949,3 +950,21 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     pocosin cells get a tree curve; cells with no forest type pixel take a neighbour's type, which may be upland; FIA soil carbon is
     modelled, so soil targets stay gNATSGO (which overstates organic wetland soils by about 35%, Uhran et al. 2021). New runs will
     differ from the P26 final runs (left as they are).
+54. **Climate response for emergent wetland growth** - ADDED 2026-11-09, not started (user: "add growth response to wetlands as a
+  to-do"). Today `Wetland: Estuarine Emergent` and `Wetland: Palustrine Emergent` grow at their ecodivision rows (estuarine
+  recalibrated to the USGS tidal marsh NPP map, to-do 39 step 10) with Tidal Marsh Productivity for the pattern, and the only yearly
+  change is CO2 in projections. Their growth flows (`Net Growth Wetland Emergent: Atmosphere -> Foliage / Fine Roots`) form the flow
+  group `Net Growth Wetland: Total`, which no climate effect reaches: defaults/climate/flow-multipliers.csv holds Forest Growth,
+  Non-Forest Growth (grass and shrub only) and the two Q10 groups. So under alternative LOCA2 futures marsh growth differs only by
+  CO2, while grass, shrub and forest growth and every class's litter decay respond to the climate. Forested wetlands grow on the
+  forest net growth flows and already take the forest climate effect. (Agriculture growth has the same gap; not part of this item.)
+  - **Build:** a Climate Options choice, Wetland Growth (None / ... ), a `WetlandGrowth` role row for `Net Growth Wetland: Total` in
+    flow-multipliers.csv, and the emitter in src/climate.R so stage 7 (PRISM years) and stage 11 (LOCA2 years, against the climate
+    model's own 1991-2020 normal) write it like the others; the Climate Multipliers figure picks it up as another series.
+  - **Response, to decide (review first):** rain is a poor driver of tidal marsh, which is fed by tides and rivers, and better for
+    inland (palustrine) marsh. Candidates: (a) Miami NPP as for grass and shrub before RAP fit, the quickest; (b) temperature only
+    (a Q10 or the Miami temperature term) for estuarine marsh and Miami for palustrine; (c) a fit of marsh productivity to climate,
+    space for time across the USGS tidal marsh NPP map (2015 only) or from a yearly series if one exists (Landsat marsh biomass,
+    eddy flux at marsh sites such as AmeriFlux US-Myb, US-Tw1), with sea-level rise and salinity as covariates to consider.
+  - **Tests:** a quick test on a library with emergent wetland (Solano: Suisun Marsh; Calaveras has 21 inland cells), stage 7 and a
+    Projection Climate result under two SSPs, checking the series against the forest and grass ones and that 1.0 holds at the normal.
