@@ -954,6 +954,29 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
        (Histosols; already downloaded) are marked; on them fire also burns BG Slow (depth of burn by severity), and woody or emergent
        wetland converted to cropland or pasture loses soil carbon as drained organic soil. Rates from the woody wetland review plus a
        short check of peat-fire depth of burn and the IPCC 2013 Wetlands Supplement emission factors for drained organic soils.
+  - **Built 2026-11-10 (branch claude/lucascore-syncrosim-todo-f02a9f, version 1.3.0; not on main, not run yet):**
+    - FIA split: `src/fia.R` `fia_hydric_group` (PHYSCLCD 31-39), cache key bumped. 9,780 hydric conditions, 77% of their area in
+      the three groups.
+    - Twins: `tools/make_wetland_forest.R` copies every upland row (23 files) for its twin; Ids 121/601/701, diagram cells H14-H16,
+      Ag Contraction types 1009-1014. Forest-by-name tests now use `is_forest_class` (stages 4, 6, 12).
+    - Other types by region: `tools/make_wetland_forest_regions.R` -> `defaults/growth/wetland-forest-regions.csv`. Warm Continental
+      (and Mountains) Spruce/Fir; Subtropical and Savanna Oak/Gum/Cypress; every other ecodivision Elm/Ash/Cottonwood (Hot
+      Continental by its own plots, the rest by default). Stage 5 assigns palustrine woody wetland cells (NLCD 90 not estuarine in
+      C-CAP, NLCD 95 that C-CAP maps as forested or scrub-shrub) and logs the reassignments; estuarine forested cells stay
+      Palustrine Forested.
+    - Burial: `defaults/spinup/wetland-burial.csv`; flow `Stabilization: BG Slow -> Deep Soil` in the forest pathways for the twins
+      only, rate = burial / soil target, fixed outside the gNATSGO soil multiplier (stage 3 calibration and flows, stage 4 spin-up).
+    - Organic soils: Data Source `HistosolFile` (Data Download: gNATSGO mukey raster for the region + the component table, percent
+      Histosols). Stage 8 writes the Organic Soil Share map as the spatial multiplier of flow group `Organic Soil`.
+      `tools/make_organic_soil.R` writes `defaults/stockflow/organic-soil-pathways.csv`: peat fire on the twins burns 0.03 / 0.07 /
+      0.15 of BG Slow (low / medium / high), and cropland and pasture lose 11.2-14.3 and 2.8-3.6 Mg C/ha/yr (US Inventory) as a share
+      of a 600 Mg C/ha reference stock. Sources: `dev/nonforest/review/notes/peat-fire-drained-organic-soils.md` (local).
+    - Library update 1.3 (`ui/LucasCoreUpdates.cs`): the twins, their transition types and groups, the Histosol column, the new flow
+      types, groups, memberships, order, filters and the Organic Soil Share multiplier type.
+    - Tests: `tests/unit-wetland-forest.R` (31 checks); all unit tests pass except `unit-treemap.R`, which needs a local DataMart.
+    - Still to do: an eastern test library (Chesapeake, Virginia, chosen 2026-11-10) through Data Download, Build and a historical
+      run; rerun `tools/calibrate-stem-turnover.R`, `make_co2_ecm_share.R` and `calibrate-harvest-age.R` on the split conditions
+      (the twins hold the upland values until then); merge to main and release 1.3.0.
   - **Known limits:** mineral and organic soil are not separated within a class (oak/gum/cypress mixes both); scrub-shrub and
     pocosin cells get a tree curve; cells with no forest type pixel take a neighbour's type, which may be upland; FIA soil carbon is
     modelled, so soil targets stay gNATSGO (which overstates organic wetland soils by about 35%, Uhran et al. 2021). New runs will
