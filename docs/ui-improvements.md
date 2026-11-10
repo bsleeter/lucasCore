@@ -14,7 +14,7 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | 2 | 39 Grassland, shrubland and wetland carbon: options beyond today's crude method | Yes | User order 2026-11-02: third, with the other open science items (user: explore additional options).  Step 1 (rates on a page) and the diagram view done; the diagram shows emergent wetland rates settling far above their starting pools; suspect values (emergent wetland growth 31, irrigated grass 9.19 Mg C/ha/yr), root turnover splits. Review done 2026-11-06 (dev/nonforest/review). Revised approach accepted the same day: one stage 3 solver (measured stocks as targets, growth from data, rates solved; IPCC, IBIS or data as the target source), IPCC factors for soil change on conversion, carbon for pasture and cropland. Nine steps; step 1, the emergent wetland fix, is next | - |
 | next, after the UI check | 53 Forested wetlands as wetland counterparts of three forest type groups (spruce/fir, oak/gum/cypress, elm/ash/cottonwood) | Yes (woody wetland classes, and the three upland types lose their hydric FIA plots) | Planned 2026-11-09; the user picks it up in a new session once the commits since v1.1.0 are confirmed in the UI. Three choices open (item 53) | - |
 | later | 54 Climate response for emergent wetland growth | Yes (marsh growth by year, in history and in projections, when turned on) | Added 2026-11-09 (user). Today only CO2 changes marsh growth under alternative climate futures; the response model needs a short review first (item 54) | - |
-| later | 55 Shrubland growth: chaparral and non-sage on different bases (fluxes about 2x apart, stocks agree) | Yes (shrub fluxes and stocks, when changed) | Noted 2026-11-09 (user): direction RAP NPP for every grass and shrub class with stocks fitted to literature; first decide chaparral from measured chaparral NPP (item 55) | - |
+| later | 55 Grass and shrub stocks fitted to literature (chaparral wood turnover 0.08; non-sage and native sage steppe split by RAP herb share) | Yes | Refit done 2026-11-09 (item 55); left: the RAP tests at the Sky Oaks towers, the foothill chaparral scale | - |
 | release | 46 CO2 fertilization | Yes, in projections with a Projection Climate result (Central by default; None turns it off) | Added 2026-11-04; built, tested (Puget run, age-band check), documented (guide 7.3.1) and pushed 2026-11-06. Left: a release | - |
 | later | 47 Example libraries by region and resolution | No (each holds its own results) | Added 2026-11-04, replaces 13. Best built after the open science items, since each carbon change dates them | 14, restore test |
 | any | 49 Test national mode end to end | No | Added 2026-11-04. Never run end to end; fills about 175 GB overnight | 12 (done) |
@@ -969,7 +969,7 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     eddy flux at marsh sites such as AmeriFlux US-Myb, US-Tw1), with sea-level rise and salinity as covariates to consider.
   - **Tests:** a quick test on a library with emergent wetland (Solano: Suisun Marsh; Calaveras has 21 inland cells), stage 7 and a
     Projection Climate result under two SSPs, checking the series against the forest and grass ones and that 1.0 holds at the normal.
-55. **Shrubland growth: chaparral and non-sage on different bases** - NOTED 2026-11-09, left as is for now (user: "option 1 but note
+55. **Shrubland growth: chaparral and non-sage on different bases** - REFIT 2026-11-09 (steps 1 and 2 done; first noted the same day, user: "option 1 but note
   this for later follow up work"). Found in the Calaveras test: in the Mediterranean ecodivision non-sage shrub grows at 3.9 Mg
   C/ha/yr and chaparral at about 2.0, although RAP NPP is nearly the same for both (3.92 and 3.85).
   - **Why:** chaparral's growth is solved from literature biomass (defaults/stockflow/chaparral-age.csv: 11 Mg C/ha aboveground at
@@ -1003,3 +1003,26 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
        need field data or fuel loads (LANDFIRE FCCS).
     3. Grassland: Irrigated Perennial has no ecodivision RAP sample anywhere (one CONUS mean, 2.86); about half the class x
        ecodivision pairs of the sage family, annual grass and chaparral use the class's CONUS mean.
+  - **Review (2026-11-09):** `dev/nonforest/review/reports/Chaparral NPP and shrub stocks.md` and its notes (local only). Measured
+    chamise and scrub oak aboveground NPP about 1.4-1.5 Mg C/ha/yr at 23-35 yr, Ceanothus 3.4-5 (Riggan et al. 1988, Gray 1982,
+    Schlesinger et al. 1982, Mooney et al. 1977); no belowground NPP measured for any chaparral; chamise total about 2-3. RAP NPP is
+    MOD17 on Landsat (total NPP, roots included; no soil-moisture term), never validated for shrubs; MODIS GPP ran 26-90% above the
+    young Sky Oaks chamise tower. Verdict: RAP likely high in chaparral only (its sage and open-shrub values sit near the parent
+    product's shrub mean). RAP has no shrub biomass (cover and NPP only); its herbaceous biomass is a year's production.
+  - **Done (user 2026-11-09: "go ahead with the refit", "yes do that"):**
+    1. Chaparral keeps its biomass anchor; wood turnover 0.03 -> 0.08 (chamise 0.06-0.13 from standing dead). Mature NPP in the
+       Mediterranean ecodivision 1.9 -> 2.48 Mg C/ha/yr; stocks unchanged (11 aboveground, 6.6 roots at the CONUS mean).
+    2. Live-stock targets in grass-shrub-literature.csv (AgLiveTarget, RootLiveTarget, StockSource; at the class's CONUS mean NPP),
+       fitted by tools/make_grass_shrub.R fit_stocks: Natural Perennial 1.0 / 3.0 and Irrigated Perennial 1.7 / 2.0 (foliage share
+       and fine-root turnover 0.82, 0.86/yr); Annual 0.95 / 0.8 (roots now die back yearly; only the ratio is fitted, since RAP's
+       2.8 exceeds the field annual total of about 1.75, so its stocks follow NPP); Sage 1.0 / 2.4 and Invaded 0.9 / 1.7 (wood,
+       fine- and coarse-root turnover; little change). Non-sage 1.5 / 2.0 and Native Sage Steppe 1.4 / 2.4 (herbaceous parts
+       inferred): growth split by RAP's herbaceous share (0.67, 0.76) - that share grows as Natural Perennial grass, the rest as
+       Sage (mixed_rates) - then wood (0.039, 0.033) and root turnover fitted; they held 3-5x the targets on Sage's split.
+       Post Fire Shrub follows Non-sage (a legacy class, not used now; user 2026-11-09).
+    Calaveras quick test (stages 3, 4, 8 and 10 years on a copy): annual grass live 4.8 -> 3.7, non-sage live 18.4 -> 7.4 and dead
+    organic matter 10.3 -> 5.5 Mg C/ha, chaparral stocks unchanged; shrubland 2.46 -> 2.33 Tg, grassland 5.92 -> 5.82, both steady.
+  - **Still open:** the decisive RAP tests (RAP NPP at the Sky Oaks towers against tower GPP x 0.5; RAP against the unpartitioned
+    Landsat NPP at chaparral pixels; RAP herbaceous production against the San Joaquin and Hopland clipping series); the
+    foothill chaparral scale s (Calaveras 1.21 lifts mature chaparral to about 13.3 Mg C/ha against a measured Sierra foothill
+    chamise value of about 7.5); a root target for irrigated pasture (assumed); and step 3 above.
