@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000" role="img" aria-labelledby="bp-title">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1100" width="1600" height="1100" role="img" aria-labelledby="bp-title">
 <title id="bp-title">lucasCore data blueprint: national datasets and the stages that read them</title>
 <style><![CDATA[@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap');
 svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Consolas,'Courier New',monospace;--bg:#f4f6f6;--surface:#ffffff;--line:#cfd6d8;--ink:#17242a;--ink2:#34444b;--muted:#5f6e74;--edge:#3b4a51;--on:#ffffff;
@@ -28,9 +28,9 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 .sn2{font:600 13px var(--sans);fill:var(--ink)} .mk{font:400 11px var(--sans);fill:var(--ink2)} .ch{font:400 10px var(--sans);fill:var(--muted)}
 ]]></style>
 <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker></defs>
-<rect class="bg" width="1600" height="1000"/>
+<rect class="bg" width="1600" height="1100"/>
 <text x="24" y="44" class="h1">lucasCore data blueprint</text>
-<text x="24" y="66" class="sub">The national datasets lucasCore reads, the stages that read them, what for, and the option that switches each one · version 1.1.0</text>
+<text x="24" y="66" class="sub">The national datasets lucasCore reads, the stages that read them, what for, and the option that switches each one · version 1.2.0</text>
 <rect class="lg f-setup" x="1152.8" y="28" width="14" height="12" rx="2"/>
 <text x="1176.8" y="38" class="lgt">Setup</text>
 <rect class="lg f-land" x="1213.8" y="28" width="14" height="12" rx="2"/>
@@ -45,7 +45,7 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <text x="1142.8" y="62" class="lgt">read with the default settings</text>
 <path d="M1334.8,58 h18" class="wire f-setup alt" style="opacity:1"/>
 <text x="1358.8" y="62" class="lgt">read only under a non-default option</text>
-<rect class="box" x="24" y="104" width="600" height="830" rx="7"/><text x="40" y="126" class="eyebrow">DATA SOURCES SHEET · FILLED BY STAGE 15 DATA DOWNLOAD</text><text x="40" y="146" class="sname">National datasets</text>
+<rect class="box" x="24" y="104" width="600" height="930" rx="7"/><text x="40" y="126" class="eyebrow">DATA SOURCES SHEET · FILLED BY STAGE 15 DATA DOWNLOAD</text><text x="40" y="146" class="sname">National datasets</text>
 <text x="312" y="146" class="ghead">VINTAGE · RESOLUTION</text>
 <text x="40" y="172" class="ghead">FIA AND STRATA</text>
 <g class="ds" data-ds="EcodivisionFile" tabindex="0" role="button" aria-label="FIA ecodivisions"><rect class="dsbg" x="32" y="178" width="584" height="22" rx="3"/>
@@ -126,82 +126,99 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <text x="40" y="673" class="dsn">FPA-FOD fire occurrence</text>
 <text x="312" y="673" class="dsv">7th edition · geopackage</text>
 </g>
-<text x="40" y="708" class="ghead">CLIMATE</text>
-<g class="ds" data-ds="PrismFolder" tabindex="0" role="button" aria-label="PRISM"><rect class="dsbg" x="32" y="714" width="584" height="22" rx="3"/>
-<text x="40" y="729" class="dsn">PRISM</text>
-<text x="312" y="729" class="dsv">annual tmean and ppt · normals</text>
+<text x="40" y="708" class="ghead">NON-FOREST PRODUCTIVITY</text>
+<g class="ds" data-ds="RapNppFolder" tabindex="0" role="button" aria-label="RAP vegetation NPP"><rect class="dsbg" x="32" y="714" width="584" height="22" rx="3"/>
+<text x="40" y="729" class="dsn">RAP vegetation NPP</text>
+<text x="312" y="729" class="dsv">v3 · 30 m · 2014 to 2023</text>
 </g>
-<g class="ds" data-ds="Loca2Folder" tabindex="0" role="button" aria-label="LOCA2"><rect class="dsbg" x="32" y="737" width="584" height="22" rx="3"/>
-<text x="40" y="752" class="dsn">LOCA2</text>
-<text x="312" y="752" class="dsv">GCM / member / SSP</text>
+<g class="ds" data-ds="CdlFolder" tabindex="0" role="button" aria-label="Cropland Data Layer"><rect class="dsbg" x="32" y="737" width="584" height="22" rx="3"/>
+<text x="40" y="752" class="dsn">Cropland Data Layer</text>
+<text x="312" y="752" class="dsv">USDA NASS · 30 m · 2014 to 2025</text>
 </g>
-<text x="40" y="787" class="ghead">COVARIATES</text>
-<g class="ds" data-ds="RoadsFile" tabindex="0" role="button" aria-label="LANDFIRE roads"><rect class="dsbg" x="32" y="793" width="584" height="22" rx="3"/>
-<text x="40" y="808" class="dsn">LANDFIRE roads</text>
-<text x="312" y="808" class="dsv">LF2023 · 30 m</text>
+<g class="ds" data-ds="TidalMarshNppFolder" tabindex="0" role="button" aria-label="USGS tidal marsh NPP"><rect class="dsbg" x="32" y="760" width="584" height="22" rx="3"/>
+<text x="40" y="775" class="dsn">USGS tidal marsh NPP</text>
+<text x="312" y="775" class="dsv">Woltz et al. 2023 · 30 m · 2015</text>
 </g>
-<g class="ds" data-ds="ElevationFile" tabindex="0" role="button" aria-label="LANDFIRE elevation"><rect class="dsbg" x="32" y="816" width="584" height="22" rx="3"/>
-<text x="40" y="831" class="dsn">LANDFIRE elevation</text>
-<text x="312" y="831" class="dsv">LF2020 · 30 m</text>
+<text x="40" y="810" class="ghead">CLIMATE</text>
+<g class="ds" data-ds="PrismFolder" tabindex="0" role="button" aria-label="PRISM"><rect class="dsbg" x="32" y="816" width="584" height="22" rx="3"/>
+<text x="40" y="831" class="dsn">PRISM</text>
+<text x="312" y="831" class="dsv">annual tmean and ppt, monthly ppt · normals</text>
 </g>
-<g class="ds" data-ds="WuiFolder" tabindex="0" role="button" aria-label="SILVIS WUI blocks"><rect class="dsbg" x="32" y="839" width="584" height="22" rx="3"/>
-<text x="40" y="854" class="dsn">SILVIS WUI blocks</text>
-<text x="312" y="854" class="dsv">v4 · 1990 to 2020 change</text>
+<g class="ds" data-ds="Loca2Folder" tabindex="0" role="button" aria-label="LOCA2"><rect class="dsbg" x="32" y="839" width="584" height="22" rx="3"/>
+<text x="40" y="854" class="dsn">LOCA2</text>
+<text x="312" y="854" class="dsv">GCM / member / SSP</text>
 </g>
-<g class="ds" data-ds="NccpiFile" tabindex="0" role="button" aria-label="gNATSGO crop productivity"><rect class="dsbg" x="32" y="862" width="584" height="22" rx="3"/>
-<text x="40" y="877" class="dsn">gNATSGO crop productivity</text>
-<text x="312" y="877" class="dsv">NCCPI · 30 m</text>
+<text x="40" y="889" class="ghead">COVARIATES</text>
+<g class="ds" data-ds="RoadsFile" tabindex="0" role="button" aria-label="LANDFIRE roads"><rect class="dsbg" x="32" y="895" width="584" height="22" rx="3"/>
+<text x="40" y="910" class="dsn">LANDFIRE roads</text>
+<text x="312" y="910" class="dsv">LF2023 · 30 m</text>
 </g>
-<g class="ds" data-ds="ForestOwnerFile" tabindex="0" role="button" aria-label="USFS forest ownership"><rect class="dsbg" x="32" y="885" width="584" height="22" rx="3"/>
-<text x="40" y="900" class="dsn">USFS forest ownership</text>
-<text x="312" y="900" class="dsv">circa 2017 · 30 m</text>
+<g class="ds" data-ds="ElevationFile" tabindex="0" role="button" aria-label="LANDFIRE elevation"><rect class="dsbg" x="32" y="918" width="584" height="22" rx="3"/>
+<text x="40" y="933" class="dsn">LANDFIRE elevation</text>
+<text x="312" y="933" class="dsv">LF2020 · 30 m</text>
+</g>
+<g class="ds" data-ds="WuiFolder" tabindex="0" role="button" aria-label="SILVIS WUI blocks"><rect class="dsbg" x="32" y="941" width="584" height="22" rx="3"/>
+<text x="40" y="956" class="dsn">SILVIS WUI blocks</text>
+<text x="312" y="956" class="dsv">v4 · 1990 to 2020 change</text>
+</g>
+<g class="ds" data-ds="NccpiFile" tabindex="0" role="button" aria-label="gNATSGO crop productivity"><rect class="dsbg" x="32" y="964" width="584" height="22" rx="3"/>
+<text x="40" y="979" class="dsn">gNATSGO crop productivity</text>
+<text x="312" y="979" class="dsv">NCCPI · 30 m</text>
+</g>
+<g class="ds" data-ds="ForestOwnerFile" tabindex="0" role="button" aria-label="USFS forest ownership"><rect class="dsbg" x="32" y="987" width="584" height="22" rx="3"/>
+<text x="40" y="1002" class="dsn">USFS forest ownership</text>
+<text x="312" y="1002" class="dsv">circa 2017 · 30 m</text>
 </g>
 <path class="wire f-setup" data-ds="EcodivisionFile" data-stage="1" d="M616,189 C808,189 808,123.0 998,123.0"/>
 <path class="wire f-carbon" data-ds="EcodivisionFile" data-stage="2" d="M616,189 C808,189 808,191.2 998,191.2"/>
 <path class="wire f-carbon" data-ds="EcodivisionFile" data-stage="3" d="M616,189 C808,189 808,267.2 998,267.2"/>
-<path class="wire f-land" data-ds="EcodivisionFile" data-stage="5" d="M616,189 C808,189 808,340.4 998,340.4"/>
+<path class="wire f-land" data-ds="EcodivisionFile" data-stage="5" d="M616,189 C808,189 808,340.2 998,340.2"/>
 <path class="wire f-land" data-ds="EcodivisionFile" data-stage="6" d="M616,189 C808,189 808,419.2 998,419.2"/>
-<path class="wire f-carbon" data-ds="FiaConditionFile" data-stage="2" d="M616,212 C808,212 808,201.6 998,201.6"/>
-<path class="wire f-carbon" data-ds="FiaConditionFile" data-stage="3" d="M616,212 C808,212 808,277.6 998,277.6"/>
-<path class="wire f-carbon" data-ds="FiaDisturbanceFile" data-stage="2" d="M616,235 C808,235 808,212.0 998,212.0"/>
-<path class="wire f-carbon" data-ds="FiaDisturbanceFile" data-stage="3" d="M616,235 C808,235 808,288.0 998,288.0"/>
-<path class="wire f-carbon alt" data-ds="FiaDataMartFolder" data-stage="2" d="M616,258 C808,258 808,222.4 998,222.4"/>
+<path class="wire f-carbon alt" data-ds="FiaConditionFile" data-stage="2" d="M616,212 C808,212 808,201.6 998,201.6"/>
+<path class="wire f-carbon alt" data-ds="FiaConditionFile" data-stage="3" d="M616,212 C808,212 808,277.6 998,277.6"/>
+<path class="wire f-carbon alt" data-ds="FiaDisturbanceFile" data-stage="2" d="M616,235 C808,235 808,212.0 998,212.0"/>
+<path class="wire f-carbon alt" data-ds="FiaDisturbanceFile" data-stage="3" d="M616,235 C808,235 808,288.0 998,288.0"/>
+<path class="wire f-carbon" data-ds="FiaDataMartFolder" data-stage="2" d="M616,258 C808,258 808,222.4 998,222.4"/>
 <path class="wire f-carbon" data-ds="FiaDataMartFolder" data-stage="3" d="M616,258 C808,258 808,298.4 998,298.4"/>
-<path class="wire f-land alt" data-ds="FiaDataMartFolder" data-stage="5" d="M616,258 C808,258 808,345.1 998,345.1"/>
+<path class="wire f-land alt" data-ds="FiaDataMartFolder" data-stage="5" d="M616,258 C808,258 808,344.5 998,344.5"/>
 <path class="wire f-setup" data-ds="NlcdFolder" data-stage="1" d="M616,314 C808,314 808,149.0 998,149.0"/>
-<path class="wire f-land" data-ds="NlcdFolder" data-stage="5" d="M616,314 C808,314 808,349.8 998,349.8"/>
+<path class="wire f-land" data-ds="NlcdFolder" data-stage="5" d="M616,314 C808,314 808,348.8 998,348.8"/>
 <path class="wire f-land" data-ds="NlcdFolder" data-stage="6" d="M616,314 C808,314 808,429.6 998,429.6"/>
 <path class="wire f-land" data-ds="NlcdFolder" data-stage="10" d="M616,314 C808,314 808,644.9 998,644.9"/>
-<path class="wire f-land" data-ds="Evt2016File" data-stage="5" d="M616,337 C808,337 808,354.5 998,354.5"/>
-<path class="wire f-land" data-ds="RcmapFile" data-stage="5" d="M616,360 C808,360 808,359.3 998,359.3"/>
-<path class="wire f-land" data-ds="CcapFile" data-stage="5" d="M616,383 C808,383 808,364.0 998,364.0"/>
-<path class="wire f-land alt" data-ds="ForestTypeGroupFolder" data-stage="5" d="M616,406 C808,406 808,368.7 998,368.7"/>
-<path class="wire f-land alt" data-ds="TreeMapFolder" data-stage="5" d="M616,429 C808,429 808,373.5 998,373.5"/>
-<path class="wire f-land" data-ds="StandAgeFile" data-stage="5" d="M616,452 C808,452 808,378.2 998,378.2"/>
-<path class="wire f-land" data-ds="FriFile" data-stage="5" d="M616,475 C808,475 808,382.9 998,382.9"/>
-<path class="wire f-land" data-ds="SoilCarbonFile" data-stage="5" d="M616,498 C808,498 808,387.6 998,387.6"/>
-<path class="wire f-carbon" data-ds="SoilCarbonFile" data-stage="8" d="M616,498 C808,498 808,503.0 998,503.0"/>
+<path class="wire f-land" data-ds="Evt2016File" data-stage="5" d="M616,337 C808,337 808,353.2 998,353.2"/>
+<path class="wire f-land" data-ds="RcmapFile" data-stage="5" d="M616,360 C808,360 808,357.5 998,357.5"/>
+<path class="wire f-land" data-ds="CcapFile" data-stage="5" d="M616,383 C808,383 808,361.8 998,361.8"/>
+<path class="wire f-land alt" data-ds="ForestTypeGroupFolder" data-stage="5" d="M616,406 C808,406 808,366.2 998,366.2"/>
+<path class="wire f-land alt" data-ds="TreeMapFolder" data-stage="5" d="M616,429 C808,429 808,370.5 998,370.5"/>
+<path class="wire f-land" data-ds="StandAgeFile" data-stage="5" d="M616,452 C808,452 808,374.8 998,374.8"/>
+<path class="wire f-land" data-ds="FriFile" data-stage="5" d="M616,475 C808,475 808,379.2 998,379.2"/>
+<path class="wire f-land" data-ds="SoilCarbonFile" data-stage="5" d="M616,498 C808,498 808,383.5 998,383.5"/>
+<path class="wire f-carbon" data-ds="SoilCarbonFile" data-stage="8" d="M616,498 C808,498 808,495.2 998,495.2"/>
 <path class="wire f-land" data-ds="MtbsSeverityFolder" data-stage="6" d="M616,554 C808,554 808,440.0 998,440.0"/>
 <path class="wire f-land" data-ds="LcmsFolder" data-stage="6" d="M616,577 C808,577 808,450.4 998,450.4"/>
 <path class="wire f-land" data-ds="LcmsFolder" data-stage="10" d="M616,577 C808,577 808,650.7 998,650.7"/>
 <path class="wire f-land alt" data-ds="LandfireDisturbanceFolder" data-stage="6" d="M616,600 C808,600 808,460.8 998,460.8"/>
 <path class="wire f-land alt" data-ds="LandfireDisturbanceFolder" data-stage="10" d="M616,600 C808,600 808,656.4 998,656.4"/>
-<path class="wire f-carbon" data-ds="FirePerimeterHistoryFile" data-stage="8" d="M616,623 C808,623 808,529.0 998,529.0"/>
+<path class="wire f-land" data-ds="FirePerimeterHistoryFile" data-stage="5" d="M616,623 C808,623 808,387.8 998,387.8"/>
+<path class="wire f-carbon" data-ds="FirePerimeterHistoryFile" data-stage="8" d="M616,623 C808,623 808,505.6 998,505.6"/>
 <path class="wire f-land" data-ds="FirePerimeterHistoryFile" data-stage="9" d="M616,623 C808,623 808,572.5 998,572.5"/>
 <path class="wire f-land" data-ds="FirePerimeterHistoryFile" data-stage="10" d="M616,623 C808,623 808,662.2 998,662.2"/>
 <path class="wire f-land alt" data-ds="BurnProbabilityFile" data-stage="9" d="M616,646 C808,646 808,585.5 998,585.5"/>
 <path class="wire f-land alt" data-ds="FpaFodFile" data-stage="9" d="M616,669 C808,669 808,598.5 998,598.5"/>
-<path class="wire f-carbon" data-ds="PrismFolder" data-stage="2" d="M616,725 C808,725 808,232.8 998,232.8"/>
-<path class="wire f-carbon" data-ds="PrismFolder" data-stage="3" d="M616,725 C808,725 808,308.8 998,308.8"/>
-<path class="wire f-climate" data-ds="PrismFolder" data-stage="7" d="M616,725 C808,725 808,744.0 998,744.0"/>
-<path class="wire f-climate" data-ds="Loca2Folder" data-stage="11" d="M616,748 C808,748 808,820.0 998,820.0"/>
-<path class="wire f-land" data-ds="RoadsFile" data-stage="10" d="M616,804 C808,804 808,668.0 998,668.0"/>
-<path class="wire f-land" data-ds="ElevationFile" data-stage="9" d="M616,827 C808,827 808,611.5 998,611.5"/>
-<path class="wire f-land" data-ds="ElevationFile" data-stage="10" d="M616,827 C808,827 808,673.8 998,673.8"/>
-<path class="wire f-fig" data-ds="ElevationFile" data-stage="12" d="M616,827 C808,827 808,896.0 998,896.0"/>
-<path class="wire f-land" data-ds="WuiFolder" data-stage="10" d="M616,850 C808,850 808,679.6 998,679.6"/>
-<path class="wire f-land" data-ds="NccpiFile" data-stage="10" d="M616,873 C808,873 808,685.3 998,685.3"/>
-<path class="wire f-land" data-ds="ForestOwnerFile" data-stage="10" d="M616,896 C808,896 808,691.1 998,691.1"/>
+<path class="wire f-carbon alt" data-ds="RapNppFolder" data-stage="8" d="M616,725 C808,725 808,516.0 998,516.0"/>
+<path class="wire f-carbon alt" data-ds="CdlFolder" data-stage="8" d="M616,748 C808,748 808,526.4 998,526.4"/>
+<path class="wire f-carbon alt" data-ds="TidalMarshNppFolder" data-stage="8" d="M616,771 C808,771 808,536.8 998,536.8"/>
+<path class="wire f-carbon" data-ds="PrismFolder" data-stage="2" d="M616,827 C808,827 808,232.8 998,232.8"/>
+<path class="wire f-carbon" data-ds="PrismFolder" data-stage="3" d="M616,827 C808,827 808,308.8 998,308.8"/>
+<path class="wire f-climate" data-ds="PrismFolder" data-stage="7" d="M616,827 C808,827 808,744.0 998,744.0"/>
+<path class="wire f-climate" data-ds="Loca2Folder" data-stage="11" d="M616,850 C808,850 808,820.0 998,820.0"/>
+<path class="wire f-land" data-ds="RoadsFile" data-stage="10" d="M616,906 C808,906 808,668.0 998,668.0"/>
+<path class="wire f-land" data-ds="ElevationFile" data-stage="9" d="M616,929 C808,929 808,611.5 998,611.5"/>
+<path class="wire f-land" data-ds="ElevationFile" data-stage="10" d="M616,929 C808,929 808,673.8 998,673.8"/>
+<path class="wire f-fig" data-ds="ElevationFile" data-stage="12" d="M616,929 C808,929 808,896.0 998,896.0"/>
+<path class="wire f-land" data-ds="WuiFolder" data-stage="10" d="M616,952 C808,952 808,679.6 998,679.6"/>
+<path class="wire f-land" data-ds="NccpiFile" data-stage="10" d="M616,975 C808,975 808,685.3 998,685.3"/>
+<path class="wire f-land" data-ds="ForestOwnerFile" data-stage="10" d="M616,998 C808,998 808,691.1 998,691.1"/>
 <circle class="sport" cx="616" cy="189" r="3"/>
 <circle class="sport" cx="616" cy="212" r="3"/>
 <circle class="sport" cx="616" cy="235" r="3"/>
@@ -223,11 +240,14 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <circle class="sport" cx="616" cy="669" r="3"/>
 <circle class="sport" cx="616" cy="725" r="3"/>
 <circle class="sport" cx="616" cy="748" r="3"/>
-<circle class="sport" cx="616" cy="804" r="3"/>
+<circle class="sport" cx="616" cy="771" r="3"/>
 <circle class="sport" cx="616" cy="827" r="3"/>
 <circle class="sport" cx="616" cy="850" r="3"/>
-<circle class="sport" cx="616" cy="873" r="3"/>
-<circle class="sport" cx="616" cy="896" r="3"/>
+<circle class="sport" cx="616" cy="906" r="3"/>
+<circle class="sport" cx="616" cy="929" r="3"/>
+<circle class="sport" cx="616" cy="952" r="3"/>
+<circle class="sport" cx="616" cy="975" r="3"/>
+<circle class="sport" cx="616" cy="998" r="3"/>
 <g class="stage f-setup" data-stage="1" tabindex="0" role="button" aria-label="Stage 1, Study Area and Strata">
 <rect class="sb" x="1000" y="104" width="576" height="64" rx="5"/>
 <rect class="badge" x="1010" y="113" width="24" height="20" rx="3"/>
@@ -256,8 +276,8 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <rect class="badge" x="1010" y="265" width="24" height="20" rx="3"/>
 <text x="1022" y="279" class="badge-t" text-anchor="middle">3</text>
 <text x="1044" y="280" class="sn2">Carbon Flows</text>
-<text x="1012" y="299" class="mk">Stock-flow parameters and the dead organic matter decay calibration</text>
-<text x="1012" y="313" class="ch">Set by: Carbon Method; the Carbon Assumptions sheets</text>
+<text x="1012" y="299" class="mk">Stock-flow parameters (forest and non-forest), the decay calibration and Crop Yield multipliers</text>
+<text x="1012" y="313" class="ch">Set by: Carbon Method; the Carbon Assumptions sheets; Grassland, Shrubland and Wetland Carbon</text>
 </g>
 <circle class="port f-carbon" cx="1000" cy="267.2" r="2.4"/>
 <circle class="port f-carbon" cx="1000" cy="277.6" r="2.4"/>
@@ -272,17 +292,18 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <text x="1012" y="375" class="mk">State class and stand age maps, annual NLCD on the grid, return intervals, soil targets</text>
 <text x="1012" y="389" class="ch">Set by: Build Options (Forest Type Map, Land Cover Resampling); Land Cover Crosswalks</text>
 </g>
-<circle class="port f-land" cx="1000" cy="340.4" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="345.1" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="349.8" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="354.5" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="359.3" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="364.0" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="368.7" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="373.5" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="378.2" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="382.9" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="387.6" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="340.2" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="344.5" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="348.8" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="353.2" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="357.5" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="361.8" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="366.2" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="370.5" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="374.8" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="379.2" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="383.5" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="387.8" r="2.4"/>
 <g class="stage f-land" data-stage="6" tabindex="0" role="button" aria-label="Stage 6, Historical Transitions">
 <rect class="sb" x="1000" y="408" width="576" height="64" rx="5"/>
 <rect class="badge" x="1010" y="417" width="24" height="20" rx="3"/>
@@ -301,11 +322,14 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <rect class="badge" x="1010" y="493" width="24" height="20" rx="3"/>
 <text x="1022" y="507" class="badge-t" text-anchor="middle">8</text>
 <text x="1044" y="508" class="sn2">Initial Stock Maps</text>
-<text x="1012" y="527" class="mk">Initial carbon stock maps by age and last disturbance</text>
-<text x="1012" y="541" class="ch">Set by: Carbon Assumptions &gt; Spin-up</text>
+<text x="1012" y="527" class="mk">Initial carbon stock maps, and the site productivity multipliers of forest and non-forest cells</text>
+<text x="1012" y="541" class="ch">Set by: Build Options &gt; Site Productivity; Carbon Assumptions &gt; Spin-up</text>
 </g>
-<circle class="port f-carbon" cx="1000" cy="503.0" r="2.4"/>
-<circle class="port f-carbon" cx="1000" cy="529.0" r="2.4"/>
+<circle class="port f-carbon" cx="1000" cy="495.2" r="2.4"/>
+<circle class="port f-carbon" cx="1000" cy="505.6" r="2.4"/>
+<circle class="port f-carbon" cx="1000" cy="516.0" r="2.4"/>
+<circle class="port f-carbon" cx="1000" cy="526.4" r="2.4"/>
+<circle class="port f-carbon" cx="1000" cy="536.8" r="2.4"/>
 <g class="stage f-land" data-stage="9" tabindex="0" role="button" aria-label="Stage 9, Projection Transitions">
 <rect class="sb" x="1000" y="560" width="576" height="64" rx="5"/>
 <rect class="badge" x="1010" y="569" width="24" height="20" rx="3"/>
@@ -362,7 +386,7 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <text x="1012" y="921" class="ch">Set by: Run Figures; Compare Runs</text>
 </g>
 <circle class="port f-fig" cx="1000" cy="896.0" r="2.4"/>
-<text x="24" y="962" class="foot">Wires run from a dataset to each stage that reads it, coloured by the stage. Vintages are those stage 15 Data Download fetches into Data Sources Home, where a blank path reads them.</text>
-<text x="24" y="978" class="foot">Stages 0 and 4 read no national data. Generated by docs/blueprint/build-data.R from package.xml (lucasCore 1.1.0), 2026-11-06.</text>
+<text x="24" y="1062" class="foot">Wires run from a dataset to each stage that reads it, coloured by the stage. Vintages are those stage 15 Data Download fetches into Data Sources Home, where a blank path reads them.</text>
+<text x="24" y="1078" class="foot">Stages 0 and 4 read no national data. Generated by docs/blueprint/build-data.R from package.xml (lucasCore 1.2.0), 2026-11-09.</text>
 </svg>
 

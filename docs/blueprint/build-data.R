@@ -25,18 +25,18 @@ ds_default <- setNames(xml_attr(cols, "defaultValue"), xml_attr(cols, "name"))
 # ---- the datasets: group, label, vintage, and per stage what it is read for -------------------------------------------------------
 # u(stage, role, note, alt): note = the setting that switches it; alt = TRUE when only a non-default option reads it (dashed wire)
 u <- function(stage, role, note = NA_character_, alt = FALSE) list(stage = stage, role = role, note = note, alt = alt)
-fia_note <- "Growth Curve Options > FIA Data: USGS condition tables (default)"
+fia_note <- "Growth Curve Options > FIA Data: USGS condition tables (the default is the FIA DataMart, 2026-11-09)"
 D <- list(
   list("FIA and strata", "EcodivisionFile", "FIA ecodivisions", "dissolved shapefile · StrtmId, StrtmNm", list(
     u(1, "Primary strata and the model lattice"), u(2, "Each plot's ecodivision, and the ecodivision climate the curves use"),
     u(3, "Ecodivisions of the decay calibration and their climate"), u(5, "The model lattice (the same grid as stage 1)"), u(6, "The model lattice"))),
   list("FIA and strata", "FiaConditionFile", "FIA condition carbon and volume", "USGS data release · 2024-02-12 · .Rds", list(
-    u(2, "Condition carbon and merchantable volume the curves are fitted to", fia_note), u(3, "Condition carbon pools for the decay calibration", fia_note))),
+    u(2, "Condition carbon and merchantable volume the curves are fitted to", fia_note, TRUE), u(3, "Condition carbon pools for the decay calibration", fia_note, TRUE))),
   list("FIA and strata", "FiaDisturbanceFile", "FIA disturbance and treatment codes", "USGS data release · 2024-02-13 · .Rds", list(
-    u(2, "Disturbance and treatment codes of each condition", fia_note), u(3, "Disturbance and treatment codes of each condition", fia_note))),
+    u(2, "Disturbance and treatment codes of each condition", fia_note, TRUE), u(3, "Disturbance and treatment codes of each condition", fia_note, TRUE))),
   list("FIA and strata", "FiaDataMartFolder", "FIA DataMart", "state PLOT, COND, TREE, DWM csvs + REFERENCE", list(
-    u(2, "Condition tables derived from the state CSVs, in place of the USGS release", "Growth Curve Options > FIA Data: FIA DataMart", TRUE),
-    u(3, "Measured down dead wood (COND_DWM_CALC) the decay is calibrated to", "Carbon Method: FIA measured dead wood (default)"),
+    u(2, "Condition tables derived from the state CSVs (carbon, volume, disturbance), cached in the folder", "Growth Curve Options > FIA Data: FIA DataMart (default)"),
+    u(3, "Condition carbon pools and the measured down dead wood (COND_DWM_CALC) the decay is calibrated to", "Carbon Method: FIA measured dead wood (default)"),
     u(5, "Each TreeMap plot's forested condition (type, stand age, site class)", "Build Options: a TreeMap option", TRUE))),
   list("Land cover, age and soil", "NlcdFolder", "Annual NLCD", "Collection 1.2 · 30 m · one map a year from 1985", list(
     u(1, "Start-year land mask, modal on the model grid"), u(5, "Annual land cover on the model grid; developed, agriculture, water and ice classes", "Build Options > Land Cover Resampling"),
@@ -63,6 +63,7 @@ D <- list(
     u(6, "Disturbance by type, for a transition group whose source is Landfire", "defaults/transitions/sources.csv: Landfire", TRUE),
     u(10, "Event classes LANDFIRE:<type>", "Projection Allocation > Event Classes: LANDFIRE", TRUE))),
   list("Disturbance", "FirePerimeterHistoryFile", "Interagency fire perimeter history", "all years · wildfire perimeters", list(
+    u(5, "Years since fire of chaparral, non-sage shrub and the sage family: the last perimeter since 1900 over the cell"),
     u(8, "Last disturbance: high-severity fire where a perimeter since 1900 covers the cell, else clearcut"),
     u(9, "Fire sizes (one per incident and year) for the projection size distribution", "Fire > Fire Method: Historical rates (default)"),
     u(10, "Recently burned pixels kept out of the fit", "Suitability Options > Burn Window"))),
@@ -70,9 +71,15 @@ D <- list(
     u(9, "Burn probability that guides where projected fire spreads and starts", "Fire > Fire Method: Burn probability", TRUE))),
   list("Disturbance", "FpaFodFile", "FPA-FOD fire occurrence", "7th edition · geopackage", list(
     u(9, "Ignition density, smoothed (5 km default)", "Fire > Ignitions: FPA-FOD ignition density", TRUE))),
-  list("Climate", "PrismFolder", "PRISM", "annual tmean and ppt · normals", list(
+  list("Non-forest productivity", "RapNppFolder", "RAP vegetation NPP", "v3 · 30 m · 2014 to 2023", list(
+    u(8, "Herbaceous and shrub NPP: each grassland and shrubland cell's growth multiplier against its ecodivision and class target", "Build Options > Site Productivity: Grass and Shrub Productivity", TRUE))),
+  list("Non-forest productivity", "CdlFolder", "Cropland Data Layer", "USDA NASS · 30 m · 2014 to 2025", list(
+    u(8, "Each cell's crops at their county's NASS growth and harvest: the Cropland Productivity and Crop Harvest multipliers", "Build Options > Site Productivity: Cropland Productivity", TRUE))),
+  list("Non-forest productivity", "TidalMarshNppFolder", "USGS tidal marsh NPP", "Woltz et al. 2023 · 30 m · 2015", list(
+    u(8, "Estuarine and palustrine marsh NPP: the emergent wetland multiplier against its ecodivision mean", "Build Options > Site Productivity: Tidal Marsh Productivity", TRUE))),
+  list("Climate", "PrismFolder", "PRISM", "annual tmean and ppt, monthly ppt · normals", list(
     u(2, "Ecodivision climate for the growth curves"), u(3, "Ecodivision climate for the decay calibration"),
-    u(7, "Annual temperature and precipitation for the historical climate multipliers", "Climate Options"))),
+    u(7, "Annual temperature and precipitation for the historical climate multipliers; monthly precipitation by water-year season for the non-forest RAP fit", "Climate Options"))),
   list("Climate", "Loca2Folder", "LOCA2", "GCM / member / SSP", list(
     u(11, "Projected climate of one scenario, model and replicate (its SSP also sets the CO2 of the CO2 fertilization multiplier)", "Projection > Climate"))),
   list("Covariates", "RoadsFile", "LANDFIRE roads", "LF2023 · 30 m", list(u(10, "Distance to roads covariate", "Suitability Covariates"))),
@@ -91,10 +98,10 @@ if (length(m <- setdiff(names(D), names(ds_display)))) stop("not a Data Sources 
 S <- list(
   `1` = list("1", "Study Area and Strata", "Model grid, land mask, primary, secondary and tertiary strata rasters", "Build Options (cell size, strata sources); Study Area"),
   `2` = list("2", "Fit Growth Curves", "Merchantable volume and live-tree carbon curves per forest class and ecodivision", "Growth Curve Options (FIA Data, fit settings)"),
-  `3` = list("3", "Carbon Flows", "Stock-flow parameters and the dead organic matter decay calibration", "Carbon Method; the Carbon Assumptions sheets"),
+  `3` = list("3", "Carbon Flows", "Stock-flow parameters (forest and non-forest), the decay calibration and Crop Yield multipliers", "Carbon Method; the Carbon Assumptions sheets; Grassland, Shrubland and Wetland Carbon"),
   `5` = list("5", "Initial Conditions", "State class and stand age maps, annual NLCD on the grid, return intervals, soil targets", "Build Options (Forest Type Map, Land Cover Resampling); Land Cover Crosswalks"),
   `6` = list("6", "Historical Transitions", "Historical transition pathways, targets and annual spatial multipliers", "defaults/transitions/sources.csv (where each transition group comes from)"),
-  `8` = list("8", "Initial Stock Maps", "Initial carbon stock maps by age and last disturbance", "Carbon Assumptions > Spin-up"),
+  `8` = list("8", "Initial Stock Maps", "Initial carbon stock maps, and the site productivity multipliers of forest and non-forest cells", "Build Options > Site Productivity; Carbon Assumptions > Spin-up"),
   `9` = list("9", "Projection Transitions", "Projection transition targets, fire sizes and slope selectivity", "Projection Options; Projection Transitions; Fire"),
   `10` = list("10", "Transition Suitability", "Surfaces that place projected transitions, with adjacency and patch sizes", "Projection Allocation; Suitability Options and Covariates; Rule Weights"),
   `7` = list("7", "Climate Multipliers", "Historical climate flow multipliers on growth and decomposition", "Climate Options (forest and non-forest growth, decomposition)"),
@@ -111,7 +118,7 @@ for (id in names(S)) { txt <- src_text(id)
   if (length(m <- setdiff(mine, reads))) stop(sprintf("the data blueprint says stage %s reads %s, but its script does not mention it", id, paste(m, collapse = ", "))) }
 
 # ---- drawing ----------------------------------------------------------------
-W <- 1600; H <- 1000
+W <- 1600; H <- 1100   # 1000 until 2026-11-09, when three non-forest datasets were added
 g <- character(); add <- function(...) g <<- c(g, ...)
 add(sprintf('<rect class="bg" width="%d" height="%d"/>', W, H), TX(24, 44, "lucasCore data blueprint", "h1"),
     TX(24, 66, sprintf("The national datasets lucasCore reads, the stages that read them, what for, and the option that switches each one · version %s", version), "sub"))
@@ -123,14 +130,14 @@ leg(list(list(fam = "setup", label = "Setup"), list(fam = "land", label = "Land 
          list(fam = "climate", label = "Climate"), list(fam = "fig", label = "Figures")), 38)
 leg(list(list(alt = FALSE, label = "read with the default settings"), list(alt = TRUE, label = "read only under a non-default option")), 62)
 
-add(box(24, 104, 600, 830, "Data Sources sheet · filled by stage 15 Data Download", "National datasets"), TX(312, 146, "VINTAGE · RESOLUTION", "ghead"))
+add(box(24, 104, 600, 930, "Data Sources sheet · filled by stage 15 Data Download", "National datasets"), TX(312, 146, "VINTAGE · RESOLUTION", "ghead"))
 y <- 172; sy <- c(); grp <- ""
 for (d in D) {
   if (d[[1]] != grp) { if (nzchar(grp)) y <- y + 12; grp <- d[[1]]; add(TX(40, y, toupper(grp), "ghead")); y <- y + 21 }
   add(sprintf('<g class="ds" data-ds="%s" tabindex="0" role="button" aria-label="%s"><rect class="dsbg" x="32" y="%d" width="584" height="22" rx="3"/>', d[[2]], esc(d[[3]]), y - 15),
       TX(40, y, d[[3]], "dsn"), TX(312, y, d[[4]], "dsv"), "</g>")
   sy[d[[2]]] <- y - 4; y <- y + 23 }
-if (y > 934) stop("the dataset column runs past its box (y = ", y, ")")
+if (y > 1034) stop("the dataset column runs past its box (y = ", y, ")")
 
 BX <- 1000; BWD <- 576; BHT <- 64
 by <- setNames(104 + (seq_along(S) - 1) * 76, names(S))
@@ -150,8 +157,8 @@ for (id in names(S)) { s <- S[[id]]; yy <- by[[id]]; bw <- if (nchar(s[[1]]) > 2
       TX(BX + 20 + bw, yy + 24, s[[2]], "sn2"), TX(BX + 12, yy + 43, s[[3]], "mk"), TX(BX + 12, yy + 57, paste("Set by:", s[[4]]), "ch"), "</g>")
   for (ty in uses$ty[uses$stage == id]) add(sprintf('<circle class="port f-%s" cx="%d" cy="%.1f" r="2.4"/>', fam[[id]], BX, ty)) }
 
-add(TX(24, 962, "Wires run from a dataset to each stage that reads it, coloured by the stage. Vintages are those stage 15 Data Download fetches into Data Sources Home, where a blank path reads them.", "foot"),
-    TX(24, 978, sprintf("Stages 0 and 4 read no national data. Generated by docs/blueprint/build-data.R from package.xml (lucasCore %s), %s.", version, format(Sys.Date())), "foot"))
+add(TX(24, 1062, "Wires run from a dataset to each stage that reads it, coloured by the stage. Vintages are those stage 15 Data Download fetches into Data Sources Home, where a blank path reads them.", "foot"),
+    TX(24, 1078, sprintf("Stages 0 and 4 read no national data. Generated by docs/blueprint/build-data.R from package.xml (lucasCore %s), %s.", version, format(Sys.Date())), "foot"))
 body <- paste(c(defs, g), collapse = "\n")
 head <- svg_head(W, H, "lucasCore data blueprint: national datasets and the stages that read them")
 svg_file <- file.path(out, "lucascore-data-blueprint.svg")

@@ -16,7 +16,6 @@ pkg <- normalizePath(file.path(here, "..", ".."), winslash = "/")
 args <- commandArgs(TRUE); out <- if (length(args)) args[1] else here
 dir.create(out, showWarnings = FALSE, recursive = TRUE)
 source(file.path(here, "style.R"))
-
 # ---- package.xml ------------------------------------------------------------
 x <- read_xml(file.path(pkg, "package.xml"))
 version <- xml_attr(x, "version")
@@ -30,7 +29,6 @@ st <- lapply(tr, function(t) { sh <- xml_find_all(t, "dataSheet")
        script = xml_attr(t, "programArguments"), sheet = xml_attr(sh, "name"), type = xml_attr(sh, "type")) })
 names(st) <- vapply(st, function(s) as.character(s$id), "")
 writers <- function(sheets) sort(unique(as.integer(unlist(lapply(st, function(s) if (any(s$sheet %in% sheets & s$type %in% c("Output", "Both"))) s$id)))))
-
 if (length(miss <- setdiff(names(st), names(fam)))) stop("stage(s) not in the blueprint layout: ", paste(miss, collapse = ", "))
 where <- c(`0` = "Stock-Flow Definitions; also first in the Build pipeline (writes nothing there when the dependency has the definitions)",
   `1` = "Build", `2` = "Build, or once in the optional Growth Curves scenario shared by several builds", `3` = "Build", `4` = "Build",
@@ -42,23 +40,22 @@ where <- c(`0` = "Stock-Flow Definitions; also first in the Build pipeline (writ
   `16` = "A scenario on a Build result; optional, since stage 17 writes the same record", `17` = "A scenario on a Build result and its runs")
 desc <- c(`0` = "Writes the fixed LUCAS stock-flow definitions from defaults/stockflow: flow pathway diagram, flow order, flow and stock type groups, output options and filters.",
   `1` = "Makes the model grid at the Build cell size, cuts it to the study area, and writes the primary (FIA ecodivision), secondary and tertiary strata rasters.",
-  `2` = "Fits merchantable volume curves and the live-tree carbon curves (CBM pools) for every forest state class and FIA ecodivision.",
-  `3` = "Sets the stock-flow parameters (net growth, growth split, turnover, dead organic matter decay) and the full flow configuration, with decay calibrated to the Carbon Method.",
+  `2` = "Fits merchantable volume curves and the live-tree carbon curves (CBM pools) for every forest state class and FIA ecodivision, from the FIA DataMart by default.",
+  `3` = "Sets the stock-flow parameters (net growth, growth split, turnover, dead organic matter decay) and the full flow configuration, with forest decay calibrated to the Carbon Method; grassland, shrubland, emergent wetland, cropland and pasture rates by ecodivision (RAP NPP, gNATSGO, literature, NASS yields), and the yearly Crop Yield multipliers.",
   `4` = "Spins up each ecodivision and forest state class and writes initial carbon stocks by age and last disturbance.",
-  `5` = "Maps state class and stand age at the model resolution, resamples annual NLCD to the model grid, and writes the per-cell spin-up return intervals and soil carbon targets.",
+  `5` = "Maps state class and stand age at the model resolution (for chaparral, non-sage shrub and the sage family, years since fire from the fire perimeter history), resamples annual NLCD to the model grid, and writes the per-cell spin-up return intervals and soil carbon targets.",
   `6` = "Derives the historical transition pathways and annual transition spatial multipliers from the same resampled maps as the state classes.",
-  `7` = "Writes annual climate flow spatial multipliers for the historical years from PRISM, with the Climate Options growth and decomposition methods.",
-  `8` = "Maps the initial carbon stocks (ST-Sim Initial Stocks, spatial) from the stock curves, stand age and soil carbon.",
+  `7` = "Writes annual climate flow spatial multipliers for the historical years from PRISM, with the Climate Options growth and decomposition methods (non-forest growth by RAP fit, from water-year rain by season, by default).",
+  `8` = "Maps the initial carbon stocks (ST-Sim Initial Stocks, spatial) from the stock curves, stand age and soil carbon, and writes the site productivity multipliers (forest from TreeMap; grass and shrub from RAP NPP; cropland, crop harvest and crop mix from the Cropland Data Layer and NASS; tidal marsh from the USGS NPP map) with a Non-Forest Productivity table.",
   `9` = "Sets projection transitions by drawing a whole historical year for each projection year and iteration; transition groups in one sampling set share the draw.",
   `10` = "Makes the surfaces that place projected transitions: fitted suitability (logistic GAM on the annual NLCD record) or WUI/PAD rules, with adjacency and patch sizes.",
   `11` = "Writes the climate flow spatial multipliers of the projection years from one LOCA2 run, and the CO2 fertilization growth multipliers from its SSP (beta by vegetation type, ECM share and stand age).",
-  `12` = "Draws the publication figures (PNG) of a Build result.",
+  `12` = "Draws the publication figures (PNG) of a Build result: strata, land cover and years since fire, carbon, forest and non-forest productivity and growth, land change, fire by land type, and the climate and crop multipliers.",
   `13` = "Draws report figures (PNG) of one ST-Sim run on a lucasCore Build.",
   `14` = "Draws figures (PNG) and two summary tables (carbon, land change) that compare ST-Sim runs on one Build.",
   `15` = "Fetches the national datasets into Data Sources Home for the Study Area plus a buffer: the region's clips in regions/<name>, the shared national copies at the top, or every dataset whole (Home layout National). Write-once, with a manifest and files.csv checksums; a blank Data Sources path reads the home.",
   `16` = "Writes the FGDC CSDGM metadata record of a Build and checks it with the USGS metadata parser (mp).",
   `17` = "Writes a USGS data release folder from a Build and its runs: tables, maps, metadata records, a review packet and a backup of the library.")
-
 # ---- drawing helpers --------------------------------------------------------
 wrap2 <- function(s) { if (nchar(s) <= 19) return(s); sp <- gregexpr(" ", s)[[1]]; k <- sp[which.min(abs(sp - nchar(s) / 2))]
   c(substr(s, 1, k - 1), substr(s, k + 1, nchar(s))) }
@@ -77,7 +74,6 @@ engine <- function(xr, y) paste0(sprintf('<g class="engine"><rect x="%d" y="%d" 
 W <- 1600; H <- 1000
 g <- character()
 add <- function(...) g <<- c(g, ...)
-
 # ---- header and legend ------------------------------------------------------
 add(sprintf('<rect class="bg" width="%d" height="%d"/>', W, H),
     TX(24, 44, "lucasCore blueprint", "h1"),
@@ -91,31 +87,30 @@ leg(list(list(fam = "setup", label = "Setup"), list(fam = "land", label = "Land 
          list(fam = "climate", label = "Climate"), list(fam = "fig", label = "Figures")), 38)
 leg(list(list(kind = "edge", label = "datasheet passed on"), list(kind = "dep", label = "scenario dependency"),
          list(kind = "bus", label = "shared map sheet")), 62)
-
 # ---- national data ----------------------------------------------------------
 data_groups <- list(
   list("FIA", c(1, 2, 3, 5, 6), c("FIADB DataMart (PLOT, COND, TREE)", "Condition carbon and volume (USGS)", "Disturbance and treatment codes", "FIA ecodivisions (primary strata)")),
   list("Land cover", c(1, 5, 6, 10), c("Annual NLCD", "LANDFIRE EVT 2016", "RCMAP 1985, C-CAP 2001", "USFS forest types, TreeMap", "NASA CMS forest age 1990")),
   list("Disturbance", c(5, 6, 8, 9, 10), c("LANDFIRE disturbance", "MTBS burn severity", "USFS LCMS annual change", "Interagency fire perimeters",
                                          "FPA-FOD fire occurrence", "FSim burn probability", "LANDFIRE fire return interval")),
-  list("Climate", c(2, 3, 7, 11), c("PRISM annual and normals", "LOCA2 (scenario, model, replicate)")),
+  list("Climate", c(2, 3, 7, 11), c("PRISM annual, monthly and normals", "LOCA2 (scenario, model, replicate)")),
+  list("Non-forest", 8, c("RAP NPP v3, Cropland Data Layer", "USGS tidal marsh NPP 2015")),
   list("Soil", c(5, 8), "gNATSGO soil organic carbon"),
   list("Covariates", c(9, 10), c("Roads and elevation (LANDFIRE)", "SILVIS WUI v4", "gNATSGO crop productivity", "USFS forest ownership")),
-  list("Package defaults", c(0, 3, 4, 5, 6, 8, 9, 10), c("stockflow, stsim, strata", "carbon-assumptions, cbm, spinup", "growth, initialstocks, climate",
+  list("Package defaults", c(0, 3, 4, 5, 6, 8, 9, 10), c("stockflow (incl. non-forest, NASS crops)", "carbon-assumptions, cbm, spinup", "growth, initialstocks, climate",
                                                           "landcover crosswalks", "transitions, projection rules")))
 add(box(24, 104, 216, 830, "Data Sources sheet", "National data"))
 y <- 172
 for (i in seq_along(data_groups)) { d <- data_groups[[i]]
-  if (i > 1) { add(sprintf('<line class="rule" x1="40" y1="%d" x2="224" y2="%d"/>', y - 15, y - 15)) }
+  if (i > 1) { add(sprintf('<line class="rule" x1="40" y1="%d" x2="224" y2="%d"/>', y - 14, y - 14)) }
   add(TX(40, y, d[[1]], "gt"))
   if (length(d[[2]]) > 5) { y <- y + 8; add(chips(d[[2]], 224, y)); y <- y + 14 } else add(chips(d[[2]], 224, y - 11))
-  for (it in d[[3]]) { y <- y + 15; add(TX(40, y, it, "item")) }
-  y <- y + 31 }
+  for (it in d[[3]]) { y <- y + 14; add(TX(40, y, it, "item")) }   # 14 and 27 (were 15 and 31): room for the non-forest group, 2026-11-09
+  y <- y + 27 }
 add(TX(40, y - 12, "(used when a sheet is left empty)", "lbl"))
 # stage 15 fills the national data into Data Sources Home, where a blank path reads it
 add(sprintf('<line class="rule" x1="40" y1="%d" x2="224" y2="%d"/>', y + 6, y + 6), TX(40, y + 26, "Filled by its own scenario", "lbl"), block(15, 40, y + 34))
 if (y + 34 + BH > 934) stop("the Data Download block runs past the national data box (y = ", y + 34 + BH, ")")
-
 # ---- definitions row --------------------------------------------------------
 add(box(268, 104, 202, 136, "Scenario · dependency", "Stock-Flow Definitions"), block(0, 283, 160))
 add(box(494, 104, 480, 136, "Scenario · dependency · input sheets", "Carbon Assumptions"))
@@ -125,7 +120,6 @@ for (i in seq_along(ca)) { cx <- 510 + ((i - 1) %% 3) * 153; cy <- 158 + ((i - 1
 add(box(998, 104, 230, 136, "Scenario · optional, shared", "Growth Curves (CONUS)"), block(2, 1027, 160, ghost = TRUE))
 add(PATH("M369,240 V266", "dep"), TX(375, 258, "dependency", "lbl"), PATH("M734,240 V266", "dep"), TX(740, 258, "dependency", "lbl"),
     PATH("M1113,240 V266", "dep"), TX(1119, 258, "optional dependency", "lbl"))
-
 # ---- Build ------------------------------------------------------------------
 add(box(268, 268, 960, 322, "Scenario · one per study area", "Build"))
 add(TX(1212, 290, "PIPELINE", "eyebrow", "end"), TX(1212, 310, "0 › 1 › 5 › 2 › 3 › 4 › 6 › 7 › 8 › 12", "mono", "end"))
@@ -148,13 +142,11 @@ lane_edge(456, 526, "Carbon Curves", FALSE)
 lane_edge(645, 526, "Decay Calibration, Flow Multipliers", FALSE)
 lane_edge(834, 526, "Initial Stock Curves", FALSE)
 add(TX(1126, 494, "reads the summaries", "lbl", "middle"), TX(1126, 507, "of stages 1 to 8", "lbl", "middle"))
-
 # ---- projection setup and climate ------------------------------------------
 add(PATH("M494,590 V620", "dep"), TX(500, 610, "Build result", "lbl"), PATH("M859,590 V620", "dep"), TX(865, 610, "Build result", "lbl"))
 add(box(268, 622, 452, 150, "Scenario · on the Build result", "Projection Setup"), block(9, 284, 690), block(10, 532, 690))
 add(PATH("M456,722 H530"), TX(494, 714, "Projection", "lbl", "middle"), TX(494, 738, "Schedule", "lbl", "middle"))
 add(box(744, 622, 230, 150, "Scenario · one per LOCA2 run", "Projection Climate"), block(11, 773, 690))
-
 # ---- ST-Sim runs and analysis ----------------------------------------------
 add(PATH("M268,560 H254 V869 H266", "dep"))
 add(box(268, 804, 330, 130, "Scenario · pipeline ST-Sim", "Historical run"), engine(582, 812),
@@ -166,7 +158,6 @@ add(box(622, 804, 352, 130, "Scenario · pipeline ST-Sim", "Projection run"), en
     TX(638, 898, "mode 2 starts from a historical run's final maps.", "txt"), TX(638, 920, "tools/new-projection.R", "mono"))
 add(PATH("M974,869 H996", "dep"))
 add(box(998, 602, 230, 332, "Scenarios · on results", "Figures, records, release"), block(13, 1027, 666), block(14, 1027, 732), block(16, 1027, 798), block(17, 1027, 864))
-
 # ---- ST-Sim inputs and reports ---------------------------------------------
 stsim <- list(
   Definitions = list("Flow Pathway Diagram" = "stsim_FlowPathwayDiagram", "Flow Order and Options" = c("stsim_FlowOrder", "stsim_FlowOrderOptions"),
@@ -186,8 +177,8 @@ if (length(miss <- setdiff(written, unlist(stsim)))) stop("ST-Sim sheet(s) writt
 reports <- list("Strata Summary" = "OutputStrataSummary", "State Class Summary" = "OutputStateClassSummary",
   "Growth and carbon curve parameters" = c("OutputGrowthParameter", "OutputCarbonParameter", "OutputGrowthReport"),
   "Decay Calibration" = "OutputDecayCalibration", "Return intervals, soil targets" = c("OutputReturnInterval", "OutputSoilTarget"),
-  "Historical Transition Summary" = "OutputTransitionSummary", "Climate Multiplier Summary" = "OutputClimateSummary",
-  "Initial Stock Summary" = "OutputInitialStockSummary",
+  "Historical Transition Summary" = "OutputTransitionSummary", "Climate and CO2 summaries" = c("OutputClimateSummary", "OutputCo2Beta", "OutputCo2Series"),
+  "Initial stocks, non-forest productivity" = c("OutputInitialStockSummary", "OutputNonForestProductivity"),
   "Projection schedule, rates, fires" = c("OutputProjectionSchedule", "OutputProjectionRate", "OutputFireSize", "OutputFireSlope"),
   "Suitability maps and curves" = c("OutputSuitability", "OutputSuitabilityCurve", "OutputSuitabilityMap", "OutputPatchSize"),
   "Figures (PNG)" = c("OutputBuildFigure", "OutputRunFigure", "OutputCompareFigure"),
@@ -204,13 +195,11 @@ add(sprintf('<line class="rule" x1="1272" y1="%d" x2="1560" y2="%d"/>', y - 6, y
 add(TX(1272, y + 18, "LUCASCORE REPORT SHEETS", "ghead")); y <- y + 36
 for (lab in names(reports)) { row(lab, reports[[lab]], y); y <- y + 19 }
 if (y > 934) stop("the ST-Sim column runs past its box (y = ", y, ")")
-
 add(TX(24, 962, "Solid arrows: a datasheet one stage writes and a later stage reads. Dashed: a scenario dependency (the dependency supplies its sheets; the first one with rows wins). Chips: the stages that read a data group, or write a sheet.", "foot"),
     TX(24, 978, sprintf("Every stage also writes the Validation sheet, and every Build stage the Data Sources Used sheet. Generated by docs/blueprint/build.R from package.xml (lucasCore %s), %s.", version, format(Sys.Date())), "foot"))
 body <- paste(c(defs, g), collapse = "\n")
 head <- svg_head(W, H, "lucasCore blueprint: scenarios, stages and datasheets")
 writeLines(standalone_svg(head, body), file.path(out, "lucascore-blueprint.svg"), useBytes = TRUE)
-
 # ---- interactive page -------------------------------------------------------
 sheet_list <- function(s, types) { k <- s$type %in% types & s$sheet != "OutputValidation"
   lapply(s$sheet[k], function(sh) list(sheet = sh, label = pretty(sh), from = setdiff(writers(sh), s$id),
@@ -221,6 +210,5 @@ stages_json <- lapply(st, function(s) { id <- as.character(s$id)
 json <- gsub("</", "<\\/", toJSON(stages_json, auto_unbox = TRUE), fixed = TRUE)
 tpl <- paste(readLines(file.path(here, "template.html"), warn = FALSE, encoding = "UTF-8"), collapse = "\n")
 writeLines(fill_page(tpl, paste0(head, "\n", body, "\n</svg>"), json, version, length(st), "package"), file.path(out, "index.html"), useBytes = TRUE)
-
 render_png(file.path(out, "lucascore-blueprint.svg"), file.path(out, "lucascore-blueprint.png"), W, H)
 cat("svg:", file.path(out, "lucascore-blueprint.svg"), "\nhtml:", file.path(out, "index.html"), "\n")

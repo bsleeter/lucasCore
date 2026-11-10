@@ -30,7 +30,7 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker></defs>
 <rect class="bg" width="1600" height="1000"/>
 <text x="24" y="44" class="h1">lucasCore blueprint</text>
-<text x="24" y="66" class="sub">SyncroSim 3 add-on to ST-Sim 4.5 · version 1.1.0 · 18 stages in src/ · the scenarios they run in and the datasheets they pass on</text>
+<text x="24" y="66" class="sub">SyncroSim 3 add-on to ST-Sim 4.5 · version 1.2.0 · 18 stages in src/ · the scenarios they run in and the datasheets they pass on</text>
 <rect class="lg f-setup" x="1152.8" y="28" width="14" height="12" rx="2"/>
 <text x="1174.8" y="38" class="lgt">Setup</text>
 <rect class="lg f-land" x="1213.8" y="28" width="14" height="12" rx="2"/>
@@ -50,56 +50,61 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <rect class="box" x="24" y="104" width="216" height="830" rx="7"/><text x="40" y="126" class="eyebrow">DATA SOURCES SHEET</text><text x="40" y="146" class="sname">National data</text>
 <text x="40" y="172" class="gt">FIA</text>
 <g class="chip f-setup" data-stage="1"><rect x="122" y="161" width="18" height="14" rx="3"/><text x="131" y="171.5" class="chip-t" text-anchor="middle">1</text></g><g class="chip f-carbon" data-stage="2"><rect x="143" y="161" width="18" height="14" rx="3"/><text x="152" y="171.5" class="chip-t" text-anchor="middle">2</text></g><g class="chip f-carbon" data-stage="3"><rect x="164" y="161" width="18" height="14" rx="3"/><text x="173" y="171.5" class="chip-t" text-anchor="middle">3</text></g><g class="chip f-land" data-stage="5"><rect x="185" y="161" width="18" height="14" rx="3"/><text x="194" y="171.5" class="chip-t" text-anchor="middle">5</text></g><g class="chip f-land" data-stage="6"><rect x="206" y="161" width="18" height="14" rx="3"/><text x="215" y="171.5" class="chip-t" text-anchor="middle">6</text></g>
-<text x="40" y="187" class="item">FIADB DataMart (PLOT, COND, TREE)</text>
-<text x="40" y="202" class="item">Condition carbon and volume (USGS)</text>
-<text x="40" y="217" class="item">Disturbance and treatment codes</text>
-<text x="40" y="232" class="item">FIA ecodivisions (primary strata)</text>
-<line class="rule" x1="40" y1="248" x2="224" y2="248"/>
-<text x="40" y="263" class="gt">Land cover</text>
-<g class="chip f-setup" data-stage="1"><rect x="143" y="252" width="18" height="14" rx="3"/><text x="152" y="262.5" class="chip-t" text-anchor="middle">1</text></g><g class="chip f-land" data-stage="5"><rect x="164" y="252" width="18" height="14" rx="3"/><text x="173" y="262.5" class="chip-t" text-anchor="middle">5</text></g><g class="chip f-land" data-stage="6"><rect x="185" y="252" width="18" height="14" rx="3"/><text x="194" y="262.5" class="chip-t" text-anchor="middle">6</text></g><g class="chip f-land" data-stage="10"><rect x="206" y="252" width="18" height="14" rx="3"/><text x="215" y="262.5" class="chip-t" text-anchor="middle">10</text></g>
-<text x="40" y="278" class="item">Annual NLCD</text>
-<text x="40" y="293" class="item">LANDFIRE EVT 2016</text>
-<text x="40" y="308" class="item">RCMAP 1985, C-CAP 2001</text>
-<text x="40" y="323" class="item">USFS forest types, TreeMap</text>
-<text x="40" y="338" class="item">NASA CMS forest age 1990</text>
-<line class="rule" x1="40" y1="354" x2="224" y2="354"/>
-<text x="40" y="369" class="gt">Disturbance</text>
-<g class="chip f-land" data-stage="5"><rect x="122" y="358" width="18" height="14" rx="3"/><text x="131" y="368.5" class="chip-t" text-anchor="middle">5</text></g><g class="chip f-land" data-stage="6"><rect x="143" y="358" width="18" height="14" rx="3"/><text x="152" y="368.5" class="chip-t" text-anchor="middle">6</text></g><g class="chip f-carbon" data-stage="8"><rect x="164" y="358" width="18" height="14" rx="3"/><text x="173" y="368.5" class="chip-t" text-anchor="middle">8</text></g><g class="chip f-land" data-stage="9"><rect x="185" y="358" width="18" height="14" rx="3"/><text x="194" y="368.5" class="chip-t" text-anchor="middle">9</text></g><g class="chip f-land" data-stage="10"><rect x="206" y="358" width="18" height="14" rx="3"/><text x="215" y="368.5" class="chip-t" text-anchor="middle">10</text></g>
-<text x="40" y="384" class="item">LANDFIRE disturbance</text>
-<text x="40" y="399" class="item">MTBS burn severity</text>
-<text x="40" y="414" class="item">USFS LCMS annual change</text>
-<text x="40" y="429" class="item">Interagency fire perimeters</text>
-<text x="40" y="444" class="item">FPA-FOD fire occurrence</text>
-<text x="40" y="459" class="item">FSim burn probability</text>
-<text x="40" y="474" class="item">LANDFIRE fire return interval</text>
-<line class="rule" x1="40" y1="490" x2="224" y2="490"/>
-<text x="40" y="505" class="gt">Climate</text>
-<g class="chip f-carbon" data-stage="2"><rect x="143" y="494" width="18" height="14" rx="3"/><text x="152" y="504.5" class="chip-t" text-anchor="middle">2</text></g><g class="chip f-carbon" data-stage="3"><rect x="164" y="494" width="18" height="14" rx="3"/><text x="173" y="504.5" class="chip-t" text-anchor="middle">3</text></g><g class="chip f-climate" data-stage="7"><rect x="185" y="494" width="18" height="14" rx="3"/><text x="194" y="504.5" class="chip-t" text-anchor="middle">7</text></g><g class="chip f-climate" data-stage="11"><rect x="206" y="494" width="18" height="14" rx="3"/><text x="215" y="504.5" class="chip-t" text-anchor="middle">11</text></g>
-<text x="40" y="520" class="item">PRISM annual and normals</text>
-<text x="40" y="535" class="item">LOCA2 (scenario, model, replicate)</text>
-<line class="rule" x1="40" y1="551" x2="224" y2="551"/>
-<text x="40" y="566" class="gt">Soil</text>
-<g class="chip f-land" data-stage="5"><rect x="185" y="555" width="18" height="14" rx="3"/><text x="194" y="565.5" class="chip-t" text-anchor="middle">5</text></g><g class="chip f-carbon" data-stage="8"><rect x="206" y="555" width="18" height="14" rx="3"/><text x="215" y="565.5" class="chip-t" text-anchor="middle">8</text></g>
-<text x="40" y="581" class="item">gNATSGO soil organic carbon</text>
-<line class="rule" x1="40" y1="597" x2="224" y2="597"/>
-<text x="40" y="612" class="gt">Covariates</text>
-<g class="chip f-land" data-stage="9"><rect x="185" y="601" width="18" height="14" rx="3"/><text x="194" y="611.5" class="chip-t" text-anchor="middle">9</text></g><g class="chip f-land" data-stage="10"><rect x="206" y="601" width="18" height="14" rx="3"/><text x="215" y="611.5" class="chip-t" text-anchor="middle">10</text></g>
-<text x="40" y="627" class="item">Roads and elevation (LANDFIRE)</text>
-<text x="40" y="642" class="item">SILVIS WUI v4</text>
-<text x="40" y="657" class="item">gNATSGO crop productivity</text>
-<text x="40" y="672" class="item">USFS forest ownership</text>
-<line class="rule" x1="40" y1="688" x2="224" y2="688"/>
-<text x="40" y="703" class="gt">Package defaults</text>
-<g class="chip f-setup" data-stage="0"><rect x="59" y="711" width="18" height="14" rx="3"/><text x="68" y="721.5" class="chip-t" text-anchor="middle">0</text></g><g class="chip f-carbon" data-stage="3"><rect x="80" y="711" width="18" height="14" rx="3"/><text x="89" y="721.5" class="chip-t" text-anchor="middle">3</text></g><g class="chip f-carbon" data-stage="4"><rect x="101" y="711" width="18" height="14" rx="3"/><text x="110" y="721.5" class="chip-t" text-anchor="middle">4</text></g><g class="chip f-land" data-stage="5"><rect x="122" y="711" width="18" height="14" rx="3"/><text x="131" y="721.5" class="chip-t" text-anchor="middle">5</text></g><g class="chip f-land" data-stage="6"><rect x="143" y="711" width="18" height="14" rx="3"/><text x="152" y="721.5" class="chip-t" text-anchor="middle">6</text></g><g class="chip f-carbon" data-stage="8"><rect x="164" y="711" width="18" height="14" rx="3"/><text x="173" y="721.5" class="chip-t" text-anchor="middle">8</text></g><g class="chip f-land" data-stage="9"><rect x="185" y="711" width="18" height="14" rx="3"/><text x="194" y="721.5" class="chip-t" text-anchor="middle">9</text></g><g class="chip f-land" data-stage="10"><rect x="206" y="711" width="18" height="14" rx="3"/><text x="215" y="721.5" class="chip-t" text-anchor="middle">10</text></g>
-<text x="40" y="740" class="item">stockflow, stsim, strata</text>
-<text x="40" y="755" class="item">carbon-assumptions, cbm, spinup</text>
-<text x="40" y="770" class="item">growth, initialstocks, climate</text>
-<text x="40" y="785" class="item">landcover crosswalks</text>
-<text x="40" y="800" class="item">transitions, projection rules</text>
-<text x="40" y="819" class="lbl">(used when a sheet is left empty)</text>
-<line class="rule" x1="40" y1="837" x2="224" y2="837"/>
-<text x="40" y="857" class="lbl">Filled by its own scenario</text>
-<g class="stage f-setup" data-stage="15" tabindex="0" role="button" aria-label="Stage 15, Data Download"><rect class="sb" x="40" y="865" width="172" height="64" rx="5"/><rect class="badge" x="49" y="875" width="24" height="20" rx="3"/><text x="61" y="889" class="badge-t" text-anchor="middle">15</text><text x="81" y="890" class="sn">Data Download</text><text x="49" y="919" class="ss">15-data-download.R</text></g>
+<text x="40" y="186" class="item">FIADB DataMart (PLOT, COND, TREE)</text>
+<text x="40" y="200" class="item">Condition carbon and volume (USGS)</text>
+<text x="40" y="214" class="item">Disturbance and treatment codes</text>
+<text x="40" y="228" class="item">FIA ecodivisions (primary strata)</text>
+<line class="rule" x1="40" y1="241" x2="224" y2="241"/>
+<text x="40" y="255" class="gt">Land cover</text>
+<g class="chip f-setup" data-stage="1"><rect x="143" y="244" width="18" height="14" rx="3"/><text x="152" y="254.5" class="chip-t" text-anchor="middle">1</text></g><g class="chip f-land" data-stage="5"><rect x="164" y="244" width="18" height="14" rx="3"/><text x="173" y="254.5" class="chip-t" text-anchor="middle">5</text></g><g class="chip f-land" data-stage="6"><rect x="185" y="244" width="18" height="14" rx="3"/><text x="194" y="254.5" class="chip-t" text-anchor="middle">6</text></g><g class="chip f-land" data-stage="10"><rect x="206" y="244" width="18" height="14" rx="3"/><text x="215" y="254.5" class="chip-t" text-anchor="middle">10</text></g>
+<text x="40" y="269" class="item">Annual NLCD</text>
+<text x="40" y="283" class="item">LANDFIRE EVT 2016</text>
+<text x="40" y="297" class="item">RCMAP 1985, C-CAP 2001</text>
+<text x="40" y="311" class="item">USFS forest types, TreeMap</text>
+<text x="40" y="325" class="item">NASA CMS forest age 1990</text>
+<line class="rule" x1="40" y1="338" x2="224" y2="338"/>
+<text x="40" y="352" class="gt">Disturbance</text>
+<g class="chip f-land" data-stage="5"><rect x="122" y="341" width="18" height="14" rx="3"/><text x="131" y="351.5" class="chip-t" text-anchor="middle">5</text></g><g class="chip f-land" data-stage="6"><rect x="143" y="341" width="18" height="14" rx="3"/><text x="152" y="351.5" class="chip-t" text-anchor="middle">6</text></g><g class="chip f-carbon" data-stage="8"><rect x="164" y="341" width="18" height="14" rx="3"/><text x="173" y="351.5" class="chip-t" text-anchor="middle">8</text></g><g class="chip f-land" data-stage="9"><rect x="185" y="341" width="18" height="14" rx="3"/><text x="194" y="351.5" class="chip-t" text-anchor="middle">9</text></g><g class="chip f-land" data-stage="10"><rect x="206" y="341" width="18" height="14" rx="3"/><text x="215" y="351.5" class="chip-t" text-anchor="middle">10</text></g>
+<text x="40" y="366" class="item">LANDFIRE disturbance</text>
+<text x="40" y="380" class="item">MTBS burn severity</text>
+<text x="40" y="394" class="item">USFS LCMS annual change</text>
+<text x="40" y="408" class="item">Interagency fire perimeters</text>
+<text x="40" y="422" class="item">FPA-FOD fire occurrence</text>
+<text x="40" y="436" class="item">FSim burn probability</text>
+<text x="40" y="450" class="item">LANDFIRE fire return interval</text>
+<line class="rule" x1="40" y1="463" x2="224" y2="463"/>
+<text x="40" y="477" class="gt">Climate</text>
+<g class="chip f-carbon" data-stage="2"><rect x="143" y="466" width="18" height="14" rx="3"/><text x="152" y="476.5" class="chip-t" text-anchor="middle">2</text></g><g class="chip f-carbon" data-stage="3"><rect x="164" y="466" width="18" height="14" rx="3"/><text x="173" y="476.5" class="chip-t" text-anchor="middle">3</text></g><g class="chip f-climate" data-stage="7"><rect x="185" y="466" width="18" height="14" rx="3"/><text x="194" y="476.5" class="chip-t" text-anchor="middle">7</text></g><g class="chip f-climate" data-stage="11"><rect x="206" y="466" width="18" height="14" rx="3"/><text x="215" y="476.5" class="chip-t" text-anchor="middle">11</text></g>
+<text x="40" y="491" class="item">PRISM annual, monthly and normals</text>
+<text x="40" y="505" class="item">LOCA2 (scenario, model, replicate)</text>
+<line class="rule" x1="40" y1="518" x2="224" y2="518"/>
+<text x="40" y="532" class="gt">Non-forest</text>
+<g class="chip f-carbon" data-stage="8"><rect x="206" y="521" width="18" height="14" rx="3"/><text x="215" y="531.5" class="chip-t" text-anchor="middle">8</text></g>
+<text x="40" y="546" class="item">RAP NPP v3, Cropland Data Layer</text>
+<text x="40" y="560" class="item">USGS tidal marsh NPP 2015</text>
+<line class="rule" x1="40" y1="573" x2="224" y2="573"/>
+<text x="40" y="587" class="gt">Soil</text>
+<g class="chip f-land" data-stage="5"><rect x="185" y="576" width="18" height="14" rx="3"/><text x="194" y="586.5" class="chip-t" text-anchor="middle">5</text></g><g class="chip f-carbon" data-stage="8"><rect x="206" y="576" width="18" height="14" rx="3"/><text x="215" y="586.5" class="chip-t" text-anchor="middle">8</text></g>
+<text x="40" y="601" class="item">gNATSGO soil organic carbon</text>
+<line class="rule" x1="40" y1="614" x2="224" y2="614"/>
+<text x="40" y="628" class="gt">Covariates</text>
+<g class="chip f-land" data-stage="9"><rect x="185" y="617" width="18" height="14" rx="3"/><text x="194" y="627.5" class="chip-t" text-anchor="middle">9</text></g><g class="chip f-land" data-stage="10"><rect x="206" y="617" width="18" height="14" rx="3"/><text x="215" y="627.5" class="chip-t" text-anchor="middle">10</text></g>
+<text x="40" y="642" class="item">Roads and elevation (LANDFIRE)</text>
+<text x="40" y="656" class="item">SILVIS WUI v4</text>
+<text x="40" y="670" class="item">gNATSGO crop productivity</text>
+<text x="40" y="684" class="item">USFS forest ownership</text>
+<line class="rule" x1="40" y1="697" x2="224" y2="697"/>
+<text x="40" y="711" class="gt">Package defaults</text>
+<g class="chip f-setup" data-stage="0"><rect x="59" y="719" width="18" height="14" rx="3"/><text x="68" y="729.5" class="chip-t" text-anchor="middle">0</text></g><g class="chip f-carbon" data-stage="3"><rect x="80" y="719" width="18" height="14" rx="3"/><text x="89" y="729.5" class="chip-t" text-anchor="middle">3</text></g><g class="chip f-carbon" data-stage="4"><rect x="101" y="719" width="18" height="14" rx="3"/><text x="110" y="729.5" class="chip-t" text-anchor="middle">4</text></g><g class="chip f-land" data-stage="5"><rect x="122" y="719" width="18" height="14" rx="3"/><text x="131" y="729.5" class="chip-t" text-anchor="middle">5</text></g><g class="chip f-land" data-stage="6"><rect x="143" y="719" width="18" height="14" rx="3"/><text x="152" y="729.5" class="chip-t" text-anchor="middle">6</text></g><g class="chip f-carbon" data-stage="8"><rect x="164" y="719" width="18" height="14" rx="3"/><text x="173" y="729.5" class="chip-t" text-anchor="middle">8</text></g><g class="chip f-land" data-stage="9"><rect x="185" y="719" width="18" height="14" rx="3"/><text x="194" y="729.5" class="chip-t" text-anchor="middle">9</text></g><g class="chip f-land" data-stage="10"><rect x="206" y="719" width="18" height="14" rx="3"/><text x="215" y="729.5" class="chip-t" text-anchor="middle">10</text></g>
+<text x="40" y="747" class="item">stockflow (incl. non-forest, NASS crops)</text>
+<text x="40" y="761" class="item">carbon-assumptions, cbm, spinup</text>
+<text x="40" y="775" class="item">growth, initialstocks, climate</text>
+<text x="40" y="789" class="item">landcover crosswalks</text>
+<text x="40" y="803" class="item">transitions, projection rules</text>
+<text x="40" y="818" class="lbl">(used when a sheet is left empty)</text>
+<line class="rule" x1="40" y1="836" x2="224" y2="836"/>
+<text x="40" y="856" class="lbl">Filled by its own scenario</text>
+<g class="stage f-setup" data-stage="15" tabindex="0" role="button" aria-label="Stage 15, Data Download"><rect class="sb" x="40" y="864" width="172" height="64" rx="5"/><rect class="badge" x="49" y="874" width="24" height="20" rx="3"/><text x="61" y="888" class="badge-t" text-anchor="middle">15</text><text x="81" y="889" class="sn">Data Download</text><text x="49" y="918" class="ss">15-data-download.R</text></g>
 <rect class="box" x="268" y="104" width="202" height="136" rx="7"/><text x="284" y="126" class="eyebrow">SCENARIO · DEPENDENCY</text><text x="284" y="146" class="sname">Stock-Flow Definitions</text>
 <g class="stage f-setup" data-stage="0" tabindex="0" role="button" aria-label="Stage 0, Stock-Flow Definitions"><rect class="sb" x="283" y="160" width="172" height="64" rx="5"/><rect class="badge" x="292" y="170" width="24" height="20" rx="3"/><text x="304" y="184" class="badge-t" text-anchor="middle">0</text><text x="324" y="179" class="sn">Stock-Flow</text><text x="324" y="193" class="sn">Definitions</text><text x="292" y="214" class="ss">0-stock-flow-definitions.R</text></g>
 <rect class="box" x="494" y="104" width="480" height="136" rx="7"/><text x="510" y="126" class="eyebrow">SCENARIO · DEPENDENCY · INPUT SHEETS</text><text x="510" y="146" class="sname">Carbon Assumptions</text>
@@ -324,14 +329,14 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <text x="1272" y="765" class="rowt">Historical Transition Summary</text>
 <g class="chip f-land" data-stage="6"><rect x="1542" y="754" width="18" height="14" rx="3"/><text x="1551" y="764.5" class="chip-t" text-anchor="middle">6</text></g>
 </g>
-<g class="row" data-sheet="OutputClimateSummary" data-stages="7 11">
+<g class="row" data-sheet="OutputClimateSummary OutputCo2Beta OutputCo2Series" data-stages="7 11">
 <rect class="rowbg" x="1264" y="771" width="304" height="18" rx="3"/>
-<text x="1272" y="784" class="rowt">Climate Multiplier Summary</text>
+<text x="1272" y="784" class="rowt">Climate and CO2 summaries</text>
 <g class="chip f-climate" data-stage="7"><rect x="1521" y="773" width="18" height="14" rx="3"/><text x="1530" y="783.5" class="chip-t" text-anchor="middle">7</text></g><g class="chip f-climate" data-stage="11"><rect x="1542" y="773" width="18" height="14" rx="3"/><text x="1551" y="783.5" class="chip-t" text-anchor="middle">11</text></g>
 </g>
-<g class="row" data-sheet="OutputInitialStockSummary" data-stages="8">
+<g class="row" data-sheet="OutputInitialStockSummary OutputNonForestProductivity" data-stages="8">
 <rect class="rowbg" x="1264" y="790" width="304" height="18" rx="3"/>
-<text x="1272" y="803" class="rowt">Initial Stock Summary</text>
+<text x="1272" y="803" class="rowt">Initial stocks, non-forest productivity</text>
 <g class="chip f-carbon" data-stage="8"><rect x="1542" y="792" width="18" height="14" rx="3"/><text x="1551" y="802.5" class="chip-t" text-anchor="middle">8</text></g>
 </g>
 <g class="row" data-sheet="OutputProjectionSchedule OutputProjectionRate OutputFireSize OutputFireSlope" data-stages="9">
@@ -360,6 +365,6 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <g class="chip f-setup" data-stage="15"><rect x="1542" y="887" width="18" height="14" rx="3"/><text x="1551" y="897.5" class="chip-t" text-anchor="middle">15</text></g>
 </g>
 <text x="24" y="962" class="foot">Solid arrows: a datasheet one stage writes and a later stage reads. Dashed: a scenario dependency (the dependency supplies its sheets; the first one with rows wins). Chips: the stages that read a data group, or write a sheet.</text>
-<text x="24" y="978" class="foot">Every stage also writes the Validation sheet, and every Build stage the Data Sources Used sheet. Generated by docs/blueprint/build.R from package.xml (lucasCore 1.1.0), 2026-11-06.</text>
+<text x="24" y="978" class="foot">Every stage also writes the Validation sheet, and every Build stage the Data Sources Used sheet. Generated by docs/blueprint/build.R from package.xml (lucasCore 1.2.0), 2026-11-09.</text>
 </svg>
 
