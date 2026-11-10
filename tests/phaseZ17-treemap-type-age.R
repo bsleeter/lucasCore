@@ -32,7 +32,7 @@ for (k in names(CASES)) { v <- as.data.table(datasheet(R[[k]], "lucasCore_Output
 cat(logs(R$treemap, "TreeMap|Forest type map|Stand age"), sep = "\n")
 expect("TreeMap coverage logged", length(logs(R$treemap, "^TreeMap 2016: .* join a forested condition")) == 1)
 S0 <- mp(R$base, "StateClassFileName"); S1 <- mp(R$treemap, "StateClassFileName"); A0 <- mp(R$base, "AgeFileName"); A1 <- mp(R$treemap, "AgeFileName")
-f0 <- !is.na(S0) & (S0 >= 100 | S0 == 90); f1 <- !is.na(S1) & (S1 >= 100 | S1 == 90)
+f0 <- !is.na(S0) & (S0 >= 100 | S0 %in% c(90, 91)); f1 <- !is.na(S1) & (S1 >= 100 | S1 %in% c(90, 91))
 expect("the same forest cells (forest is from NLCD)", identical(f0, f1), sprintf("%d vs %d", sum(f0), sum(f1)))
 gi <- fread(file.path(pkg, "defaults/growth/forest-type-crosswalk.csv"))
 expect("every TreeMap forest cell is a forest type with growth inputs", all(S1[f1 & S1 >= 100] %in% gi$StateClassId), paste(setdiff(unique(S1[f1 & S1 >= 100]), gi$StateClassId), collapse = ", "))

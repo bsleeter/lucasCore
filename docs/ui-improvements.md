@@ -963,8 +963,9 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     - Other types by region: `tools/make_wetland_forest_regions.R` -> `defaults/growth/wetland-forest-regions.csv`. Warm Continental
       (and Mountains) Spruce/Fir; Subtropical and Savanna Oak/Gum/Cypress; every other ecodivision Elm/Ash/Cottonwood (Hot
       Continental by its own plots, the rest by default). Stage 5 assigns palustrine woody wetland cells (NLCD 90 not estuarine in
-      C-CAP, NLCD 95 that C-CAP maps as forested or scrub-shrub) and logs the reassignments; estuarine forested cells stay
-      Palustrine Forested.
+      C-CAP, NLCD 95 that C-CAP maps as forested or scrub-shrub) and logs the reassignments; estuarine forested cells run
+      as `Wetland: Estuarine Forested` (91, its own rates and curves; 2026-11-10: until then folded into Palustrine Forested, 90,
+      which now starts with no cells and stays defined for older libraries).
     - Burial: `defaults/spinup/wetland-burial.csv`; flow `Stabilization: BG Slow -> Deep Soil` in the forest pathways for the twins
       only, rate = burial / soil target, fixed outside the gNATSGO soil multiplier (stage 3 calibration and flows, stage 4 spin-up).
     - Organic soils: Data Source `HistosolFile` (Data Download: gNATSGO mukey raster for the region + the component table, percent
