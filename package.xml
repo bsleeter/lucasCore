@@ -1274,6 +1274,9 @@
 		<dataSheet name="OutputTransitionSummary" type="Input"/>
 		<dataSheet name="OutputClimateSummary" type="Input"/>
 		<dataSheet name="stsim_FlowSpatialMultiplier" type="Input"/>
+		<dataSheet name="stsim_FlowMultiplier" type="Input"/>
+		<dataSheet name="stsim_StateAttributeValue" type="Input"/>
+		<dataSheet name="stsim_TransitionSpatialMultiplier" type="Input"/>
 		<dataSheet name="OutputSiteClassMap" type="Input"/>
 		<dataSheet name="OutputBuildFigure" type="Output"/>
 		<dataSheet name="OutputValidation" type="Both"/>

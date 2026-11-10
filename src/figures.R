@@ -128,8 +128,13 @@ figure_kit <- function(sc, dem, outdir, NOTE) {
     done(f, title, caption) }
   ptitle <- function(i, s) title(main = sprintf("(%s) %s", letters[i], s), adj = 0, font.main = 2, cex.main = .95, col.main = INK)
   hgrid <- function() abline(h = axTicks(2), col = GRID, lwd = .6)
-  # a legend in one row just above the plot's top right corner, clear of the data
-  top_legend <- function(...) legend("bottomright", ..., horiz = TRUE, inset = c(0, 1.01), xpd = NA, bty = "n", cex = .72, border = NA)
+  # a legend just above the plot's top right corner, clear of the data: in one row when it fits beside the panel title (avoid, the
+  # title's text), else in as few rows as it takes (2026-11-09: a long legend ran over the title in Figures 7 and 8)
+  top_legend <- function(legend, ..., avoid = "") { u <- par("usr"); free <- (u[2] - u[1]) - strwidth(avoid, cex = .95, font = 2) * 1.1
+    ew <- strwidth(legend, cex = .72) + strwidth("MMM", cex = .72); nr <- 1
+    while (nr < length(legend) && max(vapply(split(ew, ceiling(seq_along(ew) / ceiling(length(ew) / nr))), sum, 0)) > free) nr <- nr + 1
+    graphics::legend("bottomright", legend = legend, ..., ncol = ceiling(length(legend) / nr), inset = c(0, 1.01), xpd = NA, bty = "n", cex = .72, border = NA,
+                     x.intersp = .6, text.width = NULL) }
   environment() }
 # the kit's functions and frame values into the calling function's environment (the functions keep counting figures in the kit)
 use_kit <- function(K, into) for (nm in setdiff(ls(K), c("I", "rows", "n"))) assign(nm, get(nm, envir = K), envir = into)
@@ -163,8 +168,17 @@ build_figures <- function(I, outdir) {
   if (!is.null(I$age)) { a <- cv(I$age); a[!forest] <- NA; ab <- c(0, 1, 20, 40, 60, 80, 100, 120, 150, Inf)
     P[[length(P) + 1]] <- list(k = classed(a, ab), cols = RAMP_AGE(length(ab) - 1), lab = c("0", "1-20", "20-40", "40-60", "60-80", "80-100", "100-120", "120-150", ">150"),
                                title = "Stand age (years)", sub = "NASA CMS forest age, updated by disturbance; grey: not forest") }
+  # shrubland's age is its years since fire (stage 5: chaparral and non-sage from the fire perimeter history, the sage family the same),
+  # which sets its growth and carbon by age (user, 2026-11-09: non-forest attributes in the Build figures)
+  shrub <- !is.na(vS) & vS %in% scn$Id[grepl("^Shrubland:", scn$Name)]
+  ysf_cap <- ""
+  if (!is.null(I$age) && any(shrub)) { a <- cv(I$age); a[!shrub] <- NA
+    if (any(!is.na(a) & a > 0)) { yb <- c(0, 5, 10, 20, 30, 50, 75, 100, Inf); as <- a[shrub & !is.na(a)]
+      P[[length(P) + 1]] <- list(k = classed(a, yb), cols = RAMP_SITE(9)[c(1:4, 6:9)], lab = c("0-4", "5-9", "10-19", "20-29", "30-49", "50-74", "75-99", "100+"),
+        title = "Shrubland years since fire", sub = sprintf("shrubland cells: median %.0f years; grey: not shrubland", median(as)))
+      ysf_cap <- sprintf(" (%s) Years since fire of the shrubland cells, their age in the model: the last fire in the fire perimeter history, else the class's unburned age; it sets their growth and starting carbon.", letters[length(P)]) } }
   map_figure("land_cover", "Initial land cover", P,
-    sprintf("(a) State class in the start year (%s), the twelve largest named. (b) Forest type groups of the forest cells. (c) Initial stand age of the forest cells.%s", I$years[1], relief))
+    sprintf("(a) State class in the start year (%s), the twelve largest named. (b) Forest type groups of the forest cells. (c) Initial stand age of the forest cells.%s%s", I$years[1], ysf_cap, relief))
 
   # ---- maps: initial carbon ----------------------------------------------------------------------------------------------------
   if (!is.null(I$stocks) && length(I$stocks)) {
@@ -181,17 +195,38 @@ build_figures <- function(I, outdir) {
       sprintf("Carbon in the start year (%s): %.1f Tg C in the study area. (a, b) Classes in even steps between each map's 1st and 99.5th percentiles; the end classes are open. (c) Classes of roughly equal area: forest soil starts at its type's gNATSGO mean (stage 3 calibrates decay to it), so it varies little within a type, and other land takes gNATSGO directly.%s", I$years[1], totTg, relief)) }
 
   # ---- maps: site productivity (to-do 35) ----------------------------------------------------------------------------------------
-  if (!is.null(I$site)) {
-    m <- cv(I$site); m[!forest] <- NA; mb <- c(-Inf, 0.6, 0.7, 0.8, 0.9, 0.95, 1.05, 1.1, 1.2, 1.3, 1.5, Inf)
-    mf <- m[forest & !is.na(m)]
-    P <- list(list(k = classed(m, mb), cols = RAMP_SITE(length(mb) - 1), lab = c("<0.6", "0.6", "0.7", "0.8", "0.9", "0.95-1.05", "1.05", "1.1", "1.2", "1.3", ">1.5"),
-                   title = "Site productivity multiplier", sub = sprintf("forest cells: mean %.2f, 10th-90th percentile %.2f-%.2f; grey: not forest", mean(mf), quantile(mf, .1), quantile(mf, .9))))
-    if (!is.null(I$site_class)) { s <- cv(I$site_class); s[!forest] <- NA
-      P[[2]] <- list(k = classed(s, c(-Inf, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, Inf)), cols = rev(RAMP_SITE(7)), lab = c("1: 225+", "2: 165", "3: 120", "4: 85", "5: 50", "6: 20", "7: 0-19"),
-                     title = "FIA site class (mean of the cell's TreeMap plots)", sub = "potential growth, cubic feet per acre per year; grey: not forest or no TreeMap plot") }
-    map_figure("site_productivity", "Site productivity", P,
-      sprintf("(a) Each forest cell's growth multiplier (stage 8): its TreeMap pixels' FIA site class mix, each class weighted by its forest type and ecodivision's multiplier (Build Results > Site Productivity). It multiplies the climate multipliers on forest growth and scaled the cell's starting live and dead carbon; other land stays at 1.%s%s",
-              if (length(P) > 1) " (b) The cell's mean FIA site class, from the share of its TreeMap pixels in each class (stage 5); 1 is the most productive." else "", relief)) }
+  # the non-forest multipliers (Build Options > Site Productivity, stage 8), each over its own classes' cells (user, 2026-11-09)
+  NF_MAPS <- list(
+    `Grass and Shrub Productivity` = list(re = "^(Grassland|Shrubland):", who = "grassland and shrubland",
+      cap = "each grassland and shrubland cell's multiplier on non-forest growth: its RAP herbaceous and shrub NPP (2014-2023) over its ecodivision and class target"),
+    `Cropland Productivity` = list(re = "^Agriculture:", who = "cropland and pasture",
+      cap = "each cropland and pasture cell's multiplier on agriculture growth: its Cropland Data Layer crops (2014-2025) at their county's NASS growth, over its ecodivision and class growth"),
+    `Crop Harvest` = list(re = "^Agriculture:", who = "cropland and pasture",
+      cap = "each cropland and pasture cell's multiplier on agriculture harvest: its crops' harvested share of aboveground growth over its class's harvest rate"),
+    `Tidal Marsh Productivity` = list(re = "^Wetland: .*Emergent", who = "emergent wetland",
+      cap = "each emergent wetland cell's multiplier on wetland growth: the USGS tidal marsh NPP map (2015) over its ecodivision mean"))
+  mb <- c(-Inf, 0.6, 0.7, 0.8, 0.9, 0.95, 1.05, 1.1, 1.2, 1.3, 1.5, Inf); mlab <- c("<0.6", "0.6", "0.7", "0.8", "0.9", "0.95-1.05", "1.05", "1.1", "1.2", "1.3", ">1.5")
+  nf_maps <- I$nf_maps[intersect(names(NF_MAPS), names(I$nf_maps))]
+  if (!is.null(I$site) || length(nf_maps)) {
+    P <- list(); cap <- character(); flat <- character()
+    if (!is.null(I$site)) { m <- cv(I$site); m[!forest] <- NA; mf <- m[forest & !is.na(m)]
+      P[[1]] <- list(k = classed(m, mb), cols = RAMP_SITE(length(mb) - 1), lab = mlab,
+                     title = "Site productivity multiplier", sub = sprintf("forest cells: mean %.2f, 10th-90th percentile %.2f-%.2f; grey: not forest", mean(mf), quantile(mf, .1), quantile(mf, .9)))
+      cap <- sprintf("(a) Each forest cell's growth multiplier (stage 8): its TreeMap pixels' FIA site class mix, each class weighted by its forest type and ecodivision's multiplier (Build Results > Site Productivity). It multiplies the climate multipliers on forest growth and scaled the cell's starting live and dead carbon.")
+      if (!is.null(I$site_class)) { s <- cv(I$site_class); s[!forest] <- NA
+        P[[2]] <- list(k = classed(s, c(-Inf, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, Inf)), cols = rev(RAMP_SITE(7)), lab = c("1: 225+", "2: 165", "3: 120", "4: 85", "5: 50", "6: 20", "7: 0-19"),
+                       title = "FIA site class (mean of the cell's TreeMap plots)", sub = "potential growth, cubic feet per acre per year; grey: not forest or no TreeMap plot")
+        cap <- c(cap, "(b) The cell's mean FIA site class, from the share of its TreeMap pixels in each class (stage 5); 1 is the most productive.") } }
+    for (t in names(nf_maps)) { d <- NF_MAPS[[t]]; own <- !is.na(vS) & vS %in% scn$Id[grepl(d$re, scn$Name)]
+      m <- cv(nf_maps[[t]]); m[!own] <- NA; mo <- m[own & !is.na(m)]
+      if (!length(mo)) next
+      if (all(abs(mo - 1) < 1e-6)) { flat <- c(flat, sprintf("%s is 1 on every %s cell here (no map data in the study area).", t, d$who)); next }
+      P[[length(P) + 1]] <- list(k = classed(m, mb), cols = RAMP_SITE(length(mb) - 1), lab = mlab, title = sprintf("%s multiplier", t),
+        sub = sprintf("%s cells: mean %.2f, 10th-90th percentile %.2f-%.2f; grey: other land", d$who, mean(mo), quantile(mo, .1), quantile(mo, .9)))
+      cap <- c(cap, sprintf("(%s) %s%s.", letters[length(P)], toupper(substr(d$cap, 1, 1)), substring(d$cap, 2))) }
+    if (length(P)) map_figure("site_productivity", "Site productivity", P,
+      paste0(paste(c(cap, if (length(nf_maps)) "Each non-forest multiplier is capped at 0.3-2.5; the grass and shrub and the cropland ones are also passed to nearby land of other classes for when it changes class (not mapped), and the growth multipliers also scaled the cell's starting live and dead carbon (not its soil). Build Results > Non-Forest Productivity has them by ecodivision and class.",
+                       flat), collapse = " "), relief)) }
 
   # ---- charts: area and carbon by state class ----------------------------------------------------------------------------------
   fq <- as.data.table(freq(I$sc))[, .(Id = value, km2 = count * cell_km2)][, Class := scn$Name[match(Id, scn$Id)]][order(-km2)]
@@ -213,19 +248,42 @@ build_figures <- function(I, outdir) {
         legend("bottomright", names(pc), fill = pc, border = NA, bty = "n", cex = .75) } })
 
   # ---- charts: growth curves ----------------------------------------------------------------------------------------------------
-  if (!is.null(I$carbon_curves) && nrow(I$carbon_curves)) {
-    cc <- I$carbon_curves; vc <- I$volume_curves
-    eco <- head(cc[, .N, by = StratumId][order(-N), StratumId], 3); ne <- length(eco); hasV <- !is.null(vc) && nrow(vc)
-    types <- sort(unique(cc$StateClassId)); tc <- scol[types]; tc[is.na(tc)] <- "#777777"
-    chart_figure("growth_curves", "Growth curves", "Live tree carbon (CBM biomass pools) and merchantable volume by stand age for the forest types of each ecodivision, fitted to FIA.",
-      if (hasV) 2 else 1, ne, h = (if (hasV) 1500 else 800) + 160, draw = function() {
+  # non-forest growth (user, 2026-11-09): the Net Growth state attribute of the study area's non-forest classes (forested wetlands grow
+  # like forest and are left out): shrubland by years since fire, the classes with one rate as bars
+  ng <- I$nf_growth; ng_age <- ng_flat <- NULL
+  if (!is.null(ng) && nrow(ng)) { ng <- ng[!is.na(Value)]; ng[, AgeMin := ifelse(is.na(AgeMin), 0L, as.integer(AgeMin))]
+    nage <- ng[, .(n = uniqueN(AgeMin)), by = StateClassId]
+    ng_age <- ng[StateClassId %in% nage[n > 1, StateClassId]]; ng_flat <- ng[StateClassId %in% nage[n == 1, StateClassId], .(Value = mean(Value)), by = .(StratumId, StateClassId)] }
+  if ((!is.null(I$carbon_curves) && nrow(I$carbon_curves)) || (!is.null(ng) && nrow(ng))) {
+    cc <- I$carbon_curves %||% data.table(); vc <- I$volume_curves; hasC <- nrow(cc) > 0
+    eco <- if (hasC) head(cc[, .N, by = StratumId][order(-N), StratumId], 3) else head(ng[, .N, by = StratumId][order(-N), StratumId], 3); ne <- length(eco)
+    hasV <- hasC && !is.null(vc) && nrow(vc); hasA <- !is.null(ng_age) && nrow(ng_age[StratumId %in% eco]); hasF <- !is.null(ng_flat) && nrow(ng_flat[StratumId %in% eco])
+    nr <- hasC + hasV + hasA + hasF
+    types <- if (hasC) sort(unique(cc$StateClassId)) else character(); tc <- scol[types]; tc[is.na(tc)] <- "#777777"
+    cap <- c(if (hasC) "Live tree carbon (CBM biomass pools) and merchantable volume by stand age for the forest types of each ecodivision, fitted to FIA.",
+             if (hasA) "Net growth (NPP) of the shrubland classes by years since fire, which the model uses as their age, before the climate and productivity multipliers.",
+             if (hasF) "Net growth of the other non-forest classes, one rate each (grassland, emergent wetland, cropland and pasture), before the climate and productivity multipliers.")
+    chart_figure("growth_curves", "Growth curves", paste(cap, collapse = " "), nr, ne, h = 750 * nr + 160, draw = function() {
         i <- 0; panel <- function(d, y, ylab, lab) for (e in eco) { i <<- i + 1; x <- d[StratumId == e]
           plot(NA, xlim = range(d$Age), ylim = c(0, max(d[[y]], na.rm = TRUE) * 1.05), xlab = "Stand age (years)", ylab = ylab, bty = "l"); hgrid()
           for (t in types) { s <- x[StateClassId == t][order(Age)]; if (nrow(s)) lines(s$Age, s[[y]], col = tc[t], lwd = 1.6) }
           ptitle(i, sprintf("%s, %s", lab, e))
           if (i == 1) legend("bottomright", short_class(types), col = tc, lwd = 2, bty = "n", cex = .65) }
-        panel(cc, "TotalLive", "Live tree carbon (Mg C/ha)", "Live tree carbon")
-        if (hasV) panel(vc, "MerchantableVolume", "Merchantable volume (m3/ha)", "Merchantable volume") }) }
+        if (hasC) panel(cc, "TotalLive", "Live tree carbon (Mg C/ha)", "Live tree carbon")
+        if (hasV) panel(vc, "MerchantableVolume", "Merchantable volume (m3/ha)", "Merchantable volume")
+        if (hasA) { at <- sort(unique(ng_age$StateClassId)); ac <- setNames(QUAL[(seq_along(at) - 1) %% length(QUAL) + 1], at)   # the shrub classes' own colours are near alike
+          for (e in eco) { i <- i + 1; x <- ng_age[StratumId == e]
+            if (!nrow(x)) { plot.new(); next }
+            plot(NA, xlim = range(ng_age$AgeMin), ylim = c(0, max(ng_age$Value) * 1.05), xlab = "Years since fire", ylab = "Net growth (Mg C/ha/yr)", bty = "l"); hgrid()
+            for (t in at) { s <- x[StateClassId == t][order(AgeMin)]; if (nrow(s)) lines(s$AgeMin, s$Value, col = ac[t], lwd = 1.8) }
+            ptitle(i, sprintf("Shrubland net growth, %s", e))
+            legend("topright", sub("^Shrubland: ", "", at), col = ac, lwd = 2, bty = "n", cex = .65) } }
+        if (hasF) { ft <- sort(unique(ng_flat$StateClassId)); fc <- scol[ft]; fc[is.na(fc)] <- "#777777"; xm <- max(ng_flat$Value) * 1.1
+          for (e in eco) { i <- i + 1; x <- ng_flat[StratumId == e][match(ft, StateClassId)]; v <- x$Value; v[is.na(v)] <- 0
+            op <- par(mar = c(4.5, if (e == eco[1]) 13 else 2, 3, 1))
+            barplot(rev(v), names.arg = if (e == eco[1]) rev(ft) else rep("", length(ft)), horiz = TRUE, col = rev(fc), border = NA, xlim = c(0, xm),
+                    cex.names = .7, xlab = "Net growth (Mg C/ha/yr)")
+            abline(v = axTicks(1), col = GRID, lwd = .6); ptitle(i, sprintf("Other non-forest net growth, %s", e)); par(op) } } }) }
 
   # ---- charts: decay calibration ------------------------------------------------------------------------------------------------
   if (!is.null(I$decay) && nrow(I$decay)) {
@@ -245,7 +303,7 @@ build_figures <- function(I, outdir) {
           abline(v = 1, lty = 2, col = MUTED); abline(h = seq_len(ny), col = GRID, lwd = .6)
           for (k in names(cols)) points(x[[cols[k]]], seq_len(ny), pch = 16, col = pc[k], cex = 1.1)
           if (i == 1) axis(2, at = seq_len(ny), labels = short_class(x$StateClassId), cex.axis = .7, tick = FALSE)
-          ptitle(i, eco[i]); if (i == ne) top_legend(names(pc), col = pc, pch = 16) } }) }
+          ptitle(i, eco[i]); if (i == ne) top_legend(names(pc), col = pc, pch = 16, avoid = sprintf("(%s) %s", letters[i], eco[i])) } }) }
 
   # ---- charts: historical land-use change and disturbance -----------------------------------------------------------------------
   if (!is.null(I$trans) && nrow(I$trans)) {
@@ -256,30 +314,62 @@ build_figures <- function(I, outdir) {
       m <- dcast(x, Member ~ Timestep, value.var = "Area", fill = 0); mm <- matrix(0, nrow(m), length(yrs), dimnames = list(m$Member, yrs))
       k <- intersect(colnames(m)[-1], as.character(yrs)); mm[, k] <- as.matrix(m[, k, with = FALSE])
       mm <- mm[order(match(rownames(mm), names(cols)), rownames(mm)), , drop = FALSE]      # the colour list's order (low to high severity)
-      cl <- cols[rownames(mm)]; cl[is.na(cl)] <- QUAL[seq_len(sum(is.na(cl)))]
+      # every member a colour: the list's, else the qualitative set (2026-11-09: with no list, cols[...] was NULL and the bars and keys grey)
+      cl <- if (length(cols)) unname(cols[rownames(mm)]) else rep(NA_character_, nrow(mm)); cl[is.na(cl)] <- QUAL[(seq_len(sum(is.na(cl))) - 1) %% length(QUAL) + 1]
       b <- barplot(mm, col = cl, border = NA, space = .15, xaxt = "n", ylab = "Area per year (km2)"); hgrid()
       barplot(mm, col = cl, border = NA, space = .15, xaxt = "n", add = TRUE, axes = FALSE)
       at <- if (length(yrs) <= 15) seq_along(yrs) else which(yrs %% 5 == 0); axis(1, at = b[at], labels = yrs[at], cex.axis = .75)
-      ptitle(i, fam); top_legend(rownames(mm), fill = cl) }
+      ptitle(i, fam); top_legend(rownames(mm), fill = cl, avoid = sprintf("(%s) %s", letters[i], fam)) }
     fams <- intersect(c("Urbanization", "Intensification", "Ag Expansion", "Ag Contraction", "Ag Change"), unique(tr$Family))
     if (length(fams)) chart_figure("land_use_change", "Historical land-use change", sprintf("Annual area of each land-use transition group, %s-%s, from annual NLCD (stage 6), by member type.", min(yrs), max(yrs)),
       ceiling(length(fams) / 2), min(2, length(fams)), draw = function() for (i in seq_along(fams)) stack(tr, fams[i], c(), i))
     dfam <- intersect(c("Fire", "Forest Harvest", "Insect"), unique(tr$Family))
+    # the burned area by land type (user, 2026-11-09): stage 6's yearly fire maps (all severities) over each cell's start-year class
+    ft <- NULL
+    if ("Fire" %in% dfam && !is.null(I$fire_maps) && nrow(I$fire_maps)) {
+      sv <- values(I$sc, mat = FALSE); snm <- scn$Name[match(sv, as.numeric(scn$Id))]
+      ty <- ifelse(!is.na(sv) & sv >= 100 & sv < 1000, "Forest", sub(":.*$", "", snm)); ty[!ty %in% c("Forest", "Shrubland", "Grassland", "Wetland", "Agriculture")] <- "Other"; ty[is.na(sv)] <- NA
+      ft <- rbindlist(lapply(seq_len(nrow(I$fire_maps)), function(j) { r <- rast(I$fire_maps$File[j])
+        if (!compareGeom(r, I$sc, stopOnError = FALSE)) r <- resample(r, I$sc, method = "near")
+        v <- values(r, mat = FALSE); b <- !is.na(v) & v > 0 & !is.na(ty)
+        if (!any(b)) return(NULL); data.table(Timestep = I$fire_maps$Timestep[j], Member = ty[b])[, .(Area = .N * cell_km2), by = .(Timestep, Member)] }))
+      if (nrow(ft)) ft <- ft[, .(Area = sum(Area)), by = .(Timestep, Member)][, Family := "Fire by land type"] else ft <- NULL }
     if (length(dfam)) { tr[Family %in% dfam, Member := sub("^Forest ", "", Member)]
-      dcol <- c(`Low Severity` = "#fbe3a2", `Medium Severity` = "#ef8f2a", `High Severity` = "#a81d1a", Clearcut = "#3d3d3d", Selection = "#b5b5b5")
-      chart_figure("disturbance", "Disturbance history", sprintf("Annual area burned by severity (MTBS) and harvested by clearcut and selection (LCMS tree removal), %s-%s, as written by stage 6.", min(yrs), max(yrs)),
-        length(dfam), 1, h = 640 * length(dfam) + 260, draw = function() for (i in seq_along(dfam)) stack(tr, dfam[i], dcol, i)) } }
+      dcol <- c(`Low Severity` = "#fbe3a2", `Medium Severity` = "#ef8f2a", `High Severity` = "#a81d1a", Clearcut = "#3d3d3d", Selection = "#b5b5b5",
+                Forest = "#2b8152", Shrubland = "#c08a3e", Grassland = "#e8d27a", Wetland = "#5aa5b4", Agriculture = "#b07aa1", Other = "#9a9a9a")
+      np <- length(dfam) + !is.null(ft)
+      chart_figure("disturbance", "Disturbance history", sprintf("Annual area burned by severity (MTBS)%s and harvested by clearcut and selection (LCMS tree removal), %s-%s, as written by stage 6.",
+          if (is.null(ft)) "" else ", burned area by the land type the cells had in the start year", min(yrs), max(yrs)),
+        np, 1, h = 640 * np + 260, draw = function() { i <- 0
+          for (f in dfam) { i <- i + 1; stack(tr, f, dcol, i)
+            if (f == "Fire" && !is.null(ft)) { i <- i + 1; stack(ft, "Fire by land type", dcol, i) } } }) } }
 
   # ---- charts: climate multipliers -----------------------------------------------------------------------------------------------
-  if (!is.null(I$climate) && nrow(I$climate)) {
-    cl <- copy(I$climate); cl[, Effect := sprintf("%s (%s)", FlowGroup, Model)]; cls <- unique(cl$Climate); eff <- unique(cl$Effect)
-    ec <- setNames(QUAL[seq_along(eff)], eff)
-    chart_figure("climate", "Climate multipliers", "Year-to-year growth and decomposition multipliers against each cell's 1991-2020 normal (stage 7): the study-area mean, with the range across cells shaded.",
-      1, length(cls), h = 1000, draw = function() for (i in seq_along(cls)) { x <- cl[Climate == cls[i]]
-        plot(NA, xlim = range(x$Timestep), ylim = range(c(x$Min, x$Max), na.rm = TRUE), xlab = "", ylab = "Multiplier (1 = normal)", bty = "l"); hgrid(); abline(h = 1, lty = 2, col = MUTED)
-        for (e in eff) { s <- x[Effect == e][order(Timestep)]; if (!nrow(s)) next
-          polygon(c(s$Timestep, rev(s$Timestep)), c(s$Min, rev(s$Max)), col = adjustcolor(ec[e], .15), border = NA); lines(s$Timestep, s$Mean, col = ec[e], lwd = 1.6) }
-        ptitle(i, cls[i]); top_legend(eff, col = ec, lwd = 2) }) }
+  # agriculture's yearly multipliers (user, 2026-11-09): Crop Yield (stage 3, NASS yields by ecodivision and class) and Crop Mix (stage 8,
+  # a California county's crop mix by year: the mean of its yearly growth and harvest maps over the agriculture cells)
+  ag <- NULL; yr0 <- I$years[1]; yr1 <- I$years[2]
+  if (!is.null(I$crop_yield) && nrow(I$crop_yield)) ag <- I$crop_yield[Timestep >= yr0 & Timestep <= yr1, .(Mean = mean(Value), Min = min(Value), Max = max(Value), Effect = "Crop Yield (NASS)"), by = Timestep]
+  if (!is.null(I$crop_mix) && nrow(I$crop_mix)) {
+    agc <- !is.na(vS0 <- values(I$sc, mat = FALSE)) & vS0 %in% as.numeric(scn$Id[grepl("^Agriculture:", scn$Name)])
+    if (any(agc)) ag <- rbind(ag, rbindlist(lapply(seq_len(nrow(I$crop_mix)), function(j) { r <- rast(I$crop_mix$File[j])
+      if (!compareGeom(r, I$sc, stopOnError = FALSE)) r <- resample(r, I$sc, method = "near")
+      v <- values(r, mat = FALSE)[agc]; v <- v[!is.na(v)]; if (!length(v)) return(NULL)
+      data.table(Timestep = I$crop_mix$Timestep[j], Mean = mean(v), Min = quantile(v, .1, names = FALSE), Max = quantile(v, .9, names = FALSE), Effect = sprintf("Crop Mix %s", I$crop_mix$Kind[j])) }))[Timestep >= yr0 & Timestep <= yr1], fill = TRUE) }
+  hasCl <- !is.null(I$climate) && nrow(I$climate); hasAg <- !is.null(ag) && nrow(ag)
+  if (hasCl || hasAg) {
+    cl <- if (hasCl) copy(I$climate)[, Effect := sprintf("%s (%s)", FlowGroup, Model)] else data.table(Climate = character(), Effect = character())
+    cls <- unique(cl$Climate); eff <- unique(cl$Effect); ec <- setNames(QUAL[seq_along(eff)], eff)
+    np <- length(cls) + hasAg
+    chart_figure("climate", "Climate multipliers", paste(c(if (hasCl) "Year-to-year growth and decomposition multipliers against each cell's 1991-2020 normal (stage 7): the study-area mean, with the range across cells shaded.",
+        if (hasAg) sprintf("(%s) Agriculture's yearly growth multipliers: Crop Yield (stage 3, NASS county yields against their mean; mean and range across ecodivisions and classes)%s.", letters[np],
+          if (!is.null(I$crop_mix) && nrow(I$crop_mix)) " and Crop Mix (stage 8, the county's yearly crop mix against the Cropland Data Layer years; mean over the agriculture cells, 10th-90th percentile shaded)" else "")), collapse = " "),
+      np, 1, h = 800 * np + 260, draw = function() {
+        line_panel <- function(x, eff, ec, i, lab) { plot(NA, xlim = range(x$Timestep), ylim = range(c(x$Min, x$Max, 1), na.rm = TRUE), xlab = "", ylab = "Multiplier (1 = normal)", bty = "l"); hgrid(); abline(h = 1, lty = 2, col = MUTED)
+          for (e in eff) { s <- x[Effect == e][order(Timestep)]; if (!nrow(s)) next
+            polygon(c(s$Timestep, rev(s$Timestep)), c(s$Min, rev(s$Max)), col = adjustcolor(ec[e], .15), border = NA); lines(s$Timestep, s$Mean, col = ec[e], lwd = 1.6) }
+          ptitle(i, lab); top_legend(eff, col = ec, lwd = 2, avoid = sprintf("(%s) %s", letters[i], lab)) }
+        for (i in seq_along(cls)) line_panel(cl[Climate == cls[i]], eff, ec, i, cls[i])
+        if (hasAg) { ae <- unique(ag$Effect); line_panel(ag, ae, setNames(c("#9c755f", "#59a14f", "#e15759")[seq_along(ae)], ae), np, "Agriculture") } }) }
 
   # ---- charts: build checks ------------------------------------------------------------------------------------------------------
   if (!is.null(I$validation) && nrow(I$validation)) {
