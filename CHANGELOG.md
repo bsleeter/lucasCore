@@ -2,9 +2,32 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
-## Unreleased
+## 1.2.0 - 2026-11-10
+
+Grassland, shrubland, wetland and agriculture carbon rebuilt from data, CO2 fertilization in projections, and library updates.
+
+**Upgrading:** install `lucasCore-1.2.0.ssimpkg`. A library made with 1.1.0 or 1.1.1 is brought up to 1.2 the first time SyncroSim
+opens it (Studio asks to update it; it keeps a backup): new columns, the agriculture stock, flows and flow groups, the new Flow
+Multiplier Types, and the stock-flow rows of a Stock-Flow Definitions scenario. tools/sync-library.R is no longer needed for that.
+Results made with 1.1 keep their values; rerun the Build to use the new non-forest carbon. Needs SyncroSim 3.1.29 or later with
+ST-Sim 4.5.4.
 
 ### Added
+- Library updates (ui/LucasCoreUpdates.cs, SyncroSim's .NET update provider): each version's schema and definition changes are applied
+  when a library made with an earlier version is opened. Every step checks first, so a library that already has a change is left as
+  it is. The 1.1 update (the Study Area options table) moved here from updates/update-1.1000.xml.
+- Grassland and shrubland carbon by ecodivision (to-do 39): growth and soil from RAP NPP and gNATSGO, pools and litter from the
+  literature; chaparral, non-sage shrub and the sage family grow by years since fire (woody recovery from the literature, the early
+  dip from RAP within MTBS fire perimeters).
+- Emergent wetlands by ecodivision, fitted in ST-Sim's flow order; estuarine growth recalibrated to the USGS tidal marsh NPP map.
+- Cropland and pasture grow, are harvested and decay (to-do 39 step 6): a new Agriculture Sector stock, Net Growth Agriculture and
+  Harvest flows, and Crop Yield multipliers from NASS county yields by year.
+- Build Options > Site Productivity, three choices (each None by default): Grass and Shrub Productivity (RAP NPP 2014-2023),
+  Cropland Productivity (each cell's Cropland Data Layer crops at their county's NASS growth, with a Crop Harvest map, and in
+  California the County Agricultural Commissioners' rates and yearly crop mix, Crop Mix) and Tidal Marsh Productivity (the USGS
+  tidal marsh NPP map). Data Sources: RAP NPP, Cropland Data Layer and tidal marsh NPP folders, filled by the Data Download.
+- Climate Options > Non-Forest Growth: RAP fit (the default), grass and shrub growth from the water year's rain by season, last
+  year's rain and temperature, fitted to RAP NPP; PRISM monthly precipitation is downloaded for it.
 - CO2 fertilization of growth in projections (stage 11, to-do 46): the Climate page of a Projection Climate scenario chooses a series
   (None / Low / Central / High, Central by default), an optional CO2 ceiling and reference CO2, and a table of its betas. Growth
   is multiplied by 1 + beta ln(CO2 / the CO2 of the historical end year), with CO2 from the SSP (Meinshausen et al. 2020) and beta by
@@ -12,12 +35,33 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   taper with stand age. New CO2 Flow Multiplier Type; a CO2 Betas table on the page, loaded with the chosen series' defaults for the study area's strata and editable; CO2 Fertilization Betas and CO2 Series results.
   The No Climate projection has no CO2 effect.
 - tools/make_co2_ecm_share.R (the ECM shares from the FIA DataMart tree tables) and tools/make_co2_default_betas.R (the table the page loads).
+- Build result: a Non-Forest Productivity table (each non-forest multiplier by ecodivision and class: cells, share with map data,
+  mean, 10th, median and 90th percentile, share at the cap).
+- Build Figures: the non-forest productivity maps beside forest site productivity (Figure 4), shrubland years since fire (Figure 2),
+  shrubland net growth by years since fire and the other non-forest classes' net growth (Figure 6), burned area by land type
+  (Figure 9) and an agriculture panel of Crop Yield and Crop Mix (Figure 10).
+- The data home keeps each dataset's download records in records/, so a home copied or restored whole is not downloaded again (to-do 52).
 
 ### Changed
+- FIA Data in Growth Curve Options defaults to the FIA DataMart. A library set to the USGS condition tables whose files are not set
+  reads the DataMart instead and says so in the log (a new library's Build stopped in stage 2).
+- TreeMap is kept whole at the top of the data home, like FIA and PRISM, so each new region reads it instead of fetching the 5.4 GB
+  zip again.
+- Data Download: a dataset that only a browser can fetch (RCMAP 1985 on ScienceBase, which now asks for a captcha) is a step for the
+  user, listed at the end of the log, not a failure that stops the run. A stage that stops on a failed check names what failed.
 - Stage 11 runs when every climate effect is None, for CO2 alone, and copies the Build's flow multipliers into its result when it
   writes CO2 rows.
 - Minimum SyncroSim version raised from 3.1.9 to 3.1.29, the version lucasCore is tested on (3.1.9 was never tested). The README
   names the rsyncrosim version tested with (2.1.13).
+
+### Fixed
+- The data home no longer counts a Build's FIA caches or a GIS overview (.ovr) beside a raster as part of a dataset, which made
+  the FIA DataMart and the Cropland Data Layer look out of date and download again.
+- tools/new-library.R: the LOCA2 lookup no longer breaks when Data Sources Home is set.
+- Build Figures: Figure 8's transition types each have a colour and key; a legend too wide for the space beside its panel title
+  wraps (Figures 7, 8, 10); the decay and checks charts no longer fail with few rows.
+- Stage 8 run alone keeps the Initial Conditions Spatial feed and the dependency's flow spatial multipliers; stage 7 run alone keeps
+  the Build's productivity multipliers.
 
 ## 1.1.1 - 2026-11-09
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<package name="lucasCore" displayName="LUCAS Core (model builder)" description="Builds LUCAS land-use and carbon models in ST-Sim from national datasets (FIA growth curves; CBM carbon parameters; spatial initial conditions; historical transitions and projections)" version="1.1.0" url="https://code.usgs.gov/LUCC/lucasCore" minSyncroSimVersion="3.1.29">
+<package name="lucasCore" displayName="LUCAS Core (model builder)" description="Builds LUCAS land-use and carbon models in ST-Sim from national datasets (FIA growth curves; CBM carbon parameters; spatial initial conditions; historical transitions and projections)" version="1.2.0" url="https://code.usgs.gov/LUCC/lucasCore" minSyncroSimVersion="3.1.29">
 
 	<builtFor package="stsim" version="4.5.4"/>
 
@@ -1449,5 +1449,6 @@
 		</group>
 	</layout>
 
-	<updateProvider className="SyncroSim.Core.XMLUpdateProvider" classAssembly="SyncroSim.Core"/>
+	<!-- library updates (ui/LucasCoreUpdates.cs): a library made with an earlier version is brought up to this one when SyncroSim opens it -->
+	<updateProvider className="lucasCoreUI.LucasCoreUpdates" classAssembly="lucasCoreUI"/>
 </package>

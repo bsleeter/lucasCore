@@ -1,7 +1,9 @@
 # =============================================================================
 # sync-library.R - bring a library made with an earlier lucasCore up to date with the current package (columns, stages, definitions)
 # =============================================================================
-# SyncroSim adds a new datasheet's table when a library opens, but not a new column in an existing table (the library then fails to
+# Since 1.2.0 a release brings a library made with an earlier release up to date by itself (ui/LucasCoreUpdates.cs, run by SyncroSim
+# when it opens the library). This tool is for the steps between releases: SyncroSim adds a new datasheet's table when a library
+# opens, but not a new column in an existing table (the library then fails to
 # open: "no such column"), and it lists only the stages that existed when the library was made. Without a package version bump and
 # its update XML, this does both from the current starter (Starter/LUCAS Core (CONUS).ssim, built by tools/build_starter.R from this
 # package), which is the reference schema:
