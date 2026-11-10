@@ -23,7 +23,7 @@ nm <- c(setNames(TW$Name, TW$UpName),
         setNames(paste0("Ag Contraction Cropland: Wetland ", TW$Group), paste0("Ag Contraction Cropland: ", TW$Group)),
         setNames(paste0("Ag Contraction Pasture: Wetland ", TW$Group), paste0("Ag Contraction Pasture: ", TW$Group)))
 
-rd <- function(f) fread(f, colClasses = "character", na.strings = NULL, encoding = "UTF-8")
+rd <- function(f) fread(f, sep = ",", colClasses = "character", na.strings = NULL, encoding = "UTF-8", fill = TRUE)
 wr <- function(x, f) { for (k in names(x)) set(x, which(x[[k]] == ""), k, NA_character_); fwrite(x, f, quote = "auto", na = ""); cat(sprintf("%-62s %d rows\n", sub(paste0(pkg, "/"), "", f), nrow(x))) }
 # rows naming an upland class (or its transition types) copied for the twin, after any old twin rows are dropped;
 # ids: extra exact-value replacements in named columns, e.g. list(StateClassId = c(`120` = "121"))

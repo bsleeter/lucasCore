@@ -258,6 +258,23 @@ if (tm_on) {
   fg <- "Net Growth Wetland: Total"; if (!fg %in% stsim_list("FlowGroup")$Name) fail("Tidal Marsh Productivity: flow group '%s' not found", fg)
   put_multiplier("Tidal Marsh Productivity", fg, write_raster(setValues(rast(P), ifelse(land, tmult, NA)), "TidalMarshProductivity.tif", "FLT4S"))
 }
+# ---- Organic Soil Share (to-do 53: peat fire and drained organic soils) ---------------------------------------------------------
+# Each cell's share of organic soil: the mean over its 10 m gNATSGO map units of their percent of Histosol components (Data Source
+# HistosolFile; tools/make_organic_soil.R). It is the Flow Spatial Multiplier of the flow group Organic Soil (peat burned by fire on the
+# forested wetland twins, drained organic soil under cropland and pasture), so those flows act in proportion to it. Without the file
+# every cell is 0 and the flows are off.
+os_v <- rep(0, ncell(P)); hf <- read_data_sources("HistosolFile", optional = TRUE)$HistosolFile
+if (!is.null(hf) && length(hf) && !is.na(hf) && nzchar(hf) && file.exists(hf)) {
+  hr <- rast(hf); win <- project(as.polygons(ext(P) + 1000, crs = crs(P)), crs(hr)); cr <- tryCatch(crop(hr, win, snap = "out"), error = function(e) NULL)
+  if (!is.null(cr)) { v <- values(project(cr / 100, P, method = "average"), mat = FALSE); os_v <- ifelse(is.na(v), 0, pmin(pmax(v, 0), 1)) }
+  os <- data.table(cls = cname[land], s = os_v[land])[, .(Cells = .N, Organic = sum(s >= 0.5), Mean = mean(s)), by = cls][Organic > 0][order(-Organic)]
+  say("Organic Soil Share (gNATSGO Histosols): %d of %d land cells at least half organic (mean share %.3f)", sum(os_v[land] >= 0.5), sum(land), mean(os_v[land]))
+  for (i in seq_len(min(nrow(os), 8))) with(os[i], say("  %s: %d of %d cells at least half organic (mean share %.2f)", cls, Organic, Cells, Mean))
+} else say("Organic Soil Share: no HistosolFile in the Data Sources (run a Data Download with it), so every cell is 0 and peat fire and drained organic soils are off")
+if ("Organic Soil Share" %in% stsim_list("FlowMultiplierType")$Name && "Organic Soil" %in% stsim_list("FlowGroup")$Name) {
+  put_multiplier("Organic Soil Share", "Organic Soil", write_raster(setValues(rast(P), ifelse(land, os_v, NA)), "OrganicSoilShare.tif", "FLT4S"))
+} else fail("Organic Soil Share: the library has no Flow Multiplier Type 'Organic Soil Share' or flow group 'Organic Soil' - update the library to lucasCore 1.3")
+
 # ---- Cropland Productivity (Build Options; to-do 39 step 6, user 2026-11-07) -------------------------------------------------
 # The agriculture counterpart: each 30 m Cropland Data Layer pixel of CDL_YEARS takes its county's NASS growth of its crop group
 # (defaults/stockflow/ag-county-crop-npp.csv: the 1985-2023 mean, yields converted with USDA Tech. Bull. 1939 coefficients;

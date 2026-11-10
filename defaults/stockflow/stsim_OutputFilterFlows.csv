@@ -98,3 +98,9 @@ Net Growth Agriculture: Atmosphere -> Foliage [Type],Yes,No,No
 Net Growth Agriculture: Total,Yes,No,No
 Harvest: Foliage -> Agriculture Sector [Type],Yes,No,No
 Harvest: Agriculture,Yes,Yes,Yes
+LULC: Emission Peat CO2 [Type],Yes,No,No
+LULC: Emission Peat CO [Type],Yes,No,No
+LULC: Emission Peat CH4 [Type],Yes,No,No
+Emission: Drained Organic Soil -> Atmosphere [Type],Yes,No,No
+LULC: Emission Peat,Yes,No,No
+LULC: Emission Peat (CO2e),Yes,No,No

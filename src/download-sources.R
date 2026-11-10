@@ -485,6 +485,24 @@ download_handlers <- function() {
     finish = function(ctx, items) { dest <- file.path(ctx$place, out); if (whole_conus(ctx)) gnatsgo_national(ctx, items, dest) else gnatsgo_region(ctx, asset, dest); dest })
   H$SoilCarbonFile <- gnatsgo("SoilCarbonFile", "gNATSGO soil organic carbon", "soc0_999", "gnatsgo_soc0_999.tif", "gNATSGO soc0_999 (gSSURGO with its gaps filled), not the gSSURGO file of the build machine")
   H$NccpiFile <- gnatsgo("NccpiFile", "gNATSGO crop productivity (NCCPI)", "nccpi3all", "gnatsgo_nccpi3all.tif", "nccpi3all at 10 m; stage 10 reads it onto its 30 m grid")
+  # ---- gNATSGO Histosol share (to-do 53: peat fire and drained organic soils): each 10 m map unit's percent of Histosol
+  # components (component table: taxorder, comppct_r), from the map unit key raster (mukey) over the region and the national
+  # component table (46 MB parquet). Region only: a national 10 m map unit raster is not needed by any stage.
+  H$HistosolFile <- list(column = "HistosolFile", name = "gNATSGO Histosol share", version = "gNATSGO July 2020 (gnatsgo-rasters mukey, gnatsgo-tables component)", method = "stac",
+    note = "percent of each 10 m map unit in Histosol components (organic soils), for peat fire and drained organic soils (stages 3, 5, 8)",
+    plan = function(ctx) { if (whole_conus(ctx)) stop("the Histosol share is fetched for a region only", call. = FALSE)
+      data.table::data.table(url = PC_STAC, file = "gnatsgo_histosol_pct.tif", fetch = FALSE) },
+    finish = function(ctx, items) { dest <- file.path(ctx$place, "gnatsgo_histosol_pct.tif"); dir.create(ctx$dl, recursive = TRUE, showWarnings = FALSE)
+      mk <- file.path(ctx$dl, "mukey.tif"); gnatsgo_region(ctx, "mukey", mk)
+      pq <- file.path(ctx$dl, "component.parquet")
+      utils::download.file(sprintf("https://soils.blob.core.windows.net/gnatsgo/july2020/parquet/component.parquet/part.0.parquet?%s", pc_token()), pq, mode = "wb", quiet = TRUE)
+      co <- data.table::as.data.table(arrow::read_parquet(pq, col_select = c("mukey", "comppct_r", "taxorder")))
+      h <- co[, .(pct = sum(comppct_r[taxorder %in% "Histosols"], na.rm = TRUE)), by = mukey]
+      r <- terra::rast(mk); u <- terra::unique(r)[[1]]; u <- u[!is.na(u)]
+      v <- h$pct[match(as.character(u), as.character(h$mukey))]; v[is.na(v)] <- 0
+      dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)
+      terra::classify(r, cbind(u, pmin(100, v)), others = NA, filename = dest, datatype = "INT1U", overwrite = TRUE, gdal = "COMPRESS=DEFLATE")
+      ctx$log(sprintf("  Histosols: %d map units, %d with Histosol components", length(u), sum(v > 0))); unlink(c(mk, pq)); dest })
 
   # ==== behind a login (phase 5) ==========================================================================================
 

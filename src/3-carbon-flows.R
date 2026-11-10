@@ -408,7 +408,7 @@ rd <- function(f) { x <- fread(pkg_file("defaults", "stockflow", f), colClasses 
 fp_forest <- rbindlist(lapply(cw$StateClass, function(c0) FOREST_PATHWAYS[, .(FromStateClassId = c0, FromStockTypeId = From, ToStockTypeId = To,
                                                                                 StateAttributeTypeId = Attribute, FlowTypeId = FlowType, Multiplier = 1)]))
 fp_forest <- fp_forest[FlowTypeId != BURIAL_FLOW | FromStateClassId %in% cells[burial_rate > 0, unique(StateClass)]]
-fp <- rbind(fp_forest, rd("nonforest-pathways.csv"), rd("nonforest-pathways-agriculture.csv"), ev_all[, which(vapply(ev_all, function(v) any(!is.na(v)), TRUE)), with = FALSE], fill = TRUE)   # events with the per-type fire rows
+fp <- rbind(fp_forest, rd("nonforest-pathways.csv"), rd("nonforest-pathways-agriculture.csv"), rd("organic-soil-pathways.csv"), ev_all[, which(vapply(ev_all, function(v) any(!is.na(v)), TRUE)), with = FALSE], fill = TRUE)   # events with the per-type fire rows
 # Carbon Assumptions - Grassland, Shrubland and Wetland Carbon (to-do 39, 2026-10-30): the package's non-forest rates (the CONUS 1 km
 # build's, from IBIS; one value per class, the same in every ecodivision, except the forested wetlands' growth curve and age-varying
 # growth split) with the scenario's rows on top, the more specific last: a class's row for every ecodivision and age, then for one age,

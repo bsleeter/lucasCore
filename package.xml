@@ -32,6 +32,7 @@
 		<column name="PrismFolder" displayName="PRISM Folder (annual and normals)" dataType="String" isOptional="True"/>
 		<column name="Loca2Folder" displayName="LOCA2 Folder (gcm/r1i1p1f1/ssp)" dataType="String" isOptional="True"/>
 		<column name="SoilCarbonFile" displayName="Soil Organic Carbon (gNATSGO soc0_999; gSSURGO also reads)" dataType="String" isOptional="True"/>
+		<column name="HistosolFile" displayName="Histosol share (gNATSGO map units, % organic soil; peat fire and drained organic soils, to-do 53)" dataType="String" isOptional="True"/>
 		<column name="FirePerimeterHistoryFile" displayName="Interagency Fire Perimeter History" dataType="String" isOptional="True"/>
 		<column name="RoadsFile" displayName="Roads (LANDFIRE 30 m raster; stage 10)" dataType="String" isOptional="True"/>
 		<column name="ElevationFile" displayName="Elevation (LANDFIRE 30 m DEM; stage 10)" dataType="String" isOptional="True"/>

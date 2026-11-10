@@ -56,3 +56,7 @@ Transfer: Snag Stem -> AG Medium,
 Net Growth Agriculture: Atmosphere -> Fine Roots,
 Net Growth Agriculture: Atmosphere -> Foliage,
 Harvest: Foliage -> Agriculture Sector,
+LULC: Emission Peat CO2,Peat burned by fire on organic soil (forested wetland twins; Organic Soil Share map)
+LULC: Emission Peat CO,Peat burned by fire on organic soil (forested wetland twins; Organic Soil Share map)
+LULC: Emission Peat CH4,Peat burned by fire on organic soil (forested wetland twins; Organic Soil Share map)
+Emission: Drained Organic Soil -> Atmosphere,Oxidation of drained organic soil under cropland and pasture (Organic Soil Share map)

@@ -80,6 +80,93 @@ namespace lucasCoreUI
             AddFilter(store, "stsim_OutputFilterStocks", "OutputFilterStocksId", "StockGroupId", "stsim_StockGroup", "Agriculture Sector [Type]", false);
         }
 
+        // ---- 1.3 (lucasCore 1.3.0): forested wetland twins and organic soils (to-do 53) -----------------------------------------
+        [Update(1.3, "lucasCore 1.3: the forested wetland classes Wetland: Spruce/Fir Group, Wetland: Oak/Gum/Cypress Group and Wetland: Elm/Ash/Cottonwood Group with their Ag Contraction transition types; Data Sources Histosol share")]
+        public static void Update_1_300(DataStore store)
+        {
+            AddColumn(store, "lucasCore_DataSource", "HistosolFile", "TEXT");
+            string[,] tw = { { "Spruce/Fir Group", "121", "255,140,170,60" }, { "Oak/Gum/Cypress Group", "601", "255,40,120,130" }, { "Elm/Ash/Cottonwood Group", "701", "255,140,90,40" } };
+            for (int i = 0; i < 3; i++)
+            {
+                AddStateClass(store, "Wetland: " + tw[i, 0], "Wetland", tw[i, 0], tw[i, 1], tw[i, 2]);
+                foreach (string use in new[] { "Cropland", "Pasture" })
+                {
+                    string up = "Ag Contraction " + use + ": " + tw[i, 0], tt = "Ag Contraction " + use + ": Wetland " + tw[i, 0];
+                    AddTransitionType(store, tt, up);
+                }
+            }
+
+            // peat fire and drained organic soils (tools/make_organic_soil.R): flow types, their groups, memberships, order and filters
+            string[] gas = { "CO2", "CO", "CH4" }; string[] co2e = { "3.67", "4.66", "33.5" };
+            const string drain = "Emission: Drained Organic Soil -> Atmosphere";
+            AddNamed(store, "stsim_FlowGroup", "FlowGroupId", "Organic Soil", "Description", "The flows on organic soil only (peat fire, drained organic soil): the group of the Organic Soil Share spatial multiplier", false);
+            AddNamed(store, "stsim_FlowGroup", "FlowGroupId", "LULC: Emission Peat", "Description", "Peat burned by fire", false);
+            AddNamed(store, "stsim_FlowGroup", "FlowGroupId", "LULC: Emission Peat (CO2e)", "Description", "Peat burned by fire (CO2e)", false);
+            AddNamed(store, "stsim_FlowMultiplierType", "FlowMultiplierTypeId", "Organic Soil Share", null, null, false);
+            for (int i = 0; i < 3; i++)
+            {
+                string f = "LULC: Emission Peat " + gas[i], m = "-" + co2e[i];
+                AddNamed(store, "stsim_FlowType", "FlowTypeId", f, "Description", "Peat burned by fire on organic soil (forested wetland twins; Organic Soil Share map)", false);
+                AddNamed(store, "stsim_FlowGroup", "FlowGroupId", f + " [Type]", null, null, true);
+                string[] mem = { "Emission: Total|1", "Emission: Total (CO2e)|" + co2e[i], "LULC: Emission|1", "LULC: Emission (CO2e)|" + co2e[i],
+                                 "LULC: Emission " + gas[i] + "|1", "LULC: Emission " + gas[i] + " (CO2e)|" + co2e[i], "LULC: Emission Peat|1",
+                                 "LULC: Emission Peat (CO2e)|" + co2e[i], "Net Biome Productivity|-1", "Net Biome Productivity (CO2e)|" + m, "Organic Soil|1" };
+                foreach (string g in mem) { string[] p = g.Split('|'); AddMembership(store, f, p[0], p[1]); }
+                AddFlowOrder(store, f, 11);
+                AddFilter(store, "stsim_OutputFilterFlows", "OutputFilterFlowsId", "FlowGroupId", "stsim_FlowGroup", f + " [Type]", false);
+            }
+            AddNamed(store, "stsim_FlowType", "FlowTypeId", drain, "Description", "Oxidation of drained organic soil under cropland and pasture (Organic Soil Share map)", false);
+            AddNamed(store, "stsim_FlowGroup", "FlowGroupId", drain + " [Type]", null, null, true);
+            string[] dm = { "BG Slow ->|1", "Emission: Total|1", "Emission: Total (CO2e)|3.67", "Emission: Total Rh|1", "Emission: Total Rh (CO2e)|3.67",
+                            "Net Biome Productivity|-1", "Net Biome Productivity (CO2e)|-3.67", "Net Ecosystem Productivity|-1", "Net Ecosystem Productivity (CO2e)|-3.67", "Organic Soil|1" };
+            foreach (string g in dm) { string[] p = g.Split('|'); AddMembership(store, drain, p[0], p[1]); }
+            AddFlowOrder(store, drain, 5);
+            AddFilter(store, "stsim_OutputFilterFlows", "OutputFilterFlowsId", "FlowGroupId", "stsim_FlowGroup", drain + " [Type]", false);
+            AddFilter(store, "stsim_OutputFilterFlows", "OutputFilterFlowsId", "FlowGroupId", "stsim_FlowGroup", "LULC: Emission Peat", false);
+            AddFilter(store, "stsim_OutputFilterFlows", "OutputFilterFlowsId", "FlowGroupId", "stsim_FlowGroup", "LULC: Emission Peat (CO2e)", false);
+        }
+
+        // a state class (with its Id, labels by name) in every project that lacks it
+        private static void AddStateClass(DataStore store, string name, string labelX, string labelY, string id, string color)
+        {
+            if (!store.TableExists("stsim_StateClass")) return;
+            DataTable p = Rows(store, "SELECT ProjectId FROM core_Project WHERE ProjectId NOT IN (SELECT ProjectId FROM stsim_StateClass WHERE Name = " + Q(name) + ")");
+            foreach (DataRow r in p.Rows)
+            {
+                string pr = Id(r["ProjectId"]);
+                string x = IdOf(store, "stsim_StateLabelX", "StateLabelXId", pr, labelX), y = IdOf(store, "stsim_StateLabelY", "StateLabelYId", pr, labelY);
+                if (x == null || y == null) continue;
+                store.ExecuteNonQuery("INSERT INTO stsim_StateClass (StateClassId, ProjectId, Name, StateLabelXId, StateLabelYId, Id, Color) VALUES (" +
+                                      NewId(store).ToString(CultureInfo.InvariantCulture) + ", " + pr + ", " + Q(name) + ", " + x + ", " + y + ", " + id + ", " + Q(color) + ")");
+            }
+        }
+
+        // a transition type in every project that lacks it, with a free Id, ST-Sim's own [Type] group, and the named groups of the
+        // type it copies (likeType: Ag Contraction, Ag Contraction: Cropland ...)
+        private static void AddTransitionType(DataStore store, string name, string likeType)
+        {
+            if (!store.TableExists("stsim_TransitionType")) return;
+            DataTable p = Rows(store, "SELECT ProjectId FROM core_Project WHERE ProjectId NOT IN (SELECT ProjectId FROM stsim_TransitionType WHERE Name = " + Q(name) + ")");
+            foreach (DataRow r in p.Rows)
+            {
+                string pr = Id(r["ProjectId"]);
+                long free = 1009;
+                while (Convert.ToInt64(store.ExecuteScalar("SELECT COUNT(*) FROM stsim_TransitionType WHERE ProjectId = " + pr + " AND Id = " + free.ToString(CultureInfo.InvariantCulture)), CultureInfo.InvariantCulture) > 0) free++;
+                string tt = NewId(store).ToString(CultureInfo.InvariantCulture);
+                store.ExecuteNonQuery("INSERT INTO stsim_TransitionType (TransitionTypeId, ProjectId, Name, Id) VALUES (" + tt + ", " + pr + ", " + Q(name) + ", " + free.ToString(CultureInfo.InvariantCulture) + ")");
+                string auto = NewId(store).ToString(CultureInfo.InvariantCulture);
+                store.ExecuteNonQuery("INSERT INTO stsim_TransitionGroup (TransitionGroupId, ProjectId, Name, IsAuto) VALUES (" + auto + ", " + pr + ", " + Q(name + " [Type]") + ", -1)");
+                store.ExecuteNonQuery("INSERT INTO stsim_TransitionTypeGroup (TransitionTypeGroupId, ProjectId, TransitionTypeId, TransitionGroupId, IsAuto) VALUES (" +
+                                      NewId(store).ToString(CultureInfo.InvariantCulture) + ", " + pr + ", " + tt + ", " + auto + ", -1)");
+                string like = IdOf(store, "stsim_TransitionType", "TransitionTypeId", pr, likeType);
+                if (like == null) continue;
+                DataTable g = Rows(store, "SELECT TransitionGroupId FROM stsim_TransitionTypeGroup WHERE ProjectId = " + pr + " AND TransitionTypeId = " + like + " AND IsAuto IS NULL");
+                foreach (DataRow gr in g.Rows)
+                    store.ExecuteNonQuery("INSERT INTO stsim_TransitionTypeGroup (TransitionTypeGroupId, ProjectId, TransitionTypeId, TransitionGroupId) VALUES (" +
+                                          NewId(store).ToString(CultureInfo.InvariantCulture) + ", " + pr + ", " + tt + ", " + Id(gr["TransitionGroupId"]) + ")");
+            }
+        }
+
         // ---- helpers ------------------------------------------------------------------------------------------------------------
         private static string Q(string s) { return "'" + s.Replace("'", "''") + "'"; }
 

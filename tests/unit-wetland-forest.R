@@ -46,4 +46,15 @@ check("regions: the northern lake states take Spruce/Fir and the Southeast Oak/G
       rg[Ecodivision == "Warm Continental", StateClassId] == TW[1] && rg[Ecodivision == "Subtropical", StateClassId] == TW[2])
 bu <- rd(D("spinup", "wetland-burial.csv"))
 check("burial: the three twins only, 0.25 / 0.1 / 0 Mg C/ha/yr", setequal(bu$StateClass, TW) && all(as.numeric(bu[match(TW, StateClass), Burial]) == c(0.25, 0.1, 0)))
+
+# peat fire and drained organic soils (tools/make_organic_soil.R)
+op <- rd(D("stockflow", "organic-soil-pathways.csv")); ft <- rd(D("stsim", "stsim_FlowType.csv")); stk <- rd(D("stsim", "stsim_StockType.csv"))
+mb <- rd(D("stockflow", "stsim_FlowTypeGroupMembership.csv")); fo <- rd(D("stockflow", "stsim_FlowOrder.csv"))
+check("organic soil pathways: flow types and stock types are defined", all(op$FlowTypeId %in% ft$Name) && all(c(op$FromStockTypeId, op$ToStockTypeId) %in% stk$Name))
+check("every organic soil flow is in the Organic Soil group (its spatial multiplier) and has a flow order", all(unique(op$FlowTypeId) %in% mb[FlowGroupId == "Organic Soil", FlowTypeId]) && all(unique(op$FlowTypeId) %in% fo$FlowTypeId))
+pf <- op[!is.na(TransitionGroupId), .(s = sum(as.numeric(Multiplier))), by = .(FromStateClassId, TransitionGroupId)]
+check("peat fire: each twin burns 0.03 / 0.07 / 0.15 of BG Slow by severity (gases summed)", nrow(pf) == 9 && all(TW %in% pf$FromStateClassId) && all(abs(pf$s - c(0.03, 0.07, 0.15)[match(pf$TransitionGroupId, paste0("Fire: ", c("Low", "Medium", "High"), " Severity [Type]"))]) < 1e-9))
+dr <- op[is.na(TransitionGroupId)]
+check("drained organic soil: cropland and pasture in every ecodivision, cropland about 4 times pasture", nrow(dr) == 2 * nrow(eco) && all(dr[FromStateClassId == "Agriculture: Cropland", as.numeric(Multiplier)] / dr[FromStateClassId == "Agriculture: Pasture", as.numeric(Multiplier)][match(dr[FromStateClassId == "Agriculture: Cropland", FromStratumId], dr[FromStateClassId == "Agriculture: Pasture", FromStratumId])] > 3.5))
+check("drained emissions count as emissions and against net biome productivity", all(c("Emission: Total", "Net Biome Productivity") %in% mb[FlowTypeId == "Emission: Drained Organic Soil -> Atmosphere", FlowGroupId]))
 cat(sprintf("%d passed, %d failed\n", n_ok, n_bad)); if (n_bad) quit(status = 1)

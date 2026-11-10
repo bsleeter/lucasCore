@@ -331,3 +331,46 @@ Net Growth Agriculture: Atmosphere -> Foliage,Net Primary Productivity (CO2e),3.
 Harvest: Foliage -> Agriculture Sector,Harvest: Agriculture,1
 Harvest: Foliage -> Agriculture Sector,Net Biome Productivity,-1
 Harvest: Foliage -> Agriculture Sector,Net Biome Productivity (CO2e),-3.67
+LULC: Emission Peat CO2,Emission: Total,1
+LULC: Emission Peat CO2,Emission: Total (CO2e),3.67
+LULC: Emission Peat CO2,LULC: Emission,1
+LULC: Emission Peat CO2,LULC: Emission (CO2e),3.67
+LULC: Emission Peat CO2,LULC: Emission CO2,1
+LULC: Emission Peat CO2,LULC: Emission CO2 (CO2e),3.67
+LULC: Emission Peat CO2,LULC: Emission Peat,1
+LULC: Emission Peat CO2,LULC: Emission Peat (CO2e),3.67
+LULC: Emission Peat CO2,Net Biome Productivity,-1
+LULC: Emission Peat CO2,Net Biome Productivity (CO2e),-3.67
+LULC: Emission Peat CO,Emission: Total,1
+LULC: Emission Peat CO,Emission: Total (CO2e),4.66
+LULC: Emission Peat CO,LULC: Emission,1
+LULC: Emission Peat CO,LULC: Emission (CO2e),4.66
+LULC: Emission Peat CO,LULC: Emission CO,1
+LULC: Emission Peat CO,LULC: Emission CO (CO2e),4.66
+LULC: Emission Peat CO,LULC: Emission Peat,1
+LULC: Emission Peat CO,LULC: Emission Peat (CO2e),4.66
+LULC: Emission Peat CO,Net Biome Productivity,-1
+LULC: Emission Peat CO,Net Biome Productivity (CO2e),-4.66
+LULC: Emission Peat CH4,Emission: Total,1
+LULC: Emission Peat CH4,Emission: Total (CO2e),33.5
+LULC: Emission Peat CH4,LULC: Emission,1
+LULC: Emission Peat CH4,LULC: Emission (CO2e),33.5
+LULC: Emission Peat CH4,LULC: Emission CH4,1
+LULC: Emission Peat CH4,LULC: Emission CH4 (CO2e),33.5
+LULC: Emission Peat CH4,LULC: Emission Peat,1
+LULC: Emission Peat CH4,LULC: Emission Peat (CO2e),33.5
+LULC: Emission Peat CH4,Net Biome Productivity,-1
+LULC: Emission Peat CH4,Net Biome Productivity (CO2e),-33.5
+Emission: Drained Organic Soil -> Atmosphere,BG Slow ->,1
+Emission: Drained Organic Soil -> Atmosphere,Emission: Total,1
+Emission: Drained Organic Soil -> Atmosphere,Emission: Total (CO2e),3.67
+Emission: Drained Organic Soil -> Atmosphere,Emission: Total Rh,1
+Emission: Drained Organic Soil -> Atmosphere,Emission: Total Rh (CO2e),3.67
+Emission: Drained Organic Soil -> Atmosphere,Net Biome Productivity,-1
+Emission: Drained Organic Soil -> Atmosphere,Net Biome Productivity (CO2e),-3.67
+Emission: Drained Organic Soil -> Atmosphere,Net Ecosystem Productivity,-1
+Emission: Drained Organic Soil -> Atmosphere,Net Ecosystem Productivity (CO2e),-3.67
+LULC: Emission Peat CO2,Organic Soil,1
+LULC: Emission Peat CO,Organic Soil,1
+LULC: Emission Peat CH4,Organic Soil,1
+Emission: Drained Organic Soil -> Atmosphere,Organic Soil,1

@@ -56,3 +56,7 @@ Iteration,Timestep,FlowTypeId,Order
 ,,Net Growth Agriculture: Atmosphere -> Fine Roots,1
 ,,Net Growth Agriculture: Atmosphere -> Foliage,1
 ,,Harvest: Foliage -> Agriculture Sector,2
+,,LULC: Emission Peat CO2,11
+,,LULC: Emission Peat CO,11
+,,LULC: Emission Peat CH4,11
+,,Emission: Drained Organic Soil -> Atmosphere,5
