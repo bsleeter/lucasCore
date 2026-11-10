@@ -253,7 +253,7 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
     u <- dcast(X$unit_c, Unit ~ Timestep, value.var = "Mg"); setnames(u, c("Unit", "c0", "c1")); u <- merge(u, X$unit_a, by = "Unit")
     u[, `:=`(name = sub("^[^:]*: ", "", Unit), d0 = c0 / ha, d1 = c1 / ha, chg = (c1 - c0) / ha, Tg1 = c1 / 1e6)]; u <- u[order(chg)]
     chart_figure("carbon_by_unit", "Carbon by secondary stratum", sprintf("(a) Change in mean total ecosystem carbon density, %d-%d, by secondary stratum. (b) Total ecosystem carbon in %d.", y0, y1, y1),
-      1, 2, h = 300 + 60 * nrow(u), draw = function() {
+      1, 2, h = max(960, 300 + 60 * nrow(u)), draw = function() {   # at least one chart row's height: 2 units (Great Dismal Swamp, 2026-11-10) left 420 px, less than the margins
         par(mar = c(4.5, 12, 3, 1)); barplot(u$chg, names.arg = u$name, horiz = TRUE, col = ifelse(u$chg >= 0, "#2b8152", "#a81d1a"), border = NA, cex.names = .7, xlab = "Mg C/ha")
         abline(v = 0, col = MUTED); ptitle(1, sprintf("Change in carbon density, %d-%d", y0, y1))
         o <- order(u$Tg1); barplot(u$Tg1[o], names.arg = u$name[o], horiz = TRUE, col = "#2b8152", border = NA, cex.names = .7, xlab = "Tg C")
