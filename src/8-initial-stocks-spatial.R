@@ -176,6 +176,14 @@ src_of[land & is.na(src_of)] <- "zero (developed, barren, water, ice)"
 # its soil (BG Slow and Deep Soil) keeps the class mean, as forest's does (user, 2026-11-07). Every other land cell, and a grass or
 # shrub cell without RAP pixels, takes the multiplier of the grass and shrub cells near it (src/productivity-fill.R), cells at the
 # 0.3 floor (RAP sees them nearly bare: fallow or graded land mapped as grass) not passed on.
+# Non-Forest Productivity (user, 2026-11-09): each multiplier's spread by ecodivision x class over the class's own cells, as a result
+# table (the run log has the class totals). has = the cell has map data of its own; the rest were filled or keep 1
+np_rows <- list()
+np_add <- function(name, cells, m, has, source, cap = c(0.3, 2.5)) { if (!any(cells)) return(invisible())
+  np_rows[[length(np_rows) + 1]] <<- data.table(StratumId = sname[cells], StateClassId = cname[cells], m = m[cells], has = has[cells])[,
+    .(Multiplier = name, Cells = .N, WithData = round(100 * mean(has), 1), Mean = round(mean(m), 3), P10 = round(quantile(m, 0.1, names = FALSE), 3),
+      Median = round(quantile(m, 0.5, names = FALSE), 3), P90 = round(quantile(m, 0.9, names = FALSE), 3),
+      AtCap = round(100 * mean(m <= cap[1] + 1e-9 | m >= cap[2] - 1e-9), 1), Source = source), by = .(StratumId, StateClassId)][order(StateClassId, -Cells)] }
 gpv <- opt$GrassShrubProductivity[1]
 gs_on <- !is.null(gpv) && !is.na(gpv) && (identical(suppressWarnings(as.integer(gpv)), 2L) || startsWith(as.character(gpv), "RAP"))
 if (gs_on) {
@@ -204,6 +212,7 @@ if (gs_on) {
   say("Grass and shrub productivity (RAP NPP %d-%d): %d cells, multiplier mean %.2f; %.1f%% have no RAP pixels left (filled from nearby grass and shrub); their starting live and dead carbon scaled the same way",
       min(RAP_YEARS), max(RAP_YEARS), sum(isGS), mean(gmult[isGS]), 100 * mean(!use[isGS]))
   for (i in seq_len(nrow(gsum))) with(gsum[i], say("  %s: %d cells, mean %.2f (10%% %.2f, 90%% %.2f), %.1f%% without RAP, %.1f%% at the cap", cls, Cells, Mean, P10, P90, NoRap, Capped))
+  np_add("Grass and Shrub Productivity", isGS, gmult, use, sprintf("RAP NPP %d-%d / ecodivision x class target", min(RAP_YEARS), max(RAP_YEARS)), CAP)
   say("Grass and shrub productivity: %.1f%% of the other land cells filled from grass and shrub within 10 km of the same ecodivision (mean %.2f); the rest keep 1",
       100 * mean(gfl$filled[land & !isGS]), if (any(gfl$filled[land & !isGS])) mean(gmult[land & !isGS & gfl$filled]) else 1)
   fg <- "Net Growth Non Forest: Total"; if (!fg %in% stsim_list("FlowGroup")$Name) fail("Grass and Shrub Productivity: flow group '%s' not found", fg)
@@ -245,6 +254,7 @@ if (tm_on) {
   say("Tidal marsh productivity (USGS tidal marsh NPP 2015): %d emergent wetland cells, %.1f%% with map pixels (the rest keep 1); their starting live and dead carbon scaled the same way",
       sum(isTM), 100 * mean(thas[isTM]))
   for (i in seq_len(nrow(tsum))) with(tsum[i], say("  %s: %d cells, %.1f%% mapped, mapped mean %.2f (10%% %.2f, 90%% %.2f)", cls, Cells, Mapped, Mean, P10, P90))
+  np_add("Tidal Marsh Productivity", isTM, tmult, thas, "USGS tidal marsh NPP 2015 / ecodivision map mean (no map data = 1)", CAP)
   fg <- "Net Growth Wetland: Total"; if (!fg %in% stsim_list("FlowGroup")$Name) fail("Tidal Marsh Productivity: flow group '%s' not found", fg)
   put_multiplier("Tidal Marsh Productivity", fg, write_raster(setValues(rast(P), ifelse(land, tmult, NA)), "TidalMarshProductivity.tif", "FLT4S"))
 }
@@ -309,6 +319,7 @@ if (cp_on) {
   say("Cropland productivity (CDL %d-%d x NASS county growth): %d cells, multiplier mean %.2f; %.1f%% have no surveyed crop pixels (filled from nearby cropland and pasture)",
       min(CDL_YEARS), max(CDL_YEARS), sum(isAG), mean(cmult[isAG]), 100 * mean(!use[isAG]))
   for (i in seq_len(nrow(csum))) with(csum[i], say("  %s: %d cells, mean %.2f (10%% %.2f, 90%% %.2f), %.1f%% without surveyed crops, %.1f%% at the cap", cls, Cells, Mean, P10, P90, NoCdl, Capped))
+  np_add("Cropland Productivity", isAG, cmult, use, sprintf("CDL %d-%d x NASS county growth / ecodivision x class growth", min(CDL_YEARS), max(CDL_YEARS)), CAP)
   say("Cropland productivity: %.1f%% of the other land cells filled from cropland and pasture within 10 km of the same ecodivision (mean %.2f); the rest keep 1",
       100 * mean(cfl$filled[land & !isAG]), if (any(cfl$filled[land & !isAG])) mean(cmult[land & !isAG & cfl$filled]) else 1)
   fg <- "Net Growth Agriculture: Total"; if (!fg %in% stsim_list("FlowGroup")$Name) fail("Cropland Productivity: flow group '%s' not found - run tools/sync-library.R", fg)
@@ -323,6 +334,7 @@ if (cp_on) {
             P10 = round(quantile(m, 0.1), 2), P90 = round(quantile(m, 0.9), 2)), by = cls][order(-Cells)]
   say("Crop harvest (CDL x county harvested share): %d cells, multiplier mean %.2f", sum(isAG), mean(hmult[isAG]))
   for (i in seq_len(nrow(hsum))) with(hsum[i], say("  %s: %d cells, mean %.2f (10%% %.2f, 90%% %.2f), harvested share of foliage %.3f", cls, Cells, Mean, P10, P90, Rate))
+  np_add("Crop Harvest", isAG, hmult, huse, "CDL x county harvested share / ecodivision x class harvest rate", CAP)
   hg <- "Harvest: Agriculture"; if (!hg %in% stsim_list("FlowGroup")$Name) fail("Crop Harvest: flow group '%s' not found - run tools/sync-library.R", hg)
   put_multiplier("Crop Harvest", hg, write_raster(setValues(rast(P), ifelse(land, hmult, NA)), "CropHarvest.tif", "FLT4S"))
   # Crop Mix (user 2026-11-08: vary the crop mix through time). The two maps above hold the crops of the CDL years; a California
@@ -409,6 +421,8 @@ write_stsim(data.table(StockTypeId = st$StockTypeId, RasterFileName = files), "I
 put_multipliers_save()
 keep_ic_properties(scn, ic, 8)
 write_ds(summ[, .(StateClassId, Cells, PostFire, Live, Dom, Soil, TotalTg, Source)], "OutputInitialStockSummary")
+if (length(np_rows)) { np <- rbindlist(np_rows)[, .(Multiplier, StratumId, StateClassId, Cells, WithData, Mean, P10, Median, P90, AtCap, Source)]
+  tryCatch(write_ds(np, "OutputNonForestProductivity"), error = function(e) say("Non-Forest Productivity table not written (%s): reopen the library in SyncroSim Studio so it adds the table", conditionMessage(e))) }
 progressBar()
 finish_checks()
 progressBar(type = "end")

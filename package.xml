@@ -831,6 +831,22 @@
 		<column name="Source" dataType="String"/>
 	</dataSheet>
 
+	<!-- stage 8 (Build Options: Site Productivity): each grass and shrub, tidal marsh, cropland and crop harvest multiplier's spread, one
+	     row per multiplier x ecodivision x class, over the class's own cells (other land cells take filled values and are not here) -->
+	<dataSheet name="OutputNonForestProductivity" displayName="Non-Forest Productivity">
+		<column name="Multiplier" displayName="Multiplier" dataType="String"/>
+		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum"/>
+		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="Cells" dataType="Integer"/>
+		<column name="WithData" displayName="Cells With Map Data (%)" dataType="Double" format="0.0"/>
+		<column name="Mean" displayName="Mean Multiplier" dataType="Double" format="0.000"/>
+		<column name="P10" displayName="10th Percentile" dataType="Double" format="0.000"/>
+		<column name="Median" dataType="Double" format="0.000"/>
+		<column name="P90" displayName="90th Percentile" dataType="Double" format="0.000"/>
+		<column name="AtCap" displayName="Cells at 0.3 or 2.5 (%)" dataType="Double" format="0.0"/>
+		<column name="Source" dataType="String"/>
+	</dataSheet>
+
 	<dataSheet name="OutputSiteClassMap" displayName="Site Class Shares (TreeMap)">
 		<!-- stage 5 when Build Options: Site Productivity = TreeMap site class (to-do 35 step 4): per cell, the share of its TreeMap 30 m
 		     pixels whose FIA plot is in each site class; stage 8 combines them with Site Productivity's multipliers -->
@@ -1175,6 +1191,7 @@
 		<dataSheet name="OutputNlcdAnnual" type="Input"/>
 		<dataSheet name="stsim_FlowSpatialMultiplier" type="Output"/>
 		<dataSheet name="OutputInitialStockSummary" type="Output"/>
+		<dataSheet name="OutputNonForestProductivity" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
@@ -1401,6 +1418,7 @@
 				<item name="OutputGrowthParameter"/>
 				<item name="OutputCarbonParameter"/>
 				<item name="OutputSiteProductivity"/>
+				<item name="OutputNonForestProductivity"/>
 				<item name="OutputDecayCalibration"/>
 				<item name="OutputCarbonRate"/>
 				<item name="OutputGrowthReport"/>
