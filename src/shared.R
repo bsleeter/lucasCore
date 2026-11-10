@@ -376,12 +376,27 @@ tile_notes <- function(a, tl, n, lvl, unit_name) {
 # from Windows (terra::free_RAM() stops at 16 GB on the build machine, which has 1 TB). Each worker should then get
 # terraOptions(memfrac = 0.6 / workers), set after library(terra), which resets it: left at terra's 0.6, every worker plans on most of the free memory, and on a colleague's
 # machine stage 5's NLCD workers failed with std::bad_alloc (2026-11-10)
+# The result carries the free memory read (attribute free_gb, NA when neither Windows nor terra answered: then at most 4 workers).
 par_workers <- function(n, cap = 20, gb_each = 2) {
   kb <- if (.Platform$OS.type == "windows") suppressWarnings(as.numeric(tryCatch(system2("powershell", c("-NoProfile", "-Command",
           "(Get-CimInstance Win32_OperatingSystem).FreePhysicalMemory"), stdout = TRUE), error = function(e) NA)[1])) else NA_real_
   if (is.na(kb)) kb <- tryCatch(terra::free_RAM(), error = function(e) NA_real_)
-  m <- if (is.na(kb)) cap else max(1, floor(kb / 1024^2 / gb_each))
-  as.integer(max(1, min(n, cap, parallel::detectCores() - 1, m))) }
+  m <- if (is.na(kb)) 4 else max(1, floor(kb / 1024^2 / gb_each))
+  structure(as.integer(max(1, min(n, cap, parallel::detectCores() - 1, m))), free_gb = kb / 1024^2) }
+
+# parLapply(X, fun) on par_workers(length(X), cap) workers, init(cl, workers) run on each new cluster first (exports, terra's
+# memory share), args(workers) the further arguments of fun. When a worker runs out of memory (std::bad_alloc, cannot allocate)
+# the cluster is stopped and the step runs again on half as many workers, down to one: on a colleague's machine 1.2.3's free
+# memory sizing still started 20 NLCD workers and 3 failed (2026-11-10), so the count from par_workers is only where it starts.
+par_lapply_mem <- function(X, fun, label, cap = 20, init = function(cl, nw) NULL, args = function(nw) list()) {
+  nw <- par_workers(length(X), cap); fg <- attr(nw, "free_gb"); nw <- as.integer(nw)
+  say("%s: %d parallel workers (%s)", label, nw, if (is.na(fg)) "free memory unknown" else sprintf("%.1f GB free memory", fg))
+  repeat {
+    cl <- parallel::makeCluster(nw)
+    r <- tryCatch({ init(cl, nw); do.call(parallel::parLapply, c(list(cl, X, fun), args(nw))) }, error = function(e) e, finally = parallel::stopCluster(cl))
+    if (!inherits(r, "error")) return(r)
+    if (nw <= 1L || !grepl("bad_alloc|cannot allocate|out of memory|memory exhausted", conditionMessage(r), ignore.case = TRUE)) stop(r)
+    nw2 <- max(1L, nw %/% 2L); say("%s: out of memory on %d workers (%s); running again on %d", label, nw, conditionMessage(r), nw2); nw <- nw2 } }
 
 # Annual NLCD on the model grid R (a crop of lattice L): modal aggregation of the 30 m classes. The aggregation blocks are fixed to the
 # CONUS crop the CONUS 1km build used (lattice extent + one block, snapped to the NLCD 30 m grid), so a regional build aggregates the
