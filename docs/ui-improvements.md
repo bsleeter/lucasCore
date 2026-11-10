@@ -14,6 +14,7 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | 2 | 39 Grassland, shrubland and wetland carbon: options beyond today's crude method | Yes | User order 2026-11-02: third, with the other open science items (user: explore additional options).  Step 1 (rates on a page) and the diagram view done; the diagram shows emergent wetland rates settling far above their starting pools; suspect values (emergent wetland growth 31, irrigated grass 9.19 Mg C/ha/yr), root turnover splits. Review done 2026-11-06 (dev/nonforest/review). Revised approach accepted the same day: one stage 3 solver (measured stocks as targets, growth from data, rates solved; IPCC, IBIS or data as the target source), IPCC factors for soil change on conversion, carbon for pasture and cropland. Nine steps; step 1, the emergent wetland fix, is next | - |
 | next, after the UI check | 53 Forested wetlands as wetland counterparts of three forest type groups (spruce/fir, oak/gum/cypress, elm/ash/cottonwood) | Yes (woody wetland classes, and the three upland types lose their hydric FIA plots) | Planned 2026-11-09; the user picks it up in a new session once the commits since v1.1.0 are confirmed in the UI. Three choices open (item 53) | - |
 | later | 54 Climate response for emergent wetland growth | Yes (marsh growth by year, in history and in projections, when turned on) | Added 2026-11-09 (user). Today only CO2 changes marsh growth under alternative climate futures; the response model needs a short review first (item 54) | - |
+| later | 55 Shrubland growth: chaparral and non-sage on different bases (fluxes about 2x apart, stocks agree) | Yes (shrub fluxes, when changed) | Noted 2026-11-09 (user): left as is; a short review of measured shrub NPP against RAP first (item 55) | - |
 | release | 46 CO2 fertilization | Yes, in projections with a Projection Climate result (Central by default; None turns it off) | Added 2026-11-04; built, tested (Puget run, age-band check), documented (guide 7.3.1) and pushed 2026-11-06. Left: a release | - |
 | later | 47 Example libraries by region and resolution | No (each holds its own results) | Added 2026-11-04, replaces 13. Best built after the open science items, since each carbon change dates them | 14, restore test |
 | any | 49 Test national mode end to end | No | Added 2026-11-04. Never run end to end; fills about 175 GB overnight | 12 (done) |
@@ -968,3 +969,20 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     eddy flux at marsh sites such as AmeriFlux US-Myb, US-Tw1), with sea-level rise and salinity as covariates to consider.
   - **Tests:** a quick test on a library with emergent wetland (Solano: Suisun Marsh; Calaveras has 21 inland cells), stage 7 and a
     Projection Climate result under two SSPs, checking the series against the forest and grass ones and that 1.0 holds at the normal.
+55. **Shrubland growth: chaparral and non-sage on different bases** - NOTED 2026-11-09, left as is for now (user: "option 1 but note
+  this for later follow up work"). Found in the Calaveras test: in the Mediterranean ecodivision non-sage shrub grows at 3.9 Mg
+  C/ha/yr and chaparral at about 2.0, although RAP NPP is nearly the same for both (3.92 and 3.85).
+  - **Why:** chaparral's growth is solved from literature biomass (defaults/stockflow/chaparral-age.csv: 11 Mg C/ha aboveground at
+    maturity, Bohlman et al. 2018, scaled by the ecodivision's RAP NPP; slow wood and coarse root turnover 0.03), so RAP sets only
+    its pattern between ecodivisions (tools/make_grass_shrub.R prints the mature NPP against RAP). Non-sage has no data of its own
+    (grass-shrub-literature.csv: RatesOf Native Sage Steppe, i.e. Sage's shares and turnover) and takes RAP's NPP level as is,
+    grass and forb layer included. Post Fire Shrub takes Non-sage's.
+  - **Effect:** stocks agree (Calaveras start: live 18.4 vs 15.5 Mg C/ha, dead organic matter 10.3 vs 10.9; soil is solved to each
+    class's gNATSGO target either way), since two thirds of non-sage growth goes to foliage and fine roots that turn over within a
+    year or two. The fluxes do not: NPP, litter fall, heterotrophic respiration and the size of the climate response are about 2x
+    chaparral's per hectare. In Calaveras non-sage cells also average 1.44 on Grass and Shrub Productivity (about 5.6 Mg C/ha/yr).
+  - **Options considered:** (2) scale non-sage's NPP by chaparral's literature / RAP ratio per ecodivision (0.52 in the
+    Mediterranean), stocks kept on target: comparable fluxes, but assumes RAP overstates open shrubland as it does chaparral;
+    (3) give chaparral a fast-turnover component (understory or more fine roots) so its NPP meets RAP with biomass kept: raises
+    chaparral's fluxes 2x, also without direct data. Follow-up: a short review of measured NPP in chaparral and in the open
+    shrublands non-sage stands for (coastal sage scrub, montane and foothill shrub), and of RAP NPP against them, then choose.
