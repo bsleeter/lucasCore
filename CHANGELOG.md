@@ -2,6 +2,12 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+### Fixed
+- Data Download, forest type groups: where the network read of a region's NFCMS zip on Box fails (a network that blocks GDAL's
+  range requests), the stage fetches the zip and checks the region's coverage from that copy instead of stopping with "file does not exist".
+
 ## 1.2.1 - 2026-11-10
 
 Grass and shrub live carbon fitted to field biomass, and California's crop mix filled where a county's report leaves a crop out.

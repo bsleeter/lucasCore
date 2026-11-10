@@ -109,10 +109,19 @@ download_handlers <- function() {
     finish = function(ctx, items) {
       gdal_remote(); dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE); n <- 0
       for (i in seq_len(nrow(items))) { m <- sprintf("Data/%s/%s_ForestType.tif", items$region[i], items$region[i]); dest <- file.path(ctx$place, basename(m))
-        if (clipping(ctx)) { r <- terra::rast(remote_member(items$url[i], m))
-          b <- terra::project(terra::vect(sf::st_as_sfc(sf::st_bbox(setNames(ctx$region$box, c("xmin", "ymin", "xmax", "ymax")), crs = sf::st_crs(5070)))), terra::crs(r))
-          e <- terra::intersect(terra::ext(b), terra::ext(r)); if (is.null(e)) next
-          v <- terra::global(terra::crop(r, e), "notNA")[[1]]; if (!isTRUE(v > 0)) { ctx$log(sprintf("  %s: no forest type cells in the region", items$region[i])); next } }
+        if (clipping(ctx)) {
+          # forest type cells of this region's tile inside the study area's box: NA when the tile misses the box
+          cells <- function(src) { r <- terra::rast(src)
+            b <- terra::project(terra::vect(sf::st_as_sfc(sf::st_bbox(setNames(ctx$region$box, c("xmin", "ymin", "xmax", "ymax")), crs = sf::st_crs(5070)))), terra::crs(r))
+            e <- terra::intersect(terra::ext(b), terra::ext(r)); if (is.null(e)) NA_real_ else terra::global(terra::crop(r, e), "notNA")[[1]] }
+          # read over the network; where that fails (a network that blocks GDAL's range requests to Box: a colleague, 2026-11-10)
+          # the zip is fetched and read from disk, and zip_raster then unpacks that copy
+          v <- tryCatch(cells(remote_member(items$url[i], m)), error = function(e) {
+            ctx$log(sprintf("  remote read of %s failed (%s): fetching the zip", basename(m), conditionMessage(e))); NULL })
+          if (is.null(v)) { if (!file.exists(items$dest[i])) fetch_files(items$url[i], items$dest[i], ctx$connections, ctx$log)
+            v <- cells(sprintf("/vsizip/%s/%s", normalizePath(items$dest[i], winslash = "/"), m)) }
+          if (is.na(v)) next
+          if (!isTRUE(v > 0)) { ctx$log(sprintf("  %s: no forest type cells in the region", items$region[i])); next } }
         zip_raster(ctx, items, i, m, dest); n <- n + 1; ctx$log(sprintf("  %s_ForestType.tif", items$region[i])) }
       if (!n) stop("no NFCMS region tile covers the region", call. = FALSE)
       ctx$place })
