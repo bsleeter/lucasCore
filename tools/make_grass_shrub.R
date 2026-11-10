@@ -49,6 +49,9 @@ agg <- function(x) x[, .(Windows = uniqueN(window), Cells = sum(cells), Treed = 
                          NppTree = weighted.mean(NppTree, nppCells, na.rm = TRUE),
                          Soil0to30 = weighted.mean(Soil0to30, soilCells, na.rm = TRUE), Soil0to999 = weighted.mean(Soil0to999, soilCells, na.rm = TRUE)), by = StateClassId]
 own <- s[, agg(.SD), by = StratumId]; conus <- agg(s)
+# RAP's herbaceous share of each class's NPP at its CONUS mean: splits the growth of a class with HerbOf and ShrubOf (to-do 55)
+herb_share <- s[, .(h = weighted.mean(NppAnnual + NppPerennial, nppCells, na.rm = TRUE) / weighted.mean(Npp, nppCells, na.rm = TRUE)), by = StateClassId]
+herb_share <- setNames(herb_share$h, herb_share$StateClassId)
 tg <- CJ(StratumId = ECO, StateClassId = GS)
 tg[, src := ifelse(StateClassId == "Shrubland: Post Fire Shrub", "Shrubland: Non-sage", StateClassId)]
 tg <- merge(tg, own, by.x = c("StratumId", "src"), by.y = c("StratumId", "StateClassId"), all.x = TRUE)
@@ -91,6 +94,8 @@ GROWTH_GROUPS <- unname(NG)
 EM_SHARE <- c(AGVF = 0.815, other = 0.83); SNAG_FALL <- 0.10 / (0.10 + 0.0718)
 params_of <- function(cls) { r <- lit[StateClassId == cls]; if (!nrow(r)) stop("no literature row for ", cls)
   if (!is.na(r$RatesOf)) { b <- params_of(r$RatesOf); b$AgLitter <- r$AgLitter; b$AgSlow <- r$AgSlow; b$StateClassId <- cls; return(b) }
+  # a class with a herbaceous and a shrub part (to-do 55): the shrub class's rates as the base, its own targets and parts kept
+  if (!is.na(r$ShrubOf)) { b <- params_of(r$ShrubOf); for (k in c("AgLitter", "AgSlow", "StateClassId", "HerbOf", "ShrubOf", "AgLiveTarget", "RootLiveTarget")) b[[k]] <- r[[k]]; return(b) }
   r }
 # the class's rate table: every group of the class's flows, from the literature
 lit_rates <- function(cls, moisture, shares = NULL) {
@@ -131,9 +136,27 @@ loss_of <- function(p, m, pool) { g <- intersect(paste(unique(p[FromStockTypeId 
 #   grass, roots turning over: foliage share = AgLive / NPP, fine roots the rest; fine-root turnover solved for RootLive
 #   grass, roots dying back (annual): every pool is the year's growth, so only the split is fitted: foliage share = AgLive / (AgLive +
 #                RootLive); the stocks then follow NPP (RAP's NPP is above the field total for annual grass, report section 3)
-#   shrub: wood turnover solved so foliage + wood = AgLive (foliage turnover kept: it is measured); coarse-root turnover so fine + coarse
+#   shrub: wood turnover solved so foliage + wood = AgLive (foliage turnover kept: it is measured); fine- and coarse-root turnover scaled together so fine + coarse
 #          roots = RootLive (fine-root turnover kept)
 # Each solved rate is printed with the literature value it replaces, as a check on plausibility.
+# A class whose growth is part herbaceous and part shrub (HerbOf, ShrubOf; to-do 55, user 2026-11-09: non-sage and native sage steppe):
+# RAP's herbaceous share h of the class's NPP grows as the HerbOf grass (foliage dying back, fine roots at its turnover) and 1 - h as the
+# ShrubOf shrub (its split and turnover). One foliage and one fine-root pool hold both parts, so each takes the turnover that gives the
+# same steady stock as the two parts apart: f = 1 / (w_herb / f_herb + w_shrub / f_shrub), w = each part's share of the pool's growth.
+mixed_rates <- function(cls, mo, r) {
+  h <- herb_share[[cls]]; gp <- params_of(r$HerbOf); sp <- params_of(r$ShrubOf); n <- function(p, k) as.numeric(p[[k]])
+  fk <- if (mo == "Moist") "kFineRootMoist" else "kFineRootDry"
+  herb <- h * c(Foliage = n(gp, "ShareFoliage"), Wood = 0, Fine = n(gp, "ShareFineRoot"), Coarse = 0)
+  shrub <- (1 - h) * c(Foliage = n(sp, "ShareFoliage"), Wood = n(sp, "ShareWood"), Fine = n(sp, "ShareFineRoot"), Coarse = n(sp, "ShareCoarseRoot"))
+  sh <- herb + shrub; m <- lit_rates(cls, mo, shares = sh)
+  eq <- function(wh, fh, fs) 1 / (wh / fh + (1 - wh) / fs)
+  fF <- eq(herb[["Foliage"]] / sh[["Foliage"]], 1, frac(n(sp, "kFoliage")))
+  fR <- eq(herb[["Fine"]] / sh[["Fine"]], if (identical(gp[[fk]], "dieback")) 1 else frac(n(gp, fk)), frac(n(sp, fk)))
+  m[FlowGroupId == TY("Biomass Turnover: Foliage -> AG Very Fast"), Value := fF]; m[FlowGroupId == TY("Biomass Turnover: Fine Roots -> BG Very Fast"), Value := fR]
+  cat(sprintf("  %s (%s): RAP herbaceous share %.3f; growth split foliage %.3f, wood %.3f, fine roots %.3f, coarse roots %.3f; foliage turnover %.3f, fine roots %.3f /yr
+",
+              cls, mo, h, sh[["Foliage"]], sh[["Wood"]], sh[["Fine"]], sh[["Coarse"]], -log(1 - min(fF, 1 - 1e-9)), -log(1 - fR)))
+  m }
 fit_stocks <- function(cls, mo, p, npp) {
   r <- params_of(cls); ag <- suppressWarnings(as.numeric(r$AgLiveTarget)); rt <- suppressWarnings(as.numeric(r$RootLiveTarget))
   if (is.na(ag) || is.na(rt) || !is.na(r$RatesOf)) return(lit_rates(cls, mo))
@@ -146,12 +169,17 @@ fit_stocks <- function(cls, mo, p, npp) {
     cat(sprintf("  %s (%s): foliage share %.3f (was %s), fine-root turnover %.3f/yr (was %s)\n", cls, mo, a, r$ShareFoliage,
                 -log(1 - min(m[FlowGroupId == TY("Biomass Turnover: Fine Roots -> BG Very Fast"), Value], 1 - 1e-9)), r[[fk]]))
     return(m) }
-  m <- lit_rates(cls, mo)
+  m <- if (is.na(r$HerbOf)) lit_rates(cls, mo) else mixed_rates(cls, mo, r)
+
   wg <- c(TY("Biomass Turnover: Other Wood -> Snag Branches"), TY("Biomass Turnover: Other Wood -> AG Fast"))
   m <- nf_fit_pool(p, m, memb, ord, npp, WOOD, ag, over = c(FOL, WOOD), only = wg)$mult
-  m <- nf_fit_pool(p, m, memb, ord, npp, CR, rt, over = c(FR, CR), only = TY("Biomass Turnover: Coarse Roots -> BG Fast"))$mult
-  kw <- -log(1 - sum(m[FlowGroupId %in% wg, Value])); kc <- -log(1 - m[FlowGroupId == TY("Biomass Turnover: Coarse Roots -> BG Fast"), Value])
-  cat(sprintf("  %s (%s): wood turnover %.3f/yr (was %s), coarse-root turnover %.3f/yr (was %s)\n", cls, mo, kw, r$kWood, kc, r$kCoarseRoot))
+  # roots: fine- and coarse-root turnover scaled by one factor (their literature ratio kept) so fine + coarse = RootLive (2026-11-09: coarse
+  # alone needed 0.9/yr for non-sage in moist ecodivisions, where its herbaceous fine roots already hold most of the target)
+  rg <- c(TY("Biomass Turnover: Fine Roots -> BG Very Fast"), TY("Biomass Turnover: Coarse Roots -> BG Fast"))
+  m <- nf_fit_pool(p, m, memb, ord, npp, c(FR, CR), rt, only = rg)$mult
+  kw <- -log(1 - sum(m[FlowGroupId %in% wg, Value])); kc <- -log(1 - m[FlowGroupId == TY("Biomass Turnover: Coarse Roots -> BG Fast"), Value]); kf <- -log(1 - min(m[FlowGroupId == rg[1], Value], 1 - 1e-9))
+  cat(sprintf("  %s (%s): wood turnover %.3f/yr (was %s); fine-root %.3f/yr and coarse-root %.3f/yr (were %s, %s)
+", cls, mo, kw, r$kWood, kf, kc, r[[if (mo == "Moist") "kFineRootMoist" else "kFineRootDry"]], r$kCoarseRoot))
   m }
 fit_litter_slow <- function(p, m, npp, r) {
   m <- nf_fit_pool(p, m, memb, ord, npp, AGVF, as.numeric(r$AgLitter), over = if (identical(r$StateClassId, "Shrubland: Chaparral")) c(AGVF, AGF) else AGVF)$mult

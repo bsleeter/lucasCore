@@ -131,7 +131,11 @@ sage_ok <- vapply(SAGE, function(cls) { e <- "Temperate Desert"; p <- pa[FromStr
     z <- pool_at(nb); k <- intersect(names(z), names(S)); gap <- max(gap, max(abs(S[k] - z[k]))) }
   wood <- vapply(c(0, 10, 30, amax), function(a) pool_at(A[findInterval(a, A)])[["Biomass: Other Wood"]], 1)[!duplicated(pmin(c(0, 10, 30, amax), amax))]
   mat <- m[as.integer(AgeMin) == amax & FlowGroupId %in% NGG]; mt <- gt[StratumId == e & StateClassId == cls, as.numeric(NPP)]
-  c(gap = gap, rising = all(diff(wood) > 0), mature = all(abs(as.numeric(mat$Value[match(NGG, mat$FlowGroupId)]) - sh(cls)) < 1e-6) && abs(growth_at(amax) - mt) < 1e-4,
+  mv <- as.numeric(mat$Value[match(NGG, mat$FlowGroupId)])
+  # a class with a herbaceous part (HerbOf; to-do 55) has its split from RAP's herbaceous share, not the table: a valid split then
+  herb_of <- function(k) { r <- lit[StateClassId == k]; if (!is.na(r$HerbOf)) TRUE else if (!is.na(r$RatesOf)) herb_of(r$RatesOf) else FALSE }   # Post Fire Shrub -> Non-sage
+  split_ok <- if (herb_of(cls)) all(mv >= 0) && abs(sum(mv) - 1) < 1e-6 else all(abs(mv - sh(cls)) < 1e-6)
+  c(gap = gap, rising = all(diff(wood) > 0), mature = split_ok && abs(growth_at(amax) - mt) < 1e-4,
     later = abs(growth_at(5) - mt) < 1e-4) }, c(gap = 0, rising = 0, mature = 0, later = 0))
 check(sprintf("sage family: the age-bin pools step to the next bin's (largest gap %.1e Mg C/ha)", max(sage_ok["gap", ])), max(sage_ok["gap", ]) < 1e-3)
 check("sage family: wood rises with years since fire (surviving coarse roots die back first); at AgeMax the literature split and RAP NPP; from age 2 the mature NPP",

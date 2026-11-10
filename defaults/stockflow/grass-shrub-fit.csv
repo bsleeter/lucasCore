@@ -4,169 +4,169 @@ Hot Continental,Grassland: Irrigated Perennial,Moist,2.8551,2.8551,3.7,1.7,2,1,0
 Hot Continental,Grassland: Natural Perennial,Moist,2.5182,2.5182,3.766,0.941,2.824,0.941,0,0.471,75.17,0,0.5,0.2657,0.003604
 Hot Continental,Shrubland: Chaparral,Moist,3.194,2.0591,17.6,11,6.6,7,3.85,0.5,39.74,0,0.3458,0.3039,0.003479
 Hot Continental,Shrubland: Invaded Sage Steppe,Moist,0.9275,0.9275,2.6,0.9,1.7,1.116,0.123,0.3,36.6,0,0.2451,0.169,0.002763
-Hot Continental,Shrubland: Native Sage Steppe,Moist,1.263,1.263,8.775,2.581,6.194,1.615,0.837,0.774,46.54,0,0.2517,0.08051,0.003238
-Hot Continental,Shrubland: Non-sage,Moist,2.8531,2.8531,19.822,5.83,13.992,3.648,1.891,1.749,95.1,0,0.2517,0.08051,0.003579
-Hot Continental,Shrubland: Post Fire Shrub,Moist,2.8531,2.8531,19.822,5.83,13.992,3.648,1.891,1.749,95.1,0,0.2517,0.08051,0.003579
+Hot Continental,Shrubland: Native Sage Steppe,Moist,1.263,1.263,3.8,1.4,2.4,0.693,0.205,0.3,46.54,0,0.4456,0.2049,0.003072
+Hot Continental,Shrubland: Non-sage,Moist,2.8531,2.8531,8.169,3.501,4.668,1.758,0.627,0.7,95.1,0,0.4286,0.1979,0.00341
+Hot Continental,Shrubland: Post Fire Shrub,Moist,2.8531,2.8531,8.169,3.501,4.668,1.758,0.627,0.7,95.1,0,0.4286,0.1979,0.00341
 Hot Continental,Shrubland: Sage,Moist,0.4894,0.4894,3.4,1,2.4,0.626,0.324,0.3,30.88,0,0.2517,0.08051,0.001891
 Hot Continental Mountains,Grassland: Annual,Moist,2.8026,2.8026,2.803,1.521,1.281,1,0,0.5,58.41,0,0.6034,0.3563,0.003781
 Hot Continental Mountains,Grassland: Irrigated Perennial,Moist,2.8551,2.8551,3.7,1.7,2,1,0,0.5,83.04,0,0.6296,0.3824,0.002401
 Hot Continental Mountains,Grassland: Natural Perennial,Moist,3.2545,3.2545,4.867,1.217,3.65,1.217,0,0.608,36.29,0,0.5,0.2657,0.009647
 Hot Continental Mountains,Shrubland: Chaparral,Moist,3.194,2.0591,17.6,11,6.6,7,3.85,0.5,39.74,0,0.3458,0.3039,0.003479
 Hot Continental Mountains,Shrubland: Invaded Sage Steppe,Moist,0.9275,0.9275,2.6,0.9,1.7,1.116,0.123,0.3,36.6,0,0.2451,0.169,0.002763
-Hot Continental Mountains,Shrubland: Native Sage Steppe,Moist,1.263,1.263,8.775,2.581,6.194,1.615,0.837,0.774,46.54,0,0.2517,0.08051,0.003238
-Hot Continental Mountains,Shrubland: Non-sage,Moist,3.7962,3.7962,26.375,7.757,18.617,4.854,2.516,2.327,189.42,0,0.2517,0.08051,0.002391
-Hot Continental Mountains,Shrubland: Post Fire Shrub,Moist,3.7962,3.7962,26.375,7.757,18.617,4.854,2.516,2.327,189.42,0,0.2517,0.08051,0.002391
+Hot Continental Mountains,Shrubland: Native Sage Steppe,Moist,1.263,1.263,3.8,1.4,2.4,0.693,0.205,0.3,46.54,0,0.4456,0.2049,0.003072
+Hot Continental Mountains,Shrubland: Non-sage,Moist,3.7962,3.7962,10.87,4.658,6.211,2.34,0.835,0.932,189.42,0,0.4286,0.1979,0.002278
+Hot Continental Mountains,Shrubland: Post Fire Shrub,Moist,3.7962,3.7962,10.87,4.658,6.211,2.34,0.835,0.932,189.42,0,0.4286,0.1979,0.002278
 Hot Continental Mountains,Shrubland: Sage,Moist,0.4894,0.4894,3.4,1,2.4,0.626,0.324,0.3,30.88,0,0.2517,0.08051,0.001891
 Marine,Grassland: Annual,Moist,2.8026,2.8026,2.803,1.521,1.281,1,0,0.5,58.41,0,0.6034,0.3563,0.003781
 Marine,Grassland: Irrigated Perennial,Moist,2.8551,2.8551,3.7,1.7,2,1,0,0.5,83.04,0,0.6296,0.3824,0.002401
 Marine,Grassland: Natural Perennial,Moist,3.078,3.078,4.603,1.151,3.452,1.151,0,0.575,146.81,0,0.5,0.2657,0.002255
 Marine,Shrubland: Chaparral,Moist,3.194,2.0591,17.6,11,6.6,7,3.85,0.5,39.74,0,0.3458,0.3039,0.003479
 Marine,Shrubland: Invaded Sage Steppe,Moist,0.9275,0.9275,2.6,0.9,1.7,1.116,0.123,0.3,36.6,0,0.2451,0.169,0.002763
-Marine,Shrubland: Native Sage Steppe,Moist,1.263,1.263,8.775,2.581,6.194,1.615,0.837,0.774,46.54,0,0.2517,0.08051,0.003238
-Marine,Shrubland: Non-sage,Moist,2.8417,2.8417,19.743,5.807,13.936,3.634,1.883,1.742,144.36,0,0.2517,0.08051,0.002348
-Marine,Shrubland: Post Fire Shrub,Moist,2.8417,2.8417,19.743,5.807,13.936,3.634,1.883,1.742,144.36,0,0.2517,0.08051,0.002348
+Marine,Shrubland: Native Sage Steppe,Moist,1.263,1.263,3.8,1.4,2.4,0.693,0.205,0.3,46.54,0,0.4456,0.2049,0.003072
+Marine,Shrubland: Non-sage,Moist,2.8417,2.8417,8.137,3.487,4.65,1.751,0.625,0.697,144.36,0,0.4286,0.1979,0.002238
+Marine,Shrubland: Post Fire Shrub,Moist,2.8417,2.8417,8.137,3.487,4.65,1.751,0.625,0.697,144.36,0,0.4286,0.1979,0.002238
 Marine,Shrubland: Sage,Moist,0.4894,0.4894,3.4,1,2.4,0.626,0.324,0.3,30.88,0,0.2517,0.08051,0.001891
 Marine Mountains,Grassland: Annual,Moist,2.5841,2.5841,2.584,1.403,1.181,0.922,0,0.461,63.59,0,0.6034,0.3563,0.003202
 Marine Mountains,Grassland: Irrigated Perennial,Moist,2.8551,2.8551,3.7,1.7,2,1,0,0.5,83.04,0,0.6296,0.3824,0.002401
 Marine Mountains,Grassland: Natural Perennial,Moist,1.8549,1.8549,2.774,0.693,2.08,0.693,0,0.347,61.56,0,0.5,0.2657,0.003241
 Marine Mountains,Shrubland: Chaparral,Moist,3.194,2.0591,17.6,11,6.6,7,3.85,0.5,39.74,0,0.3458,0.3039,0.003479
 Marine Mountains,Shrubland: Invaded Sage Steppe,Moist,0.9275,0.9275,2.6,0.9,1.7,1.116,0.123,0.3,36.6,0,0.2451,0.169,0.002763
-Marine Mountains,Shrubland: Native Sage Steppe,Moist,1.0223,1.0223,7.103,2.089,5.014,1.307,0.678,0.627,39.71,0,0.2517,0.08051,0.003071
-Marine Mountains,Shrubland: Non-sage,Moist,1.5496,1.5496,10.766,3.166,7.6,1.981,1.027,0.95,72.34,0,0.2517,0.08051,0.002556
-Marine Mountains,Shrubland: Post Fire Shrub,Moist,1.5496,1.5496,10.766,3.166,7.6,1.981,1.027,0.95,72.34,0,0.2517,0.08051,0.002556
+Marine Mountains,Shrubland: Native Sage Steppe,Moist,1.0223,1.0223,3.076,1.133,1.943,0.561,0.166,0.243,39.71,0,0.4456,0.2049,0.002913
+Marine Mountains,Shrubland: Non-sage,Moist,1.5496,1.5496,4.437,1.902,2.535,0.955,0.341,0.38,72.34,0,0.4286,0.1979,0.002435
+Marine Mountains,Shrubland: Post Fire Shrub,Moist,1.5496,1.5496,4.437,1.902,2.535,0.955,0.341,0.38,72.34,0,0.4286,0.1979,0.002435
 Marine Mountains,Shrubland: Sage,Moist,0.4894,0.4894,3.4,1,2.4,0.626,0.324,0.3,30.88,0,0.2517,0.08051,0.001891
 Mediterranean,Grassland: Annual,Dry,3.6221,3.6221,3.622,1.966,1.656,1.292,0,0.646,65.95,0,0.6034,0.3563,0.004328
 Mediterranean,Grassland: Irrigated Perennial,Dry,2.8551,2.8551,3.7,1.7,2,1,0,0.5,83.04,0,0.6296,0.3824,0.002401
 Mediterranean,Grassland: Natural Perennial,Dry,2.7837,2.7837,4.163,1.041,3.122,1.041,0,0.52,63.24,0,0.5,0.2657,0.004735
 Mediterranean,Shrubland: Chaparral,Dry,3.8528,2.4839,21.23,13.269,7.961,8.444,4.644,0.603,45.78,0,0.3458,0.3039,0.003643
 Mediterranean,Shrubland: Invaded Sage Steppe,Dry,0.9275,0.9275,2.6,0.9,1.7,1.116,0.123,0.3,36.6,0,0.2451,0.169,0.002763
-Mediterranean,Shrubland: Native Sage Steppe,Dry,1.263,1.263,8.775,2.581,6.194,1.615,0.837,0.774,46.54,0,0.2517,0.08051,0.003238
-Mediterranean,Shrubland: Non-sage,Dry,3.9158,3.9158,27.205,8.002,19.204,5.007,2.595,2.4,81.39,0,0.2517,0.08051,0.00574
-Mediterranean,Shrubland: Post Fire Shrub,Dry,3.9158,3.9158,27.205,8.002,19.204,5.007,2.595,2.4,81.39,0,0.2517,0.08051,0.00574
+Mediterranean,Shrubland: Native Sage Steppe,Dry,1.263,1.263,3.8,1.4,2.4,0.693,0.205,0.3,46.54,0,0.4456,0.2049,0.003072
+Mediterranean,Shrubland: Non-sage,Dry,3.9158,3.9158,11.212,4.805,6.407,2.413,0.861,0.961,81.39,0,0.4286,0.1979,0.005469
+Mediterranean,Shrubland: Post Fire Shrub,Dry,3.9158,3.9158,11.212,4.805,6.407,2.413,0.861,0.961,81.39,0,0.4286,0.1979,0.005469
 Mediterranean,Shrubland: Sage,Dry,0.4894,0.4894,3.4,1,2.4,0.626,0.324,0.3,30.88,0,0.2517,0.08051,0.001891
 Mediterranean Mountains,Grassland: Annual,Dry,2.8254,2.8254,2.825,1.534,1.292,1.008,0,0.504,58.87,0,0.6034,0.3563,0.003782
 Mediterranean Mountains,Grassland: Irrigated Perennial,Dry,2.8551,2.8551,3.7,1.7,2,1,0,0.5,83.04,0,0.6296,0.3824,0.002401
 Mediterranean Mountains,Grassland: Natural Perennial,Dry,2.1301,2.1301,3.185,0.796,2.389,0.796,0,0.398,54.36,0,0.5,0.2657,0.004215
 Mediterranean Mountains,Shrubland: Chaparral,Dry,2.9478,1.9004,16.243,10.152,6.091,6.46,3.553,0.461,37.4,0,0.3458,0.3039,0.003412
 Mediterranean Mountains,Shrubland: Invaded Sage Steppe,Dry,1.1855,1.1855,3.323,1.15,2.173,1.426,0.157,0.383,28.24,0,0.2451,0.169,0.004577
-Mediterranean Mountains,Shrubland: Native Sage Steppe,Dry,1.0985,1.0985,7.632,2.245,5.387,1.405,0.728,0.673,37.25,0,0.2517,0.08051,0.003518
-Mediterranean Mountains,Shrubland: Non-sage,Dry,1.9312,1.9312,13.417,3.946,9.471,2.469,1.28,1.184,58.37,0,0.2517,0.08051,0.003947
-Mediterranean Mountains,Shrubland: Post Fire Shrub,Dry,1.9312,1.9312,13.417,3.946,9.471,2.469,1.28,1.184,58.37,0,0.2517,0.08051,0.003947
+Mediterranean Mountains,Shrubland: Native Sage Steppe,Dry,1.0985,1.0985,3.305,1.218,2.087,0.603,0.178,0.261,37.25,0,0.4456,0.2049,0.003338
+Mediterranean Mountains,Shrubland: Non-sage,Dry,1.9312,1.9312,5.53,2.37,3.16,1.19,0.425,0.474,58.37,0,0.4286,0.1979,0.003761
+Mediterranean Mountains,Shrubland: Post Fire Shrub,Dry,1.9312,1.9312,5.53,2.37,3.16,1.19,0.425,0.474,58.37,0,0.4286,0.1979,0.003761
 Mediterranean Mountains,Shrubland: Sage,Dry,0.9124,0.9124,6.339,1.864,4.475,1.167,0.605,0.559,45.38,0,0.2517,0.08051,0.002399
 Prairie,Grassland: Annual,Moist,2.8026,2.8026,2.803,1.521,1.281,1,0,0.5,58.41,0,0.6034,0.3563,0.003781
 Prairie,Grassland: Irrigated Perennial,Moist,2.8551,2.8551,3.7,1.7,2,1,0,0.5,83.04,0,0.6296,0.3824,0.002401
 Prairie,Grassland: Natural Perennial,Moist,4.3057,4.3057,6.439,1.61,4.829,1.61,0,0.805,100.08,0,0.5,0.2657,0.004628
 Prairie,Shrubland: Chaparral,Moist,3.194,2.0591,17.6,11,6.6,7,3.85,0.5,39.74,0,0.3458,0.3039,0.003479
 Prairie,Shrubland: Invaded Sage Steppe,Moist,0.9275,0.9275,2.6,0.9,1.7,1.116,0.123,0.3,36.6,0,0.2451,0.169,0.002763
-Prairie,Shrubland: Native Sage Steppe,Moist,1.263,1.263,8.775,2.581,6.194,1.615,0.837,0.774,46.54,0,0.2517,0.08051,0.003238
-Prairie,Shrubland: Non-sage,Moist,4.1795,4.1795,29.038,8.54,20.497,5.344,2.77,2.562,95.7,0,0.2517,0.08051,0.00521
-Prairie,Shrubland: Post Fire Shrub,Moist,4.1795,4.1795,29.038,8.54,20.497,5.344,2.77,2.562,95.7,0,0.2517,0.08051,0.00521
+Prairie,Shrubland: Native Sage Steppe,Moist,1.263,1.263,3.8,1.4,2.4,0.693,0.205,0.3,46.54,0,0.4456,0.2049,0.003072
+Prairie,Shrubland: Non-sage,Moist,4.1795,4.1795,11.967,5.129,6.838,2.576,0.919,1.026,95.7,0,0.4286,0.1979,0.004964
+Prairie,Shrubland: Post Fire Shrub,Moist,4.1795,4.1795,11.967,5.129,6.838,2.576,0.919,1.026,95.7,0,0.4286,0.1979,0.004964
 Prairie,Shrubland: Sage,Moist,0.4894,0.4894,3.4,1,2.4,0.626,0.324,0.3,30.88,0,0.2517,0.08051,0.001891
 Savanna,Grassland: Annual,Moist,2.8026,2.8026,2.803,1.521,1.281,1,0,0.5,58.41,0,0.6034,0.3563,0.003781
 Savanna,Grassland: Irrigated Perennial,Moist,2.8551,2.8551,3.7,1.7,2,1,0,0.5,83.04,0,0.6296,0.3824,0.002401
 Savanna,Grassland: Natural Perennial,Moist,3.3672,3.3672,5.035,1.259,3.776,1.259,0,0.629,64.94,0,0.5,0.2657,0.005578
 Savanna,Shrubland: Chaparral,Moist,3.194,2.0591,17.6,11,6.6,7,3.85,0.5,39.74,0,0.3458,0.3039,0.003479
 Savanna,Shrubland: Invaded Sage Steppe,Moist,0.9275,0.9275,2.6,0.9,1.7,1.116,0.123,0.3,36.6,0,0.2451,0.169,0.002763
-Savanna,Shrubland: Native Sage Steppe,Moist,1.263,1.263,8.775,2.581,6.194,1.615,0.837,0.774,46.54,0,0.2517,0.08051,0.003238
-Savanna,Shrubland: Non-sage,Moist,4.5045,4.5045,31.295,9.205,22.091,5.76,2.985,2.761,133.78,0,0.2517,0.08051,0.004017
-Savanna,Shrubland: Post Fire Shrub,Moist,4.5045,4.5045,31.295,9.205,22.091,5.76,2.985,2.761,133.78,0,0.2517,0.08051,0.004017
+Savanna,Shrubland: Native Sage Steppe,Moist,1.263,1.263,3.8,1.4,2.4,0.693,0.205,0.3,46.54,0,0.4456,0.2049,0.003072
+Savanna,Shrubland: Non-sage,Moist,4.5045,4.5045,12.898,5.528,7.37,2.776,0.99,1.106,133.78,0,0.4286,0.1979,0.003827
+Savanna,Shrubland: Post Fire Shrub,Moist,4.5045,4.5045,12.898,5.528,7.37,2.776,0.99,1.106,133.78,0,0.4286,0.1979,0.003827
 Savanna,Shrubland: Sage,Moist,0.4894,0.4894,3.4,1,2.4,0.626,0.324,0.3,30.88,0,0.2517,0.08051,0.001891
 Subtropical,Grassland: Annual,Moist,2.8026,2.8026,2.803,1.521,1.281,1,0,0.5,58.41,0,0.6034,0.3563,0.003781
 Subtropical,Grassland: Irrigated Perennial,Moist,2.8551,2.8551,3.7,1.7,2,1,0,0.5,83.04,0,0.6296,0.3824,0.002401
 Subtropical,Grassland: Natural Perennial,Moist,2.9344,2.9344,4.388,1.097,3.291,1.097,0,0.548,70.43,0,0.5,0.2657,0.004482
 Subtropical,Shrubland: Chaparral,Moist,3.194,2.0591,17.6,11,6.6,7,3.85,0.5,39.74,0,0.3458,0.3039,0.003479
 Subtropical,Shrubland: Invaded Sage Steppe,Moist,0.9275,0.9275,2.6,0.9,1.7,1.116,0.123,0.3,36.6,0,0.2451,0.169,0.002763
-Subtropical,Shrubland: Native Sage Steppe,Moist,1.263,1.263,8.775,2.581,6.194,1.615,0.837,0.774,46.54,0,0.2517,0.08051,0.003238
-Subtropical,Shrubland: Non-sage,Moist,3.4208,3.4208,23.766,6.99,16.776,4.374,2.267,2.097,89.02,0,0.2517,0.08051,0.004585
-Subtropical,Shrubland: Post Fire Shrub,Moist,3.4208,3.4208,23.766,6.99,16.776,4.374,2.267,2.097,89.02,0,0.2517,0.08051,0.004585
+Subtropical,Shrubland: Native Sage Steppe,Moist,1.263,1.263,3.8,1.4,2.4,0.693,0.205,0.3,46.54,0,0.4456,0.2049,0.003072
+Subtropical,Shrubland: Non-sage,Moist,3.4208,3.4208,9.795,4.198,5.597,2.108,0.752,0.84,89.02,0,0.4286,0.1979,0.004368
+Subtropical,Shrubland: Post Fire Shrub,Moist,3.4208,3.4208,9.795,4.198,5.597,2.108,0.752,0.84,89.02,0,0.4286,0.1979,0.004368
 Subtropical,Shrubland: Sage,Moist,0.4894,0.4894,3.4,1,2.4,0.626,0.324,0.3,30.88,0,0.2517,0.08051,0.001891
 Subtropical Mountains,Grassland: Annual,Moist,2.8026,2.8026,2.803,1.521,1.281,1,0,0.5,58.41,0,0.6034,0.3563,0.003781
 Subtropical Mountains,Grassland: Irrigated Perennial,Moist,2.8551,2.8551,3.7,1.7,2,1,0,0.5,83.04,0,0.6296,0.3824,0.002401
 Subtropical Mountains,Grassland: Natural Perennial,Moist,4.4876,4.4876,6.711,1.678,5.033,1.678,0,0.839,51.66,0,0.5,0.2657,0.009345
 Subtropical Mountains,Shrubland: Chaparral,Moist,3.194,2.0591,17.6,11,6.6,7,3.85,0.5,39.74,0,0.3458,0.3039,0.003479
 Subtropical Mountains,Shrubland: Invaded Sage Steppe,Moist,0.9275,0.9275,2.6,0.9,1.7,1.116,0.123,0.3,36.6,0,0.2451,0.169,0.002763
-Subtropical Mountains,Shrubland: Native Sage Steppe,Moist,1.263,1.263,8.775,2.581,6.194,1.615,0.837,0.774,46.54,0,0.2517,0.08051,0.003238
-Subtropical Mountains,Shrubland: Non-sage,Moist,4.9763,4.9763,34.573,10.169,24.405,6.363,3.298,3.051,27.16,0,0.2517,0.08051,0.02186
-Subtropical Mountains,Shrubland: Post Fire Shrub,Moist,4.9763,4.9763,34.573,10.169,24.405,6.363,3.298,3.051,27.16,0,0.2517,0.08051,0.02186
+Subtropical Mountains,Shrubland: Native Sage Steppe,Moist,1.263,1.263,3.8,1.4,2.4,0.693,0.205,0.3,46.54,0,0.4456,0.2049,0.003072
+Subtropical Mountains,Shrubland: Non-sage,Moist,4.9763,4.9763,14.249,6.107,8.142,3.067,1.094,1.221,27.16,0,0.4286,0.1979,0.02083
+Subtropical Mountains,Shrubland: Post Fire Shrub,Moist,4.9763,4.9763,14.249,6.107,8.142,3.067,1.094,1.221,27.16,0,0.4286,0.1979,0.02083
 Subtropical Mountains,Shrubland: Sage,Moist,0.4894,0.4894,3.4,1,2.4,0.626,0.324,0.3,30.88,0,0.2517,0.08051,0.001891
 Temperate Desert,Grassland: Annual,Dry,1.3091,1.3091,1.309,0.711,0.598,0.467,0,0.234,42.85,0,0.6034,0.3563,0.002407
 Temperate Desert,Grassland: Irrigated Perennial,Dry,2.8551,2.8551,3.7,1.7,2,1,0,0.5,83.04,0,0.6296,0.3824,0.002401
 Temperate Desert,Grassland: Natural Perennial,Dry,1.3176,1.3176,1.97,0.493,1.478,0.493,0,0.246,46.88,0,0.5,0.2657,0.003023
 Temperate Desert,Shrubland: Chaparral,Dry,3.194,2.0591,17.6,11,6.6,7,3.85,0.5,39.74,0,0.3458,0.3039,0.003479
 Temperate Desert,Shrubland: Invaded Sage Steppe,Dry,1.1131,1.1131,3.12,1.08,2.04,1.339,0.148,0.36,31.31,0,0.2451,0.169,0.003876
-Temperate Desert,Shrubland: Native Sage Steppe,Dry,1.1606,1.1606,8.063,2.372,5.692,1.484,0.769,0.711,36.69,0,0.2517,0.08051,0.003774
-Temperate Desert,Shrubland: Non-sage,Dry,0.602,0.602,4.182,1.23,2.952,0.77,0.399,0.369,28.16,0,0.2517,0.08051,0.00255
-Temperate Desert,Shrubland: Post Fire Shrub,Dry,0.602,0.602,4.182,1.23,2.952,0.77,0.399,0.369,28.16,0,0.2517,0.08051,0.00255
+Temperate Desert,Shrubland: Native Sage Steppe,Dry,1.1606,1.1606,3.492,1.287,2.205,0.637,0.188,0.276,36.69,0,0.4456,0.2049,0.00358
+Temperate Desert,Shrubland: Non-sage,Dry,0.602,0.602,1.724,0.739,0.985,0.371,0.132,0.148,28.16,0,0.4286,0.1979,0.00243
+Temperate Desert,Shrubland: Post Fire Shrub,Dry,0.602,0.602,1.724,0.739,0.985,0.371,0.132,0.148,28.16,0,0.4286,0.1979,0.00243
 Temperate Desert,Shrubland: Sage,Dry,0.5204,0.5204,3.616,1.063,2.552,0.665,0.345,0.319,21.98,0,0.2517,0.08051,0.002824
 Temperate Desert Mountains,Grassland: Annual,Dry,1.2106,1.2106,1.211,0.657,0.553,0.432,0,0.216,36.44,0,0.6034,0.3563,0.002618
 Temperate Desert Mountains,Grassland: Irrigated Perennial,Dry,2.8551,2.8551,3.7,1.7,2,1,0,0.5,83.04,0,0.6296,0.3824,0.002401
 Temperate Desert Mountains,Grassland: Natural Perennial,Dry,1.0273,1.0273,1.536,0.384,1.152,0.384,0,0.192,44,0,0.5,0.2657,0.002512
 Temperate Desert Mountains,Shrubland: Chaparral,Dry,3.194,2.0591,17.6,11,6.6,7,3.85,0.5,39.74,0,0.3458,0.3039,0.003479
 Temperate Desert Mountains,Shrubland: Invaded Sage Steppe,Dry,0.7397,0.7397,2.074,0.718,1.356,0.89,0.098,0.239,39.42,0,0.2451,0.169,0.002046
-Temperate Desert Mountains,Shrubland: Native Sage Steppe,Dry,1.1083,1.1083,7.7,2.265,5.435,1.417,0.735,0.679,50.8,0,0.2517,0.08051,0.002603
-Temperate Desert Mountains,Shrubland: Non-sage,Dry,1.006,1.006,6.989,2.056,4.934,1.286,0.667,0.617,49.36,0,0.2517,0.08051,0.002432
-Temperate Desert Mountains,Shrubland: Post Fire Shrub,Dry,1.006,1.006,6.989,2.056,4.934,1.286,0.667,0.617,49.36,0,0.2517,0.08051,0.002432
+Temperate Desert Mountains,Shrubland: Native Sage Steppe,Dry,1.1083,1.1083,3.335,1.229,2.106,0.608,0.18,0.263,50.8,0,0.4456,0.2049,0.002469
+Temperate Desert Mountains,Shrubland: Non-sage,Dry,1.006,1.006,2.88,1.234,1.646,0.62,0.221,0.247,49.36,0,0.4286,0.1979,0.002317
+Temperate Desert Mountains,Shrubland: Post Fire Shrub,Dry,1.006,1.006,2.88,1.234,1.646,0.62,0.221,0.247,49.36,0,0.4286,0.1979,0.002317
 Temperate Desert Mountains,Shrubland: Sage,Dry,0.4656,0.4656,3.235,0.951,2.283,0.595,0.309,0.285,33,0,0.2517,0.08051,0.001683
 Temperate Steppe,Grassland: Annual,Dry,2.6907,2.6907,2.691,1.461,1.23,0.96,0,0.48,80.11,0,0.6034,0.3563,0.002646
 Temperate Steppe,Grassland: Irrigated Perennial,Dry,2.8551,2.8551,3.7,1.7,2,1,0,0.5,83.04,0,0.6296,0.3824,0.002401
 Temperate Steppe,Grassland: Natural Perennial,Dry,2.6995,2.6995,4.037,1.009,3.028,1.009,0,0.505,74.7,0,0.5,0.2657,0.003887
 Temperate Steppe,Shrubland: Chaparral,Dry,3.194,2.0591,17.6,11,6.6,7,3.85,0.5,39.74,0,0.3458,0.3039,0.003479
 Temperate Steppe,Shrubland: Invaded Sage Steppe,Dry,0.9275,0.9275,2.6,0.9,1.7,1.116,0.123,0.3,36.6,0,0.2451,0.169,0.002763
-Temperate Steppe,Shrubland: Native Sage Steppe,Dry,1.8127,1.8127,12.594,3.704,8.89,2.318,1.201,1.111,46.77,0,0.2517,0.08051,0.004624
-Temperate Steppe,Shrubland: Non-sage,Dry,1.945,1.945,13.513,3.974,9.539,2.487,1.289,1.192,71.56,0,0.2517,0.08051,0.003243
-Temperate Steppe,Shrubland: Post Fire Shrub,Dry,1.945,1.945,13.513,3.974,9.539,2.487,1.289,1.192,71.56,0,0.2517,0.08051,0.003243
+Temperate Steppe,Shrubland: Native Sage Steppe,Dry,1.8127,1.8127,5.454,2.009,3.445,0.995,0.294,0.431,46.77,0,0.4456,0.2049,0.004387
+Temperate Steppe,Shrubland: Non-sage,Dry,1.945,1.945,5.569,2.387,3.182,1.199,0.428,0.477,71.56,0,0.4286,0.1979,0.00309
+Temperate Steppe,Shrubland: Post Fire Shrub,Dry,1.945,1.945,5.569,2.387,3.182,1.199,0.428,0.477,71.56,0,0.4286,0.1979,0.00309
 Temperate Steppe,Shrubland: Sage,Dry,0.4894,0.4894,3.4,1,2.4,0.626,0.324,0.3,30.88,0,0.2517,0.08051,0.001891
 Temperate Steppe Mountains,Grassland: Annual,Dry,2.1735,2.1735,2.174,1.18,0.994,0.776,0,0.388,44.87,0,0.6034,0.3563,0.003817
 Temperate Steppe Mountains,Grassland: Irrigated Perennial,Dry,2.8551,2.8551,3.7,1.7,2,1,0,0.5,83.04,0,0.6296,0.3824,0.002401
 Temperate Steppe Mountains,Grassland: Natural Perennial,Dry,1.8203,1.8203,2.722,0.68,2.041,0.68,0,0.34,77.46,0,0.5,0.2657,0.002528
 Temperate Steppe Mountains,Shrubland: Chaparral,Dry,3.194,2.0591,17.6,11,6.6,7,3.85,0.5,39.74,0,0.3458,0.3039,0.003479
 Temperate Steppe Mountains,Shrubland: Invaded Sage Steppe,Dry,2.233,2.233,6.26,2.167,4.093,2.687,0.296,0.722,52.47,0,0.2451,0.169,0.004641
-Temperate Steppe Mountains,Shrubland: Native Sage Steppe,Dry,1.6341,1.6341,11.353,3.339,8.014,2.089,1.083,1.002,62.59,0,0.2517,0.08051,0.003115
-Temperate Steppe Mountains,Shrubland: Non-sage,Dry,1.8976,1.8976,13.184,3.878,9.306,2.426,1.258,1.163,69.17,0,0.2517,0.08051,0.003273
-Temperate Steppe Mountains,Shrubland: Post Fire Shrub,Dry,1.8976,1.8976,13.184,3.878,9.306,2.426,1.258,1.163,69.17,0,0.2517,0.08051,0.003273
+Temperate Steppe Mountains,Shrubland: Native Sage Steppe,Dry,1.6341,1.6341,4.917,1.811,3.105,0.897,0.265,0.388,62.59,0,0.4456,0.2049,0.002955
+Temperate Steppe Mountains,Shrubland: Non-sage,Dry,1.8976,1.8976,5.433,2.329,3.105,1.169,0.417,0.466,69.17,0,0.4286,0.1979,0.003118
+Temperate Steppe Mountains,Shrubland: Post Fire Shrub,Dry,1.8976,1.8976,5.433,2.329,3.105,1.169,0.417,0.466,69.17,0,0.4286,0.1979,0.003118
 Temperate Steppe Mountains,Shrubland: Sage,Dry,0.6964,0.6964,4.838,1.423,3.415,0.89,0.462,0.427,31.44,0,0.2517,0.08051,0.002642
 Tropical/Subtropical Desert,Grassland: Annual,Dry,0.5219,0.5219,0.522,0.283,0.239,0.186,0,0.093,37.64,0,0.6034,0.3563,0.001092
 Tropical/Subtropical Desert,Grassland: Irrigated Perennial,Dry,2.8551,2.8551,3.7,1.7,2,1,0,0.5,83.04,0,0.6296,0.3824,0.002401
 Tropical/Subtropical Desert,Grassland: Natural Perennial,Dry,0.7509,0.7509,1.123,0.281,0.842,0.281,0,0.14,71.08,0,0.5,0.2657,0.001137
 Tropical/Subtropical Desert,Shrubland: Chaparral,Dry,1.0691,0.6892,5.891,3.682,2.209,2.343,1.289,0.167,10.04,0,0.3458,0.3039,0.004609
 Tropical/Subtropical Desert,Shrubland: Invaded Sage Steppe,Dry,0.9275,0.9275,2.6,0.9,1.7,1.116,0.123,0.3,36.6,0,0.2451,0.169,0.002763
-Tropical/Subtropical Desert,Shrubland: Native Sage Steppe,Dry,1.263,1.263,8.775,2.581,6.194,1.615,0.837,0.774,46.54,0,0.2517,0.08051,0.003238
-Tropical/Subtropical Desert,Shrubland: Non-sage,Dry,0.5288,0.5288,3.674,1.081,2.593,0.676,0.35,0.324,29.99,0,0.2517,0.08051,0.002104
-Tropical/Subtropical Desert,Shrubland: Post Fire Shrub,Dry,0.5288,0.5288,3.674,1.081,2.593,0.676,0.35,0.324,29.99,0,0.2517,0.08051,0.002104
+Tropical/Subtropical Desert,Shrubland: Native Sage Steppe,Dry,1.263,1.263,3.8,1.4,2.4,0.693,0.205,0.3,46.54,0,0.4456,0.2049,0.003072
+Tropical/Subtropical Desert,Shrubland: Non-sage,Dry,0.5288,0.5288,1.514,0.649,0.865,0.326,0.116,0.13,29.99,0,0.4286,0.1979,0.002005
+Tropical/Subtropical Desert,Shrubland: Post Fire Shrub,Dry,0.5288,0.5288,1.514,0.649,0.865,0.326,0.116,0.13,29.99,0,0.4286,0.1979,0.002005
 Tropical/Subtropical Desert,Shrubland: Sage,Dry,0.4894,0.4894,3.4,1,2.4,0.626,0.324,0.3,30.88,0,0.2517,0.08051,0.001891
 Tropical/Subtropical Steppe,Grassland: Annual,Dry,1.871,1.871,1.871,1.016,0.855,0.668,0,0.334,67.53,0,0.6034,0.3563,0.002183
 Tropical/Subtropical Steppe,Grassland: Irrigated Perennial,Dry,2.8551,2.8551,3.7,1.7,2,1,0,0.5,83.04,0,0.6296,0.3824,0.002401
 Tropical/Subtropical Steppe,Grassland: Natural Perennial,Dry,2.7654,2.7654,4.135,1.034,3.101,1.034,0,0.517,71.3,0,0.5,0.2657,0.004172
 Tropical/Subtropical Steppe,Shrubland: Chaparral,Dry,3.194,2.0591,17.6,11,6.6,7,3.85,0.5,39.74,0,0.3458,0.3039,0.003479
 Tropical/Subtropical Steppe,Shrubland: Invaded Sage Steppe,Dry,0.9275,0.9275,2.6,0.9,1.7,1.116,0.123,0.3,36.6,0,0.2451,0.169,0.002763
-Tropical/Subtropical Steppe,Shrubland: Native Sage Steppe,Dry,0.7763,0.7763,5.393,1.586,3.807,0.993,0.514,0.476,44.42,0,0.2517,0.08051,0.002085
-Tropical/Subtropical Steppe,Shrubland: Non-sage,Dry,1.7487,1.7487,12.149,3.573,8.576,2.236,1.159,1.072,52.19,0,0.2517,0.08051,0.003997
-Tropical/Subtropical Steppe,Shrubland: Post Fire Shrub,Dry,1.7487,1.7487,12.149,3.573,8.576,2.236,1.159,1.072,52.19,0,0.2517,0.08051,0.003997
+Tropical/Subtropical Steppe,Shrubland: Native Sage Steppe,Dry,0.7763,0.7763,2.336,0.861,1.475,0.426,0.126,0.184,44.42,0,0.4456,0.2049,0.001978
+Tropical/Subtropical Steppe,Shrubland: Non-sage,Dry,1.7487,1.7487,5.007,2.146,2.861,1.078,0.384,0.429,52.19,0,0.4286,0.1979,0.003808
+Tropical/Subtropical Steppe,Shrubland: Post Fire Shrub,Dry,1.7487,1.7487,5.007,2.146,2.861,1.078,0.384,0.429,52.19,0,0.4286,0.1979,0.003808
 Tropical/Subtropical Steppe,Shrubland: Sage,Dry,0.4894,0.4894,3.4,1,2.4,0.626,0.324,0.3,30.88,0,0.2517,0.08051,0.001891
 Tropical/Subtropical Steppe Mountains,Grassland: Annual,Dry,1.0264,1.0264,1.026,0.557,0.469,0.366,0,0.183,60.32,0,0.6034,0.3563,0.001341
 Tropical/Subtropical Steppe Mountains,Grassland: Irrigated Perennial,Dry,2.8551,2.8551,3.7,1.7,2,1,0,0.5,83.04,0,0.6296,0.3824,0.002401
 Tropical/Subtropical Steppe Mountains,Grassland: Natural Perennial,Dry,1.2142,1.2142,1.816,0.454,1.362,0.454,0,0.227,39.08,0,0.5,0.2657,0.003342
 Tropical/Subtropical Steppe Mountains,Shrubland: Chaparral,Dry,1.2943,0.8344,7.132,4.458,2.675,2.837,1.56,0.203,17.99,0,0.3458,0.3039,0.003115
 Tropical/Subtropical Steppe Mountains,Shrubland: Invaded Sage Steppe,Dry,0.9275,0.9275,2.6,0.9,1.7,1.116,0.123,0.3,36.6,0,0.2451,0.169,0.002763
-Tropical/Subtropical Steppe Mountains,Shrubland: Native Sage Steppe,Dry,1.2596,1.2596,8.751,2.574,6.177,1.611,0.835,0.772,59.34,0,0.2517,0.08051,0.002533
-Tropical/Subtropical Steppe Mountains,Shrubland: Non-sage,Dry,1.0276,1.0276,7.139,2.1,5.04,1.314,0.681,0.63,32.98,0,0.2517,0.08051,0.003717
-Tropical/Subtropical Steppe Mountains,Shrubland: Post Fire Shrub,Dry,1.0276,1.0276,7.139,2.1,5.04,1.314,0.681,0.63,32.98,0,0.2517,0.08051,0.003717
+Tropical/Subtropical Steppe Mountains,Shrubland: Native Sage Steppe,Dry,1.2596,1.2596,3.79,1.396,2.394,0.691,0.204,0.299,59.34,0,0.4456,0.2049,0.002403
+Tropical/Subtropical Steppe Mountains,Shrubland: Non-sage,Dry,1.0276,1.0276,2.942,1.261,1.681,0.633,0.226,0.252,32.98,0,0.4286,0.1979,0.003542
+Tropical/Subtropical Steppe Mountains,Shrubland: Post Fire Shrub,Dry,1.0276,1.0276,2.942,1.261,1.681,0.633,0.226,0.252,32.98,0,0.4286,0.1979,0.003542
 Tropical/Subtropical Steppe Mountains,Shrubland: Sage,Dry,0.4894,0.4894,3.4,1,2.4,0.626,0.324,0.3,30.88,0,0.2517,0.08051,0.001891
 Warm Continental,Grassland: Annual,Moist,2.8026,2.8026,2.803,1.521,1.281,1,0,0.5,58.41,0,0.6034,0.3563,0.003781
 Warm Continental,Grassland: Irrigated Perennial,Moist,2.8551,2.8551,3.7,1.7,2,1,0,0.5,83.04,0,0.6296,0.3824,0.002401
 Warm Continental,Grassland: Natural Perennial,Moist,2.546,2.546,3.807,0.952,2.855,0.952,0,0.476,89.49,0,0.5,0.2657,0.003061
 Warm Continental,Shrubland: Chaparral,Moist,3.194,2.0591,17.6,11,6.6,7,3.85,0.5,39.74,0,0.3458,0.3039,0.003479
 Warm Continental,Shrubland: Invaded Sage Steppe,Moist,0.9275,0.9275,2.6,0.9,1.7,1.116,0.123,0.3,36.6,0,0.2451,0.169,0.002763
-Warm Continental,Shrubland: Native Sage Steppe,Moist,1.263,1.263,8.775,2.581,6.194,1.615,0.837,0.774,46.54,0,0.2517,0.08051,0.003238
-Warm Continental,Shrubland: Non-sage,Moist,2.8138,2.8138,19.549,5.75,13.799,3.598,1.865,1.725,95.65,0,0.2517,0.08051,0.00351
-Warm Continental,Shrubland: Post Fire Shrub,Moist,2.8138,2.8138,19.549,5.75,13.799,3.598,1.865,1.725,95.65,0,0.2517,0.08051,0.00351
+Warm Continental,Shrubland: Native Sage Steppe,Moist,1.263,1.263,3.8,1.4,2.4,0.693,0.205,0.3,46.54,0,0.4456,0.2049,0.003072
+Warm Continental,Shrubland: Non-sage,Moist,2.8138,2.8138,8.057,3.453,4.604,1.734,0.619,0.691,95.65,0,0.4286,0.1979,0.003344
+Warm Continental,Shrubland: Post Fire Shrub,Moist,2.8138,2.8138,8.057,3.453,4.604,1.734,0.619,0.691,95.65,0,0.4286,0.1979,0.003344
 Warm Continental,Shrubland: Sage,Moist,0.4894,0.4894,3.4,1,2.4,0.626,0.324,0.3,30.88,0,0.2517,0.08051,0.001891
 Warm Continental Mountains,Grassland: Annual,Moist,2.8026,2.8026,2.803,1.521,1.281,1,0,0.5,58.41,0,0.6034,0.3563,0.003781
 Warm Continental Mountains,Grassland: Irrigated Perennial,Moist,2.8551,2.8551,3.7,1.7,2,1,0,0.5,83.04,0,0.6296,0.3824,0.002401
 Warm Continental Mountains,Grassland: Natural Perennial,Moist,0.7389,0.7389,1.105,0.276,0.829,0.276,0,0.138,172.45,0,0.5,0.2657,0.0004609
 Warm Continental Mountains,Shrubland: Chaparral,Moist,3.194,2.0591,17.6,11,6.6,7,3.85,0.5,39.74,0,0.3458,0.3039,0.003479
 Warm Continental Mountains,Shrubland: Invaded Sage Steppe,Moist,0.9275,0.9275,2.6,0.9,1.7,1.116,0.123,0.3,36.6,0,0.2451,0.169,0.002763
-Warm Continental Mountains,Shrubland: Native Sage Steppe,Moist,1.263,1.263,8.775,2.581,6.194,1.615,0.837,0.774,46.54,0,0.2517,0.08051,0.003238
-Warm Continental Mountains,Shrubland: Non-sage,Moist,1.2224,1.2224,8.493,2.498,5.995,1.563,0.81,0.749,44.83,0,0.2517,0.08051,0.003253
-Warm Continental Mountains,Shrubland: Post Fire Shrub,Moist,1.2224,1.2224,8.493,2.498,5.995,1.563,0.81,0.749,44.83,0,0.2517,0.08051,0.003253
+Warm Continental Mountains,Shrubland: Native Sage Steppe,Moist,1.263,1.263,3.8,1.4,2.4,0.693,0.205,0.3,46.54,0,0.4456,0.2049,0.003072
+Warm Continental Mountains,Shrubland: Non-sage,Moist,1.2224,1.2224,3.5,1.5,2,0.753,0.269,0.3,44.83,0,0.4286,0.1979,0.003099
+Warm Continental Mountains,Shrubland: Post Fire Shrub,Moist,1.2224,1.2224,3.5,1.5,2,0.753,0.269,0.3,44.83,0,0.4286,0.1979,0.003099
 Warm Continental Mountains,Shrubland: Sage,Moist,0.4894,0.4894,3.4,1,2.4,0.626,0.324,0.3,30.88,0,0.2517,0.08051,0.001891
