@@ -2,6 +2,37 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## 1.2.3 - 2026-11-10
+
+A Build fix for machines with less memory than cores.
+
+**Upgrading:** install `lucasCore-1.2.3.ssimpkg`. There are no schema changes from 1.2.0, so a 1.2 library needs no update; switch
+its lucasCore package to 1.2.3 (`SyncroSim.Console.exe --add --package --pkg=lucasCore --ver=1.2.3 --lib=<library.ssim>`).
+Results are as in 1.2.2; only how many parallel workers stages 5 and 6 start changes.
+
+### Fixed
+- Build stage 5 (and stage 6): the parallel NLCD steps start no more workers than the free memory allows (2 GB each), and each
+  worker's terra memory share is divided among them. Left at terra's own share, every worker planned on most of the free memory,
+  and on a machine with less memory than cores stage 5 failed with `std::bad_alloc`. tests/unit-par-workers.R checks it.
+
+## 1.2.2 - 2026-11-10
+
+USFS forest type tiles kept whole in the data home, and a Data Download fix for networks that block remote reads of Box.
+
+**Upgrading:** install `lucasCore-1.2.2.ssimpkg`. There are no schema changes from 1.2.0, so a 1.2 library needs no update; switch
+its lucasCore package to 1.2.2 (`SyncroSim.Console.exe --add --package --pkg=lucasCore --ver=1.2.2 --lib=<library.ssim>`).
+Only the Data Download changes; Builds and their results are as in 1.2.1.
+
+### Changed
+- Data Download, USFS forest type groups: each FIA region's tile is kept whole at the top of the data home, like TreeMap, and only
+  the tiles a study area touches are fetched; a second study area in the same region reads the tile already there. A region
+  downloaded earlier keeps reading its clipped copy. A tile's zip (any name) or its `<REGION>_ForestType.tif` saved by hand in
+  `<home>/supplied` is used instead of fetching.
+
+### Fixed
+- Data Download, USFS forest type groups: on a network where GDAL cannot read the Box zips remotely, the stage stopped with "file
+  does not exist". It now fetches every tile whose extent touches the study area instead.
+
 ## 1.2.1 - 2026-11-10
 
 Grass and shrub live carbon fitted to field biomass, and California's crop mix filled where a county's report leaves a crop out.

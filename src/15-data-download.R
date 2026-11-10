@@ -8,7 +8,7 @@
 # (Data Sources columns), blank = every one src/download-sources.R can fetch. Check only lists what would download, and how big.
 # Download Results gets one row per dataset; a failed dataset does not stop the others.
 # Home layout (plan, "Second study areas: home layout"): By region (the default) writes the region's clips into
-# <home>/regions/<Region name>/ (blank = from the Study Area units) and the datasets kept whole (FIA, PRISM, LOCA2, FPA-FOD, TreeMap, CDL, tidal marsh NPP)
+# <home>/regions/<Region name>/ (blank = from the Study Area units) and the datasets kept whole (FIA, PRISM, LOCA2, FPA-FOD, TreeMap, CDL, tidal marsh NPP, USFS forest type tiles)
 # at the top, shared by every region; National ignores the Study Area and keeps every dataset whole at the top. Write-once
 # (src/download.R): no file in the home is ever replaced, so a second region never changes what another library read.
 # The Stratum Sources presets' polygons (states, counties, watersheds, ecoregions, pyromes, federal lands, GAP status) are fetched

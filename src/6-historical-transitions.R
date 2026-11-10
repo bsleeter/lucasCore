@@ -187,7 +187,7 @@ dl <- data.table(Timestep = integer(), TransitionGroupId = character(), Source =
 if (nrow(fire) || nrow(lfg) || nrow(lcg)) {
   b <- grid_blocks(rast(nf[[1]]), L, P)
   wy <- c(y0, yrs)   # the start year's fire is needed for the first year's clearcut burn test
-  ncl <- max(1, min(length(wy), 40, detectCores() - 2))
+  ncl <- max(1L, min(par_workers(length(wy), cap = 40), detectCores() - 2L))
   args <- list(clear = clear_syncrosim_proj, memfrac = 0.6 / ncl, pf = ic$StratumFileName[1], E = as.vector(b$ext), fact = b$fact, td = TD(),
                nf = as.list(nf), mt = as.list(mt), lf = lf, fire_groups = fire$TransitionGroupId, fire_codes = lapply(fire$Classes, codes), lf_groups = lfg$TransitionGroupId,
                lc = as.list(lc), lc_groups = lcg$TransitionGroupId, lc_code = lc_code, lc_kind = lc_kind, y0 = y0, y1 = y1)
