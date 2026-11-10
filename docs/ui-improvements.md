@@ -978,6 +978,15 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     - Still to do: an eastern test library (Chesapeake and Suffolk, Virginia: the Great Dismal Swamp with Lake Drummond and the drained farmland east of it; chosen 2026-11-10) through Data Download, Build and a historical
       run; rerun `tools/calibrate-stem-turnover.R`, `make_co2_ecm_share.R` and `calibrate-harvest-age.R` on the split conditions
       (the twins hold the upland values until then); merge to main and release 1.3.0.
+    - Great Dismal Swamp test (library `Great Dismal Swamp`, Build result 7, 2026-11-10): the Histosol share needed its own home
+      folder (`soils-terrain/histosol/*.tif`; written into a folder of its own name, stage 8 could not open it). Stage 5 gave 34,386
+      woody wetland cells a twin (65% already of a twin's group; the loblolly, oak/hickory and oak/pine cells -> Oak/Gum/Cypress).
+      Stage 8: 14,965 of 87,557 land cells at least half organic, nearly all Oak/Gum/Cypress (mean share 0.44). Fault found: the
+      Oak/Gum/Cypress twin started at 263 Mg C/ha of soil against its gNATSGO target of 1,066, because stage 4's spin-up burned
+      peat in every fire at full strength while stage 3 calibrated without it; stage 4 now leaves the peat-fire flows out
+      (`PEAT_FIRE_FLOWS`, `src/flows.R`). Starting soil stays the class mean (user, 2026-11-10: "just start each cell the same";
+      per-cell gNATSGO soil was weighed and set aside, since cells away from the class balance drift toward it during a run).
+      To do: Build again and check the twins' starting soil against the target.
   - **Known limits:** mineral and organic soil are not separated within a class (oak/gum/cypress mixes both); scrub-shrub and
     pocosin cells get a tree curve; cells with no forest type pixel take a neighbour's type, which may be upland; FIA soil carbon is
     modelled, so soil targets stay gNATSGO (which overstates organic wetland soils by about 35%, Uhran et al. 2021). New runs will

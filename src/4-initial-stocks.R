@@ -27,6 +27,7 @@ setnames(cc, c("StratumId", "StateClassId"), c("Stratum", "StateClass"))
 fo <- fread(pkg_file("defaults", "stockflow", "stsim_FlowOrder.csv"))
 # the event flows stage 3 wrote (the LUCAS defaults plus its per-forest-type fire rows), so the spin-up disturbs as the model will
 ev <- as.data.table(datasheet(scn, "stsim_FlowPathway", optional = TRUE, lookupsAsFactors = FALSE))[!is.na(TransitionGroupId)]
+ev <- ev[!FlowTypeId %in% PEAT_FIRE_FLOWS]   # as stage 3 calibrated (src/flows.R)
 if (!nrow(ev)) fail("no transition-triggered flow pathways: run stage 3 first")
 LAST <- c(Fire = "Fire: High Severity [Type]", Clearcut = "Forest Harvest: Forest Clearcut [Type]")
 # the cells stage 3 calibrated: the study area's ecodivisions x every forest type (all of CONUS when stage 3 ran without a study area)
