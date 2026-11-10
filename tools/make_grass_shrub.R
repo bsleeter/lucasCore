@@ -102,7 +102,8 @@ lit_rates <- function(cls, moisture, shares = NULL) {
   set(TY("Biomass Turnover: Foliage -> AG Very Fast"), if (identical(r$kFoliage, "dieback")) 1 else frac(g("kFoliage")))
   if (!is.na(g("kWood"))) { fw <- frac(g("kWood")); s <- if (identical(r$SnagShareOfWood, "fit")) 0.5 else g("SnagShareOfWood")
     set(TY("Biomass Turnover: Other Wood -> Snag Branches"), fw * s); set(TY("Biomass Turnover: Other Wood -> AG Fast"), fw * (1 - s)) }
-  set(TY("Biomass Turnover: Fine Roots -> BG Very Fast"), frac(g(if (moisture == "Moist") "kFineRootMoist" else "kFineRootDry")))
+  fk <- if (moisture == "Moist") "kFineRootMoist" else "kFineRootDry"
+  set(TY("Biomass Turnover: Fine Roots -> BG Very Fast"), if (identical(r[[fk]], "dieback")) 1 else frac(g(fk)))   # dieback: annual grass roots
   if (!is.na(g("kCoarseRoot"))) set(TY("Biomass Turnover: Coarse Roots -> BG Fast"), frac(g("kCoarseRoot")))
   two <- function(pool, from_to_slow, k, em) { f <- frac(k); set(TY(sprintf("Emission: %s -> Atmosphere", pool)), f * em); set(TY(sprintf("Decay: %s", from_to_slow)), f * (1 - em)) }
   two("AG Very Fast", "AG Very Fast -> AG Slow", 0.5, EM_SHARE[["AGVF"]])                      # solved below
@@ -123,6 +124,35 @@ loss_of <- function(p, m, pool) { g <- intersect(paste(unique(p[FromStockTypeId 
 # the litter target counts leaf and fine litter (AG very fast) for grass and the sage family (user 2026-11-06: Nagy et al. 2021 measured
 # litter; fine woody debris follows its literature rate on its own), and AG very fast + fast for chaparral (its litter stocks include
 # fine woody litter: Bohlman 2018, Riggan 1988)
+# ---- live stocks fitted to literature (to-do 55; report "Chaparral NPP and shrub stocks", user 2026-11-09: RAP NPP for every class,
+# stocks fitted to the best literature estimates) --------------------------------------------------------------------------------
+# A class with AgLiveTarget and RootLiveTarget (Mg C/ha of live carbon at the class's CONUS mean NPP; grass aboveground = peak, which a
+# foliage pool that dies back each year holds at the year's end) gets the rates that hold them:
+#   grass, roots turning over: foliage share = AgLive / NPP, fine roots the rest; fine-root turnover solved for RootLive
+#   grass, roots dying back (annual): every pool is the year's growth, so only the split is fitted: foliage share = AgLive / (AgLive +
+#                RootLive); the stocks then follow NPP (RAP's NPP is above the field total for annual grass, report section 3)
+#   shrub: wood turnover solved so foliage + wood = AgLive (foliage turnover kept: it is measured); coarse-root turnover so fine + coarse
+#          roots = RootLive (fine-root turnover kept)
+# Each solved rate is printed with the literature value it replaces, as a check on plausibility.
+fit_stocks <- function(cls, mo, p, npp) {
+  r <- params_of(cls); ag <- suppressWarnings(as.numeric(r$AgLiveTarget)); rt <- suppressWarnings(as.numeric(r$RootLiveTarget))
+  if (is.na(ag) || is.na(rt) || !is.na(r$RatesOf)) return(lit_rates(cls, mo))
+  grass <- identical(r$kFoliage, "dieback"); fk <- if (mo == "Moist") "kFineRootMoist" else "kFineRootDry"
+  if (grass) {
+    a <- if (identical(r[[fk]], "dieback")) ag / (ag + rt) else ag / npp
+    if (a <= 0 || a >= 1) stop(sprintf("%s: aboveground target %.2f against NPP %.2f leaves no share for roots", cls, ag, npp))
+    m <- lit_rates(cls, mo, shares = c(Foliage = a, Wood = 0, Fine = 1 - a, Coarse = 0))
+    if (!identical(r[[fk]], "dieback")) m <- nf_fit_pool(p, m, memb, ord, npp, FR, rt, only = TY("Biomass Turnover: Fine Roots -> BG Very Fast"))$mult
+    cat(sprintf("  %s (%s): foliage share %.3f (was %s), fine-root turnover %.3f/yr (was %s)\n", cls, mo, a, r$ShareFoliage,
+                -log(1 - min(m[FlowGroupId == TY("Biomass Turnover: Fine Roots -> BG Very Fast"), Value], 1 - 1e-9)), r[[fk]]))
+    return(m) }
+  m <- lit_rates(cls, mo)
+  wg <- c(TY("Biomass Turnover: Other Wood -> Snag Branches"), TY("Biomass Turnover: Other Wood -> AG Fast"))
+  m <- nf_fit_pool(p, m, memb, ord, npp, WOOD, ag, over = c(FOL, WOOD), only = wg)$mult
+  m <- nf_fit_pool(p, m, memb, ord, npp, CR, rt, over = c(FR, CR), only = TY("Biomass Turnover: Coarse Roots -> BG Fast"))$mult
+  kw <- -log(1 - sum(m[FlowGroupId %in% wg, Value])); kc <- -log(1 - m[FlowGroupId == TY("Biomass Turnover: Coarse Roots -> BG Fast"), Value])
+  cat(sprintf("  %s (%s): wood turnover %.3f/yr (was %s), coarse-root turnover %.3f/yr (was %s)\n", cls, mo, kw, r$kWood, kc, r$kCoarseRoot))
+  m }
 fit_litter_slow <- function(p, m, npp, r) {
   m <- nf_fit_pool(p, m, memb, ord, npp, AGVF, as.numeric(r$AgLitter), over = if (identical(r$StateClassId, "Shrubland: Chaparral")) c(AGVF, AGF) else AGVF)$mult
   nf_fit_pool(p, m, memb, ord, npp, AGS, as.numeric(r$AgSlow), only = TY("Emission: AG Slow -> Atmosphere"))$mult }
@@ -232,7 +262,7 @@ own_rates <- lit[is.na(RatesOf), StateClassId]
 for (cls in intersect(GS, own_rates)) for (mo in unique(tg$Moisture)) {
   p <- path_of(ECO[1], cls)
   if (cls == CHAP) { if (is.null(chap_ref)) chap_ref <- chap_rates(p); refs[[paste(cls, mo)]] <- chap_ref$mult; next }
-  refs[[paste(cls, mo)]] <- fit_litter_slow(p, lit_rates(cls, mo), refnpp[[cls]], params_of(cls)) }
+  refs[[paste(cls, mo)]] <- fit_litter_slow(p, fit_stocks(cls, mo, p, refnpp[[cls]]), refnpp[[cls]], params_of(cls)) }
 # a class with RatesOf takes that class's rates whole, its solved litter and AG Slow rates included (user 2026-11-06: Native Sage Steppe
 # uses Sage's turnover, so its biomass and litter follow its NPP; its AgLitter row is then not used); only its soil decay is its own
 src_of <- function(cls) { r <- lit[StateClassId == cls, RatesOf]; if (is.na(r)) cls else src_of(r) }

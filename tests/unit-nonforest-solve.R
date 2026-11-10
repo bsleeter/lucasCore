@@ -82,8 +82,19 @@ sa <- rd("stockflow", "shrub-age.csv"); SAGE <- sa$StateClassId; BYAGE <- c(CHAP
 check("a grass and shrub target and fit for every ecodivision x class", nrow(gt) == uniqueN(gm$StratumId) * length(GS) && nrow(gf) == nrow(gt))
 sh <- function(cls) { r <- lit[StateClassId == cls]; while (!is.na(r$RatesOf)) r <- lit[StateClassId == r$RatesOf]; as.numeric(c(r$ShareFoliage, r$ShareWood, r$ShareFineRoot, r$ShareCoarseRoot)) }
 NGG <- paste("Net Growth Non Forest: Atmosphere ->", c("Foliage", "Other Wood", "Fine Roots", "Coarse Roots"), "[Type]")
-ok_sh <- all(vapply(setdiff(GS, BYAGE), function(cls) { x <- gm[StateClassId == cls & is.na(AgeMin) & FlowGroupId %in% NGG]; all(abs(as.numeric(x$Value[match(NGG, x$FlowGroupId)]) - sh(cls)) < 1e-6) }, TRUE))
+# (to-do 55, 2026-11-09) a grass class with live-stock targets has its split fitted to them (tools/make_grass_shrub.R fit_stocks): foliage
+# and fine roots only, summing to 1; every other class keeps the table's split
+fitted <- lit[!is.na(AgLiveTarget) & kFoliage == "dieback", StateClassId]
+ok_sh <- all(vapply(setdiff(GS, c(BYAGE, fitted)), function(cls) { x <- gm[StateClassId == cls & is.na(AgeMin) & FlowGroupId %in% NGG]; all(abs(as.numeric(x$Value[match(NGG, x$FlowGroupId)]) - sh(cls)) < 1e-6) }, TRUE))
 check("each class's growth split is the literature table's (no IBIS share)", ok_sh)
+ok_fit <- all(vapply(fitted, function(cls) { x <- gm[StateClassId == cls & is.na(AgeMin) & FlowGroupId %in% NGG]; v <- as.numeric(x$Value[match(NGG, x$FlowGroupId)])
+  all(!is.na(v)) && all(v >= 0) && all(abs(tapply(v, rep(x$StratumId[1], 4), sum) - 1) < 1e-6) && v[2] == 0 && v[4] == 0 }, TRUE))
+check("a grass class fitted to live-stock targets grows foliage and fine roots only, summing to 1", length(fitted) > 0 && ok_fit)
+# the fitted stocks: at the class's CONUS mean NPP, live carbon meets the targets (annual grass: the ratio, its stocks following NPP)
+fs <- gf[StateClassId %in% lit[!is.na(AgLiveTarget), StateClassId]]
+fs[, `:=`(ag = as.numeric(lit$AgLiveTarget[match(StateClassId, lit$StateClassId)]), rt = as.numeric(lit$RootLiveTarget[match(StateClassId, lit$StateClassId)]))]
+fs[, ratio_ok := abs(as.numeric(Aboveground) / as.numeric(Roots) - ag / rt) < 0.02 * ag / rt]
+check("every class with live-stock targets holds their aboveground : root ratio in every ecodivision", nrow(fs) > 0 && all(fs$ratio_ok))
 ngg <- ng[StateClassId %in% setdiff(GS, BYAGE)]
 check("grass and shrub Net Growth = RAP NPP (chaparral: by age)", all(merge(ngg[, .(StratumId, StateClassId, v = as.numeric(Value))], gt[, .(StratumId, StateClassId, t = as.numeric(NPP))])[, abs(v - t) < 1e-9]) &&
       ng[StateClassId == CHAP, uniqueN(AgeMin)] == 101)

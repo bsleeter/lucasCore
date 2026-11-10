@@ -5,10 +5,10 @@ Hot Continental,Grassland: Annual,Carbon Initial Conditions: Aboveground Slow,,,
 Hot Continental,Grassland: Annual,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Hot Continental,Grassland: Annual,Carbon Initial Conditions: Belowground Fast,,,0
 Hot Continental,Grassland: Annual,Carbon Initial Conditions: Belowground Slow,,,58.4075
-Hot Continental,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.3823
+Hot Continental,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.2638
 Hot Continental,Grassland: Annual,Carbon Initial Conditions: Deep Soil,,,0
-Hot Continental,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,2.2168
-Hot Continental,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.4013
+Hot Continental,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,1.2812
+Hot Continental,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.5214
 Hot Continental,Grassland: Annual,Carbon Initial Conditions: Snag Branch,,,0
 Hot Continental,Grassland: Annual,Carbon Initial Conditions: Snag Stem,,,0
 Hot Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -17,10 +17,10 @@ Hot Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveg
 Hot Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Hot Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Hot Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Slow,,,83.0379
-Hot Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.978
+Hot Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.7914
 Hot Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Hot Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,3.164
-Hot Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.4276
+Hot Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,2
+Hot Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.7
 Hot Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Hot Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Hot Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -29,10 +29,10 @@ Hot Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Abovegro
 Hot Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,0.9414
 Hot Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Hot Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Slow,,,75.1714
-Hot Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,1.991
+Hot Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,1.918
 Hot Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Hot Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,4.4393
-Hot Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,0.8814
+Hot Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,2.8242
+Hot Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,0.9414
 Hot Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Hot Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Hot Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -41,10 +41,10 @@ Hot Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Abovegrou
 Hot Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Hot Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Fast,,,0
 Hot Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Slow,,,58.4075
-Hot Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.3823
+Hot Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.2638
 Hot Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Deep Soil,,,0
-Hot Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,2.2168
-Hot Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.4013
+Hot Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,1.2812
+Hot Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.5214
 Hot Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Snag Branch,,,0
 Hot Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Snag Stem,,,0
 Hot Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -53,10 +53,10 @@ Hot Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditio
 Hot Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Hot Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Hot Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Slow,,,83.0379
-Hot Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.978
+Hot Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.7914
 Hot Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Hot Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,3.164
-Hot Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.4276
+Hot Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,2
+Hot Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.7
 Hot Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Hot Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Hot Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -65,10 +65,10 @@ Hot Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions
 Hot Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1.2167
 Hot Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Hot Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Slow,,,36.2931
-Hot Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,2.5731
+Hot Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,2.4788
 Hot Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Hot Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,5.7373
-Hot Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,1.1391
+Hot Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,3.65
+Hot Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,1.2167
 Hot Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Hot Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Marine,Grassland: Annual,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -77,10 +77,10 @@ Marine,Grassland: Annual,Carbon Initial Conditions: Aboveground Slow,,,0.5
 Marine,Grassland: Annual,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Marine,Grassland: Annual,Carbon Initial Conditions: Belowground Fast,,,0
 Marine,Grassland: Annual,Carbon Initial Conditions: Belowground Slow,,,58.4075
-Marine,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.3823
+Marine,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.2638
 Marine,Grassland: Annual,Carbon Initial Conditions: Deep Soil,,,0
-Marine,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,2.2168
-Marine,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.4013
+Marine,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,1.2812
+Marine,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.5214
 Marine,Grassland: Annual,Carbon Initial Conditions: Snag Branch,,,0
 Marine,Grassland: Annual,Carbon Initial Conditions: Snag Stem,,,0
 Marine,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -89,10 +89,10 @@ Marine,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Slo
 Marine,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Marine,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Marine,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Slow,,,83.0379
-Marine,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.978
+Marine,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.7914
 Marine,Grassland: Irrigated Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Marine,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,3.164
-Marine,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.4276
+Marine,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,2
+Marine,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.7
 Marine,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Marine,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Marine,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -101,10 +101,10 @@ Marine,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Slow,
 Marine,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1.1507
 Marine,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Marine,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Slow,,,146.8058
-Marine,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,2.4336
+Marine,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,2.3443
 Marine,Grassland: Natural Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Marine,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,5.4261
-Marine,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,1.0773
+Marine,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,3.452
+Marine,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,1.1507
 Marine,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Marine,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Marine Mountains,Grassland: Annual,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -113,10 +113,10 @@ Marine Mountains,Grassland: Annual,Carbon Initial Conditions: Aboveground Slow,,
 Marine Mountains,Grassland: Annual,Carbon Initial Conditions: Aboveground Very Fast,,,0.922
 Marine Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Fast,,,0
 Marine Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Slow,,,63.5862
-Marine Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.2745
+Marine Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.1653
 Marine Mountains,Grassland: Annual,Carbon Initial Conditions: Deep Soil,,,0
-Marine Mountains,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,2.044
-Marine Mountains,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.292
+Marine Mountains,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,1.1813
+Marine Mountains,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.4028
 Marine Mountains,Grassland: Annual,Carbon Initial Conditions: Snag Branch,,,0
 Marine Mountains,Grassland: Annual,Carbon Initial Conditions: Snag Stem,,,0
 Marine Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -125,10 +125,10 @@ Marine Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Above
 Marine Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Marine Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Marine Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Slow,,,83.0379
-Marine Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.978
+Marine Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.7914
 Marine Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Marine Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,3.164
-Marine Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.4276
+Marine Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,2
+Marine Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.7
 Marine Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Marine Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Marine Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -137,10 +137,10 @@ Marine Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Abovegr
 Marine Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,0.6934
 Marine Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Marine Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Slow,,,61.5611
-Marine Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,1.4666
+Marine Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,1.4128
 Marine Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Marine Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,3.27
-Marine Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,0.6492
+Marine Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,2.0803
+Marine Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,0.6934
 Marine Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Marine Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Mediterranean,Grassland: Annual,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -149,10 +149,10 @@ Mediterranean,Grassland: Annual,Carbon Initial Conditions: Aboveground Slow,,,0.
 Mediterranean,Grassland: Annual,Carbon Initial Conditions: Aboveground Very Fast,,,1.2924
 Mediterranean,Grassland: Annual,Carbon Initial Conditions: Belowground Fast,,,0
 Mediterranean,Grassland: Annual,Carbon Initial Conditions: Belowground Slow,,,65.9476
-Mediterranean,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.7865
+Mediterranean,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.6334
 Mediterranean,Grassland: Annual,Carbon Initial Conditions: Deep Soil,,,0
-Mediterranean,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,2.865
-Mediterranean,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.8111
+Mediterranean,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,1.6558
+Mediterranean,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.9663
 Mediterranean,Grassland: Annual,Carbon Initial Conditions: Snag Branch,,,0
 Mediterranean,Grassland: Annual,Carbon Initial Conditions: Snag Stem,,,0
 Mediterranean,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -161,10 +161,10 @@ Mediterranean,Grassland: Irrigated Perennial,Carbon Initial Conditions: Abovegro
 Mediterranean,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Mediterranean,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Mediterranean,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Slow,,,83.0379
-Mediterranean,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.978
+Mediterranean,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.7914
 Mediterranean,Grassland: Irrigated Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Mediterranean,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,3.164
-Mediterranean,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.4276
+Mediterranean,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,2
+Mediterranean,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.7
 Mediterranean,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Mediterranean,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Mediterranean,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -173,10 +173,10 @@ Mediterranean,Grassland: Natural Perennial,Carbon Initial Conditions: Abovegroun
 Mediterranean,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1.0406
 Mediterranean,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Mediterranean,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Slow,,,63.2373
-Mediterranean,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,2.2009
+Mediterranean,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,2.1202
 Mediterranean,Grassland: Natural Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Mediterranean,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,3.745
-Mediterranean,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,0.9743
+Mediterranean,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,3.1219
+Mediterranean,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,1.0406
 Mediterranean,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Mediterranean,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Mediterranean Mountains,Grassland: Annual,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -185,10 +185,10 @@ Mediterranean Mountains,Grassland: Annual,Carbon Initial Conditions: Aboveground
 Mediterranean Mountains,Grassland: Annual,Carbon Initial Conditions: Aboveground Very Fast,,,1.0081
 Mediterranean Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Fast,,,0
 Mediterranean Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Slow,,,58.8687
-Mediterranean Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.3935
+Mediterranean Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.2741
 Mediterranean Mountains,Grassland: Annual,Carbon Initial Conditions: Deep Soil,,,0
-Mediterranean Mountains,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,2.2349
-Mediterranean Mountains,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.4127
+Mediterranean Mountains,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,1.2916
+Mediterranean Mountains,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.5338
 Mediterranean Mountains,Grassland: Annual,Carbon Initial Conditions: Snag Branch,,,0
 Mediterranean Mountains,Grassland: Annual,Carbon Initial Conditions: Snag Stem,,,0
 Mediterranean Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -197,10 +197,10 @@ Mediterranean Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions
 Mediterranean Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Mediterranean Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Mediterranean Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Slow,,,83.0379
-Mediterranean Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.978
+Mediterranean Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.7914
 Mediterranean Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Mediterranean Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,3.164
-Mediterranean Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.4276
+Mediterranean Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,2
+Mediterranean Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.7
 Mediterranean Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Mediterranean Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Mediterranean Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -209,10 +209,10 @@ Mediterranean Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: 
 Mediterranean Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,0.7963
 Mediterranean Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Mediterranean Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Slow,,,54.3594
-Mediterranean Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,1.6841
+Mediterranean Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,1.6224
 Mediterranean Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Mediterranean Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,2.8657
-Mediterranean Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,0.7455
+Mediterranean Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,2.3889
+Mediterranean Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,0.7963
 Mediterranean Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Mediterranean Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Prairie,Grassland: Annual,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -221,10 +221,10 @@ Prairie,Grassland: Annual,Carbon Initial Conditions: Aboveground Slow,,,0.5
 Prairie,Grassland: Annual,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Prairie,Grassland: Annual,Carbon Initial Conditions: Belowground Fast,,,0
 Prairie,Grassland: Annual,Carbon Initial Conditions: Belowground Slow,,,58.4075
-Prairie,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.3823
+Prairie,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.2638
 Prairie,Grassland: Annual,Carbon Initial Conditions: Deep Soil,,,0
-Prairie,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,2.2168
-Prairie,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.4013
+Prairie,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,1.2812
+Prairie,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.5214
 Prairie,Grassland: Annual,Carbon Initial Conditions: Snag Branch,,,0
 Prairie,Grassland: Annual,Carbon Initial Conditions: Snag Stem,,,0
 Prairie,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -233,10 +233,10 @@ Prairie,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Sl
 Prairie,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Prairie,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Prairie,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Slow,,,83.0379
-Prairie,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.978
+Prairie,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.7914
 Prairie,Grassland: Irrigated Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Prairie,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,3.164
-Prairie,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.4276
+Prairie,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,2
+Prairie,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.7
 Prairie,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Prairie,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Prairie,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -245,10 +245,10 @@ Prairie,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Slow
 Prairie,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1.6096
 Prairie,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Prairie,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Slow,,,100.084
-Prairie,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,3.4043
+Prairie,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,3.2794
 Prairie,Grassland: Natural Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Prairie,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,7.5904
-Prairie,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,1.507
+Prairie,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,4.8289
+Prairie,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,1.6096
 Prairie,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Prairie,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Savanna,Grassland: Annual,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -257,10 +257,10 @@ Savanna,Grassland: Annual,Carbon Initial Conditions: Aboveground Slow,,,0.5
 Savanna,Grassland: Annual,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Savanna,Grassland: Annual,Carbon Initial Conditions: Belowground Fast,,,0
 Savanna,Grassland: Annual,Carbon Initial Conditions: Belowground Slow,,,58.4075
-Savanna,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.3823
+Savanna,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.2638
 Savanna,Grassland: Annual,Carbon Initial Conditions: Deep Soil,,,0
-Savanna,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,2.2168
-Savanna,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.4013
+Savanna,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,1.2812
+Savanna,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.5214
 Savanna,Grassland: Annual,Carbon Initial Conditions: Snag Branch,,,0
 Savanna,Grassland: Annual,Carbon Initial Conditions: Snag Stem,,,0
 Savanna,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -269,10 +269,10 @@ Savanna,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Sl
 Savanna,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Savanna,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Savanna,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Slow,,,83.0379
-Savanna,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.978
+Savanna,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.7914
 Savanna,Grassland: Irrigated Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Savanna,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,3.164
-Savanna,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.4276
+Savanna,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,2
+Savanna,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.7
 Savanna,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Savanna,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Savanna,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -281,10 +281,10 @@ Savanna,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Slow
 Savanna,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1.2588
 Savanna,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Savanna,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Slow,,,64.9381
-Savanna,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,2.6622
+Savanna,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,2.5646
 Savanna,Grassland: Natural Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Savanna,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,5.9359
-Savanna,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,1.1785
+Savanna,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,3.7764
+Savanna,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,1.2588
 Savanna,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Savanna,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Subtropical,Grassland: Annual,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -293,10 +293,10 @@ Subtropical,Grassland: Annual,Carbon Initial Conditions: Aboveground Slow,,,0.5
 Subtropical,Grassland: Annual,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Subtropical,Grassland: Annual,Carbon Initial Conditions: Belowground Fast,,,0
 Subtropical,Grassland: Annual,Carbon Initial Conditions: Belowground Slow,,,58.4075
-Subtropical,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.3823
+Subtropical,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.2638
 Subtropical,Grassland: Annual,Carbon Initial Conditions: Deep Soil,,,0
-Subtropical,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,2.2168
-Subtropical,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.4013
+Subtropical,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,1.2812
+Subtropical,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.5214
 Subtropical,Grassland: Annual,Carbon Initial Conditions: Snag Branch,,,0
 Subtropical,Grassland: Annual,Carbon Initial Conditions: Snag Stem,,,0
 Subtropical,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -305,10 +305,10 @@ Subtropical,Grassland: Irrigated Perennial,Carbon Initial Conditions: Abovegroun
 Subtropical,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Subtropical,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Subtropical,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Slow,,,83.0379
-Subtropical,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.978
+Subtropical,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.7914
 Subtropical,Grassland: Irrigated Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Subtropical,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,3.164
-Subtropical,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.4276
+Subtropical,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,2
+Subtropical,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.7
 Subtropical,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Subtropical,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Subtropical,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -317,10 +317,10 @@ Subtropical,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground 
 Subtropical,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1.097
 Subtropical,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Subtropical,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Slow,,,70.4275
-Subtropical,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,2.3201
+Subtropical,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,2.235
 Subtropical,Grassland: Natural Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Subtropical,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,5.173
-Subtropical,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,1.027
+Subtropical,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,3.291
+Subtropical,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,1.097
 Subtropical,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Subtropical,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Subtropical Mountains,Grassland: Annual,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -329,10 +329,10 @@ Subtropical Mountains,Grassland: Annual,Carbon Initial Conditions: Aboveground S
 Subtropical Mountains,Grassland: Annual,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Subtropical Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Fast,,,0
 Subtropical Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Slow,,,58.4075
-Subtropical Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.3823
+Subtropical Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.2638
 Subtropical Mountains,Grassland: Annual,Carbon Initial Conditions: Deep Soil,,,0
-Subtropical Mountains,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,2.2168
-Subtropical Mountains,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.4013
+Subtropical Mountains,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,1.2812
+Subtropical Mountains,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.5214
 Subtropical Mountains,Grassland: Annual,Carbon Initial Conditions: Snag Branch,,,0
 Subtropical Mountains,Grassland: Annual,Carbon Initial Conditions: Snag Stem,,,0
 Subtropical Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -341,10 +341,10 @@ Subtropical Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: 
 Subtropical Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Subtropical Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Subtropical Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Slow,,,83.0379
-Subtropical Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.978
+Subtropical Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.7914
 Subtropical Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Subtropical Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,3.164
-Subtropical Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.4276
+Subtropical Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,2
+Subtropical Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.7
 Subtropical Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Subtropical Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Subtropical Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -353,10 +353,10 @@ Subtropical Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Ab
 Subtropical Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1.6776
 Subtropical Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Subtropical Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Slow,,,51.6593
-Subtropical Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,3.5481
+Subtropical Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,3.418
 Subtropical Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Subtropical Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,7.9111
-Subtropical Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,1.5707
+Subtropical Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,5.0329
+Subtropical Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,1.6776
 Subtropical Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Subtropical Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Temperate Desert,Grassland: Annual,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -365,10 +365,10 @@ Temperate Desert,Grassland: Annual,Carbon Initial Conditions: Aboveground Slow,,
 Temperate Desert,Grassland: Annual,Carbon Initial Conditions: Aboveground Very Fast,,,0.4671
 Temperate Desert,Grassland: Annual,Carbon Initial Conditions: Belowground Fast,,,0
 Temperate Desert,Grassland: Annual,Carbon Initial Conditions: Belowground Slow,,,42.8466
-Temperate Desert,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,0.6457
+Temperate Desert,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,0.5903
 Temperate Desert,Grassland: Annual,Carbon Initial Conditions: Deep Soil,,,0
-Temperate Desert,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,1.0355
-Temperate Desert,Grassland: Annual,Carbon Initial Conditions: Foliage,,,0.6546
+Temperate Desert,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,0.5984
+Temperate Desert,Grassland: Annual,Carbon Initial Conditions: Foliage,,,0.7107
 Temperate Desert,Grassland: Annual,Carbon Initial Conditions: Snag Branch,,,0
 Temperate Desert,Grassland: Annual,Carbon Initial Conditions: Snag Stem,,,0
 Temperate Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -377,10 +377,10 @@ Temperate Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Above
 Temperate Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Temperate Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Temperate Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Slow,,,83.0379
-Temperate Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.978
+Temperate Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.7914
 Temperate Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Temperate Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,3.164
-Temperate Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.4276
+Temperate Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,2
+Temperate Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.7
 Temperate Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Temperate Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Temperate Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -389,10 +389,10 @@ Temperate Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Abovegr
 Temperate Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,0.4926
 Temperate Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Temperate Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Slow,,,46.8804
-Temperate Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,1.0417
+Temperate Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,1.0035
 Temperate Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Temperate Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,1.7726
-Temperate Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,0.4612
+Temperate Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,1.4777
+Temperate Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,0.4926
 Temperate Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Temperate Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Temperate Desert Mountains,Grassland: Annual,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -401,10 +401,10 @@ Temperate Desert Mountains,Grassland: Annual,Carbon Initial Conditions: Abovegro
 Temperate Desert Mountains,Grassland: Annual,Carbon Initial Conditions: Aboveground Very Fast,,,0.432
 Temperate Desert Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Fast,,,0
 Temperate Desert Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Slow,,,36.4392
-Temperate Desert Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,0.5971
+Temperate Desert Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,0.5459
 Temperate Desert Mountains,Grassland: Annual,Carbon Initial Conditions: Deep Soil,,,0
-Temperate Desert Mountains,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,0.9576
-Temperate Desert Mountains,Grassland: Annual,Carbon Initial Conditions: Foliage,,,0.6053
+Temperate Desert Mountains,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,0.5534
+Temperate Desert Mountains,Grassland: Annual,Carbon Initial Conditions: Foliage,,,0.6572
 Temperate Desert Mountains,Grassland: Annual,Carbon Initial Conditions: Snag Branch,,,0
 Temperate Desert Mountains,Grassland: Annual,Carbon Initial Conditions: Snag Stem,,,0
 Temperate Desert Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -413,10 +413,10 @@ Temperate Desert Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditi
 Temperate Desert Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Temperate Desert Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Temperate Desert Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Slow,,,83.0379
-Temperate Desert Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.978
+Temperate Desert Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.7914
 Temperate Desert Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Temperate Desert Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,3.164
-Temperate Desert Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.4276
+Temperate Desert Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,2
+Temperate Desert Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.7
 Temperate Desert Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Temperate Desert Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Temperate Desert Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -425,10 +425,10 @@ Temperate Desert Mountains,Grassland: Natural Perennial,Carbon Initial Condition
 Temperate Desert Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,0.384
 Temperate Desert Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Temperate Desert Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Slow,,,43.9989
-Temperate Desert Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.8122
+Temperate Desert Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.7824
 Temperate Desert Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Temperate Desert Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,1.3821
-Temperate Desert Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,0.3596
+Temperate Desert Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,1.1521
+Temperate Desert Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,0.384
 Temperate Desert Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Temperate Desert Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Temperate Steppe,Grassland: Annual,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -437,10 +437,10 @@ Temperate Steppe,Grassland: Annual,Carbon Initial Conditions: Aboveground Slow,,
 Temperate Steppe,Grassland: Annual,Carbon Initial Conditions: Aboveground Very Fast,,,0.9601
 Temperate Steppe,Grassland: Annual,Carbon Initial Conditions: Belowground Fast,,,0
 Temperate Steppe,Grassland: Annual,Carbon Initial Conditions: Belowground Slow,,,80.1103
-Temperate Steppe,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.3271
+Temperate Steppe,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.2133
 Temperate Steppe,Grassland: Annual,Carbon Initial Conditions: Deep Soil,,,0
-Temperate Steppe,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,2.1283
-Temperate Steppe,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.3454
+Temperate Steppe,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,1.23
+Temperate Steppe,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.4607
 Temperate Steppe,Grassland: Annual,Carbon Initial Conditions: Snag Branch,,,0
 Temperate Steppe,Grassland: Annual,Carbon Initial Conditions: Snag Stem,,,0
 Temperate Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -449,10 +449,10 @@ Temperate Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Above
 Temperate Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Temperate Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Temperate Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Slow,,,83.0379
-Temperate Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.978
+Temperate Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.7914
 Temperate Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Temperate Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,3.164
-Temperate Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.4276
+Temperate Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,2
+Temperate Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.7
 Temperate Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Temperate Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Temperate Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -461,10 +461,10 @@ Temperate Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Abovegr
 Temperate Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1.0092
 Temperate Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Temperate Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Slow,,,74.7035
-Temperate Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,2.1343
+Temperate Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,2.0561
 Temperate Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Temperate Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,3.6317
-Temperate Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,0.9448
+Temperate Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,3.0275
+Temperate Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,1.0092
 Temperate Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Temperate Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Temperate Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -473,10 +473,10 @@ Temperate Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Abovegro
 Temperate Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Aboveground Very Fast,,,0.7755
 Temperate Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Fast,,,0
 Temperate Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Slow,,,44.866
-Temperate Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.072
+Temperate Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,0.9801
 Temperate Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Deep Soil,,,0
-Temperate Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,1.7192
-Temperate Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.0868
+Temperate Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,0.9936
+Temperate Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.1799
 Temperate Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Snag Branch,,,0
 Temperate Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Snag Stem,,,0
 Temperate Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -485,10 +485,10 @@ Temperate Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditi
 Temperate Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Temperate Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Temperate Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Slow,,,83.0379
-Temperate Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.978
+Temperate Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.7914
 Temperate Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Temperate Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,3.164
-Temperate Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.4276
+Temperate Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,2
+Temperate Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.7
 Temperate Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Temperate Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Temperate Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -497,10 +497,10 @@ Temperate Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Condition
 Temperate Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,0.6805
 Temperate Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Temperate Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Slow,,,77.46
-Temperate Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,1.4392
+Temperate Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,1.3864
 Temperate Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Temperate Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,2.4489
-Temperate Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,0.6371
+Temperate Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,2.0415
+Temperate Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,0.6805
 Temperate Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Temperate Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Tropical/Subtropical Desert,Grassland: Annual,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -509,10 +509,10 @@ Tropical/Subtropical Desert,Grassland: Annual,Carbon Initial Conditions: Abovegr
 Tropical/Subtropical Desert,Grassland: Annual,Carbon Initial Conditions: Aboveground Very Fast,,,0.1862
 Tropical/Subtropical Desert,Grassland: Annual,Carbon Initial Conditions: Belowground Fast,,,0
 Tropical/Subtropical Desert,Grassland: Annual,Carbon Initial Conditions: Belowground Slow,,,37.6422
-Tropical/Subtropical Desert,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,0.2574
+Tropical/Subtropical Desert,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,0.2353
 Tropical/Subtropical Desert,Grassland: Annual,Carbon Initial Conditions: Deep Soil,,,0
-Tropical/Subtropical Desert,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,0.4128
-Tropical/Subtropical Desert,Grassland: Annual,Carbon Initial Conditions: Foliage,,,0.261
+Tropical/Subtropical Desert,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,0.2386
+Tropical/Subtropical Desert,Grassland: Annual,Carbon Initial Conditions: Foliage,,,0.2833
 Tropical/Subtropical Desert,Grassland: Annual,Carbon Initial Conditions: Snag Branch,,,0
 Tropical/Subtropical Desert,Grassland: Annual,Carbon Initial Conditions: Snag Stem,,,0
 Tropical/Subtropical Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -521,10 +521,10 @@ Tropical/Subtropical Desert,Grassland: Irrigated Perennial,Carbon Initial Condit
 Tropical/Subtropical Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Tropical/Subtropical Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Tropical/Subtropical Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Slow,,,83.0379
-Tropical/Subtropical Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.978
+Tropical/Subtropical Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.7914
 Tropical/Subtropical Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Tropical/Subtropical Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,3.164
-Tropical/Subtropical Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.4276
+Tropical/Subtropical Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,2
+Tropical/Subtropical Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.7
 Tropical/Subtropical Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Tropical/Subtropical Desert,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Tropical/Subtropical Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -533,10 +533,10 @@ Tropical/Subtropical Desert,Grassland: Natural Perennial,Carbon Initial Conditio
 Tropical/Subtropical Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,0.2807
 Tropical/Subtropical Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Tropical/Subtropical Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Slow,,,71.0755
-Tropical/Subtropical Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.5937
+Tropical/Subtropical Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.5719
 Tropical/Subtropical Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Tropical/Subtropical Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,1.0102
-Tropical/Subtropical Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,0.2628
+Tropical/Subtropical Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,0.8421
+Tropical/Subtropical Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,0.2807
 Tropical/Subtropical Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Tropical/Subtropical Desert,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Tropical/Subtropical Steppe,Grassland: Annual,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -545,10 +545,10 @@ Tropical/Subtropical Steppe,Grassland: Annual,Carbon Initial Conditions: Abovegr
 Tropical/Subtropical Steppe,Grassland: Annual,Carbon Initial Conditions: Aboveground Very Fast,,,0.6676
 Tropical/Subtropical Steppe,Grassland: Annual,Carbon Initial Conditions: Belowground Fast,,,0
 Tropical/Subtropical Steppe,Grassland: Annual,Carbon Initial Conditions: Belowground Slow,,,67.5253
-Tropical/Subtropical Steppe,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,0.9228
+Tropical/Subtropical Steppe,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,0.8437
 Tropical/Subtropical Steppe,Grassland: Annual,Carbon Initial Conditions: Deep Soil,,,0
-Tropical/Subtropical Steppe,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,1.4799
-Tropical/Subtropical Steppe,Grassland: Annual,Carbon Initial Conditions: Foliage,,,0.9355
+Tropical/Subtropical Steppe,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,0.8553
+Tropical/Subtropical Steppe,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.0157
 Tropical/Subtropical Steppe,Grassland: Annual,Carbon Initial Conditions: Snag Branch,,,0
 Tropical/Subtropical Steppe,Grassland: Annual,Carbon Initial Conditions: Snag Stem,,,0
 Tropical/Subtropical Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -557,10 +557,10 @@ Tropical/Subtropical Steppe,Grassland: Irrigated Perennial,Carbon Initial Condit
 Tropical/Subtropical Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Tropical/Subtropical Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Tropical/Subtropical Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Slow,,,83.0379
-Tropical/Subtropical Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.978
+Tropical/Subtropical Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.7914
 Tropical/Subtropical Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Tropical/Subtropical Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,3.164
-Tropical/Subtropical Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.4276
+Tropical/Subtropical Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,2
+Tropical/Subtropical Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.7
 Tropical/Subtropical Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Tropical/Subtropical Steppe,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Tropical/Subtropical Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -569,10 +569,10 @@ Tropical/Subtropical Steppe,Grassland: Natural Perennial,Carbon Initial Conditio
 Tropical/Subtropical Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1.0338
 Tropical/Subtropical Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Tropical/Subtropical Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Slow,,,71.3026
-Tropical/Subtropical Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,2.1864
+Tropical/Subtropical Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,2.1063
 Tropical/Subtropical Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Tropical/Subtropical Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,3.7204
-Tropical/Subtropical Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,0.9679
+Tropical/Subtropical Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,3.1014
+Tropical/Subtropical Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,1.0338
 Tropical/Subtropical Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Tropical/Subtropical Steppe,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Tropical/Subtropical Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -581,10 +581,10 @@ Tropical/Subtropical Steppe Mountains,Grassland: Annual,Carbon Initial Condition
 Tropical/Subtropical Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Aboveground Very Fast,,,0.3662
 Tropical/Subtropical Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Fast,,,0
 Tropical/Subtropical Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Slow,,,60.3234
-Tropical/Subtropical Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,0.5062
+Tropical/Subtropical Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,0.4628
 Tropical/Subtropical Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Deep Soil,,,0
-Tropical/Subtropical Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,0.8119
-Tropical/Subtropical Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Foliage,,,0.5132
+Tropical/Subtropical Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,0.4692
+Tropical/Subtropical Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Foliage,,,0.5572
 Tropical/Subtropical Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Snag Branch,,,0
 Tropical/Subtropical Steppe Mountains,Grassland: Annual,Carbon Initial Conditions: Snag Stem,,,0
 Tropical/Subtropical Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -593,10 +593,10 @@ Tropical/Subtropical Steppe Mountains,Grassland: Irrigated Perennial,Carbon Init
 Tropical/Subtropical Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Tropical/Subtropical Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Tropical/Subtropical Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Slow,,,83.0379
-Tropical/Subtropical Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.978
+Tropical/Subtropical Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.7914
 Tropical/Subtropical Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Tropical/Subtropical Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,3.164
-Tropical/Subtropical Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.4276
+Tropical/Subtropical Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,2
+Tropical/Subtropical Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.7
 Tropical/Subtropical Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Tropical/Subtropical Steppe Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Tropical/Subtropical Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -605,10 +605,10 @@ Tropical/Subtropical Steppe Mountains,Grassland: Natural Perennial,Carbon Initia
 Tropical/Subtropical Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,0.4539
 Tropical/Subtropical Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Tropical/Subtropical Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Slow,,,39.0798
-Tropical/Subtropical Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.96
+Tropical/Subtropical Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.9248
 Tropical/Subtropical Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Tropical/Subtropical Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,1.6335
-Tropical/Subtropical Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,0.425
+Tropical/Subtropical Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,1.3617
+Tropical/Subtropical Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,0.4539
 Tropical/Subtropical Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Tropical/Subtropical Steppe Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Warm Continental,Grassland: Annual,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -617,10 +617,10 @@ Warm Continental,Grassland: Annual,Carbon Initial Conditions: Aboveground Slow,,
 Warm Continental,Grassland: Annual,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Warm Continental,Grassland: Annual,Carbon Initial Conditions: Belowground Fast,,,0
 Warm Continental,Grassland: Annual,Carbon Initial Conditions: Belowground Slow,,,58.4075
-Warm Continental,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.3823
+Warm Continental,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.2638
 Warm Continental,Grassland: Annual,Carbon Initial Conditions: Deep Soil,,,0
-Warm Continental,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,2.2168
-Warm Continental,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.4013
+Warm Continental,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,1.2812
+Warm Continental,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.5214
 Warm Continental,Grassland: Annual,Carbon Initial Conditions: Snag Branch,,,0
 Warm Continental,Grassland: Annual,Carbon Initial Conditions: Snag Stem,,,0
 Warm Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -629,10 +629,10 @@ Warm Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Above
 Warm Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Warm Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Warm Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Slow,,,83.0379
-Warm Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.978
+Warm Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.7914
 Warm Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Warm Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,3.164
-Warm Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.4276
+Warm Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,2
+Warm Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.7
 Warm Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Warm Continental,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Warm Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -641,10 +641,10 @@ Warm Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Abovegr
 Warm Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,0.9518
 Warm Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Warm Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Slow,,,89.485
-Warm Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,2.013
+Warm Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,1.9391
 Warm Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Warm Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,4.4883
-Warm Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,0.8911
+Warm Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,2.8554
+Warm Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,0.9518
 Warm Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Warm Continental,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Warm Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -653,10 +653,10 @@ Warm Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Abovegro
 Warm Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Warm Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Fast,,,0
 Warm Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Slow,,,58.4075
-Warm Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.3823
+Warm Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Belowground Very Fast,,,1.2638
 Warm Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Deep Soil,,,0
-Warm Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,2.2168
-Warm Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.4013
+Warm Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Fine Roots,,,1.2812
+Warm Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Foliage,,,1.5214
 Warm Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Snag Branch,,,0
 Warm Continental Mountains,Grassland: Annual,Carbon Initial Conditions: Snag Stem,,,0
 Warm Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -665,10 +665,10 @@ Warm Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditi
 Warm Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,1
 Warm Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Warm Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Slow,,,83.0379
-Warm Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.978
+Warm Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.7914
 Warm Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Warm Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,3.164
-Warm Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.4276
+Warm Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Fine Roots,,,2
+Warm Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Foliage,,,1.7
 Warm Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Warm Continental Mountains,Grassland: Irrigated Perennial,Carbon Initial Conditions: Snag Stem,,,0
 Warm Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Fast,,,0
@@ -677,9 +677,9 @@ Warm Continental Mountains,Grassland: Natural Perennial,Carbon Initial Condition
 Warm Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Aboveground Very Fast,,,0.2762
 Warm Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Fast,,,0
 Warm Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Slow,,,172.4527
-Warm Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.5842
+Warm Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Belowground Very Fast,,,0.5628
 Warm Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Deep Soil,,,0
-Warm Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,1.3026
-Warm Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,0.2586
+Warm Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Fine Roots,,,0.8287
+Warm Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Foliage,,,0.2762
 Warm Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Branch,,,0
 Warm Continental Mountains,Grassland: Natural Perennial,Carbon Initial Conditions: Snag Stem,,,0
