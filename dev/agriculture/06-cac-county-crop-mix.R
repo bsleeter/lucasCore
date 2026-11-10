@@ -37,6 +37,20 @@ so[, GEOID := sprintf("06%03d", as.integer(CountyCode))]
 # fixed rates: the crop's mean per harvested ha in the county over every year
 rt <- so[ha > 0, .(rN = sum(nppC) / sum(ha), rA = sum(agC) / sum(ha), rH = sum(hC) / sum(ha)), by = .(GEOID, Crop)]
 so <- rt[so, on = .(GEOID, Crop)]
+# Missing crop-years (user 2026-11-09). A county leaves a crop out of a year's report when its few growers would be identifiable; it is
+# then counted under an "UNSPECIFIED" row the factors do not value (Calaveras 2020: 811 acres of walnuts, 70% of its cropland, gone, so
+# Crop Mix fell to 0.38). 463 of 1,479 county-crop series have such gaps. A crop missing between two years it was reported takes the
+# harvested area interpolated between them; one reported in both 2018 and 2019 and missing in 2020 (the last year read) keeps its 2019
+# area. Each filled row is valued at the crop's fixed county rate like the others; hulls and straw (no area of their own) are not filled.
+ca <- so[ha > 0, .(ha = sum(ha)), by = .(GEOID, Crop, Year)]
+fill <- ca[, { yrs <- sort(Year); h <- ha[order(Year)]; miss <- setdiff(min(yrs):max(yrs), yrs)
+  f <- if (length(miss)) data.table(Year = as.numeric(miss), ha = approx(yrs, h, xout = miss)$y) else data.table(Year = numeric(), ha = numeric())
+  if (max(yrs) == max(YRS) - 1 && (max(YRS) - 2) %in% yrs) f <- rbind(f, data.table(Year = as.numeric(max(YRS)), ha = h[length(h)]))
+  f }, by = .(GEOID, Crop)]
+fill <- rt[fill, on = .(GEOID, Crop)]
+cat(sprintf("missing crop-years filled: %d (%d of them in %d, carried from %d), %.0f thousand ha-years\n", nrow(fill), sum(fill$Year == max(YRS)),
+            max(YRS), max(YRS) - 1, sum(fill$ha) / 1000))
+so <- rbind(so, fill[, .(GEOID, Crop, Year, ha, rN, rA, rH, hC = 0)], fill = TRUE)
 out <- so[, .(HarvestedHa = round(sum(ha)), NPP = round(sum(ha * rN, na.rm = TRUE)), AG = round(sum(ha * rA, na.rm = TRUE)),
               Harvest = round(sum(ha * rH, na.rm = TRUE) + sum(hC[ha == 0]))), by = .(GEOID, Year)][NPP > 0]
 out[Harvest > AG, Harvest := AG]   # hulls or straw with almost no crop counted (Inyo 2019, Mono)
