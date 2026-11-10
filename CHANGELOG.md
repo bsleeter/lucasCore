@@ -2,7 +2,13 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
-## Unreleased
+## 1.2.3 - 2026-11-10
+
+A Build fix for machines with less memory than cores.
+
+**Upgrading:** install `lucasCore-1.2.3.ssimpkg`. There are no schema changes from 1.2.0, so a 1.2 library needs no update; switch
+its lucasCore package to 1.2.3 (`SyncroSim.Console.exe --add --package --pkg=lucasCore --ver=1.2.3 --lib=<library.ssim>`).
+Results are as in 1.2.2; only how many parallel workers stages 5 and 6 start changes.
 
 ### Fixed
 - Build stage 5 (and stage 6): the parallel NLCD steps start no more workers than the free memory allows (2 GB each), and each
