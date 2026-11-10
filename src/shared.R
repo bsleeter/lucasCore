@@ -369,6 +369,17 @@ tile_notes <- function(a, tl, n, lvl, unit_name) {
                                            lvl, 100 * a$share, 1 / a$share))
   out }
 
+# workers for a parallel raster step: at most n and cap, the cores less one, and gb_each GB of free memory a worker. Free memory
+# from Windows (terra::free_RAM() stops at 16 GB on the build machine, which has 1 TB). Each worker should then get
+# terraOptions(memfrac = 0.6 / workers), set after library(terra), which resets it: left at terra's 0.6, every worker plans on most of the free memory, and on a colleague's
+# machine stage 5's NLCD workers failed with std::bad_alloc (2026-11-10)
+par_workers <- function(n, cap = 20, gb_each = 2) {
+  kb <- if (.Platform$OS.type == "windows") suppressWarnings(as.numeric(tryCatch(system2("powershell", c("-NoProfile", "-Command",
+          "(Get-CimInstance Win32_OperatingSystem).FreePhysicalMemory"), stdout = TRUE), error = function(e) NA)[1])) else NA_real_
+  if (is.na(kb)) kb <- tryCatch(terra::free_RAM(), error = function(e) NA_real_)
+  m <- if (is.na(kb)) cap else max(1, floor(kb / 1024^2 / gb_each))
+  as.integer(max(1, min(n, cap, parallel::detectCores() - 1, m))) }
+
 # Annual NLCD on the model grid R (a crop of lattice L): modal aggregation of the 30 m classes. The aggregation blocks are fixed to the
 # CONUS crop the CONUS 1km build used (lattice extent + one block, snapped to the NLCD 30 m grid), so a regional build aggregates the
 # same 30 m pixels into each cell as a CONUS build. NLCD's Albers WKT differs from EPSG:5070 only in naming, so extents are used as is.

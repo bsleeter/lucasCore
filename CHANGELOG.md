@@ -2,6 +2,13 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+### Fixed
+- Build stage 5 (and stage 6): the parallel NLCD steps start no more workers than the free memory allows (2 GB each), and each
+  worker's terra memory share is divided among them. Left at terra's own share, every worker planned on most of the free memory,
+  and on a machine with less memory than cores stage 5 failed with `std::bad_alloc`. tests/unit-par-workers.R checks it.
+
 ## 1.2.2 - 2026-11-10
 
 USFS forest type tiles kept whole in the data home, and a Data Download fix for networks that block remote reads of Box.
