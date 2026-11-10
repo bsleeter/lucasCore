@@ -139,7 +139,7 @@ run_dataset <- function(h, ctx, layout, check_only = FALSE) {
   out <- function(status, files = NA_integer_, mb = NA_real_, nxt = NA_character_)
     data.table::data.table(DataSource = col, Dataset = h$name, Status = status, Files = as.integer(files), SizeMb = round(mb, 1),
                            Minutes = round(as.numeric(difftime(Sys.time(), t0, units = "mins")), 2), Next = nxt)
-  # where it goes: national copies (FIA, PRISM, LOCA2, FPA-FOD, TreeMap, the CDL and the tidal marsh map) whole at the top of the home, the rest in the region folder
+  # where it goes: national copies (FIA, PRISM, LOCA2, FPA-FOD, TreeMap, the CDL, the tidal marsh map, and the USFS forest type tiles a region touches) whole at the top of the home, the rest in the region folder
   ctx$store <- store_for(h, ctx); where <- home_label(ctx$home, ctx$store); if (isTRUE(h$national)) ctx$keep <- TRUE
   # a handler with have(ctx, items) (one TRUE per planned item already in place) can grow: a rerun asking for more (LOCA2 models,
   # scenarios, members) fetches only what is missing; without it, a covering manifest means the dataset is done
@@ -157,7 +157,8 @@ run_dataset <- function(h, ctx, layout, check_only = FALSE) {
   if (up && is.null(h$have)) { log(sprintf("%s: up to date in %s (manifest and files.csv)", h$name, where))
     return(out("skipped", nrow(read_files(ctx$store)[Column == col]), nxt = held_in(where))) }
   # a copy held elsewhere for this region (a clipped copy in the region folder of a dataset now kept whole, or a national copy)
-  if (!up && !newer && is.null(h$have)) for (d in setdiff(unique(c(ctx$region_home, ctx$home)), ctx$store))
+  # (a handler that can grow skips this, unless a region's copy made before it was kept whole still serves: held_in_region)
+  if (!up && !newer && (is.null(h$have) || isTRUE(h$held_in_region))) for (d in setdiff(unique(c(ctx$region_home, ctx$home)), ctx$store))
     if (dataset_up_to_date(d, col, ctx$region)) { log(sprintf("%s: up to date in %s", h$name, home_label(ctx$home, d)))
       return(out("skipped", nrow(read_files(d)[Column == col]), nxt = held_in(home_label(ctx$home, d)))) }
   # write-once: a folder that holds this dataset for another region is never refetched over
@@ -177,8 +178,10 @@ run_dataset <- function(h, ctx, layout, check_only = FALSE) {
     if (any(got)) log(sprintf("%s: %d of %d asked files already in place; fetching the other %d", h$name, sum(got), nrow(items), sum(!got)))
     items <- items[!got] }
   items[, dest := file.path(ctx$dl, file)]; if (!"fetch" %in% names(items)) items[, fetch := TRUE]
-  get <- items[fetch == TRUE]; remote <- items[fetch == FALSE]
-  if (check_only && "supplied" %in% names(items)) { log(sprintf("%s: from %s, supplied by hand", h$name, items$supplied[1]))
+  # supplied: files saved by hand, for all of a dataset (RCMAP) or some of its items (the forest type tiles)
+  sup <- if ("supplied" %in% names(items)) items[!is.na(supplied), supplied] else character()
+  get <- items[fetch == TRUE]; remote <- items[fetch == FALSE]; if (length(sup)) remote <- remote[is.na(supplied)]
+  if (check_only && length(sup) && length(sup) == nrow(items)) { log(sprintf("%s: from %s, supplied by hand", h$name, items$supplied[1]))
     return(out("would download", 1, 0, sprintf("from %s, supplied by hand", items$supplied[1]))) }
   if (check_only) { s <- url_sizes(get$url); miss <- sum(is.na(s))
     log(sprintf("%s: %d files to fetch into %s, %.0f MB%s%s", h$name, nrow(get), where, sum(s, na.rm = TRUE) / 1e6, if (miss) sprintf(" (%d sizes unknown)", miss) else "",
@@ -189,7 +192,7 @@ run_dataset <- function(h, ctx, layout, check_only = FALSE) {
   if (nrow(get)) { sizes <- url_sizes(get$url)
     log(sprintf("%s: fetching %d files (%.0f MB%s)", h$name, nrow(get), sum(sizes, na.rm = TRUE) / 1e6, if (anyNA(sizes)) ", some sizes unknown" else ""))
     fetch_files(get$url, get$dest, ctx$connections, log, sizes); mb <- sum(file.size(get$dest), na.rm = TRUE) / 1e6 }
-  if ("supplied" %in% names(items)) log(sprintf("%s: reading %s, supplied by hand", h$name, items$supplied[1]))
+  if (length(sup)) log(sprintf("%s: reading %s, supplied by hand", h$name, paste(sup, collapse = ", ")))
   else if (nrow(remote)) log(if (!is.null(h$method)) sprintf("%s: %s by its source (%s)", h$name, if (is.null(ctx$region$poly)) "read whole" else "clipped", h$method) else sprintf("%s: reading %d archives remotely, writing the region only", h$name, nrow(remote)))
   log(sprintf("%s: %.0f MB fetched; unpacking%s", h$name, mb, if (is.null(ctx$region$poly) || ctx$keep) "" else " and clipping to the region"))
   # finish writes into a staging folder; commit_staged moves its files into place without replacing any a library may have read
@@ -204,7 +207,7 @@ run_dataset <- function(h, ctx, layout, check_only = FALSE) {
   copy <- if (is.null(ctx$region$poly) || isTRUE(h$national) || (ctx$keep && !by_source)) "national" else "clipped"
   src <- layout[Column == col]
   write_manifest(ctx$store, data.table::data.table(Column = col, Dataset = h$name, Source = src$Source, Version = if (!is.null(h$version)) h$version else src$Version,
-    Url = paste(unique(dirname(items$url)), collapse = " "), Doi = src$Doi, Method = if ("supplied" %in% names(items)) "by hand" else if (!is.null(h$method)) h$method else "direct", Copy = copy,
+    Url = paste(unique(dirname(items$url)), collapse = " "), Doi = src$Doi, Method = if (length(sup) && length(sup) == nrow(items)) "by hand" else if (length(sup)) "direct, part by hand" else if (!is.null(h$method)) h$method else "direct", Copy = copy,
     Units = ctx$region$units, BufferKm = ctx$region$buffer_km, Xmin = ctx$region$box[1], Ymin = ctx$region$box[2], Xmax = ctx$region$box[3], Ymax = ctx$region$box[4],
     Files = nrow(fr), Bytes = sprintf("%.0f", sum(as.numeric(fr$Bytes))), Downloaded = format(Sys.time(), "%Y-%m-%dT%H:%M:%S"), Status = "done",
     Note = if ("note" %in% names(items)) items$note[1] else if (!is.null(h$note)) h$note else NA_character_))

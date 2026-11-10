@@ -4,9 +4,15 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
 
 ## Unreleased
 
+### Changed
+- Data Download, USFS forest type groups: each FIA region's tile is kept whole at the top of the data home, like TreeMap, and only
+  the tiles a study area touches are fetched; a second study area in the same region reads the tile already there. A region
+  downloaded earlier keeps reading its clipped copy. A tile's zip (any name) or its `<REGION>_ForestType.tif` saved by hand in
+  `<home>/supplied` is used instead of fetching.
+
 ### Fixed
-- Data Download, forest type groups: where the network read of a region's NFCMS zip on Box fails (a network that blocks GDAL's
-  range requests), the stage fetches the zip and checks the region's coverage from that copy instead of stopping with "file does not exist".
+- Data Download, USFS forest type groups: on a network where GDAL cannot read the Box zips remotely, the stage stopped with "file
+  does not exist". It now fetches every tile whose extent touches the study area instead.
 
 ## 1.2.1 - 2026-11-10
 

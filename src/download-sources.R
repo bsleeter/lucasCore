@@ -17,6 +17,40 @@ gdal_remote <- function() Sys.setenv(CPL_VSIL_CURL_USE_HEAD = "NO", GDAL_HTTP_MA
                                      CPL_VSIL_CURL_ALLOWED_EXTENSIONS = ".zip,.tif,.dbf,.nc", GDAL_DISABLE_READDIR_ON_OPEN = "EMPTY_DIR")
 remote_member <- function(url, member) sprintf("/vsizip//vsicurl/%s/%s", url, member)
 
+# NFCMS v3 forest type group tiles: each FIA region's zip on Box, and each tile's extent (EPSG:5070 metres, xmin ymin xmax ymax;
+# read from the tiles 2026-11-10). The tiles overlap: near a region's edge two or three hold forest
+NFCMS_BOX <- c(PSW = "w6932ioy4vym4al2e3tr534almkh3dvs", PNW = "7izvs0615i8fovgv2sx1cnvzewmuqg7j", NE = "fw87536re6tj11lxdt04aixw6yrlkzln",
+               NLS = "v861gwms9fq68sitl0r3vs2v3moxeu9x", NPS = "1ti822foipef1w9qs05tdo3olv7quin7", RMN = "141vgz2rz2u4mbeqodsu5w9wsejf8uy1",
+               RMS = "ari2g6yf4bt4io0gw2nt5qzrb5gxqspp", SC = "w2qwgoq527nkuesv4xu6ppcy5d2bkui5", SE = "qecyblmgdpmovp2g67ze0sx594rtixo2")
+NFCMS_EXT <- list(PSW = c(-2364615, 1211805, -1482345, 2460435), PNW = c(-2337285, 2290575, -1504305, 3180555), NE = c(1009965, 1655685, 2266845, 3054285),
+                  NLS = c(-102405, 2076885, 1142535, 3004905), NPS = c(-719085, 1438245, 1377075, 2981535), RMN = c(-1733385, 2137545, -594915, 3063525),
+                  RMS = c(-2252295, 935595, -475365, 2683845), SC = c(-1075305, 309855, 1447305, 1884105), SE = c(712215, 251175, 2126205, 2021055))
+nfcms_member <- function(k) sprintf("Data/%s/%s_ForestType.tif", k, k)
+
+# the tiles a study area needs: those whose extent touches its box and that have forest type cells in it. The cells are counted
+# from the tile already at the top of the home, else over the network; where the network read fails the extent decides
+nfcms_tiles <- function(ctx) { b <- ctx$region$box
+  k <- names(NFCMS_EXT)[vapply(NFCMS_EXT, function(e) b[1] < e[3] && b[3] > e[1] && b[2] < e[4] && b[4] > e[2], TRUE)]
+  gdal_remote(); remote_ok <- TRUE
+  keep <- vapply(k, function(t) {
+    local <- file.path(ctx$place, paste0(t, "_ForestType.tif"))
+    if (!file.exists(local) && !remote_ok) return(TRUE)
+    v <- tryCatch({ r <- terra::rast(if (file.exists(local)) local else remote_member(sprintf(BOX, NFCMS_BOX[[t]]), nfcms_member(t)))
+      bb <- terra::project(terra::vect(sf::st_as_sfc(sf::st_bbox(setNames(b, c("xmin", "ymin", "xmax", "ymax")), crs = sf::st_crs(5070)))), terra::crs(r))
+      e <- terra::intersect(terra::ext(bb), terra::ext(r)); if (is.null(e)) 0 else terra::global(terra::crop(r, e), "notNA")[[1]] },
+      error = function(e) { ctx$log(sprintf("  USFS forest types: the network read of the %s tile failed (%s); every tile whose extent touches the region is fetched", t, conditionMessage(e)))
+        remote_ok <<- FALSE; NA_real_ })
+    if (is.na(v)) return(TRUE)
+    if (v == 0) ctx$log(sprintf("  USFS forest types: the %s tile has no forest type cells in the region", t)); v > 0 }, TRUE)
+  k[keep] }
+
+# a tile saved by hand: <home>/supplied/<REGION>_ForestType.tif, or any zip there that holds the region's tile; "" if none
+nfcms_supplied <- function(k, home) { d <- file.path(home, "supplied"); if (!dir.exists(d)) return("")
+  tif <- file.path(d, paste0(k, "_ForestType.tif")); if (file.exists(tif)) return(normalizePath(tif, winslash = "/"))
+  for (z in list.files(d, "[.]zip$", full.names = TRUE, ignore.case = TRUE)) {
+    n <- tryCatch(utils::unzip(z, list = TRUE)$Name, error = function(e) character()); if (nfcms_member(k) %in% n) return(normalizePath(z, winslash = "/")) }
+  "" }
+
 # the 48 conterminous states and DC by FIPS (TIGER STATEFP)
 CONUS_STATES <- c(`01` = "AL", `04` = "AZ", `05` = "AR", `06` = "CA", `08` = "CO", `09` = "CT", `10` = "DE", `11` = "DC", `12` = "FL", `13` = "GA",
   `16` = "ID", `17` = "IL", `18` = "IN", `19` = "IA", `20` = "KS", `21` = "KY", `22` = "LA", `23` = "ME", `24` = "MD", `25` = "MA", `26` = "MI",
@@ -99,31 +133,29 @@ RDS <- "https://www.fs.usda.gov/rds/archive/products/%s/%s"
 download_handlers <- function() {
   H <- list()
 
-  # ---- NFCMS v3 forest type groups: one tile per FIA region, read from its regional zip ----------------------------------
-  nfcms <- c(PSW = "w6932ioy4vym4al2e3tr534almkh3dvs", PNW = "7izvs0615i8fovgv2sx1cnvzewmuqg7j", NE = "fw87536re6tj11lxdt04aixw6yrlkzln",
-             NLS = "v861gwms9fq68sitl0r3vs2v3moxeu9x", NPS = "1ti822foipef1w9qs05tdo3olv7quin7", RMN = "141vgz2rz2u4mbeqodsu5w9wsejf8uy1",
-             RMS = "ari2g6yf4bt4io0gw2nt5qzrb5gxqspp", SC = "w2qwgoq527nkuesv4xu6ppcy5d2bkui5", SE = "qecyblmgdpmovp2g67ze0sx594rtixo2")
-  H$ForestTypeGroupFolder <- list(column = "ForestTypeGroupFolder", name = "USFS forest type groups (NFCMS v3)", version = "v3 (RDS-2025-0019)",
-    note = "v3 tiles; the tiles on the build machine predate v3. No .vat.dbf ships with v3 (stage 5 reads the raw codes)",
-    plan = function(ctx) data.table::data.table(url = sprintf(BOX, nfcms), file = paste0(names(nfcms), ".zip"), region = names(nfcms), fetch = !clipping(ctx)),
-    finish = function(ctx, items) {
-      gdal_remote(); dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE); n <- 0
-      for (i in seq_len(nrow(items))) { m <- sprintf("Data/%s/%s_ForestType.tif", items$region[i], items$region[i]); dest <- file.path(ctx$place, basename(m))
-        if (clipping(ctx)) {
-          # forest type cells of this region's tile inside the study area's box: NA when the tile misses the box
-          cells <- function(src) { r <- terra::rast(src)
-            b <- terra::project(terra::vect(sf::st_as_sfc(sf::st_bbox(setNames(ctx$region$box, c("xmin", "ymin", "xmax", "ymax")), crs = sf::st_crs(5070)))), terra::crs(r))
-            e <- terra::intersect(terra::ext(b), terra::ext(r)); if (is.null(e)) NA_real_ else terra::global(terra::crop(r, e), "notNA")[[1]] }
-          # read over the network; where that fails (a network that blocks GDAL's range requests to Box: a colleague, 2026-11-10)
-          # the zip is fetched and read from disk, and zip_raster then unpacks that copy
-          v <- tryCatch(cells(remote_member(items$url[i], m)), error = function(e) {
-            ctx$log(sprintf("  remote read of %s failed (%s): fetching the zip", basename(m), conditionMessage(e))); NULL })
-          if (is.null(v)) { if (!file.exists(items$dest[i])) fetch_files(items$url[i], items$dest[i], ctx$connections, ctx$log)
-            v <- cells(sprintf("/vsizip/%s/%s", normalizePath(items$dest[i], winslash = "/"), m)) }
-          if (is.na(v)) next
-          if (!isTRUE(v > 0)) { ctx$log(sprintf("  %s: no forest type cells in the region", items$region[i])); next } }
-        zip_raster(ctx, items, i, m, dest); n <- n + 1; ctx$log(sprintf("  %s_ForestType.tif", items$region[i])) }
-      if (!n) stop("no NFCMS region tile covers the region", call. = FALSE)
+  # ---- NFCMS v3 forest type groups: one tile per FIA region (1.9-8.8 GB zips on Box), kept whole at the top of the home and
+  # fetched only for the regions a study area touches; a second study area in the same region reads the tile already there (user,
+  # 2026-11-10). A tile is wanted when it has forest type cells in the study area's box, read over the network; where GDAL cannot
+  # read Box remotely (a colleague's network, 2026-11-10) every tile whose extent touches the box. A zip (or the tif) saved by hand
+  # into <home>/supplied is used instead of fetching. Regions downloaded before 1.2.2 keep their clipped copy (held_in_region)
+  H$ForestTypeGroupFolder <- list(column = "ForestTypeGroupFolder", name = "USFS forest type groups (NFCMS v3)", version = "v3 (RDS-2025-0019)", national = TRUE,
+    held_in_region = TRUE,
+    note = "v3 tiles, whole; the tiles on the build machine predate v3. No .vat.dbf ships with v3 (stage 5 reads the raw codes)",
+    plan = function(ctx) {
+      k <- if (whole_conus(ctx)) names(NFCMS_BOX) else nfcms_tiles(ctx)
+      it <- data.table::data.table(url = sprintf(BOX, NFCMS_BOX[k]), file = paste0(k, ".zip"), region = k, out = paste0(k, "_ForestType.tif"))
+      own <- vapply(k, nfcms_supplied, "", home = ctx$home)
+      if (any(nzchar(own))) it[, `:=`(supplied = ifelse(nzchar(own), own, NA_character_), fetch = !nzchar(own))]
+      it },
+    have = function(ctx, items) recorded(ctx, "ForestTypeGroupFolder", file.path(ctx$place, items$out)),
+    finish = function(ctx, items) { dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE)
+      for (i in seq_len(nrow(items))) { dest <- file.path(ctx$place, items$out[i])
+        own <- "supplied" %in% names(items) && !is.na(items$supplied[i]); src <- if (own) items$supplied[i] else items$dest[i]
+        if (grepl("[.]tif$", src, ignore.case = TRUE)) { if (!file.copy(src, dest, overwrite = TRUE)) stop(sprintf("could not copy %s", src), call. = FALSE) }
+        else { x <- unzip_to(src, file.path(ctx$dl, "unzip"), nfcms_member(items$region[i]))
+          if (!file.rename(x, dest) && !(file.copy(x, dest, overwrite = TRUE) && file.remove(x))) stop(sprintf("could not move %s into place", basename(x)), call. = FALSE) }
+        if (!own) unlink(src)
+        ctx$log(sprintf("  %s (whole%s)", items$out[i], if (own) ", supplied by hand" else "")) }
       ctx$place })
 
   # ---- TreeMap 2016: the raster and its attribute table (the plots), from one zip ------------------------------------
