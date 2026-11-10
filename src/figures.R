@@ -14,7 +14,10 @@
 # I: strata (list of 3 SpatRasters: primary, secondary, tertiary), strata_names (list of 3 data.tables Id, Name), strata_sources
 #    (secondary and tertiary source names), sc (SpatRaster), sc_list (Name, Id, Color "a,r,g,b"), age (SpatRaster), carbon_curves,
 #    volume_curves, decay, stocks (named list of SpatRasters by stock type), site and site_class (SpatRasters: the site productivity
-#    multiplier and mean site class, or NULL), trans, climate, validation (data.tables), dem
+#    multiplier and mean site class, or NULL), trans, climate, validation (data.tables), dem; optional non-forest inputs (2026-11-09):
+#    nf_maps (named list of SpatRasters: Grass and Shrub / Cropland / Tidal Marsh Productivity, Crop Harvest), crop_mix (Timestep, Kind,
+#    File), nf_growth (StratumId, StateClassId, AgeMin, Value: Net Growth), crop_yield (Timestep, StratumId, StateClassId, Value),
+#    fire_maps (Timestep, File: stage 6's yearly fire maps)
 #    (elevation .tif), label (study area), years (start, end), result (result scenario id, for the note)
 # =============================================================================
 suppressPackageStartupMessages({ library(terra); library(sf); library(data.table) })
@@ -131,8 +134,8 @@ figure_kit <- function(sc, dem, outdir, NOTE) {
   # a legend just above the plot's top right corner, clear of the data: in one row when it fits beside the panel title (avoid, the
   # title's text), else in as few rows as it takes (2026-11-09: a long legend ran over the title in Figures 7 and 8)
   top_legend <- function(legend, ..., avoid = "") { u <- par("usr"); free <- (u[2] - u[1]) - strwidth(avoid, cex = .95, font = 2) * 1.1
-    ew <- strwidth(legend, cex = .72) + strwidth("MMM", cex = .72); nr <- 1
-    while (nr < length(legend) && max(vapply(split(ew, ceiling(seq_along(ew) / ceiling(length(ew) / nr))), sum, 0)) > free) nr <- nr + 1
+    cw <- max(strwidth(legend, cex = .72)) + strwidth("MMMM", cex = .72); nr <- 1   # every column as wide as the widest key
+    while (nr < length(legend) && ceiling(length(legend) / nr) * cw > free) nr <- nr + 1
     graphics::legend("bottomright", legend = legend, ..., ncol = ceiling(length(legend) / nr), inset = c(0, 1.01), xpd = NA, bty = "n", cex = .72, border = NA,
                      x.intersp = .6, text.width = NULL) }
   environment() }
@@ -295,7 +298,7 @@ build_figures <- function(I, outdir) {
     } else { pc <- c(Snag = "#8c510a", `Down wood` = "#d8b365", `Forest floor` = "#5ab4ac", Soil = "#01665e")
       cols <- c(Snag = "SnagDecayMultiplier", `Down wood` = "DownWoodDecayMultiplier", `Forest floor` = "ForestFloorDecayMultiplier", Soil = "SoilDecayMultiplier") }
     chart_figure("decay_calibration", "Dead organic matter calibration", if (meas) "Decay rate multipliers by forest type, calibrated in stage 3 to FIA's measured snags, down logs, fine woody debris, litter and duff in mature stands (snag, down log and fine woody debris rates shared by the ecodivision) and soil to gNATSGO; 1 = the CBM-CFS3 default. Snag fall is set separately from remeasured dead trees." else "Decay rate multipliers of the snag, down wood, forest floor and soil pools by forest type, calibrated in stage 3 so spin-up carbon matches FIA and gNATSGO; 1 = the CBM-CFS3 default.",
-      1, ne, h = 300 + 70 * max(dc[, .N, by = StratumId]$N), draw = function() {
+      1, ne, h = max(800, 300 + 70 * max(dc[, .N, by = StratumId]$N)), draw = function() {
         for (i in seq_along(eco)) { x <- dc[StratumId == eco[i]]; x <- x[order(x$SoilDecayMultiplier)]; ny <- nrow(x)
           par(mar = c(4.5, if (i == 1) 13 else 1, 3, 1))
           rg <- range(unlist(dc[, cols, with = FALSE]), 1, na.rm = TRUE)      # one scale for every panel
@@ -375,7 +378,7 @@ build_figures <- function(I, outdir) {
   if (!is.null(I$validation) && nrow(I$validation)) {
     v <- I$validation[, .(Checks = .N, Failed = sum(Status != "Pass")), by = Stage][order(Stage)]
     chart_figure("checks", "Build checks", "The validation checks each stage ran on its own outputs; Build Results > Validation lists each with its detail.",
-      1, 1, h = 300 + 70 * nrow(v), draw = function() { par(mar = c(4.5, 14, 3, 1)); o <- rev(seq_len(nrow(v)))
+      1, 1, h = max(800, 300 + 70 * nrow(v)), draw = function() { par(mar = c(4.5, 14, 3, 1)); o <- rev(seq_len(nrow(v)))
         barplot(rbind(v$Checks - v$Failed, v$Failed)[, o, drop = FALSE], names.arg = v$Stage[o], horiz = TRUE, col = c("#2b8152", "#a81d1a"), border = NA, cex.names = .75, xlab = "Checks")
         ptitle(1, sprintf("%d checks, %d failed", sum(v$Checks), sum(v$Failed)))
         legend("bottomright", c("Passed", "Failed"), fill = c("#2b8152", "#a81d1a"), border = NA, bty = "n", cex = .75) }) }
