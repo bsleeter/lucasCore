@@ -38,6 +38,9 @@ check("each twin has its own diagram cell", all(TW %in% loc$StateClassIdSource) 
 fail <- function(...) stop(sprintf(...)); source(file.path(pkg, "src", "fia.R"))
 g <- fia_hydric_group(c(120, 120, 600, 700, 800, 120, 600), c(31, 21, 39, 35, 31, NA, 40))
 check("hydric conditions (physiographic class 31-39) of the three groups take the twin code, others keep theirs", identical(g, c(121L, 120L, 601L, 701L, 800L, 120L, 600L)))
+eval(parse(text = grep("^is_(forest_class|wetland_forest) <-", readLines(file.path(pkg, "src", "shared.R")), value = TRUE)))
+check("is_wetland_forest: the three twins only (stage 3 fits their dead wood apart from the upland types)",
+      identical(is_wetland_forest(c(TW, UP, "Wetland: Estuarine Forested", "Wetland: Palustrine Emergent", NA)), c(TRUE, TRUE, TRUE, rep(FALSE, 6))) && all(is_forest_class(TW)))
 
 # regions and burial
 rg <- rd(D("growth", "wetland-forest-regions.csv")); eco <- rd(D("strata", "ecodivisions-list.csv"))

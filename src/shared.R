@@ -28,6 +28,7 @@ prj <- rsyncrosim::project()
 fail <- function(...) stop(sprintf(...), call. = FALSE)
 # a forest class: the upland forest type groups and their forested wetland twins (Wetland: Spruce/Fir Group etc., to-do 53)
 is_forest_class <- function(x) !is.na(x) & grepl("^(Forest: |Wetland: .+ Group$)", x)
+is_wetland_forest <- function(x) !is.na(x) & grepl("^Wetland: .+ Group$", x)   # the three forested wetland classes (to-do 53)
 say  <- function(...) updateRunLog(sprintf(...))
 
 # the R version and, in a git checkout of the package, its commit: a Build logs this line and the model record reads it from the log

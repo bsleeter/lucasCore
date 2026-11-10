@@ -273,21 +273,26 @@ if (dom_mode == 4L) {
   for (x in list(cells, all_cells)) x[, mplots := dat_m$obs[x, on = c("sc", "ecodiv"), .(n = sum(n)), by = .EACHI]$n][is.na(mplots), mplots := 0L]
   say("Measured dead wood: %d down woody material conditions (%d states), %d mature (age >= %d, no fire or cutting in %d yr%s) in this build's types; snag fall from %d remeasured snags",
       nrow(dw$dwm), length(dw$states), sum(dat_m$obs$n), MEAS_MIN_AGE, CAL$exclusion, if (is.null(MA_BY)) "" else "; per forest type where set", nrow(dw$fall))
-  # fits: each forest type pooled over its ecodivisions (the fallback), and each ecodivision over its types with enough plots (shared snag,
-  # down log and fine woody debris multipliers; litter and duff per type)
-  ecos <- unique(cells[mplots >= MIN_DWM_CELL, Stratum])   # the forest-type fallback only for types with a cell short of its own fit
-  types <- unique(all_cells[sc %in% cells[!(Stratum %in% ecos & mplots >= MIN_DWM_CELL), sc] & mplots > 0, sc])
+  # fits: each forest type pooled over its ecodivisions (the fallback), and each ecodivision over its upland types with enough plots
+  # (shared snag, down log and fine woody debris multipliers; litter and duff per type). A forested wetland class is fitted on its own
+  # plots in its ecodivision, apart from the upland types (user, 2026-11-10: dead wood on waterlogged ground decays apart from
+  # upland's); with too few, it takes its own class pooled over ecodivisions, never the upland types' values
+  cells[, dgrp := data.table::fifelse(is_wetland_forest(StateClass), paste(Stratum, StateClass, sep = " | "), Stratum)]
+  ecos <- unique(cells[mplots >= MIN_DWM_CELL, dgrp])   # the forest-type fallback only for types with a cell short of its own fit
+  types <- unique(all_cells[sc %in% cells[!(dgrp %in% ecos & mplots >= MIN_DWM_CELL), sc] & mplots > 0, sc])
   parallel::clusterExport(cl, c("dat_m", "cells", "all_cells"), envir = environment())
-  jobs <- c(lapply(types, function(s) list(kind = "type", rows = all_cells[sc == s & mplots > 0])), lapply(ecos, function(e) list(kind = "eco", rows = cells[Stratum == e & mplots >= MIN_DWM_CELL])))
+  jobs <- c(lapply(types, function(s) list(kind = "type", rows = all_cells[sc == s & mplots > 0])), lapply(ecos, function(e) list(kind = "eco", rows = cells[dgrp == e & mplots >= MIN_DWM_CELL])))
   fits <- parallel::parLapply(cl, jobs, function(j) cal_fit_measured(j$rows, ctx, dat_m))
   ft <- stats::setNames(fits[seq_along(types)], types); fe <- stats::setNames(fits[length(types) + seq_along(ecos)], ecos)
+  wl <- cells[is_wetland_forest(StateClass), .N]
+  if (wl) say("Dead wood decay: %d forested wetland cells fitted apart from the upland types (%d on their own plots)", wl, cells[is_wetland_forest(StateClass) & dgrp %in% ecos, .N])
   cells[, `:=`(Level = NA_character_, m_snag = NA_real_, m_cwd = NA_real_, m_floor = NA_real_, clearcut = NA_real_)]
   M5 <- c("snag", "cwd", "fwd", "litter", "duff"); setm <- function(i, v, lv) cells[i, `:=`(Level = lv, m_snag = v[["snag"]], m_cwd = v[["cwd"]], m_fwd = v[["fwd"]], m_litter = v[["litter"]], m_duff = v[["duff"]])]
   # a fit's value of pool g for a cell outside it: from a row where g was calibrated, not one the user fixed
   pick <- function(f, rows, gs) stats::setNames(lapply(gs, function(g) { j <- which(is.na(rows[[paste0("fx_", g)]]))[1]; f[[g]][if (is.na(j)) 1L else j] }), gs)
-  for (i in seq_len(nrow(cells))) { e <- cells$Stratum[i]; s <- as.character(cells$sc[i]); tf <- if (s %in% names(ft)) pick(ft[[s]], jobs[[match(s, types)]]$rows, M5) else NULL
+  for (i in seq_len(nrow(cells))) { e <- cells$dgrp[i]; s <- as.character(cells$sc[i]); tf <- if (s %in% names(ft)) pick(ft[[s]], jobs[[match(s, types)]]$rows, M5) else NULL
     if (e %in% names(fe)) { f <- fe[[e]]; rows <- jobs[[length(types) + match(e, ecos)]]$rows; j <- match(cells$sc[i], rows$sc)
-      if (!is.na(j)) setm(i, as.list(f[j, ..M5]), "Ecodivision")
+      if (!is.na(j)) setm(i, as.list(f[j, ..M5]), if (is_wetland_forest(cells$StateClass[i])) "Wetland class" else "Ecodivision")
       else if (!is.null(tf)) setm(i, c(pick(f, rows, c("snag", "cwd", "fwd")), tf[c("litter", "duff")]), "Ecodivision; litter and duff by forest type")
     } else if (!is.null(tf)) setm(i, tf, "Forest type") }
   nod <- cells[is.na(Level), unique(StateClass)]

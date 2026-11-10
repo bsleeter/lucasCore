@@ -988,6 +988,11 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       (`PEAT_FIRE_FLOWS`, `src/flows.R`). Starting soil stays the class mean (user, 2026-11-10: "just start each cell the same";
       per-cell gNATSGO soil was weighed and set aside, since cells away from the class balance drift toward it during a run).
       To do: Build again and check the twins' starting soil against the target.
+    - Dead wood decay (user, 2026-11-10): the twins' snag, down log and fine woody debris multipliers had been the ecodivision's
+      shared upland values (the regional rule of 2026-10-27), so wetland dead wood decayed as upland's. Stage 3 now fits each twin
+      on its own mature FIA dead wood plots in its ecodivision (Level "Wetland class"); a twin with too few takes its own class
+      pooled over ecodivisions, never the upland types' values. Upland forest keeps the regional rule. To check on the next Build:
+      the GDS Oak/Gum/Cypress twin (172 mature plots) gets its own values, and the upland types' shared values move a little.
   - **Known limits:** mineral and organic soil are not separated within a class (oak/gum/cypress mixes both); scrub-shrub and
     pocosin cells get a tree curve; cells with no forest type pixel take a neighbour's type, which may be upland; FIA soil carbon is
     modelled, so soil targets stay gNATSGO (which overstates organic wetland soils by about 35%, Uhran et al. 2021). New runs will
