@@ -974,7 +974,7 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     - Library update 1.3 (`ui/LucasCoreUpdates.cs`): the twins, their transition types and groups, the Histosol column, the new flow
       types, groups, memberships, order, filters and the Organic Soil Share multiplier type.
     - Tests: `tests/unit-wetland-forest.R` (31 checks); all unit tests pass except `unit-treemap.R`, which needs a local DataMart.
-    - Still to do: an eastern test library (Chesapeake, Virginia, chosen 2026-11-10) through Data Download, Build and a historical
+    - Still to do: an eastern test library (Chesapeake and Suffolk, Virginia: the Great Dismal Swamp with Lake Drummond and the drained farmland east of it; chosen 2026-11-10) through Data Download, Build and a historical
       run; rerun `tools/calibrate-stem-turnover.R`, `make_co2_ecm_share.R` and `calibrate-harvest-age.R` on the split conditions
       (the twins hold the upland values until then); merge to main and release 1.3.0.
   - **Known limits:** mineral and organic soil are not separated within a class (oak/gum/cypress mixes both); scrub-shrub and
