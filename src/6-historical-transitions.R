@@ -187,13 +187,16 @@ dl <- data.table(Timestep = integer(), TransitionGroupId = character(), Source =
 if (nrow(fire) || nrow(lfg) || nrow(lcg)) {
   b <- grid_blocks(rast(nf[[1]]), L, P)
   wy <- c(y0, yrs)   # the start year's fire is needed for the first year's clearcut burn test
-  ncl <- max(1L, min(par_workers(length(wy), cap = 40), detectCores() - 2L))
-  args <- list(clear = clear_syncrosim_proj, memfrac = 0.6 / ncl, pf = ic$StratumFileName[1], E = as.vector(b$ext), fact = b$fact, td = TD(),
+  args <- list(clear = clear_syncrosim_proj, pf = ic$StratumFileName[1], E = as.vector(b$ext), fact = b$fact, td = TD(),
                nf = as.list(nf), mt = as.list(mt), lf = lf, fire_groups = fire$TransitionGroupId, fire_codes = lapply(fire$Classes, codes), lf_groups = lfg$TransitionGroupId,
                lc = as.list(lc), lc_groups = lcg$TransitionGroupId, lc_code = lc_code, lc_kind = lc_kind, y0 = y0, y1 = y1)
-  say("30 m disturbances: %d years on %d workers (blocks of %d x %d pixels)", length(wy), ncl, b$fact, b$fact)
-  t0 <- Sys.time(); cl <- makeCluster(ncl)
-  res <- tryCatch(parLapply(cl, wy, year_layers, a = args), finally = stopCluster(cl))
+  say("30 m disturbances: %d years (blocks of %d x %d pixels)", length(wy), b$fact, b$fact)
+  # terra's memory share split among the workers; a step that runs out of memory runs again on half the workers (src/shared.R)
+  t0 <- Sys.time()
+  res <- par_lapply_mem(wy, function(y, a) tryCatch(year_layers(y, a), error = function(e) stop(sprintf("year %d: %s", y, conditionMessage(e)), call. = FALSE)),
+                        "30 m disturbances", cap = max(1L, min(40L, detectCores() - 2L)),
+                        init = function(cl, nw) parallel::clusterExport(cl, "year_layers", envir = environment(year_layers)),
+                        args = function(nw) list(a = utils::modifyList(args, list(memfrac = 0.6 / nw))))
   dl <- rbindlist(res)
   layers[[length(layers) + 1]] <- dl[Timestep %in% yrs, .(Timestep, TransitionGroupId, Source, File)]
   say("30 m disturbances done in %.1f min", as.numeric(Sys.time() - t0, units = "mins"))

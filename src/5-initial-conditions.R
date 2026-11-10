@@ -63,14 +63,16 @@ progressBar()
 years <- y0:y1; nfs <- nlcd_file(src$NlcdFolder, years)
 miss <- years[!file.exists(nfs)]; if (length(miss)) fail("Annual NLCD missing for %s", paste(miss, collapse = ", "))
 td <- TD(); pf <- ic$StratumFileName[1]; Lw <- wrap(L)
-nw <- par_workers(length(years)); say("Annual NLCD: %d parallel workers", nw)
-cl <- makeCluster(nw)
-clusterExport(cl, c("nlcd_on_grid", "grid_blocks", "clear_syncrosim_proj", "td", "pf", "Lw"), envir = environment())
-invisible(clusterEvalQ(cl, clear_syncrosim_proj())); invisible(clusterCall(cl, function(f) { library(terra); terraOptions(memfrac = f, progress = 0) }, 0.6 / nw))   # after library(terra), which resets it
-nl_files <- parLapply(cl, seq_along(years), function(i, years, nfs) { library(terra); P <- rast(pf); L <- unwrap(Lw)
+# each cluster: the exports, then terra's memory share split among the workers (after library(terra), which resets it); a step
+# that runs out of memory runs again on half the workers (par_lapply_mem, src/shared.R)
+here5 <- environment()
+nlcd_init <- function(names) function(cl, nw) { clusterExport(cl, names, envir = here5); invisible(clusterEvalQ(cl, clear_syncrosim_proj()))
+  invisible(clusterCall(cl, function(f) { library(terra); terraOptions(memfrac = f, progress = 0) }, 0.6 / nw)) }
+nl_files <- par_lapply_mem(seq_along(years), function(i, years, nfs) tryCatch({ library(terra); P <- rast(pf); L <- unwrap(Lw)
   n <- mask(nlcd_on_grid(nfs[i], L, rast(P)), P); f <- file.path(td, sprintf("NLCD_%d.tif", years[i]))
-  writeRaster(n, f, overwrite = TRUE, datatype = "INT1U", gdal = c("COMPRESS=DEFLATE", "TILED=YES")); f }, years = years, nfs = nfs)
-stopCluster(cl); nl_files <- unlist(nl_files)
+  writeRaster(n, f, overwrite = TRUE, datatype = "INT1U", gdal = c("COMPRESS=DEFLATE", "TILED=YES")); f }, error = function(e) stop(sprintf("NLCD %d (%s): %s", years[i], basename(nfs[i]), conditionMessage(e)), call. = FALSE)), "Annual NLCD",
+  init = nlcd_init(c("nlcd_on_grid", "grid_blocks", "clear_syncrosim_proj", "td", "pf", "Lw")), args = function(nw) list(years = years, nfs = nfs))
+nl_files <- unlist(nl_files)
 say("Annual NLCD: %d years written (modal: each cell's most common 30 m class)", length(years))
 # Build Options: Land Cover Resampling. Area-matched replaces the modal maps with maps whose class areas equal the 30 m areas in each
 # secondary stratum unit, year by year (src/landcover-match.R); everything downstream reads these maps
@@ -78,13 +80,10 @@ lcr <- if ("LandCoverResampling" %in% names(opt) && !is.na(opt$LandCoverResampli
 if (lcr == "2" || grepl("^Area", lcr)) {
   source(pkg_file("src", "landcover-match.R"))
   t0 <- Sys.time(); cd <- file.path(td, "lc-counts"); dir.create(cd, showWarnings = FALSE)
-  nw <- par_workers(length(years)); cl <- makeCluster(nw)
-  clusterExport(cl, c("nlcd_counts_on_grid", "grid_blocks", "clear_syncrosim_proj", "LC_CLASSES", "cd", "pf", "Lw"), envir = environment())
-  invisible(clusterEvalQ(cl, clear_syncrosim_proj())); invisible(clusterCall(cl, function(f) { library(terra); terraOptions(memfrac = f, progress = 0) }, 0.6 / nw))   # after library(terra), which resets it
-  cfs <- unlist(parLapply(cl, seq_along(years), function(i, years, nfs) { library(terra); P <- rast(pf); L <- unwrap(Lw)
+  cfs <- unlist(par_lapply_mem(seq_along(years), function(i, years, nfs) tryCatch({ library(terra); P <- rast(pf); L <- unwrap(Lw)
     s <- mask(nlcd_counts_on_grid(nfs[i], L, rast(P)), P); f <- file.path(cd, sprintf("counts_%d.tif", years[i]))
-    writeRaster(s, f, overwrite = TRUE, datatype = "INT2U", gdal = c("COMPRESS=DEFLATE", "TILED=YES")); f }, years = years, nfs = nfs))
-  stopCluster(cl)
+    writeRaster(s, f, overwrite = TRUE, datatype = "INT2U", gdal = c("COMPRESS=DEFLATE", "TILED=YES")); f }, error = function(e) stop(sprintf("NLCD %d (%s): %s", years[i], basename(nfs[i]), conditionMessage(e)), call. = FALSE)), "Annual NLCD class counts",
+    init = nlcd_init(c("nlcd_counts_on_grid", "grid_blocks", "clear_syncrosim_proj", "LC_CLASSES", "cd", "pf", "Lw")), args = function(nw) list(years = years, nfs = nfs)))
   land <- !is.na(values(P, mat = FALSE)); cell_km2 <- (res_m / 1000)^2
   match_step <- lc_matcher(values(rast(ic$SecondaryStratumFileName[1]), mat = FALSE)[land])
   DEVI <- which(LC_CLASSES %in% 21:24); prev <- NULL; pp <- NULL; short <- 0; nrev <- 0; lost <- 0; wrong <- list(); a30 <- list()
