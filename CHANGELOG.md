@@ -2,7 +2,13 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
-## Unreleased
+## 1.2.2 - 2026-11-10
+
+USFS forest type tiles kept whole in the data home, and a Data Download fix for networks that block remote reads of Box.
+
+**Upgrading:** install `lucasCore-1.2.2.ssimpkg`. There are no schema changes from 1.2.0, so a 1.2 library needs no update; switch
+its lucasCore package to 1.2.2 (`SyncroSim.Console.exe --add --package --pkg=lucasCore --ver=1.2.2 --lib=<library.ssim>`).
+Only the Data Download changes; Builds and their results are as in 1.2.1.
 
 ### Changed
 - Data Download, USFS forest type groups: each FIA region's tile is kept whole at the top of the data home, like TreeMap, and only
