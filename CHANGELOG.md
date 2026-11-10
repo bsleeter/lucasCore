@@ -2,6 +2,26 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## 1.2.1 - 2026-11-10
+
+Grass and shrub live carbon fitted to field biomass, and California's crop mix filled where a county's report leaves a crop out.
+
+**Upgrading:** install `lucasCore-1.2.1.ssimpkg`. There are no schema changes from 1.2.0, so a 1.2 library needs no update; switch
+its lucasCore package to 1.2.1 (`SyncroSim.Console.exe --add --package --pkg=lucasCore --ver=1.2.1 --lib=<library.ssim>`).
+The changes are in the package defaults, so rerun the Build to use them; results made with 1.2.0 keep their values.
+
+### Changed
+- Grassland and shrubland (to-do 55): growth stays on RAP NPP for every class, and each class's turnover is now fitted so its live
+  stocks match field biomass (aboveground and roots, from a literature review). Chaparral's wood turnover is 0.08 a year (was
+  0.03), which puts mature Mediterranean chaparral growth at about 2.5 Mg C/ha/yr with its stocks unchanged. Non-sage shrub and
+  Native Sage Steppe split their growth between a grass layer and a shrub layer by RAP's herbaceous share, bringing their live
+  carbon down to about 1.5 / 2.0 and 1.4 / 2.4 Mg C/ha (aboveground / roots) at the class's mean NPP, from 3 to 5 times that.
+  Annual grass roots die back each year. In the Calaveras test, annual grass live carbon fell from 4.8 to 3.7 Mg C/ha and non-sage
+  from 18.4 to 7.4.
+- Crop Mix (California): a crop missing from a year of a county's commissioners' report (counted under "unspecified" so growers
+  stay private) takes its area interpolated between the years it was reported, or its 2019 area when 2020 is missing. 3,404
+  crop-years filled; Calaveras's 2020 crop mix goes from 0.37 to 0.85 of its 2014-2020 level (its walnuts had been left out).
+
 ## 1.2.0 - 2026-11-09
 
 Grassland, shrubland, wetland and agriculture carbon rebuilt from data, CO2 fertilization in projections, and library updates.
