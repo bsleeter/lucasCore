@@ -15,6 +15,7 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | next | 53 Forested wetlands as wetland counterparts of three forest type groups (spruce/fir, oak/gum/cypress, elm/ash/cottonwood), with burial, peat fire and drained peat | Yes (woody wetland classes, and the three upland types lose their hydric FIA plots) | Planned 2026-11-09; choices decided 2026-11-10 (other types by region, burial, peat fire now); not started | - |
 | later | 54 Climate response for emergent wetland growth | Yes (marsh growth by year, in history and in projections, when turned on) | Added 2026-11-09 (user). Today only CO2 changes marsh growth under alternative climate futures; the response model needs a short review first (item 54) | - |
 | later | 55 Grass and shrub stocks fitted to literature (chaparral wood turnover 0.08; non-sage and native sage steppe split by RAP herb share) | Yes | Refit done 2026-11-09 (item 55); left: the RAP tests at the Sky Oaks towers, the foothill chaparral scale | - |
+| next | 56 Run Build stages on their own or a few in sequence, each result a dependency of the next | No (the same results, fewer reruns) | Added 2026-11-10 (user), after the Great Dismal Swamp Build failed in stage 8 after 44 minutes and had to be rerun whole | - |
 | release | 46 CO2 fertilization | Yes, in projections with a Projection Climate result (Central by default; None turns it off) | Added 2026-11-04; built, tested (Puget run, age-band check), documented (guide 7.3.1) and pushed 2026-11-06. Left: a release | - |
 | later | 47 Example libraries by region and resolution | No (each holds its own results) | Added 2026-11-04, replaces 13. Best built after the open science items, since each carbon change dates them | 14, restore test |
 | any | 49 Test national mode end to end | No | Added 2026-11-04. Never run end to end; fills about 175 GB overnight | 12 (done) |
@@ -1056,3 +1057,25 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     Landsat NPP at chaparral pixels; RAP herbaceous production against the San Joaquin and Hopland clipping series); the
     foothill chaparral scale s (Calaveras 1.21 lifts mature chaparral to about 13.3 Mg C/ha against a measured Sierra foothill
     chamise value of about 7.5); a root target for irrigated pasture (assumed); and step 3 above.
+
+56. **Run Build stages on their own, or a few in sequence, as a dependency chain** - TO DO, added 2026-11-10 (user: "I want the
+    ability to run each of these on its own, or a few sequentially, and have them serve as dependencies down the chain. This way if
+    one step fails down the chain, I do not have to re-run the entire thing"). Prompted by the Great Dismal Swamp Build: stages 0-7
+    passed and stage 8 failed after 44 minutes on a misplaced input (the Histosol share written into a folder of its own name), and
+    the only way to a complete Build result from Studio was the whole Build again.
+  - **Today:** a Build is one scenario whose pipeline runs stages 0-12 into one result; a failure leaves that result partial and
+    nothing starts from it. tools/quick-test.R already makes a scenario that depends on a Build result with a pipeline of only the
+    named stages, and the stages read what they need through dependencies, so the mechanism works, but only from a script and only
+    on top of an existing Build result.
+  - **Wanted:** in Studio, a Build split into steps (each stage, or a group such as 0-4, 5-7, 8, 9-11, 12), each step a scenario
+    whose result is the dependency of the next, so a failed step is rerun alone and the steps before it are kept; a Build run as one
+    pipeline should still be possible and give the same result.
+  - **What the quick tests already taught (each must hold for a chain of steps):** options sheets did not reach a rerun stage through
+    the dependency (stage 3 fell back to the default FIA source), so quick-test.R copies every Build options sheet; sheets a stage
+    appends to (Flow Spatial Multipliers in stages 7, 8 and 11) must carry the earlier rows over, since a result's own rows hide its
+    dependency's; the Stock-Flow Definitions scenario goes first in the dependency list; Initial Conditions Spatial is saved again
+    so SyncroSim writes its Properties; stage 12 finds its files in the dependencies' folders.
+  - **To settle:** how the steps appear in Studio (step scenarios made by a command, or the Build's own pipeline rerun from a chosen
+    stage on a chosen result); which later scenarios (Projection Setup, historical and projection runs, Model Record, Data Release)
+    accept the last step's result where they now look for a Build result; and how the model record lists a chain of results as one Build.
+  - **Related:** a check before stage 0 that every Data Sources file opens would have stopped this Build in seconds.
