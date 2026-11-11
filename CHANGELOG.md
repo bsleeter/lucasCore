@@ -2,6 +2,18 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## 1.3.1 - 2026-11-11
+
+A fix for library update 1.3.
+
+**Upgrading:** install `lucasCore-1.3.1.ssimpkg` in place of 1.3.0. Opening a 1.2 library runs library update 1.3, as in 1.3.0
+it was meant to. A library already at 1.3 needs no update; switch its lucasCore package to 1.3.1
+(`SyncroSim.Console.exe --add --package --pkg=lucasCore --ver=1.3.1 --lib=<library.ssim>`). Builds and results are as in 1.3.0.
+
+### Fixed
+- Library update 1.3 stopped with "SQL logic error, near "s": syntax error", and the library stayed at 1.2. The update's
+  description had an apostrophe in it, and SyncroSim writes that text into the library without quoting it.
+
 ## 1.3.0 - 2026-11-11
 
 Forested wetlands as classes of their own, peat as its own soil stock, and a carbon fluxes figure that breaks the balance down by
