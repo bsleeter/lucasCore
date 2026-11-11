@@ -1340,6 +1340,26 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       resprouting Non-sage about 10-15, all fitted per region.
     - **A side benefit (user):** land use and land cover line up better. The disturbed classes give NLCD-like maps of the land in its
       waiting stage, burned forest that shows as shrub or grass, without changing use-based accounting.
+  - **Build (started 2026-11-11, user: "Yes go ahead"; on the to-do 53 branch, version 1.4.0 there, not merged).** Names and Ids agreed:
+    `Disturbed: <type>` (state label X Disturbed, Y the type's label; the wetland twins' disturbed classes take "Wetland <type>"),
+    Id 2000 + the parent's (not NLCD codes, not 100-999, not the legacy EVT targets 61, 83, 84, 1000, 1001). Order: 1 structure,
+    2 carbon, 3 historical maps (stage 6), 4 projections (stages 9-10), 5 starting cells (stages 5, 8), 6 figures, 7 calibration
+    (RCMAP, Northern Basin and Range; download to ask) and a test Build, release 1.4.0.
+    - **Step 1 DONE 2026-11-11.** `tools/make_post_disturbance.R` writes, from `defaults/transitions/post-disturbance-settings.csv`
+      (window, return age and chance, reburn conversion, forest's shrub share, by parent; provisional values from P26) and
+      `post-disturbance-regions.csv` (each ecodivision's shrub and grass class): 36 classes; the types Post-disturbance: Forest
+      Return, Shrub Return, Conversion and their groups (+ Post-disturbance); `pathways/post-disturbance.csv` (return and
+      conversion); fire.csv (high severity into the disturbed class, reburn proportions, medium and low keep it); urbanization and
+      ag expansion as the parent; diagram cells (columns I and J); CO2 classes (disturbed forest as Non-sage; then rerun
+      tools/make_co2_default_betas.R); definitions (edited as text lines). Stages 5 and 8 count forest as Ids 100-999; stage 6's
+      natural classes for Ag Contraction gates stop at 999; transition pairs and Run Figures know the Disturbed family (cover and
+      balance group Disturbed). Library update 1.4 (`Update_1_400`) adds the label, classes, types and groups, worked out from each
+      library's own classes; tested on a copy of Calaveras (schema 1.4, 36 classes, Ids 2051-2990). tests/unit-post-disturbance.R
+      (17 checks, including no apostrophe in any update description). Class 59 and the Succession Post Fire types are kept for now
+      (nothing reaches them); retiring them touches about 20 tables. Found and fixed on the way: four definitions rows whose `{*}`
+      quotes had been doubled to 16 by an earlier read-and-rewrite.
+    - Until step 3, historical runs send burned forest and shrub into the disturbed classes and nothing returns them (stage 6 sets a
+      target of 0 on a type with no yearly map). Until step 2 the disturbed classes have no carbon rows. Don't Build with this yet.
   - **Starting cells: disturbed before the start year (user, 2026-11-11, the Mount St Helens case).** Stage 5's "forest in any
     year" rule already starts a natural cell as forest when NLCD shows it as forest in any later year, so a blast zone or burn that
     regrew starts as its forest type. Its age is the problem: a stand that began after the start year (age 0 or less from CMS or
