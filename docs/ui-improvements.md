@@ -1267,6 +1267,39 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
           NLCD forest the year after a fire includes partly burned stands.
       - Not needed (user, 2026-11-11: "I am not worried about the adjacency timing for just a single layer"): the timing test of
         one extra adjacency setting.
+  - **Shrubland too (user, 2026-11-11).** In the Northern Basin and Range, NLCD shows large areas of shrubland turned to grassland
+    after fire, the way cheatgrass establishes. Decisions:
+    - **Shrubs get post-disturbance classes, as forest does** (user: a consistent approach; NLCD calls burned shrubland grass whether
+      it is regrowing or converting, so without separate classes real conversion can't be told apart, calibrated, or managed in
+      projection scenarios). One class each for Sage, Native Sage Steppe, Invaded Sage Steppe, Non-sage and Chaparral: +5, so +36
+      classes in all with the forest ones, class 59 retired.
+      - Carbon while waiting: the class's own type's (the shrub-age recovery curves, whose early years are already grass and herb,
+        and its dead wood, litter and soil), so it is a copy of its parent class with its own identity. Forest post-disturbance
+        classes differ: they grow shrub and grass, not trees.
+      - Out: back to its shrub type with age carried over, or conversion. Same Return and Conversion transition types as forest.
+      - Calibration: NLCD is a weak signal for shrub return (big sagebrush is back to a quarter of its cover after about 19 years, so
+        NLCD can show grass for decades on recovering land). Use RCMAP's yearly fractional cover (shrub, sagebrush, annual herbaceous,
+        1985 on): conversion where annual herbaceous cover dominates and sagebrush doesn't recover; NLCD as the check. Needs a
+        Northern Basin and Range region home (a download; ask first).
+      - Window: longer for big sagebrush (reseeds, doesn't resprout; something like 30-40 years), shorter for resprouting chaparral
+        and many Non-sage shrubs.
+      - Adjacency: a shrub Return group with a "Live Shrub" attribute (sagebrush seed travels tens of metres), so two adjacency
+        calculations in all (Live Forest, Live Shrub). Fallback: static gates or none for shrubs. Rerun the own-type check for shrubs.
+      - Groups: forest Return, shrub Return, and one Conversion group: +3 named groups.
+      - To-do 58 gains shrub actions on these classes: post-fire seeding of sagebrush or perennial grasses, sagebrush seedlings
+        ("plugs"), pre-emergent herbicide against cheatgrass.
+    - **Conversion goes to `Grassland: Annual`** for the sage family and chaparral, one class for cheatgrass and California annual
+      grassland (user: "they share a class name but underlying carbon values differ by ecodivision"). The class already has its own
+      sampled rows in the dry ecodivisions: Temperate Desert NPP 1.31 Mg C/ha/yr, soil 43 Mg C/ha; Temperate Desert Mountains 1.21,
+      36; Temperate Steppe 2.69, 80; Mediterranean 3.62, 66. Non-sage converts to annual grass or stays, by region. Soil carries over
+      and moves toward the annual grass level through decay.
+    - **Fire raises burned area on converted land (user: "Yes, raise burned area").** Projections draw a historical year's burned
+      fraction per pyrome and spread it with one rate map per severity, whatever the class, so converted annual grass burns no more
+      often than the sagebrush it replaced, and post-disturbance land reburns no more often, although reburns drive most conversion.
+      Add a fire multiplier by state class (ST-Sim transition multipliers per class; no run-time cost) on `Grassland: Annual` in the
+      dry ecodivisions and on the post-disturbance classes, fitted from how often each burned historically. It adds fire on top of
+      the year drawn, so the grass-fire cycle feeds itself as conversion spreads. Calibrate so the historical period still matches
+      the observed burned area.
   - **Starting cells: disturbed before the start year (user, 2026-11-11, the Mount St Helens case).** Stage 5's "forest in any
     year" rule already starts a natural cell as forest when NLCD shows it as forest in any later year, so a blast zone or burn that
     regrew starts as its forest type. Its age is the problem: a stand that began after the start year (age 0 or less from CMS or
