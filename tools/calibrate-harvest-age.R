@@ -23,35 +23,44 @@ a <- commandArgs(TRUE); opt <- function(k, d) { m <- grep(sprintf("^--%s=", k), 
 pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
 ds0 <- fread(file.path(pkg, "defaults/library/project/lucasCore_DataSource.csv"))
 dm <- opt("dm", ds0$FiaDataMartFolder[1]); ecof <- ds0$EcodivisionFile[1]
+if (is.na(ecof) || !nzchar(ecof)) ecof <- file.path(pkg, "defaults", "strata", "ecodivisions", "EcoDivisions_Dissolve.shp")   # the shipped map when the default Data Sources leave it blank
 PCT <- as.numeric(opt("percentile", 0.1)); MIN_CUTS <- as.integer(opt("min-cuts", 20)); MIN_ECO <- as.integer(opt("min-eco-cuts", 30)); dry <- "--dry-run" %in% a
 KINDS <- c(clearcut = "Forest Harvest: Forest Clearcut", selection = "Forest Harvest: Forest Selection")
 
 hp <- file.path(pkg, "defaults/transitions/pathways/harvest.csv"); hv <- fread(hp, colClasses = "character", na.strings = "")
 types <- unique(hv[TransitionTypeId == KINDS[["clearcut"]], StateClassIdSource])
 norm <- function(x) sub("sgroup$", "group", gsub("[^a-z]", "", tolower(sub("^Forest: ", "", x))))   # "Other western softwoods group" = "Other Western Softwood Group"
-grp <- fread(file.path(dm, "REFERENCE", "REF_FOREST_TYPE.csv"), select = c("VALUE", "TYPGRPCD"))
-gnm <- fread(file.path(dm, "REFERENCE", "REF_FOREST_TYPE_GROUP.csv"), select = c("VALUE", "MEANING"))
+# the reference tables from the extracted REFERENCE folder, or from FIADB_REFERENCE.zip (as src/fia.R fia_reference)
+ref <- function(f) { p <- file.path(dm, "REFERENCE", f); if (file.exists(p)) return(fread(p))
+  td <- tempfile(); utils::unzip(file.path(dm, "FIADB_REFERENCE.zip"), files = f, exdir = td); fread(file.path(td, f)) }
+grp <- ref("REF_FOREST_TYPE.csv")[, .(VALUE, TYPGRPCD)]
+gnm <- ref("REF_FOREST_TYPE_GROUP.csv")[, .(VALUE, MEANING)]
 gnm[, Type := types[match(norm(MEANING), norm(types))]]
+# forested wetland twins (to-do 53): a hydric condition (PHYSCLCD 31-39) of Spruce/Fir, Oak/Gum/Cypress or Elm/Ash/Cottonwood takes the
+# twin's code (src/fia.R fia_hydric_group), and the twin codes are named after the twin classes
+fail <- function(...) stop(sprintf(...), call. = FALSE); source(file.path(pkg, "src", "fia.R"))
+tw <- data.table(VALUE = unname(FIA_HYDRIC_TWINS), MEANING = NA_character_)[, Type := sub("^Forest: ", "Wetland: ", gnm$Type[match(as.integer(names(FIA_HYDRIC_TWINS)), gnm$VALUE)])]
+gnm <- rbind(gnm, tw[Type %in% types])
 
 # ---- the cuts -------------------------------------------------------------------------------------------------------------
 sts <- sort(sub("_PLOT[.]csv$", "", list.files(dm, "^[A-Z]{2}_PLOT[.]csv$"))); sts <- sts[file.exists(file.path(dm, paste0(sts, "_COND.csv")))]
 t0 <- Sys.time()
 cuts <- rbindlist(lapply(sts, function(s) {
   pl <- fread(file.path(dm, sprintf("%s_PLOT.csv", s)), select = c("CN", "PREV_PLT_CN", "MEASYEAR", "LAT", "LON"), colClasses = list(character = c("CN", "PREV_PLT_CN")))
-  cd <- fread(file.path(dm, sprintf("%s_COND.csv", s)), select = c("PLT_CN", "CONDID", "COND_STATUS_CD", "STDAGE", "FORTYPCD", "BALIVE", paste0("TRTCD", 1:3), paste0("TRTYR", 1:3)),
+  cd <- fread(file.path(dm, sprintf("%s_COND.csv", s)), select = c("PLT_CN", "CONDID", "COND_STATUS_CD", "STDAGE", "FORTYPCD", "PHYSCLCD", "BALIVE", paste0("TRTCD", 1:3), paste0("TRTYR", 1:3)),
               colClasses = list(character = "PLT_CN"))
-  for (k in c(paste0("TRTCD", 1:3), paste0("TRTYR", 1:3), "STDAGE", "BALIVE", "FORTYPCD")) set(cd, j = k, value = as.numeric(cd[[k]]))
+  for (k in c(paste0("TRTCD", 1:3), paste0("TRTYR", 1:3), "STDAGE", "BALIVE", "FORTYPCD", "PHYSCLCD")) set(cd, j = k, value = as.numeric(cd[[k]]))
   cd <- merge(cd, pl[, .(PLT_CN = CN, PREV_PLT_CN, MEASYEAR, LAT, LON)], by = "PLT_CN")
   cd[, TRTYR := fcase(TRTCD1 %in% 10 & between(TRTYR1, 1900, 2100), TRTYR1, TRTCD2 %in% 10 & between(TRTYR2, 1900, 2100), TRTYR2,
                       TRTCD3 %in% 10 & between(TRTYR3, 1900, 2100), TRTYR3, default = NA_real_)]
   now <- cd[!is.na(TRTYR) & !is.na(PREV_PLT_CN) & nzchar(PREV_PLT_CN), .(PREV_PLT_CN, CONDID, TRTYR, ba1 = BALIVE)]
-  pre <- cd[COND_STATUS_CD %in% 1, .(PREV_PLT_CN = PLT_CN, CONDID, age0 = STDAGE, typ0 = FORTYPCD, ba0 = BALIVE, y0 = MEASYEAR, LAT, LON)]
+  pre <- cd[COND_STATUS_CD %in% 1, .(PREV_PLT_CN = PLT_CN, CONDID, age0 = STDAGE, typ0 = FORTYPCD, phys0 = PHYSCLCD, ba0 = BALIVE, y0 = MEASYEAR, LAT, LON)]
   x <- merge(now, pre, by = c("PREV_PLT_CN", "CONDID"))
   x[TRTYR >= y0 & TRTYR <= y0 + 20 & !is.na(age0) & age0 >= 0 & !is.na(typ0)][, State := s][] }))
 cuts[, age := age0 + (TRTYR - y0)]
 cuts[, loss := fifelse(!is.na(ba0) & ba0 > 0, 1 - fifelse(is.na(ba1), 0, ba1) / ba0, NA_real_)]
 cuts[, kind := fcase(loss >= 0.75, "clearcut", loss >= 0.10, "selection", default = NA_character_)]
-cuts <- merge(cuts, grp[, .(typ0 = VALUE, TYPGRPCD)], by = "typ0", all.x = TRUE)
+cuts <- merge(cuts, grp[, .(typ0 = VALUE, TYPGRPCD)], by = "typ0", all.x = TRUE)[, TYPGRPCD := fia_hydric_group(TYPGRPCD, phys0)]
 cuts <- merge(cuts, gnm[, .(TYPGRPCD = VALUE, Type)], by = "TYPGRPCD", all.x = TRUE)
 cuts <- cuts[!is.na(kind) & !is.na(Type)]
 eco <- read_sf(ecof); pts <- unique(cuts[!is.na(LAT) & !is.na(LON), .(LAT, LON)])
@@ -69,8 +78,11 @@ fit_t <- cuts[, .(Cuts = .N, AgeMin = pq(age)), by = .(Type, kind)]
 fit_e <- cuts[!is.na(Ecodivision), .(Cuts = .N, AgeMin = pq(age)), by = .(Ecodivision, Type, kind)][Cuts >= MIN_ECO]
 # fallback: culmination of mean annual increment of a Build result's merchantable volume curves
 cmai <- NULL; cv <- opt("curves", NA)
-if (!is.na(cv)) { suppressPackageStartupMessages(library(rsyncrosim)); lp <- sub(":[0-9]+$", "", cv); id <- as.integer(sub("^.*:", "", cv))
-  vc <- as.data.table(datasheet(scenario(suppressWarnings(ssimLibrary(lp)), id), "lucasCore_MerchantableVolumeCurve", lookupsAsFactors = FALSE))
+if (!is.na(cv)) { lp <- sub(":[0-9]+$", "", cv); id <- as.integer(sub("^.*:", "", cv))
+  # read by SQL, read-only: rsyncrosim cannot open the sheet of a library made with another lucasCore version (2026-11-10)
+  con <- DBI::dbConnect(RSQLite::SQLite(), lp, flags = RSQLite::SQLITE_RO)
+  vc <- as.data.table(DBI::dbGetQuery(con, sprintf("SELECT s.Name AS StratumId, c.Name AS StateClassId, v.Age, v.MerchantableVolume FROM lucasCore_MerchantableVolumeCurve v
+    JOIN stsim_Stratum s ON s.StratumId = v.StratumId JOIN stsim_StateClass c ON c.StateClassId = v.StateClassId WHERE v.ScenarioId = %d", id))); DBI::dbDisconnect(con)
   cmai <- vc[Age > 0 & MerchantableVolume > 0][order(StratumId, StateClassId, Age)][, .(c = Age[which.max(MerchantableVolume / Age)]), by = .(StratumId, Type = StateClassId)][
     , .(CMAI = as.integer(round(median(c)))), by = Type] }
 pkgv <- hv[TransitionTypeId == KINDS[["clearcut"]], .(Type = StateClassIdSource, Package = as.integer(AgeMin))]

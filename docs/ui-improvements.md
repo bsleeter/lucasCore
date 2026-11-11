@@ -977,8 +977,16 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       types, groups, memberships, order, filters and the Organic Soil Share multiplier type.
     - Tests: `tests/unit-wetland-forest.R` (31 checks); all unit tests pass except `unit-treemap.R`, which needs a local DataMart.
     - Still to do: an eastern test library (Chesapeake and Suffolk, Virginia: the Great Dismal Swamp with Lake Drummond and the drained farmland east of it; chosen 2026-11-10) through Data Download, Build and a historical
-      run; rerun `tools/calibrate-stem-turnover.R`, `make_co2_ecm_share.R` and `calibrate-harvest-age.R` on the split conditions
-      (the twins hold the upland values until then); merge to main and release 1.3.0.
+      run (done: Builds 10 and 17, historical runs 13 and 19); merge to main and release 1.3.0.
+    - Refitted on the split FIA conditions (2026-11-10): stem turnover, the CO2 ECM share (and the default betas made from it) and
+      minimum harvest ages, for the twins and the three upland types they split from; every other class's rows kept as they were
+      (the reruns also moved a few unrelated rows: four stem turnover rows by at most 0.0003 from the cached conditions, and the ten
+      harvest ages of types with too few cuts, which take a Build's curves and so depend on which Build is given). Wetland against
+      upland: ECM share Subtropical Oak/Gum/Cypress 0.129 against 0.392, Warm Continental Spruce/Fir 0.568 against 0.713;
+      clearcut age Spruce/Fir 64 against 37 (65 and 157 cuts), Oak/Gum/Cypress 29 against 27, Elm/Ash/Cottonwood 35 against 23;
+      stem turnover Subtropical Oak/Gum/Cypress 0.0147 against 0.0174. The harvest age tool now applies the hydric split itself
+      (fia_hydric_group), reads FIADB_REFERENCE.zip when no REFERENCE folder is unpacked and a Build's curves by SQL; both tools
+      fall back to the shipped ecodivision map. tests/unit-wetland-forest.R checks these tables for rows of the twins' own.
     - Great Dismal Swamp test (library `Great Dismal Swamp`, Build result 7, 2026-11-10): the Histosol share needed its own home
       folder (`soils-terrain/histosol/*.tif`; written into a folder of its own name, stage 8 could not open it). Stage 5 gave 34,386
       woody wetland cells a twin (65% already of a twin's group; the loblolly, oak/hickory and oak/pine cells -> Oak/Gum/Cypress).

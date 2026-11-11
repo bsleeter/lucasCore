@@ -13,17 +13,21 @@ tt <- function(x) sub("^(Ag Contraction (Cropland|Pasture)): (.+ Group)$", "\\1:
 # every row naming an upland class has a twin row with the same other values
 files <- c(file.path("carbon-assumptions", c("cbm-defaults", "fia-measured"), "cbm-crosswalk.csv"),
            file.path("carbon-assumptions", c("cbm-defaults", "fia-measured"), "growth-inputs.csv"),
-           file.path("carbon-assumptions", "fia-measured", "live-turnover.csv"), file.path("cbm", "species-crosswalk.csv"),
-           file.path("climate", c("co2-classes.csv", "co2-ecm-share.csv", "co2-default-betas.csv")), file.path("spinup", c("return-interval.csv", "soil-targets.csv")),
-           file.path("transitions", "harvest-age.csv"), file.path("transitions", "pathways", paste0(c("ag-contraction", "ag-expansion", "fire", "harvest", "urbanization"), ".csv")),
+           file.path("cbm", "species-crosswalk.csv"), file.path("climate", "co2-classes.csv"), file.path("spinup", c("return-interval.csv", "soil-targets.csv")),
+           file.path("transitions", "pathways", paste0(c("ag-contraction", "ag-expansion", "fire", "harvest", "urbanization"), ".csv")),
            character())
-for (f in files) { x <- rd(D(f))
+skip <- c(`transitions/pathways/harvest.csv` = "AgeMin")   # minimum harvest ages are the twins' own (tools/calibrate-harvest-age.R)
+for (f in files) { x <- rd(D(f)); if (f %in% names(skip)) x[, (skip[[f]]) := NULL]
   key <- function(y) apply(y, 1, function(r) paste(ifelse(is.na(r), "", r), collapse = "|"))
   up <- x[Reduce(`|`, lapply(x, function(v) v %in% UP))]
   want <- copy(up); for (k in names(want)) { v <- want[[k]]; h <- v %in% UP; v[h] <- TW[match(v[h], UP)]; v <- tt(v)
     if (k == "FiaTypeGroups") v <- c(`120` = "121", `600` = "601", `700` = "701")[v] %||% v; set(want, j = k, value = v) }
   check(sprintf("%s: %d upland rows, each with its twin", f, nrow(up)), nrow(up) > 0 && all(key(want) %in% key(x))) }
 sc <- rd(D("stsim", "stsim_StateClass.csv"))
+# tables refitted on the split FIA conditions (2026-11-10): each twin has rows of its own there, fitted on its own plots
+for (f in c(file.path("carbon-assumptions", "fia-measured", "live-turnover.csv"), file.path("climate", c("co2-ecm-share.csv", "co2-default-betas.csv")), file.path("transitions", "harvest-age.csv"))) {
+  x <- rd(D(f)); cl <- intersect(c("StateClassId", "StateClassIdSource"), names(x))[1]
+  check(sprintf("%s: rows for each twin", f), all(TW %in% x[[cl]])) }
 check("the three twins are state classes 121, 601, 701, labelled Wetland", all(sc[match(TW, Name), Id] == c("121", "601", "701")) && all(sc[match(TW, Name), StateLabelXId] == "Wetland"))
 cw <- rd(D("growth", "forest-type-crosswalk.csv"))
 check("forest-type crosswalk: each twin fits on its own FIA code", all(cw[match(c("121", "601", "701"), StateClassId), FiaTypeGroups] == c("121", "601", "701")))

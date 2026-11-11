@@ -23,7 +23,8 @@ ds0 <- fread(file.path(pkg, "defaults/library/project/lucasCore_DataSource.csv")
 dm <- opt("dm", ds0$FiaDataMartFolder[1]); SR <- as.numeric(opt("stand-replacing", 0.7)); MIN_AGE <- as.numeric(opt("min-age", 60)); MIN_N <- as.integer(opt("min-conds", 30)); MIN_DIA <- as.numeric(opt("min-dia", 0)); dry <- "--dry-run" %in% a
 cf <- file.path(dm, "fia-conditions.rds"); if (!file.exists(cf)) stop("no ", cf, ": run a Build's stage 2 with the FIA DataMart folder first (it caches the conditions)")
 cc <- readRDS(cf)$cond[, .(PLT_CN = plt_cn, CONDID = as.integer(condid), ecodiv, fortyp_grp = as.integer(fortyp_grp), stdage = as.numeric(stdage))][!is.na(stdage) & stdage >= MIN_AGE]
-eco <- unique(as.data.table(st_drop_geometry(read_sf(ds0$EcodivisionFile[1])))[, .(ecodiv = as.character(ecodiv), Ecodivision = StrtmNm)])
+ecof0 <- ds0$EcodivisionFile[1]; if (is.na(ecof0) || !nzchar(ecof0)) ecof0 <- file.path(pkg, "defaults", "strata", "ecodivisions", "EcoDivisions_Dissolve.shp")   # the shipped map when the default Data Sources leave it blank
+eco <- unique(as.data.table(st_drop_geometry(read_sf(ecof0)))[, .(ecodiv = as.character(ecodiv), Ecodivision = StrtmNm)])
 # one name per code: the shapefile has a second M260 polygon named "Mediterranean" (found 2026-10-30); a mountain code keeps its "Mountains" name
 eco <- eco[order(ecodiv, -(startsWith(ecodiv, "M") & grepl("Mountains$", Ecodivision)))][!duplicated(ecodiv)]
 # FIA group -> forest type: the type of that code first, else the first type that pools it

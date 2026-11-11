@@ -29,19 +29,19 @@ Forest: Douglas-fir Group,Temperate Steppe,95,0.975
 Forest: Douglas-fir Group,Temperate Steppe Mountains,5639,0.975
 Forest: Douglas-fir Group,Tropical/Subtropical Steppe,46,0.967
 Forest: Douglas-fir Group,Tropical/Subtropical Steppe Mountains,103,0.983
-Forest: Elm/Ash/Cottonwood Group,,18511,0.27
-Forest: Elm/Ash/Cottonwood Group,Hot Continental,5327,0.224
-Forest: Elm/Ash/Cottonwood Group,Hot Continental Mountains,260,0.199
-Forest: Elm/Ash/Cottonwood Group,Marine,52,0.584
-Forest: Elm/Ash/Cottonwood Group,Marine Mountains,54,0.81
-Forest: Elm/Ash/Cottonwood Group,Prairie,2685,0.271
-Forest: Elm/Ash/Cottonwood Group,Subtropical,4757,0.282
+Forest: Elm/Ash/Cottonwood Group,,14539,0.278
+Forest: Elm/Ash/Cottonwood Group,Hot Continental,4604,0.225
+Forest: Elm/Ash/Cottonwood Group,Hot Continental Mountains,248,0.202
+Forest: Elm/Ash/Cottonwood Group,Marine,49,0.59
+Forest: Elm/Ash/Cottonwood Group,Marine Mountains,52,0.803
+Forest: Elm/Ash/Cottonwood Group,Prairie,2644,0.269
+Forest: Elm/Ash/Cottonwood Group,Subtropical,4169,0.277
 Forest: Elm/Ash/Cottonwood Group,Subtropical Mountains,67,0.267
-Forest: Elm/Ash/Cottonwood Group,Temperate Steppe,544,0.522
-Forest: Elm/Ash/Cottonwood Group,Temperate Steppe Mountains,90,0.917
+Forest: Elm/Ash/Cottonwood Group,Temperate Steppe,537,0.52
+Forest: Elm/Ash/Cottonwood Group,Temperate Steppe Mountains,82,0.913
 Forest: Elm/Ash/Cottonwood Group,Tropical/Subtropical Steppe,165,0.37
-Forest: Elm/Ash/Cottonwood Group,Warm Continental,4309,0.243
-Forest: Elm/Ash/Cottonwood Group,Warm Continental Mountains,109,0.374
+Forest: Elm/Ash/Cottonwood Group,Warm Continental,1799,0.281
+Forest: Elm/Ash/Cottonwood Group,Warm Continental Mountains,43,0.32
 Forest: Exotic Hardwoods Group,,965,0.179
 Forest: Exotic Hardwoods Group,Hot Continental,212,0.187
 Forest: Exotic Hardwoods Group,Hot Continental Mountains,42,0.288
@@ -85,14 +85,14 @@ Forest: Maple/Beech/Birch Group,Prairie,99,0.347
 Forest: Maple/Beech/Birch Group,Subtropical,69,0.301
 Forest: Maple/Beech/Birch Group,Warm Continental,14127,0.416
 Forest: Maple/Beech/Birch Group,Warm Continental Mountains,6876,0.557
-Forest: Oak/Gum/Cypress Group,,16058,0.308
-Forest: Oak/Gum/Cypress Group,Hot Continental,307,0.392
-Forest: Oak/Gum/Cypress Group,Hot Continental Mountains,34,0.497
-Forest: Oak/Gum/Cypress Group,Prairie,254,0.59
-Forest: Oak/Gum/Cypress Group,Savanna,212,0.058
-Forest: Oak/Gum/Cypress Group,Subtropical,15120,0.304
+Forest: Oak/Gum/Cypress Group,,10893,0.397
+Forest: Oak/Gum/Cypress Group,Hot Continental,252,0.435
+Forest: Oak/Gum/Cypress Group,Hot Continental Mountains,32,0.509
+Forest: Oak/Gum/Cypress Group,Prairie,252,0.591
+Forest: Oak/Gum/Cypress Group,Savanna,31,0.077
+Forest: Oak/Gum/Cypress Group,Subtropical,10200,0.392
 Forest: Oak/Gum/Cypress Group,Subtropical Mountains,65,0.608
-Forest: Oak/Gum/Cypress Group,Tropical/Subtropical Steppe,59,0.539
+Forest: Oak/Gum/Cypress Group,Tropical/Subtropical Steppe,56,0.515
 Forest: Oak/Hickory Group,,90758,0.598
 Forest: Oak/Hickory Group,Hot Continental,32478,0.596
 Forest: Oak/Hickory Group,Hot Continental Mountains,14681,0.617
@@ -141,12 +141,12 @@ Forest: Ponderosa Pine Group,Tropical/Subtropical Steppe,360,0.956
 Forest: Ponderosa Pine Group,Tropical/Subtropical Steppe Mountains,667,0.961
 Forest: Redwood Group,,265,0.204
 Forest: Redwood Group,Mediterranean,251,0.199
-Forest: Spruce/Fir Group,,14263,0.69
-Forest: Spruce/Fir Group,Hot Continental,198,0.716
-Forest: Spruce/Fir Group,Hot Continental Mountains,76,0.907
+Forest: Spruce/Fir Group,,6650,0.783
+Forest: Spruce/Fir Group,Hot Continental,91,0.707
+Forest: Spruce/Fir Group,Hot Continental Mountains,71,0.901
 Forest: Spruce/Fir Group,Temperate Steppe Mountains,53,1
-Forest: Spruce/Fir Group,Warm Continental,11153,0.628
-Forest: Spruce/Fir Group,Warm Continental Mountains,2783,0.845
+Forest: Spruce/Fir Group,Warm Continental,3965,0.713
+Forest: Spruce/Fir Group,Warm Continental Mountains,2470,0.858
 Forest: Tanoak/Laurel Group,,806,0.847
 Forest: Tanoak/Laurel Group,Marine Mountains,95,0.825
 Forest: Tanoak/Laurel Group,Mediterranean,312,0.754
@@ -169,30 +169,17 @@ Forest: White/Red/Jack Pine Group,Hot Continental Mountains,531,0.857
 Forest: White/Red/Jack Pine Group,Subtropical,48,0.744
 Forest: White/Red/Jack Pine Group,Warm Continental,5581,0.919
 Forest: White/Red/Jack Pine Group,Warm Continental Mountains,717,0.865
-Wetland: Elm/Ash/Cottonwood Group,,18511,0.27
-Wetland: Elm/Ash/Cottonwood Group,Hot Continental,5327,0.224
-Wetland: Elm/Ash/Cottonwood Group,Hot Continental Mountains,260,0.199
-Wetland: Elm/Ash/Cottonwood Group,Marine,52,0.584
-Wetland: Elm/Ash/Cottonwood Group,Marine Mountains,54,0.81
-Wetland: Elm/Ash/Cottonwood Group,Prairie,2685,0.271
-Wetland: Elm/Ash/Cottonwood Group,Subtropical,4757,0.282
-Wetland: Elm/Ash/Cottonwood Group,Subtropical Mountains,67,0.267
-Wetland: Elm/Ash/Cottonwood Group,Temperate Steppe,544,0.522
-Wetland: Elm/Ash/Cottonwood Group,Temperate Steppe Mountains,90,0.917
-Wetland: Elm/Ash/Cottonwood Group,Tropical/Subtropical Steppe,165,0.37
-Wetland: Elm/Ash/Cottonwood Group,Warm Continental,4309,0.243
-Wetland: Elm/Ash/Cottonwood Group,Warm Continental Mountains,109,0.374
-Wetland: Oak/Gum/Cypress Group,,16058,0.308
-Wetland: Oak/Gum/Cypress Group,Hot Continental,307,0.392
-Wetland: Oak/Gum/Cypress Group,Hot Continental Mountains,34,0.497
-Wetland: Oak/Gum/Cypress Group,Prairie,254,0.59
-Wetland: Oak/Gum/Cypress Group,Savanna,212,0.058
-Wetland: Oak/Gum/Cypress Group,Subtropical,15120,0.304
-Wetland: Oak/Gum/Cypress Group,Subtropical Mountains,65,0.608
-Wetland: Oak/Gum/Cypress Group,Tropical/Subtropical Steppe,59,0.539
-Wetland: Spruce/Fir Group,,14263,0.69
-Wetland: Spruce/Fir Group,Hot Continental,198,0.716
-Wetland: Spruce/Fir Group,Hot Continental Mountains,76,0.907
-Wetland: Spruce/Fir Group,Temperate Steppe Mountains,53,1
-Wetland: Spruce/Fir Group,Warm Continental,11153,0.628
-Wetland: Spruce/Fir Group,Warm Continental Mountains,2783,0.845
+Wetland: Elm/Ash/Cottonwood Group,,3972,0.236
+Wetland: Elm/Ash/Cottonwood Group,Hot Continental,723,0.216
+Wetland: Elm/Ash/Cottonwood Group,Prairie,41,0.414
+Wetland: Elm/Ash/Cottonwood Group,Subtropical,588,0.33
+Wetland: Elm/Ash/Cottonwood Group,Warm Continental,2510,0.215
+Wetland: Elm/Ash/Cottonwood Group,Warm Continental Mountains,66,0.42
+Wetland: Oak/Gum/Cypress Group,,5165,0.128
+Wetland: Oak/Gum/Cypress Group,Hot Continental,55,0.208
+Wetland: Oak/Gum/Cypress Group,Savanna,181,0.052
+Wetland: Oak/Gum/Cypress Group,Subtropical,4920,0.129
+Wetland: Spruce/Fir Group,,7613,0.574
+Wetland: Spruce/Fir Group,Hot Continental,107,0.725
+Wetland: Spruce/Fir Group,Warm Continental,7188,0.568
+Wetland: Spruce/Fir Group,Warm Continental Mountains,313,0.667
