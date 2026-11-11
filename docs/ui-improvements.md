@@ -1004,7 +1004,7 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       F6; `tools/make_organic_soil.R` writes it all; library update 1.3 adds its groups and diagram cell. GDS preview (Build 10's
       soil, the same formula): 16,395 cells, 35 Tg C of peat; Oak/Gum/Cypress twin mean 1,037 Mg C/ha, cropland 454 cells at a
       mean 156 (drained loss then about 3.7 Gg C/yr, against 0.2 when drainage took BG Slow at the class mean). To check on the
-      next GDS Build and historical run. lucasCoreUI.dll must be rebuilt with Studio closed (`tools/build_ui.ps1`; it compiles).
+      next GDS Build and historical run. lucasCoreUI.dll rebuilt.
   - **Known limits:** mineral and organic soil are not separated within a class (oak/gum/cypress mixes both); scrub-shrub and
     pocosin cells get a tree curve; cells with no forest type pixel take a neighbour's type, which may be upland; FIA soil carbon is
     modelled, so soil targets stay gNATSGO (which overstates organic wetland soils by about 35%, Uhran et al. 2021). New runs will
