@@ -86,7 +86,7 @@ miami <- function(t, p, forest) { if (!forest) return(6116 * (1 - exp(-6.05e-5 *
 climate_normals <- function(Tn, Pn) list(forest = miami(Tn, Pn, TRUE), nonforest = miami(Tn, Pn, FALSE))
 
 # the lon/lat window of the climate data around the model grid
-climate_window <- function(P) ext(project(as.polygons(ext(P) + 20000, crs = crs(P)), "EPSG:4326")) + 0.5
+climate_window <- function(P) ext(project(as.polygons(ext(P) + 20000, crs = crs(P)), "EPSG:4269")) + 0.5   # NAD83 lon/lat: the model grid's datum, so no datum shift (PRISM is NAD83; LOCA2's WGS84 is within a metre)
 
 # an emitter: emit() writes one year's multiplier rasters for every flow group and records the rows and a summary
 climate_emitter <- function(fm, P, prm) {

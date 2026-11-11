@@ -6,7 +6,12 @@ suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
 # SyncroSim Studio points PROJ at its own bundled database, which terra's newer PROJ cannot read (every projection then fails
 # with "Cannot find coordinate operations"). The console does not set it. Same fix as lucasFireC2F.
 # (the path may be the 8.3 short form, C:/PROGRA~1/SYNCRO~1, so match case-insensitively on "syncro"). Parallel workers call it too.
-clear_syncrosim_proj <- function() for (v in c("PROJ_LIB", "PROJ_DATA", "GDAL_DATA")) if (grepl("syncro", tolower(Sys.getenv(v)), fixed = TRUE)) Sys.unsetenv(v)
+clear_syncrosim_proj <- function() { for (v in c("PROJ_LIB", "PROJ_DATA", "GDAL_DATA")) if (grepl("syncro", tolower(Sys.getenv(v)), fixed = TRUE)) Sys.unsetenv(v)
+  # and no datum grids from the internet: on a colleague's machine (2026-11-10) PROJ reached for cdn.proj.org, could not, and stage 7's
+  # reprojection to lon/lat came back empty ("[ext] invalid extent"). PROJ then uses the grids installed with it, or its standard
+  # shift (about a metre between NAD83 and WGS84), the same on every machine
+  Sys.setenv(PROJ_NETWORK = "OFF"); if (requireNamespace("terra", quietly = TRUE)) invisible(utils::capture.output(try(terra::projNetwork(FALSE), silent = TRUE)))
+  if ("sf" %in% loadedNamespaces()) invisible(try(sf::sf_proj_network(FALSE), silent = TRUE)) }
 clear_syncrosim_proj()
 
 PKG <- "lucasCore"
