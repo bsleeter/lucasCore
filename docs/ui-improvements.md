@@ -1358,8 +1358,23 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       (17 checks, including no apostrophe in any update description). Class 59 and the Succession Post Fire types are kept for now
       (nothing reaches them); retiring them touches about 20 tables. Found and fixed on the way: four definitions rows whose `{*}`
       quotes had been doubled to 16 by an earlier read-and-rewrite.
+    - **Step 2 DONE 2026-11-11.** Stage 3 derives the disturbed classes' carbon each Build (`src/disturbed-carbon.R`;
+      tests/unit-disturbed-carbon.R, 12 checks), from the rows it already has, so they follow their parents and the defaults hold no
+      copies (copying them would have added about 210,000 multiplier rows, and gone stale when make_grass_shrub reruns). A disturbed
+      shrub class takes all its parent's non-forest rows and its fire class rows; a disturbed forest class takes the growth pathways,
+      growth split, live turnover and net growth of its ecodivision's shrub class, and its forest type's dead wood pathways
+      (FOREST_PATHWAYS) and rates (stage 3's per-cell rates, burial where the type has it); its fire rows are the all-class (forest) rows.
+      Only the study area's ecodivisions are written, and a disturbed forest class only where its type has rates.
+    - **Tested 2026-11-11 on a copy of the GDS 1.3 rerun library** (updated to 1.4 with a test package; SyncroSim's 1.4.0 entry points
+      at this worktree): stages 3, 4 and 6 rerun on Build 23 (8.5 min) and 1985-2012 historical (34 min), both clean. High-severity
+      fire put 34 ha (2006) and 533 ha (2008) into Disturbed: Wetland Oak/Gum/Cypress Group; the 2011 fire had no high-severity pixels.
+      In the class: live carbon 2.8 to 4.3 Mg C/ha (2008-2012, shrub growth), standing dead 17.3 to 1.6 and down wood 10.6 to 9.3,
+      peat 1,290 to 1,231 after the 2011 fire; NPP 2.4-3.4, NEP -4.9 (2009) to -0.1 (2012). Its dead wood rates are its forest twin's
+      exactly (snag stem transfer 0.145, decay 0.059, BG Slow emission 0.0000874). Total ecosystem carbon within 0-9 Gg C of run 24
+      (136 Tg), the same as the run-to-run noise before any land was disturbed. A quick test that skips stage 6 keeps the Build's old
+      pathways (fire stays in the forest class).
     - Until step 3, historical runs send burned forest and shrub into the disturbed classes and nothing returns them (stage 6 sets a
-      target of 0 on a type with no yearly map). Until step 2 the disturbed classes have no carbon rows. Don't Build with this yet.
+      target of 0 on a type with no yearly map). Don't Build real libraries with this yet.
   - **Starting cells: disturbed before the start year (user, 2026-11-11, the Mount St Helens case).** Stage 5's "forest in any
     year" rule already starts a natural cell as forest when NLCD shows it as forest in any later year, so a blast zone or burn that
     regrew starts as its forest type. Its age is the problem: a stand that began after the start year (age 0 or less from CMS or
