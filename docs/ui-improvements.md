@@ -1200,15 +1200,57 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     per forest type group) let a cell return as a different forest type than before, by adjacency to that type.
     - This is why the old design had one shared class: a cell could become any type its neighbours were.
     - A shared class forgets the pre-disturbance type, and with it the type's dead wood parameters and its most likely return.
-    - To settle: per-type post-disturbance classes (each keeps its type's carbon and returns to it by adjacency to standing forest of
-      that type), with `Succession` pathways to other types by adjacency to them, so type change stays possible; or one shared class
-      with adjacency to each type (simpler pathways, but no memory of origin, and dead wood decay can't follow the old type).
+    - Settled in the scoping below (user, 2026-11-11: "That sounds good for 57"): per-type classes, one adjacency calculation for
+      return, and type change, if wanted, by static gates rather than adjacency.
     - The machinery exists for Ag Change: `src/adjacency-curve.R` fits an event rate by the share of a class within a radius from
       the annual maps, scaled to ST-Sim's adjacency multiplier; stage 10 sets it up (`AdjacencyRadius`, `AdjacencyUpdate`). The same
       fit on the P26 burns would give return by the share of unburned forest (of the same type, or any type) around each burned pixel
       at the time of the fire. Literature check: seedling density by distance to a live seed source after high-severity fire.
-    - Cost: one adjacency attribute per forest type a cell can return to; ST-Sim recomputes them at each update, so update every few
-      years as Ag Change does.
+  - **Scoping (2026-11-11).** The user's main concern is run time, since adjacency calculations slow runs.
+    - **How ST-Sim's adjacency costs:** an adjacency setting belongs to a transition group (state attribute, neighbourhood radius,
+      update frequency). ST-Sim keys its maps by transition group (`CreateAdjacencySettingDictionaryByTGID`,
+      `m_TransitionAdjacencyStateAttributeValueMap` in SyncroSim.STSim.dll 4.5.4), so it computes each group's neighbourhood share
+      at each update. The cost is groups with a setting x cells x neighbourhood cells, in update years only. It does not grow with
+      the number of classes or transition types. Projections now have 4 such groups (urbanization's developed share, agriculture
+      expansion, the two Ag Change directions), at 3 cells' radius, updated every 5 years (stage 10).
+    - **State classes: +31** (54 to about 84). One post-disturbance class per forest class with a stand-replacing fire pathway: 28
+      upland type groups and the 3 wetland twins. Each class holds its own type, so it keeps that type's dead wood, decay and soil
+      parameters and returns to it. One new state label X (for example "Forest Disturbed"). `Shrubland: Post Fire Shrub` (59) is
+      retired (net +30). No new permanent non-forest classes: conversion goes to the existing Chaparral, Non-sage or grass classes
+      by region.
+    - **Transition types: +2, and 29 retired.**
+      - "Post-disturbance: Return" and "Post-disturbance: Conversion", each with one pathway per class (the source class says which
+        type a cell returns to).
+      - The 29 unused `Succession Post Fire: <type>` types go, and so do `Ag Contraction Cropland / Pasture: Shrubland Post Fire
+        Shrub` with class 59. Farm land never contracts into a post-disturbance class.
+      - Entry needs no new type: the forest classes' Fire: High Severity pathways are pointed at their post-disturbance class.
+      - Reburns use the existing fire types, with proportions: part to conversion, part restarting the clock.
+    - **Transition groups: +2 named** (plus ST-Sim's 2 [Type] groups for the new types). Return gets the adjacency setting.
+      Conversion has none: it is set by time since disturbance (what has not returned by the window's end converts). They are
+      separate groups because an adjacency multiplier applies to a whole group.
+    - **Adjacency: +1 attribute, +1 setting.** A "Live Forest" attribute (1 on every forest class, 0 on the post-disturbance
+      classes) drives the Return group's multiplier, updated every 5 years: five adjacency calculations in projections, against four
+      today. The class picks the type and adjacency only sets the speed, so a cell can't return as a type that doesn't belong there.
+      The compromise: a cell gets seed-source credit from any forest type around it, not only its own.
+    - **Type change (optional), by static gates, not adjacency.** This is how Ag Contraction picks its destination today: stage 6
+      fills each farm cell with the most common natural class around it in the start-year map, and writes one 0/1 map per destination,
+      the spatial multiplier on that destination's transition type ([6-historical-transitions.R](../src/6-historical-transitions.R),
+      "ag contraction destinations"; stage 9 keeps those rows in projections). For post-disturbance classes: one transition type per
+      destination forest type, each gated to cells where that type is present nearby in the start year (or listed for the
+      ecodivision), at a small probability by region. No cost at run time. The limit, as for Ag Contraction: the gates are fixed at
+      the start year.
+    - **What would multiply the cost (avoid):** return by own-type forest, up to 31 calculations; type change by adjacency, about one
+      per destination type; replanting that favours cells far from a seed source (to-do 58), probably +1, since ST-Sim seems to
+      compute per group. For 58, prefer area targets prioritized by time since disturbance and ownership.
+    - **Rows, not run time:** a tool (as for the wetland twins) writes the carbon rows for the 31 classes: dead wood, decay and soil
+      copied from each forest type; grass and shrub growth from the regional non-forest class; fire carbon flows; flow-multiplier
+      group memberships. That's several thousand default rows. No spin-up, since no cell starts in these classes (unless starting
+      from MTBS history is added). Stage 10 fits the return curve by time since fire, the conversion share, and Return's adjacency
+      curve.
+    - **Before building, two checks:**
+      - P26: fit return on the own-type share against the any-forest share around each burned pixel, with `src/adjacency-curve.R`'s
+        method, to see how much the any-forest proxy loses;
+      - a P26-size projection with and without one extra adjacency setting, to confirm the per-group cost and time a 5-year update.
   - **Also to settle:**
     - which model fire severities enter, given how LANDFIRE severity maps to MTBS's classes;
     - starting cells in the state, with time since disturbance from MTBS, for runs that start well after 1984;
