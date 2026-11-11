@@ -27,10 +27,14 @@ check("high-severity fire on every parent leads to its disturbed class (age rese
       all(vapply(seq_len(nrow(par)), function(i) { x <- hi[StateClassIdSource == par$Name[i]]; nrow(x) == 1 && x$StateClassIdDest == par$dname[i] && x$AgeReset == "Yes" }, TRUE)))
 st <- fread(D("transitions", "post-disturbance-settings.csv")); par[, set := fifelse(as.integer(Id) >= 100, "Forest", Name)]; par <- merge(par, st, by.x = "set", by.y = "ParentClass")
 ret <- pd[TransitionTypeId %in% RT]
-check("each disturbed class returns to its parent from ReturnAgeMin to the window's end, age kept, by its kind's type",
+check("each disturbed class can return to its parent at any age in its window (probability 1: the chance is a multiplier), age kept, by its kind's type",
       all(vapply(seq_len(nrow(par)), function(i) { p <- par[i]; x <- ret[StateClassIdSource == p$dname]
-        nrow(x) == 1 && x$StateClassIdDest == p$Name && num(x$AgeMin) == p$ReturnAgeMin && num(x$AgeMax) == p$Window - 1 && x$AgeReset == "No" &&
-          x$TransitionTypeId == RT[[if (as.integer(p$Id) >= 100) "Forest" else "Shrub"]] && abs(num(x$Probability) - p$ReturnProbability) < 1e-9 }, TRUE)))
+        nrow(x) == 1 && x$StateClassIdDest == p$Name && is.na(x$AgeMin) && num(x$AgeMax) == p$Window - 1 && x$AgeReset == "No" &&
+          x$TransitionTypeId == RT[[if (as.integer(p$Id) >= 100) "Forest" else "Shrub"]] && num(x$Probability) == 1 }, TRUE)))
+so <- rd(D("transitions", "sources.csv"))
+check("stage 6 sources: return on NLCD two years running (forest incl. woody wetland, shrub), conversion on everywhere",
+      so[TransitionGroupId == paste(RT[["Forest"]], "[Type]"), Source == "NlcdPersist" & Classes == "41|42|43|90"] && so[TransitionGroupId == paste(RT[["Shrub"]], "[Type]"), Source == "NlcdPersist" & Classes == "52"] &&
+      so[TransitionGroupId == paste(CV, "[Type]"), Source == "All"])
 eco <- rd(D("strata", "ecodivisions-list.csv"))$Name
 # proportions of one choice add up in every ecodivision (rows with a blank stratum apply in all of them)
 adds_up <- function(x) all(vapply(eco, function(e) { y <- x[is.na(StratumIdSource) | StratumIdSource == e]; nrow(y) > 0 && abs(sum(num(ifelse(is.na(y$Proportion), "1", y$Proportion))) - 1) < 1e-6 }, TRUE))

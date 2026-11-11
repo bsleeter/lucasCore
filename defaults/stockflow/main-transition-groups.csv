@@ -9,3 +9,7 @@ Forest Harvest: Forest Clearcut [Type],Yes,Yes
 Forest Harvest: Forest Selection [Type],Yes,Yes
 Insect,Yes,Yes
 Ag Change,Yes,Yes
+Post-disturbance,Yes,Yes
+Post-disturbance: Forest Return [Type],Yes,Yes
+Post-disturbance: Shrub Return [Type],Yes,Yes
+Post-disturbance: Conversion [Type],Yes,Yes

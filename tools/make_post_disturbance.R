@@ -71,9 +71,9 @@ PW <- c("Iteration", "Timestep", "StratumIdSource", "StateClassIdSource", "Strat
         "TransitionTypeId", "Probability", "Proportion", "AgeMin", "AgeMax", "AgeRelative", "AgeReset", "TSTMin", "TSTMax", "TSTRelative")
 pw <- function(...) { x <- data.table(...); for (k in setdiff(PW, names(x))) set(x, j = k, value = NA_character_); x[, lapply(.SD, as.character), .SDcols = PW] }
 fmt <- function(v) sub("\\.?0+$", "", formatC(v, format = "f", digits = 6))
-# return, conversion at the window's end
+# return (probability 1 at any age in the window; the chance is a multiplier: NLCD maps in history, by age in projections), conversion at the window's end
 ret <- par[, pw(StateClassIdSource = dname, StateClassIdDest = Name, TransitionTypeId = fifelse(kind == "Forest", RET_F, RET_S),
-                Probability = fmt(ReturnProbability), AgeMin = ReturnAgeMin, AgeMax = Window - 1L, AgeReset = "No")]
+                Probability = "1", AgeMax = Window - 1L, AgeReset = "No")]   # any age in the window: historical runs follow NLCD (stage 6); projections set the chance by age (ReturnAgeMin, ReturnProbability; stage 9)
 conv <- merge(dest, par[, .(From = dname, Window)], by = "From")[, pw(StratumIdSource = StratumIdSource, StateClassIdSource = From, StateClassIdDest = To,
             TransitionTypeId = CONV, Probability = "1", Proportion = fmt(Share), AgeMin = Window, AgeReset = "No")]
 wr(rbind(ret, conv), D("transitions", "pathways", "post-disturbance.csv"))

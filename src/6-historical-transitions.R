@@ -122,6 +122,25 @@ check(STAGE, "no cell is on in two land-use groups in one year", lu_twice == 0L,
 say("Land-use change: %d groups from the annual NLCD's class pairs (%d cell changes); %.1f km2 of change left out as it reversed within %d years", nrow(lu), sum(lengths(lu_on)), lu_brief * cell_km2, LU_PERSIST)
 progressBar()
 
+# ---- post-disturbance return and conversion (to-do 57, user 2026-11-11: historical runs follow NLCD) ----------------------------
+# NlcdPersist: on in year y where the modal NLCD shows one of the group's classes in y - 1 and y, so a disturbed cell returns to its type
+# in the year NLCD shows it back for the second year running (the pathways allow it at any age in the window). All: on everywhere,
+# so a disturbed cell still waiting converts at the end of its window (the pathways' age limit)
+pdg <- so[Source %in% c("NlcdPersist", "All")]
+if (nrow(pdg)) { on_file <- NULL; pd_n <- list()
+  for (i in seq_len(nrow(pdg))) { g <- pdg$TransitionGroupId[i]
+    if (pdg$Source[i] == "All") {
+      if (is.null(on_file)) on_file <- write_raster(mask(init(P, 1), P), "On.tif", "INT1U")
+      for (y in yrs) layers[[length(layers) + 1]] <- data.table(Timestep = y, TransitionGroupId = g, Source = "All", File = on_file)
+    } else { cl <- codes(pdg$Classes[i]); n <- 0
+      for (y in yrs) { on <- land0 & NV[[as.character(y - 1)]] %in% cl & NV[[as.character(y)]] %in% cl; f <- NA_character_
+        if (any(on)) { v <- as.integer(on); v[!land0] <- NA_integer_; n <- n + 1
+          f <- write_raster(setValues(rast(P), v), sprintf("Persist-%s_%d.tif", gsub("[^A-Za-z0-9]+", "-", sub(TYPE_SUFFIX, "", g, fixed = TRUE)), y), "INT1U") }
+        layers[[length(layers) + 1]] <- data.table(Timestep = y, TransitionGroupId = g, Source = "NlcdPersist", File = f) }
+      pd_n[[g]] <- n } }
+  say("Post-disturbance: %s", paste(c(sprintf("%s on NLCD %s two years running (%d yearly maps)", names(pd_n), pdg[match(names(pd_n), TransitionGroupId), Classes], unlist(pd_n)),
+                                      if (!is.null(on_file)) sprintf("%s on everywhere (the window's end decides)", paste(pdg[Source == "All", TransitionGroupId], collapse = ", "))), collapse = "; ")) }
+
 # ---- 30 m disturbances: fraction of each cell's 30 m pixels, one year per worker ------------------------------------------
 fire <- so[Source == "Mtbs"]; ncc <- so[Source == "NlcdClearcut"]; lfg <- so[Source == "Landfire"]; lcg <- so[Source == "Lcms"]
 # the clearcut group (for the minimum-age rule): the NLCD clearcut source, or LCMS stand-replacing tree removal
