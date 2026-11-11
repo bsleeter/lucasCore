@@ -1267,6 +1267,24 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
           NLCD forest the year after a fire includes partly burned stands.
       - Not needed (user, 2026-11-11: "I am not worried about the adjacency timing for just a single layer"): the timing test of
         one extra adjacency setting.
+  - **Starting cells: disturbed before the start year (user, 2026-11-11, the Mount St Helens case).** Stage 5's "forest in any
+    year" rule already starts a natural cell as forest when NLCD shows it as forest in any later year, so a blast zone or burn that
+    regrew starts as its forest type. Its age is the problem: a stand that began after the start year (age 0 or less from CMS or
+    TreeMap), or one with no age, takes the most common age of its neighbours (`fill_modal`), which in a large disturbed patch is the
+    old forest around it. Measured 2026-11-11 (`dev/fire/start-ever-forest.R`; P26 Build 53, Puget's starting maps from historical
+    result 59, NLCD at 150 m):
+    - P26: 83.5 kha (4.2% of starting forest) are forest only by the rule (NLCD 1985: 68 kha shrub, 15 kha grass). NLCD shows them
+      as forest at any time from 1985 to 2023. 84% start older than 20 years. Mean starting live biomass 68 Mg C/ha, against 5.5
+      for NLCD forest aged 1-10 and 102 for all forest: about 5 Tg C of live biomass too much at the start (2.6% of P26's).
+    - Puget: 72.3 kha (9.2% of starting forest; 55 kha shrub, 18 kha grass), mostly old clearcuts: 77% show as forest by 2005. Their
+      ages match the rest of the forest (90% older than 20), and their live biomass is 126 Mg C/ha, against 33 for forest aged 1-10
+      and 132 for all forest: about 7 Tg C too much (6.5% of Puget's), and the regrowth of 1985-2005 is missed.
+    - Under 57, these cells start in their type's post-disturbance class, with time since disturbance from the event's date where
+      it is recorded, otherwise from NLCD's return year (about the 21-year median before return) or TreeMap's establishment year.
+      In historical runs they return when NLCD shows them as forest. Cells never forest in the record start as grass or shrub,
+      unless a recorded disturbance and a forest potential (LANDFIRE BpS or EVT) say otherwise, and that is a Build option.
+    - Interim fix, apart from 57: in stage 5, give these cells a young age (1, or the start year minus an estimated disturbance year)
+      instead of their neighbours'. It changes Build results.
   - **Also to settle:**
     - which model fire severities enter, given how LANDFIRE severity maps to MTBS's classes;
     - starting cells in the state, with time since disturbance from MTBS, for runs that start well after 1984;
