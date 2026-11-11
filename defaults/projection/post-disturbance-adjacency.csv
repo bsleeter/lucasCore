@@ -1,0 +1,12 @@
+TransitionGroupId,StateAttributeTypeId,AttributeValue,Amount,Weight,Note
+Post-disturbance: Forest Return [Type],Live Forest,0,0.246,0,"to-do 57: share of live forest (forest type group classes) within the adjacency radius -> multiplier of the return chance. P26 burns 1986-2005, moderate and high severity, not reburned within 20 years (dev/fire/p26-seed-source.R): return within 20 years by the any-forest share within 450 m (3 cells of 150 m), relative to the highest bin (86.1%). ST-Sim interpolates between points. Weight: the bin's burned pixels, for the mean multiplier stage 9 divides the return chance by"
+Post-disturbance: Forest Return [Type],Live Forest,0.025,0.246,287261,share under 0.05: 21.2% back within 20 years
+Post-disturbance: Forest Return [Type],Live Forest,0.075,0.302,92499,0.05-0.1: 26.0%
+Post-disturbance: Forest Return [Type],Live Forest,0.15,0.376,133328,0.1-0.2: 32.4%
+Post-disturbance: Forest Return [Type],Live Forest,0.25,0.470,100261,0.2-0.3: 40.5%
+Post-disturbance: Forest Return [Type],Live Forest,0.35,0.583,71918,0.3-0.4: 50.2%
+Post-disturbance: Forest Return [Type],Live Forest,0.45,0.679,53366,0.4-0.5: 58.5%
+Post-disturbance: Forest Return [Type],Live Forest,0.55,0.773,35962,0.5-0.6: 66.6%
+Post-disturbance: Forest Return [Type],Live Forest,0.7,0.868,41245,0.6-0.8: 74.7%
+Post-disturbance: Forest Return [Type],Live Forest,0.9,1,11224,0.8 and more: 86.1%
+Post-disturbance: Forest Return [Type],Live Forest,1,1,0,

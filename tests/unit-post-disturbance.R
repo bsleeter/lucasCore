@@ -61,6 +61,13 @@ check("each disturbed class has a CO2 class row", all(dis$Name %in% rd(D("climat
 check("no pathway leads into a disturbed class except fire", all(c(pd$StateClassIdDest, unlist(lapply(c("urbanization.csv", "ag-expansion.csv", "ag-contraction.csv", "harvest.csv", "ag-change.csv", "intensification.csv"),
       function(f) rd(D("transitions", "pathways", f))$StateClassIdDest))) %in% setdiff(sc$Name, dis$Name) | is.na(c(pd$StateClassIdDest, unlist(lapply(c("urbanization.csv", "ag-expansion.csv", "ag-contraction.csv", "harvest.csv", "ag-change.csv", "intensification.csv"),
       function(f) rd(D("transitions", "pathways", f))$StateClassIdDest))))))
+pa <- fread(D("projection", "post-disturbance-adjacency.csv"))
+check("return adjacency: Live Forest, a defined attribute type, multipliers rise with the share from above 0 to 1, weights for the mean",
+      all(pa$StateAttributeTypeId == "Live Forest") && "Live Forest" %in% rd(D("stsim", "stsim_StateAttributeType.csv"))$Name && !is.unsorted(pa$AttributeValue) &&
+      !is.unsorted(pa$Amount) && min(pa$Amount) > 0 && max(pa$Amount) == 1 && sum(pa$Weight) > 0 && all(pa$TransitionGroupId %in% paste(RT, "[Type]")))
+fc <- rd(D("projection", "fire-class-multipliers.csv"))
+check("fire by state class: names a disturbed kind or a class, in a known ecodivision, multiplier at least 1",
+      all(fc$StateClassId %in% c("Disturbed: forest", "Disturbed: shrub", sc$Name)) && all(is.na(fc$StratumId) | fc$StratumId %in% eco) && all(num(fc$Multiplier) >= 1))
 up <- grep("\\[Update\\(", readLines(file.path("ui", "LucasCoreUpdates.cs")), value = TRUE)
 check("library update 1.4 exists, and no update description holds an apostrophe (SyncroSim writes it unquoted: the 1.3.0 failure)",
       any(grepl("\\[Update\\(1\\.4,", up)) && !any(grepl("'", up)))

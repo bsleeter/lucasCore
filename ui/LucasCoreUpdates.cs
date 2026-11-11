@@ -134,6 +134,7 @@ namespace lucasCoreUI
         public static void Update_1_400(DataStore store)
         {
             AddNamed(store, "stsim_StateLabelX", "StateLabelXId", "Disturbed", null, null, false);
+            AddStateAttributeType(store, "Live Forest", "State Class", "1 on forest type group classes (Ids 100-999), written by stage 10: the live forest share around a disturbed forest cell drives its return multiplier (to-do 57)");
             string[] grps = { "Post-disturbance", "Post-disturbance: Forest Return", "Post-disturbance: Shrub Return", "Post-disturbance: Conversion" };
             foreach (string g in grps) AddNamed(store, "stsim_TransitionGroup", "TransitionGroupId", g, null, null, false);
             for (int i = 1; i < grps.Length; i++)
@@ -197,6 +198,20 @@ namespace lucasCoreUI
                 foreach (DataRow gr in g.Rows)
                     store.ExecuteNonQuery("INSERT INTO stsim_TransitionTypeGroup (TransitionTypeGroupId, ProjectId, TransitionTypeId, TransitionGroupId) VALUES (" +
                                           NewId(store).ToString(CultureInfo.InvariantCulture) + ", " + pr + ", " + tt + ", " + Id(gr["TransitionGroupId"]) + ")");
+            }
+        }
+
+        // a state attribute type in its attribute group, in every project that has the group and lacks the type
+        private static void AddStateAttributeType(DataStore store, string name, string group, string description)
+        {
+            if (!store.TableExists("stsim_StateAttributeType")) return;
+            DataTable p = Rows(store, "SELECT ProjectId FROM core_Project WHERE ProjectId NOT IN (SELECT ProjectId FROM stsim_StateAttributeType WHERE Name = " + Q(name) + ")");
+            foreach (DataRow r in p.Rows)
+            {
+                string pr = Id(r["ProjectId"]), g = IdOf(store, "stsim_AttributeGroup", "AttributeGroupId", pr, group);
+                if (g == null) continue;
+                store.ExecuteNonQuery("INSERT INTO stsim_StateAttributeType (StateAttributeTypeId, ProjectId, Name, AttributeGroupId, Description) VALUES (" +
+                                      NewId(store).ToString(CultureInfo.InvariantCulture) + ", " + pr + ", " + Q(name) + ", " + g + ", " + Q(description) + ")");
             }
         }
 

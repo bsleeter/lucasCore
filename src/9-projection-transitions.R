@@ -442,6 +442,46 @@ cov <- if (length(new_tt)) rbindlist(new_tt, fill = TRUE)[, .(n = uniqueN(paste(
 check(STAGE, "every Target group has a target in every iteration and projection year", all(cov$n == nexp), paste(cov[n != nexp, TransitionGroupId], collapse = "; "))
 check(STAGE, "every Probability group has a map in every iteration and projection year",
       all(vapply(c(pg$TransitionGroupId, fire_all), function(g) nrow(sm_out[TransitionGroupId == g & Timestep > y1 & !is.na(MultiplierFileName)]) == nexp, TRUE)))
+# ---- post-disturbance return and conversion (to-do 57): on everywhere from the historical end + 1; a disturbed class's return chance
+# by its age (years since the disturbance): 0 below ReturnAgeMin, then ReturnProbability a year to the window's end (post-disturbance-
+# settings.csv), divided by the mean of the live forest adjacency multiplier where stage 10 applies it (post-disturbance-adjacency.csv),
+# so the average return stays the fitted one. Conversion needs no chance: the pathways convert at the window's end
+PD_GROUPS <- c("Post-disturbance: Forest Return [Type]", "Post-disturbance: Shrub Return [Type]", "Post-disturbance: Conversion [Type]")
+pd_have <- intersect(PD_GROUPS, unique(sm$TransitionGroupId))
+if (length(pd_have)) {
+  sm_out <- rbind(sm_out[!(TransitionGroupId %in% pd_have & Timestep > y1)],
+                  data.table(Iteration = NA_integer_, Timestep = y1 + 1L, TransitionGroupId = pd_have, MultiplierFileName = write_raster(mask(init(P, 1), P), "PostDisturbance-On.tif", "INT1U")), fill = TRUE)
+  scl9 <- stsim_list("StateClass"); idc <- suppressWarnings(as.integer(scl9$Id))
+  dis <- scl9[!is.na(idc) & idc >= 2000L & idc < 3000L]; parent <- scl9$Name[match(as.integer(dis$Id) - 2000L, idc)]
+  pst <- read_default("transitions", "post-disturbance-settings.csv"); pad <- read_default("projection", "post-disturbance-adjacency.csv")
+  adj_mean <- if (nrow(pad)) pad[, sum(as.numeric(Amount) * as.numeric(Weight)) / sum(as.numeric(Weight)), by = TransitionGroupId] else data.table(TransitionGroupId = character(), V1 = numeric())
+  set_of <- ifelse(as.integer(dis$Id) - 2000L >= 100L, "Forest", parent)
+  tmv <- rbindlist(lapply(seq_len(nrow(dis)), function(i) { s <- pst[ParentClass == set_of[i]]; if (!nrow(s)) return(NULL)
+    g <- if (set_of[i] == "Forest") PD_GROUPS[1] else PD_GROUPS[2]; if (!g %in% pd_have) return(NULL)
+    m <- adj_mean[TransitionGroupId == g, V1]; p <- min(1, as.numeric(s$ReturnProbability) / (if (length(m)) m else 1))
+    a0 <- as.integer(s$ReturnAgeMin); w <- as.integer(s$Window)
+    data.table(Timestep = y1 + 1L, StateClassId = dis$Name[i], AgeMin = c(0L, a0), AgeMax = c(a0 - 1L, w - 1L), TransitionGroupId = g, Amount = c(0, round(p, 6)))[AgeMax >= AgeMin] }))
+  say("Post-disturbance: %s on everywhere from %d; return chance by age for %d disturbed classes (forest %s a year from age %s%s)", paste(pd_have, collapse = ", "), y1 + 1L, uniqueN(tmv$StateClassId),
+      tmv[TransitionGroupId == PD_GROUPS[1] & Amount > 0, if (.N) format(Amount[1]) else "-"], tmv[TransitionGroupId == PD_GROUPS[1] & Amount > 0, if (.N) AgeMin[1] else "-"],
+      if (nrow(adj_mean)) sprintf(", raised for the live forest adjacency multiplier, mean %.2f", adj_mean[TransitionGroupId == PD_GROUPS[1], V1]) else "") } else tmv <- NULL
+# fire by state class (to-do 57, user 2026-11-11: raise burned area): disturbed land and annual grass in the dry ecodivisions burn more
+# often than the drawn year's rate alone gives (defaults/projection/fire-class-multipliers.csv; "Disturbed: forest" / "Disturbed: shrub"
+# = every disturbed class of that kind). On top of the drawn year: burned area grows with conversion
+fcm <- read_default("projection", "fire-class-multipliers.csv"); fire_tmv <- NULL
+if (nrow(fire_rows) && nrow(fcm)) { scl9 <- stsim_list("StateClass"); idc <- suppressWarnings(as.integer(scl9$Id))
+  kind_cls <- list(`Disturbed: forest` = scl9$Name[!is.na(idc) & idc >= 2100L & idc < 3000L], `Disturbed: shrub` = scl9$Name[!is.na(idc) & idc >= 2000L & idc < 2100L])
+  fire_tmv <- rbindlist(lapply(seq_len(nrow(fcm)), function(i) { k <- fcm$StateClassId[i]; cls <- if (k %in% names(kind_cls)) kind_cls[[k]] else intersect(k, scl9$Name)
+    if (!length(cls) || abs(as.numeric(fcm$Multiplier[i]) - 1) < 1e-9) return(NULL)
+    data.table(Timestep = y1 + 1L, StratumId = if (is.na(fcm$StratumId[i]) || !nzchar(fcm$StratumId[i])) NA_character_ else fcm$StratumId[i], StateClassId = cls,
+               TransitionGroupId = fire_g, Amount = as.numeric(fcm$Multiplier[i])) }))
+  if (nrow(fire_tmv)) fire_tmv <- fire_tmv[is.na(StratumId) | StratumId %in% stsim_list("Stratum")$Name]
+  say("Fire by state class: %s", if (nrow(fire_tmv)) paste(fire_tmv[, sprintf("%s%s x%.2f", if (.N > 1) sprintf("%d classes", .N) else StateClassId[1], ifelse(is.na(StratumId[1]), "", paste0(" in ", StratumId[1])), Amount[1]), by = .(StratumId, Amount)]$V1, collapse = "; ") else "none (every multiplier 1)") }
+if (!is.null(tmv) || !is.null(fire_tmv)) {
+  old_tmv <- as.data.table(datasheet(scn, "stsim_TransitionMultiplierValue", optional = TRUE, lookupsAsFactors = FALSE))
+  # earlier rows of a rerun are replaced: the post-disturbance groups', and the fire group's by state class (no other fire multiplier)
+  if (nrow(old_tmv)) old_tmv <- old_tmv[!(!is.na(Timestep) & Timestep > y1 & (TransitionGroupId %in% PD_GROUPS | (TransitionGroupId == fire_g & !is.na(StateClassId)))),
+                                        setdiff(names(old_tmv), c("TransitionMultiplierValueId", "ScenarioId")), with = FALSE]
+  write_stsim(rbind(old_tmv, tmv, fire_tmv, fill = TRUE), "TransitionMultiplierValue") }
 write_stsim(sm_out, "TransitionSpatialMultiplier")
 if (nrow(fire_rows)) {
   # (method 3: no size distribution - an earlier one for the fire group is removed)

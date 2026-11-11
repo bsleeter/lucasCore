@@ -410,9 +410,15 @@ for (i in seq_len(nrow(al))) { g <- al$TransitionGroupId[i]
   new_rows[[g]] <- data.table(Iteration = NA_integer_, Timestep = y1 + 1L, TransitionGroupId = g, MultiplierFileName = f) }
 sm_out <- rbind(sm[!(TransitionGroupId %in% al$TransitionGroupId & Timestep == y1 + 1 & is.na(Iteration)), .(Iteration, Timestep, TransitionGroupId, MultiplierFileName)], rbindlist(new_rows))
 write_stsim(sm_out, "TransitionSpatialMultiplier")
+# post-disturbance return (to-do 57): a disturbed forest cell returns sooner with more live forest around it (its seed source); the
+# share of every forest type counts (P26: own type adds nothing, dev/fire/p26-seed-source.R). One adjacency calculation, every adj_up years
+pda <- read_default("projection", "post-disturbance-adjacency.csv")
+for (g in intersect(unique(pda$TransitionGroupId), unique(sm$TransitionGroupId))) { x <- pda[TransitionGroupId == g]
+  adj_set[[g]] <- data.table(TransitionGroupId = g, StateAttributeTypeId = x$StateAttributeTypeId[1], NeighborhoodRadius = adj_r, UpdateFrequency = adj_up)
+  adj_mult[[g]] <- data.table(TransitionGroupId = g, AttributeValue = as.numeric(x$AttributeValue), Amount = as.numeric(x$Amount)) }
 if (length(adj_set)) {
-  # the state attributes adjacency reads: 1 on developed (NLCD 21-24) or agriculture (81, 82) classes
-  scl <- stsim_list("StateClass"); used <- unique(rbindlist(adj_set)$StateAttributeTypeId); ATTR <- list(Developed = DEV, Agriculture = c(81L, 82L), Pasture = 81L, Cropland = 82L)
+  # the state attributes adjacency reads: 1 on developed (NLCD 21-24) or agriculture (81, 82) classes, or on forest type groups (Live Forest)
+  scl <- stsim_list("StateClass"); used <- unique(rbindlist(adj_set)$StateAttributeTypeId); ATTR <- list(Developed = DEV, Agriculture = c(81L, 82L), Pasture = 81L, Cropland = 82L, `Live Forest` = 100:999)
   sav <- as.data.table(datasheet(scn, "stsim_StateAttributeValue", optional = TRUE, lookupsAsFactors = FALSE))
   if (nrow(sav)) sav <- sav[!StateAttributeTypeId %in% names(ATTR)]
   dv <- rbindlist(lapply(used, function(k) data.table(StateClassId = scl$Name, StateAttributeTypeId = k, Value = as.numeric(as.integer(scl$Id) %in% ATTR[[k]]))))

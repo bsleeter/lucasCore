@@ -1,0 +1,7 @@
+StateClassId,StratumId,Multiplier,Note
+Disturbed: forest,,1.5,"to-do 57 (user 2026-11-11: raise burned area on converted and post-disturbance land): every disturbed forest class. P26, first MTBS high-severity burns of NLCD forest 1986-2024: reburned at 0.0145 a year, against 0.0094 a year for P26 forest's first burns (692 kha of 1,890 kha in 39 years): 1.5 (moderate 1.8, low 2.1; dev/fire/p26-fire-gap.R output)"
+Disturbed: shrub,,1,"every disturbed shrub class: to calibrate on the Northern Basin and Range (RCMAP, MTBS; a download to ask)"
+Grassland: Annual,Temperate Desert,1,"the grass-fire cycle (cheatgrass burns more often than the sagebrush it replaces): to calibrate on the Northern Basin and Range"
+Grassland: Annual,Temperate Desert Mountains,1,
+Grassland: Annual,Temperate Steppe,1,
+Grassland: Annual,Temperate Steppe Mountains,1,
