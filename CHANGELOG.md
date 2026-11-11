@@ -2,6 +2,48 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## 1.3.0 - 2026-11-11
+
+Forested wetlands as classes of their own, peat as its own soil stock, and a carbon fluxes figure that breaks the balance down by
+driver. Tested on the Great Dismal Swamp (Chesapeake and Suffolk, Virginia). Includes every fix from 1.2.1 to 1.2.3.
+
+**Upgrading:** install `lucasCore-1.3.0.ssimpkg`. Opening a 1.2 library with it runs library update 1.3, which adds the new state
+classes, transition types, stock, flows and groups. Close Studio before you update. A library needs a new Build to give its forested
+wetlands their own classes and peat. Until then its results stay as they were in 1.2.
+
+### Added
+- Forested wetland classes Wetland: Spruce/Fir Group (121), Wetland: Oak/Gum/Cypress Group (601) and Wetland: Elm/Ash/Cottonwood
+  Group (701). Each one twins its upland group. FIA conditions on hydric sites (physiographic class 31-39) are split off to the twin,
+  so the twins get their own growth curves, dead wood fits, stem turnover, CO2 ECM share and minimum harvest ages. A regions table
+  picks the twin for each ecodivision. The twins have their own Ag Contraction transition types and carbon burial into Deep Soil
+  (0.25 / 0.1 / 0 Mg C/ha/yr).
+- Palustrine forested cells now start as their region's twin class. Estuarine forested cells start as Wetland: Estuarine Forested
+  (91), and Wetland: Palustrine Forested (90) starts empty.
+- DOM: Peat stock. In Build stage 8, each cell with a gNATSGO Histosol share starts with the organic soil carbon above its class's
+  soil, capped by that share. Peat does not decay. It is lost to fire in any class (0.03 / 0.07 / 0.15 of the stock by severity),
+  to drainage under cropland and pasture, and to urbanization. Peat counts in DOM: Soil and Total Ecosystem, and has a cell in the
+  flow diagram.
+- Data Sources and Data Download: the Histosol share (`soils-terrain/histosol/*.tif`). The Download page can now tick the Cropland
+  Data Layer, tidal marsh NPP and the Histosol share.
+- Run Figures, Carbon fluxes is now six panels: NPP, Rh and NEP; losses by cause (fire, insect, forest harvest, land use change,
+  crop harvest, drained peat) with NBP; emissions by driver (fire on vegetation and on peat, insect, harvest, urbanization, other
+  land change, drained peat); removals (harvested wood, wood from land use change, crop harvest, lateral export); a waterfall from
+  NPP to NBP; and NBP by land cover. Compare Figures uses the same causes.
+
+### Changed
+- Dead wood decay: a wetland class with enough FIA plots gets its own fit, with duff held at its upland type's value (FIA hydric
+  duff is muck or peat). A wetland class with too few plots takes its ecodivision's upland values.
+- The Organic Soil Share flow multiplier and the Organic Soil flow group are retired. Peat flows now draw on DOM: Peat.
+
+### Fixed
+- Build stage 4: the soil spin-up leaves peat fire out, as stage 3 calibrates. Before this, wetland soil started at a quarter of its
+  target.
+- Stages 5 and 6: if a parallel step runs out of memory, it runs again on half the workers. An error names its NLCD year.
+- Stage 7 and later: PROJ no longer fetches datum grids from the internet, and the climate window is in NAD83 (EPSG:4269). Behind
+  some firewalls, the climate step stopped with "invalid extent".
+- Run Figures: the carbon by secondary stratum chart is at least one chart row tall per unit. A run with many units failed with
+  "figure margins too large".
+
 ## 1.2.3 - 2026-11-10
 
 A Build fix for machines with less memory than cores.
