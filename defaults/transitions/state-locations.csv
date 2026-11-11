@@ -53,3 +53,39 @@ Iteration,Timestep,StratumIdSource,StateClassIdSource,StratumIdDest,StateClassId
 ,,,Wetland: Spruce/Fir Group,,Wetland: Spruce/Fir Group,,,H14
 ,,,Wetland: Oak/Gum/Cypress Group,,Wetland: Oak/Gum/Cypress Group,,,H15
 ,,,Wetland: Elm/Ash/Cottonwood Group,,Wetland: Elm/Ash/Cottonwood Group,,,H16
+,,,Disturbed: Alder/Maple Group,,Disturbed: Alder/Maple Group,,,I1
+,,,Disturbed: Aspen/Birch Group,,Disturbed: Aspen/Birch Group,,,I2
+,,,Disturbed: California Mixed Conifer Group,,Disturbed: California Mixed Conifer Group,,,I3
+,,,Disturbed: Douglas-fir Group,,Disturbed: Douglas-fir Group,,,I4
+,,,Disturbed: Elm/Ash/Cottonwood Group,,Disturbed: Elm/Ash/Cottonwood Group,,,I5
+,,,Disturbed: Exotic Hardwoods Group,,Disturbed: Exotic Hardwoods Group,,,I6
+,,,Disturbed: Exotic Softwoods Group,,Disturbed: Exotic Softwoods Group,,,I7
+,,,Disturbed: Fir/Spruce/Mountain Hemlock Group,,Disturbed: Fir/Spruce/Mountain Hemlock Group,,,I8
+,,,Disturbed: Hemlock/Sitka Spruce Group,,Disturbed: Hemlock/Sitka Spruce Group,,,I9
+,,,Disturbed: Loblolly/Shortleaf Pine Group,,Disturbed: Loblolly/Shortleaf Pine Group,,,I10
+,,,Disturbed: Lodgepole Pine Group,,Disturbed: Lodgepole Pine Group,,,I11
+,,,Disturbed: Longleaf/Slash Pine Group,,Disturbed: Longleaf/Slash Pine Group,,,I12
+,,,Disturbed: Maple/Beech/Birch Group,,Disturbed: Maple/Beech/Birch Group,,,I13
+,,,Disturbed: Oak/Gum/Cypress Group,,Disturbed: Oak/Gum/Cypress Group,,,I14
+,,,Disturbed: Oak/Hickory Group,,Disturbed: Oak/Hickory Group,,,I15
+,,,Disturbed: Oak/Pine Group,,Disturbed: Oak/Pine Group,,,I16
+,,,Disturbed: Other Western Hardwoods Group,,Disturbed: Other Western Hardwoods Group,,,I17
+,,,Disturbed: Other Western Softwood Group,,Disturbed: Other Western Softwood Group,,,I18
+,,,Disturbed: Pinyon/Juniper Group,,Disturbed: Pinyon/Juniper Group,,,I19
+,,,Disturbed: Ponderosa Pine Group,,Disturbed: Ponderosa Pine Group,,,I20
+,,,Disturbed: Redwood Group,,Disturbed: Redwood Group,,,I21
+,,,Disturbed: Spruce/Fir Group,,Disturbed: Spruce/Fir Group,,,I22
+,,,Disturbed: Tanoak/Laurel Group,,Disturbed: Tanoak/Laurel Group,,,I23
+,,,Disturbed: Tropical Hardwoods Group,,Disturbed: Tropical Hardwoods Group,,,I24
+,,,Disturbed: Western Larch Group,,Disturbed: Western Larch Group,,,I25
+,,,Disturbed: Western Oak Group,,Disturbed: Western Oak Group,,,I26
+,,,Disturbed: Western White Pine Group,,Disturbed: Western White Pine Group,,,I27
+,,,Disturbed: White/Red/Jack Pine Group,,Disturbed: White/Red/Jack Pine Group,,,I28
+,,,Disturbed: Wetland Elm/Ash/Cottonwood Group,,Disturbed: Wetland Elm/Ash/Cottonwood Group,,,I29
+,,,Disturbed: Wetland Oak/Gum/Cypress Group,,Disturbed: Wetland Oak/Gum/Cypress Group,,,I30
+,,,Disturbed: Wetland Spruce/Fir Group,,Disturbed: Wetland Spruce/Fir Group,,,I31
+,,,Disturbed: Chaparral,,Disturbed: Chaparral,,,J1
+,,,Disturbed: Invaded Sage Steppe,,Disturbed: Invaded Sage Steppe,,,J2
+,,,Disturbed: Native Sage Steppe,,Disturbed: Native Sage Steppe,,,J3
+,,,Disturbed: Non-sage,,Disturbed: Non-sage,,,J4
+,,,Disturbed: Sage,,Disturbed: Sage,,,J5

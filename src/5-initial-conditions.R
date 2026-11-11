@@ -236,7 +236,7 @@ if (wf_n > 0) {
   for (j in seq_len(min(nrow(r), 12))) with(r[j], say("  %s, %s -> %s: %d cells", stl$Name[match(Eco, stl$Id)], if (is.na(Fz)) "no forest type" else scl$Name[match(Fz, scl$Id)], scl$Name[match(Tw, scl$Id)], N)) }
 S <- ifel(woody, tw, S)
 S <- mask(S, m)
-forest <- S >= 100 | S == 91
+forest <- (S >= 100 & S <= 999) | S == 91   # forest type groups (100-999); disturbed classes (2000 + parent, to-do 57) are not forest
 progressBar()
 
 # ---- stand age (Build Options: Stand Age Source), shifted to the start year, filled from neighbours, forest and forested wetland only
@@ -259,7 +259,7 @@ if (site_on) {   # 7 single-band maps: share of the cell's TreeMap pixels (with 
   s30 <- classify(tm30, cbind(tpl$Value, as.numeric(tpl$siteclcd)), others = NA)
   sh <- lapply(1:7, function(k) mask(project(ifel(is.na(s30), NA, s30 == k), R, method = "average"), P))
   tot <- Reduce(`+`, lapply(sh, function(x) ifel(is.na(x), 0, x)))
-  vf <- values(mask(ifel(S >= 100, 1, NA), P), mat = FALSE); vt <- values(tot, mat = FALSE)
+  vf <- values(mask(ifel(S >= 100 & S <= 999, 1, NA), P), mat = FALSE); vt <- values(tot, mat = FALSE)
   cov <- mean(!is.na(vt[which(vf == 1)]) & vt[which(vf == 1)] > 0)
   check(STAGE, "site class shares add up to 1 wherever a cell has TreeMap pixels", all(abs(vt[!is.na(vt) & vt > 0] - 1) < 1e-4))
   say("Site class shares (TreeMap): %.1f%% of forest cells have TreeMap pixels with a site class (the rest get multiplier 1 in stage 8); shares of the study area's TreeMap pixels: %s",
@@ -308,7 +308,7 @@ Fr <- classify(crop_to(rast(src$FriFile)), cbind(as.integer(fri$Value), ifelse(f
 Fr <- project(Fr, R, method = "average")
 # gNATSGO soc 0-999 (g C/m2): 0 and its undeclared no-data value (-1920, the CONUS median: ocean and unmapped areas) are missing
 So <- crop_to(rast(src$SoilCarbonFile)); So <- classify(So, cbind(-Inf, 0, NA), include.lowest = TRUE); So <- project(So, R, method = "average") * 0.01
-z <- data.table(P = values(P, mat = FALSE), S = values(S, mat = FALSE), fri = values(Fr, mat = FALSE), soil = values(So, mat = FALSE))[!is.na(P) & S >= 100]
+z <- data.table(P = values(P, mat = FALSE), S = values(S, mat = FALSE), fri = values(Fr, mat = FALSE), soil = values(So, mat = FALSE))[!is.na(P) & S >= 100 & S <= 999]
 z[, `:=`(StratumId = stl$Name[match(P, as.integer(stl$Id))], StateClassId = scl$Name[match(S, as.integer(scl$Id))])]
 ri <- z[!is.na(fri), .(ReturnInterval = as.integer(round(mean(fri))), Cells = .N), by = .(StratumId, StateClassId)]
 st <- z[!is.na(soil) & soil > 0, .(SoilTarget = round(mean(soil), 2), Cells = .N), by = .(StratumId, StateClassId)]
@@ -327,7 +327,7 @@ check(STAGE, "forest cells have an age of at least 1, chaparral and the sage fam
       all(vA[which(vF == 1)] >= 1) && all(vA[which(vF == 0 & !vC)] == 0) && all(vA[which(vC)] >= 0 & vA[which(vC)] <= max(y0 - 1900, as.integer(shrub_age$AgeMax))))
 check(STAGE, "every forest ecodivision x class has a return interval", nrow(ri) == nrow(fc), sprintf("%d of %d", nrow(ri), nrow(fc)))
 say("Forest cells: %d (%.1f%% of land); natural cells made forest by the any-year rule: %d; developed/ag/water/ice kept: %d",
-    sum(vF == 1, na.rm = TRUE), 100 * mean(vF[!is.na(vP)] == 1), sum(!is.na(v0) & !(v0 %in% 41:43) & vS >= 100 & !lu, na.rm = TRUE), sum(lu))
+    sum(vF == 1, na.rm = TRUE), 100 * mean(vF[!is.na(vP)] == 1), sum(!is.na(v0) & !(v0 %in% 41:43) & vS >= 100 & vS <= 999 & !lu, na.rm = TRUE), sum(lu))
 say("Return intervals: %d cells, %d-%d yr (median %d); gNATSGO soil targets: %d cells, median %.0f Mg C/ha",
     nrow(ri), min(ri$ReturnInterval), max(ri$ReturnInterval), as.integer(median(ri$ReturnInterval)), nrow(st), median(st$SoilTarget))
 progressBar()

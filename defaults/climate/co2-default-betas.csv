@@ -1,6 +1,42 @@
 StateClassId,StratumId,AgeBand,Low,Central,High
 Agriculture: Cropland,,,0.1,0.2,0.3
 Agriculture: Pasture,,,0.15,0.35,0.55
+Disturbed: Alder/Maple Group,,,0,0.15,0.4
+Disturbed: Aspen/Birch Group,,,0,0.15,0.4
+Disturbed: California Mixed Conifer Group,,,0,0.15,0.4
+Disturbed: Chaparral,,,0,0.15,0.4
+Disturbed: Douglas-fir Group,,,0,0.15,0.4
+Disturbed: Elm/Ash/Cottonwood Group,,,0,0.15,0.4
+Disturbed: Exotic Hardwoods Group,,,0,0.15,0.4
+Disturbed: Exotic Softwoods Group,,,0,0.15,0.4
+Disturbed: Fir/Spruce/Mountain Hemlock Group,,,0,0.15,0.4
+Disturbed: Hemlock/Sitka Spruce Group,,,0,0.15,0.4
+Disturbed: Invaded Sage Steppe,,,0,0.15,0.4
+Disturbed: Loblolly/Shortleaf Pine Group,,,0,0.15,0.4
+Disturbed: Lodgepole Pine Group,,,0,0.15,0.4
+Disturbed: Longleaf/Slash Pine Group,,,0,0.15,0.4
+Disturbed: Maple/Beech/Birch Group,,,0,0.15,0.4
+Disturbed: Native Sage Steppe,,,0,0.15,0.4
+Disturbed: Non-sage,,,0,0.15,0.4
+Disturbed: Oak/Gum/Cypress Group,,,0,0.15,0.4
+Disturbed: Oak/Hickory Group,,,0,0.15,0.4
+Disturbed: Oak/Pine Group,,,0,0.15,0.4
+Disturbed: Other Western Hardwoods Group,,,0,0.15,0.4
+Disturbed: Other Western Softwood Group,,,0,0.15,0.4
+Disturbed: Pinyon/Juniper Group,,,0,0.15,0.4
+Disturbed: Ponderosa Pine Group,,,0,0.15,0.4
+Disturbed: Redwood Group,,,0,0.15,0.4
+Disturbed: Sage,,,0,0.15,0.4
+Disturbed: Spruce/Fir Group,,,0,0.15,0.4
+Disturbed: Tanoak/Laurel Group,,,0,0.15,0.4
+Disturbed: Tropical Hardwoods Group,,,0,0.15,0.4
+Disturbed: Western Larch Group,,,0,0.15,0.4
+Disturbed: Western Oak Group,,,0,0.15,0.4
+Disturbed: Western White Pine Group,,,0,0.15,0.4
+Disturbed: Wetland Elm/Ash/Cottonwood Group,,,0,0.15,0.4
+Disturbed: Wetland Oak/Gum/Cypress Group,,,0,0.15,0.4
+Disturbed: Wetland Spruce/Fir Group,,,0,0.15,0.4
+Disturbed: White/Red/Jack Pine Group,,,0,0.15,0.4
 Forest: Alder/Maple Group,,1 (0-25),0.1761,0.4142,0.65
 Forest: Alder/Maple Group,,2 (26-50),0.1301,0.3642,0.5754
 Forest: Alder/Maple Group,,3 (51-75),0.084,0.3141,0.5007

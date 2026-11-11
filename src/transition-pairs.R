@@ -12,7 +12,7 @@ LU_NAMED <- c("Developed: Open Space" = 21L, "Developed: Low Intensity" = 22L, "
 # the NLCD classes a state class stands for on the annual maps: natural state classes are one family, since a cell's natural class on the map
 # need not be its state class (the any-year forest rule); NA for a class with no NLCD counterpart in the pathways
 nlcd_of_class <- function(cls) { if (cls %in% names(LU_NAMED)) return(unname(LU_NAMED[cls]))
-  if (grepl("^(Forest|Grassland|Shrubland|Wetland):", cls)) return(LU_NATURAL)
+  if (grepl("^(Forest|Grassland|Shrubland|Wetland|Disturbed):", cls)) return(LU_NATURAL)
   NA_integer_ }
 
 # one row per group and class pair. pw has StateClassIdSource, StateClassIdDest, TransitionTypeId; types maps a group to its transition types

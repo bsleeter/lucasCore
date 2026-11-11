@@ -375,7 +375,7 @@ progressBar()
 # ---- ag contraction destinations: the nearest natural state class of the start year --------------------------------------
 gates <- NULL; nv <- so[Source == "NaturalVeg"]
 if (nrow(nv)) {
-  Nat <- fill_modal(mask(ifel(S >= 40 & !(S %in% c(81, 82)), S, NA), m), m, 71)
+  Nat <- fill_modal(mask(ifel(S >= 40 & S < 1000 & !(S %in% c(81, 82)), S, NA), m), m, 71)
   check(STAGE, "every land cell has a natural class for ag contraction", !any(land & is.na(values(Nat, mat = FALSE))))
   gt <- unique(pw[TransitionTypeId %in% unlist(lapply(nv$TransitionGroupId, grp_types)), .(TransitionTypeId, StateClassIdDest)])
   multi <- gt[, .N, by = TransitionTypeId][N > 1]

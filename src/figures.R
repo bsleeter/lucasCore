@@ -333,7 +333,7 @@ build_figures <- function(I, outdir) {
     ft <- NULL
     if ("Fire" %in% dfam && !is.null(I$fire_maps) && nrow(I$fire_maps)) {
       sv <- values(I$sc, mat = FALSE); snm <- scn$Name[match(sv, as.numeric(scn$Id))]
-      ty <- ifelse(!is.na(sv) & sv >= 100 & sv < 1000, "Forest", sub(":.*$", "", snm)); ty[!ty %in% c("Forest", "Shrubland", "Grassland", "Wetland", "Agriculture")] <- "Other"; ty[is.na(sv)] <- NA
+      ty <- ifelse(!is.na(sv) & sv >= 100 & sv < 1000, "Forest", sub(":.*$", "", snm)); ty[!ty %in% c("Forest", "Disturbed", "Shrubland", "Grassland", "Wetland", "Agriculture")] <- "Other"; ty[is.na(sv)] <- NA
       ft <- rbindlist(lapply(seq_len(nrow(I$fire_maps)), function(j) { r <- rast(I$fire_maps$File[j])
         if (!compareGeom(r, I$sc, stopOnError = FALSE)) r <- resample(r, I$sc, method = "near")
         v <- values(r, mat = FALSE); b <- !is.na(v) & v > 0 & !is.na(ty)
@@ -341,7 +341,7 @@ build_figures <- function(I, outdir) {
       if (nrow(ft)) ft <- ft[, .(Area = sum(Area)), by = .(Timestep, Member)][, Family := "Fire by land type"] else ft <- NULL }
     if (length(dfam)) { tr[Family %in% dfam, Member := sub("^Forest ", "", Member)]
       dcol <- c(`Low Severity` = "#fbe3a2", `Medium Severity` = "#ef8f2a", `High Severity` = "#a81d1a", Clearcut = "#3d3d3d", Selection = "#b5b5b5",
-                Forest = "#2b8152", Shrubland = "#c08a3e", Grassland = "#e8d27a", Wetland = "#5aa5b4", Agriculture = "#b07aa1", Other = "#9a9a9a")
+                Forest = "#2b8152", Disturbed = "#b5651d", Shrubland = "#c08a3e", Grassland = "#e8d27a", Wetland = "#5aa5b4", Agriculture = "#b07aa1", Other = "#9a9a9a")
       np <- length(dfam) + !is.null(ft)
       chart_figure("disturbance", "Disturbance history", sprintf("Annual area burned by severity (MTBS)%s and harvested by clearcut and selection (LCMS tree removal), %s-%s, as written by stage 6.",
           if (is.null(ft)) "" else ", burned area by the land type the cells had in the start year", min(yrs), max(yrs)),

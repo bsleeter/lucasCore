@@ -7,7 +7,7 @@ StateClass,Developed: Low Intensity,"Cells whose most common start-year annual N
 StateClass,Developed: Medium Intensity,"Cells whose most common start-year annual NLCD class is Developed, Medium Intensity (23): impervious surface 50-79% of cover.",NlcdFolder
 StateClass,Developed: High Intensity,"Cells whose most common start-year annual NLCD class is Developed, High Intensity (24): impervious surface 80-100% of cover.",NlcdFolder
 StateClass,Developed: Transportation,Developed cells under a LANDFIRE road. Defined in the package's class list; the default Build does not map it.,RoadsFile
-StateClass,Forest: *,"Cells that are forest (annual NLCD 41, 42 or 43) in any year of the record and are not developed, agricultural, water or ice in the start year, whose most common forest type among their 30 m pixels is the FIA forest type group """"""""""""""""{*}"""""""""""""""". The type comes from the Build Options Forest Type Map: LANDFIRE EVT 2016 through the Land Cover Crosswalks (default), the USFS forest type group map, or TreeMap 2016. Forest cells with no typed pixel take their neighbours' type.",Evt2016File
+StateClass,Forest: *,"Cells that are forest (annual NLCD 41, 42 or 43) in any year of the record and are not developed, agricultural, water or ice in the start year, whose most common forest type among their 30 m pixels is the FIA forest type group ""{*}"". The type comes from the Build Options Forest Type Map: LANDFIRE EVT 2016 through the Land Cover Crosswalks (default), the USFS forest type group map, or TreeMap 2016. Forest cells with no typed pixel take their neighbours' type.",Evt2016File
 StateClass,Grassland: Annual,"Start-year NLCD Shrub/Scrub (52) or Grassland/Herbaceous (71) cells that are never forest, whose most common RCMAP vegetation state (1985) is Annual Grassland (RCMAP value 2).",RcmapFile
 StateClass,Grassland: Natural Perennial,"Start-year NLCD 52 or 71 cells that are never forest, whose most common RCMAP vegetation state (1985) is Natural Perennial Grassland (RCMAP value 3). Where RCMAP has no type (outside its western US extent), NLCD 71 cells.",RcmapFile
 StateClass,Grassland: Irrigated Perennial,"Start-year NLCD 52 or 71 cells that are never forest, whose most common RCMAP vegetation state (1985) is Irrigated Perennial Grassland (RCMAP value 4).",RcmapFile
@@ -53,8 +53,8 @@ TransitionType,Intensification: Low to High,Developed: Low Intensity becomes Dev
 TransitionType,Intensification: Medium to High,Developed: Medium Intensity becomes Developed: High Intensity.,NlcdFolder
 TransitionType,Ag Expansion: Cropland,A natural cell becomes Agriculture: Cropland (NLCD 82).,NlcdFolder
 TransitionType,Ag Expansion: Pasture,A natural cell becomes Agriculture: Pasture (NLCD 81).,NlcdFolder
-TransitionType,Ag Contraction Cropland: *,"Agriculture: Cropland returns to the natural state class """"""""""""""""{*}"""""""""""""""", the nearest natural class of the start year.",NlcdFolder
-TransitionType,Ag Contraction Pasture: *,"Agriculture: Pasture returns to the natural state class """"""""""""""""{*}"""""""""""""""", the nearest natural class of the start year.",NlcdFolder
+TransitionType,Ag Contraction Cropland: *,"Agriculture: Cropland returns to the natural state class ""{*}"", the nearest natural class of the start year.",NlcdFolder
+TransitionType,Ag Contraction Pasture: *,"Agriculture: Pasture returns to the natural state class ""{*}"", the nearest natural class of the start year.",NlcdFolder
 TransitionType,Fire: Low Severity,Wildfire of low severity: MTBS burn severity 1 (unburned to low) or 2 (low).,MtbsSeverityFolder
 TransitionType,Fire: Medium Severity,Wildfire of moderate severity: MTBS burn severity 3.,MtbsSeverityFolder
 TransitionType,Fire: High Severity,Wildfire of high severity: MTBS burn severity 4.,MtbsSeverityFolder
@@ -124,8 +124,8 @@ FlowType,LULC: Harvest Live,Live biomass carbon removed to the forestry sector b
 FlowType,LULC: Harvest DOM,Dead organic matter carbon removed to the forestry sector by harvest.,
 FlowType,LULC: Mortality Live,Live biomass carbon killed by a disturbance or land-use transition and moved to dead organic matter.,
 FlowType,LULC: Transfer DOM,Dead organic matter moved between pools by a disturbance or land-use transition.,
-FlowGroup,*,"The sum of the flow types in the group """"""""""""""""{*}"""""""""""""""", in carbon (or carbon dioxide equivalent where the name says CO2e).",
-Stratum,*,"Primary stratum: the FIA ecological division """"""""""""""""{*}"""""""""""""""" (ECOMAP 2007 divisions, dissolved; a Mountains division is the division's mountain provinces). Growth curves and carbon parameters vary by primary stratum.",EcodivisionFile
+FlowGroup,*,"The sum of the flow types in the group ""{*}"", in carbon (or carbon dioxide equivalent where the name says CO2e).",
+Stratum,*,"Primary stratum: the FIA ecological division ""{*}"" (ECOMAP 2007 divisions, dissolved; a Mountains division is the division's mountain provinces). Growth curves and carbon parameters vary by primary stratum.",EcodivisionFile
 Stratum,State: *,Secondary or tertiary stratum: the US state {*} (US Census TIGER/Line 2009).,StatesFile
 Stratum,County: *,Secondary or tertiary stratum: the US county {*} (US Census TIGER/Line 2022).,CountiesFile
 Stratum,HUC6: *,"Secondary or tertiary stratum: the watershed basin (hydrologic unit, 6-digit) {*} (USGS Watershed Boundary Dataset).",WatershedsFile
@@ -138,3 +138,11 @@ Stratum,Ecodivision: *,"Secondary or tertiary stratum: the FIA ecological divisi
 StockType,Agriculture Sector,"Carbon removed from cropland and pasture each year by crop harvest and hay and grazing removal (a sink outside the ecosystem).",
 FlowType,Net Growth Agriculture: *,"Annual uptake of carbon by cropland and pasture into the live pool named after the arrow ({*}): NASS county yields converted to growth with USDA Tech. Bull. 1939 Table 3-3 coefficients, varying by year through the Crop Yield flow multiplier.",
 FlowType,Harvest: Foliage -> Agriculture Sector,"Crop harvest and hay and grazing removal: the harvested share of the year's aboveground growth, removed from the ecosystem.",
+StateClass,Disturbed: *,"Land of the {*} after a stand-replacing disturbance (high-severity fire), waiting either to return to it or to convert to non-forest or grassland. Age counts the years since the disturbance. No cell starts in it in the default Build (to-do 57).",
+TransitionType,Post-disturbance: Forest Return,"A disturbed forest class returns to its forest type, its age (years since the disturbance) carried over.",
+TransitionType,Post-disturbance: Shrub Return,"A disturbed shrub class returns to its shrub type, its age carried over.",
+TransitionType,Post-disturbance: Conversion,"A disturbed class that has not returned by the end of its window converts: disturbed forest to its ecodivision's shrub or grass class, disturbed sage, sage steppe and chaparral to annual grass, disturbed non-sage to its ecodivision's grass class.",
+TransitionGroup,Post-disturbance,"Every way out of a disturbed class: return or conversion.",
+TransitionGroup,Post-disturbance: Forest Return,"Return of disturbed forest to its forest type.",
+TransitionGroup,Post-disturbance: Shrub Return,"Return of disturbed shrubland to its shrub type.",
+TransitionGroup,Post-disturbance: Conversion,"Conversion of disturbed land that has not returned by the end of its window.",

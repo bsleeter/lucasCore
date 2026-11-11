@@ -8,7 +8,8 @@ check <- function(what, ok) { if (isTRUE(ok)) n_ok <<- n_ok + 1 else { n_bad <<-
 rd <- function(f) fread(f, colClasses = "character", na.strings = "")
 UP <- c("Forest: Spruce/Fir Group", "Forest: Oak/Gum/Cypress Group", "Forest: Elm/Ash/Cottonwood Group")
 TW <- sub("^Forest: ", "Wetland: ", UP)
-tt <- function(x) sub("^(Ag Contraction (Cropland|Pasture)): (.+ Group)$", "\\1: Wetland \\3", x)
+tt <- function(x) sub("^Disturbed: (.+ Group)$", "Disturbed: Wetland \\1",   # the twin's disturbed class (to-do 57)
+                      sub("^(Ag Contraction (Cropland|Pasture)): (.+ Group)$", "\\1: Wetland \\3", x))
 
 # every row naming an upland class has a twin row with the same other values
 files <- c(file.path("carbon-assumptions", c("cbm-defaults", "fia-measured"), "cbm-crosswalk.csv"),

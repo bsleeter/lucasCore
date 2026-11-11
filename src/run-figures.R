@@ -18,8 +18,8 @@
 suppressPackageStartupMessages({ library(DBI); library(RSQLite) })
 
 cover_group <- function(x) { g <- sub(":.*$", "", x); g[grepl("^Forest", x)] <- "Forest"
-  g[!g %in% c("Forest", "Shrubland", "Grassland", "Agriculture", "Developed", "Wetland", "Water")] <- "Barren and other"; g }
-COVER_COLS <- c(Forest = "#2b8152", Shrubland = "#c9a26b", Grassland = "#e6d77a", Agriculture = "#d98b3a", Developed = "#c0392b",
+  g[!g %in% c("Forest", "Disturbed", "Shrubland", "Grassland", "Agriculture", "Developed", "Wetland", "Water")] <- "Barren and other"; g }   # Disturbed: waiting to return or convert (to-do 57)
+COVER_COLS <- c(Forest = "#2b8152", Disturbed = "#b5651d", Shrubland = "#c9a26b", Grassland = "#e6d77a", Agriculture = "#d98b3a", Developed = "#c0392b",
                 Wetland = "#5aa9b8", Water = "#3b6ea8", `Barren and other` = "#a3a3a3")
 FAMILIES <- c("Urbanization", "Intensification", "Ag Expansion", "Ag Contraction", "Ag Change", "Fire", "Forest Harvest")
 # carbon lost each year, by cause (user, 2026-11-10: the flux figure's "fire emissions" were every transition's emissions): a transition's
@@ -33,8 +33,8 @@ EMIS_COLS <- c(`Fire: vegetation` = "#c93a1d", `Fire: peat` = "#7f1d0f", Insect 
 emis_driver <- function(type) data.table::fcase(grepl("^Fire", type), "Fire", grepl("^Insect", type), "Insect", grepl("^Forest Harvest", type), "Forest harvest",
                                                grepl("^Urbanization", type), "Urbanization", default = "Other land change")
 REM_COLS <- c(`Forest harvest wood` = "#6b6b6b", `Wood from land use change` = "#8c6d31", `Crop harvest` = "#e3b23c", `Lateral export (water)` = "#6baed6")
-BAL_COLS <- c(Forest = "#2b8152", `Forested wetland` = "#66c2a5", `Emergent wetland` = "#9ecae1", Agriculture = "#d98b3a", `Grass and shrub` = "#c9a26b", Developed = "#c0392b", Other = "#a3a3a3")
-balance_group <- function(x) data.table::fcase(grepl("^Forest", x), "Forest", grepl("^Wetland: .*(Group|Forested)$", x), "Forested wetland", grepl("^Wetland", x), "Emergent wetland",
+BAL_COLS <- c(Forest = "#2b8152", Disturbed = "#b5651d", `Forested wetland` = "#66c2a5", `Emergent wetland` = "#9ecae1", Agriculture = "#d98b3a", `Grass and shrub` = "#c9a26b", Developed = "#c0392b", Other = "#a3a3a3")
+balance_group <- function(x) data.table::fcase(grepl("^Forest", x), "Forest", grepl("^Disturbed", x), "Disturbed", grepl("^Wetland: .*(Group|Forested)$", x), "Forested wetland", grepl("^Wetland", x), "Emergent wetland",
                                                grepl("^Agriculture", x), "Agriculture", grepl("^(Grassland|Shrubland)", x), "Grass and shrub", grepl("^Developed", x), "Developed", default = "Other")
 RAMP_CHG <- colorRampPalette(c("#7a3b12", "#c98b4f", "#efd9b4", "#f5f2ec", "#cfe3b8", "#6fae74", "#1f5f3f"))
 

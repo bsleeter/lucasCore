@@ -70,7 +70,7 @@ progressBar()
 out <- matrix(0, ncell(P), nrow(st), dimnames = list(NULL, st$StockTypeId)); src_of <- rep(NA_character_, ncell(P))
 # forest: stage 4 curves
 amax <- max(cv$Age); fk <- paste(cv$StratumId, cv$StateClassId, cv$TransitionGroupId, cv$Age)
-isF <- land & !is.na(vS) & vS >= 100
+isF <- land & !is.na(vS) & vS >= 100 & vS <= 999   # forest type groups; not the disturbed classes (2000 + parent, to-do 57)
 key <- paste(sname, cname, last, pmin(pmax(round(vA), 0), amax))
 m <- match(key[isF], fk)
 check(STAGE, "every forest cell finds its ecodivision x class x last disturbance x age in the stock curves", !anyNA(m),
@@ -443,7 +443,7 @@ summ[, StateClassId := scl$Name[match(S, as.integer(scl$Id))]]
 tot <- d[, sum(live + dom + soil)] * cell_ha / 1e9
 say("Initial carbon: %.2f Pg C (live %.2f, dead organic matter %.2f, soil %.2f); forest mean live %.0f, DOM %.0f, soil %.0f Mg C/ha",
     tot, sum(d$live) * cell_ha / 1e9, sum(d$dom) * cell_ha / 1e9, sum(d$soil) * cell_ha / 1e9,
-    mean(d[!is.na(S) & S >= 100, live]), mean(d[!is.na(S) & S >= 100, dom]), mean(d[!is.na(S) & S >= 100, soil]))
+    mean(d[!is.na(S) & S >= 100 & S <= 999, live]), mean(d[!is.na(S) & S >= 100 & S <= 999, dom]), mean(d[!is.na(S) & S >= 100 & S <= 999, soil]))
 files <- vapply(seq_len(nrow(st)), function(j) write_raster(setValues(rast(P), out[, j]), sprintf("%s.tif", gsub("[^A-Za-z0-9]+", "-", st$StockTypeId[j])), "FLT4S"), "")
 write_stsim(data.table(StockTypeId = st$StockTypeId, RasterFileName = files), "InitialStockSpatial")
 put_multipliers_save()
