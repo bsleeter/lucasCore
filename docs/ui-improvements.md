@@ -1373,8 +1373,24 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       exactly (snag stem transfer 0.145, decay 0.059, BG Slow emission 0.0000874). Total ecosystem carbon within 0-9 Gg C of run 24
       (136 Tg), the same as the run-to-run noise before any land was disturbed. A quick test that skips stage 6 keeps the Build's old
       pathways (fire stays in the forest class).
-    - Until step 3, historical runs send burned forest and shrub into the disturbed classes and nothing returns them (stage 6 sets a
-      target of 0 on a type with no yearly map). Don't Build real libraries with this yet.
+    - **Step 3 DONE 2026-11-11.** Return pathways are probability 1 at any age in the window (the chance is a multiplier: NLCD maps
+      in history, an age-dependent multiplier in projections, step 4; ST-Sim's transition multiplier values take AgeMin and AgeMax).
+      Stage 6 sources (`sources.csv`): NlcdPersist, on in year y where the modal NLCD shows the group's classes in y - 1 and y (Forest
+      Return 41|42|43|90, woody wetland for the twins; Shrub Return 52, RCMAP cover to follow for the sage family); All, on everywhere
+      (Conversion; the pathways' age limit converts at the window's end). Conversion's destination uses the pathways' proportions,
+      not yet the NLCD class at the time. The three groups and Post-disturbance get maps (main-transition-groups.csv). GDS copy
+      (stage 6 on the step 2 result, 1985-2012, 34 min): the 2008 fire put 540 ha into Disturbed: Wetland Oak/Gum/Cypress Group;
+      313 ha returned in 2009 (NLCD kept them as woody wetland), 20 ha more in 2012, 207 ha still waiting in 2012.
+    - Until step 4, projections leave disturbed land waiting: stage 6's multipliers are off after the record (y1 + 1). Don't Build real
+      libraries with this yet.
+    - Test notes: a quick test whose Build result is itself a quick-test result fails at the historical step (new-historical.R wants
+      the stock-flow definitions, which are in the original Build result); pass the original result too. The transition output filter
+      is stage 0's, so a test that doesn't rerun stage 0 has no summaries of new groups. Multiprocessing was off in the GDS library
+      (core_Multiprocessing), and its automatic tiles are whole counties (2), so turning it on gives at most about 2x (user: "it will
+      cut the run time almost in half"); turned on in the test copy. Ideas for faster test libraries: finer tiles from a tertiary
+      stratum with many units (historical runs follow maps, not targets), 300 m resolution, one county or watershed, shorter windows
+      around the events tested. Stage 3 on GDS calibrates all 19 ecodivisions (8.5 min), not just the study area's two; why is not
+      checked.
   - **Starting cells: disturbed before the start year (user, 2026-11-11, the Mount St Helens case).** Stage 5's "forest in any
     year" rule already starts a natural cell as forest when NLCD shows it as forest in any later year, so a blast zone or burn that
     regrew starts as its forest type. Its age is the problem: a stand that began after the start year (age 0 or less from CMS or
