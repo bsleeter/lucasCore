@@ -1013,6 +1013,18 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       carbon export from forested wetlands (palustrine and tidal; by region if the data allow); then export rates for the twins and
       Estuarine Forested from the same pools as marsh, with stage 3 calibrating soil decay so the spin-up still reaches the gNATSGO
       soil (export as a fixed flow, as burial is), and the pathways and memberships written by the tools. Not started.
+    - **To do: peat carbon by soil series, pooled across soil surveys** (user, 2026-11-10: the Peat map shows county boundary
+      effects; "Add option 3 to 53 as a to-do and leave it as-is for now"). The edge is in gNATSGO's carbon for the same soils, not
+      in where Histosols are mapped: in GDS, Oak/Gum/Cypress twin cells at least 90% Histosol average 1,962 Mg C/ha (10th-90th
+      percentile 1,881-1,979) in the Chesapeake survey and 2,515 (1,788-3,221) in Suffolk's. Each survey entered its own horizon
+      data (organic matter, bulk density, depth) for the same series. Plan: in the Data Download's Histosol step, also read
+      gNATSGO's horizon table (chorizon; Planetary Computer gnatsgo-tables, probably a few hundred MB) and compute each Histosol
+      component's carbon to its full depth; pool by series name (compname, and its taxonomic great group as a fallback) over the
+      surveys where it is mapped; give each map unit its series' pooled carbon, weighted by component percent; stage 8 then sets
+      Peat from that in place of soc0_999 on organic cells (mineral components keep gNATSGO). Keeps real differences between
+      series and organic shares, removes the survey edges. Weighed and set aside: Uhran et al. 2021's wetland soil carbon map
+      (wetlands only, to 1 m, so no farmland peat and no deep peat); a single pooled study-area peat density (removes real
+      variation); spatial smoothing (blurs real edges). Not started.
   - **Known limits:** mineral and organic soil are not separated within a class (oak/gum/cypress mixes both); scrub-shrub and
     pocosin cells get a tree curve; cells with no forest type pixel take a neighbour's type, which may be upland; FIA soil carbon is
     modelled, so soil targets stay gNATSGO (which overstates organic wetland soils by about 35%, Uhran et al. 2021). New runs will
