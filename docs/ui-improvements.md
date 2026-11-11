@@ -1005,6 +1005,18 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       soil, the same formula): 16,395 cells, 35 Tg C of peat; Oak/Gum/Cypress twin mean 1,037 Mg C/ha, cropland 454 cells at a
       mean 156 (drained loss then about 3.7 Gg C/yr, against 0.2 when drainage took BG Slow at the class mean). To check on the
       next GDS Build and historical run. lucasCoreUI.dll rebuilt.
+    - Wetland dead wood fits at their limits (2026-11-10, user: "Look into the decay fits hitting their limits"; then "Yes, make the
+      change"). Two causes: FIA's duff on hydric plots is the top of the muck or peat (mature means: Spruce/Fir 152 Mg C/ha against
+      29 upland, Oak/Gum/Cypress 60 against 13, Elm/Ash/Cottonwood 108 against 5), carbon the model holds as soil, so the duff fit
+      went to its limit; and a wetland class fitted alone over every ecodivision on its thin plots let the ecodivisions with near-zero
+      pools steer snag and duff to the limits (GDS Build 17: Elm/Ash/Cottonwood snag 20 and duff 20, Spruce/Fir duff 0.05). Stage 3
+      now fits a wetland class on its own plots only where it has enough in the ecodivision, with duff held at its upland counterpart's
+      multiplier there (`hold_duff`, `cal_fit_measured`); with too few it takes the ecodivision's upland values (its counterpart's
+      litter and duff). This replaces "never the upland types' values" from earlier the same day. Stage 3 alone on a copy of GDS
+      (all 589 CONUS cells): 4 wetland cells on their own plots (Warm Continental Spruce/Fir and Elm/Ash/Cottonwood, Subtropical
+      Oak/Gum/Cypress, Hot Continental Elm/Ash/Cottonwood), none at a limit; the 8 wetland values still at a limit (7 snag, 1 duff of
+      57 cells) are inherited from upland fits, and upland forest has 38 snag and 20 duff multipliers at a limit of 532 (an older,
+      separate issue).
     - **To do: lateral export from forested wetlands** (user, 2026-11-10). Only the emergent marsh classes export carbon to Aquatic
       (Lateral Transport from BG Slow, BG Very Fast and AG Very Fast; `tools/make_emergent_wetland.R`): in GDS run 19 estuarine
       marsh 1.66 Mg C/ha/yr, palustrine marsh 0.03. The three wetland forest twins and Wetland: Estuarine Forested export none,

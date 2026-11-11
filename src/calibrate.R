@@ -150,7 +150,10 @@ cal_fit_measured <- function(rows, ctx, dat) {
   # multipliers the user fixed (Carbon Assumptions: Fixed Decay Multipliers, columns fx_<pool> of rows): set before the fits, so the
   # pools fitted after them see them, and left out of the rows each fit moves
   FX <- sapply(MEAS_MULT, function(g) { v <- rows[[paste0("fx_", g)]]; if (is.null(v)) rep(NA_real_, nrow(rows)) else as.numeric(v) })
-  FX <- matrix(FX, nrow = nrow(rows), dimnames = list(NULL, MEAS_MULT)); P[!is.na(FX)] <- log(FX[!is.na(FX)])
+  FX <- matrix(FX, nrow = nrow(rows), dimnames = list(NULL, MEAS_MULT))
+  # a duff multiplier held from elsewhere (hold_duff: a forested wetland row takes its upland counterpart's, 3-carbon-flows.R), as if fixed
+  if (!is.null(rows$hold_duff)) { k <- is.na(FX[, "duff"]) & !is.na(rows$hold_duff); FX[k, "duff"] <- rows$hold_duff[k] }
+  P[!is.na(FX)] <- log(FX[!is.na(FX)])
   lim <- log(cal_bounds(ctx)$mult)
   fit1 <- function(g, idx) { pool <- MEAS_POOLS[match(g, MEAS_MULT)]; idx <- idx[is.na(FX[idx, g])]; if (!length(idx)) return(invisible())
     P[idx, g] <<- stats::optimize(function(v) { Q <- P; Q[idx, g] <- v; sum(sapply(idx, function(i) pool_loss(Q[i, ], i, pool))) }, lim)$minimum }
