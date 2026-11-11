@@ -1265,7 +1265,8 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
           one cell around (radius 150 m); that radius is worth testing.
         - Limits: return includes replanting (not separated; to-do 58); the type map (USFS, 2000s) postdates some of the fires;
           NLCD forest the year after a fire includes partly burned stands.
-      - a P26-size projection with and without one extra adjacency setting, to confirm the per-group cost and time a 5-year update.
+      - Not needed (user, 2026-11-11: "I am not worried about the adjacency timing for just a single layer"): the timing test of
+        one extra adjacency setting.
   - **Also to settle:**
     - which model fire severities enter, given how LANDFIRE severity maps to MTBS's classes;
     - starting cells in the state, with time since disturbance from MTBS, for runs that start well after 1984;
