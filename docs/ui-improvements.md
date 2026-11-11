@@ -1045,6 +1045,15 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       series and organic shares, removes the survey edges. Weighed and set aside: Uhran et al. 2021's wetland soil carbon map
       (wetlands only, to 1 m, so no farmland peat and no deep peat); a single pooled study-area peat density (removes real
       variation); spatial smoothing (blurs real edges). Not started.
+    - **To do: deep peat burns where a swamp is drained** (user, 2026-11-11). Peat fire takes a fixed share of a cell's peat by
+      severity (0.03 / 0.07 / 0.15, any class), however wet or dry the peat is. In a drained swamp, ditches lower the water table,
+      and fires there can smoulder deep into the peat for weeks. The Great Dismal Swamp's 2008 South One and 2011 Lateral West fires
+      did this. GDS run 24 gives 238 Gg C of peat fire in 2008 and 131 in 2011, all from those shares. Steps: a literature check of
+      measured peat burn depth and carbon loss in drained against undrained peatlands, with the GDS fires first and also pocosins and
+      other drained swamps by region; how burn depth follows the water table or the drought at the time of the fire; and whether
+      fire is more likely in a drained swamp. Then choose how the model knows a cell is drained: a drainage map (ditch density, or
+      the NWI's drained or ditched modifier) or a yearly drought index. Then scale the peat fire share by it, up to a burn depth
+      cap, and check it against the GDS fires. Not started.
   - **Known limits:** mineral and organic soil are not separated within a class (oak/gum/cypress mixes both); scrub-shrub and
     pocosin cells get a tree curve; cells with no forest type pixel take a neighbour's type, which may be upland; FIA soil carbon is
     modelled, so soil targets stay gNATSGO (which overstates organic wetland soils by about 35%, Uhran et al. 2021). New runs will
