@@ -128,6 +128,36 @@ namespace lucasCoreUI
             AddFilter(store, "stsim_OutputFilterFlows", "OutputFilterFlowsId", "FlowGroupId", "stsim_FlowGroup", "LULC: Emission Peat (CO2e)", false);
         }
 
+        // ---- 1.4 (to-do 57): the post-disturbance classes (tools/make_post_disturbance.R). The description must not hold an apostrophe:
+        // SyncroSim writes it into the library unquoted (1.3.0) ---------------------------------------------------------------------
+        [Update(1.4, "lucasCore 1.4: the Disturbed state classes of every forest type group, forested wetland and five shrub classes, with the transition types and groups that return them to their type or convert them")]
+        public static void Update_1_400(DataStore store)
+        {
+            AddNamed(store, "stsim_StateLabelX", "StateLabelXId", "Disturbed", null, null, false);
+            string[] grps = { "Post-disturbance", "Post-disturbance: Forest Return", "Post-disturbance: Shrub Return", "Post-disturbance: Conversion" };
+            foreach (string g in grps) AddNamed(store, "stsim_TransitionGroup", "TransitionGroupId", g, null, null, false);
+            for (int i = 1; i < grps.Length; i++)
+            {
+                AddTransitionType(store, grps[i], null);
+                AddTypeToGroup(store, grps[i], grps[i]); AddTypeToGroup(store, grps[i], grps[0]);
+            }
+            // one disturbed class per forest class (Id 100-999) and per shrub class below, named by its Y label (a wetland twin, whose Y
+            // label is the upland type, takes "Wetland <type>"), Id 2000 + its own
+            string[] shrubs = { "Shrubland: Sage", "Shrubland: Native Sage Steppe", "Shrubland: Invaded Sage Steppe", "Shrubland: Non-sage", "Shrubland: Chaparral" };
+            string sh = ""; foreach (string s in shrubs) sh += (sh.Length > 0 ? ", " : "") + Q(s);
+            if (!store.TableExists("stsim_StateClass")) return;
+            DataTable c = Rows(store, "SELECT DISTINCT c.Id AS Id, x.Name AS X, y.Name AS Y FROM stsim_StateClass c JOIN stsim_StateLabelX x ON x.StateLabelXId = c.StateLabelXId " +
+                                      "JOIN stsim_StateLabelY y ON y.StateLabelYId = c.StateLabelYId WHERE (c.Id BETWEEN 100 AND 999) OR c.Name IN (" + sh + ")");
+            foreach (DataRow r in c.Rows)
+            {
+                long id = Convert.ToInt64(r["Id"], CultureInfo.InvariantCulture);
+                string y = Convert.ToString(r["Y"], CultureInfo.InvariantCulture);
+                if (Convert.ToString(r["X"], CultureInfo.InvariantCulture) == "Wetland") y = "Wetland " + y;
+                AddNamed(store, "stsim_StateLabelY", "StateLabelYId", y, "Description", "Disturbed", false);
+                AddStateClass(store, "Disturbed: " + y, "Disturbed", y, (2000 + id).ToString(CultureInfo.InvariantCulture), id >= 100 ? "255,196,170,120" : "255,236,220,170");
+            }
+        }
+
         // a state class (with its Id, labels by name) in every project that lacks it
         private static void AddStateClass(DataStore store, string name, string labelX, string labelY, string id, string color)
         {
@@ -160,12 +190,28 @@ namespace lucasCoreUI
                 store.ExecuteNonQuery("INSERT INTO stsim_TransitionGroup (TransitionGroupId, ProjectId, Name, IsAuto) VALUES (" + auto + ", " + pr + ", " + Q(name + " [Type]") + ", -1)");
                 store.ExecuteNonQuery("INSERT INTO stsim_TransitionTypeGroup (TransitionTypeGroupId, ProjectId, TransitionTypeId, TransitionGroupId, IsAuto) VALUES (" +
                                       NewId(store).ToString(CultureInfo.InvariantCulture) + ", " + pr + ", " + tt + ", " + auto + ", -1)");
+                if (likeType == null) continue;
                 string like = IdOf(store, "stsim_TransitionType", "TransitionTypeId", pr, likeType);
                 if (like == null) continue;
                 DataTable g = Rows(store, "SELECT TransitionGroupId FROM stsim_TransitionTypeGroup WHERE ProjectId = " + pr + " AND TransitionTypeId = " + like + " AND IsAuto IS NULL");
                 foreach (DataRow gr in g.Rows)
                     store.ExecuteNonQuery("INSERT INTO stsim_TransitionTypeGroup (TransitionTypeGroupId, ProjectId, TransitionTypeId, TransitionGroupId) VALUES (" +
                                           NewId(store).ToString(CultureInfo.InvariantCulture) + ", " + pr + ", " + tt + ", " + Id(gr["TransitionGroupId"]) + ")");
+            }
+        }
+
+        // a transition type's membership of a named transition group, in every project that has both and lacks it
+        private static void AddTypeToGroup(DataStore store, string type, string group)
+        {
+            if (!store.TableExists("stsim_TransitionTypeGroup")) return;
+            foreach (DataRow r in Rows(store, "SELECT ProjectId FROM core_Project").Rows)
+            {
+                string pr = Id(r["ProjectId"]);
+                string t = IdOf(store, "stsim_TransitionType", "TransitionTypeId", pr, type), g = IdOf(store, "stsim_TransitionGroup", "TransitionGroupId", pr, group);
+                if (t == null || g == null) continue;
+                if (Convert.ToInt64(store.ExecuteScalar("SELECT COUNT(*) FROM stsim_TransitionTypeGroup WHERE ProjectId = " + pr + " AND TransitionTypeId = " + t + " AND TransitionGroupId = " + g), CultureInfo.InvariantCulture) > 0) continue;
+                store.ExecuteNonQuery("INSERT INTO stsim_TransitionTypeGroup (TransitionTypeGroupId, ProjectId, TransitionTypeId, TransitionGroupId) VALUES (" +
+                                      NewId(store).ToString(CultureInfo.InvariantCulture) + ", " + pr + ", " + t + ", " + g + ")");
             }
         }
 
