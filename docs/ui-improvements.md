@@ -1005,6 +1005,14 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       soil, the same formula): 16,395 cells, 35 Tg C of peat; Oak/Gum/Cypress twin mean 1,037 Mg C/ha, cropland 454 cells at a
       mean 156 (drained loss then about 3.7 Gg C/yr, against 0.2 when drainage took BG Slow at the class mean). To check on the
       next GDS Build and historical run. lucasCoreUI.dll rebuilt.
+    - **To do: lateral export from forested wetlands** (user, 2026-11-10). Only the emergent marsh classes export carbon to Aquatic
+      (Lateral Transport from BG Slow, BG Very Fast and AG Very Fast; `tools/make_emergent_wetland.R`): in GDS run 19 estuarine
+      marsh 1.66 Mg C/ha/yr, palustrine marsh 0.03. The three wetland forest twins and Wetland: Estuarine Forested export none,
+      though swamps do (the Great Dismal Swamp's blackwater drains to the rivers around it; tidal swamps and mangroves are flushed
+      as marsh is), so the swamp sink may be somewhat too large. Steps: a literature check of dissolved and particulate organic
+      carbon export from forested wetlands (palustrine and tidal; by region if the data allow); then export rates for the twins and
+      Estuarine Forested from the same pools as marsh, with stage 3 calibrating soil decay so the spin-up still reaches the gNATSGO
+      soil (export as a fixed flow, as burial is), and the pathways and memberships written by the tools. Not started.
   - **Known limits:** mineral and organic soil are not separated within a class (oak/gum/cypress mixes both); scrub-shrub and
     pocosin cells get a tree curve; cells with no forest type pixel take a neighbour's type, which may be upland; FIA soil carbon is
     modelled, so soil targets stay gNATSGO (which overstates organic wetland soils by about 35%, Uhran et al. 2021). New runs will
