@@ -1300,6 +1300,46 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       dry ecodivisions and on the post-disturbance classes, fitted from how often each burned historically. It adds fire on top of
       the year drawn, so the grass-fire cycle feeds itself as conversion spreads. Calibrate so the historical period still matches
       the observed burned area.
+  - **Forest keeps its separate post-disturbance classes** (#3, user 2026-11-11: settled). The reasons for shrubs hold for forest:
+    real conversion has to be told apart, calibrated and managed.
+  - **Walkthrough: one burned forest cell (agreed with the user, 2026-11-11; "lets begin").**
+    1. **The fire.** High-severity fire moves the cell from `Forest: California Mixed Conifer Group` to its disturbed class (for
+       example `Forest Disturbed: California Mixed Conifer Group`). Age resets to 0, so from then on age is years since the fire.
+       The pathways use ST-Sim's age limits, not a time-since-transition clock, and cells that start in the state take their age
+       from stage 5's map.
+    2. **Carbon while it waits.**
+       - Dead wood: the forest's fire flows kill the trees into snags, down wood and the forest floor, which decay at the forest
+         type's rates (copied from its forest class): the post-fire path calibrated on FIA's post-fire plots carries on unchanged.
+       - Soil: the forest type's soil and decay.
+       - Live growth: shrub and grass, from the region's non-forest class (in P26 Non-sage's curve, 25/50/90% of its woody carbon at
+         about 8/19/50 years, plus its herbaceous growth; Chaparral's in the Mediterranean ecodivisions). No tree growth.
+    3. **The window** is set per forest type and region (say 30 years for Mixed Conifer), not per cell. Each year, a waiting cell
+       has a chance to return to its forest type: from the fitted return curve by years since the fire (P26 high severity: 26% back
+       by 20 years, 58% by 25, 69% by 30), scaled up by the live forest around it.
+    4. **Return is gradual.** Cells in one burn come back over the years, the edges near standing forest first. A returning cell
+       goes back to its forest class with its age carried over: a cell back at year 22 joins the forest curve at age 22.
+    5. **Conversion.** A cell still waiting at the window's end converts; a high-severity reburn inside the window converts a share
+       at once and sends the rest back to age 0 in the same class (P26: reburned pixels were 8% forest after 20-25 years). Where to:
+       - historical runs: what NLCD shows then (shrub 52 to the region's shrub class, grass 71 to its grass class);
+       - projections: shares fitted from that history per forest type and region, as pathways with proportions (P26 non-returners
+         after 30 years: 28% shrub, 1% grass, so mostly Non-sage or Chaparral);
+       - which shrub or grass class in a region: a regions table (as for the wetland twins), or static gates from the non-forest
+         classes around the cell at the start.
+    6. **Management** (to-do 58): replanting early in the window (years 1-5), back to the forest type at a seedling age, with a
+       chance of failure; a scenario sets the area planted per year and where.
+    7. **Historical runs follow NLCD.** Entry from the fire maps already used (MTBS and LANDFIRE high severity); return where stage
+       6's annual map shows NLCD forest two years running; conversion at the window's end to the class NLCD shows. A burn late in
+       the record (2015 with a 30-year window) is still waiting in 2023 and carries into the projection in its disturbed class.
+    - **Two points to settle:** the shrub carbon in the live pools carries into the forest's on return, and the forest curve grows
+      on from its age (P26: the same order around year 20; check per type, so there's no jump); and burns in the last years of the
+      record may not have a confirmed return yet, so they reach the projection still waiting.
+    - **Conversion timing (#4):** at the window's end and at a reburn, not decided at the fire. It matches what the record can show
+      (conversion only shows as a return that never happened), management early in the window acts on cells whose outcome is still
+      open, and carbon in the waiting years is nearly the same either way (shrub and grass for forest). The cost: a cell that would
+      have returned after its window converts, so windows matter: forest about 30 years, big sagebrush about 30-40, chaparral and
+      resprouting Non-sage about 10-15, all fitted per region.
+    - **A side benefit (user):** land use and land cover line up better. The disturbed classes give NLCD-like maps of the land in its
+      waiting stage, burned forest that shows as shrub or grass, without changing use-based accounting.
   - **Starting cells: disturbed before the start year (user, 2026-11-11, the Mount St Helens case).** Stage 5's "forest in any
     year" rule already starts a natural cell as forest when NLCD shows it as forest in any later year, so a blast zone or burn that
     regrew starts as its forest type. Its age is the problem: a stand that began after the start year (age 0 or less from CMS or
