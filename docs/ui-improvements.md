@@ -16,6 +16,7 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | later | 54 Climate response for emergent wetland growth | Yes (marsh growth by year, in history and in projections, when turned on) | Added 2026-11-09 (user). Today only CO2 changes marsh growth under alternative climate futures; the response model needs a short review first (item 54) | - |
 | later | 55 Grass and shrub stocks fitted to literature (chaparral wood turnover 0.08; non-sage and native sage steppe split by RAP herb share) | Yes | Refit done 2026-11-09 (item 55); left: the RAP tests at the Sky Oaks towers, the foothill chaparral scale | - |
 | next | 56 Run Build stages on their own or a few in sequence, each result a dependency of the next | No (the same results, fewer reruns) | Added 2026-11-10 (user), after the Great Dismal Swamp Build failed in stage 8 after 44 minutes and had to be rerun whole | - |
+| later | 57 A post-disturbance state for forest: regrowth after a delay, or conversion to non-forest, with adjacency to a seed source | Yes (burned forest waits, returns or converts; carbon of the waiting years) | Added 2026-11-11 (user). P26: about a quarter of single high-severity burns are not forest after 30 years in NLCD, and reburns mostly convert | - |
 | release | 46 CO2 fertilization | Yes, in projections with a Projection Climate result (Central by default; None turns it off) | Added 2026-11-04; built, tested (Puget run, age-band check), documented (guide 7.3.1) and pushed 2026-11-06. Left: a release | - |
 | later | 47 Example libraries by region and resolution | No (each holds its own results) | Added 2026-11-04, replaces 13. Best built after the open science items, since each carbon change dates them | 14, restore test |
 | any | 49 Test national mode end to end | No | Added 2026-11-04. Never run end to end; fills about 175 GB overnight | 12 (done) |
@@ -1155,3 +1156,64 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     stage on a chosen result); which later scenarios (Projection Setup, historical and projection runs, Model Record, Data Release)
     accept the last step's result where they now look for a Build result; and how the model record lists a chain of results as one Build.
   - **Related:** a check before stage 0 that every Data Sources file opens would have stopped this Build in seconds.
+57. **A post-disturbance state for forest: regrowth, delay and conversion** - TO DO, added 2026-11-11 (user: forest is a use class,
+    so a stand-replacing disturbance resets age and the stand regrows the next year; this "misses things like disturbance that lead
+    to forest never returning. It also misses things like regrowth around Mount St Helens after the 1980 eruption"). Map consistency
+    with NLCD is not a goal (user, 2026-11-11). The user chose option B, a post-disturbance state, as the general approach, not
+    necessarily `Shrubland: Post Fire Shrub`.
+  - **Why use-based forest stays:** FIA counts forest land by use, so land that is unstocked for now is still forest, and the US
+    greenhouse gas inventory and IPCC report by use too. FIA's young plots carry slow establishment in the growth curves, and the
+    post-fire snag, down log and forest floor path is calibrated on FIA post-fire plots (dev/fia/FINDINGS.md). The post-disturbance
+    state goes between disturbance and forest without changing those.
+  - **P26 evidence (2026-11-11; `dev/fire/p26-fire-gap.R`, summary `dev/fire/p26-fire-gap-summary.R`).** Method: forest
+    pixels (Annual NLCD 41-43 the year before) at a first MTBS burn, 1986-2024, in the P26 pyrome, followed in Annual NLCD to 2025,
+    against unburned forest given the same mix of fire years.
+    - Size: 692 kha of forest burned, about a third of P26's 1,890 kha of 1985 forest. NLCD forest fell to 1,416 kha by 2025, and grass
+      rose from 40 to 292 kha.
+    - Share NLCD forest after a single burn, at 1 / 5 / 10 / 20 / 30 years: high severity 0 / 1 / 1 / 26 / 69%; moderate 8 / 11 / 14 /
+      43 / 65%; low 53 / 61 / 63 / 75 / 78%; unburned forest 99 / 98 / 97 / 96 / 95%.
+    - High severity goes grass (years 1-5), then shrub (to about year 20), then forest. The median return is 21 years, and about a
+      quarter is still non-forest at 30 years.
+    - Reburns: 8% forest at 20-25 years; of high-severity pixels burned again after a 1986-2005 fire, 3% are forest in 2025.
+    - High severity, forest at 20 years by type group: Fir/Spruce 9%, Ponderosa 23%, California Mixed Conifer 24%, Western Oak 31%.
+    - Limits: MTBS maps only large fires; only 21 kha of high-severity burn has 30 years to see; NLCD calls 44% of low-severity burns
+      grass the year after, so NLCD's own response to burned ground is in these numbers.
+  - **The design:**
+    - **Entry:** a cell enters a post-disturbance state after any stand-replacing disturbance with no assured regrowth: high-severity
+      fire (perhaps a share of medium severity; MTBS moderate behaves almost as high), insect or drought die-off at stand-replacing
+      levels, wind, volcanic loss. Harvest and planted stands go straight back to forest at age 0, as now.
+    - **Carbon in the state:** the state keeps its forest type's dead wood, decay, snag fall and soil parameters, so the FIA
+      post-disturbance calibration holds. Live carbon grows as grass and shrub. Age runs from the disturbance.
+    - **Return:** back to forest at age = years since the disturbance (no reset: FIA's young curves already hold the establishment
+      lag, and the shrub carbon of the waiting years stands in for the young stand's). This is a probability over a time-since-
+      transition window, by forest type, disturbance, severity and region.
+    - **Conversion:** not back by the window's end means a permanent non-forest class chosen by region (for example Chaparral in the
+      Mediterranean ecodivisions, Non-sage elsewhere; a regions table as for the wetland twins). The forest's dead wood and soil carry
+      over.
+    - **Repeat disturbance:** inside the window, it restarts the clock or converts; P26's reburns mostly convert.
+    - **Climate:** in projections, the return and conversion chances can follow climatic water deficit through a multiplier (the
+      regeneration-failure feedback: Davis et al. 2019, Stevens-Rumann et al. 2018, Coop et al. 2020).
+  - **Adjacency: the seed source (user, 2026-11-11).** The old LUCAS approach sent disturbed cells into `Shrubland: Post Fire Shrub`
+    and moved them out by a probability, using adjacency so that cells near standing forest returned first. They were more likely
+    to return to their pre-fire class than cells far from a seed source. The `Succession Post Fire: <type>` transition types (one
+    per forest type group) let a cell return as a different forest type than before, by adjacency to that type.
+    - This is why the old design had one shared class: a cell could become any type its neighbours were.
+    - A shared class forgets the pre-disturbance type, and with it the type's dead wood parameters and its most likely return.
+    - To settle: per-type post-disturbance classes (each keeps its type's carbon and returns to it by adjacency to standing forest of
+      that type), with `Succession` pathways to other types by adjacency to them, so type change stays possible; or one shared class
+      with adjacency to each type (simpler pathways, but no memory of origin, and dead wood decay can't follow the old type).
+    - The machinery exists for Ag Change: `src/adjacency-curve.R` fits an event rate by the share of a class within a radius from
+      the annual maps, scaled to ST-Sim's adjacency multiplier; stage 10 sets it up (`AdjacencyRadius`, `AdjacencyUpdate`). The same
+      fit on the P26 burns would give return by the share of unburned forest (of the same type, or any type) around each burned pixel
+      at the time of the fire. Literature check: seedling density by distance to a live seed source after high-severity fire.
+    - Cost: one adjacency attribute per forest type a cell can return to; ST-Sim recomputes them at each update, so update every few
+      years as Ag Change does.
+  - **Also to settle:**
+    - which model fire severities enter, given how LANDFIRE severity maps to MTBS's classes;
+    - starting cells in the state, with time since disturbance from MTBS, for runs that start well after 1984;
+    - whether historical runs take return or conversion as observed in NLCD, and the fitted chances only in projections;
+    - fitting by forest type and ecodivision beyond P26 (rerun the script on other region homes);
+    - the carbon check: shrub and grass carbon in the waiting years against the FIA curve at the same age, per type.
+  - **Related:** natural succession onto barren, grass and shrub land (Mount St Helens' blast zone, abandoned land) uses the same
+    pathways and could be scoped with this; Ag Contraction already moves agriculture into forest types. `Shrubland: Post Fire Shrub`
+    (class 59) and its transition types can be reused or retired.
