@@ -16,7 +16,8 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | later | 54 Climate response for emergent wetland growth | Yes (marsh growth by year, in history and in projections, when turned on) | Added 2026-11-09 (user). Today only CO2 changes marsh growth under alternative climate futures; the response model needs a short review first (item 54) | - |
 | later | 55 Grass and shrub stocks fitted to literature (chaparral wood turnover 0.08; non-sage and native sage steppe split by RAP herb share) | Yes | Refit done 2026-11-09 (item 55); left: the RAP tests at the Sky Oaks towers, the foothill chaparral scale | - |
 | next | 56 Run Build stages on their own or a few in sequence, each result a dependency of the next | No (the same results, fewer reruns) | Added 2026-11-10 (user), after the Great Dismal Swamp Build failed in stage 8 after 44 minutes and had to be rerun whole | - |
-| later | 57 A post-disturbance state for forest: regrowth after a delay, or conversion to non-forest, with adjacency to a seed source | Yes (burned forest waits, returns or converts; carbon of the waiting years) | Added 2026-11-11 (user). P26: about a quarter of single high-severity burns are not forest after 30 years in NLCD, and reburns mostly convert | - |
+| later | 57 A post-disturbance state for forest: regrowth after a delay, or conversion to non-forest, with adjacency to a seed source | Yes (burned forest waits, returns or converts; carbon of the waiting years) | Added 2026-11-11 (user). P26: about a quarter of single high-severity burns are not forest after 30 years in NLCD, and reburns mostly convert | 58 (developed together) |
+| later | 58 Management and mitigation for disturbed forest: replanting and restoration, salvage, site preparation, fuel treatments | Yes, in scenarios that turn them on | Added 2026-11-11 (user). Developed with 57 so its structure takes these actions | 57 (developed together) |
 | release | 46 CO2 fertilization | Yes, in projections with a Projection Climate result (Central by default; None turns it off) | Added 2026-11-04; built, tested (Puget run, age-band check), documented (guide 7.3.1) and pushed 2026-11-06. Left: a release | - |
 | later | 47 Example libraries by region and resolution | No (each holds its own results) | Added 2026-11-04, replaces 13. Best built after the open science items, since each carbon change dates them | 14, restore test |
 | any | 49 Test national mode end to end | No | Added 2026-11-04. Never run end to end; fills about 175 GB overnight | 12 (done) |
@@ -1214,6 +1215,45 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     - whether historical runs take return or conversion as observed in NLCD, and the fitted chances only in projections;
     - fitting by forest type and ecodivision beyond P26 (rerun the script on other region homes);
     - the carbon check: shrub and grass carbon in the waiting years against the FIA curve at the same age, per type.
+  - **Developed with to-do 58** (management and mitigation, user 2026-11-11): the state's classes, pathways, windows and strata
+    must leave room for replanting, salvage, site preparation and fuel treatments, so 58's options are checked against each
+    design choice here before it is built.
   - **Related:** natural succession onto barren, grass and shrub land (Mount St Helens' blast zone, abandoned land) uses the same
     pathways and could be scoped with this; Ag Contraction already moves agriculture into forest types. `Shrubland: Post Fire Shrub`
     (class 59) and its transition types can be reused or retired.
+58. **Management and mitigation actions for disturbed forest** - TO DO, added 2026-11-11 (user: "imposing management, such as
+    replanting/restoration to mitigate the permanent loss of forest. In an alternative scenario, we could impose replanting on the
+    forest - recently disturbed classes to push them back to their original types"). Kept apart from to-do 57, whose goal is the
+    state-and-transition structure for post-disturbance return and conversion. Developed together with 57 (user): each structure
+    choice in 57 is checked against the options here, so the actions can be added without rebuilding it. The actions are scenario
+    choices for projections; the baseline keeps what happened historically.
+  - **Replanting and restoration:** a management transition from a post-disturbance class back to a forest type.
+    - Window: within a few years of the disturbance (time since transition, for example 1-5 years), before shrubs take the site.
+    - Age: reset to a seedling age on planting (natural return keeps age = years since the disturbance, to-do 57).
+    - Survival: a share of plantings fails and stays in the post-disturbance state, where it can still return or convert. Failure
+      can follow climatic water deficit, as natural return does.
+    - Type: the original type by default. A scenario can plant a different, more drought-tolerant type (assisted migration) along
+      the pathways 57 provides for type change.
+    - Amount: an area per year (ST-Sim transition targets), since planting is limited by budget and nursery stock.
+    - Where first: by ownership (secondary strata: federal lands, PAD-US); far from a live seed source, the reverse of natural
+      return's adjacency, since those cells won't come back on their own; reburned cells, which mostly convert.
+  - **Salvage logging:** removing snags after the disturbance, to harvested wood products. It changes the dead wood the cell carries
+    into the post-disturbance state and often comes before replanting, especially on private land. A share of disturbed area in a
+    short window, by ownership.
+  - **Site preparation:** burning or removing slash and shrubs before planting, with its carbon flows (emissions, and dead wood and
+    shrub carbon removed).
+  - **Fuel treatments and prescribed fire:** lower the high-severity share of later fires, so less forest enters the post-disturbance
+    state at all. In ST-Sim, a treatment transition, and a multiplier on fire severity (or on high-severity fire) for treated cells
+    for some years after. The model's Forest Selection harvest may cover mechanical thinning in part; to check.
+  - **Outputs:** the carbon difference from a baseline without the action; area treated, planted and salvaged; forest conversion
+    avoided, per hectare treated or planted.
+  - **Calibration: don't count historical planting twice.** The return rates fitted in 57 (from NLCD) already include whatever
+    replanting followed past fires. Separate planted from natural return where records allow: the Forest Service's FACTS
+    reforestation records, and private-land records where they exist. Then fit the baseline as natural return plus the historical
+    planting rate, and let a scenario change the rate. Where no records exist, the baseline stays as observed and a scenario counts
+    only planting above the historical rate. The same holds for salvage and fuel treatments (FACTS hazardous fuels records; LANDFIRE
+    disturbance records treatments too).
+  - **What 57 must allow, so these can be added later:** post-disturbance classes that know their original type; a time-since-
+    disturbance clock that management can read; an age that can be reset on planting; ownership in the strata; an adjacency
+    attribute that a scenario can use in reverse; and the dead wood pools of the waiting years, so salvage and site preparation can
+    take from them.
