@@ -268,6 +268,16 @@ if (site_on) {   # 7 single-band maps: share of the cell's TreeMap pixels (with 
 }
 A <- fill_modal(mask(A, m), m, round(global(A, "mean", na.rm = TRUE)[[1]]))
 A <- mask(ifel(forest, max(A, 1), 0), m)
+# regrowing forest (src/regrowth-age.R; to-do 57, user decision 2026-11-11): a cell that is forest only by the any-year rule (grass,
+# shrub or barren in the start year) and that NLCD shows regrowing takes its starting age from the record, not from CMS or TreeMap
+source(pkg_file("src", "regrowth-age.R")); rg <- regrowth_settings(read_default("landcover", "regrowth-age.csv"))
+rc <- which(values(forest, mat = FALSE) %in% 1 & values(n0, mat = FALSE) %in% c(31, 52, 71))
+if (length(rc)) {
+  ra <- regrowth_age(as.matrix(N[rc]), years, rg$lag, rg$share, rg$nonforest_years); hit <- !is.na(ra)
+  va <- values(A, mat = FALSE); was <- va[rc[hit]]; va[rc[hit]] <- ra[hit]; A <- setValues(A, va)
+  say("Regrowing forest: %d of %d cells that are forest only by the any-year rule take their age from NLCD (median %s years, was %s; the rest keep the %s age)",
+      sum(hit), length(rc), if (any(hit)) as.integer(stats::median(ra[hit])) else "-", if (any(hit)) as.integer(stats::median(was)) else "-", asrc)
+}
 # chaparral (to-do 39, 2026-11-06: it grows by age since fire): the years since the last interagency fire perimeter of 1900 to the start
 # year over the cell's centre; never burned since 1900: the start year - 1900 (user decision; on the age curve's plateau)
 # The sage family the same way (to-do 39 step 8, 2026-11-08: its shrubs regrow over decades after fire; defaults/stockflow/

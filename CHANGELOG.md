@@ -2,6 +2,15 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+### Changed
+- Build stage 5: a cell that starts as forest only because NLCD shows it as forest in a later year, and whose record shows it
+  regrowing (not forest at the start, then forest within 20 years and staying forest), takes its starting stand age from that
+  record instead of from NASA CMS or TreeMap. Those sources gave 1980s clearcuts and burns ages of about 45 years, so they started
+  with mature forest carbon and their regrowth was missed. Settings in `defaults/landcover/regrowth-age.csv`. On existing maps this
+  resets 45 kha in the Northern Sierra Nevada (P26) and 58 kha in the Puget Lowlands. Changes Build results.
+
 ## 1.3.1 - 2026-11-11
 
 A fix for library update 1.3.

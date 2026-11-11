@@ -1283,8 +1283,17 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       it is recorded, otherwise from NLCD's return year (about the 21-year median before return) or TreeMap's establishment year.
       In historical runs they return when NLCD shows them as forest. Cells never forest in the record start as grass or shrub,
       unless a recorded disturbance and a forest potential (LANDFIRE BpS or EVT) say otherwise, and that is a Build option.
-    - Interim fix, apart from 57: in stage 5, give these cells a young age (1, or the start year minus an estimated disturbance year)
-      instead of their neighbours'. It changes Build results.
+    - Correction (2026-11-11): the neighbour fill is not the main cause. Almost all of these cells take their age straight from the
+      source: P26 98.5% from CMS (median about 45; 549 cells, about 1.2 kha, filled), Puget 96% from TreeMap (median 44; 1,309 cells,
+      about 2.9 kha, filled). The sources and NLCD disagree. Puget's cells mostly regrow as clearcuts do; about half of P26's flicker
+      between forest and shrub or grass (open mixed conifer, ponderosa and western oak), where CMS's age may be right.
+    - DONE 2026-11-11, apart from 57 (user: "Yes, from NLCD"): stage 5 takes these cells' starting age from the NLCD record where it
+      shows them regrowing (`src/regrowth-age.R`, settings `defaults/landcover/regrowth-age.csv`, tests/unit-regrowth-age.R): not
+      forest in the first two years, then forest two years running less than 20 years after the start, and forest in at least 2/3
+      of the years after that; age = 20 minus the years until that first forest. Others keep the CMS or TreeMap age. On the existing
+      maps: P26 45.3 kha reset (median age 48 to 10; live biomass now 73 Mg C/ha against 18 for NLCD forest aged 1-20, about 2.5 Tg
+      C less at the start), Puget 58.4 kha (44 to 9; 128 against 53, about 4.4 Tg C). A first version without the 20-year limit
+      reset 74.5 kha of P26, mostly cells first forest after 2005, more likely open stands filling in. Changes Build results.
   - **Also to settle:**
     - which model fire severities enter, given how LANDFIRE severity maps to MTBS's classes;
     - starting cells in the state, with time since disturbance from MTBS, for runs that start well after 1984;

@@ -1,0 +1,4 @@
+Parameter,Value,Description
+RegrowthLag,20,"Years from a stand-replacing disturbance until NLCD shows forest (P26 burns: median 21 years). A regrowing cell starts at this minus the years until NLCD first shows it as forest; a cell first forest this many years or more after the start keeps its CMS or TreeMap age (more likely an open stand filling in)"
+ForestShare,0.667,"Share of the years from that first forest year to the end of the record the cell must be forest in; cells that flicker between forest and shrub or grass keep their CMS or TreeMap age"
+NonForestYears,2,"Years at the start of the record the cell must not be forest in"

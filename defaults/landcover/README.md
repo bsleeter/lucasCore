@@ -11,6 +11,11 @@
 - `ccap-state-class-crosswalk.csv`: C-CAP 2001 classes -> state classes; only wetland classes (>= 90) are used. From `Data Sources/CCAP`.
 - `LF16_FRI_200.csv`: LANDFIRE LC16 fire regime table; FRI_REPLAC (replacement-fire return interval, years) gives the spin-up return
   interval. From `Data Sources/FRI/CSV_Data`.
+- `regrowth-age.csv` (2026-11-11, to-do 57): settings of `src/regrowth-age.R`. A cell that stage 5 starts as forest only because
+  NLCD shows it as forest in a later year, and whose record shows it regrowing, takes its starting stand age from that record
+  instead of from CMS or TreeMap: RegrowthLag minus the years until NLCD first shows it as forest. RegrowthLag 20 (P26 burns: median
+  21 years to NLCD forest), ForestShare 0.667, NonForestYears 2. On P26 Build 53's maps it resets 45 kha (of 84 kha forest only by
+  the any-year rule; median age 48 to 10), on Puget's 58 kha (of 72 kha; 44 to 9).
 
 Edits to the source crosswalks:
 - 2026-10-20: "California Lower Montane Foothill Pine Woodland and Savanna" (EVT 2016 7114) and "California Lower Montane Blue Oak-Foothill
