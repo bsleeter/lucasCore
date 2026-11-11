@@ -16,7 +16,7 @@
 # Needs the Live-Tree Carbon Curves of stage 2 (same pipeline, or a dependency on a stage 2 result).
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
-source(pkg_file("src", "growth.R")); source(pkg_file("src", "flows.R")); source(pkg_file("src", "dom.R")); source(pkg_file("src", "calibrate.R")); source(pkg_file("src", "fia.R"))
+source(pkg_file("src", "growth.R")); source(pkg_file("src", "flows.R")); source(pkg_file("src", "dom.R")); source(pkg_file("src", "calibrate.R")); source(pkg_file("src", "fia.R")); source(pkg_file("src", "disturbed-carbon.R"))
 suppressPackageStartupMessages({ library(terra); library(sf) })
 STAGE <- "3 Carbon Flows"
 progressBar(type = "begin", totalSteps = 6)
@@ -473,10 +473,18 @@ sh <- rbindlist(lapply(names(POOL_OUT), function(p) { pool <- sub(" ->$", "", p)
 check(STAGE, "emergent wetland shares out of each pool's total loss add to 1", !nrow(sh) || all(abs(sh$s - 1) < 1e-3), paste(head(sh[abs(s - 1) >= 1e-3, sprintf("%s %s %s %.3f", StratumId, StateClassId, pool, s)], 5), collapse = "; "))
 check(STAGE, "grassland, shrubland and wetland rates are between 0 and 1 and net growth is not negative", all(between(as.numeric(gs_m$Value), 0, 1)) && all(as.numeric(nf_g$Value) >= 0))
 if (all(is.na(gs_m$AgeMin))) gs_m[, AgeMin := NULL]
-fm <- rbind(fm_g, fm_d, gs_m, rd("nonforest-multipliers-other.csv"), fill = TRUE)
+# post-disturbance classes (to-do 57; src/disturbed-carbon.R): derived from the rows above, so they follow their parents
+dcl <- disturbed_classes(scl)
+dcb <- disturbed_carbon(dcl, read_default("transitions", "post-disturbance-regions.csv"), study, rd("nonforest-pathways.csv"), gs_m, nf_g, fm_d, FOREST_PATHWAYS,
+                        cells[burial_rate > 0, unique(StateClass)], ev_all, BURIAL_FLOW)
+if (nrow(dcl)) {
+  fp <- rbind(fp, dcb$fp, dcb$ev, fill = TRUE)
+  say("Disturbed classes: %d forest (forest dead wood, decay and soil; live carbon as the ecodivision's shrub class), %d shrub (their parent's rows): %d pathways, %d multipliers, %d net growth values",
+      length(dcb$forest), length(dcb$shrub), nrow(dcb$fp) + if (is.null(dcb$ev)) 0L else nrow(dcb$ev), nrow(dcb$fm), nrow(dcb$sav)) }
+fm <- rbind(fm_g, fm_d, gs_m, dcb$fm, rd("nonforest-multipliers-other.csv"), fill = TRUE)
 # (the CONUS 1km build also had 0.01 "scalar" multipliers on the four climate flow groups, undoing climate rasters stored as
 # integers x 100; stage 7 writes true multipliers, so there are none: a run without climate multipliers runs at normal climate)
-sav <- rbind(ng, nf_g, fill = TRUE)
+sav <- rbind(ng, nf_g, dcb$sav, fill = TRUE)
 for (k in c("Iteration", "Timestep")) for (x in list(fp, fm, sav)) if (k %in% names(x)) x[, (k) := NULL]
 # cropland and pasture growth varies by year (to-do 39 step 6, user 2026-11-07): the Crop Yield flow multiplier on Net Growth
 # Agriculture: Total = the ecodivision's NASS yield index (defaults/stockflow/ag-crop-yield.csv, tools/make_agriculture.R; 1.0 = the
