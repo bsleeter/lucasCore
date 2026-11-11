@@ -14,3 +14,4 @@ DOM: Belowground Slow,Carbon Initial Conditions: Belowground Slow,BGS
 DOM: Snag Stem,Carbon Initial Conditions: Snag Stem,SnagStem
 DOM: Snag Branch,Carbon Initial Conditions: Snag Branch,SnagBranch
 Deep Soil,Carbon Initial Conditions: Deep Soil,
+DOM: Peat,,

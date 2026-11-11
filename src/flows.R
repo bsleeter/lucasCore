@@ -142,8 +142,9 @@ DOM: Belowground Slow,Deep Soil,Stabilization: BG Slow -> Deep Soil,", na.string
 # Mg C/ha/yr), as a share of the class's soil target per year. The upland classes have no burial (the flow is left out of their
 # pathways). The rate is fixed: the soil multiplier calibrated to gNATSGO does not scale it.
 BURIAL_FLOW <- "Stabilization: BG Slow -> Deep Soil"
-# peat fire (tools/make_organic_soil.R): scaled in a run by the Organic Soil Share map, so the spin-ups (stage 3's calibration and
-# stage 4's stocks) leave it out; with it at full strength on every cell, stage 4 held wetland soil at a quarter of the gNATSGO target
+# peat fire (tools/make_organic_soil.R): it burns the DOM: Peat stock, which only cells on organic soil hold (stage 8), so the
+# spin-ups (stage 3's calibration and stage 4's stocks) leave it out; when it burned BG Slow at full strength on every cell, stage 4
+# held wetland soil at a quarter of the gNATSGO target
 PEAT_FIRE_FLOWS <- paste("LULC: Emission Peat", c("CO2", "CO", "CH4"))
 add_burial <- function(vals, rate) { vals[[BURIAL_FLOW]] <- if (is.null(rate) || !length(rate) || is.na(rate)) 0 else rate; vals }
 

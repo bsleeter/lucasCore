@@ -258,11 +258,11 @@ if (tm_on) {
   fg <- "Net Growth Wetland: Total"; if (!fg %in% stsim_list("FlowGroup")$Name) fail("Tidal Marsh Productivity: flow group '%s' not found", fg)
   put_multiplier("Tidal Marsh Productivity", fg, write_raster(setValues(rast(P), ifelse(land, tmult, NA)), "TidalMarshProductivity.tif", "FLT4S"))
 }
-# ---- Organic Soil Share (to-do 53: peat fire and drained organic soils) ---------------------------------------------------------
+# ---- Organic soil (to-do 53: the Peat stock) -------------------------------------------------------------------------------------
 # Each cell's share of organic soil: the mean over its 10 m gNATSGO map units of their percent of Histosol components (Data Source
-# HistosolFile; tools/make_organic_soil.R). It is the Flow Spatial Multiplier of the flow group Organic Soil (peat burned by fire on the
-# forested wetland twins, drained organic soil under cropland and pasture), so those flows act in proportion to it. Without the file
-# every cell is 0 and the flows are off.
+# HistosolFile). A cell with any share starts DOM: Peat at its gNATSGO soil above its class's soil (set below, after the soil step;
+# tools/make_organic_soil.R): peat fire, drainage under cropland and pasture, and urbanization take from it. Without the file no
+# cell has peat. (Until 2026-11-10 the share was a Flow Spatial Multiplier on those flows, which took from BG Slow.)
 os_v <- rep(0, ncell(P)); hf <- read_data_sources("HistosolFile", optional = TRUE)$HistosolFile
 if (!is.null(hf) && length(hf) && !is.na(hf) && nzchar(hf) && file.exists(hf)) {
   hr <- rast(hf); win <- project(as.polygons(ext(P) + 1000, crs = crs(P)), crs(hr)); cr <- tryCatch(crop(hr, win, snap = "out"), error = function(e) NULL)
@@ -270,10 +270,7 @@ if (!is.null(hf) && length(hf) && !is.na(hf) && nzchar(hf) && file.exists(hf)) {
   os <- data.table(cls = cname[land], s = os_v[land])[, .(Cells = .N, Organic = sum(s >= 0.5), Mean = mean(s)), by = cls][Organic > 0][order(-Organic)]
   say("Organic Soil Share (gNATSGO Histosols): %d of %d land cells at least half organic (mean share %.3f)", sum(os_v[land] >= 0.5), sum(land), mean(os_v[land]))
   for (i in seq_len(min(nrow(os), 8))) with(os[i], say("  %s: %d of %d cells at least half organic (mean share %.2f)", cls, Organic, Cells, Mean))
-} else say("Organic Soil Share: no HistosolFile in the Data Sources (run a Data Download with it), so every cell is 0 and peat fire and drained organic soils are off")
-if ("Organic Soil Share" %in% stsim_list("FlowMultiplierType")$Name && "Organic Soil" %in% stsim_list("FlowGroup")$Name) {
-  put_multiplier("Organic Soil Share", "Organic Soil", write_raster(setValues(rast(P), ifelse(land, os_v, NA)), "OrganicSoilShare.tif", "FLT4S"))
-} else fail("Organic Soil Share: the library has no Flow Multiplier Type 'Organic Soil Share' or flow group 'Organic Soil' - update the library to lucasCore 1.3")
+} else say("Organic soil: no HistosolFile in the Data Sources (run a Data Download with it), so no cell starts with peat")
 
 # ---- Cropland Productivity (Build Options; to-do 39 step 6, user 2026-11-07) -------------------------------------------------
 # The agriculture counterpart: each 30 m Cropland Data Layer pixel of CDL_YEARS takes its county's NASS growth of its crop group
@@ -419,11 +416,25 @@ vSo <- values(project(So, P, method = "average") * 0.01, mat = FALSE)
 bgs <- which(st$StockTypeId == "DOM: Belowground Slow"); sub_ <- land & out[, bgs] == 0 & !is.na(vSo)
 out[sub_, bgs] <- vSo[sub_]
 say("Soil: gNATSGO used for %d cells whose class has no belowground slow carbon (%s)", sum(sub_), paste(names(table(src_of[sub_])), collapse = ", "))
+# Peat: on a cell with Histosol components, its gNATSGO soil above the soil its class starts with (BG Slow + Deep Soil), at most its
+# organic share of that gNATSGO soil (a mostly mineral cell's soil above its class mean is mineral, not peat). The class's soil is in
+# balance with the class's inputs; the peat above it is the cell's own and has no decay, so it holds until the cell burns, is drained
+# for farming or is built on (user, 2026-11-10)
+pj <- which(st$StockTypeId == "DOM: Peat"); dsj <- which(st$StockTypeId %in% c("DOM: Belowground Slow", "Deep Soil"))
+if (!length(pj)) fail("stock-types.csv has no DOM: Peat")
+pt <- land & os_v > 0 & !is.na(vSo); out[, pj] <- 0
+out[pt, pj] <- pmax(0, pmin(vSo[pt] - rowSums(out[pt, dsj, drop = FALSE]), os_v[pt] * vSo[pt]))
+hp <- land & out[, pj] > 0
+if (any(hp)) {
+  pk <- data.table(cls = cname[hp], p = out[hp, pj], s = os_v[hp])[, .(Cells = .N, Mean = mean(p), Max = max(p), Share = mean(s), Tg = sum(p) * cell_ha / 1e6), by = cls][order(-Tg)]
+  say("Peat (gNATSGO soil above the class's, on cells with Histosol components): %d cells, %.2f Tg C, mean %.0f Mg C/ha", sum(hp), sum(pk$Tg), sum(out[hp, pj]) / sum(hp))
+  for (i in seq_len(min(nrow(pk), 8))) with(pk[i], say("  %s: %d cells, mean %.0f Mg C/ha (max %.0f), mean organic share %.2f, %.2f Tg C", cls, Cells, Mean, Max, Share, Tg))
+} else say("Peat: no cell starts with peat (no Histosol components, or no gNATSGO soil above the class's)")
 out[!land, ] <- NA
 progressBar()
 # ---- checks, summary, outputs -----------------------------------------------------------------------------------------
 check(STAGE, "every land cell has every pool, none negative", !anyNA(out[land, ]) && all(out[land, ] >= 0), sprintf("%d NA, %d negative", sum(is.na(out[land, ])), sum(out[land, ] < 0, na.rm = TRUE)))
-soil_j <- which(st$StockTypeId %in% c("DOM: Belowground Slow", "Deep Soil"))   # soil = BG Slow + Deep Soil
+soil_j <- which(st$StockTypeId %in% c("DOM: Belowground Slow", "Deep Soil", "DOM: Peat"))   # soil = BG Slow + Deep Soil + Peat
 live <- grep("^Biomass", st$StockTypeId); dom <- setdiff(seq_len(nrow(st)), c(live, soil_j))
 d <- data.table(S = vS, src = src_of, fire = postfire, live = rowSums(out[, live]), dom = rowSums(out[, dom]), soil = rowSums(out[, soil_j, drop = FALSE]))[land]
 summ <- d[, .(Cells = .N, PostFire = round(mean(fire), 3), Live = round(mean(live), 1), Dom = round(mean(dom), 1), Soil = round(mean(soil), 1),

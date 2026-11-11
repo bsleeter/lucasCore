@@ -993,6 +993,18 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       on its own mature FIA dead wood plots in its ecodivision (Level "Wetland class"); a twin with too few takes its own class
       pooled over ecodivisions, never the upland types' values. Upland forest keeps the regional rule. To check on the next Build:
       the GDS Oak/Gum/Cypress twin (172 mature plots) gets its own values, and the upland types' shared values move a little.
+    - Peat stock (user, 2026-11-10: "How do we initiate soc for areas where it is much higher than the class mean? Like for ag
+      lands here (or similarly in the Delta region of California). Seems we are missing a large potential land use change
+      effect"). Every class keeps its class-mean soil in BG Slow, in balance; the carbon above it on organic soil goes into the
+      stock DOM: Peat (it was defined but unused), cell by cell: stage 8 sets it to the cell's gNATSGO soil above its class's soil,
+      at most its Histosol share of that gNATSGO soil. Peat has no decay; peat fire (any class, 0.03 / 0.07 / 0.15 by severity),
+      drainage under cropland and pasture (the inventory factors as a share of 600 Mg C/ha) and urbanization (0.2, as BG Slow)
+      take from it, so a wetland drained to farmland starts losing its peat. The Organic Soil Share multiplier and the flow group
+      Organic Soil are retired (no flows from BG Slow scale by it now). Peat counts in DOM: Soil and Total Ecosystem, diagram cell
+      F6; `tools/make_organic_soil.R` writes it all; library update 1.3 adds its groups and diagram cell. GDS preview (Build 10's
+      soil, the same formula): 16,395 cells, 35 Tg C of peat; Oak/Gum/Cypress twin mean 1,037 Mg C/ha, cropland 454 cells at a
+      mean 156 (drained loss then about 3.7 Gg C/yr, against 0.2 when drainage took BG Slow at the class mean). To check on the
+      next GDS Build and historical run. lucasCoreUI.dll must be rebuilt with Studio closed (`tools/build_ui.ps1`; it compiles).
   - **Known limits:** mineral and organic soil are not separated within a class (oak/gum/cypress mixes both); scrub-shrub and
     pocosin cells get a tree curve; cells with no forest type pixel take a neighbour's type, which may be upland; FIA soil carbon is
     modelled, so soil targets stay gNATSGO (which overstates organic wetland soils by about 35%, Uhran et al. 2021). New runs will

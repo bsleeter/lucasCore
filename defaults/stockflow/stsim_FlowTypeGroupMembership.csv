@@ -361,7 +361,6 @@ LULC: Emission Peat CH4,LULC: Emission Peat,1
 LULC: Emission Peat CH4,LULC: Emission Peat (CO2e),33.5
 LULC: Emission Peat CH4,Net Biome Productivity,-1
 LULC: Emission Peat CH4,Net Biome Productivity (CO2e),-33.5
-Emission: Drained Organic Soil -> Atmosphere,BG Slow ->,1
 Emission: Drained Organic Soil -> Atmosphere,Emission: Total,1
 Emission: Drained Organic Soil -> Atmosphere,Emission: Total (CO2e),3.67
 Emission: Drained Organic Soil -> Atmosphere,Emission: Total Rh,1
@@ -370,7 +369,3 @@ Emission: Drained Organic Soil -> Atmosphere,Net Biome Productivity,-1
 Emission: Drained Organic Soil -> Atmosphere,Net Biome Productivity (CO2e),-3.67
 Emission: Drained Organic Soil -> Atmosphere,Net Ecosystem Productivity,-1
 Emission: Drained Organic Soil -> Atmosphere,Net Ecosystem Productivity (CO2e),-3.67
-LULC: Emission Peat CO2,Organic Soil,1
-LULC: Emission Peat CO,Organic Soil,1
-LULC: Emission Peat CH4,Organic Soil,1
-Emission: Drained Organic Soil -> Atmosphere,Organic Soil,1

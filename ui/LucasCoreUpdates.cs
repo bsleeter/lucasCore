@@ -81,7 +81,7 @@ namespace lucasCoreUI
         }
 
         // ---- 1.3 (lucasCore 1.3.0): forested wetland twins and organic soils (to-do 53) -----------------------------------------
-        [Update(1.3, "lucasCore 1.3: the forested wetland classes Wetland: Spruce/Fir Group, Wetland: Oak/Gum/Cypress Group and Wetland: Elm/Ash/Cottonwood Group with their Ag Contraction transition types; Data Sources Histosol share")]
+        [Update(1.3, "lucasCore 1.3: the forested wetland classes Wetland: Spruce/Fir Group, Wetland: Oak/Gum/Cypress Group and Wetland: Elm/Ash/Cottonwood Group with their Ag Contraction transition types; Data Sources Histosol share; the DOM: Peat stock's groups and the peat fire and drained peat flows")]
         public static void Update_1_300(DataStore store)
         {
             AddColumn(store, "lucasCore_DataSource", "HistosolFile", "TEXT");
@@ -96,29 +96,31 @@ namespace lucasCoreUI
                 }
             }
 
-            // peat fire and drained organic soils (tools/make_organic_soil.R): flow types, their groups, memberships, order and filters
+            // peat (tools/make_organic_soil.R): the DOM: Peat stock's groups and diagram cell, and the flows that take from it (fire,
+            // drainage under cropland and pasture): flow types, their groups, memberships, order and filters
             string[] gas = { "CO2", "CO", "CH4" }; string[] co2e = { "3.67", "4.66", "33.5" };
-            const string drain = "Emission: Drained Organic Soil -> Atmosphere";
-            AddNamed(store, "stsim_FlowGroup", "FlowGroupId", "Organic Soil", "Description", "The flows on organic soil only (peat fire, drained organic soil): the group of the Organic Soil Share spatial multiplier", false);
+            const string drain = "Emission: Drained Organic Soil -> Atmosphere", peat = "DOM: Peat";
+            AddStockMembership(store, peat, "DOM: Soil", "NULL");
+            AddStockMembership(store, peat, "Total Ecosystem", "NULL");
+            AddScenarioRow(store, "stsim_FlowPathwayDiagram", "FlowPathwayDiagramId", "StockTypeId", "stsim_StockType", "StockTypeId", peat, "Location", "'F6'");
             AddNamed(store, "stsim_FlowGroup", "FlowGroupId", "LULC: Emission Peat", "Description", "Peat burned by fire", false);
             AddNamed(store, "stsim_FlowGroup", "FlowGroupId", "LULC: Emission Peat (CO2e)", "Description", "Peat burned by fire (CO2e)", false);
-            AddNamed(store, "stsim_FlowMultiplierType", "FlowMultiplierTypeId", "Organic Soil Share", null, null, false);
             for (int i = 0; i < 3; i++)
             {
                 string f = "LULC: Emission Peat " + gas[i], m = "-" + co2e[i];
-                AddNamed(store, "stsim_FlowType", "FlowTypeId", f, "Description", "Peat burned by fire on organic soil (forested wetland twins; Organic Soil Share map)", false);
+                AddNamed(store, "stsim_FlowType", "FlowTypeId", f, "Description", "Peat (DOM: Peat) burned by fire", false);
                 AddNamed(store, "stsim_FlowGroup", "FlowGroupId", f + " [Type]", null, null, true);
                 string[] mem = { "Emission: Total|1", "Emission: Total (CO2e)|" + co2e[i], "LULC: Emission|1", "LULC: Emission (CO2e)|" + co2e[i],
                                  "LULC: Emission " + gas[i] + "|1", "LULC: Emission " + gas[i] + " (CO2e)|" + co2e[i], "LULC: Emission Peat|1",
-                                 "LULC: Emission Peat (CO2e)|" + co2e[i], "Net Biome Productivity|-1", "Net Biome Productivity (CO2e)|" + m, "Organic Soil|1" };
+                                 "LULC: Emission Peat (CO2e)|" + co2e[i], "Net Biome Productivity|-1", "Net Biome Productivity (CO2e)|" + m };
                 foreach (string g in mem) { string[] p = g.Split('|'); AddMembership(store, f, p[0], p[1]); }
                 AddFlowOrder(store, f, 11);
                 AddFilter(store, "stsim_OutputFilterFlows", "OutputFilterFlowsId", "FlowGroupId", "stsim_FlowGroup", f + " [Type]", false);
             }
-            AddNamed(store, "stsim_FlowType", "FlowTypeId", drain, "Description", "Oxidation of drained organic soil under cropland and pasture (Organic Soil Share map)", false);
+            AddNamed(store, "stsim_FlowType", "FlowTypeId", drain, "Description", "Oxidation of drained peat (DOM: Peat) under cropland and pasture", false);
             AddNamed(store, "stsim_FlowGroup", "FlowGroupId", drain + " [Type]", null, null, true);
-            string[] dm = { "BG Slow ->|1", "Emission: Total|1", "Emission: Total (CO2e)|3.67", "Emission: Total Rh|1", "Emission: Total Rh (CO2e)|3.67",
-                            "Net Biome Productivity|-1", "Net Biome Productivity (CO2e)|-3.67", "Net Ecosystem Productivity|-1", "Net Ecosystem Productivity (CO2e)|-3.67", "Organic Soil|1" };
+            string[] dm = { "Emission: Total|1", "Emission: Total (CO2e)|3.67", "Emission: Total Rh|1", "Emission: Total Rh (CO2e)|3.67",
+                            "Net Biome Productivity|-1", "Net Biome Productivity (CO2e)|-3.67", "Net Ecosystem Productivity|-1", "Net Ecosystem Productivity (CO2e)|-3.67" };
             foreach (string g in dm) { string[] p = g.Split('|'); AddMembership(store, drain, p[0], p[1]); }
             AddFlowOrder(store, drain, 5);
             AddFilter(store, "stsim_OutputFilterFlows", "OutputFilterFlowsId", "FlowGroupId", "stsim_FlowGroup", drain + " [Type]", false);
@@ -234,6 +236,22 @@ namespace lucasCoreUI
                 if (Convert.ToInt64(store.ExecuteScalar("SELECT COUNT(*) FROM " + t + " WHERE ScenarioId = " + sc + " AND FlowTypeId = " + ft + " AND FlowGroupId = " + fg), CultureInfo.InvariantCulture) > 0) continue;
                 store.ExecuteNonQuery("INSERT INTO " + t + " (FlowTypeGroupMembershipId, ScenarioId, FlowTypeId, FlowGroupId, Value) VALUES (" +
                                       NewId(store).ToString(CultureInfo.InvariantCulture) + ", " + sc + ", " + ft + ", " + fg + ", " + value + ")");
+            }
+        }
+
+        // a stock type's membership in a stock group (Value NULL: counted whole), in each scenario holding its own stock-flow definitions
+        private static void AddStockMembership(DataStore store, string stockType, string stockGroup, string value)
+        {
+            const string t = "stsim_StockTypeGroupMembership";
+            if (!store.TableExists(t)) return;
+            foreach (DataRow s in Holders(store, t).Rows)
+            {
+                string sc = Id(s["ScenarioId"]), pr = Id(s["ProjectId"]);
+                string st = IdOf(store, "stsim_StockType", "StockTypeId", pr, stockType), sg = IdOf(store, "stsim_StockGroup", "StockGroupId", pr, stockGroup);
+                if (st == null || sg == null) continue;
+                if (Convert.ToInt64(store.ExecuteScalar("SELECT COUNT(*) FROM " + t + " WHERE ScenarioId = " + sc + " AND StockTypeId = " + st + " AND StockGroupId = " + sg), CultureInfo.InvariantCulture) > 0) continue;
+                store.ExecuteNonQuery("INSERT INTO " + t + " (StockTypeGroupMembershipId, ScenarioId, StockTypeId, StockGroupId, Value) VALUES (" +
+                                      NewId(store).ToString(CultureInfo.InvariantCulture) + ", " + sc + ", " + st + ", " + sg + ", " + value + ")");
             }
         }
 

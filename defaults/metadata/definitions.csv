@@ -88,7 +88,7 @@ StockType,DOM: Belowground Very Fast,Dead organic matter: dead fine roots in the
 StockType,DOM: Belowground Fast,Dead organic matter: dead coarse roots in the mineral soil (CBM-CFS3 BG fast pool).,
 StockType,DOM: Belowground Slow,Dead organic matter: humified carbon in the mineral soil (CBM-CFS3 BG slow pool).,
 StockType,Deep Soil,"Stabilized soil carbon below the active mineral soil, fed from the belowground slow pool.",
-StockType,DOM: Peat,Dead organic matter: peat in wetland soils.,
+StockType,DOM: Peat,"Peat: the organic soil carbon a cell holds above its class's soil (gNATSGO soil above the class's, at most its Histosol share of it; stage 8). No decay of its own; lost to fire, to drainage under cropland and pasture, and to urbanization.",HistosolFile
 StockType,DOM: Black Carbon,Dead organic matter: pyrogenic (black) carbon. Not used.,
 StockType,Forestry Sector,Carbon removed from the ecosystem by harvest (transition-triggered flows only).,
 StockGroup,Atmosphere,The Atmosphere stock types.,
