@@ -191,11 +191,13 @@ build_figures <- function(I, outdir) {
     pools <- grp(names(I$stocks)); tot <- sum_of(names(I$stocks))
     totTg <- global(tot * cell_km2 * 100, "sum", na.rm = TRUE)[[1]] / 1e6
     mp <- function(r, ramp, title, sub, equal = TRUE) { v <- cv(r); s <- steps(v, equal); list(k = classed(v, s$brk), cols = ramp(length(s$brk) - 1), lab = s$lab, title = title, sub = sub) }
-    P <- list(mp(tot, RAMP_C, "Total ecosystem carbon (Mg C/ha)", sprintf("the 14 CBM pools; %.1f Tg C", totTg)))
+    P <- list(mp(tot, RAMP_C, "Total ecosystem carbon (Mg C/ha)", sprintf("all %d carbon pools; %.1f Tg C", length(I$stocks), totTg)))
     if (any(pools == "Live biomass")) P[[2]] <- mp(sum_of(names(I$stocks)[pools == "Live biomass"]), RAMP_C, "Live biomass carbon (Mg C/ha)", "stem, foliage, other wood and roots")
-    if (any(pools == "Soil")) P[[length(P) + 1]] <- mp(sum_of(names(I$stocks)[pools == "Soil"]), RAMP_SOIL, "Soil carbon (Mg C/ha)", "belowground pools; classes of equal area", equal = FALSE)
+    if (any(pools == "Soil")) P[[length(P) + 1]] <- mp(sum_of(names(I$stocks)[pools == "Soil"]), RAMP_SOIL, "Soil carbon (Mg C/ha)", "belowground pools and peat; classes of equal area", equal = FALSE)
+    peat <- if ("DOM: Peat" %in% names(I$stocks)) { pr <- I$stocks[["DOM: Peat"]]; global(mask(ifel(is.na(pr), 0, pr), I$sc) * cell_km2 * 100, "sum", na.rm = TRUE)[[1]] / 1e6 } else 0
     map_figure("initial_carbon", sprintf("Initial carbon stocks, %s", I$years[1]), P,
-      sprintf("Carbon in the start year (%s): %.1f Tg C in the study area. (a, b) Classes in even steps between each map's 1st and 99.5th percentiles; the end classes are open. (c) Classes of roughly equal area: forest soil starts at its type's gNATSGO mean (stage 3 calibrates decay to it), so it varies little within a type, and other land takes gNATSGO directly.%s", I$years[1], totTg, relief)) }
+      sprintf("Carbon in the start year (%s): %.1f Tg C in the study area. (a, b) Classes in even steps between each map's 1st and 99.5th percentiles; the end classes are open. (c) Classes of roughly equal area: each class's soil starts at its gNATSGO mean (stage 3 calibrates forest decay to it) and land with no soil of its own takes gNATSGO directly%s.%s", I$years[1], totTg,
+              if (peat > 0) sprintf("; on organic soil the gNATSGO carbon above that is peat (%.1f Tg C), so soil varies within a class there", peat) else "", relief)) }
 
   # ---- maps: site productivity (to-do 35) ----------------------------------------------------------------------------------------
   # the non-forest multipliers (Build Options > Site Productivity, stage 8), each over its own classes' cells (user, 2026-11-09)
