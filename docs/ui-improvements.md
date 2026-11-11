@@ -1248,8 +1248,23 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       from MTBS history is added). Stage 10 fits the return curve by time since fire, the conversion share, and Return's adjacency
       curve.
     - **Before building, two checks:**
-      - P26: fit return on the own-type share against the any-forest share around each burned pixel, with `src/adjacency-curve.R`'s
-        method, to see how much the any-forest proxy loses;
+      - DONE 2026-11-11: own-type against any-forest seed source on P26 (`dev/fire/p26-seed-source.R`, summary
+        `dev/fire/p26-seed-source-summary.R`). Forest pixels at a first moderate or high-severity MTBS burn, 1986-2005, not burned
+        again within 20 years: 74.4 kha, 36% back to NLCD forest within 20 years (moderate 46%, high 27%). Live forest is NLCD
+        forest the year after the fire; type is the USFS type group map; shares are within 150 m on the 30 m grid, and within
+        450 m on P26's 150 m grid (3 cells, as ST-Sim computes it).
+        - The seed source matters: within 450 m, return rises from 21% with almost no live forest around (share under 0.05) to
+          51% at 0.3-0.4 and 86% above 0.8. Within 150 m, 23% to 95%.
+        - Any forest does as well as own type, or slightly better. Return within 20 years, logistic fits with severity and type
+          (deviance explained, AUC): severity and type alone 4.3%, 0.63; any 450 m 12.0%, 0.72; own 450 m 10.7%, 0.71; both
+          12.0%. Any 150 m 16.4%, 0.75; own 150 m 15.8%, 0.75; both 16.4%. Own type adds nothing once any-forest share is in.
+        - The two rarely disagree: 3.1 kha (4%) have an any-forest share at least 0.25 above the own-type share. At the same
+          any-forest share (0.3-0.6), return varies little with the own-type part of it (53% to 57%).
+        - So one "Live Forest" attribute is enough. The 150 m share predicts better than the 450 m share, so the seed-source
+          effect works at a shorter range than P26's adjacency radius. At 150 m model cells, ST-Sim's smallest neighbourhood is
+          one cell around (radius 150 m); that radius is worth testing.
+        - Limits: return includes replanting (not separated; to-do 58); the type map (USFS, 2000s) postdates some of the fires;
+          NLCD forest the year after a fire includes partly burned stands.
       - a P26-size projection with and without one extra adjacency setting, to confirm the per-group cost and time a 5-year update.
   - **Also to settle:**
     - which model fire severities enter, given how LANDFIRE severity maps to MTBS's classes;
