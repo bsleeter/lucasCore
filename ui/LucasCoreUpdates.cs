@@ -81,7 +81,7 @@ namespace lucasCoreUI
         }
 
         // ---- 1.3 (lucasCore 1.3.0): forested wetland twins and organic soils (to-do 53) -----------------------------------------
-        [Update(1.3, "lucasCore 1.3: the forested wetland classes Wetland: Spruce/Fir Group, Wetland: Oak/Gum/Cypress Group and Wetland: Elm/Ash/Cottonwood Group with their Ag Contraction transition types; Data Sources Histosol share; the DOM: Peat stock's groups and the peat fire and drained peat flows")]
+        [Update(1.3, "lucasCore 1.3: the forested wetland classes Wetland: Spruce/Fir Group, Wetland: Oak/Gum/Cypress Group and Wetland: Elm/Ash/Cottonwood Group with their Ag Contraction transition types; Data Sources Histosol share; the groups and diagram cell of the DOM: Peat stock, and the peat fire and drained peat flows")]
         public static void Update_1_300(DataStore store)
         {
             AddColumn(store, "lucasCore_DataSource", "HistosolFile", "TEXT");
