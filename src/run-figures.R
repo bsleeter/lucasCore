@@ -22,6 +22,12 @@ cover_group <- function(x) { g <- sub(":.*$", "", x); g[grepl("^Forest", x)] <- 
 COVER_COLS <- c(Forest = "#2b8152", Shrubland = "#c9a26b", Grassland = "#e6d77a", Agriculture = "#d98b3a", Developed = "#c0392b",
                 Wetland = "#5aa9b8", Water = "#3b6ea8", `Barren and other` = "#a3a3a3")
 FAMILIES <- c("Urbanization", "Intensification", "Ag Expansion", "Ag Contraction", "Ag Change", "Fire", "Forest Harvest")
+# carbon lost each year, by cause (user, 2026-11-10: the flux figure's "fire emissions" were every transition's emissions): a transition's
+# emissions and removals (LULC: Emission, LULC: Harvest) by its type, crop harvest (Harvest: Agriculture) and drained peat
+LOSS_COLS <- c(Fire = "#c93a1d", Insect = "#7b4a8b", `Forest harvest` = "#6b6b6b", `Land use change` = "#8c6d31", `Crop harvest` = "#e3b23c", `Drained peat` = "#4a2f17")
+loss_cause <- function(grp, type) data.table::fcase(grp == "Harvest: Agriculture", "Crop harvest", grepl("^Emission: Drained", grp), "Drained peat",
+                                                    grepl("^Fire", type), "Fire", grepl("^Insect", type), "Insect", grepl("^Forest Harvest", type), "Forest harvest",
+                                                    default = "Land use change")
 RAMP_CHG <- colorRampPalette(c("#7a3b12", "#c98b4f", "#efd9b4", "#f5f2ec", "#cfe3b8", "#6fae74", "#1f5f3f"))
 
 # ---- the run's tables and maps ---------------------------------------------------------------------------------------------
@@ -43,6 +49,10 @@ load_run <- function(lib, rid) {
   flows <- if (dbExistsTable(con, "stsim_OutputFlow")) q("SELECT o.Timestep, g.Name AS FlowGroup, SUM(o.Amount) / %d AS Mg FROM stsim_OutputFlow o JOIN stsim_FlowGroup g ON g.FlowGroupId = o.FlowGroupId
               WHERE o.ScenarioId = %d AND g.Name IN ('Net Primary Productivity', 'Emission: Total Rh', 'Net Ecosystem Productivity', 'Net Biome Productivity', 'LULC: Emission', 'LULC: Harvest')
               GROUP BY o.Timestep, g.Name", nit, rid) else NULL
+  losses <- if (dbExistsTable(con, "stsim_OutputFlow")) q("SELECT o.Timestep, g.Name AS FlowGroup, t.Name AS TransitionType, SUM(o.Amount) / %d AS Mg FROM stsim_OutputFlow o
+              JOIN stsim_FlowGroup g ON g.FlowGroupId = o.FlowGroupId LEFT JOIN stsim_TransitionType t ON t.TransitionTypeId = o.TransitionTypeId WHERE o.ScenarioId = %d
+              AND g.Name IN ('LULC: Emission', 'LULC: Harvest', 'Harvest: Agriculture', 'Emission: Drained Organic Soil -> Atmosphere [Type]') GROUP BY o.Timestep, g.Name, t.Name", nit, rid) else NULL
+  if (!is.null(losses)) losses[, Cause := loss_cause(FlowGroup, TransitionType)]
   unit_c <- if (!is.null(stocks)) q("SELECT s.Name AS Unit, o.Timestep, SUM(o.Amount) / %d AS Mg FROM stsim_OutputStock o JOIN stsim_StockGroup g ON g.StockGroupId = o.StockGroupId
               JOIN stsim_SecondaryStratum s ON s.SecondaryStratumId = o.SecondaryStratumId WHERE o.ScenarioId = %d AND g.Name = 'Total Ecosystem' AND o.Timestep IN (%d, %d)
               GROUP BY s.Name, o.Timestep", nit, rid, yrs[1], yrs[2]) else NULL
@@ -57,7 +67,7 @@ load_run <- function(lib, rid) {
   hm <- q("SELECT o.Timestep, o.Filename FROM stsim_OutputSpatialTransition o JOIN stsim_TransitionGroup g ON g.TransitionGroupId = o.TransitionGroupId
            WHERE o.ScenarioId = %d AND o.Iteration = 1 AND g.Name LIKE 'Forest Harvest%%'", rid)
   te <- q("SELECT o.Timestep, o.Filename FROM stsim_OutputAverageSpatialStockGroup o JOIN stsim_StockGroup g ON g.StockGroupId = o.StockGroupId WHERE o.ScenarioId = %d AND g.Name = 'Total Ecosystem'", rid)
-  list(rid = rid, nit = nit, years = yrs, sc_list = sc, tt_list = tt, area = area, trans = trans, stocks = stocks, flows = flows, unit_c = unit_c, unit_a = unit_a, te_it = te_it,
+  list(rid = rid, nit = nit, years = yrs, sc_list = sc, tt_list = tt, area = area, trans = trans, stocks = stocks, flows = flows, losses = losses, unit_c = unit_c, unit_a = unit_a, te_it = te_it,
        sc0 = path("stsim_OutputSpatialState", ssm[Timestep == yrs[1], Filename]), sc1 = path("stsim_OutputSpatialState", ssm[Timestep == yrs[2], Filename]),
        fire = if (nrow(fm)) setNames(vapply(fm$Filename, function(f) path("stsim_OutputSpatialTransition", f), ""), fm$Timestep) else character(),
        harvest = if (nrow(hm)) setNames(vapply(hm$Filename, function(f) path("stsim_OutputSpatialTransition", f), ""), hm$Timestep) else character(),
@@ -237,16 +247,24 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
   if (!is.null(X$flows) && nrow(X$flows)) {
     fl <- X$flows[, .(Tg = sum(Mg) / 1e6), by = .(Timestep, FlowGroup)]; yy <- sort(unique(fl$Timestep))
     g <- function(nm) { v <- fl[FlowGroup == nm][match(yy, Timestep), Tg]; v[is.na(v)] <- 0; v }
-    chart_figure("carbon_fluxes", "Carbon fluxes", "(a) Net primary productivity, heterotrophic respiration and net ecosystem productivity. (b) Losses to fire emissions and harvest, and net biome productivity (net ecosystem productivity less those losses).", 1, 2, h = 1150, draw = function() {
+    lc <- if (!is.null(X$losses) && nrow(X$losses)) X$losses[, .(Tg = sum(Mg) / 1e6), by = .(Timestep, Cause)] else NULL
+    cz <- if (is.null(lc)) character() else names(LOSS_COLS)[names(LOSS_COLS) %in% lc$Cause]
+    chart_figure("carbon_fluxes", "Carbon fluxes", paste("(a) Net primary productivity, heterotrophic respiration and net ecosystem productivity. (b) Carbon lost each year by cause: what each",
+      "transition emits and removes (fire, including peat; insects; forest harvest, its wood and slash; land use change, mostly the emissions and wood of urbanization and agricultural expansion),",
+      "crop harvest (carried off the field each year and mostly respired off site within the year) and drained peat (oxidized under cropland and pasture; part of heterotrophic respiration).",
+      "Net biome productivity, the change in ecosystem carbon, is net ecosystem productivity less the transitions' losses and crop harvest. The legend gives each cause's mean, Tg C per year."), 1, 2, h = 1150, draw = function() {
       low(); a <- cbind(NPP = g("Net Primary Productivity"), Rh = g("Emission: Total Rh"), NEP = g("Net Ecosystem Productivity"))
       plot(NA, xlim = range(yy), ylim = range(c(0, a)), xlab = "", ylab = "Tg C per year", bty = "l"); hgrid(); abline(h = 0, col = MUTED, lty = 2)
       fc <- c(NPP = "#2b8152", Rh = "#a6611a", NEP = "#3b6ea8"); for (k in colnames(a)) lines(yy, a[, k], col = fc[k], lwd = 2); mark_line()
       ptitle(1, "Productivity and respiration"); under_legend(c("Net primary productivity", "Heterotrophic respiration", "Net ecosystem productivity"), col = fc, lwd = 2)
-      low(); L <- rbind(Fire = g("LULC: Emission"), Harvest = g("LULC: Harvest")); nbp <- g("Net Biome Productivity")
-      b <- barplot(-L, col = c("#c93a1d", "#6b6b6b"), border = NA, ylim = range(c(-colSums(L), nbp, 0)) * 1.1, ylab = "Tg C per year"); hgrid(); abline(h = 0, col = MUTED)
+      low(); nbp <- g("Net Biome Productivity")
+      if (length(cz)) { L <- matrix(t(vapply(cz, function(k) { v <- lc[Cause == k][match(yy, Timestep), Tg]; v[is.na(v)] <- 0; v }, numeric(length(yy)))), nrow = length(cz), dimnames = list(cz, NULL)); lcol <- LOSS_COLS[cz]
+      } else { L <- rbind(`Transition emissions` = g("LULC: Emission"), Harvest = g("LULC: Harvest")); lcol <- c("#c93a1d", "#6b6b6b") }   # a run read without the losses table
+      b <- barplot(-L, col = lcol, border = NA, ylim = range(c(-colSums(L), nbp, 0)) * 1.1, ylab = "Tg C per year"); hgrid(); abline(h = 0, col = MUTED)
       lines(b, nbp, lwd = 2, col = "#3b6ea8"); at <- which(yy %% 5 == 0); axis(1, at = b[at], labels = yy[at], cex.axis = .75); mark_bar(b, yy)
-      ptitle(2, sprintf("Losses and net biome productivity (mean %+.2f Tg C/yr)", mean(nbp)))
-      under_legend(c("Fire emissions", "Harvest", "Net biome productivity"), fill = c("#c93a1d", "#6b6b6b", NA), lty = c(NA, NA, 1), col = c(NA, NA, "#3b6ea8")) }) }
+      ptitle(2, sprintf("Losses by cause and net biome productivity (mean %+.2f Tg C/yr)", mean(nbp)))
+      mloss <- rowMeans(L)
+      under_legend(c(sprintf("%s (%.3g)", rownames(L), mloss), "Net biome productivity"), fill = c(lcol, NA), lty = c(rep(NA, nrow(L)), 1), col = c(rep(NA, nrow(L)), "#3b6ea8")) }) }
 
   # ---- charts: carbon by secondary stratum -----------------------------------------------------------------------------------
   if (!is.null(X$unit_c) && nrow(X$unit_c) > 1 && uniqueN(X$unit_c$Unit) > 1) {

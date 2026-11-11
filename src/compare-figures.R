@@ -43,6 +43,9 @@ compare_runs <- function(lib, runs) {
 # ---- per-run series --------------------------------------------------------------------------------------------------------
 te_of <- function(X) if (is.null(X$stocks)) data.table(Timestep = integer(), Tg = numeric()) else X$stocks[StockGroup == "Total Ecosystem", .(Tg = sum(Mg) / 1e6), by = Timestep][order(Timestep)]
 flow_of <- function(X, g) if (is.null(X$flows)) data.table(Timestep = integer(), Tg = numeric()) else X$flows[FlowGroup == g, .(Tg = sum(Mg) / 1e6), by = Timestep][order(Timestep)]
+# a cause of carbon loss (run-figures.R loss_cause: Fire, Forest harvest, Land use change, Crop harvest, ...): "cause:<name>"
+cause_of <- function(X, k) if (is.null(X$losses)) data.table(Timestep = integer(), Tg = numeric()) else X$losses[Cause == k, .(Tg = sum(Mg) / 1e6), by = Timestep][order(Timestep)]
+series_of <- function(X, g) if (startsWith(g, "cause:")) cause_of(X, sub("^cause:", "", g)) else flow_of(X, g)
 trans_of <- function(X, f) X$trans[TransitionGroup == f, .(km2 = sum(ha) / 100), by = Timestep][order(Timestep)]
 at_year <- function(d, y, v = "Tg") { x <- d[Timestep == y][[v]]; if (length(x)) x[1] else NA_real_ }
 
@@ -141,16 +144,16 @@ compare_figures <- function(R, grid, dem, label, outdir) {
   FL <- c(`Net primary productivity` = "Net Primary Productivity", `Heterotrophic respiration` = "Emission: Total Rh",
           `Net ecosystem productivity` = "Net Ecosystem Productivity", `Net biome productivity` = "Net Biome Productivity")
   if (any(vapply(R, function(r) !is.null(r$X$flows) && nrow(r$X$flows) > 0, TRUE))) {
-    chart_figure("carbon_fluxes", "Carbon fluxes per year", "Net primary productivity, heterotrophic respiration, net ecosystem productivity and net biome productivity (net ecosystem productivity less fire emissions and harvest) in each run, per year.",
+    chart_figure("carbon_fluxes", "Carbon fluxes per year", "Net primary productivity, heterotrophic respiration, net ecosystem productivity and net biome productivity (net ecosystem productivity less what transitions emit and remove, and crop harvest) in each run, per year.",
       2, 2, h = 1900, draw = function() for (i in seq_along(FL)) { low()
         run_lines(function(X) flow_of(X, FL[i]), "Tg C per year", i, names(FL)[i], zero = i >= 3) }) }
 
   # ---- charts: flux means by period ------------------------------------------------------------------------------------------
   # the history as one period, the projections by decade (2024-2030, 2031-2040, ...); a bar per run that covers the period
   per <- function(y, h) if (h) rep("hist", length(y)) else sprintf("%d", as.integer(ceiling(y / 10) * 10))
-  pm <- function(r, g) { d <- flow_of(r$X, g); d <- d[Timestep > r$X$years[1]]
+  pm <- function(r, g) { d <- series_of(r$X, g); d <- d[Timestep > r$X$years[1]]
     if (!nrow(d)) return(NULL); d[, p := per(Timestep, r$hist)]; d[, .(Tg = mean(Tg), y0 = min(Timestep), y1 = max(Timestep)), by = p] }
-  FM <- c(FL[c(1, 2, 4)], `Fire emissions` = "LULC: Emission")
+  FM <- c(FL[c(1, 2, 4)], `Fire emissions (with peat)` = "cause:Fire")   # LULC: Emission until 2026-11-10: every transition's emissions, labelled fire
   if (any(vapply(R, function(r) !is.null(r$X$flows) && nrow(r$X$flows) > 0, TRUE))) {
     Z <- lapply(FM, function(g) lapply(R, pm, g = g))
     pers <- unique(rbindlist(lapply(Z[[1]], function(z) if (!is.null(z)) z[, .(p, y0, y1)])))[order(p != "hist", p)]
