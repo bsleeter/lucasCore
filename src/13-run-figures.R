@@ -49,9 +49,10 @@ if (is.null(X$wp)) say("No Wood Products result on run %d: run stage 18 on it fo
   say("Wood products from result %d: %d-%d", attr(X$wp, "scenario"), wy[1], wy[2])
   check(STAGE, "the wood products result covers the run's years", wy[1] <= X$years[1] + 1 && wy[2] >= X$years[2], sprintf("wood products %d-%d, run %d-%d", wy[1], wy[2], X$years[1], X$years[2])) }
 
-ic <- as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", optional = TRUE, lookupsAsFactors = FALSE))
-if (!nrow(ic) || is.na(ic$StateClassFileName[1])) fail("no state class map: this scenario must depend on the run's Build result")
-grid <- rast(ic$StateClassFileName[1])
+ic <- tryCatch(as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", optional = TRUE, lookupsAsFactors = FALSE)), error = function(e) e)
+gf <- figures_grid(ic, lib_file, c(rid, hid), say)   # the Build's state class map, else the run's own (src/run-figures.R)
+if (is.na(gf)) fail("no state class map: this scenario must depend on the run's Build result, and neither it nor the run has its map in the library's data folder")
+grid <- rast(gf)
 scl <- stsim_list("StateClass"); cols <- setNames(argb(scl$Color), scl$Name)
 sa <- read_ds("StudyArea"); label <- if (nrow(sa)) paste(sub("^[^:]*: ", "", sa$UnitId), collapse = ", ") else "CONUS"
 obs <- read_ds("OutputTransitionSummary"); if (!nrow(obs)) obs <- NULL

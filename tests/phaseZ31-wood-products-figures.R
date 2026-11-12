@@ -66,4 +66,9 @@ expect("compare: the wood products figure and the summary table are drawn", any(
        all(file.exists(cres$FileName)), paste(cres$Title, collapse = "; "))
 wp_of_run <- function(lib, rid) NULL; R0 <- compare_runs(lib, data.table(RunScenarioId = PID)); c0 <- compare_figures(R0, grid, NULL, "Test", tempfile("cf0"))
 expect("compare: no results, no wood products figure, the columns blank", !any(grepl("wood_products", basename(c0$FileName))) && all(is.na(attr(c0, "carbon")$NbpWithProducts)))
+# ---- the grid when the Build result's map cannot be read (Puget, 2026-11-12: its data folder was gone) -------------------------
+g <- figures_grid(simpleError("Object reference not set to an instance of an object."), lib, c(PID, HID), function(...) invisible())
+expect("grid: a Build map SyncroSim cannot read falls back to the run's own, on the same grid", !is.na(g) && file.exists(g) && all(dim(rast(g)) == dim(grid)), g)
+g2 <- figures_grid(data.table(StateClassFileName = file.path(tempdir(), "gone.tif")), lib, c(PID, HID), function(...) invisible())
+expect("grid: a Build map whose file is missing falls back too", !is.na(g2) && file.exists(g2))
 cat(sprintf("%d passed, %d failed\n", n_ok, n_bad)); if (n_bad) quit(status = 1)

@@ -116,6 +116,28 @@ join_runs <- function(H, P) {
   J$join <- c(history = te(H), projection = te(P)); J$proj_start <- ys; J$hist <- list(rid = H$rid, years = H$years)
   J }
 
+# ---- the model grid from a run -------------------------------------------------------------------------------------------
+# run_grid: the state class map of the first of result scenarios rids whose own initial conditions file is in the library's data
+# folder (a run's result holds a copy of its Build's, or the projection's start map), or NA. Stages 13 and 14 read the grid from the
+# Build result they depend on, and fall back to this when that file is gone (Puget Lowlands, 2026-11-12: the data folders of its
+# older results, the Build's among them, had been removed, and SyncroSim failed the read with "Object reference not set").
+run_grid <- function(lib, rids) {
+  con <- dbConnect(SQLite(), lib, flags = SQLITE_RO); on.exit(dbDisconnect(con))
+  for (r in rids[!is.na(rids)]) { f <- dbGetQuery(con, sprintf("SELECT StateClassFileName f FROM stsim_InitialConditionsSpatial WHERE ScenarioId = %d", as.integer(r)))$f
+    if (length(f) && !is.na(f[1])) { p <- file.path(paste0(lib, ".data"), sprintf("Scenario-%d", as.integer(r)), "stsim_InitialConditionsSpatial", basename(f[1]))
+      if (file.exists(p)) return(structure(p, run = as.integer(r))) } }
+  NA_character_ }
+# the grid a figures stage draws on: the Build result's state class map (ic: its Initial Conditions Spatial sheet, or an error), else
+# run_grid's; say: the stage's log function
+figures_grid <- function(ic, lib, rids, say) {
+  f <- if (inherits(ic, "error") || !nrow(ic) || is.na(ic$StateClassFileName[1])) NA_character_ else ic$StateClassFileName[1]
+  if (!is.na(f) && file.exists(f)) return(f)
+  g <- run_grid(lib, rids)
+  if (!is.na(g)) say("The Build result's state class map is not readable (%s): the grid is read from run %d's initial conditions instead",
+                     if (inherits(ic, "error")) "SyncroSim could not read it; its file may be missing from the library's data folder" else if (is.na(f)) "the Build result has none" else "its file is missing",
+                     attr(g, "run"))
+  as.character(g) }
+
 # ---- harvested wood products (stage 18) ------------------------------------------------------------------------------------
 # wp_of_run: the wood products of run rid, from the newest Wood Products result that followed it (stage 18's Wood Products sheet, the
 # rows over all iterations: Year, Variable, Mean, Lower, Upper; Mg C), or NULL when stage 18 has not been run on it. A projection's

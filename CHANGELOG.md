@@ -22,6 +22,9 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   without a result are drawn as before. Test: `tests/phaseZ31-wood-products-figures.R`.
 
 ### Fixed
+- Run Figures and Compare Runs stopped with "Object reference not set to an instance of an object" when the Build result they
+  depend on had lost its maps from the library's data folder (Puget Lowlands). They now take the model grid from the run's own
+  initial conditions map when the Build's cannot be read, and say so in the log.
 - Compare Runs' summary tables: a long run name or many columns made the headers and values overlap. Columns are now sized by the
   width of their text as drawn, and the table scaled to fit.
 

@@ -33,9 +33,10 @@ if (any(w)) say("Wood products (stage 18) on %s%s", paste(vapply(R[w], function(
 check(STAGE, "the projections end in the same year", length(unique(vapply(Filter(function(r) !r$hist, R), function(r) r$X$years[2], 0))) == 1,
       paste(vapply(Filter(function(r) !r$hist, R), function(r) sprintf("%d: %d", r$rid, r$X$years[2]), ""), collapse = ", "))
 
-ic <- as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", optional = TRUE, lookupsAsFactors = FALSE))
-if (!nrow(ic) || is.na(ic$StateClassFileName[1])) fail("no state class map: this scenario must depend on the runs' Build result")
-grid <- rast(ic$StateClassFileName[1])
+ic <- tryCatch(as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", optional = TRUE, lookupsAsFactors = FALSE)), error = function(e) e)
+gf <- figures_grid(ic, lib_file, vapply(R, function(r) as.integer(r$rid), 0L), say)   # the Build's state class map, else a run's own (src/run-figures.R)
+if (is.na(gf)) fail("no state class map: this scenario must depend on the runs' Build result, and neither it nor the runs have their map in the library's data folder")
+grid <- rast(gf)
 sa <- read_ds("StudyArea"); label <- if (nrow(sa)) paste(sub("^[^:]*: ", "", sa$UnitId), collapse = ", ") else "CONUS"
 dem <- tryCatch(read_data_sources("ElevationFile")$ElevationFile, error = function(e) { say("No hillshade: %s", conditionMessage(e)); NULL })
 progressBar()
