@@ -277,6 +277,26 @@ if (length(rc)) {
   va <- values(A, mat = FALSE); was <- va[rc[hit]]; va[rc[hit]] <- ra[hit]; A <- setValues(A, va)
   say("Regrowing forest: %d of %d cells that are forest only by the any-year rule take their age from NLCD (median %s years, was %s; the rest keep the %s age)",
       sum(hit), length(rc), if (any(hit)) as.integer(stats::median(ra[hit])) else "-", if (any(hit)) as.integer(stats::median(was)) else "-", asrc)
+  # to-do 57 step 5: a regrowing cell starts in its type's disturbed class (Disturbed: <type>, Id 2000 + the type's), as a cell burned
+  # in the historical run would be, and returns to its type when stage 6's maps show NLCD forest; its age is the years since the
+  # disturbance (from the latest fire perimeter where one dates it, else the regrowth age). Setting DisturbedStart (regrowth-age.csv)
+  di <- rc[hit]; pid <- values(S, mat = FALSE)[di]; did <- 2000L + as.integer(pid)
+  if (length(di) && rg$disturbed_start != "None") {
+    if (!all(did %in% as.integer(scl$Id))) {
+      say("Regrowing forest: the library has no disturbed classes (Disturbed: <type>, library update 1.4); %d cells start as forest", length(di))
+    } else {
+      win <- as.integer(read_default("transitions", "post-disturbance-settings.csv")[ParentClass == "Forest", Window])
+      fpf <- read_data_sources("FirePerimeterHistoryFile", optional = TRUE)$FirePerimeterHistoryFile; lf <- rep(NA_integer_, length(di))
+      if (!is.na(fpf)) { fp <- read_fire_perimeters(fpf, y0 - win, y0)
+        if (nrow(fp)) { fp <- sf::st_make_valid(sf::st_transform(fp, crs(R))); lf <- as.integer(values(rasterize(vect(fp), R, field = "yr", fun = "max"), mat = FALSE)[di]) } }
+      dst <- disturbed_start(ra[hit], lf, y0, rg$lag, win, rg$disturbed_start)
+      vs <- values(S, mat = FALSE); vs[di[dst$use]] <- did[dst$use]; S <- setValues(S, vs)
+      va <- values(A, mat = FALSE); va[di[dst$use]] <- dst$age[dst$use]; A <- setValues(A, va)
+      say("Disturbed at the start (DisturbedStart %s): %d of the %d regrowing cells start in their type's disturbed class, %d dated by a fire perimeter of %d-%d (median %s years since the fire)%s",
+          rg$disturbed_start, sum(dst$use), length(di), sum(dst$use & dst$dated), y0 - win, y0,
+          if (any(dst$use & dst$dated)) as.integer(stats::median(dst$age[dst$use & dst$dated])) else "-", if (is.na(fpf)) " (no fire perimeter file)" else "")
+    }
+  }
 }
 # chaparral (to-do 39, 2026-11-06: it grows by age since fire): the years since the last interagency fire perimeter of 1900 to the start
 # year over the cell's centre; never burned since 1900: the start year - 1900 (user decision; on the age curve's plateau)

@@ -32,6 +32,20 @@ regrowth_age <- function(nl, years, lag = 20, share = 2 / 3, nonforest_years = 2
 }
 
 regrowth_settings <- function(tab) {
-  v <- setNames(as.numeric(tab$Value), tab$Parameter)
-  list(lag = unname(v["RegrowthLag"]), share = unname(v["ForestShare"]), nonforest_years = as.integer(v["NonForestYears"]))
+  v <- setNames(as.character(tab$Value), tab$Parameter); n <- function(k) as.numeric(v[[k]])
+  ds <- if ("DisturbedStart" %in% names(v)) v[["DisturbedStart"]] else "None"
+  if (!ds %in% c("All", "Fire", "None")) stop(sprintf("regrowth-age.csv: DisturbedStart is '%s'; use All, Fire or None", ds))
+  list(lag = n("RegrowthLag"), share = n("ForestShare"), nonforest_years = as.integer(n("NonForestYears")), disturbed_start = ds)
+}
+
+# Starting a regrowing cell in its type's disturbed class (to-do 57 step 5). ra: the cells' regrowth ages (regrowth_age, not NA);
+# last_fire: the year of the latest fire perimeter over each cell (NA: none); y0: the start year; window: the forest post-disturbance
+# window. A fire dates the disturbance when the cell's return (the year NLCD first shows it as forest, y0 + lag - ra) comes within the
+# window after it; the age is then the years since that fire, else the regrowth age. use: the cells that start disturbed under mode
+# (All: every regrowing cell; Fire: the dated ones; None: none).
+disturbed_start <- function(ra, last_fire, y0, lag, window, mode = "All") {
+  ret <- y0 + lag - ra
+  dated <- !is.na(last_fire) & last_fire <= y0 & ret - last_fire < window
+  list(use = switch(mode, All = rep(TRUE, length(ra)), Fire = dated, None = rep(FALSE, length(ra))),
+       age = as.integer(ifelse(dated, pmax(1L, y0 - last_fire), ra)), dated = dated)
 }

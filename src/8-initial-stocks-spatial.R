@@ -40,6 +40,13 @@ check(STAGE, "every stock type exists", all(st$StockTypeId %in% stt), paste(setd
 if (any(vapply(.checks, function(x) x$Status != "Pass", TRUE))) finish_checks()
 land <- !is.na(values(P, mat = FALSE)); vP <- values(P, mat = FALSE); vS <- values(S, mat = FALSE); vA <- values(A, mat = FALSE)
 cname <- scl$Name[match(vS, as.integer(scl$Id))]; sname <- stl$Name[match(vP, as.integer(stl$Id))]
+# disturbed forest classes at the start (to-do 57 step 5; stage 5 starts regrowing cells in them): such a cell takes its forest type's
+# pools at its years since disturbance (the type's stock curves, or the forested wetland tables for a twin) for dead wood and soil, and
+# its ecodivision's shrub class's live carbon at that age (below, after the class tables). Until then it goes as its type
+pid <- vS - 2000L
+isD <- land & !is.na(vS) & pid >= 100L & pid <= 999L & pid %in% as.integer(scl$Id)
+d_name <- cname[isD]
+if (any(isD)) { vS[isD] <- pid[isD]; cname[isD] <- scl$Name[match(pid[isD], as.integer(scl$Id))] }
 cell_ha <- (res(P)[1] / 100)^2
 progressBar()
 # ---- last disturbance: interagency fire perimeters, 1900 to the start year --------------------------------------------------
@@ -166,6 +173,26 @@ ew <- lt("emergent-wetland.csv"); fill_class(ew, land & cname %in% unique(ew$Sta
 # mean under the class (gNATSGO), as grass and shrub
 ag <- lt("agriculture.csv"); fill_class(ag, land & cname %in% unique(ag$StateClassId), FALSE, "agriculture")
 src_of[land & is.na(src_of)] <- "zero (developed, barren, water, ice)"
+# disturbed forest at the start: live carbon from its ecodivision's shrub class (defaults/transitions/post-disturbance-regions.csv) at
+# its years since disturbance, as stage 3 grows it (src/disturbed-carbon.R); dead wood and soil stay its type's, from above
+if (any(isD)) {
+  rgn <- read_default("transitions", "post-disturbance-regions.csv"); shr <- rgn$ShrubClass[match(sname[isD], rgn$Ecodivision)]
+  lj <- which(startsWith(st$StockTypeId, "Biomass: "))
+  tb <- rbind(lt("shrub-age.csv"), lt("chaparral.csv"), fill = TRUE)[StateAttributeTypeId %in% st$Attribute[lj] & StateClassId %in% unique(shr)]
+  w <- dcast(tb, StratumId + StateClassId + AgeMin ~ StateAttributeTypeId, value.var = "Value", fun.aggregate = sum)
+  ag <- pmax(round(vA[isD]), 0); ab <- ag; ky <- paste(sname[isD], shr)
+  for (k in unique(ky)) { i <- which(ky == k); a <- sort(unique(w[paste(StratumId, StateClassId) == k, AgeMin])); if (length(a)) ab[i] <- a[pmax(findInterval(ag[i], a), 1)] }
+  mm <- match(paste(ky, ab), paste(w$StratumId, w$StateClassId, w$AgeMin))
+  check(STAGE, "every disturbed forest cell finds its ecodivision's shrub class and age in the shrub tables", !anyNA(mm),
+        sprintf("%d of %d unmatched (%s)", sum(is.na(mm)), sum(isD), paste(head(unique(paste(ky, ab)[is.na(mm)]), 3), collapse = "; ")))
+  ix <- which(isD); was <- rowSums(out[ix, lj, drop = FALSE]); out[ix, lj] <- 0
+  for (j in lj) if (st$Attribute[j] %in% names(w)) out[ix[!is.na(mm)], j] <- w[[st$Attribute[j]]][mm[!is.na(mm)]]
+  src_of[isD] <- "disturbed forest (its type's dead wood and soil, shrub live carbon)"
+  say("Disturbed forest at the start: %d cells (%s); live carbon %.1f Mg C/ha from their shrub class (%s), against %.1f on their type's curve; dead wood and soil their type's",
+      sum(isD), paste(sprintf("%s %d", sub("^Disturbed: ", "", names(table(d_name))), table(d_name)), collapse = ", "), mean(rowSums(out[ix, lj, drop = FALSE])),
+      paste(unique(shr), collapse = ", "), mean(was))
+  vS[isD] <- vS[isD] + 2000L; cname[isD] <- d_name
+}
 # ---- Grass and Shrub Productivity (Build Options; to-do 39 step 5) ---------------------------------------------------------
 # The grass and shrub counterpart of Site Productivity: a cell's growth multiplier = its RAP herbaceous + shrub NPP (mean of
 # RAP_YEARS, the years the class targets were sampled from) / its ecodivision x class target NPP (defaults/stockflow/

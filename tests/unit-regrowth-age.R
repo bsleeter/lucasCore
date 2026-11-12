@@ -28,5 +28,15 @@ v <- row(rep(S, 2), rep(F, 18)); b <- regrowth_age(rbind(v), yrs, lag = 10)
 check("the age is the lag less the years to forest, and forest that first shows the lag or more after the start keeps its source age", identical(b, 8L) && is.na(regrowth_age(rbind(row(rep(S, 14), rep(F, 6))), yrs, lag = 10)) && identical(regrowth_age(rbind(row(rep(S, 9), rep(F, 11))), yrs, lag = 10), 1L))
 s <- regrowth_settings(fread(file.path("defaults", "landcover", "regrowth-age.csv")))
 check("defaults: lag 20, share about 2/3, two non-forest years", s$lag == 20 && abs(s$share - 2 / 3) < 0.01 && s$nonforest_years == 2L)
+check("defaults: only fire-dated regrowing cells start disturbed (DisturbedStart Fire); a bad value stops", s$disturbed_start == "Fire" &&
+      inherits(try(regrowth_settings(data.table(Parameter = c("RegrowthLag", "ForestShare", "NonForestYears", "DisturbedStart"), Value = c("20", "0.667", "2", "Some"))), silent = TRUE), "try-error"))
+# disturbed_start: regrowth ages 12 (return 1993), 18 (1987), 5 (2000), 12; fires 1980, 1950, 1983, none; start 1985, window 30
+ds <- disturbed_start(c(12L, 18L, 5L, 12L), c(1980L, 1950L, 1983L, NA), 1985L, 20, 30, "All")
+check("a fire dates the disturbance when the return comes within the window after it (age = years since the fire), else the regrowth age",
+      identical(ds$dated, c(TRUE, FALSE, TRUE, FALSE)) && identical(ds$age, c(5L, 18L, 2L, 12L)) && all(ds$use))
+check("Fire starts only the dated cells disturbed, None none", identical(disturbed_start(c(12L, 18L, 5L, 12L), c(1980L, 1950L, 1983L, NA), 1985L, 20, 30, "Fire")$use, c(TRUE, FALSE, TRUE, FALSE)) &&
+      !any(disturbed_start(c(12L, 18L), c(1980L, NA), 1985L, 20, 30, "None")$use))
+check("a fire in the start year gives age 1, and a cell returns before its window ends at any dating", identical(disturbed_start(10L, 1985L, 1985L, 20, 30)$age, 1L) &&
+      all(1985L + 20 - c(12L, 18L, 5L, 12L) - (1985L - ds$age) < 30))
 check("an empty matrix gives an empty result", length(regrowth_age(nl[0, , drop = FALSE], yrs)) == 0)
 cat(sprintf("%d passed, %d failed\n", n_ok, n_bad)); if (n_bad) quit(status = 1)

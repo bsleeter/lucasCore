@@ -1395,8 +1395,47 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       with age reset. The new burns waited out ReturnAgeMin, then returned at about 10% a year from 2039 (40, 54, 32, 32 ha), 169 ha
       still disturbed in 2043. 4 ha of Disturbed: Non-sage returned and 2 ha converted at the 12-year window's end. No forest
       conversion at a window's end yet, since 20 years is shorter than the 30-year window.
-    - Found by this test: a burned swamp converts to Shrubland: Non-sage (the region's shrub class), not to scrub-shrub or emergent
-      wetland. Settle this with the "conversion destination by NLCD" step (wetland twins could convert to a wetland class).
+    - **Step 5 DONE 2026-11-11.** Stage 5 starts a regrowing cell (`src/regrowth-age.R`) in its type's disturbed class, by the
+      setting DisturbedStart in `defaults/landcover/regrowth-age.csv`: Fire (default, user 2026-11-11), only cells a fire perimeter
+      dates, meaning the cell's return (the year NLCD first shows it as forest) comes within the forest window after the latest
+      perimeter of the 30 years before the start; All, every regrowing cell; None. A dated cell's age is the years since that fire,
+      others keep the regrowth age. Stage 8 gives a disturbed start cell its type's pools at that age (stock curves, or the forested
+      wetland tables for a twin) for dead wood and soil, and live carbon from its ecodivision's shrub class at that age (shrub-age.csv,
+      chaparral.csv). Measured on the existing maps (`dev/fire/regrowth-fire.R`): P26 3.6 of 45.3 kha of regrowing
+      cells are dated by a perimeter (fires mostly 1965-1985; median 7 years since the fire, against 12 by the regrowth rule); Puget
+      none of 58.4 kha (old clearcuts). So under Fire, Puget's regrowing clearcuts start as young forest (harvest goes straight back
+      to forest), and under All they would wait in a disturbed class until NLCD shows forest. GDS quick test (stages 5, 6, 8 on Build
+      48 with All, result 57; 5 years, result 59): 8 cells (18 ha; pine and oak types) started disturbed, live carbon 5.4 Mg C/ha from
+      Non-sage against 13.1 on their types' curves, and still waiting in 1990 (their NLCD return is about 2000). No disturbed start
+      cells for the shrub classes: chaparral and the sage family already start at their age since fire.
+    - **TO DO (user, 2026-11-11): windows by region.** `post-disturbance-settings.csv` has one Forest row, so every forest type in
+      every ecodivision waits up to 30 years with no return chance before 15. Southeastern forests (loblolly and shortleaf pine,
+      oak/gum/cypress) restock far faster. Give the settings an Ecodivision column (and optionally a forest type), with a blank meaning
+      everywhere. Then `tools/make_post_disturbance.R` writes the return and conversion pathways by stratum where rows differ, stage 9
+      writes the return chance by stratum, and stage 5 takes the cell's own window. Fit the values per ecodivision in step 7, by
+      the P26 method (`dev/fire/p26-fire-gap.R`: share back to NLCD forest by years since a stand-replacing loss).
+    - **TO DO (user, 2026-11-11): non-fire disturbance, Mount St Helens and the rest.** Two gaps:
+      - Before the start year: only fire perimeters date a disturbance, so DisturbedStart Fire leaves the 1980 blast zone, older
+        windthrow and insect kill as young forest with their NLCD regrowth age. Option: an optional Data Source of recorded
+        stand-replacing events (polygons with year and cause: the Mount St Helens 1980 blast and debris zones, large hurricanes, bark
+        beetle outbreaks), read with the fire perimeters, so DisturbedStart Fire becomes "Recorded".
+      - During the record: only fire and harvest are modelled. Stage 6 takes clearcut and selection from LCMS Tree Removal (class 9,
+        split by what NLCD shows next), and the LCMS Change layer already downloaded (v2025-11, 1985 on) names other causes: 1 Wind,
+        2 Hurricane, 3 Snow or Ice, 4 Desiccation, 5 Inundation, 10 Defoliation, 11 Southern Pine Beetle, 12 Insect, Disease or
+        Drought Stress, 13 Other Loss (`dev/harvest/02-lcms-vs-nlcd.R`). Option: a "Disturbance: Stand-Replacing" group from those
+        codes split "standrep" as Tree Removal is (shrub or grass in NLCD within two years), with pathways from each forest class to
+        its disturbed class (age reset) as high-severity fire has. Return then follows NLCD as for fire. No new download. In
+        projections it needs a rate (the historical years' area, drawn as fire is, or a mean by ecodivision).
+    - **TO DECIDE (user, 2026-11-11: "make the wetland decision something to address"): what a burned forested wetland converts
+      to.** The GDS test showed a burned swamp converting to Shrubland: Non-sage, the region's shrub class, at a reburn or the
+      window's end. Upland shrub carbon and no burial are wrong for a swamp that stays wet. Options:
+      - the wetland twins convert to a wetland class (`Wetland: Palustrine Scrub-Shrub` or `Palustrine Emergent`, with their own
+        carbon and burial), by a column in `post-disturbance-regions.csv` or a twin-specific row in the settings;
+      - historical runs take the destination from NLCD at the time (90 woody wetland, 95 emergent herbaceous wetland, 52 shrub), as
+        the "conversion destination by NLCD" step plans for every class, and projections use the shares fitted from that;
+      - the twins' waiting class keeps wetland carbon (peat, burial) rather than the upland shrub's, whatever it converts to.
+      Check against the GDS record: how much of the 2008 and 2011 burns NLCD shows as 90, 95 or 52 later. Settle this before
+      calibration (step 7) and before a real wetland library is built on 1.4.
     - Found and fixed by this test (released as 1.3.2): the Projection Setup stopped with "historical run 45 has no 2023 map for DOM:
       Peat". The stock output filter had peat maps off. The library's path also has to stay short: the historical run failed on a
       Windows long path in the scratchpad, and ran fine from `F:\lucasCore\dev\libs\t57`.
