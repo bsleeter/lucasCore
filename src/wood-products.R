@@ -46,7 +46,6 @@ wp_params <- function(dir = file.path("defaults", "wood-products")) {
             roundwood = rd("roundwood-factors.csv"), primary = rd("primary-products.csv"), eu_ratio = rd("end-use-ratios.csv"),
             half_life = rd("end-use-half-lives.csv"), fates = rd("discard-fates.csv"), swds = rd("swds.csv"),
             settings = rd("settings.csv"), uncertainty = rd("uncertainty.csv"), history = rd("regional-harvest-history.csv"))
-  P$setting <- function(k) { v <- P$settings[Setting == k, Value]; if (length(v) != 1) stop("wood products setting missing: ", k); as.numeric(v) }
   P$growing[is.na(ForestTypeGroup), ForestTypeGroup := ""]
   P$crosswalk[is.na(ForestTypeGroup), ForestTypeGroup := ""]; P$crosswalk[is.na(Wood), Wood := ""]
   P$uncertainty[is.na(Material), Material := ""]
@@ -55,6 +54,10 @@ wp_params <- function(dir = file.path("defaults", "wood-products")) {
   wp_check_params(P)
   P
 }
+
+# A setting of settings.csv; wp_set() changes one (the stage's options override the defaults).
+wp_setting <- function(P, k) { v <- P$settings[Setting == k, Value]; if (length(v) != 1) stop("wood products setting missing: ", k); as.numeric(v) }
+wp_set <- function(P, k, v) { if (!k %in% P$settings$Setting) stop("not a wood products setting: ", k); P$settings <- data.table::copy(P$settings)[Setting == k, Value := v]; P }
 
 wp_check_params <- function(P) {
   s <- P$primary[, .(s = sum(Fraction)), by = .(Region, Wood, LogSize)]
@@ -103,7 +106,7 @@ wp_mult <- function(n, k, row, central) {
 }
 
 # Draws of every uncertain parameter. n draws; central = TRUE gives one draw with every multiplier 1 (the published values).
-wp_draws <- function(P, n = P$setting("Draws"), seed = 1L, central = FALSE) {
+wp_draws <- function(P, n = wp_setting(P, "Draws"), seed = 1L, central = FALSE) {
   if (central) n <- 1L
   if (!is.null(seed)) set.seed(seed)
   n <- as.integer(n); D <- list(n = n, central = central)
@@ -132,7 +135,7 @@ wp_draws <- function(P, n = P$setting("Draws"), seed = 1L, central = FALSE) {
     D$dump_hl[, m] <- wp_mult(n, 1, wp_unc(P, "Dump_HalfLives", m), central)
     D$rec_hl[, m] <- wp_mult(n, 1, wp_unc(P, "Recovered_HalfLives", m), central) }
   # the land-clearing utilized share
-  D$lcu <- pmin(1, pmax(0, P$setting("LandClearingUtilized") * wp_mult(n, 1, wp_unc(P, "LandClearingUtilized"), central)[, 1]))
+  D$lcu <- pmin(1, pmax(0, wp_setting(P, "LandClearingUtilized") * wp_mult(n, 1, wp_unc(P, "LandClearingUtilized"), central)[, 1]))
   D
 }
 wp_period <- function(periods, years) vapply(years, function(y) { k <- which(periods$FirstYear <= y & periods$LastYear >= y); if (length(k)) k[1] else if (y < min(periods$FirstYear)) 1L else nrow(periods) }, 1L)
@@ -148,7 +151,7 @@ wp_split <- function(rem, P) {
   if (!"Wood" %in% names(rem)) rem[, Wood := NA_character_]
   bad <- setdiff(unique(rem$Region), P$regions$Region); if (length(bad)) stop("not a wood products region: ", paste(bad, collapse = ", "))
   bad <- setdiff(unique(rem$Cause), c("Harvest", "Clearing")); if (length(bad)) stop("removal cause must be Harvest or Clearing: ", paste(bad, collapse = ", "))
-  rem[, ft := sub("^Forest:\\s*", "", ForestType)]
+  rem[, ft := sub("^[^:]*: *", "", ForestType)]   # "Forest: Douglas-fir Group", "Wetland: Oak/Gum/Cypress Group"
   cw <- P$crosswalk[, .(ft = ForestType, Group = ForestTypeGroup, WoodFix = Wood)]
   rem <- merge(rem, cw, by = "ft", all.x = TRUE)
   unmatched <- unique(rem[!is.na(ft) & is.na(Group), ft])
@@ -242,7 +245,7 @@ wp_enduses <- function(prod, P, D, d, years, loss = TRUE) {
   ny <- length(years); emit_ec <- loss_wood <- loss_paper <- rep(0, ny)
   eu_in <- matrix(0, ny, length(P$end_uses), dimnames = list(NULL, P$end_uses))
   ey <- pmin(pmax(years, min(P$eu_ratio$Year)), max(P$eu_ratio$Year))
-  loss_w <- if (loss) P$setting(WP_SOLID_LOSS) else 0; loss_p <- if (loss) P$setting("LossInUsePaper") else 0
+  loss_w <- if (loss) wp_setting(P, WP_SOLID_LOSS) else 0; loss_p <- if (loss) wp_setting(P, "LossInUsePaper") else 0
   for (p in colnames(prod)) {
     if (!any(prod[, p] > 0)) next
     if (p == WP_FUEL_PRODUCT) { emit_ec <- emit_ec + prod[, p]; next }

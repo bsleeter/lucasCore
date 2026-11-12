@@ -78,7 +78,7 @@ check("in use by end use adds up to the draw mean in use", { a <- m$enduse[Itera
 # ---- land clearing: the unutilized share is emitted the year it is cleared ------------------------------------------------------
 cl <- data.table(Iteration = 1L, Year = 2000L, Region = "NE", ForestType = "Oak/Hickory Group", Cause = "Clearing", Carbon = 100)
 x <- wp_inputs(wp_split(cl, P), P, C, 1L, 2000L)
-check("land clearing: 1 - LandClearingUtilized (0.5) of the wood emitted without energy capture that year", abs(x$emit_no - 100 * (1 - P$setting("LandClearingUtilized"))) < 1e-9)
+check("land clearing: 1 - LandClearingUtilized (0.5) of the wood emitted without energy capture that year", abs(x$emit_no - 100 * (1 - wp_setting(P, "LandClearingUtilized"))) < 1e-9)
 check("land clearing: the utilized half is conserved through products", abs(x$emit_ec + sum(x$eu_in) + x$loss_wood + x$loss_paper + x$emit_no - 100) < 1e-9)
 
 # ---- the split: wood type and log size --------------------------------------------------------------------------------------

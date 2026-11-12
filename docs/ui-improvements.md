@@ -17,7 +17,7 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | later | 55 Grass and shrub stocks fitted to literature (chaparral wood turnover 0.08; non-sage and native sage steppe split by RAP herb share) | Yes | Refit done 2026-11-09 (item 55); left: the RAP tests at the Sky Oaks towers, the foothill chaparral scale | - |
 | next | 56 Run Build stages on their own or a few in sequence, each result a dependency of the next | No (the same results, fewer reruns) | Added 2026-11-10 (user), after the Great Dismal Swamp Build failed in stage 8 after 44 minutes and had to be rerun whole | - |
 | later | 57 A post-disturbance state for forest: regrowth after a delay, or conversion to non-forest, with adjacency to a seed source | Yes (burned forest waits, returns or converts; carbon of the waiting years) | Added 2026-11-11 (user). P26: about a quarter of single high-severity burns are not forest after 30 years in NLCD, and reburns mostly convert | 58 (developed together) |
-| next | 59 Harvested wood products: the fate of the carbon in Forestry Sector, after a run (stage 18, not spatial) | Yes, in reporting (wood products pools and their emissions; an NBP that counts storage in products). The ST-Sim runs do not change | Added 2026-11-11 (user). Forestry Sector has no flows out today, so harvested wood is stored forever | Parameter tables and the model done (item 59, steps 1-2); next the stage |
+| next | 59 Harvested wood products: the fate of the carbon in Forestry Sector, after a run (stage 18, not spatial) | Yes, in reporting (wood products pools and their emissions; an NBP that counts storage in products). The ST-Sim runs do not change | Added 2026-11-11 (user). Forestry Sector has no flows out today, so harvested wood is stored forever | Steps 1-3 done (tables, model, stage 18; not yet run inside Studio); next Run Figures and Compare Runs |
 | later | 58 Management and mitigation for disturbed forest: replanting and restoration, salvage, site preparation, fuel treatments | Yes, in scenarios that turn them on | Added 2026-11-11 (user). Developed with 57 so its structure takes these actions | 57 (developed together) |
 | release | 46 CO2 fertilization | Yes, in projections with a Projection Climate result (Central by default; None turns it off) | Added 2026-11-04; built, tested (Puget run, age-band check), documented (guide 7.3.1) and pushed 2026-11-06. Left: a release | - |
 | later | 47 Example libraries by region and resolution | No (each holds its own results) | Added 2026-11-04, replaces 13. Best built after the open science items, since each carbon change dates them | 14, restore test |
@@ -1450,7 +1450,19 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     again); bark burned with energy capture; mill fuel all energy, as in HWP-C; landfill decay as CO2, as in HWP-C. The model wants
     removals by Smith region, forest type and cause (Harvest or Clearing); the stage (step 3) maps ecodivisions and transition types
     to them. The Northern Region comparison (Stockmann et al. 2012) in the step list was replaced by the national check, which tests
-    more of the chain.
+    more of the chain. User 2026-11-12: keep the 0.5 land-clearing default.
+  - **Step 3, the stage - built 2026-11-12, not yet run inside SyncroSim:** `src/18-wood-products.R` (transformer WoodProducts,
+    "18 - Wood Products"), `src/wood-products-run.R` (the run's `LULC: Harvest` flows by SQL; Smith region from the secondary
+    stratum's state or county, Oregon and Washington by ecodivision, or the Region option; Urbanization and Ag Expansion are land
+    clearing; a projection joined to its history with find_history, the history's iterations recycled), page `ui/WoodProductsView.cs`
+    (run, Region, Draws, Seed, land-clearing share, spin-up), sheets WoodProductsOptions, OutputWoodProducts (Iteration blank = all,
+    Year, Source, Variable, Mean, Lower, Upper), OutputWoodProductsEndUse, OutputWoodProductsScale, OutputWoodProductsFigure (two
+    figures: stocks and stock change; where the removed carbon goes and in use by end use). New datasheets only, so no library update
+    method. `tests/phaseZ30-wood-products.R` runs the stage script with SyncroSim's calls stubbed, read-only: 16 checks pass on
+    lucasCore-projection (runs 10 and 12, California) and Puget Lowlands (59 and 64, PNW West); a projection shares its history's
+    years exactly. Puget: 17.5 Tg C stored in 2023, 0.05 Tg C/yr stock change, as harvest fell from about 1 Tg C/yr (late 1980s) to
+    0.44 while the pre-1985 products decay. Left: run it in Studio once the branch is in the registered package (F:\lucasCore);
+    Smith has no PWW row for many forest groups (they take the regional average, logged).
     A design point for step 2: Smith's industrial roundwood ratios exceed 1 for pulpwood (it also comes from tops and cull, which the
     model keeps in Other Wood), so the stage uses Smith's ratios as shares of the removed carbon, which is conserved.
   - **Steps:** (1) source the parameter tables and write them to `defaults/wood-products` with citations; check that national

@@ -5,11 +5,16 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
 ## Unreleased
 
 ### Added
-- Harvested wood products model (to-do 59, not yet a stage): `src/wood-products.R` follows the carbon that harvest moves to
-  Forestry Sector through products in use, landfills and dumps, with the USFS method (Smith et al. 2006, Skog 2008, the HWP-C
-  calculator) and its parameter tables in `defaults/wood-products`. Tests: `tests/unit-wood-products.R` and
-  `tests/unit-wood-products-national.R`; on a national harvest series the model's stock is within 7% of the US Inventory's and its
-  stock change within 3% (1990-2016).
+- Stage 18 - Wood Products (to-do 59): what becomes of the carbon a run harvests. ST-Sim moves harvest and land-clearing wood to
+  Forestry Sector and nothing flows out of it; this stage follows it through products in use, landfills and dumps, by year, with
+  the USFS harvested wood products model (`src/wood-products.R`: Smith et al. 2006, Skog 2008, the HWP-C calculator; parameter
+  tables and sources in `defaults/wood-products`). Run it in its own scenario on the run's Build result, like Run Figures; a
+  projection is joined to its historical run. Before the run it starts from each region's harvest history from 1906, scaled to the
+  run. Parameter draws (default 100 per iteration) give a 90% interval. New page Wood Products; new output sheets Wood Products,
+  Wood Products by End Use, Wood Products Spin-up and Wood Products Figures (Export > LUCAS Core > Wood Products Figures). On a
+  national harvest series the model's stock is within 7% of the US Inventory's and its stock change within 3% (1990-2016).
+  Tests: `tests/unit-wood-products.R`, `tests/unit-wood-products-national.R`, `tests/phaseZ30-wood-products.R` (the stage on a
+  library's runs, read-only).
 
 ## 1.3.2 - 2026-11-11
 
