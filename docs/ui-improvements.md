@@ -1588,7 +1588,7 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
            some years. The open point is the age itself: NLCD shows forest only once trees have canopy, so a stand it first shows
            as forest is older than 0. On the curves, 20 years is 23-38 Mg C/ha, which the model credits only over the next 20 years.
            Age 0 (user, 2026-11-12) is the conservative choice, and continuous; a young age would credit that carbon in the year of
-           the transition (a jump). Kept; raised with the user.
+           the transition (a jump). Kept (user, 2026-11-12: "Keep age 0").
         7. **Stage 6 (historical runs).** sources.csv row `Reforestation, NlcdPersist, 41|42|43|90`: on where the modal NLCD shows
            forest two years running, as Forest Return. Type gates from `ReforestType.tif` at the start year, as the NaturalVeg
            gates. Only cells in a natural non-forest class can take it: the reforesting cells, and cells a fire converted that NLCD
