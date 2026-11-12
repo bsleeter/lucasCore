@@ -79,4 +79,14 @@ check("Reforestation is a main (spatial) group for stock-flow and a transition s
 check("the 1.4 library update adds the group, the types and the new columns", { u <- paste(readLines(file.path("ui", "LucasCoreUpdates.cs")), collapse = "\n")
   all(vapply(c('"Reforestation: " + y', '"lucasCore_DataSource", "BpsFile"', '"ReforestTypeFileName"', '"BpsForestShareFileName"'), grepl, TRUE, u, fixed = TRUE)) })
 check("stage 6 reads Reforestation from NLCD (NlcdPersist on 41-43, not woody wetland) and takes the stage 5 maps and Reforestation Options", fread(file.path("defaults", "transitions", "sources.csv"))[TransitionGroupId == "Reforestation", Source == "NlcdPersist" && Classes == "41|42|43"] && grepl('programArguments="src/6-historical-transitions.R">[^<]*(<dataSheet [^>]*>[^<]*)*<dataSheet name="ReforestationOptions" type="Input"/>[^<]*<dataSheet name="OutputLandCoverLayers" type="Input"/>', paste(readLines("package.xml"), collapse = " ")))
+# the projection (step 8)
+check("Recent Years: blank is 10, a number is kept, 0 stops", reforest_options(data.table())$recent_years == 10L && reforest_options(data.table(RecentYears = 5L))$recent_years == 5L &&
+      inherits(try(reforest_options(data.table(RecentYears = 0L)), silent = TRUE), "try-error"))
+pt8 <- fread(file.path("defaults", "projection", "transitions.csv"))[TransitionGroupId == "Reforestation"]
+check("projection: Reforestation is a Target group in its own sampling set", nrow(pt8) == 1 && pt8$Method == "Target" && pt8$SamplingSet == "Reforestation")
+al8 <- fread(file.path("defaults", "projection", "allocation.csv"))[TransitionGroupId == "Reforestation"]
+check("projection: a fitted Reforestation surface from barren, shrub, grass and emergent wetland, events by the stage 5 rule", nrow(al8) == 1 && al8$Method == "Fitted" && al8$SourceClasses == "31|52|71|95" && al8$EventClasses == "Reforestation")
+cv8 <- fread(file.path("defaults", "projection", "covariates.csv"))[Surface == "Reforestation" & Include == "Yes", Covariate]
+check("projection: the Reforestation surface has forest potential, distance to forest and forest share", setequal(cv8, c("Forest potential (BpS)", "Distance to forest", "Forest share within 1 km")) &&
+      all(vapply(cv8, function(k) grepl(sprintf("`%s` = ", k), paste(readLines(file.path("src", "10-transition-suitability.R")), collapse = "\n"), fixed = TRUE), TRUE)))
 cat(sprintf("%d passed, %d failed\n", n_ok, n_bad)); if (n_bad) quit(status = 1)

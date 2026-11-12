@@ -54,6 +54,8 @@ pt <- read_ds("ProjectionTransition")
 if (!nrow(pt)) { pt <- read_default("projection", "transitions.csv"); src_rules <- "defaults/projection/transitions.csv"
 } else { setnames(pt, "UnitSourceId", "UnitSource", skip_absent = TRUE); src_rules <- "the Projection Transitions sheet" }
 pt[, Method := sub(" .*", "", Method)]; pt[, StrataLevel := sub(" .*", "", StrataLevel)]
+source(pkg_file("src", "reforestation.R")); ro9 <- reforest_options(read_ds("ReforestationOptions"))   # (to-do 57: off = no Reforestation in the projection)
+if (!ro9$enabled && any(pt$TransitionGroupId == "Reforestation")) { pt[TransitionGroupId == "Reforestation", Method := "None"]; say("Reforestation: off (Reforestation Options)") }
 for (k in c("UnitSource", "ExcludeGap", "SamplingSet", "StrataLevel")) if (!k %in% names(pt)) pt[, (k) := NA_character_]
 pt[is.na(SamplingSet) | !nzchar(SamplingSet), SamplingSet := TransitionGroupId]
 bad <- pt[!Method %in% c("Target", "Probability", "None")]; if (nrow(bad)) fail("Projection Transitions: unknown method for %s", paste(bad$TransitionGroupId, collapse = "; "))
@@ -66,7 +68,7 @@ ic <- as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", optional = 
 if (!nrow(ic) || is.na(ic$StateClassFileName[1])) fail("no state class map: run stages 1, 5 and 6 first")
 P <- rast(ic$StratumFileName[1]); S2 <- rast(ic$SecondaryStratumFileName[1]); S3 <- rast(ic$TertiaryStratumFileName[1]); S <- rast(ic$StateClassFileName[1])
 home_coverage(P)   # Data Sources read from the home folder must hold the study area (shared.R)
-land <- !is.na(values(P, mat = FALSE)); vS <- values(S, mat = FALSE)
+land <- !is.na(values(P, mat = FALSE)); vS <- values(S, mat = FALSE); vS0 <- vS   # vS0: the Build's start-year classes, kept when a hand-over replaces S (Reforestation's history needs them)
 
 # ---- mode 2: a stand-alone projection starts from a historical run's final maps (Projection Start) ----------------------------
 # The historical run (a result scenario in this library, made with tools/new-historical.R --historical-only --bookend-maps) gives the
@@ -177,6 +179,15 @@ first_time <- function(g, y) { f <- hist_file(g, y); if (is.na(f) || !grepl("^Nl
   n <- nlcd_year(y); p <- nlcd_prev(y); h <- had_before(y); lv <- match(n, DEV)
   again <- (!is.na(lv) & !(p %in% DEV) & h$dev) | (!is.na(lv) & p %in% DEV & h$lev >= lv) | (n %in% c(81L, 82L) & h$ag)
   !again }
+# Reforestation (to-do 57 step 8): stage 6's map is NLCD forest two years running everywhere, and only cells in a natural non-forest
+# class have a pathway, so its historical area in year y is the cells whose start-year class can reforest and that NLCD first shows as
+# forest two years running in y - what the historical run realizes (fire-converted cells aside)
+refo_first <- NULL; refo_el <- NULL
+refo_ok <- function(g, y) { if (!identical(g, "Reforestation")) return(rep(TRUE, length(land)))
+  if (is.null(refo_first)) { fy <- rep(NA_integer_, length(land)); yy <- sort(nl$Year); prev <- nlcd_year(yy[1]) %in% 41:43
+    for (k in yy[-1]) { cur <- nlcd_year(k) %in% 41:43; hit <- is.na(fy) & prev & cur; fy[hit] <- k; prev <- cur }
+    refo_first <<- fy; refo_el <<- land & vS0 %in% src_ids("Reforestation") }   # (the start-year classes, not a hand-over's end state: found 2026-11-12, 0 or inflated targets)
+  refo_el & refo_first %in% y }
 # Projection Options > Targets From Historical Run (user decision 2026-11-05): every Target group's area per unit and reference year is what
 # that run realized there, so the projection continues at the rate the historical period could reproduce; blank = the historical maps
 tgt_run <- if ("TargetsScenarioId" %in% names(po)) nz(po$TargetsScenarioId, NA) else NA
@@ -204,9 +215,13 @@ gap <- if (any(!is.na(pt$ExcludeGap) & nzchar(pt$ExcludeGap))) unit_map("GAP Sta
 progressBar()
 
 # ---- the draws -----------------------------------------------------------------------------------------------------------
+# Reforestation (to-do 57 step 8; user 2026-11-12: the recent years' rate): its own sampling set draws from the last Recent Years
+# (Reforestation Options, default 10) of the reference period, since the CONUS rate falls by decade (about 610 to 170 kha a year)
+ref_of <- function(s) if (identical(s, "Reforestation")) tail(ref, ro9$recent_years) else ref
 sets <- sort(unique(pt[Method != "None", SamplingSet]))
 sched <- rbindlist(lapply(seq_along(sets), function(i) { set.seed(seed * 1000L + i)
-  d <- CJ(Iteration = seq_len(nit), Timestep = pyrs); d[, `:=`(SamplingSet = sets[i], HistoricalYear = sample(ref, .N, replace = TRUE))]; d }))
+
+  d <- CJ(Iteration = seq_len(nit), Timestep = pyrs); d[, `:=`(SamplingSet = sets[i], HistoricalYear = sample(ref_of(sets[i]), .N, replace = TRUE))]; d }))
 check(STAGE, "every draw is a reference year", all(sched$HistoricalYear %in% ref))
 say("Sampling sets: %s", paste(sprintf("%s (%s)", sets, vapply(sets, function(s) paste(pt[SamplingSet == s, .N], "groups"), "")), collapse = "; "))
 
@@ -236,7 +251,7 @@ for (i in seq_len(nrow(tg))) { g <- tg$TransitionGroupId[i]; L <- tg$StrataLevel
           M[, j] <- M[, j] * ifelse(all_k > 0, first_k / all_k, 1) }
         if (sum(M0) > 0) say("%s: first-time gains are %.0f%% of what the run realized", m, 100 * sum(M) / sum(M0)) }
       return(M) }
-    a <- vapply(ref, function(y) { v <- hist_vals(m, y) * fits_prev(m, y) * first_time(m, y); vapply(units, function(k) sum(v[land & u == k]), 0) }, numeric(length(units)))
+    a <- vapply(ref, function(y) { v <- hist_vals(m, y) * fits_prev(m, y) * first_time(m, y) * refo_ok(m, y); vapply(units, function(k) sum(v[land & u == k]), 0) }, numeric(length(units)))
     matrix(a, nrow = length(units), dimnames = list(units, ref)) * cell_amt })
   a <- Reduce(`+`, am)
   dr <- sched[SamplingSet == tg$SamplingSet[i]]
@@ -271,7 +286,7 @@ for (i in seq_len(nrow(tg))) { g <- tg$TransitionGroupId[i]; L <- tg$StrataLevel
   el <- elig(g); share <- if (length(ex)) sum(el & !(gap %in% ex)) / max(1, sum(el)) else 1
   rates[[g]] <- data.table(TransitionGroup = g, Method = "Target", Unit = nm, MeanArea = rowMeans(a) / cell_amt * cell_km2,
                            MinArea = apply(a, 1, min) / cell_amt * cell_km2, MaxArea = apply(a, 1, max) / cell_amt * cell_km2, AllowedShare = share)
-  say("%s: target by %s (%d units), mean %.2f km2/yr over %d-%d (%s)%s", g, L, length(units), sum(rowMeans(a)) / cell_amt * cell_km2, rs, re, if (is.null(TR)) "the historical maps" else sprintf("realized in run %s", tgt_run),
+  ry <- ref_of(tg$SamplingSet[i]); say("%s: target by %s (%d units), mean %.2f km2/yr over %d-%d (%s)%s", g, L, length(units), sum(rowMeans(a[, match(ry, ref), drop = FALSE])) / cell_amt * cell_km2, min(ry), max(ry), if (is.null(TR)) "the historical maps" else sprintf("realized in run %s", tgt_run),
       if (length(ex)) sprintf("; %.0f%% of eligible land allowed (not GAP %s)", 100 * share, paste(ex, collapse = ", ")) else "") }
 progressBar()
 

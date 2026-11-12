@@ -1609,6 +1609,24 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
            `Reforestation`, SourceClasses 31|52|71|95, EventClasses 41|42|43|90. covariates.csv: new forest potential (BpS forest
            share), distance to forest and forest share within 1 km, with elevation, slope and land cover. The destination type in
            projections: `ReforestType.tif` (step 4).
+           DONE 2026-11-12. Stage 9: Reforestation is a Target group in its own sampling set, drawing from the last Recent Years
+           (Reforestation Options, new column, default 10) of the reference period; its historical area in a year is the cells whose
+           Build start-year class can reforest and that NLCD first shows as forest two years running that year (stage 6's map is NLCD
+           forest everywhere, so the plain map would have counted every forest cell). Stage 10: Event Classes "Reforestation" = the
+           stage 5 rule per fitting cell (`reforest_pick` on the fitting grid's NLCD, BpS potential and the cutoff by ecodivision), so
+           regrowth after clearcut or fire is not an event; new built-in covariates Forest potential (BpS) (forest share of the cell),
+           Distance to forest and Forest share within 1 km (NLCD 41-43 by epoch), the Reforestation surface's rows in covariates.csv,
+           and their effect curves in Suitability Curves. Stages 9 and 10 take Reforestation Options. tools/new-projection.R gained
+           --base and --also (a setup on a quick-test result). Lassen (setup result 22, 150 m fitting grid; the other surfaces set to
+           None, to-do 60): 155 events, out of sample AUC 0.79 (fit 1986-2012, scored on 2013-2023; the top 10% of eligible land held
+           22% of the later reforestation); suitability rises with forest potential and forest share and falls steeply with distance
+           to forest (map and curves `dev/reforestation/lassen-surface.R`, png not committed). 10-year projection (result 21): 229.5 ha
+           reforested against 216 ha of targets (iteration 1), within a cell a year. Found by the test: in a projection that starts
+           from a historical run, stage 9 replaced the start map by the run's 2023 state before counting Reforestation's history,
+           so its target was 0 (the reforested cells are forest by then); it now uses the Build's start-year classes. Note: on
+           forest potential reforestation can only show after the cutoff (24 years at Lassen, so 2009 on), so the recent-years rate
+           (about 0.2 km2 a year at Lassen, against 0.07 over the whole record) is the rate of the record's late years; it will run
+           high late in a long projection as the stock of cells recovering from disturbance before 1985 runs down (open).
         9. **Tests.** tests/unit-reforestation.R: the cutoff table's resolution and the override, the cell readings, the pathway
            table (every source class to every forest type, no disturbed classes). tests/unit-regrowth-age.R updated for the
            per-cell cutoff. End to end on P26 or Puget (both have rule cells; GDS has few): stages 5 and 6, a short historical

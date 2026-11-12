@@ -11,3 +11,4 @@ Forest Harvest: Forest Clearcut [Type],Fitted,Clearcut,41|42|43,LCMS:standrep,No
 Forest Harvest: Forest Selection [Type],Fitted,Selection,41|42|43,LCMS:partial,No,Auto,LCMS Tree Removal on forest that stays forest (the stage 6 selection source)
 Ag Change: Cropland to Pasture [Type],Adjacency,Ag Change to Pasture,82,81,Yes,Auto,"cropland -> pasture: adjacency to pasture only (no covariates), the curve read from the annual maps"
 Ag Change: Pasture to Cropland [Type],Adjacency,Ag Change to Cropland,81,82,Yes,Auto,pasture -> cropland: adjacency to cropland only
+Reforestation,Fitted,Reforestation,31|52|71|95,Reforestation,No,Auto,"to-do 57 step 8: barren, shrub, grass or emergent wetland that reforests by the stage 5 rule (first forest, persisting, on BpS non-forest or after the cutoff on BpS forest; regrowth after clearcut or fire is not an event); the stage 6 type gates pick the forest type"

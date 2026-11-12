@@ -517,6 +517,7 @@
 		<column name="Enabled" displayName="Reforestation Transition (blank = on)" dataType="Boolean" isOptional="True"/>
 		<column name="CutoffYears" displayName="Cutoff, Years After the Start Year (blank = fitted by ecodivision)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="1" formula2="60"/>
 		<column name="RiparianAs" displayName="LANDFIRE BpS Riparian and Savanna Read As" dataType="Integer" validationType="List" formula1="1:Forest potential|2:Non-forest potential" isOptional="True" defaultValue="1"/>
+		<column name="RecentYears" displayName="Projection Draws From the Last N Historical Years (blank = 10)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1"/>
 	</dataSheet>
 
 	<!-- Carbon Assumptions: Growth Inputs (to-do 29) - per forest type, the inputs of the growth curves (stage 2) and live carbon flows
@@ -1215,6 +1216,7 @@
 
 	<transformer name="ProjectionTransitions" displayName="9 - Projection Transitions" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/9-projection-transitions.R">
 		<dataSheet name="BuildOptions" type="Input"/>
+		<dataSheet name="ReforestationOptions" type="Input"/>
 		<dataSheet name="FireOptions" type="Input"/>
 		<dataSheet name="ProjectionOptions" type="Input"/>
 		<dataSheet name="ProjectionStart" type="Input"/>
@@ -1244,6 +1246,7 @@
 		<dataSheet name="SuitabilityOptions" type="Input"/>
 		<dataSheet name="SuitabilityRegion" type="Input"/>
 		<dataSheet name="SuitabilityCovariate" type="Input"/>
+		<dataSheet name="ReforestationOptions" type="Input"/>
 		<dataSheet name="RuleWeight" type="Input"/>
 		<dataSheet name="OutputNlcdAnnual" type="Input"/>
 		<dataSheet name="OutputProjectionSchedule" type="Input"/>

@@ -43,15 +43,17 @@ reforest_cutoff <- function(eco, tab = read_default("landcover", "reforestation-
 }
 
 # The scenario's Reforestation Options (single row; package.xml ReforestationOptions): enabled (blank = TRUE), cutoff override
-# (blank = NA: the fitted table), how riparian and savanna BpS read (1 or blank = "forest", 2 = "non-forest")
+# (blank = NA: the fitted table), how riparian and savanna BpS read (1 or blank = "forest", 2 = "non-forest"), and the projection's
+# recent years (blank = 10: Reforestation draws its historical years from the last 10 of the reference period)
 reforest_options <- function(x) {
   x <- data.table::as.data.table(x); g <- function(k) if (nrow(x) && k %in% names(x)) x[[k]][1] else NA
-  en <- g("Enabled"); cy <- suppressWarnings(as.numeric(g("CutoffYears")))
+  en <- g("Enabled"); cy <- suppressWarnings(as.numeric(g("CutoffYears"))); ry <- suppressWarnings(as.integer(g("RecentYears"))); if (is.na(ry)) ry <- 10L
+  if (ry < 1) stop(sprintf("Reforestation Options: Recent Years is %s; give 1 or more", ry))
   ra <- g("RiparianAs"); ra <- if (is.character(ra) || is.factor(ra)) c(`forest potential` = 1L, `non-forest potential` = 2L)[tolower(trimws(as.character(ra)))] else suppressWarnings(as.integer(ra))   # (rsyncrosim gives the list label)
   ra <- unname(ra); if (length(ra) && is.na(ra) && is.character(g("RiparianAs")) && nzchar(g("RiparianAs"))) stop(sprintf("Reforestation Options: Riparian and Savanna Read As is %s; use Forest potential or Non-forest potential", g("RiparianAs")))
   if (!is.na(ra) && !ra %in% 1:2) stop(sprintf("Reforestation Options: Riparian and Savanna Read As is %s; use 1 (forest potential) or 2 (non-forest)", ra))
   list(enabled = is.na(en) || isTRUE(as.logical(en)) || identical(toupper(as.character(en)), "YES"),
-       cutoff = cy, riparian_as = if (!is.na(ra) && ra == 2L) "non-forest" else "forest")
+       cutoff = cy, riparian_as = if (!is.na(ra) && ra == 2L) "non-forest" else "forest", recent_years = ry)
 }
 
 # Which candidate cells reforest (to-do 57 step 4). nl: NLCD codes, one row per candidate cell (natural, not forest at the start,

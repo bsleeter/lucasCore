@@ -74,7 +74,8 @@ src <- read_data_sources(c("NlcdFolder", "FirePerimeterHistoryFile", "RoadsFile"
 # ---- covariates, per surface ---------------------------------------------------------------------------------------------------
 BUILTIN <- c(`Distance to developed land` = "s(lDistDev, k = 8)", `Developed share within 1 km` = "s(DevShare, k = 6)", `Housing density (census decade)` = "s(lHU, k = 6)",
              `Distance to roads` = "s(lDistRoad, k = 6)", Slope = "s(Slope, k = 6)", Elevation = "s(Elev, k = 6)", `Land cover` = "LC", `GAP status` = "GAP", County = "s(County, bs = \"re\")",
-             `Distance to agriculture` = "s(lDistAg, k = 6)", `Agriculture share within 1 km` = "s(AgShare, k = 6)", `Crop productivity (NCCPI)` = "s(Nccpi, k = 6)", `Forest owner type` = "Owner")
+             `Distance to agriculture` = "s(lDistAg, k = 6)", `Agriculture share within 1 km` = "s(AgShare, k = 6)", `Crop productivity (NCCPI)` = "s(Nccpi, k = 6)", `Forest owner type` = "Owner",
+             `Forest potential (BpS)` = "s(BpsForest, k = 6)", `Distance to forest` = "s(lDistFor, k = 6)", `Forest share within 1 km` = "s(ForShare, k = 6)")   # (the last three: to-do 57, Reforestation)
 cv <- read_ds("SuitabilityCovariate"); cv_src <- "the Suitability Covariates sheet"
 if (!nrow(cv)) { cv <- read_default("projection", "covariates.csv"); cv_src <- "defaults/projection/covariates.csv" }
 for (k in c("Surface", "Name", "File")) if (!k %in% names(cv)) cv[, (k) := NA_character_]
@@ -89,6 +90,9 @@ lc_kinds <- unique(sub("^LCMS:\\s*", "", grep("^LCMS:", al[Method == "Fitted", E
 if (any(!lc_kinds %in% c("standrep", "partial"))) fail("Projection Allocation: LCMS events are LCMS:standrep or LCMS:partial")
 ag_ev <- function(e) { k <- suppressWarnings(codes_of(e)); length(k) > 0 && all(k %in% 81:82) }
 need_ag <- any(c("Distance to agriculture", "Agriculture share within 1 km") %in% need) || any(al[Method == "Fitted" & Adjacency == TRUE, vapply(EventClasses, ag_ev, TRUE)])
+need_for <- any(c("Distance to forest", "Forest share within 1 km") %in% need); need_bps <- "Forest potential (BpS)" %in% need
+rf_ev <- function(e) identical(trimws(as.character(e)), "Reforestation")   # Event Classes "Reforestation": the stage 5 rule per pixel (below)
+need_rf <- any(vapply(al[Method == "Fitted", EventClasses], rf_ev, TRUE))
 rows <- sources_from_sheet(as.data.table(datasheet(prj, ds("StratumSource"), optional = TRUE, lookupsAsFactors = FALSE)))
 by_num <- setNames(rows, vapply(rows, function(s) as.character(s$Number), ""))
 ul <- stsim_list("SecondaryStratum"); ul[, Id := as.integer(Id)]
@@ -219,6 +223,38 @@ if (length(lc_kinds)) { todo <- YRS[-1][!file.exists(vapply(YRS[-1], lc_c, ""))]
       r <- rast(a$f[i]); r <- crop(r, project(as.polygons(ext(a$E), crs = crs(g)), crs(r)), snap = "out"); levels(r) <- NULL
       e <- r == 9; e <- project(e, rast(ext(a$E), res = 30, crs = crs(g)), method = "near"); if (a$fact > 1) e <- aggregate(e, a$fact, "mean", na.rm = TRUE)
       writeRaster(resample(e, g, method = "near") >= 0.5, a$out[i], datatype = "INT1U", gdal = "COMPRESS=DEFLATE", overwrite = TRUE); NULL }, a = a); stopCluster(cl) } }
+# ---- reforestation layers (to-do 57 step 8) ---------------------------------------------------------------------------------------
+# forest distance and share by epoch (NLCD 41-43), as the agriculture ones
+if (need_for) { todo <- EPOCHS[!file.exists(vapply(EPOCHS, ep_c, "", k = "forshare"))]
+  if (length(todo)) { cl <- makeCluster(length(todo)); a <- list(inp = vapply(todo, nl_c, ""), dd = vapply(todo, ep_c, "", k = "distfor"), ds = vapply(todo, ep_c, "", k = "forshare"), win = win, clear = clear_syncrosim_proj)
+    parLapply(cl, seq_along(todo), function(i, a) { library(terra); a$clear(); terraOptions(progress = 0, memfrac = 0.06)
+      d <- rast(a$inp[i]) %in% 41:43
+      writeRaster(distance(ifel(d, 1, NA)), a$dd[i], datatype = "FLT4S", gdal = "COMPRESS=DEFLATE", overwrite = TRUE)
+      writeRaster(focal(d, w = a$win, fun = "mean", na.rm = TRUE), a$ds[i], datatype = "FLT4S", gdal = "COMPRESS=DEFLATE", overwrite = TRUE); NULL }, a = a); stopCluster(cl) } }
+# BpS potential on the fitting grid (src/reforestation.R; Reforestation Options for riparian and savanna): the forest share of each
+# fitting cell's 30 m pixels (covariate Forest potential (BpS)) and the most common potential (1 forest, 2 non-forest, 3 other)
+if (need_bps || need_rf) { source(pkg_file("src", "reforestation.R")); ro10 <- reforest_options(read_ds("ReforestationOptions"))
+  if (!file.exists(cf("bpsforest")) || !file.exists(cf("bpspot"))) { bfile <- read_data_sources("BpsFile")$BpsFile
+    lk <- bps_lookup(); b <- crop(rast(bfile), project(as.polygons(E30, crs = crs(ref)), crs(rast(bfile))), snap = "out"); levels(b) <- NULL
+    b <- classify(b, cbind(lk$VALUE, match(bps_potential(lk$VALUE, lk, ro10$riparian_as), c("forest", "non-forest", "other"))), others = 3L)
+    b <- project(b, rast(E30, res = 30, crs = crs(ref)), method = "near")
+    bfr <- if (fact > 1) aggregate(b == 1, fact, "mean", na.rm = TRUE) else (b == 1); bpo <- if (fact > 1) aggregate(b, fact, "modal", na.rm = TRUE) else b
+    writeRaster(resample(bfr, G, method = "near"), cf("bpsforest"), datatype = "FLT4S", gdal = "COMPRESS=DEFLATE", overwrite = TRUE)
+    writeRaster(resample(bpo, G, method = "near"), cf("bpspot"), datatype = "INT1U", gdal = "COMPRESS=DEFLATE", overwrite = TRUE) } }
+# Event Classes "Reforestation": the year each fitting cell reforests by stage 5's rule (src/reforestation.R reforest_pick): not forest
+# at the start, first forest (41-43) two years running from the second year on, forest in 2/3 of the years after, and on BpS non-forest
+# or at or after its ecodivision's cutoff on BpS forest. The event is that first forest year; earlier regrowth (before the cutoff, as
+# after a clearcut or fire) is neither event nor control once the cell is forest
+rfy_c <- cf(sprintf("refoyear_c%s", if (need_rf && !is.na(ro10$cutoff)) as.integer(ro10$cutoff) else "fit"))
+if (need_rf && !file.exists(rfy_c)) {
+  ep <- read_sf(read_data_sources("EcodivisionFile")$EcodivisionFile); stl10 <- stsim_list("Stratum")
+  eco_r <- rasterize(vect(st_transform(ep, crs(G))), G, field = "StrtmId"); en10 <- stl10$Name[match(values(eco_r, mat = FALSE), as.integer(stl10$Id))]
+  cut <- reforest_cutoff(en10, override = ro10$cutoff); pot <- c("forest", "non-forest", "other")[values(rast(cf("bpspot")), mat = FALSE)]; pot[is.na(pot)] <- "other"
+  NL <- rast(vapply(YRS, nl_c, "")); m <- values(NL); keep <- which(!is.na(m[, 1]) & !(m[, 1] %in% 41:43) & rowSums(m >= 41 & m <= 43, na.rm = TRUE) > 0)
+  out <- rep(NA_integer_, nrow(m))
+  if (length(keep)) { pk <- reforest_pick(m[keep, , drop = FALSE], YRS, pot[keep], cut[keep]); hit <- keep[pk$reforest]; out[hit] <- as.integer(y0 + pk$first[pk$reforest]) }
+  writeRaster(setValues(rast(G), out), rfy_c, datatype = "INT2U", gdal = "COMPRESS=DEFLATE", overwrite = TRUE)
+  say("Reforestation events: %d fitting cells reforest by the stage 5 rule (cutoff %s), %d-%d", sum(!is.na(out)), if (is.na(ro10$cutoff)) "fitted by ecodivision" else ro10$cutoff, min(c(out, NA), na.rm = TRUE), max(c(out, NA), na.rm = TRUE)) }
 for (i in seq_len(nrow(custom))) { k <- make.names(custom$Name[i]); if (is.na(custom$File[i]) || !file.exists(custom$File[i])) fail("Suitability Covariates: custom raster %s not found (%s)", custom$Name[i], custom$File[i])
   f <- cf(paste0("custom_", k)); if (!file.exists(f)) writeRaster(resample(rast(custom$File[i]), G, method = "bilinear"), f, overwrite = TRUE) }
 say("Fitting layers ready: annual NLCD %d-%d, developed%s distance and share (epochs %s), roads, terrain, GAP, county, housing density 1990-2020, fire perimeters%s%s%s%s",
@@ -233,8 +269,10 @@ layer_paths <- function(y) c(DistDev = ep_c(epoch_of(y), "distdev"), DevShare = 
   Slope = cf("slope"), Elev = cf("elev"), GAP = cf("gap"), County = cf("county"),
   if (need_ag) c(DistAg = ep_c(epoch_of(y), "distag"), AgShare = ep_c(epoch_of(y), "agshare")),
   if (file.exists(cf("nccpi"))) c(Nccpi = cf("nccpi")), if (file.exists(cf("owner"))) c(Owner = cf("owner")),
+  if (need_for) c(DistFor = ep_c(epoch_of(y), "distfor"), ForShare = ep_c(epoch_of(y), "forshare")), if (need_bps) c(BpsForest = cf("bpsforest")),
   setNames(vapply(make.names(custom$Name), function(k) cf(paste0("custom_", k)), ""), make.names(custom$Name)))
 covs <- function(d) { d[, `:=`(lDistDev = log1p(DistDev), lDistRoad = log1p(DistRoad), lHU = log1p(HU))]; if ("DistAg" %in% names(d)) d[, lDistAg := log1p(DistAg)]
+  if ("DistFor" %in% names(d)) d[, lDistFor := log1p(DistFor)]
   if ("Owner" %in% names(d)) d[, Owner := OWNERS[as.character(Owner)]]; d }
 # a surface's model terms
 terms_for <- function(s) { on <- cov_for(s); cu <- on[Covariate == "Custom raster"]
@@ -262,7 +300,8 @@ for (sname in unique(al$Surface)) {
   sc <- codes_of(gs$SourceClasses[1]); exg <- codes_of(gs$ExGap[1]); inS <- function(x) if (length(sc)) x %in% sc else !(x %in% NOT_SOURCE)
   lft <- if (grepl("^LANDFIRE:", gs$EventClasses[1])) sub("^LANDFIRE:\\s*", "", gs$EventClasses[1]) else NA_character_
   lck <- if (grepl("^LCMS:", gs$EventClasses[1])) sub("^LCMS:\\s*", "", gs$EventClasses[1]) else NA_character_
-  to <- if (is.na(lft) && is.na(lck)) suppressWarnings(codes_of(gs$EventClasses[1])) else integer()
+  rft <- rf_ev(gs$EventClasses[1])
+  to <- if (is.na(lft) && is.na(lck) && !rft) suppressWarnings(codes_of(gs$EventClasses[1])) else if (rft) 41:43 else integer()
   if (meth == "Fitted" && is.na(lft) && is.na(lck) && (!length(to) || anyNA(to))) fail("Projection Allocation: surface %s needs Event Classes (NLCD codes, LANDFIRE:<type> or LCMS:standrep|partial)", sname)
   # adjacency in the run: developed share for developed events, agriculture share for agriculture events
   # (Method Adjacency: the share of the class the cell becomes - pasture for cropland to pasture, cropland for the reverse)
@@ -299,7 +338,7 @@ for (sname in unique(al$Surface)) {
     a <- list(nl = setNames(vapply(YRS, nl_c, ""), YRS), lp = lapply(setNames(YRS[-1], YRS[-1]), function(y) layer_paths(y - 1)), bf = setNames(vapply((y0 - burn_w):y1, bf, ""), (y0 - burn_w):y1),
               lf = if (!is.na(lft)) setNames(vapply(YRS[-1], lf_c, "", t = lft), YRS[-1]) else NULL, reg = reg_file(sname), gap = cf("gap"), sc = sc, nots = NOT_SOURCE, exg = exg,
               lc = if (!is.na(lck)) setNames(vapply(YRS[-1], lc_c, ""), YRS[-1]) else NULL, kind = lck, y0 = y0, y1 = y1, fk = if (flick_n > 0) fk else NA_character_, fn = flick_n,
-              to = to, nctrl = nctrl, bw = burn_w, nc = ncol(G), patch = patch_sizes, clear = clear_syncrosim_proj)
+              to = to, nctrl = nctrl, bw = burn_w, nc = ncol(G), patch = patch_sizes, clear = clear_syncrosim_proj, rfy = if (rft) rfy_c else NULL)
     res_y <- parLapply(cl, YRS[-1], function(y, a) { a$clear(); terraOptions(progress = 0, memfrac = 0.04)
       v <- function(f) values(rast(f), mat = FALSE); inS <- function(x) if (length(a$sc)) x %in% a$sc else !(x %in% a$nots)
       p <- v(a$nl[[as.character(y - 1)]]); q <- v(a$nl[[as.character(y)]]); g <- v(a$gap); rg <- v(a$reg)
@@ -307,7 +346,8 @@ for (sname in unique(al$Surface)) {
       el <- which(!is.na(rg) & !is.na(p) & inS(p) & !(g %in% a$exg) & !burn)
       # LCMS: Tree Removal, stand-replacing when NLCD shows shrub or grass that year or within two; no tree removal is a control
       tr <- if (!is.null(a$lc)) { e <- v(a$lc[[as.character(y)]])[el]; !is.na(e) & e > 0 } else rep(FALSE, length(el))
-      isev <- if (!is.null(a$lf)) { e <- v(a$lf[[as.character(y)]])[el]; !is.na(e) & e > 0
+      isev <- if (!is.null(a$rfy)) { e <- v(a$rfy)[el]; !is.na(e) & e == y   # Reforestation: the stage 5 rule's year
+      } else if (!is.null(a$lf)) { e <- v(a$lf[[as.character(y)]])[el]; !is.na(e) & e > 0
       } else if (!is.null(a$lc)) { sr <- Reduce(`|`, lapply(y:min(y + 2, a$y1), function(k) v(a$nl[[as.character(k)]])[el] %in% c(52, 71)))
         if (a$kind == "standrep") tr & sr else tr & !sr
       } else q[el] %in% a$to
@@ -361,7 +401,7 @@ for (sname in unique(al$Surface)) {
     out_sum[[length(out_sum) + 1]] <- data.table(Surface = sname, Item = c("Events (km2)", "Controls", "Deviance explained"), Value = c(nev * res_f^2 / 1e6, smp[Event == 0, .N], sm_m$dev.expl),
       Note = c(sprintf("%d m cells, %d-%d, fitting region", res_f, y0 + 1, y1), "weighted to the unchanged land of each year", paste(tm, collapse = " + ")))
     # response curves (others at typical unchanged-land values)
-    CONT <- c("lDistDev", "DevShare", "lHU", "lDistRoad", "Slope", "Elev", "lDistAg", "AgShare", "Nccpi", make.names(custom$Name))
+    CONT <- c("lDistDev", "DevShare", "lHU", "lDistRoad", "Slope", "Elev", "lDistAg", "AgShare", "Nccpi", "BpsForest", "lDistFor", "ForShare", make.names(custom$Name))
     base <- smp[Event == 0][1][rep(1, 60)]; vs <- intersect(CONT, all.vars(form))
     for (k in vs) {
       xs <- seq(quantile(smp[[k]], 0.01, na.rm = TRUE), quantile(smp[[k]], 0.99, na.rm = TRUE), length.out = 60); nd <- copy(base)

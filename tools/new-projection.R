@@ -9,7 +9,9 @@
 # A setup made without the hand-over still works with --stage9: the projection then runs stage 9 itself (names the historical run in
 # Projection Start) before ST-Sim, as before - but such scenarios cannot run under multi-scenario multiprocessing.
 # Usage: Rscript tools/new-projection.R <library.ssim> --build=<Projection Setup result> [--climate=<Projection Climate result>] [--years=10]
-#                                       [--iterations=<n>] [--name="..."] [--replace]
+#                                       [--iterations=<n>] [--name="..."] [--replace] [--base=<Build result>] [--also=<id,...>]
+#   --base        the Build result the setup was made on (default: found among the setup's dependencies by its name, "Build ...")
+#   --also        further results after it (a setup on a quick-test result: --base=<the quick test> --also=<the Build it reran stages on>)
 #        Rscript tools/new-projection.R <library.ssim> --build=<result> --historical=<result id> --stage9 [...]   (legacy)
 #   --years       projection years to run (default 10; at most to the projection end)
 #   --iterations  Monte Carlo iterations (default: the setup's, the draws stage 9 made)
@@ -30,7 +32,9 @@ sfd <- if (is.na(sfd)) integer(0) else sfd
 setup <- nrow(suppressWarnings(as.data.table(datasheet(B, "lucasCore_OutputSuitability", optional = TRUE)))) > 0 || grepl("^Projection Setup", sc[ScenarioId == bid, Name])
 build_of <- NA_integer_
 if (setup) { par <- sc[ScenarioId == bid, ParentId]; d <- as.data.table(dependency(scenario(L, if (is.na(par)) bid else par)))
-  build_of <- d[grepl("Build", Name, fixed = TRUE), ScenarioId][1]; if (is.na(build_of)) stop("cannot find the Build result the Projection Setup was made on") }
+  build_of <- suppressWarnings(as.integer(opt("base", NA)))   # --base: a setup on a quick-test result (its name has no "Build")
+  if (is.na(build_of)) build_of <- d[grepl("Build", Name, fixed = TRUE), ScenarioId][1]; if (is.na(build_of)) stop("cannot find the Build result the Projection Setup was made on: pass --base=<id>") }
+also <- if (is.na(opt("also", NA))) integer(0) else as.integer(strsplit(opt("also", NA), ",")[[1]])   # further results after the Build (a quick test: the Build it reran stages on)
 # the hand-over the setup made (its Projection Start)
 pst <- suppressWarnings(as.data.table(datasheet(B, "lucasCore_ProjectionStart", optional = TRUE)))
 hid_setup <- if (nrow(pst) && "HistoricalScenarioId" %in% names(pst)) pst$HistoricalScenarioId[1] else NA
@@ -61,7 +65,7 @@ if (!is.na(clim)) { if (!clim %in% sc[IsResult == "Yes", ScenarioId]) stop("--cl
   if (!nrow(suppressWarnings(as.data.table(datasheet(scenario(L, clim), "stsim_FlowSpatialMultiplier", optional = TRUE))))) stop(sprintf("result %d has no flow multipliers: run its stage 11 first", clim))
 } else cat("note: no --climate: the projection years run at normal climate (make a Projection Climate scenario with tools/new-projection-climate.R)\n")
 cl <- if (!is.na(clim)) clim else integer(0)
-dependency(S) <- if (setup) c(bid, cl, build_of, sfd) else c(cl, bid, sfd)   # legacy (a Build result, stage 9 in the pipeline): its multipliers would win, so climate first
+dependency(S) <- if (setup) c(bid, cl, build_of, also, sfd) else c(cl, bid, also, sfd)   # legacy (a Build result, stage 9 in the pipeline): its multipliers would win, so climate first
 if (legacy) { saveDatasheet(S, data.frame(HistoricalScenarioId = hid), "lucasCore_ProjectionStart")
   # Projection Start shares a feed with Projection Options, and a dependency supplies whole feeds: copy the options
   po <- suppressWarnings(as.data.frame(datasheet(B, "lucasCore_ProjectionOptions", lookupsAsFactors = FALSE)))

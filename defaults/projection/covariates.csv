@@ -15,3 +15,6 @@ Ag Contraction,Agriculture share within 1 km,Yes,,,
 Ag Contraction,Crop productivity (NCCPI),Yes,,,
 Clearcut,Forest owner type,Yes,,,
 Selection,Forest owner type,Yes,,,
+Reforestation,Forest potential (BpS),Yes,,,"to-do 57: share of the cell on LANDFIRE BpS forest potential"
+Reforestation,Distance to forest,Yes,,,seed source
+Reforestation,Forest share within 1 km,Yes,,,
