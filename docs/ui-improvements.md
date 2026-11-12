@@ -1579,6 +1579,16 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
            which grows from age 0 on its FIA curve. Stage 8 needs nothing, since these cells start as non-forest classes. Check per
            forest type that there's no jump in live biomass at the transition. These cells also start with no forest legacy dead
            wood: right for encroachment, low for St Helens-type recovery (the events file is the fix there).
+           CHECKED 2026-11-12 on Lassen (full Build result 6, 35 min; `dev/reforestation/carbon-at-transition.R`): no jump.
+           Stage 3's net growth is a mass balance (g(t) = C(t+1) - (1 - r) C(t)), so a reforested cell follows its curve from age 0
+           plus the carried grass or shrub carbon, which fades at the forest pools' turnover (foliage 0.11-0.91, fine roots 0.64,
+           other wood 0.04, coarse roots 0.02 a year). The 117 cells carry 5.5 Mg C/ha live (median; Non-sage 5.5, chaparral 16.2,
+           grass 3.2, barren 0); 3.3 is left after 5 years, 2.7 after 10, 1.9 after 20, against destination curves of 4-10 Mg C/ha
+           at age 5 and 10-19 at age 10. So the cell's live carbon is continuous at the transition and a little above the curve for
+           some years. The open point is the age itself: NLCD shows forest only once trees have canopy, so a stand it first shows
+           as forest is older than 0. On the curves, 20 years is 23-38 Mg C/ha, which the model credits only over the next 20 years.
+           Age 0 (user, 2026-11-12) is the conservative choice, and continuous; a young age would credit that carbon in the year of
+           the transition (a jump). Kept; raised with the user.
         7. **Stage 6 (historical runs).** sources.csv row `Reforestation, NlcdPersist, 41|42|43|90`: on where the modal NLCD shows
            forest two years running, as Forest Return. Type gates from `ReforestType.tif` at the start year, as the NaturalVeg
            gates. Only cells in a natural non-forest class can take it: the reforesting cells, and cells a fire converted that NLCD
