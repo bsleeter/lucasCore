@@ -17,7 +17,7 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | later | 55 Grass and shrub stocks fitted to literature (chaparral wood turnover 0.08; non-sage and native sage steppe split by RAP herb share) | Yes | Refit done 2026-11-09 (item 55); left: the RAP tests at the Sky Oaks towers, the foothill chaparral scale | - |
 | next | 56 Run Build stages on their own or a few in sequence, each result a dependency of the next | No (the same results, fewer reruns) | Added 2026-11-10 (user), after the Great Dismal Swamp Build failed in stage 8 after 44 minutes and had to be rerun whole | - |
 | later | 57 A post-disturbance state for forest: regrowth after a delay, or conversion to non-forest, with adjacency to a seed source | Yes (burned forest waits, returns or converts; carbon of the waiting years) | Added 2026-11-11 (user). P26: about a quarter of single high-severity burns are not forest after 30 years in NLCD, and reburns mostly convert | 58 (developed together) |
-| next | 59 Harvested wood products: the fate of the carbon in Forestry Sector, after a run (stage 18, not spatial) | Yes, in reporting (wood products pools and their emissions; an NBP that counts storage in products). The ST-Sim runs do not change | Added 2026-11-11 (user). Forestry Sector has no flows out today, so harvested wood is stored forever | Steps 1-3 done (tables, model, stage 18; not yet run inside Studio); next Run Figures and Compare Runs |
+| next | 59 Harvested wood products: the fate of the carbon in Forestry Sector, after a run (stage 18, not spatial) | Yes, in reporting (wood products pools and their emissions; an NBP that counts storage in products). The ST-Sim runs do not change | Added 2026-11-11 (user). Forestry Sector has no flows out today, so harvested wood is stored forever | Steps 1-4 done (tables, model, stage 18, Run Figures and Compare Runs; not yet run inside Studio); next P26 and Puget runs, the guide section |
 | later | 58 Management and mitigation for disturbed forest: replanting and restoration, salvage, site preparation, fuel treatments | Yes, in scenarios that turn them on | Added 2026-11-11 (user). Developed with 57 so its structure takes these actions | 57 (developed together) |
 | release | 46 CO2 fertilization | Yes, in projections with a Projection Climate result (Central by default; None turns it off) | Added 2026-11-04; built, tested (Puget run, age-band check), documented (guide 7.3.1) and pushed 2026-11-06. Left: a release | - |
 | later | 47 Example libraries by region and resolution | No (each holds its own results) | Added 2026-11-04, replaces 13. Best built after the open science items, since each carbon change dates them | 14, restore test |
@@ -1463,6 +1463,19 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     years exactly. Puget: 17.5 Tg C stored in 2023, 0.05 Tg C/yr stock change, as harvest fell from about 1 Tg C/yr (late 1980s) to
     0.44 while the pre-1985 products decay. Left: run it in Studio once the branch is in the registered package (F:\lucasCore);
     Smith has no PWW row for many forest groups (they take the regional average, logged).
+  - **Step 4, Run Figures and Compare Runs - built 2026-11-12, not yet run inside SyncroSim:** the lookup is by RunScenarioId:
+    `wp_of_run` (src/run-figures.R) reads the newest Wood Products result whose rows name the run (its over-all rows), so stage 18
+    is run on the run first and nothing else is named. A separate figure rather than extra lines on the carbon stock chart (the
+    products are a few percent of ecosystem carbon and vanish on its scale): Run Figures "Harvested wood products" - (a) carbon stored
+    in use and in landfills and dumps with the interval, (b) ecosystem NBP, the change in products as bars, and NBP with products
+    with the interval. Compare Runs: the same two panels with one line per run, and the carbon summary gains HWP (mean stock change)
+    and NBP + HWP (sheet columns HwpStored, HwpStockChange, NbpWithProducts; `Update(1.4)` adds them to older libraries at the 1.4.0
+    release, tools/sync-library.R before it). A history with no result of its own takes its projection's (stage 18 on a projection
+    runs the history's years with the same draws). Runs with no result keep their figures as before, with a log line. The summary
+    tables now measure their text (strwidth) instead of counting characters, so long run names no longer overlap the columns.
+    `tests/phaseZ31-wood-products-figures.R`: 12 checks pass on lucasCore-projection and Puget Lowlands (NBP with products is NBP
+    plus the stock change every year; the history borrowing its projection's result agrees with stage 18 on the history alone).
+    Puget 1985-2050: ecosystem NBP -0.148 Tg C/yr, products +0.150, together +0.002.
     A design point for step 2: Smith's industrial roundwood ratios exceed 1 for pulpwood (it also comes from tops and cull, which the
     model keeps in Other Wood), so the stage uses Smith's ratios as shares of the removed carbon, which is conserved.
   - **Steps:** (1) source the parameter tables and write them to `defaults/wood-products` with citations; check that national

@@ -7,6 +7,7 @@
 #           highest severity, last burn | harvest: times harvested, type, last harvest | total ecosystem carbon in the first and last
 #           year and its change
 #   charts  land area by cover group | transitions per year, simulated against the Build's record | carbon stocks | carbon fluxes |
+#           harvested wood products and NBP with them (when stage 18 has been run on the run: wp_of_run) |
 #           carbon by secondary stratum (counties)
 # A stand-alone projection is drawn with its historical run in front (find_history, join_runs): one set of figures from the start of the
 # history to the end of the projection, a dashed line where the projection starts.
@@ -114,6 +115,29 @@ join_runs <- function(H, P) {
   te <- function(X) { s <- X$stocks; if (is.null(s)) NA_real_ else s[StockGroup == "Total Ecosystem" & Timestep == ys, sum(Mg)] / 1e6 }
   J$join <- c(history = te(H), projection = te(P)); J$proj_start <- ys; J$hist <- list(rid = H$rid, years = H$years)
   J }
+
+# ---- harvested wood products (stage 18) ------------------------------------------------------------------------------------
+# wp_of_run: the wood products of run rid, from the newest Wood Products result that followed it (stage 18's Wood Products sheet, the
+# rows over all iterations: Year, Variable, Mean, Lower, Upper; Mg C), or NULL when stage 18 has not been run on it. A projection's
+# result holds its historical run's years too (stage 18 joins them). Stages 13 and 14 keep it as X$wp.
+wp_of_run <- function(lib, rid) {
+  con <- dbConnect(SQLite(), lib, flags = SQLITE_RO); on.exit(dbDisconnect(con))
+  if (!dbExistsTable(con, "lucasCore_OutputWoodProducts")) return(NULL)
+  s <- dbGetQuery(con, sprintf("SELECT MAX(ScenarioId) s FROM lucasCore_OutputWoodProducts WHERE RunScenarioId = %d", rid))$s
+  if (!length(s) || is.na(s)) return(NULL)
+  w <- as.data.table(dbGetQuery(con, sprintf("SELECT Year, Variable, Mean, Lower, Upper FROM lucasCore_OutputWoodProducts WHERE ScenarioId = %d AND RunScenarioId = %d AND Iteration IS NULL", s, rid)))
+  if (!nrow(w)) return(NULL)
+  setattr(w, "scenario", as.integer(s)); w }
+# a wood products variable (or the sum of several) over the run's years, Tg C: Timestep, Tg (and Lower, Upper for one variable)
+wp_tg <- function(X, v) { W <- X$wp; if (is.null(W)) return(data.table(Timestep = integer(), Tg = numeric(), Lower = numeric(), Upper = numeric()))
+  W[Variable %in% v & Year >= X$years[1] & Year <= X$years[2], .(Tg = sum(Mean) / 1e6, Lower = if (.N == 1) Lower / 1e6 else NA_real_, Upper = if (.N == 1) Upper / 1e6 else NA_real_),
+    by = .(Timestep = Year)][order(Timestep)] }
+# net biome productivity counting storage in products (the production approach): the ecosystem's NBP, which counts harvest as a loss,
+# plus the change in carbon stored in products in use and in landfills and dumps; Tg C per year, with the products' interval
+nbp_products <- function(X) { s <- wp_tg(X, "StockChange")
+  if (is.null(X$flows) || !nrow(s)) return(data.table(Timestep = integer(), Tg = numeric(), Lower = numeric(), Upper = numeric()))
+  n <- X$flows[FlowGroup == "Net Biome Productivity", .(NBP = sum(Mg) / 1e6), by = Timestep]
+  m <- merge(n, s, by = "Timestep"); m[, .(Timestep, Tg = NBP + Tg, Lower = NBP + Lower, Upper = NBP + Upper, NBP)][order(Timestep)] }
 
 # ---- the figures -----------------------------------------------------------------------------------------------------------
 # X: load_run(); grid: the Build's state class map (the model grid); sc_colours: state class Name -> colour; dem; label; observed: the
@@ -340,6 +364,34 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
         s <- stack_bars(ymat(nc, "Group", names(BAL_COLS)), BAL_COLS, "Tg C per year", line = nbp)
         ptitle(6, "Net biome productivity by land cover"); legend_means(s$M, s$cols, "Net biome productivity")
       } else { plot.new(); ptitle(6, "Net biome productivity by land cover: not in this run's output") } }) }
+
+  # ---- charts: harvested wood products (stage 18's result on this run, when there is one) ------------------------------------
+  # (a) carbon stored in products in use and in landfills and dumps, with the interval of the total; (b) NBP with and without the
+  # change in that store (the production approach)
+  ws <- wp_tg(X, "Stored"); wn <- nbp_products(X)
+  if (nrow(ws) && nrow(wn)) {
+    wu <- wp_tg(X, c("InUse", "Recovered"))[match(ws$Timestep, Timestep)]; wl <- wp_tg(X, c("Landfill", "Dump"))[match(ws$Timestep, Timestep)]
+    ivl <- if (any(ws$Upper > ws$Lower)) "the shading the interval over the parameter draws" else "the published parameters (no draws)"
+    chart_figure("wood_products", "Harvested wood products", paste0(sprintf("Stage 18 (Wood Products, result %d) on this run, the USFS harvested wood products model (production approach). ", attr(X$wp, "scenario")),
+      "(a) Carbon stored in harvested wood products: in use (products in use and recovered for reuse) and in landfills and dumps, including what was harvested before the run and is still stored; ",
+      sprintf("the dashed lines the interval of the total. (b) Net biome productivity of the ecosystem (harvest counted as a loss) and with the change in carbon stored in products added (%s). Means in Tg C per year.", ivl)),
+      1, 2, h = 1150, draw = function() {
+        low(); yy <- ws$Timestep; u <- wu$Tg; l <- wl$Tg; u[is.na(u)] <- 0; l[is.na(l)] <- 0
+        plot(NA, xlim = range(yy), ylim = c(0, max(ws$Upper, u + l, na.rm = TRUE) * 1.05), xlab = "", ylab = "Tg C", bty = "l"); hgrid()
+        polygon(c(yy, rev(yy)), c(rep(0, length(yy)), rev(l)), col = "#8c6d31", border = NA)
+        polygon(c(yy, rev(yy)), c(l, rev(l + u)), col = "#d9a441", border = NA)
+        if (any(ws$Upper > ws$Lower)) { lines(yy, ws$Lower, lty = 2, col = INK); lines(yy, ws$Upper, lty = 2, col = INK) }
+        mark_line(); n1 <- nrow(ws)
+        ptitle(1, sprintf("Carbon stored in products, %d: %.3g Tg C (%.3g-%.3g)", yy[n1], ws$Tg[n1], ws$Lower[n1], ws$Upper[n1]))
+        under_legend(c("In use", "Landfills and dumps"), fill = c("#d9a441", "#8c6d31"))
+        low(); yy <- wn$Timestep; dw <- wn$Tg - wn$NBP   # the change in carbon stored in products, as bars on the zero line
+        plot(NA, xlim = range(yy), ylim = range(c(0, wn$NBP, wn$Lower, wn$Upper, dw)) * 1.05, xlab = "", ylab = "Tg C per year", bty = "l"); hgrid(); abline(h = 0, col = MUTED, lty = 2)
+        rect(yy - .4, 0, yy + .4, dw, col = "#d9a441", border = NA)
+        if (any(wn$Upper > wn$Lower)) polygon(c(yy, rev(yy)), c(wn$Lower, rev(wn$Upper)), col = adjustcolor("#2b8152", .25), border = NA)
+        lines(yy, wn$NBP, col = "#3b6ea8", lwd = 2); lines(yy, wn$Tg, col = "#2b8152", lwd = 2); mark_line()
+        ptitle(2, sprintf("NBP with wood products (mean %+.3g Tg C/yr)", mean(wn$Tg)))
+        under_legend(c(sprintf("Ecosystem NBP (%+.3g)", mean(wn$NBP)), sprintf("Change in products (%+.3g)", mean(dw)), sprintf("NBP with products (%+.3g)", mean(wn$Tg))),
+                     col = c("#3b6ea8", NA, "#2b8152"), lwd = c(2, NA, 2), fill = c(NA, "#d9a441", NA)) }) }
 
   # ---- charts: carbon by secondary stratum -----------------------------------------------------------------------------------
   if (!is.null(X$unit_c) && nrow(X$unit_c) > 1 && uniqueN(X$unit_c$Unit) > 1) {

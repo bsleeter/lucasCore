@@ -128,6 +128,16 @@ namespace lucasCoreUI
             AddFilter(store, "stsim_OutputFilterFlows", "OutputFilterFlowsId", "FlowGroupId", "stsim_FlowGroup", "LULC: Emission Peat (CO2e)", false);
         }
 
+        // ---- 1.4 (lucasCore 1.4.0): harvested wood products (to-do 59) ----------------------------------------------------------
+        // stage 18's sheets are new (SyncroSim makes their tables); Compare Runs' carbon summary gains the wood products columns
+        [Update(1.4, "lucasCore 1.4: Compare Carbon Summary columns for harvested wood products (carbon stored, its mean change, and net biome productivity with it)")]
+        public static void Update_1_400(DataStore store)
+        {
+            AddColumn(store, "lucasCore_OutputCompareCarbon", "HwpStored", "DOUBLE");
+            AddColumn(store, "lucasCore_OutputCompareCarbon", "HwpStockChange", "DOUBLE");
+            AddColumn(store, "lucasCore_OutputCompareCarbon", "NbpWithProducts", "DOUBLE");
+        }
+
         // a state class (with its Id, labels by name) in every project that lacks it
         private static void AddStateClass(DataStore store, string name, string labelX, string labelY, string id, string color)
         {

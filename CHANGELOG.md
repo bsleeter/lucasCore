@@ -15,6 +15,15 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   national harvest series the model's stock is within 7% of the US Inventory's and its stock change within 3% (1990-2016).
   Tests: `tests/unit-wood-products.R`, `tests/unit-wood-products-national.R`, `tests/phaseZ30-wood-products.R` (the stage on a
   library's runs, read-only).
+- Run Figures and Compare Runs show the wood products of a run that stage 18 has followed (its newest Wood Products result): a
+  Harvested wood products figure (carbon stored in use and in landfills and dumps; net biome productivity with the change in that
+  store added, the production approach), and in Compare Runs' carbon summary the columns HWP and NBP + HWP (Compare Carbon Summary:
+  HwpStored, HwpStockChange, NbpWithProducts). A historical run takes its projection's result when it has none of its own. Runs
+  without a result are drawn as before. Test: `tests/phaseZ31-wood-products-figures.R`.
+
+### Fixed
+- Compare Runs' summary tables: a long run name or many columns made the headers and values overlap. Columns are now sized by the
+  width of their text as drawn, and the table scaled to fit.
 
 ## 1.3.2 - 2026-11-11
 

@@ -906,6 +906,9 @@
 		<column name="NEP" displayName="Mean net ecosystem productivity (Tg C/yr)" dataType="Double" isOptional="True"/>
 		<column name="LulcLoss" displayName="Mean losses to land-use and land-cover change: fire emissions and harvest (Tg C/yr)" dataType="Double" isOptional="True"/>
 		<column name="NBP" displayName="Mean net biome productivity (Tg C/yr)" dataType="Double" isOptional="True"/>
+		<column name="HwpStored" displayName="Carbon stored in harvested wood products, end (Tg C; stage 18)" dataType="Double" isOptional="True"/>
+		<column name="HwpStockChange" displayName="Mean change in carbon stored in harvested wood products (Tg C/yr)" dataType="Double" isOptional="True"/>
+		<column name="NbpWithProducts" displayName="Mean net biome productivity with wood products (Tg C/yr)" dataType="Double" isOptional="True"/>
 	</dataSheet>
 
 	<dataSheet name="OutputCompareLand" displayName="Compare Land Change Summary">

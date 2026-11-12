@@ -9,7 +9,8 @@
 # Figures naming the run (blank = the newest result scenario with ST-Sim output). A stand-alone projection gets its historical run (its
 # Projection Setup's Projection Start) joined in front, checked on total ecosystem carbon in the year the projection starts from. The run's tables are read from the library by SQL
 # and its maps from its data folder, so the run's own outputs set what can be drawn: a figure whose maps the run did not write is left
-# out (state class maps for the land cover figure, Fire transition maps, Total Ecosystem average stock maps).
+# out (state class maps for the land cover figure, Fire transition maps, Total Ecosystem average stock maps). The wood products figure
+# (carbon stored in products, NBP with products) is drawn when stage 18 has been run on the run (its newest Wood Products result).
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
 source(pkg_file("src", "figures.R")); source(pkg_file("src", "run-figures.R"))
@@ -41,6 +42,12 @@ if (!is.na(hid)) {
           sprintf("%.4f vs %.4f Tg C in %d (%+.4f)", X$join["history"], X$join["projection"], X$proj_start, d))
   } else if (!is.null(H)) say("Historical run %d ends in %d, not in %d where the projection starts: the projection alone is drawn", hid, H$years[2], X$years[1])
 }
+# harvested wood products: stage 18's newest result on this run (for a projection it holds the history's years too)
+X$wp <- tryCatch(wp_of_run(lib_file, rid), error = function(e) { say("Wood products not readable: %s", conditionMessage(e)); NULL })
+if (is.null(X$wp)) say("No Wood Products result on run %d: run stage 18 on it for the wood products figure and NBP with products", rid) else {
+  wy <- range(X$wp$Year[X$wp$Variable == "StockChange"])
+  say("Wood products from result %d: %d-%d", attr(X$wp, "scenario"), wy[1], wy[2])
+  check(STAGE, "the wood products result covers the run's years", wy[1] <= X$years[1] + 1 && wy[2] >= X$years[2], sprintf("wood products %d-%d, run %d-%d", wy[1], wy[2], X$years[1], X$years[2])) }
 
 ic <- as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", optional = TRUE, lookupsAsFactors = FALSE))
 if (!nrow(ic) || is.na(ic$StateClassFileName[1])) fail("no state class map: this scenario must depend on the run's Build result")

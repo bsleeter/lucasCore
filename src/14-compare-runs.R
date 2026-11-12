@@ -8,7 +8,8 @@
 # Export > LUCAS Core > Compare Figures saves them all to a folder.
 # Its own scenario: depends on the runs' Build result (the grid). A run that is another listed run's historical run (its Projection
 # Setup's Projection Start) is drawn as the history in black, and a projection's historical run is added when it is not listed. The
-# baseline is the run ticked Baseline, else the first projection listed; the others are differenced against it.
+# baseline is the run ticked Baseline, else the first projection listed; the others are differenced against it. Runs that stage 18
+# (Wood Products) has followed get the wood products figure and summary columns (a history takes its projection's when it has none).
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
 source(pkg_file("src", "figures.R")); source(pkg_file("src", "run-figures.R")); source(pkg_file("src", "compare-figures.R"))
@@ -25,6 +26,10 @@ if (length(bad)) fail("Compare Runs: result %s has no ST-Sim output: list result
 R <- tryCatch(compare_runs(lib_file, runs), error = function(e) fail("Compare Runs: %s", conditionMessage(e)))
 for (r in R) say("Run %d (%s): %d-%d, %d iteration(s)%s", r$rid, r$label, r$X$years[1], r$X$years[2], r$X$nit,
                  if (r$hist) ", the history" else if (r$base) ", the baseline" else "")
+w <- vapply(R, function(r) !is.null(r$X$wp), TRUE)
+if (any(w)) say("Wood products (stage 18) on %s%s", paste(vapply(R[w], function(r) sprintf("%d (result %d)", r$rid, attr(r$X$wp, "scenario")), ""), collapse = ", "),
+                if (all(w)) "" else sprintf("; none on %s: run stage 18 on it to add it", paste(vapply(R[!w], function(r) sprintf("%d", r$rid), ""), collapse = ", "))) else
+  say("No Wood Products result on these runs: run stage 18 on them for the wood products figure and NBP with products")
 check(STAGE, "the projections end in the same year", length(unique(vapply(Filter(function(r) !r$hist, R), function(r) r$X$years[2], 0))) == 1,
       paste(vapply(Filter(function(r) !r$hist, R), function(r) sprintf("%d: %d", r$rid, r$X$years[2]), ""), collapse = ", "))
 

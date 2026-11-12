@@ -18,30 +18,9 @@ HID <- if (length(a) >= 2) as.integer(a[2]) else 10L; PID <- if (length(a) >= 3)
 n_ok <- 0; n_bad <- 0
 expect <- function(what, ok, detail = "") { cat(sprintf("%s  %s %s\n", if (isTRUE(ok)) "PASS" else "FAIL", what, detail)); if (isTRUE(ok)) n_ok <<- n_ok + 1 else n_bad <<- n_bad + 1 }
 
-# run the stage script with stubs for SyncroSim; returns the sheets it wrote, its log and its checks (or the error)
-stage <- function(options, out = tempfile("wp")) {
-  E <- new.env(parent = globalenv()); dir.create(out)
-  E$env <- list(PackageDirectory = pkg, LibraryFilePath = lib, TransferDirectory = out)
-  E$sheets <- list(); E$log <- character(); E$checks <- list()
-  with(E, {
-    pkg_file <- function(...) file.path(env$PackageDirectory, ...)
-    main_library <- function() env$LibraryFilePath
-    TD <- function() env$TransferDirectory
-    say <- function(...) log <<- c(log, sprintf(...))
-    fail <- function(...) stop(sprintf(...), call. = FALSE)
-    progressBar <- function(...) invisible()
-    read_ds <- function(name, ...) if (name == "WoodProductsOptions") as.data.table(options) else data.table()
-    write_ds <- function(x, name, ...) sheets[[name]] <<- as.data.table(x)
-    check <- function(stage, what, ok, detail = "") { if (length(ok) != 1 || is.na(ok)) ok <- FALSE
-      checks[[length(checks) + 1]] <<- data.table(Check = what, Status = if (ok) "Pass" else "FAIL", Detail = detail); invisible(ok) }
-    finish_checks <- function() invisible()
-  })
-  E$options <- options
-  code <- readLines(file.path(pkg, "src", "18-wood-products.R"))
-  code <- code[!grepl("^source\\(file.path\\(rsyncrosim::ssimEnvironment", code)]   # shared.R: replaced by the stubs above
-  res <- tryCatch({ eval(parse(text = code), envir = E); NULL }, error = function(e) conditionMessage(e))
-  list(sheets = E$sheets, log = E$log, checks = rbindlist(E$checks), error = res)
-}
+# run the stage script with stubs for SyncroSim (tests/wood-products-stage-stub.R); returns the sheets it wrote, its log and its checks (or the error)
+source(file.path(pkg, "tests", "wood-products-stage-stub.R"))
+stage <- function(options) stage_18(pkg, lib, options)
 
 t0 <- Sys.time()
 H <- stage(data.frame(RunScenarioId = HID, Draws = 20L))
