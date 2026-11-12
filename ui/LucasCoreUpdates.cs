@@ -165,6 +165,8 @@ namespace lucasCoreUI
             AddColumn(store, "lucasCore_DataSource", "BpsFile", "TEXT");
             AddColumn(store, "lucasCore_OutputLandCoverLayers", "ReforestTypeFileName", "TEXT");
             AddColumn(store, "lucasCore_OutputLandCoverLayers", "BpsForestShareFileName", "TEXT");
+            AddColumn(store, "lucasCore_OutputLandCoverLayers", "StartRuleFileName", "TEXT");
+            AddColumn(store, "lucasCore_OutputLandCoverLayers", "FirstForestYearFileName", "TEXT");
             AddNamed(store, "stsim_TransitionGroup", "TransitionGroupId", "Reforestation", null, null, false);
             foreach (DataRow r in c.Rows)
             {

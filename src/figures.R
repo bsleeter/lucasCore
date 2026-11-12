@@ -183,6 +183,28 @@ build_figures <- function(I, outdir) {
   map_figure("land_cover", "Initial land cover", P,
     sprintf("(a) State class in the start year (%s), the twelve largest named. (b) Forest type groups of the forest cells. (c) Initial stand age of the forest cells.%s%s", I$years[1], ysf_cap, relief))
 
+  # ---- maps: how forest starts (to-do 57 step 6) -------------------------------------------------------------------------------
+  # stage 5's start rule for natural cells NLCD shows as forest only after the start year: regrowth (forest, its age from NLCD),
+  # disturbed at the start (a fire perimeter dates it), reforests later (starts as its start-year class: slow recovery on BpS forest,
+  # encroachment on BpS non-forest), or forest with its source age (flickers, late first forest on other potential, reforestation off)
+  sm <- I$start_maps
+  if (!is.null(sm$kind)) { kv <- cv(sm$kind); km <- values(sm$kind, mat = FALSE); nk <- tabulate(km[!is.na(km)], 5)   # (areas from the model grid; cv() samples the finer display grid)
+    if (sum(nk) > 0) {
+      SR_LAB <- c("Regrowth: forest, NLCD age", "Disturbed at the start", "Reforests: slow recovery", "Reforests: encroachment", "Forest, source age")
+      SR_COL <- c("#6fae74", "#d9822b", "#c0392b", "#7b3294", "#9fb7c9")
+      P <- list(list(k = kv, cols = SR_COL, lab = sprintf("%s (%s km2)", SR_LAB, format(round(nk * cell_km2, 1), trim = TRUE)), key = TRUE,
+                     title = "How natural cells NLCD shows as forest later start", sub = sprintf("%s km2 of barren, shrub, grass or emergent wetland in %s; grey: other cells", format(round(sum(nk) * cell_km2, 1), trim = TRUE), I$years[1])))
+      if (!is.null(sm$first)) { fv <- cv(sm$first); fb <- c(I$years[1], seq(I$years[1] + 5, I$years[2], by = 5), I$years[2] + 1)
+        P[[2]] <- list(k = classed(fv, fb), cols = RAMP_AGE(length(fb) - 1), lab = sprintf("%d-%d", fb[-length(fb)], fb[-1] - 1),
+                       title = "Year NLCD first shows forest", sub = "the first of two forest years in a row; grey: other cells") }
+      if (!is.null(sm$bpsf)) { bv <- cv(sm$bpsf); bb <- seq(0, 1, 0.2); bb[length(bb)] <- 1.0001
+        P[[length(P) + 1]] <- list(k = classed(bv, bb), cols = RAMP_C(length(bb) - 1), lab = c("0-0.2", "0.2-0.4", "0.4-0.6", "0.6-0.8", "0.8-1"),
+                                   title = "Forest potential (LANDFIRE BpS)", sub = "share of the cell's 30 m pixels whose potential vegetation is forest") }
+      map_figure("forest_start", "How forest starts: regrowth and reforestation", P,
+        sprintf("(a) Natural cells that are barren, shrub, grass or emergent wetland in %s and that NLCD shows as forest later. Cells that come back before their ecodivision's reforestation cutoff start as forest with their age from the NLCD record (regrowth), or in their type's disturbed class where a fire perimeter dates the disturbance. Cells that come back later on forest potential (slow recovery), or at any time on non-forest potential (encroachment), start as their %s class and reforest when NLCD shows forest. Cells that flicker between forest and shrub or grass start as forest with their CMS or TreeMap age.%s%s%s",
+                I$years[1], I$years[1], if (length(P) > 1) " (b) The year NLCD first shows each of them as forest." else "",
+                if (!is.null(sm$bpsf)) sprintf(" (%s) The share of each cell on forest potential (LANDFIRE BpS 2020), which decides between slow recovery and encroachment.", letters[length(P)]) else "", relief)) } }
+
   # ---- maps: initial carbon ----------------------------------------------------------------------------------------------------
   if (!is.null(I$stocks) && length(I$stocks)) {
     grp <- function(s) ifelse(grepl("^Biomass", s), "Live biomass", ifelse(grepl("Snag|Aboveground Medium|Belowground Fast", s), "Dead wood",

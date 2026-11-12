@@ -1425,6 +1425,20 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       all Subtropical. A first version wrote rows for all 19 of the library's ecodivisions; stage 9 now takes the study area's from
       its stratum map. The setup then stopped in stage 10: a Projection Setup on a quick-test result builds its fitting region
       differently from one on a full Build and reaches past the downloaded NLCD (setup 52, on Build 48, passed). Not this change.
+    - **Step 6 DONE 2026-11-12 (figures; user chose three of four proposed: not the settings chart).** Build Figures (stage 12):
+      "How forest starts: regrowth and reforestation": (a) how each natural cell NLCD shows as forest only later starts (regrowth
+      with its NLCD age, disturbed at the start, reforests later by slow recovery or encroachment, or forest with its source age),
+      (b) the year NLCD first shows it as forest, (c) the BpS forest share. Stage 5 now writes the two maps it needs (Land Cover
+      Layers: StartRule, FirstForestYear; in the 1.4 update). Run Figures (stage 13): "After disturbance, and reforestation": (a)
+      how each cell in a disturbed class came out (back to forest or shrubland, converted, still waiting at the end), (b) its last
+      high-severity fire, (c) reforestation by year; and "Disturbed land and reforestation over time": (a) area in the disturbed
+      classes, forest and shrub, (b) yearly returns, conversions and reforestation. A projection joins its historical run in front.
+      Lassen (Build figures result 35; Run Figures 36 historical, 37 historical + 10-year projection): the 2012 Reading and 2021
+      Dixie fires put 13 and 44 km2 of forest into its disturbed classes; few have returned by 2023 (window 30 years, NLCD not yet
+      forest); in the projection a high-severity reburn converts 12.7 km2 in 2027 (reburn conversion 0.9), worth a look in step 7.
+      Found by the test: the Build figure counted areas on the finer display grid (25 times too large), and a run that wrote no
+      transition maps (the projection) showed its fires as "before 1986"; it now says "no fire map for its year". Scripts
+      `dev/reforestation/lassen-run-figures.R`.
     - **TO DO (user, 2026-11-11): non-fire disturbance, Mount St Helens and the rest.** Two gaps:
       - Before the start year: only fire perimeters date a disturbance, so DisturbedStart Fire leaves the 1980 blast zone, older
         windthrow and insect kill as young forest with their NLCD regrowth age. Option: an optional Data Source of recorded

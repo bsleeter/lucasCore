@@ -280,8 +280,11 @@ if (ro$enabled) { cu <- unique(data.table(e = eco_nm, c = cut_all)[!is.na(e)])
   say("Reforestation: on; cutoff %s (%s)", if (is.na(ro$cutoff)) "fitted by ecodivision" else sprintf("%d years, set on Reforestation Options", as.integer(ro$cutoff)),
       paste(sprintf("%s %d", cu$e, as.integer(cu$c)), collapse = ", ")) } else say("Reforestation: off (Reforestation Options); regrowth up to RegrowthLag (%d years)", as.integer(rg$lag))
 rc <- which(values(forest, mat = FALSE) %in% 1 & values(n0, mat = FALSE) %in% c(31, 52, 71))
+rule <- which(values(forest, mat = FALSE) %in% 1 & values(n0, mat = FALSE) %in% c(31, 52, 71, 95) & !values(woody, mat = FALSE) %in% TRUE)   # (to-do 57 step 6: the start rule map)
+kind <- rep(NA_integer_, ncell(R)); kind[rule] <- 5L
 if (length(rc)) {
   ra <- regrowth_age(as.matrix(N[rc]), years, rg$lag, rg$share, rg$nonforest_years, cutoff = cut_all[rc]); hit <- !is.na(ra)
+  kind[rc[hit]] <- 1L
   va <- values(A, mat = FALSE); was <- va[rc[hit]]; va[rc[hit]] <- ra[hit]; A <- setValues(A, va)
   say("Regrowing forest: %d of %d cells that are forest only by the any-year rule take their age from NLCD (median %s years, was %s; the rest keep the %s age)",
       sum(hit), length(rc), if (any(hit)) as.integer(stats::median(ra[hit])) else "-", if (any(hit)) as.integer(stats::median(was)) else "-", asrc)
@@ -303,6 +306,7 @@ if (length(rc)) {
         if (nrow(fp)) { fp <- sf::st_make_valid(sf::st_transform(fp, crs(R))); lf <- as.integer(values(rasterize(vect(fp), R, field = "yr", fun = "max"), mat = FALSE)[di]) } }
       dst <- disturbed_start(ra[hit], lf, y0, rg$lag, win, rg$disturbed_start)
       vs <- values(S, mat = FALSE); vs[di[dst$use]] <- did[dst$use]; S <- setValues(S, vs)
+      kind[di[dst$use]] <- 2L
       va <- values(A, mat = FALSE); va[di[dst$use]] <- dst$age[dst$use]; A <- setValues(A, va)
       say("Disturbed at the start (DisturbedStart %s): %d of the %d regrowing cells start in their type's disturbed class, %d dated by a fire perimeter of %d-%d (median %s years since the fire)%s",
           rg$disturbed_start, sum(dst$use), length(di), sum(dst$use & dst$dated), y0 - max(win, na.rm = TRUE), y0,
@@ -331,6 +335,7 @@ if (ro$enabled) {
   if (length(cand)) {
     pot <- POT[values(Bp, mat = FALSE)[cand]]; pot[is.na(pot)] <- "other"
     pk <- reforest_pick(as.matrix(N[cand]), years, pot, cut_all[cand], rg$share); rf <- cand[pk$reforest]; n_rf <- length(rf)
+    if (n_rf) kind[rf] <- ifelse(pot[pk$reforest] == "non-forest", 4L, 3L)
     if (n_rf) { v0 <- v0a[rf]
       vS[rf] <- ifelse(v0 %in% c(52, 71), values(G, mat = FALSE)[rf], ifelse(v0 == 95, vW[rf], v0)); S <- setValues(S, vS)
       va <- values(A, mat = FALSE); va[rf] <- 0; A <- setValues(A, va) }
@@ -345,6 +350,15 @@ if (ro$enabled) {
 tt <- table(typ_all); ft0 <- if (length(tt)) as.integer(names(tt)[which.max(tt)]) else 220L   # (no forest at all: Douglas-fir)
 ft <- setValues(rast(R), typ_all); ft <- fill_modal(mask(ft, m), m, ft0)
 fRT <- write_raster(ft, "ReforestType.tif")
+# how each natural cell forest only by the any-year rule starts (to-do 57 step 6, Build Figures): 1 forest with the NLCD regrowth age,
+# 2 disturbed at the start (fire-dated), 3 reforests later on BpS forest (slow recovery), 4 reforests later on BpS non-forest
+# (encroachment), 5 forest with the CMS or TreeMap age (flickers, or first forest late on other potential, or reforestation off);
+# and the year NLCD first shows it as forest two years running
+if (length(rule)) { ffy <- reforest_pick(as.matrix(N[rule]), years, "other", Inf)$first
+  kv <- rep(NA_integer_, ncell(R)); kv[rule] <- kind[rule]; fv <- rep(NA_integer_, ncell(R)); fv[rule] <- as.integer(y0 + ffy)
+  fSR <- write_raster(setValues(rast(R), kv), "StartRule.tif", "INT1U"); fFY <- write_raster(setValues(rast(R), fv), "FirstForestYear.tif", "INT2U")
+  say("Start of the %d natural cells forest only by the any-year rule: %s", length(rule), paste(sprintf("%s %d", c("regrowth age", "disturbed", "slow recovery", "encroachment", "source age"),
+      tabulate(kind[rule], 5)), collapse = ", ")) }
 forest <- (S >= 100 & S <= 999) | S == 91
 # chaparral (to-do 39, 2026-11-06: it grows by age since fire): the years since the last interagency fire perimeter of 1900 to the start
 # year over the cell's centre; never burned since 1900: the start year - 1900 (user decision; on the age curve's plateau)
@@ -409,7 +423,8 @@ saveDatasheet(scn, as.data.frame(row), "stsim_InitialConditionsSpatial")
 write_ds(data.frame(Year = years, FileName = nl_files), "OutputNlcdAnnual")
 write_ds(data.frame(ForestTypeFileName = write_raster(Fz, "ForestType.tif"), GrassShrubFileName = write_raster(G, "GrassShrubType.tif"),
                     WetlandFileName = write_raster(W, "WetlandType.tif"), EverForestFileName = write_raster(mask(ever_forest, m), "EverForest.tif", datatype = "INT1U"),
-                    ReforestTypeFileName = fRT, BpsForestShareFileName = if (exists("fBf")) fBf else NA_character_),
+                    ReforestTypeFileName = fRT, BpsForestShareFileName = if (exists("fBf")) fBf else NA_character_,
+                    StartRuleFileName = if (exists("fSR")) fSR else NA_character_, FirstForestYearFileName = if (exists("fFY")) fFY else NA_character_),
          "OutputLandCoverLayers")
 write_ds(ri, "OutputReturnInterval"); write_ds(st, "OutputSoilTarget")
 summ <- data.table(S = vS, A = vA)[!is.na(S), .(Cells = .N, MeanAge = round(mean(A), 1)), by = S][, StateClassId := scl$Name[match(S, as.integer(scl$Id))]]

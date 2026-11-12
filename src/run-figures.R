@@ -79,11 +79,16 @@ load_run <- function(lib, rid) {
   hm <- q("SELECT o.Timestep, o.Filename FROM stsim_OutputSpatialTransition o JOIN stsim_TransitionGroup g ON g.TransitionGroupId = o.TransitionGroupId
            WHERE o.ScenarioId = %d AND o.Iteration = 1 AND g.Name LIKE 'Forest Harvest%%'", rid)
   te <- q("SELECT o.Timestep, o.Filename FROM stsim_OutputAverageSpatialStockGroup o JOIN stsim_StockGroup g ON g.StockGroupId = o.StockGroupId WHERE o.ScenarioId = %d AND g.Name = 'Total Ecosystem'", rid)
+  # post-disturbance return and conversion, and reforestation (to-do 57 step 6): their yearly maps of iteration 1
+  pdm <- q("SELECT o.Timestep, g.Name AS Grp, o.Filename FROM stsim_OutputSpatialTransition o JOIN stsim_TransitionGroup g ON g.TransitionGroupId = o.TransitionGroupId
+           WHERE o.ScenarioId = %d AND o.Iteration = 1 AND (g.Name LIKE 'Post-disturbance: %%' OR g.Name = 'Reforestation')", rid)
+  if (nrow(pdm)) pdm[, File := vapply(Filename, function(f) path("stsim_OutputSpatialTransition", f), "")]
   list(rid = rid, nit = nit, years = yrs, sc_list = sc, tt_list = tt, area = area, trans = trans, stocks = stocks, flows = flows, losses = losses, nbp_cls = nbp_cls, unit_c = unit_c, unit_a = unit_a, te_it = te_it,
        sc0 = path("stsim_OutputSpatialState", ssm[Timestep == yrs[1], Filename]), sc1 = path("stsim_OutputSpatialState", ssm[Timestep == yrs[2], Filename]),
        fire = if (nrow(fm)) setNames(vapply(fm$Filename, function(f) path("stsim_OutputSpatialTransition", f), ""), fm$Timestep) else character(),
        harvest = if (nrow(hm)) setNames(vapply(hm$Filename, function(f) path("stsim_OutputSpatialTransition", f), ""), hm$Timestep) else character(),
-       carbon0 = path("stsim_OutputAverageSpatialStockGroup", te[Timestep == yrs[1], Filename]), carbon1 = path("stsim_OutputAverageSpatialStockGroup", te[Timestep == yrs[2], Filename]))
+       carbon0 = path("stsim_OutputAverageSpatialStockGroup", te[Timestep == yrs[1], Filename]), carbon1 = path("stsim_OutputAverageSpatialStockGroup", te[Timestep == yrs[2], Filename]),
+       pd = if (nrow(pdm)) pdm[, .(Timestep, Grp, File)] else NULL)
 }
 
 # ---- a projection's historical run, and the two joined -------------------------------------------------------------------
@@ -111,6 +116,7 @@ join_runs <- function(H, P) {
   J$unit_a <- H$unit_a; J$sc0 <- H$sc0; J$carbon0 <- H$carbon0
   late <- function(m) m[as.integer(names(m)) > ys]
   J$fire <- c(H$fire, late(P$fire)); J$harvest <- c(H$harvest, late(P$harvest))
+  J$pd <- rbind(H$pd, if (!is.null(P$pd)) P$pd[Timestep > ys])
   te <- function(X) { s <- X$stocks; if (is.null(s)) NA_real_ else s[StockGroup == "Total Ecosystem" & Timestep == ys, sum(Mg)] / 1e6 }
   J$join <- c(history = te(H), projection = te(P)); J$proj_start <- ys; J$hist <- list(rid = H$rid, years = H$years)
   J }
@@ -196,6 +202,68 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
       list(k = ifelse(is.na(last_h), NA, findInterval(last_h, yb, rightmost.closed = TRUE)), cols = colorRampPalette(c("#efe3bd", "#b8894a", "#4a2c10"))(length(yb) - 1), lab = ylab,
            title = "Year of the last harvest", sub = "grey: not harvested")),
       sprintf("Forest harvest in the run (iteration 1), from its yearly harvest transition maps (the Forest Harvest groups mapped by the transition group output filter): how often each cell was harvested, its most intensive harvest type, and when it was last harvested.%s", relief)) }
+
+  # ---- maps: after disturbance, and reforestation (to-do 57 step 6) ----------------------------------------------------------
+  # Each cell that was in a disturbed class during the run (iteration 1): how it left it, from the yearly Post-disturbance maps (the
+  # latest wins), or still waiting at the end (a disturbed class in the last year); when it last burned at high severity; and the
+  # cells that reforested, by year
+  pd <- X$pd; SHRUB_P <- c("Sage", "Native Sage Steppe", "Invaded Sage Steppe", "Non-sage", "Chaparral")
+  if (!is.null(pd) && nrow(pd) && !is.null(r1)) {
+    outc <- rep(NA_integer_, length(inz)); refy <- rep(NA_integer_, length(inz))
+    code <- c(`Post-disturbance: Forest Return [Type]` = 1L, `Post-disturbance: Shrub Return [Type]` = 2L, `Post-disturbance: Conversion [Type]` = 3L)
+    for (i in order(pd$Timestep)) { r <- rd(pd$File[i]); if (is.null(r)) next; v <- cv(r); hit <- !is.na(v) & v > 0
+      if (pd$Grp[i] == "Reforestation") refy[hit] <- pd$Timestep[i] else if (pd$Grp[i] %in% names(code)) outc[hit] <- code[[pd$Grp[i]]] }
+    v1 <- cv(r1); outc[inz & !is.na(v1) & v1 >= 2000] <- 4L
+    v0 <- if (!is.null(r0)) cv(r0) else rep(NA_real_, length(inz)); started <- inz & !is.na(v0) & v0 >= 2000
+    last_hs <- rep(NA_integer_, length(inz))
+    for (y in names(X$fire)) { r <- rd(X$fire[[y]]); if (is.null(r)) next; v <- cv(r); h <- !is.na(v) & v > 0 & grepl("High", X$tt_list$Name[match(v, X$tt_list$Id)]); last_hs[h] <- as.integer(y) }
+    if (any(!is.na(outc)) || any(!is.na(refy))) {
+      km2c <- function(k) sum(outc %in% k & inz) * prod(res(el)) / 1e6
+      OL <- c("Back to forest", "Back to shrubland", "Converted (shrub or grass)", "Still disturbed at the end"); OC <- c("#2b8152", "#c9a26b", "#c0392b", "#b5651d")
+      pres <- sort(unique(outc[!is.na(outc)]))
+      P <- list()
+      if (length(pres)) P[[1]] <- list(k = match(outc, pres), cols = OC[pres], lab = sprintf("%s (%.1f km2)", OL[pres], vapply(pres, km2c, 0)), key = TRUE,
+                                         title = "After disturbance: how each cell came out", sub = sprintf("cells in a disturbed class during the run; %.1f km2 started in one", sum(started) * prod(res(el)) / 1e6))
+      if (length(pres)) { yb <- unique(c(y0, seq(y0 + 5, y1, by = 5), y1 + 1)); nb <- length(yb) - 1L
+        # no high-severity fire on the maps: started disturbed (before the run), else a year the run did not map (a run that wrote no
+        # transition maps, as a projection made with bookend maps)
+        hs <- ifelse(is.na(outc), NA, ifelse(!is.na(last_hs), findInterval(last_hs, yb, rightmost.closed = TRUE) + 1L, ifelse(started, 1L, nb + 2L)))
+        nomap <- any(hs %in% (nb + 2L))
+        P[[length(P) + 1]] <- list(k = hs, cols = c("#d9d4c7", colorRampPalette(c("#fde7b0", "#e0702b", "#6b1a10"))(nb), "#8f8f8f"),
+          lab = c(sprintf("before %d", y0 + 1), sprintf("%d-%d", head(yb, -1) + c(1, rep(0, length(yb) - 2)), tail(yb, -1) - 1), "no fire map for its year"), key = TRUE,
+          title = "Last high-severity fire", sub = sprintf("the same cells; before %d: started disturbed (a fire perimeter dates it)%s", y0 + 1, if (nomap) "; no fire map: the run wrote no transition maps that year" else "")) }
+      if (any(!is.na(refy))) { yb <- unique(c(y0, seq(y0 + 5, y1, by = 5), y1 + 1))
+        P[[length(P) + 1]] <- list(k = ifelse(is.na(refy), NA, findInterval(refy, yb, rightmost.closed = TRUE)), cols = colorRampPalette(c("#dfe6b4", "#62ab68", "#0f3a2b"))(length(yb) - 1),
+          lab = sprintf("%d-%d", head(yb, -1) + c(1, rep(0, length(yb) - 2)), tail(yb, -1) - 1), key = TRUE, title = "Reforestation, by year",
+          sub = sprintf("%.1f km2 of barren, shrub, grass or emergent wetland became forest", sum(!is.na(refy) & inz) * prod(res(el)) / 1e6)) }
+      map_figure("post_disturbance", sprintf("After disturbance, and reforestation, %d-%d", y0 + 1, y1), P,
+        sprintf("Iteration 1, from the run's yearly transition maps. %sA high-severity fire moves forest and shrubland into its type's disturbed class; it returns to its type when %s, or converts to shrubland or grassland at the end of its window or at a high-severity reburn.%s%s",
+                if (length(pres)) "(a) How each cell that was in a disturbed class left it (the latest exit), or that it is still waiting in the last year. (b) When those cells last burned at high severity. " else "",
+                if (is.null(ps)) "the annual NLCD shows it again (historical years)" else "the annual NLCD shows it again (historical years) or with its yearly chance (projection years)",
+                if (any(!is.na(refy))) sprintf(" (%s) Natural non-forest cells that became forest (Reforestation), by year.", letters[length(P)]) else "", relief)) }
+  }
+
+  # ---- charts: disturbed land and its outcomes over time (to-do 57 step 6) ----------------------------------------------------
+  dis <- X$area[grepl("^Disturbed: ", Class)]
+  pdt <- X$trans[TransitionGroup %in% c("Post-disturbance: Forest Return", "Post-disturbance: Shrub Return", "Post-disturbance: Conversion", "Reforestation")]
+  if (nrow(dis) || nrow(pdt)) {
+    dis[, Family := ifelse(sub("^Disturbed: ", "", Class) %in% SHRUB_P, "Disturbed shrubland", "Disturbed forest")]
+    yrs <- y0:y1; da <- dcast(dis[, .(km2 = sum(ha) / 100), by = .(Timestep, Family)], Timestep ~ Family, value.var = "km2", fill = 0)
+    ser <- function(g) { s <- pdt[TransitionGroup == g][match(yrs, Timestep), ha] / 100; s[is.na(s)] <- 0; s }
+    TL <- c(`Post-disturbance: Forest Return` = "Back to forest", `Post-disturbance: Shrub Return` = "Back to shrubland", `Post-disturbance: Conversion` = "Converted", Reforestation = "Reforestation")
+    TC <- c("#2b8152", "#c9a26b", "#c0392b", "#62ab68")
+    chart_figure("post_disturbance_time", "Disturbed land and reforestation over time",
+      sprintf("(a) Area in the disturbed classes each year (forest types and shrub types waiting to return or convert). (b) Area leaving them each year, back to their type or converted, and the area that reforested (natural non-forest becoming forest), in km2 a year%s.", if (is.null(ps)) "" else "; the dashed line marks the projection's start"),
+      1, 2, h = 1150, draw = function() {
+        low(); fams <- setdiff(names(da), "Timestep"); top <- max(c(unlist(da[, ..fams]), 0.01), na.rm = TRUE) * 1.1
+        plot(NA, xlim = range(yrs), ylim = c(0, top), xlab = "", ylab = "km2"); hgrid()
+        for (j in seq_along(fams)) lines(da$Timestep, da[[fams[j]]], col = c("#b5651d", "#d9b27a")[j], lwd = 2)
+        mark_line(); ptitle(1, "Area in disturbed classes"); if (length(fams)) under_legend(fams, col = c("#b5651d", "#d9b27a")[seq_along(fams)], lwd = 2)
+        low(); S <- sapply(names(TL), ser); top <- max(c(S, 0.01)) * 1.1
+        plot(NA, xlim = range(yrs), ylim = c(0, top), xlab = "", ylab = "km2 per year"); hgrid()
+        for (j in seq_along(TL)) lines(yrs, S[, j], col = TC[j], lwd = 2, type = "s")
+        mark_line(); ptitle(2, "Leaving the disturbed classes, and reforestation")
+        under_legend(sprintf("%s (%.1f km2 in all)", TL, colSums(S)), col = TC, lwd = 2) }) }
 
   # ---- maps: carbon ------------------------------------------------------------------------------------------------------------
   c0 <- rd(X$carbon0); c1 <- rd(X$carbon1)

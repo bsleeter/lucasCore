@@ -63,6 +63,11 @@ shf <- if (nrow(shs) == 7) vapply(shs[order(SiteClass), FileName], find_file, ""
 site_class <- if (!anyNA(shf)) { X <- rast(shf); X[is.na(X)] <- 0; m <- Reduce(`+`, lapply(1:7, function(k) X[[k]] * k)); m[sum(X) == 0] <- NA; m } else NULL   # each cell's share-weighted mean class
 if (!is.null(site_m)) say("Site productivity: multiplier map %s%s", basename(sources(site_m)), if (is.null(site_class)) ", no site class shares" else "")
 dem <- tryCatch(read_data_sources("ElevationFile")$ElevationFile, error = function(e) { say("No hillshade: %s", conditionMessage(e)); NULL })
+# how forest starts (to-do 57 step 6): stage 5's start rule and first-forest-year maps of the cells forest only by the any-year rule, and
+# the BpS forest share (reforestation); a Build made before has none of them
+lcl <- tryCatch(as.data.table(datasheet(scn, ds("OutputLandCoverLayers"), optional = TRUE)), error = function(e) data.table())
+lc_r <- function(k) if (nrow(lcl) && k %in% names(lcl)) opt_rast(find_file(lcl[[k]][1], ds("OutputLandCoverLayers"))) else NULL
+start_maps <- list(kind = lc_r("StartRuleFileName"), first = lc_r("FirstForestYearFileName"), bpsf = lc_r("BpsForestShareFileName"))
 I <- list(strata = list(prim, opt_rast(ic$SecondaryStratumFileName[1]), opt_rast(ic$TertiaryStratumFileName[1])),
           strata_names = list(stl, named("SecondaryStratum"), named("TertiaryStratum")),
           strata_sources = c(source_name(opt$SecondarySourceId[1], "States"), source_name(opt$TertiarySourceId[1], "Federal Lands")),
@@ -72,7 +77,7 @@ I <- list(strata = list(prim, opt_rast(ic$SecondaryStratumFileName[1]), opt_rast
           stocks = if (nrow(st)) setNames(lapply(st$RasterFileName, rast), st$StockTypeId) else NULL,
           stock_summary = sheet("OutputInitialStockSummary"), trans = sheet("OutputTransitionSummary"),
           climate = sheet("OutputClimateSummary"), site = site_m, site_class = site_class, validation = sheet("OutputValidation"), dem = dem,
-          nf_maps = nf_maps, crop_mix = crop_mix, nf_growth = nf_growth, crop_yield = crop_yield, fire_maps = fire_maps,
+          nf_maps = nf_maps, crop_mix = crop_mix, nf_growth = nf_growth, crop_yield = crop_yield, fire_maps = fire_maps, start_maps = start_maps,
           label = if (nrow(sa)) paste(sub("^[^:]*: ", "", sa$UnitId), collapse = ", ") else "CONUS", years = c(opt$StartYear[1], opt$EndYear[1]),
           result = rsyncrosim::scenarioId(scn))
 progressBar()

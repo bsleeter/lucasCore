@@ -730,6 +730,8 @@
 		<column name="EverForestFileName" displayName="Forest in Any Year (NLCD)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
 		<column name="ReforestTypeFileName" displayName="Forest Type Each Cell Would Reach (reforestation gates)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif" isOptional="True"/>
 		<column name="BpsForestShareFileName" displayName="Share on LANDFIRE BpS Forest Potential" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif" isOptional="True"/>
+		<column name="StartRuleFileName" displayName="How Forest Only by the Any-Year Rule Starts (1 regrowth age, 2 disturbed, 3 slow recovery, 4 encroachment, 5 source age)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif" isOptional="True"/>
+		<column name="FirstForestYearFileName" displayName="Year NLCD First Shows Forest (cells forest only by the any-year rule)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif" isOptional="True"/>
 	</dataSheet>
 
 	<dataSheet name="OutputReturnInterval" displayName="Spin-up Return Intervals">
@@ -1298,6 +1300,7 @@
 		<dataSheet name="stsim_StateAttributeValue" type="Input"/>
 		<dataSheet name="stsim_TransitionSpatialMultiplier" type="Input"/>
 		<dataSheet name="OutputSiteClassMap" type="Input"/>
+		<dataSheet name="OutputLandCoverLayers" type="Input"/>
 		<dataSheet name="OutputBuildFigure" type="Output"/>
 		<dataSheet name="OutputValidation" type="Both"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
