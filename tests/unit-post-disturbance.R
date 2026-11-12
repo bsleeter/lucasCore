@@ -53,10 +53,14 @@ cv <- pd[TransitionTypeId == CV]
 check("conversion at the window's end: proportions add to 1 in every ecodivision, at that ecodivision's window, to existing classes",
       all(vapply(seq_len(nrow(res)), function(i) { p <- res[i]; x <- in_eco(cv[StateClassIdSource == p$dname], p$Ecodivision)
         nrow(x) > 0 && abs(sum(num(x$Proportion)) - 1) < 1e-6 && all(num(x$AgeMin) == p$Window) }, TRUE)) && all(cv$StateClassIdDest %in% sc$Name))
-check("disturbed forest converts to its ecodivision's shrub or grass class; sage, sage steppe and chaparral to annual grass",
-      all(cv[StateClassIdSource %in% par[as.integer(Id) >= 100, dname], StateClassIdDest] %in%
+check("disturbed upland forest converts to its ecodivision's shrub or grass class; sage, sage steppe and chaparral to annual grass",
+      all(cv[StateClassIdSource %in% par[as.integer(Id) >= 100 & StateLabelXId != "Wetland", dname], StateClassIdDest] %in%
             unlist(fread(D("transitions", "post-disturbance-regions.csv"))[, .(ShrubClass, GrassClass)])) &&
       all(cv[StateClassIdSource %in% par[Name %in% SHRUBS[c(1:3, 5)], dname], StateClassIdDest] == "Grassland: Annual"))
+check("a disturbed forested wetland twin converts to Wetland: Palustrine Emergent, at the window's end and at a reburn (user 2026-11-12)", {
+  tw <- par[as.integer(Id) >= 100 & StateLabelXId == "Wetland", dname]; length(tw) == 3 &&
+  all(cv[StateClassIdSource %in% tw, StateClassIdDest] == "Wetland: Palustrine Emergent") &&
+  all(hi[StateClassIdSource %in% tw & StateClassIdDest != StateClassIdSource, StateClassIdDest] == "Wetland: Palustrine Emergent") })
 check("a high-severity reburn: proportions add to 1 in every ecodivision; the share staying is 1 - ReburnConversion, age reset",
       all(vapply(seq_len(nrow(res)), function(i) { p <- res[i]; x <- in_eco(hi[StateClassIdSource == p$dname], p$Ecodivision); s <- x[StateClassIdDest == p$dname]
         nrow(s) == 1 && abs(sum(num(x$Proportion)) - 1) < 1e-6 && all(x$AgeReset == "Yes") && abs(num(s$Proportion) - (1 - p$ReburnConversion)) < 1e-6 }, TRUE)))

@@ -1676,7 +1676,10 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
         - Age at the transition: 0; the grass or shrub live carbon carries over (step 6).
         - Projection rate: the mean of the record's recent years (10 by default, a setting), since the rate falls by decade
           (step 8).
-    - **TO DECIDE (user, 2026-11-11: "make the wetland decision something to address"): what a burned forested wetland converts
+    - **DECIDED 2026-11-12 (user: "it should probably become an herbaceous wetland"): a burned forested wetland that does not
+      come back converts to Wetland: Palustrine Emergent**, at the window's end and at a high-severity reburn, whatever the
+      ecodivision (`tools/make_post_disturbance.R`; tests/unit-post-disturbance.R, 24 checks), so it keeps wetland carbon and
+      burial. Not yet run in a Build on a wetland library (GDS). The question as it was: what a burned forested wetland converts
       to.** The GDS test showed a burned swamp converting to Shrubland: Non-sage, the region's shrub class, at a reburn or the
       window's end. Upland shrub carbon and no burial are wrong for a swamp that stays wet. Options:
       - the wetland twins convert to a wetland class (`Wetland: Palustrine Scrub-Shrub` or `Palustrine Emergent`, with their own

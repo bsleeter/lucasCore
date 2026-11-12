@@ -62,11 +62,16 @@ res <- pd_resolve(st, par$Name, par$kind == "Forest", eco)
 stopifnot(nrow(res) == nrow(par) * length(eco))   # every parent class has settings in every ecodivision
 res <- merge(res, par[, .(Parent = Name, dname, kind)], by = "Parent")
 # conversion destinations by class and ecodivision, each with its share: disturbed forest to the ecodivision's shrub (ShrubShare) or
-# grass class, disturbed Non-sage to its grass class, the rest to Grassland: Annual
-fr <- merge(res[kind == "Forest"], rg, by = "Ecodivision")
+# grass class, disturbed Non-sage to its grass class, the rest to Grassland: Annual. A disturbed forested wetland twin converts to
+# Wetland: Palustrine Emergent (user, 2026-11-12: a burned swamp that does not come back as forest stays wet: herbaceous wetland,
+# with its own wetland carbon and burial), whatever the ecodivision
+WET_DEST <- "Wetland: Palustrine Emergent"; stopifnot(WET_DEST %in% sc$Name)
+twins <- par[kind == "Forest" & StateLabelXId == "Wetland", Name]
+fr <- merge(res[kind == "Forest" & !Parent %in% twins], rg, by = "Ecodivision")
 dest <- rbind(fr[, .(From = dname, Ecodivision, To = ShrubClass, Share = ShrubShare)], fr[, .(From = dname, Ecodivision, To = GrassClass, Share = 1 - ShrubShare)],
               merge(res[Parent == "Shrubland: Non-sage"], rg, by = "Ecodivision")[, .(From = dname, Ecodivision, To = GrassClass, Share = 1)],
-              res[kind == "Shrub" & Parent != "Shrubland: Non-sage", .(From = dname, Ecodivision, To = "Grassland: Annual", Share = 1)])[Share > 0]
+              res[kind == "Shrub" & Parent != "Shrubland: Non-sage", .(From = dname, Ecodivision, To = "Grassland: Annual", Share = 1)],
+              res[Parent %in% twins, .(From = dname, Ecodivision, To = WET_DEST, Share = 1)])[Share > 0]
 dest <- merge(dest, res[, .(From = dname, Ecodivision, Window, ReburnConversion)], by = c("From", "Ecodivision"))
 # a class gets rows by ecodivision where its destinations, window or reburn share differ between ecodivisions, else one row (blank
 # stratum) for all of them: ST-Sim must not see a blank-stratum row and an ecodivision's row for the same class and type
