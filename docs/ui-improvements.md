@@ -1470,9 +1470,71 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
         savanna (clearcut regrowth); apply the reforestation transition to cells first forest from 2005 on BpS forest (slow
         recovery: start as the 1985 class) and to cells on BpS non-forest (encroachment: no legacy dead wood; the natural one for the
         projection suitability surface, since it continues). Fire-dated cells, and event-file cells if added, still start in the
-        disturbed class. Open: the 2004 cutoff counts from the start year, not the disturbance, so cells first forest in 2003 and
-        2006 start very differently; whether to use the regrowth rule's 20 years or fit it; the suitability layer's predictors;
-        whether open woodland flicker (the half of P26's rule cells that flicker) belongs here or stays forest.
+        disturbed class. The cutoff counts from the start year, not the disturbance, so cells first forest just before and just
+        after it start very differently; that is the cost of a rule for cells whose disturbance year is unknown.
+      - **Decided (user, 2026-11-12):** on by default; the cutoff is fitted, and the user can override it; LANDFIRE BpS (or a
+        similar potential natural vegetation layer) is needed, so the Build downloads it.
+      - **Build plan** (written 2026-11-12, not started). Each step is tested before the next.
+        1. **BpS as a Data Source.** Column `BpsFile` (package.xml lucasCore_DataSource, defaults/library/data-sources.csv and
+           project/lucasCore_DataSource.csv, defaults/download/endpoints.csv), downloaded as EVT and FRI are, by `lf_single()` in
+           src/download-sources.R: LFPS layer LF2020_BPS (LF 2.2.0, the edition in `F:/lucas-master/Data Sources/BpS`; check the
+           LFPS layer name and whether a newer edition exists), all of CONUS from LANDFIRE's full-extent zip. Its attribute table
+           (VALUE, GROUPVEG) is read from the download's CSV_Data. New `defaults/landcover/bps-groups.csv`: GROUPVEG to forest
+           (Conifer, Conifer-Hardwood, Hardwood, Hardwood-Conifer, Peatland Forest), riparian or savanna, non-forest (Grassland,
+           Shrubland, Sparse, Barren, Peatland non-forest), other. Citation and data dictionary rows.
+        2. **Fit the cutoff** (`tools/fit_reforestation_cutoff.R`, national layers, as `dev/fire/reforestation-conus.R` samples
+           them). Cells with a dated stand-replacing event during the record on BpS forest (LCMS Tree Removal that NLCD shows as
+           shrub or grass, MTBS high severity) give the years from the event to NLCD forest (two years running, forest in 2/3 of
+           the years after). Return times are censored at the record's end, so the quantile comes from a survival curve
+           (Kaplan-Meier), not from the returns seen. Cutoff per ecodivision = the 0.9 quantile (a setting), with the division's
+           or CONUS's value where an ecodivision has too few events (minimum also a setting). Shipped as
+           `defaults/landcover/reforestation-cutoff.csv` (Ecodivision, Years, Events, Source), like post-disturbance-settings.csv
+           (blank Ecodivision = all; most specific row wins, `pd_resolve`'s rule). Check it against the regrowth rule's 20 years
+           and the CONUS split (how much moves between regrowth and reforestation).
+        3. **Settings and override.** A single-row Build sheet `ReforestationOptions` (as HarvestAgeOptions): Enabled (Yes by
+           default), CutoffYears (blank = the fitted table; a number overrides it everywhere), and the reading of riparian or
+           savanna BpS (default: as forest potential). Added to stage 5's inputs in package.xml. The regrowth rule's RegrowthLag
+           keeps setting the age; the cutoff replaces its other job (which cells count as regrowing), so `regrowth_age()` takes the
+           cutoff per cell instead of `lag`.
+        4. **Stage 5: which cells reforest.** Among natural cells forest only by the any-year rule (NLCD at the start 31, 52, 71,
+           95): first forest at or after the cell's cutoff on BpS forest, or at any time on BpS non-forest, start as their
+           start-year class (the grass, shrub, barren or wetland type stage 5 already gives non-forest cells, with the shrub age
+           rule). The rest stay as now: forest with the regrowth age, or the disturbed class where a fire perimeter dates them
+           (DisturbedStart Fire wins over reforestation). BpS on the model grid: the share of the cell's 30 m pixels in each group,
+           the cell's group the most common. New output `ReforestType.tif`: the forest type each reforesting cell would have had
+           (the any-year rule's type, wetland twin included), for stage 6. Check what reads `EverForest.tif` downstream and whether
+           it should drop these cells. Say lines: area by reading and ecodivision, against the CONUS split.
+        5. **Definitions.** Transition group `Reforestation`; one type per destination, `Reforestation: <forest type>` (as Ag
+           Contraction's), incl. the wetland twins; stsim_TransitionType, TransitionGroup, TransitionTypeGroup,
+           TransitionSimulationGroup and stockflow main-transition-groups.csv. `tools/make_reforestation.R` writes
+           `defaults/transitions/pathways/reforestation.csv`: every natural non-forest class (Barren: All, the grassland classes,
+           Sage, Native and Invaded Sage Steppe, Non-sage, Chaparral, emergent wetland) to every forest type, probability 1, age
+           reset. Disturbed classes have no rows (they have Return). tools/sync-library.R brings existing libraries up to date.
+        6. **Carbon.** No flows on the transition (as Ag Contraction): the grass or shrub live carbon carries into the forest class,
+           which grows from age 0 on its FIA curve. Stage 8 needs nothing, since these cells start as non-forest classes. Check per
+           forest type that there's no jump in live biomass at the transition. These cells also start with no forest legacy dead
+           wood: right for encroachment, low for St Helens-type recovery (the events file is the fix there).
+        7. **Stage 6 (historical runs).** sources.csv row `Reforestation, NlcdPersist, 41|42|43|90`: on where the modal NLCD shows
+           forest two years running, as Forest Return. Type gates from `ReforestType.tif` at the start year, as the NaturalVeg
+           gates. Only reforesting cells can take it, since every other cell NLCD shows as forest starts as forest. Check: no clash
+           with the land-use class pairs (transition-pairs.R); a cell converted to shrub after a fire that NLCD later shows as
+           forest would also take it (decide whether that's wanted).
+        8. **Projections (stages 9 and 10).** transitions.csv row `Reforestation`: Target by ecodivision, the area from the
+           historical record (mean, or the recent years since the rate falls by decade). allocation.csv: a fitted surface
+           `Reforestation`, SourceClasses 31|52|71|95, EventClasses 41|42|43|90. covariates.csv: new forest potential (BpS forest
+           share), distance to forest and forest share within 1 km, with elevation, slope and land cover. The destination type in
+           projections: the nearest forest type (`fill_modal` from the start-year forest, as Ag Contraction's nearest natural
+           class), for every natural non-forest cell.
+        9. **Tests.** tests/unit-reforestation.R: the cutoff table's resolution and the override, the cell readings, the pathway
+           table (every source class to every forest type, no disturbed classes). tests/unit-regrowth-age.R updated for the
+           per-cell cutoff. End to end on P26 or Puget (both have rule cells; GDS has few): stages 5 and 6, a short historical
+           run (reforesting cells reach forest when NLCD does; area by year against the NLCD record), then a Projection Setup.
+           Starting carbon before and after.
+        10. **Docs.** CHANGELOG (changes Build results), defaults README files, the Build page help, metadata; ships in 1.4.0.
+      - **Still to decide (user), before or during the build:** flickering open woodland (the half of P26's rule cells that fail
+        the 2/3 test): forest as now, or reforestation (proposed: as now); riparian or savanna BpS: forest potential (proposed) or
+        non-forest; whether a fire-converted cell that NLCD later shows as forest takes Reforestation; age at the transition (0,
+        proposed, or a set young age); the projection rate (record mean or recent years).
     - **TO DECIDE (user, 2026-11-11: "make the wetland decision something to address"): what a burned forested wetland converts
       to.** The GDS test showed a burned swamp converting to Shrubland: Non-sage, the region's shrub class, at a reburn or the
       window's end. Upland shrub carbon and no burial are wrong for a swamp that stays wet. Options:
