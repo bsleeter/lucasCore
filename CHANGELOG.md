@@ -2,7 +2,18 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
-## Unreleased
+## 1.3.2 - 2026-11-11
+
+A fix for projections started from a 1.3 historical run, and better starting ages for regrowing forest.
+
+**Upgrading:** install `lucasCore-1.3.2.ssimpkg` in place of 1.3.1. There is no library update: switch a library's lucasCore
+package to 1.3.2 (`SyncroSim.Console.exe --add --package --pkg=lucasCore --ver=1.3.2 --lib=<library.ssim>`). Both changes take
+effect at the next Build; rerun the Build and then the historical run before a Projection Setup that starts from it.
+
+### Fixed
+- A Projection Setup that starts from a historical run stopped with "historical run ... has no <year> map for DOM: Peat". The
+  stock output filter still had peat maps off from before 1.3.0 filled that stock, so a historical run wrote no final peat map.
+  Peat maps are now on (`defaults/stockflow/stsim_OutputFilterStocks.csv`).
 
 ### Changed
 - Build stage 5: a cell that starts as forest only because NLCD shows it as forest in a later year, and whose record shows it
