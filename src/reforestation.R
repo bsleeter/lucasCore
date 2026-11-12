@@ -41,3 +41,15 @@ reforest_cutoff <- function(eco, tab = read_default("landcover", "reforestation-
   if (anyNA(v) && !length(all)) stop(sprintf("reforestation-cutoff.csv: no row for %s and no blank Ecodivision row", paste(unique(eco[is.na(v)]), collapse = ", ")))
   v[is.na(v)] <- all[1]; v
 }
+
+# The scenario's Reforestation Options (single row; package.xml ReforestationOptions): enabled (blank = TRUE), cutoff override
+# (blank = NA: the fitted table), how riparian and savanna BpS read (1 or blank = "forest", 2 = "non-forest")
+reforest_options <- function(x) {
+  x <- data.table::as.data.table(x); g <- function(k) if (nrow(x) && k %in% names(x)) x[[k]][1] else NA
+  en <- g("Enabled"); cy <- suppressWarnings(as.numeric(g("CutoffYears")))
+  ra <- g("RiparianAs"); ra <- if (is.character(ra) || is.factor(ra)) c(`forest potential` = 1L, `non-forest potential` = 2L)[tolower(trimws(as.character(ra)))] else suppressWarnings(as.integer(ra))   # (rsyncrosim gives the list label)
+  ra <- unname(ra); if (length(ra) && is.na(ra) && is.character(g("RiparianAs")) && nzchar(g("RiparianAs"))) stop(sprintf("Reforestation Options: Riparian and Savanna Read As is %s; use Forest potential or Non-forest potential", g("RiparianAs")))
+  if (!is.na(ra) && !ra %in% 1:2) stop(sprintf("Reforestation Options: Riparian and Savanna Read As is %s; use 1 (forest potential) or 2 (non-forest)", ra))
+  list(enabled = is.na(en) || isTRUE(as.logical(en)) || identical(toupper(as.character(en)), "YES"),
+       cutoff = cy, riparian_as = if (!is.na(ra) && ra == 2L) "non-forest" else "forest")
+}

@@ -39,7 +39,7 @@ saveDatasheet(S, data.frame(StageNameId = pick, RunOrder = seq_along(pick)), "co
 # copied from the result, or with --options from the Build scenario (its current options)
 src_id <- bid
 if ("--options" %in% a) { src_id <- sc[ScenarioId == bid, ParentId]; if (is.na(src_id)) stop("--options: the Build result has no parent scenario") }
-for (sh in paste0("lucasCore_", c("BuildOptions", "ClimateOptions", "GrowthOptions", "CarbonOptions", "FireOptions", "HarvestAgeOptions", "StudyAreaOptions"))) {
+for (sh in paste0("lucasCore_", c("BuildOptions", "ClimateOptions", "GrowthOptions", "CarbonOptions", "FireOptions", "HarvestAgeOptions", "ReforestationOptions", "StudyAreaOptions"))) {
   x <- datasheet(scenario(L, src_id), sh, optional = TRUE); if (nrow(x)) saveDatasheet(S, x, sh) }
 description(S) <- sprintf("Quick test (tools/quick-test.R): reruns %s on top of Build result %d, which supplies everything else.", paste(pick, collapse = "; "), bid)
 cat(sprintf("scenario %d: %s, on Build result %d\n", scenarioId(S), paste(pick, collapse = "; "), bid))

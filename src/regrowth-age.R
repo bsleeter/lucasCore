@@ -16,16 +16,20 @@
 # =============================================================================
 
 # nl: matrix of NLCD codes, one row per cell, one column per year of the record (first column the start year); years: those years.
+# cutoff: years after the start from which a first forest no longer counts as regrowth, one value or one per row (to-do 57 step 3:
+# the fitted reforestation cutoff by ecodivision, src/reforestation.R; default the lag, as before). The age stays lag-based, at
+# least 1 (a cell first forest after `lag` years but before its cutoff starts at age 1).
 # Returns the age at the start year for cells that regrow, NA for the others.
-regrowth_age <- function(nl, years, lag = 20, share = 2 / 3, nonforest_years = 2) {
+regrowth_age <- function(nl, years, lag = 20, share = 2 / 3, nonforest_years = 2, cutoff = lag) {
   nl <- as.matrix(nl); ny <- ncol(nl); stopifnot(length(years) == ny)
+  cutoff <- rep_len(as.numeric(cutoff), nrow(nl))
   out <- rep(NA_integer_, nrow(nl)); if (!nrow(nl) || ny < nonforest_years + 2) return(out)
   f <- nl %in% 41:43; dim(f) <- dim(nl)
   ok <- rowSums(f[, seq_len(nonforest_years), drop = FALSE]) == 0
   for (i in which(ok)) {
     r <- f[i, ]; k <- which(r[-ny] & r[-1]); k <- k[k > nonforest_years]
     if (!length(k)) next
-    t <- k[1]; if (years[t] - years[1] >= lag || mean(r[t:ny]) < share) next
+    t <- k[1]; if (years[t] - years[1] >= cutoff[i] || mean(r[t:ny]) < share) next
     out[i] <- as.integer(min(lag, max(1, lag - (years[t] - years[1]))))
   }
   out

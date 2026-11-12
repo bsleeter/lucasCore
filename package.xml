@@ -508,6 +508,16 @@
 		<dataSheet name="HarvestAgeOptions"/>
 		<dataSheet name="MinimumHarvestAge"/>
 	</dataFeed>
+	<!-- stage 5 (to-do 57, the reforestation transition; user 2026-11-12: on by default, the cutoff fitted with a manual override). A
+	     natural cell NLCD shows becoming forest at or after its ecodivision's cutoff (years after the start year; package table
+	     defaults/landcover/reforestation-cutoff.csv, tools/fit_reforestation_cutoff.R) on BpS forest potential, or at any time on BpS
+	     non-forest potential, starts as its start-year class and reforests when NLCD shows forest. Blank = the defaults (on, the
+	     fitted cutoff, riparian and savanna as forest potential) -->
+	<dataSheet name="ReforestationOptions" displayName="Reforestation Options" isSingleRow="True">
+		<column name="Enabled" displayName="Reforestation Transition (blank = on)" dataType="Boolean" isOptional="True"/>
+		<column name="CutoffYears" displayName="Cutoff, Years After the Start Year (blank = fitted by ecodivision)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="1" formula2="60"/>
+		<column name="RiparianAs" displayName="LANDFIRE BpS Riparian and Savanna Read As" dataType="Integer" validationType="List" formula1="1:Forest potential|2:Non-forest potential" isOptional="True" defaultValue="1"/>
+	</dataSheet>
 
 	<!-- Carbon Assumptions: Growth Inputs (to-do 29) - per forest type, the inputs of the growth curves (stage 2) and live carbon flows
 	     (stage 3) that were package files: the FIA forest type groups whose plots it is fitted to (codes, ';' between) and its growth class
@@ -1143,6 +1153,7 @@
 
 	<transformer name="InitialConditions" displayName="5 - Initial Conditions" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/5-initial-conditions.R">
 		<dataSheet name="BuildOptions" type="Input"/>
+		<dataSheet name="ReforestationOptions" type="Input"/>
 		<dataSheet name="LandCoverCrosswalk" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Both"/>
 		<dataSheet name="OutputNlcdAnnual" type="Output"/>
@@ -1364,6 +1375,7 @@
 			<item name="ClimateOptions"/>
 			<item name="GrowthOptions"/>
 			<item name="HarvestAge"/>
+			<item name="ReforestationOptions"/>
 			<group name="lucasCoreCarbonAssumptions" displayName="Carbon Assumptions">
 				<item name="CarbonOptions"/>
 				<item name="GrowthInput"/>

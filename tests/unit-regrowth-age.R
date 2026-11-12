@@ -39,4 +39,12 @@ check("Fire starts only the dated cells disturbed, None none", identical(disturb
 check("a fire in the start year gives age 1, and a cell returns before its window ends at any dating", identical(disturbed_start(10L, 1985L, 1985L, 20, 30)$age, 1L) &&
       all(1985L + 20 - c(12L, 18L, 5L, 12L) - (1985L - ds$age) < 30))
 check("an empty matrix gives an empty result", length(regrowth_age(nl[0, , drop = FALSE], yrs)) == 0)
+# a per-cell cutoff (to-do 57 step 3: the fitted reforestation cutoff by ecodivision)
+yl <- 1985:2015; rl <- function(k) c(rep(S, k), rep(F, length(yl) - k))   # first forest k years after the start
+nl2 <- rbind(rl(8), rl(15), rl(22), rl(22))
+check("the default cutoff is the lag: forest 22 years on is not regrowth", is.na(regrowth_age(nl2[3, , drop = FALSE], yl)))
+a2 <- regrowth_age(nl2, yl, cutoff = c(11, 11, 24, 20))
+check("a cutoff of 11: forest after 8 years regrows (age 12), after 15 does not", identical(a2[1], 12L) && is.na(a2[2]))
+check("a cutoff of 24: forest after 22 years regrows at age 1 (the age stays lag-based); a cutoff of 20 leaves it alone", identical(a2[3], 1L) && is.na(a2[4]))
+check("one cutoff for all rows works as before", identical(regrowth_age(nl2, yl, cutoff = 20), regrowth_age(nl2, yl)))
 cat(sprintf("%d passed, %d failed\n", n_ok, n_bad)); if (n_bad) quit(status = 1)

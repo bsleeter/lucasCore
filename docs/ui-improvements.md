@@ -1525,6 +1525,13 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
            savanna BpS (default: as forest potential). Added to stage 5's inputs in package.xml. The regrowth rule's RegrowthLag
            keeps setting the age; the cutoff replaces its other job (which cells count as regrowing), so `regrowth_age()` takes the
            cutoff per cell instead of `lag`.
+           DONE 2026-11-12. package.xml `ReforestationOptions` (single row; Enabled, CutoffYears 1-60, RiparianAs 1 Forest potential
+           or 2 Non-forest potential), in the scenario's LUCAS Core group after Minimum Harvest Age and an input of stage 5 (stages
+           6 and 9 add it when they read it); `reforest_options()` in src/reforestation.R reads it (rsyncrosim returns the list
+           label, so both label and code read). `regrowth_age(..., cutoff =)` takes one cutoff or one per cell (default the lag, so
+           stage 5 is unchanged until step 4 passes the fitted one); the age stays lag-based, at least 1. tools/quick-test.R copies
+           the sheet. A library made before gets the table when it opens (checked on the Lassen library: written and read back).
+           Tests: unit-reforestation 30, unit-regrowth-age 19 checks.
         4. **Stage 5: which cells reforest.** Among natural cells forest only by the any-year rule (NLCD at the start 31, 52, 71,
            95): first forest at or after the cell's cutoff on BpS forest, or at any time on BpS non-forest, start as their
            start-year class (the grass, shrub, barren or wetland type stage 5 already gives non-forest cells, with the shrub age
