@@ -16,6 +16,7 @@
   | Pyromes | PyromesFile | USFS RDS-2020-0020 Pyromes_CONUS_20200206 |
   | Federal Lands | PadusFile | PAD-US 4.0 state geodatabases: layer federal_fee, the fee land owned by a federal agency or a tribe (Own_Name; tribal = BIA). Until 2026-11-02 the National Atlas fedlanp010g (2014), which the CONUS 1km tertiary strata used |
   | GAP Status | PadusFile | PAD-US 4.0 state geodatabases: layer gap_status (GAP_Sts, no Proclamation boundaries; the most protected status where areas overlap) |
+  | National Parks | PadusUnitsFile | PAD-US 4.0 state geodatabases, a GeoPackage of its own (padus4-units.gpkg): layer nps_units, the National Park Service's fee land by unit name (Unit_Nm), mapped to ids by nps-units-crosswalk.csv (added 2026-11-12, user: a single park as the study area; refuges and DoD installations to follow as more layers) |
 
   A File set on the Stratum Sources page wins when it exists on the machine; a blank File, or one the machine lacks (a library made
   on another computer), reads the home (src/strata.R, strata_path). A Data Download fetches these first, since its region is the
@@ -30,7 +31,11 @@
 - `states-list.csv`, `counties-list.csv`, `federal-lands-list.csv`, `gap-status-list.csv`: the names of sources whose polygons do not
   carry them; `*-crosswalk.csv`: text values to ids for sources keyed by a text field.
 
-A custom source: add a Stratum Sources row with an unused Number (10-20) and a Prefix, then run
+- `nps-units-list.csv`, `nps-units-crosswalk.csv`: the National Parks units (Id 9999 = Not National Park Service land), written by
+  `tools/make_nps_units.R` from the PadusUnitsFile GeoPackage. Ids are stable: a rerun keeps every id and gives new units the next
+  ones; names that differ only in accents share one.
+
+A custom source: add a Stratum Sources row with an unused Number (11-20; 10 is National Parks) and a Prefix, then run
 `tools/new-library.R <library> --rebuild-strata`. Existing unit ids keep their meaning, so scenario data stays valid.
 The universal lists hold 6,221 units (2026-10-21): 3,108 counties, 2,413 HUC8, 405 HUC6, 128 pyromes, 85 EPA Level III ecoregions,
 49 states, 19 ecodivisions, 9 federal managers, 5 GAP classes.

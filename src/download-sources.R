@@ -344,12 +344,12 @@ download_handlers <- function() {
   #                 to its managers by federal-lands-crosswalk.csv (TRIB = BIA, the Indian lands of the National Atlas map it replaced)
   PADUS_LAYERS <- list(gap_status = "SELECT GAP_Sts FROM \"%s\" WHERE Category <> 'Proclamation'",
                        federal_fee = "SELECT Own_Name FROM \"%s\" WHERE Category = 'Fee' AND Own_Type IN ('FED', 'TRIB')")
-  H$PadusFile <- list(column = "PadusFile", name = "PAD-US 4.0 (GAP status, federal and tribal fee land)", national = TRUE,
-    version = "PAD-US 4.0 state geodatabases (gap_status, federal_fee)",
+  # one PAD-US dataset: the 49 CONUS state geodatabases, each state's combined layer into one GeoPackage `file`, one -sql query a layer
+  padus_dataset <- function(column, name, version, layers, file) list(column = column, name = name, national = TRUE, version = version,
     plan = function(ctx) { st <- unname(CONUS_STATES)
       data.table::data.table(url = sprintf("https://www.sciencebase.gov/catalog/file/get/652d4f80d34e44db0e2ee45c?name=PADUS4_0_State_%s_GDB.zip", st),
                              file = sprintf("PADUS4_0_State_%s_GDB.zip", st), fetch = TRUE) },
-    finish = function(ctx, items) { dest <- file.path(ctx$place, "padus4.gpkg"); dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE); unlink(dest)
+    finish = function(ctx, items) { dest <- file.path(ctx$place, file); dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE); unlink(dest)
       for (i in seq_len(nrow(items))) { m <- utils::unzip(items$dest[i], list = TRUE)$Name
         gdb <- unique(sub("([.]gdb)/.*$", "\\1", m[grepl("[.]gdb/", m)]))[1]
         if (is.na(gdb)) stop(sprintf("%s holds no geodatabase", items$file[i]), call. = FALSE)
@@ -357,9 +357,20 @@ download_handlers <- function() {
         lay <- grep("^PADUS4_0Comb_", sf::st_layers(src)$name, value = TRUE)[1]
         if (is.na(lay)) stop(sprintf("%s has no PADUS4_0Comb_ layer", items$file[i]), call. = FALSE)
         # (ogr2ogr cannot -select while appending: each layer is an -sql query)
-        for (k in names(PADUS_LAYERS)) sf::gdal_utils("vectortranslate", src, dest, quiet = TRUE,
-          options = c(if (file.exists(dest)) "-update", if (i > 1) "-append", "-nln", k, "-sql", sprintf(PADUS_LAYERS[[k]], lay), "-nlt", "CONVERT_TO_LINEAR", "-nlt", "PROMOTE_TO_MULTI", "-t_srs", "EPSG:5070")) }
-      ctx$log(sprintf("  PAD-US 4.0: %d states into %s (layers %s)", nrow(items), basename(dest), paste(names(PADUS_LAYERS), collapse = ", "))); dest })
+        for (k in names(layers)) sf::gdal_utils("vectortranslate", src, dest, quiet = TRUE,
+          options = c(if (file.exists(dest)) "-update", if (i > 1) "-append", "-nln", k, "-sql", sprintf(layers[[k]], lay), "-nlt", "CONVERT_TO_LINEAR", "-nlt", "PROMOTE_TO_MULTI", "-t_srs", "EPSG:5070")) }
+      ctx$log(sprintf("  PAD-US 4.0: %d states into %s (layers %s)", nrow(items), basename(dest), paste(names(layers), collapse = ", "))); dest })
+  H$PadusFile <- padus_dataset("PadusFile", "PAD-US 4.0 (GAP status, federal and tribal fee land)", "PAD-US 4.0 state geodatabases (gap_status, federal_fee)",
+                               PADUS_LAYERS, "padus4.gpkg")
+  # PAD-US units by name, for study areas of one managed unit (user 2026-11-12: National Parks first, then refuges, DoD installations).
+  # Its own file, so padus4.gpkg (which libraries have read: the home is write-once) stays as it is. A layer per manager:
+  #   nps_units     Unit_Nm of the National Park Service's fee land (Mang_Name NPS, Category Fee; the combined layer holds no
+  #                 Proclamation boundaries, and its wilderness Designation polygons overlap the fee land): the National Parks preset,
+  #                 ids from nps-units-crosswalk.csv (tools/make_nps_units.R)
+  # A new layer (FWS refuges, DoD) changes the file: give the dataset a new version then, so the Data Download adds it as a new edition
+  PADUS_UNIT_LAYERS <- list(nps_units = "SELECT Unit_Nm FROM \"%s\" WHERE Mang_Name = 'NPS' AND Category = 'Fee'")
+  H$PadusUnitsFile <- padus_dataset("PadusUnitsFile", "PAD-US 4.0 management units (National Park Service)", "PAD-US 4.0 state geodatabases (nps_units)",
+                                    PADUS_UNIT_LAYERS, "padus4-units.gpkg")
 
   # ==== clipped by the source (phase 4) for a region; for all of CONUS (Home layout National) the sources' national files =====
 
@@ -416,6 +427,7 @@ download_handlers <- function() {
       b <- lfps_job(ctx, items$layer); write_band(b, 1, dest); dest })
   H$Evt2016File <- lf_single("Evt2016File", "LANDFIRE EVT 2016", "LF2016_EVT", "LF 2.0.0 (LF2016_EVT)", "LC16_EVT_200.tif", "CONUS_LF2016/LF2016_EVT_CONUS.zip")
   H$FriFile <- lf_single("FriFile", "LANDFIRE mean fire return interval", "LF2016_FRI", "LF 2016 (LF2016_FRI)", "LC16_FRI_200.tif", "CONUS_LF2016/LF2016_FRI_CONUS.zip")
+  H$BpsFile <- lf_single("BpsFile", "LANDFIRE Biophysical Settings 2020", "LF2020_BPS", "LF 2020 (LF2020_BPS)", "LC20_BPS_220.tif", "CONUS_LF2020/LF2020_BPS_CONUS.zip")
   H$ElevationFile <- lf_single("ElevationFile", "LANDFIRE elevation", "LF2020_Elev", "LF 2020 (LF2020_Elev)", "LC20_Elev_220.tif", "CONUS_Topo_LF2020/LF2020_Elev_CONUS.zip")
   H$RoadsFile <- lf_single("RoadsFile", "LANDFIRE roads", "LF2023_Roads", "LF 2023 (LF2023_Roads)", "LF2023_Roads_CONUS.tif", "CONUS_LF2023/LF2023_Roads_CONUS.zip")
 

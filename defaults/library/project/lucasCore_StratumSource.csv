@@ -8,3 +8,4 @@ HUC6,4,HUC6,Watershed basins (WBD HU6); Id = HUC6 code,,WBDHU6,huc6,{name} ({huc
 HUC8,5,HUC8,Watershed subbasins (WBD HU8); Id = HUC8 code,,WBDHU8,huc8,{name} ({huc8}),,,huc8-list.csv,FALSE,Last,Nearest,,
 Pyromes,7,Pyrome,FSim / WRC pyromes (RDS-2020-0020); Id = pyrome number,,,PYROME,P{PYROME} {NAME},,,pyromes-list.csv,FALSE,Last,Nearest,,
 States,2,State,US states (TIGER 2009); Id = state FIPS. The CONUS 1km secondary strata,,,STATEFP,,,,states-list.csv,FALSE,Last,Modal,29000,
+National Parks,10,NPS,"National Park Service units by name (PAD-US 4.0 NPS fee land, Unit_Nm); Id from nps-units-crosswalk.csv. For a study area of one park; other land = Not National Park Service land",,nps_units,,,Unit_Nm,nps-units-crosswalk.csv,nps-units-list.csv,FALSE,Last,Default,,9999

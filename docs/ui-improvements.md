@@ -1482,6 +1482,14 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
            (VALUE, GROUPVEG) is read from the download's CSV_Data. New `defaults/landcover/bps-groups.csv`: GROUPVEG to forest
            (Conifer, Conifer-Hardwood, Hardwood, Hardwood-Conifer, Peatland Forest), riparian or savanna, non-forest (Grassland,
            Shrubland, Sparse, Barren, Peatland non-forest), other. Citation and data dictionary rows.
+           DONE 2026-11-12. LFPS lists LF2020_BPS as the current CONUS edition (LF2023_BPS is Alaska only); the national zip is
+           `CONUS_LF2020/LF2020_BPS_CONUS.zip` (2.0 GB). LFPS jobs return the raster alone, so the attribute table ships as
+           `defaults/landcover/LF20_BPS_220.csv` (VALUE, BPS_CODE, BPS_NAME, GROUPVEG; 2,189 values) and `src/reforestation.R`
+           reads it (`bps_lookup`, `bps_potential`; riparian and savanna as forest unless set otherwise; Hawaii types with no group,
+           water and fill as other). tests/unit-reforestation.R (17 checks). Fetched by Data Download for GDS (plumbing only: 4 MB,
+           identical cell for cell to the national copy, same grid as EVT), P26 (29 MB) and Puget (20 MB), which the step 4 tests
+           use (user, 2026-11-12: test in the West). A library made before needs `tools/sync-library.R --columns-only` with a
+           fresh `tools/new-library.R` library as `--reference` (the starter is not rebuilt yet).
         2. **Fit the cutoff** (`tools/fit_reforestation_cutoff.R`, national layers, as `dev/fire/reforestation-conus.R` samples
            them). Cells with a dated stand-replacing event during the record on BpS forest (LCMS Tree Removal that NLCD shows as
            shrub or grass, MTBS high severity) give the years from the event to NLCD forest (two years running, forest in 2/3 of
@@ -1638,3 +1646,21 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     disturbance clock that management can read; an age that can be reset on planting; ownership in the strata; an adjacency
     attribute that a scenario can use in reverse; and the dead wood pools of the waiting years, so salvage and site preparation can
     take from them.
+59. **Study areas from managed units: National Parks, then wildlife refuges and DoD installations** - National Parks BUILT
+    2026-11-12, not yet tested in a Build (user: "I'd like the ability to select National Parks to be the study area. Eventually I'll
+    expand this to include things like DoD installations, Wildlife Refuges, etc... the plumbing to select a single national Park
+    would be useful right away for testing").
+  - Source (user's choice 2026-11-12: PAD-US over the National Atlas map, which has names and GNIS ids but is 1:1,000,000, 2014,
+    splits wilderness from its park, and no Data Download fetches it any more): PAD-US 4.0, the same 49 state geodatabases as
+    PadusFile. The federal_fee layer Federal Lands reads keeps only the owner, so a new Data Download dataset `PadusUnitsFile`
+    writes `study-area/padus-units/padus4-units.gpkg` (padus4.gpkg is left as libraries read it; the home is write-once), layer
+    `nps_units`: Unit_Nm of NPS fee land (Mang_Name NPS, Category Fee). The state files hold no Proclamation boundaries, so a park
+    is the land NPS owns (inholdings are holes), as Federal Lands' fee rule; wilderness Designation polygons overlap and are left out.
+  - Preset `National Parks` (Number 10, prefix NPS: "NPS: Yosemite National Park"), ValueField Unit_Nm through
+    `defaults/strata/nps-units-crosswalk.csv`; other land 9999 "Not National Park Service land" (Fill Default). Every NPS unit
+    is listed (parks, monuments, recreation areas, seashores, historic sites). `tools/make_nps_units.R` writes the list and crosswalk
+    with stable ids (a rerun keeps them, new units take the next; names differing only in accents share one).
+  - Existing libraries: `tools/new-library.R <library> --rebuild-strata` adds the source and its units (it stops if a custom source
+    already uses Number 10; custom sources now take 11-20).
+  - Next: refuges (Mang_Name FWS, Des_Tp NWR) and DoD installations (Mang_Type / Mang_Name DOD) as more layers of the same file:
+    that changes the file, so the dataset takes a new version and the Data Download adds it as a new edition.

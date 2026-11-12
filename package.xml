@@ -29,6 +29,7 @@
 		<column name="BurnProbabilityFile" displayName="Burn probability raster (fire method 2 default; FSim CONUS LF2020 270 m)" dataType="String" isOptional="True"/>
 		<column name="FpaFodFile" displayName="FPA-FOD fire occurrence geopackage (ignition density, fire method 2)" dataType="String" isOptional="True"/>
 		<column name="FriFile" displayName="LANDFIRE Mean Fire Return Interval" dataType="String" isOptional="True"/>
+		<column name="BpsFile" displayName="LANDFIRE Biophysical Settings 2020 (potential vegetation; reforestation, stage 5)" dataType="String" isOptional="True"/>
 		<column name="PrismFolder" displayName="PRISM Folder (annual and normals)" dataType="String" isOptional="True"/>
 		<column name="Loca2Folder" displayName="LOCA2 Folder (gcm/r1i1p1f1/ssp)" dataType="String" isOptional="True"/>
 		<column name="SoilCarbonFile" displayName="Soil Organic Carbon (gNATSGO soc0_999; gSSURGO also reads)" dataType="String" isOptional="True"/>
