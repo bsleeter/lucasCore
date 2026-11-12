@@ -1,7 +1,9 @@
-ParentClass,Window,ReturnAgeMin,ReturnProbability,ReburnConversion,ShrubShare,Note
-Forest,30,15,0.075,0.9,0.95,"Every forest type group and wetland twin (Ids 100-999). P26 high severity, first burn, NLCD (dev/fire/p26-fire-gap.R): 26% forest at 20 years, 58% at 25, 69% at 30, median return 21 years; an annual chance of 0.075 from year 15 gives 32% / 54% / 69% back at 20 / 25 / 30 and leaves 31% waiting at 30, which convert. Reburned pixels 8% forest after 20-25 years (ReburnConversion 0.9). Non-returners after 30 years 28% shrub, 1% grass (ShrubShare 0.95). Provisional until stage 10 fits return by type and region (to-do 57)"
-Shrubland: Sage,35,10,0.05,0.9,,"Big sagebrush reseeds and does not resprout: about a quarter of its cover back after 19 years (shrub-age.csv). Provisional until fitted on RCMAP cover (to-do 57)"
-Shrubland: Native Sage Steppe,35,10,0.05,0.9,,As Sage; provisional
-Shrubland: Invaded Sage Steppe,35,10,0.03,0.95,,"Slower than Sage (cheatgrass competition and reburns); provisional"
-Shrubland: Non-sage,12,2,0.25,0.8,,"Mixed desert shrubs, many resprout (rabbitbrush back in 2-4 years); provisional"
-Shrubland: Chaparral,12,2,0.3,0.8,,"Resprouting and seeding chaparral, back within a few years; type conversion to annual grass after short-interval reburns; provisional"
+ParentClass,Ecodivision,Window,ReturnAgeMin,ReturnProbability,ReburnConversion,ShrubShare,Note
+Forest,,30,15,0.075,0.9,0.95,"Every forest type group and wetland twin (Ids 100-999). P26 high severity, first burn, NLCD (dev/fire/p26-fire-gap.R): 26% forest at 20 years, 58% at 25, 69% at 30, median return 21 years; an annual chance of 0.075 from year 15 gives 32% / 54% / 69% back at 20 / 25 / 30 and leaves 31% waiting at 30, which convert. Reburned pixels 8% forest after 20-25 years (ReburnConversion 0.9). Non-returners after 30 years 28% shrub, 1% grass (ShrubShare 0.95). Provisional until stage 10 fits return by type and region (to-do 57)"
+Forest,Subtropical,15,2,0.2,0.9,0.95,"Southeastern forest (user, 2026-11-11: much shorter than the West): southern pines and oak/gum/cypress restock within a few years after a stand-replacing loss. Provisional, not fitted: 0.2 a year from age 2 gives 59% back by 5 years, 87% by 10 and 95% by 15 (5% convert). To fit in step 7 by the P26 method (NLCD return by years since the loss)"
+Forest,Subtropical Mountains,15,2,0.2,0.9,0.95,As Subtropical; provisional
+Shrubland: Sage,,35,10,0.05,0.9,,Big sagebrush reseeds and does not resprout: about a quarter of its cover back after 19 years (shrub-age.csv). Provisional until fitted on RCMAP cover (to-do 57)
+Shrubland: Native Sage Steppe,,35,10,0.05,0.9,,As Sage; provisional
+Shrubland: Invaded Sage Steppe,,35,10,0.03,0.95,,Slower than Sage (cheatgrass competition and reburns); provisional
+Shrubland: Non-sage,,12,2,0.25,0.8,,"Mixed desert shrubs, many resprout (rabbitbrush back in 2-4 years); provisional"
+Shrubland: Chaparral,,12,2,0.3,0.8,,"Resprouting and seeding chaparral, back within a few years; type conversion to annual grass after short-interval reburns; provisional"

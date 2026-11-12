@@ -455,14 +455,21 @@ if (length(pd_have)) {
   dis <- scl9[!is.na(idc) & idc >= 2000L & idc < 3000L]; parent <- scl9$Name[match(as.integer(dis$Id) - 2000L, idc)]
   pst <- read_default("transitions", "post-disturbance-settings.csv"); pad <- read_default("projection", "post-disturbance-adjacency.csv")
   adj_mean <- if (nrow(pad)) pad[, sum(as.numeric(Amount) * as.numeric(Weight)) / sum(as.numeric(Weight)), by = TransitionGroupId] else data.table(TransitionGroupId = character(), V1 = numeric())
-  set_of <- ifelse(as.integer(dis$Id) - 2000L >= 100L, "Forest", parent)
-  tmv <- rbindlist(lapply(seq_len(nrow(dis)), function(i) { s <- pst[ParentClass == set_of[i]]; if (!nrow(s)) return(NULL)
-    g <- if (set_of[i] == "Forest") PD_GROUPS[1] else PD_GROUPS[2]; if (!g %in% pd_have) return(NULL)
-    m <- adj_mean[TransitionGroupId == g, V1]; p <- min(1, as.numeric(s$ReturnProbability) / (if (length(m)) m else 1))
-    a0 <- as.integer(s$ReturnAgeMin); w <- as.integer(s$Window)
-    data.table(Timestep = y1 + 1L, StateClassId = dis$Name[i], AgeMin = c(0L, a0), AgeMax = c(a0 - 1L, w - 1L), TransitionGroupId = g, Amount = c(0, round(p, 6)))[AgeMax >= AgeMin] }))
-  say("Post-disturbance: %s on everywhere from %d; return chance by age for %d disturbed classes (forest %s a year from age %s%s)", paste(pd_have, collapse = ", "), y1 + 1L, uniqueN(tmv$StateClassId),
-      tmv[TransitionGroupId == PD_GROUPS[1] & Amount > 0, if (.N) format(Amount[1]) else "-"], tmv[TransitionGroupId == PD_GROUPS[1] & Amount > 0, if (.N) AgeMin[1] else "-"],
+  # settings by class and ecodivision (src/post-disturbance.R): rows by ecodivision only for a class whose settings differ between
+  # the study area's ecodivisions, else one row for all of them
+  source(pkg_file("src", "post-disturbance.R")); is_f <- as.integer(dis$Id) - 2000L >= 100L
+  stl9 <- stsim_list("Stratum"); eco9 <- stl9$Name[match(sort(unique(stats::na.omit(values(P, mat = FALSE)))), as.integer(stl9$Id))]   # the study area's ecodivisions
+  res9 <- pd_resolve(pst, parent, is_f, stats::na.omit(eco9)); vary9 <- pd_varies(res9, c("Window", "ReturnAgeMin", "ReturnProbability"))
+  tmv <- rbindlist(lapply(seq_len(nrow(dis)), function(i) { r <- res9[Parent %in% parent[i]]; if (!nrow(r)) return(NULL)
+    g <- if (is_f[i]) PD_GROUPS[1] else PD_GROUPS[2]; if (!g %in% pd_have) return(NULL)
+    m <- adj_mean[TransitionGroupId == g, V1]; if (!isTRUE(vary9[parent[i]])) r <- r[1][, Ecodivision := NA_character_]
+    rbindlist(lapply(seq_len(nrow(r)), function(j) { s <- r[j]; p <- min(1, s$ReturnProbability / (if (length(m)) m else 1))
+      a0 <- as.integer(s$ReturnAgeMin); w <- as.integer(s$Window)
+      data.table(Timestep = y1 + 1L, StratumId = s$Ecodivision, StateClassId = dis$Name[i], AgeMin = c(0L, a0), AgeMax = c(a0 - 1L, w - 1L),
+                 TransitionGroupId = g, Amount = c(0, round(p, 6)))[AgeMax >= AgeMin] })) }))
+  fr9 <- tmv[TransitionGroupId == PD_GROUPS[1] & Amount > 0, .(Amount = Amount[1], AgeMin = AgeMin[1]), by = StratumId]
+  say("Post-disturbance: %s on everywhere from %d; return chance by age for %d disturbed classes (forest: %s a year%s)", paste(pd_have, collapse = ", "), y1 + 1L, uniqueN(tmv$StateClassId),
+      if (nrow(fr9)) paste(fr9[, sprintf("%s from age %d%s", format(Amount), AgeMin, ifelse(is.na(StratumId), "", paste(" in", StratumId)))], collapse = "; ") else "-",
       if (nrow(adj_mean)) sprintf(", raised for the live forest adjacency multiplier, mean %.2f", adj_mean[TransitionGroupId == PD_GROUPS[1], V1]) else "") } else tmv <- NULL
 # fire by state class (to-do 57, user 2026-11-11: raise burned area): disturbed land and annual grass in the dry ecodivisions burn more
 # often than the drawn year's rate alone gives (defaults/projection/fire-class-multipliers.csv; "Disturbed: forest" / "Disturbed: shrub"

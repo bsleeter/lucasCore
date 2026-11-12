@@ -1408,12 +1408,23 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       48 with All, result 57; 5 years, result 59): 8 cells (18 ha; pine and oak types) started disturbed, live carbon 5.4 Mg C/ha from
       Non-sage against 13.1 on their types' curves, and still waiting in 1990 (their NLCD return is about 2000). No disturbed start
       cells for the shrub classes: chaparral and the sage family already start at their age since fire.
-    - **TO DO (user, 2026-11-11): windows by region.** `post-disturbance-settings.csv` has one Forest row, so every forest type in
-      every ecodivision waits up to 30 years with no return chance before 15. Southeastern forests (loblolly and shortleaf pine,
-      oak/gum/cypress) restock far faster. Give the settings an Ecodivision column (and optionally a forest type), with a blank meaning
-      everywhere. Then `tools/make_post_disturbance.R` writes the return and conversion pathways by stratum where rows differ, stage 9
-      writes the return chance by stratum, and stage 5 takes the cell's own window. Fit the values per ecodivision in step 7, by
-      the P26 method (`dev/fire/p26-fire-gap.R`: share back to NLCD forest by years since a stand-replacing loss).
+    - **Windows by region: DONE 2026-11-11 (user: "I could see southeastern forests having a much shorter period").**
+      `post-disturbance-settings.csv` has an Ecodivision column (blank = every ecodivision), and ParentClass takes Forest or one
+      class's name. For each class and ecodivision the most specific row wins: the class there, the class anywhere, Forest there,
+      Forest anywhere (`src/post-disturbance.R`, `pd_resolve`). `tools/make_post_disturbance.R` writes a class's return, conversion
+      and reburn pathways by ecodivision only where its settings or destinations differ between ecodivisions, else one blank-stratum
+      row, so ST-Sim never sees both for one class and type. Stage 9 writes the return chance by ecodivision the same way, and stage
+      5 takes each start cell's window from its type and ecodivision. Provisional southeastern rows: Subtropical and Subtropical
+      Mountains forest, window 15, return from age 2 at 0.2 a year (59% back by 5 years, 87% by 10, 95% by 15). Not fitted: step 7
+      fits each ecodivision by the P26 method (`dev/fire/p26-fire-gap.R`: share back to NLCD forest by years since a
+      stand-replacing loss). The forest pathways grew from 1,237 to 1,795 rows, since every forest class now has its rows by
+      ecodivision; the shrub classes' are unchanged. tests/unit-post-disturbance.R checks the resolution and that no class mixes
+      blank and ecodivision rows (23 checks). GDS check (stages 5, 6, 8 on Build 48, result 63; Projection Setup on it, result 69):
+      stage 5 found each regrowing cell's window (none fire-dated: under Fire all 8 start as forest); stage 9 wrote one return row
+      per class with the Subtropical values (0.474 a year from age 2, i.e. 0.2 / the 0.42 mean adjacency multiplier), since GDS is
+      all Subtropical. A first version wrote rows for all 19 of the library's ecodivisions; stage 9 now takes the study area's from
+      its stratum map. The setup then stopped in stage 10: a Projection Setup on a quick-test result builds its fitting region
+      differently from one on a full Build and reaches past the downloaded NLCD (setup 52, on Build 48, passed). Not this change.
     - **TO DO (user, 2026-11-11): non-fire disturbance, Mount St Helens and the rest.** Two gaps:
       - Before the start year: only fire perimeters date a disturbance, so DisturbedStart Fire leaves the 1980 blast zone, older
         windthrow and insect kill as young forest with their NLCD regrowth age. Option: an optional Data Source of recorded

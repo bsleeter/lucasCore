@@ -8,7 +8,7 @@
 #   - converts at the window's end (Post-disturbance: Conversion): disturbed forest to its ecodivision's shrub class (ShrubShare) or
 #     grass class, disturbed sage, sage steppe and chaparral to Grassland: Annual, disturbed Non-sage to its ecodivision's grass class;
 #   - converts at a high-severity reburn inside the window (ReburnConversion of the reburns; the rest start again at age 0).
-# Settings: defaults/transitions/post-disturbance-settings.csv (window, return, reburn, by parent class) and
+# Settings: defaults/transitions/post-disturbance-settings.csv (window, return, reburn, by parent class and ecodivision; src/post-disturbance.R) and
 # post-disturbance-regions.csv (each ecodivision's shrub and grass class). Rerunnable: every disturbed row is written again.
 # Carbon rows (stage 3) are not written here.
 # Usage: Rscript tools/make_post_disturbance.R            (from the repository root)
@@ -53,45 +53,51 @@ ttg <- rbind(ttg, data.table(TransitionTypeId = c(RET_F, RET_F, RET_S, RET_S, CO
                              TransitionGroupId = c(RET_F, "Post-disturbance", RET_S, "Post-disturbance", CONV, "Post-disturbance"), IsAuto = ""))
 wr(ttg, D("stsim", "stsim_TransitionTypeGroup.csv"))
 
-# ---- settings ---------------------------------------------------------------------------------------------------------------
-st <- fread(D("transitions", "post-disturbance-settings.csv")); rg <- fread(D("transitions", "post-disturbance-regions.csv"))
+# ---- settings, by class and ecodivision (src/post-disturbance.R) ---------------------------------------------------------------
+source(file.path(pkg, "src", "post-disturbance.R"))
+st <- fread(D("transitions", "post-disturbance-settings.csv"), na.strings = ""); rg <- fread(D("transitions", "post-disturbance-regions.csv"))
 eco <- rd(D("strata", "ecodivisions-list.csv"))$Name; stopifnot(setequal(rg$Ecodivision, eco))
-par[, set := fifelse(kind == "Forest", "Forest", Name)]; stopifnot(all(par$set %in% st$ParentClass))
-par <- merge(par, st[, .(set = ParentClass, Window, ReturnAgeMin, ReturnProbability, ReburnConversion, ShrubShare)], by = "set")
 stopifnot(all(c(rg$ShrubClass, rg$GrassClass, "Grassland: Annual") %in% sc$Name))
-# conversion destinations by ecodivision, each with its share
-dest <- rbindlist(lapply(seq_len(nrow(par)), function(i) { p <- par[i]
-  if (p$kind == "Forest") rbind(rg[, .(StratumIdSource = Ecodivision, To = ShrubClass, Share = p$ShrubShare)], rg[, .(StratumIdSource = Ecodivision, To = GrassClass, Share = 1 - p$ShrubShare)])[, From := p$dname]
-  else if (p$Name == "Shrubland: Non-sage") rg[, .(StratumIdSource = Ecodivision, To = GrassClass, Share = 1, From = p$dname)]
-  else data.table(StratumIdSource = NA_character_, To = "Grassland: Annual", Share = 1, From = p$dname) }))
-dest <- dest[Share > 0]
+res <- pd_resolve(st, par$Name, par$kind == "Forest", eco)
+stopifnot(nrow(res) == nrow(par) * length(eco))   # every parent class has settings in every ecodivision
+res <- merge(res, par[, .(Parent = Name, dname, kind)], by = "Parent")
+# conversion destinations by class and ecodivision, each with its share: disturbed forest to the ecodivision's shrub (ShrubShare) or
+# grass class, disturbed Non-sage to its grass class, the rest to Grassland: Annual
+fr <- merge(res[kind == "Forest"], rg, by = "Ecodivision")
+dest <- rbind(fr[, .(From = dname, Ecodivision, To = ShrubClass, Share = ShrubShare)], fr[, .(From = dname, Ecodivision, To = GrassClass, Share = 1 - ShrubShare)],
+              merge(res[Parent == "Shrubland: Non-sage"], rg, by = "Ecodivision")[, .(From = dname, Ecodivision, To = GrassClass, Share = 1)],
+              res[kind == "Shrub" & Parent != "Shrubland: Non-sage", .(From = dname, Ecodivision, To = "Grassland: Annual", Share = 1)])[Share > 0]
+dest <- merge(dest, res[, .(From = dname, Ecodivision, Window, ReburnConversion)], by = c("From", "Ecodivision"))
+# a class gets rows by ecodivision where its destinations, window or reburn share differ between ecodivisions, else one row (blank
+# stratum) for all of them: ST-Sim must not see a blank-stratum row and an ecodivision's row for the same class and type
+one_or_each <- function(x, each) rbind(x[From %in% each], unique(x[!From %in% each], by = setdiff(names(x), "Ecodivision"))[, Ecodivision := NA_character_])
+dsig <- dest[order(To), .(s = paste(To, Share, Window, ReburnConversion, collapse = ";")), by = .(From, Ecodivision)]
+dest <- one_or_each(dest, dsig[, .(v = uniqueN(s) > 1), by = From][v == TRUE, From])
 
 # ---- pathways ---------------------------------------------------------------------------------------------------------------
 PW <- c("Iteration", "Timestep", "StratumIdSource", "StateClassIdSource", "StratumIdDest", "StateClassIdDest", "SecondaryStratumId", "TertiaryStratumId",
         "TransitionTypeId", "Probability", "Proportion", "AgeMin", "AgeMax", "AgeRelative", "AgeReset", "TSTMin", "TSTMax", "TSTRelative")
 pw <- function(...) { x <- data.table(...); for (k in setdiff(PW, names(x))) set(x, j = k, value = NA_character_); x[, lapply(.SD, as.character), .SDcols = PW] }
 fmt <- function(v) sub("\\.?0+$", "", formatC(v, format = "f", digits = 6))
-# return (probability 1 at any age in the window; the chance is a multiplier: NLCD maps in history, by age in projections), conversion at the window's end
-ret <- par[, pw(StateClassIdSource = dname, StateClassIdDest = Name, TransitionTypeId = fifelse(kind == "Forest", RET_F, RET_S),
-                Probability = "1", AgeMax = Window - 1L, AgeReset = "No")]   # any age in the window: historical runs follow NLCD (stage 6); projections set the chance by age (ReturnAgeMin, ReturnProbability; stage 9)
-conv <- merge(dest, par[, .(From = dname, Window)], by = "From")[, pw(StratumIdSource = StratumIdSource, StateClassIdSource = From, StateClassIdDest = To,
-            TransitionTypeId = CONV, Probability = "1", Proportion = fmt(Share), AgeMin = Window, AgeReset = "No")]
+# return (probability 1 at any age in the window; the chance is a multiplier: NLCD maps in history, by age in projections), by
+# ecodivision where the class's window differs between them; conversion at the window's end
+wv <- pd_varies(res, "Window"); rt <- res[, .(From = dname, Ecodivision, Name = Parent, kind, Window)]
+rt <- one_or_each(rt, par$dname[match(names(wv)[wv], par$Name)])
+ret <- rt[, pw(StratumIdSource = Ecodivision, StateClassIdSource = From, StateClassIdDest = Name, TransitionTypeId = fifelse(kind == "Forest", RET_F, RET_S),
+               Probability = "1", AgeMax = Window - 1L, AgeReset = "No")]   # historical runs follow NLCD (stage 6); projections set the chance by age (stage 9)
+conv <- dest[, pw(StratumIdSource = Ecodivision, StateClassIdSource = From, StateClassIdDest = To, TransitionTypeId = CONV, Probability = "1",
+                  Proportion = fmt(Share), AgeMin = Window, AgeReset = "No")]
 wr(rbind(ret, conv), D("transitions", "pathways", "post-disturbance.csv"))
 # fire: high severity moves the parent to its disturbed class; in the disturbed class a high-severity reburn converts ReburnConversion
-# of the cells (by the conversion shares) and starts the rest again at age 0; medium and low severity keep the class and its age
+# of the cells (by the conversion shares) and starts the rest again at age 0, in the same ecodivisions as the conversion rows;
+# medium and low severity keep the class and its age
 fire <- rd(D("transitions", "pathways", "fire.csv")); fire <- fire[!startsWith(StateClassIdSource, PFX)]
 hi <- fire$TransitionTypeId == "Fire: High Severity" & fire$StateClassIdSource %in% par$Name
 set(fire, which(hi), "StateClassIdDest", par$dname[match(fire$StateClassIdSource[hi], par$Name)])
-reb <- merge(dest, par[, .(From = dname, ReburnConversion)], by = "From")
-reb <- rbind(reb[, pw(StratumIdSource = StratumIdSource, StateClassIdSource = From, StateClassIdDest = To, TransitionTypeId = "Fire: High Severity",
-                      Probability = "1", Proportion = fmt(Share * ReburnConversion), AgeReset = "Yes")],
-             par[, pw(StateClassIdSource = dname, StateClassIdDest = dname, TransitionTypeId = "Fire: High Severity", Probability = "1",
-                      Proportion = fmt(1 - ReburnConversion), AgeReset = "Yes")])
-# a class with conversion rows by ecodivision needs its stay row in each ecodivision too, so the proportions add up there
-byeco <- unique(dest[!is.na(StratumIdSource), From])
-reb <- rbind(reb[!(StateClassIdSource %in% byeco & StateClassIdDest == StateClassIdSource)],
-             CJ(From = byeco, StratumIdSource = eco)[par, on = .(From = dname), nomatch = 0][, pw(StratumIdSource = StratumIdSource, StateClassIdSource = From,
-                StateClassIdDest = From, TransitionTypeId = "Fire: High Severity", Probability = "1", Proportion = fmt(1 - ReburnConversion), AgeReset = "Yes")])
+reb <- rbind(dest[, pw(StratumIdSource = Ecodivision, StateClassIdSource = From, StateClassIdDest = To, TransitionTypeId = "Fire: High Severity",
+                       Probability = "1", Proportion = fmt(Share * ReburnConversion), AgeReset = "Yes")],
+             unique(dest[, .(From, Ecodivision, ReburnConversion)])[, pw(StratumIdSource = Ecodivision, StateClassIdSource = From, StateClassIdDest = From,
+                       TransitionTypeId = "Fire: High Severity", Probability = "1", Proportion = fmt(1 - ReburnConversion), AgeReset = "Yes")])
 ml <- par[, .(t = c("Fire: Medium Severity", "Fire: Low Severity")), by = dname][, pw(StateClassIdSource = dname, StateClassIdDest = dname, TransitionTypeId = t,
                                                                                  Probability = "1", AgeReset = "No")]
 wr(rbind(fire, reb, ml), D("transitions", "pathways", "fire.csv"))

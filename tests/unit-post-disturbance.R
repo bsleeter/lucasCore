@@ -25,29 +25,41 @@ fire <- rd(D("transitions", "pathways", "fire.csv")); pd <- rd(D("transitions", 
 hi <- fire[TransitionTypeId == "Fire: High Severity"]
 check("high-severity fire on every parent leads to its disturbed class (age reset), and none stays in the parent",
       all(vapply(seq_len(nrow(par)), function(i) { x <- hi[StateClassIdSource == par$Name[i]]; nrow(x) == 1 && x$StateClassIdDest == par$dname[i] && x$AgeReset == "Yes" }, TRUE)))
-st <- fread(D("transitions", "post-disturbance-settings.csv")); par[, set := fifelse(as.integer(Id) >= 100, "Forest", Name)]; par <- merge(par, st, by.x = "set", by.y = "ParentClass")
+source(file.path("src", "post-disturbance.R")); eco <- rd(D("strata", "ecodivisions-list.csv"))$Name
+st <- fread(D("transitions", "post-disturbance-settings.csv"), na.strings = "")
+res <- pd_resolve(st, par$Name, as.integer(par$Id) >= 100, eco); res[, dname := par$dname[match(Parent, par$Name)]]
+check("settings: every ecodivision named is in the ecodivision list, and a resolution for part of them ignores the rest",
+      all(na.omit(st$Ecodivision) %in% eco) && nrow(pd_resolve(st, "Forest: Oak/Pine Group", TRUE, "Marine")) == 1)
+check("settings: every parent class has a window, return and reburn share in every ecodivision; a class's own row beats Forest, an ecodivision's row beats the blank one",
+      nrow(res) == nrow(par) * length(eco) && !anyNA(res[, .(Window, ReturnAgeMin, ReturnProbability, ReburnConversion)]) &&
+      res[Parent == "Forest: Loblolly/Shortleaf Pine Group" & Ecodivision == "Subtropical", Window] == st[ParentClass == "Forest" & Ecodivision %in% "Subtropical", Window] &&
+      res[Parent == "Forest: Loblolly/Shortleaf Pine Group" & Ecodivision == "Marine", Window] == st[ParentClass == "Forest" & is.na(Ecodivision), Window] &&
+      identical(pd_resolve(data.table(ParentClass = c("Forest", "Forest: Oak/Pine Group"), Ecodivision = NA, Window = c(30, 9)), c("Forest: Oak/Pine Group", "Forest: Oak/Hickory Group"), c(TRUE, TRUE), "Marine")$Window, c(9, 30)))
+# the pathway rows for a class and ecodivision: the ecodivision's own rows, or the blank-stratum rows when the class has none of its own
+in_eco <- function(x, e) { y <- x[StratumIdSource %in% e]; if (nrow(y)) y else x[is.na(StratumIdSource)] }
 ret <- pd[TransitionTypeId %in% RT]
-check("each disturbed class can return to its parent at any age in its window (probability 1: the chance is a multiplier), age kept, by its kind's type",
-      all(vapply(seq_len(nrow(par)), function(i) { p <- par[i]; x <- ret[StateClassIdSource == p$dname]
-        nrow(x) == 1 && x$StateClassIdDest == p$Name && is.na(x$AgeMin) && num(x$AgeMax) == p$Window - 1 && x$AgeReset == "No" &&
-          x$TransitionTypeId == RT[[if (as.integer(p$Id) >= 100) "Forest" else "Shrub"]] && num(x$Probability) == 1 }, TRUE)))
+check("each disturbed class can return to its parent at any age in its window, in every ecodivision (probability 1: the chance is a multiplier), age kept, by its kind's type",
+      all(vapply(seq_len(nrow(res)), function(i) { p <- res[i]; x <- in_eco(ret[StateClassIdSource == p$dname], p$Ecodivision)
+        nrow(x) == 1 && x$StateClassIdDest == p$Parent && is.na(x$AgeMin) && num(x$AgeMax) == p$Window - 1 && x$AgeReset == "No" &&
+          x$TransitionTypeId == RT[[if (p$Parent %in% SHRUBS) "Shrub" else "Forest"]] && num(x$Probability) == 1 }, TRUE)))
+check("no class has both a blank-stratum row and ecodivision rows for one transition type (ST-Sim would apply both)",
+      all(pd[, !(any(is.na(StratumIdSource)) && any(!is.na(StratumIdSource))), by = .(StateClassIdSource, TransitionTypeId)]$V1) &&
+      all(fire[startsWith(StateClassIdSource, "Disturbed: "), !(any(is.na(StratumIdSource)) && any(!is.na(StratumIdSource))), by = .(StateClassIdSource, TransitionTypeId)]$V1))
 so <- rd(D("transitions", "sources.csv"))
 check("stage 6 sources: return on NLCD two years running (forest incl. woody wetland, shrub), conversion on everywhere",
       so[TransitionGroupId == paste(RT[["Forest"]], "[Type]"), Source == "NlcdPersist" & Classes == "41|42|43|90"] && so[TransitionGroupId == paste(RT[["Shrub"]], "[Type]"), Source == "NlcdPersist" & Classes == "52"] &&
       so[TransitionGroupId == paste(CV, "[Type]"), Source == "All"])
-eco <- rd(D("strata", "ecodivisions-list.csv"))$Name
-# proportions of one choice add up in every ecodivision (rows with a blank stratum apply in all of them)
-adds_up <- function(x) all(vapply(eco, function(e) { y <- x[is.na(StratumIdSource) | StratumIdSource == e]; nrow(y) > 0 && abs(sum(num(ifelse(is.na(y$Proportion), "1", y$Proportion))) - 1) < 1e-6 }, TRUE))
 cv <- pd[TransitionTypeId == CV]
-check("conversion at the window's end: proportions add to 1 in every ecodivision, to existing classes",
-      all(vapply(seq_len(nrow(par)), function(i) { x <- cv[StateClassIdSource == par$dname[i]]; adds_up(x) && all(num(x$AgeMin) == par$Window[i]) }, TRUE)) && all(cv$StateClassIdDest %in% sc$Name))
+check("conversion at the window's end: proportions add to 1 in every ecodivision, at that ecodivision's window, to existing classes",
+      all(vapply(seq_len(nrow(res)), function(i) { p <- res[i]; x <- in_eco(cv[StateClassIdSource == p$dname], p$Ecodivision)
+        nrow(x) > 0 && abs(sum(num(x$Proportion)) - 1) < 1e-6 && all(num(x$AgeMin) == p$Window) }, TRUE)) && all(cv$StateClassIdDest %in% sc$Name))
 check("disturbed forest converts to its ecodivision's shrub or grass class; sage, sage steppe and chaparral to annual grass",
-      all(cv[startsWith(StateClassIdSource, "Disturbed: ") & StateClassIdSource %in% par[as.integer(Id) >= 100, dname], StateClassIdDest] %in%
+      all(cv[StateClassIdSource %in% par[as.integer(Id) >= 100, dname], StateClassIdDest] %in%
             unlist(fread(D("transitions", "post-disturbance-regions.csv"))[, .(ShrubClass, GrassClass)])) &&
       all(cv[StateClassIdSource %in% par[Name %in% SHRUBS[c(1:3, 5)], dname], StateClassIdDest] == "Grassland: Annual"))
 check("a high-severity reburn: proportions add to 1 in every ecodivision; the share staying is 1 - ReburnConversion, age reset",
-      all(vapply(seq_len(nrow(par)), function(i) { x <- hi[StateClassIdSource == par$dname[i]]; s <- x[StateClassIdDest == par$dname[i]]
-        adds_up(x) && all(x$AgeReset == "Yes") && all(abs(num(s$Proportion) - (1 - par$ReburnConversion[i])) < 1e-6) }, TRUE)))
+      all(vapply(seq_len(nrow(res)), function(i) { p <- res[i]; x <- in_eco(hi[StateClassIdSource == p$dname], p$Ecodivision); s <- x[StateClassIdDest == p$dname]
+        nrow(s) == 1 && abs(sum(num(x$Proportion)) - 1) < 1e-6 && all(x$AgeReset == "Yes") && abs(num(s$Proportion) - (1 - p$ReburnConversion)) < 1e-6 }, TRUE)))
 check("medium and low severity keep a disturbed class and its age",
       all(vapply(par$dname, function(d) { x <- fire[StateClassIdSource == d & TransitionTypeId %in% c("Fire: Medium Severity", "Fire: Low Severity")]
         nrow(x) == 2 && all(x$StateClassIdDest == d) && all(x$AgeReset == "No") }, TRUE)))
