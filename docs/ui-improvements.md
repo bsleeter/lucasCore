@@ -1429,14 +1429,50 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       - Before the start year: only fire perimeters date a disturbance, so DisturbedStart Fire leaves the 1980 blast zone, older
         windthrow and insect kill as young forest with their NLCD regrowth age. Option: an optional Data Source of recorded
         stand-replacing events (polygons with year and cause: the Mount St Helens 1980 blast and debris zones, large hurricanes, bark
-        beetle outbreaks), read with the fire perimeters, so DisturbedStart Fire becomes "Recorded".
-      - During the record: only fire and harvest are modelled. Stage 6 takes clearcut and selection from LCMS Tree Removal (class 9,
+        beetle outbreaks), read with the fire perimeters, so DisturbedStart Fire becomes "Recorded". The user's version (2026-11-11:
+        "a gis boundary layer and then a date the user can either set (or read from the layer itself)"): an uploaded events file,
+        a polygon layer plus a year typed in the Build or taken from a field of the layer. Agreed as the clean approach for St
+        Helens; not built. It is the only route for land never forest in the record (see the St Helens split below).
+      - During the record (user, 2026-11-11: "for now, I do not want to model these changes", so not to build; the record is used
+        only to start cells in 1985): only fire and harvest are modelled. Stage 6 takes clearcut and selection from LCMS Tree Removal (class 9,
         split by what NLCD shows next), and the LCMS Change layer already downloaded (v2025-11, 1985 on) names other causes: 1 Wind,
         2 Hurricane, 3 Snow or Ice, 4 Desiccation, 5 Inundation, 10 Defoliation, 11 Southern Pine Beetle, 12 Insect, Disease or
         Drought Stress, 13 Other Loss (`dev/harvest/02-lcms-vs-nlcd.R`). Option: a "Disturbance: Stand-Replacing" group from those
         codes split "standrep" as Tree Removal is (shrub or grass in NLCD within two years), with pathways from each forest class to
         its disturbed class (age reset) as high-severity fire has. Return then follows NLCD as for fire. No new download. In
         projections it needs a rate (the historical years' area, drawn as fire is, or a mean by ecodivision).
+    - **TO DO, design agreed in outline (user, 2026-11-11-12): a reforestation transition for natural non-forest that becomes
+      forest with no fire or harvest behind it.** The user's idea: such a cell starts as what NLCD calls it in 1985, grows on that
+      class's curve, and moves to forest when NLCD shows forest; in projections a spatial multiplier (a suitability layer, as other
+      transitions have) says where it is likely. Measured first, since stage 5's any-year rule already folds most of this into
+      forest:
+      - How big (`dev/fire/reforestation-conus.R`, 200k random 30 m points, Annual NLCD 1985-2025, LCMS v2025-11 and MTBS 1985-2023;
+        event: natural 31, 52, 71, 95 to forest 41-43, 90 two years running, forest in 2/3 of the years after). CONUS, 1986-2023:
+        38.6 Mha of events; 18.4 after harvest, 1.8 after fire, 5.0 forest earlier in the record and lost with no recorded cause,
+        13.5 Mha (355 kha a year, falling from about 610 to 170 kha a year by decade) non-forest since 1985 with nothing recorded.
+        Subtropical has the most.
+      - Split of those 13.5 Mha by timing, LANDFIRE BpS 2020 group and later harvest (`dev/fire/reforestation-conus-split.R`):
+        | Reading | Mha | kha a year | cut again later |
+        |---|---|---|---|
+        | forest by 2004, BpS forest: clearcut regrowth, already right (any-year rule, NLCD regrowth age) | 7.3 | 192 | 32% |
+        | forest from 2005, BpS forest: slow recovery, the St Helens type | 2.6 | 69 | 1% |
+        | BpS non-forest (mostly NLCD shrub on BpS shrubland or grassland, dry West and Prairie): encroachment | 1.7 | 44 | 4% |
+        | BpS riparian, savanna or other (1.1 of it Subtropical, probably bottomland regrowth) | 1.9 | 50 | 27% |
+        So real reforestation is about 4.3 Mha, about 113 kha a year. Caveats: per 30 m pixel (the model grid smooths flicker), each
+        point is about 6,700 ha so some ecodivision numbers rest on a few dozen points, BpS is modelled potential, and 2004 is the
+        regrowth rule's 20-year limit, not fitted.
+      - Mount St Helens (`dev/fire/st-helens.R`, a 1,783 km2 box over the mountain and the blast zone to its north, so it also holds
+        nearby harvest land): 872 km2 natural non-forest in 1985. 438 km2 (50%) forest by 2004, almost all BpS forest, mostly
+        1995-2004: stays forest in 1985. 155 km2 (18%) forest from 2005, at a falling rate (61, 46, 27, 22 km2 per five years): the
+        transition's case. 279 km2 (32%) never forest by 2025, half barren (the pumice plain and debris avalanche) but 176 km2 BpS
+        forest: only the events file reaches it. Group map `dev/fire/st-helens-groups.tif` (not committed).
+      - The narrower design this points to: keep the any-year rule for cells first forest by 2004 on BpS forest, riparian or
+        savanna (clearcut regrowth); apply the reforestation transition to cells first forest from 2005 on BpS forest (slow
+        recovery: start as the 1985 class) and to cells on BpS non-forest (encroachment: no legacy dead wood; the natural one for the
+        projection suitability surface, since it continues). Fire-dated cells, and event-file cells if added, still start in the
+        disturbed class. Open: the 2004 cutoff counts from the start year, not the disturbance, so cells first forest in 2003 and
+        2006 start very differently; whether to use the regrowth rule's 20 years or fit it; the suitability layer's predictors;
+        whether open woodland flicker (the half of P26's rule cells that flicker) belongs here or stays forest.
     - **TO DECIDE (user, 2026-11-11: "make the wetland decision something to address"): what a burned forested wetland converts
       to.** The GDS test showed a burned swamp converting to Shrubland: Non-sage, the region's shrub class, at a reburn or the
       window's end. Upland shrub carbon and no burial are wrong for a swamp that stays wet. Options:
