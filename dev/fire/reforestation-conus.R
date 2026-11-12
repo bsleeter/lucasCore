@@ -16,7 +16,8 @@ ev <- extract(eco, xy)[, 1]; keep <- !is.na(ev) & ev > 0; xy <- xy[keep, ]; ev <
 frac <- mean(keep); cat(sprintf("%d of %d points on CONUS land (ecodivision map): %.0f%%\n", nrow(xy), n, 100 * frac))
 files <- c(setNames(vapply(yrs, function(y) list.files(file.path(DS, "NLCD", "Annual NLCD"), sprintf("^Annual_NLCD_LndCov_%d_CU_C1V.[.]tif$", y), full.names = TRUE)[1], ""), paste0("n", yrs)),
            setNames(vapply(1985:2023, function(y) list.files(file.path(DS, "LCMS", "v2025-11", "Change_Annual", y), "Change_.*[.]tif$", full.names = TRUE)[1], ""), paste0("l", 1985:2023)),
-           setNames(file.path(DS, "MTBS", "Burn Severity", sprintf("mtbs_CONUS_%d.tif", 1985:2023)), paste0("m", 1985:2023)))
+           setNames(file.path(DS, "MTBS", "Burn Severity", sprintf("mtbs_CONUS_%d.tif", 1985:2023)), paste0("m", 1985:2023)),
+           bps = file.path(DS, "BpS", "LF2020_BPS_CONUS", "LF2020_BPS_CONUS", "Tif", "LF2020_BPS_CONUS.tif"))
 stopifnot(all(file.exists(files)))
 cl <- makeCluster(20); clusterExport(cl, "xy")
 V <- parLapply(cl, files, function(f) { library(terra); terraOptions(progress = 0); { r <- rast(f); levels(r) <- NULL; as.integer(extract(r, xy)[, 1]) } }); stopCluster(cl)
@@ -30,7 +31,8 @@ for (t in 2:which(yrs == 2023)) { c0 <- is.na(evy) & nat[, t - 1] & f[, t] & f[,
 i <- which(!is.na(evy)); t <- evy[i]
 before <- function(X) vapply(seq_along(i), function(j) any(X[i[j], seq_len(t[j] - 1)]), TRUE)
 fb <- before(dist & !cutm); cb <- before(cutm); wasF <- vapply(seq_along(i), function(j) any(f[i[j], seq_len(t[j] - 1)]), TRUE)
-D <- data.table(eco = ev[i], year = yrs[t], start = N[i, 1], kind = fifelse(fb, "after fire", fifelse(cb, "after harvest", fifelse(wasF, "no record: forest lost in the record", "no record: non-forest since 1985"))))
+cut_after <- vapply(seq_along(i), function(j) any(cutm[i[j], t[j]:ncol(cutm)]), TRUE)
+D <- data.table(pt = i, x = xy[i, 1], y = xy[i, 2], eco = ev[i], year = yrs[t], start = N[i, 1], bps = V$bps[i], cut_after, kind = fifelse(fb, "after fire", fifelse(cb, "after harvest", fifelse(wasF, "no record: forest lost in the record", "no record: non-forest since 1985"))))
 # area: each sample point stands for CONUS land area / points on land; CONUS land area from the ecodivision map's pixel count
 land_px <- global(!is.na(eco) & eco > 0, "sum", na.rm = TRUE)[[1]]; ha_pt <- land_px * 0.09 / nrow(xy)
 fwrite(D, file.path(out, "events.csv")); saveRDS(list(ev = ev, f1985 = f[, 1], f2023 = f[, which(yrs == 2023)], nat1985 = nat[, 1], nat2005 = nat[, which(yrs == 2005)], flick = flick & is.na(evy), ha_pt = ha_pt), file.path(out, "sample.rds"))
