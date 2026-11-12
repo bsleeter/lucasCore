@@ -2,6 +2,15 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+### Added
+- Harvested wood products model (to-do 59, not yet a stage): `src/wood-products.R` follows the carbon that harvest moves to
+  Forestry Sector through products in use, landfills and dumps, with the USFS method (Smith et al. 2006, Skog 2008, the HWP-C
+  calculator) and its parameter tables in `defaults/wood-products`. Tests: `tests/unit-wood-products.R` and
+  `tests/unit-wood-products-national.R`; on a national harvest series the model's stock is within 7% of the US Inventory's and its
+  stock change within 3% (1990-2016).
+
 ## 1.3.2 - 2026-11-11
 
 A fix for projections started from a 1.3 historical run, and better starting ages for regrowing forest.

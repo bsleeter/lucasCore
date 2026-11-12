@@ -17,7 +17,7 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | later | 55 Grass and shrub stocks fitted to literature (chaparral wood turnover 0.08; non-sage and native sage steppe split by RAP herb share) | Yes | Refit done 2026-11-09 (item 55); left: the RAP tests at the Sky Oaks towers, the foothill chaparral scale | - |
 | next | 56 Run Build stages on their own or a few in sequence, each result a dependency of the next | No (the same results, fewer reruns) | Added 2026-11-10 (user), after the Great Dismal Swamp Build failed in stage 8 after 44 minutes and had to be rerun whole | - |
 | later | 57 A post-disturbance state for forest: regrowth after a delay, or conversion to non-forest, with adjacency to a seed source | Yes (burned forest waits, returns or converts; carbon of the waiting years) | Added 2026-11-11 (user). P26: about a quarter of single high-severity burns are not forest after 30 years in NLCD, and reburns mostly convert | 58 (developed together) |
-| next | 59 Harvested wood products: the fate of the carbon in Forestry Sector, after a run (stage 18, not spatial) | Yes, in reporting (wood products pools and their emissions; an NBP that counts storage in products). The ST-Sim runs do not change | Added 2026-11-11 (user). Forestry Sector has no flows out today, so harvested wood is stored forever | Parameter tables sourced (item 59, step 1) |
+| next | 59 Harvested wood products: the fate of the carbon in Forestry Sector, after a run (stage 18, not spatial) | Yes, in reporting (wood products pools and their emissions; an NBP that counts storage in products). The ST-Sim runs do not change | Added 2026-11-11 (user). Forestry Sector has no flows out today, so harvested wood is stored forever | Parameter tables and the model done (item 59, steps 1-2); next the stage |
 | later | 58 Management and mitigation for disturbed forest: replanting and restoration, salvage, site preparation, fuel treatments | Yes, in scenarios that turn them on | Added 2026-11-11 (user). Developed with 57 so its structure takes these actions | 57 (developed together) |
 | release | 46 CO2 fertilization | Yes, in projections with a Projection Climate result (Central by default; None turns it off) | Added 2026-11-04; built, tested (Puget run, age-band check), documented (guide 7.3.1) and pushed 2026-11-06. Left: a release | - |
 | later | 47 Example libraries by region and resolution | No (each holds its own results) | Added 2026-11-04, replaces 13. Best built after the open science items, since each carbon change dates them | 14, restore test |
@@ -1434,9 +1434,23 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     templates and the California, Oregon and Washington inputs). Smith's Table 8 decay curves are rebuilt from Tables D2 and D3 to
     within 0.001. Choices made: Smith's Table D6 for primary products, with its West hardwood row for RMN, RMS, PWE and PSW (the HWP-C
     templates fill those gaps with 100% fuel); sawtimber end uses for lumber and plywood whatever the log; Table D3 half-lives (HWP-C),
-    not Skog 2008's calibrated ones; state lists of Smith's map-only regions read as the RPA regions, to check against Fig. 1. Left:
-    a 1906 harvest history outside CA, OR and WA (RPA removals by region, Oswalt et al. 2019 Table 35 and earlier editions, come out
-    of the PDF garbled and need care); the land-clearing utilized share (Table 40); the national check.
+    not Skog 2008's calibrated ones. Smith's region map read from its page image: Ohio is in the Northeast.
+    Harvest history (2026-11-11): `regional-harvest-history.csv`, each Smith region 1906-1997 (Pacific 1906-2019), from three tables
+    transcribed from page images into `defaults/wood-products/transcribed/` and checked against their printed totals: Haynes 2003
+    Tables 16 and 13 (removals by RPA region, subregion shares, 1952-97) and the 1956 Historical Forestry Statistics Table 15 (lumber
+    by Census region 1905-54, spliced at 1952); CA, OR and WA from their state inventories. Only the shape is used (the stage scales it
+    to the run's first decade). Extended 2026-11-12 to 2016 outside the Pacific by FRUS 2017 (Oswalt et al. 2019) Table 35's change
+    by subregion from 1996. Land clearing: no source gives the utilized share (Table 40 has only the unutilized "other removals"), so
+    lucasCore assumes 0.5, drawn over 0 to 1, in settings.csv - a placeholder for the user to confirm or replace.
+  - **Step 2, the model - done 2026-11-12:** `src/wood-products.R` (wp_params, wp_split, wp_spinup, wp_draws, wp_model, wp_summary,
+    wp_pulse). Tests: `tests/unit-wood-products.R` (28 checks: by hand, conservation, spin-up, draws, Smith Tables 6 and 8) and
+    `tests/unit-wood-products-national.R` (the regional histories scaled to the US roundwood harvest, FRUS Table 41: stock 0.93-0.98
+    of the Inventory's in 1990, 2005, 2016; stock change 0.97-1.03; SWDS 1.00-1.02; products in use 0.87-0.90, the Inventory's housing
+    starting in 1800). Choices recorded in the README: the run's flow is what left the site (Smith's roundwood share not applied
+    again); bark burned with energy capture; mill fuel all energy, as in HWP-C; landfill decay as CO2, as in HWP-C. The model wants
+    removals by Smith region, forest type and cause (Harvest or Clearing); the stage (step 3) maps ecodivisions and transition types
+    to them. The Northern Region comparison (Stockmann et al. 2012) in the step list was replaced by the national check, which tests
+    more of the chain.
     A design point for step 2: Smith's industrial roundwood ratios exceed 1 for pulpwood (it also comes from tops and cull, which the
     model keeps in Other Wood), so the stage uses Smith's ratios as shares of the removed carbon, which is conserved.
   - **Steps:** (1) source the parameter tables and write them to `defaults/wood-products` with citations; check that national

@@ -1,7 +1,7 @@
 Region,Name,GrowingStockRegion,RoundwoodRegion,ProductRegion,West,States,Ecodivisions
-NE,Northeast,Northeast,Northeast,Northeast,FALSE,Connecticut;Delaware;Maine;Maryland;Massachusetts;New Hampshire;New Jersey;New York;Pennsylvania;Rhode Island;Vermont;West Virginia,""
+NE,Northeast,Northeast,Northeast,Northeast,FALSE,Connecticut;Delaware;Maine;Maryland;Massachusetts;New Hampshire;New Jersey;New York;Ohio;Pennsylvania;Rhode Island;Vermont;West Virginia,""
 NLS,Northern Lake States,Northern Lake States,North Central,North Central,FALSE,Michigan;Minnesota;Wisconsin,""
-NPS,Northern Prairie States,Northern Prairie States,North Central,North Central,FALSE,Illinois;Indiana;Iowa;Kansas;Missouri;Nebraska;North Dakota;Ohio;South Dakota,""
+NPS,Northern Prairie States,Northern Prairie States,North Central,North Central,FALSE,Illinois;Indiana;Iowa;Kansas;Missouri;Nebraska;North Dakota;South Dakota,""
 SE,Southeast,Southeast,South,Southeast,FALSE,Florida;Georgia;North Carolina;South Carolina;Virginia,""
 SC,South Central,South Central,South,South Central,FALSE,Alabama;Arkansas;Kentucky;Louisiana;Mississippi;Oklahoma;Tennessee;Texas,""
 RMN,"Rocky Mountain, North",Rocky Mountain; North,Rocky Mountain,Rocky Mountain,TRUE,Idaho;Montana,""

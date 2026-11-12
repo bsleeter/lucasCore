@@ -43,9 +43,9 @@ regions <- data.table(
   ProductRegion = c("Northeast", "North Central", "North Central", "Southeast", "South Central", "Rocky Mountain", "Rocky Mountain", "Pacific Southwest",
                     "Pacific Northwest; East", "Pacific Northwest; West"),
   West = c(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, FALSE),
-  States = c("Connecticut;Delaware;Maine;Maryland;Massachusetts;New Hampshire;New Jersey;New York;Pennsylvania;Rhode Island;Vermont;West Virginia",
+  States = c("Connecticut;Delaware;Maine;Maryland;Massachusetts;New Hampshire;New Jersey;New York;Ohio;Pennsylvania;Rhode Island;Vermont;West Virginia",
              "Michigan;Minnesota;Wisconsin",
-             "Illinois;Indiana;Iowa;Kansas;Missouri;Nebraska;North Dakota;Ohio;South Dakota",
+             "Illinois;Indiana;Iowa;Kansas;Missouri;Nebraska;North Dakota;South Dakota",
              "Florida;Georgia;North Carolina;South Carolina;Virginia",
              "Alabama;Arkansas;Kentucky;Louisiana;Mississippi;Oklahoma;Tennessee;Texas",
              "Idaho;Montana", "Arizona;Colorado;Nevada;New Mexico;Utah;Wyoming", "California",
@@ -159,14 +159,21 @@ w(dh, "swds.csv")
 
 # ---- settings and uncertainty -------------------------------------------------------------------------------------------------
 op <- rt(REG, "HWP_MODEL_OPTIONS")
-w(data.table(Setting = c("LossInUseWood", "LossInUsePaper", "Draws", "Interval"),
-             Value = c(op$PIU.WOOD.LOSS, op$PIU.PAPER.LOSS, op$N.ITER, op$MC.CI.REPORT),
+# LandClearingUtilized: the share of the wood removed by land clearing (urbanization, agricultural expansion) that becomes roundwood.
+# No USFS source gives it: TPO reports only the unutilized part ("other removals", growing stock removed by cultural operations or
+# timberland clearing, Oswalt et al. 2019 Table 40) and counts the utilized part in roundwood products without saying where it came
+# from. lucasCore's assumption is half, with a wide range (uncertainty.csv); the rest is emitted in the year cleared.
+w(data.table(Setting = c("LossInUseWood", "LossInUsePaper", "Draws", "Interval", "LandClearingUtilized"),
+             Value = c(op$PIU.WOOD.LOSS, op$PIU.PAPER.LOSS, op$N.ITER, op$MC.CI.REPORT, 0.5),
              Note = c("share of solid wood lost when placed in use, discarded that year (Stockmann et al. 2012)", "the same for paper (none)",
-                      "parameter draws per run iteration (HWP-C vR default)", "the interval reported (90%)")), "settings.csv")
+                      "parameter draws per run iteration (HWP-C vR default)", "the interval reported (90%)",
+                      "share of land-clearing wood that becomes roundwood (lucasCore assumption: no published value; the rest is emitted when cleared)")), "settings.csv")
 mc <- rt(REG, "MonteCarloValues"); setnames(mc, c("ParameterId", "Parameter", "Paper", "FirstYear", "LastYear", "Min", "Mode", "Max", "Interval"))
 mc[, Material := fcase(Paper == 1, "paper", Paper == 0, "wood", default = "")][, Paper := NULL]
-w(mc[, .(Parameter, Material, FirstYear, LastYear, Min = round(Min, 4), Mode, Max = round(Max, 4), Interval,
-         Note = "triangular multiplier on the parameter, Min and Max the 90% bounds (Stockmann et al. 2012 Table 9)")], "uncertainty.csv")
+w(rbind(mc[, .(Parameter, Material, FirstYear, LastYear, Min = round(Min, 4), Mode, Max = round(Max, 4), Interval,
+               Note = "triangular multiplier on the parameter, Min and Max the 90% bounds (Stockmann et al. 2012 Table 9)")],
+        data.table(Parameter = "LandClearingUtilized", Material = "", FirstYear = NA, LastYear = NA, Min = 0.2, Mode = 1, Max = 1.8, Interval = 0.9,
+                   Note = "lucasCore: a wide triangular multiplier on the assumed share (0.1 to 0.9 at the 90% bounds), as no source gives it")), "uncertainty.csv")
 
 # ---- harvest histories where the HWP-C state inventories have them (thousand board feet, Scribner; board feet per cubic foot) ---
 hist <- rbindlist(lapply(list(c("California", "CA_Inputs_HWP_Model.xlsx", "Loeffler et al. 2019"), c("Oregon", "Oregon_Inputs_HWP_Model.xlsx", "Morgan et al. 2021"),
@@ -176,4 +183,78 @@ hist <- rbindlist(lapply(list(c("California", "CA_Inputs_HWP_Model.xlsx", "Loeff
   h[, BoardFeetPerCubicFoot := vapply(Year, function(y) { k <- b[StartYear <= y & EndYear >= y, Conversion]; if (length(k)) k[1] else b$Conversion[if (y < min(b$StartYear)) 1 else nrow(b)] }, 0)]
   h[, Source := sprintf("%s, via HWP-C vR (%s)", s[3], commit)] }))
 w(hist, "state-harvest-history.csv")
+
+# ---- the 1906-on harvest history of each Smith region, for the stage's spin-up (to-do 59) ------------------------------------
+# Only its shape matters: the stage scales a region's series to the run's own removals over the run's first decade. So each region
+# takes the nearest published series, in million cubic feet of growing-stock removals (the quantity ST-Sim's harvest flow is):
+#   1952-1997  Haynes 2003 Table 16 removals of the RPA region (North, South, Rocky Mountains, Pacific Coast) by wood type, times the
+#              subregion's share of the region's harvest in Haynes Table 13 (Northeast, North Central, Southeast, South Central,
+#              North and South Rocky Mountains, PNW West and East, Pacific Southwest; hardwood West as one), linear between the years
+#   1906-1951  the 1956 Historical Forestry Statistics Table 15 lumber production of the Census region nearest the Smith region,
+#              spliced to the 1952 removals (its 1950-54 mean = the 1952 value), split by wood type as in 1952; 1948 (total only)
+#              linear between 1947 and 1949
+#   1998-2016  outside the Pacific: the 1997 value times the change of the FRUS 2017 (Oswalt et al. 2019) Table 35 subregion from
+#              1996 to 2006 and 2016, linear between (Rocky Mountain total, as Haynes's Rocky Mountains include the Great Plains)
+#   Pacific    the state harvest histories above (California for PSW, Oregon plus Washington for PNW West and East, split as Table 13
+#              splits them), 1906-2019, in cubic feet, split by wood type as Haynes Table 16 splits the Pacific Coast
+# The transcribed tables are in transcribed/ (README.md says how each was checked). Before 1952 lumber stands for all products
+# (pulpwood was a smaller share then), and the Rocky Mountains of Table 16 include the Great Plains; both only bend the shape.
+tr <- function(f) fread(file.path(out, "transcribed", f), header = TRUE)
+rem <- melt(tr("rpa-removals-by-region-1952-1997.csv"), id.vars = c("Region", "Wood"), variable.name = "Year", value.name = "Removals", variable.factor = FALSE)[, Year := as.integer(Year)]
+hv <- melt(tr("rpa-harvest-by-subregion-1952-1996.csv"), id.vars = c("Subregion", "Wood"), variable.name = "Year", value.name = "Harvest", variable.factor = FALSE)[, Year := as.integer(Year)]
+hv[Year == 1996L, Year := 1997L]   # Table 13's last year beside Table 16's
+lum <- tr("lumber-by-census-region-1905-1954.csv"); lum[, (names(lum)[2:10]) := lapply(.SD, as.numeric), .SDcols = 2:10]
+px <- data.table(Region = regions$Region,
+  RpaRegion = c("North", "North", "North", "South", "South", "Rocky Mountains", "Rocky Mountains", "Pacific Coast", "Pacific Coast", "Pacific Coast"),
+  SubregionSW = c("Northeast", "North Central", "North Central", "Southeast", "South Central", "North Rocky Mountains", "South Rocky Mountains",
+                  "Pacific Southwest", "Pacific Northwest East", "Pacific Northwest West"),
+  SubregionHW = c("Northeast", "North Central", "North Central", "Southeast", "South Central", "West", "West", "West", "West", "West"),
+  Lumber = c("NewEngland+MiddleAtlantic", "Lake", "Central", "SouthAtlantic", "South", "RockyMountain", "RockyMountain", "", "", ""),
+  States = c("", "", "", "", "", "", "", "California", "Oregon+Washington", "Oregon+Washington"),
+  Frus = c("Northeast", "North Central", "North Central", "Southeast", "South Central", "Rocky Mountain total", "Rocky Mountain total", "", "", ""))
+frus <- tr("frus2017-removals-by-subregion-1976-2016.csv")   # thousand cubic feet
+sub_of <- list(North = c("Northeast", "North Central"), South = c("Southeast", "South Central"), `Rocky Mountains` = c("North Rocky Mountains", "South Rocky Mountains"),
+               `Pacific Coast` = c("Pacific Northwest West", "Pacific Northwest East", "Pacific Southwest"))
+YRS <- sort(unique(rem$Year)); interp <- function(x, y, at) approx(x, y, at, rule = 2)$y
+share <- function(p, wd) {   # the subregion's share of its RPA region's harvest in each Table 13 year (hardwood West: the whole region)
+  s <- if (wd == "SW") p$SubregionSW else p$SubregionHW; if (s == "West") return(rep(1, length(YRS)))
+  vapply(YRS, function(y) hv[Wood == wd & Year == y & Subregion == s, Harvest] / hv[Wood == wd & Year == y & Subregion %in% sub_of[[p$RpaRegion]], sum(Harvest)], 0) }
+lum[Year == 1948L, (names(lum)[3:10]) := lapply(names(lum)[3:10], function(k) interp(lum[Year %in% c(1947L, 1949L), Year], lum[Year %in% c(1947L, 1949L), get(k)], 1948))]
+lum[, `NewEngland+MiddleAtlantic` := NewEngland + fifelse(is.na(MiddleAtlantic), 0, MiddleAtlantic)]
+hist_c <- hist[, .(Year, State, Mcf = HarvestMBF * 1000 / BoardFeetPerCubicFoot / 1e6)]
+LASTP <- hist_c[, max(Year), by = State][, min(V1)]
+reg_hist <- rbindlist(lapply(seq_len(nrow(px)), function(i) { p <- px[i]
+  survey <- rbindlist(lapply(c("SW", "HW"), function(wd) data.table(Wood = wd, Year = YRS, Removals = rem[Region == p$RpaRegion & Wood == wd][order(Year), Removals] * share(p, wd))))
+  if (nzchar(p$States)) {   # Pacific: the state series, split by subregion share and wood type
+    st <- strsplit(p$States, "+", fixed = TRUE)[[1]]; y <- 1906:LASTP; tot <- hist_c[State %in% st & Year %in% y, .(Mcf = sum(Mcf)), by = Year][order(Year)]
+    if (nrow(tot) != length(y)) stop("state history has gaps for ", p$Region)
+    sh <- if (length(st) > 1) interp(YRS, share(p, "SW"), y) else rep(1, length(y))
+    pc <- rem[Region == "Pacific Coast"]; hw <- interp(YRS, pc[Wood == "HW"][order(Year), Removals] / (pc[Wood == "HW"][order(Year), Removals] + pc[Wood == "SW"][order(Year), Removals]), y)
+    return(rbind(data.table(Region = p$Region, Wood = "SW", Year = y, Removals = tot$Mcf * sh * (1 - hw), Basis = sprintf("%s harvest (state inventory)%s", p$States, if (length(st) > 1) " x Haynes 2003 Table 13 subregion share" else "")),
+                 data.table(Region = p$Region, Wood = "HW", Year = y, Removals = tot$Mcf * sh * hw, Basis = sprintf("%s harvest (state inventory), hardwood share of Haynes 2003 Table 16 Pacific Coast", p$States)))) }
+  # after 1997: the 1997 value times the FRUS 2017 Table 35 subregion's change from 1996, at 2006 and 2016, linear between
+  f35 <- function(wd, y) frus[Subregion == p$Frus & Wood == wd, get(as.character(y))] / frus[Subregion == p$Frus & Wood == wd, `1996`]
+  ext <- rbindlist(lapply(c("SW", "HW"), function(wd) data.table(Wood = wd, Year = c(2006L, 2016L), Removals = survey[Wood == wd & Year == max(YRS), Removals] * c(f35(wd, 2006), f35(wd, 2016)))))
+  sv <- rbind(survey, ext)[order(Wood, Year)]; y2 <- 1952:2016
+  after <- rbindlist(lapply(c("SW", "HW"), function(wd) data.table(Region = p$Region, Wood = wd, Year = y2, Removals = interp(sv[Wood == wd, Year], sv[Wood == wd, Removals], y2),
+                 Basis = fifelse(y2 <= max(YRS), sprintf("Haynes 2003 Table 16 %s removals x Table 13 %s share", p$RpaRegion, if (wd == "SW") p$SubregionSW else p$SubregionHW),
+                                 sprintf("the 1997 value x FRUS 2017 Table 35 %s change from 1996", p$Frus)))))
+  L <- lum[, .(Year, L = get(p$Lumber))]; k <- survey[Year == 1952L, sum(Removals)] / L[Year %in% 1950:1954, mean(L)]; f_hw <- survey[Year == 1952L & Wood == "HW", Removals] / survey[Year == 1952L, sum(Removals)]
+  y1 <- 1906:1951; before <- rbind(data.table(Region = p$Region, Wood = "SW", Year = y1, Removals = L[match(y1, Year), L] * k * (1 - f_hw)),
+                                   data.table(Region = p$Region, Wood = "HW", Year = y1, Removals = L[match(y1, Year), L] * k * f_hw))[
+    , Basis := sprintf("1956 Historical Forestry Statistics Table 15 lumber, %s, spliced to the 1952 removals", p$Lumber)]
+  rbind(before, after) }))
+if (reg_hist[, anyNA(Removals) || any(Removals < 0)]) stop("regional harvest history has missing or negative values")
+w(reg_hist[, Removals := round(Removals, 2)][order(Region, Wood, Year)], "regional-harvest-history.csv")
+# the shape check: where a state series and Haynes overlap (California and PSW, Oregon plus Washington and PNW), they should move together
+for (r in c("PSW", "PWW")) { a <- reg_hist[Region == r & Year %in% YRS, .(v = sum(Removals)), by = Year]
+  p <- px[Region == r]; b <- vapply(YRS, function(y) sum(rem[Region == p$RpaRegion & Year == y, Removals] * c(SW = share(p, "SW")[match(y, YRS)], HW = 1)[rem[Region == p$RpaRegion & Year == y, Wood]]), 0)
+  cat(sprintf("%s: state series vs Haynes in the survey years, correlation %.2f, ratio %s\n", r, cor(a$v, b), paste(sprintf("%.2f", a$v / b), collapse = " "))) }
+# FRUS 2017 and Haynes should agree where both give a year (1976, and 1996 against Haynes's 1997): their ratio by subregion
+for (r in c("Northeast", "North Central", "Southeast", "South Central")) for (wd in c("SW", "HW")) {
+  reg <- names(sub_of)[vapply(sub_of, function(v) r %in% v, TRUE)]
+  hr <- vapply(c(1976L, 1997L), function(y) rem[Region == reg & Wood == wd & Year == y, Removals] * hv[Subregion == r & Wood == wd & Year == y, Harvest] /
+                                            hv[Subregion %in% sub_of[[reg]] & Wood == wd & Year == y, sum(Harvest)], 0)
+  fr <- unlist(frus[Subregion == r & Wood == wd, .(`1976`, `1996`)]) / 1000
+  cat(sprintf("FRUS 2017 / Haynes, %s %s: 1976 %.2f, 1996/97 %.2f\n", r, wd, fr[1] / hr[1], fr[2] / hr[2])) }
 cat("HWP-C vR commit", commit, "\n")
