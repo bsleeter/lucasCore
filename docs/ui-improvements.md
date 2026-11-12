@@ -1381,8 +1381,25 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       not yet the NLCD class at the time. The three groups and Post-disturbance get maps (main-transition-groups.csv). GDS copy
       (stage 6 on the step 2 result, 1985-2012, 34 min): the 2008 fire put 540 ha into Disturbed: Wetland Oak/Gum/Cypress Group;
       313 ha returned in 2009 (NLCD kept them as woody wetland), 20 ha more in 2012, 207 ha still waiting in 2012.
-    - Until step 4, projections leave disturbed land waiting: stage 6's multipliers are off after the record (y1 + 1). Don't Build real
-      libraries with this yet.
+    - **Step 4 DONE 2026-11-11.** Stage 9 turns the three groups' maps on from y1 + 1 and writes the return chance as transition
+      multiplier values by class and age: 0 below ReturnAgeMin, then ReturnProbability divided by the mean adjacency multiplier
+      (`defaults/projection/post-disturbance-adjacency.csv`, so the mean chance holds). Stage 10 adds a Live Forest attribute (1 on
+      Ids 100-999) and the return groups' adjacency multiplier (the P26 curve: any live forest nearby, not own type). Fire multipliers
+      by class (`fire-class-multipliers.csv`; disturbed forest 1.5 from P26's reburns; disturbed shrub and annual grass 1 until
+      calibrated). On a rerun, stage 9 replaces only these rows of TransitionMultiplierValue.
+    - **Tested end to end 2026-11-11 on the GDS copy** (`dev/libs/t57/GDS57.ssim`, multiprocessing on): Build 48 (46 min), historical
+      1985-2023 50 (33 min), Projection Setup 52 (15 min), projection 2024-2043 54 (18 min, 1 iteration), all clean. Historical: the
+      2008 fire put 536 ha into Disturbed: Wetland Oak/Gum/Cypress Group, 475 ha returned as NLCD showed woody wetland again, 94 ha
+      still disturbed in 2023 (all at age 16). Projection: the only fire year drawn was 2024 (2,185 ha, 572 high severity), on the
+      same swamp. It reburned the 94 ha cohort: 40 ha converted (the 0.9 reburn share), 9 ha returned that year, 4 ha stayed disturbed
+      with age reset. The new burns waited out ReturnAgeMin, then returned at about 10% a year from 2039 (40, 54, 32, 32 ha), 169 ha
+      still disturbed in 2043. 4 ha of Disturbed: Non-sage returned and 2 ha converted at the 12-year window's end. No forest
+      conversion at a window's end yet, since 20 years is shorter than the 30-year window.
+    - Found by this test: a burned swamp converts to Shrubland: Non-sage (the region's shrub class), not to scrub-shrub or emergent
+      wetland. Settle this with the "conversion destination by NLCD" step (wetland twins could convert to a wetland class).
+    - Found and fixed by this test (released as 1.3.2): the Projection Setup stopped with "historical run 45 has no 2023 map for DOM:
+      Peat". The stock output filter had peat maps off. The library's path also has to stay short: the historical run failed on a
+      Windows long path in the scratchpad, and ran fine from `F:\lucasCore\dev\libs\t57`.
     - Test notes: a quick test whose Build result is itself a quick-test result fails at the historical step (new-historical.R wants
       the stock-flow definitions, which are in the original Build result); pass the original result too. The transition output filter
       is stage 0's, so a test that doesn't rerun stage 0 has no summaries of new groups. Multiprocessing was off in the GDS library
