@@ -1741,3 +1741,30 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     already uses Number 10; custom sources now take 11-20).
   - Next: refuges (Mang_Name FWS, Des_Tp NWR) and DoD installations (Mang_Type / Mang_Name DOD) as more layers of the same file:
     that changes the file, so the dataset takes a new version and the Data Download adds it as a new edition.
+60. **Transitions a study area does not have: projections should not stop** - TO DO, added 2026-11-12 (user: "This raises a good
+    issue about what happens when there are no transitions of a certain type within a study area"). Found on the Lassen Volcanic NP
+    test library (to-do 57 step 8): the Projection Setup stopped in stage 10, "Urbanization: only 4 events in the fitting region -
+    choose a larger Suitability Fitting Region". Today:
+    - stage 6: a group with no events has Off maps; fine.
+    - stage 9: a Target group gets zero targets in every unit and year; fine.
+    - stage 10: a Fitted surface with fewer than 30 events stops the whole setup. A larger fitting region needs every fitting
+      layer (NLCD, roads, elevation, WUI, NCCPI, ...) downloaded for that region too, so for a small study area (a park, a refuge,
+      a county with no agriculture) the only way through is to set the surface to None by hand.
+    Proposed: a surface whose groups have zero historical area in the study area in every reference year is skipped (nothing to
+    place: say so); one with some area but too few events falls back to None (random within its strata) with the event count in the
+    log and in the suitability summary, unless the user set a fitting region. Check the same for Adjacency surfaces, the patch size
+    step (no events) and stage 9's fire (a pyrome with no burnable area). Test on Lassen (no urbanization or agriculture).
+61. **Burn severity in non-forest classes: does MTBS capture high-severity shrubland fire?** - TO DO, added 2026-11-12 (user: "look at
+    burn severity distribution across the non-forest classes. I am a little unclear if there is much high severity shrubland fire
+    captured in MTBS Burn Severity"). It matters because only high severity moves a shrub cell into its disturbed class (to-do 57:
+    Disturbed: Sage, Native and Invaded Sage Steppe, Non-sage, Chaparral; window, return, conversion to grass); low and medium
+    severity leave the shrub class and its age as they were. MTBS classes come from dNBR thresholds set per fire, and shrub and grass
+    fires (little pre-fire biomass, so a small dNBR) may rarely reach "high" even when the shrubs are consumed and must regrow from
+    seed or resprouts. To do:
+    - measure the MTBS severity mix (1 unburned to low, 2 low, 3 moderate, 4 high) by NLCD class at the fire year (41-43, 52, 71)
+      and by RCMAP or LANDFIRE type (sage, chaparral, desert scrub), CONUS sample and P26, and against LANDFIRE disturbance
+      severity;
+    - compare with what NLCD and RCMAP show after the fire (shrub cover lost, grass gain): does moderate severity in shrubland
+      also mean the shrubs are gone?
+    - options: treat moderate and high as stand-replacing for shrub classes; a per-class severity map (stage 6 and the projection's
+      severity shares); RdNBR or RAVG instead of the MTBS classes.
