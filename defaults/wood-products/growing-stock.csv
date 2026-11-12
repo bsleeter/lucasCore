@@ -1,0 +1,85 @@
+Region,ForestTypeGroup,SoftwoodFraction,SoftwoodSawtimberFraction,HardwoodSawtimberFraction,SoftwoodSpecificGravity,HardwoodSpecificGravity,Source
+NE,Aspen-birch,0.247,0.439,0.33,0.353,0.428,Smith 2006 Table 4
+NE,Elm-ash-cottonwood,0.047,0.471,0.586,0.358,0.47,Smith 2006 Table 4
+NE,Maple-beech-birch,0.132,0.604,0.526,0.369,0.518,Smith 2006 Table 4
+NE,Oak-hickory,0.039,0.706,0.667,0.388,0.534,Smith 2006 Table 4
+NE,Oak-pine,0.511,0.777,0.545,0.371,0.516,Smith 2006 Table 4
+NE,Spruce-fir,0.87,0.508,0.301,0.353,0.481,Smith 2006 Table 4
+NE,White-red-jack pine,0.794,0.72,0.429,0.361,0.51,Smith 2006 Table 4
+NLS,Aspen-birch,0.157,0.514,0.336,0.351,0.397,Smith 2006 Table 4
+NLS,Elm-ash-cottonwood,0.107,0.468,0.405,0.335,0.46,Smith 2006 Table 4
+NLS,Maple-beech-birch,0.094,0.669,0.422,0.356,0.496,Smith 2006 Table 4
+NLS,Oak-hickory,0.042,0.605,0.473,0.369,0.534,Smith 2006 Table 4
+NLS,Spruce-fir,0.876,0.425,0.276,0.344,0.444,Smith 2006 Table 4
+NLS,White-red-jack pine,0.902,0.646,0.296,0.389,0.473,Smith 2006 Table 4
+NPS,Elm-ash-cottonwood,0.004,0.443,0.563,0.424,0.453,Smith 2006 Table 4
+NPS,Loblolly-shortleaf pine,0.843,0.686,0.352,0.468,0.544,Smith 2006 Table 4
+NPS,Maple-beech-birch,0.01,0.47,0.538,0.437,0.508,Smith 2006 Table 4
+NPS,Oak-hickory,0.02,0.497,0.501,0.448,0.565,Smith 2006 Table 4
+NPS,Oak-pine,0.463,0.605,0.314,0.451,0.566,Smith 2006 Table 4
+NPS,Ponderosa pine,0.982,0.715,0.169,0.381,0.473,Smith 2006 Table 4
+PWE,Douglas-fir,0.989,0.896,0.494,0.429,0.391,Smith 2006 Table 4
+PWE,Fir-spruce-m.hemlock,0.994,0.864,0.605,0.37,0.361,Smith 2006 Table 4
+PWE,Lodgepole pine,0.992,0.642,0.537,0.38,0.345,Smith 2006 Table 4
+PWE,Ponderosa pine,0.996,0.906,0.254,0.385,0.513,Smith 2006 Table 4
+PWW,Alder-maple,0.365,0.895,0.635,0.402,0.385,Smith 2006 Table 4
+PWW,Douglas-fir,0.959,0.914,0.415,0.44,0.426,Smith 2006 Table 4
+PWW,Fir-spruce-m.hemlock,0.992,0.905,0.296,0.399,0.417,Smith 2006 Table 4
+PWW,Hemlock-Sitka spruce,0.956,0.909,0.628,0.405,0.38,Smith 2006 Table 4
+PSW,Mixed conifer,0.943,0.924,0.252,0.394,0.521,Smith 2006 Table 4
+PSW,Douglas-fir,0.857,0.919,0.32,0.429,0.483,Smith 2006 Table 4
+PSW,Fir-spruce-m.hemlock,1,0.946,0,0.372,0.51,Smith 2006 Table 4
+PSW,Ponderosa pine,0.997,0.895,0.169,0.38,0.51,Smith 2006 Table 4
+PSW,Redwood,0.925,0.964,0.468,0.376,0.449,Smith 2006 Table 4
+RMN,Douglas-fir,0.993,0.785,0.353,0.428,0.37,Smith 2006 Table 4
+RMN,Fir-spruce-m.hemlock,0.999,0.753,0,0.355,0.457,Smith 2006 Table 4
+RMN,Hemlock-Sitka spruce,0.972,0.735,0.596,0.375,0.441,Smith 2006 Table 4
+RMN,Lodgepole pine,0.999,0.54,0.219,0.383,0.391,Smith 2006 Table 4
+RMN,Ponderosa pine,0.999,0.816,0,0.391,0.374,Smith 2006 Table 4
+RMS,Aspen-birch,0.297,0.766,0.349,0.355,0.35,Smith 2006 Table 4
+RMS,Douglas-fir,0.962,0.758,0.23,0.431,0.35,Smith 2006 Table 4
+RMS,Fir-spruce-m.hemlock,0.958,0.77,0.367,0.342,0.35,Smith 2006 Table 4
+RMS,Lodgepole pine,0.981,0.607,0.121,0.377,0.35,Smith 2006 Table 4
+RMS,Ponderosa pine,0.993,0.773,0.071,0.383,0.386,Smith 2006 Table 4
+SE,Elm-ash-cottonwood,0.03,0.817,0.551,0.433,0.499,Smith 2006 Table 4
+SE,Loblolly-shortleaf pine,0.889,0.556,0.326,0.469,0.494,Smith 2006 Table 4
+SE,Longleaf-slash pine,0.963,0.557,0.209,0.536,0.503,Smith 2006 Table 4
+SE,Oak-gum-cypress,0.184,0.789,0.5,0.441,0.484,Smith 2006 Table 4
+SE,Oak-hickory,0.07,0.721,0.551,0.438,0.524,Smith 2006 Table 4
+SE,Oak-pine,0.508,0.746,0.425,0.462,0.516,Smith 2006 Table 4
+SC,Elm-ash-cottonwood,0.044,0.787,0.532,0.427,0.494,Smith 2006 Table 4
+SC,Loblolly-shortleaf pine,0.88,0.653,0.358,0.47,0.516,Smith 2006 Table 4
+SC,Longleaf-slash pine,0.929,0.723,0.269,0.531,0.504,Smith 2006 Table 4
+SC,Oak-gum-cypress,0.179,0.83,0.589,0.44,0.513,Smith 2006 Table 4
+SC,Oak-hickory,0.057,0.706,0.534,0.451,0.544,Smith 2006 Table 4
+SC,Oak-pine,0.512,0.767,0.432,0.467,0.537,Smith 2006 Table 4
+RMN,Pinyon-juniper,0.986,0.783,0.042,0.422,0.62,Smith 2006 Table 4 (West)
+RMN,Tanoak-laurel,0.484,0.909,0.468,0.43,0.459,Smith 2006 Table 4 (West)
+RMN,Western larch,0.989,0.781,0.401,0.433,0.43,Smith 2006 Table 4 (West)
+RMN,Western oak,0.419,0.899,0.206,0.416,0.59,Smith 2006 Table 4 (West)
+RMN,Western white pine,1,0.838,0,0.376,,Smith 2006 Table 4 (West)
+RMS,Pinyon-juniper,0.986,0.783,0.042,0.422,0.62,Smith 2006 Table 4 (West)
+RMS,Tanoak-laurel,0.484,0.909,0.468,0.43,0.459,Smith 2006 Table 4 (West)
+RMS,Western larch,0.989,0.781,0.401,0.433,0.43,Smith 2006 Table 4 (West)
+RMS,Western oak,0.419,0.899,0.206,0.416,0.59,Smith 2006 Table 4 (West)
+RMS,Western white pine,1,0.838,0,0.376,,Smith 2006 Table 4 (West)
+PSW,Pinyon-juniper,0.986,0.783,0.042,0.422,0.62,Smith 2006 Table 4 (West)
+PSW,Tanoak-laurel,0.484,0.909,0.468,0.43,0.459,Smith 2006 Table 4 (West)
+PSW,Western larch,0.989,0.781,0.401,0.433,0.43,Smith 2006 Table 4 (West)
+PSW,Western oak,0.419,0.899,0.206,0.416,0.59,Smith 2006 Table 4 (West)
+PSW,Western white pine,1,0.838,0,0.376,,Smith 2006 Table 4 (West)
+PWE,Pinyon-juniper,0.986,0.783,0.042,0.422,0.62,Smith 2006 Table 4 (West)
+PWE,Tanoak-laurel,0.484,0.909,0.468,0.43,0.459,Smith 2006 Table 4 (West)
+PWE,Western larch,0.989,0.781,0.401,0.433,0.43,Smith 2006 Table 4 (West)
+PWE,Western oak,0.419,0.899,0.206,0.416,0.59,Smith 2006 Table 4 (West)
+PWE,Western white pine,1,0.838,0,0.376,,Smith 2006 Table 4 (West)
+NE,"",0.226,0.647,0.579,0.371,0.518,Smith 2006 Table D8 (regional average)
+NLS,"",0.292,0.556,0.407,0.36,0.473,Smith 2006 Table D8 (regional average)
+NPS,"",0.093,0.622,0.511,0.434,0.537,Smith 2006 Table D8 (regional average)
+PWE,"",0.98,0.865,0.501,0.396,0.424,Smith 2006 Table D8 (regional average)
+PWW,"",0.89,0.911,0.538,0.426,0.415,Smith 2006 Table D8 (regional average)
+PSW,"",0.829,0.925,0.308,0.399,0.51,Smith 2006 Table D8 (regional average)
+RMN,"",0.983,0.734,0.442,0.394,0.389,Smith 2006 Table D8 (regional average)
+RMS,"",0.865,0.742,0.337,0.369,0.353,Smith 2006 Table D8 (regional average)
+SE,"",0.423,0.612,0.512,0.462,0.508,Smith 2006 Table D8 (regional average)
+SC,"",0.358,0.693,0.523,0.463,0.529,Smith 2006 Table D8 (regional average)

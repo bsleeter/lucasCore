@@ -1,0 +1,5 @@
+Setting,Value,Note
+LossInUseWood,0.08,"share of solid wood lost when placed in use, discarded that year (Stockmann et al. 2012)"
+LossInUsePaper,0,the same for paper (none)
+Draws,100,parameter draws per run iteration (HWP-C vR default)
+Interval,0.9,the interval reported (90%)

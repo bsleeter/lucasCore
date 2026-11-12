@@ -1,0 +1,15 @@
+EndUse,HalfLife,Basis
+"new housing, single family",100,Smith 2006 Table D3
+"new housing, multifamily",70,Smith 2006 Table D3
+"new nonresidential, other",67,Smith 2006 Table D3
+"new nonresidential, new nonres buildings",67,Smith 2006 Table D3
+"manufacturing, furniture",30,Smith 2006 Table D3
+"residential r and r, n/a",30,Smith 2006 Table D3
+"manufacturing, other manufacturing",12,Smith 2006 Table D3
+"rail and railcar, n/a",12,Smith 2006 Table D3
+"other, n/a",12,Smith 2006 Table D3
+"new housing, manufactured housing",12,Smith 2006 Table D3
+other industrial products,12,Smith 2006 Table D3
+"packaging and shipping, n/a",6,Smith 2006 Table D3
+wood pulp,2.6,paper (Smith 2006 Table D3: 2.6 years)
+fuelwood and other,0,"burned in the year produced, with energy capture"

@@ -1,0 +1,21 @@
+RoundwoodRegion,Wood,LogSize,IndustrialRoundwoodRatio,BarkToWood,RemovedAsRoundwood,FuelwoodRatio
+Northeast,SW,Sawlog,0.991,0.182,0.948,0.136
+Northeast,SW,Pulpwood,3.079,0.185,0.948,0.136
+Northeast,HW,Sawlog,0.927,0.199,0.879,0.547
+Northeast,HW,Pulpwood,2.177,0.218,0.879,0.547
+North Central,SW,Sawlog,0.985,0.182,0.931,0.066
+North Central,SW,Pulpwood,1.285,0.185,0.931,0.066
+North Central,HW,Sawlog,0.96,0.199,0.831,0.348
+North Central,HW,Pulpwood,1.387,0.218,0.831,0.348
+Pacific Coast,SW,Sawlog,0.965,0.181,0.929,0.096
+Pacific Coast,SW,Pulpwood,1.099,0.185,0.929,0.096
+Pacific Coast,HW,Sawlog,0.721,0.197,0.947,0.957
+Pacific Coast,HW,Pulpwood,0.324,0.219,0.947,0.957
+Rocky Mountain,SW,Sawlog,0.994,0.181,0.907,0.217
+Rocky Mountain,SW,Pulpwood,2.413,0.185,0.907,0.217
+Rocky Mountain,HW,Sawlog,0.832,0.201,0.755,3.165
+Rocky Mountain,HW,Pulpwood,1.336,0.219,0.755,3.165
+South,SW,Sawlog,0.99,0.182,0.891,0.019
+South,SW,Pulpwood,1.246,0.185,0.891,0.019
+South,HW,Sawlog,0.832,0.198,0.752,0.301
+South,HW,Pulpwood,1.191,0.218,0.752,0.301
