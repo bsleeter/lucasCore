@@ -72,4 +72,7 @@ check("drained peat does not count as a flow out of BG Slow", !"BG Slow ->" %in%
 dr <- op[is.na(TransitionGroupId)]
 check("drained organic soil: cropland and pasture in every ecodivision, cropland about 4 times pasture", nrow(dr) == 2 * nrow(eco) && all(dr[FromStateClassId == "Agriculture: Cropland", as.numeric(Multiplier)] / dr[FromStateClassId == "Agriculture: Pasture", as.numeric(Multiplier)][match(dr[FromStateClassId == "Agriculture: Cropland", FromStratumId], dr[FromStateClassId == "Agriculture: Pasture", FromStratumId])] > 3.5))
 check("drained emissions count as emissions and against net biome productivity", all(c("Emission: Total", "Net Biome Productivity") %in% mb[FlowTypeId == "Emission: Drained Organic Soil -> Atmosphere", FlowGroupId]))
+ofs <- rd(D("stockflow", "stsim_OutputFilterStocks.csv")); st8 <- paste(unique(rd(D("initialstocks", "stock-types.csv"))$StockTypeId), "[Type]")
+check("every stock stage 8 starts (DOM: Peat too) is mapped, so a projection can start from a historical run's final maps (2026-11-11: peat was not)",
+      all(st8 %in% ofs$StockGroupId) && all(ofs[StockGroupId %in% st8, Spatial == "Yes" & AvgSpatial == "Yes"]))
 cat(sprintf("%d passed, %d failed\n", n_ok, n_bad)); if (n_bad) quit(status = 1)

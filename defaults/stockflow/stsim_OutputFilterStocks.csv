@@ -28,7 +28,7 @@ DOM: Deadwood,Yes,Yes,Yes
 DOM: Down Deadwood,Yes,No,No
 DOM: Litter,Yes,Yes,Yes
 DOM: No Soil,Yes,No,No
-DOM: Peat [Type],Yes,No,No
+DOM: Peat [Type],Yes,Yes,Yes
 DOM: Snag Branch [Type],Yes,Yes,Yes
 DOM: Snag Stem [Type],Yes,Yes,Yes
 DOM: Soil,Yes,Yes,Yes
