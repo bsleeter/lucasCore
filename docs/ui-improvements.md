@@ -1564,6 +1564,17 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
            `defaults/transitions/pathways/reforestation.csv`: every natural non-forest class (Barren: All, the grassland classes,
            Sage, Native and Invaded Sage Steppe, Non-sage, Chaparral, emergent wetland) to every forest type, probability 1, age
            reset. Disturbed classes have no rows (they have Return). tools/sync-library.R brings existing libraries up to date.
+           DONE 2026-11-12 (`tools/make_reforestation.R`; 7 more checks in tests/unit-reforestation.R, 45 in all). 31 types
+           `Reforestation: <type>` (Ids 1100-1130; a twin "Reforestation: Wetland <type>"), all in group Reforestation (not in the
+           simulation groups, as Post-disturbance), a main spatial group for stock-flow. 310 pathways from 10 source classes (Barren,
+           sage family, Non-sage, Chaparral, the three grass classes, Palustrine Emergent; not Post Fire Shrub 59, Estuarine
+           Emergent, the disturbed classes) to the 31 forest classes, probability 1, age reset. Libraries made before 1.4: the 1.4
+           update (ui/LucasCoreUpdates.cs Update_1_400) adds the group, the types and the columns of steps 1 and 4 (BpsFile,
+           ReforestTypeFileName, BpsForestShareFileName); it compiles, but is NOT yet run on a library: SyncroSim runs an update
+           provider only from an installed package, not the dev pointer (memory: release-library-updates), so test it on a copy of
+           a 1.3 library at the 1.4.0 release, together with main's own 1.4 update (the two must be merged). The Lassen library was
+           made again from the package (old one kept as dev/libs/lassen/Lassen-before-step5.ssim); stages 1, 5, 6 (result 4, 10
+           min): the pathways load, the 31 types have zero targets until step 7 gives them maps.
         6. **Carbon.** No flows on the transition (as Ag Contraction): the grass or shrub live carbon carries into the forest class,
            which grows from age 0 on its FIA curve. Stage 8 needs nothing, since these cells start as non-forest classes. Check per
            forest type that there's no jump in live biomass at the transition. These cells also start with no forest legacy dead

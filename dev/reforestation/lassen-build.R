@@ -6,6 +6,8 @@ a <- commandArgs(TRUE); st <- if (length(a) && !grepl("^--", a[1])) as.integer(s
 nm <- sub("^--name=", "", grep("^--name=", a, value = TRUE)); if (!length(nm)) nm <- "Build Lassen 150 m"
 L <- ssimLibrary("F:/lucasCore/dev/libs/lassen/Lassen.ssim", summary = FALSE); P <- project(L, 1)
 sc <- as.data.table(scenario(L, summary = TRUE))
+d <- datasheet(P, "lucasCore_DataSource", optional = TRUE, empty = FALSE)   # the data home (Data Download done 2026-11-12 into E:/lucasData)
+if (!nrow(d) || is.na(d$DataSourcesHome[1])) saveDatasheet(P, data.frame(DataSourcesHome = "E:/lucasData"), "lucasCore_DataSource", append = FALSE, force = TRUE)
 S <- scenario(P, nm); dependency(S) <- sc[Name %in% c("Stock-Flow Definitions", "Carbon Assumptions") & IsResult == "No", ScenarioId]
 names_all <- c(`0` = "0 - Stock-Flow Definitions", `1` = "1 - Study Area and Strata", `5` = "5 - Initial Conditions", `2` = "2 - Fit Growth Curves", `3` = "3 - Carbon Flows",
                `4` = "4 - Spin-up and Initial Stocks", `6` = "6 - Historical Transitions", `7` = "7 - Climate Multipliers", `8` = "8 - Initial Stock Maps")

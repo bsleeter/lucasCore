@@ -157,6 +157,23 @@ namespace lucasCoreUI
                 AddNamed(store, "stsim_StateLabelY", "StateLabelYId", y, "Description", "Disturbed", false);
                 AddStateClass(store, "Disturbed: " + y, "Disturbed", y, (2000 + id).ToString(CultureInfo.InvariantCulture), id >= 100 ? "255,196,170,120" : "255,236,220,170");
             }
+
+            // reforestation (to-do 57 steps 1-5, tools/make_reforestation.R): LANDFIRE BpS as a Data Source, the stage 5 maps of each
+            // cell's destination forest type and BpS forest share, and the Reforestation group with one type per forest class
+            // ("Reforestation: <Y label>", a wetland twin "Reforestation: Wetland <type>"). (The Reforestation Options sheet is a new
+            // table, which SyncroSim adds by itself.)
+            AddColumn(store, "lucasCore_DataSource", "BpsFile", "TEXT");
+            AddColumn(store, "lucasCore_OutputLandCoverLayers", "ReforestTypeFileName", "TEXT");
+            AddColumn(store, "lucasCore_OutputLandCoverLayers", "BpsForestShareFileName", "TEXT");
+            AddNamed(store, "stsim_TransitionGroup", "TransitionGroupId", "Reforestation", null, null, false);
+            foreach (DataRow r in c.Rows)
+            {
+                if (Convert.ToInt64(r["Id"], CultureInfo.InvariantCulture) < 100) continue;
+                string y = Convert.ToString(r["Y"], CultureInfo.InvariantCulture);
+                if (Convert.ToString(r["X"], CultureInfo.InvariantCulture) == "Wetland") y = "Wetland " + y;
+                AddTransitionType(store, "Reforestation: " + y, null);
+                AddTypeToGroup(store, "Reforestation: " + y, "Reforestation");
+            }
         }
 
         // a state class (with its Id, labels by name) in every project that lacks it
