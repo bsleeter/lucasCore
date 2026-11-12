@@ -27,3 +27,17 @@ bps_potential <- function(v, lookup = bps_lookup(), riparian_as = "forest") {
   p <- lookup$Potential[match(as.integer(v), lookup$VALUE)]; p[is.na(p)] <- "other"
   p[p == "riparian or savanna"] <- riparian_as; p
 }
+
+# The reforestation cutoff (to-do 57 step 2): years after the start year from which a natural cell's first NLCD forest counts as
+# reforestation rather than regrowth from a disturbance before the record. defaults/landcover/reforestation-cutoff.csv
+# (tools/fit_reforestation_cutoff.R) gives it by ecodivision, a blank Ecodivision row for any other; override (Reforestation
+# Options' CutoffYears, a number) replaces it everywhere. Returns one value per element of eco (ecodivision names).
+reforest_cutoff <- function(eco, tab = read_default("landcover", "reforestation-cutoff.csv"), override = NA) {
+  if (!is.na(suppressWarnings(as.numeric(override)))) { v <- as.numeric(override)
+    if (v < 1 || v > 60) stop(sprintf("the reforestation cutoff override is %s years; give 1 to 60", override)); return(rep(v, length(eco))) }
+  tab <- data.table::as.data.table(tab); tab[, Ecodivision := as.character(Ecodivision)][!is.na(Ecodivision) & !nzchar(trimws(Ecodivision)), Ecodivision := NA_character_]
+  if (anyDuplicated(tab$Ecodivision)) stop("reforestation-cutoff.csv: an Ecodivision appears twice")
+  all <- tab[is.na(Ecodivision), as.numeric(Years)]; v <- as.numeric(tab$Years[match(eco, tab$Ecodivision)])
+  if (anyNA(v) && !length(all)) stop(sprintf("reforestation-cutoff.csv: no row for %s and no blank Ecodivision row", paste(unique(eco[is.na(v)]), collapse = ", ")))
+  v[is.na(v)] <- all[1]; v
+}

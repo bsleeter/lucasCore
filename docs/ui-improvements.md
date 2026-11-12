@@ -1499,6 +1499,27 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
            `defaults/landcover/reforestation-cutoff.csv` (Ecodivision, Years, Events, Source), like post-disturbance-settings.csv
            (blank Ecodivision = all; most specific row wins, `pd_resolve`'s rule). Check it against the regrowth rule's 20 years
            and the CONUS split (how much moves between regrowth and reforestation).
+           DONE 2026-11-12 (`tools/fit_reforestation_cutoff.R`, 4.5 min; `src/reforestation.R` `reforest_cutoff`, 7 more checks in
+           tests/unit-reforestation.R). Changes from the plan, found while fitting:
+           - a cohort, not Kaplan-Meier: events of 1986-1995 all have 29 years of record after them, so return within 29 years
+             is never censored; the cutoff is the 0.9 quantile of years to return among those that returned (KM's 0.9 is undefined
+             where many burns never return, and those are conversions, not slow returns). Values of 28-29 in the dry West sit at
+             that limit, so they are lower bounds;
+           - a high-severity fire counts only where NLCD shows barren, shrub or grass within two years (some MTBS pixels stay
+             forest in NLCD, which gave 1-year "returns"), and return is looked for from the first non-forest year;
+           - sample: 10 km tiles (570 drawn, 30 per ecodivision on NLCD 1985 forest; 388 with events, 874k event pixels: 91%
+             clearcut). Each tile counts as at most 500 events, since one burn or harvest unit can hold most of an ecodivision's
+             events (Temperate Desert Mountains: 84% in one tile); equal tile weights let tiles with a few slow events swing it
+             (Hot Continental 12 to 21 years).
+           Result (years; median return in brackets): CONUS 21 (12); Subtropical 11 (7), Subtropical Mountains 12, Hot Continental
+           and its Mountains 12, Warm Continental and its Mountains 18, Marine 20 (17), Mediterranean 20, Savanna 21 (CONUS's;
+           3 events), Marine Mountains 23 (17), Mediterranean Mountains 24 (18; Lassen), Prairie 26, Tropical/Subtropical Steppe
+           29, Tropical/Subtropical Desert 27 (with its domain), Temperate Steppe and Temperate Desert 28, the dry mountains 27-28.
+           Clearcuts returned 93% of the time within 29 years (90% within 20), high-severity fires 21% (90% of returns within 28).
+           Against the flat 20 years on the CONUS sample's unrecorded reforestation on forest potential: 0.9 Mha moves to regrowth
+           (slow western and Marine mountains) and 0.6 Mha to reforestation (Subtropical: 0.54 to 0.99), so 3.2 to 2.8 Mha.
+           Open: RegrowthLag (the age of a regrowing cell, 20 everywhere) could take the fitted median return by ecodivision
+           (6-23 years) the same way; not changed.
         3. **Settings and override.** A single-row Build sheet `ReforestationOptions` (as HarvestAgeOptions): Enabled (Yes by
            default), CutoffYears (blank = the fitted table; a number overrides it everywhere), and the reading of riparian or
            savanna BpS (default: as forest potential). Added to stage 5's inputs in package.xml. The regrowth rule's RegrowthLag
