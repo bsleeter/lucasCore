@@ -1441,7 +1441,7 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
         codes split "standrep" as Tree Removal is (shrub or grass in NLCD within two years), with pathways from each forest class to
         its disturbed class (age reset) as high-severity fire has. Return then follows NLCD as for fire. No new download. In
         projections it needs a rate (the historical years' area, drawn as fire is, or a mean by ecodivision).
-    - **TO DO, design agreed in outline (user, 2026-11-11-12): a reforestation transition for natural non-forest that becomes
+    - **BUILT 2026-11-12 (steps 1-10 below; release with 1.4.0), design agreed (user, 2026-11-11-12): a reforestation transition for natural non-forest that becomes
       forest with no fire or harvest behind it.** The user's idea: such a cell starts as what NLCD calls it in 1985, grows on that
       class's curve, and moves to forest when NLCD shows forest; in projections a spatial multiplier (a suitability layer, as other
       transitions have) says where it is likely. Measured first, since stage 5's any-year rule already folds most of this into
@@ -1644,6 +1644,12 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
            FIA DataMart under the worktree's dev/libs (environment, not this change); unit-metadata-definitions found the
            Reforestation group and types missing from defaults/metadata/definitions.csv (added).
         10. **Docs.** CHANGELOG (changes Build results), defaults README files, the Build page help, metadata; ships in 1.4.0.
+           DONE 2026-11-12: CHANGELOG (Unreleased: Changed, Added, the 1.4 upgrade note), defaults/landcover and
+           defaults/transitions README, user guide section 3.9 Reforestation Options and the Reforestation surface in 6.4, the
+           Stratum Sources and unit counts (National Parks), metadata definitions (step 9). The data dictionary describes released
+           outputs, which this does not change. Open for the 1.4.0 release: run library update 1.4 on a copy of a 1.3 library, merged
+           with main's own 1.4 update (step 5); the starter library rebuilt (tools/build_starter.R) for BpsFile, the new options and
+           National Parks; the guide's transition type and group counts (143 and 15, already behind the post-disturbance classes).
       - **Decided (user, 2026-11-12), for the steps above:**
         - Flickering open woodland (natural cells forest in some years but under 2/3 of the years after; about half of P26's
           rule cells) starts as forest, as now, with its CMS or TreeMap age (step 4).

@@ -16,6 +16,21 @@
   instead of from CMS or TreeMap: RegrowthLag minus the years until NLCD first shows it as forest. RegrowthLag 20 (P26 burns: median
   21 years to NLCD forest), ForestShare 0.667, NonForestYears 2. On P26 Build 53's maps it resets 45 kha (of 84 kha forest only by
   the any-year rule; median age 48 to 10), on Puget's 58 kha (of 72 kha; 44 to 9).
+  With reforestation on (to-do 57), the reforestation cutoff below replaces RegrowthLag as the limit of regrowth (RegrowthLag still
+  sets the age).
+- `LF20_BPS_220.csv` (2026-11-12, to-do 57): LANDFIRE Biophysical Settings 2020 (LF 2020, the current CONUS edition) attribute
+  table, trimmed to VALUE, BPS_CODE, BPS_NAME, GROUPVEG (2,189 values; from the national zip's CSV_Data). LANDFIRE Product Service
+  jobs return the raster alone, so the table ships here. Read by `src/reforestation.R`.
+- `bps-groups.csv` (2026-11-12): each BpS GROUPVEG's potential vegetation: forest (Conifer, Conifer-Hardwood, Hardwood,
+  Hardwood-Conifer, Peatland Forest), riparian or savanna (read as forest potential unless Reforestation Options says otherwise),
+  non-forest (Grassland, Shrubland, Sparse, Barren, Peatland non-forest), other (water, ice, fill). Values with no group (Hawaii) are
+  other.
+- `reforestation-cutoff.csv` (2026-11-12, `tools/fit_reforestation_cutoff.R`): years after the start year from which a natural
+  cell's first NLCD forest counts as reforestation rather than regrowth, by ecodivision (blank = CONUS, 21). The 90th percentile of
+  the years from a clearcut (LCMS Tree Removal NLCD shows as shrub or grass) or high-severity fire (MTBS 4 NLCD shows as barren,
+  shrub or grass) of 1986-1995 on BpS forest to NLCD forest two years running and lasting, among the events that returned within 29
+  years; 10 km tiles, each counting as at most 500 events. Values of 28-29 in the dry West sit at the 29-year limit. Reforestation
+  Options' cutoff overrides the table.
 
 Edits to the source crosswalks:
 - 2026-10-20: "California Lower Montane Foothill Pine Woodland and Savanna" (EVT 2016 7114) and "California Lower Montane Blue Oak-Foothill

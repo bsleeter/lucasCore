@@ -142,11 +142,11 @@ When lucasCore is added, it fills the **Definitions** project with everything a 
 | What | Where to see it (Definitions project properties) | Rows |
 | --- | --- | --- |
 | Primary strata: the FIA ecodivisions | ST-Sim > Strata > Primary Stratum | 19 |
-| Secondary and tertiary strata: every unit of every Stratum Source | ST-Sim > Strata > Secondary Stratum, Tertiary Stratum | 6,221 each |
+| Secondary and tertiary strata: every unit of every Stratum Source | ST-Sim > Strata > Secondary Stratum, Tertiary Stratum | 6,606 each |
 | State classes, from NLCD land cover and FIA forest type groups | ST-Sim > States > State Class | 51 |
 | Transition types and groups: land use, harvest, fire, insects | ST-Sim > Transitions | 143 types, 15 groups |
 | Stock and flow types: the 14 carbon pools and their flows | ST-Sim > Advanced | 23 stocks, 54 flows |
-| Stratum Sources (states, counties, HUCs, ecoregions, pyromes, federal lands, GAP status) | LUCAS Core (model builder) > LUCAS Core > Stratum Sources | 9 |
+| Stratum Sources (states, counties, HUCs, ecoregions, pyromes, federal lands, GAP status, National Park Service units) | LUCAS Core (model builder) > LUCAS Core > Stratum Sources | 10 |
 | LOCA2 climate scenarios, models and replicates | LUCAS Core (model builder) > LUCAS Core | 3, 10 and 6 |
 
 lucasCore also fills two lists that the Carbon Assumptions pages (chapter 3) pick from: the CBM-CFS3 ecozones and species types, with the turnover and decay rates each one sets.
@@ -678,6 +678,18 @@ The crosswalks tell stage 5 which state class each land cover code becomes: fore
 
 *Figure 3.20. Land Cover Crosswalks, filled in from the package defaults.*
 
+
+### 3.9 Reforestation Options
+
+Some land that NLCD shows as barren, shrub or grass in the start year becomes forest later in the record without a fire or harvest behind it: forest recovering slowly from a disturbance before the record (Mount St Helens, Lassen's 1915 eruption), or trees spreading onto shrubland and grassland. Stage 5 starts such a cell as its start-year class, and the **Reforestation** transition takes it to forest in the year NLCD does; projections continue it at the rate of the record's recent years, placed by a fitted surface (section 6.4). A cell that NLCD shows as forest again before its ecodivision's cutoff counts as regrowth instead and starts as forest with the regrowth age. Reforestation needs the LANDFIRE Biophysical Settings data source (BpsFile), which the Data Download fetches.
+
+1. Choose **LUCAS Core > Reforestation Options**.
+2. **Reforestation Transition**: blank or ticked = on; clear the tick to build as before (every such cell starts as forest).
+3. **Cutoff, Years After the Start Year**: blank = the package's value for each ecodivision (11-29 years); a number applies everywhere.
+4. **LANDFIRE BpS Riparian and Savanna Read As**: forest potential (default) or non-forest potential.
+5. **Projection Draws From the Last N Historical Years**: blank = 10.
+
+The run log of stage 5 lists how many cells reforest in each ecodivision, and why the others stay forest.
 Save the library (**File > Save**) before running.
 
 ## 4. Running the Build
@@ -1218,7 +1230,7 @@ With spatial tiles on (section 6.2), the Target Strata of every Target row follo
 The Spatial Allocation page sets how stage 10 fits the suitability surfaces of the **Fitted** rows on the Transitions page. Each surface is a logistic regression of where the historical events happened, against covariates such as distance to developed land and slope. P26 uses the defaults.
 
 15. Open **Projection > Spatial Allocation** (14).
-16. **Settings for** (15): **Every surface**, or one surface (Urbanization, Open Space, Ag Expansion, Ag Contraction, Clearcut, Selection) to give it settings of its own.
+16. **Settings for** (15): **Every surface**, or one surface (Urbanization, Open Space, Ag Expansion, Ag Contraction, Clearcut, Selection, Reforestation) to give it settings of its own.
 17. **Fit the regression on** (16): the region the surfaces are fitted on. The study area is the default. A small study area has few change events, so fit it on a larger region instead (its pyrome, neighbouring counties, or the state) by choosing the kind of unit and adding the units.
 18. **Fitting** (17):
     - **Fitting resolution**: 30 m is native NLCD; a coarser resolution fits faster. P26 uses 150 m, the model's own cell size (section 6.6 compares it with 30 m).
@@ -1229,6 +1241,8 @@ The Spatial Allocation page sets how stage 10 fits the suitability surfaces of t
     - **Place patches**: the historical events of each year are joined into patches, and their sizes in model cells become ST-Sim size distributions, so a 150 m model places patches rather than scattered cells.
 19. **Covariates** (18): the covariates every surface uses (distance to developed land, developed share within 1 km, housing density, distance to roads, slope, elevation, land cover, GAP status, county). Choose a surface under **Settings for** to add or drop covariates for it alone; by default the agricultural surfaces add distance to agriculture, agriculture share within 1 km and crop productivity (NCCPI), and the harvest surfaces add forest owner type. **Add raster** adds a covariate of your own.
 20. **Adjacency** (19): for groups with Adjacency ticked on the Transitions page, the share of developed land (or agriculture) within the neighbourhood radius (blank = 3 model cells) raises a cell's suitability, recomputed every 5 years during the run.
+
+The **Reforestation** surface (section 3.9) is fitted on the cells that reforested by stage 5's rule, so regrowth after a clearcut or fire is not an event, and adds three covariates of its own: forest potential (the share of the cell on LANDFIRE BpS forest), distance to forest and forest share within 1 km. On Lassen Volcanic National Park (150 m) it placed the 2013-2023 reforestation better than random (AUC 0.79).
 
 The **Rule weights** table at the bottom applies only to groups whose method is **Rules** (a weight per WUI class and GAP status, multiplied); with the default Fitted surfaces it is not used.
 

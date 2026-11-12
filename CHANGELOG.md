@@ -10,6 +10,38 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   record instead of from NASA CMS or TreeMap. Those sources gave 1980s clearcuts and burns ages of about 45 years, so they started
   with mature forest carbon and their regrowth was missed. Settings in `defaults/landcover/regrowth-age.csv`. On existing maps this
   resets 45 kha in the Northern Sierra Nevada (P26) and 58 kha in the Puget Lowlands. Changes Build results.
+- Build stage 5: reforestation (to-do 57). A natural cell that is barren, shrub, grass or emergent wetland at the start and that
+  NLCD later shows as forest no longer always starts as forest. It starts as its start-year class when its potential vegetation
+  (LANDFIRE BpS 2020) is not forest, or when it is forest potential but NLCD first shows forest only at or after its ecodivision's
+  cutoff: 11-12 years in the Southeast, 18-20 in the East and Marine lowlands, 23-24 in the Marine and Mediterranean mountains,
+  26-29 in the dry West (`defaults/landcover/reforestation-cutoff.csv`, fitted by `tools/fit_reforestation_cutoff.R` as the 90th
+  percentile of the years forest takes to come back after a dated clearcut or high-severity fire). Cells that come back before
+  the cutoff stay forest with the regrowth age, as do cells that flicker between forest and shrub or grass. On Lassen Volcanic
+  National Park (150 m) 117 of 6,591 such cells reforest, and the start has 0.8% less live carbon. Changes Build results.
+- Build stage 5: a check that every forest cell has an age failed when a fire perimeter started cells in a disturbed class; it now
+  allows the disturbed classes an age, and names any failing cells by class.
+
+### Added
+- The Reforestation transition: group Reforestation, one type per forest class ("Reforestation: <type>"), pathways from every
+  natural non-forest class to every forest class, age reset; no carbon flows, so the grass or shrub carbon carries over and the
+  forest grows from age 0 (`tools/make_reforestation.R`). Historical runs (stage 6): a cell reforests in the year NLCD shows it as
+  forest (41-43) for the second year running, as the forest type stage 5 gives it (new Land Cover Layers map: the forest type of
+  every cell). Projections: a Target group in its own sampling set, drawing from the last 10 years of the record (stage 9), placed
+  by a fitted Reforestation surface (stage 10) whose events follow the stage 5 rule, with new covariates Forest potential (BpS),
+  Distance to forest and Forest share within 1 km.
+- Reforestation Options (scenario, LUCAS Core group): the transition on or off, the cutoff (blank = fitted by ecodivision), how
+  LANDFIRE's riparian and savanna types read (forest potential by default), and the number of recent years projections draw from.
+- Data Source LANDFIRE Biophysical Settings 2020 (BpsFile), fetched by the Data Download; its attribute table and the potential of
+  each vegetation group ship in `defaults/landcover`.
+- Stratum Source National Parks (Number 10): every National Park Service unit in CONUS (384) by name, from PAD-US 4.0 NPS fee land,
+  for a study area of one park. New Data Download dataset PAD-US 4.0 management units (`study-area/padus-units/padus4-units.gpkg`);
+  `tools/make_nps_units.R` writes the unit list with stable ids. Existing libraries: `tools/new-library.R <library> --rebuild-strata`
+  (custom sources now take Numbers 11-20).
+- `tools/new-projection.R --base=<id> --also=<ids>`: a projection on a Projection Setup made on a quick-test result.
+
+**Upgrading (1.4):** library update 1.4 adds the Reforestation group and types, the simulation group, and the new columns (BpsFile,
+the Land Cover Layers maps). A library needs a Data Download of BpsFile and a new Build for reforestation; with BpS missing and
+Reforestation on, stage 5 stops with a message. Turn it off on Reforestation Options to build as before.
 
 ## 1.3.1 - 2026-11-11
 

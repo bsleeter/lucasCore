@@ -22,6 +22,14 @@
     over matching the 30 m area (2026-10-20).
   - `Landfire`: LANDFIRE annual disturbance types (the `DIST_TYPE` column of each year's attribute table, so the coding changes in 2024
     do not matter). Years with no LANDFIRE folder (before 1999) get no transitions.
+  - `NlcdPersist`: NLCD classes the modal annual NLCD shows in year-1 and year; on where it does. Forest Return and Shrub Return
+    (to-do 57) return a disturbed cell in the second year NLCD shows its type; Reforestation (41-43, not 90) takes a natural
+    non-forest cell to forest the same way. Only cells with a pathway can use the map.
+  - `All`: on everywhere (Post-disturbance: Conversion; the pathways' age limits decide).
+- `pathways/reforestation.csv` (2026-11-12, `tools/make_reforestation.R`): Barren, the sage family, Non-sage, Chaparral, the grass
+  classes and Palustrine Emergent to every forest class, one type per forest class, age reset. Stage 6 gates each type to stage 5's
+  ReforestType map (the forest type every cell would reach), as NaturalVeg gates Ag Contraction; Reforestation Options off drops the
+  source (zero target).
 
 MTBS and LANDFIRE give each cell the fraction of its 30 m pixels that had the disturbance (over the same aggregation blocks as the NLCD),
 so the expected area matches the 30 m area. Within a source with several groups (fire severities), the cell's whole fraction goes to its
