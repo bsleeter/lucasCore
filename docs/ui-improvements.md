@@ -1541,6 +1541,23 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
            gates and projections: the cell's own type where it starts as forest or disturbed, the any-year rule's type (wetland
            twin included) where it reforests, else the nearest forest type (`fill_modal`). Check what reads `EverForest.tif` downstream and whether
            it should drop these cells. Say lines: area by reading and ecodivision, against the CONUS split.
+           DONE 2026-11-12 (src/5-initial-conditions.R; `reforest_pick()` in src/reforestation.R, 8 more checks). Candidates: natural
+           cells forest only by the any-year rule, NLCD 31, 52, 71 or 95 at the start, not woody wetland. First forest = two years
+           running from the second year on, then forest in 2/3 of the years after (else they flicker and stay forest). The cutoff
+           also replaces RegrowthLag as the limit of regrowth (`regrowth_age(cutoff =)`), so a cell either regrows or reforests;
+           with Reforestation off it is RegrowthLag, as before. Reforesting cells start as G (shrub, grass), W (emergent) or barren,
+           age 0 (chaparral and sage then take their fire age). BpS on the model grid: the most common potential of the cell's 30 m
+           pixels; BpsForestShare.tif the forest share. ReforestType.tif: every land cell's forest type (own, parent of a disturbed
+           class, the any-year rule's for reforesting cells, else neighbours'); both added to Land Cover Layers (a library made
+           before needs `tools/sync-library.R --columns-only`). EverForest is read by nothing downstream (output only), so it keeps
+           its meaning (NLCD forest in any year). No BpsFile with Reforestation on stops stage 5 with a message.
+           Lassen test (library dev/libs/lassen/Lassen.ssim, 150 m, user 2026-11-12: a test library, run efficiency first;
+           `dev/reforestation/lassen-build.R`, stages 1 and 5 in 8 min, result 13): 19,318 land cells; 6,591 forest only by the
+           any-year rule; 117 reforest (111 slow recovery on BpS forest, first forest 24-37 years after 1985; 6 encroachment), all
+           inside the park, at the edges of the high country's open land (map `dev/reforestation/lassen-step4.png`, not committed);
+           4,947 regrow before the 24-year cutoff and stay forest; 1,526 flicker. Found by the test: the age check counted the
+           disturbed classes (age = years since the fire) as "other cells" that must be 0, and failed on the 7 fire-dated cells; it
+           now allows them an age of at least 1 and names the failing cells by class.
         5. **Definitions.** Transition group `Reforestation`; one type per destination, `Reforestation: <forest type>` (as Ag
            Contraction's), incl. the wetland twins; stsim_TransitionType, TransitionGroup, TransitionTypeGroup,
            TransitionSimulationGroup and stockflow main-transition-groups.csv. `tools/make_reforestation.R` writes

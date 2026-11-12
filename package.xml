@@ -727,6 +727,8 @@
 		<column name="GrassShrubFileName" displayName="Grassland/Shrubland Type (RCMAP)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
 		<column name="WetlandFileName" displayName="Wetland Type (C-CAP)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
 		<column name="EverForestFileName" displayName="Forest in Any Year (NLCD)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
+		<column name="ReforestTypeFileName" displayName="Forest Type Each Cell Would Reach (reforestation gates)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif" isOptional="True"/>
+		<column name="BpsForestShareFileName" displayName="Share on LANDFIRE BpS Forest Potential" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif" isOptional="True"/>
 	</dataSheet>
 
 	<dataSheet name="OutputReturnInterval" displayName="Spin-up Return Intervals">

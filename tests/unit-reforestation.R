@@ -50,4 +50,17 @@ check("a bad riparian code stops", inherits(try(reforest_options(data.table(Ripa
 check("package.xml declares the sheet as a stage 5 input", { x <- paste(readLines("package.xml"), collapse = "\n")
   grepl('<dataSheet name="ReforestationOptions"', x, fixed = TRUE) && grepl('programArguments="src/5-initial-conditions.R">[[:space:]]*<dataSheet name="BuildOptions" type="Input"/>[[:space:]]*<dataSheet name="ReforestationOptions" type="Input"/>', x) })
 check("the list label from rsyncrosim reads too", reforest_options(data.table(RiparianAs = "Non-forest potential"))$riparian_as == "non-forest" && reforest_options(data.table(RiparianAs = "Forest potential"))$riparian_as == "forest")
+# which cells reforest (step 4)
+yr <- 1985:2015; S5 <- 52L; F4 <- 42L; at <- function(k) c(rep(S5, k), rep(F4, length(yr) - k))   # first forest k years after the start
+flk <- c(S5, S5, F4, F4, rep(c(S5, S5, S5, F4), 6), S5, S5, S5)[seq_along(yr)]                    # forest two years running once, then mostly not
+nl <- rbind(at(8), at(25), at(8), at(25), flk, rep(S5, length(yr)), at(25))
+pk <- reforest_pick(nl, yr, c("forest", "forest", "non-forest", "non-forest", "non-forest", "non-forest", "other"), c(24, 24, 24, 24, 24, 24, 24))
+check("BpS forest: forest after 8 years (before the cutoff) is regrowth, after 25 reforests", !pk$reforest[1] && pk$reforest[2])
+check("BpS non-forest reforests at any timing", pk$reforest[3] && pk$reforest[4])
+check("a cell that flickers keeps the forest start", !pk$reforest[5] && !pk$persistent[5] && identical(pk$first[5], 2L))
+check("a cell never forest two years running is left alone", !pk$reforest[6] && is.na(pk$first[6]))
+check("other BpS (water, fill) keeps the forest start", !pk$reforest[7])
+check("first forest is counted in years after the start", identical(pk$first[1:2], c(8L, 25L)))
+check("a per-cell cutoff applies cell by cell", identical(reforest_pick(nl[c(2, 2), ], yr, "forest", c(24, 26))$reforest, c(TRUE, FALSE)))
+check("no cells gives empty results", length(reforest_pick(nl[0, , drop = FALSE], yr, character(), numeric())$reforest) == 0)
 cat(sprintf("%d passed, %d failed\n", n_ok, n_bad)); if (n_bad) quit(status = 1)

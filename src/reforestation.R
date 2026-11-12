@@ -53,3 +53,20 @@ reforest_options <- function(x) {
   list(enabled = is.na(en) || isTRUE(as.logical(en)) || identical(toupper(as.character(en)), "YES"),
        cutoff = cy, riparian_as = if (!is.na(ra) && ra == 2L) "non-forest" else "forest")
 }
+
+# Which candidate cells reforest (to-do 57 step 4). nl: NLCD codes, one row per candidate cell (natural, not forest at the start,
+# forest in some later year), one column per year (first the start year); potential: each cell's BpS potential (bps_potential);
+# cutoff: each cell's cutoff (reforest_cutoff); share: the regrowth rule's ForestShare. A cell's first forest is the first year NLCD
+# shows forest (41-43) two years running; it must then be forest in at least `share` of the years after (cells that flicker keep
+# the any-year rule's forest start, user 2026-11-12). It reforests when that first forest is on BpS non-forest (encroachment), or on
+# BpS forest at or after its cutoff (slow recovery). "other" potential (water, fill) keeps the forest start.
+# Returns reforest (logical), first (years from the start to the first forest; NA where never two years running) and persistent.
+reforest_pick <- function(nl, years, potential, cutoff, share = 2 / 3) {
+  nl <- as.matrix(nl); ny <- ncol(nl); n <- nrow(nl); stopifnot(length(years) == ny, length(potential) %in% c(1, n))
+  potential <- rep_len(potential, n); cutoff <- rep_len(as.numeric(cutoff), n)
+  first <- rep(NA_integer_, n); keep <- rep(FALSE, n); if (!n || ny < 3) return(list(reforest = keep, first = first, persistent = keep))
+  f <- nl >= 41 & nl <= 43; f[is.na(f)] <- FALSE
+  for (i in seq_len(n)) { r <- f[i, ]; k <- which(r[-ny] & r[-1]); k <- k[k >= 2]
+    if (!length(k)) next; t <- k[1]; first[i] <- as.integer(years[t] - years[1]); keep[i] <- mean(r[t:ny]) >= share }
+  list(reforest = keep & !is.na(first) & (potential == "non-forest" | (potential == "forest" & first >= cutoff)), first = first, persistent = keep)
+}

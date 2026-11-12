@@ -271,9 +271,17 @@ A <- mask(ifel(forest, max(A, 1), 0), m)
 # regrowing forest (src/regrowth-age.R; to-do 57, user decision 2026-11-11): a cell that is forest only by the any-year rule (grass,
 # shrub or barren in the start year) and that NLCD shows regrowing takes its starting age from the record, not from CMS or TreeMap
 source(pkg_file("src", "regrowth-age.R")); rg <- regrowth_settings(read_default("landcover", "regrowth-age.csv"))
+# the reforestation cutoff (to-do 57 steps 2-4; Reforestation Options): years after the start from which a first NLCD forest is not
+# regrowth. It also bounds which cells count as regrowing (in place of RegrowthLag), so a cell either regrows or reforests
+source(pkg_file("src", "reforestation.R")); ro <- reforest_options(read_ds("ReforestationOptions"))
+eco_nm <- stl$Name[match(values(P, mat = FALSE), as.integer(stl$Id))]
+cut_all <- if (ro$enabled) reforest_cutoff(eco_nm, override = ro$cutoff) else rep(rg$lag, ncell(P))
+if (ro$enabled) { cu <- unique(data.table(e = eco_nm, c = cut_all)[!is.na(e)])
+  say("Reforestation: on; cutoff %s (%s)", if (is.na(ro$cutoff)) "fitted by ecodivision" else sprintf("%d years, set on Reforestation Options", as.integer(ro$cutoff)),
+      paste(sprintf("%s %d", cu$e, as.integer(cu$c)), collapse = ", ")) } else say("Reforestation: off (Reforestation Options); regrowth up to RegrowthLag (%d years)", as.integer(rg$lag))
 rc <- which(values(forest, mat = FALSE) %in% 1 & values(n0, mat = FALSE) %in% c(31, 52, 71))
 if (length(rc)) {
-  ra <- regrowth_age(as.matrix(N[rc]), years, rg$lag, rg$share, rg$nonforest_years); hit <- !is.na(ra)
+  ra <- regrowth_age(as.matrix(N[rc]), years, rg$lag, rg$share, rg$nonforest_years, cutoff = cut_all[rc]); hit <- !is.na(ra)
   va <- values(A, mat = FALSE); was <- va[rc[hit]]; va[rc[hit]] <- ra[hit]; A <- setValues(A, va)
   say("Regrowing forest: %d of %d cells that are forest only by the any-year rule take their age from NLCD (median %s years, was %s; the rest keep the %s age)",
       sum(hit), length(rc), if (any(hit)) as.integer(stats::median(ra[hit])) else "-", if (any(hit)) as.integer(stats::median(was)) else "-", asrc)
@@ -302,6 +310,42 @@ if (length(rc)) {
     }
   }
 }
+# reforestation (to-do 57 step 4; user 2026-11-12): a natural cell not forest at the start that NLCD later shows as forest (two years
+# running, then in 2/3 of the years after) starts as its start-year class, not forest, when its potential vegetation (LANDFIRE BpS
+# 2020) is not forest (encroachment), or is forest and its first forest comes at or after its cutoff (slow recovery). Stage 6's
+# Reforestation transition then takes it to forest in the year NLCD does. Cells a fire perimeter starts disturbed keep that; woody
+# wetlands stay forested wetland; flickering cells and cells on other potential (water, fill) keep the any-year rule's forest.
+# ReforestType: the forest type every land cell would reach (its own where it starts as forest or disturbed, the any-year rule's
+# where it reforests, else its neighbours'), for stage 6's type gates and the projection. BpsForestShare: the share of each cell's
+# 30 m pixels on forest potential (a projection covariate, step 8).
+vS <- values(S, mat = FALSE); typ_all <- ifelse(vS >= 100 & vS <= 999, vS, ifelse(vS >= 2100 & vS <= 2999, vS - 2000L, NA_integer_))
+n_rf <- 0L
+if (ro$enabled) {
+  bf <- read_data_sources("BpsFile", optional = TRUE)$BpsFile
+  if (is.na(bf)) fail("Reforestation Options: the reforestation transition is on and needs LANDFIRE BpS (Data Sources: BpsFile; a Data Download fetches it), or turn it off")
+  b30 <- crop_to(rast(bf)); levels(b30) <- NULL; lk <- bps_lookup(); POT <- c("forest", "non-forest", "other")
+  b30 <- classify(b30, cbind(lk$VALUE, match(bps_potential(lk$VALUE, lk, ro$riparian_as), POT)), others = 3L)
+  Bp <- mask(project(b30, R, method = "mode"), m); Bf <- mask(project(ifel(b30 == 1, 1, 0), R, method = "average"), m)
+  v0a <- values(n0, mat = FALSE); vW <- values(W, mat = FALSE)
+  cand <- which(vS >= 100 & vS <= 999 & v0a %in% c(31, 52, 71, 95) & !values(woody, mat = FALSE) %in% TRUE & !(v0a == 95 & vW %in% c(90, 91)))
+  if (length(cand)) {
+    pot <- POT[values(Bp, mat = FALSE)[cand]]; pot[is.na(pot)] <- "other"
+    pk <- reforest_pick(as.matrix(N[cand]), years, pot, cut_all[cand], rg$share); rf <- cand[pk$reforest]; n_rf <- length(rf)
+    if (n_rf) { v0 <- v0a[rf]
+      vS[rf] <- ifelse(v0 %in% c(52, 71), values(G, mat = FALSE)[rf], ifelse(v0 == 95, vW[rf], v0)); S <- setValues(S, vS)
+      va <- values(A, mat = FALSE); va[rf] <- 0; A <- setValues(A, va) }
+    rd <- data.table(eco = eco_nm[cand], pot, first = pk$first, rf = pk$reforest)
+    say("Reforestation: %d of %d natural cells forest only by the any-year rule start as their start-year class (%d on BpS non-forest, %d on BpS forest at or after the cutoff; median first forest %s years after the start); %d stay forest (%d on BpS forest before the cutoff, %d flicker or never forest two years running, %d on other BpS)",
+        n_rf, length(cand), sum(pk$reforest & pot == "non-forest"), sum(pk$reforest & pot == "forest"), if (n_rf) as.integer(stats::median(pk$first[pk$reforest])) else "-",
+        length(cand) - n_rf, sum(pk$persistent & pot == "forest" & pk$first < cut_all[cand]), sum(!pk$persistent & pot != "other"), sum(pot == "other"))
+    for (e in unique(rd$eco[rd$rf])) say("  %s: %d cells reforest (%d encroachment, %d slow recovery)", e, sum(rd$rf & rd$eco == e), sum(rd$rf & rd$eco == e & rd$pot == "non-forest"), sum(rd$rf & rd$eco == e & rd$pot == "forest"))
+  }
+  fBf <- write_raster(Bf, "BpsForestShare.tif", "FLT4S")
+}
+tt <- table(typ_all); ft0 <- if (length(tt)) as.integer(names(tt)[which.max(tt)]) else 220L   # (no forest at all: Douglas-fir)
+ft <- setValues(rast(R), typ_all); ft <- fill_modal(mask(ft, m), m, ft0)
+fRT <- write_raster(ft, "ReforestType.tif")
+forest <- (S >= 100 & S <= 999) | S == 91
 # chaparral (to-do 39, 2026-11-06: it grows by age since fire): the years since the last interagency fire perimeter of 1900 to the start
 # year over the cell's centre; never burned since 1900: the start year - 1900 (user decision; on the age curve's plateau)
 # The sage family the same way (to-do 39 step 8, 2026-11-08: its shrubs regrow over decades after fire; defaults/stockflow/
@@ -346,9 +390,11 @@ miss <- raster_ids_in_list(S, "StateClass")
 check(STAGE, "state class values are stsim State Class Ids", !length(miss), if (length(miss)) paste("not in the list:", paste(miss, collapse = ", ")) else "")
 lu <- !is.na(v0) & v0 %in% c(11, 12, 21:24, 81, 82)
 check(STAGE, "start-year developed, agriculture, water and ice keep their class", all(vS[lu] == v0[lu]), sprintf("%d cells", sum(lu)))
-vC <- vS %in% age_id
-check(STAGE, "forest cells have an age of at least 1, chaparral and the sage family their years since fire and other cells 0",
-      all(vA[which(vF == 1)] >= 1) && all(vA[which(vF == 0 & !vC)] == 0) && all(vA[which(vC)] >= 0 & vA[which(vC)] <= max(y0 - 1900, as.integer(shrub_age$AgeMax))))
+vC <- vS %in% age_id; vD <- !is.na(vS) & vS >= 2000   # disturbed classes (to-do 57 step 5): age = years since the disturbance
+bad_age <- which((vF %in% 1 & !(vA >= 1)) | (vD & !(vA >= 1)) | (vF %in% 0 & !vC & !vD & !(vA == 0)) | (vC & !(vA >= 0 & vA <= max(y0 - 1900, as.integer(shrub_age$AgeMax)))))
+check(STAGE, "forest and disturbed cells have an age of at least 1, chaparral and the sage family their years since fire and other cells 0", !length(bad_age),
+      if (length(bad_age)) { b <- data.table(S = vS[bad_age], A = vA[bad_age])[, .(n = .N, ages = paste(range(A, na.rm = TRUE), collapse = "-")), by = S]
+        paste(sprintf("%s: %d cells, age %s", scl$Name[match(b$S, as.integer(scl$Id))], b$n, b$ages), collapse = "; ") } else "")
 check(STAGE, "every forest ecodivision x class has a return interval", nrow(ri) == nrow(fc), sprintf("%d of %d", nrow(ri), nrow(fc)))
 say("Forest cells: %d (%.1f%% of land); natural cells made forest by the any-year rule: %d; developed/ag/water/ice kept: %d",
     sum(vF == 1, na.rm = TRUE), 100 * mean(vF[!is.na(vP)] == 1), sum(!is.na(v0) & !(v0 %in% 41:43) & vS >= 100 & vS <= 999 & !lu, na.rm = TRUE), sum(lu))
@@ -362,7 +408,8 @@ row <- ic[1]; row$StateClassFileName <- fS; row$AgeFileName <- fA
 saveDatasheet(scn, as.data.frame(row), "stsim_InitialConditionsSpatial")
 write_ds(data.frame(Year = years, FileName = nl_files), "OutputNlcdAnnual")
 write_ds(data.frame(ForestTypeFileName = write_raster(Fz, "ForestType.tif"), GrassShrubFileName = write_raster(G, "GrassShrubType.tif"),
-                    WetlandFileName = write_raster(W, "WetlandType.tif"), EverForestFileName = write_raster(mask(ever_forest, m), "EverForest.tif", datatype = "INT1U")),
+                    WetlandFileName = write_raster(W, "WetlandType.tif"), EverForestFileName = write_raster(mask(ever_forest, m), "EverForest.tif", datatype = "INT1U"),
+                    ReforestTypeFileName = fRT, BpsForestShareFileName = if (exists("fBf")) fBf else NA_character_),
          "OutputLandCoverLayers")
 write_ds(ri, "OutputReturnInterval"); write_ds(st, "OutputSoilTarget")
 summ <- data.table(S = vS, A = vA)[!is.na(S), .(Cells = .N, MeanAge = round(mean(A), 1)), by = S][, StateClassId := scl$Name[match(S, as.integer(scl$Id))]]
