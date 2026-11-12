@@ -89,6 +89,8 @@ TYPE_SUFFIX <- " [Type]"
 grp_types <- function(g) if (endsWith(g, TYPE_SUFFIX)) substr(g, 1, nchar(g) - nchar(TYPE_SUFFIX)) else ttg[TransitionGroupId == g, TransitionTypeId]
 elig_cells <- function(g) vS %in% sid(unique(pw[TransitionTypeId %in% grp_types(g), StateClassIdSource]))
 so <- read_default("transitions", "sources.csv")
+source(pkg_file("src", "reforestation.R")); ro6 <- reforest_options(read_ds("ReforestationOptions"))   # (to-do 57: off = no Reforestation maps, so a zero target)
+if (!ro6$enabled) { so <- so[TransitionGroupId != "Reforestation"]; say("Reforestation: off (Reforestation Options)") }
 ok_g <- vapply(so$TransitionGroupId, function(g) if (endsWith(g, TYPE_SUFFIX)) grp_types(g) %in% ttl$Name else g %in% tgl$Name, TRUE)
 check(STAGE, "every transition group in sources.csv exists", all(ok_g), paste(so$TransitionGroupId[!ok_g], collapse = "; "))
 nopw <- so$TransitionGroupId[vapply(so$TransitionGroupId, function(g) !any(grp_types(g) %in% pw$TransitionTypeId), TRUE)]
@@ -404,6 +406,22 @@ if (nrow(nv)) {
     gfile[[d]] <- if (global(r, "sum", na.rm = TRUE)[[1]] > 0) write_raster(r, sprintf("NaturalVeg-%d.tif", id), "INT1U") else off_file }
   gates <- gt[, .(Timestep = y0, TransitionGroupId = paste0(TransitionTypeId, TYPE_SUFFIX), MultiplierFileName = unlist(gfile[StateClassIdDest]))]
   say("Ag contraction: %d types gated to %d natural classes (%d present in the study area)", nrow(gt), length(gfile), sum(unlist(gfile) != off_file))
+}
+
+# ---- reforestation destinations (to-do 57 step 7): each "Reforestation: <type>" only where stage 5's ReforestType map holds that type -
+# (the group's yearly maps are the NlcdPersist ones above: on where NLCD shows forest two years running; only cells in a natural
+# non-forest class have a pathway, so these are the cells stage 5 started as their start-year class and those a fire converted)
+if ("Reforestation" %in% so$TransitionGroupId) {
+  lcl <- read_ds("OutputLandCoverLayers"); rtf <- if (nrow(lcl) && "ReforestTypeFileName" %in% names(lcl)) lcl$ReforestTypeFileName[1] else NA_character_
+  if (is.na(rtf) || !file.exists(rtf)) fail("Reforestation needs stage 5's ReforestType map (Land Cover Layers): rerun stage 5 with this version")
+  RTm <- rast(rtf); rgt <- unique(pw[TransitionTypeId %in% grp_types("Reforestation"), .(TransitionTypeId, StateClassIdDest)])
+  multi <- rgt[, .N, by = TransitionTypeId][N > 1]
+  check(STAGE, "each Reforestation type leads to a single forest class", !nrow(multi), paste(multi$TransitionTypeId, collapse = "; "))
+  rfile <- list()
+  for (d in unique(rgt$StateClassIdDest)) { r <- mask(RTm == sid(d), P)
+    rfile[[d]] <- if (global(r, "sum", na.rm = TRUE)[[1]] > 0) write_raster(r, sprintf("ReforestType-%d.tif", sid(d)), "INT1U") else off_file }
+  gates <- rbind(gates, rgt[, .(Timestep = y0, TransitionGroupId = paste0(TransitionTypeId, TYPE_SUFFIX), MultiplierFileName = unlist(rfile[StateClassIdDest]))])
+  say("Reforestation: %d types gated to their destination forest class (%d present in the study area)", nrow(rgt), sum(unlist(rfile) != off_file))
 }
 progressBar()
 

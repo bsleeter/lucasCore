@@ -11,7 +11,8 @@
 # Shrubland: Post Fire Shrub (class 59, to be retired), Wetland: Estuarine Emergent (tidal marsh), the estuarine forested class
 # (91; no FIA curves of its own as a destination).
 # Writes defaults/transitions/pathways/reforestation.csv and the Reforestation rows of defaults/stsim (TransitionType,
-# TransitionGroup, TransitionTypeGroup; not TransitionSimulationGroup, as Post-disturbance) and defaults/stockflow/main-transition-groups.csv. Rerunnable.
+# TransitionGroup, TransitionTypeGroup, TransitionSimulationGroup: ST-Sim writes transition maps only for those and [Type] groups,
+# found in step 7) and defaults/stockflow/main-transition-groups.csv. Rerunnable.
 # A library made before gets the group and types from the 1.4 update (ui/LucasCoreUpdates.cs, Update_1_400).
 # Usage: Rscript tools/make_reforestation.R   (from the repository root)
 # =============================================================================
@@ -39,6 +40,8 @@ wr(tg, D("stsim", "stsim_TransitionGroup.csv"))
 ttg <- rd(D("stsim", "stsim_TransitionTypeGroup.csv")); ttg <- ttg[!startsWith(TransitionTypeId, PFX)]
 ttg <- rbind(ttg, data.table(TransitionTypeId = fo$type, TransitionGroupId = GRP, IsAuto = ""), fill = TRUE)
 wr(ttg, D("stsim", "stsim_TransitionTypeGroup.csv"))
+sg <- rd(D("stsim", "stsim_TransitionSimulationGroup.csv")); if (!GRP %in% sg$TransitionGroupId) sg <- rbind(sg, data.table(TransitionGroupId = GRP))   # (a primary group, as Ag Contraction: ST-Sim maps only these and [Type] groups)
+wr(sg, D("stsim", "stsim_TransitionSimulationGroup.csv"))
 mg <- rd(D("stockflow", "main-transition-groups.csv")); if (!GRP %in% mg$TransitionGroupId) mg <- rbind(mg, data.table(TransitionGroupId = GRP, Spatial = "Yes", SpatialProbability = "Yes"))
 wr(mg, D("stockflow", "main-transition-groups.csv"))
 

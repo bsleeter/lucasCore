@@ -174,6 +174,15 @@ namespace lucasCoreUI
                 AddTransitionType(store, "Reforestation: " + y, null);
                 AddTypeToGroup(store, "Reforestation: " + y, "Reforestation");
             }
+            // a transition simulation group, as Ag Contraction: ST-Sim writes transition maps only for these and [Type] groups
+            if (store.TableExists("stsim_TransitionSimulationGroup"))
+                foreach (DataRow r in Rows(store, "SELECT ProjectId FROM core_Project").Rows)
+                {
+                    string pr = Id(r["ProjectId"]), g = IdOf(store, "stsim_TransitionGroup", "TransitionGroupId", pr, "Reforestation");
+                    if (g == null || Convert.ToInt64(store.ExecuteScalar("SELECT COUNT(*) FROM stsim_TransitionSimulationGroup WHERE ProjectId = " + pr + " AND TransitionGroupId = " + g), CultureInfo.InvariantCulture) > 0) continue;
+                    store.ExecuteNonQuery("INSERT INTO stsim_TransitionSimulationGroup (TransitionSimulationGroupId, ProjectId, TransitionGroupId) VALUES (" +
+                                          NewId(store).ToString(CultureInfo.InvariantCulture) + ", " + pr + ", " + g + ")");
+                }
         }
 
         // a state class (with its Id, labels by name) in every project that lacks it

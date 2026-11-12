@@ -1173,6 +1173,8 @@
 		<dataSheet name="OutputNlcdAnnual" type="Input"/>
 		<dataSheet name="MinimumHarvestAge" type="Input"/>
 		<dataSheet name="HarvestAgeOptions" type="Input"/>
+		<dataSheet name="ReforestationOptions" type="Input"/>
+		<dataSheet name="OutputLandCoverLayers" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Both"/>
 		<dataSheet name="stsim_Transition" type="Output"/>
 		<dataSheet name="stsim_DeterministicTransition" type="Output"/>

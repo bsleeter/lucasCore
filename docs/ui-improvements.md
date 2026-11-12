@@ -1593,6 +1593,17 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
            forest two years running, as Forest Return. Type gates from `ReforestType.tif` at the start year, as the NaturalVeg
            gates. Only cells in a natural non-forest class can take it: the reforesting cells, and cells a fire converted that NLCD
            later shows as forest (decided: they take it). Check: no clash with the land-use class pairs (transition-pairs.R).
+           DONE 2026-11-12. sources.csv `Reforestation, NlcdPersist, 41|42|43` (the NlcdPersist maps Forest Return uses: on where the
+           modal NLCD shows forest the year before and that year); stage 6 gates each type to ReforestType (as the NaturalVeg
+           gates) and takes ReforestationOptions (off: the source is dropped, so a zero target) and Land Cover Layers as inputs.
+           No clash with the land-use pairs: those start from developed or agricultural classes. Lassen (stage 6 on Build result 6,
+           38-year run; `dev/reforestation/lassen-historical.R`): all 117 cells reforest in the year NLCD predicts (1988-2023,
+           most 2010-2023), as their ReforestType; 3 more are fire-converted cells NLCD shows as forest again (decided). Found by
+           the test: (1) NLCD 90 in the source turned 7 shrub, grass or emergent cells that NLCD later calls woody wetland into
+           upland forest (their ReforestType comes from neighbours); Reforestation now follows 41-43 only, as stage 5's any-year
+           rule (Forest Return keeps 90 for the twins); (2) ST-Sim writes transition maps only for transition simulation groups
+           and [Type] groups, so Reforestation is now a simulation group, as Ag Contraction (package defaults, make_reforestation.R
+           and the 1.4 update). NLCD 2023 shows 86 of the 117 as forest; the model keeps the rest forest (no transition back).
         8. **Projections (stages 9 and 10).** transitions.csv row `Reforestation`: Target by ecodivision, the area from the
            historical record, the mean of its recent years (decided: 10 by default, a setting). allocation.csv: a fitted surface
            `Reforestation`, SourceClasses 31|52|71|95, EventClasses 41|42|43|90. covariates.csv: new forest potential (BpS forest
