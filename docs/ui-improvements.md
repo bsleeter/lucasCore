@@ -1501,8 +1501,9 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
            start-year class (the grass, shrub, barren or wetland type stage 5 already gives non-forest cells, with the shrub age
            rule). The rest stay as now: forest with the regrowth age, or the disturbed class where a fire perimeter dates them
            (DisturbedStart Fire wins over reforestation). BpS on the model grid: the share of the cell's 30 m pixels in each group,
-           the cell's group the most common. New output `ReforestType.tif`: the forest type each reforesting cell would have had
-           (the any-year rule's type, wetland twin included), for stage 6. Check what reads `EverForest.tif` downstream and whether
+           the cell's group the most common. New output `ReforestType.tif`, a forest type for every land cell, for stage 6's
+           gates and projections: the cell's own type where it starts as forest or disturbed, the any-year rule's type (wetland
+           twin included) where it reforests, else the nearest forest type (`fill_modal`). Check what reads `EverForest.tif` downstream and whether
            it should drop these cells. Say lines: area by reading and ecodivision, against the CONUS split.
         5. **Definitions.** Transition group `Reforestation`; one type per destination, `Reforestation: <forest type>` (as Ag
            Contraction's), incl. the wetland twins; stsim_TransitionType, TransitionGroup, TransitionTypeGroup,
@@ -1516,25 +1517,31 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
            wood: right for encroachment, low for St Helens-type recovery (the events file is the fix there).
         7. **Stage 6 (historical runs).** sources.csv row `Reforestation, NlcdPersist, 41|42|43|90`: on where the modal NLCD shows
            forest two years running, as Forest Return. Type gates from `ReforestType.tif` at the start year, as the NaturalVeg
-           gates. Only reforesting cells can take it, since every other cell NLCD shows as forest starts as forest. Check: no clash
-           with the land-use class pairs (transition-pairs.R); a cell converted to shrub after a fire that NLCD later shows as
-           forest would also take it (decide whether that's wanted).
+           gates. Only cells in a natural non-forest class can take it: the reforesting cells, and cells a fire converted that NLCD
+           later shows as forest (decided: they take it). Check: no clash with the land-use class pairs (transition-pairs.R).
         8. **Projections (stages 9 and 10).** transitions.csv row `Reforestation`: Target by ecodivision, the area from the
-           historical record (mean, or the recent years since the rate falls by decade). allocation.csv: a fitted surface
+           historical record, the mean of its recent years (decided: 10 by default, a setting). allocation.csv: a fitted surface
            `Reforestation`, SourceClasses 31|52|71|95, EventClasses 41|42|43|90. covariates.csv: new forest potential (BpS forest
            share), distance to forest and forest share within 1 km, with elevation, slope and land cover. The destination type in
-           projections: the nearest forest type (`fill_modal` from the start-year forest, as Ag Contraction's nearest natural
-           class), for every natural non-forest cell.
+           projections: `ReforestType.tif` (step 4).
         9. **Tests.** tests/unit-reforestation.R: the cutoff table's resolution and the override, the cell readings, the pathway
            table (every source class to every forest type, no disturbed classes). tests/unit-regrowth-age.R updated for the
            per-cell cutoff. End to end on P26 or Puget (both have rule cells; GDS has few): stages 5 and 6, a short historical
            run (reforesting cells reach forest when NLCD does; area by year against the NLCD record), then a Projection Setup.
            Starting carbon before and after.
         10. **Docs.** CHANGELOG (changes Build results), defaults README files, the Build page help, metadata; ships in 1.4.0.
-      - **Still to decide (user), before or during the build:** flickering open woodland (the half of P26's rule cells that fail
-        the 2/3 test): forest as now, or reforestation (proposed: as now); riparian or savanna BpS: forest potential (proposed) or
-        non-forest; whether a fire-converted cell that NLCD later shows as forest takes Reforestation; age at the transition (0,
-        proposed, or a set young age); the projection rate (record mean or recent years).
+      - **Decided (user, 2026-11-12), for the steps above:**
+        - Flickering open woodland (natural cells forest in some years but under 2/3 of the years after; about half of P26's
+          rule cells) starts as forest, as now, with its CMS or TreeMap age (step 4).
+        - Riparian or savanna BpS reads as forest potential (step 3's default, step 4).
+        - A cell that has already left its disturbed class as non-forest (the window ended, or a reburn converted it) and that
+          NLCD later shows as forest takes Reforestation back to forest: historical runs follow NLCD (steps 5 and 7; the
+          pathways' sources include the shrub and grass classes conversion leads to; the gate map then needs a type for every
+          cell, not only the reforesting ones; projections use the same map). Within the window, return stays the disturbed
+          class's Forest Return.
+        - Age at the transition: 0; the grass or shrub live carbon carries over (step 6).
+        - Projection rate: the mean of the record's recent years (10 by default, a setting), since the rate falls by decade
+          (step 8).
     - **TO DECIDE (user, 2026-11-11: "make the wetland decision something to address"): what a burned forested wetland converts
       to.** The GDS test showed a burned swamp converting to Shrubland: Non-sage, the region's shrub class, at a reburn or the
       window's end. Upland shrub carbon and no burial are wrong for a swamp that stays wet. Options:
