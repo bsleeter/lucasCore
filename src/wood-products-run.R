@@ -90,6 +90,15 @@ wp_run_removals <- function(lib, rid, P, pkg, region = NA_character_) {
 `%||%` <- function(a, b) if (is.null(a) || (length(a) == 1 && is.na(a))) b else a
 
 # ---- figures ---------------------------------------------------------------------------------------------------------------
+# end uses as the figures name them (the sheets keep McKeever's names, as in defaults/wood-products/end-use-*.csv)
+WP_ENDUSE_LABELS <- c(`new housing, single family` = "New housing: single family", `new housing, multifamily` = "New housing: multifamily",
+  `new housing, manufactured housing` = "New housing: manufactured", `new nonresidential, new nonres buildings` = "New nonresidential buildings",
+  `new nonresidential, other` = "New nonresidential: other", `residential r and r, n/a` = "Residential repair and remodeling",
+  `manufacturing, furniture` = "Furniture", `manufacturing, other manufacturing` = "Other manufacturing", `rail and railcar, n/a` = "Railroad ties and railcars",
+  `other, n/a` = "Other end uses", `other industrial products` = "Other industrial products", `packaging and shipping, n/a` = "Packaging and shipping",
+  `wood pulp` = "Paper (wood pulp)", `fuelwood and other` = "Fuelwood")
+wp_enduse_label <- function(x) { l <- unname(WP_ENDUSE_LABELS[x]); ifelse(is.na(l), x, l) }
+
 # m: wp_model(); s: wp_summary(m); outdir; note: the line under each title. Returns one row per PNG (Figure, Title, Caption, FileName).
 wp_figures <- function(m, s, outdir, note, proj_start = NA) {
   INK <- "#20211f"; MUTED <- "#55534c"; GRID <- "#e3e1db"
@@ -138,7 +147,7 @@ wp_figures <- function(m, s, outdir, note, proj_start = NA) {
     ptitle(1, sprintf("Removed: %.3f Tg C/yr; stored: %.0f%%", mean(rem$Mean) / sc, 100 * sum(ch$Mean) / sum(rem$Mean)))
     leg(legend = c("Removed", "Emitted, energy capture", "Emitted, no energy capture", "Stock change"), col = c(INK, "#c93a1d", "#7b4a8b", "#2b8152"), lty = c(1, 1, 1, 2), lwd = 1.6)
     op <- par(mar = c(4.5, 14, 3, 1)); on.exit(par(op))
-    barplot(eu$InUse / sc, names.arg = eu$EndUse, horiz = TRUE, col = "#2b8152", border = NA, xlab = "Tg C", cex.names = .62, las = 1)
+    barplot(eu$InUse / sc, names.arg = wp_enduse_label(eu$EndUse), horiz = TRUE, col = "#2b8152", border = NA, xlab = "Tg C", cex.names = .62, las = 1)
     ptitle(2, sprintf("In use in %d: %.2f Tg C", y1, sum(eu$InUse) / sc)) })
   rbindlist(rows)
 }

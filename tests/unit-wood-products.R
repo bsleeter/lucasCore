@@ -109,5 +109,7 @@ check("an asymmetric triangle too", { Fa <- function(x) if (x <= 1) (x - tri[1])
 set.seed(3); r <- wp_rtri(2e5, wp_triangle(0.85, 1, 1.15, 0.9))
 check("sampled draws hit the bounds' 5% and 95%", abs(mean(r < 0.85) - 0.05) < 0.003 && abs(mean(r > 1.15) - 0.05) < 0.003)
 check("the land-clearing share stays within 0 and 1 in every draw", { d <- wp_draws(P, n = 500, seed = 2); all(d$lcu >= 0 & d$lcu <= 1) && abs(mean(d$lcu) - 0.5) < 0.03 })
+source(file.path("src", "wood-products-run.R"))
+check("every end use has a figure label", all(unique(read.csv(file.path("defaults", "wood-products", "end-use-half-lives.csv"))$EndUse) %in% names(WP_ENDUSE_LABELS)))
 
 cat(sprintf("%d passed, %d failed\n", n_ok, n_bad)); if (n_bad) quit(status = 1)
