@@ -1632,6 +1632,17 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
            per-cell cutoff. End to end on P26 or Puget (both have rule cells; GDS has few): stages 5 and 6, a short historical
            run (reforesting cells reach forest when NLCD does; area by year against the NLCD record), then a Projection Setup.
            Starting carbon before and after.
+           DONE 2026-11-12, on the Lassen Volcanic NP library at 150 m (user: test in the West; Lassen as the test area) rather than
+           P26 or Puget. tests/unit-reforestation.R: 50 checks (BpS table and potential, the cutoff and its override, the options,
+           the cell rule, the definitions and pathways, stage 6 and projection wiring, the 1.4 update text); unit-regrowth-age 19.
+           End to end: stage 5 (step 4), the historical run (step 7: all 117 cells in the year NLCD predicts), the Projection Setup
+           and a 10-year projection (step 8). Off switch (Reforestation Options: Enabled off; quick test of stages 5, 6, 8 on Build
+           result 6, result 24): regrowth back to RegrowthLag 20, the 117 cells start as forest (15,560 forest cells, 15,443 with it
+           on), Reforestation gets zero targets. Starting carbon at Lassen, on against off: live biomass 3.224 against 3.250 Tg C
+           (-0.026, -0.8%), all stocks 8.461 against 8.505 (-0.044, -0.5%), about 100 Mg C/ha of live carbon on each of the 117
+           cells (263 ha), which off start with CMS' old-forest age. The full unit sweep: all pass but unit-treemap, which needs the
+           FIA DataMart under the worktree's dev/libs (environment, not this change); unit-metadata-definitions found the
+           Reforestation group and types missing from defaults/metadata/definitions.csv (added).
         10. **Docs.** CHANGELOG (changes Build results), defaults README files, the Build page help, metadata; ships in 1.4.0.
       - **Decided (user, 2026-11-12), for the steps above:**
         - Flickering open woodland (natural cells forest in some years but under 2/3 of the years after; about half of P26's

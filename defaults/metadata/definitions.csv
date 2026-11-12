@@ -146,3 +146,5 @@ TransitionGroup,Post-disturbance,"Every way out of a disturbed class: return or 
 TransitionGroup,Post-disturbance: Forest Return,"Return of disturbed forest to its forest type.",
 TransitionGroup,Post-disturbance: Shrub Return,"Return of disturbed shrubland to its shrub type.",
 TransitionGroup,Post-disturbance: Conversion,"Conversion of disturbed land that has not returned by the end of its window.",
+TransitionGroup,Reforestation,"Natural non-forest land (barren, shrub, grass or emergent wetland) that becomes forest with no fire or harvest behind it: slow recovery after a disturbance before the record, and encroachment onto land whose potential vegetation is not forest. Historical runs follow the annual NLCD (forest two years running); projections take the recent years' area and place it by a fitted surface (to-do 57).",NlcdFolder
+TransitionType,Reforestation: *,"Natural non-forest land becomes the forest type ""{*}"", the type stage 5 gives the cell (its own, or its neighbours'); a new stand from age 0, the grass or shrub carbon carried over.",BpsFile
