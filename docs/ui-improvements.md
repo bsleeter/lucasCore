@@ -1437,8 +1437,10 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       0.022 a year (40% back). The western windows are partly the record's length (about 10% of pixels followed past 30 years, curves
       still rising slowly), so conversion at the window's end may come early there; in historical runs Reforestation brings back
       what NLCD later shows as forest. Curves in `dev/fire/post-disturbance-fit.csv`. Pathways regenerated (fire.csv,
-      post-disturbance.csv); tests/unit-post-disturbance.R 24 checks. Not yet run in a Build. Open: the shrub classes (RCMAP cover;
-      the download needs asking), forest type within an ecodivision.
+      post-disturbance.csv); tests/unit-post-disturbance.R 24 checks. Not yet run in a Build. Open: the shrub classes (RCMAP cover,
+      now downloaded: see below), forest type within an ecodivision. RCMAP V8 sagebrush and shrub cover 1985-2025 downloaded
+      2026-11-12 to the national copy <home>/land-cover/rcmap-cover/<comp>/ (82 yearly tifs, 198 GB, 116 min; Data Download
+      scenario in the Lassen library; manifest <home>/records/RcmapCoverFolder-manifest.csv), so later Builds need not fetch it.
     - **Step 6 DONE 2026-11-12 (figures; user chose three of four proposed: not the settings chart).** Build Figures (stage 12):
       "How forest starts: regrowth and reforestation": (a) how each natural cell NLCD shows as forest only later starts (regrowth
       with its NLCD age, disturbed at the start, reforests later by slow recovery or encroachment, or forest with its source age),
