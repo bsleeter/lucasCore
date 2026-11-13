@@ -100,7 +100,7 @@ namespace lucasCoreUI
             private const string ANY = "(any)";
             public readonly Label[] Captions = new Label[3];
             public readonly ComboBox[] Units = new ComboBox[3];
-            public readonly Label Info = new Label { AutoSize = true, MaximumSize = new Size(420, 0), Tag = Fit.Fixed, ForeColor = SystemColors.GrayText, Margin = new Padding(3, 2, 3, 3) };
+            public readonly Label Info = Note("");   // the Where line's note: beside the boxes, to the right edge
             private ModelStrata m_ms;
 
             public WherePicker()
@@ -108,7 +108,7 @@ namespace lucasCoreUI
                 for (int i = 0; i < 3; i++)
                 {
                     Captions[i] = new Label { AutoSize = true, Margin = new Padding(3, 7, 6, 3), Tag = Fit.Fixed };
-                    Units[i] = new ComboBox { Width = 330, Anchor = AnchorStyles.Left, Margin = new Padding(3, 3, 12, 3), AutoCompleteMode = AutoCompleteMode.SuggestAppend,
+                    Units[i] = new ComboBox { Width = 260, Anchor = AnchorStyles.Left, Margin = new Padding(3, 3, 12, 3), AutoCompleteMode = AutoCompleteMode.SuggestAppend,
                                               AutoCompleteSource = AutoCompleteSource.ListItems, MaxDropDownItems = 20 };
                 }
             }
@@ -118,7 +118,7 @@ namespace lucasCoreUI
                 var t = new TableLayoutPanel { AutoSize = true, ColumnCount = 2, Margin = new Padding(0) };
                 t.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize)); t.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
                 for (int i = 0; i < 3; i++) { t.RowCount = i + 1; t.RowStyles.Add(new RowStyle(SizeType.AutoSize)); t.Controls.Add(Captions[i], 0, i); t.Controls.Add(Units[i], 1, i); }
-                var p = Column(); p.Controls.Add(t); p.Controls.Add(Info); return p;
+                return t;
             }
 
             public void Load(ModelStrata ms)
@@ -133,9 +133,9 @@ namespace lucasCoreUI
                     c.EndUpdate(); c.Text = ""; if (!req) c.SelectedIndex = 0;
                 }
                 Info.Text = (ms.TileLevel >= 0
-                    ? string.Format("This projection runs in spatial tiles of {0} units, so each action names one {0} unit (a target must lie inside one tile), and optionally a unit at the other levels: add a row for each unit, or combination of units, to manage.", ms.Source[ms.TileLevel])
-                    : "No spatial tiles: leave every level at (any) for the whole study area, or name a unit at one or more levels (for example a county and a federal owner within it).")
-                    + (ms.FromBuild ? " The lists hold the units with land in the study area; a combination with no land stops the setup, which names the row." : " (The Build has not run yet: every unit of each source is listed.)");
+                    ? string.Format("Required: a {0} unit (the projection runs in {0} tiles); the other levels are optional.", ms.Source[ms.TileLevel])
+                    : "(any) everywhere = the whole study area; or name a unit at one or more levels, e.g. a county and a federal owner in it.")
+                    + (ms.FromBuild ? " Lists: units with land in the study area." : " Lists: every unit (the Build has not run).");
             }
 
             // the row's stratum columns, or an error message
@@ -174,6 +174,18 @@ namespace lucasCoreUI
         private readonly Label m_state = new Label { AutoSize = true, MaximumSize = new Size(640, 0), ForeColor = SystemColors.GrayText, Margin = new Padding(3, 8, 3, 3) };
         private readonly Label m_rows = new Label { AutoSize = true, MaximumSize = new Size(760, 0), Margin = new Padding(3, 4, 3, 6) };
 
+        // a parameter line: a fixed-width caption, the control, then its note, which Fit widens to the page's right edge
+        private static FlowLayoutPanel Line(string caption, Control c, Label note)
+        {
+            var r = new FlowLayoutPanel { AutoSize = true, WrapContents = false, Margin = new Padding(0, 0, 0, 4) };
+            r.Controls.Add(new Label { Text = caption, AutoSize = false, Size = new Size(150, 24), Margin = new Padding(3, 6, 3, 0), Tag = Fit.Fixed });
+            r.Controls.Add(c);
+            if (note != null) { note.Margin = new Padding(10, 6, 3, 3); r.Controls.Add(note); }
+            return r;
+        }
+        private static FlowLayoutPanel Lines(params Control[] lines) { var c = Column(); foreach (Control l in lines) c.Controls.Add(l); return c; }
+        private static FlowLayoutPanel ActionRow(ActionForm a) { var r = new FlowLayoutPanel { AutoSize = true, WrapContents = false, Margin = new Padding(150, 2, 0, 0) }; r.Controls.Add(a.Add); r.Controls.Add(a.Said); return r; }
+
         private static FlowLayoutPanel Pair(TextBox a, string mid, TextBox b, string after)
         {
             var r = new FlowLayoutPanel { AutoSize = true, WrapContents = false, Margin = new Padding(0) };   // (not a wrapping row: Fit would widen it to the page and squeeze the notes column)
@@ -187,36 +199,31 @@ namespace lucasCoreUI
         {
             this.SuspendLayout();
             AddGroup(Group("What management does in a projection", ProjectionTransitionsView.Stack(
-                Note("Management acts on forest that a disturbance has put into its disturbed class (high-severity fire): the land that waits to come back as forest, comes back, or converts to shrub or grass at the end of its window. Choose an action's settings below and add it; add it again with other settings for other years or another place. The rows at the bottom are what the Projection Setup uses. With no rows the projection is the baseline: natural return and conversion only."),
-                Note("The area is management above what happened historically. The natural return rates were fitted from what NLCD saw after past fires, and that already includes whatever planting followed them, so a row adds planting or salvage on top of the past rate."))));
+                Note("Management acts on forest a high-severity fire has put into its disturbed class, while it waits to return or convert. Set an action below and add it; add it again for other years or places. No rows = the baseline. Areas are on top of the historical rate (the fitted natural return already includes past planting)."))));
 
-            // replanting
-            var f = Form();
-            FormRow(f, "Years:", Pair(m_rep.Start, "to", m_rep.End, null), "blank = from the first projection year, or to the projection end");
-            FormRow(f, "Area per year:", m_rep.Area, "planted each year, in the library's amount units (hectares unless the Terminology says otherwise). When less land is eligible in a year (few recent fires), less is planted; the run reports what was done");
-            FormRow(f, "Where:", m_rep.Where.Panel(), "a unit at one or more of the Build's strata levels (Build Options), or (any) at every level for the whole study area. An area over several units is spread over them by their forest land");
-            FormRow(f, "Years since the disturbance:", Pair(m_rep.From, "to", m_rep.To, null), "the window for planting: a disturbed cell is planted only at these ages (0 = the year of the fire). Default 1 to 5: before shrubs and grass take the site");
-            FormRow(f, "Survival:", m_rep.Survival, "the share of the planted area that takes and goes back to its forest type at age 0. The rest fails: it stays disturbed with its age and can still return on its own or convert. Default 0.8");
-            FormRow(f, "Priority:", m_rep.Priority, "at random among eligible cells, or first where natural return is least likely: far from live forest (the inverse of the seed-source curve that speeds natural return near live forest). Every replanting row uses the same priority");
-            FormRow(f, "Site preparation:", m_rep.Prep, "carbon flows on the planted (and failed) area. Pile and burn: the shrub and herb cover burns as clearcut slash does (96% to CO2, CO and CH4), its roots die, half the litter and fine woody debris and 30% of the branch snags burn. Mechanical (mastication): the cover goes to litter and fine woody debris, its roots die; nothing burns. None: no flows. Provisional values (to-do 58)");
-            var ra = Row(); ra.Controls.Add(m_rep.Add); ra.Controls.Add(m_rep.Said);
-            AddGroup(Group("Replanting", ProjectionTransitionsView.Stack(f, ra,
-                Wrapped("A planted cell goes back to its own forest type (its disturbed class remembers it). Planting a different type is not offered yet.", 760))));
+            // replanting: caption, control, then its note to the right edge
+            AddGroup(Group("Replanting", Lines(
+                Line("Years:", Pair(m_rep.Start, "to", m_rep.End, null), Note("Blank = from the projection start, or to its end.")),
+                Line("Area per year:", m_rep.Area, Note("In the library's units (hectares). Less is planted when less land is eligible; the run reports what was done.")),
+                Line("Where:", m_rep.Where.Panel(), m_rep.Where.Info),
+                Line("Years since disturbance:", Pair(m_rep.From, "to", m_rep.To, null), Note("Ages a disturbed cell can be planted (0 = the fire year). Default 1-5, before shrubs and grass take the site.")),
+                Line("Survival:", m_rep.Survival, Note("Share that takes: back to its own forest type at age 0. The rest stays disturbed and can still return or convert. Default 0.8.")),
+                Line("Priority:", m_rep.Priority, Note("Random, or first where natural return is least likely (far from live forest). One priority for all replanting rows.")),
+                Line("Site preparation:", m_rep.Prep, Note("Carbon on the planted area. Pile and burn: cover burned (96% emitted), roots die, half the litter and fine woody debris and 30% of branch snags burn. Mechanical: cover to litter and fine woody debris, roots die. Provisional.")),
+                ActionRow(m_rep))));
 
             // salvage
-            var g = Form();
-            FormRow(g, "Years:", Pair(m_sal.Start, "to", m_sal.End, null), "blank = from the first projection year, or to the projection end");
-            FormRow(g, "Area per year:", m_sal.Area, "salvaged each year, in the library's amount units");
-            FormRow(g, "Where:", m_sal.Where.Panel(), "a unit at one or more of the Build's strata levels, or (any) at every level for the whole study area");
-            FormRow(g, "Years since the disturbance:", Pair(m_sal.From, "to", m_sal.To, null), "the window: salvage follows soon after the fire, before the snags lose their value. Default 0 to 2");
-            var sa = Row(); sa.Controls.Add(m_sal.Add); sa.Controls.Add(m_sal.Said);
-            AddGroup(Group("Salvage logging", ProjectionTransitionsView.Stack(g, sa,
-                Wrapped("Salvage takes mostly the snags: 72% of snag stems and 85% of any merchantable live wood go to the forestry sector, branch snags fall to dead wood (CBM's salvage matrix). The cell stays in its disturbed class with its age, so its return and conversion clock keeps running.", 760))));
+            AddGroup(Group("Salvage logging", Lines(
+                Line("Years:", Pair(m_sal.Start, "to", m_sal.End, null), Note("Blank = from the projection start, or to its end.")),
+                Line("Area per year:", m_sal.Area, Note("In the library's units (hectares). Takes mostly snags to the forestry sector; the cell stays disturbed with its age.")),
+                Line("Where:", m_sal.Where.Panel(), m_sal.Where.Info),
+                Line("Years since disturbance:", Pair(m_sal.From, "to", m_sal.To, null), Note("Soon after the fire, before the snags lose value. Default 0-2.")),
+                ActionRow(m_sal))));
 
             // the rows
             var r = Row(); r.Controls.Add(m_clear); r.Controls.Add(m_state);
             AddGroup(Group("Actions (what the Projection Setup uses)", ProjectionTransitionsView.Stack(m_rows, m_grid, r,
-                Wrapped("Stage 9 turns each row into ST-Sim targets; Projection Results > Management Actions (as set up) lists what each row became. The grid can also be edited directly.", 760))));
+                Wrapped("Edit here directly if you like. Projection Results > Management Actions (as set up) lists what each row became.", 760))));
             EndGroups();
 
             m_rep.Priority.Items.AddRange(new object[] { "None (random among eligible cells)", "Far from live forest (least likely to return on its own)" });
