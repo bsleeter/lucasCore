@@ -25,8 +25,9 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   20 years, 79% back; Chaparral 8 years, 87% back, reburn conversion 0.10. Changes Build and Run results.
 - Moderate-severity fire is now stand-replacing in the shrub classes (Sage, Native and Invaded Sage Steppe, Non-sage, Chaparral):
   like high severity it moves the cell into its disturbed class (age reset), and a moderate or high reburn there can convert it.
-  RCMAP shows moderate-severity shrub fire losing and regaining cover as high-severity fire does. Forest is unchanged (high only).
-  Changes Run results.
+  RCMAP shows moderate-severity shrub fire losing and regaining cover as high-severity fire does. Its carbon follows: moderate fire
+  in these classes burns and kills what high-severity fire does (`defaults/stockflow/nonforest-fire.csv`). Forest is unchanged
+  (high only). Changes Run results.
 - Build stage 5: a check that every forest cell has an age failed when a fire perimeter started cells in a disturbed class; it now
   allows the disturbed classes an age, and names any failing cells by class.
 

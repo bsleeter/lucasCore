@@ -1862,9 +1862,10 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       high severity are both stand-replacing for the five shrub classes, in historical runs and projections alike (the fire pathways,
       `tools/make_post_disturbance.R`: the parent goes to its disturbed class with age reset, and in the disturbed class a moderate
       or high reburn converts ReburnConversion); forest stays high only. Run Figures' "Last stand-replacing fire" counts moderate fire
-      for shrub cells. Not yet run in a Build. Open: the shrub fire carbon (`defaults/stockflow/nonforest-fire.csv`) still kills less
-      at Medium than at High (e.g. Sage roots 0.6 against 0.9), so a moderate fire now resets the class while leaving more live
-      carbon; whether Medium's shares should move toward High's is to decide with the RCMAP evidence (cover loss alike).
+      for shrub cells. The shrub fire carbon follows (user: "Yes, align them"): the Medium rows of the five classes in
+      `defaults/stockflow/nonforest-fire.csv` now equal their High rows (chaparral's High from chaparral-age.csv), and
+      `tools/make_nonforest_fire.R` regenerated the medium-severity event rows (event-pathways.csv). Low severity is unchanged.
+      Not yet run in a Build.
     - Chaparral type conversion: the fitted ReburnConversion (0.10) says most chaparral that reburns before recovering still comes
       back; check on RCMAP annual herbaceous (and herbaceous) cover, a second national download (Data Source RcmapCoverFolder
       components), and against the short-interval reburn literature.
