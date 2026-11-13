@@ -1677,7 +1677,7 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
            forest potential reforestation can only show after the cutoff (24 years at Lassen, so 2009 on), so the recent-years rate
            (about 0.2 km2 a year at Lassen, against 0.07 over the whole record) is the rate of the record's late years; it will run
            high late in a long projection as the stock of cells recovering from disturbance before 1985 runs down. Settled
-           2026-11-13 (user: "We can remove this. I think this is the best data to fit on as of now"): the recent 10 years stay
+           2026-11-12 (user: "We can remove this. I think this is the best data to fit on as of now"): the recent 10 years stay
            the projection's rate; no adjustment planned.
         9. **Tests.** tests/unit-reforestation.R: the cutoff table's resolution and the override, the cell readings, the pathway
            table (every source class to every forest type, no disturbed classes). tests/unit-regrowth-age.R updated for the
