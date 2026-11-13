@@ -140,6 +140,10 @@ for (sh in c("lucasCore_CbmEcozone", "lucasCore_CbmSpeciesType")) {
   if (!nrow(have)) { x <- rd("library", "project", paste0(sh, ".csv")); saveDatasheet(P, as.data.frame(x), sh, append = FALSE, force = TRUE)
     cat(sprintf("%-34s %4d rows written\n", sh, nrow(x))) } else cat(sprintf("%-34s kept (%d rows)\n", sh, nrow(have))) }
 cat("library ready:", f, "\n")
+# --rebuild-strata / --rebuild-climate on an existing library update its lists only: a library whose Builds write the stock-flow
+# definitions themselves (stage 0) and keep their carbon assumptions on their own pages has no use for the two scenarios below
+# (Puget 2026-11-13: a strata rebuild added both)
+if (any(c("--rebuild-strata", "--rebuild-climate") %in% a)) quit(save = "no")
 
 # ---- the Stock-Flow Definitions scenario ------------------------------------------------------------------------------
 # Fixed LUCAS stock-flow definitions (flow pathway diagram, flow order, type-group memberships, output options) in a scenario that
