@@ -1945,4 +1945,22 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       Not yet run in a Build.
     - Chaparral type conversion: the fitted ReburnConversion (0.10) says most chaparral that reburns before recovering still comes
       back; check on RCMAP annual herbaceous (and herbaceous) cover, a second national download (Data Source RcmapCoverFolder
-      components), and against the short-interval reburn literature.
+      components), and against the short-interval reburn literature. Detail (user, 2026-11-13: "Lets keep this detail in the to-do
+      list"):
+      - Where 0.10 comes from (tools/fit_shrub_post_disturbance.R, 2026-11-12): chaparral pixels (Mediterranean ecodivisions, NLCD
+        shrub the year before) burned at MTBS moderate or high severity 1986-2010, 792,096 pixels in 99 fires. "Back" = RCMAP shrub
+        cover at half its pre-fire level or more two years running. A reburn = a moderate or high reburn before the pixel was back:
+        10,653 pixels, so mostly short-interval reburns (chaparral is usually back in a few years). For them, the Kaplan-Meier share
+        back within 15 years of the reburn was about 90%; ReburnConversion = 1 - that = 0.10.
+      - What it does: fire moves chaparral to Disturbed: Chaparral (age 0); from age 2, 25.2% a year returns (about 87% back by age
+        8); at the window's end (age 8) the rest, about 13% of a burn not reburned, converts to Grassland: Annual. A moderate or high
+        reburn while disturbed converts 10% of those cells to Grassland: Annual outright; the other 90% restart at age 0 (a new
+        chance to return, or to reach the window's end).
+      - Why provisional: low against the literature (repeated fires within about 5-10 years convert chaparral, especially obligate
+        seeders, to nonnative annual grass in southern California); repeat fires within a few years are uncommon in a 1986-2010
+        sample and the fit cannot tell short from very short intervals; "back" at half the pre-fire shrub cover is lenient; RCMAP
+        shrub cover does not tell resprouting chaparral from subshrubs or a shift to coastal sage; nothing requires grass not to
+        rise, so a pixel can count as back while converting.
+      - The check: RCMAP annual herbaceous cover on the same reburned pixels (does annual grass take over where shrub cover
+        returns?), with the published short-interval reburn studies; possibly a conversion that depends on the interval between
+        fires.
