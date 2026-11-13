@@ -69,8 +69,6 @@ Iteration,Timestep,StratumIdSource,StateClassIdSource,StratumIdDest,StateClassId
 ,,,Shrubland: Native Sage Steppe,,Agriculture: Pasture,,,Ag Expansion: Pasture,1,,,,,,,,
 ,,,Shrubland: Non-sage,,Agriculture: Cropland,,,Ag Expansion: Cropland,1,,,,,,,,
 ,,,Shrubland: Non-sage,,Agriculture: Pasture,,,Ag Expansion: Pasture,1,,,,,,,,
-,,,Shrubland: Post Fire Shrub,,Agriculture: Cropland,,,Ag Expansion: Cropland,1,,,,,,,,
-,,,Shrubland: Post Fire Shrub,,Agriculture: Pasture,,,Ag Expansion: Pasture,1,,,,,,,,
 ,,,Shrubland: Sage,,Agriculture: Cropland,,,Ag Expansion: Cropland,1,,,,,,,,
 ,,,Shrubland: Sage,,Agriculture: Pasture,,,Ag Expansion: Pasture,1,,,,,,,,
 ,,,Wetland: Estuarine Emergent,,Agriculture: Cropland,,,Ag Expansion: Cropland,1,,,,,,,,

@@ -80,9 +80,13 @@ for (f in c("urbanization.csv", "ag-expansion.csv")) { x <- rd(D("transitions", 
 loc <- rd(D("transitions", "state-locations.csv"))
 check("each disturbed class has a diagram cell; cells are unique", all(dis$Name %in% loc$StateClassIdSource) && !anyDuplicated(loc$Location))
 check("each disturbed class has a CO2 class row", all(dis$Name %in% rd(D("climate", "co2-classes.csv"))$StateClassId))
-check("no pathway leads into a disturbed class except fire", all(c(pd$StateClassIdDest, unlist(lapply(c("urbanization.csv", "ag-expansion.csv", "ag-contraction.csv", "harvest.csv", "ag-change.csv", "intensification.csv"),
-      function(f) rd(D("transitions", "pathways", f))$StateClassIdDest))) %in% setdiff(sc$Name, dis$Name) | is.na(c(pd$StateClassIdDest, unlist(lapply(c("urbanization.csv", "ag-expansion.csv", "ag-contraction.csv", "harvest.csv", "ag-change.csv", "intensification.csv"),
-      function(f) rd(D("transitions", "pathways", f))$StateClassIdDest))))))
+into <- c(pd$StateClassIdDest, unlist(lapply(c("urbanization.csv", "ag-expansion.csv", "ag-contraction.csv", "harvest.csv", "ag-change.csv", "intensification.csv"),
+      function(f) { x <- rd(D("transitions", "pathways", f)); x[is.na(StateClassIdDest) | StateClassIdDest != StateClassIdSource, StateClassIdDest] })))   # (staying in its class is not leading into it)
+check("no pathway leads into a disturbed class except fire", all(into %in% setdiff(sc$Name, dis$Name) | is.na(into)))
+hv <- rd(D("transitions", "pathways", "harvest.csv")); sv <- hv[TransitionTypeId == "Forest Harvest: Salvage Logging"]; disf <- dis$Name[as.integer(dis$Id) >= 2100L]
+check("salvage logging: only on the disturbed forest classes (wetland twins too), every one, within 5 years, same class, no age reset",
+      setequal(sv$StateClassIdSource, disf) && nrow(sv) == length(disf) && all(sv$StateClassIdDest == sv$StateClassIdSource) &&
+      all(as.integer(sv$AgeMax) == 5L) && all(sv$AgeReset == "No") && all(is.na(sv$TSTMax)) && length(disf) == 31L)
 pa <- fread(D("projection", "post-disturbance-adjacency.csv"))
 check("return adjacency: Live Forest, a defined attribute type, multipliers rise with the share from above 0 to 1, weights for the mean",
       all(pa$StateAttributeTypeId == "Live Forest") && "Live Forest" %in% rd(D("stsim", "stsim_StateAttributeType.csv"))$Name && !is.unsorted(pa$AttributeValue) &&

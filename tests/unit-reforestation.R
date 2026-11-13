@@ -72,7 +72,7 @@ check("one Reforestation type per forest class, each in the group Reforestation"
 check("type ids are unique", !anyDuplicated(tt5$Id))
 check("every natural non-forest source class reaches every forest class, once", nrow(pw5) == 10 * length(fo5) && !anyDuplicated(pw5[, .(StateClassIdSource, StateClassIdDest)]) &&
       all(pw5[, uniqueN(StateClassIdDest), by = StateClassIdSource]$V1 == length(fo5)))
-check("no disturbed, Post Fire Shrub, estuarine or forest class is a source", !any(grepl("^Disturbed|Post Fire|Estuarine|^Forest", pw5$StateClassIdSource)) && all(pw5$StateClassIdSource %in% sc5$Name))
+check("no disturbed, estuarine or forest class is a source", !any(grepl("^Disturbed|Estuarine|^Forest", pw5$StateClassIdSource)) && all(pw5$StateClassIdSource %in% sc5$Name))
 check("each pathway's type names its destination, probability 1, age reset", all(pw5$TransitionTypeId %in% tt5$Name) && all(pw5$Probability == 1) && all(pw5$AgeReset == "Yes") &&
       all(mapply(function(t, d) { y <- sc5[Name == d]; sub("^Reforestation: ", "", t) == if (y$StateLabelXId == "Wetland") paste("Wetland", y$StateLabelYId) else y$StateLabelYId }, pw5$TransitionTypeId, pw5$StateClassIdDest)))
 check("Reforestation is a main (spatial) group for stock-flow and a transition simulation group (ST-Sim maps only those and [Type] groups)", "Reforestation" %in% fread(file.path("defaults", "stockflow", "main-transition-groups.csv"))$TransitionGroupId && "Reforestation" %in% fread(file.path("defaults", "stsim", "stsim_TransitionSimulationGroup.csv"), sep = ",")$TransitionGroupId)

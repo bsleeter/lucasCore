@@ -121,6 +121,13 @@ wr(rbind(fire, reb, ml), D("transitions", "pathways", "fire.csv"))
 for (f in c("urbanization.csv", "ag-expansion.csv")) { x <- rd(D("transitions", "pathways", f)); x <- x[!startsWith(StateClassIdSource, PFX)]
   y <- x[StateClassIdSource %in% par$Name][, StateClassIdSource := par$dname[match(StateClassIdSource, par$Name)]]
   wr(rbind(x, y), D("transitions", "pathways", f)) }
+# salvage logging (user, 2026-11-13: "Yes, make that change, include the wetland twins"): on the disturbed forest classes only
+# (upland and wetland twins), within 5 years of the disturbance (the class's age is years since it), staying in the class with
+# its age, so return and conversion keep their clock. Its carbon flows (event-pathways.csv) take mostly snags to the forestry sector
+SALV <- "Forest Harvest: Salvage Logging"; SALV_AGE <- 5L
+h <- rd(D("transitions", "pathways", "harvest.csv")); h <- h[TransitionTypeId != SALV]
+wr(rbind(h, par[kind == "Forest", pw(StateClassIdSource = dname, StateClassIdDest = dname, TransitionTypeId = SALV, Probability = "1",
+                                     AgeMax = SALV_AGE, AgeReset = "No")]), D("transitions", "pathways", "harvest.csv"))
 
 # ---- diagram, CO2 and definitions -------------------------------------------------------------------------------------------
 loc <- rd(D("transitions", "state-locations.csv")); loc <- loc[!startsWith(StateClassIdSource, PFX)]

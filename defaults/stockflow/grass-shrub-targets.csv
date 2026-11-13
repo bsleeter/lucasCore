@@ -6,7 +6,6 @@ Hot Continental,Shrubland: Chaparral,CONUS class mean,Moist,59,143239,,0.73,3.19
 Hot Continental,Shrubland: Invaded Sage Steppe,CONUS class mean,Moist,54,113169,,0.73,0.9275,0.0493,17.35,36.6,0
 Hot Continental,Shrubland: Native Sage Steppe,CONUS class mean,Moist,60,437787,,0.73,1.263,0.105,23.67,46.54,0
 Hot Continental,Shrubland: Non-sage,ecodivision sample - few untreed cells (most of the ecodivision's NLCD 2001 grass and shrub is trees by 2014-2023),Moist,46,2429,17007,0.73,2.8531,0.9576,41.54,95.1,0
-Hot Continental,Shrubland: Post Fire Shrub,ecodivision sample (Non-sage targets) - few untreed cells (most of the ecodivision's NLCD 2001 grass and shrub is trees by 2014-2023),Moist,46,2429,17007,0.73,2.8531,0.9576,41.54,95.1,0
 Hot Continental,Shrubland: Sage,CONUS class mean,Moist,59,202308,,0.73,0.4894,0.0355,15.83,30.88,0
 Hot Continental Mountains,Grassland: Annual,CONUS class mean,Moist,60,512902,,0.88,2.8026,0.1915,26.9,58.41,0
 Hot Continental Mountains,Grassland: Irrigated Perennial,CONUS class mean - small sample (RAP is not meant for irrigated land; alfalfa and irrigated pasture are Agriculture: Pasture),Moist,25,507,,0.88,2.8551,0.1862,31.67,83.04,0
@@ -15,7 +14,6 @@ Hot Continental Mountains,Shrubland: Chaparral,CONUS class mean,Moist,59,143239,
 Hot Continental Mountains,Shrubland: Invaded Sage Steppe,CONUS class mean,Moist,54,113169,,0.88,0.9275,0.0493,17.35,36.6,0
 Hot Continental Mountains,Shrubland: Native Sage Steppe,CONUS class mean,Moist,60,437787,,0.88,1.263,0.105,23.67,46.54,0
 Hot Continental Mountains,Shrubland: Non-sage,ecodivision sample - few untreed cells (most of the ecodivision's NLCD 2001 grass and shrub is trees by 2014-2023),Moist,16,1616,4455,0.88,3.7962,1.7974,115.45,189.42,0
-Hot Continental Mountains,Shrubland: Post Fire Shrub,ecodivision sample (Non-sage targets) - few untreed cells (most of the ecodivision's NLCD 2001 grass and shrub is trees by 2014-2023),Moist,16,1616,4455,0.88,3.7962,1.7974,115.45,189.42,0
 Hot Continental Mountains,Shrubland: Sage,CONUS class mean,Moist,59,202308,,0.88,0.4894,0.0355,15.83,30.88,0
 Marine,Grassland: Annual,CONUS class mean,Moist,60,512902,719,0.99,2.8026,0.1915,26.9,58.41,0
 Marine,Grassland: Irrigated Perennial,CONUS class mean - small sample (RAP is not meant for irrigated land; alfalfa and irrigated pasture are Agriculture: Pasture),Moist,25,507,1,0.99,2.8551,0.1862,31.67,83.04,0
@@ -24,7 +22,6 @@ Marine,Shrubland: Chaparral,CONUS class mean,Moist,59,143239,,0.99,3.194,0.6809,
 Marine,Shrubland: Invaded Sage Steppe,CONUS class mean,Moist,54,113169,,0.99,0.9275,0.0493,17.35,36.6,0
 Marine,Shrubland: Native Sage Steppe,CONUS class mean,Moist,60,437787,,0.99,1.263,0.105,23.67,46.54,0
 Marine,Shrubland: Non-sage,ecodivision sample - few untreed cells (most of the ecodivision's NLCD 2001 grass and shrub is trees by 2014-2023),Moist,55,1879,116170,0.99,2.8417,1.3375,72.43,144.36,0
-Marine,Shrubland: Post Fire Shrub,ecodivision sample (Non-sage targets) - few untreed cells (most of the ecodivision's NLCD 2001 grass and shrub is trees by 2014-2023),Moist,55,1879,116170,0.99,2.8417,1.3375,72.43,144.36,0
 Marine,Shrubland: Sage,CONUS class mean,Moist,59,202308,,0.99,0.4894,0.0355,15.83,30.88,0
 Marine Mountains,Grassland: Annual,ecodivision sample - few untreed cells (most of the ecodivision's NLCD 2001 grass and shrub is trees by 2014-2023),Moist,18,11577,1643,0.73,2.5841,0.422,27.96,63.59,0
 Marine Mountains,Grassland: Irrigated Perennial,CONUS class mean - small sample (RAP is not meant for irrigated land; alfalfa and irrigated pasture are Agriculture: Pasture),Moist,25,507,,0.73,2.8551,0.1862,31.67,83.04,0
@@ -33,7 +30,6 @@ Marine Mountains,Shrubland: Chaparral,CONUS class mean,Moist,59,143239,38,0.73,3
 Marine Mountains,Shrubland: Invaded Sage Steppe,CONUS class mean,Moist,54,113169,52,0.73,0.9275,0.0493,17.35,36.6,0
 Marine Mountains,Shrubland: Native Sage Steppe,ecodivision sample - few untreed cells (most of the ecodivision's NLCD 2001 grass and shrub is trees by 2014-2023),Moist,10,8541,9222,0.73,1.0223,0.2512,25.69,39.71,0
 Marine Mountains,Shrubland: Non-sage,ecodivision sample - few untreed cells (most of the ecodivision's NLCD 2001 grass and shrub is trees by 2014-2023),Moist,57,25078,108259,0.73,1.5496,0.7049,43.81,72.34,0
-Marine Mountains,Shrubland: Post Fire Shrub,ecodivision sample (Non-sage targets) - few untreed cells (most of the ecodivision's NLCD 2001 grass and shrub is trees by 2014-2023),Moist,57,25078,108259,0.73,1.5496,0.7049,43.81,72.34,0
 Marine Mountains,Shrubland: Sage,CONUS class mean,Moist,59,202308,261,0.73,0.4894,0.0355,15.83,30.88,0
 Mediterranean,Grassland: Annual,ecodivision sample,Dry,59,245341,546,0.04,3.6221,0.2522,30.15,65.95,0
 Mediterranean,Grassland: Irrigated Perennial,CONUS class mean - small sample (RAP is not meant for irrigated land; alfalfa and irrigated pasture are Agriculture: Pasture),Dry,25,507,0,0.04,2.8551,0.1862,31.67,83.04,0
@@ -42,7 +38,6 @@ Mediterranean,Shrubland: Chaparral,ecodivision sample,Dry,50,68787,1834,0.04,3.8
 Mediterranean,Shrubland: Invaded Sage Steppe,CONUS class mean,Dry,54,113169,0,0.04,0.9275,0.0493,17.35,36.6,0
 Mediterranean,Shrubland: Native Sage Steppe,CONUS class mean,Dry,60,437787,0,0.04,1.263,0.105,23.67,46.54,0
 Mediterranean,Shrubland: Non-sage,ecodivision sample,Dry,53,45361,8524,0.04,3.9158,1.3165,45.08,81.39,0
-Mediterranean,Shrubland: Post Fire Shrub,ecodivision sample (Non-sage targets),Dry,53,45361,8524,0.04,3.9158,1.3165,45.08,81.39,0
 Mediterranean,Shrubland: Sage,CONUS class mean,Dry,59,202308,,0.04,0.4894,0.0355,15.83,30.88,0
 Mediterranean Mountains,Grassland: Annual,ecodivision sample,Dry,50,133640,5340,0.21,2.8254,0.2135,30.07,58.87,0
 Mediterranean Mountains,Grassland: Irrigated Perennial,CONUS class mean - small sample (RAP is not meant for irrigated land; alfalfa and irrigated pasture are Agriculture: Pasture),Dry,25,507,,0.21,2.8551,0.1862,31.67,83.04,0
@@ -51,7 +46,6 @@ Mediterranean Mountains,Shrubland: Chaparral,ecodivision sample,Dry,43,60169,470
 Mediterranean Mountains,Shrubland: Invaded Sage Steppe,ecodivision sample,Dry,11,8514,2652,0.21,1.1855,0.2986,18.55,28.24,0
 Mediterranean Mountains,Shrubland: Native Sage Steppe,ecodivision sample,Dry,11,12535,3830,0.21,1.0985,0.2498,19,37.25,0
 Mediterranean Mountains,Shrubland: Non-sage,ecodivision sample,Dry,58,74955,54797,0.21,1.9312,0.7205,32.3,58.37,0
-Mediterranean Mountains,Shrubland: Post Fire Shrub,ecodivision sample (Non-sage targets),Dry,58,74955,54797,0.21,1.9312,0.7205,32.3,58.37,0
 Mediterranean Mountains,Shrubland: Sage,ecodivision sample,Dry,5,1372,842,0.21,0.9124,0.3918,22.28,45.38,0
 Prairie,Grassland: Annual,CONUS class mean,Moist,60,512902,,0.14,2.8026,0.1915,26.9,58.41,0
 Prairie,Grassland: Irrigated Perennial,CONUS class mean - small sample (RAP is not meant for irrigated land; alfalfa and irrigated pasture are Agriculture: Pasture),Moist,25,507,0,0.14,2.8551,0.1862,31.67,83.04,0
@@ -60,7 +54,6 @@ Prairie,Shrubland: Chaparral,CONUS class mean,Moist,59,143239,,0.14,3.194,0.6809
 Prairie,Shrubland: Invaded Sage Steppe,CONUS class mean,Moist,54,113169,,0.14,0.9275,0.0493,17.35,36.6,0
 Prairie,Shrubland: Native Sage Steppe,CONUS class mean,Moist,60,437787,,0.14,1.263,0.105,23.67,46.54,0
 Prairie,Shrubland: Non-sage,ecodivision sample,Moist,30,9303,12800,0.14,4.1795,1.9657,36.1,95.7,0
-Prairie,Shrubland: Post Fire Shrub,ecodivision sample (Non-sage targets),Moist,30,9303,12800,0.14,4.1795,1.9657,36.1,95.7,0
 Prairie,Shrubland: Sage,CONUS class mean,Moist,59,202308,,0.14,0.4894,0.0355,15.83,30.88,0
 Savanna,Grassland: Annual,CONUS class mean,Moist,60,512902,,0.93,2.8026,0.1915,26.9,58.41,0
 Savanna,Grassland: Irrigated Perennial,CONUS class mean - small sample (RAP is not meant for irrigated land; alfalfa and irrigated pasture are Agriculture: Pasture),Moist,25,507,,0.93,2.8551,0.1862,31.67,83.04,0
@@ -69,7 +62,6 @@ Savanna,Shrubland: Chaparral,CONUS class mean,Moist,59,143239,,0.93,3.194,0.6809
 Savanna,Shrubland: Invaded Sage Steppe,CONUS class mean,Moist,54,113169,,0.93,0.9275,0.0493,17.35,36.6,0
 Savanna,Shrubland: Native Sage Steppe,CONUS class mean,Moist,60,437787,,0.93,1.263,0.105,23.67,46.54,0
 Savanna,Shrubland: Non-sage,ecodivision sample - few untreed cells (most of the ecodivision's NLCD 2001 grass and shrub is trees by 2014-2023),Moist,49,7226,109148,0.93,4.5045,3.3299,36.6,133.78,0
-Savanna,Shrubland: Post Fire Shrub,ecodivision sample (Non-sage targets) - few untreed cells (most of the ecodivision's NLCD 2001 grass and shrub is trees by 2014-2023),Moist,49,7226,109148,0.93,4.5045,3.3299,36.6,133.78,0
 Savanna,Shrubland: Sage,CONUS class mean,Moist,59,202308,,0.93,0.4894,0.0355,15.83,30.88,0
 Subtropical,Grassland: Annual,CONUS class mean,Moist,60,512902,,0.87,2.8026,0.1915,26.9,58.41,0
 Subtropical,Grassland: Irrigated Perennial,CONUS class mean - small sample (RAP is not meant for irrigated land; alfalfa and irrigated pasture are Agriculture: Pasture),Moist,25,507,,0.87,2.8551,0.1862,31.67,83.04,0
@@ -78,7 +70,6 @@ Subtropical,Shrubland: Chaparral,CONUS class mean,Moist,59,143239,,0.87,3.194,0.
 Subtropical,Shrubland: Invaded Sage Steppe,CONUS class mean,Moist,54,113169,,0.87,0.9275,0.0493,17.35,36.6,0
 Subtropical,Shrubland: Native Sage Steppe,CONUS class mean,Moist,60,437787,,0.87,1.263,0.105,23.67,46.54,0
 Subtropical,Shrubland: Non-sage,ecodivision sample - few untreed cells (most of the ecodivision's NLCD 2001 grass and shrub is trees by 2014-2023),Moist,51,6151,45861,0.87,3.4208,2.0323,24.57,89.02,0
-Subtropical,Shrubland: Post Fire Shrub,ecodivision sample (Non-sage targets) - few untreed cells (most of the ecodivision's NLCD 2001 grass and shrub is trees by 2014-2023),Moist,51,6151,45861,0.87,3.4208,2.0323,24.57,89.02,0
 Subtropical,Shrubland: Sage,CONUS class mean,Moist,59,202308,,0.87,0.4894,0.0355,15.83,30.88,0
 Subtropical Mountains,Grassland: Annual,CONUS class mean,Moist,60,512902,,0.86,2.8026,0.1915,26.9,58.41,0
 Subtropical Mountains,Grassland: Irrigated Perennial,CONUS class mean - small sample (RAP is not meant for irrigated land; alfalfa and irrigated pasture are Agriculture: Pasture),Moist,25,507,,0.86,2.8551,0.1862,31.67,83.04,0
@@ -87,7 +78,6 @@ Subtropical Mountains,Shrubland: Chaparral,CONUS class mean,Moist,59,143239,,0.8
 Subtropical Mountains,Shrubland: Invaded Sage Steppe,CONUS class mean,Moist,54,113169,,0.86,0.9275,0.0493,17.35,36.6,0
 Subtropical Mountains,Shrubland: Native Sage Steppe,CONUS class mean,Moist,60,437787,,0.86,1.263,0.105,23.67,46.54,0
 Subtropical Mountains,Shrubland: Non-sage,ecodivision sample - few untreed cells (most of the ecodivision's NLCD 2001 grass and shrub is trees by 2014-2023),Moist,28,649,16630,0.86,4.9763,1.264,15.43,27.16,0
-Subtropical Mountains,Shrubland: Post Fire Shrub,ecodivision sample (Non-sage targets) - few untreed cells (most of the ecodivision's NLCD 2001 grass and shrub is trees by 2014-2023),Moist,28,649,16630,0.86,4.9763,1.264,15.43,27.16,0
 Subtropical Mountains,Shrubland: Sage,CONUS class mean,Moist,59,202308,,0.86,0.4894,0.0355,15.83,30.88,0
 Temperate Desert,Grassland: Annual,ecodivision sample,Dry,40,46067,307,0.06,1.3091,0.027,19.41,42.85,0
 Temperate Desert,Grassland: Irrigated Perennial,CONUS class mean - small sample (RAP is not meant for irrigated land; alfalfa and irrigated pasture are Agriculture: Pasture),Dry,25,507,0,0.06,2.8551,0.1862,31.67,83.04,0
@@ -96,7 +86,6 @@ Temperate Desert,Shrubland: Chaparral,CONUS class mean,Dry,59,143239,2,0.06,3.19
 Temperate Desert,Shrubland: Invaded Sage Steppe,ecodivision sample,Dry,37,34190,88,0.06,1.1131,0.0462,15.89,31.31,0
 Temperate Desert,Shrubland: Native Sage Steppe,ecodivision sample,Dry,52,199117,6947,0.06,1.1606,0.0585,19.88,36.69,0
 Temperate Desert,Shrubland: Non-sage,ecodivision sample,Dry,55,152365,23684,0.06,0.602,0.0792,11.34,28.16,0
-Temperate Desert,Shrubland: Post Fire Shrub,ecodivision sample (Non-sage targets),Dry,55,152365,23684,0.06,0.602,0.0792,11.34,28.16,0
 Temperate Desert,Shrubland: Sage,ecodivision sample,Dry,39,39089,938,0.06,0.5204,0.0238,12.76,21.98,0
 Temperate Desert Mountains,Grassland: Annual,ecodivision sample,Dry,24,19132,23,0.14,1.2106,0.0158,12.86,36.44,0
 Temperate Desert Mountains,Grassland: Irrigated Perennial,CONUS class mean - small sample (RAP is not meant for irrigated land; alfalfa and irrigated pasture are Agriculture: Pasture),Dry,25,507,0,0.14,2.8551,0.1862,31.67,83.04,0
@@ -105,7 +94,6 @@ Temperate Desert Mountains,Shrubland: Chaparral,CONUS class mean,Dry,59,143239,1
 Temperate Desert Mountains,Shrubland: Invaded Sage Steppe,ecodivision sample,Dry,42,67189,2916,0.14,0.7397,0.0156,17.32,39.42,0
 Temperate Desert Mountains,Shrubland: Native Sage Steppe,ecodivision sample,Dry,57,83611,6485,0.14,1.1083,0.1562,26.5,50.8,0
 Temperate Desert Mountains,Shrubland: Non-sage,ecodivision sample,Dry,59,64937,38739,0.14,1.006,0.1869,26.33,49.36,0
-Temperate Desert Mountains,Shrubland: Post Fire Shrub,ecodivision sample (Non-sage targets),Dry,59,64937,38739,0.14,1.006,0.1869,26.33,49.36,0
 Temperate Desert Mountains,Shrubland: Sage,ecodivision sample,Dry,53,151686,15847,0.14,0.4656,0.0358,16.68,33,0
 Temperate Steppe,Grassland: Annual,ecodivision sample,Dry,18,3633,1,0,2.6907,0.0495,41.23,80.11,0
 Temperate Steppe,Grassland: Irrigated Perennial,CONUS class mean - small sample (RAP is not meant for irrigated land; alfalfa and irrigated pasture are Agriculture: Pasture),Dry,25,507,0,0,2.8551,0.1862,31.67,83.04,0
@@ -114,7 +102,6 @@ Temperate Steppe,Shrubland: Chaparral,CONUS class mean,Dry,59,143239,,0,3.194,0.
 Temperate Steppe,Shrubland: Invaded Sage Steppe,CONUS class mean,Dry,54,113169,0,0,0.9275,0.0493,17.35,36.6,0
 Temperate Steppe,Shrubland: Native Sage Steppe,ecodivision sample,Dry,26,10839,19,0,1.8127,0.0761,19.88,46.77,0
 Temperate Steppe,Shrubland: Non-sage,ecodivision sample,Dry,42,25558,94,0,1.945,0.0797,29.76,71.56,0
-Temperate Steppe,Shrubland: Post Fire Shrub,ecodivision sample (Non-sage targets),Dry,42,25558,94,0,1.945,0.0797,29.76,71.56,0
 Temperate Steppe,Shrubland: Sage,CONUS class mean,Dry,59,202308,0,0,0.4894,0.0355,15.83,30.88,0
 Temperate Steppe Mountains,Grassland: Annual,ecodivision sample,Dry,21,11070,8,0.14,2.1735,0.0591,25.97,44.87,0
 Temperate Steppe Mountains,Grassland: Irrigated Perennial,CONUS class mean - small sample (RAP is not meant for irrigated land; alfalfa and irrigated pasture are Agriculture: Pasture),Dry,25,507,0,0.14,2.8551,0.1862,31.67,83.04,0
@@ -123,7 +110,6 @@ Temperate Steppe Mountains,Shrubland: Chaparral,CONUS class mean,Dry,59,143239,,
 Temperate Steppe Mountains,Shrubland: Invaded Sage Steppe,ecodivision sample,Dry,10,2971,11,0.14,2.233,0.078,30.8,52.47,0
 Temperate Steppe Mountains,Shrubland: Native Sage Steppe,ecodivision sample,Dry,44,104609,4026,0.14,1.6341,0.1219,31.09,62.59,0
 Temperate Steppe Mountains,Shrubland: Non-sage,ecodivision sample,Dry,59,66683,34757,0.14,1.8976,0.4691,38.29,69.17,0
-Temperate Steppe Mountains,Shrubland: Post Fire Shrub,ecodivision sample (Non-sage targets),Dry,59,66683,34757,0.14,1.8976,0.4691,38.29,69.17,0
 Temperate Steppe Mountains,Shrubland: Sage,ecodivision sample,Dry,12,9198,347,0.14,0.6964,0.0229,13.88,31.44,0
 Tropical/Subtropical Desert,Grassland: Annual,ecodivision sample,Dry,40,40192,15,0.04,0.5219,0.0048,9.21,37.64,0
 Tropical/Subtropical Desert,Grassland: Irrigated Perennial,CONUS class mean - small sample (RAP is not meant for irrigated land; alfalfa and irrigated pasture are Agriculture: Pasture),Dry,25,507,,0.04,2.8551,0.1862,31.67,83.04,0
@@ -132,7 +118,6 @@ Tropical/Subtropical Desert,Shrubland: Chaparral,ecodivision sample,Dry,12,6545,
 Tropical/Subtropical Desert,Shrubland: Invaded Sage Steppe,CONUS class mean,Dry,54,113169,,0.04,0.9275,0.0493,17.35,36.6,0
 Tropical/Subtropical Desert,Shrubland: Native Sage Steppe,CONUS class mean,Dry,60,437787,41,0.04,1.263,0.105,23.67,46.54,0
 Tropical/Subtropical Desert,Shrubland: Non-sage,ecodivision sample,Dry,60,472966,18136,0.04,0.5288,0.0574,10.68,29.99,0
-Tropical/Subtropical Desert,Shrubland: Post Fire Shrub,ecodivision sample (Non-sage targets),Dry,60,472966,18136,0.04,0.5288,0.0574,10.68,29.99,0
 Tropical/Subtropical Desert,Shrubland: Sage,CONUS class mean,Dry,59,202308,,0.04,0.4894,0.0355,15.83,30.88,0
 Tropical/Subtropical Steppe,Grassland: Annual,ecodivision sample,Dry,22,1298,0,0.05,1.871,0.0463,21.23,67.53,0
 Tropical/Subtropical Steppe,Grassland: Irrigated Perennial,CONUS class mean - small sample (RAP is not meant for irrigated land; alfalfa and irrigated pasture are Agriculture: Pasture),Dry,25,507,0,0.05,2.8551,0.1862,31.67,83.04,0
@@ -141,7 +126,6 @@ Tropical/Subtropical Steppe,Shrubland: Chaparral,CONUS class mean,Dry,59,143239,
 Tropical/Subtropical Steppe,Shrubland: Invaded Sage Steppe,CONUS class mean,Dry,54,113169,10,0.05,0.9275,0.0493,17.35,36.6,0
 Tropical/Subtropical Steppe,Shrubland: Native Sage Steppe,ecodivision sample,Dry,14,15092,2259,0.05,0.7763,0.1108,13.86,44.42,0
 Tropical/Subtropical Steppe,Shrubland: Non-sage,ecodivision sample,Dry,60,281719,20574,0.05,1.7487,0.21,18.6,52.19,0
-Tropical/Subtropical Steppe,Shrubland: Post Fire Shrub,ecodivision sample (Non-sage targets),Dry,60,281719,20574,0.05,1.7487,0.21,18.6,52.19,0
 Tropical/Subtropical Steppe,Shrubland: Sage,CONUS class mean,Dry,59,202308,506,0.05,0.4894,0.0355,15.83,30.88,0
 Tropical/Subtropical Steppe Mountains,Grassland: Annual,ecodivision sample,Dry,19,813,44,0.1,1.0264,0.2252,24.58,60.32,0
 Tropical/Subtropical Steppe Mountains,Grassland: Irrigated Perennial,CONUS class mean - small sample (RAP is not meant for irrigated land; alfalfa and irrigated pasture are Agriculture: Pasture),Dry,25,507,,0.1,2.8551,0.1862,31.67,83.04,0
@@ -150,7 +134,6 @@ Tropical/Subtropical Steppe Mountains,Shrubland: Chaparral,ecodivision sample,Dr
 Tropical/Subtropical Steppe Mountains,Shrubland: Invaded Sage Steppe,CONUS class mean,Dry,54,113169,1,0.1,0.9275,0.0493,17.35,36.6,0
 Tropical/Subtropical Steppe Mountains,Shrubland: Native Sage Steppe,ecodivision sample,Dry,6,3433,379,0.1,1.2596,0.2181,19.46,59.34,0
 Tropical/Subtropical Steppe Mountains,Shrubland: Non-sage,ecodivision sample,Dry,60,210938,37679,0.1,1.0276,0.2855,16.65,32.98,0
-Tropical/Subtropical Steppe Mountains,Shrubland: Post Fire Shrub,ecodivision sample (Non-sage targets),Dry,60,210938,37679,0.1,1.0276,0.2855,16.65,32.98,0
 Tropical/Subtropical Steppe Mountains,Shrubland: Sage,CONUS class mean,Dry,59,202308,,0.1,0.4894,0.0355,15.83,30.88,0
 Warm Continental,Grassland: Annual,CONUS class mean,Moist,60,512902,,0.73,2.8026,0.1915,26.9,58.41,0
 Warm Continental,Grassland: Irrigated Perennial,CONUS class mean - small sample (RAP is not meant for irrigated land; alfalfa and irrigated pasture are Agriculture: Pasture),Moist,25,507,,0.73,2.8551,0.1862,31.67,83.04,0
@@ -159,7 +142,6 @@ Warm Continental,Shrubland: Chaparral,CONUS class mean,Moist,59,143239,,0.73,3.1
 Warm Continental,Shrubland: Invaded Sage Steppe,CONUS class mean,Moist,54,113169,,0.73,0.9275,0.0493,17.35,36.6,0
 Warm Continental,Shrubland: Native Sage Steppe,CONUS class mean,Moist,60,437787,,0.73,1.263,0.105,23.67,46.54,0
 Warm Continental,Shrubland: Non-sage,ecodivision sample - few untreed cells (most of the ecodivision's NLCD 2001 grass and shrub is trees by 2014-2023),Moist,53,4298,38323,0.73,2.8138,1.1197,45.25,95.65,0
-Warm Continental,Shrubland: Post Fire Shrub,ecodivision sample (Non-sage targets) - few untreed cells (most of the ecodivision's NLCD 2001 grass and shrub is trees by 2014-2023),Moist,53,4298,38323,0.73,2.8138,1.1197,45.25,95.65,0
 Warm Continental,Shrubland: Sage,CONUS class mean,Moist,59,202308,,0.73,0.4894,0.0355,15.83,30.88,0
 Warm Continental Mountains,Grassland: Annual,CONUS class mean,Moist,60,512902,,0.98,2.8026,0.1915,26.9,58.41,0
 Warm Continental Mountains,Grassland: Irrigated Perennial,CONUS class mean - small sample (RAP is not meant for irrigated land; alfalfa and irrigated pasture are Agriculture: Pasture),Moist,25,507,,0.98,2.8551,0.1862,31.67,83.04,0
@@ -168,5 +150,4 @@ Warm Continental Mountains,Shrubland: Chaparral,CONUS class mean,Moist,59,143239
 Warm Continental Mountains,Shrubland: Invaded Sage Steppe,CONUS class mean,Moist,54,113169,,0.98,0.9275,0.0493,17.35,36.6,0
 Warm Continental Mountains,Shrubland: Native Sage Steppe,CONUS class mean,Moist,60,437787,,0.98,1.263,0.105,23.67,46.54,0
 Warm Continental Mountains,Shrubland: Non-sage,CONUS class mean,Moist,60,1454551,31479,0.98,1.2224,0.277,19.65,44.83,0
-Warm Continental Mountains,Shrubland: Post Fire Shrub,CONUS class mean (Non-sage targets),Moist,60,1454551,31479,0.98,1.2224,0.277,19.65,44.83,0
 Warm Continental Mountains,Shrubland: Sage,CONUS class mean,Moist,59,202308,,0.98,0.4894,0.0355,15.83,30.88,0

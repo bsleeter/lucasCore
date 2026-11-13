@@ -1795,13 +1795,30 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     design choice here before it is built.
   - **Related:** natural succession onto barren, grass and shrub land (Mount St Helens' blast zone, abandoned land) uses the same
     pathways and could be scoped with this; Ag Contraction already moves agriculture into forest types. `Shrubland: Post Fire Shrub`
-    (class 59) and its transition types can be reused or retired.
+    (class 59) and its transition types can be reused or retired. RETIRED 2026-11-13 (user: "Retire the post fire shrubland class
+    as it is not longer being used"): class 59, its Y label and the two Ag Contraction types to it (`Ag Contraction Cropland /
+    Pasture: Shrubland Post Fire Shrub`) are gone from the defaults (state lists, pathways, locations, carbon, CO2 and metadata
+    tables; about 13,700 rows). Nothing reached it: no cell starts in it (the EVT "Recently ..." codes are not used, id 1000 in the
+    crosswalk), Ag Contraction goes to the start year's nearest natural class, and fire sends land to the disturbed classes.
+    Existing libraries keep the class and types in their lists (unreached; deleting them could orphan scenario rows and outputs);
+    new libraries do not get them. The archived defaults/stockflow/legacy-ibis tables and the EVT provenance CSV are unchanged.
+    Also retired 2026-11-13 (user: "Also retire the Succession Post Fire types"): the 28 `Succession Post Fire: <type>` transition
+    types (no pathway used them; the disturbed classes return by Post-disturbance: Forest Return), their group `Succession: Post
+    Fire Recovery` and the empty parent `Succession`, and their three definitions. Same rule for existing libraries.
 58. **Management and mitigation actions for disturbed forest** - TO DO, added 2026-11-11 (user: "imposing management, such as
     replanting/restoration to mitigate the permanent loss of forest. In an alternative scenario, we could impose replanting on the
     forest - recently disturbed classes to push them back to their original types"). Kept apart from to-do 57, whose goal is the
     state-and-transition structure for post-disturbance return and conversion. Developed together with 57 (user): each structure
     choice in 57 is checked against the options here, so the actions can be added without rebuilding it. The actions are scenario
     choices for projections; the baseline keeps what happened historically.
+  - **Salvage logging: moved to the disturbed classes (DONE 2026-11-13, user: "Yes, make that change, include the wetland
+    twins").** `Forest Harvest: Salvage Logging` had pathways on the 28 upland live forest classes (same class, TSTMax 5, which
+    counted from the type's own last transition, not from a fire), from before the disturbed classes. It is now on the 31 disturbed
+    forest classes (wetland twins too), ages 0-5 (years since the disturbance), same class, no age reset, written by
+    tools/make_post_disturbance.R; tests/unit-post-disturbance.R checks it. Carbon flows unchanged (CBM salvage: 72% of snag stems
+    and 85% of any merchantable live wood to the forestry sector). Not driven by default (no source map, no target, no projection
+    rule); a projection scenario sets its target or area. Live forest after insects or wind can't be salvaged: those don't move
+    land into a disturbed class.
   - **Replanting and restoration:** a management transition from a post-disturbance class back to a forest type.
     - Window: within a few years of the disturbance (time since transition, for example 1-5 years), before shrubs take the site.
     - Age: reset to a seedling age on planting (natural return keeps age = years since the disturbance, to-do 57).

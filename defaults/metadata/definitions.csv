@@ -16,7 +16,6 @@ StateClass,Shrubland: Invaded Sage Steppe,"Start-year NLCD 52 or 71 cells that a
 StateClass,Shrubland: Sage,"Start-year NLCD 52 or 71 cells that are never forest, whose most common RCMAP vegetation state (1985) is Sage Shrubland (RCMAP value 7).",RcmapFile
 StateClass,Shrubland: Non-sage,"Start-year NLCD 52 or 71 cells that are never forest, whose most common RCMAP vegetation state (1985) is Non-sage Shrubland (RCMAP value 8). Where RCMAP has no type (outside its western US extent), NLCD 52 cells.",RcmapFile
 StateClass,Shrubland: Chaparral,"Start-year NLCD 52 or 71 cells that are never forest, whose most common RCMAP vegetation state (1985) is Chaparral (RCMAP value 9).",RcmapFile
-StateClass,Shrubland: Post Fire Shrub,"Shrubland that follows stand-replacing loss of forest. Defined in the package's class list; in the default Build only agriculture pathways reach or leave it, and no cell starts in it.",
 StateClass,Snow/Ice: All,Cells whose most common start-year annual NLCD class is Perennial Ice/Snow (12).,NlcdFolder
 StateClass,Water: All,Cells whose most common start-year annual NLCD class is Open Water (11).,NlcdFolder
 StateClass,Wetland: Palustrine Forested,"No cells at the start since 2026-11-10: palustrine woody wetland runs as the three forested wetland classes (to-do 53) and estuarine forested wetland as Wetland: Estuarine Forested. Kept so libraries and results made before then stay valid.",CcapFile
@@ -37,8 +36,6 @@ TransitionGroup,Fire,"Wildfire, by MTBS burn severity: low (MTBS 1 unburned to l
 TransitionGroup,Forest Harvest,"Removal of trees by harvest, from LCMS Tree Removal: clearcut where last year's forest becomes shrub or grass in NLCD that year or within two years, selection where it stays forest.",LcmsFolder
 TransitionGroup,Insect,Insect and disease mortality by severity. Defined in the package's group list; no pathway uses it in the default model.,
 TransitionGroup,Restoration Wetland,Conversion of other land to wetland. Defined in the package's group list; no pathway uses it in the default model.,
-TransitionGroup,Succession,Natural change of state class without disturbance. Defined in the package's group list; no pathway uses it in the default model.,
-TransitionGroup,Succession: Post Fire Recovery,Return of post-fire shrubland to forest. Defined in the package's group list; no pathway uses it in the default model.,
 TransitionGroup,Wetland Change: Gain,Gain of wetland area. Defined in the package's group list; no pathway uses it in the default model.,
 TransitionGroup,Wetland Change: Loss,Loss of wetland area. Defined in the package's group list; no pathway uses it in the default model.,
 TransitionType,Urbanization: Open,A cell becomes Developed: Open Space (NLCD 21).,NlcdFolder
@@ -62,12 +59,11 @@ TransitionType,Forest Harvest: Forest Clearcut,Stand-replacing harvest: LCMS Tre
 TransitionType,Forest Harvest: Forest Selection,Partial harvest: LCMS Tree Removal on last year's forest that stays forest.,LcmsFolder
 TransitionType,Forest Harvest: Forest Selection 20%,Partial harvest removing about 20% of live biomass. Defined in the harvest pathways; it has no mapped source and a zero target in the historical model.,
 TransitionType,Forest Harvest: Forest Selection 85%,Partial harvest removing about 85% of live biomass. Defined in the harvest pathways; it has no mapped source and a zero target in the historical model.,
-TransitionType,Forest Harvest: Salvage Logging,Harvest of trees killed by a disturbance. Defined in the harvest pathways; it has no mapped source and a zero target in the historical model.,
+TransitionType,Forest Harvest: Salvage Logging,"Harvest of trees killed by a disturbance: on the disturbed forest classes only (wetland twins too), within 5 years of the disturbance, keeping the class and its age; it takes mostly snags to the forestry sector. It has no mapped source and a zero target in the historical model.",
 TransitionType,Insect: *,Insect and disease mortality of {*}. Defined in the package's type list; no pathway uses it in the default model.,
 TransitionType,Restoration Wetland: *,Conversion to Wetland: {*}. Defined in the package's type list; no pathway uses it in the default model.,
 TransitionType,Ag Change: *,Agricultural cells that change class: {*}.,NlcdFolder
 TransitionType,Wetland Change: *,Wetland change {*}. Defined in the package's type list; no pathway uses it in the default model.,
-TransitionType,Succession Post Fire: *,Post-fire shrubland returns to Forest: {*}. Defined in the package's type list; no pathway uses it in the default model.,
 StockType,Aquatic,Carbon moved out of the ecosystem to water bodies by lateral transport (a sink outside the ecosystem).,
 StockType,Atmosphere,The atmosphere: the source of net growth and the sink of decay emissions (baseline flows).,
 StockType,Atmosphere: CH4,Carbon emitted as methane by disturbance (transition-triggered flows only).,

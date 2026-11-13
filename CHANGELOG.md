@@ -28,8 +28,21 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   RCMAP shows moderate-severity shrub fire losing and regaining cover as high-severity fire does. Its carbon follows: moderate fire
   in these classes burns and kills what high-severity fire does (`defaults/stockflow/nonforest-fire.csv`). Forest is unchanged
   (high only). Changes Run results.
+- `Forest Harvest: Salvage Logging` now acts on the 31 disturbed forest classes (28 upland, 3 wetland twins) instead of the live
+  forest classes: within 5 years of the disturbance (the class's age), staying in the class with its age, so return and conversion
+  keep their clock. Its carbon flows are unchanged and on a disturbed class take mostly snags to the forestry sector. Salvage has
+  no mapped source or default target, so results do not change; it is there for management scenarios (to-do 58).
 - Build stage 5: a check that every forest cell has an age failed when a fire perimeter started cells in a disturbed class; it now
   allows the disturbed classes an age, and names any failing cells by class.
+
+### Removed
+- `Shrubland: Post Fire Shrub` (class 59) and the two transition types that led to it (`Ag Contraction Cropland: Shrubland Post
+  Fire Shrub`, `Ag Contraction Pasture: Shrubland Post Fire Shrub`). Nothing reached the class: no cell starts in it, agriculture
+  contracts to the nearest natural class, and fire now moves land into the disturbed classes. New libraries no longer have it;
+  existing libraries keep it in their lists, unused. No change to results.
+- The 28 `Succession Post Fire: <type>` transition types and their groups (`Succession: Post Fire Recovery` and the empty
+  `Succession`). No pathway used them: burned forest now returns from its disturbed class by `Post-disturbance: Forest Return`.
+  Same as above for new and existing libraries. No change to results.
 
 ### Added
 - The Reforestation transition: group Reforestation, one type per forest class ("Reforestation: <type>"), pathways from every

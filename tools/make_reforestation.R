@@ -8,7 +8,7 @@
 # Chaparral), the grass classes and Wetland: Palustrine Emergent - to every forest type group and forested wetland twin (Ids
 # 100-999), probability 1, age reset (a new stand from age 0, user 2026-11-12; the grass or shrub live carbon carries over, since no
 # flows are triggered). Left out: the disturbed classes (they return by Post-disturbance: Forest Return within their window),
-# Shrubland: Post Fire Shrub (class 59, to be retired), Wetland: Estuarine Emergent (tidal marsh), the estuarine forested class
+# Wetland: Estuarine Emergent (tidal marsh), the estuarine forested class
 # (91; no FIA curves of its own as a destination).
 # Writes defaults/transitions/pathways/reforestation.csv and the Reforestation rows of defaults/stsim (TransitionType,
 # TransitionGroup, TransitionTypeGroup, TransitionSimulationGroup: ST-Sim writes transition maps only for those and [Type] groups,

@@ -6,7 +6,6 @@
 # windows across CONUS, by class as stage 5 maps it) and, for each ecodivision x grassland or shrubland class:
 #   targets   NPP = RAP herb + shrub NPP (the tree band left out); soil 0-30 cm and whole profile from gNATSGO. An ecodivision keeps its
 #             own value with >= MIN_WINDOWS windows and >= MIN_CELLS cells of the class; otherwise the class's CONUS mean (all windows).
-#             Shrubland: Post Fire Shrub (made by fire, not mapped) takes Shrubland: Non-sage's targets.
 #   rates     literature only (defaults/stockflow/grass-shrub-literature.csv and chaparral-age.csv; the report "Grass and shrub turnover
 #             and decay", user decisions 2026-11-06): growth split, live turnover and dead pool decay; CBM-CFS3's split of each dead
 #             pool's loss; litter decay, AG Slow emission and soil decay solved so the ordered steady state (src/nonforest-solve.R)
@@ -53,7 +52,7 @@ own <- s[, agg(.SD), by = StratumId]; conus <- agg(s)
 herb_share <- s[, .(h = weighted.mean(NppAnnual + NppPerennial, nppCells, na.rm = TRUE) / weighted.mean(Npp, nppCells, na.rm = TRUE)), by = StateClassId]
 herb_share <- setNames(herb_share$h, herb_share$StateClassId)
 tg <- CJ(StratumId = ECO, StateClassId = GS)
-tg[, src := ifelse(StateClassId == "Shrubland: Post Fire Shrub", "Shrubland: Non-sage", StateClassId)]
+tg[, src := StateClassId]
 tg <- merge(tg, own, by.x = c("StratumId", "src"), by.y = c("StratumId", "StateClassId"), all.x = TRUE)
 tg[, Source := fifelse(!is.na(Windows) & Windows >= MIN_WINDOWS & Cells >= MIN_CELLS & is.finite(NPP) & is.finite(Soil0to999), "ecodivision sample", "CONUS class mean")]
 cm <- conus[match(tg$src, StateClassId)]; fb <- which(tg$Source == "CONUS class mean")
@@ -123,7 +122,7 @@ lit_rates <- function(cls, moisture, shares = NULL) {
   set(TY("Emission: AG Slow -> Atmosphere"), 0.015); set(TY("Transfer: AG Slow -> BG Slow"), 0.006)
   set(TY("Emission: BG Slow -> Atmosphere"), 0.0033)
   m }
-refnpp <- setNames(conus$NPP, conus$StateClassId); refnpp[["Shrubland: Post Fire Shrub"]] <- refnpp[["Shrubland: Non-sage"]]
+refnpp <- setNames(conus$NPP, conus$StateClassId)
 path_of <- function(e, cls) pa[FromStratumId == e & FromStateClassId == cls]
 loss_of <- function(p, m, pool) { g <- intersect(paste(unique(p[FromStockTypeId == pool, FlowTypeId]), "[Type]"), m$FlowGroupId); sum(m[FlowGroupId %in% g, Value]) }
 # the litter target counts leaf and fine litter (AG very fast) for grass and the sage family (user 2026-11-06: Nagy et al. 2021 measured
