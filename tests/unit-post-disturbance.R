@@ -23,8 +23,12 @@ check("the return and conversion types exist, each in its own group and in Post-
       all(vapply(c(RT, CV), function(t) setequal(tg[TransitionTypeId == t, TransitionGroupId], c(t, "Post-disturbance")), TRUE)))
 fire <- rd(D("transitions", "pathways", "fire.csv")); pd <- rd(D("transitions", "pathways", "post-disturbance.csv"))
 hi <- fire[TransitionTypeId == "Fire: High Severity"]
-check("high-severity fire on every parent leads to its disturbed class (age reset), and none stays in the parent",
-      all(vapply(seq_len(nrow(par)), function(i) { x <- hi[StateClassIdSource == par$Name[i]]; nrow(x) == 1 && x$StateClassIdDest == par$dname[i] && x$AgeReset == "Yes" }, TRUE)))
+# stand-replacing severities: high in forest, moderate (Medium) and high in the shrub classes (user decision 2026-11-12)
+SEVS <- c("Fire: Low Severity", "Fire: Medium Severity", "Fire: High Severity")
+sr_of <- function(cls) if (cls %in% SHRUBS) SEVS[2:3] else SEVS[3]
+check("stand-replacing fire (high; moderate or high in the shrub classes) on every parent leads to its disturbed class (age reset); the other severities keep the parent",
+      all(vapply(seq_len(nrow(par)), function(i) all(vapply(SEVS, function(t) { x <- fire[StateClassIdSource == par$Name[i] & TransitionTypeId == t]
+        nrow(x) == 1 && if (t %in% sr_of(par$Name[i])) x$StateClassIdDest == par$dname[i] && x$AgeReset == "Yes" else x$StateClassIdDest == par$Name[i] }, TRUE)), TRUE)))
 source(file.path("src", "post-disturbance.R")); eco <- rd(D("strata", "ecodivisions-list.csv"))$Name
 st <- fread(D("transitions", "post-disturbance-settings.csv"), na.strings = "")
 res <- pd_resolve(st, par$Name, as.integer(par$Id) >= 100, eco); res[, dname := par$dname[match(Parent, par$Name)]]
@@ -62,12 +66,13 @@ check("a disturbed forested wetland twin converts to Wetland: Palustrine Emergen
   tw <- par[as.integer(Id) >= 100 & StateLabelXId == "Wetland", dname]; length(tw) == 3 &&
   all(cv[StateClassIdSource %in% tw, StateClassIdDest] == "Wetland: Palustrine Emergent") &&
   all(hi[StateClassIdSource %in% tw & StateClassIdDest != StateClassIdSource, StateClassIdDest] == "Wetland: Palustrine Emergent") })
-check("a high-severity reburn: proportions add to 1 in every ecodivision; the share staying is 1 - ReburnConversion, age reset",
-      all(vapply(seq_len(nrow(res)), function(i) { p <- res[i]; x <- in_eco(hi[StateClassIdSource == p$dname], p$Ecodivision); s <- x[StateClassIdDest == p$dname]
-        nrow(s) == 1 && abs(sum(num(x$Proportion)) - 1) < 1e-6 && all(x$AgeReset == "Yes") && abs(num(s$Proportion) - (1 - p$ReburnConversion)) < 1e-6 }, TRUE)))
-check("medium and low severity keep a disturbed class and its age",
-      all(vapply(par$dname, function(d) { x <- fire[StateClassIdSource == d & TransitionTypeId %in% c("Fire: Medium Severity", "Fire: Low Severity")]
-        nrow(x) == 2 && all(x$StateClassIdDest == d) && all(x$AgeReset == "No") }, TRUE)))
+check("a stand-replacing reburn: proportions add to 1 in every ecodivision; the share staying is 1 - ReburnConversion, age reset",
+      all(vapply(seq_len(nrow(res)), function(i) { p <- res[i]; all(vapply(sr_of(p$Parent), function(t) {
+        x <- in_eco(fire[StateClassIdSource == p$dname & TransitionTypeId == t], p$Ecodivision); s <- x[StateClassIdDest == p$dname]
+        nrow(s) == 1 && abs(sum(num(x$Proportion)) - 1) < 1e-6 && all(x$AgeReset == "Yes") && abs(num(s$Proportion) - (1 - p$ReburnConversion)) < 1e-6 }, TRUE)) }, TRUE)))
+check("the other severities keep a disturbed class and its age",
+      all(vapply(seq_len(nrow(par)), function(i) { d <- par$dname[i]; o <- setdiff(SEVS, sr_of(par$Name[i])); x <- fire[StateClassIdSource == d & TransitionTypeId %in% o]
+        nrow(x) == length(o) && all(x$StateClassIdDest == d) && all(x$AgeReset == "No") }, TRUE)))
 for (f in c("urbanization.csv", "ag-expansion.csv")) { x <- rd(D("transitions", "pathways", f))
   check(sprintf("%s: each disturbed class has its parent's rows", f), all(vapply(seq_len(nrow(par)), function(i) {
     a <- x[StateClassIdSource == par$Name[i], paste(StateClassIdDest, TransitionTypeId)]; b <- x[StateClassIdSource == par$dname[i], paste(StateClassIdDest, TransitionTypeId)]

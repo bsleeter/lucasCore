@@ -215,8 +215,13 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
       if (pd$Grp[i] == "Reforestation") refy[hit] <- pd$Timestep[i] else if (pd$Grp[i] %in% names(code)) outc[hit] <- code[[pd$Grp[i]]] }
     v1 <- cv(r1); outc[inz & !is.na(v1) & v1 >= 2000] <- 4L
     v0 <- if (!is.null(r0)) cv(r0) else rep(NA_real_, length(inz)); started <- inz & !is.na(v0) & v0 >= 2000
-    last_hs <- rep(NA_integer_, length(inz))
-    for (y in names(X$fire)) { r <- rd(X$fire[[y]]); if (is.null(r)) next; v <- cv(r); h <- !is.na(v) & v > 0 & grepl("High", X$tt_list$Name[match(v, X$tt_list$Id)]); last_hs[h] <- as.integer(y) }
+    # the last stand-replacing fire: high severity, or moderate (Medium) in the shrub classes (tools/make_post_disturbance.R); a cell
+    # counts as shrub when it starts or ends in a disturbed shrub class or came back to shrubland
+    last_hs <- rep(NA_integer_, length(inz)); last_ms <- last_hs
+    for (y in names(X$fire)) { r <- rd(X$fire[[y]]); if (is.null(r)) next; v <- cv(r); nm <- X$tt_list$Name[match(v, X$tt_list$Id)]
+      last_hs[!is.na(v) & v > 0 & grepl("High", nm)] <- as.integer(y); last_ms[!is.na(v) & v > 0 & grepl("High|Medium", nm)] <- as.integer(y) }
+    dsh <- X$sc_list$Id[X$sc_list$Name %in% paste0("Disturbed: ", SHRUB_P)]
+    shr <- outc %in% 2L | v1 %in% dsh | v0 %in% dsh; last_hs[shr] <- last_ms[shr]
     if (any(!is.na(outc)) || any(!is.na(refy))) {
       km2c <- function(k) sum(outc %in% k & inz) * prod(res(el)) / 1e6
       OL <- c("Back to forest", "Back to shrubland", "Converted (shrub or grass)", "Still disturbed at the end"); OC <- c("#2b8152", "#c9a26b", "#c0392b", "#b5651d")
@@ -231,14 +236,14 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
         nomap <- any(hs %in% (nb + 2L))
         P[[length(P) + 1]] <- list(k = hs, cols = c("#d9d4c7", colorRampPalette(c("#fde7b0", "#e0702b", "#6b1a10"))(nb), "#8f8f8f"),
           lab = c(sprintf("before %d", y0 + 1), sprintf("%d-%d", head(yb, -1) + c(1, rep(0, length(yb) - 2)), tail(yb, -1) - 1), "no fire map for its year"), key = TRUE,
-          title = "Last high-severity fire", sub = sprintf("the same cells; before %d: started disturbed (a fire perimeter dates it)%s", y0 + 1, if (nomap) "; no fire map: the run wrote no transition maps that year" else "")) }
+          title = "Last stand-replacing fire", sub = sprintf("the same cells (high severity; moderate or high in shrubland); before %d: started disturbed (a fire perimeter dates it)%s", y0 + 1, if (nomap) "; no fire map: the run wrote no transition maps that year" else "")) }
       if (any(!is.na(refy))) { yb <- unique(c(y0, seq(y0 + 5, y1, by = 5), y1 + 1))
         P[[length(P) + 1]] <- list(k = ifelse(is.na(refy), NA, findInterval(refy, yb, rightmost.closed = TRUE)), cols = colorRampPalette(c("#dfe6b4", "#62ab68", "#0f3a2b"))(length(yb) - 1),
           lab = sprintf("%d-%d", head(yb, -1) + c(1, rep(0, length(yb) - 2)), tail(yb, -1) - 1), key = TRUE, title = "Reforestation, by year",
           sub = sprintf("%.1f km2 of barren, shrub, grass or emergent wetland became forest", sum(!is.na(refy) & inz) * prod(res(el)) / 1e6)) }
       map_figure("post_disturbance", sprintf("After disturbance, and reforestation, %d-%d", y0 + 1, y1), P,
-        sprintf("Iteration 1, from the run's yearly transition maps. %sA high-severity fire moves forest and shrubland into its type's disturbed class; it returns to its type when %s, or converts to shrubland or grassland at the end of its window or at a high-severity reburn.%s%s",
-                if (length(pres)) "(a) How each cell that was in a disturbed class left it (the latest exit), or that it is still waiting in the last year. (b) When those cells last burned at high severity. " else "",
+        sprintf("Iteration 1, from the run's yearly transition maps. %sA stand-replacing fire (high severity in forest, moderate or high in shrubland) moves the cell into its type's disturbed class; it returns to its type when %s, or converts to shrubland or grassland at the end of its window or at a stand-replacing reburn.%s%s",
+                if (length(pres)) "(a) How each cell that was in a disturbed class left it (the latest exit), or that it is still waiting in the last year. (b) When those cells last had a stand-replacing fire. " else "",
                 if (is.null(ps)) "the annual NLCD shows it again (historical years)" else "the annual NLCD shows it again (historical years) or with its yearly chance (projection years)",
                 if (any(!is.na(refy))) sprintf(" (%s) Natural non-forest cells that became forest (Reforestation), by year.", letters[length(P)]) else "", relief)) }
   }

@@ -1,13 +1,13 @@
 # =============================================================================
 # make_post_disturbance.R - the post-disturbance state classes (to-do 57, user decisions 2026-11-11)
 # =============================================================================
-# High-severity fire moves a forest or shrub cell into its type's disturbed class ("Disturbed: <type>", Id 2000 + the type's Id);
+# Stand-replacing fire (high severity in forest; moderate or high in the shrub classes) moves a forest or shrub cell into its type's disturbed class ("Disturbed: <type>", Id 2000 + the type's Id);
 # age resets, so in the class age is years since the disturbance. From there a cell
 #   - returns to its type (Post-disturbance: Forest Return / Shrub Return), each year with a chance from ReturnAgeMin to the window's
 #     end, age carried over;
 #   - converts at the window's end (Post-disturbance: Conversion): disturbed forest to its ecodivision's shrub class (ShrubShare) or
 #     grass class, disturbed sage, sage steppe and chaparral to Grassland: Annual, disturbed Non-sage to its ecodivision's grass class;
-#   - converts at a high-severity reburn inside the window (ReburnConversion of the reburns; the rest start again at age 0).
+#   - converts at a stand-replacing reburn inside the window (ReburnConversion of the reburns; the rest start again at age 0).
 # Settings: defaults/transitions/post-disturbance-settings.csv (window, return, reburn, by parent class and ecodivision; src/post-disturbance.R) and
 # post-disturbance-regions.csv (each ecodivision's shrub and grass class). Rerunnable: every disturbed row is written again.
 # Carbon rows (stage 3) are not written here.
@@ -93,18 +93,25 @@ ret <- rt[, pw(StratumIdSource = Ecodivision, StateClassIdSource = From, StateCl
 conv <- dest[, pw(StratumIdSource = Ecodivision, StateClassIdSource = From, StateClassIdDest = To, TransitionTypeId = CONV, Probability = "1",
                   Proportion = fmt(Share), AgeMin = Window, AgeReset = "No")]
 wr(rbind(ret, conv), D("transitions", "pathways", "post-disturbance.csv"))
-# fire: high severity moves the parent to its disturbed class; in the disturbed class a high-severity reburn converts ReburnConversion
+# fire: a stand-replacing severity (SR) moves the parent to its disturbed class; in the disturbed class such a reburn converts ReburnConversion
 # of the cells (by the conversion shares) and starts the rest again at age 0, in the same ecodivisions as the conversion rows;
-# medium and low severity keep the class and its age
+# the other severities keep the class and its age
 fire <- rd(D("transitions", "pathways", "fire.csv")); fire <- fire[!startsWith(StateClassIdSource, PFX)]
-hi <- fire$TransitionTypeId == "Fire: High Severity" & fire$StateClassIdSource %in% par$Name
-set(fire, which(hi), "StateClassIdDest", par$dname[match(fire$StateClassIdSource[hi], par$Name)])
-reb <- rbind(dest[, pw(StratumIdSource = Ecodivision, StateClassIdSource = From, StateClassIdDest = To, TransitionTypeId = "Fire: High Severity",
+# Stand-replacing severities: high for forest; moderate (Medium) and high for the shrub classes (user decision 2026-11-12: RCMAP
+# shows moderate-severity shrub fire losing and regaining cover as high severity does, tools/fit_shrub_post_disturbance.R)
+SR <- list(Forest = "Fire: High Severity", Shrub = c("Fire: Medium Severity", "Fire: High Severity"))
+ALL_SEV <- c("Fire: Low Severity", "Fire: Medium Severity", "Fire: High Severity")
+kind_of <- function(cls) par$kind[match(cls, par$Name)]
+hi <- fire$StateClassIdSource %in% par$Name; hi[hi] <- mapply(function(t, k) t %in% SR[[k]], fire$TransitionTypeId[hi], kind_of(fire$StateClassIdSource[hi]))
+set(fire, which(hi), "StateClassIdDest", par$dname[match(fire$StateClassIdSource[hi], par$Name)]); set(fire, which(hi), "AgeReset", "Yes")
+dk <- unique(par[, .(From = dname, kind)])
+reb <- rbindlist(lapply(c("Forest", "Shrub"), function(k) { d <- dest[From %in% dk[kind == k, From]]; if (!nrow(d)) return(NULL)
+  rbindlist(lapply(SR[[k]], function(t) rbind(d[, pw(StratumIdSource = Ecodivision, StateClassIdSource = From, StateClassIdDest = To, TransitionTypeId = t,
                        Probability = "1", Proportion = fmt(Share * ReburnConversion), AgeReset = "Yes")],
-             unique(dest[, .(From, Ecodivision, ReburnConversion)])[, pw(StratumIdSource = Ecodivision, StateClassIdSource = From, StateClassIdDest = From,
-                       TransitionTypeId = "Fire: High Severity", Probability = "1", Proportion = fmt(1 - ReburnConversion), AgeReset = "Yes")])
-ml <- par[, .(t = c("Fire: Medium Severity", "Fire: Low Severity")), by = dname][, pw(StateClassIdSource = dname, StateClassIdDest = dname, TransitionTypeId = t,
-                                                                                 Probability = "1", AgeReset = "No")]
+             unique(d[, .(From, Ecodivision, ReburnConversion)])[, pw(StratumIdSource = Ecodivision, StateClassIdSource = From, StateClassIdDest = From,
+                       TransitionTypeId = t, Probability = "1", Proportion = fmt(1 - ReburnConversion), AgeReset = "Yes")]))) }))
+ml <- par[, .(t = setdiff(ALL_SEV, SR[[kind[1]]])), by = dname][, pw(StateClassIdSource = dname, StateClassIdDest = dname, TransitionTypeId = t,
+                                                                     Probability = "1", AgeReset = "No")]
 wr(rbind(fire, reb, ml), D("transitions", "pathways", "fire.csv"))
 # urbanization and agricultural expansion: as the parent class
 for (f in c("urbanization.csv", "ag-expansion.csv")) { x <- rd(D("transitions", "pathways", f)); x <- x[!startsWith(StateClassIdSource, PFX)]
@@ -127,7 +134,7 @@ wr(rbind(co, y), D("climate", "co2-classes.csv"))
 # definitions: edited as text lines (a read and rewrite through fread/fwrite doubles the escaped quotes of other rows)
 de <- data.table(Kind = c("StateClass", "TransitionType", "TransitionType", "TransitionType", rep("TransitionGroup", 4)),
   Name = c("Disturbed: *", RET_F, RET_S, CONV, grps),
-  Definition = c("Land of the {*} after a stand-replacing disturbance (high-severity fire), waiting either to return to it or to convert to non-forest or grassland. Age counts the years since the disturbance. No cell starts in it in the default Build (to-do 57).",
+  Definition = c("Land of the {*} after a stand-replacing disturbance (high-severity fire; moderate or high in shrubland), waiting either to return to it or to convert to non-forest or grassland. Age counts the years since the disturbance. No cell starts in it in the default Build (to-do 57).",
                  "A disturbed forest class returns to its forest type, its age (years since the disturbance) carried over.",
                  "A disturbed shrub class returns to its shrub type, its age carried over.",
                  "A disturbed class that has not returned by the end of its window converts: disturbed forest to its ecodivision's shrub or grass class, disturbed sage, sage steppe and chaparral to annual grass, disturbed non-sage to its ecodivision's grass class.",

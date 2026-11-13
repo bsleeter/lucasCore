@@ -1858,8 +1858,13 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       severity shares); RdNBR or RAVG instead of the MTBS classes.
     - First findings 2026-11-12 (to-do 57 step 7 shrub fit, 907 sampled western fires 1986-2010): only 396 had any high-severity
       pixel that lost shrub cover, 550 had moderate; and moderate-severity pixels lose and regain RCMAP shrub cover as high-severity
-      ones do (same return curves and windows within 2 years). This supports treating moderate and high as stand-replacing for the
-      shrub classes (stage 6 and projections), not yet done.
+      ones do (same return curves and windows within 2 years). DONE 2026-11-12 (user: "Yes, do it here"): moderate (Medium) and
+      high severity are both stand-replacing for the five shrub classes, in historical runs and projections alike (the fire pathways,
+      `tools/make_post_disturbance.R`: the parent goes to its disturbed class with age reset, and in the disturbed class a moderate
+      or high reburn converts ReburnConversion); forest stays high only. Run Figures' "Last stand-replacing fire" counts moderate fire
+      for shrub cells. Not yet run in a Build. Open: the shrub fire carbon (`defaults/stockflow/nonforest-fire.csv`) still kills less
+      at Medium than at High (e.g. Sage roots 0.6 against 0.9), so a moderate fire now resets the class while leaving more live
+      carbon; whether Medium's shares should move toward High's is to decide with the RCMAP evidence (cover loss alike).
     - Chaparral type conversion: the fitted ReburnConversion (0.10) says most chaparral that reburns before recovering still comes
       back; check on RCMAP annual herbaceous (and herbaceous) cover, a second national download (Data Source RcmapCoverFolder
       components), and against the short-interval reburn literature.
