@@ -1,0 +1,336 @@
+Name,Id
+Acoma Pueblo,10
+Agua Caliente Indian Reservation,20
+Alabama-Coushatta Reservation,50
+Allegany Reservation,80
+Alturas Indian Rancheria,95
+Annette Island Reserve,110
+Aroostook Band of Micmac Trust Land,115
+Auburn Rancheria,120
+Augustine Reservation,125
+Bad River Reservation,140
+Barona Reservation,155
+Battle Mountain Reservation,165
+Bay Mills Reservation,170
+Benton Paiute Reservation,185
+Berry Creek Rancheria,200
+Big Bend Rancheria,215
+Big Cypress Reservation,225
+Big Lagoon Rancheria,240
+Big Pine Reservation,250
+Big Sandy Rancheria,265
+Big Valley Rancheria,275
+Bishop Reservation,290
+Blackfeet Indian Reservation,305
+Blue Lake Rancheria,325
+Bois Forte Reservation,335
+Bridgeport Reservation,350
+Brighton Reservation,360
+Burns Paiute Indian Colony,400
+Cabazon Reservation,415
+Cahuilla Reservation,435
+Campbell Ranch,440
+Campo Indian Reservation,450
+Capitan Grande Reservation,495
+Carson Colony,510
+Catawba Reservation,525
+Cattaraugus Reservation,540
+Cedarville Rancheria,555
+Celilo Village,560
+Chehalis Reservation,575
+Chemehuevi Reservation,585
+Cheyenne River Reservation,605
+Chicken Ranch Rancheria,620
+Chitimacha Reservation,635
+Pueblo de Cochiti,680
+Coconut Creek Trust Land,690
+Cocopah Reservation,695
+Coeur d'Alene Reservation,705
+Cold Springs Rancheria,720
+Colorado River Indian Reservation,735
+Colusa Rancheria,750
+Colville Reservation,760
+"Coos, Lower Umpqua, and Siuslaw Reservation",770
+Coquille Reservation,775
+Cortina Indian Rancheria,780
+Coushatta Reservation,795
+Cow Creek Reservation,815
+Cowlitz Reservation,820
+Coyote Valley Reservation,825
+Crow Reservation,845
+Crow Creek Reservation,855
+Dresslerville Colony,940
+Dry Creek Rancheria,955
+Duck Valley Reservation,965
+Duckwater Reservation,975
+Eastern Cherokee Reservation,990
+Elko Colony,1005
+Elk Valley Rancheria,1010
+Ely Reservation,1040
+Enterprise Rancheria,1055
+Ewiiaapaayp Reservation,1065
+Fallon Paiute-Shoshone Colony,1070
+Fallon Paiute-Shoshone Reservation,1075
+Flandreau Reservation,1100
+Flathead Reservation,1110
+Fond du Lac Reservation,1125
+Forest County Potawatomi Community,1135
+Fort Apache Reservation,1140
+Fort Belknap Reservation,1150
+Fort Berthold Reservation,1160
+Fort Bidwell Reservation,1170
+Fort Hall Reservation,1185
+Fort Independence Reservation,1195
+Fort McDermitt Indian Reservation,1210
+Fort McDowell Yavapai Nation Reservation,1220
+Fort Mojave Reservation,1235
+Fort Peck Indian Reservation,1250
+Fort Pierce Reservation,1260
+Fort Sill Apache Indian Reservation,1270
+Fort Yuma Indian Reservation,1280
+Gila River Indian Reservation,1310
+Goshute Reservation,1340
+Grand Portage Reservation,1355
+Grand Ronde Community,1365
+Grand Traverse Reservation,1370
+Greenville Rancheria,1380
+Grindstone Indian Rancheria,1395
+Guidiville Rancheria,1400
+Hannahville Indian Community,1410
+Havasupai Reservation,1440
+Ho-Chunk Nation Reservation,1450
+Hoh Indian Reservation,1460
+Hollywood Reservation,1475
+Hoopa Valley Reservation,1490
+Hopi Reservation,1505
+Hopland Rancheria,1515
+Houlton Maliseet Reservation,1530
+Hualapai Indian Reservation,1545
+Huron Potawatomi Reservation,1550
+Immokalee Reservation,1555
+Inaja and Cosmit Reservation,1560
+Indian Township Reservation,1575
+Iowa (KS-NE) Reservation,1590
+Isabella Reservation,1610
+Isleta Pueblo,1625
+Jackson Rancheria,1640
+Jamestown S'Klallam Reservation,1655
+Jamul Indian Village,1670
+Jemez Pueblo,1685
+Jena Band of Choctaw Reservation,1690
+Jicarilla Apache Nation Reservation,1700
+Kaibab Indian Reservation,1720
+Kalispel Reservation,1735
+Karuk Reservation,1750
+Kickapoo (KS) Reservation,1770
+Kickapoo (TX) Reservation,1775
+Klamath Reservation,1785
+Kootenai Reservation,1800
+Lac Courte Oreilles Reservation,1815
+Lac du Flambeau Reservation,1825
+Lac Vieux Desert Reservation,1830
+Laguna Pueblo,1840
+La Jolla Reservation,1850
+Lake Traverse Reservation,1860
+L'Anse Reservation,1880
+La Posta Indian Reservation,1895
+Las Vegas Indian Colony,1915
+Laytonville Rancheria,1925
+Leech Lake Reservation,1940
+Likely Rancheria,1955
+Little River Reservation,1960
+Little Traverse Bay Reservation,1963
+Lone Pine Reservation,1970
+Lookout Rancheria,1980
+Los Coyotes Reservation,1995
+Lovelock Indian Colony,2015
+Lower Brule Reservation,2030
+Lower Elwha Reservation,2040
+Lower Sioux Indian Community,2055
+Lummi Reservation,2070
+Lytton Rancheria,2075
+Makah Indian Reservation,2085
+Manchester-Point Arena Rancheria,2100
+Manzanita Reservation,2115
+Maricopa (Ak Chin) Indian Reservation,2130
+Mashantucket Pequot Reservation,2145
+Mashpee Wampanoag Trust Land,2147
+Match-e-be-nash-she-wish Band of Pottawatomi Reservation,2150
+Menominee Reservation,2175
+Mesa Grande Reservation,2190
+Mescalero Reservation,2205
+Miccosukee Reservation,2240
+Middletown Rancheria,2255
+Mille Lacs Reservation,2270
+Minnesota Chippewa Trust Land,2285
+Mississippi Choctaw Reservation,2300
+Moapa River Indian Reservation,2315
+Mohegan Reservation,2320
+Montgomery Creek Rancheria,2330
+Mooretown Rancheria,2340
+Morongo Reservation,2360
+Muckleshoot Reservation,2375
+Nambe Pueblo,2400
+Narragansett Reservation,2415
+Navajo Nation Reservation,2430
+Nez Perce Reservation,2445
+Nisqually Reservation,2460
+Nooksack Reservation,2475
+Northern Cheyenne Indian Reservation,2490
+North Fork Rancheria,2495
+Northwestern Shoshone Reservation,2505
+Ohkay Owingeh,2510
+Oil Springs Reservation,2535
+Omaha Reservation,2550
+Oneida Indian Nation Reservation,2555
+Oneida (WI) Reservation,2560
+Onondaga Nation Reservation,2570
+Ontonagon Reservation,2580
+Osage Reservation,2595
+Paiute (UT) Reservation,2625
+Pala Reservation,2635
+Pascua Pueblo Yaqui Reservation,2680
+Paskenta Rancheria,2685
+Passamaquoddy Trust Land,2695
+Pauma and Yuima Reservation,2715
+Pechanga Reservation,2745
+Penobscot Reservation,2760
+Picayune Rancheria,2775
+Picuris Pueblo,2785
+Pine Ridge Reservation,2810
+Pinoleville Rancheria,2820
+Pit River Trust Land,2835
+Pleasant Point Reservation,2850
+Poarch Creek Reservation,2865
+Pokagon Reservation,2890
+Ponca (NE) Trust Land,2900
+Port Gamble Reservation,2910
+Port Madison Reservation,2925
+Prairie Band of Potawatomi Nation Reservation,2980
+Prairie Island Indian Community,2985
+Pueblo of Pojoaque,2990
+Puyallup Reservation,3000
+Pyramid Lake Paiute Reservation,3010
+Quartz Valley Reservation,3020
+Quileute Reservation,3030
+Quinault Reservation,3040
+Ramona Village,3070
+Red Cliff Reservation,3085
+Redding Rancheria,3095
+Red Lake Reservation,3100
+Redwood Valley Rancheria,3115
+Reno-Sparks Indian Colony,3130
+Resighini Rancheria,3145
+Rincon Reservation,3165
+Roaring Creek Rancheria,3185
+Robinson Rancheria,3195
+Rocky Boy's Reservation,3205
+Rohnerville (Rancheria) Trust Land,3220
+Rosebud Indian Reservation,3235
+Round Valley Reservation,3250
+Rumsey Indian Rancheria,3265
+Sac and Fox/Meskwaki Settlement,3280
+Sac and Fox Nation Reservation,3285
+St. Croix Reservation,3305
+St. Regis Mohawk Reservation,3320
+Salt River Reservation,3340
+San Carlos Reservation,3355
+Sandia Pueblo,3370
+San Felipe Pueblo,3400
+San Ildefonso Pueblo,3415
+San Manuel Reservation,3445
+San Pasqual Reservation,3460
+Santa Ana Pueblo,3480
+Santa Clara Pueblo,3495
+Santa Rosa Rancheria,3520
+Santa Rosa Reservation,3525
+Santa Ynez Reservation,3540
+Santa Ysabel Reservation,3550
+Santee Reservation,3565
+Santo Domingo Pueblo,3585
+Sauk-Suiattle Reservation,3625
+Sault Ste. Marie Reservation,3635
+Seminole (FL) Trust Land,3665
+Shakopee Mdewakanton Sioux Community,3680
+Sherwood Valley Rancheria,3735
+Shingle Springs Rancheria,3750
+Shoalwater Bay Indian Reservation,3780
+Siletz Reservation,3795
+Skokomish Reservation,3825
+Skull Valley Reservation,3840
+Smith River Rancheria,3855
+Snoqualmie Reservation,3860
+Soboba Reservation,3870
+Sokaogon Chippewa Community,3885
+Southern Ute Reservation,3925
+South Fork Reservation,3930
+Spirit Lake Reservation,3935
+Spokane Reservation,3940
+Squaxin Island Reservation,3955
+Standing Rock Reservation,3970
+Stewart Community,3980
+Stewarts Point Rancheria,3985
+Stillaguamish Reservation,4000
+Stockbridge Munsee Community,4015
+Sulphur Bank Rancheria,4030
+Summit Lake Reservation,4045
+Susanville Indian Rancheria,4060
+Swinomish Reservation,4075
+Sycuan Reservation,4090
+Table Bluff Reservation,4095
+Table Mountain Rancheria,4110
+Tampa Reservation,4130
+Taos Pueblo,4140
+Tesuque Pueblo,4170
+Timbi-Sha Shoshone Reservation,4180
+Tohono O'odham Nation Reservation,4200
+Tonawanda Reservation,4225
+Tonto Apache Reservation,4235
+Torres-Martinez Reservation,4255
+Trinidad Rancheria,4275
+Tulalip Reservation,4290
+Tule River Reservation,4300
+Tunica-Biloxi Reservation,4315
+Tuolumne Rancheria,4330
+Turtle Mountain Reservation,4345
+Tuscarora Nation Reservation,4360
+Twenty-Nine Palms Reservation,4375
+Uintah and Ouray Reservation,4390
+Umatilla Reservation,4405
+Upper Lake Rancheria,4430
+Upper Sioux Community,4445
+Upper Skagit Reservation,4455
+Ute Mountain Reservation,4470
+Viejas Reservation,4500
+Walker River Reservation,4515
+Wampanoag-Aquinnah Trust Land,4530
+Warm Springs Reservation,4545
+Washoe Ranches Trust Land,4560
+Wells Colony,4580
+White Earth Reservation,4595
+Wind River Reservation,4610
+Winnebago Reservation,4625
+Winnemucca Indian Colony,4635
+Woodfords Community,4665
+XL Ranch Rancheria,4680
+Yakama Nation Reservation,4690
+Yankton Reservation,4700
+Yavapai-Apache Nation Reservation,4708
+Yavapai-Prescott Reservation,4710
+Yerington Colony,4725
+Yomba Reservation,4740
+Ysleta del Sur Pueblo,4755
+Yurok Reservation,4760
+Zia Pueblo,4770
+Zuni Reservation,4785
+Golden Hill Paugussett (state) Reservation,9100
+Hassanamisco (state) Reservation,9150
+Mattaponi (state) Reservation,9230
+MOWA Choctaw (state) Reservation,9240
+Pamunkey (state) Reservation,9260
+Paucatuck Eastern Pequot (state) Reservation,9280
+Poospatuck (state) Reservation,9300
+Schaghticoke (state) Reservation,9350
+Shinnecock (state) Reservation,9370
+Tama (state) Reservation,9400
+Not tribal land,99999

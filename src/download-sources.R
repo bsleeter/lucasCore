@@ -384,13 +384,41 @@ download_handlers <- function() {
                                PADUS_LAYERS, "padus4.gpkg")
   # PAD-US units by name, for study areas of one managed unit (user 2026-11-12: National Parks first, then refuges, DoD installations).
   # Its own file, so padus4.gpkg (which libraries have read: the home is write-once) stays as it is. A layer per manager:
-  #   nps_units     Unit_Nm of the National Park Service's fee land (Mang_Name NPS, Category Fee; the combined layer holds no
-  #                 Proclamation boundaries, and its wilderness Designation polygons overlap the fee land): the National Parks preset,
+  #   nps_units     Unit_Nm of the National Park Service's fee land (Mang_Name NPS, Category Fee: the land NPS owns, not its
+  #                 Proclamation boundary; its wilderness Designation polygons overlap the fee land): the National Parks preset,
   #                 ids from nps-units-crosswalk.csv (tools/make_nps_units.R)
-  # A new layer (FWS refuges, DoD) changes the file: give the dataset a new version then, so the Data Download adds it as a new edition
-  PADUS_UNIT_LAYERS <- list(nps_units = "SELECT Unit_Nm FROM \"%s\" WHERE Mang_Name = 'NPS' AND Category = 'Fee'")
-  H$PadusUnitsFile <- padus_dataset("PadusUnitsFile", "PAD-US 4.0 management units (National Park Service)", "PAD-US 4.0 state geodatabases (nps_units)",
+  # To-do 59, 2026-11-13 (user: "Build your four plus tribal lands and BLM, separate numbers"), one layer per preset; each keeps
+  # Unit_Nm plus the fields its unit list (tools/make_unit_lists.R) chooses names by, and a name the list leaves out is not read:
+  #   fws_units     FWS fee land (refuges, wetland management districts, waterfowl production areas, hatcheries): FWS Refuges
+  #   dod_units     military installation boundaries (Mang_Name DOD, Des_Tp MIL: PAD-US keeps them as Proclamation boundaries;
+  #                 DoD fee land and easements are not mapped by installation): DoD Installations
+  #   usfs_units    Forest Service fee land (national forests and grasslands): National Forests
+  #   wilderness    designated wilderness (Des_Tp WA), any manager; it overlaps the parks, forests and refuges: Wilderness
+  #   blm_ncl       BLM designations of the National Conservation Lands (monuments, conservation areas, wilderness study areas...)
+  # A new layer changes the file, so the dataset takes a new version and the Data Download adds it as a new edition
+  PADUS_UNIT_LAYERS <- list(nps_units = "SELECT Unit_Nm FROM \"%s\" WHERE Mang_Name = 'NPS' AND Category = 'Fee'",
+                            fws_units = "SELECT Unit_Nm, Des_Tp FROM \"%s\" WHERE Mang_Name = 'FWS' AND Category = 'Fee'",
+                            dod_units = "SELECT Unit_Nm FROM \"%s\" WHERE Mang_Name = 'DOD' AND Des_Tp = 'MIL'",
+                            usfs_units = "SELECT Unit_Nm, Des_Tp FROM \"%s\" WHERE Mang_Name = 'USFS' AND Category = 'Fee'",
+                            wilderness = "SELECT Unit_Nm, Mang_Name FROM \"%s\" WHERE Des_Tp = 'WA' AND Category <> 'Proclamation'",
+                            blm_ncl = "SELECT Unit_Nm, Des_Tp FROM \"%s\" WHERE Mang_Name = 'BLM' AND Category = 'Designation' AND Des_Tp <> 'WA'")
+  H$PadusUnitsFile <- padus_dataset("PadusUnitsFile", "PAD-US 4.0 management units (NPS, FWS, DoD, USFS, wilderness, BLM)",
+                                    sprintf("PAD-US 4.0 state geodatabases (%s)", paste(names(PADUS_UNIT_LAYERS), collapse = ", ")),
                                     PADUS_UNIT_LAYERS, "padus4-units.gpkg")
+  # ---- tribal lands: Census TIGER/Line 2022 American Indian / Alaska Native / Native Hawaiian areas, the land of federally
+  # recognized reservations and their off-reservation trust land (CLASSFP D2, D3, D5, D8) and state reservations (D4); not the
+  # statistical areas (OTSAs, SDTSAs, Alaska Native village and Hawaiian areas), which are not tribal land holdings. One GeoPackage
+  # layer tribal_lands with AIANNHCE as an integer (a reservation and its trust land share it: the Tribal Lands preset dissolves by it)
+  TRIBAL_CLASSES <- c("D2", "D3", "D4", "D5", "D8")
+  H$TribalLandsFile <- list(column = "TribalLandsFile", name = "Tribal lands (TIGER/Line 2022 AIANNH)", national = TRUE,
+    version = "TIGER/Line 2022 (tl_2022_us_aiannh; reservations and trust land)",
+    plan = function(ctx) data.table::data.table(url = "https://www2.census.gov/geo/tiger/TIGER2022/AIANNH/tl_2022_us_aiannh.zip", file = "tl_2022_us_aiannh.zip", fetch = TRUE),
+    finish = function(ctx, items) { dest <- file.path(ctx$place, "tribal-lands.gpkg"); dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE); unlink(dest)
+      src <- sprintf("/vsizip/%s/tl_2022_us_aiannh.shp", normalizePath(items$dest[1], winslash = "/"))
+      sf::gdal_utils("vectortranslate", src, dest, quiet = TRUE, options = c("-nln", "tribal_lands", "-sql",
+        sprintf("SELECT CAST(AIANNHCE AS integer) AS AIANNHCE, NAME, NAMELSAD, CLASSFP, COMPTYP FROM tl_2022_us_aiannh WHERE CLASSFP IN (%s)",
+                paste0("'", TRIBAL_CLASSES, "'", collapse = ", ")), "-nlt", "PROMOTE_TO_MULTI", "-t_srs", "EPSG:5070"))
+      ctx$log(sprintf("  Tribal lands: %s", basename(dest))); dest })
 
   # ==== clipped by the source (phase 4) for a region; for all of CONUS (Home layout National) the sources' national files =====
 

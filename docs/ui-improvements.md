@@ -1867,6 +1867,32 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     already uses Number 10; custom sources now take 11-20).
   - Next: refuges (Mang_Name FWS, Des_Tp NWR) and DoD installations (Mang_Type / Mang_Name DOD) as more layers of the same file:
     that changes the file, so the dataset takes a new version and the Data Download adds it as a new edition.
+  - **Seven more sources, BUILT 2026-11-13** (user: "Build your four plus tribal lands and BLM, separate numbers", "add MSAs as 17,
+    skip CSAs"). Numbers 11-17; custom sources now take 18-20 (Number x 1e8 must fit a 32-bit id, so 20 is the most).
+    | # | Preset (prefix) | Source | Units |
+    | --- | --- | --- | --- |
+    | 11 | FWS Refuges (FWS) | PAD-US layer fws_units: FWS fee land, Des_Tp NWR, NCA, RMA (refuges, conservation areas such as Grasslands WMA, waterfowl production areas, wetland districts); not hatcheries or Farm Service Agency interests | 717 |
+    | 12 | DoD Installations (DoD) | PAD-US layer dod_units: Mang_Name DOD, Des_Tp MIL. PAD-US keeps installations as Proclamation boundaries (DoD fee land is not mapped by installation; the first query, Category <> Proclamation, found only 9 easements), so land inside a boundary counts whoever owns it | 677 |
+    | 13 | National Forests (NF) | PAD-US layer usfs_units: Forest Service fee land, Des_Tp NF or NG, names ending National Forest or National Grassland (not purchase units, experimental areas or "<forest> Other" parcels); inholdings are not part of a forest | 172 |
+    | 14 | Wilderness (Wilderness) | PAD-US layer wilderness: Des_Tp WA, any manager; overlaps the other sources, hence its own | 802 |
+    | 15 | Tribal Lands (Tribal) | TIGER/Line 2022 AIANNH (new dataset TribalLandsFile, study-area/tribal-lands/tribal-lands.gpkg): federally recognized reservations and off-reservation trust land (CLASSFP D2, D3, D5, D8) and state reservations (D4), dissolved by AIANNHCE (the id); not the statistical areas (OTSAs, SDTSAs, ANVSAs, Hawaiian Home Lands) | 334 |
+    | 16 | BLM National Conservation Lands (BLM) | PAD-US layer blm_ncl: BLM designations NM, NCA, WSA (not ACECs, not river corridors) | 538 |
+    | 17 | Metropolitan Areas (Metro) | The Counties polygons through msa-crosswalk.csv (OMB July 2023 delineation, metro CBSAs, county GEOID to CBSA code), dissolved; no new download. Connecticut: old counties to their main planning region's metro (Litchfield, Windham: none; Waterbury-Shelton has no county and is not listed) | 382 |
+    - Lists and crosswalks: `tools/make_unit_lists.R` (stable ids, as tools/make_nps_units.R); the shipped universal lists gain 3,629
+      units (10,235 in all), every existing row unchanged; presets, Studio template rows, endpoints, data sources, citations, strata
+      README, user guide 3.2.
+    - PAD-US units edition 2 (padus4-units.gpkg with the six layers, editions/PAD-US-4-0-state-geodatabases-...-1f466c30). Found:
+      stage lookups of strata polygons ignored editions, so every library would have read edition 1 (nps_units only). Now a preset
+      whose layer is not in the edition picked reads the newest edition that has it (src/shared.R strata_edition_with_layer; the
+      shipped lists follow the package). `tools/new-data-download.R --new-editions` added.
+    - Tests: each source read from the home with one known unit's area (Sacramento NWR 44 km2 once its two duplicate polygons are
+      merged, Fort Irwin 3,057, Lassen NF 4,323, Caribou Wilderness 84, Navajo Nation Reservation 63,333, Grand Staircase-Escalante
+      7,616, Vallejo metro 2,347 with water). Stage 1 in a fresh library (dev/libs/strata-units-test.ssim): Metro: Vallejo, CA with
+      Metropolitan Areas and Tribal Lands as strata, 96,010 cells (2,160 km2, Solano County's land); Wilderness: Lassen Volcanic
+      Wilderness Area with National Forests and Wilderness as strata, 14,149 cells (318 km2; the wilderness is about 320). All checks
+      pass. unit-strata-home, home-editions, page-feeds, metadata-record, release pass.
+    - Not done: a full Build on one of these; National Forests use fee land (PAD-US also has the forests' proclamation boundaries,
+      should the whole boundary be wanted later).
 60. **Transitions a study area does not have: projections should not stop** - TO DO, added 2026-11-12 (user: "This raises a good
     issue about what happens when there are no transitions of a certain type within a study area"). Found on the Lassen Volcanic NP
     test library (to-do 57 step 8): the Projection Setup stopped in stage 10, "Urbanization: only 4 events in the fitting region -

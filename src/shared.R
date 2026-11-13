@@ -124,17 +124,27 @@ read_data_sources <- function(cols, optional = FALSE) {
 # a strata preset with no File on this machine reads its polygons from Data Sources Home (src/strata.R strata_path): the national
 # copy a Data Download scenario puts at the top of the home (looked up with no study area box: study_box() reads strata polygons
 # itself). Recorded in Data Sources Used like the Data Sources the stage read.
-strata_from_home <- function(col) {
+strata_from_home <- function(col, layer = NA_character_) {
   d <- as.data.table(datasheet(prj, ds("DataSource"), lookupsAsFactors = FALSE, optional = TRUE))
   home <- if (nrow(d) && "DataSourcesHome" %in% names(d)) d$DataSourcesHome[1] else NA_character_
   if (is.na(home) || !nzchar(home)) return(NA_character_)
   hp <- home_layout(env$PackageDirectory)[Column == col, HomePath]; if (length(hp) != 1) return(NA_character_)
   pk <- home_pick(home, col, hp)
   if (is.null(pk)) return(NA_character_)
+  pk <- strata_edition_with_layer(home, col, hp, pk, layer)
   if (is.null(.home_cov$home)) .home_cov$home <- home
   if (is.null(.home_cov$read[[col]])) .home_cov$read[[col]] <- list(DataSource = col, Origin = "home", Dir = pk$dir, Path = pk$path)
   pk$path }
 options(lucas.strata.home = strata_from_home)
+# a preset's layer may exist only in a newer edition of its dataset (to-do 59, 2026-11-13: PadusUnitsFile's first edition holds only
+# nps_units; the refuge, DoD, forest, wilderness and BLM layers came with the second). The shipped unit lists follow the package,
+# so a layer missing from the edition picked is read from the newest edition that has it
+strata_edition_with_layer <- function(home, col, hp, pk, layer) {
+  has <- function(p) tryCatch(layer %in% sf::st_layers(p)$name, error = function(e) FALSE)
+  if (is.na(layer) || !nzchar(layer) || has(pk$path)) return(pk)
+  ed <- home_editions(home, col)[nzchar(Edition)][order(-as.numeric(as.POSIXct(Downloaded, tz = "UTC")))]
+  for (i in seq_len(nrow(ed))) { p <- home_path(ed$Dir[i], hp); if (!is.na(p) && has(p)) return(list(dir = ed$Dir[i], path = p)) }
+  pk }
 
 # the study area's box (EPSG:5070, xmin, ymin, xmax, ymax), for choosing among region folders: stage 1's primary strata raster
 # when the scenario has one, else the Study Area units' polygons; all of CONUS with no Study Area

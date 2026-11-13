@@ -437,7 +437,7 @@ Dependencies: none. Pipeline: stages 0, 1, 5, 2, 3, 4, 6, 7, 8.
 
 ### 3.2 Study Area
 
-The study area is one or more units of one kind: states, counties, HUCs, EPA ecoregions, pyromes, ecodivisions, federal lands or GAP status. All of CONUS is the default.
+The study area is one or more units of one kind: states, counties, HUCs, EPA ecoregions, pyromes, ecodivisions, federal lands, GAP status, National Park Service units, FWS refuges, DoD installations, national forests, wilderness areas, tribal lands, BLM National Conservation Lands or metropolitan areas. All of CONUS is the default.
 
 1. Choose the **LUCAS Core (model builder)** tab.
 2. Choose **LUCAS Core > Study Area**.

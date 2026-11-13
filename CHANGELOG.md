@@ -45,6 +45,11 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   Same as above for new and existing libraries. No change to results.
 
 ### Added
+- Seven study area and strata sources (Stratum Sources presets 11-17): FWS Refuges, DoD Installations, National Forests,
+  Wilderness, Tribal Lands, BLM National Conservation Lands and Metropolitan Areas. The first five and BLM come from PAD-US 4.0 (a
+  new edition of the PAD-US units download), Tribal Lands from Census TIGER/Line 2022 (a new Data Download dataset), Metropolitan
+  Areas from the Counties polygons grouped by the OMB 2023 metro delineation. Custom sources now take Numbers 18-20. Existing
+  libraries get them with `tools/new-library.R <library> --rebuild-strata`, and a Data Download with Fetch new editions.
 - The Reforestation transition: group Reforestation, one type per forest class ("Reforestation: <type>"), pathways from every
   natural non-forest class to every forest class, age reset; no carbon flows, so the grass or shrub carbon carries over and the
   forest grows from age 0 (`tools/make_reforestation.R`). Historical runs (stage 6): a cell reforests in the year NLCD shows it as
@@ -75,6 +80,8 @@ it was meant to. A library already at 1.3 needs no update; switch its lucasCore 
 (`SyncroSim.Console.exe --add --package --pkg=lucasCore --ver=1.3.1 --lib=<library.ssim>`). Builds and results are as in 1.3.0.
 
 ### Fixed
+- Strata polygons read from Data Sources Home ignored newer editions of a dataset, so a preset whose layer exists only in a newer
+  edition (the PAD-US units file) could not be read. A preset now reads the newest edition that has its layer.
 - Build stage 6: pathway rows written by ecodivision (`fire.csv` and `post-disturbance.csv`: reburn proportions, return window and
   conversion age) lost their ecodivision, so every ecodivision's rows applied everywhere. Each disturbed forest class had about 19
   return pathways, so its yearly return chance was drawn 19 times: on Lassen 90% of a burn came back in its first eligible year

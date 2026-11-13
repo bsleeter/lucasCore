@@ -68,7 +68,8 @@ strata_home_column <- function(preset, pkgdir) {
 strata_path <- function(s, pkgdir) {
   f <- strata_file(s$File, pkgdir); if (!is.na(f) && file.exists(f)) return(f)
   col <- strata_home_column(s$Preset, pkgdir); look <- getOption("lucas.strata.home")
-  p <- if (!is.na(col) && is.function(look)) look(col) else NA_character_
+  lay <- if (!is.na(col)) strata_presets(pkgdir)[[s$Preset]]$Layer else NA   # (the home copy is read with the preset's layer)
+  p <- if (!is.na(col) && is.function(look)) { if (length(formals(look)) > 1) look(col, lay) else look(col) } else NA_character_
   if (!is.na(p) && file.exists(p)) return(structure(p, home = TRUE))
   stop(sprintf("strata source %s: %s", s$Preset,
     if (!is.na(col)) sprintf("%snot in Data Sources Home: run a Data Download scenario (dataset %s), or set the source's File on the Stratum Sources page",

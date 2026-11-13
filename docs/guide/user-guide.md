@@ -146,7 +146,7 @@ When lucasCore is added, it fills the **Definitions** project with everything a 
 | State classes, from NLCD land cover and FIA forest type groups | ST-Sim > States > State Class | 51 |
 | Transition types and groups: land use, harvest, fire, insects | ST-Sim > Transitions | 143 types, 15 groups |
 | Stock and flow types: the 14 carbon pools and their flows | ST-Sim > Advanced | 23 stocks, 54 flows |
-| Stratum Sources (states, counties, HUCs, ecoregions, pyromes, federal lands, GAP status, National Park Service units) | LUCAS Core (model builder) > LUCAS Core > Stratum Sources | 10 |
+| Stratum Sources (states, counties, HUCs, ecoregions, pyromes, federal lands, GAP status, National Park Service units, FWS refuges, DoD installations, national forests, wilderness, tribal lands, BLM National Conservation Lands, metropolitan areas) | LUCAS Core (model builder) > LUCAS Core > Stratum Sources | 10 |
 | LOCA2 climate scenarios, models and replicates | LUCAS Core (model builder) > LUCAS Core | 3, 10 and 6 |
 
 lucasCore also fills two lists that the Carbon Assumptions pages (chapter 3) pick from: the CBM-CFS3 ecozones and species types, with the turnover and decay rates each one sets.
@@ -439,7 +439,7 @@ Dependencies: none. Pipeline: stages 0, 1, 5, 2, 3, 4, 6, 7, 8.
 
 ### 3.2 Study Area
 
-The study area is one or more units of one kind: states, counties, HUCs, EPA ecoregions, pyromes, ecodivisions, federal lands or GAP status. All of CONUS is the default.
+The study area is one or more units of one kind: states, counties, HUCs, EPA ecoregions, pyromes, ecodivisions, federal lands, GAP status, National Park Service units, FWS refuges, DoD installations, national forests, wilderness areas, tribal lands, BLM National Conservation Lands or metropolitan areas. All of CONUS is the default.
 
 1. Choose the **LUCAS Core (model builder)** tab.
 2. Choose **LUCAS Core > Study Area**.

@@ -3,7 +3,8 @@
 # =============================================================================
 # Usage: Rscript tools/new-library.R <library.ssim> [--project=Definitions] [--rebuild-strata] [--rebuild-climate] [--loca2=<folder>]
 #   Strata sources: every preset in defaults/strata/presets.csv (FIA Ecodivisions, States, Counties, HUC6, HUC8, EPA Level III
-#                              Ecoregions, Pyromes, Federal Lands, GAP Status) becomes a Stratum Sources row, and the stsim Secondary
+#                              Ecoregions, Pyromes, Federal Lands, GAP Status, National Parks, FWS Refuges, DoD Installations, National
+#                              Forests, Wilderness, Tribal Lands, BLM National Conservation Lands, Metropolitan Areas) becomes a Stratum Sources row, and the stsim Secondary
 #                              and Tertiary Strata lists hold every unit of every source. Scenarios pick their sources in Build Options.
 #   --rebuild-strata           rewrite Stratum Sources and the unit lists (after adding a custom source row with a new Number;
 #                              existing unit ids keep their meaning, so scenario data stays valid)
