@@ -163,6 +163,7 @@ namespace lucasCoreUI
             // ("Reforestation: <Y label>", a wetland twin "Reforestation: Wetland <type>"). (The Reforestation Options sheet is a new
             // table, which SyncroSim adds by itself.)
             AddColumn(store, "lucasCore_DataSource", "BpsFile", "TEXT");
+            AddColumn(store, "lucasCore_DataSource", "RcmapCoverFolder", "TEXT");
             AddColumn(store, "lucasCore_OutputLandCoverLayers", "ReforestTypeFileName", "TEXT");
             AddColumn(store, "lucasCore_OutputLandCoverLayers", "BpsForestShareFileName", "TEXT");
             AddColumn(store, "lucasCore_OutputLandCoverLayers", "StartRuleFileName", "TEXT");

@@ -19,6 +19,7 @@
 		<column name="Evt2001File" displayName="LANDFIRE EVT 2001 (retired 2026-11-01: not read; LANDFIRE no longer publishes it)" dataType="String" isOptional="True" isVisible="False"/>
 		<column name="Evt2016File" displayName="LANDFIRE EVT 2016 (LF 2.0.0)" dataType="String" isOptional="True"/>
 		<column name="RcmapFile" displayName="RCMAP Vegetation State 1985 (USGS, doi 10.5066/P13OMU52)" dataType="String" isOptional="True"/>
+		<column name="RcmapCoverFolder" displayName="RCMAP Cover Time Series Folder (sagebrush/ and shrub/ rcmap_component_year.tif, 1985-2025; USGS, doi 10.5066/P138CYEL)" dataType="String" isOptional="True"/>
 		<column name="CcapFile" displayName="C-CAP Land Cover 2001" dataType="String" isOptional="True"/>
 		<column name="StandAgeFile" displayName="NASA CMS Forest Age 1990" dataType="String" isOptional="True"/>
 		<column name="ForestTypeGroupFolder" displayName="USFS Forest Type Group Map Folder (NFCMS regional *_ForestType.tif)" dataType="String" isOptional="True"/>

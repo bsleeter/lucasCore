@@ -168,6 +168,26 @@ download_handlers <- function() {
       zip_raster(ctx, items, 1, "Data/TreeMap2016.tif", file.path(ctx$place, "TreeMap2016.tif"))
       zip_dbf(ctx, items, 1, "Data/TreeMap2016.tif.vat.dbf", file.path(ctx$place, "TreeMap2016.tif.vat.dbf")); ctx$place })
 
+  # ---- RCMAP fractional cover time series: sagebrush and all shrubs, every year 1985-2025 (to-do 57 step 7: how shrub cover comes
+  # back after fire) ---------------------------------------------------------------------------------------------------------------
+  # MRLC's direct bundles of USGS RCMAP V8 (Rigge, Bunde and Postma 2026, doi 10.5066/P138CYEL; ScienceBase serves the same files only
+  # through its JavaScript file manager): one zip per component and decade, each holding rcmap_<component>_<year>.tif (percent cover
+  # of the 30 m pixel, western US) and the metadata. National (user, 2026-11-12: kept whole at the top of the home so no Build fetches
+  # it again): land-cover/rcmap-cover/<component>/rcmap_<component>_<year>.tif. Non-sagebrush shrub is shrub minus sagebrush
+  RCMAP_TS <- "https://www.mrlc.gov/downloads/sciweb1/shared/mrlc/data-bundles"
+  RCMAP_COMP <- c(Sagebrush = "sagebrush", Shrub = "shrub"); RCMAP_PER <- list(`1985_1994` = 1985:1994, `1995_2004` = 1995:2004, `2005_2014` = 2005:2014, `2015_2025` = 2015:2025)
+  H$RcmapCoverFolder <- list(column = "RcmapCoverFolder", name = "RCMAP fractional cover time series (sagebrush, shrub)", national = TRUE, version = "V8, 1985-2025 (10.5066/P138CYEL)",
+    plan = function(ctx) { x <- data.table::CJ(comp = names(RCMAP_COMP), per = names(RCMAP_PER))
+      x[, `:=`(url = sprintf("%s/%s_%s.zip", RCMAP_TS, comp, per), file = sprintf("%s_%s.zip", comp, per), fetch = TRUE)][] },
+    finish = function(ctx, items) {
+      for (i in seq_len(nrow(items))) { k <- RCMAP_COMP[[items$comp[i]]]; d <- file.path(ctx$place, k); dir.create(d, recursive = TRUE, showWarnings = FALSE)
+        m <- sprintf("rcmap_%s_%d.tif", k, RCMAP_PER[[items$per[i]]])
+        ok <- tryCatch({ utils::unzip(items$dest[i], files = m, exdir = d); all(file.exists(file.path(d, m)) & file.size(file.path(d, m)) > 0) }, error = function(e) FALSE, warning = function(w) FALSE)
+        if (!ok) { unlink(file.path(d, m)); system2("tar", c("-xf", shQuote(items$dest[i]), "-C", shQuote(d), shQuote(m)))   # (Windows' tar reads zip64)
+          if (!all(file.exists(file.path(d, m)))) stop(sprintf("could not unpack %s from %s", paste(m[!file.exists(file.path(d, m))], collapse = ", "), items$file[i]), call. = FALSE) }
+        unlink(items$dest[i]); ctx$log(sprintf("  RCMAP %s %s: %d years", k, sub("_", "-", items$per[i]), length(m))) }
+      ctx$place })
+
   # ---- FIA DataMart: four tables of every state, and the reference tables (national: the growth curves use every state) ---
   H$FiaDataMartFolder <- list(column = "FiaDataMartFolder", name = "FIA DataMart (all states)", national = TRUE, version = "FIADB (replaced in place)",
     note = "All 48 states: PLOT, COND, TREE, COND_DWM_CALC; FIADB_REFERENCE.zip kept zipped",
