@@ -9,7 +9,7 @@
 # Usage: Rscript tests/unit-treemap.R
 # =============================================================================
 pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
-DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))
+DS <- Sys.getenv("LUCAS_DATA_HOME", NA); if (is.na(DS)) DS <- Filter(dir.exists, c("E:/lucasData", file.path(pkg, "dev/libs/Data Sources")))[1]   # the main data home, else the repository copy
 suppressPackageStartupMessages({ library(data.table); library(terra) }); ok <- TRUE
 expect <- function(what, cond, detail = "") { cat(sprintf("%s  %s %s\n", if (isTRUE(cond)) "PASS" else "FAIL", what, detail)); if (!isTRUE(cond)) ok <<- FALSE }
 source(file.path(pkg, "src", "treemap.R"))

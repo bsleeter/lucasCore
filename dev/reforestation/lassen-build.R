@@ -10,7 +10,7 @@ d <- datasheet(P, "lucasCore_DataSource", optional = TRUE, empty = FALSE)   # th
 if (!nrow(d) || is.na(d$DataSourcesHome[1])) saveDatasheet(P, data.frame(DataSourcesHome = "E:/lucasData"), "lucasCore_DataSource", append = FALSE, force = TRUE)
 S <- scenario(P, nm); dependency(S) <- sc[Name %in% c("Stock-Flow Definitions", "Carbon Assumptions") & IsResult == "No", ScenarioId]
 names_all <- c(`0` = "0 - Stock-Flow Definitions", `1` = "1 - Study Area and Strata", `5` = "5 - Initial Conditions", `2` = "2 - Fit Growth Curves", `3` = "3 - Carbon Flows",
-               `4` = "4 - Spin-up and Initial Stocks", `6` = "6 - Historical Transitions", `7` = "7 - Climate Multipliers", `8` = "8 - Initial Stock Maps")
+               `4` = "4 - Spin-up and Initial Stocks", `6` = "6 - Historical Transitions", `7` = "7 - Climate Multipliers", `8` = "8 - Initial Stock Maps", `12` = "12 - Build Figures")
 saveDatasheet(S, data.frame(StageNameId = names_all[as.character(st)], RunOrder = seq_along(st)), "core_Pipeline")
 saveDatasheet(S, data.frame(Resolution = 150L, StartYear = 1985L, EndYear = 2023L, SecondarySourceId = "States", TertiarySourceId = "Federal Lands"), "lucasCore_BuildOptions")
 saveDatasheet(S, data.frame(UnitId = "NPS: Lassen Volcanic National Park"), "lucasCore_StudyArea")
