@@ -18,6 +18,11 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   percentile of the years forest takes to come back after a dated clearcut or high-severity fire). Cells that come back before
   the cutoff stay forest with the regrowth age, as do cells that flicker between forest and shrub or grass. On Lassen Volcanic
   National Park (150 m) 117 of 6,591 such cells reforest, and the start has 0.8% less live carbon. Changes Build results.
+- Post-disturbance settings fitted (`defaults/transitions/post-disturbance-settings.csv`, to-do 57 step 7). Forest by ecodivision
+  from MTBS high-severity loss followed in NLCD (`tools/fit_post_disturbance.R`). Shrub classes from RCMAP sagebrush and shrub
+  cover after moderate and high severity fire on NLCD shrub pixels (`tools/fit_shrub_post_disturbance.R`): Sage and Native Sage
+  Steppe window 27 years, 43% back; Invaded Sage Steppe kept slower (0.6 times the return probability, reburns convert); Non-sage
+  20 years, 79% back; Chaparral 8 years, 87% back, reburn conversion 0.10. Changes Build and Run results.
 - Build stage 5: a check that every forest cell has an age failed when a fire perimeter started cells in a disturbed class; it now
   allows the disturbed classes an age, and names any failing cells by class.
 

@@ -1441,6 +1441,26 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       now downloaded: see below), forest type within an ecodivision. RCMAP V8 sagebrush and shrub cover 1985-2025 downloaded
       2026-11-12 to the national copy <home>/land-cover/rcmap-cover/<comp>/ (82 yearly tifs, 198 GB, 116 min; Data Download
       scenario in the Lassen library; manifest <home>/records/RcmapCoverFolder-manifest.csv), so later Builds need not fetch it.
+    - **Step 7 shrub DONE 2026-11-12 (user: "go for it" on the recommendation: write as fitted, invaded steppe kept slower,
+      chaparral conversion provisional).** `tools/fit_shrub_post_disturbance.R --severity=3,4 --write`: RCMAP sagebrush (sage family)
+      or shrub cover after MTBS moderate and high severity wildfire 1986-2010, up to 60 fires per ecodivision; "back" = cover at half
+      its pre-fire level two years running; only pixels NLCD shows as shrub (52) the year before (RCMAP alone also counted shrub
+      understory in forest: only 34% of its Non-sage and 54% of its Chaparral pixels were NLCD shrub). 2.1 M pixels in 551 fires.
+      | Class | Window | ReturnAgeMin | ReturnProbability | ReburnConversion | back by window | was (provisional) |
+      | Sage, Native Sage Steppe | 27 | 8 | 0.028 | 0.98 | 43% | 35 / 10 / 0.05 / 0.9 |
+      | Invaded Sage Steppe | 27 | 8 | 0.017 (0.6 x the sage fit) | 1 | - | 35 / 10 / 0.03 / 0.95 |
+      | Non-sage | 20 | 2 | 0.080 | 0.69 | 79% | 12 / 2 / 0.25 / 0.8 |
+      | Chaparral | 8 | 2 | 0.252 | 0.10 | 87% | 12 / 2 / 0.3 / 0.8 |
+      Severity barely matters: high only (396 fires) and moderate only (550) give windows within 2 years and the same curves, so
+      moderate-severity shrub fires lose and regain cover as high-severity ones do (to-do 61). NLCD on the same pixels (share grass
+      1 / 5 / 10 / 20 years after): Chaparral 0.54 / 0.35 / 0.08 / 0.06, Non-sage 0.38 / 0.34 / 0.23 / 0.12, Sage family
+      0.59 / 0.60 / 0.57 / 0.35; so NLCD's post-fire shrub-to-grass is mostly temporary in chaparral and non-sage, and lasting only in
+      sage, where RCMAP has 25% of the sagebrush back at 20 years while NLCD already calls 64% shrub (other shrubs first). Curves in
+      `dev/fire/shrub-post-disturbance-fit.csv`, the NLCD comparison in `dev/fire/shrub-post-fire-nlcd.csv`. Pathways regenerated;
+      unit-post-disturbance 24 checks. Open: RCMAP cannot separate native from invaded steppe (invaded kept slower by judgement; could
+      be fitted on the annual-grass layer stage 5 uses); chaparral's 0.10 conversion of pixels that reburn before recovering is low
+      against the type-conversion literature (repeat fires within about 5 years are rare in a 1986-2010 sample): check on RCMAP
+      annual herbaceous cover (to-do 61). Not yet run in a Build.
     - **Step 6 DONE 2026-11-12 (figures; user chose three of four proposed: not the settings chart).** Build Figures (stage 12):
       "How forest starts: regrowth and reforestation": (a) how each natural cell NLCD shows as forest only later starts (regrowth
       with its NLCD age, disturbed at the start, reforests later by slow recovery or encroachment, or forest with its source age),
@@ -1836,3 +1856,10 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       also mean the shrubs are gone?
     - options: treat moderate and high as stand-replacing for shrub classes; a per-class severity map (stage 6 and the projection's
       severity shares); RdNBR or RAVG instead of the MTBS classes.
+    - First findings 2026-11-12 (to-do 57 step 7 shrub fit, 907 sampled western fires 1986-2010): only 396 had any high-severity
+      pixel that lost shrub cover, 550 had moderate; and moderate-severity pixels lose and regain RCMAP shrub cover as high-severity
+      ones do (same return curves and windows within 2 years). This supports treating moderate and high as stand-replacing for the
+      shrub classes (stage 6 and projections), not yet done.
+    - Chaparral type conversion: the fitted ReburnConversion (0.10) says most chaparral that reburns before recovering still comes
+      back; check on RCMAP annual herbaceous (and herbaceous) cover, a second national download (Data Source RcmapCoverFolder
+      components), and against the short-interval reburn literature.

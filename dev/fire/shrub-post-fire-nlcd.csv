@@ -1,0 +1,91 @@
+class,off,g,share
+Non-sage,1,shrub,0.6
+Non-sage,1,developed/ag,0
+Sage family,1,shrub,0.41
+Non-sage,1,grass,0.38
+Non-sage,1,forest,0.01
+Non-sage,1,other,0
+Sage family,1,grass,0.59
+Sage family,1,other,0
+Non-sage,1,barren,0
+Sage family,1,developed/ag,0
+Sage family,1,forest,0
+Sage family,1,barren,0
+Chaparral,1,shrub,0.45
+Chaparral,1,grass,0.54
+Chaparral,1,forest,0
+Chaparral,1,other,0
+Chaparral,1,developed/ag,0
+Chaparral,1,barren,0
+Non-sage,5,shrub,0.64
+Non-sage,5,developed/ag,0
+Sage family,5,shrub,0.4
+Non-sage,5,grass,0.34
+Non-sage,5,forest,0.01
+Sage family,5,grass,0.6
+Sage family,5,developed/ag,0
+Non-sage,5,other,0
+Sage family,5,other,0
+Non-sage,5,barren,0
+Sage family,5,forest,0
+Sage family,5,barren,0
+Chaparral,5,shrub,0.64
+Chaparral,5,grass,0.35
+Chaparral,5,forest,0.01
+Chaparral,5,other,0
+Chaparral,5,developed/ag,0
+Chaparral,5,barren,0
+Non-sage,10,shrub,0.74
+Non-sage,10,developed/ag,0
+Non-sage,10,forest,0.03
+Non-sage,10,other,0
+Sage family,10,shrub,0.42
+Non-sage,10,grass,0.23
+Sage family,10,grass,0.57
+Sage family,10,developed/ag,0
+Sage family,10,other,0
+Sage family,10,forest,0
+Non-sage,10,barren,0
+Chaparral,10,shrub,0.91
+Chaparral,10,forest,0.01
+Chaparral,10,grass,0.08
+Chaparral,10,other,0
+Chaparral,10,developed/ag,0
+Chaparral,10,barren,0
+Sage family,10,barren,0
+Non-sage,15,shrub,0.81
+Non-sage,15,developed/ag,0
+Non-sage,15,forest,0.03
+Non-sage,15,other,0
+Sage family,15,shrub,0.46
+Non-sage,15,grass,0.15
+Sage family,15,grass,0.54
+Sage family,15,developed/ag,0
+Sage family,15,other,0
+Sage family,15,forest,0
+Non-sage,15,barren,0
+Chaparral,15,shrub,0.9
+Chaparral,15,grass,0.07
+Chaparral,15,forest,0.02
+Chaparral,15,developed/ag,0
+Chaparral,15,other,0
+Chaparral,15,barren,0
+Sage family,15,barren,0
+Non-sage,20,shrub,0.81
+Non-sage,20,grass,0.12
+Non-sage,20,forest,0.06
+Sage family,20,shrub,0.64
+Non-sage,20,developed/ag,0
+Sage family,20,developed/ag,0
+Sage family,20,grass,0.35
+Non-sage,20,other,0
+Sage family,20,other,0
+Sage family,20,forest,0
+Non-sage,20,barren,0
+Chaparral,20,shrub,0.88
+Chaparral,20,forest,0.06
+Chaparral,20,developed/ag,0.01
+Chaparral,20,grass,0.06
+Chaparral,20,barren,0
+Chaparral,20,other,0
+Sage family,20,barren,0.01
