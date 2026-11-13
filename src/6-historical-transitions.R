@@ -64,7 +64,8 @@ check(STAGE, "pathway state classes and transition types are in the stsim lists"
               if (length(badc) || length(badt)) "a library made before they were added needs tools/sync-library.R"), collapse = " | "))
 if (length(badc) || length(badt)) finish_checks()
 num <- function(x) suppressWarnings(as.numeric(x))
-tr <- pw[, .(StateClassIdSource, StateClassIdDest, TransitionTypeId, Probability = num(Probability), Proportion = num(Proportion), AgeMin = num(AgeMin),
+if (!"StratumIdSource" %in% names(pw)) pw[, StratumIdSource := NA_character_]
+tr <- pw[, .(Eco = StratumIdSource, StateClassIdSource, StateClassIdDest, TransitionTypeId, Probability = num(Probability), Proportion = num(Proportion), AgeMin = num(AgeMin),
              AgeMax = num(AgeMax), AgeRelative = num(AgeRelative), AgeReset = ifelse(is.na(AgeReset), NA, toupper(AgeReset) %in% c("YES", "TRUE")),
              TSTMin = num(TSTMin), TSTMax = num(TSTMax), TSTRelative = num(TSTRelative))]
 # minimum harvest ages (to-do 34): the package's FIA values (defaults/transitions/harvest-age.csv, tools/calibrate-harvest-age.R: the
@@ -80,6 +81,10 @@ hopt <- read_ds("HarvestAgeOptions"); hv <- function(k, d) if (nrow(hopt) && k %
 H_MAPS <- as.logical(hv("UseStudyArea", TRUE)); H_MAP_KM2 <- num(hv("MinMapArea", 1)); H_OFFSET <- num(hv("SelectionOffset", 10)); H_FLOOR <- num(hv("SelectionFloor", 5))
 badh <- rbind(ha[, .(StateClassId, TransitionTypeId)], if (nrow(mh)) mh[, .(StateClassId, TransitionTypeId)])[!paste(StateClassId, TransitionTypeId) %in% pw[, paste(StateClassIdSource, TransitionTypeId)]]
 check(STAGE, "every minimum harvest age has a pathway", !nrow(badh), paste(unique(badh[, paste(StateClassId, TransitionTypeId)]), collapse = "; "))
+# pathway rows by ecodivision (fire.csv and post-disturbance.csv: reburn proportions, return window and conversion by ecodivision,
+# to-do 57): only the study area's ecodivisions' rows are kept. They used to lose their ecodivision here, so every ecodivision's rows
+# applied everywhere (Lassen chain 2026-11-12: 19 return rows per disturbed class, conversion from the earliest window)
+tr <- tr[is.na(Eco) | Eco %in% eco_here]
 tr[, StratumIdSource := NA_character_]
 loc <- read_default("transitions", "state-locations.csv")[StateClassIdSource %in% scl$Name, .(StateClassIdSource, StateClassIdDest, Location)]
 say("Pathways: %d rows in %d sets (%s); %d transition types", nrow(tr), uniqueN(pw$Set), paste(unique(pw$Set), collapse = ", "), uniqueN(pw$TransitionTypeId))
@@ -290,18 +295,22 @@ sp <- unique(he[, .(StateClassIdSource = StateClassId, TransitionTypeId)])
 # Strata are used everywhere or nowhere: with any ecodivision harvest-age row, every pathway (probabilistic and deterministic) is written
 # once per ecodivision here and none is blank-stratum. ST-Sim takes a cell's stratum rows IN PLACE OF the blank-stratum rows, so a mix
 # hides pathways: P26 Build 50 had harvest rows by ecodivision for two types and its historical run lost half its fire and urbanization.
-if (nrow(sp)) {
-  tr <- rbindlist(lapply(eco_here, function(e) copy(tr)[, StratumIdSource := e]))
+# An ecodivision's own rows for a class and type replace the blank rows for that class and type there.
+if (nrow(sp) || any(!is.na(tr$Eco))) {
+  tr <- rbindlist(lapply(eco_here, function(e) { own <- tr[Eco %in% e]; k <- paste(own$StateClassIdSource, own$TransitionTypeId)
+    rbind(own, tr[is.na(Eco) & !paste(StateClassIdSource, TransitionTypeId) %in% k])[, StratumIdSource := e] }))
   tr[he, on = .(StratumIdSource = Ecodivision, StateClassIdSource = StateClassId, TransitionTypeId), AgeMin := i.AgeMin]
   loc <- rbindlist(lapply(eco_here, function(e) copy(loc)[, StratumIdSource := e])) }
-setcolorder(tr, "StratumIdSource")
+tr[, Eco := NULL]; setcolorder(tr, "StratumIdSource")
 tr <- tr[, names(tr)[vapply(tr, function(v) !all(is.na(v)), TRUE)], with = FALSE]
 by_eco <- "StratumIdSource" %in% names(tr)
-pset <- function(x, e) x[StratumIdSource == e, sort(paste(StateClassIdSource, TransitionTypeId))]
+pset <- function(x, e) x[StratumIdSource == e, sort(unique(paste(StateClassIdSource, TransitionTypeId)))]   # (an ecodivision's own rows may number differently)
 check(STAGE, "pathways use strata consistently (every row blank, or every ecodivision has every pathway)", !by_eco ||
       (!anyNA(tr$StratumIdSource) && setequal(unique(tr$StratumIdSource), eco_here) && all(vapply(eco_here, function(e) identical(pset(tr, e), pset(tr, eco_here[1])), TRUE)) &&
        "StratumIdSource" %in% names(loc) && !anyNA(loc$StratumIdSource) && setequal(unique(loc$StratumIdSource), eco_here)),
       if (by_eco) sprintf("%d pathway rows over %d ecodivisions", nrow(tr), length(eco_here)) else "no ecodivision rows")
+dup <- tr[, .N, by = c(intersect(c("StratumIdSource", "StateClassIdSource", "StateClassIdDest", "TransitionTypeId"), names(tr)))][N > 1]
+check(STAGE, "no pathway is written twice (same stratum, classes and type)", !nrow(dup), paste(head(dup[, paste(StateClassIdSource, TransitionTypeId, N, sep = " / ")], 5), collapse = "; "))
 if (by_eco) say("Pathways by ecodivision (an ecodivision harvest age): %d rows, %d deterministic, in each of %s", nrow(tr) / length(eco_here), nrow(loc) / length(eco_here), paste(eco_here, collapse = ", "))
 here <-ha[(is.na(Ecodivision) | Ecodivision %in% eco_here) & StateClassId %in% unique(cn) & TransitionTypeId %in% c(CC, SEL)][order(StateClassId, TransitionTypeId, Ecodivision)]
 say("Minimum harvest ages (study area maps %s, cuts after %s, at least %g km2; selection at most clearcut - %g yr, at least %g yr):", if (isTRUE(H_MAPS)) "on" else "off", if (exists("AGE_YEAR")) AGE_YEAR else "-", H_MAP_KM2, H_OFFSET, H_FLOOR)

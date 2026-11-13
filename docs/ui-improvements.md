@@ -1702,6 +1702,25 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
            outputs, which this does not change. Open for the 1.4.0 release: run library update 1.4 on a copy of a 1.3 library, merged
            with main's own 1.4 update (step 5); the starter library rebuilt (tools/build_starter.R) for BpsFile, the new options and
            National Parks; the guide's transition type and group counts (143 and 15, already behind the post-disturbance classes).
+        11. **Full chain on Lassen (user, 2026-11-12: "Go ahead with the full Lassen test").** DONE 2026-11-13 with
+           `dev/reforestation/lassen-chain.sh` (Build stages 1, 5, 2, 3, 4, 6, 7, 8, 12; historical 1985-2023; Projection Setup with
+           only Reforestation fitted; projection to 2050, 1 iteration; Run Figures of both). Three bugs found and fixed:
+           - Historical runs returned 3 km2 to forest in 2012 and 1.5 in 2021, the years they burned (NLCD still shows forest in the
+             fire year): return pathways now start at age 2 (8442020).
+           - Stage 10 stopped fitting the Reforestation surface (92 events; a covariate had fewer distinct values than its smooth's
+             k): k now shrinks to the data, a covariate under 4 values is dropped (8442020).
+           - Stage 6 dropped the ecodivision of the by-ecodivision pathway rows (fire.csv reburns, post-disturbance.csv return,
+             conversion), so all 19 ecodivisions' rows applied everywhere: each disturbed forest class had 19 return pathways, and
+             90% of a burn returned in its first eligible year (1-year experiments: return multiplier 0 gave 0 ha; adjacency fixed at
+             0.5 still gave 65% of the age-13 cells, i.e. the 0.071 chance drawn about 19 times). Conversion started at the
+             earliest window (12 years; Lassen's is 25), reburn proportions stacked. Now only the study area's rows are kept, an
+             ecodivision's own rows replace the blank rows for that class and type, and a Build check stops on a duplicate pathway.
+             Every library built with the by-ecodivision settings (since 2026-11-12) needs a new Build.
+           Final chain: Build 72 (no duplicate pathways; 1,464 pathway rows for Mediterranean Mountains), historical 74, setup 78,
+           projection 80, figures 76 and 82. Reforestation: 117 of 117 cells in the expected years (117 transitions), 116 forest in
+           2023. No return in the fire years. Projection: back to forest 33 km2 over 2024-2050, steady (0.4-2.7 km2 a year)
+           instead of pulses; conversion at the 25-year window (5.6 km2 in 2037 from the 2012 burn, 14 in 2046 from 2021); disturbed
+           forest peaks at 62 km2 after the drawn 2031 fire and falls to 23 by 2050.
       - **Decided (user, 2026-11-12), for the steps above:**
         - Flickering open woodland (natural cells forest in some years but under 2/3 of the years after; about half of P26's
           rule cells) starts as forest, as now, with its CMS or TreeMap age (step 4).

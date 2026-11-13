@@ -62,6 +62,14 @@ it was meant to. A library already at 1.3 needs no update; switch its lucasCore 
 (`SyncroSim.Console.exe --add --package --pkg=lucasCore --ver=1.3.1 --lib=<library.ssim>`). Builds and results are as in 1.3.0.
 
 ### Fixed
+- Build stage 6: pathway rows written by ecodivision (`fire.csv` and `post-disturbance.csv`: reburn proportions, return window and
+  conversion age) lost their ecodivision, so every ecodivision's rows applied everywhere. Each disturbed forest class had about 19
+  return pathways, so its yearly return chance was drawn 19 times: on Lassen 90% of a burn came back in its first eligible year
+  instead of 7% a year. Conversion started at the earliest window of any ecodivision (12 years instead of 25 there), and reburn
+  proportions stacked. Only the study area's ecodivisions' rows are kept now, and a Build check stops on any pathway written twice.
+  Changes Build and Run results; libraries built before this need a new Build.
+- Historical runs no longer return disturbed land to forest in the year it burned (return pathways from age 2), and Projection
+  Setup (stage 10) fits a suitability surface whose covariate has fewer distinct values than its smooth term allows.
 - Library update 1.3 stopped with "SQL logic error, near "s": syntax error", and the library stayed at 1.2. The update's
   description had an apostrophe in it, and SyncroSim writes that text into the library without quoting it.
 
