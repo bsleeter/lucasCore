@@ -144,3 +144,12 @@ TransitionGroup,Post-disturbance: Shrub Return,"Return of disturbed shrubland to
 TransitionGroup,Post-disturbance: Conversion,"Conversion of disturbed land that has not returned by the end of its window.",
 TransitionGroup,Reforestation,"Natural non-forest land (barren, shrub, grass or emergent wetland) that becomes forest with no fire or harvest behind it: slow recovery after a disturbance before the record, and encroachment onto land whose potential vegetation is not forest. Historical runs follow the annual NLCD (forest two years running); projections take the recent years' area and place it by a fitted surface (to-do 57).",NlcdFolder
 TransitionType,Reforestation: *,"Natural non-forest land becomes the forest type ""{*}"", the type stage 5 gives the cell (its own, or its neighbours'); a new stand from age 0, the grass or shrub carbon carried over.",BpsFile
+TransitionType,Management: Replanting,"Planting after a disturbance (Management Actions page): a disturbed forest class back to its forest type at age 0, without site preparation.",
+TransitionType,Management: Replanting (failed),"A planting that did not take (the Management Actions page's survival): the cell stays in its disturbed class with its age, where it can still return or convert.",
+TransitionType,Management: Replanting after Burn Site Prep,"Planting after pile-and-burn site preparation (its carbon: the Site Preparation: Burn group).",
+TransitionType,Management: Replanting after Burn Site Prep (failed),"A planting after pile-and-burn site preparation that did not take: the site preparation carbon flows, then the cell stays disturbed.",
+TransitionType,Management: Replanting after Mechanical Site Prep,"Planting after mechanical site preparation (mastication; its carbon: the Site Preparation: Mechanical group).",
+TransitionType,Management: Replanting after Mechanical Site Prep (failed),"A planting after mechanical site preparation that did not take: the site preparation carbon flows, then the cell stays disturbed.",
+TransitionGroup,Management: Replanting,"Every replanting transition, planted or failed, with or without site preparation (to-do 58).",
+TransitionGroup,Site Preparation: Burn,"Replanting after pile-and-burn site preparation: shrub and herb cover burned, roots killed, half the litter and fine woody debris and 30% of the branch snags burned.",
+TransitionGroup,Site Preparation: Mechanical,"Replanting after mechanical site preparation (mastication): shrub and herb cover to litter and fine woody debris, roots killed.",

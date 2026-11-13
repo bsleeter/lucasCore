@@ -14,3 +14,11 @@ Post-disturbance: Forest Return [Type],Yes,Yes
 Post-disturbance: Shrub Return [Type],Yes,Yes
 Post-disturbance: Conversion [Type],Yes,Yes
 Reforestation,Yes,Yes
+Forest Harvest: Salvage Logging [Type],Yes,Yes
+Management: Replanting,Yes,Yes
+Management: Replanting [Type],Yes,Yes
+Management: Replanting (failed) [Type],Yes,Yes
+Management: Replanting after Burn Site Prep [Type],Yes,Yes
+Management: Replanting after Burn Site Prep (failed) [Type],Yes,Yes
+Management: Replanting after Mechanical Site Prep [Type],Yes,Yes
+Management: Replanting after Mechanical Site Prep (failed) [Type],Yes,Yes

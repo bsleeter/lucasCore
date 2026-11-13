@@ -309,6 +309,37 @@
 		<validation validationType="Unique" columns="TransitionGroupId"/>
 	</dataSheet>
 
+	<!-- to-do 58 (user 2026-11-13: "Start with replanting, salvage and site prep on a dedicated page"): management after a disturbance
+	     in a projection. Stage 9 turns each row into ST-Sim targets on the disturbed forest classes (an area a year), and stage 10
+	     sets the replanting priority. An empty sheet: no management (the baseline). Area above the historical rate: the fitted
+	     natural return already includes whatever planting followed past fires -->
+	<dataSheet name="ManagementAction" displayName="Management Actions" viewClassName="lucasCoreUI.ManagementActionsView" viewClassAssembly="lucasCoreUI">
+		<column name="ActionId" displayName="Action" dataType="Integer" validationType="List" formula1="1:Replanting|2:Salvage logging"/>
+		<column name="StartYear" displayName="Start Year (blank = the first projection year)" dataType="Integer" isOptional="True"/>
+		<column name="EndYear" displayName="End Year (blank = the projection end)" dataType="Integer" isOptional="True"/>
+		<column name="Amount" displayName="Area per Year (the library's amount units, e.g. hectares)" dataType="Double" validationType="Decimal" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="StratumId" displayName="Primary Stratum (ecodivision; blank = any)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
+		<column name="SecondaryStratumId" displayName="Secondary Stratum (blank = any)" dataType="Integer" validationType="Datasheet" formula1="stsim_SecondaryStratum" isOptional="True"/>
+		<column name="TertiaryStratumId" displayName="Tertiary Stratum (blank = any; blank at every level = the whole study area)" dataType="Integer" validationType="Datasheet" formula1="stsim_TertiaryStratum" isOptional="True"/>
+		<column name="MinAge" displayName="From Year Since the Disturbance (blank: replanting 1, salvage 0)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="MaxAge" displayName="To Year Since the Disturbance (blank: replanting 5, salvage 2)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="Priority" displayName="Priority (replanting)" dataType="Integer" validationType="List" formula1="1:None (random among eligible cells)|2:Far from live forest (least likely to return on its own)" defaultValue="1" isOptional="True"/>
+		<column name="Survival" displayName="Survival (replanting: share of the planted area that takes)" dataType="Double" defaultValue="0.8" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+		<column name="SitePreparation" displayName="Site Preparation (replanting)" dataType="Integer" validationType="List" formula1="1:None|2:Pile and burn|3:Mechanical (mastication)" defaultValue="1" isOptional="True"/>
+	</dataSheet>
+
+	<dataSheet name="OutputManagementAction" displayName="Management Actions (as set up)">
+		<!-- stage 9: each Management Actions row as the transition types and areas it drives -->
+		<column name="Row" dataType="Integer"/>
+		<column name="TransitionType" displayName="Transition Type" dataType="String"/>
+		<column name="StartYear" displayName="Start Year" dataType="Integer"/>
+		<column name="EndYear" displayName="End Year" dataType="Integer"/>
+		<column name="AreaPerYear" displayName="Area per Year" dataType="Double"/>
+		<column name="YearsSinceDisturbance" displayName="Years Since the Disturbance" dataType="String"/>
+		<column name="Where" dataType="String"/>
+		<column name="Note" dataType="String"/>
+	</dataSheet>
+
 	<dataSheet name="ClimateOptions" displayName="Climate Options" isSingleRow="True" viewClassName="lucasCoreUI.ClimateOptionsView" viewClassAssembly="lucasCoreUI">
 		<column name="ForestGrowthModel" displayName="Forest Growth (None = normal climate every year)" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP|3:Tree ring" defaultValue="3"/>
 		<column name="NonForestGrowthModel" displayName="Non-Forest Growth" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP|3:RAP fit" defaultValue="3"/>
@@ -1219,6 +1250,7 @@
 
 	<transformer name="ProjectionTransitions" displayName="9 - Projection Transitions" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/9-projection-transitions.R">
 		<dataSheet name="BuildOptions" type="Input"/>
+		<dataSheet name="ManagementAction" type="Input"/>
 		<dataSheet name="ReforestationOptions" type="Input"/>
 		<dataSheet name="FireOptions" type="Input"/>
 		<dataSheet name="ProjectionOptions" type="Input"/>
@@ -1230,6 +1262,7 @@
 		<dataSheet name="stsim_InitialStockSpatial" type="Both"/>
 		<dataSheet name="stsim_TransitionTarget" type="Both"/>
 		<dataSheet name="OutputProjectionSchedule" type="Output"/>
+		<dataSheet name="OutputManagementAction" type="Output"/>
 		<dataSheet name="core_SpatialMultiprocessing" type="Output"/>
 		<dataSheet name="OutputProjectionRate" type="Output"/>
 		<dataSheet name="OutputFireSize" type="Output"/>
@@ -1243,6 +1276,7 @@
 
 	<transformer name="TransitionSuitability" displayName="10 - Transition Suitability" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/10-transition-suitability.R">
 		<dataSheet name="BuildOptions" type="Input"/>
+		<dataSheet name="ManagementAction" type="Input"/>
 		<dataSheet name="StudyArea" type="Input"/>
 		<dataSheet name="ProjectionTransition" type="Input"/>
 		<dataSheet name="ProjectionAllocation" type="Input"/>
@@ -1406,6 +1440,7 @@
 				<item name="ProjectionTransitions"/>
 				<item name="SpatialAllocation"/>
 				<item name="FireOptions"/>
+				<item name="ManagementAction"/>
 				<item name="ProjectionClimatePage"/>
 			</group>
 			<item name="RunFigureOptions"/>
@@ -1431,6 +1466,7 @@
 				<item name="OutputHarvestAge"/>
 				<item name="OutputProjectionRate"/>
 				<item name="OutputProjectionSchedule"/>
+				<item name="OutputManagementAction"/>
 				<item name="OutputFireSize"/>
 				<item name="OutputFireSlope"/>
 				<item name="OutputSuitability"/>

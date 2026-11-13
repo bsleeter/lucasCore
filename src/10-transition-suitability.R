@@ -492,6 +492,18 @@ pda <- read_default("projection", "post-disturbance-adjacency.csv")
 for (g in intersect(unique(pda$TransitionGroupId), unique(sm$TransitionGroupId))) { x <- pda[TransitionGroupId == g]
   adj_set[[g]] <- data.table(TransitionGroupId = g, StateAttributeTypeId = x$StateAttributeTypeId[1], NeighborhoodRadius = adj_r, UpdateFrequency = adj_up)
   adj_mult[[g]] <- data.table(TransitionGroupId = g, AttributeValue = as.numeric(x$AttributeValue), Amount = as.numeric(x$Amount)) }
+# replanting priority (to-do 58, Management Actions: Far from live forest): the inverse of natural return's seed-source curve, so the
+# cells least likely to come back on their own are planted first (weight = the lowest return multiplier / the cell's, 1 where no live
+# forest is near). ST-Sim spreads a target over cells by their weights
+source(pkg_file("src", "management.R"))
+mrows <- management_rows(read_ds("ManagementAction"), y1, projection_end(), say, fail)
+if (!is.null(mrows) && any(mrows$Priority == "Far from live forest")) {
+  fr <- pda[TransitionGroupId == "Post-disturbance: Forest Return [Type]"]
+  if (!nrow(fr)) fail("Management Actions: priority Far from live forest needs the forest return seed-source curve (defaults/projection/post-disturbance-adjacency.csv)")
+  am <- as.numeric(fr$Amount); g <- MG_REPLANT_GROUP
+  adj_set[[g]] <- data.table(TransitionGroupId = g, StateAttributeTypeId = fr$StateAttributeTypeId[1], NeighborhoodRadius = adj_r, UpdateFrequency = adj_up)
+  adj_mult[[g]] <- data.table(TransitionGroupId = g, AttributeValue = as.numeric(fr$AttributeValue), Amount = round(min(am) / am, 5))
+  say("Management Actions: replanting far from live forest first (weight %.2f with no live forest within %g m, %.2f surrounded)", 1, adj_r, min(am) / max(am)) }
 if (length(adj_set)) {
   # the state attributes adjacency reads: 1 on developed (NLCD 21-24) or agriculture (81, 82) classes, or on forest type groups (Live Forest)
   scl <- stsim_list("StateClass"); used <- unique(rbindlist(adj_set)$StateAttributeTypeId); ATTR <- list(Developed = DEV, Agriculture = c(81L, 82L), Pasture = 81L, Cropland = 82L, `Live Forest` = 100:999)

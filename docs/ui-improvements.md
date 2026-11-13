@@ -1819,6 +1819,39 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     and 85% of any merchantable live wood to the forestry sector). Not driven by default (no source map, no target, no projection
     rule); a projection scenario sets its target or area. Live forest after insects or wind can't be salvaged: those don't move
     land into a disturbed class.
+  - **Replanting, site preparation and salvage: BUILT 2026-11-13** (user: "Start with replanting, salvage and site prep on a dedicated
+    page"; fuel treatments later, as their own step: they change the fire pathways). The baseline stays as observed: a scenario's
+    area is management above the historical rate (the fitted natural return includes past planting); FACTS-based separation later.
+    - Types (tools/make_management.R; Ids 1200-1205, group Management: Replanting): Replanting, after Burn Site Prep, after
+      Mechanical Site Prep, each with a "(failed)" twin. From every disturbed forest class (31, wetland twins too); planted: to the
+      parent forest type, age reset to 0; failed: same class and age (carries the site preparation carbon, can still return or
+      convert). Survival splits a row's area between the two. Site preparation carbon on groups Site Preparation: Burn (cover burns
+      as clearcut slash, roots die, half the litter and fine woody debris and 30% of branch snags burn) and Site Preparation:
+      Mechanical (cover to litter and fine woody debris, roots die): provisional judgement values. Salvage: the existing type, on
+      the disturbed classes (above). Stage 6 gives every one a zero target (no historical map).
+    - The page (Projection > Management Actions, ui/ManagementActionsView.cs; user: parameters with their explanations beside
+      them, an Add button that writes the choices as a grid row, the grid the record and still editable): years, area a year, where
+      (a unit at any of the three strata levels the Build uses, from Build Results > Strata Summary, or any; with spatial tiles the
+      tile level's unit is required, user: "these area targets ... MUST be specified at the same strata"), years since the
+      disturbance (replanting 1-5, salvage 0-2), survival (0.8), priority (random, or far from live forest: the inverse of the
+      seed-source curve, an adjacency multiplier on Management: Replanting, stage 10), site preparation. Each row in words.
+    - Stage 9 (src/management.R): targets on the types' [Type] groups for every unit combination of one set of strata keys (tile
+      level and the levels rows name), zeros included, so no blank-strata row overlaps a unit's; the age window as multipliers;
+      Projection Results > Management Actions (as set up). Checks: one window per action, one priority, tile-level units with tiles.
+    - Maps and summaries: the replanting family, its [Type] groups and salvage's [Type] group are main groups
+      (defaults/stockflow/main-transition-groups.csv). Found on Lassen: a library's transition output filter is written when the
+      library is made, so new groups were run but not reported; the 1.4 update adds them (summary, maps) to every scenario with a
+      filter. Also the update adds the types, groups and the sheet's StratumId column.
+    - Test (dev/management/lassen-management.R; Lassen Build 91, historical 93, baseline projection 99): replanting 300 ha a year
+      2024-2050 (survival 0.8, pile and burn, far from live forest) and salvage 200 ha a year, setup 114, projection 116. Planted
+      about 220-260 ha and failed 47-76 a year while recent burns are within 1-5 years (none 2027-2030 and 2035-2044 when no burn
+      is; 3,472 ha in all); salvage only in the 0-2 years after the drawn 2031 and 2045 fires (1,188 ha). By 2050: forest 32,362
+      against 30,116 ha, disturbed forest 817 against 2,513; natural return 2,383 against 3,069 ha and conversion 1,710 against
+      2,194 (planted land no longer waits). Carbon by 2050: biomass +0.092 Tg C, dead matter -0.062 (salvage, burned slash),
+      ecosystem +0.021, forestry sector +0.021. With transition maps on (a 3-year copy), every management [Type] group is mapped
+      each year (2024 planting after burn site prep: 118 cells, 265 ha). tests/unit-management.R 24 checks.
+    - Open: planting a different type (assisted migration); fuel treatments; FACTS records for the baseline; a full Build on Puget
+      (tiled by county) to try the tile rule in a run.
   - **Replanting and restoration:** a management transition from a post-disturbance class back to a forest type.
     - Window: within a few years of the disturbance (time since transition, for example 1-5 years), before shrubs take the site.
     - Age: reset to a seedling age on planting (natural return keeps age = years since the disturbance, to-do 57).

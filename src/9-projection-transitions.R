@@ -457,6 +457,20 @@ cov <- if (length(new_tt)) rbindlist(new_tt, fill = TRUE)[, .(n = uniqueN(paste(
 check(STAGE, "every Target group has a target in every iteration and projection year", all(cov$n == nexp), paste(cov[n != nexp, TransitionGroupId], collapse = "; "))
 check(STAGE, "every Probability group has a map in every iteration and projection year",
       all(vapply(c(pg$TransitionGroupId, fire_all), function(g) nrow(sm_out[TransitionGroupId == g & Timestep > y1 & !is.na(MultiplierFileName)]) == nexp, TRUE)))
+# ---- management actions (to-do 58; user 2026-11-13: "Start with replanting, salvage and site prep on a dedicated page") -------------
+# Each Management Actions row is an area a year on the disturbed forest classes (src/management.R), in its years and strata. Its types
+# keep stage 6's zero target elsewhere: every management type's targets are written on one set of strata keys (the tile level, and
+# any level a row names), a row for every unit combination of the study area, so no blank-strata row overlaps a unit's. The age
+# window (years since the disturbance) is a multiplier, 0 outside it
+source(pkg_file("src", "management.R"))
+mg <- management_targets(read_ds("ManagementAction"), y0 = y0, y1 = y1, pend = pend, land = land, lev = lev, lev_list = lev_list, lev_col = lev_col,
+                         tile_lvl = if (tiles > 1) tile_lvl else NA_character_, sc_vals = values(S, mat = FALSE), say = say, fail = fail)
+mg_tmv <- NULL
+if (!is.null(mg)) {
+  tt_out <- rbind(tt_out[!TransitionGroupId %in% mg$groups], mg$targets, fill = TRUE)
+  mg_tmv <- mg$multipliers
+  check(STAGE, "management: every management type has a target in every projection year", all(mg$targets[Timestep > y1, uniqueN(Timestep), by = TransitionGroupId]$V1 == length(pyrs)))
+  write_ds(mg$summary, "OutputManagementAction") }
 # ---- post-disturbance return and conversion (to-do 57): on everywhere from the historical end + 1; a disturbed class's return chance
 # by its age (years since the disturbance): 0 below ReturnAgeMin, then ReturnProbability a year to the window's end (post-disturbance-
 # settings.csv), divided by the mean of the live forest adjacency multiplier where stage 10 applies it (post-disturbance-adjacency.csv),
@@ -498,12 +512,12 @@ if (nrow(fire_rows) && nrow(fcm)) { scl9 <- stsim_list("StateClass"); idc <- sup
                TransitionGroupId = fire_g, Amount = as.numeric(fcm$Multiplier[i])) }))
   if (nrow(fire_tmv)) fire_tmv <- fire_tmv[is.na(StratumId) | StratumId %in% stsim_list("Stratum")$Name]
   say("Fire by state class: %s", if (nrow(fire_tmv)) paste(fire_tmv[, sprintf("%s%s x%.2f", if (.N > 1) sprintf("%d classes", .N) else StateClassId[1], ifelse(is.na(StratumId[1]), "", paste0(" in ", StratumId[1])), Amount[1]), by = .(StratumId, Amount)]$V1, collapse = "; ") else "none (every multiplier 1)") }
-if (!is.null(tmv) || !is.null(fire_tmv)) {
+if (!is.null(tmv) || !is.null(fire_tmv) || !is.null(mg_tmv)) {
   old_tmv <- as.data.table(datasheet(scn, "stsim_TransitionMultiplierValue", optional = TRUE, lookupsAsFactors = FALSE))
-  # earlier rows of a rerun are replaced: the post-disturbance groups', and the fire group's by state class (no other fire multiplier)
-  if (nrow(old_tmv)) old_tmv <- old_tmv[!(!is.na(Timestep) & Timestep > y1 & (TransitionGroupId %in% PD_GROUPS | (TransitionGroupId == fire_g & !is.na(StateClassId)))),
+  # earlier rows of a rerun are replaced: the post-disturbance groups', the fire group's by state class (no other fire multiplier), the management types'
+  if (nrow(old_tmv)) old_tmv <- old_tmv[!(!is.na(Timestep) & Timestep > y1 & (TransitionGroupId %in% c(PD_GROUPS, MG_GROUPS) | (TransitionGroupId == fire_g & !is.na(StateClassId)))),
                                         setdiff(names(old_tmv), c("TransitionMultiplierValueId", "ScenarioId")), with = FALSE]
-  write_stsim(rbind(old_tmv, tmv, fire_tmv, fill = TRUE), "TransitionMultiplierValue") }
+  write_stsim(rbind(old_tmv, tmv, fire_tmv, mg_tmv, fill = TRUE), "TransitionMultiplierValue") }
 write_stsim(sm_out, "TransitionSpatialMultiplier")
 if (nrow(fire_rows)) {
   # (method 3: no size distribution - an earlier one for the fire group is removed)

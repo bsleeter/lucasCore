@@ -11,6 +11,7 @@
 // C# 5 (the .NET Framework compiler of tools/build_ui.ps1): no string interpolation.
 // =============================================================================
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using SyncroSim.Core;
@@ -130,7 +131,7 @@ namespace lucasCoreUI
 
         // ---- 1.4 (to-do 57): the post-disturbance classes (tools/make_post_disturbance.R). The description must not hold an apostrophe:
         // SyncroSim writes it into the library unquoted (1.3.0) ---------------------------------------------------------------------
-        [Update(1.4, "lucasCore 1.4: the Disturbed state classes of every forest type group, forested wetland and five shrub classes, with the transition types and groups that return them to their type or convert them")]
+        [Update(1.4, "lucasCore 1.4: the Disturbed state classes of every forest type group, forested wetland and five shrub classes, with the transition types and groups that return them to their type or convert them; the Reforestation transitions; and the Management replanting transitions")]
         public static void Update_1_400(DataStore store)
         {
             AddNamed(store, "stsim_StateLabelX", "StateLabelXId", "Disturbed", null, null, false);
@@ -163,6 +164,7 @@ namespace lucasCoreUI
             // ("Reforestation: <Y label>", a wetland twin "Reforestation: Wetland <type>"). (The Reforestation Options sheet is a new
             // table, which SyncroSim adds by itself.)
             AddColumn(store, "lucasCore_DataSource", "BpsFile", "TEXT");
+            AddColumn(store, "lucasCore_ManagementAction", "StratumId", "INTEGER");   // (the sheet is new in 1.4; a development library made it before this column)
             AddColumn(store, "lucasCore_DataSource", "RcmapCoverFolder", "TEXT");
             AddColumn(store, "lucasCore_OutputLandCoverLayers", "ReforestTypeFileName", "TEXT");
             AddColumn(store, "lucasCore_OutputLandCoverLayers", "BpsForestShareFileName", "TEXT");
@@ -186,6 +188,50 @@ namespace lucasCoreUI
                     store.ExecuteNonQuery("INSERT INTO stsim_TransitionSimulationGroup (TransitionSimulationGroupId, ProjectId, TransitionGroupId) VALUES (" +
                                           NewId(store).ToString(CultureInfo.InvariantCulture) + ", " + pr + ", " + g + ")");
                 }
+
+            // management (to-do 58, tools/make_management.R): six replanting types (with or without site preparation, planted or failed),
+            // their group and the two site preparation groups that carry its carbon flows. (The Management Actions sheets are new
+            // tables, which SyncroSim adds by itself.)
+            string[] grpM = { "Management: Replanting", "Site Preparation: Burn", "Site Preparation: Mechanical" };
+            foreach (string g in grpM) AddNamed(store, "stsim_TransitionGroup", "TransitionGroupId", g, null, null, false);
+            string[] preps = { "", " after Burn Site Prep", " after Mechanical Site Prep" };
+            for (int i = 0; i < preps.Length; i++)
+                foreach (string end in new[] { "", " (failed)" })
+                {
+                    string t = "Management: Replanting" + preps[i] + end;
+                    AddTransitionType(store, t, null);
+                    AddTypeToGroup(store, t, grpM[0]);
+                    if (i > 0) AddTypeToGroup(store, t, grpM[i]);
+                }
+            // ST-Sim summarizes only the groups in a scenario's transition output filter, and a library's filter was written when the
+            // library was made (Lassen 2026-11-13: replanting ran but was not reported). Every scenario with a filter gets the new groups,
+            // summary on (src/transition-filter.R)
+            if (store.TableExists("stsim_OutputFilterTransitionGroups") && store.TableExists("core_Scenario"))
+            {
+                // mapped (Spatial and Spatial Probability on), as defaults/stockflow/main-transition-groups.csv: the replanting family and
+                // its [Type] groups (each is simulated on its own target, and ST-Sim maps by simulation unit) and salvage's [Type] group;
+                // the two site preparation groups are summarized only
+                var names = new List<string>(grpM); var mapped = new HashSet<string> { grpM[0], "Forest Harvest: Salvage Logging [Type]" };
+                names.Add("Forest Harvest: Salvage Logging [Type]");
+                for (int i = 0; i < preps.Length; i++)
+                    foreach (string end in new[] { "", " (failed)" }) { string n = "Management: Replanting" + preps[i] + end + " [Type]"; names.Add(n); mapped.Add(n); }
+                foreach (DataRow r in Rows(store, "SELECT DISTINCT f.ScenarioId AS S, s.ProjectId AS P FROM stsim_OutputFilterTransitionGroups f JOIN core_Scenario s ON s.ScenarioId = f.ScenarioId").Rows)
+                {
+                    string sc = Id(r["S"]), pr = Id(r["P"]);
+                    foreach (string n in names)
+                    {
+                        string g = IdOf(store, "stsim_TransitionGroup", "TransitionGroupId", pr, n); if (g == null) continue;
+                        string m = mapped.Contains(n) ? "-1" : "0";
+                        if (Convert.ToInt64(store.ExecuteScalar("SELECT COUNT(*) FROM stsim_OutputFilterTransitionGroups WHERE ScenarioId = " + sc + " AND TransitionGroupId = " + g), CultureInfo.InvariantCulture) > 0)
+                        {
+                            if (m == "-1") store.ExecuteNonQuery("UPDATE stsim_OutputFilterTransitionGroups SET Spatial = -1, SpatialProbability = -1 WHERE ScenarioId = " + sc + " AND TransitionGroupId = " + g);
+                            continue;
+                        }
+                        store.ExecuteNonQuery("INSERT INTO stsim_OutputFilterTransitionGroups (OutputFilterTransitionGroupsId, ScenarioId, TransitionGroupId, Summary, SummaryByStateClass, TimeSinceTransition, Spatial, SpatialEvents, SpatialTimeSinceTransition, SpatialProbability, AvgSpatialTimeSinceTransition) VALUES (" +
+                                              NewId(store).ToString(CultureInfo.InvariantCulture) + ", " + sc + ", " + g + ", -1, 0, 0, " + m + ", 0, 0, " + m + ", 0)");
+                    }
+                }
+            }
         }
 
         // a state class (with its Id, labels by name) in every project that lacks it

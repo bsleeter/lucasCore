@@ -45,6 +45,12 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   Same as above for new and existing libraries. No change to results.
 
 ### Added
+- Management Actions (Projection > Management Actions; to-do 58): replanting after a disturbance, with or without site preparation
+  (pile and burn, or mechanical), and salvage logging, as an area a year in chosen years and strata units, within a window of
+  years since the disturbance. Replanting returns disturbed forest to its own type at age 0; a survival share fails and stays
+  disturbed; it can go first where natural return is least likely (far from live forest). Six new transition types, three groups,
+  site preparation carbon flows, mapped and summarized. With spatial tiles every action names a unit of the tile level. An empty
+  page is the baseline. Changes Build results (new pathways); projection results only when actions are set.
 - Seven study area and strata sources (Stratum Sources presets 11-17): FWS Refuges, DoD Installations, National Forests,
   Wilderness, Tribal Lands, BLM National Conservation Lands and Metropolitan Areas. The first five and BLM come from PAD-US 4.0 (a
   new edition of the PAD-US units download), Tribal Lands from Census TIGER/Line 2022 (a new Data Download dataset), Metropolitan
