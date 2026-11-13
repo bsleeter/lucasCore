@@ -13,7 +13,7 @@ suppressPackageStartupMessages({ library(rsyncrosim); library(data.table) })
 a <- commandArgs(TRUE); pos <- a[!grepl("^--", a)]; if (!length(pos)) stop("usage: Rscript tools/add-definitions.R <library.ssim> [--dry-run]")
 dry <- "--dry-run" %in% a
 pkg <- normalizePath(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), ".."), winslash = "/")
-rd <- function(...) fread(file.path(pkg, "defaults", ...), colClasses = "character", na.strings = "", encoding = "UTF-8")
+rd <- function(...) fread(file.path(pkg, "defaults", ...), sep = ",", colClasses = "character", na.strings = "", encoding = "UTF-8")
 L <- ssimLibrary(normalizePath(pos[1], winslash = "/"), summary = FALSE); P <- rsyncrosim::project(L, 1)
 man <- rd("stsim", "manifest.csv")[order(as.integer(Order))]
 add_n <- 0
