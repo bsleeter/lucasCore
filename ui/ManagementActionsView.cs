@@ -36,7 +36,7 @@ namespace lucasCoreUI
             public readonly List<string>[] Units = { new List<string>(), new List<string>(), new List<string>() };   // names with land, by level
             public readonly Dictionary<string, int>[] Keys = { new Dictionary<string, int>(), new Dictionary<string, int>(), new Dictionary<string, int>() };
             public int TileLevel = -1;   // 0-2 with tiles, -1 without
-            public bool FromBuild;       // the units come from the Build's Strata Summary (else every unit of the source)
+            public bool FromBuild;       // the units come from the Build result's Strata Summary (else none: only (any))
 
             private static DataRow First(Scenario s, string sheet)
             {
@@ -56,10 +56,8 @@ namespace lucasCoreUI
                 DataTable src = p.GetDataSheet("lucasCore_StratumSource").GetData();
                 Func<object, string, string> name = (k, d) => { if (k == null || k == DBNull.Value) return d;
                     DataRow r = src.Rows.Cast<DataRow>().FirstOrDefault(x => x.RowState != DataRowState.Deleted && Convert.ToInt32(x["StratumSourceId"]) == Convert.ToInt32(k)); return r == null ? d : Convert.ToString(r["Name"]); };
-                Func<string, int> number = n => { DataRow r = src.Rows.Cast<DataRow>().FirstOrDefault(x => x.RowState != DataRowState.Deleted && Convert.ToString(x["Name"]) == n);
-                    return r == null || r["Number"] == DBNull.Value ? -1 : Convert.ToInt32(r["Number"]); };
                 DataRow bo = Own(sc, "lucasCore_BuildOptions");
-                if (bo != null) { Source[1] = name(bo["SecondarySourceId"], Source[1]); Source[2] = name(bo["TertiarySourceId"], Source[2]); }
+                if (bo != null) { Source[1] = name(bo["SecondarySourceId"], Source[1]); Source[2] = name(bo["TertiarySourceId"], Source[2]); } else { Source[1] = null; Source[2] = null; }   // (no Build: its sources are not known)
                 // tiles: the projection's own (Run Settings), else the Build's; on when 0 (automatic) or more than 1
                 DataRow po = First(sc, "lucasCore_ProjectionOptions");
                 Func<DataRow, string, object> v = (r, c) => r != null && r.Table.Columns.Contains(c) ? r[c] : DBNull.Value;
@@ -73,7 +71,8 @@ namespace lucasCoreUI
                 for (int i = 0; i < 3; i++)
                     foreach (DataRow r in Live(p.GetDataSheet(lists[i]).GetData()))
                     { string n = Convert.ToString(r["Name"]); Keys[i][n] = Convert.ToInt32(r[Columns[i]]); if (r["ID"] != DBNull.Value) ids[i][n] = Convert.ToInt64(r["ID"]); }
-                // the units with land in the study area (the Build's Strata Summary), else every unit of the level's source
+                // the units with land in the study area (the Build result's Strata Summary); with no Build result, none (user 2026-11-13:
+                // the choices offered in this model only, not the national lists)
                 DataSheet ss = null;
                 if (sc != null) { if (HasRows(sc, "lucasCore_OutputStrataSummary")) ss = sc.GetDataSheet("lucasCore_OutputStrataSummary");
                                   else foreach (Scenario d in sc.Dependencies) if (HasRows(d, "lucasCore_OutputStrataSummary")) { ss = d.GetDataSheet("lucasCore_OutputStrataSummary"); break; } }
@@ -82,10 +81,6 @@ namespace lucasCoreUI
                 if (ss != null)
                     foreach (DataRow r in Live(ss.GetData()))
                     { int i = Array.IndexOf(Levels, Convert.ToString(r["Level"])); string n = Convert.ToString(r["Name"]); if (i >= 0 && Keys[i].ContainsKey(n) && !Units[i].Contains(n)) Units[i].Add(n); }
-                else
-                    for (int i = 0; i < 3; i++)
-                    { int num = i == 0 ? -1 : number(Source[i]);
-                      foreach (var kv in ids[i]) if (i == 0 || (num >= 0 && (int)(kv.Value / 100000000L) == num)) Units[i].Add(kv.Key); }
                 for (int i = 0; i < 3; i++) Units[i].Sort(StringComparer.CurrentCultureIgnoreCase);
             }
 
@@ -127,7 +122,7 @@ namespace lucasCoreUI
                 for (int i = 0; i < 3; i++)
                 {
                     bool req = i == ms.TileLevel;
-                    Captions[i].Text = string.Format("{0} ({1}){2}:", ModelStrata.Levels[i], ms.Source[i], req ? ", required" : "");
+                    Captions[i].Text = (ms.Source[i] == null ? ModelStrata.Levels[i] : string.Format("{0} ({1})", ModelStrata.Levels[i], ms.Source[i])) + (req ? ", required:" : ":");
                     ComboBox c = Units[i]; c.BeginUpdate(); c.Items.Clear(); if (!req) c.Items.Add(ANY);
                     foreach (string n in ms.Units[i]) c.Items.Add(n);
                     c.EndUpdate(); c.Text = ""; if (!req) c.SelectedIndex = 0;
@@ -135,7 +130,7 @@ namespace lucasCoreUI
                 Info.Text = (ms.TileLevel >= 0
                     ? string.Format("Required: a {0} unit (the projection runs in {0} tiles); the other levels are optional.", ms.Source[ms.TileLevel])
                     : "(any) everywhere = the whole study area; or name a unit at one or more levels, e.g. a county and a federal owner in it.")
-                    + (ms.FromBuild ? " Lists: units with land in the study area." : " Lists: every unit (the Build has not run).");
+                    + (ms.FromBuild ? " Lists: units with land in the study area." : " To choose units, run the Build and set its result as this Projection Setup's dependency; until then only (any), the whole study area.");
             }
 
             // the row's stratum columns, or an error message
@@ -146,7 +141,7 @@ namespace lucasCoreUI
                     string col = ModelStrata.Columns[i]; if (nr.Table.Columns.Contains(col)) nr[col] = DBNull.Value;
                     string txt = Units[i].Text.Trim();
                     if (txt.Length == 0 || txt == ANY)
-                    { if (i == m_ms.TileLevel) return string.Format("choose a {0} unit (the projection's tiles need one)", m_ms.Source[i]); continue; }
+                    { if (i == m_ms.TileLevel) return m_ms.FromBuild ? string.Format("choose a {0} unit (the projection's tiles need one)", m_ms.Source[i]) : "the projection runs in tiles, so each action needs a unit: run the Build and set its result as this Projection Setup's dependency first"; continue; }
                     string n = m_ms.Units[i].FirstOrDefault(x => string.Equals(x, txt, StringComparison.OrdinalIgnoreCase));
                     if (n == null) return string.Format("{0} is not a {1} unit with land in the study area", txt, m_ms.Source[i]);
                     if (!nr.Table.Columns.Contains(col)) return "this library's Management Actions sheet has no " + ModelStrata.Levels[i] + " column (update the package)";
