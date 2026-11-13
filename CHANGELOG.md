@@ -22,6 +22,10 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   without a result are drawn as before. Test: `tests/phaseZ31-wood-products-figures.R`.
 
 ### Fixed
+- Data Download fetched the Cropland Data Layer again when its files had been unzipped into `land-cover/cdl` by hand over a failed
+  earlier download, and failed again. The Data Sources page then showed "home failed", and a Build could stop on the failed
+  manifest row. A year whose file is in place and is the national 30 m layer is now recorded as it is, with its checksum, by hand.
+  Only the missing years are fetched.
 - Run Figures and Compare Runs stopped with "Object reference not set to an instance of an object" when the Build result they
   depend on had lost its maps from the library's data folder (Puget Lowlands). They now take the model grid from the run's own
   initial conditions map when the Build's cannot be read, and say so in the log.
