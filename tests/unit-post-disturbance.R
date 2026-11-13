@@ -33,7 +33,8 @@ check("settings: every ecodivision named is in the ecodivision list, and a resol
 check("settings: every parent class has a window, return and reburn share in every ecodivision; a class's own row beats Forest, an ecodivision's row beats the blank one",
       nrow(res) == nrow(par) * length(eco) && !anyNA(res[, .(Window, ReturnAgeMin, ReturnProbability, ReburnConversion)]) &&
       res[Parent == "Forest: Loblolly/Shortleaf Pine Group" & Ecodivision == "Subtropical", Window] == st[ParentClass == "Forest" & Ecodivision %in% "Subtropical", Window] &&
-      res[Parent == "Forest: Loblolly/Shortleaf Pine Group" & Ecodivision == "Marine", Window] == st[ParentClass == "Forest" & is.na(Ecodivision), Window] &&
+      res[Parent == "Forest: Loblolly/Shortleaf Pine Group" & Ecodivision == "Marine", Window] == st[ParentClass == "Forest" & Ecodivision %in% "Marine", Window] &&
+      pd_resolve(st[!(ParentClass == "Forest" & Ecodivision %in% "Marine")], "Forest: Oak/Pine Group", TRUE, "Marine")$Window == st[ParentClass == "Forest" & is.na(Ecodivision), Window] &&
       identical(pd_resolve(data.table(ParentClass = c("Forest", "Forest: Oak/Pine Group"), Ecodivision = NA, Window = c(30, 9)), c("Forest: Oak/Pine Group", "Forest: Oak/Hickory Group"), c(TRUE, TRUE), "Marine")$Window, c(9, 30)))
 # the pathway rows for a class and ecodivision: the ecodivision's own rows, or the blank-stratum rows when the class has none of its own
 in_eco <- function(x, e) { y <- x[StratumIdSource %in% e]; if (nrow(y)) y else x[is.na(StratumIdSource)] }

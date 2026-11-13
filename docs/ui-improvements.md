@@ -1425,6 +1425,20 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       all Subtropical. A first version wrote rows for all 19 of the library's ecodivisions; stage 9 now takes the study area's from
       its stratum map. The setup then stopped in stage 10: a Projection Setup on a quick-test result builds its fitting region
       differently from one on a full Build and reaches past the downloaded NLCD (setup 52, on Build 48, passed). Not this change.
+    - **Step 7, forest part DONE 2026-11-12** (user: "Write them"; `tools/fit_post_disturbance.R`, 2 min): the Forest rows of
+      post-disturbance-settings.csv fitted by ecodivision, the P26 method on CONUS. 268 MTBS wildfires of 1986-2010 (up to 40 per
+      ecodivision), 1.95 million pixels NLCD showed going from forest to barren, shrub or grass within two years of high severity,
+      followed to NLCD forest two years running (Kaplan-Meier, censored at 2024 or a reburn; each fire at most 500 pixels). East:
+      Subtropical 84% back by 13 years (0.169 a year from year 4), Subtropical Mountains 83% by 16, Warm and Hot Continental about
+      82% by 14-18. West: Mediterranean Mountains (P26, Lassen) 37% by 25 (0.030 a year from 11; P26's provisional 58% at 25 had
+      counted pixels NLCD never showed lost), Marine and Marine Mountains 44% by 29, Temperate Steppe Mountains 29% by 30, Temperate
+      Desert Mountains 18% by 24, Temperate Steppe 3% by 25 (11 fires). Reburn conversion 0.79-0.99 except Marine 0.30. Shrub share
+      of non-returners 0.71-0.97 in the West, 0.20-0.30 in the Subtropical ecodivisions. CONUS fallback: window 26, from year 4,
+      0.022 a year (40% back). The western windows are partly the record's length (about 10% of pixels followed past 30 years, curves
+      still rising slowly), so conversion at the window's end may come early there; in historical runs Reforestation brings back
+      what NLCD later shows as forest. Curves in `dev/fire/post-disturbance-fit.csv`. Pathways regenerated (fire.csv,
+      post-disturbance.csv); tests/unit-post-disturbance.R 24 checks. Not yet run in a Build. Open: the shrub classes (RCMAP cover;
+      the download needs asking), forest type within an ecodivision.
     - **Step 6 DONE 2026-11-12 (figures; user chose three of four proposed: not the settings chart).** Build Figures (stage 12):
       "How forest starts: regrowth and reforestation": (a) how each natural cell NLCD shows as forest only later starts (regrowth
       with its NLCD age, disturbed at the start, reforests later by slow recovery or encroachment, or forest with its source age),
