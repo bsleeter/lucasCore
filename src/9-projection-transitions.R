@@ -340,7 +340,7 @@ if (nrow(fire_rows) && fire_m < 3) { g <- fire_g; ms <- mem[[g]]; u <- unit_map(
     if (!file.exists(bpf)) fail("Fire Options: burn probability raster not found (%s)", bpf)
     bp_r <- rast(bpf); bpm <- values(project(crop(bp_r, project(as.polygons(ext(P), crs = crs(P)), crs(bp_r)), snap = "out"), P, method = "average"), mat = FALSE)
     bpm[is.na(bpm) | bpm < 0] <- 0
-    if (!any(bpm[el] > 0)) fail("Fire Options: the burn probability raster (%s) is 0 or missing over the burnable land", bpf)
+    if (any(el) && !any(bpm[el] > 0)) fail("Fire Options: the burn probability raster (%s) is 0 or missing over the burnable land", bpf)   # (no burnable land: nothing to place, to-do 60)
     w <- bpm; slope_on <- FALSE
     say("%s: burn probability %s; mean %.4f/yr on burnable cells (slope selectivity off: the burn probability holds terrain)", g, basename(bpf), mean(bpm[el]))
     ig <- if (ign_src == 1) bpm else {

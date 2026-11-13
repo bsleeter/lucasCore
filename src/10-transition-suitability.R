@@ -69,6 +69,8 @@ codes_of <- function(s) if (is.null(s) || is.na(s) || !nzchar(s)) integer() else
 al[, ExGap := vapply(Target, function(t) paste(codes_of(tg[TransitionGroupId == t, ExcludeGap][1]), collapse = "|"), "")]
 if (!"SourceClasses" %in% names(al)) al[, SourceClasses := NA_character_]
 NOT_SOURCE <- c(21:24, 11, 12)   # blank Source Classes: every class but developed, water and ice
+NLCD_CODES <- c(11L, 12L, 21:24, 31L, 41:43, 52L, 71L, 81L, 82L, 90L, 95L)
+MIN_FIT_EVENTS <- 30L   # fewer events in the fitting region: no covariate fit, adjacency only (to-do 60)
 src <- read_data_sources(c("NlcdFolder", "FirePerimeterHistoryFile", "RoadsFile", "ElevationFile", "WuiFolder"))
 
 # ---- covariates, per surface ---------------------------------------------------------------------------------------------------
@@ -363,7 +365,30 @@ for (sname in unique(al$Surface)) {
     smp <- covs(smp[!is.na(LC) & !is.na(County) & !is.na(Slope)]); smp[, `:=`(LC = factor(LC), GAP = factor(GAP), County = factor(County))]
     if ("Owner" %in% names(smp)) smp[, Owner := factor(Owner)]
     nev <- smp[Event == 1, .N]; say("%s: %d events (%.1f km2 of %d m cells) and %d controls, %d-%d", sname, nev, nev * res_f^2 / 1e6, res_f, smp[Event == 0, .N], y0 + 1, y1)
-    if (nev < 30) fail("%s: only %d events in the fitting region - choose a larger Suitability Fitting Region (adjacent counties, the pyrome, the ecoregion or the state)", sname, nev)
+    if (nev < MIN_FIT_EVENTS) {
+      # to-do 60 (user 2026-11-13: "If too few transitions occur during historical, the covariate approach should be dropped and use
+      # only adjacency"): a study area with few events of a kind (a park with almost no urbanization) no longer stops the setup.
+      # No covariates: every allowed cell weighs 1, and for developed or agriculture events ST-Sim's adjacency multiplier, read
+      # from the model grid's annual maps as Method Adjacency does (src/adjacency-curve.R), places the change near existing change
+      fb <- if (is.na(attr_k)) "no adjacency for these events, so every allowed cell weighs 1 (random within the strata)" else sprintf("adjacency only (%s share within %g m)", tolower(attr_k), adj_r)
+      say("%s: %d events in the fitting region, under %d to fit covariates: covariates dropped, %s", sname, nev, MIN_FIT_EVENTS, fb)
+      surf <- mask(init(rast(P), 1), P)
+      if (!is.na(attr_k)) {
+        source(pkg_file("src", "adjacency-curve.R"))
+        wm <- focalMat(rast(P), adj_r, "circle"); wm[wm > 0] <- 1; fl <- function(y) rast(nl$FileName[nl$Year == y])
+        src_c <- if (length(sc)) sc else setdiff(NLCD_CODES, NOT_SOURCE); shc <- if (attr_k == "Developed") DEV else c(81L, 82L)
+        acv <- adjacency_curve(rbindlist(lapply((y0 + 1):y1, function(y) adjacency_counts(fl(y - 1), fl(y), src_c, to, shc, wm)$counts)))
+        nadj <- sum(acv$Events)
+        if (nadj > 0) {
+          for (g in gs$TransitionGroupId) { adj_set[[g]] <- data.table(TransitionGroupId = g, StateAttributeTypeId = attr_k, NeighborhoodRadius = adj_r, UpdateFrequency = adj_up)
+            adj_mult[[g]] <- data.table(TransitionGroupId = g, AttributeValue = acv$AttributeValue, Amount = acv$Amount) }
+          out_curve[[length(out_curve) + 1]] <- data.table(Surface = sname, Covariate = paste(attr_k, "share"), X = acv$AttributeValue, Effect = log(pmax(acv$Amount, 1e-6)))
+          say("%s: adjacency curve from %d events on the model grid, rate per 1,000 cells a year by %s share: %s", sname, nadj, tolower(attr_k),
+              paste(sprintf("%.1f", 1000 * acv$Rate[c(1, 2, 3, 6, 11)]), c("(0)", "(0.1)", "(0.2)", "(0.5)", "(1)"), collapse = ", "))
+        } else say("%s: no events on the model grid either: no adjacency curve, every allowed cell weighs 1", sname) }
+      out_sum[[length(out_sum) + 1]] <- data.table(Surface = sname, Item = "Covariates dropped: too few events to fit", Value = nev,
+        Note = sprintf("events in the fitting region, %d-%d (at least %d needed); %s", y0 + 1, y1, MIN_FIT_EVENTS, fb))
+    } else {
     tm <- terms; if (nlevels(smp$GAP) < 2) tm <- setdiff(tm, "GAP"); if (nlevels(smp$County) < 2) tm <- tm[!grepl("County", tm)]; if (nlevels(smp$LC) < 2) tm <- setdiff(tm, "LC")
     if ("Owner" %in% tm && nlevels(smp$Owner) < 2) tm <- setdiff(tm, "Owner")
     form <- as.formula(paste("Event ~", paste(tm, collapse = " + ")))
@@ -427,6 +452,7 @@ for (sname in unique(al$Surface)) {
       nd[[share_k]] <- xs; ef <- predict(m, nd, type = "link", exclude = grep("County", tm, value = TRUE)); amt <- exp(ef - max(ef))
       for (g in gs[Adjacency == TRUE, TransitionGroupId]) { adj_set[[g]] <- data.table(TransitionGroupId = g, StateAttributeTypeId = attr_k, NeighborhoodRadius = adj_r, UpdateFrequency = adj_up)
         adj_mult[[g]] <- data.table(TransitionGroupId = g, AttributeValue = xs, Amount = round(amt, 5)) } }
+    }   # (enough events to fit)
   } else {
     # Rules: WUI class weight x GAP status weight on the model grid
     rw <- read_ds("RuleWeight"); if (!nrow(rw)) rw <- read_default("projection", "rule-weights.csv"); rw <- rw[Surface == sname]

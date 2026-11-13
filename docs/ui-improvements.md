@@ -1893,7 +1893,7 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       pass. unit-strata-home, home-editions, page-feeds, metadata-record, release pass.
     - Not done: a full Build on one of these; National Forests use fee land (PAD-US also has the forests' proclamation boundaries,
       should the whole boundary be wanted later).
-60. **Transitions a study area does not have: projections should not stop** - TO DO, added 2026-11-12 (user: "This raises a good
+60. **Transitions a study area does not have: projections should not stop** - DONE 2026-11-13, added 2026-11-12 (user: "This raises a good
     issue about what happens when there are no transitions of a certain type within a study area"). Found on the Lassen Volcanic NP
     test library (to-do 57 step 8): the Projection Setup stopped in stage 10, "Urbanization: only 4 events in the fitting region -
     choose a larger Suitability Fitting Region". Today:
@@ -1906,6 +1906,19 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     place: say so); one with some area but too few events falls back to None (random within its strata) with the event count in the
     log and in the suitability summary, unless the user set a fitting region. Check the same for Adjacency surfaces, the patch size
     step (no events) and stage 9's fire (a pyrome with no burnable area). Test on Lassen (no urbanization or agriculture).
+  - **DONE 2026-11-13** (user: "60 needs to be addressed immediately as this can block a user from running the model. If too few
+    transitions occur during historical, the covariate approach should be dropped and use only adjacency"). Stage 10: a Fitted
+    surface with fewer than 30 events in its fitting region (MIN_FIT_EVENTS) no longer stops. Its covariates are dropped and every
+    allowed cell weighs 1; for developed or agriculture events the adjacency multiplier is read from the model grid's annual maps as
+    Method Adjacency does (src/adjacency-curve.R) and set on every group of the surface; other events (harvest, reforestation, ag
+    contraction) are random within their strata; with no events on the model grid either, no adjacency curve. Logged, and a
+    "Covariates dropped: too few events to fit" row in the suitability summary with the event count. Adjacency-method surfaces with
+    no events already passed (flat multiplier); the patch size step skips a group with no patches. Stage 9, fire method 2: a study
+    area with no burnable land no longer stops on "burn probability 0 or missing" (a full run with no burnable land not tested).
+    Test, Lassen (Build 72, historical 74), the default allocation (every surface Fitted; it stopped before on Urbanization):
+    setup result 86 completes. Urbanization and Open Space adjacency only (curves from 14 and 17 model-grid events), Ag Expansion
+    flat (no events), Ag Contraction, Clearcut and Selection random within strata, Reforestation fitted (92 events, AUC 0.545); a
+    5-year projection from it runs (result 88). Not done: a user-set fitting region still falls back the same way.
 61. **Burn severity in non-forest classes: does MTBS capture high-severity shrubland fire?** - TO DO, added 2026-11-12 (user: "look at
     burn severity distribution across the non-forest classes. I am a little unclear if there is much high severity shrubland fire
     captured in MTBS Burn Severity"). It matters because only high severity moves a shrub cell into its disturbed class (to-do 57:

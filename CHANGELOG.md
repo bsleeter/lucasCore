@@ -80,6 +80,11 @@ it was meant to. A library already at 1.3 needs no update; switch its lucasCore 
 (`SyncroSim.Console.exe --add --package --pkg=lucasCore --ver=1.3.1 --lib=<library.ssim>`). Builds and results are as in 1.3.0.
 
 ### Fixed
+- Projection Setup (stage 10) no longer stops when a study area has too few historical events of a kind to fit its suitability
+  surface (fewer than 30 in the fitting region: a park with almost no urbanization, a county with no agriculture). The surface
+  drops its covariates; developed and agriculture change is placed by adjacency alone (the curve read from the study area's annual
+  maps), other change at random within its strata. The run log and the suitability summary say which surfaces fell back and why.
+  Stage 9 with the burn probability fire option no longer stops when the study area has no burnable land.
 - Strata polygons read from Data Sources Home ignored newer editions of a dataset, so a preset whose layer exists only in a newer
   edition (the PAD-US units file) could not be read. A preset now reads the newest edition that has its layer.
 - Build stage 6: pathway rows written by ecodivision (`fire.csv` and `post-disturbance.csv`: reburn proportions, return window and
