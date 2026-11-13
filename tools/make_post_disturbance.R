@@ -88,8 +88,12 @@ fmt <- function(v) sub("\\.?0+$", "", formatC(v, format = "f", digits = 6))
 # ecodivision where the class's window differs between them; conversion at the window's end
 wv <- pd_varies(res, "Window"); rt <- res[, .(From = dname, Ecodivision, Name = Parent, kind, Window)]
 rt <- one_or_each(rt, par$dname[match(names(wv)[wv], par$Name)])
+# RET_AGE0: no return before the second year after the disturbance. Age is 0 in the fire year, and NLCD often still shows the fire
+# year (and the year before) as forest, so without it a cell returned in the year it burned (Lassen 2026-11-12: 3 km2 in 2012).
+# Stage 9's ReturnAgeMin (2 or more) governs projections.
+RET_AGE0 <- 2L
 ret <- rt[, pw(StratumIdSource = Ecodivision, StateClassIdSource = From, StateClassIdDest = Name, TransitionTypeId = fifelse(kind == "Forest", RET_F, RET_S),
-               Probability = "1", AgeMax = Window - 1L, AgeReset = "No")]   # historical runs follow NLCD (stage 6); projections set the chance by age (stage 9)
+               Probability = "1", AgeMin = RET_AGE0, AgeMax = Window - 1L, AgeReset = "No")]   # historical runs follow NLCD (stage 6); projections set the chance by age (stage 9)
 conv <- dest[, pw(StratumIdSource = Ecodivision, StateClassIdSource = From, StateClassIdDest = To, TransitionTypeId = CONV, Probability = "1",
                   Proportion = fmt(Share), AgeMin = Window, AgeReset = "No")]
 wr(rbind(ret, conv), D("transitions", "pathways", "post-disturbance.csv"))

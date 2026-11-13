@@ -7,26 +7,25 @@
 set -e
 LIB=F:/lucasCore/dev/libs/lassen/Lassen.ssim; TAG="chain 2026-11-12"
 R=$(ls -d "/c/Program Files/R"/R-*/bin/Rscript.exe | tail -1)
-q() { grep -v -i "warning\|built for\|In ssimLibrary\|^ *$"; }
+q() { grep -v -i "warning\|built for\|In ssimLibrary\|^ *$" || true; }   # grep finds nothing to print: not an error
 runid() { "$R" -e "suppressPackageStartupMessages(library(rsyncrosim)); L <- ssimLibrary('$LIB', summary = FALSE); t0 <- Sys.time(); r <- run(scenario(L, $1)); cat(sprintf('RESULT %d (%.1f min)\n', scenarioId(r), as.numeric(difftime(Sys.time(), t0, units = 'mins'))))" 2>&1 | grep "RESULT" | awk '{print $2}'; }
-echo "== Build $(date +%H:%M)"
+B=${1:-}; H=${2:-}   # resume: bash lassen-chain.sh <Build result> <historical result>
+if [ -z "$B" ]; then echo "== Build $(date +%H:%M)"
 B=$("$R" dev/reforestation/lassen-build.R 1,5,2,3,4,6,7,8,12 --name="Build Lassen 150 m $TAG" 2>&1 | tee /dev/stderr | grep "^result" | awk '{print $2}')
-echo "BUILD RESULT $B"
+echo "BUILD RESULT $B"; fi
+if [ -z "$H" ]; then
 echo "== Historical $(date +%H:%M)"
 HS=$("$R" tools/new-historical.R $LIB --build=$B --historical-only --name="Historical 1985-2023 $TAG" --replace 2>&1 | q | tail -1)
-H=$(runid $HS); echo "HISTORICAL RESULT $H"
+H=$(runid $HS); echo "HISTORICAL RESULT $H"; fi
+echo "== Run Figures and reforestation check (historical) $(date +%H:%M)"
+if [ -z "${2:-}" ]; then "$R" dev/reforestation/lassen-run-figures.R $B 1 $H 2>&1 | q | grep -v Datasheet || true; "$R" dev/reforestation/lassen-historical.R $H $B 2>&1 | q; fi
 echo "== Projection Setup $(date +%H:%M)"
 SS=$("$R" tools/new-projection-setup.R $LIB --build=$B --historical=$H --resolution=150 --end=2050 --name="Projection Setup $TAG" --replace 2>&1 | q | tail -1)
-"$R" -e "suppressPackageStartupMessages(library(rsyncrosim)); L <- ssimLibrary('$LIB', summary = FALSE)
-  a <- datasheet(scenario(L, 16), 'lucasCore_ProjectionAllocation', empty = FALSE); saveDatasheet(scenario(L, $SS), a, 'lucasCore_ProjectionAllocation')
-  o <- datasheet(scenario(L, 16), 'lucasCore_SuitabilityOptions', empty = FALSE); saveDatasheet(scenario(L, $SS), o, 'lucasCore_SuitabilityOptions')
-  p <- datasheet(scenario(L, $SS), 'lucasCore_ProjectionOptions', empty = FALSE); if (nrow(p)) { p\$Iterations <- 1; saveDatasheet(scenario(L, $SS), p, 'lucasCore_ProjectionOptions') }" 2>&1 | q
-S=$(runid $SS); echo "SETUP RESULT $S"
+"$R" dev/reforestation/lassen-setup-options.R $SS 2>&1 | grep "^scenario" || true   # (a multi-line Rscript -e runs only its first line on Windows)
+S=$(runid $SS); echo "SETUP RESULT $S"; [ -n "$S" ] || { echo "setup $SS failed: see its run log"; exit 1; }
 echo "== Projection $(date +%H:%M)"
 PS=$("$R" tools/new-projection.R $LIB --build=$S --years=27 --iterations=1 --name="Projection 2024-2050 $TAG" --replace 2>&1 | q | tail -1)
-P=$(runid $PS); echo "PROJECTION RESULT $P"
+P=$(runid $PS); echo "PROJECTION RESULT $P"; [ -n "$P" ] || { echo "projection $PS failed: see its run log"; exit 1; }
 echo "== Run Figures $(date +%H:%M)"
-"$R" dev/reforestation/lassen-run-figures.R $B 1 $H $P 2>&1 | q | grep -v Datasheet
-echo "== Reforestation check $(date +%H:%M)"
-"$R" dev/reforestation/lassen-historical.R $H $B 2>&1 | q
+"$R" dev/reforestation/lassen-run-figures.R $B 1 $P 2>&1 | q | grep -v Datasheet || true
 echo "== Done $(date +%H:%M): Build $B, historical $H, setup $S, projection $P"

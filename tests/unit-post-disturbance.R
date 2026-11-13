@@ -43,9 +43,9 @@ check("settings: every parent class has a window, return and reburn share in eve
 # the pathway rows for a class and ecodivision: the ecodivision's own rows, or the blank-stratum rows when the class has none of its own
 in_eco <- function(x, e) { y <- x[StratumIdSource %in% e]; if (nrow(y)) y else x[is.na(StratumIdSource)] }
 ret <- pd[TransitionTypeId %in% RT]
-check("each disturbed class can return to its parent at any age in its window, in every ecodivision (probability 1: the chance is a multiplier), age kept, by its kind's type",
+check("each disturbed class can return to its parent from age 2 (not in the fire year) to its window's end, in every ecodivision (probability 1: the chance is a multiplier), age kept, by its kind's type",
       all(vapply(seq_len(nrow(res)), function(i) { p <- res[i]; x <- in_eco(ret[StateClassIdSource == p$dname], p$Ecodivision)
-        nrow(x) == 1 && x$StateClassIdDest == p$Parent && is.na(x$AgeMin) && num(x$AgeMax) == p$Window - 1 && x$AgeReset == "No" &&
+        nrow(x) == 1 && x$StateClassIdDest == p$Parent && num(x$AgeMin) == 2 && num(x$AgeMax) == p$Window - 1 && x$AgeReset == "No" &&
           x$TransitionTypeId == RT[[if (p$Parent %in% SHRUBS) "Shrub" else "Forest"]] && num(x$Probability) == 1 }, TRUE)))
 check("no class has both a blank-stratum row and ecodivision rows for one transition type (ST-Sim would apply both)",
       all(pd[, !(any(is.na(StratumIdSource)) && any(!is.na(StratumIdSource))), by = .(StateClassIdSource, TransitionTypeId)]$V1) &&

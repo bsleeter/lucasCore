@@ -367,11 +367,21 @@ for (sname in unique(al$Surface)) {
     tm <- terms; if (nlevels(smp$GAP) < 2) tm <- setdiff(tm, "GAP"); if (nlevels(smp$County) < 2) tm <- tm[!grepl("County", tm)]; if (nlevels(smp$LC) < 2) tm <- setdiff(tm, "LC")
     if ("Owner" %in% tm && nlevels(smp$Owner) < 2) tm <- setdiff(tm, "Owner")
     form <- as.formula(paste("Event ~", paste(tm, collapse = " + ")))
-    fitm <- function(d) bam(form, family = binomial, data = d, weights = W / mean(W), discrete = TRUE, nthreads = min(32, detectCores() - 4))
+    # a smooth's basis cannot be larger than its covariate's distinct values in the sample (mgcv stops: "fewer unique covariate
+    # combinations than specified maximum degrees of freedom"; Lassen 150 m, Reforestation): k shrinks to the distinct values - 1,
+    # and a covariate with fewer than 4 distinct values leaves the model
+    fit_terms <- function(d, tm) { out <- character(); for (t in tm) { m <- regmatches(t, regexec("^s\\(([A-Za-z0-9_]+), k = ([0-9]+)\\)$", t))[[1]]
+        if (!length(m)) { out <- c(out, t); next }
+        u <- uniqueN(d[[m[2]]][!is.na(d[[m[2]]])]); if (u < 4) { say("%s: %s dropped (%d distinct values in the sample)", sname, m[2], u); next }
+        out <- c(out, if (u - 1 < as.integer(m[3])) sprintf("s(%s, k = %d)", m[2], u - 1L) else t) }
+      out }
+    tm <- fit_terms(smp, tm); form <- as.formula(paste("Event ~", paste(tm, collapse = " + ")))
+    fitm <- function(d) { tt <- fit_terms(d, tm); f <- if (identical(tt, tm)) form else as.formula(paste("Event ~", paste(tt, collapse = " + ")))
+      bam(f, family = binomial, data = d, weights = W / mean(W), discrete = TRUE, nthreads = min(32, detectCores() - 4)) }
     lev <- list(LC = levels(smp$LC), GAP = levels(smp$GAP), County = levels(smp$County), Owner = if ("Owner" %in% names(smp)) levels(smp$Owner))
     # predict over chosen cells of G from year y conditions; hold the share that adjacency carries in the run at a typical value
     share_t <- if (adj) sprintf("s(%s, k = 6)", share_k) else NA_character_
-    hold <- if (adj && share_t %in% tm) median(smp[Event == 0][[share_k]], na.rm = TRUE) else NA_real_
+    hold <- if (adj && any(startsWith(tm, sprintf("s(%s,", share_k)))) median(smp[Event == 0][[share_k]], na.rm = TRUE) else NA_real_
     pred_g <- function(m, y, cells) { lp <- layer_paths(y); n <- values(rast(nl_c(y)), mat = FALSE)[cells]; p <- rep(0, length(cells))
       ok <- !is.na(n) & inS(n) & !(gapv[cells] %in% exg)
       d <- data.table(LC = lc_group(n)); for (k in names(lp)) d[[k]] <- values(rast(lp[[k]]), mat = FALSE)[cells]
@@ -412,7 +422,7 @@ for (sname in unique(al$Surface)) {
     cells <- which(!is.na(std_m)); pv <- rep(NA_real_, ncell(G)); pv[cells] <- pred_g(m, y1, cells)
     surf <- to_model(setValues(rast(G), pv))
     # adjacency: the fitted share curve, scaled to 1 at its highest
-    if (adj && share_t %in% tm) { xs <- seq(0, 1, 0.05); nd <- smp[Event == 0][1][rep(1, length(xs))]
+    if (adj && any(startsWith(tm, sprintf("s(%s,", share_k)))) { xs <- seq(0, 1, 0.05); nd <- smp[Event == 0][1][rep(1, length(xs))]
       for (j in setdiff(vs, share_k)) nd[[j]] <- median(smp[Event == 0][[j]], na.rm = TRUE)
       nd[[share_k]] <- xs; ef <- predict(m, nd, type = "link", exclude = grep("County", tm, value = TRUE)); amt <- exp(ef - max(ef))
       for (g in gs[Adjacency == TRUE, TransitionGroupId]) { adj_set[[g]] <- data.table(TransitionGroupId = g, StateAttributeTypeId = attr_k, NeighborhoodRadius = adj_r, UpdateFrequency = adj_up)
