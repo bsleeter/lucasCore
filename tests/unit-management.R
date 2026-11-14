@@ -69,4 +69,23 @@ check("a primary (ecodivision) unit: keys on StratumId", "StratumId" %in% names(
 check("two replanting priorities in one scenario stop", inherits(try(run(data.table(ActionId = c("Replanting", "Replanting"), Amount = 1,
       Priority = c("None (random among eligible cells)", "Far from live forest (least likely to return on its own)"))), silent = TRUE), "try-error"))
 check("a row outside the projection is left out", is.null(run(data.table(ActionId = "Replanting", Amount = 5, StartYear = 2040))))
+# ---- costs (transition attributes) -------------------------------------------------------------------------------------------
+cd <- management_cost_defaults(file.path("defaults", "management", "costs.csv"))
+check("cost defaults: the four items, numeric", all(c("Planting", "Site preparation: Pile and burn", "Site preparation: Mechanical", "Salvage logging") %in% names(cd)) && !anyNA(cd))
+check("cost defaults convert per hectare to the library's unit (acres: /2.471)", abs(management_cost_defaults(file.path("defaults", "management", "costs.csv"), 2.471)[["Planting"]] - cd[["Planting"]] / 2.471) < 1e-9)
+runc <- function(ma) management_targets(ma, 1985L, 2023L, 2030L, land, lev, lev_list, lev_col, NA_character_, scv, say, fail, cost_defaults = cd)
+c1 <- runc(data.table(ActionId = "Replanting", Amount = 100, Survival = 0.8, SitePreparation = "Pile and burn", Priority = "None (random among eligible cells)"))$costs
+check("replanting with pile and burn: planting and site preparation on the planted and failed types, defaults, from the projection start",
+      nrow(c1) == 4 && setequal(c1$TransitionAttributeTypeId, MG_COST_TYPES[c("Planting", "Prep")]) && all(c1$Timestep == 2024) &&
+      all(c1[TransitionAttributeTypeId == MG_COST_TYPES[["Planting"]], Value] == cd[["Planting"]]) &&
+      all(c1[TransitionAttributeTypeId == MG_COST_TYPES[["Prep"]], Value] == cd[["Site preparation: Pile and burn"]]) && all(grepl(" \\[Type\\]$", c1$TransitionGroupId)))
+c2 <- runc(data.table(ActionId = "Replanting", Amount = 10, Cost = 500, SitePreparation = "None"))$costs
+check("a row's own cost wins; no site preparation, no site preparation cost", nrow(c2) == 2 && all(c2$Value == 500) && all(c2$TransitionAttributeTypeId == MG_COST_TYPES[["Planting"]]))
+r3c <- runc(data.table(ActionId = "Salvage logging", Amount = 30, TertiaryStratumId = "B"))
+check("salvage: the default net cost (negative = revenue) in the row's unit, and in the summary", nrow(r3c$costs) == 1 && r3c$costs$Value == cd[["Salvage logging"]] &&
+      r3c$costs$TertiaryStratumId == "B" && all(r3c$summary$CostPerArea == cd[["Salvage logging"]]))
+check("two overlapping rows for the same type and place at different costs stop", inherits(try(runc(data.table(ActionId = "Salvage logging", Amount = 5, Cost = c(100, 200))), silent = TRUE), "try-error"))
+check("the same rows at the same cost are fine", !inherits(try(runc(data.table(ActionId = "Salvage logging", Amount = 5, Cost = c(100, 100))), silent = TRUE), "try-error"))
+check("without cost defaults no costs", is.null(r1$costs))
+
 cat(sprintf("%d passed, %d failed\n", n_ok, n_bad)); if (n_bad) quit(status = 1)

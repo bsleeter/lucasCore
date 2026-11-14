@@ -154,7 +154,7 @@ namespace lucasCoreUI
         // ---- one action's form ----------------------------------------------------------------------------------------------
         private class ActionForm
         {
-            public readonly TextBox Start = Box(60), End = Box(60), Area = Box(80), From = Box(40), To = Box(40), Survival = Box(50);
+            public readonly TextBox Start = Box(60), End = Box(60), Area = Box(80), From = Box(40), To = Box(40), Survival = Box(50), Cost = Box(70), PrepCost = Box(70);
             public readonly ComboBox Priority = List(330), Prep = List(250);
             public readonly WherePicker Where = new WherePicker();
             public readonly Button Add;
@@ -164,6 +164,35 @@ namespace lucasCoreUI
 
         private readonly ActionForm m_rep = new ActionForm("Add replanting");
         private readonly ActionForm m_sal = new ActionForm("Add salvage logging");
+        // costs (user 2026-11-13: "start with costs per hectare and research defaults"): USD per hectare, the package defaults in
+        // defaults/management/costs.csv; a row keeps the cost shown when it is added (stage 9 uses the default for a blank one)
+        private const string UNIT = "hectare";
+        private readonly Label m_repCostNote = Note(""), m_salCostNote = Note("");
+        private readonly Dictionary<string, double> m_cost = new Dictionary<string, double>();
+        private string m_costYear = "";
+        private void LoadCosts()
+        {
+            m_cost.Clear();
+            try
+            {
+                List<string[]> rows = Defaults.ReadCsv(Defaults.PackageFile("defaults", "management", "costs.csv"));
+                int ii = Array.IndexOf(rows[0], "Item"), ic = Array.IndexOf(rows[0], "CostPerHa"), iy = Array.IndexOf(rows[0], "DollarYear");
+                foreach (string[] r in rows.Skip(1)) { double v; if (r.Length > ic && double.TryParse(r[ic], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out v)) m_cost[r[ii].Trim()] = v; if (iy >= 0 && r.Length > iy && m_costYear.Length == 0) m_costYear = r[iy]; }
+            }
+            catch (Exception) { }
+        }
+        private string CostText(string item) { double v; return m_cost.TryGetValue(item, out v) ? v.ToString("0", System.Globalization.CultureInfo.InvariantCulture) : ""; }
+        private static readonly string[] PREP_ITEM = { null, "Site preparation: Pile and burn", "Site preparation: Mechanical" };
+        private void ShowPrepCost()
+        {
+            int p = m_rep.Prep.SelectedIndex; m_rep.PrepCost.Enabled = p > 0; m_rep.PrepCost.Text = p > 0 ? CostText(PREP_ITEM[p]) : "";
+        }
+        private void CostNotes()
+        {
+            string yr = m_costYear.Length > 0 ? " (" + m_costYear + " USD)" : "";
+            m_repCostNote.Text = string.Format("USD{0}. Defaults: planting {1}, pile and burn {2}, mechanical {3}; edit for your area. Paid on failed plantings too. Provisional.", yr, CostText("Planting"), CostText(PREP_ITEM[1]), CostText(PREP_ITEM[2]));
+            m_salCostNote.Text = string.Format("USD{0}: logging cost minus timber revenue; negative = net revenue. Default {1}; it varies widely with timber value and access. Provisional.", yr, CostText("Salvage logging"));
+        }
         private readonly Panel m_grid = GridHost(200);
         private readonly Button m_clear = new Button { Text = "Remove all rows", AutoSize = true, Margin = new Padding(3, 3, 12, 3) };
         private readonly Label m_state = new Label { AutoSize = true, MaximumSize = new Size(640, 0), ForeColor = SystemColors.GrayText, Margin = new Padding(3, 8, 3, 3) };
@@ -205,6 +234,7 @@ namespace lucasCoreUI
                 Line("Survival:", m_rep.Survival, Note("Share that takes: back to its own forest type at age 0. The rest stays disturbed and can still return or convert. Default 0.8.")),
                 Line("Priority:", m_rep.Priority, Note("Random, or first where natural return is least likely (far from live forest). One priority for all replanting rows.")),
                 Line("Site preparation:", m_rep.Prep, Note("Carbon on the planted area. Pile and burn: cover burned (96% emitted), roots die, half the litter and fine woody debris and 30% of branch snags burn. Mechanical: cover to litter and fine woody debris, roots die. Provisional.")),
+                Line("Cost per " + UNIT + ":", Pair(m_rep.Cost, "planting +", m_rep.PrepCost, "site preparation"), m_repCostNote),
                 ActionRow(m_rep))));
 
             // salvage
@@ -213,6 +243,7 @@ namespace lucasCoreUI
                 Line("Area per year:", m_sal.Area, Note("In the library's units (hectares). Takes mostly snags to the forestry sector; the cell stays disturbed with its age.")),
                 Line("Where:", m_sal.Where.Panel(), m_sal.Where.Info),
                 Line("Years since disturbance:", Pair(m_sal.From, "to", m_sal.To, null), Note("Soon after the fire, before the snags lose value. Default 0-2.")),
+                Line("Net cost per " + UNIT + ":", m_sal.Cost, m_salCostNote),
                 ActionRow(m_sal))));
 
             // the rows
@@ -223,17 +254,19 @@ namespace lucasCoreUI
 
             m_rep.Priority.Items.AddRange(new object[] { "None (random among eligible cells)", "Far from live forest (least likely to return on its own)" });
             m_rep.Prep.Items.AddRange(new object[] { "None", "Pile and burn", "Mechanical (mastication)" });
-            Defaults();
+            LoadCosts(); FillDefaults(); CostNotes();
+            m_rep.Prep.SelectedIndexChanged += (s, e) => ShowPrepCost();
             m_rep.Add.Click += (s, e) => AddRow(1, m_rep);
             m_sal.Add.Click += (s, e) => AddRow(2, m_sal);
             m_clear.Click += (s, e) => ClearAll();
             this.ResumeLayout(false);
         }
 
-        private void Defaults()
+        private void FillDefaults()
         {
             m_rep.Area.Text = "100"; m_rep.From.Text = "1"; m_rep.To.Text = "5"; m_rep.Survival.Text = "0.8"; m_rep.Priority.SelectedIndex = 0; m_rep.Prep.SelectedIndex = 0;
             m_sal.Area.Text = "100"; m_sal.From.Text = "0"; m_sal.To.Text = "2";
+            m_rep.Cost.Text = CostText("Planting"); ShowPrepCost(); m_sal.Cost.Text = CostText("Salvage logging");
         }
 
         public override void LoadDataFeed(DataFeed dataFeed)
@@ -271,6 +304,11 @@ namespace lucasCoreUI
             if (err != null) { a.Said.ForeColor = Color.Firebrick; a.Said.Text = "Not added: " + err + "."; return; }
             nr["ActionId"] = action; nr["StartYear"] = start; nr["EndYear"] = end; nr["Amount"] = area; nr["MinAge"] = from; nr["MaxAge"] = to;
             if (rep) { nr["Survival"] = surv; nr["Priority"] = a.Priority.SelectedIndex + 1; nr["SitePreparation"] = a.Prep.SelectedIndex + 1; }
+            object cost = DBNull.Value, pcost = DBNull.Value; string ce = ReadNumber(a.Cost, "the cost", false, false, -1e9, 1e9, out cost);
+            if (ce == null && rep && a.Prep.SelectedIndex > 0) ce = ReadNumber(a.PrepCost, "the site preparation cost", false, false, 0, 1e9, out pcost);
+            if (ce != null) { a.Said.ForeColor = Color.Firebrick; a.Said.Text = "Not added: " + ce + "."; return; }
+            if (nr.Table.Columns.Contains("Cost")) nr["Cost"] = cost;
+            if (nr.Table.Columns.Contains("SitePrepCost")) nr["SitePrepCost"] = pcost;
             Sheet.BeginAddRows();
             try { dt.Rows.Add(nr); }
             finally { Sheet.EndAddRows(); }
@@ -321,6 +359,7 @@ namespace lucasCoreUI
                 s += string.Format("; {0:0}% takes{1}{2}", 100 * sv, prep == 2 ? ", after pile and burn" : prep == 3 ? ", after mechanical site preparation" : ", no site preparation",
                                    pri == 2 ? ", far from live forest first" : ", at random");
             }
+            if (r.Table.Columns.Contains("Cost") && r["Cost"] != DBNull.Value) s += string.Format("; {0} USD per {1}{2}", Num(r["Cost"], ""), UNIT, rep && r.Table.Columns.Contains("SitePrepCost") && r["SitePrepCost"] != DBNull.Value ? " + " + Num(r["SitePrepCost"], "") + " site preparation" : "");
             return s + ".";
         }
 

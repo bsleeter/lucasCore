@@ -62,6 +62,18 @@ roots <- function(g) c(ev(g, "Biomass: Fine Root", "DOM: Belowground Very Fast",
 mech <- function(g) c(ev(g, "Biomass: Foliage", "DOM: Aboveground Very Fast", "LULC: Mortality Live", 1), ev(g, "Biomass: Other Wood", "DOM: Aboveground Fast", "LULC: Mortality Live", 1), roots(g))
 edit_lines(D("stockflow", "event-pathways.csv"), function(l) grepl(",Site Preparation: [A-Za-z]+,", l), c(burn(PREP[["Burn"]]), mech(PREP[["Mechanical"]])))
 
+# costs (user 2026-11-13: "start with costs per hectare and research defaults"): ST-Sim transition attributes, one type per cost,
+# in a "Management Cost" attribute group; stage 9 writes their values (USD per unit area) on the management types' [Type] groups
+COSTS <- data.table(Name = c("Management Cost: Planting", "Management Cost: Site Preparation", "Management Cost: Salvage Logging"),
+                    Description = c("Replanting: seedlings and planting, per unit area planted (planted and failed alike)",
+                                    "Site preparation before replanting (pile and burn, or mechanical), per unit area",
+                                    "Salvage logging net cost per unit area (negative = net revenue)"))
+edit_lines(D("stsim", "stsim_AttributeGroup.csv"), function(l) first_field(l) == "Management Cost", "Management Cost,")
+tat <- D("stsim", "stsim_TransitionAttributeType.csv"); if (!file.exists(tat)) writeLines("Name,AttributeGroupId,Units,Description", tat)
+edit_lines(tat, function(l) startsWith(first_field(l), "Management Cost:"), COSTS[, sprintf('%s,Management Cost,USD,"%s"', Name, Description)])
+man <- readLines(D("stsim", "manifest.csv")); if (!any(grepl(",stsim_TransitionAttributeType,", man, fixed = TRUE))) {
+  i <- grep(",stsim_StateAttributeType,", man, fixed = TRUE); writeLines(append(man, "15,stsim_TransitionAttributeType,Project,management costs (to-do 58; tools/make_management.R)", i), D("stsim", "manifest.csv")) }
+
 # definitions
 dl <- c(
   'TransitionType,Management: Replanting,"Planting after a disturbance (Management Actions page): a disturbed forest class back to its forest type at age 0, without site preparation.",',

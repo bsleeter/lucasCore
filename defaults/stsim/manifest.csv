@@ -12,6 +12,7 @@ Order,Datasheet,Scope,Note
 13,stsim_AgeGroup,Project,
 14,stsim_AttributeGroup,Project,
 15,stsim_StateAttributeType,Project,
+15,stsim_TransitionAttributeType,Project,management costs (to-do 58; tools/make_management.R)
 16,core_DistributionType,Project,
 17,core_ExternalVariableType,Project,
 18,stsim_StockType,Project,

@@ -33,4 +33,12 @@ cs <- function(id) { d <- as.data.table(datasheet(scenario(L, id), "stsim_Output
 cat("carbon (Tg C) by pool group, baseline vs management:\n"); print(merge(cs(P0), cs(scenarioId(p)), by = c("Timestep", "g"), suffixes = c(".base", ".mgmt")))
 # the management maps (transition maps by group and year): the replanting family, its types, salvage
 sp <- as.data.table(datasheet(scenario(L, scenarioId(p)), "stsim_OutputSpatialTransition", lookupsAsFactors = FALSE))
-cat("transition maps written for management groups:\n"); print(sp[grepl("Replant|Salvage", TransitionGroupId), .(maps = .N, years = paste(range(Timestep), collapse = "-")), by = TransitionGroupId])
+if (nrow(sp)) { cat("transition maps written for management groups:\n"); print(sp[grepl("Replant|Salvage", TransitionGroupId), .(maps = .N, years = paste(range(Timestep), collapse = "-")), by = TransitionGroupId]) } else cat("no transition maps (transition map output off)\n")
+# costs (transition attributes): the ST-Sim total per year against hectares treated x cost per hectare
+cat("cost values written by stage 9:\n"); print(datasheet(r, "stsim_TransitionAttributeValue"))
+ta <- as.data.table(datasheet(scenario(L, scenarioId(p)), "stsim_OutputTransitionAttribute", lookupsAsFactors = FALSE))
+cat("transition attribute output (USD) by year and type:\n"); print(dcast(ta[, .(USD = round(sum(Amount))), by = .(Timestep, TransitionAttributeTypeId)], Timestep ~ TransitionAttributeTypeId, value.var = "USD"))
+cd <- setNames(fread("defaults/management/costs.csv")$CostPerHa, fread("defaults/management/costs.csv")$Item)
+ha <- ty[, .(rep = sum(Amount[grepl("Replanting", TransitionGroupId)]), sal = sum(Amount[grepl("Salvage", TransitionGroupId)])), by = Timestep]
+ex <- ha[, .(Timestep, Planting = rep * cd[["Planting"]], Prep = rep * cd[["Site preparation: Pile and burn"]], Salvage = sal * cd[["Salvage logging"]])]
+cat("expected (ha x default cost per ha):\n"); print(ex[order(Timestep)])

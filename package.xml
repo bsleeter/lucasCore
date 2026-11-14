@@ -326,6 +326,8 @@
 		<column name="Priority" displayName="Priority (replanting)" dataType="Integer" validationType="List" formula1="1:None (random among eligible cells)|2:Far from live forest (least likely to return on its own)" defaultValue="1" isOptional="True"/>
 		<column name="Survival" displayName="Survival (replanting: share of the planted area that takes)" dataType="Double" defaultValue="0.8" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
 		<column name="SitePreparation" displayName="Site Preparation (replanting)" dataType="Integer" validationType="List" formula1="1:None|2:Pile and burn|3:Mechanical (mastication)" defaultValue="1" isOptional="True"/>
+		<column name="Cost" displayName="Cost per Area (USD per amount unit: planting, or salvage net cost; negative = revenue; blank = the package default)" dataType="Double" isOptional="True"/>
+		<column name="SitePrepCost" displayName="Site Preparation Cost per Area (USD per amount unit; blank = the package default)" dataType="Double" isOptional="True"/>
 	</dataSheet>
 
 	<dataSheet name="OutputManagementAction" displayName="Management Actions (as set up)">
@@ -338,6 +340,7 @@
 		<column name="YearsSinceDisturbance" displayName="Years Since the Disturbance" dataType="String"/>
 		<column name="Where" dataType="String"/>
 		<column name="Note" dataType="String"/>
+		<column name="CostPerArea" displayName="Cost per Area (USD per amount unit)" dataType="Double"/>
 	</dataSheet>
 
 	<dataSheet name="ClimateOptions" displayName="Climate Options" isSingleRow="True" viewClassName="lucasCoreUI.ClimateOptionsView" viewClassAssembly="lucasCoreUI">
@@ -1261,6 +1264,7 @@
 		<dataSheet name="stsim_TransitionSpatialMultiplier" type="Both"/>
 		<dataSheet name="stsim_InitialStockSpatial" type="Both"/>
 		<dataSheet name="stsim_TransitionTarget" type="Both"/>
+		<dataSheet name="stsim_TransitionAttributeValue" type="Both"/>
 		<dataSheet name="OutputProjectionSchedule" type="Output"/>
 		<dataSheet name="OutputManagementAction" type="Output"/>
 		<dataSheet name="core_SpatialMultiprocessing" type="Output"/>

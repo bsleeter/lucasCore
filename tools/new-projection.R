@@ -73,7 +73,8 @@ if (legacy) { saveDatasheet(S, data.frame(HistoricalScenarioId = hid), "lucasCor
   if (nrow(po)) saveDatasheet(S, po, "lucasCore_ProjectionOptions") }
 saveDatasheet(S, data.frame(MinimumTimestep = yh, MaximumTimestep = ye, MinimumIteration = 1L, MaximumIteration = it, IsSpatial = TRUE), "stsim_RunControl")
 saveDatasheet(S, data.frame(SummaryOutputSC = TRUE, SummaryOutputSCTimesteps = 1L, SummaryOutputSCZeroValues = FALSE,
-                            SummaryOutputTR = TRUE, SummaryOutputTRTimesteps = 1L, SummaryOutputTRIntervalMean = FALSE), "stsim_OutputOptions")
+                            SummaryOutputTR = TRUE, SummaryOutputTRTimesteps = 1L, SummaryOutputTRIntervalMean = FALSE,
+                            SummaryOutputTA = TRUE, SummaryOutputTATimesteps = 1L), "stsim_OutputOptions")   # (TA: management costs, to-do 58)
 ev <- ye - yh
 saveDatasheet(S, data.frame(RasterOutputSC = TRUE, RasterOutputSCTimesteps = ev, RasterOutputAge = TRUE, RasterOutputAgeTimesteps = ev), "stsim_OutputOptionsSpatial")
 saveDatasheet(S, data.frame(SummaryOutputST = TRUE, SummaryOutputSTTimesteps = 1L, SummaryOutputFL = TRUE, SummaryOutputFLTimesteps = 1L,

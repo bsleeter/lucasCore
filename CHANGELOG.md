@@ -51,6 +51,11 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   disturbed; it can go first where natural return is least likely (far from live forest). Six new transition types, three groups,
   site preparation carbon flows, mapped and summarized. With spatial tiles every action names a unit of the tile level. An empty
   page is the baseline. Changes Build results (new pathways); projection results only when actions are set.
+- Management costs: each Management Actions row has a cost per unit area (planting, site preparation, salvage net cost; negative =
+  net revenue), filled from provisional package defaults (`defaults/management/costs.csv`, 2024 USD per hectare: planting 1,200,
+  pile and burn 1,800, mechanical 2,200, salvage -1,000, with ranges and sources) or the user's own. Stage 9 writes them as ST-Sim
+  transition attributes (group Management Cost, three types in USD), so a projection with Transition attributes output reports
+  the cost a year by type and strata. New projections (`tools/new-projection.R`) turn that output on.
 - Seven study area and strata sources (Stratum Sources presets 11-17): FWS Refuges, DoD Installations, National Forests,
   Wilderness, Tribal Lands, BLM National Conservation Lands and Metropolitan Areas. The first five and BLM come from PAD-US 4.0 (a
   new edition of the PAD-US units download), Tribal Lands from Census TIGER/Line 2022 (a new Data Download dataset), Metropolitan
@@ -72,6 +77,16 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   `tools/make_nps_units.R` writes the unit list with stable ids. Existing libraries: `tools/new-library.R <library> --rebuild-strata`
   (custom sources now take Numbers 11-20).
 - `tools/new-projection.R --base=<id> --also=<ids>`: a projection on a Projection Setup made on a quick-test result.
+
+### Fixed
+- Ag Change targets were ignored in spatial projections (ST-Sim warned "At least one Transition Target has been defined with a
+  non-primary Transition Group"; seen in 1.3.2 too). Ag Change was a transition simulation group, so it was the primary group of
+  both its types, while their targets (one area per unit each) are on the types' own `[Type]` groups; ST-Sim's spatial allocation
+  uses only the primary group's target, so cropland to pasture and pasture to cropland ran at their pathway probability and stage
+  10's multipliers. Ag Change is no longer a simulation group, so each type's `[Type]` group is primary and takes its target; the
+  Ag Change group still sums both, and the two `[Type]` groups are mapped. The 1.4 library update removes the row; on 1.3.x,
+  delete Ag Change from the project's Transition Simulation Groups. Changes projection results where cropland or pasture change
+  (not Lassen). New `tests/unit-primary-groups.R`: every default and management target is on a primary group.
 
 **Upgrading (1.4):** library update 1.4 adds the Reforestation group and types, the simulation group, and the new columns (BpsFile,
 the Land Cover Layers maps). A library needs a Data Download of BpsFile and a new Build for reforestation; with BpS missing and

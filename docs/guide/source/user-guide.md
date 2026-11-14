@@ -915,7 +915,7 @@ The Build result supplies the model and, through stage 0, the map and carbon out
 
 > The start year is the initial state the Build mapped, so the first transitions happen in 1986. Transitions are random wherever a multiplier covers only part of a cell, so more iterations give a range of outcomes, at proportionally more run time and disk space. One iteration is enough to check the run.
 
-6. Open **Output Options > Tabular** (10). Tick **State classes every** `1` years (11) and **Transitions every** `1` years (12). These yearly tables, by stratum, are what the results charts use.
+6. Open **Output Options > Tabular** (10). Tick **State classes every** `1` years (11) and **Transitions every** `1` years (12). These yearly tables, by stratum, are what the results charts use. With Management Actions (Projection > Management Actions), also tick **Transition attributes every** `1` years: the actions' costs.
 
 &#91;image: The Output Options Tabular page: Tabular marked 10, State classes every 1 years marked 11 and Transitions every 1 years marked 12\]
 

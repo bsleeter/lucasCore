@@ -41,8 +41,9 @@ management_rows <- function(ma, y1, pend, say, fail) {
     pri <- if (rep && grepl("^Far", as.character(col(r, "Priority")))) "Far from live forest" else "None"
     pri1 <- as.character(col(r, "StratumId")); sec <- as.character(col(r, "SecondaryStratumId")); ter <- as.character(col(r, "TertiaryStratumId"))
     base <- if (rep) MG_REPLANT[[prep]] else MG_SALVAGE
+    cost <- num(col(r, "Cost")); spc <- num(col(r, "SitePrepCost"))
     out <- data.table::data.table(Row = i, Action = if (rep) "Replanting" else "Salvage logging", Type = base, Share = sv, S0 = s0, S1 = s1, A = a,
-                                  A0 = a0, A1 = a1, Prep = prep, Priority = pri, Primary = pri1, Secondary = sec, Tertiary = ter)
+                                  A0 = a0, A1 = a1, Prep = prep, Priority = pri, Primary = pri1, Secondary = sec, Tertiary = ter, Cost = cost, PrepCost = spc)
     if (rep) out <- rbind(out, data.table::copy(out)[, `:=`(Type = paste(base, "(failed)"), Share = 1 - sv)])
     out }))
   if (!nrow(rows)) return(NULL)
@@ -50,8 +51,35 @@ management_rows <- function(ma, y1, pend, say, fail) {
   pr <- unique(rows[Action == "Replanting", Priority]); if (length(pr) > 1) fail("Management Actions: every Replanting row needs the same priority")
   rows }
 
+# ---- costs (user 2026-11-13: "start with costs per hectare and research defaults") ----------------------------------------------
+# ST-Sim transition attributes (types from tools/make_management.R, USD): a row's cost per unit area, else the package default
+# (defaults/management/costs.csv, USD per hectare, converted to the library's amount units), on its types' [Type] groups from its start
+# year in its strata. Planting and site preparation cost go on the planted and the failed type alike (the money is spent either way)
+MG_COST_TYPES <- c(Planting = "Management Cost: Planting", Prep = "Management Cost: Site Preparation", Salvage = "Management Cost: Salvage Logging")
+management_cost_defaults <- function(file, per_ha = 1) {
+  d <- data.table::fread(file, na.strings = ""); v <- setNames(as.numeric(d$CostPerHa) / per_ha, d$Item)
+  need <- c("Planting", "Site preparation: Pile and burn", "Site preparation: Mechanical", "Salvage logging")
+  if (!all(need %in% names(v))) stop(sprintf("%s needs rows %s", basename(file), paste(setdiff(need, names(v)), collapse = ", ")), call. = FALSE)
+  v }
+management_costs <- function(rows, defaults, lev_col, fail) {
+  rows <- data.table::copy(rows)
+  rows[, `:=`(PlantCost = ifelse(is.na(Cost), defaults[["Planting"]], Cost),
+              SalvCost = ifelse(is.na(Cost), defaults[["Salvage logging"]], Cost),
+              PrepC = ifelse(is.na(Prep) | Prep == "None", 0, ifelse(is.na(PrepCost), ifelse(Prep == "Burn", defaults[["Site preparation: Pile and burn"]], defaults[["Site preparation: Mechanical"]]), PrepCost)))]
+  a <- rbind(rows[Action == "Replanting", .(Row, Type, S0, S1, Primary, Secondary, Tertiary, Attr = MG_COST_TYPES[["Planting"]], Value = PlantCost)],
+             rows[Action == "Replanting" & Prep != "None", .(Row, Type, S0, S1, Primary, Secondary, Tertiary, Attr = MG_COST_TYPES[["Prep"]], Value = PrepC)],
+             rows[Action != "Replanting", .(Row, Type, S0, S1, Primary, Secondary, Tertiary, Attr = MG_COST_TYPES[["Salvage"]], Value = SalvCost)])
+  # two rows for the same type and place whose years overlap must agree on a cost: ST-Sim keeps one value per type, place and year
+  a[, k := paste(Type, Attr, Primary, Secondary, Tertiary)]
+  for (kk in unique(a$k)) { z <- a[k == kk][order(S0)]; if (nrow(z) > 1) for (j in 2:nrow(z)) if (z$S0[j] <= max(z$S1[1:(j - 1)]) && any(z$Value[1:(j - 1)][z$S1[1:(j - 1)] >= z$S0[j]] != z$Value[j]))
+    fail("Management Actions: rows %d and %d act on the same type and place in the same years at different costs", z$Row[j - 1], z$Row[j]) }
+  out <- unique(a[, .(Timestep = S0, StratumId = Primary, SecondaryStratumId = Secondary, TertiaryStratumId = Tertiary, TransitionGroupId = paste0(Type, " [Type]"),
+                      TransitionAttributeTypeId = Attr, Value = round(Value, 4))])
+  out <- out[, names(out)[vapply(out, function(v) !all(is.na(v)), TRUE)], with = FALSE]
+  list(values = out, rows = rows) }
+
 # targets (Timestep, TransitionGroupId, strata key columns, Amount), age multipliers, and a summary; NULL with no rows
-management_targets <- function(ma, y0, y1, pend, land, lev, lev_list, lev_col, tile_lvl, sc_vals, say, fail) {
+management_targets <- function(ma, y0, y1, pend, land, lev, lev_list, lev_col, tile_lvl, sc_vals, say, fail, cost_defaults = NULL) {
   rows <- management_rows(ma, y1, pend, say, fail); if (is.null(rows)) return(NULL)
   LV <- c("Primary", "Secondary", "Tertiary")
   # with spatial tiles every row names a unit of the tile level: a target must lie inside one tile (user 2026-11-13: "if using spatial
@@ -81,12 +109,15 @@ management_targets <- function(ma, y0, y1, pend, land, lev, lev_list, lev_col, t
   for (L in K) data.table::setnames(tt, L, lev_col[[L]])
   mult <- data.table::rbindlist(lapply(types, function(ty) { r <- rows[Type == ty][1]; g <- paste0(ty, " [Type]")
     data.table::data.table(Timestep = y1 + 1L, TransitionGroupId = g, AgeMin = c(0, r$A0, r$A1 + 1), AgeMax = c(r$A0 - 1, r$A1, NA), Amount = c(0, 1, 0))[is.na(AgeMax) | AgeMax >= AgeMin] }))
+  cst <- if (!is.null(cost_defaults)) management_costs(rows, cost_defaults, lev_col, fail) else NULL
+  if (!is.null(cst)) rows <- cst$rows
   where <- function(p, s, t) { w <- mapply(function(a, b, c) paste(stats::na.omit(c(a, b, c)), collapse = " / "), p, s, t, USE.NAMES = FALSE); ifelse(nzchar(w), w, "study area") }
   sm <- rows[, .(Row, TransitionType = Type, StartYear = S0, EndYear = S1, AreaPerYear = A * Share, YearsSinceDisturbance = sprintf("%g-%g", A0, A1),
                  Where = where(Primary, Secondary, Tertiary),
-                 Note = ifelse(Action == "Replanting", sprintf("%s %g a year; survival %g; site preparation %s; priority %s", Action, A, ifelse(grepl("failed", Type), 1 - Share, Share), Prep, Priority), Action))]
+                 Note = ifelse(Action == "Replanting", sprintf("%s %g a year; survival %g; site preparation %s; priority %s", Action, A, ifelse(grepl("failed", Type), 1 - Share, Share), Prep, Priority), Action),
+                 CostPerArea = if (!is.null(cst)) ifelse(Action == "Replanting", PlantCost + PrepC, SalvCost) else NA_real_)]
   for (i in unique(rows$Row)) with(rows[Row == i][1], say("Management Actions: row %d, %s %g a year %d-%d, %g-%g years since the disturbance, %s%s",
     i, Action, A, S0, S1, A0, A1, where(Primary, Secondary, Tertiary),
     if (Action == "Replanting") sprintf("; survival %g, site preparation %s, priority %s", Share, Prep, Priority) else ""))
   say("Management Actions: targets for %d types on %s (%d unit combinations)", length(types), if (length(K)) paste(K, collapse = " x ") else "the whole study area", nrow(combos))
-  list(targets = tt, multipliers = mult, summary = sm, groups = paste0(types, " [Type]"), far = any(rows$Priority == "Far from live forest")) }
+  list(targets = tt, multipliers = mult, summary = sm, costs = if (!is.null(cst)) cst$values else NULL, groups = paste0(types, " [Type]"), far = any(rows$Priority == "Far from live forest")) }

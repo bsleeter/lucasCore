@@ -1850,6 +1850,15 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       2,194 (planted land no longer waits). Carbon by 2050: biomass +0.092 Tg C, dead matter -0.062 (salvage, burned slash),
       ecosystem +0.021, forestry sector +0.021. With transition maps on (a 3-year copy), every management [Type] group is mapped
       each year (2024 planting after burn site prep: 118 cells, 265 ha). tests/unit-management.R 24 checks.
+    - Costs (user 2026-11-13: "start with costs per hectare and research defaults"): ST-Sim transition attributes, group Management
+      Cost, types Planting, Site Preparation and Salvage Logging (USD). Each page row has a cost per unit area (salvage: net cost,
+      negative = net revenue) and a site preparation cost, filled from defaults/management/costs.csv (2024 USD per hectare,
+      provisional: planting 1,200 (600-3,000), pile and burn 1,800 (1,000-3,000), mechanical 2,200 (1,000-3,500), salvage -1,000
+      (-5,000 to 1,500); sources and regional values in dev/management/cost-defaults-research.md). Stage 9 writes them on the
+      types' [Type] groups from the row's start year in its strata (planting and site preparation on failed plantings too); rows
+      overlapping in type, place and years must agree. Lassen (setup 120, projection 122): ST-Sim's total is area x value, exactly:
+      planting 4.63 M USD, site preparation 6.94 M, salvage -1.05 M over 2024-2050. Later: cost-effectiveness (USD per Mg C) in
+      Compare Runs, a budget (transition attribute targets), regional costs, salvage value falling with years since the fire.
     - Open: planting a different type (assisted migration); fuel treatments; FACTS records for the baseline; a full Build on Puget
       (tiled by county) to try the tile rule in a run.
   - **Replanting and restoration:** a management transition from a post-disturbance class back to a forest type.

@@ -1,0 +1,4 @@
+Name,AttributeGroupId,Units,Description
+Management Cost: Planting,Management Cost,USD,"Replanting: seedlings and planting, per unit area planted (planted and failed alike)"
+Management Cost: Site Preparation,Management Cost,USD,"Site preparation before replanting (pile and burn, or mechanical), per unit area"
+Management Cost: Salvage Logging,Management Cost,USD,"Salvage logging net cost per unit area (negative = net revenue)"

@@ -165,6 +165,9 @@ namespace lucasCoreUI
             // table, which SyncroSim adds by itself.)
             AddColumn(store, "lucasCore_DataSource", "BpsFile", "TEXT");
             AddColumn(store, "lucasCore_ManagementAction", "StratumId", "INTEGER");   // (the sheet is new in 1.4; a development library made it before this column)
+            AddColumn(store, "lucasCore_ManagementAction", "Cost", "DOUBLE");
+            AddColumn(store, "lucasCore_ManagementAction", "SitePrepCost", "DOUBLE");
+            AddColumn(store, "lucasCore_OutputManagementAction", "CostPerArea", "DOUBLE");
             AddColumn(store, "lucasCore_DataSource", "RcmapCoverFolder", "TEXT");
             AddColumn(store, "lucasCore_OutputLandCoverLayers", "ReforestTypeFileName", "TEXT");
             AddColumn(store, "lucasCore_OutputLandCoverLayers", "BpsForestShareFileName", "TEXT");
@@ -180,13 +183,20 @@ namespace lucasCoreUI
                 AddTypeToGroup(store, "Reforestation: " + y, "Reforestation");
             }
             // a transition simulation group, as Ag Contraction: ST-Sim writes transition maps only for these and [Type] groups
+            AddSimulationGroup(store, "Reforestation");
+            // Ag Change is no longer a simulation group (user 2026-11-13, a colleague's 1.3.2 projection warned "At least one Transition
+            // Target has been defined with a non-primary Transition Group"): its targets are on its two types' [Type] groups (one area
+            // per county each, defaults/projection/transitions.csv), but a type in a listed user group has that group as its primary
+            // group, and ST-Sim's spatial allocation uses only the primary group's target, so the two types ran at their pathway
+            // probability and stage 10's multipliers, with no target. Without it each type's [Type] group is its primary group, by
+            // default (user: "With Ag Change removed the types inherit the default behavior"). The Ag Change group still summarizes
+            // both; its two [Type] groups are mapped through the output filter (below)
+            string[] agTypes = { "Ag Change: Cropland to Pasture [Type]", "Ag Change: Pasture to Cropland [Type]" };
             if (store.TableExists("stsim_TransitionSimulationGroup"))
                 foreach (DataRow r in Rows(store, "SELECT ProjectId FROM core_Project").Rows)
                 {
-                    string pr = Id(r["ProjectId"]), g = IdOf(store, "stsim_TransitionGroup", "TransitionGroupId", pr, "Reforestation");
-                    if (g == null || Convert.ToInt64(store.ExecuteScalar("SELECT COUNT(*) FROM stsim_TransitionSimulationGroup WHERE ProjectId = " + pr + " AND TransitionGroupId = " + g), CultureInfo.InvariantCulture) > 0) continue;
-                    store.ExecuteNonQuery("INSERT INTO stsim_TransitionSimulationGroup (TransitionSimulationGroupId, ProjectId, TransitionGroupId) VALUES (" +
-                                          NewId(store).ToString(CultureInfo.InvariantCulture) + ", " + pr + ", " + g + ")");
+                    string g = IdOf(store, "stsim_TransitionGroup", "TransitionGroupId", Id(r["ProjectId"]), "Ag Change");
+                    if (g != null) store.ExecuteNonQuery("DELETE FROM stsim_TransitionSimulationGroup WHERE ProjectId = " + Id(r["ProjectId"]) + " AND TransitionGroupId = " + g);
                 }
 
             // management (to-do 58, tools/make_management.R): six replanting types (with or without site preparation, planted or failed),
@@ -203,6 +213,24 @@ namespace lucasCoreUI
                     AddTypeToGroup(store, t, grpM[0]);
                     if (i > 0) AddTypeToGroup(store, t, grpM[i]);
                 }
+            // management costs (tools/make_management.R): a Management Cost attribute group and three transition attribute types, USD
+            AddNamed(store, "stsim_AttributeGroup", "AttributeGroupId", "Management Cost", null, null, false);
+            if (store.TableExists("stsim_TransitionAttributeType"))
+            {
+                string[,] costs = { { "Management Cost: Planting", "Replanting: seedlings and planting, per unit area planted (planted and failed alike)" },
+                                    { "Management Cost: Site Preparation", "Site preparation before replanting (pile and burn, or mechanical), per unit area" },
+                                    { "Management Cost: Salvage Logging", "Salvage logging net cost per unit area (negative = net revenue)" } };
+                foreach (DataRow r in Rows(store, "SELECT ProjectId FROM core_Project").Rows)
+                {
+                    string pr = Id(r["ProjectId"]), ag = IdOf(store, "stsim_AttributeGroup", "AttributeGroupId", pr, "Management Cost");
+                    for (int i = 0; i < costs.GetLength(0); i++)
+                    {
+                        if (IdOf(store, "stsim_TransitionAttributeType", "TransitionAttributeTypeId", pr, costs[i, 0]) != null) continue;
+                        store.ExecuteNonQuery("INSERT INTO stsim_TransitionAttributeType (TransitionAttributeTypeId, ProjectId, Name, AttributeGroupId, Units, Description) VALUES (" +
+                                              NewId(store).ToString(CultureInfo.InvariantCulture) + ", " + pr + ", " + Q(costs[i, 0]) + ", " + (ag ?? "NULL") + ", 'USD', " + Q(costs[i, 1]) + ")");
+                    }
+                }
+            }
             // ST-Sim summarizes only the groups in a scenario's transition output filter, and a library's filter was written when the
             // library was made (Lassen 2026-11-13: replanting ran but was not reported). Every scenario with a filter gets the new groups,
             // summary on (src/transition-filter.R)
@@ -213,6 +241,7 @@ namespace lucasCoreUI
                 // the two site preparation groups are summarized only
                 var names = new List<string>(grpM); var mapped = new HashSet<string> { grpM[0], "Forest Harvest: Salvage Logging [Type]" };
                 names.Add("Forest Harvest: Salvage Logging [Type]");
+                foreach (string n in agTypes) { names.Add(n); mapped.Add(n); }
                 for (int i = 0; i < preps.Length; i++)
                     foreach (string end in new[] { "", " (failed)" }) { string n = "Management: Replanting" + preps[i] + end + " [Type]"; names.Add(n); mapped.Add(n); }
                 foreach (DataRow r in Rows(store, "SELECT DISTINCT f.ScenarioId AS S, s.ProjectId AS P FROM stsim_OutputFilterTransitionGroups f JOIN core_Scenario s ON s.ScenarioId = f.ScenarioId").Rows)
@@ -334,6 +363,19 @@ namespace lucasCoreUI
         private static string Id(object v) { return Convert.ToInt64(v, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture); }
 
         // a project definition (Name, an optional extra column, IsAuto for ST-Sim's own type groups) in every project that lacks it
+        // a project's transition simulation group (if the group exists and is not listed yet)
+        private static void AddSimulationGroup(DataStore store, string name)
+        {
+            if (!store.TableExists("stsim_TransitionSimulationGroup")) return;
+            foreach (DataRow r in Rows(store, "SELECT ProjectId FROM core_Project").Rows)
+            {
+                string pr = Id(r["ProjectId"]), g = IdOf(store, "stsim_TransitionGroup", "TransitionGroupId", pr, name);
+                if (g == null || Convert.ToInt64(store.ExecuteScalar("SELECT COUNT(*) FROM stsim_TransitionSimulationGroup WHERE ProjectId = " + pr + " AND TransitionGroupId = " + g), CultureInfo.InvariantCulture) > 0) continue;
+                store.ExecuteNonQuery("INSERT INTO stsim_TransitionSimulationGroup (TransitionSimulationGroupId, ProjectId, TransitionGroupId) VALUES (" +
+                                      NewId(store).ToString(CultureInfo.InvariantCulture) + ", " + pr + ", " + g + ")");
+            }
+        }
+
         private static void AddNamed(DataStore store, string table, string idCol, string name, string extraCol, string extraVal, bool isAuto)
         {
             if (!store.TableExists(table)) return;

@@ -464,13 +464,21 @@ check(STAGE, "every Probability group has a map in every iteration and projectio
 # window (years since the disturbance) is a multiplier, 0 outside it
 source(pkg_file("src", "management.R"))
 mg <- management_targets(read_ds("ManagementAction"), y0 = y0, y1 = y1, pend = pend, land = land, lev = lev, lev_list = lev_list, lev_col = lev_col,
-                         tile_lvl = if (tiles > 1) tile_lvl else NA_character_, sc_vals = values(S, mat = FALSE), say = say, fail = fail)
+                         tile_lvl = if (tiles > 1) tile_lvl else NA_character_, sc_vals = values(S, mat = FALSE), say = say, fail = fail,
+                         cost_defaults = management_cost_defaults(pkg_file("defaults", "management", "costs.csv"), units_per_ha[[au]]))
 mg_tmv <- NULL
 if (!is.null(mg)) {
   tt_out <- rbind(tt_out[!TransitionGroupId %in% mg$groups], mg$targets, fill = TRUE)
   mg_tmv <- mg$multipliers
   check(STAGE, "management: every management type has a target in every projection year", all(mg$targets[Timestep > y1, uniqueN(Timestep), by = TransitionGroupId]$V1 == length(pyrs)))
-  write_ds(mg$summary, "OutputManagementAction") }
+  write_ds(mg$summary, "OutputManagementAction")
+  # costs: ST-Sim transition attribute values (USD per amount unit) on the management types; the run sums them over what it treats
+  # (Output Options > Tabular: Transition attributes). Earlier management cost rows of a rerun are replaced
+  av <- as.data.table(datasheet(scn, "stsim_TransitionAttributeValue", optional = TRUE, lookupsAsFactors = FALSE))
+  if (nrow(av)) av <- av[!TransitionAttributeTypeId %in% MG_COST_TYPES, setdiff(names(av), c("TransitionAttributeValueId", "ScenarioId")), with = FALSE]
+  if (!is.null(mg$costs) && nrow(mg$costs)) {
+    write_stsim(rbind(av, mg$costs, fill = TRUE), "TransitionAttributeValue")
+    say("Management Actions: costs (USD per %s): %s", sub("s$", "", au), paste(unique(mg$costs[, sprintf("%s %s %.0f", sub(" \\[Type\\]$", "", TransitionGroupId), sub("^Management Cost: ", "", TransitionAttributeTypeId), Value)]), collapse = "; ")) } }
 # ---- post-disturbance return and conversion (to-do 57): on everywhere from the historical end + 1; a disturbed class's return chance
 # by its age (years since the disturbance): 0 below ReturnAgeMin, then ReturnProbability a year to the window's end (post-disturbance-
 # settings.csv), divided by the mean of the live forest adjacency multiplier where stage 10 applies it (post-disturbance-adjacency.csv),
