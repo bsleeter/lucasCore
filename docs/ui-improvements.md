@@ -1887,7 +1887,15 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
         99 and 130, 20 draws, results 134 and 136 - the stage's first runs inside SyncroSim: Lassen and Puget lacked stage 18,
         added with tools/sync-library.R --schema-only and a fresh tools/new-library.R library as the reference): products stored in
         2036 0.0125 Tg C against the baseline's ~0.006, gain -198,057 Mg C ecosystem, -191,661 with products; no ratio (the
-        mismatched baseline). Later: replanting-only and salvage-only runs, each against a baseline with the same iterations.
+        mismatched baseline).
+      - Matched baseline (user 2026-11-13: "Yes, run it"; dev/management/lassen-matched-baseline.R): the same Projection Setup
+        without Management Actions (setup 138; stage 9's seeded draws give the same historical-year schedule as setup 128, all
+        324 rows), projection 140 (2024-2036, 3 iterations, multiprocessing on), stage 18 result 142. Burned 2024-2036 by iteration
+        within 1-8% of run 130's. Management run 130 against it, at 2036: live biomass +0.186 Tg C, dead wood, litter and soil
+        -0.152 (salvage and burned slash), total ecosystem +0.037 (37,118 Mg C), wood products stored +0.0064, so +43,514 Mg C with
+        products. Net cost 12.1 M USD (7.8-14.8 M by iteration): 325 USD per Mg C (210-398), 89 per Mg CO2e, on ecosystem carbon;
+        277 USD per Mg C (179-339), 76 per Mg CO2e, with wood products. The combined actions; the ratio for replanting alone, and
+        for salvage alone, needs runs with one action each (later).
     - Open: planting a different type (assisted migration); fuel treatments; FACTS records for the baseline; a full Build on Puget
       (tiled by county) to try the tile rule in a run.
   - **Replanting and restoration:** a management transition from a post-disturbance class back to a forest type.

@@ -114,7 +114,7 @@ compare_cost <- function(R, lib) {
     gain_p <- if (r$base) NA_real_ else gain + (hw(r$X) - hw(B$X))
     xn <- m$Net - mean(mb$Net); net <- mean(xn)
     per <- function(v, g = gain) if (r$base || is.na(g) || g <= 0) NA_real_ else v / g
-    data.table(RunScenarioId = r$rid, Label = r$label, Role = role_of(r), Iterations = nrow(m),
+    data.table(RunScenarioId = r$rid, Label = r$label, Role = role_of(r), Iterations = r$X$nit,
                Cost = mean(m$Cost), Revenue = mean(m$Revenue), NetCost = mean(m$Net),
                NetCostLow = min(m$Net), NetCostHigh = max(m$Net),
                ExtraNetCost = if (r$base) NA_real_ else net, CarbonGain = gain,
