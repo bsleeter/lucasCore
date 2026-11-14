@@ -1,5 +1,25 @@
-Item,CostPerHa,DollarYear,Low,High,Source,Note
-Planting,1200,2024,600,3000,"Fargione et al. 2021 (Front. For. Glob. Change), less the 29% site preparation share; checked against Auburn 2024 survey (South ~800), CAL FIRE CFIP caps (CA 835-1656), PNW 2019 survey (~970)","Seedlings and planting labour, per hectare planted (planted and failed alike). South ~800; Pacific NW ~1300; California ~1500; Northeast ~1800. Provisional: see dev/management/cost-defaults-research.md"
-Site preparation: Pile and burn,1800,2024,1000,3000,"Barker et al. 2025 (USFS managers CA/OR/WA, machine piling and burning); FACTS values as the low end","Machine piling and burning. California ~2900; Oregon/Washington ~1000-1350; hand piling ~3200. From fuel treatments in live stands, assumed similar after fire. Provisional"
-Site preparation: Mechanical,2200,2024,1000,3500,"CAL FIRE CFIP mechanical site preparation caps (1656-3311); Washington EQIP 490 (~2440); Alabama 2024 (~395); Pennsylvania EQIP 490 (440-750)","Mastication or brush removal. California ~2500; South ~400; Northeast ~600. Provisional"
-Salvage logging,-1000,2024,-5000,1500,"Own arithmetic: ~25 MBF/ha x net value per MBF; Oregon State Extension 2025 logging and haul costs; California 2026 salvage timber value schedule; Prestemon et al. 2006 (value loss ~25% a year)","Net cost to the landowner; negative = net revenue (central: 1000 USD/ha revenue). High: a net cost on cable ground (1500); Low: Douglas-fir revenue (-5000). Pine ~0; value falls ~25% a year after the fire. Provisional"
+Region,Item,Unit,Central,Low,High,DollarYear,Source,Note
+All,Planting,USD/ha,1200,600,3000,2024,"Fargione et al. 2021 (Front. For. Glob. Change), less the 29% site preparation share","Seedlings and planting, per hectare planted (planted and failed alike). National default, used where a region has no row"
+California,Planting,USD/ha,1500,800,2500,2024,"CAL FIRE CFIP cost-share caps (835-1656); Fargione et al. 2021 (USFS California)","Post-fire planting now often 250-500 trees/ha, clumped. An all-in ceiling of ~15,800/ha (CalMatters, draft strategy) is left out"
+Pacific Northwest,Planting,USD/ha,1300,950,3600,2024,"PNW industry survey 2019 (~970/ha at 950 trees/ha); Washington EQIP 612 (~3,630/ha with protection)",
+Interior West,Planting,USD/ha,1200,700,2000,2024,"Fargione et al. 2021 West median; Montana project","Southwest inferred from the West: no source of its own"
+South,Planting,USD/ha,800,650,1100,2024,"Auburn University / Alabama 2024 cost survey (hand planting 200.64/ac + 608 seedlings/ac at 0.19)",
+Northeast,Planting,USD/ha,1800,1000,3500,2024,"Fargione et al. 2021 East median; Pennsylvania EQIP 612 (~1.55 per seedling)",
+All,Site preparation: Pile and burn,USD/ha,1800,1000,3000,2024,"Barker et al. 2025 (USFS managers CA/OR/WA, machine piling and burning); FACTS as the low end","From fuel treatments in live stands, assumed similar after fire. Hand piling ~3,200 (1,350-5,000)"
+California,Site preparation: Pile and burn,USD/ha,2900,1850,4000,2024,"Barker et al. 2025, California",
+Pacific Northwest,Site preparation: Pile and burn,USD/ha,1200,700,2000,2024,"Barker et al. 2025, Oregon (1,003) and Washington (1,347)",
+South,Site preparation: Pile and burn,USD/ha,100,50,250,2024,"Alabama 2024 cost survey (broadcast burn)","Broadcast burning, no piling: the usual southern practice"
+All,Site preparation: Mechanical,USD/ha,2200,1000,3500,2024,"CAL FIRE CFIP mechanical caps (1,656-3,311); Washington EQIP 490 (~2,440)","Mastication or brush removal; the western value"
+California,Site preparation: Mechanical,USD/ha,2500,1650,3300,2024,"CAL FIRE CFIP mechanical site preparation caps",
+South,Site preparation: Mechanical,USD/ha,400,250,750,2024,"Alabama 2024 cost survey (~395)",
+Northeast,Site preparation: Mechanical,USD/ha,600,450,1650,2024,"Pennsylvania EQIP 490 (440-750)",
+All,Salvage logging,USD/ha,5100,4000,8750,2024,"Oregon State Extension EM 9553 (2025): logging 110-200 USD/MBF ground, 185-300+ cable, trucking ~50; at ~25 MBF/ha (10 MBF/ac)","Logging and haul cost per hectare salvaged. High = cable ground. Volume per hectare is the largest uncertainty"
+South,Salvage logging,USD/ha,3000,2000,5000,2024,"No southern source: judgement (pulpwood and chip-n-saw, lower volumes)","Set so the southern default roughly breaks even"
+Northeast,Salvage logging,USD/ha,3000,2000,5000,2024,"No source: as the South","Set so the default roughly breaks even"
+All,Salvage timber revenue,USD/ha,6100,3600,11000,2024,"Logging cost + net stumpage: CDTFA Harvest Values Schedule Table S (2026) net 1-250 USD/MBF; OSU EM 9553; Prestemon et al. 2006","Delivered value of the salvaged wood per hectare in the year of the fire (age 0), before the yearly loss. Net (revenue - cost) central +1,000/ha"
+California,Salvage timber revenue,USD/ha,5600,4000,8000,2024,"CDTFA Table S (2026): ponderosa pine 1-40, true fir 40-130 USD/MBF net","Pine-dominated stands: net ~0-1,000/ha"
+Pacific Northwest,Salvage timber revenue,USD/ha,8500,5500,12500,2024,"CDTFA Table S Douglas-fir 150-250 USD/MBF net; OSU EM 9553 log price ~700 USD/MBF","Douglas-fir: net ~3,000/ha"
+Interior West,Salvage timber revenue,USD/ha,5500,3500,8000,2024,"As California (pine): judgement","Net ~0-1,000/ha; cable ground net-negative"
+South,Salvage timber revenue,USD/ha,3000,1500,5000,2024,"No southern source: judgement","Roughly break-even"
+Northeast,Salvage timber revenue,USD/ha,3000,1500,5000,2024,"No source: as the South","Roughly break-even"
+All,Salvage revenue loss per year,share,0.25,0.15,0.35,2024,"Prestemon et al. 2006 (Forest Policy and Economics 8:312-322); OSU EM 9553 defect table","Share of the salvaged wood's value lost per year since the fire (the disturbed class's age): value at age a = revenue x (1 - loss)^a. Not sampled: the central value is used"

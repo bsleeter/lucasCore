@@ -478,7 +478,9 @@ if (!is.null(mg)) {
   if (nrow(av)) av <- av[!TransitionAttributeTypeId %in% MG_COST_TYPES, setdiff(names(av), c("TransitionAttributeValueId", "ScenarioId")), with = FALSE]
   if (!is.null(mg$costs) && nrow(mg$costs)) {
     write_stsim(rbind(av, mg$costs, fill = TRUE), "TransitionAttributeValue")
-    say("Management Actions: costs (USD per %s): %s", sub("s$", "", au), paste(unique(mg$costs[, sprintf("%s %s %.0f", sub(" \\[Type\\]$", "", TransitionGroupId), sub("^Management Cost: ", "", TransitionAttributeTypeId), Value)]), collapse = "; ")) } }
+    rng <- "DistributionType" %in% names(mg$costs) && any(!is.na(mg$costs$DistributionType))
+    say("Management Actions: costs and revenue (USD per %s, central%s): %s", sub("s$", "", au), if (rng) "; a range sampled per iteration" else "",
+        paste(mg$costs[, .(v = if (min(Value) == max(Value)) sprintf("%.0f", Value[1]) else sprintf("%.0f-%.0f", min(Value), max(Value))), by = .(a = sub("^Management (Cost|Revenue): ", "", TransitionAttributeTypeId))][, paste(a, v)], collapse = "; ")) } }
 # ---- post-disturbance return and conversion (to-do 57): on everywhere from the historical end + 1; a disturbed class's return chance
 # by its age (years since the disturbance): 0 below ReturnAgeMin, then ReturnProbability a year to the window's end (post-disturbance-
 # settings.csv), divided by the mean of the live forest adjacency multiplier where stage 10 applies it (post-disturbance-adjacency.csv),

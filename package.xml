@@ -317,7 +317,8 @@
 		<column name="ActionId" displayName="Action" dataType="Integer" validationType="List" formula1="1:Replanting|2:Salvage logging"/>
 		<column name="StartYear" displayName="Start Year (blank = the first projection year)" dataType="Integer" isOptional="True"/>
 		<column name="EndYear" displayName="End Year (blank = the projection end)" dataType="Integer" isOptional="True"/>
-		<column name="Amount" displayName="Area per Year (the library's amount units, e.g. hectares)" dataType="Double" validationType="Decimal" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="Amount" displayName="Area per Year (the library's amount units, e.g. hectares; or a Budget)" dataType="Double" validationType="Decimal" validationCondition="GreaterEqual" formula1="0" isOptional="True"/>
+		<column name="Budget" displayName="Budget per Year (USD, instead of an area: the area it pays for at the central cost per area)" dataType="Double" validationType="Decimal" validationCondition="GreaterEqual" formula1="0" isOptional="True"/>
 		<column name="StratumId" displayName="Primary Stratum (ecodivision; blank = any)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
 		<column name="SecondaryStratumId" displayName="Secondary Stratum (blank = any)" dataType="Integer" validationType="Datasheet" formula1="stsim_SecondaryStratum" isOptional="True"/>
 		<column name="TertiaryStratumId" displayName="Tertiary Stratum (blank = any; blank at every level = the whole study area)" dataType="Integer" validationType="Datasheet" formula1="stsim_TertiaryStratum" isOptional="True"/>
@@ -326,8 +327,10 @@
 		<column name="Priority" displayName="Priority (replanting)" dataType="Integer" validationType="List" formula1="1:None (random among eligible cells)|2:Far from live forest (least likely to return on its own)" defaultValue="1" isOptional="True"/>
 		<column name="Survival" displayName="Survival (replanting: share of the planted area that takes)" dataType="Double" defaultValue="0.8" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
 		<column name="SitePreparation" displayName="Site Preparation (replanting)" dataType="Integer" validationType="List" formula1="1:None|2:Pile and burn|3:Mechanical (mastication)" defaultValue="1" isOptional="True"/>
-		<column name="Cost" displayName="Cost per Area (USD per amount unit: planting, or salvage net cost; negative = revenue; blank = the package default)" dataType="Double" isOptional="True"/>
-		<column name="SitePrepCost" displayName="Site Preparation Cost per Area (USD per amount unit; blank = the package default)" dataType="Double" isOptional="True"/>
+		<column name="Cost" displayName="Cost per Area (USD per amount unit: planting, or salvage logging and haul; blank = the regional default)" dataType="Double" isOptional="True"/>
+		<column name="SitePrepCost" displayName="Site Preparation Cost per Area (USD per amount unit; blank = the regional default)" dataType="Double" isOptional="True"/>
+		<column name="Revenue" displayName="Salvage Timber Revenue per Area (USD per amount unit, the year of the fire; falls 25% a year; blank = the regional default)" dataType="Double" isOptional="True"/>
+		<column name="CostRange" displayName="Cost Range" dataType="Integer" validationType="List" formula1="1:Default ranges (sampled per iteration)|2:Fixed values" isOptional="True"/>
 	</dataSheet>
 
 	<dataSheet name="OutputManagementAction" displayName="Management Actions (as set up)">
@@ -340,7 +343,8 @@
 		<column name="YearsSinceDisturbance" displayName="Years Since the Disturbance" dataType="String"/>
 		<column name="Where" dataType="String"/>
 		<column name="Note" dataType="String"/>
-		<column name="CostPerArea" displayName="Cost per Area (USD per amount unit)" dataType="Double"/>
+		<column name="CostPerArea" displayName="Cost per Area (USD per amount unit, central)" dataType="Double"/>
+		<column name="RevenuePerArea" displayName="Revenue per Area (USD per amount unit, central, at the window start)" dataType="Double"/>
 	</dataSheet>
 
 	<dataSheet name="ClimateOptions" displayName="Climate Options" isSingleRow="True" viewClassName="lucasCoreUI.ClimateOptionsView" viewClassAssembly="lucasCoreUI">
@@ -959,6 +963,26 @@
 		<column name="NBP" displayName="Mean net biome productivity (Tg C/yr)" dataType="Double" isOptional="True"/>
 	</dataSheet>
 
+	<dataSheet name="OutputCompareCost" displayName="Compare Cost Summary">
+		<!-- stage 14: one row per projection with Management Actions costs (transition attribute output) - money over the run (USD, mean
+		     of the iterations), and the extra net cost per unit of carbon gained over the baseline (src/compare-figures.R compare_cost) -->
+		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer"/>
+		<column name="Label" dataType="String"/>
+		<column name="Role" displayName="Role (Baseline or Run)" dataType="String"/>
+		<column name="Iterations" dataType="Integer"/>
+		<column name="Cost" displayName="Management costs over the run (USD)" dataType="Double"/>
+		<column name="Revenue" displayName="Management revenue over the run (USD: salvaged timber)" dataType="Double"/>
+		<column name="NetCost" displayName="Net cost (USD: costs - revenue)" dataType="Double"/>
+		<column name="NetCostLow" displayName="Net cost, lowest iteration (USD)" dataType="Double"/>
+		<column name="NetCostHigh" displayName="Net cost, highest iteration (USD)" dataType="Double"/>
+		<column name="ExtraNetCost" displayName="Net cost minus the baseline's (USD)" dataType="Double" isOptional="True"/>
+		<column name="CarbonGain" displayName="Carbon gained over the baseline (Mg C: total ecosystem carbon at the end)" dataType="Double" isOptional="True"/>
+		<column name="UsdPerMgC" displayName="USD per Mg C gained" dataType="Double" isOptional="True"/>
+		<column name="UsdPerMgCLow" displayName="USD per Mg C, lowest-cost iteration" dataType="Double" isOptional="True"/>
+		<column name="UsdPerMgCHigh" displayName="USD per Mg C, highest-cost iteration" dataType="Double" isOptional="True"/>
+		<column name="UsdPerMgCO2e" displayName="USD per Mg CO2e gained" dataType="Double" isOptional="True"/>
+	</dataSheet>
+
 	<dataSheet name="OutputCompareLand" displayName="Compare Land Change Summary">
 		<!-- stage 14: one row per run compared - transition areas over the run and the change in forest and developed area (km2) -->
 		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer"/>
@@ -1369,6 +1393,7 @@
 		<dataSheet name="OutputCompareFigure" type="Output"/>
 		<dataSheet name="OutputCompareCarbon" type="Output"/>
 		<dataSheet name="OutputCompareLand" type="Output"/>
+		<dataSheet name="OutputCompareCost" type="Output"/>
 		<dataSheet name="OutputValidation" type="Both"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
@@ -1498,6 +1523,7 @@
 				<item name="OutputCompareFigure"/>
 				<item name="OutputCompareCarbon"/>
 				<item name="OutputCompareLand"/>
+				<item name="OutputCompareCost"/>
 				<item name="OutputDataDownload"/>
 				<item name="OutputDataSources"/>
 				<item name="OutputValidation"/>

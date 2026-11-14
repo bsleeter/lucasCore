@@ -74,6 +74,38 @@ compare_land <- function(R) {
                Fire = tot("Fire"), Harvest = tot("Forest Harvest"), Urbanization = tot("Urbanization"),
                ForestChange = grp("Forest", y1) - grp("Forest", y0), DevelopedChange = grp("Developed", y1) - grp("Developed", y0)) })) }
 
+# compare_cost - management cost-effectiveness (to-do 58 cost follow-ups, user 2026-11-13): per projection, the Management Actions'
+# money over the run from ST-Sim's transition attribute output (types "Management Cost: *" and "Management Revenue: *", USD;
+# Output Options > Transition attributes), per iteration: costs, revenue and net cost (costs - revenue), each against the
+# baseline's; and the carbon gained over the baseline (total ecosystem carbon at the end, Mg C; harvested wood not counted). USD per
+# Mg C = the extra net cost / the carbon gained, from the iteration mean, its range from the iterations' lowest and highest net cost
+# (each iteration draws its own costs: the cost range, Beta per iteration). No carbon gained: no ratio. NULL when no run has costs.
+management_money <- function(lib, rid, y0) {
+  con <- dbConnect(SQLite(), lib, flags = SQLITE_RO); on.exit(dbDisconnect(con))
+  if (!dbExistsTable(con, "stsim_OutputTransitionAttribute")) return(NULL)
+  d <- as.data.table(dbGetQuery(con, sprintf("SELECT o.Iteration, a.Name AS Attr, SUM(o.Amount) AS USD FROM stsim_OutputTransitionAttribute o
+    JOIN stsim_TransitionAttributeType a ON a.TransitionAttributeTypeId = o.TransitionAttributeTypeId
+    WHERE o.ScenarioId = %d AND o.Timestep > %d AND (a.Name LIKE 'Management Cost:%%' OR a.Name LIKE 'Management Revenue:%%') GROUP BY o.Iteration, a.Name", rid, y0)))
+  if (!nrow(d)) return(NULL)
+  d[, .(Cost = sum(USD[startsWith(Attr, "Management Cost:")]), Revenue = sum(USD[startsWith(Attr, "Management Revenue:")])), by = Iteration][, Net := Cost - Revenue][] }
+compare_cost <- function(R, lib) {
+  P <- Filter(function(r) !r$hist, R); B <- Filter(function(r) r$base, R)[[1]]
+  M <- lapply(P, function(r) management_money(lib, r$rid, r$X$years[1])); names(M) <- vapply(P, function(r) as.character(r$rid), "")
+  if (all(vapply(M, is.null, TRUE))) return(NULL)
+  zero <- data.table(Iteration = 1L, Cost = 0, Revenue = 0, Net = 0)
+  mb <- M[[as.character(B$rid)]]; if (is.null(mb)) mb <- zero
+  tb <- te_of(B$X)
+  rbindlist(lapply(P, function(r) { m <- M[[as.character(r$rid)]]; if (is.null(m)) m <- zero
+    y1 <- r$X$years[2]; gain <- if (r$base) NA_real_ else (at_year(te_of(r$X), y1) - at_year(tb, y1)) * 1e6
+    xn <- m$Net - mean(mb$Net); net <- mean(xn)
+    per <- function(v) if (is.na(gain) || gain <= 0) NA_real_ else v / gain
+    data.table(RunScenarioId = r$rid, Label = r$label, Role = role_of(r), Iterations = nrow(m),
+               Cost = mean(m$Cost), Revenue = mean(m$Revenue), NetCost = mean(m$Net),
+               NetCostLow = min(m$Net), NetCostHigh = max(m$Net),
+               ExtraNetCost = if (r$base) NA_real_ else net, CarbonGain = gain,
+               UsdPerMgC = if (r$base) NA_real_ else per(net), UsdPerMgCLow = if (r$base) NA_real_ else per(min(xn)), UsdPerMgCHigh = if (r$base) NA_real_ else per(max(xn)),
+               UsdPerMgCO2e = if (r$base) NA_real_ else per(net) / (44 / 12)) })) }
+
 # ---- the figures -----------------------------------------------------------------------------------------------------------
 # R: compare_runs(); grid: the Build's state class map; dem; label: the study area
 compare_figures <- function(R, grid, dem, label, outdir) {

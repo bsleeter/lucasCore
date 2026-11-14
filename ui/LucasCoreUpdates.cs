@@ -168,6 +168,10 @@ namespace lucasCoreUI
             AddColumn(store, "lucasCore_ManagementAction", "Cost", "DOUBLE");
             AddColumn(store, "lucasCore_ManagementAction", "SitePrepCost", "DOUBLE");
             AddColumn(store, "lucasCore_OutputManagementAction", "CostPerArea", "DOUBLE");
+            AddColumn(store, "lucasCore_ManagementAction", "Revenue", "DOUBLE");
+            AddColumn(store, "lucasCore_ManagementAction", "CostRange", "INTEGER");
+            AddColumn(store, "lucasCore_ManagementAction", "Budget", "DOUBLE");
+            AddColumn(store, "lucasCore_OutputManagementAction", "RevenuePerArea", "DOUBLE");
             AddColumn(store, "lucasCore_DataSource", "RcmapCoverFolder", "TEXT");
             AddColumn(store, "lucasCore_OutputLandCoverLayers", "ReforestTypeFileName", "TEXT");
             AddColumn(store, "lucasCore_OutputLandCoverLayers", "BpsForestShareFileName", "TEXT");
@@ -213,19 +217,22 @@ namespace lucasCoreUI
                     AddTypeToGroup(store, t, grpM[0]);
                     if (i > 0) AddTypeToGroup(store, t, grpM[i]);
                 }
-            // management costs (tools/make_management.R): a Management Cost attribute group and three transition attribute types, USD
+            // management costs (tools/make_management.R): a Management Cost attribute group and four transition attribute types, USD:
+            // three costs and the salvaged timber's revenue (net = revenue - costs)
             AddNamed(store, "stsim_AttributeGroup", "AttributeGroupId", "Management Cost", null, null, false);
             if (store.TableExists("stsim_TransitionAttributeType"))
             {
                 string[,] costs = { { "Management Cost: Planting", "Replanting: seedlings and planting, per unit area planted (planted and failed alike)" },
                                     { "Management Cost: Site Preparation", "Site preparation before replanting (pile and burn, or mechanical), per unit area" },
-                                    { "Management Cost: Salvage Logging", "Salvage logging net cost per unit area (negative = net revenue)" } };
+                                    { "Management Cost: Salvage Logging", "Salvage logging and haul cost per unit area (its timber revenue is Management Revenue: Salvage Timber)" },
+                                    { "Management Revenue: Salvage Timber", "Revenue from the salvaged timber per unit area, falling with years since the fire (net = revenue - costs)" } };
                 foreach (DataRow r in Rows(store, "SELECT ProjectId FROM core_Project").Rows)
                 {
                     string pr = Id(r["ProjectId"]), ag = IdOf(store, "stsim_AttributeGroup", "AttributeGroupId", pr, "Management Cost");
                     for (int i = 0; i < costs.GetLength(0); i++)
                     {
-                        if (IdOf(store, "stsim_TransitionAttributeType", "TransitionAttributeTypeId", pr, costs[i, 0]) != null) continue;
+                        string have = IdOf(store, "stsim_TransitionAttributeType", "TransitionAttributeTypeId", pr, costs[i, 0]);
+                        if (have != null) { store.ExecuteNonQuery("UPDATE stsim_TransitionAttributeType SET Description = " + Q(costs[i, 1]) + " WHERE TransitionAttributeTypeId = " + have); continue; }
                         store.ExecuteNonQuery("INSERT INTO stsim_TransitionAttributeType (TransitionAttributeTypeId, ProjectId, Name, AttributeGroupId, Units, Description) VALUES (" +
                                               NewId(store).ToString(CultureInfo.InvariantCulture) + ", " + pr + ", " + Q(costs[i, 0]) + ", " + (ag ?? "NULL") + ", 'USD', " + Q(costs[i, 1]) + ")");
                     }

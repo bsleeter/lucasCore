@@ -46,6 +46,12 @@ check(STAGE, "every figure file was written", nrow(res) > 0 && all(file.exists(r
 write_ds(res[, .(Figure, Title, Caption, FileName)], "OutputCompareFigure")
 write_ds(S, "OutputCompareCarbon")
 write_ds(Ld, "OutputCompareLand")
+# management cost-effectiveness (runs with Management Actions costs: Output Options > Transition attributes on)
+Cs <- tryCatch(compare_cost(R, lib_file), error = function(e) { say("No cost summary: %s", conditionMessage(e)); NULL })
+if (!is.null(Cs)) { write_ds(Cs, "OutputCompareCost")
+  for (i in which(!is.na(Cs$UsdPerMgC))) say("%s: %s USD extra net cost for %.0f Mg C over the baseline: %.0f USD per Mg C (%.0f-%.0f over %d iterations), %.0f per Mg CO2e",
+    Cs$Label[i], format(round(Cs$ExtraNetCost[i]), big.mark = ","), Cs$CarbonGain[i], Cs$UsdPerMgC[i], Cs$UsdPerMgCLow[i], Cs$UsdPerMgCHigh[i], Cs$Iterations[i], Cs$UsdPerMgCO2e[i])
+} else say("No management costs in these runs: no cost summary (Output Options > Transition attributes, with Management Actions)")
 progressBar()
 finish_checks()
 progressBar(type = "end")

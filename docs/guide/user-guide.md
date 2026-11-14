@@ -1633,6 +1633,7 @@ The figures are under **LUCAS Core > Build Results > Compare Figures (PNG)**, in
 
 - **Compare Carbon Summary**: carbon at the start and end of the run, its change and its difference from the baseline; the change in live biomass and in dead wood, litter and soil; and mean annual NPP, NEP, losses to land-use and land-cover change (fire emissions and harvest) and NBP.
 - **Compare Land Change Summary**: the area burned, harvested and urbanized, and the change in forest and developed area.
+- **Compare Cost Summary** (projections with Management Actions and Transition attributes output): costs, revenue and net cost of the actions over the run (the mean of the iterations, and the lowest and highest iteration), the extra net cost over the baseline, the carbon gained over it (total ecosystem carbon at the end; harvested wood is not counted), and USD per Mg C and per Mg CO2e. No carbon gained: no ratio. Each iteration draws its own costs from their ranges, so run several iterations to see the spread.
 
 To save the figures to a folder, use **Export > LUCAS Core > Compare Figures (PNG)**, as for Run Figures.
 
@@ -1853,7 +1854,7 @@ Besides the inputs they write for ST-Sim, the lucasCore stages save summary tabl
 | Historical Patch Sizes | OutputPatchSize | 10 | The sizes of each year's patches of change, by size class. |
 | Climate Multiplier Summary | OutputClimateSummary | 11 | As for stage 7, for the projection's climate future. |
 
-**Figures and comparisons** (stages 12 to 14): **Build Figures (PNG)**, **Run Figures (PNG)** and **Compare Figures (PNG)** open in the figure viewer (section 8.1). Stage 14 also writes **Compare Carbon Summary** and **Compare Land Change Summary** (section 7.4).
+**Figures and comparisons** (stages 12 to 14): **Build Figures (PNG)**, **Run Figures (PNG)** and **Compare Figures (PNG)** open in the figure viewer (section 8.1). Stage 14 also writes **Compare Carbon Summary**, **Compare Land Change Summary** and, with management costs, **Compare Cost Summary** (section 7.4).
 
 **Validation.** Every stage adds its checks to **Validation**: one row per check, with the stage, what was checked, **Pass** or **Fail**, and the numbers behind it. The same lines are in the run log. Look here first when a result looks wrong.
 

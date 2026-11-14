@@ -154,8 +154,8 @@ namespace lucasCoreUI
         // ---- one action's form ----------------------------------------------------------------------------------------------
         private class ActionForm
         {
-            public readonly TextBox Start = Box(60), End = Box(60), Area = Box(80), From = Box(40), To = Box(40), Survival = Box(50), Cost = Box(70), PrepCost = Box(70);
-            public readonly ComboBox Priority = List(330), Prep = List(250);
+            public readonly TextBox Start = Box(60), End = Box(60), Area = Box(80), From = Box(40), To = Box(40), Survival = Box(50), Cost = Box(70), PrepCost = Box(70), Revenue = Box(70), Budget = Box(90);
+            public readonly ComboBox Priority = List(330), Prep = List(250), Range = List(280);
             public readonly WherePicker Where = new WherePicker();
             public readonly Button Add;
             public readonly Label Said = new Label { AutoSize = true, MaximumSize = new Size(640, 0), ForeColor = SystemColors.GrayText, Margin = new Padding(3, 8, 3, 3) };
@@ -164,34 +164,56 @@ namespace lucasCoreUI
 
         private readonly ActionForm m_rep = new ActionForm("Add replanting");
         private readonly ActionForm m_sal = new ActionForm("Add salvage logging");
-        // costs (user 2026-11-13: "start with costs per hectare and research defaults"): USD per hectare, the package defaults in
-        // defaults/management/costs.csv; a row keeps the cost shown when it is added (stage 9 uses the default for a blank one)
+        // costs (user 2026-11-13: "start with costs per hectare and research defaults"; ranges: "Transition Attribute Values ... can
+        // also hold a distribution of cost values"): USD per hectare. A blank box = the package default of the cell's cost region
+        // (defaults/management/costs.csv, each ecodivision's region in cost-regions.csv), applied by stage 9; a value typed in is the
+        // row's own. The notes show the defaults of the model's region (with several regions in the study area, the national ones)
         private const string UNIT = "hectare";
         private readonly Label m_repCostNote = Note(""), m_salCostNote = Note("");
-        private readonly Dictionary<string, double> m_cost = new Dictionary<string, double>();
-        private string m_costYear = "";
+        private readonly Dictionary<string, double[]> m_cost = new Dictionary<string, double[]>();   // "region|item" -> central, low, high
+        private readonly Dictionary<string, string> m_regionOf = new Dictionary<string, string>();   // ecodivision -> cost region
+        private string m_costYear = "", m_region = "All", m_regionNote = "";
         private void LoadCosts()
         {
-            m_cost.Clear();
+            m_cost.Clear(); m_regionOf.Clear();
             try
             {
                 List<string[]> rows = Defaults.ReadCsv(Defaults.PackageFile("defaults", "management", "costs.csv"));
-                int ii = Array.IndexOf(rows[0], "Item"), ic = Array.IndexOf(rows[0], "CostPerHa"), iy = Array.IndexOf(rows[0], "DollarYear");
-                foreach (string[] r in rows.Skip(1)) { double v; if (r.Length > ic && double.TryParse(r[ic], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out v)) m_cost[r[ii].Trim()] = v; if (iy >= 0 && r.Length > iy && m_costYear.Length == 0) m_costYear = r[iy]; }
+                int ir = Array.IndexOf(rows[0], "Region"), ii = Array.IndexOf(rows[0], "Item"), ic = Array.IndexOf(rows[0], "Central"), il = Array.IndexOf(rows[0], "Low"), ih = Array.IndexOf(rows[0], "High"), iy = Array.IndexOf(rows[0], "DollarYear");
+                Func<string[], int, double> d = (r, k) => { double v; return k >= 0 && r.Length > k && double.TryParse(r[k], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out v) ? v : double.NaN; };
+                foreach (string[] r in rows.Skip(1))
+                {
+                    if (r.Length <= Math.Max(ir, ii)) continue;
+                    m_cost[r[ir].Trim() + "|" + r[ii].Trim()] = new[] { d(r, ic), d(r, il), d(r, ih) };
+                    if (iy >= 0 && r.Length > iy && m_costYear.Length == 0) m_costYear = r[iy];
+                }
+                List<string[]> reg = Defaults.ReadCsv(Defaults.PackageFile("defaults", "management", "cost-regions.csv"));
+                foreach (string[] r in reg.Skip(1)) if (r.Length > 1) m_regionOf[r[0].Trim()] = r[1].Trim();
             }
             catch (Exception) { }
         }
-        private string CostText(string item) { double v; return m_cost.TryGetValue(item, out v) ? v.ToString("0", System.Globalization.CultureInfo.InvariantCulture) : ""; }
-        private static readonly string[] PREP_ITEM = { null, "Site preparation: Pile and burn", "Site preparation: Mechanical" };
-        private void ShowPrepCost()
+        // the study area's cost region: one region for all its ecodivisions, else the national defaults (stage 9 applies each one's)
+        private void SetRegions(List<string> ecodivisions)
         {
-            int p = m_rep.Prep.SelectedIndex; m_rep.PrepCost.Enabled = p > 0; m_rep.PrepCost.Text = p > 0 ? CostText(PREP_ITEM[p]) : "";
+            var regs = ecodivisions.Select(e => m_regionOf.ContainsKey(e) ? m_regionOf[e] : "All").Distinct().ToList();
+            m_region = regs.Count == 1 ? regs[0] : "All";
+            m_regionNote = regs.Count == 1 ? (m_region == "All" ? "" : " (" + m_region + ")") : regs.Count > 1 ? " (national; this study area spans " + string.Join(", ", regs) + ", each ecodivision gets its own)" : "";
+            CostNotes();
         }
+        private double[] Cost(string item) { double[] v; return m_cost.TryGetValue(m_region + "|" + item, out v) || m_cost.TryGetValue("All|" + item, out v) ? v : null; }
+        private string CostText(string item)
+        {
+            double[] v = Cost(item); if (v == null) return "?";
+            Func<double, string> f = x => x.ToString("#,0", System.Globalization.CultureInfo.InvariantCulture);
+            return string.Format("{0} ({1}-{2})", f(v[0]), f(v[1]), f(v[2]));
+        }
+        private static readonly string[] PREP_ITEM = { null, "Site preparation: Pile and burn", "Site preparation: Mechanical" };
+        private void ShowPrepCost() { int p = m_rep.Prep.SelectedIndex; m_rep.PrepCost.Enabled = p > 0; if (p <= 0) m_rep.PrepCost.Text = ""; }
         private void CostNotes()
         {
-            string yr = m_costYear.Length > 0 ? " (" + m_costYear + " USD)" : "";
-            m_repCostNote.Text = string.Format("USD{0}. Defaults: planting {1}, pile and burn {2}, mechanical {3}; edit for your area. Paid on failed plantings too. Provisional.", yr, CostText("Planting"), CostText(PREP_ITEM[1]), CostText(PREP_ITEM[2]));
-            m_salCostNote.Text = string.Format("USD{0}: logging cost minus timber revenue; negative = net revenue. Default {1}; it varies widely with timber value and access. Provisional.", yr, CostText("Salvage logging"));
+            string yr = m_costYear.Length > 0 ? m_costYear + " " : "";
+            m_repCostNote.Text = string.Format("Blank = default{0}, {1}USD: planting {2}, pile and burn {3}, mechanical {4}. Paid on failed plantings too. Provisional.", m_regionNote, yr, CostText("Planting"), CostText(PREP_ITEM[1]), CostText(PREP_ITEM[2]));
+            m_salCostNote.Text = string.Format("Blank = default{0}, {1}USD: logging and haul {2}; revenue {3} in the fire year, 25% less each year after. Provisional.", m_regionNote, yr, CostText("Salvage logging"), CostText("Salvage timber revenue"));
         }
         private readonly Panel m_grid = GridHost(200);
         private readonly Button m_clear = new Button { Text = "Remove all rows", AutoSize = true, Margin = new Padding(3, 3, 12, 3) };
@@ -229,21 +251,25 @@ namespace lucasCoreUI
             AddGroup(Group("Replanting", Lines(
                 Line("Years:", Pair(m_rep.Start, "to", m_rep.End, null), Note("Blank = from the projection start, or to its end.")),
                 Line("Area per year:", m_rep.Area, Note("In the library's units (hectares). Less is planted when less land is eligible; the run reports what was done.")),
+                Line("Or a budget:", m_rep.Budget, Note("USD a year instead of an area (leave the area blank): the area it pays for at the central cost per hectare, planting + site preparation.")),
                 Line("Where:", m_rep.Where.Panel(), m_rep.Where.Info),
                 Line("Years since disturbance:", Pair(m_rep.From, "to", m_rep.To, null), Note("Ages a disturbed cell can be planted (0 = the fire year). Default 1-5, before shrubs and grass take the site.")),
                 Line("Survival:", m_rep.Survival, Note("Share that takes: back to its own forest type at age 0. The rest stays disturbed and can still return or convert. Default 0.8.")),
                 Line("Priority:", m_rep.Priority, Note("Random, or first where natural return is least likely (far from live forest). One priority for all replanting rows.")),
                 Line("Site preparation:", m_rep.Prep, Note("Carbon on the planted area. Pile and burn: cover burned (96% emitted), roots die, half the litter and fine woody debris and 30% of branch snags burn. Mechanical: cover to litter and fine woody debris, roots die. Provisional.")),
                 Line("Cost per " + UNIT + ":", Pair(m_rep.Cost, "planting +", m_rep.PrepCost, "site preparation"), m_repCostNote),
+                Line("Cost range:", m_rep.Range, Note("Default: each cost a Beta over its low-high range, drawn once per iteration; run several iterations to see the spread. Fixed: the values alone.")),
                 ActionRow(m_rep))));
 
             // salvage
             AddGroup(Group("Salvage logging", Lines(
                 Line("Years:", Pair(m_sal.Start, "to", m_sal.End, null), Note("Blank = from the projection start, or to its end.")),
                 Line("Area per year:", m_sal.Area, Note("In the library's units (hectares). Takes mostly snags to the forestry sector; the cell stays disturbed with its age.")),
+                Line("Or a budget:", m_sal.Budget, Note("USD a year instead of an area (leave the area blank): the area it pays for at the central logging cost per hectare.")),
                 Line("Where:", m_sal.Where.Panel(), m_sal.Where.Info),
                 Line("Years since disturbance:", Pair(m_sal.From, "to", m_sal.To, null), Note("Soon after the fire, before the snags lose value. Default 0-2.")),
-                Line("Net cost per " + UNIT + ":", m_sal.Cost, m_salCostNote),
+                Line("Per " + UNIT + ":", Pair(m_sal.Cost, "logging cost,", m_sal.Revenue, "timber revenue"), m_salCostNote),
+                Line("Cost range:", m_sal.Range, Note("As for replanting. Net = revenue - cost, in the transition attribute outputs.")),
                 ActionRow(m_sal))));
 
             // the rows
@@ -254,6 +280,7 @@ namespace lucasCoreUI
 
             m_rep.Priority.Items.AddRange(new object[] { "None (random among eligible cells)", "Far from live forest (least likely to return on its own)" });
             m_rep.Prep.Items.AddRange(new object[] { "None", "Pile and burn", "Mechanical (mastication)" });
+            foreach (ComboBox c in new[] { m_rep.Range, m_sal.Range }) c.Items.AddRange(new object[] { "Default ranges (sampled per iteration)", "Fixed values" });
             LoadCosts(); FillDefaults(); CostNotes();
             m_rep.Prep.SelectedIndexChanged += (s, e) => ShowPrepCost();
             m_rep.Add.Click += (s, e) => AddRow(1, m_rep);
@@ -264,16 +291,16 @@ namespace lucasCoreUI
 
         private void FillDefaults()
         {
-            m_rep.Area.Text = "100"; m_rep.From.Text = "1"; m_rep.To.Text = "5"; m_rep.Survival.Text = "0.8"; m_rep.Priority.SelectedIndex = 0; m_rep.Prep.SelectedIndex = 0;
+            m_rep.Area.Text = "100"; m_rep.Budget.Text = ""; m_rep.From.Text = "1"; m_rep.To.Text = "5"; m_rep.Survival.Text = "0.8"; m_rep.Priority.SelectedIndex = 0; m_rep.Prep.SelectedIndex = 0;
             m_sal.Area.Text = "100"; m_sal.From.Text = "0"; m_sal.To.Text = "2";
-            m_rep.Cost.Text = CostText("Planting"); ShowPrepCost(); m_sal.Cost.Text = CostText("Salvage logging");
+            m_rep.Range.SelectedIndex = 0; m_sal.Range.SelectedIndex = 0; ShowPrepCost();
         }
 
         public override void LoadDataFeed(DataFeed dataFeed)
         {
             base.LoadDataFeed(dataFeed);
             Project p = this.Scenario != null ? this.Scenario.Project : this.DataFeed.Project;
-            if (p != null) { var ms = new ModelStrata(); try { ms.Load(p, this.Scenario); } catch (Exception) { } m_rep.Where.Load(ms); m_sal.Where.Load(ms); }
+            if (p != null) { var ms = new ModelStrata(); try { ms.Load(p, this.Scenario); } catch (Exception) { } m_rep.Where.Load(ms); m_sal.Where.Load(ms); SetRegions(ms.Units[0]); }
             LoadGrid(m_grid, SheetName);
             RefreshControls();
         }
@@ -292,23 +319,28 @@ namespace lucasCoreUI
         // the form's choices as a new row of the grid
         private void AddRow(int action, ActionForm a)
         {
-            bool rep = action == 1; object start = DBNull.Value, end = DBNull.Value, area = DBNull.Value, from = DBNull.Value, to = DBNull.Value, surv = DBNull.Value;
+            bool rep = action == 1; object start = DBNull.Value, end = DBNull.Value, area = DBNull.Value, from = DBNull.Value, to = DBNull.Value, surv = DBNull.Value, budget = DBNull.Value;
             string err = ReadNumber(a.Start, "the start year", true, false, 1900, 2200, out start) ?? ReadNumber(a.End, "the end year", true, false, 1900, 2200, out end)
-                      ?? ReadNumber(a.Area, "the area per year", false, true, 0, 1e12, out area) ?? ReadNumber(a.From, "the first year since the disturbance", true, false, 0, 500, out from)
+                      ?? ReadNumber(a.Budget, "the budget", false, false, 0, 1e13, out budget) ?? ReadNumber(a.Area, "the area per year", false, a.Budget.Text.Trim().Length == 0, 0, 1e12, out area) ?? ReadNumber(a.From, "the first year since the disturbance", true, false, 0, 500, out from)
                       ?? ReadNumber(a.To, "the last year since the disturbance", true, false, 0, 500, out to)
                       ?? (rep ? ReadNumber(a.Survival, "survival", false, false, 0, 1, out surv) : null);
             if (err == null && start != DBNull.Value && end != DBNull.Value && (int)start > (int)end) err = "the start year is after the end year";
+            if (err == null && area != DBNull.Value && budget != DBNull.Value) err = "give an area or a budget, not both";
             if (err == null && from != DBNull.Value && to != DBNull.Value && (int)from > (int)to) err = "the window runs backwards";
             DataTable dt = Sheet.GetData(); DataRow nr = dt.NewRow();
             if (err == null) err = a.Where.Apply(nr);
             if (err != null) { a.Said.ForeColor = Color.Firebrick; a.Said.Text = "Not added: " + err + "."; return; }
             nr["ActionId"] = action; nr["StartYear"] = start; nr["EndYear"] = end; nr["Amount"] = area; nr["MinAge"] = from; nr["MaxAge"] = to;
+            if (nr.Table.Columns.Contains("Budget")) nr["Budget"] = budget; else if (budget != DBNull.Value) { a.Said.ForeColor = Color.Firebrick; a.Said.Text = "Not added: this library has no Budget column (update the package)."; return; }
             if (rep) { nr["Survival"] = surv; nr["Priority"] = a.Priority.SelectedIndex + 1; nr["SitePreparation"] = a.Prep.SelectedIndex + 1; }
-            object cost = DBNull.Value, pcost = DBNull.Value; string ce = ReadNumber(a.Cost, "the cost", false, false, -1e9, 1e9, out cost);
+            object cost = DBNull.Value, pcost = DBNull.Value, rev = DBNull.Value; string ce = ReadNumber(a.Cost, "the cost", false, false, 0, 1e9, out cost);
             if (ce == null && rep && a.Prep.SelectedIndex > 0) ce = ReadNumber(a.PrepCost, "the site preparation cost", false, false, 0, 1e9, out pcost);
+            if (ce == null && !rep) ce = ReadNumber(a.Revenue, "the timber revenue", false, false, 0, 1e9, out rev);
             if (ce != null) { a.Said.ForeColor = Color.Firebrick; a.Said.Text = "Not added: " + ce + "."; return; }
             if (nr.Table.Columns.Contains("Cost")) nr["Cost"] = cost;
             if (nr.Table.Columns.Contains("SitePrepCost")) nr["SitePrepCost"] = pcost;
+            if (nr.Table.Columns.Contains("Revenue")) nr["Revenue"] = rev;
+            if (nr.Table.Columns.Contains("CostRange")) nr["CostRange"] = a.Range.SelectedIndex == 1 ? 2 : 1;
             Sheet.BeginAddRows();
             try { dt.Rows.Add(nr); }
             finally { Sheet.EndAddRows(); }
@@ -350,7 +382,8 @@ namespace lucasCoreUI
             string where = string.Join(" / ", ModelStrata.Columns.Where(c => r.Table.Columns.Contains(c)).Select(c => Lookup(c, r[c])).Where(x => x != null));
             string years = r["StartYear"] == DBNull.Value && r["EndYear"] == DBNull.Value ? "every projection year"
                          : string.Format("{0} to {1}", Num(r["StartYear"], "the first projection year"), Num(r["EndYear"], "the end"));
-            string s = string.Format("{0}. {1} {2} a year, {3}, in {4}, {5}-{6} years after the disturbance", i, rep ? "Replant" : "Salvage", Num(r["Amount"], "?"), years,
+            string amt = r["Amount"] == DBNull.Value && r.Table.Columns.Contains("Budget") && r["Budget"] != DBNull.Value ? Convert.ToDouble(r["Budget"]).ToString("#,0") + " USD" : Num(r["Amount"], "?");
+            string s = string.Format("{0}. {1} {2} a year, {3}, in {4}, {5}-{6} years after the disturbance", i, rep ? "Replant" : "Salvage", amt, years,
                                      where.Length > 0 ? where : "the whole study area", Int(r["MinAge"], rep ? 1 : 0), Int(r["MaxAge"], rep ? 5 : 2));
             if (rep)
             {
@@ -359,7 +392,13 @@ namespace lucasCoreUI
                 s += string.Format("; {0:0}% takes{1}{2}", 100 * sv, prep == 2 ? ", after pile and burn" : prep == 3 ? ", after mechanical site preparation" : ", no site preparation",
                                    pri == 2 ? ", far from live forest first" : ", at random");
             }
-            if (r.Table.Columns.Contains("Cost") && r["Cost"] != DBNull.Value) s += string.Format("; {0} USD per {1}{2}", Num(r["Cost"], ""), UNIT, rep && r.Table.Columns.Contains("SitePrepCost") && r["SitePrepCost"] != DBNull.Value ? " + " + Num(r["SitePrepCost"], "") + " site preparation" : "");
+            Func<string, string> val = c => r.Table.Columns.Contains(c) && r[c] != DBNull.Value ? Num(r[c], "") : null;
+            var money = new List<string>();
+            if (val("Cost") != null) money.Add((rep ? "planting " : "logging ") + val("Cost"));
+            if (rep && val("SitePrepCost") != null) money.Add("site preparation " + val("SitePrepCost"));
+            if (!rep && val("Revenue") != null) money.Add("timber revenue " + val("Revenue"));
+            bool fixedC = r.Table.Columns.Contains("CostRange") && Int(r["CostRange"], 1) == 2;
+            s += money.Count > 0 ? string.Format("; USD per {0}: {1}", UNIT, string.Join(", ", money)) + (fixedC ? ", fixed" : "") + " (the rest: regional defaults)" : "; regional default costs" + (fixedC ? ", fixed" : "");
             return s + ".";
         }
 

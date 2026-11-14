@@ -70,22 +70,60 @@ check("two replanting priorities in one scenario stop", inherits(try(run(data.ta
       Priority = c("None (random among eligible cells)", "Far from live forest (least likely to return on its own)"))), silent = TRUE), "try-error"))
 check("a row outside the projection is left out", is.null(run(data.table(ActionId = "Replanting", Amount = 5, StartYear = 2040))))
 # ---- costs (transition attributes) -------------------------------------------------------------------------------------------
-cd <- management_cost_defaults(file.path("defaults", "management", "costs.csv"))
-check("cost defaults: the four items, numeric", all(c("Planting", "Site preparation: Pile and burn", "Site preparation: Mechanical", "Salvage logging") %in% names(cd)) && !anyNA(cd))
-check("cost defaults convert per hectare to the library's unit (acres: /2.471)", abs(management_cost_defaults(file.path("defaults", "management", "costs.csv"), 2.471)[["Planting"]] - cd[["Planting"]] / 2.471) < 1e-9)
+cf <- file.path("defaults", "management", "costs.csv")
+cd <- management_cost_defaults(cf)
+dv <- function(region, item) mg_cost_default(cd, region, item)
+check("cost defaults: national rows for every item, Low <= Central <= High", all(c(MG_COST_ITEMS, MG_LOSS_ITEM) %in% cd$values[Region == "All", Item]) &&
+      all(cd$values[Item != MG_LOSS_ITEM, Low <= Central & Central <= High]))
+check("every cost region in the defaults has a row in the region map, every map region has costs", setequal(setdiff(unique(cd$values$Region), "All"), unique(cd$regions$Region)))
+check("every ecodivision (primary stratum) has a cost region", setequal(fread(file.path("defaults", "stsim", "stsim_Stratum.csv"))$Name, cd$regions$Ecodivision))
+check("cost defaults convert per hectare to the library's unit (acres: /2.471), the loss share stays",
+      abs(mg_cost_default(management_cost_defaults(cf, 2.471), "All", "Planting")[["Central"]] - dv("All", "Planting")[["Central"]] / 2.471) < 1e-9 &&
+      mg_cost_default(management_cost_defaults(cf, 2.471), "All", MG_LOSS_ITEM)[["Central"]] == 0.25)
+check("a region without its own row takes the national one", identical(dv("Interior West", "Site preparation: Mechanical"), dv("All", "Site preparation: Mechanical")))
 runc <- function(ma) management_targets(ma, 1985L, 2023L, 2030L, land, lev, lev_list, lev_col, NA_character_, scv, say, fail, cost_defaults = cd)
 c1 <- runc(data.table(ActionId = "Replanting", Amount = 100, Survival = 0.8, SitePreparation = "Pile and burn", Priority = "None (random among eligible cells)"))$costs
-check("replanting with pile and burn: planting and site preparation on the planted and failed types, defaults, from the projection start",
+check("replanting with pile and burn: planting and site preparation on the planted and failed types, national defaults (an unknown ecodivision), from the projection start",
       nrow(c1) == 4 && setequal(c1$TransitionAttributeTypeId, MG_COST_TYPES[c("Planting", "Prep")]) && all(c1$Timestep == 2024) &&
-      all(c1[TransitionAttributeTypeId == MG_COST_TYPES[["Planting"]], Value] == cd[["Planting"]]) &&
-      all(c1[TransitionAttributeTypeId == MG_COST_TYPES[["Prep"]], Value] == cd[["Site preparation: Pile and burn"]]) && all(grepl(" \\[Type\\]$", c1$TransitionGroupId)))
+      all(c1[TransitionAttributeTypeId == MG_COST_TYPES[["Planting"]], Value] == dv("All", "Planting")[["Central"]]) &&
+      all(c1[TransitionAttributeTypeId == MG_COST_TYPES[["Prep"]], Value] == dv("All", "Site preparation: Pile and burn")[["Central"]]) && all(grepl(" \\[Type\\]$", c1$TransitionGroupId)))
+check("each value is a Beta over its range, sampled once per iteration, sd^2 < (mean - min)(max - mean)",
+      all(c1$DistributionType == "Beta") && all(c1$DistributionFrequencyId == "Iteration Only") &&
+      all(c1[TransitionAttributeTypeId == MG_COST_TYPES[["Planting"]], DistributionMin == 600 & DistributionMax == 3000]) &&
+      all(c1$DistributionSD^2 < (c1$Value - c1$DistributionMin) * (c1$DistributionMax - c1$Value)))
 c2 <- runc(data.table(ActionId = "Replanting", Amount = 10, Cost = 500, SitePreparation = "None"))$costs
-check("a row's own cost wins; no site preparation, no site preparation cost", nrow(c2) == 2 && all(c2$Value == 500) && all(c2$TransitionAttributeTypeId == MG_COST_TYPES[["Planting"]]))
+check("a row's own cost wins, with the default range scaled to it; no site preparation, no site preparation cost",
+      nrow(c2) == 2 && all(c2$Value == 500) && all(c2$TransitionAttributeTypeId == MG_COST_TYPES[["Planting"]]) && all(abs(c2$DistributionMin - 250) < 1e-6 & abs(c2$DistributionMax - 1250) < 1e-6))
+c2f <- runc(data.table(ActionId = "Replanting", Amount = 10, Cost = 500, SitePreparation = "None", CostRange = "Fixed values"))$costs
+check("CostRange Fixed: the value alone, no distribution", nrow(c2f) == 2 && !"DistributionType" %in% names(c2f))
 r3c <- runc(data.table(ActionId = "Salvage logging", Amount = 30, TertiaryStratumId = "B"))
-check("salvage: the default net cost (negative = revenue) in the row's unit, and in the summary", nrow(r3c$costs) == 1 && r3c$costs$Value == cd[["Salvage logging"]] &&
-      r3c$costs$TertiaryStratumId == "B" && all(r3c$summary$CostPerArea == cd[["Salvage logging"]]))
+sv <- r3c$costs[TransitionAttributeTypeId == MG_COST_TYPES[["Salvage"]]]; rv <- r3c$costs[TransitionAttributeTypeId == MG_COST_TYPES[["Revenue"]]][order(AgeMin)]
+check("salvage: the logging cost (one row) and the timber revenue by age 0-2, falling 25% a year, in the row's unit",
+      nrow(sv) == 1 && sv$Value == dv("All", "Salvage logging")[["Central"]] && is.na(sv$AgeMin) && nrow(rv) == 3 && identical(as.numeric(rv$AgeMin), c(0, 1, 2)) &&
+      all(abs(rv$Value - dv("All", "Salvage timber revenue")[["Central"]] * 0.75^(0:2)) < 1e-6) && all(r3c$costs$TertiaryStratumId == "B"))
+check("summary: cost per area, and revenue per area at the window's start", all(r3c$summary$CostPerArea == dv("All", "Salvage logging")[["Central"]]) &&
+      all(r3c$summary$RevenuePerArea == dv("All", "Salvage timber revenue")[["Central"]]))
 check("two overlapping rows for the same type and place at different costs stop", inherits(try(runc(data.table(ActionId = "Salvage logging", Amount = 5, Cost = c(100, 200))), silent = TRUE), "try-error"))
 check("the same rows at the same cost are fine", !inherits(try(runc(data.table(ActionId = "Salvage logging", Amount = 5, Cost = c(100, 100))), silent = TRUE), "try-error"))
 check("without cost defaults no costs", is.null(r1$costs))
+# two cost regions in the study area: values per ecodivision, each its region's default
+rr <- management_rows(data.table(ActionId = "Replanting", Amount = 10, SitePreparation = "Mechanical"), 2023L, 2030L, say, fail)
+m2 <- management_costs(rr, cd, c("Mediterranean", "Marine"), fail)$values
+check("two regions: per ecodivision (California, Pacific Northwest; mechanical in the PNW falls back to national)",
+      setequal(m2$StratumId, c("Mediterranean", "Marine")) &&
+      all(m2[StratumId == "Mediterranean" & TransitionAttributeTypeId == MG_COST_TYPES[["Planting"]], Value] == dv("California", "Planting")[["Central"]]) &&
+      all(m2[StratumId == "Marine" & TransitionAttributeTypeId == MG_COST_TYPES[["Prep"]], Value] == dv("All", "Site preparation: Mechanical")[["Central"]]))
+m1 <- management_costs(rr, cd, c("Mediterranean", "Mediterranean Mountains"), fail)$values
+check("one region: no ecodivision keys, that region's values", !"StratumId" %in% names(m1) && all(m1[TransitionAttributeTypeId == MG_COST_TYPES[["Planting"]], Value] == dv("California", "Planting")[["Central"]]))
+
+# budget mode: an area from a budget at the central cost per area
+rb <- runc(data.table(ActionId = "Replanting", Budget = 330000, Survival = 0.8, SitePreparation = "Pile and burn"))
+pc <- dv("All", "Planting")[["Central"]] + dv("All", "Site preparation: Pile and burn")[["Central"]]
+check("budget: area = budget / (planting + site preparation), split by survival", abs(sum(rb$targets[Timestep == 2024, Amount]) - 330000 / pc) < 1e-6 &&
+      abs(rb$targets[Timestep == 2024 & grepl("failed", TransitionGroupId), sum(Amount)] - 0.2 * 330000 / pc) < 1e-6 && all(grepl("budget", rb$summary$Note)))
+sb <- runc(data.table(ActionId = "Salvage logging", Budget = 51000))
+check("budget, salvage: area = budget / logging cost", abs(sum(sb$targets[Timestep == 2024, Amount]) - 51000 / dv("All", "Salvage logging")[["Central"]]) < 1e-6)
+check("an area and a budget on one row stop", inherits(try(runc(data.table(ActionId = "Salvage logging", Amount = 5, Budget = 1000)), silent = TRUE), "try-error"))
+check("a budget without cost defaults stops", inherits(try(run(data.table(ActionId = "Salvage logging", Budget = 1000)), silent = TRUE), "try-error"))
 
 cat(sprintf("%d passed, %d failed\n", n_ok, n_bad)); if (n_bad) quit(status = 1)

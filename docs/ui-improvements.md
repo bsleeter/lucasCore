@@ -1857,8 +1857,31 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       (-5,000 to 1,500); sources and regional values in dev/management/cost-defaults-research.md). Stage 9 writes them on the
       types' [Type] groups from the row's start year in its strata (planting and site preparation on failed plantings too); rows
       overlapping in type, place and years must agree. Lassen (setup 120, projection 122): ST-Sim's total is area x value, exactly:
-      planting 4.63 M USD, site preparation 6.94 M, salvage -1.05 M over 2024-2050. Later: cost-effectiveness (USD per Mg C) in
-      Compare Runs, a budget (transition attribute targets), regional costs, salvage value falling with years since the fire.
+      planting 4.63 M USD, site preparation 6.94 M, salvage -1.05 M over 2024-2050.
+    - Cost follow-ups (user 2026-11-13, done the same day; "Transition Attribute Values ... can also hold a distribution of cost
+      values to give us a built in range"):
+      - Regional defaults: costs.csv by Region (California, Pacific Northwest, Interior West, South, Northeast; All = national, the
+        fallback), each ecodivision's region in cost-regions.csv; several regions in a study area: values per ecodivision.
+      - Ranges: each value a Beta (mean = central, min/max = low/high, SD = range / 6, capped so the Beta exists), Value Sampling
+        Frequency "Iteration Only": one cost scenario per iteration. A row's own value scales the default range; Cost Range Fixed
+        writes the value alone. (ST-Sim's Value Min/Max must be >= 0: why salvage is a cost and a revenue, not a signed net.)
+      - Salvage: Management Cost: Salvage Logging (logging and haul) and Management Revenue: Salvage Timber, the revenue by the
+        disturbed class's age (AgeMin = AgeMax = a, value x 0.75^a; loss 0.25 a year, Prestemon et al. 2006).
+      - Budget mode: a row's Budget (USD a year) instead of its Amount; stage 9 sets the area = budget / central cost per area.
+        Chosen over ST-Sim transition attribute targets, which would break the planted/failed survival split (the two types are
+        simulated as separate groups, in random order). What a run spends varies around the budget with the sampled costs.
+      - Compare Runs: Compare Cost Summary (src/compare-figures.R compare_cost): costs, revenue, net cost (iteration mean, lowest,
+        highest), extra net cost over the baseline, carbon gained (total ecosystem carbon at the end), USD per Mg C (range from the
+        iterations' net cost) and per Mg CO2e; no ratio without a gain.
+      - Lassen (setup 128, projection 130: 2024-2036, 3 iterations; replanting 300 ha a year, a 500,000 USD a year replanting
+        budget from 2030 = 113.6 ha a year at 4,400 USD/ha, salvage 200 ha a year; California defaults): USD per hectare by
+        iteration, planting 1,585 / 1,123 / 1,315 (range 800-2,500), site preparation 2,963 / 2,627 / 3,334 (1,850-4,000), logging
+        4,507 / 6,834 / 4,747 (4,000-8,750), salvage revenue 4,389 / 3,547 / 5,521 (by age, 2,250-8,000). No warnings. Net cost
+        12.1 M USD (7.8-14.8 M). Carbon against baseline 99: -0.20 Tg C, no ratio - but 99 is one iteration with other fire draws,
+        so the difference is mostly fire noise: a fair test needs a baseline with the same iterations.
+      - Next (user 2026-11-13): two carbon bases in the cost summary, ecosystem and ecosystem + harvested wood products (to-do 59's
+        model); salvage moves dead wood to products, which ecosystem carbon alone counts as a loss. Later: replanting-only and
+        salvage-only runs, each against the baseline.
     - Open: planting a different type (assisted migration); fuel treatments; FACTS records for the baseline; a full Build on Puget
       (tiled by county) to try the tile rule in a run.
   - **Replanting and restoration:** a management transition from a post-disturbance class back to a forest type.

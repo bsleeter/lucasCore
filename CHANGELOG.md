@@ -51,11 +51,21 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   disturbed; it can go first where natural return is least likely (far from live forest). Six new transition types, three groups,
   site preparation carbon flows, mapped and summarized. With spatial tiles every action names a unit of the tile level. An empty
   page is the baseline. Changes Build results (new pathways); projection results only when actions are set.
-- Management costs: each Management Actions row has a cost per unit area (planting, site preparation, salvage net cost; negative =
-  net revenue), filled from provisional package defaults (`defaults/management/costs.csv`, 2024 USD per hectare: planting 1,200,
-  pile and burn 1,800, mechanical 2,200, salvage -1,000, with ranges and sources) or the user's own. Stage 9 writes them as ST-Sim
-  transition attributes (group Management Cost, three types in USD), so a projection with Transition attributes output reports
-  the cost a year by type and strata. New projections (`tools/new-projection.R`) turn that output on.
+- Management costs: Management Actions rows carry costs and revenue per unit area, as ST-Sim transition attributes (group
+  Management Cost: Planting, Site Preparation, Salvage Logging, and Management Revenue: Salvage Timber; USD), so a projection with
+  Transition attributes output reports them a year by type and strata. New projections (`tools/new-projection.R`) turn that
+  output on.
+  - Defaults by region (`defaults/management/costs.csv`, 2024 USD per hectare, provisional, with low-high ranges and sources;
+    each ecodivision's region in `cost-regions.csv`): California, Pacific Northwest, Interior West, South, Northeast, and national
+    values where a region has none. A study area spanning several regions gets each ecodivision's own. A row's own values win.
+  - Ranges: each value is a Beta distribution over its range (SD a sixth of it), drawn once per iteration, so several iterations
+    give the cost spread. Cost Range "Fixed values" turns that off for a row.
+  - Salvage: logging cost and timber revenue apart (net = revenue - cost); the revenue falls 25% a year with years since the fire.
+  - Budget mode: a row can give a budget (USD a year) instead of an area; stage 9 plants or salvages the area it pays for at the
+    central cost per area.
+  - Compare Runs: a Compare Cost Summary per projection, with costs, revenue and net cost over the run (mean and the
+    iterations' range), the extra net cost over the baseline, the carbon gained (total ecosystem carbon at the end), and USD per
+    Mg C and per Mg CO2e.
 - Seven study area and strata sources (Stratum Sources presets 11-17): FWS Refuges, DoD Installations, National Forests,
   Wilderness, Tribal Lands, BLM National Conservation Lands and Metropolitan Areas. The first five and BLM come from PAD-US 4.0 (a
   new edition of the PAD-US units download), Tribal Lands from Census TIGER/Line 2022 (a new Data Download dataset), Metropolitan
