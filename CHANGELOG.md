@@ -98,6 +98,16 @@ effect at the next Build; rerun the Build and then the historical run before a P
   minimum and maximum stand ages per harvest type (a maximum protects older forest). A row by a strata level the harvest targets
   are not keyed on splits them by each place's historical harvest. Stage 9 writes the reshaped targets and age multipliers;
   Projection Results > Forest Management (as set up) lists each row's drawn and managed harvest. An empty page is the drawn harvest.
+- Fuel Treatments (Projection > Fuel Treatments): mechanical thinning, prescribed burn, and thin and burn on upland forest, as an
+  area a year (or a budget) in chosen years and places, with a stand-age window, a retreatment interval and a priority (random,
+  or where wildfire burned more often). A treatment keeps the forest type and stand age; its carbon moves when it happens
+  (thinning: a quarter of live biomass cut, most merchantable wood to the forestry sector, slash piled and burned; prescribed burn:
+  most litter and fine woody debris burned, some coarse wood and snags, 2% of foliage scorched, 5% of live trees killed). For a wildfire in a treated cell, the severity shift: less
+  high and medium severity and more low, by years since the treatment (thin and burn: high severity x0.28 the first five years,
+  fading by 20), keeping the expected burned area (fire methods 1 and 2). Each type tracks its own time since treatment (ST-Sim
+  time since transition). Costs per hectare by region (`defaults/fuel-treatments/`, 2024 USD, provisional, ranges per iteration);
+  thinning's wood earns the harvest timber revenue. New types and pathways: a new Build is needed for treatments. Projection
+  Results > Fuel Treatments (as set up) lists each row. Library update: the treatment groups join existing output filters.
 - Timber revenue on every projection: transition attribute Management Revenue: Harvest Timber on clearcut, selection and light
   selection, per ecodivision, forest type and 10-year age band = merchantable volume (the Build's curves) x removal share (0.97,
   0.5, 0.2) x regional stumpage price (`defaults/forest-management/stumpage.csv`, 2024 USD/m3, softwood or hardwood by

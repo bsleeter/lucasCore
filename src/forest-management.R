@@ -149,7 +149,8 @@ forest_management_revenue_defaults <- function(dir, per_ha = 1) {
 # rows of stsim_TransitionAttributeValue: Management Revenue: Harvest Timber on the three harvest types, per ecodivision, forest type
 # and age band, from y1 + 1. vc: the Build's merchantable volume curves (StratumId, StateClassId, Age, MerchantableVolume m3/ha);
 # cost: management_cost_defaults (its region map); eco: the study area's ecodivisions
-forest_management_revenue <- function(vc, rev, cost, eco, y1, fixed = FALSE) {
+forest_management_revenue <- function(vc, rev, cost, eco, y1, fixed = FALSE, types = FM_TYPES, removal = FM_REMOVAL) {
+  groups <- setNames(paste0(types, " [Type]"), names(types))   # (fuel treatments add their thinning types: src/fuel-treatments.R)
   vc <- data.table::as.data.table(vc)[StratumId %in% eco & !is.na(MerchantableVolume)]
   if (!nrow(vc)) return(NULL)
   ftype <- sub("^[^:]*: ", "", vc$StateClassId); wood <- rev$wood$Wood[match(ftype, rev$wood$ForestType)]; wood[is.na(wood)] <- "Softwood"
@@ -160,9 +161,9 @@ forest_management_revenue <- function(vc, rev, cost, eco, y1, fixed = FALSE) {
   bands <- data.table::data.table(AgeMin = seq(0L, FM_BAND_TOP, FM_BAND))[, `:=`(AgeMax = ifelse(AgeMin == FM_BAND_TOP, NA_integer_, AgeMin + FM_BAND - 1L), Mid = AgeMin + FM_BAND %/% 2L)]
   out <- data.table::rbindlist(lapply(split(vc, by = c("StratumId", "StateClassId")), function(d) { d <- d[order(Age)]
     v <- stats::approx(d$Age, d$MerchantableVolume, xout = bands$Mid, rule = 2)$y; pr <- price(d$Region[1], d$Wood[1])
-    data.table::rbindlist(lapply(names(FM_TYPES), function(k) { val <- v * FM_REMOVAL[[k]] * pr[["Central"]] / rev$per_ha
+    data.table::rbindlist(lapply(names(types), function(k) { val <- v * removal[[k]] * pr[["Central"]] / rev$per_ha
       b <- lapply(val, function(x) mg_beta(x, pr, fixed))
-      data.table::data.table(Timestep = y1 + 1L, StratumId = d$StratumId[1], StateClassId = d$StateClassId[1], TransitionGroupId = FM_GROUPS[[k]],
+      data.table::data.table(Timestep = y1 + 1L, StratumId = d$StratumId[1], StateClassId = d$StateClassId[1], TransitionGroupId = groups[[k]],
                              TransitionAttributeTypeId = FM_REVENUE, AgeMin = bands$AgeMin, AgeMax = bands$AgeMax, Value = round(val, 2),
                              DistributionType = vapply(b, `[[`, "", "DistributionType"), DistributionSD = vapply(b, `[[`, 0, "DistributionSD"),
                              DistributionMin = vapply(b, `[[`, 0, "DistributionMin"), DistributionMax = vapply(b, `[[`, 0, "DistributionMax"))[Value > 0] })) }))

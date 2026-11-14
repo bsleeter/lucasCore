@@ -4,3 +4,4 @@ Management Cost: Site Preparation,Management Cost,USD,"Site preparation before r
 Management Cost: Salvage Logging,Management Cost,USD,"Salvage logging and haul cost per unit area (its timber revenue is Management Revenue: Salvage Timber)"
 Management Revenue: Salvage Timber,Management Cost,USD,"Revenue from the salvaged timber per unit area, falling with years since the fire (net = revenue - costs)"
 Management Revenue: Harvest Timber,Management Cost,USD,"Stumpage revenue of clearcut and selection harvest per unit area harvested: merchantable volume x removal share x regional stumpage price (src/forest-management.R)"
+Management Cost: Fuel Treatment,Management Cost,USD,"Fuel treatment (mechanical thinning, prescribed burn, thin and burn) per unit area treated (src/fuel-treatments.R)"

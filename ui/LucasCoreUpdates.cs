@@ -222,6 +222,11 @@ namespace lucasCoreUI
                     AddTypeToGroup(store, t, grpM[0]);
                     if (i > 0) AddTypeToGroup(store, t, grpM[i]);
                 }
+            // fuel treatments (tools/make_fuel_treatments.R): three types on upland forest in group Fuel Treatment; their pathways come with
+            // the next Build (stage 6 reads the package pathways), their time since treatment with the Projection Setup (stage 9)
+            AddNamed(store, "stsim_TransitionGroup", "TransitionGroupId", "Fuel Treatment", null, null, false);
+            string[] ftTypes = { "Fuel Treatment: Mechanical Thinning", "Fuel Treatment: Prescribed Burn", "Fuel Treatment: Thin and Burn" };
+            foreach (string t in ftTypes) { AddTransitionType(store, t, null); AddTypeToGroup(store, t, "Fuel Treatment"); }
             // management costs (tools/make_management.R): a Management Cost attribute group and four transition attribute types, USD:
             // three costs and the salvaged timber's revenue (net = revenue - costs)
             AddNamed(store, "stsim_AttributeGroup", "AttributeGroupId", "Management Cost", null, null, false);
@@ -231,7 +236,8 @@ namespace lucasCoreUI
                                     { "Management Cost: Site Preparation", "Site preparation before replanting (pile and burn, or mechanical), per unit area" },
                                     { "Management Cost: Salvage Logging", "Salvage logging and haul cost per unit area (its timber revenue is Management Revenue: Salvage Timber)" },
                                     { "Management Revenue: Salvage Timber", "Revenue from the salvaged timber per unit area, falling with years since the fire (net = revenue - costs)" },
-                                    { "Management Revenue: Harvest Timber", "Stumpage revenue of clearcut and selection harvest per unit area harvested: merchantable volume x removal share x regional stumpage price (src/forest-management.R)" } };
+                                    { "Management Revenue: Harvest Timber", "Stumpage revenue of clearcut and selection harvest per unit area harvested: merchantable volume x removal share x regional stumpage price (src/forest-management.R)" },
+                                    { "Management Cost: Fuel Treatment", "Fuel treatment (mechanical thinning, prescribed burn, thin and burn) per unit area treated (src/fuel-treatments.R)" } };
                 foreach (DataRow r in Rows(store, "SELECT ProjectId FROM core_Project").Rows)
                 {
                     string pr = Id(r["ProjectId"]), ag = IdOf(store, "stsim_AttributeGroup", "AttributeGroupId", pr, "Management Cost");
@@ -255,6 +261,7 @@ namespace lucasCoreUI
                 var names = new List<string>(grpM); var mapped = new HashSet<string> { grpM[0], "Forest Harvest: Salvage Logging [Type]" };
                 names.Add("Forest Harvest: Salvage Logging [Type]");
                 foreach (string n in agTypes) { names.Add(n); mapped.Add(n); }
+                foreach (string t in ftTypes) { names.Add(t + " [Type]"); mapped.Add(t + " [Type]"); }   // (fuel treatments: summarized and mapped)
                 for (int i = 0; i < preps.Length; i++)
                     foreach (string end in new[] { "", " (failed)" }) { string n = "Management: Replanting" + preps[i] + end + " [Type]"; names.Add(n); mapped.Add(n); }
                 foreach (DataRow r in Rows(store, "SELECT DISTINCT f.ScenarioId AS S, s.ProjectId AS P FROM stsim_OutputFilterTransitionGroups f JOIN core_Scenario s ON s.ScenarioId = f.ScenarioId").Rows)

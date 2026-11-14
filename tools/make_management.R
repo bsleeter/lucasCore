@@ -64,12 +64,13 @@ edit_lines(D("stockflow", "event-pathways.csv"), function(l) grepl(",Site Prepar
 
 # costs (user 2026-11-13: "start with costs per hectare and research defaults"): ST-Sim transition attributes, one type per cost,
 # in a "Management Cost" attribute group; stage 9 writes their values (USD per unit area) on the management types' [Type] groups
-COSTS <- data.table(Name = c("Management Cost: Planting", "Management Cost: Site Preparation", "Management Cost: Salvage Logging", "Management Revenue: Salvage Timber", "Management Revenue: Harvest Timber"),
+COSTS <- data.table(Name = c("Management Cost: Planting", "Management Cost: Site Preparation", "Management Cost: Salvage Logging", "Management Revenue: Salvage Timber", "Management Revenue: Harvest Timber", "Management Cost: Fuel Treatment"),
                     Description = c("Replanting: seedlings and planting, per unit area planted (planted and failed alike)",
                                     "Site preparation before replanting (pile and burn, or mechanical), per unit area",
                                     "Salvage logging and haul cost per unit area (its timber revenue is Management Revenue: Salvage Timber)",
                                     "Revenue from the salvaged timber per unit area, falling with years since the fire (net = revenue - costs)",
-                                    "Stumpage revenue of clearcut and selection harvest per unit area harvested: merchantable volume x removal share x regional stumpage price (src/forest-management.R)"))
+                                    "Stumpage revenue of clearcut and selection harvest per unit area harvested: merchantable volume x removal share x regional stumpage price (src/forest-management.R)",
+                                    "Fuel treatment (mechanical thinning, prescribed burn, thin and burn) per unit area treated (src/fuel-treatments.R)"))
 edit_lines(D("stsim", "stsim_AttributeGroup.csv"), function(l) first_field(l) == "Management Cost", "Management Cost,")
 tat <- D("stsim", "stsim_TransitionAttributeType.csv"); if (!file.exists(tat)) writeLines("Name,AttributeGroupId,Units,Description", tat)
 edit_lines(tat, function(l) grepl("^Management (Cost|Revenue):", first_field(l)), COSTS[, sprintf('%s,Management Cost,USD,"%s"', Name, Description)])

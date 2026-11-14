@@ -488,6 +488,48 @@ if (!is.null(fm_rows)) {
     Row, Where, StartYear, EndYear, ClearcutBefore, ClearcutAfter, SelectionBefore, SelectionAfter, LightSelectionAfter, ClearcutAges, SelectionAges, Note))
   check(STAGE, "forest management: every harvest type has a target in every projection year", all(fm$targets[Timestep > y1, uniqueN(Timestep), by = TransitionGroupId]$V1 == length(pyrs)))
 }
+# ---- fuel treatments (user 2026-11-13: "Next is Fuel Treatments"; "Lets go with the severity shift") ----------------------------
+# src/fuel-treatments.R: each Fuel Treatments row is an area a year (or a budget) of a treatment in its years and place, on upland
+# forest; for a wildfire in a treated cell, the severity shift by years since the treatment (multipliers on the severity types keyed
+# on each treatment type's own time since transition); per treatment a stand-age window, a retreatment interval and a priority
+source(pkg_file("src", "management.R")); source(pkg_file("src", "fuel-treatments.R"))   # (management.R: the cost machinery the treatments share)
+ftd <- pkg_file("defaults", "fuel-treatments")
+ft_set <- if (file.exists(file.path(ftd, "settings.csv"))) { s <- fread(file.path(ftd, "settings.csv"), na.strings = ""); s[, Key := ft_key(Treatment)]
+  list(MinAge = setNames(s$MinAge, s$Key), Retreat = setNames(s$RetreatmentYears, s$Key)) } else NULL
+ft_rows <- fuel_treatment_rows(read_ds("FuelTreatment"), y1, pend, say, fail, ft_set)
+ft_tmv <- NULL; ft_av <- NULL
+if (!is.null(ft_rows)) {
+  if (!nrow(fire_rows)) say("Fuel Treatments: the projection has no fire (Projection Transitions): the treatments change nothing but their own carbon")
+  if (nrow(fire_rows) && fire_m == 3) say("Fuel Treatments: lucasFireC2F seasons (fire method 3) burn their own maps: the severity shift does not apply")
+  ft_eff <- fread(file.path(ftd, "effects.csv"), na.strings = ""); ft_eff[, TreatmentKey := ft_key(Treatment)]
+  ft_cells <- data.table(w = as.numeric(elig(FT_GROUPS[["Thin"]])[land]))
+  for (L in c("Primary", "Secondary", "Tertiary")) set(ft_cells, j = L, value = lev_list[[L]]$Name[match(lev[[L]][land], as.integer(lev_list[[L]]$Id))])
+  # the study area's historical burned area by severity (the reference years' fire maps)
+  sev_area <- vapply(FT_SEV, function(g) sum(vapply(ref, function(y) sum(hist_vals(g, y)[land]), 0)), 0); names(sev_area) <- names(FT_SEV)
+  if (!(sum(sev_area) > 0)) { sev_area <- c(High = 1, Medium = 1, Low = 1); say("Fuel Treatments: no historical fire in the study area: severity shares taken as equal") }
+  say("Fuel Treatments: historical burned shares high %.0f%%, medium %.0f%%, low %.0f%%", 100 * sev_area[["High"]] / sum(sev_area), 100 * sev_area[["Medium"]] / sum(sev_area), 100 * sev_area[["Low"]] / sum(sev_area))
+  ft_cost <- tryCatch(fuel_treatment_costs(ft_rows, { x <- fread(file.path(ftd, "costs.csv"), na.strings = ""); x[, Treatment := ft_key(Treatment)]
+      x[!(Unit %in% "share"), `:=`(Central = Central / units_per_ha[[au]], Low = Low / units_per_ha[[au]], High = High / units_per_ha[[au]])][] },
+    management_cost_defaults(pkg_file("defaults", "management", "costs.csv"), units_per_ha[[au]]), unique(stats::na.omit(ft_cells$Primary)), fail),
+    error = function(e) { say("Fuel Treatments: no costs (%s)", conditionMessage(e)); NULL })
+  ft <- fuel_treatment_targets(ft_rows, y0, y1, pend, ft_cells, lev_col, if (tiles > 1) tile_lvl else NA_character_, ft_eff, sev_area, say, fail, ft_cost)
+  tt_out <- rbind(tt_out[!TransitionGroupId %in% ft$groups], ft$targets, fill = TRUE)
+  ft_tmv <- ft$multipliers; ft_av <- if (!is.null(ft_cost)) ft_cost$values else NULL
+  # time since each treatment: its own [Type] group (rows of earlier runs of these types replaced)
+  tsg <- as.data.table(datasheet(scn, "stsim_TimeSinceTransitionGroup", optional = TRUE, lookupsAsFactors = FALSE))
+  if (nrow(tsg)) tsg <- tsg[!TransitionTypeId %in% FT_TYPES, setdiff(names(tsg), c("TimeSinceTransitionGroupId", "ScenarioId")), with = FALSE]
+  write_stsim(rbind(tsg, ft$tst, fill = TRUE), "TimeSinceTransitionGroup")
+  # priority: where wildfire has burned more often (each treatment type with that priority)
+  if (ft$fire_priority) { fq <- Reduce(`+`, lapply(ref, function(y) Reduce(`+`, lapply(FT_SEV, function(g) hist_vals(g, y))))) / length(ref)
+    el <- elig(FT_GROUPS[["Thin"]]); v <- ifelse(el, 0.1 + fq, 0); if (sum(el)) v <- v / mean(v[el]); v[!land] <- NA
+    pf <- write_raster(setValues(rast(P), v), "FuelTreatment-Priority.tif", "FLT4S")
+    pk <- unique(ft_rows[Priority == "Fire likelihood", Key])
+    sm_out <- rbind(sm_out[!TransitionGroupId %in% FT_GROUPS[pk]], data.table(Iteration = NA_integer_, Timestep = y1 + 1L, TransitionGroupId = FT_GROUPS[pk], MultiplierFileName = pf), fill = TRUE)
+    say("Fuel Treatments: %s placed where wildfire burned more often (mean historical burned share %.3f a year)", paste(FT_TYPES[pk], collapse = ", "), mean(fq[el])) }
+  write_ds(ft$summary, "OutputFuelTreatment")
+  say("Fuel Treatments: severity multipliers by years since treatment: %s", paste(ft$effects[, sprintf("%s %s %s x%.2f", sub("^Fuel Treatment: ", "", Treatment), Severity, Years, Multiplier)], collapse = "; "))
+  check(STAGE, "fuel treatments: every treatment type has a target in every projection year", all(ft$targets[Timestep > y1, uniqueN(Timestep), by = TransitionGroupId]$V1 == length(pyrs)))
+}
 # ---- management actions (to-do 58; user 2026-11-13: "Start with replanting, salvage and site prep on a dedicated page") -------------
 # Each Management Actions row is an area a year on the disturbed forest classes (src/management.R), in its years and strata. Its types
 # keep stage 6's zero target elsewhere: every management type's targets are written on one set of strata keys (the tile level, and
@@ -508,13 +550,14 @@ if (!is.null(mg)) {
 # Tabular: Transition attributes). Timber revenue goes on every projection, baselines included, so a run that harvests less shows the
 # revenue it gives up (Compare Runs, Compare Cost Summary). Earlier rows of these types (a rerun) are replaced
 av <- as.data.table(datasheet(scn, "stsim_TransitionAttributeValue", optional = TRUE, lookupsAsFactors = FALSE))
-if (nrow(av)) av <- av[!TransitionAttributeTypeId %in% c(MG_COST_TYPES, FM_REVENUE), setdiff(names(av), c("TransitionAttributeValueId", "ScenarioId")), with = FALSE]
+if (nrow(av)) av <- av[!TransitionAttributeTypeId %in% c(MG_COST_TYPES, FM_REVENUE, FT_COST), setdiff(names(av), c("TransitionAttributeValueId", "ScenarioId")), with = FALSE]
 fm_rev <- tryCatch({
   vc <- as.data.table(datasheet(scn, "lucasCore_MerchantableVolumeCurve", optional = TRUE, lookupsAsFactors = FALSE))
   if (!nrow(vc)) { say("Timber revenue: no merchantable volume curves in the Build: none"); NULL } else
     forest_management_revenue(vc, forest_management_revenue_defaults(pkg_file("defaults", "forest-management"), units_per_ha[[au]]),
                               management_cost_defaults(pkg_file("defaults", "management", "costs.csv"), units_per_ha[[au]]),
-                              stsim_list("Stratum")$Name[as.numeric(stsim_list("Stratum")$Id) %in% unique(values(P, mat = FALSE))], y1) },
+                              stsim_list("Stratum")$Name[as.numeric(stsim_list("Stratum")$Id) %in% unique(values(P, mat = FALSE))], y1,
+                              types = c(FM_TYPES, FT_TYPES[c("Thin", "ThinBurn")]), removal = c(FM_REMOVAL, ft_removal())) },
   error = function(e) { say("Timber revenue: not written (%s)", conditionMessage(e)); NULL })
 if (!is.null(fm_rev) && nrow(fm_rev)) say("Timber revenue: %d values (USD per %s harvested, central; a range sampled per iteration): clearcut %.0f-%.0f, selection %.0f-%.0f",
   nrow(fm_rev), sub("s$", "", au), min(fm_rev[TransitionGroupId == FM_GROUPS[["CC"]], Value]), max(fm_rev[TransitionGroupId == FM_GROUPS[["CC"]], Value]),
@@ -523,7 +566,7 @@ mg_av <- if (!is.null(mg) && !is.null(mg$costs) && nrow(mg$costs)) mg$costs else
 if (!is.null(mg_av)) { rng <- "DistributionType" %in% names(mg_av) && any(!is.na(mg_av$DistributionType))
   say("Management Actions: costs and revenue (USD per %s, central%s): %s", sub("s$", "", au), if (rng) "; a range sampled per iteration" else "",
       paste(mg_av[, .(v = if (min(Value) == max(Value)) sprintf("%.0f", Value[1]) else sprintf("%.0f-%.0f", min(Value), max(Value))), by = .(a = sub("^Management (Cost|Revenue): ", "", TransitionAttributeTypeId))][, paste(a, v)], collapse = "; ")) }
-if (nrow(av) || !is.null(mg_av) || !is.null(fm_rev)) write_stsim(rbind(av, mg_av, fm_rev, fill = TRUE), "TransitionAttributeValue")
+if (nrow(av) || !is.null(mg_av) || !is.null(fm_rev) || !is.null(ft_av)) write_stsim(rbind(av, mg_av, fm_rev, ft_av, fill = TRUE), "TransitionAttributeValue")
 # ---- post-disturbance return and conversion (to-do 57): on everywhere from the historical end + 1; a disturbed class's return chance
 # by its age (years since the disturbance): 0 below ReturnAgeMin, then ReturnProbability a year to the window's end (post-disturbance-
 # settings.csv), divided by the mean of the live forest adjacency multiplier where stage 10 applies it (post-disturbance-adjacency.csv),
@@ -565,12 +608,13 @@ if (nrow(fire_rows) && nrow(fcm)) { scl9 <- stsim_list("StateClass"); idc <- sup
                TransitionGroupId = fire_g, Amount = as.numeric(fcm$Multiplier[i])) }))
   if (nrow(fire_tmv)) fire_tmv <- fire_tmv[is.na(StratumId) | StratumId %in% stsim_list("Stratum")$Name]
   say("Fire by state class: %s", if (nrow(fire_tmv)) paste(fire_tmv[, sprintf("%s%s x%.2f", if (.N > 1) sprintf("%d classes", .N) else StateClassId[1], ifelse(is.na(StratumId[1]), "", paste0(" in ", StratumId[1])), Amount[1]), by = .(StratumId, Amount)]$V1, collapse = "; ") else "none (every multiplier 1)") }
-if (!is.null(tmv) || !is.null(fire_tmv) || !is.null(mg_tmv) || !is.null(fm_tmv)) {
+if (!is.null(tmv) || !is.null(fire_tmv) || !is.null(mg_tmv) || !is.null(fm_tmv) || !is.null(ft_tmv)) {
   old_tmv <- as.data.table(datasheet(scn, "stsim_TransitionMultiplierValue", optional = TRUE, lookupsAsFactors = FALSE))
   # earlier rows of a rerun are replaced: the post-disturbance groups', the fire group's by state class (no other fire multiplier), the management types'
-  if (nrow(old_tmv)) old_tmv <- old_tmv[!(!is.na(Timestep) & Timestep > y1 & (TransitionGroupId %in% c(PD_GROUPS, MG_GROUPS, FM_GROUPS) | (TransitionGroupId == fire_g & !is.na(StateClassId)))),
+  if (nrow(old_tmv)) old_tmv <- old_tmv[!(!is.na(Timestep) & Timestep > y1 & (TransitionGroupId %in% c(PD_GROUPS, MG_GROUPS, FM_GROUPS, FT_GROUPS) | (TransitionGroupId == fire_g & !is.na(StateClassId)))),
                                         setdiff(names(old_tmv), c("TransitionMultiplierValueId", "ScenarioId")), with = FALSE]
-  write_stsim(rbind(old_tmv, tmv, fire_tmv, mg_tmv, fm_tmv, fill = TRUE), "TransitionMultiplierValue") }
+  if (nrow(old_tmv) && "TSTGroupId" %in% names(old_tmv)) old_tmv <- old_tmv[!(TransitionGroupId %in% FT_SEV & !is.na(TSTGroupId) & TSTGroupId %in% FT_GROUPS)]
+  write_stsim(rbind(old_tmv, tmv, fire_tmv, mg_tmv, fm_tmv, ft_tmv, fill = TRUE), "TransitionMultiplierValue") }
 write_stsim(sm_out, "TransitionSpatialMultiplier")
 if (nrow(fire_rows)) {
   # (method 3: no size distribution - an earlier one for the fire group is removed)

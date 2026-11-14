@@ -1929,7 +1929,35 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
         less stored in products). Plumbing only: an artificial harvest in a national park. Clearcut revenue reaches 73,921 USD/ha
         in the oldest bands (~1,900 m3/ha): check the volume curves' top end.
       - Open: slash retention on clearcuts; more wood to long-lived products (stage 18's end-use mix); revenue a row can override.
-    - Open: planting a different type (assisted migration); fuel treatments; FACTS records for the baseline; a full Build on Puget
+    - Fuel treatments (user 2026-11-13: "Next is Fuel Treatments"; "Lets go with the severity shift"): Projection > Fuel Treatments
+      (ui/FuelTreatmentsView.cs, src/fuel-treatments.R, stage 9; research in dev/fuel-treatments/research.md).
+      - Three transition types on upland forest, back to the same class without an age reset (tools/make_fuel_treatments.R, Ids
+        1300-1302, group Fuel Treatment): Mechanical Thinning (25% of live biomass cut, 80% of the merchantable cut to the forestry
+        sector, slash piled and 90% burned), Prescribed Burn (litter 80%, fine woody debris 60%, coarse 30%, snag branches 30%, snag
+        stems 5% consumed, crown scorch 2% of foliage, 5% of live trees killed) and Thin and Burn (both). Flows from
+        tools/make_fuel_treatment_flows.R; CO2/CO/CH4 0.9/0.09/0.01 of what burns.
+      - Effect, the severity shift: a wildfire in a treated cell has its high and medium severity multiplied down by years since
+        treatment (defaults/fuel-treatments/effects.csv: thin and burn x0.28 high, x0.60 medium in years 0-5, fading by 20; burn
+        alone x0.38 / x0.65; thin alone x0.65 / x0.85), and low severity up by 1 + ((1 - mH) sH + (1 - mM) sM) / sL, the shares
+        from the historical severity maps, so the burned area stays the same. ST-Sim time-since-transition multipliers (one TST
+        group per treatment; the first matching row wins, so the retreatment block comes first).
+      - A row: treatment, area a year, years, a unit, stand ages (minimum 20 by default), retreatment interval (thin 20, burn 10,
+        thin and burn 20 years: multiplier 0 on the treatment until then), priority (random, or where wildfire burned more often:
+        a map of the historical burned share, FuelTreatment-Priority.tif), cost per hectare by region (Beta range per iteration,
+        Management Cost: Fuel Treatment; thin and burn 0.9 x the two). Thinning's wood earns timber revenue (removal 0.2).
+      - Lassen plumbing test (dev/fuel-treatments/lassen-fuel-treatments.R; Build 170, historical 172; setups 180 and 183,
+        projections 185 and 186 run at once, 2024-2050, 3 iterations): thin and burn 400 ha a year where fire burned more often and
+        prescribed burn 600 at random. High-severity fire 5,654 -> 4,755 ha (-16%), medium -7%, low +5%, burned area the same.
+        Conversion over the run unchanged (2,124 against 2,140 ha); in 2050, 22% less forest in the disturbed classes (2,817 ->
+        2,191 ha) and 690 ha more live forest: the avoided conversion (user 2026-11-13: "it is possible we could see the added
+        benefit of treatment beyond just severity reduction") is still waiting in the disturbed state at 27 years. Ecosystem
+        carbon 0.20 Tg C lower in 2050 (0.16 with wood products): at this rate (~27,000 ha on ~30,000 ha of forest) the thinning
+        and burning outweigh the fire avoided. Cost 37.2 M USD, timber revenue 25.6 M; no USD per Mg C (carbon lost).
+      - Found on the way: libraries made before the treatment groups lacked them in the transition output filter, so the area
+        treated was not reported (Lassen and Puget patched; LucasCoreUpdates.cs adds them on a library update).
+      - Open: regional effects (the South's short-lived burn effect; no effect in wet forest); a longer run and lower rates for the
+        carbon sign; FACTS hazardous fuels records for the baseline.
+    - Open: planting a different type (assisted migration); FACTS records for the baseline; a full Build on Puget
       (tiled by county, 20-30 jobs; user 2026-11-13) to try the tile rule in a run.
   - **Replanting and restoration:** a management transition from a post-disturbance class back to a forest type.
     - Window: within a few years of the disturbance (time since transition, for example 1-5 years), before shrubs take the site.

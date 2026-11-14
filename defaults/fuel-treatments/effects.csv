@@ -1,0 +1,13 @@
+Treatment,TSTMin,TSTMax,High,Medium,Source,Note
+Thin and burn,0,5,0.28,0.6,Davis et al. 2024 meta-analysis (thin + prescribed burn: 72% less severity; no decline in the first decade); Graham 2009 in Kalies and Yocom Kent 2016,"Multipliers on Fire: High and Medium Severity for a wildfire in a treated cell; low severity rises to keep the burned area (stage 9). Dry western conifer evidence, applied everywhere (provisional: dev/fuel-treatments/research.md)"
+Thin and burn,6,10,0.32,0.65,Davis et al. 2024,
+Thin and burn,11,15,0.6,0.8,"Davis et al. 2024 (66% within 10 years, 28% after; only thin + burn still significant after 10 years); Martinson and Omi 2013",
+Thin and burn,16,20,0.85,0.95,Own inference: fading to none by about 20 years,
+Prescribed burn,0,5,0.38,0.65,Davis et al. 2024 (prescribed burn: 62% less severity),"The South's frequent burns act shorter (Ross 2024: 88% less one month after, 17% at 38 months): not regional yet"
+Prescribed burn,6,10,0.5,0.75,Davis et al. 2024,
+Prescribed burn,11,15,0.75,0.9,Davis et al. 2024; own inference,
+Prescribed burn,16,20,0.95,1,Own inference,
+Mechanical thinning,0,5,0.65,0.85,"Davis et al. 2024 (thin only: 27% less severity, not significant; 40% of observations burned worse)",Thinning without treating its slash can make fire worse (range up to 1.15)
+Mechanical thinning,6,10,0.7,0.9,Davis et al. 2024,
+Mechanical thinning,11,15,0.85,0.95,Own inference,
+Mechanical thinning,16,20,1,1,dev/fuel-treatments/research.md Table 1,

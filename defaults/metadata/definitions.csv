@@ -152,3 +152,7 @@ TransitionType,Management: Replanting after Mechanical Site Prep (failed),"A pla
 TransitionGroup,Management: Replanting,"Every replanting transition, planted or failed, with or without site preparation (to-do 58).",
 TransitionGroup,Site Preparation: Burn,"Replanting after pile-and-burn site preparation: shrub and herb cover burned, roots killed, half the litter and fine woody debris and 30% of the branch snags burned.",
 TransitionGroup,Site Preparation: Mechanical,"Replanting after mechanical site preparation (mastication): shrub and herb cover to litter and fine woody debris, roots killed.",
+TransitionType,Fuel Treatment: Mechanical Thinning,"Fuel treatment by thinning from below (Fuel Treatments page): small trees and ladder fuels removed, merchantable wood to the forestry sector, slash treated. The forest type and stand age stay; for some years after, a wildfire in the cell is less often high severity (stage 9 multipliers by time since the treatment).",
+TransitionType,Fuel Treatment: Prescribed Burn,"Fuel treatment by prescribed underburning: litter and fine woody debris partly burned, some understory mortality. The forest type and stand age stay; for some years after, a wildfire in the cell is less often high severity.",
+TransitionType,Fuel Treatment: Thin and Burn,"Fuel treatment by thinning followed by prescribed burning: both carbon effects, and the strongest and longest reduction of high-severity fire.",
+TransitionGroup,Fuel Treatment,"Every fuel treatment: mechanical thinning, prescribed burn, thin and burn.",

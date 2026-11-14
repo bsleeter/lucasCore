@@ -33,10 +33,14 @@ ifm <- one("IFM x50", data.frame(HarvestScale = 50, ClearcutToSelection = 0.5, S
                                  ClearcutMinAge = 80L, ClearcutMaxAge = 200L, SelectionMaxAge = 200L))
 # the two projections at once (user 2026-11-13: "st-sim scenarios ... can run at the same time if you set the multiprocessing options
 # accordingly": Lassen's library multiprocessing has multi-scenario on, 3 jobs); the setups run R stages, so one at a time above
-t0 <- Sys.time(); pr <- run(L, scenario = c(base$projection, ifm$projection))
-pid <- vapply(pr, scenarioId, 0L); cat(sprintf("PROJECTION RESULTS %s (together, %.1f min)\n", paste(pid, collapse = ", "), as.numeric(difftime(Sys.time(), t0, units = "mins"))))
-for (p in pr) { x <- capture.output(runLog(p)); cat(grep("\\[Warning\\]", x, value = TRUE), sep = "\n") }
-pick <- function(ps) pid[vapply(pr, function(p) as.integer(parentId(p)) == ps, TRUE)][1]
+# rsyncrosim's run() runs a list of scenarios one at a time; the console runs them at once given together (--sids)
+t0 <- Sys.time(); before <- as.data.table(scenario(L, summary = TRUE))$ScenarioId
+tt <- command(list(run = NULL, lib = filepath(L), sids = paste(c(base$projection, ifm$projection), collapse = ",")), session(L))
+if (!identical(tt[1], "saved")) cat(tt, sep = "\n")
+sc <- as.data.table(scenario(L, summary = TRUE)); new <- sc[!ScenarioId %in% before & IsResult == "Yes"]
+cat(sprintf("PROJECTION RESULTS %s (together, %.1f min)\n", paste(new$ScenarioId, collapse = ", "), as.numeric(difftime(Sys.time(), t0, units = "mins"))))
+for (p in new$ScenarioId) { x <- capture.output(runLog(scenario(L, p))); cat(grep("\\[Warning\\]", x, value = TRUE), sep = "\n") }
+pick <- function(ps) new[ParentId == ps, ScenarioId][1]
 base$run <- pick(base$projection); ifm$run <- pick(ifm$projection)
 for (x in list(base, ifm)) {
   W <- scenario(project(L, 1), sprintf("EXP Wood Products on FM %s", x$label)); dependency(W) <- B

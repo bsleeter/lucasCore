@@ -384,6 +384,42 @@
 		<column name="Note" dataType="String"/>
 	</dataSheet>
 
+	<!-- fuel treatments (user 2026-11-13: "Next is Fuel Treatments"; "Lets go with the severity shift"): an area a year of a treatment on
+	     upland forest in its years and place; for a wildfire in a treated cell, less high- and medium-severity fire and more low for
+	     some years after (src/fuel-treatments.R, stage 9). An empty sheet: no treatments -->
+	<dataSheet name="FuelTreatment" displayName="Fuel Treatments" viewClassName="lucasCoreUI.FuelTreatmentsView" viewClassAssembly="lucasCoreUI">
+		<column name="TreatmentId" displayName="Treatment" dataType="Integer" validationType="List" formula1="1:Mechanical thinning|2:Prescribed burn|3:Thin and burn"/>
+		<column name="StartYear" displayName="Start Year (blank = the first projection year)" dataType="Integer" isOptional="True"/>
+		<column name="EndYear" displayName="End Year (blank = the last)" dataType="Integer" isOptional="True"/>
+		<column name="Amount" displayName="Area per Year (the library's amount units; or a Budget)" dataType="Double" validationType="Decimal" validationCondition="GreaterEqual" formula1="0" isOptional="True"/>
+		<column name="Budget" displayName="Budget per Year (USD, instead of an area)" dataType="Double" validationType="Decimal" validationCondition="GreaterEqual" formula1="0" isOptional="True"/>
+		<column name="StratumId" displayName="Primary Stratum (blank = any)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
+		<column name="SecondaryStratumId" displayName="Secondary Stratum (blank = any)" dataType="Integer" validationType="Datasheet" formula1="stsim_SecondaryStratum" isOptional="True"/>
+		<column name="TertiaryStratumId" displayName="Tertiary Stratum (blank = any)" dataType="Integer" validationType="Datasheet" formula1="stsim_TertiaryStratum" isOptional="True"/>
+		<column name="MinAge" displayName="Stand Age From (blank = the default)" dataType="Integer" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0" isOptional="True"/>
+		<column name="MaxAge" displayName="Stand Age To (blank = any)" dataType="Integer" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0" isOptional="True"/>
+		<column name="Retreatment" displayName="Retreatment Interval (yr; blank = the default)" dataType="Integer" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0" isOptional="True"/>
+		<column name="Priority" dataType="Integer" validationType="List" formula1="1:Random among eligible cells|2:Fire likelihood (where wildfire burned more often)" defaultValue="1" isOptional="True"/>
+		<column name="Cost" displayName="Cost per Area (USD per amount unit; blank = the regional default)" dataType="Double" isOptional="True"/>
+		<column name="CostRange" displayName="Cost Range" dataType="Integer" validationType="List" formula1="1:Default ranges (sampled per iteration)|2:Fixed values" isOptional="True"/>
+		<validation validationType="LessEqual" columns="MinAge|MaxAge"/>
+	</dataSheet>
+
+	<dataSheet name="OutputFuelTreatment" displayName="Fuel Treatments (as set up)">
+		<!-- stage 9: each Fuel Treatments row as set up -->
+		<column name="Row" dataType="Integer"/>
+		<column name="Treatment" dataType="String"/>
+		<column name="StartYear" displayName="Start Year" dataType="Integer"/>
+		<column name="EndYear" displayName="End Year" dataType="Integer"/>
+		<column name="AreaPerYear" displayName="Area per Year" dataType="Double"/>
+		<column name="Where" dataType="String"/>
+		<column name="StandAges" displayName="Stand Ages" dataType="String"/>
+		<column name="Retreatment" displayName="Retreatment Interval (yr)" dataType="Double"/>
+		<column name="Priority" dataType="String"/>
+		<column name="CostPerArea" displayName="Cost per Area (USD per amount unit, central)" dataType="Double" isOptional="True"/>
+		<column name="Note" dataType="String" isOptional="True"/>
+	</dataSheet>
+
 	<dataSheet name="ClimateOptions" displayName="Climate Options" isSingleRow="True" viewClassName="lucasCoreUI.ClimateOptionsView" viewClassAssembly="lucasCoreUI">
 		<column name="ForestGrowthModel" displayName="Forest Growth (None = normal climate every year)" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP|3:Tree ring" defaultValue="3"/>
 		<column name="NonForestGrowthModel" displayName="Non-Forest Growth" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP|3:RAP fit" defaultValue="3"/>
@@ -1373,6 +1409,7 @@
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="ManagementAction" type="Input"/>
 		<dataSheet name="ForestManagement" type="Input"/>
+		<dataSheet name="FuelTreatment" type="Input"/>
 		<dataSheet name="ReforestationOptions" type="Input"/>
 		<dataSheet name="FireOptions" type="Input"/>
 		<dataSheet name="ProjectionOptions" type="Input"/>
@@ -1389,6 +1426,7 @@
 		<dataSheet name="OutputProjectionSchedule" type="Output"/>
 		<dataSheet name="OutputManagementAction" type="Output"/>
 		<dataSheet name="OutputForestManagement" type="Output"/>
+		<dataSheet name="OutputFuelTreatment" type="Output"/>
 		<dataSheet name="core_SpatialMultiprocessing" type="Output"/>
 		<dataSheet name="OutputProjectionRate" type="Output"/>
 		<dataSheet name="OutputFireSize" type="Output"/>
@@ -1582,6 +1620,7 @@
 				<item name="FireOptions"/>
 				<item name="ManagementAction"/>
 				<item name="ForestManagement"/>
+				<item name="FuelTreatment"/>
 				<item name="ProjectionClimatePage"/>
 			</group>
 			<item name="RunFigureOptions"/>
@@ -1610,6 +1649,7 @@
 				<item name="OutputProjectionSchedule"/>
 				<item name="OutputManagementAction"/>
 				<item name="OutputForestManagement"/>
+				<item name="OutputFuelTreatment"/>
 				<item name="OutputFireSize"/>
 				<item name="OutputFireSlope"/>
 				<item name="OutputSuitability"/>

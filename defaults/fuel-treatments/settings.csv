@@ -1,0 +1,4 @@
+Treatment,MinAge,RetreatmentYears,Note
+Mechanical thinning,20,20,"Stands young enough to have no merchantable wood are not thinned; about 20 years between thinnings (dev/fuel-treatments/research.md)"
+Prescribed burn,20,10,"Western maintenance burns about every 10 years; the South burns every 1-5 (3) years, not regional yet"
+Thin and burn,20,20,"A thinning with its burn about every 20 years; a maintenance burn in between is a Prescribed burn row"

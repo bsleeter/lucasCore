@@ -1,0 +1,81 @@
+Treatment,FromStockTypeId,ToStockTypeId,FlowTypeId,Multiplier
+Fuel Treatment: Mechanical Thinning,Biomass: Merchantable,Forestry Sector,LULC: Harvest Live,0.2
+Fuel Treatment: Mechanical Thinning,Biomass: Merchantable,Atmosphere: CO2,LULC: Emission Live CO2,0.0405
+Fuel Treatment: Mechanical Thinning,Biomass: Merchantable,Atmosphere: CO,LULC: Emission Live CO,0.00405
+Fuel Treatment: Mechanical Thinning,Biomass: Merchantable,Atmosphere: CH4,LULC: Emission Live CH4,0.00045
+Fuel Treatment: Mechanical Thinning,Biomass: Merchantable,DOM: Aboveground Medium,LULC: Mortality Live,0.005
+Fuel Treatment: Mechanical Thinning,Biomass: Other Wood,Atmosphere: CO2,LULC: Emission Live CO2,0.2025
+Fuel Treatment: Mechanical Thinning,Biomass: Other Wood,Atmosphere: CO,LULC: Emission Live CO,0.02025
+Fuel Treatment: Mechanical Thinning,Biomass: Other Wood,Atmosphere: CH4,LULC: Emission Live CH4,0.00225
+Fuel Treatment: Mechanical Thinning,Biomass: Other Wood,DOM: Aboveground Fast,LULC: Mortality Live,0.025
+Fuel Treatment: Mechanical Thinning,Biomass: Foliage,Atmosphere: CO2,LULC: Emission Live CO2,0.2025
+Fuel Treatment: Mechanical Thinning,Biomass: Foliage,Atmosphere: CO,LULC: Emission Live CO,0.02025
+Fuel Treatment: Mechanical Thinning,Biomass: Foliage,Atmosphere: CH4,LULC: Emission Live CH4,0.00225
+Fuel Treatment: Mechanical Thinning,Biomass: Foliage,DOM: Aboveground Very Fast,LULC: Mortality Live,0.025
+Fuel Treatment: Mechanical Thinning,Biomass: Fine Root,DOM: Aboveground Very Fast,LULC: Mortality Live,0.125
+Fuel Treatment: Mechanical Thinning,Biomass: Fine Root,DOM: Belowground Very Fast,LULC: Mortality Live,0.125
+Fuel Treatment: Mechanical Thinning,Biomass: Coarse Root,DOM: Aboveground Fast,LULC: Mortality Live,0.125
+Fuel Treatment: Mechanical Thinning,Biomass: Coarse Root,DOM: Belowground Fast,LULC: Mortality Live,0.125
+Fuel Treatment: Prescribed Burn,DOM: Aboveground Very Fast,Atmosphere: CO2,LULC: Emission DOM CO2,0.72
+Fuel Treatment: Prescribed Burn,DOM: Aboveground Very Fast,Atmosphere: CO,LULC: Emission DOM CO,0.072
+Fuel Treatment: Prescribed Burn,DOM: Aboveground Very Fast,Atmosphere: CH4,LULC: Emission DOM CH4,0.008
+Fuel Treatment: Prescribed Burn,DOM: Aboveground Fast,Atmosphere: CO2,LULC: Emission DOM CO2,0.54
+Fuel Treatment: Prescribed Burn,DOM: Aboveground Fast,Atmosphere: CO,LULC: Emission DOM CO,0.054
+Fuel Treatment: Prescribed Burn,DOM: Aboveground Fast,Atmosphere: CH4,LULC: Emission DOM CH4,0.006
+Fuel Treatment: Prescribed Burn,DOM: Aboveground Medium,Atmosphere: CO2,LULC: Emission DOM CO2,0.27
+Fuel Treatment: Prescribed Burn,DOM: Aboveground Medium,Atmosphere: CO,LULC: Emission DOM CO,0.027
+Fuel Treatment: Prescribed Burn,DOM: Aboveground Medium,Atmosphere: CH4,LULC: Emission DOM CH4,0.003
+Fuel Treatment: Prescribed Burn,DOM: Snag Branch,Atmosphere: CO2,LULC: Emission DOM CO2,0.27
+Fuel Treatment: Prescribed Burn,DOM: Snag Branch,Atmosphere: CO,LULC: Emission DOM CO,0.027
+Fuel Treatment: Prescribed Burn,DOM: Snag Branch,Atmosphere: CH4,LULC: Emission DOM CH4,0.003
+Fuel Treatment: Prescribed Burn,DOM: Snag Stem,Atmosphere: CO2,LULC: Emission DOM CO2,0.045
+Fuel Treatment: Prescribed Burn,DOM: Snag Stem,Atmosphere: CO,LULC: Emission DOM CO,0.0045
+Fuel Treatment: Prescribed Burn,DOM: Snag Stem,Atmosphere: CH4,LULC: Emission DOM CH4,5e-04
+Fuel Treatment: Prescribed Burn,Biomass: Foliage,Atmosphere: CO2,LULC: Emission Live CO2,0.018
+Fuel Treatment: Prescribed Burn,Biomass: Foliage,Atmosphere: CO,LULC: Emission Live CO,0.0018
+Fuel Treatment: Prescribed Burn,Biomass: Foliage,Atmosphere: CH4,LULC: Emission Live CH4,2e-04
+Fuel Treatment: Prescribed Burn,Biomass: Merchantable,DOM: Snag Stem,LULC: Mortality Live,0.05
+Fuel Treatment: Prescribed Burn,Biomass: Other Wood,DOM: Snag Branch,LULC: Mortality Live,0.05
+Fuel Treatment: Prescribed Burn,Biomass: Foliage,DOM: Aboveground Very Fast,LULC: Mortality Live,0.05
+Fuel Treatment: Prescribed Burn,Biomass: Fine Root,DOM: Belowground Very Fast,LULC: Mortality Live,0.05
+Fuel Treatment: Prescribed Burn,Biomass: Coarse Root,DOM: Belowground Fast,LULC: Mortality Live,0.05
+Fuel Treatment: Thin and Burn,Biomass: Merchantable,Forestry Sector,LULC: Harvest Live,0.2
+Fuel Treatment: Thin and Burn,Biomass: Merchantable,Atmosphere: CO2,LULC: Emission Live CO2,0.0405
+Fuel Treatment: Thin and Burn,Biomass: Merchantable,Atmosphere: CO,LULC: Emission Live CO,0.00405
+Fuel Treatment: Thin and Burn,Biomass: Merchantable,Atmosphere: CH4,LULC: Emission Live CH4,0.00045
+Fuel Treatment: Thin and Burn,Biomass: Merchantable,DOM: Aboveground Medium,LULC: Mortality Live,0.005
+Fuel Treatment: Thin and Burn,Biomass: Other Wood,Atmosphere: CO2,LULC: Emission Live CO2,0.2025
+Fuel Treatment: Thin and Burn,Biomass: Other Wood,Atmosphere: CO,LULC: Emission Live CO,0.02025
+Fuel Treatment: Thin and Burn,Biomass: Other Wood,Atmosphere: CH4,LULC: Emission Live CH4,0.00225
+Fuel Treatment: Thin and Burn,Biomass: Other Wood,DOM: Aboveground Fast,LULC: Mortality Live,0.025
+Fuel Treatment: Thin and Burn,Biomass: Foliage,Atmosphere: CO2,LULC: Emission Live CO2,0.2025
+Fuel Treatment: Thin and Burn,Biomass: Foliage,Atmosphere: CO,LULC: Emission Live CO,0.02025
+Fuel Treatment: Thin and Burn,Biomass: Foliage,Atmosphere: CH4,LULC: Emission Live CH4,0.00225
+Fuel Treatment: Thin and Burn,Biomass: Foliage,DOM: Aboveground Very Fast,LULC: Mortality Live,0.025
+Fuel Treatment: Thin and Burn,Biomass: Fine Root,DOM: Aboveground Very Fast,LULC: Mortality Live,0.125
+Fuel Treatment: Thin and Burn,Biomass: Fine Root,DOM: Belowground Very Fast,LULC: Mortality Live,0.125
+Fuel Treatment: Thin and Burn,Biomass: Coarse Root,DOM: Aboveground Fast,LULC: Mortality Live,0.125
+Fuel Treatment: Thin and Burn,Biomass: Coarse Root,DOM: Belowground Fast,LULC: Mortality Live,0.125
+Fuel Treatment: Thin and Burn,DOM: Aboveground Very Fast,Atmosphere: CO2,LULC: Emission DOM CO2,0.72
+Fuel Treatment: Thin and Burn,DOM: Aboveground Very Fast,Atmosphere: CO,LULC: Emission DOM CO,0.072
+Fuel Treatment: Thin and Burn,DOM: Aboveground Very Fast,Atmosphere: CH4,LULC: Emission DOM CH4,0.008
+Fuel Treatment: Thin and Burn,DOM: Aboveground Fast,Atmosphere: CO2,LULC: Emission DOM CO2,0.54
+Fuel Treatment: Thin and Burn,DOM: Aboveground Fast,Atmosphere: CO,LULC: Emission DOM CO,0.054
+Fuel Treatment: Thin and Burn,DOM: Aboveground Fast,Atmosphere: CH4,LULC: Emission DOM CH4,0.006
+Fuel Treatment: Thin and Burn,DOM: Aboveground Medium,Atmosphere: CO2,LULC: Emission DOM CO2,0.27
+Fuel Treatment: Thin and Burn,DOM: Aboveground Medium,Atmosphere: CO,LULC: Emission DOM CO,0.027
+Fuel Treatment: Thin and Burn,DOM: Aboveground Medium,Atmosphere: CH4,LULC: Emission DOM CH4,0.003
+Fuel Treatment: Thin and Burn,DOM: Snag Branch,Atmosphere: CO2,LULC: Emission DOM CO2,0.27
+Fuel Treatment: Thin and Burn,DOM: Snag Branch,Atmosphere: CO,LULC: Emission DOM CO,0.027
+Fuel Treatment: Thin and Burn,DOM: Snag Branch,Atmosphere: CH4,LULC: Emission DOM CH4,0.003
+Fuel Treatment: Thin and Burn,DOM: Snag Stem,Atmosphere: CO2,LULC: Emission DOM CO2,0.045
+Fuel Treatment: Thin and Burn,DOM: Snag Stem,Atmosphere: CO,LULC: Emission DOM CO,0.0045
+Fuel Treatment: Thin and Burn,DOM: Snag Stem,Atmosphere: CH4,LULC: Emission DOM CH4,5e-04
+Fuel Treatment: Thin and Burn,Biomass: Foliage,Atmosphere: CO2,LULC: Emission Live CO2,0.018
+Fuel Treatment: Thin and Burn,Biomass: Foliage,Atmosphere: CO,LULC: Emission Live CO,0.0018
+Fuel Treatment: Thin and Burn,Biomass: Foliage,Atmosphere: CH4,LULC: Emission Live CH4,2e-04
+Fuel Treatment: Thin and Burn,Biomass: Merchantable,DOM: Snag Stem,LULC: Mortality Live,0.05
+Fuel Treatment: Thin and Burn,Biomass: Other Wood,DOM: Snag Branch,LULC: Mortality Live,0.05
+Fuel Treatment: Thin and Burn,Biomass: Foliage,DOM: Aboveground Very Fast,LULC: Mortality Live,0.05
+Fuel Treatment: Thin and Burn,Biomass: Fine Root,DOM: Belowground Very Fast,LULC: Mortality Live,0.05
+Fuel Treatment: Thin and Burn,Biomass: Coarse Root,DOM: Belowground Fast,LULC: Mortality Live,0.05

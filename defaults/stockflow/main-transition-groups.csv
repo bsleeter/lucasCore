@@ -24,3 +24,6 @@ Management: Replanting after Burn Site Prep [Type],Yes,Yes
 Management: Replanting after Burn Site Prep (failed) [Type],Yes,Yes
 Management: Replanting after Mechanical Site Prep [Type],Yes,Yes
 Management: Replanting after Mechanical Site Prep (failed) [Type],Yes,Yes
+Fuel Treatment: Mechanical Thinning [Type],Yes,Yes
+Fuel Treatment: Prescribed Burn [Type],Yes,Yes
+Fuel Treatment: Thin and Burn [Type],Yes,Yes
