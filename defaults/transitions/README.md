@@ -37,4 +37,4 @@ most common group: ST-Sim lets a cell make one transition per timestep, so separ
 
 Every group with a source gets a multiplier in every year (an all-zero raster when nothing happened), the start year, and the year after
 the end year. Every pathway type with no time-varying source gets a zero transition target (a type with no multiplier and no target would
-run on every eligible cell). Types in the harvest set with no source (Selection 20%, Selection 85%, Salvage Logging) get zero targets.
+run on every eligible cell). Types in the harvest set with no source (Selection 20%, Salvage Logging) get zero targets.

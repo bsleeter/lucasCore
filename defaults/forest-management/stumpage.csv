@@ -1,0 +1,13 @@
+Region,Wood,Central,Low,High,Unit,DollarYear,Source,Note
+All,Softwood,33,15,60,USD/m3,2024,"Weighted by approximate harvest volume from the regional values (own estimate)","Per m3 of merchantable volume; by forest area instead about 25. Provisional: dev/forest-management/stumpage-research.md"
+All,Hardwood,20,9,40,USD/m3,2024,"Weighted by approximate harvest volume from the regional values (own estimate)",
+California,Softwood,40,25,110,USD/m3,2024,"CDTFA Harvest Values Schedules 2024 (Douglas-fir 250-450, fir 90-240, pine 100-180 USD/MBF inland; redwood 660-1,170); 5.4 m3/MBF","Interior mixed conifer ~35-40; the statewide 50 is pulled up by coastal redwood (forest-type-wood.csv prices redwood as softwood: low)"
+California,Hardwood,8,0,22,USD/m3,2024,"CDTFA miscellaneous hardwood (20 USD/ton; chips 0); own conversion","Little hardwood market"
+Pacific Northwest,Softwood,70,45,105,USD/m3,2024,"Washington DOR 2024 stumpage tables (westside Douglas-fir 487-606 USD/MBF, hemlock 226-333); Oregon state forests FY2024 588; WA DNR auctions 231-379; 5.4 m3/MBF, 90% sawlog",
+Pacific Northwest,Hardwood,50,30,80,USD/m3,2024,"Washington DOR 2024 red alder 369-511 USD/MBF",
+Interior West,Softwood,25,3,50,USD/m3,2024,"Idaho Dept of Lands FY2024 (Douglas-fir 227, grand fir 189, ponderosa 110 USD/MBF); Montana DOR FY2024 147-203; low end: USFS cut-and-sold sawtimber averages",
+Interior West,Hardwood,3,0,10,USD/m3,2024,"Own estimate: little hardwood market",
+South,Softwood,19,12,28,USD/m3,2024,"Timber Mart-South 2024 South-wide (pine sawtimber ~25 USD/ton, chip-n-saw 18, pulp 8); 1.10 t/m3; 40% sawtimber, 25% chip-n-saw, 35% pulp","Cross-checks: NC, AL, MS, FL, SC quarterly reports"
+South,Hardwood,18,11,32,USD/m3,2024,"Timber Mart-South 2024 (hardwood sawtimber ~33 USD/ton, pulp 7); 1.15 t/m3; 35% sawtimber, 65% pulp",
+Northeast,Softwood,16,7,32,USD/m3,2024,"Maine Forest Service 2024 (spruce-fir sawlogs 108 USD/MBF, white pine 208, pulp 2-9 USD/ton); 4.7 m3/MBF (International 1/4, own)","Lake States: no data newer than 2020-21 (Minnesota aspen ~16 USD/m3 after CPI)"
+Northeast,Hardwood,22,7,50,USD/m3,2024,"Maine 2024 hardwood sawlogs 115-293 USD/MBF; Penn State Q4 2024 (red oak 333-497, white oak 489-659, black cherry 213-510)",

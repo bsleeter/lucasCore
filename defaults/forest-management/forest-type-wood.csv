@@ -1,0 +1,29 @@
+ForestType,Wood,Note
+Alder/Maple Group,Hardwood,
+Aspen/Birch Group,Hardwood,mostly pulpwood
+California Mixed Conifer Group,Softwood,
+Douglas-fir Group,Softwood,
+Elm/Ash/Cottonwood Group,Hardwood,
+Exotic Hardwoods Group,Hardwood,
+Exotic Softwoods Group,Softwood,
+Fir/Spruce/Mountain Hemlock Group,Softwood,
+Hemlock/Sitka Spruce Group,Softwood,
+Loblolly/Shortleaf Pine Group,Softwood,
+Lodgepole Pine Group,Softwood,
+Longleaf/Slash Pine Group,Softwood,
+Maple/Beech/Birch Group,Hardwood,
+Oak/Gum/Cypress Group,Hardwood,bottomland hardwoods; the cypress share is not priced apart
+Oak/Hickory Group,Hardwood,
+Oak/Pine Group,Mixed,the mean of the softwood and hardwood prices
+Other Western Hardwoods Group,Hardwood,
+Other Western Softwood Group,Softwood,
+Pinyon/Juniper Group,Softwood,little merchantable volume and a low market: priced as softwood (provisional)
+Ponderosa Pine Group,Softwood,
+Redwood Group,Softwood,priced as the region's softwood: redwood stumpage is several times higher (provisional)
+Spruce/Fir Group,Softwood,
+Tanoak/Laurel Group,Hardwood,
+Tropical Hardwoods Group,Hardwood,
+Western Larch Group,Softwood,
+Western Oak Group,Hardwood,
+Western White Pine Group,Softwood,
+White/Red/Jack Pine Group,Softwood,

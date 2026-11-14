@@ -87,7 +87,6 @@ Fire: Medium Severity,302,"255,255,255,0",,Landfire Disturbance data
 Forest Harvest: Forest Clearcut,400,"255,165,42,42",,Landfire Disturbance data
 Forest Harvest: Forest Selection,401,"255,0,128,0",,Landfire Disturbance data
 Forest Harvest: Forest Selection 20%,402,"255,255,255,0",,
-Forest Harvest: Forest Selection 85%,403,"255,0,128,128",,
 Forest Harvest: Salvage Logging,404,"255,0,255,255",,
 Insect: High Severity,500,"255,128,0,128",,Based on ADS data with mortality > 30%
 Insect: Low Severity,501,"255,0,0,255",,Based on ADS data with mortality 4-10%

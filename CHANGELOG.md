@@ -92,6 +92,20 @@ effect at the next Build; rerun the Build and then the historical run before a P
   disturbed; it can go first where natural return is least likely (far from live forest). Six new transition types, three groups,
   site preparation carbon flows, mapped and summarized. With spatial tiles every action names a unit of the tile level. An empty
   page is the baseline. Changes Build results (new pathways); projection results only when actions are set.
+- Forest Management (Projection > Forest Management): improved forest management as changes to the harvest a projection draws
+  from the historical record, by years and place (a unit at any of the three strata levels): a share of clearcut moved to
+  selection (by area, or by volume: the same wood removed), a share of selection moved to light selection, a harvest scale, and
+  minimum and maximum stand ages per harvest type (a maximum protects older forest). A row by a strata level the harvest targets
+  are not keyed on splits them by each place's historical harvest. Stage 9 writes the reshaped targets and age multipliers;
+  Projection Results > Forest Management (as set up) lists each row's drawn and managed harvest. An empty page is the drawn harvest.
+- Timber revenue on every projection: transition attribute Management Revenue: Harvest Timber on clearcut, selection and light
+  selection, per ecodivision, forest type and 10-year age band = merchantable volume (the Build's curves) x removal share (0.97,
+  0.5, 0.2) x regional stumpage price (`defaults/forest-management/stumpage.csv`, 2024 USD/m3, softwood or hardwood by
+  `forest-type-wood.csv`, provisional, with ranges sampled per iteration). Harvesting less shows as revenue given up in the Compare
+  Cost Summary.
+- Light selection: `Forest Harvest: Forest Selection 20%` (20% of live biomass removed) takes Forest Selection's minimum ages
+  (stage 6; projections on older Builds get them as multipliers). `Forest Harvest: Forest Selection 85%`, unused and with flows
+  that sent its merchantable wood to dead wood, is gone from new libraries (existing libraries keep it in their lists, unused).
 - Management costs: Management Actions rows carry costs and revenue per unit area, as ST-Sim transition attributes (group
   Management Cost: Planting, Site Preparation, Salvage Logging, and Management Revenue: Salvage Timber; USD), so a projection with
   Transition attributes output reports them a year by type and strata. New projections (`tools/new-projection.R`) turn that

@@ -289,6 +289,11 @@ ccap <- function(e, t) { k <- match(paste(e, t), ha[TransitionTypeId == CC, past
 s <- ha$TransitionTypeId == SEL & !ha$Basis %in% "Minimum Harvest Age page"
 if (any(s)) { cap <- ccap(ha$Ecodivision[s], ha$StateClassId[s]) - H_OFFSET; new <- pmax(H_FLOOR, pmin(ha$AgeMin[s], cap, na.rm = TRUE))
   ch <- !is.na(new) & new != ha$AgeMin[s]; ha[which(s)[ch], `:=`(AgeMin = new[ch], Basis = sprintf("clearcut minimum - %g yr", H_OFFSET))] }
+# light selection (Forest Selection 20%, the Forest Management page's lighter selection; user 2026-11-13): selection's minimum ages,
+# where the page gives none of its own (it had none, so it could cut a stand of any age)
+LIGHT <- "Forest Harvest: Forest Selection 20%"
+lt <- ha[TransitionTypeId == SEL & !paste(Ecodivision, StateClassId) %in% ha[TransitionTypeId == LIGHT, paste(Ecodivision, StateClassId)]]
+if (nrow(lt)) ha <- rbind(ha, copy(lt)[, `:=`(TransitionTypeId = LIGHT, Basis = "as Forest Selection")], fill = TRUE)
 hb <- ha[is.na(Ecodivision)]; he <- ha[!is.na(Ecodivision) & Ecodivision %in% eco_here]
 tr[hb, on = .(StateClassIdSource = StateClassId, TransitionTypeId), AgeMin := i.AgeMin]
 sp <- unique(he[, .(StateClassIdSource = StateClassId, TransitionTypeId)])

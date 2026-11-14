@@ -28,7 +28,7 @@ namespace lucasCoreUI
         // Results > Strata Summary). With spatial tiles a target must sit inside one tile, so an action names one unit of the tile level
         // (user 2026-11-13: "if using spatial multiprocessing, these area targets ... MUST be specified at the same strata"); stage 9
         // checks the same (src/management.R)
-        private class ModelStrata
+        internal class ModelStrata
         {
             public static readonly string[] Levels = { "Primary", "Secondary", "Tertiary" };
             public static readonly string[] Columns = { "StratumId", "SecondaryStratumId", "TertiaryStratumId" };
@@ -90,7 +90,7 @@ namespace lucasCoreUI
         // ---- where an action applies: a unit at any of the three strata levels, or "(any)" there; all "(any)" = the whole study
         // area (user 2026-11-13: "the management could also be specified by a) the tiling strata and b) the other strata", e.g. County A
         // with Federal Land Type A, then County A with Type B). With spatial tiles the tile level's unit is required ----------------
-        private class WherePicker
+        internal class WherePicker
         {
             private const string ANY = "(any)";
             public readonly Label[] Captions = new Label[3];
@@ -221,7 +221,7 @@ namespace lucasCoreUI
         private readonly Label m_rows = new Label { AutoSize = true, MaximumSize = new Size(760, 0), Margin = new Padding(3, 4, 3, 6) };
 
         // a parameter line: a fixed-width caption, the control, then its note, which Fit widens to the page's right edge
-        private static FlowLayoutPanel Line(string caption, Control c, Label note)
+        internal static FlowLayoutPanel Line(string caption, Control c, Label note)
         {
             var r = new FlowLayoutPanel { AutoSize = true, WrapContents = false, Margin = new Padding(0, 0, 0, 4) };
             r.Controls.Add(new Label { Text = caption, AutoSize = false, Size = new Size(150, 24), Margin = new Padding(3, 6, 3, 0), Tag = Fit.Fixed });
@@ -229,10 +229,10 @@ namespace lucasCoreUI
             if (note != null) { note.Margin = new Padding(10, 6, 3, 3); r.Controls.Add(note); }
             return r;
         }
-        private static FlowLayoutPanel Lines(params Control[] lines) { var c = Column(); foreach (Control l in lines) c.Controls.Add(l); return c; }
+        internal static FlowLayoutPanel Lines(params Control[] lines) { var c = Column(); foreach (Control l in lines) c.Controls.Add(l); return c; }
         private static FlowLayoutPanel ActionRow(ActionForm a) { var r = new FlowLayoutPanel { AutoSize = true, WrapContents = false, Margin = new Padding(150, 2, 0, 0) }; r.Controls.Add(a.Add); r.Controls.Add(a.Said); return r; }
 
-        private static FlowLayoutPanel Pair(TextBox a, string mid, TextBox b, string after)
+        internal static FlowLayoutPanel Pair(TextBox a, string mid, TextBox b, string after)
         {
             var r = new FlowLayoutPanel { AutoSize = true, WrapContents = false, Margin = new Padding(0) };   // (not a wrapping row: Fit would widen it to the page and squeeze the notes column)
             a.Margin = new Padding(3, 3, 3, 3); b.Margin = new Padding(3, 3, 3, 3);

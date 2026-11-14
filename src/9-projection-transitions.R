@@ -457,6 +457,37 @@ cov <- if (length(new_tt)) rbindlist(new_tt, fill = TRUE)[, .(n = uniqueN(paste(
 check(STAGE, "every Target group has a target in every iteration and projection year", all(cov$n == nexp), paste(cov[n != nexp, TransitionGroupId], collapse = "; "))
 check(STAGE, "every Probability group has a map in every iteration and projection year",
       all(vapply(c(pg$TransitionGroupId, fire_all), function(g) nrow(sm_out[TransitionGroupId == g & Timestep > y1 & !is.na(MultiplierFileName)]) == nexp, TRUE)))
+# ---- forest management (user 2026-11-13: "changes/improved forest management ... change the target areas for clearcut and
+# selection ..., increase the minimum harvest age"; old forest by a maximum age) ------------------------------------------------
+# src/forest-management.R: each Forest Management row moves a share of clearcut to selection and of selection to light selection,
+# scales the harvest, and narrows the harvest ages, in its years and place; the drawn targets elsewhere stay as they are
+source(pkg_file("src", "forest-management.R"))
+fm_rows <- forest_management_rows(read_ds("ForestManagement"), y1, pend, say, fail)
+fm_tmv <- NULL
+if (!is.null(fm_rows)) {
+  fm_cells <- data.table(w_forest = as.numeric(elig(FM_GROUPS[["CC"]])[land]))
+  for (L in c("Primary", "Secondary", "Tertiary")) set(fm_cells, j = L, value = lev_list[[L]]$Name[match(lev[[L]][land], as.integer(lev_list[[L]]$Id))])
+  # each harvest group's historical harvest per cell over the reference years (where a row needs its targets split by place)
+  for (k in c("CC", "SEL")) { g <- FM_GROUPS[[k]]; ms <- if (!is.null(mem[[g]])) mem[[g]] else g
+    hv <- Reduce(`+`, lapply(ms, function(m) Reduce(`+`, lapply(ref, function(y) hist_vals(m, y))))); set(fm_cells, j = g, value = hv[land]) }
+  fm <- forest_management_targets(tt_out, fm_rows, y1, fm_cells, lev_col, if (tiles > 1) tile_lvl else NA_character_, say, fail)
+  tt_out <- rbind(tt_out[!(TransitionGroupId %in% FM_GROUPS & !is.na(Timestep) & Timestep > y1)], fm$targets, fill = TRUE)
+  # Forest Selection's minimum ages, as the Build settled them (stage 6's Minimum Harvest Ages output), for light selection. (Not the
+  # Build's stsim_Transition: declared as an input, SyncroSim copies it into the setup result, and the projection then finds no
+  # initial conditions - Lassen 2026-11-13)
+  oha <- read_ds("OutputHarvestAge")
+  sel_min <- if (nrow(oha)) unique(oha[TransitionTypeId == FM_TYPES[["SEL"]] & !is.na(AgeMin), .(StratumId = as.character(StratumId), StateClassId, AgeMin)]) else NULL
+  if (is.null(sel_min) || !nrow(sel_min)) say("Forest Management: no minimum harvest ages in the Build (Minimum Harvest Ages): light selection's ages are the rows' own")
+  fm_tmv <- forest_management_ages(fm_rows, y1, pend, sel_min, lev_col)
+  # light selection where selection may happen: the selection group's allowed-cells map (GAP exclusion), its projection rows copied
+  if (any(fm_rows$Light > 0)) { sa <- sm_out[TransitionGroupId == FM_GROUPS[["SEL"]] & !is.na(Timestep) & Timestep > y1]
+    sm_out <- rbind(sm_out[!(TransitionGroupId == FM_GROUPS[["LIGHT"]] & !is.na(Timestep) & Timestep > y1)], copy(sa)[, TransitionGroupId := FM_GROUPS[["LIGHT"]]], fill = TRUE)
+    say("Forest Management: light selection where selection may happen (%d spatial multiplier rows of %s)", nrow(sa), FM_GROUPS[["SEL"]]) }
+  write_ds(fm$summary, "OutputForestManagement")
+  for (i in seq_len(nrow(fm$summary))) with(fm$summary[i], say("Forest Management: row %d, %s %d-%d: clearcut %.1f -> %.1f, selection %.1f -> %.1f, light selection %.1f a year (iteration mean); ages clearcut %s, selection %s; %s",
+    Row, Where, StartYear, EndYear, ClearcutBefore, ClearcutAfter, SelectionBefore, SelectionAfter, LightSelectionAfter, ClearcutAges, SelectionAges, Note))
+  check(STAGE, "forest management: every harvest type has a target in every projection year", all(fm$targets[Timestep > y1, uniqueN(Timestep), by = TransitionGroupId]$V1 == length(pyrs)))
+}
 # ---- management actions (to-do 58; user 2026-11-13: "Start with replanting, salvage and site prep on a dedicated page") -------------
 # Each Management Actions row is an area a year on the disturbed forest classes (src/management.R), in its years and strata. Its types
 # keep stage 6's zero target elsewhere: every management type's targets are written on one set of strata keys (the tile level, and
@@ -472,15 +503,27 @@ if (!is.null(mg)) {
   mg_tmv <- mg$multipliers
   check(STAGE, "management: every management type has a target in every projection year", all(mg$targets[Timestep > y1, uniqueN(Timestep), by = TransitionGroupId]$V1 == length(pyrs)))
   write_ds(mg$summary, "OutputManagementAction")
-  # costs: ST-Sim transition attribute values (USD per amount unit) on the management types; the run sums them over what it treats
-  # (Output Options > Tabular: Transition attributes). Earlier management cost rows of a rerun are replaced
-  av <- as.data.table(datasheet(scn, "stsim_TransitionAttributeValue", optional = TRUE, lookupsAsFactors = FALSE))
-  if (nrow(av)) av <- av[!TransitionAttributeTypeId %in% MG_COST_TYPES, setdiff(names(av), c("TransitionAttributeValueId", "ScenarioId")), with = FALSE]
-  if (!is.null(mg$costs) && nrow(mg$costs)) {
-    write_stsim(rbind(av, mg$costs, fill = TRUE), "TransitionAttributeValue")
-    rng <- "DistributionType" %in% names(mg$costs) && any(!is.na(mg$costs$DistributionType))
-    say("Management Actions: costs and revenue (USD per %s, central%s): %s", sub("s$", "", au), if (rng) "; a range sampled per iteration" else "",
-        paste(mg$costs[, .(v = if (min(Value) == max(Value)) sprintf("%.0f", Value[1]) else sprintf("%.0f-%.0f", min(Value), max(Value))), by = .(a = sub("^Management (Cost|Revenue): ", "", TransitionAttributeTypeId))][, paste(a, v)], collapse = "; ")) } }
+}
+# ---- transition attributes: management costs and harvest timber revenue (ST-Sim sums them over what a run does; Output Options >
+# Tabular: Transition attributes). Timber revenue goes on every projection, baselines included, so a run that harvests less shows the
+# revenue it gives up (Compare Runs, Compare Cost Summary). Earlier rows of these types (a rerun) are replaced
+av <- as.data.table(datasheet(scn, "stsim_TransitionAttributeValue", optional = TRUE, lookupsAsFactors = FALSE))
+if (nrow(av)) av <- av[!TransitionAttributeTypeId %in% c(MG_COST_TYPES, FM_REVENUE), setdiff(names(av), c("TransitionAttributeValueId", "ScenarioId")), with = FALSE]
+fm_rev <- tryCatch({
+  vc <- as.data.table(datasheet(scn, "lucasCore_MerchantableVolumeCurve", optional = TRUE, lookupsAsFactors = FALSE))
+  if (!nrow(vc)) { say("Timber revenue: no merchantable volume curves in the Build: none"); NULL } else
+    forest_management_revenue(vc, forest_management_revenue_defaults(pkg_file("defaults", "forest-management"), units_per_ha[[au]]),
+                              management_cost_defaults(pkg_file("defaults", "management", "costs.csv"), units_per_ha[[au]]),
+                              stsim_list("Stratum")$Name[as.numeric(stsim_list("Stratum")$Id) %in% unique(values(P, mat = FALSE))], y1) },
+  error = function(e) { say("Timber revenue: not written (%s)", conditionMessage(e)); NULL })
+if (!is.null(fm_rev) && nrow(fm_rev)) say("Timber revenue: %d values (USD per %s harvested, central; a range sampled per iteration): clearcut %.0f-%.0f, selection %.0f-%.0f",
+  nrow(fm_rev), sub("s$", "", au), min(fm_rev[TransitionGroupId == FM_GROUPS[["CC"]], Value]), max(fm_rev[TransitionGroupId == FM_GROUPS[["CC"]], Value]),
+  min(fm_rev[TransitionGroupId == FM_GROUPS[["SEL"]], Value]), max(fm_rev[TransitionGroupId == FM_GROUPS[["SEL"]], Value]))
+mg_av <- if (!is.null(mg) && !is.null(mg$costs) && nrow(mg$costs)) mg$costs else NULL
+if (!is.null(mg_av)) { rng <- "DistributionType" %in% names(mg_av) && any(!is.na(mg_av$DistributionType))
+  say("Management Actions: costs and revenue (USD per %s, central%s): %s", sub("s$", "", au), if (rng) "; a range sampled per iteration" else "",
+      paste(mg_av[, .(v = if (min(Value) == max(Value)) sprintf("%.0f", Value[1]) else sprintf("%.0f-%.0f", min(Value), max(Value))), by = .(a = sub("^Management (Cost|Revenue): ", "", TransitionAttributeTypeId))][, paste(a, v)], collapse = "; ")) }
+if (nrow(av) || !is.null(mg_av) || !is.null(fm_rev)) write_stsim(rbind(av, mg_av, fm_rev, fill = TRUE), "TransitionAttributeValue")
 # ---- post-disturbance return and conversion (to-do 57): on everywhere from the historical end + 1; a disturbed class's return chance
 # by its age (years since the disturbance): 0 below ReturnAgeMin, then ReturnProbability a year to the window's end (post-disturbance-
 # settings.csv), divided by the mean of the live forest adjacency multiplier where stage 10 applies it (post-disturbance-adjacency.csv),
@@ -522,12 +565,12 @@ if (nrow(fire_rows) && nrow(fcm)) { scl9 <- stsim_list("StateClass"); idc <- sup
                TransitionGroupId = fire_g, Amount = as.numeric(fcm$Multiplier[i])) }))
   if (nrow(fire_tmv)) fire_tmv <- fire_tmv[is.na(StratumId) | StratumId %in% stsim_list("Stratum")$Name]
   say("Fire by state class: %s", if (nrow(fire_tmv)) paste(fire_tmv[, sprintf("%s%s x%.2f", if (.N > 1) sprintf("%d classes", .N) else StateClassId[1], ifelse(is.na(StratumId[1]), "", paste0(" in ", StratumId[1])), Amount[1]), by = .(StratumId, Amount)]$V1, collapse = "; ") else "none (every multiplier 1)") }
-if (!is.null(tmv) || !is.null(fire_tmv) || !is.null(mg_tmv)) {
+if (!is.null(tmv) || !is.null(fire_tmv) || !is.null(mg_tmv) || !is.null(fm_tmv)) {
   old_tmv <- as.data.table(datasheet(scn, "stsim_TransitionMultiplierValue", optional = TRUE, lookupsAsFactors = FALSE))
   # earlier rows of a rerun are replaced: the post-disturbance groups', the fire group's by state class (no other fire multiplier), the management types'
-  if (nrow(old_tmv)) old_tmv <- old_tmv[!(!is.na(Timestep) & Timestep > y1 & (TransitionGroupId %in% c(PD_GROUPS, MG_GROUPS) | (TransitionGroupId == fire_g & !is.na(StateClassId)))),
+  if (nrow(old_tmv)) old_tmv <- old_tmv[!(!is.na(Timestep) & Timestep > y1 & (TransitionGroupId %in% c(PD_GROUPS, MG_GROUPS, FM_GROUPS) | (TransitionGroupId == fire_g & !is.na(StateClassId)))),
                                         setdiff(names(old_tmv), c("TransitionMultiplierValueId", "ScenarioId")), with = FALSE]
-  write_stsim(rbind(old_tmv, tmv, fire_tmv, mg_tmv, fill = TRUE), "TransitionMultiplierValue") }
+  write_stsim(rbind(old_tmv, tmv, fire_tmv, mg_tmv, fm_tmv, fill = TRUE), "TransitionMultiplierValue") }
 write_stsim(sm_out, "TransitionSpatialMultiplier")
 if (nrow(fire_rows)) {
   # (method 3: no size distribution - an earlier one for the fire group is removed)

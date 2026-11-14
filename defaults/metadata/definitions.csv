@@ -57,8 +57,7 @@ TransitionType,Fire: Medium Severity,Wildfire of moderate severity: MTBS burn se
 TransitionType,Fire: High Severity,Wildfire of high severity: MTBS burn severity 4.,MtbsSeverityFolder
 TransitionType,Forest Harvest: Forest Clearcut,Stand-replacing harvest: LCMS Tree Removal on last year's forest that annual NLCD shows as shrub or grass that year or within two years.,LcmsFolder
 TransitionType,Forest Harvest: Forest Selection,Partial harvest: LCMS Tree Removal on last year's forest that stays forest.,LcmsFolder
-TransitionType,Forest Harvest: Forest Selection 20%,Partial harvest removing about 20% of live biomass. Defined in the harvest pathways; it has no mapped source and a zero target in the historical model.,
-TransitionType,Forest Harvest: Forest Selection 85%,Partial harvest removing about 85% of live biomass. Defined in the harvest pathways; it has no mapped source and a zero target in the historical model.,
+TransitionType,Forest Harvest: Forest Selection 20%,"Light selection: a partial harvest removing 20% of live biomass (merchantable wood to the forestry sector, the rest to dead wood), with Forest Selection's minimum ages. No mapped source, so a zero target in the historical model; projections use it for the Forest Management page's lighter selection.",
 TransitionType,Forest Harvest: Salvage Logging,"Harvest of trees killed by a disturbance: on the disturbed forest classes only (wetland twins too), within 5 years of the disturbance, keeping the class and its age; it takes mostly snags to the forestry sector. It has no mapped source and a zero target in the historical model.",
 TransitionType,Insect: *,Insect and disease mortality of {*}. Defined in the package's type list; no pathway uses it in the default model.,
 TransitionType,Restoration Wetland: *,Conversion to Wetland: {*}. Defined in the package's type list; no pathway uses it in the default model.,

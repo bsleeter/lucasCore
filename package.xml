@@ -347,6 +347,43 @@
 		<column name="RevenuePerArea" displayName="Revenue per Area (USD per amount unit, central, at the window start)" dataType="Double"/>
 	</dataSheet>
 
+	<!-- forest management (user 2026-11-13: "changes/improved forest management ... change the target areas for clearcut and selection
+	     ..., increase the minimum harvest age"; "Protecting old forest should just use the MaxAge field"): changes to the harvest a
+	     projection draws from the historical record, by years and place (src/forest-management.R, stage 9). An empty sheet: the drawn harvest -->
+	<dataSheet name="ForestManagement" displayName="Forest Management" viewClassName="lucasCoreUI.ForestManagementView" viewClassAssembly="lucasCoreUI">
+		<column name="StartYear" displayName="Start Year (blank = the first projection year)" dataType="Integer" isOptional="True"/>
+		<column name="EndYear" displayName="End Year (blank = the last)" dataType="Integer" isOptional="True"/>
+		<column name="StratumId" displayName="Primary Stratum (blank = any)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
+		<column name="SecondaryStratumId" displayName="Secondary Stratum (blank = any)" dataType="Integer" validationType="Datasheet" formula1="stsim_SecondaryStratum" isOptional="True"/>
+		<column name="TertiaryStratumId" displayName="Tertiary Stratum (blank = any)" dataType="Integer" validationType="Datasheet" formula1="stsim_TertiaryStratum" isOptional="True"/>
+		<column name="HarvestScale" displayName="Harvest Scale (x the drawn harvest, after the shifts; blank = 1)" dataType="Double" validationType="Decimal" validationCondition="GreaterEqual" formula1="0" isOptional="True"/>
+		<column name="ClearcutToSelection" displayName="Clearcut to Selection (share, 0-1)" dataType="Double" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1" isOptional="True"/>
+		<column name="ShiftBasis" displayName="Shift Basis" dataType="Integer" validationType="List" formula1="1:Area (a hectare for a hectare)|2:Volume (the same wood removed)" defaultValue="1" isOptional="True"/>
+		<column name="LightSelection" displayName="Selection to Light Selection (share, 0-1)" dataType="Double" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1" isOptional="True"/>
+		<column name="ClearcutMinAge" displayName="Clearcut Minimum Age (blank = the Build's)" dataType="Integer" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0" isOptional="True"/>
+		<column name="ClearcutMaxAge" displayName="Clearcut Maximum Age (blank = none)" dataType="Integer" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0" isOptional="True"/>
+		<column name="SelectionMinAge" displayName="Selection Minimum Age (blank = the Build's; light selection too)" dataType="Integer" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0" isOptional="True"/>
+		<column name="SelectionMaxAge" displayName="Selection Maximum Age (blank = none; light selection too)" dataType="Integer" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0" isOptional="True"/>
+		<validation validationType="LessEqual" columns="ClearcutMinAge|ClearcutMaxAge"/>
+		<validation validationType="LessEqual" columns="SelectionMinAge|SelectionMaxAge"/>
+	</dataSheet>
+
+	<dataSheet name="OutputForestManagement" displayName="Forest Management (as set up)">
+		<!-- stage 9: each Forest Management row as the harvest it changes (area a year, the mean of the iterations and years) -->
+		<column name="Row" dataType="Integer"/>
+		<column name="Where" dataType="String"/>
+		<column name="StartYear" displayName="Start Year" dataType="Integer"/>
+		<column name="EndYear" displayName="End Year" dataType="Integer"/>
+		<column name="ClearcutBefore" displayName="Clearcut, drawn (area a year)" dataType="Double"/>
+		<column name="ClearcutAfter" displayName="Clearcut, managed (area a year)" dataType="Double"/>
+		<column name="SelectionBefore" displayName="Selection, drawn (area a year)" dataType="Double"/>
+		<column name="SelectionAfter" displayName="Selection, managed (area a year)" dataType="Double"/>
+		<column name="LightSelectionAfter" displayName="Light selection, managed (area a year)" dataType="Double"/>
+		<column name="ClearcutAges" displayName="Clearcut Ages" dataType="String"/>
+		<column name="SelectionAges" displayName="Selection Ages" dataType="String"/>
+		<column name="Note" dataType="String"/>
+	</dataSheet>
+
 	<dataSheet name="ClimateOptions" displayName="Climate Options" isSingleRow="True" viewClassName="lucasCoreUI.ClimateOptionsView" viewClassAssembly="lucasCoreUI">
 		<column name="ForestGrowthModel" displayName="Forest Growth (None = normal climate every year)" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP|3:Tree ring" defaultValue="3"/>
 		<column name="NonForestGrowthModel" displayName="Non-Forest Growth" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP|3:RAP fit" defaultValue="3"/>
@@ -1335,12 +1372,15 @@
 	<transformer name="ProjectionTransitions" displayName="9 - Projection Transitions" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/9-projection-transitions.R">
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="ManagementAction" type="Input"/>
+		<dataSheet name="ForestManagement" type="Input"/>
 		<dataSheet name="ReforestationOptions" type="Input"/>
 		<dataSheet name="FireOptions" type="Input"/>
 		<dataSheet name="ProjectionOptions" type="Input"/>
 		<dataSheet name="ProjectionStart" type="Input"/>
 		<dataSheet name="ProjectionTransition" type="Input"/>
 		<dataSheet name="OutputNlcdAnnual" type="Input"/>
+		<dataSheet name="MerchantableVolumeCurve" type="Input"/>
+		<dataSheet name="OutputHarvestAge" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Both"/>
 		<dataSheet name="stsim_TransitionSpatialMultiplier" type="Both"/>
 		<dataSheet name="stsim_InitialStockSpatial" type="Both"/>
@@ -1348,6 +1388,7 @@
 		<dataSheet name="stsim_TransitionAttributeValue" type="Both"/>
 		<dataSheet name="OutputProjectionSchedule" type="Output"/>
 		<dataSheet name="OutputManagementAction" type="Output"/>
+		<dataSheet name="OutputForestManagement" type="Output"/>
 		<dataSheet name="core_SpatialMultiprocessing" type="Output"/>
 		<dataSheet name="OutputProjectionRate" type="Output"/>
 		<dataSheet name="OutputFireSize" type="Output"/>
@@ -1540,6 +1581,7 @@
 				<item name="SpatialAllocation"/>
 				<item name="FireOptions"/>
 				<item name="ManagementAction"/>
+				<item name="ForestManagement"/>
 				<item name="ProjectionClimatePage"/>
 			</group>
 			<item name="RunFigureOptions"/>
@@ -1567,6 +1609,7 @@
 				<item name="OutputProjectionRate"/>
 				<item name="OutputProjectionSchedule"/>
 				<item name="OutputManagementAction"/>
+				<item name="OutputForestManagement"/>
 				<item name="OutputFireSize"/>
 				<item name="OutputFireSlope"/>
 				<item name="OutputSuitability"/>

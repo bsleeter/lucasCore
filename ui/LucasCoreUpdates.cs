@@ -230,7 +230,8 @@ namespace lucasCoreUI
                 string[,] costs = { { "Management Cost: Planting", "Replanting: seedlings and planting, per unit area planted (planted and failed alike)" },
                                     { "Management Cost: Site Preparation", "Site preparation before replanting (pile and burn, or mechanical), per unit area" },
                                     { "Management Cost: Salvage Logging", "Salvage logging and haul cost per unit area (its timber revenue is Management Revenue: Salvage Timber)" },
-                                    { "Management Revenue: Salvage Timber", "Revenue from the salvaged timber per unit area, falling with years since the fire (net = revenue - costs)" } };
+                                    { "Management Revenue: Salvage Timber", "Revenue from the salvaged timber per unit area, falling with years since the fire (net = revenue - costs)" },
+                                    { "Management Revenue: Harvest Timber", "Stumpage revenue of clearcut and selection harvest per unit area harvested: merchantable volume x removal share x regional stumpage price (src/forest-management.R)" } };
                 foreach (DataRow r in Rows(store, "SELECT ProjectId FROM core_Project").Rows)
                 {
                     string pr = Id(r["ProjectId"]), ag = IdOf(store, "stsim_AttributeGroup", "AttributeGroupId", pr, "Management Cost");

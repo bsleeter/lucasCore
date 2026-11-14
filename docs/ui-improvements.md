@@ -1896,8 +1896,41 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
         products. Net cost 12.1 M USD (7.8-14.8 M by iteration): 325 USD per Mg C (210-398), 89 per Mg CO2e, on ecosystem carbon;
         277 USD per Mg C (179-339), 76 per Mg CO2e, with wood products. The combined actions; the ratio for replanting alone, and
         for salvage alone, needs runs with one action each (later).
+    - Forest management (improved forest management; user 2026-11-13: "change the target areas for clearcut and selection (increase
+      selection and reduce clearcut), increase the minimum harvest age"; "Protecting old forest should just use the MaxAge field";
+      Selection 20% and 85% "can either be removed or completely re-engineered"): Projection > Forest Management
+      (ui/ForestManagementView.cs, src/forest-management.R, stage 9).
+      - Found: harvest is an ordinary Target group (Forest Clearcut and Forest Selection [Type], per county, the drawn year's mapped
+        area); minimum harvest ages are the Build's (stage 6, pathway AgeMin); clearcut resets the stand to age 0 in its own type
+        (no regrowth delay), removes 0.97 of the merchantable wood and burns 96% of the slash; selection removes 0.5 and leaves it.
+      - A row (years, a unit at any of the three strata levels): clearcut moved to selection (by area, or by volume: 0.97 / 0.5 =
+        1.94 selection hectares a clearcut hectare), selection moved to light selection (Selection 20%: 0.2 removed; 2.5 by
+        volume), a harvest scale, and min and max age per harvest type (multipliers, 0 outside: they narrow the Build's ages; a
+        maximum protects older forest). A row by a level the targets are not keyed on moves the three types' targets to the
+        combined keys, each split by its group's historical harvest in the reference years (forest land where none was mapped).
+        Two rows on one place and year stop the setup.
+      - Light selection: Selection 20%'s flows were already a sound 20% removal; it gets Forest Selection's minimum ages (stage 6;
+        projections on older Builds read them from the Build's Minimum Harvest Ages output) and Forest Selection's allowed-cells map
+        (GAP exclusion). Selection 85% (merchantable wood to dead wood: an error) removed from the defaults.
+      - Timber revenue on every projection: Management Revenue: Harvest Timber per ecodivision, forest type and 10-year age band =
+        merchantable volume x removal share x regional stumpage (defaults/forest-management/stumpage.csv, 2024 USD/m3, provisional:
+        dev/forest-management/stumpage-research.md; softwood/hardwood by forest-type-wood.csv; California softwood 40, the interior
+        mixed conifer value, not the redwood-inflated statewide 50). Compare Cost Summary pairs iterations with a baseline that
+        has the same ones (a matched setup shares each iteration's draws).
+      - Found on the way: stage 9 sees only the sheets its transformer declares (the volume curves were invisible); declaring the
+        Build's stsim_Transition as an input copied it into the setup result, and the projection then found no initial conditions
+        (use lucasCore sheets such as OutputHarvestAge instead).
+      - Lassen plumbing test (dev/forest-management/lassen-forest-management.R; Lassen is GAP 1-2, so the test lifts the harvest's
+        GAP exclusion, and scales the drawn harvest x50: clearcut 1.7 -> 85 ha a year, selection 6.2 -> 310): baseline setup 160,
+        projection 162; IFM (x50, half the clearcut to selection by volume, 30% of selection to light, clearcut 80-200, selection
+        up to 200) setup 165, projection 167; 2024-2036, 3 iterations. Clearcut realized 443 / 360 / 878 ha against the baseline's
+        882 / 808 / 1,744; light selection 5,324 / 1,800 / 5,877. Timber revenue 45.6 M USD (baseline mean) against 38.0 M: 7.66 M
+        given up for 44,090 Mg C: 174 USD per Mg C (-1 to 452, iterations paired), 221 with wood products (34,602 Mg C: less harvest,
+        less stored in products). Plumbing only: an artificial harvest in a national park. Clearcut revenue reaches 73,921 USD/ha
+        in the oldest bands (~1,900 m3/ha): check the volume curves' top end.
+      - Open: slash retention on clearcuts; more wood to long-lived products (stage 18's end-use mix); revenue a row can override.
     - Open: planting a different type (assisted migration); fuel treatments; FACTS records for the baseline; a full Build on Puget
-      (tiled by county) to try the tile rule in a run.
+      (tiled by county, 20-30 jobs; user 2026-11-13) to try the tile rule in a run.
   - **Replanting and restoration:** a management transition from a post-disturbance class back to a forest type.
     - Window: within a few years of the disturbance (time since transition, for example 1-5 years), before shrubs take the site.
     - Age: reset to a seedling age on planting (natural return keeps age = years since the disturbance, to-do 57).

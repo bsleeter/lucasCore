@@ -112,7 +112,10 @@ compare_cost <- function(R, lib) {
     # wood into products, which ecosystem carbon alone counts as lost
     hw <- function(X) if (is.null(X$wp)) NA_real_ else at_year(wp_tg(X, "Stored"), y1) * 1e6
     gain_p <- if (r$base) NA_real_ else gain + (hw(r$X) - hw(B$X))
-    xn <- m$Net - mean(mb$Net); net <- mean(xn)
+    # each iteration against the baseline's same iteration when both have the same ones (a baseline from the same setup draws
+    # shares each iteration's historical years, so the pairs differ by the action, not the draw), else against the baseline's mean
+    paired <- !r$base && nrow(mb) > 1 && setequal(m$Iteration, mb$Iteration)
+    xn <- if (paired) m$Net - mb$Net[match(m$Iteration, mb$Iteration)] else m$Net - mean(mb$Net); net <- mean(xn)
     per <- function(v, g = gain) if (r$base || is.na(g) || g <= 0) NA_real_ else v / g
     data.table(RunScenarioId = r$rid, Label = r$label, Role = role_of(r), Iterations = r$X$nit,
                Cost = mean(m$Cost), Revenue = mean(m$Revenue), NetCost = mean(m$Net),
