@@ -961,6 +961,9 @@
 		<column name="NEP" displayName="Mean net ecosystem productivity (Tg C/yr)" dataType="Double" isOptional="True"/>
 		<column name="LulcLoss" displayName="Mean losses to land-use and land-cover change: fire emissions and harvest (Tg C/yr)" dataType="Double" isOptional="True"/>
 		<column name="NBP" displayName="Mean net biome productivity (Tg C/yr)" dataType="Double" isOptional="True"/>
+		<column name="HwpStored" displayName="Carbon stored in harvested wood products, end (Tg C; stage 18)" dataType="Double" isOptional="True"/>
+		<column name="HwpStockChange" displayName="Mean change in carbon stored in harvested wood products (Tg C/yr)" dataType="Double" isOptional="True"/>
+		<column name="NbpWithProducts" displayName="Mean net biome productivity with wood products (Tg C/yr)" dataType="Double" isOptional="True"/>
 	</dataSheet>
 
 	<dataSheet name="OutputCompareCost" displayName="Compare Cost Summary">
@@ -995,6 +998,55 @@
 		<column name="Urbanization" displayName="Urbanized (km2)" dataType="Double"/>
 		<column name="ForestChange" displayName="Forest area change (km2)" dataType="Double"/>
 		<column name="DevelopedChange" displayName="Developed area change (km2)" dataType="Double"/>
+	</dataSheet>
+
+	<dataSheet name="WoodProductsOptions" displayName="Wood Products" isSingleRow="True" viewClassName="lucasCoreUI.WoodProductsView" viewClassAssembly="lucasCoreUI">
+		<!-- stage 18: the run whose harvested carbon to follow (src/wood-products.R); the scenario depends on the run's Build result -->
+		<column name="RunScenarioId" displayName="Run (result scenario Id in this library; blank = the newest ST-Sim result)" dataType="Integer" isOptional="True"/>
+		<column name="Region" displayName="Smith region (NE, NLS, NPS, SE, SC, RMN, RMS, PSW, PWE, PWW; blank = from the strata)" dataType="String" isOptional="True"/>
+		<column name="Draws" displayName="Parameter draws per run iteration (blank = 100; 0 = the published values only)" dataType="Integer" isOptional="True"/>
+		<column name="Seed" displayName="Random seed of the draws (blank = 1)" dataType="Integer" isOptional="True"/>
+		<column name="LandClearingUtilized" displayName="Share of land-clearing wood made into products (blank = 0.5)" dataType="Double" isOptional="True"/>
+		<column name="Spinup" displayName="Start from the regional harvest history, 1906 (default on)" dataType="Boolean" defaultValue="-1" isOptional="True"/>
+	</dataSheet>
+
+	<dataSheet name="OutputWoodProducts" displayName="Wood Products">
+		<!-- stage 18: pools and flows by year (Mg C): mean and interval over the parameter draws, per run iteration (blank = over all) -->
+		<column name="Iteration" displayName="Iteration (blank = all)" dataType="Integer" isOptional="True"/>
+		<column name="Year" dataType="Integer"/>
+		<column name="Source" displayName="Source (History: the spin-up before the run; Run)" dataType="String"/>
+		<column name="Variable" displayName="Variable (Removed, InUse, Recovered, Landfill, Dump, Stored, EmittedEnergy, EmittedNoEnergy, StockChange)" dataType="String"/>
+		<column name="Mean" displayName="Mean (Mg C; flows Mg C/yr)" dataType="Double"/>
+		<column name="Lower" displayName="Lower bound of the interval" dataType="Double"/>
+		<column name="Upper" displayName="Upper bound of the interval" dataType="Double"/>
+		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer" isOptional="True"/>
+	</dataSheet>
+
+	<dataSheet name="OutputWoodProductsEndUse" displayName="Wood Products by End Use">
+		<!-- stage 18: carbon in use by end use and year (Mg C), the mean over iterations and draws -->
+		<column name="Year" dataType="Integer"/>
+		<column name="EndUse" displayName="End use" dataType="String"/>
+		<column name="InUse" displayName="In use (Mg C)" dataType="Double"/>
+		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer" isOptional="True"/>
+	</dataSheet>
+
+	<dataSheet name="OutputWoodProductsScale" displayName="Wood Products Spin-up">
+		<!-- stage 18: the harvest history scaled to the run: the run's first-decade removals over the history's in those years -->
+		<column name="Iteration" dataType="Integer"/>
+		<column name="Region" displayName="Smith region" dataType="String"/>
+		<column name="Wood" displayName="Wood (SW, HW)" dataType="String"/>
+		<column name="RunCarbon" displayName="Run removals, first decade (Mg C)" dataType="Double"/>
+		<column name="HistoryVolume" displayName="History removals, same years (million cubic feet)" dataType="Double"/>
+		<column name="Scale" displayName="Scale (Mg C per million cubic feet)" dataType="Double"/>
+	</dataSheet>
+
+	<dataSheet name="OutputWoodProductsFigure" displayName="Wood Products Figures (PNG)" viewClassName="lucasCoreUI.WoodProductsFigureView" viewClassAssembly="lucasCoreUI">
+		<!-- stage 18: one row per figure; Export > LUCAS Core > Wood Products Figures saves them all to a folder -->
+		<column name="Figure" dataType="Integer"/>
+		<column name="Title" dataType="String"/>
+		<column name="Caption" dataType="String"/>
+		<column name="FileName" displayName="Figure (PNG)" dataType="String" isExternalFile="True" isRaster="False" externalFileFilter="PNG Files (*.png)|*.png"/>
+		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer" isOptional="True"/>
 	</dataSheet>
 
 	<dataSheet name="OutputBuildFigure" displayName="Build Figures (PNG)" viewClassName="lucasCoreUI.BuildFigureView" viewClassAssembly="lucasCoreUI">
@@ -1425,6 +1477,19 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 
+	<transformer name="WoodProducts" displayName="18 - Wood Products" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/18-wood-products.R">
+		<dataSheet name="WoodProductsOptions" type="Input"/>
+		<dataSheet name="StudyArea" type="Input"/>
+		<dataSheet name="OutputWoodProducts" type="Output"/>
+		<dataSheet name="OutputWoodProductsEndUse" type="Output"/>
+		<dataSheet name="OutputWoodProductsScale" type="Output"/>
+		<dataSheet name="OutputWoodProductsFigure" type="Output"/>
+		<dataSheet name="OutputValidation" type="Both"/>
+	</transformer>
+
+	<!-- export: every wood products figure to a folder -->
+	<transformer name="WoodProductsFiguresExport" displayName="Wood Products Figures" dataSheet="OutputWoodProductsFigure" column="FileName" isFolderExport="True"/>
+
 	<!-- =================================================================================================== -->
 	<!-- LAYOUTS                                                                                           -->
 	<!-- =================================================================================================== -->
@@ -1474,6 +1539,7 @@
 			</group>
 			<item name="RunFigureOptions"/>
 			<item name="CompareRunOptions"/>
+			<item name="WoodProductsOptions"/>
 			<item name="DataDownloadOptions"/>
 			<item name="DataReleasePage"/>
 			<item name="ReleaseInformationPage"/>
@@ -1524,6 +1590,10 @@
 				<item name="OutputCompareCarbon"/>
 				<item name="OutputCompareLand"/>
 				<item name="OutputCompareCost"/>
+				<item name="OutputWoodProducts"/>
+				<item name="OutputWoodProductsEndUse"/>
+				<item name="OutputWoodProductsScale"/>
+				<item name="OutputWoodProductsFigure"/>
 				<item name="OutputDataDownload"/>
 				<item name="OutputDataSources"/>
 				<item name="OutputValidation"/>
@@ -1537,6 +1607,7 @@
 			<item name="ModelRecordExport" displayName="Model Record (FGDC metadata)"/>
 			<item name="RunFiguresExport" displayName="Run Figures (PNG)"/>
 			<item name="CompareFiguresExport" displayName="Compare Figures (PNG)"/>
+			<item name="WoodProductsFiguresExport" displayName="Wood Products Figures (PNG)"/>
 		</group>
 	</layout>
 

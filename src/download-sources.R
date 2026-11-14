@@ -387,7 +387,7 @@ download_handlers <- function() {
   #   nps_units     Unit_Nm of the National Park Service's fee land (Mang_Name NPS, Category Fee: the land NPS owns, not its
   #                 Proclamation boundary; its wilderness Designation polygons overlap the fee land): the National Parks preset,
   #                 ids from nps-units-crosswalk.csv (tools/make_nps_units.R)
-  # To-do 59, 2026-11-13 (user: "Build your four plus tribal lands and BLM, separate numbers"), one layer per preset; each keeps
+  # To-do 62, 2026-11-13 (user: "Build your four plus tribal lands and BLM, separate numbers"), one layer per preset; each keeps
   # Unit_Nm plus the fields its unit list (tools/make_unit_lists.R) chooses names by, and a name the list leaves out is not read:
   #   fws_units     FWS fee land (refuges, wetland management districts, waterfowl production areas, hatcheries): FWS Refuges
   #   dod_units     military installation boundaries (Mang_Name DOD, Des_Tp MIL: PAD-US keeps them as Proclamation boundaries;
@@ -562,6 +562,14 @@ download_handlers <- function() {
       if (!length(y)) stop(sprintf("the Cropland Data Layer years stage 8 reads are %d-%d: ask for years that include them", min(CDL_YEARS), max(CDL_YEARS)), call. = FALSE)
       data.table::data.table(year = y, url = sprintf(CDL_ZIP, y), file = sprintf("%d_30m_cdls.zip", y), out = sprintf("%d_30m_cdls.tif", y), fetch = TRUE) },
     have = function(ctx, items) recorded(ctx, "CdlFolder", file.path(ctx$place, items$out)),
+    # unzipped by hand into land-cover/cdl (2026-11-13): a year whose tif is the national 30 m layer is taken as it is
+    by_hand = function(ctx, items) vapply(file.path(ctx$place, items$out), function(f) {
+      if (!file.exists(f)) return(FALSE)
+      r <- tryCatch(terra::rast(f), error = function(e) NULL)
+      ok <- !is.null(r) && all(abs(terra::res(r) - 30) < 1e-6) && terra::ncol(r) > 1e5 && terra::nrow(r) > 5e4 && !terra::is.lonlat(r)
+      if (!ok) ctx$log(sprintf("  %s is in place but is not the national 30 m CDL (%s): fetched again", basename(f),
+                               if (is.null(r)) "not readable" else sprintf("%d x %d cells of %g", terra::ncol(r), terra::nrow(r), terra::res(r)[1])))
+      ok }, TRUE, USE.NAMES = FALSE),
     finish = function(ctx, items) { dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE)
       for (i in seq_len(nrow(items))) { zip_tif(ctx, items$dest[i], file.path(ctx$place, items$out[i])); unlink(items$dest[i]); ctx$log(sprintf("  CDL %d (national)", items$year[i])) }
       ctx$place })

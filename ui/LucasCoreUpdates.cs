@@ -131,9 +131,14 @@ namespace lucasCoreUI
 
         // ---- 1.4 (to-do 57): the post-disturbance classes (tools/make_post_disturbance.R). The description must not hold an apostrophe:
         // SyncroSim writes it into the library unquoted (1.3.0) ---------------------------------------------------------------------
-        [Update(1.4, "lucasCore 1.4: the Disturbed state classes of every forest type group, forested wetland and five shrub classes, with the transition types and groups that return them to their type or convert them; the Reforestation transitions; and the Management replanting transitions")]
+        [Update(1.4, "lucasCore 1.4: the Disturbed state classes of every forest type group, forested wetland and five shrub classes, with the transition types and groups that return them to their type or convert them; the Reforestation transitions; the Management replanting transitions and their costs; and the Compare Carbon Summary columns for harvested wood products")]
         public static void Update_1_400(DataStore store)
         {
+            // harvested wood products (to-do 59): stage 18's sheets are new (SyncroSim makes their tables); Compare Runs' carbon summary
+            // gains the wood products columns
+            AddColumn(store, "lucasCore_OutputCompareCarbon", "HwpStored", "DOUBLE");
+            AddColumn(store, "lucasCore_OutputCompareCarbon", "HwpStockChange", "DOUBLE");
+            AddColumn(store, "lucasCore_OutputCompareCarbon", "NbpWithProducts", "DOUBLE");
             AddNamed(store, "stsim_StateLabelX", "StateLabelXId", "Disturbed", null, null, false);
             AddStateAttributeType(store, "Live Forest", "State Class", "1 on forest type group classes (Ids 100-999), written by stage 10: the live forest share around a disturbed forest cell drives its return multiplier (to-do 57)");
             string[] grps = { "Post-disturbance", "Post-disturbance: Forest Return", "Post-disturbance: Shrub Return", "Post-disturbance: Conversion" };

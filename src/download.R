@@ -177,6 +177,15 @@ run_dataset <- function(h, ctx, layout, check_only = FALSE) {
       return(out("skipped", nrow(read_files(ctx$store)[Column == col]), nxt = held_in(where))) }
     if (any(got)) log(sprintf("%s: %d of %d asked files already in place; fetching the other %d", h$name, sum(got), nrow(items), sum(!got)))
     items <- items[!got] }
+  # files put in place by hand (a handler's by_hand: one TRUE per item whose finished file is already at the place, unrecorded, and is
+  # the source's): recorded as they are, not fetched (2026-11-13: the CDL unzipped into land-cover/cdl by hand was fetched again
+  # over a failed manifest row, and failed again)
+  planned <- items; hand <- if (!is.null(h$by_hand)) h$by_hand(ctx, items) else logical(nrow(items))
+  if (any(hand)) log(sprintf("%s: %d of %d files already %s, put there by hand: recorded as they are, not fetched", h$name, sum(hand), nrow(items), held_in(where)))
+  items <- items[!hand]
+  if (!nrow(items)) {
+    if (check_only) return(out("would download", sum(hand), 0, sprintf("%d files %s, put there by hand: recorded on the next download, nothing fetched", sum(hand), held_in(where))))
+    return(record_dataset(h, ctx, layout, col, ctx$place, planned, "by hand", where, log, out)) }
   items[, dest := file.path(ctx$dl, file)]; if (!"fetch" %in% names(items)) items[, fetch := TRUE]
   # supplied: files saved by hand, for all of a dataset (RCMAP) or some of its items (the forest type tiles)
   sup <- if ("supplied" %in% names(items)) items[!is.na(supplied), supplied] else character()
@@ -199,7 +208,12 @@ run_dataset <- function(h, ctx, layout, check_only = FALSE) {
   place <- ctx$place; stage <- file.path(ctx$store, ".staging", col); unlink(stage, recursive = TRUE); dir.create(stage, recursive = TRUE, showWarnings = FALSE)
   ctx$place <- stage
   path <- h$finish(ctx, items); path <- commit_staged(stage, place, path, ctx$store, col, log)
-  # record: every file under the place, with checksums; the manifest row
+  method <- if (length(sup) && length(sup) == nrow(items)) "by hand" else if (length(sup) || any(hand)) "direct, part by hand" else if (!is.null(h$method)) h$method else "direct"
+  record_dataset(h, ctx, layout, col, path, planned, method, where, log, out) }
+
+# record: every file under the place, with checksums; the manifest row (done); records/; the downloaded archives deleted
+record_dataset <- function(h, ctx, layout, col, path, items, method, where, log, out) {
+  if (identical(method, "by hand")) log(sprintf("%s: checksums of the files in place", h$name))
   fr <- files_rows(ctx$store, col, path, sha = TRUE); write_files(ctx$store, fr)
   # a region's download is a national copy only when whole files were kept: a source that clips (NLCD, LANDFIRE, perimeters,
   # gNATSGO, stand age tiles) gives the region alone, Keep national copies or not
@@ -207,7 +221,7 @@ run_dataset <- function(h, ctx, layout, check_only = FALSE) {
   copy <- if (is.null(ctx$region$poly) || isTRUE(h$national) || (ctx$keep && !by_source)) "national" else "clipped"
   src <- layout[Column == col]
   write_manifest(ctx$store, data.table::data.table(Column = col, Dataset = h$name, Source = src$Source, Version = if (!is.null(h$version)) h$version else src$Version,
-    Url = paste(unique(dirname(items$url)), collapse = " "), Doi = src$Doi, Method = if (length(sup) && length(sup) == nrow(items)) "by hand" else if (length(sup)) "direct, part by hand" else if (!is.null(h$method)) h$method else "direct", Copy = copy,
+    Url = paste(unique(dirname(items$url)), collapse = " "), Doi = src$Doi, Method = method, Copy = copy,
     Units = ctx$region$units, BufferKm = ctx$region$buffer_km, Xmin = ctx$region$box[1], Ymin = ctx$region$box[2], Xmax = ctx$region$box[3], Ymax = ctx$region$box[4],
     Files = nrow(fr), Bytes = sprintf("%.0f", sum(as.numeric(fr$Bytes))), Downloaded = format(Sys.time(), "%Y-%m-%dT%H:%M:%S"), Status = "done",
     Note = if ("note" %in% names(items)) items$note[1] else if (!is.null(h$note)) h$note else NA_character_))

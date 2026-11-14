@@ -4,7 +4,8 @@
 # (dev/figures/test_compare_figures.R)
 # =============================================================================
 # Same format as the Build and run figures (src/figures.R, figure_kit), one line or bar colour per run:
-#   charts  total ecosystem carbon and each run's difference from the baseline | carbon fluxes per year | flux means by period |
+#   charts  total ecosystem carbon and each run's difference from the baseline | carbon fluxes per year | harvested wood products and
+#           NBP with them (runs with a stage 18 result) | flux means by period |
 #           transitions per year | carbon by pool | land area change by cover group | a carbon summary table | a land change summary table
 #   maps    the baseline's final-year total ecosystem carbon and each other run's difference from it
 # compare_runs(lib, runs) reads the runs (src/run-figures.R's load_run): runs is a data.table of RunScenarioId and, optionally,
@@ -34,11 +35,17 @@ compare_runs <- function(lib, runs) {
     if (!length(n)) sprintf("Result %d", r) else sub("^[^-]* - ", "", sub(" \\(\\[.*$", "", n)) }
   colour <- function(s) if (is.na(s) || !nzchar(s)) NA_character_ else if (grepl(",", s)) argb(s) else s
   k <- 0L
-  lapply(seq_along(ids), function(i) {
+  out <- lapply(seq_along(ids), function(i) {
     col <- colour(runs$Colour[i]); if (is.na(col)) { col <- if (hist[i]) INK else COMPARE_PAL[k %% length(COMPARE_PAL) + 1L] }
     if (!hist[i]) k <<- k + 1L
     lab <- runs$Label[i]; if (is.na(lab) || !nzchar(lab)) lab <- nm(ids[i])
-    list(rid = ids[i], label = lab, col = col, hist = hist[i], base = i == b, X = load_run(lib, ids[i])) }) }
+    X <- load_run(lib, ids[i]); X$wp <- wp_of_run(lib, ids[i])   # stage 18's newest result on the run, or NULL
+    list(rid = ids[i], label = lab, col = col, hist = hist[i], base = i == b, X = X) })
+  # a history with no wood products result of its own takes a projection's: stage 18 on a projection runs its history's years too,
+  # with the same draws, so the two agree there (wp_tg keeps each run to its own years)
+  for (i in which(hist)) if (is.null(out[[i]]$X$wp)) for (j in which(!hist)) {
+    if (!is.null(out[[j]]$X$wp) && identical(find_history(lib, ids[j]), ids[i])) { out[[i]]$X$wp <- out[[j]]$X$wp; break } }
+  out }
 
 # ---- per-run series --------------------------------------------------------------------------------------------------------
 te_of <- function(X) if (is.null(X$stocks)) data.table(Timestep = integer(), Tg = numeric()) else X$stocks[StockGroup == "Total Ecosystem", .(Tg = sum(Mg) / 1e6), by = Timestep][order(Timestep)]
@@ -65,7 +72,9 @@ compare_carbon <- function(R) {
                VsBaseline = if (r$hist || r$base) NA_real_ else at_year(t, y1) - at_year(tb, y1),
                BiomassChange = pool(X, "Biomass: Total", y1) - pool(X, "Biomass: Total", y0), DomSoilChange = pool(X, dom, y1) - pool(X, dom, y0),
                NPP = mf("Net Primary Productivity"), NEP = mf("Net Ecosystem Productivity"),
-               LulcLoss = sum(mf("LULC: Emission"), mf("LULC: Harvest"), na.rm = TRUE), NBP = mf("Net Biome Productivity")) })) }
+               LulcLoss = sum(mf("LULC: Emission"), mf("LULC: Harvest"), na.rm = TRUE), NBP = mf("Net Biome Productivity"),
+               HwpStored = at_year(wp_tg(X, "Stored"), y1), HwpStockChange = { d <- wp_tg(X, "StockChange")[Timestep > y0]; if (nrow(d)) mean(d$Tg) else NA_real_ },
+               NbpWithProducts = { d <- nbp_products(X)[Timestep > y0]; if (nrow(d)) mean(d$Tg) else NA_real_ }) })) }
 compare_land <- function(R) {
   rbindlist(lapply(R, function(r) { X <- r$X; y0 <- X$years[1]; y1 <- X$years[2]
     tot <- function(f) { d <- trans_of(X, f); sum(d[Timestep > y0, km2]) }
@@ -180,6 +189,20 @@ compare_figures <- function(R, grid, dem, label, outdir) {
       2, 2, h = 1900, draw = function() for (i in seq_along(FL)) { low()
         run_lines(function(X) flow_of(X, FL[i]), "Tg C per year", i, names(FL)[i], zero = i >= 3) }) }
 
+  # ---- charts: harvested wood products (runs with a stage 18 result) ---------------------------------------------------------
+  has_wp <- vapply(R, function(r) !is.null(r$X$wp), TRUE)
+  if (any(has_wp)) {
+    miss <- vapply(R[!has_wp], `[[`, "", "label")
+    chart_figure("wood_products", "Harvested wood products", paste0("Stage 18 (Wood Products) on each run, the USFS harvested wood products model (production approach): ",
+      "(a) carbon stored in harvested wood products, in use and in landfills and dumps, including what was harvested before the run and is still stored; ",
+      "(b) net biome productivity with the change in that store added (the ecosystem's NBP counts harvest as a loss).",
+      if (length(miss)) sprintf(" No Wood Products result on %s: run stage 18 on it to add it.", paste(miss, collapse = ", ")) else ""),
+      1, 2, h = 1150, draw = function() {
+        low(); run_lines(function(X) wp_tg(X, "Stored")[, .(Timestep, Tg)], "Tg C", 1, legend = FALSE,
+          sprintf("Carbon stored in wood products, %d: %s Tg C", ye, paste(vapply(P, function(r) sprintf("%.3g", at_year(wp_tg(r$X, "Stored"), r$X$years[2])), ""), collapse = " / ")))
+        under_legend(labs, col = cols, lwd = 2, ncol = 1)
+        low(); run_lines(function(X) nbp_products(X)[, .(Timestep, Tg)], "Tg C per year", 2, "Net biome productivity with wood products", zero = TRUE, legend = FALSE) }) }
+
   # ---- charts: flux means by period ------------------------------------------------------------------------------------------
   # the history as one period, the projections by decade (2024-2030, 2031-2040, ...); a bar per run that covers the period
   per <- function(y, h) if (h) rep("hist", length(y)) else sprintf("%d", as.integer(ceiling(y / 10) * 10))
@@ -235,24 +258,31 @@ compare_figures <- function(R, grid, dem, label, outdir) {
   table_figure <- function(slug, title, caption, tab, units) {
     chart_figure(slug, title, caption, 1, 1, h = 380 + 110 * nrow(tab), draw = function() {
       par(mar = c(0, 1, 1, 1)); plot.new()
-      wd <- vapply(seq_along(tab), function(j) max(nchar(c(names(tab)[j], units[j], tab[[j]]))), 0) + 3
-      x <- .03 + c(0, cumsum(wd)[-length(wd)]) / sum(wd) * .96
-      rj <- c(FALSE, rep(TRUE, ncol(tab) - 1)); xr <- ifelse(rj, x + wd / sum(wd) * .96 - .015, x)   # numbers right-aligned
+      # each column as wide as its widest text as drawn (bold header, unit, entries) and a gap; the whole scaled down to fit when the
+      # run names are long or the columns many (2026-11-12: counted characters let the bold headers and a long run name overlap)
+      cx <- .8; gap <- strwidth("MM", cex = cx)
+      wd <- vapply(seq_along(tab), function(j) max(strwidth(names(tab)[j], cex = cx * .975, font = 2), strwidth(c(units[j], tab[[j]]), cex = cx)), 0) + gap
+      k <- min(1, .96 / sum(wd)); cx <- cx * k; wd <- wd * k
+      x <- .03 + c(0, cumsum(wd)[-length(wd)])
+      rj <- c(FALSE, rep(TRUE, ncol(tab) - 1)); xr <- ifelse(rj, x + wd - gap * k / 2, x)   # numbers right-aligned
       y <- seq(.77, by = -min(.66 / nrow(tab), .17), length.out = nrow(tab))
-      for (j in seq_along(tab)) { text(xr[j], .95, names(tab)[j], adj = c(as.numeric(rj[j]), .5), font = 2, cex = .78, col = INK)
-        text(xr[j], .90, units[j], adj = c(as.numeric(rj[j]), .5), cex = .66, col = MUTED) }
+      for (j in seq_along(tab)) { text(xr[j], .95, names(tab)[j], adj = c(as.numeric(rj[j]), .5), font = 2, cex = cx * .975, col = INK)
+        text(xr[j], .90, units[j], adj = c(as.numeric(rj[j]), .5), cex = cx * .83, col = MUTED) }
       abline(h = .855, col = GRID)
       for (i in seq_len(nrow(tab))) { rect(.005, y[i] - .025, .02, y[i] + .025, col = cols[i], border = NA)
-        for (j in seq_along(tab)) text(xr[j], y[i], tab[[j]][i], adj = c(as.numeric(rj[j]), .5), cex = .8, col = INK) } }) }
+        for (j in seq_along(tab)) text(xr[j], y[i], tab[[j]][i], adj = c(as.numeric(rj[j]), .5), cex = cx, col = INK) } }) }
   f1 <- function(x) ifelse(is.na(x), "", sprintf("%.1f", x)); s1 <- function(x) ifelse(is.na(x), "", sprintf("%+.1f", x))
   s2 <- function(x) ifelse(is.na(x), "", sprintf("%+.2f", x)); f2 <- function(x) ifelse(is.na(x), "", sprintf("%.2f", x))
   f0 <- function(x) ifelse(is.na(x), "", format(round(x), big.mark = ",")); s0 <- function(x) ifelse(is.na(x), "", paste0(ifelse(round(x) > 0, "+", ""), format(round(x), big.mark = ",", trim = TRUE)))
   Cb <- compare_carbon(R); Ld <- compare_land(R)
-  table_figure("carbon_summary", "Carbon summary", "Total ecosystem carbon at the end of each run, its change over the run and the difference from the baseline in the final year; the change in live biomass and in dead wood, litter and soil over the run; and mean annual fluxes over the run: net primary productivity, net ecosystem productivity, losses to land-use and land-cover change (fire emissions and harvest) and net biome productivity (net ecosystem productivity less those losses).",
-    Cb[, .(Run = Label, Years = sprintf("%d-%d", StartYear, EndYear), `Carbon end` = f1(CarbonEnd), Change = s1(CarbonChange),
+  ct <- Cb[, .(Run = Label, Years = sprintf("%d-%d", StartYear, EndYear), `Carbon end` = f1(CarbonEnd), Change = s1(CarbonChange),
            `vs baseline` = ifelse(Role == "Baseline", "baseline", s1(VsBaseline)), `Live biomass` = s1(BiomassChange), `Dead & soil` = s1(DomSoilChange),
-           NPP = f2(NPP), NEP = s2(NEP), `LULC losses` = f2(LulcLoss), NBP = s2(NBP))],
-    c("", "", "Tg C", "Tg C", "Tg C", "change, Tg C", "change, Tg C", "Tg C/yr", "Tg C/yr", "Tg C/yr", "Tg C/yr"))
+           NPP = f2(NPP), NEP = s2(NEP), `LULC losses` = f2(LulcLoss), NBP = s2(NBP))]
+  cu <- c("", "", "Tg C", "Tg C", "Tg C", "change, Tg C", "change, Tg C", "Tg C/yr", "Tg C/yr", "Tg C/yr", "Tg C/yr")
+  ccap <- "Total ecosystem carbon at the end of each run, its change over the run and the difference from the baseline in the final year; the change in live biomass and in dead wood, litter and soil over the run; and mean annual fluxes over the run: net primary productivity, net ecosystem productivity, losses to land-use and land-cover change (fire emissions and harvest) and net biome productivity (net ecosystem productivity less those losses)"
+  if (any(has_wp)) { ct[, `:=`(HWP = s2(Cb$HwpStockChange), `NBP + HWP` = s2(Cb$NbpWithProducts))]; cu <- c(cu, "Tg C/yr", "Tg C/yr")
+    ccap <- paste0(ccap, "; with stage 18's wood products, the mean change in carbon stored in harvested wood products (HWP) and net biome productivity with it added (blank: no Wood Products result on the run)") }
+  table_figure("carbon_summary", "Carbon summary", paste0(ccap, "."), ct, cu)
   table_figure("land_summary", "Land change summary", "Area burned, harvested and urbanized over each run (summed over its years, so land burned twice counts twice), and the change in forest and developed land area from the first to the last year of the run.",
     Ld[, .(Run = Label, Years = sprintf("%d-%d", StartYear, EndYear), Burned = f0(Fire), Harvested = f0(Harvest), Urbanized = f0(Urbanization),
            Forest = s0(ForestChange), Developed = s0(DevelopedChange))],

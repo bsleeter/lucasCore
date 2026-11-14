@@ -136,7 +136,7 @@ strata_from_home <- function(col, layer = NA_character_) {
   if (is.null(.home_cov$read[[col]])) .home_cov$read[[col]] <- list(DataSource = col, Origin = "home", Dir = pk$dir, Path = pk$path)
   pk$path }
 options(lucas.strata.home = strata_from_home)
-# a preset's layer may exist only in a newer edition of its dataset (to-do 59, 2026-11-13: PadusUnitsFile's first edition holds only
+# a preset's layer may exist only in a newer edition of its dataset (to-do 62, 2026-11-13: PadusUnitsFile's first edition holds only
 # nps_units; the refuge, DoD, forest, wilderness and BLM layers came with the second). The shipped unit lists follow the package,
 # so a layer missing from the edition picked is read from the newest edition that has it
 strata_edition_with_layer <- function(home, col, hp, pk, layer) {

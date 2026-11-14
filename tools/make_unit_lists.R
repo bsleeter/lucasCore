@@ -1,5 +1,5 @@
 # =============================================================================
-# make_unit_lists.R - unit lists and crosswalks of the managed-unit and metro presets (to-do 59; user 2026-11-13: "Build your four
+# make_unit_lists.R - unit lists and crosswalks of the managed-unit and metro presets (to-do 62; user 2026-11-13: "Build your four
 # plus tribal lands and BLM, separate numbers", "add MSAs as 17")
 # =============================================================================
 # Writes defaults/strata/<key>-list.csv (Name, Id) and, for the text-keyed sources, <key>-crosswalk.csv (Value, Id):

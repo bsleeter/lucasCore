@@ -135,6 +135,7 @@ stage: SyncroSim discards project-scope sheets that a stage saves during a run.
 | 15 - Data Download | `src/15-data-download.R` | Fetches the national datasets a Build reads into the Data Sources Home |
 | 16 - Model Record | `src/16-model-record.R` | The FGDC metadata record of a Build, as an optional quick check |
 | 17 - Data Release | `src/17-data-release.R` | A USGS data release folder from a Build and its runs: tables, maps, metadata, checks and a review packet |
+| 18 - Wood Products | `src/18-wood-products.R`, `src/wood-products.R` | What becomes of the carbon a run harvests: products in use, landfills and dumps, by year (USFS model; not spatial) |
 
 Pipeline order: 1, 5, 2, 3, 4, 6, 7, 8, 9. Every stage ends with validation checks (`lucasCore_OutputValidation`); a check that cannot be
 computed fails.

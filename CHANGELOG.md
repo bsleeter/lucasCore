@@ -4,6 +4,47 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
 
 ## Unreleased
 
+### Added
+- Stage 18 - Wood Products (to-do 59): what becomes of the carbon a run harvests. ST-Sim moves harvest and land-clearing wood to
+  Forestry Sector and nothing flows out of it; this stage follows it through products in use, landfills and dumps, by year, with
+  the USFS harvested wood products model (`src/wood-products.R`: Smith et al. 2006, Skog 2008, the HWP-C calculator; parameter
+  tables and sources in `defaults/wood-products`). Run it in its own scenario on the run's Build result, like Run Figures; a
+  projection is joined to its historical run. Before the run it starts from each region's harvest history from 1906, scaled to the
+  run. Parameter draws (default 100 per iteration) give a 90% interval. New page Wood Products; new output sheets Wood Products,
+  Wood Products by End Use, Wood Products Spin-up and Wood Products Figures (Export > LUCAS Core > Wood Products Figures). On a
+  national harvest series the model's stock is within 7% of the US Inventory's and its stock change within 3% (1990-2016).
+  Tests: `tests/unit-wood-products.R`, `tests/unit-wood-products-national.R`, `tests/phaseZ30-wood-products.R` (the stage on a
+  library's runs, read-only).
+- Run Figures and Compare Runs show the wood products of a run that stage 18 has followed (its newest Wood Products result): a
+  Harvested wood products figure (carbon stored in use and in landfills and dumps; net biome productivity with the change in that
+  store added, the production approach), and in Compare Runs' carbon summary the columns HWP and NBP + HWP (Compare Carbon Summary:
+  HwpStored, HwpStockChange, NbpWithProducts). A historical run takes its projection's result when it has none of its own. Runs
+  without a result are drawn as before. Test: `tests/phaseZ31-wood-products-figures.R`.
+
+### Fixed
+- Data Download fetched the Cropland Data Layer again when its files had been unzipped into `land-cover/cdl` by hand over a failed
+  earlier download, and failed again. The Data Sources page then showed "home failed", and a Build could stop on the failed
+  manifest row. A year whose file is in place and is the national 30 m layer is now recorded as it is, with its checksum, by hand.
+  Only the missing years are fetched.
+- Run Figures and Compare Runs stopped with "Object reference not set to an instance of an object" when the Build result they
+  depend on had lost its maps from the library's data folder (Puget Lowlands). They now take the model grid from the run's own
+  initial conditions map when the Build's cannot be read, and say so in the log.
+- Compare Runs' summary tables: a long run name or many columns made the headers and values overlap. Columns are now sized by the
+  width of their text as drawn, and the table scaled to fit.
+
+## 1.3.2 - 2026-11-11
+
+A fix for projections started from a 1.3 historical run, and better starting ages for regrowing forest.
+
+**Upgrading:** install `lucasCore-1.3.2.ssimpkg` in place of 1.3.1. There is no library update: switch a library's lucasCore
+package to 1.3.2 (`SyncroSim.Console.exe --add --package --pkg=lucasCore --ver=1.3.2 --lib=<library.ssim>`). Both changes take
+effect at the next Build; rerun the Build and then the historical run before a Projection Setup that starts from it.
+
+### Fixed
+- A Projection Setup that starts from a historical run stopped with "historical run ... has no <year> map for DOM: Peat". The
+  stock output filter still had peat maps off from before 1.3.0 filled that stock, so a historical run wrote no final peat map.
+  Peat maps are now on (`defaults/stockflow/stsim_OutputFilterStocks.csv`).
+
 ### Changed
 - Build stage 5: a cell that starts as forest only because NLCD shows it as forest in a later year, and whose record shows it
   regrowing (not forest at the start, then forest within 20 years and staying forest), takes its starting stand age from that
