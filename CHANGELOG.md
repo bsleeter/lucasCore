@@ -105,8 +105,8 @@ effect at the next Build; rerun the Build and then the historical run before a P
   - Budget mode: a row can give a budget (USD a year) instead of an area; stage 9 plants or salvages the area it pays for at the
     central cost per area.
   - Compare Runs: a Compare Cost Summary per projection, with costs, revenue and net cost over the run (mean and the
-    iterations' range), the extra net cost over the baseline, the carbon gained (total ecosystem carbon at the end), and USD per
-    Mg C and per Mg CO2e.
+    iterations' range), the extra net cost over the baseline, and the carbon gained with USD per Mg C and per Mg CO2e on two
+    bases: total ecosystem carbon at the end, and that plus the carbon stored in harvested wood products (stage 18 on both runs).
 - Seven study area and strata sources (Stratum Sources presets 11-17): FWS Refuges, DoD Installations, National Forests,
   Wilderness, Tribal Lands, BLM National Conservation Lands and Metropolitan Areas. The first five and BLM come from PAD-US 4.0 (a
   new edition of the PAD-US units download), Tribal Lands from Census TIGER/Line 2022 (a new Data Download dataset), Metropolitan

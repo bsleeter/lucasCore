@@ -979,11 +979,16 @@
 		<column name="NetCostLow" displayName="Net cost, lowest iteration (USD)" dataType="Double"/>
 		<column name="NetCostHigh" displayName="Net cost, highest iteration (USD)" dataType="Double"/>
 		<column name="ExtraNetCost" displayName="Net cost minus the baseline's (USD)" dataType="Double" isOptional="True"/>
-		<column name="CarbonGain" displayName="Carbon gained over the baseline (Mg C: total ecosystem carbon at the end)" dataType="Double" isOptional="True"/>
+		<column name="CarbonGain" displayName="Carbon gained over the baseline (Mg C: total ecosystem carbon at the end; wood products not counted)" dataType="Double" isOptional="True"/>
 		<column name="UsdPerMgC" displayName="USD per Mg C gained" dataType="Double" isOptional="True"/>
 		<column name="UsdPerMgCLow" displayName="USD per Mg C, lowest-cost iteration" dataType="Double" isOptional="True"/>
 		<column name="UsdPerMgCHigh" displayName="USD per Mg C, highest-cost iteration" dataType="Double" isOptional="True"/>
-		<column name="UsdPerMgCO2e" displayName="USD per Mg CO2e gained" dataType="Double" isOptional="True"/>
+		<column name="UsdPerMgCO2e" displayName="USD per Mg CO2e gained (ecosystem)" dataType="Double" isOptional="True"/>
+		<column name="CarbonGainWithProducts" displayName="Carbon gained over the baseline, with harvested wood products (Mg C: ecosystem + wood products stored, at the end; needs stage 18 on both runs)" dataType="Double" isOptional="True"/>
+		<column name="UsdPerMgCWithProducts" displayName="USD per Mg C gained, with wood products" dataType="Double" isOptional="True"/>
+		<column name="UsdPerMgCWithProductsLow" displayName="USD per Mg C with wood products, lowest-cost iteration" dataType="Double" isOptional="True"/>
+		<column name="UsdPerMgCWithProductsHigh" displayName="USD per Mg C with wood products, highest-cost iteration" dataType="Double" isOptional="True"/>
+		<column name="UsdPerMgCO2eWithProducts" displayName="USD per Mg CO2e gained, with wood products" dataType="Double" isOptional="True"/>
 	</dataSheet>
 
 	<dataSheet name="OutputCompareLand" displayName="Compare Land Change Summary">

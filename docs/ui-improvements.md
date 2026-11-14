@@ -1880,9 +1880,14 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
         4,507 / 6,834 / 4,747 (4,000-8,750), salvage revenue 4,389 / 3,547 / 5,521 (by age, 2,250-8,000). No warnings. Net cost
         12.1 M USD (7.8-14.8 M). Carbon against baseline 99: -0.20 Tg C, no ratio - but 99 is one iteration with other fire draws,
         so the difference is mostly fire noise: a fair test needs a baseline with the same iterations.
-      - Next (user 2026-11-13): two carbon bases in the cost summary, ecosystem and ecosystem + harvested wood products (to-do 59's
-        model); salvage moves dead wood to products, which ecosystem carbon alone counts as a loss. Later: replanting-only and
-        salvage-only runs, each against the baseline.
+      - Two carbon bases (user 2026-11-13: "against ecosystem carbon and ecosystem + HWP"), done after merging main (to-do 59):
+        CarbonGainWithProducts = the ecosystem gain + the run's carbon stored in harvested wood products at its end minus the
+        baseline's (stage 18 on both runs; NA without), with its USD per Mg C (range) and per Mg CO2e. Salvage moves dead wood to
+        products, which ecosystem carbon alone counts as lost. Lassen plumbing test (dev/management/lassen-cost-hwp.R; stage 18 on
+        99 and 130, 20 draws, results 134 and 136 - the stage's first runs inside SyncroSim: Lassen and Puget lacked stage 18,
+        added with tools/sync-library.R --schema-only and a fresh tools/new-library.R library as the reference): products stored in
+        2036 0.0125 Tg C against the baseline's ~0.006, gain -198,057 Mg C ecosystem, -191,661 with products; no ratio (the
+        mismatched baseline). Later: replanting-only and salvage-only runs, each against a baseline with the same iterations.
     - Open: planting a different type (assisted migration); fuel treatments; FACTS records for the baseline; a full Build on Puget
       (tiled by county) to try the tile rule in a run.
   - **Replanting and restoration:** a management transition from a post-disturbance class back to a forest type.

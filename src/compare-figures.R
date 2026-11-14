@@ -86,7 +86,8 @@ compare_land <- function(R) {
 # compare_cost - management cost-effectiveness (to-do 58 cost follow-ups, user 2026-11-13): per projection, the Management Actions'
 # money over the run from ST-Sim's transition attribute output (types "Management Cost: *" and "Management Revenue: *", USD;
 # Output Options > Transition attributes), per iteration: costs, revenue and net cost (costs - revenue), each against the
-# baseline's; and the carbon gained over the baseline (total ecosystem carbon at the end, Mg C; harvested wood not counted). USD per
+# baseline's; and the carbon gained over the baseline, on two bases: total ecosystem carbon at the end (Mg C), and that plus the carbon
+# stored in harvested wood products (stage 18 on both runs; NA without). USD per
 # Mg C = the extra net cost / the carbon gained, from the iteration mean, its range from the iterations' lowest and highest net cost
 # (each iteration draws its own costs: the cost range, Beta per iteration). No carbon gained: no ratio. NULL when no run has costs.
 management_money <- function(lib, rid, y0) {
@@ -106,14 +107,20 @@ compare_cost <- function(R, lib) {
   tb <- te_of(B$X)
   rbindlist(lapply(P, function(r) { m <- M[[as.character(r$rid)]]; if (is.null(m)) m <- zero
     y1 <- r$X$years[2]; gain <- if (r$base) NA_real_ else (at_year(te_of(r$X), y1) - at_year(tb, y1)) * 1e6
+    # the second basis (user 2026-11-13: "against ecosystem carbon and ecosystem + HWP"): plus the carbon stored in harvested wood
+    # products (in use, landfills and dumps; stage 18 on both runs) at the end, the run's minus the baseline's. Salvage moves dead
+    # wood into products, which ecosystem carbon alone counts as lost
+    hw <- function(X) if (is.null(X$wp)) NA_real_ else at_year(wp_tg(X, "Stored"), y1) * 1e6
+    gain_p <- if (r$base) NA_real_ else gain + (hw(r$X) - hw(B$X))
     xn <- m$Net - mean(mb$Net); net <- mean(xn)
-    per <- function(v) if (is.na(gain) || gain <= 0) NA_real_ else v / gain
+    per <- function(v, g = gain) if (r$base || is.na(g) || g <= 0) NA_real_ else v / g
     data.table(RunScenarioId = r$rid, Label = r$label, Role = role_of(r), Iterations = nrow(m),
                Cost = mean(m$Cost), Revenue = mean(m$Revenue), NetCost = mean(m$Net),
                NetCostLow = min(m$Net), NetCostHigh = max(m$Net),
                ExtraNetCost = if (r$base) NA_real_ else net, CarbonGain = gain,
-               UsdPerMgC = if (r$base) NA_real_ else per(net), UsdPerMgCLow = if (r$base) NA_real_ else per(min(xn)), UsdPerMgCHigh = if (r$base) NA_real_ else per(max(xn)),
-               UsdPerMgCO2e = if (r$base) NA_real_ else per(net) / (44 / 12)) })) }
+               UsdPerMgC = per(net), UsdPerMgCLow = per(min(xn)), UsdPerMgCHigh = per(max(xn)), UsdPerMgCO2e = per(net) / (44 / 12),
+               CarbonGainWithProducts = gain_p, UsdPerMgCWithProducts = per(net, gain_p), UsdPerMgCWithProductsLow = per(min(xn), gain_p),
+               UsdPerMgCWithProductsHigh = per(max(xn), gain_p), UsdPerMgCO2eWithProducts = per(net, gain_p) / (44 / 12)) })) }
 
 # ---- the figures -----------------------------------------------------------------------------------------------------------
 # R: compare_runs(); grid: the Build's state class map; dem; label: the study area
