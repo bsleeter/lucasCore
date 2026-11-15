@@ -2,6 +2,14 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+### Fixed
+- Data Download page: RCMAP Cover Time Series could not be ticked (its row in `defaults/download/endpoints.csv` had no Fetched
+  value), yet a download with every dataset ticked fetched it anyway: 188 GB that only `tools/fit_shrub_post_disturbance.R` reads.
+  It is now an optional dataset (Fetched = optional): it can be ticked, it is left out of Tick all, and a blank dataset list no
+  longer fetches it.
+
 ## 1.4.0 - 2026-11-15
 
 What happens after a disturbance, and what people do about it: burned and harvested land now sits in disturbed classes that return

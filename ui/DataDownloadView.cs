@@ -6,7 +6,7 @@
 // defaults/download/endpoints.csv: Comes (source = clipped by its source, remote = the region read from a remote archive, whole =
 // whole file fetched then clipped, states = the state files it touches kept whole, shared = one national copy for every region,
 // package, manual) and the sizes the P26 download measured (P26DownloadMb fetched, P26DiskMb kept; Pyrome P26 + 10 km, a 159 x 360
-// km box). SizeGb (the national files) is in the tooltip. Those the stage cannot fetch (Fetched = no) are greyed. All fetchable ticked writes a blank
+// km box). SizeGb (the national files) is in the tooltip. Those the stage cannot fetch (Fetched = no) are greyed; Fetched = optional can be ticked but is left out of Tick all and of a blank list. All fetchable ticked writes a blank
 // (every one); otherwise the ticked columns, comma separated. The home folder is shown from the project's Data Sources.
 // LOCA2: ticks from defaults/download/loca2-catalog.csv (the runs UCSD serves; tools/loca2-catalog.R), written to the same comma
 // separated columns. Blank (a new scenario) = one run: the project's first Climate Model UCSD serves (else the catalog's first), ssp245,
@@ -31,7 +31,7 @@ namespace lucasCoreUI
     {
         protected override string SheetName { get { return "lucasCore_DataDownloadOptions"; } }
 
-        private class Ds { public string Column, Name, Category, Method, Login, Note, Comes; public double SizeGb, DlMb, DiskMb; public bool Fetched; public CheckBox Box; }
+        private class Ds { public string Column, Name, Category, Method, Login, Note, Comes; public double SizeGb, DlMb, DiskMb; public bool Fetched, Optional; public CheckBox Box; }
         private readonly List<Ds> m_ds = new List<Ds>();
         private readonly Choice m_layout = new Choice("HomeLayout", 2);
         private readonly TextBox m_region = new TextBox { Width = 200, Margin = new Padding(3, 3, 6, 3) };
@@ -100,7 +100,7 @@ namespace lucasCoreUI
                 string[] e; ep.TryGetValue(kv.Key, out e);
                 Func<string, double> num = k => { double v; return double.TryParse(col(e, k), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out v) ? v : 0; };
                 m_ds.Add(new Ds { Column = kv.Key, Name = kv.Value[4], Category = kv.Value[1], Method = col(e, "Method"), Login = col(e, "Login"), Note = col(e, "Note"), Comes = col(e, "Comes"),
-                                  SizeGb = num("SizeGb"), DlMb = num("P26DownloadMb"), DiskMb = num("P26DiskMb"), Fetched = string.Equals(col(e, "Fetched"), "yes", StringComparison.OrdinalIgnoreCase) });
+                                  SizeGb = num("SizeGb"), DlMb = num("P26DownloadMb"), DiskMb = num("P26DiskMb"), Fetched = string.Equals(col(e, "Fetched"), "yes", StringComparison.OrdinalIgnoreCase), Optional = string.Equals(col(e, "Fetched"), "optional", StringComparison.OrdinalIgnoreCase) });
             }
             var list = Column();
             var quick = Row();
@@ -112,7 +112,7 @@ namespace lucasCoreUI
                 list.Controls.Add(new Label { Text = cat, AutoSize = true, Font = new Font(this.Font, FontStyle.Bold), Margin = new Padding(3, 8, 3, 2) });
                 foreach (Ds d in m_ds.Where(x => x.Category == cat))
                 {
-                    d.Box = new CheckBox { Text = d.Name + " - " + Comes(d), AutoSize = true, Enabled = d.Fetched, Margin = new Padding(18, 2, 3, 2) };
+                    d.Box = new CheckBox { Text = d.Name + " - " + (d.Optional ? "one national copy, kept whole: " + SizeText(d.SizeGb * 1000) + " (optional: no stage reads it, so it is not part of Tick all)" : Comes(d)), AutoSize = true, Enabled = d.Fetched || d.Optional, Margin = new Padding(18, 2, 3, 2) };
                     m_tip.SetToolTip(d.Box, d.Column + (d.Method.Length > 0 ? " (" + Method(d.Method) + ")" : "") + (d.SizeGb > 0 ? Environment.NewLine + "National files: " + SizeText(d.SizeGb * 1000) : "") + (d.Note.Length > 0 ? Environment.NewLine + d.Note : "") +
                                             (d.Login.Length > 0 && d.Login != "none" ? Environment.NewLine + "Login: " + d.Login : ""));
                     Ds dd = d; d.Box.CheckedChanged += (s, a) => { if (!Refreshing) WriteDatasets(); };
@@ -297,7 +297,7 @@ namespace lucasCoreUI
         private void WriteDatasets()
         {
             List<Ds> f = m_ds.Where(d => d.Fetched).ToList();
-            bool every = f.All(d => d.Box.Checked);
+            bool every = f.All(d => d.Box.Checked) && !m_ds.Any(d => d.Optional && d.Box.Checked);   // (an optional dataset is fetched only when named)
             Write("Datasets", every ? (object)DBNull.Value : string.Join(", ", m_ds.Where(d => d.Box.Checked).Select(d => d.Column)));
             RefreshControls();
         }
@@ -343,7 +343,7 @@ namespace lucasCoreUI
             ShowLoca2();
             string ds = Show(Value("Datasets")).Trim();
             var picked = new HashSet<string>(ds.Split(',').Select(x => x.Trim()).Where(x => x.Length > 0), StringComparer.OrdinalIgnoreCase);
-            foreach (Ds d in m_ds) d.Box.Checked = d.Fetched && (ds.Length == 0 || picked.Contains(d.Column));
+            foreach (Ds d in m_ds) d.Box.Checked = (d.Fetched && (ds.Length == 0 || picked.Contains(d.Column))) || (d.Optional && picked.Contains(d.Column));
             var on = m_ds.Where(d => d.Box.Checked).ToList(); var reg = on.Where(d => d.Comes != "shared").ToList(); var sh = on.Where(d => d.Comes == "shared").ToList();
             m_total.Text = string.Format("{0} ticked. A P26-sized region: about {1} to download, {2} kept{3}", on.Count, SizeText(reg.Sum(d => d.DlMb)), SizeText(reg.Sum(d => d.DiskMb)),
                 sh.Count == 0 ? "" : string.Format("; shared copies {0} to download ({1} on disk), the first time only", SizeText(sh.Sum(d => d.DlMb)), SizeText(sh.Sum(d => d.DiskMb))));

@@ -44,7 +44,8 @@ H <- download_handlers()
 asked <- trimws(strsplit(o("Datasets", ""), ",")[[1]]); asked <- asked[nzchar(asked)]
 if (length(asked)) { bad <- setdiff(asked, layout$Column); if (length(bad)) fail("Data Download: Datasets: %s are not Data Sources columns", paste(bad, collapse = ", "))
   cant <- setdiff(asked, names(H)); if (length(cant)) say("Not fetched by this version (%s): %s", "see the Data Download plan", paste(cant, collapse = ", ")) }
-todo <- if (length(asked)) intersect(asked, names(H)) else names(H)
+# a blank list is every dataset a stage reads; one marked optional in endpoints.csv (RCMAP cover time series, 188 GB: only a fitting tool reads it) comes only when named
+todo <- if (length(asked)) intersect(asked, names(H)) else setdiff(names(H), fread(pkg_file("defaults", "download", "endpoints.csv"))[Fetched == "optional", Column])
 check_only <- isTRUE(as.logical(o("CheckOnly", FALSE)))
 y_to <- o("YearTo", NA_integer_)
 make_ctx <- function(region, region_home) list(home = home, region_home = region_home, region = region,
