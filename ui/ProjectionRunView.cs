@@ -55,7 +55,7 @@ namespace lucasCoreUI
             AddGroup(Group("How the projection starts", start));
 
             var years = Column();
-            years.Controls.Add(Note("Each projection year and iteration draws one whole historical year; the groups of one sampling set (Transitions page) draw the same year."));
+            years.Controls.Add(Note("Each projection year and iteration draws one whole historical year; the groups of one sampling set (Land Use page) draw the same year."));
             var y = Row(); y.Controls.Add(m_allYears); y.Controls.Add(Caption("or from")); y.Controls.Add(m_from); y.Controls.Add(Caption("to")); y.Controls.Add(m_to); years.Controls.Add(y);
             AddGroup(Group("Historical years drawn (reference period)", years));
 
@@ -78,7 +78,7 @@ namespace lucasCoreUI
             var tl = Column();
             var t = Row(); t.Controls.Add(m_tiled); t.Controls.Add(m_tiles); t.Controls.Add(Caption("of whole units of")); t.Controls.Add(m_tileLevel); tl.Controls.Add(t);
             tl.Controls.Add(m_tileState);
-            tl.Controls.Add(Wrapped("ST-Sim runs the tiles in parallel and merges them. A target must not be split between tiles, so every Target group uses the tile strata level: choosing it here sets the Target Strata of this scenario's Target rows (Transitions page), and stage 9 enforces it. The levels are the strata set in Build Options; set one there to a layer that suits tiles before building.", 640));
+            tl.Controls.Add(Wrapped("ST-Sim runs the tiles in parallel and merges them. A target must not be split between tiles, so every Target group uses the tile strata level: choosing it here sets the Target Strata of this scenario's Target rows (Land Use page), and stage 9 enforces it. The levels are the strata set in Build Options; set one there to a layer that suits tiles before building.", 640));
             AddGroup(Group("Spatial multiprocessing", tl));
             EndGroups();
 
@@ -199,7 +199,7 @@ namespace lucasCoreUI
             m_tileState.Text = follow ? "From the Build (Build Options): every run on it uses these tiles, and stage 9 sets the Target rows to this level. Change the number or level to set this projection's own; untick for one job."
                 : !m_tiled.Checked ? (BuildTiled() ? string.Format("One job: the Build's {0} tiles are not used (tick to follow the Build again).", m_buildTiles == 0 ? "automatic" : Convert.ToString(m_buildTiles)) : "")
                 : TilesText(own) == "auto" ? "Automatic: stage 9 packs whole units into as many tiles as still shorten the run and logs the choice; type a number to choose it yourself."
-                : m_synced > 0 ? string.Format("{0} Target row{1} set to this level on the Transitions page.", m_synced, m_synced == 1 ? "" : "s")
+                : m_synced > 0 ? string.Format("{0} Target row{1} set to this level on the Land Use page.", m_synced, m_synced == 1 ? "" : "s")
                 : "Target rows use this level (rows inherited from the Build are set by stage 9 when it runs).";
         }
     }

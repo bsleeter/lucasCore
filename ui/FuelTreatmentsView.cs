@@ -58,8 +58,8 @@ namespace lucasCoreUI
                 Line("Cost range:", m_range, Note("Default: the cost a Beta over its range, drawn once per iteration. Fixed: the value alone.")),
                 r)));
             var rr = Row(); rr.Controls.Add(m_clear); rr.Controls.Add(m_state);
-            AddGroup(Group("Treatments (what the Projection Setup uses)", ProjectionTransitionsView.Stack(m_rows, m_grid, rr,
-                Wrapped("Edit here directly if you like. Projection Results > Fuel Treatments (as set up) lists what each row became.", 760))));
+            Label tn = Wrapped("Edit here directly if you like. Projection Results > Fuel Treatments (as set up) lists what each row became.", 760);
+            AddGroup(Group("Treatments (what the Projection Setup uses)", ProjectionTransitionsView.Stack(m_rows, rr, ProjectionTransitionsView.ShowTable("Show table", m_grid, tn), m_grid, tn)));
             EndGroups();
             m_treat.Items.AddRange(KEYS);
             m_priority.Items.AddRange(new object[] { "Random among eligible cells", "Fire likelihood (where wildfire burned more often)" });

@@ -22,4 +22,19 @@ for (f in list.files(file.path(pkg, "ui"), "[.]cs$", full.names = TRUE)) {
   if (length(miss)) { bad <- bad + 1L; cat(sprintf("FAIL: %s reads %s, outside its feed (%s)\n", basename(f), paste(miss, collapse = ", "), paste(have, collapse = ", "))) }
   gone <- setdiff(use[startsWith(use, "lucasCore_")], declared); if (length(gone)) { bad <- bad + 1L; cat(sprintf("FAIL: %s reads undeclared %s\n", basename(f), paste(gone, collapse = ", "))) }
 }
+# SyncroSim's own data feed rules (SyncroSim.Core): a feed has a view class and assembly, at least two sheets, each sheet in one feed
+# only, and its sheets share its data scope. Found 2026-11-14: a Natural Change feed of one sheet stopped Studio loading the package
+# ("A datafeed requires at least two datasheets"); the console loads it regardless, so only this test or Studio catches it
+scope <- function(n) { s <- xml_attr(n, "dataScope"); if (is.na(s)) "Scenario" else s }
+defs <- xml_find_all(x, "//dataSheet[@name][not(parent::dataFeed)][not(parent::transformer)]"); def_scope <- setNames(vapply(defs, scope, ""), xml_attr(defs, "name"))
+in_feed <- character()
+for (n in xml_find_all(x, "//dataFeed")) {
+  fn <- xml_attr(n, "name"); sh <- xml_attr(xml_find_all(n, "./dataSheet"), "name")
+  if (is.na(xml_attr(n, "viewClassName")) || is.na(xml_attr(n, "viewClassAssembly"))) { bad <- bad + 1L; cat(sprintf("FAIL: feed %s has no viewClassName/viewClassAssembly\n", fn)) }
+  if (length(sh) < 2) { bad <- bad + 1L; cat(sprintf("FAIL: feed %s has %d sheet (a feed needs two; put the view on the sheet instead)\n", fn, length(sh))) }
+  dup <- intersect(sh, in_feed); if (length(dup)) { bad <- bad + 1L; cat(sprintf("FAIL: feed %s repeats %s, already in another feed\n", fn, paste(dup, collapse = ", "))) }
+  in_feed <- c(in_feed, sh)
+  fs <- scope(n); off <- sh[!is.na(def_scope[sh]) & def_scope[sh] != fs]
+  if (length(off)) { bad <- bad + 1L; cat(sprintf("FAIL: feed %s (%s) holds %s of another data scope\n", fn, fs, paste(off, collapse = ", "))) }
+}
 cat(sprintf("%d sheet uses checked, %d files failed\n", seen, bad)); if (bad) quit(status = 1)

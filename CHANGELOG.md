@@ -32,6 +32,18 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
 - Compare Runs' summary tables: a long run name or many columns made the headers and values overlap. Columns are now sized by the
   width of their text as drawn, and the table scaled to fit.
 
+### Changed
+- Projection pages reorganized by what drives the change. Transitions is now **Land Use** (urbanization, intensification,
+  agriculture, forest harvest), laid out as the management pages: each group with its choices and a short note beside them (how
+  much and by which strata or rate units, the shared draw, protected land as GAP check boxes, and where each of its types goes:
+  method, surface, adjacency for land use, patch sizes), written straight into its row, and an "In words" sentence per group.
+  Fire's row (rate units, shared draw, protected land) moved to the top of the **Fire** page. New **Natural Change** page:
+  Reforestation Options (moved from its own item) and the Reforestation row; insects and drought go here later. The two tables
+  stay on Land Use behind **Show tables** (source and event classes are edited there); Forest Management, Fuel Treatments and
+  Management Actions hide their tables behind **Show table** too. Management Actions is renamed **Post-Disturbance Recovery**
+  (its outputs: Post-Disturbance Recovery (as set up)). Projection menu: Run Settings, Land Use, Spatial Allocation, Fire, Natural
+  Change, Fuel Treatments, Forest Management, Post-Disturbance Recovery, Climate. Display only: no change to the sheets or results.
+
 ## 1.3.2 - 2026-11-11
 
 A fix for projections started from a 1.3 historical run, and better starting ages for regrowing forest.

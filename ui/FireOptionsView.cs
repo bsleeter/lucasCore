@@ -33,11 +33,24 @@ namespace lucasCoreUI
         private readonly Button m_libBrowse = new Button { Text = "Browse...", AutoSize = true };
         private readonly TextBox m_rid = Box(70);
         private GroupBox m_g1, m_g2, m_g3;
+        // the Fire row of Projection Transitions (rate units, shared draw, protected land), moved here from the Transitions page (user
+        // 2026-11-14: "Should we move it to Fire so its all contained in one place?"; TransitionWalk.cs). The row stays in that sheet
+        private readonly TransitionWalk m_walk;
+        private readonly Label m_walkInfo = Note("");
+        private bool m_own;
+        private DataSheet Tr() { return TransitionWalk.OwnOrDependency(this.Scenario, TransitionWalk.TRANSITIONS, out m_own); }
+        private DataSheet Al() { bool o; return TransitionWalk.OwnOrDependency(this.Scenario, TransitionWalk.ALLOCATION, out o); }
         private List<Item> m_groups = new List<Item>();
 
         public FireOptionsView()
         {
             this.SuspendLayout();
+            m_walk = new TransitionWalk(new[] { TransitionWalk.FIRE }, Tr, Al, () => Refreshing, () => RefreshControls());
+            m_walk.Title[TransitionWalk.FIRE] = "Burned area each year";
+            m_walk.FamilyNote[TransitionWalk.FIRE] = "The drawn historical year's burned share of each unit.";
+            m_walk.FireWhere = "By the fire method below.";
+            Root.RowStyles.Add(new RowStyle(SizeType.AutoSize)); Root.Controls.Add(m_walk.Host);
+            Root.RowStyles.Add(new RowStyle(SizeType.AutoSize)); Root.Controls.Add(m_walkInfo);
             var top = Column();
             var gr = Row(); gr.Controls.Add(Caption("Fire group:")); gr.Controls.Add(m_group); top.Controls.Add(gr);
             top.Controls.Add(Option(m_method, 1, "1. Historical rates: each year burns the drawn historical year's share of each pyrome"));
@@ -86,6 +99,8 @@ namespace lucasCoreUI
         public override void LoadDataFeed(DataFeed dataFeed)
         {
             base.LoadDataFeed(dataFeed);
+            if (this.Scenario != null) { try { m_walk.Ms.Load(this.Scenario.Project, this.Scenario); } catch (Exception) { } }
+            m_walk.Rebuild();
             m_groups = this.DataFeed.Project.GetDataSheet("stsim_TransitionGroup").GetData().Rows.Cast<DataRow>()
                 .Where(x => x.RowState != DataRowState.Deleted && !Convert.ToString(x["Name"]).EndsWith("[Type]"))
                 .Select(x => new Item { Key = Convert.ToInt32(x["TransitionGroupId"]), Name = Convert.ToString(x["Name"]) }).OrderBy(x => x.Name).ToList();
@@ -96,6 +111,11 @@ namespace lucasCoreUI
 
         protected override void ShowData()
         {
+            Tr(); m_walk.Editable = m_own && !(this.Scenario != null && this.Scenario.IsResult) && this.ShouldEnableView();
+            m_walk.Show();
+            m_walkInfo.Text = !m_walk.Shows(TransitionWalk.FIRE) ? "No Fire row in the Land Use tables: open Land Use once to fill them from the defaults."
+                            : !m_own ? "The burned-area settings come from a dependency (read-only here); give this scenario its own Land Use tables to change them." : "";
+            m_walkInfo.Visible = m_walkInfo.Text.Length > 0;
             ShowChoice(m_method); ShowChoice(m_ign);
             object gid = Value("TransitionGroupId");
             m_group.BeginUpdate(); m_group.Items.Clear(); m_group.Items.Add(new Item { Key = DBNull.Value, Name = "(Fire)" });

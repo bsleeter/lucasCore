@@ -53,8 +53,8 @@ namespace lucasCoreUI
                 Line("Selection ages:", Pair(m_selMin, "to", m_selMax, null), Note("The same for selection and light selection.")),
                 r)));
             var rr = Row(); rr.Controls.Add(m_clear); rr.Controls.Add(m_state);
-            AddGroup(Group("Changes (what the Projection Setup uses)", ProjectionTransitionsView.Stack(m_rows, m_grid, rr,
-                Wrapped("Edit here directly if you like. Projection Results > Forest Management (as set up) lists the drawn and managed harvest of each row.", 760))));
+            Label tn = Wrapped("Edit here directly if you like. Projection Results > Forest Management (as set up) lists the drawn and managed harvest of each row.", 760);
+            AddGroup(Group("Changes (what the Projection Setup uses)", ProjectionTransitionsView.Stack(m_rows, rr, ProjectionTransitionsView.ShowTable("Show table", m_grid, tn), m_grid, tn)));
             EndGroups();
             m_basis.Items.AddRange(new object[] { "Area (a hectare for a hectare)", "Volume (the same wood removed)" });
             FillDefaults();

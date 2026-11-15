@@ -96,7 +96,7 @@ namespace lucasCoreUI
             var adj = Form();
             FormRow(adj, "Neighbourhood radius (m):", m_radius, "blank = 3 model cells; the developed (or agriculture) share within it drives the adjacency multiplier");
             FormRow(adj, "Update every (years):", m_update, null);
-            AddGroup(Group("Adjacency (groups with Adjacency ticked on the Transitions page)", adj));
+            AddGroup(Group("Adjacency (groups with adjacency ticked on the Land Use page)", adj));
 
             var rr = Row(); rr.Controls.Add(m_resetRules); rr.Controls.Add(m_rulesState);
             AddGroup(Group("Rule weights (Rules method)", ProjectionTransitionsView.Stack(

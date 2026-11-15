@@ -176,7 +176,7 @@
 		<dataSheet name="ProjectionOptions"/>
 		<dataSheet name="ProjectionStart"/>
 	</dataFeed>
-	<dataFeed name="ProjectionTransitions" displayName="Transitions" viewClassName="lucasCoreUI.ProjectionTransitionsView" viewClassAssembly="lucasCoreUI">
+	<dataFeed name="ProjectionTransitions" displayName="Land Use" viewClassName="lucasCoreUI.ProjectionTransitionsView" viewClassAssembly="lucasCoreUI">
 		<dataSheet name="ProjectionTransition"/>
 		<dataSheet name="ProjectionAllocation"/>
 	</dataFeed>
@@ -313,7 +313,7 @@
 	     in a projection. Stage 9 turns each row into ST-Sim targets on the disturbed forest classes (an area a year), and stage 10
 	     sets the replanting priority. An empty sheet: no management (the baseline). Area above the historical rate: the fitted
 	     natural return already includes whatever planting followed past fires -->
-	<dataSheet name="ManagementAction" displayName="Management Actions" viewClassName="lucasCoreUI.ManagementActionsView" viewClassAssembly="lucasCoreUI">
+	<dataSheet name="ManagementAction" displayName="Post-Disturbance Recovery" viewClassName="lucasCoreUI.ManagementActionsView" viewClassAssembly="lucasCoreUI">
 		<column name="ActionId" displayName="Action" dataType="Integer" validationType="List" formula1="1:Replanting|2:Salvage logging|3:Aerial seeding|4:Drill seeding|5:Sagebrush planting|6:Herbicide and seeding"/>
 		<column name="StartYear" displayName="Start Year (blank = the first projection year)" dataType="Integer" isOptional="True"/>
 		<column name="EndYear" displayName="End Year (blank = the projection end)" dataType="Integer" isOptional="True"/>
@@ -333,7 +333,7 @@
 		<column name="CostRange" displayName="Cost Range" dataType="Integer" validationType="List" formula1="1:Default ranges (sampled per iteration)|2:Fixed values" isOptional="True"/>
 	</dataSheet>
 
-	<dataSheet name="OutputManagementAction" displayName="Management Actions (as set up)">
+	<dataSheet name="OutputManagementAction" displayName="Post-Disturbance Recovery (as set up)">
 		<!-- stage 9: each Management Actions row as the transition types and areas it drives -->
 		<column name="Row" dataType="Integer"/>
 		<column name="TransitionType" displayName="Transition Type" dataType="String"/>
@@ -625,7 +625,8 @@
 	     defaults/landcover/reforestation-cutoff.csv, tools/fit_reforestation_cutoff.R) on BpS forest potential, or at any time on BpS
 	     non-forest potential, starts as its start-year class and reforests when NLCD shows forest. Blank = the defaults (on, the
 	     fitted cutoff, riparian and savanna as forest potential) -->
-	<dataSheet name="ReforestationOptions" displayName="Reforestation Options" isSingleRow="True">
+	<!-- Natural Change (user 2026-11-14): reforestation now, insects and drought later; its own page (a data feed needs two sheets) -->
+	<dataSheet name="ReforestationOptions" displayName="Natural Change" isSingleRow="True" viewClassName="lucasCoreUI.NaturalChangeView" viewClassAssembly="lucasCoreUI">
 		<column name="Enabled" displayName="Reforestation Transition (blank = on)" dataType="Boolean" isOptional="True"/>
 		<column name="CutoffYears" displayName="Cutoff, Years After the Start Year (blank = fitted by ecodivision)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="1" formula2="60"/>
 		<column name="RiparianAs" displayName="LANDFIRE BpS Riparian and Savanna Read As" dataType="Integer" validationType="List" formula1="1:Forest potential|2:Non-forest potential" isOptional="True" defaultValue="1"/>
@@ -1598,7 +1599,6 @@
 			<item name="ClimateOptions"/>
 			<item name="GrowthOptions"/>
 			<item name="HarvestAge"/>
-			<item name="ReforestationOptions"/>
 			<group name="lucasCoreCarbonAssumptions" displayName="Carbon Assumptions">
 				<item name="CarbonOptions"/>
 				<item name="GrowthInput"/>
@@ -1618,9 +1618,10 @@
 				<item name="ProjectionTransitions"/>
 				<item name="SpatialAllocation"/>
 				<item name="FireOptions"/>
-				<item name="ManagementAction"/>
-				<item name="ForestManagement"/>
+				<item name="ReforestationOptions"/>
 				<item name="FuelTreatment"/>
+				<item name="ForestManagement"/>
+				<item name="ManagementAction"/>
 				<item name="ProjectionClimatePage"/>
 			</group>
 			<item name="RunFigureOptions"/>

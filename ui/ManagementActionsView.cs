@@ -144,7 +144,7 @@ namespace lucasCoreUI
                     { if (i == m_ms.TileLevel) return m_ms.FromBuild ? string.Format("choose a {0} unit (the projection's tiles need one)", m_ms.Source[i]) : "the projection runs in tiles, so each action needs a unit: run the Build and set its result as this Projection Setup's dependency first"; continue; }
                     string n = m_ms.Units[i].FirstOrDefault(x => string.Equals(x, txt, StringComparison.OrdinalIgnoreCase));
                     if (n == null) return string.Format("{0} is not a {1} unit with land in the study area", txt, m_ms.Source[i]);
-                    if (!nr.Table.Columns.Contains(col)) return "this library's Management Actions sheet has no " + ModelStrata.Levels[i] + " column (update the package)";
+                    if (!nr.Table.Columns.Contains(col)) return "this library's Post-Disturbance Recovery sheet has no " + ModelStrata.Levels[i] + " column (update the package)";
                     nr[col] = m_ms.Keys[i][n];
                 }
                 return null;
@@ -309,8 +309,8 @@ namespace lucasCoreUI
 
             // the rows
             var r = Row(); r.Controls.Add(m_clear); r.Controls.Add(m_state);
-            AddGroup(Group("Actions (what the Projection Setup uses)", ProjectionTransitionsView.Stack(m_rows, m_grid, r,
-                Wrapped("Edit here directly if you like. Projection Results > Management Actions (as set up) lists what each row became.", 760))));
+            Label tn = Wrapped("Edit here directly if you like. Projection Results > Post-Disturbance Recovery (as set up) lists what each row became.", 760);
+            AddGroup(Group("Actions (what the Projection Setup uses)", ProjectionTransitionsView.Stack(m_rows, r, ProjectionTransitionsView.ShowTable("Show table", m_grid, tn), m_grid, tn)));
             EndGroups();
 
             m_rep.Priority.Items.AddRange(new object[] { "None (random among eligible cells)", "Far from live forest (least likely to return on its own)" });
@@ -393,7 +393,7 @@ namespace lucasCoreUI
         {
             List<DataRow> rows = Live(Sheet.GetData()).ToList();
             if (rows.Count == 0) return;
-            if (MessageBox.Show(this, "Remove every management action, so the projection is the baseline?", "Management Actions", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) != DialogResult.OK) return;
+            if (MessageBox.Show(this, "Remove every post-disturbance action, so the projection is the baseline?", "Post-Disturbance Recovery", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) != DialogResult.OK) return;
             Sheet.DeleteRows(rows);
             LoadGrid(m_grid, SheetName);
             RefreshControls();
