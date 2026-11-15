@@ -119,6 +119,13 @@ demand_history_ratio <- function(a, which = c("High", "Low"), share = 1 / 3, cap
 # futures ("<climate model>_<pair>") > steps ("2012-2020", "2020-2030" ...) > counties (5-digit FIPS) > a 6 x 6 matrix, rows = the
 # use at the start (cr, ps, rg, fr, ur, t2), columns = the use at the end (..., t1), hundreds of acres over the step
 demand_rpa_areas <- function(x, pair) {
+  # the package's table (defaults/land-use-demand/rpa-county-urbanization.csv, tools/make_land_use_demand_tables.R): the same sums,
+  # km2 a year by county and step, a column per future
+  if (is.data.frame(x)) { x <- data.table::as.data.table(x); fut <- grep(paste0("_", pair, "$"), names(x), value = TRUE)
+    if (!length(fut)) stop(sprintf("the RPA table has no future of pair %s", pair), call. = FALSE)
+    steps <- c(DEMAND_CAL, DEMAND_STEPS); miss <- setdiff(steps, unique(x$Step)); if (length(miss)) stop(sprintf("the RPA table lacks the steps %s", paste(miss, collapse = ", ")), call. = FALSE)
+    x <- x[Step %in% steps]; out <- data.table::data.table(Fips = sprintf("%05d", as.integer(x$Fips)), Step = x$Step, PerYear = rowMeans(as.matrix(x[, fut, with = FALSE])))
+    attr(out, "models") <- length(fut); return(out) }
   fut <- grep(paste0("_", pair, "$"), names(x), value = TRUE); if (!length(fut)) stop(sprintf("the RPA table has no future of pair %s", pair), call. = FALSE)
   steps <- c(DEMAND_CAL, DEMAND_STEPS); miss <- setdiff(steps, names(x[[fut[1]]])); if (length(miss)) stop(sprintf("the RPA table lacks the steps %s", paste(miss, collapse = ", ")), call. = FALSE)
   d <- data.table::rbindlist(lapply(fut, function(s) data.table::rbindlist(lapply(steps, function(st) { m <- simplify2array(unclass(x[[s]][[st]]))
@@ -148,6 +155,8 @@ demand_ratios <- function(areas, crosswalk, pooling, cap = 3, min_cal = DEMAND_M
 # more than a decade's change). Attributes: "steps" (the later decades), "mid" (2015, then each decade's middle), "models"
 DEMAND_ICLUS <- c(SSP2 = "ssp2_rcp45", SSP5 = "ssp5_rcp85"); DEMAND_ICLUS_CAL <- "2010-2020"; DEMAND_ICLUS_MIN_CAL <- 0.1   # km2 a year
 demand_iclus_areas <- function(tab, ssp) { if (!ssp %in% names(DEMAND_ICLUS)) stop(sprintf("ICLUS has SSP2 (RCP4.5) and SSP5 (RCP8.5), not %s", ssp), call. = FALSE)
+  # (the package's table has a column per run: defaults/land-use-demand/iclus-county-new-developed.csv)
+  if (all(c("Fips", "Year") %in% names(tab)) && !"Run" %in% names(tab)) tab <- data.table::melt(data.table::as.data.table(tab), id.vars = c("Fips", "Year"), variable.name = "Run", value.name = "Km2", variable.factor = FALSE)
   if (!all(c("Fips", "Run", "Year", "Km2") %in% names(tab))) stop("the ICLUS county table needs the columns Fips, Run, Year and Km2", call. = FALSE)
   t <- data.table::as.data.table(tab)[grepl(paste0("^", DEMAND_ICLUS[[ssp]], "_"), Run)]; if (!nrow(t)) stop(sprintf("the ICLUS county table has no run of %s", DEMAND_ICLUS[[ssp]]), call. = FALSE)
   if (!2010L %in% t$Year) stop("the ICLUS county table has no 2010-2020 decade (its base)", call. = FALSE)

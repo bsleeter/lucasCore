@@ -233,66 +233,6 @@ download_handlers <- function() {
       if (clipping(ctx)) clip_vector(x, dest, ctx$region, layer = "Fires") else { dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE); file.rename(x, dest) }
       dest })
 
-  # ---- 2020 RPA Assessment county land-use projections (Mihiar, Lewis & Coulston 2023): one 109 MB zip holding the same table as
-  # JSON (432 MB) and as an R list (70 MB); only the .rds is unpacked, a national table kept whole at the top of the home. Stage 9's
-  # Land Use Demand computes its urbanization ratios from it (src/land-use-demand.R) -----------------------------------------------
-  H$RpaLandUseFile <- list(column = "RpaLandUseFile", name = "2020 RPA Assessment county land-use projections", national = TRUE, version = "RDS-2023-0026",
-    note = "County gross land-use transitions 2012-2070, 20 futures, hundreds of acres; for Projection > Land Use Demand (stage 9)",
-    plan = function(ctx) data.table::data.table(url = sprintf(RDS, "RDS-2023-0026", "RDS-2023-0026.zip"), file = "rpa-landuse.zip", fetch = TRUE),
-    have = function(ctx, items) recorded(ctx, "RpaLandUseFile", file.path(ctx$place, "county_landuse_projections_RPA.rds")),
-    finish = function(ctx, items) { x <- unzip_to(items$dest[1], file.path(ctx$dl, "unzip"), "Data/county_landuse_projections_RPA.rds")
-      dest <- file.path(ctx$place, "county_landuse_projections_RPA.rds"); dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE)
-      if (!file.rename(x, dest)) stop("could not move county_landuse_projections_RPA.rds to its place", call. = FALSE)
-      unlink(file.path(ctx$dl, "unzip"), recursive = TRUE); unlink(items$dest[1]); dest })
-
-  # ---- 2020 RPA Assessment forest products market projections (FOROM; Johnston, Guo & Prestemon 2023, 2nd edition): one 8 MB zip with
-  # a table per RPA scenario; the four tables are kept whole at the top of the home. Land Use Demand's Forest Harvest reads the
-  # regions' timber harvest from them (src/land-use-demand.R) ----------------------------------------------------------------------
-  H$RpaForestProductsFolder <- list(column = "RpaForestProductsFolder", name = "2020 RPA Assessment forest products projections", national = TRUE, version = "RDS-2022-0073-2 (2nd Edition)",
-    note = "Timber harvest, production, prices and trade for six U.S. regions and the world, 1990-2015 and 2020-2070, four RPA scenarios; for Projection > Land Use Demand: Forest Harvest (stage 9)",
-    plan = function(ctx) data.table::data.table(url = sprintf(RDS, "RDS-2022-0073-2", "RDS-2022-0073-2.zip"), file = "rpa-forest-products.zip", fetch = TRUE),
-    have = function(ctx, items) recorded(ctx, "RpaForestProductsFolder", file.path(ctx$place, unname(DEMAND_HARVEST_FILE))),
-    finish = function(ctx, items) { f <- unname(DEMAND_HARVEST_FILE); x <- unzip_to(items$dest[1], file.path(ctx$dl, "unzip"), file.path("Data", f, fsep = "/"))
-      dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE)
-      for (i in seq_along(f)) if (!file.rename(x[i], file.path(ctx$place, f[i]))) stop(sprintf("could not move %s to its place", f[i]), call. = FALSE)
-      unlink(file.path(ctx$dl, "unzip"), recursive = TRUE); unlink(items$dest[1]); ctx$place })
-
-  # ---- EPA ICLUS v2.1.1 land use (four runs, 1.4-1.8 GB zips of 90 m maps): the maps are tabulated by county (src/iclus.R: new land
-  # in classes 12-16 by decade, 2010-2100) and only that table is kept; the maps (about 18 GB unpacked) are removed. Needs the Counties
-  # stratum source's polygons, which every Data Download fetches. A slow dataset: the tabulation reads every county of every map ----
-  H$IclusCountyFile <- list(column = "IclusCountyFile", name = "EPA ICLUS v2.1.1 new developed land by county", national = TRUE, version = "ICLUS v2.1.1 (2020)",
-    note = "New suburban and denser land (ICLUS classes 12-16) by county and decade 2010-2100, SSP2-RCP4.5 and SSP5-RCP8.5 x two climate models; for Projection > Land Use Demand (stage 9)",
-    plan = function(ctx) data.table::data.table(url = sprintf(ICLUS_URL, ICLUS_RUNS), file = sprintf("iclus_%s.zip", ICLUS_RUNS), fetch = TRUE),
-    have = function(ctx, items) recorded(ctx, "IclusCountyFile", file.path(ctx$place, "iclus_v211_county_new_developed.csv")),
-    finish = function(ctx, items) { ex <- file.path(ctx$dl, "iclus"); for (z in items$dest) unzip_to(z, ex)
-      s <- tryCatch(sources_from_sheet(data.table::as.data.table(rsyncrosim::datasheet(ctx$prj, "lucasCore_StratumSource", optional = TRUE, lookupsAsFactors = FALSE)))[["Counties"]], error = function(e) NULL)
-      if (is.null(s)) stop("the ICLUS county table needs the Counties stratum source (Stratum Sources page)", call. = FALSE)
-      cty <- strata_polygons(s, env$PackageDirectory); cty$GEOID <- cty$StratumId
-      tab <- iclus_county_table(ex, cty, id = "GEOID", workers = max(1L, min(16L, parallel::detectCores() - 2L)), log = ctx$log)
-      dest <- file.path(ctx$place, "iclus_v211_county_new_developed.csv"); dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE); data.table::fwrite(tab[order(Run, Fips, Year)], dest)
-      unlink(ex, recursive = TRUE); unlink(items$dest); dest })
-
-  # ---- Hauer (2019) county populations by SSP, 2020-2100 (OSF): one 311 MB zip holding an 871 MB table by age, sex and race; the
-  # county totals by year (one row per county and year, a column per SSP) are written and the table is not kept. Land Use Demand's
-  # Population method reads them (src/land-use-demand.R) ----------------------------------------------------------------------------
-  H$PopulationProjectionFile <- list(column = "PopulationProjectionFile", name = "County population projections by SSP (Hauer 2019)", national = TRUE, version = "OSF 9YNFC (SSP_asrc, 2018)",
-    note = "County totals of Hauer's age-sex-race projections, 2020-2100 in 5-year steps, SSP1 to SSP5; for Projection > Land Use Demand (stage 9)",
-    plan = function(ctx) data.table::data.table(url = "https://osf.io/download/uh5sj/", file = "SSP_asrc.zip", fetch = TRUE),
-    have = function(ctx, items) recorded(ctx, "PopulationProjectionFile", file.path(ctx$place, "hauer_county_ssp_totals.csv")),
-    finish = function(ctx, items) { x <- unzip_to(items$dest[1], file.path(ctx$dl, "unzip"), "SSP_asrc.csv")
-      d <- data.table::fread(x, select = c("YEAR", "GEOID", paste0("SSP", 1:5)), colClasses = list(character = "GEOID"))
-      tot <- d[, lapply(.SD, function(v) round(sum(v), 3)), by = .(GEOID = sprintf("%05d", as.integer(GEOID)), YEAR), .SDcols = paste0("SSP", 1:5)][order(GEOID, YEAR)]
-      dest <- file.path(ctx$place, "hauer_county_ssp_totals.csv"); dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE); data.table::fwrite(tot, dest)
-      unlink(file.path(ctx$dl, "unzip"), recursive = TRUE); unlink(items$dest[1]); dest })
-
-  # ---- Census Bureau county population estimates, 2010-2020 (vintage 2020): the base of the Population method ----------------------
-  H$CensusPopulationFile <- list(column = "CensusPopulationFile", name = "Census county population estimates 2010-2020", national = TRUE, version = "Vintage 2020 (co-est2020-alldata)",
-    note = "County resident population, 1 July 2010 to 2020; the base period of Projection > Land Use Demand: Population (stage 9)",
-    plan = function(ctx) data.table::data.table(url = "https://www2.census.gov/programs-surveys/popest/datasets/2010-2020/counties/totals/co-est2020-alldata.csv", file = "co-est2020-alldata.csv", fetch = TRUE),
-    have = function(ctx, items) recorded(ctx, "CensusPopulationFile", file.path(ctx$place, "co-est2020-alldata.csv")),
-    finish = function(ctx, items) { dest <- file.path(ctx$place, "co-est2020-alldata.csv"); dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE)
-      if (!file.rename(items$dest[1], dest)) stop("could not move co-est2020-alldata.csv to its place", call. = FALSE); dest })
-
   # ---- PRISM: annual tmean and ppt (4 km, "us_25m") and the 1991-2020 normals, national (small) ------------------------
   # from PRISM's HTTP mirror (sizes and byte ranges; the web service blocks a file fetched twice in 24 h). Stage 7 needs the year
   # before the first year, and 1991-2020 for its normal

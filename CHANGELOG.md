@@ -4,6 +4,16 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
 
 ## Unreleased
 
+### Changed
+- Land Use Demand's five sources ship with the package instead of being downloaded (`defaults/land-use-demand`, 7 MB): the RPA
+  county urbanization and timber harvest, the ICLUS county table, Hauer's county populations and the Census county populations,
+  each reduced to what stage 9 reads by `tools/make_land_use_demand_tables.R` (sources, licences and what was reduced:
+  `defaults/land-use-demand/README.md`; the files they were made from and their checksums: `made-from.csv`). In 1.4.0 they were
+  Data Download datasets: 7.5 GB fetched, mostly ICLUS maps, for a few megabytes read. The multipliers are still computed in the
+  stage, and `tests/unit-land-use-demand.R` checks that each table gives the same ratios as its published file. The Data
+  Download handlers are removed and the Data Download page lists the five as shipped; a path set on the Data Sources page still
+  wins (the published file, or another edition). No change to results; no library update.
+
 ### Fixed
 - Data Download page: RCMAP Cover Time Series was listed but could not be ticked (its row in `defaults/download/endpoints.csv`
   had no Fetched value), yet a download with every dataset ticked fetched it anyway: 188 GB that no stage reads (only

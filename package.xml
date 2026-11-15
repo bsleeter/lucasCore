@@ -42,11 +42,11 @@
 		<column name="NccpiFile" displayName="gNATSGO crop productivity NCCPI, 30 m (stage 10; blank = fetched for the fitting region from Planetary Computer)" dataType="String" isOptional="True"/>
 		<column name="ForestOwnerFile" displayName="USFS forest ownership circa 2017, 30 m (stage 10)" dataType="String" isOptional="True"/>
 		<column name="RapNppFolder" displayName="RAP vegetation NPP v3 Folder (rap-npp-v3-year.tif; Grass and Shrub Productivity, stage 8)" dataType="String" isOptional="True"/>
-		<column name="RpaLandUseFile" displayName="2020 RPA Assessment county land-use projections (county_landuse_projections_RPA.rds; USFS, doi 10.2737/RDS-2023-0026; Land Use Demand, stage 9)" dataType="String" isOptional="True"/>
-		<column name="RpaForestProductsFolder" displayName="2020 RPA Assessment forest products projections Folder (Ch7_LM_v2.csv, Ch7_HM_v2.csv, Ch7_HL_v2.csv, Ch7_HH_v2.csv; USFS, doi 10.2737/RDS-2022-0073-2; Land Use Demand: Forest Harvest, stage 9)" dataType="String" isOptional="True"/>
-		<column name="IclusCountyFile" displayName="EPA ICLUS v2.1.1 new developed land by county and decade (the Data Download's table from the 90 m maps; Land Use Demand, stage 9)" dataType="String" isOptional="True"/>
-		<column name="PopulationProjectionFile" displayName="County population projections by SSP, 2020-2100 (county totals of Hauer 2019, doi 10.17605/OSF.IO/9YNFC; Land Use Demand, stage 9)" dataType="String" isOptional="True"/>
-		<column name="CensusPopulationFile" displayName="Census county population estimates 2010-2020 (co-est2020-alldata.csv; Land Use Demand, stage 9)" dataType="String" isOptional="True"/>
+		<column name="RpaLandUseFile" displayName="2020 RPA Assessment county land-use projections (blank = the table the package ships; or county_landuse_projections_RPA.rds; USFS, doi 10.2737/RDS-2023-0026; Land Use Change, stage 9)" dataType="String" isOptional="True"/>
+		<column name="RpaForestProductsFolder" displayName="2020 RPA Assessment forest products projections (blank = the table the package ships; or a folder of Ch7_LM_v2.csv, Ch7_HM_v2.csv, Ch7_HL_v2.csv, Ch7_HH_v2.csv; USFS, doi 10.2737/RDS-2022-0073-2; Land Use Change: Forest Harvest, stage 9)" dataType="String" isOptional="True"/>
+		<column name="IclusCountyFile" displayName="EPA ICLUS v2.1.1 new developed land by county and decade (blank = the table the package ships, made from the 90 m maps; Land Use Change, stage 9)" dataType="String" isOptional="True"/>
+		<column name="PopulationProjectionFile" displayName="County population projections by SSP, 2020-2100 (county totals of Hauer 2019, doi 10.17605/OSF.IO/9YNFC; blank = the table the package ships; Land Use Change, stage 9)" dataType="String" isOptional="True"/>
+		<column name="CensusPopulationFile" displayName="Census county population estimates 2010-2020 (co-est2020-alldata.csv; blank = the table the package ships; Land Use Change, stage 9)" dataType="String" isOptional="True"/>
 		<column name="CdlFolder" displayName="Cropland Data Layer Folder (year_30m_cdls.tif; Cropland Productivity, stage 8)" dataType="String" isOptional="True"/>
 		<column name="TidalMarshNppFolder" displayName="USGS tidal marsh NPP Folder (NPP_CONUSTidalEEM_gCm2.tif, NPP_CONUSTidalPEM_gCm2.tif; Tidal Marsh Productivity, stage 8)" dataType="String" isOptional="True"/>
 	</dataSheet>

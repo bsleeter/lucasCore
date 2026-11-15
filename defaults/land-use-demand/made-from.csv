@@ -1,0 +1,6 @@
+Table,Source,SourceMd5,Rows,Made
+census-county-population.csv,co-est2020-alldata.csv,65f430d658319ff891641013138ce1b4,3143,2026-11-15
+hauer-county-population.csv,SSP_asrc.csv,f339b7e20c4549641e8fd8facfc848f3,53329,2026-11-15
+iclus-county-new-developed.csv,iclus_v211_county_new_developed.csv,1707a8736314a838def5efc697a8b0a6,27954,2026-11-15
+rpa-county-urbanization.csv,county_landuse_projections_RPA.rds,9678e79574e427a38013f056902fcdf6,18450,2026-11-15
+rpa-timber-harvest.csv,Ch7_LM_v2.csv,5215c353f1564423114fe5230dcdf2d3,24,2026-11-15

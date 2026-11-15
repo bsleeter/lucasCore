@@ -80,7 +80,11 @@ sheet_defaults <- function(name, quiet = FALSE) {
 # the project's Data Sources: a blank cell (or an empty sheet) takes the package default path; required columns must exist on disk.
 # Files the package ships: the dissolved FIA ecodivisions (ECOMAP 2007 divisions; ECOMAP 2025 renumbers them, so a fresh download
 # would not match the package's strata tables)
-PACKAGE_SOURCES <- list(EcodivisionFile = c("defaults", "strata", "ecodivisions", "EcoDivisions_Dissolve.shp"))
+PACKAGE_SOURCES <- list(EcodivisionFile = c("defaults", "strata", "ecodivisions", "EcoDivisions_Dissolve.shp"),
+  # Land Use Demand's tables (user 2026-11-15: shipped, not downloaded; made by tools/make_land_use_demand_tables.R from the published files)
+  RpaLandUseFile = c("defaults", "land-use-demand", "rpa-county-urbanization.csv"), RpaForestProductsFolder = c("defaults", "land-use-demand", "rpa-timber-harvest.csv"),
+  IclusCountyFile = c("defaults", "land-use-demand", "iclus-county-new-developed.csv"), PopulationProjectionFile = c("defaults", "land-use-demand", "hauer-county-population.csv"),
+  CensusPopulationFile = c("defaults", "land-use-demand", "census-county-population.csv"))
 # A blank path reads, in order: its place under Data Sources Home (src/datahome.R), the package's own copy (package.xml has no default paths:
 # the build machine's were removed 2026-11-02, so a dataset missing from the home stops with what to do)
 source(file.path(env$PackageDirectory, "src", "datahome.R"))
@@ -95,7 +99,7 @@ read_data_sources <- function(cols, optional = FALSE) {
   ed <- tryCatch(as.data.table(datasheet(prj, ds("DataSourceEdition"), optional = TRUE, lookupsAsFactors = FALSE)), error = function(e) data.table())
   ed <- if (nrow(ed) && all(c("DataSource", "Edition") %in% names(ed))) setNames(as.character(ed$Edition), ed$DataSource) else character()
   for (k in cols) { v <- if (nrow(d) && k %in% names(d)) d[[k]][1] else NA_character_; how <- "set"; dir <- NA_character_
-    if ((is.na(v) || !nzchar(v)) && !is.null(hl) && k %in% hl$Column) {
+    if ((is.na(v) || !nzchar(v)) && !is.null(hl) && k %in% hl[!is.na(HomePath), Column]) {   # (no home place: a table the package ships)
       # with region folders, the folder is chosen by the study area: the smallest region whose manifest covers it (datahome.R)
       want_ed <- if (k %in% names(ed) && !is.na(ed[[k]]) && nzchar(ed[[k]])) ed[[k]] else NULL
       pk <- tryCatch(home_pick(home, k, hl[Column == k, HomePath], if (regions || !is.null(want_ed)) study_box() else NULL, want_ed), error = function(e) fail("%s", conditionMessage(e)))

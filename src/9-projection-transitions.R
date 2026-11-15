@@ -270,10 +270,12 @@ dm_custom <- function(kind) { cr <- read_ds("LandUseDemandRatio")
   list(method = "Custom", Y = Y, pool = pool, cover = FALSE, cap = Inf) }
 if (dm$method == "RPA") { if (is.na(dm$pair)) fail("Land Use Demand: RPA scenario '%s' is not one of the four RPA pairs", dm$scenario)
   if (dm$pooling == "County") { say("Land Use Demand: RPA is not used county by county (its single counties are unreliable): pooled by metropolitan area"); dm$pooling <- "Metro" }
-  # the published county table (Data Source RpaLandUseFile, fetched by Data Download): ratios computed here, not shipped
+  # the county table the package ships (defaults/land-use-demand, reduced from the published file by tools/make_land_use_demand_tables.R),
+  # or the published .rds a Data Sources path names; the ratios are computed here
   rpa_f <- read_data_sources("RpaLandUseFile")$RpaLandUseFile
+  rpa_x <- tryCatch(if (grepl("[.]rds$", rpa_f, ignore.case = TRUE)) readRDS(rpa_f) else fread(rpa_f, colClasses = list(character = "Fips")), error = function(e) fail("Land Use Demand: %s could not be read (%s)", rpa_f, conditionMessage(e)))
   dm_cw <- read_default("strata", "msa-crosswalk.csv")
-  dm_a <- tryCatch(demand_rpa_areas(readRDS(rpa_f), dm$pair), error = function(e) fail("Land Use Demand: %s could not be read as the RPA county projections (%s)", rpa_f, conditionMessage(e)))
+  dm_a <- tryCatch(demand_rpa_areas(rpa_x, dm$pair), error = function(e) fail("Land Use Demand: %s could not be read as the RPA county projections (%s)", rpa_f, conditionMessage(e)))
   dm_R <- demand_ratios(dm_a, dm_cw, dm$pooling, dm$cap)
   dm_pool <- demand_unit(dm_county(), dm_cw, dm$pooling); here <- sort(unique(dm_pool[land]))
   say("Land Use Demand: urbanization follows the 2020 RPA Assessment (%s), %s, the mean of %d climate models; pooled by %s; ratio capped at %g",
@@ -288,7 +290,7 @@ if (dm$method == "RPA") { if (is.na(dm$pair)) fail("Land Use Demand: RPA scenari
   if (rs > 2020 || re < 2012) say("Land Use Demand: the reference period %d-%d does not overlap RPA's 2012-2020 step; the ratio still multiplies the drawn years as they are", rs, re)
   dm_Y <- demand_years(dm_R, DEMAND_MID, pyrs); dm_cover <- TRUE
 } else if (dm$method == "ICLUS") { if (is.na(dm$iclus)) fail("Land Use Demand: the ICLUS scenario is SSP2 (RCP4.5) or SSP5 (RCP8.5)")
-  # EPA ICLUS v2.1.1: the county table the Data Download makes from its 90 m maps (Data Source IclusCountyFile; src/iclus.R): new land
+  # EPA ICLUS v2.1.1: the county table made from its 90 m maps (shipped in defaults/land-use-demand; Data Source IclusCountyFile; src/iclus.R): new land
   # in classes 12-16 by decade, against its first modelled decade 2010-2020
   icf <- read_data_sources("IclusCountyFile")$IclusCountyFile; dm_cw <- read_default("strata", "msa-crosswalk.csv")
   dm_a <- tryCatch(demand_iclus_areas(fread(icf, colClasses = list(character = "Fips")), dm$iclus), error = function(e) fail("Land Use Demand: %s could not be read as the ICLUS county table (%s)", icf, conditionMessage(e)))
@@ -340,9 +342,10 @@ if (dm$method != "Historical") { dm_spec$Urbanization <- list(method = dm$method
 # Forest Harvest (clearcut and selection, each with its own target) has the same settings, and the 2020 RPA Assessment's timber harvest by
 # region as a published path. Forest Management rows (below) then act on the targets this leaves
 dm_harvest_rpa <- function() { if (is.na(dm$harvest_pair)) fail("Land Use Demand: the harvest scenario is one of the four RPA pairs")
-  hd <- read_data_sources("RpaForestProductsFolder")$RpaForestProductsFolder; hf <- file.path(hd, DEMAND_HARVEST_FILE[[dm$harvest_pair]])
-  if (!file.exists(hf)) fail("Land Use Demand: %s is not in %s (run a Data Download with RpaForestProductsFolder)", basename(hf), hd)
-  R <- tryCatch(demand_harvest_ratios(fread(hf, header = TRUE), dm$cap), error = function(e) fail("Land Use Demand: %s could not be read as the RPA forest products table (%s)", hf, conditionMessage(e)))
+  # the package's table (one file, a Scenario column), or a folder of the published tables a Data Sources path names
+  hd <- read_data_sources("RpaForestProductsFolder")$RpaForestProductsFolder; hf <- if (dir.exists(hd)) file.path(hd, DEMAND_HARVEST_FILE[[dm$harvest_pair]]) else hd
+  if (!file.exists(hf)) fail("Land Use Demand: %s is not in %s (the published tables of RDS-2022-0073-2; a blank Data Sources path uses the package's table)", basename(hf), hd)
+  R <- tryCatch({ ht <- fread(hf, header = TRUE); if ("Scenario" %in% names(ht)) ht <- ht[Scenario == dm$harvest_pair]; demand_harvest_ratios(ht, dm$cap) }, error = function(e) fail("Land Use Demand: %s could not be read as the RPA forest products table (%s)", hf, conditionMessage(e)))
   pool <- demand_harvest_region(dm_county()); here <- sort(unique(pool[land])); if (!length(here)) fail("Land Use Demand: no county of the study area is in an RPA region (the conterminous United States): set Forest Harvest Demand to Historical")
   Y <- demand_years(R, attr(R, "mid"), pyrs); yy <- intersect(c(2030L, 2050L, 2070L), pyrs)
   say("Land Use Demand: Forest Harvest follows the 2020 RPA Assessment's timber harvest (%s), %s, relative to 2020; RPA region%s %s%s; the 2070 value is kept afterwards; a ratio of volume, so volume per hectare is taken as unchanged",

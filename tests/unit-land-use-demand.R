@@ -201,20 +201,25 @@ check("package.xml declares the sheets and stage 9 reads and writes them", grepl
   grepl('<dataSheet name="LandUseDemand" type="Input"/>', x9, fixed = TRUE) && grepl('<dataSheet name="OutputLandUseDemand" type="Output"/>', x9, fixed = TRUE))
 check("Data Sources has the RpaLandUseFile column, and the update adds it to existing libraries", grepl('<column name="RpaLandUseFile"', x9, fixed = TRUE) &&
   any(grepl('AddColumn(store, "lucasCore_DataSource", "RpaLandUseFile"', readLines("ui/LucasCoreUpdates.cs", warn = FALSE), fixed = TRUE)))
-lay <- fread("defaults/library/data-sources.csv", colClasses = "character")[Column == "RpaLandUseFile"]
-check("data-sources.csv gives it a home place for one .rds file", nrow(lay) == 1 && lay$HomePath == "land-use/rpa-2020/*.rds")
-check("endpoints.csv and citations.csv have its rows", nrow(fread("defaults/download/endpoints.csv")[Column == "RpaLandUseFile" & Fetched == "yes"]) == 1 && nrow(fread("defaults/metadata/citations.csv")[Column == "RpaLandUseFile"]) == 1)
+# the five sources ship with the package (user 2026-11-15: tables, not downloads): defaults/land-use-demand, made by tools/make_land_use_demand_tables.R
+SHIP <- c(RpaLandUseFile = "rpa-county-urbanization.csv", RpaForestProductsFolder = "rpa-timber-harvest.csv", IclusCountyFile = "iclus-county-new-developed.csv",
+          PopulationProjectionFile = "hauer-county-population.csv", CensusPopulationFile = "census-county-population.csv")
 env <- list(PackageDirectory = "."); source("src/datahome.R"); source("src/download.R"); source("src/iclus.R"); source("src/download-sources.R")
-check("the Data Download stage loads the ICLUS tabulation its handler uses", any(grepl('pkg_file("src", "iclus.R")', readLines("src/15-data-download.R", warn = FALSE), fixed = TRUE)) &&
-  nrow(download_handlers()$IclusCountyFile$plan(list())) == 4)
-h <- download_handlers()$RpaLandUseFile
-check("the download handler fetches the release's zip, keeps the table whole (national) and writes the file the home place names", !is.null(h) && isTRUE(h$national) &&
-  grepl("RDS-2023-0026[.]zip$", h$plan(list())$url) && grepl("[.]rds$", lay$HomePath))
-check("no pre-computed ratios ship with the package", !file.exists("defaults/projection/rpa-urban-ratios.csv"))
-for (k in c("RpaForestProductsFolder", "IclusCountyFile", "PopulationProjectionFile", "CensusPopulationFile")) check(sprintf("%s: a Data Sources column, the update, a home place, an endpoint, a citation and a national download handler", k),
+sh <- paste(readLines("src/shared.R", warn = FALSE), collapse = "\n"); made <- fread("defaults/land-use-demand/made-from.csv")
+for (k in names(SHIP)) check(sprintf("%s: a Data Sources column, the update, shipped with the package (no home place, no download handler), a citation", k),
   grepl(sprintf('<column name="%s"', k), x9, fixed = TRUE) && any(grepl(sprintf('"lucasCore_DataSource", "%s"', k), readLines("ui/LucasCoreUpdates.cs", warn = FALSE), fixed = TRUE)) &&
-  nrow(fread("defaults/library/data-sources.csv", colClasses = "character")[Column == k & grepl("^land-use/", HomePath)]) == 1 &&
-  nrow(fread("defaults/download/endpoints.csv")[Column == k & Fetched == "yes"]) == 1 && nrow(fread("defaults/metadata/citations.csv")[Column == k]) == 1 && isTRUE(download_handlers()[[k]]$national))
+  nrow(fread("defaults/library/data-sources.csv", colClasses = "character", na.strings = "")[Column == k & Access == "package" & is.na(HomePath)]) == 1 &&
+  nrow(fread("defaults/download/endpoints.csv")[Column == k & Method == "package" & Fetched == "no"]) == 1 && nrow(fread("defaults/metadata/citations.csv")[Column == k]) == 1 &&
+  is.null(download_handlers()[[k]]) && file.exists(file.path("defaults/land-use-demand", SHIP[[k]])) && SHIP[[k]] %in% made$Table &&
+  grepl(sprintf('%s = c("defaults", "land-use-demand", "%s")', k, SHIP[[k]]), sh, fixed = TRUE))
+check("no pre-computed ratios ship with the package (the tables are the sources, reduced; the ratios are computed in the stage)", !file.exists("defaults/projection/rpa-urban-ratios.csv"))
+PK <- list(rpa = fread("defaults/land-use-demand/rpa-county-urbanization.csv", colClasses = list(character = "Fips")), iclus = fread("defaults/land-use-demand/iclus-county-new-developed.csv", colClasses = list(character = "Fips")),
+           hauer = fread("defaults/land-use-demand/hauer-county-population.csv"), census = fread("defaults/land-use-demand/census-county-population.csv", encoding = "Latin-1"), harvest = fread("defaults/land-use-demand/rpa-timber-harvest.csv", header = TRUE))
+a5 <- demand_rpa_areas(PK$rpa, "rcp85_ssp5")
+check("package RPA table: five climate models a pair, 3,075 counties, about 3,600 km2 a year in 2012-2020", attr(a5, "models") == 5 && uniqueN(a5$Fips) == 3075 && abs(a5[Step == DEMAND_CAL, sum(PerYear)] - 3600) < 150)
+check("package ICLUS table: two climate models a scenario", attr(demand_iclus_areas(PK$iclus, "SSP5"), "models") == 2)
+check("package population tables: over 3,000 counties under every SSP", all(vapply(DEMAND_SSPS, function(s) uniqueN(demand_population(PK$hauer, PK$census, s)$Fips) > 3000, TRUE)))
+check("package harvest table: the six regions for each of the four scenarios", all(vapply(names(DEMAND_HARVEST_FILE), function(p) nrow(demand_harvest_ratios(PK$harvest[Scenario == p], 99)) == 6, TRUE)))
 check("package.xml declares the custom table and stage 9 reads it", grepl('<dataSheet name="LandUseDemandRatio"', x9, fixed = TRUE) && grepl('<dataSheet name="LandUseDemandRatio" type="Input"/>', x9, fixed = TRUE))
 check("every method of the sheet's list is one the stage knows", { m <- regmatches(x9, regexpr('name="UrbanMethod"[^>]*formula1="[^"]*"', x9)); it <- strsplit(sub('.*formula1="([^"]*)"', "\\1", m), "|", fixed = TRUE)[[1]]
   setequal(vapply(sub("^[0-9]+:", "", it), function(s) demand_options(data.table(UrbanMethod = s))$method, ""), DEMAND_METHODS) })
@@ -254,4 +259,13 @@ if (all(file.exists(file.path(fd, DEMAND_HARVEST_FILE)))) { hr <- lapply(DEMAND_
   check("RPA forest products: low growth (SSP3) the least and high growth (SSP5) the most in 2070", all(hr$rcp85_ssp3[, "2070"] < hr$rcp85_ssp2[, "2070"]) && all(hr$rcp85_ssp2[, "2070"] < hr$rcp85_ssp5[names(DEMAND_HARVEST_REGIONS), "2070"][rownames(hr$rcp85_ssp2)]))
   cat(sprintf("  Pacific Coast harvest in 2070 against 2020: SSP3 %.2f, SSP2 %.2f, SSP1 %.2f, SSP5 %.2f\n", hr$rcp85_ssp3["Pacific Coast", "2070"], hr$rcp85_ssp2["Pacific Coast", "2070"], hr$rcp45_ssp1["Pacific Coast", "2070"], hr$rcp85_ssp5["Pacific Coast", "2070"]))
 } else cat("skip: the RPA forest products tables are not in the Data Sources folder\n")
+# ---- the package's tables give the ratios of the published files (when those are in the Data Sources folder) ----
+eq <- function(a, b, tol = 1e-3) identical(dim(a), dim(b)) && identical(dimnames(a), dimnames(b)) && max(abs(a - b)) < tol
+if (file.exists(f)) check("package RPA table = the published .rds: the same metropolitan ratios for every pair", all(vapply(DEMAND_PAIRS, function(p) eq(demand_ratios(demand_rpa_areas(PK$rpa, p), cw, "Metro", 3), demand_ratios(demand_rpa_areas(X, p), cw, "Metro", 3)), TRUE)))
+if (file.exists(hf) && file.exists(cf)) check("package population tables = the published ones: the same county ratios for every SSP", all(vapply(DEMAND_SSPS, function(s) eq(
+  demand_population_ratios(demand_population(PK$hauer, PK$census, s), cw, "County", 1, cap = 99), demand_population_ratios(demand_population(H, C, s), cw, "County", 1, cap = 99)), TRUE)))
+if (file.exists(icf)) check("package ICLUS table = the tabulated one: the same metropolitan ratios for both scenarios", all(vapply(c("SSP2", "SSP5"), function(s) { a <- demand_iclus_areas(PK$iclus, s); b <- demand_iclus_areas(T, s)
+  eq(demand_ratios(a, cw, "Metro", 3, DEMAND_ICLUS_MIN_CAL, DEMAND_ICLUS_CAL, attr(a, "steps")), demand_ratios(b, cw, "Metro", 3, DEMAND_ICLUS_MIN_CAL, DEMAND_ICLUS_CAL, attr(b, "steps"))) }, TRUE)))
+if (all(file.exists(file.path(fd, DEMAND_HARVEST_FILE)))) check("package harvest table = the published tables: the same regional ratios for every scenario", all(vapply(names(DEMAND_HARVEST_FILE), function(p)
+  eq(demand_harvest_ratios(PK$harvest[Scenario == p], 99), demand_harvest_ratios(fread(file.path(fd, DEMAND_HARVEST_FILE[[p]]), header = TRUE), 99), 1e-9), TRUE)))
 cat(sprintf("%d checks, %d failed\n", n, fails)); if (fails) quit(status = 1)
