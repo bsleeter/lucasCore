@@ -18,7 +18,8 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
 - A Historical or Projection scenario made in Studio on a Build result had no tabular state class or transition output: the Build
   wrote the stock and flow output options, the spatial output options and the three output filters, and not ST-Sim's Output
   Options (only `tools/new-historical.R` and `tools/new-projection.R` set them). Stage 0 now writes them whenever the scenario
-  has none (`defaults/stockflow/stsim_OutputOptions.csv`: state class and transition summaries every year). A scenario that sets
+  has none (`defaults/stockflow/stsim_OutputOptions.csv`: state class, transition and transition attribute summaries every year; the
+  attributes are where management costs are reported). A scenario that sets
   its own Output Options replaces them whole. A Build made before this needs stage 0 rerun, or the two boxes ticked by hand.
 - Data Download page: RCMAP Cover Time Series was listed but could not be ticked (its row in `defaults/download/endpoints.csv`
   had no Fetched value), yet a download with every dataset ticked fetched it anyway: 188 GB that no stage reads (only
