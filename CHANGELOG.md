@@ -2,7 +2,15 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
-## Unreleased
+## 1.4.0 - 2026-11-15
+
+What happens after a disturbance, and what people do about it: burned and harvested land now sits in disturbed classes that return
+or convert, land reforests, and projections can carry post-disturbance recovery, forest management, fuel treatments and rangeland
+restoration with their costs. Also new: harvested wood products, and alternative amounts of land use change in projections.
+
+**Upgrading:** install `lucasCore-1.4.0.ssimpkg` in place of 1.3.2, and back up each library's .ssim before opening it: library update 1.4 runs when a 1.3 library is opened. It adds the Disturbed state classes with their return and conversion transitions, the management transitions and their costs, the Reforestation group and types, the simulation group, and the new columns (BpsFile,
+the Land Cover Layers maps). A library needs a Data Download of BpsFile and a new Build for reforestation; with BpS missing and
+Reforestation on, stage 5 stops with a message. Turn it off on Reforestation Options to build as before.
 
 ### Added
 - Land Use Demand: alternative amounts of urbanization in a projection, to see a wide range of what could happen with development
@@ -50,12 +58,9 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   the source. The analysis behind the choices is in `dev/land-use-demand`: RPA against Annual NLCD 2012-2020 for 3,021 counties
   (urbanization agrees in total, 0.96, not by county; agriculture does not agree); the population model explains where
   development is (R2 0.67) but not how a county's rate changes between decades, so its county ratios are scenarios, not
-  predictions. Tests: `tests/unit-land-use-demand.R`, and
-  `tests/phaseZ32-land-use-demand.R` (stage 9 alone on a Build result, once per method: Puget Lowland at 990 m, 13 variants, every
-  check passed and the kinds without a setting kept the baseline's targets). Not done: `lucasCoreUI.dll` is not rebuilt, and the
-  new Data Sources columns are added in the 1.4 update, which a library already at 1.4 will not run again (it then fails to
-  open: add the columns with `tools/sync-library.R`, or move them to a 1.5 update); the download handlers have not fetched
-  through a Data Download run.
+  predictions. Tests: `tests/unit-land-use-demand.R`, and `tests/phaseZ32-land-use-demand.R` (stage 9 alone on a Build result, once
+  per method: Puget Lowland at 990 m; every check passed and the kinds without a setting kept the baseline's targets). Known
+  limit: the five download handlers have not yet fetched their sources through a Data Download run.
 
 - Stage 18 - Wood Products (to-do 59): what becomes of the carbon a run harvests. ST-Sim moves harvest and land-clearing wood to
   Forestry Sector and nothing flows out of it; this stage follows it through products in use, landfills and dumps, by year, with
@@ -72,84 +77,6 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   store added, the production approach), and in Compare Runs' carbon summary the columns HWP and NBP + HWP (Compare Carbon Summary:
   HwpStored, HwpStockChange, NbpWithProducts). A historical run takes its projection's result when it has none of its own. Runs
   without a result are drawn as before. Test: `tests/phaseZ31-wood-products-figures.R`.
-
-### Fixed
-- Data Download fetched the Cropland Data Layer again when its files had been unzipped into `land-cover/cdl` by hand over a failed
-  earlier download, and failed again. The Data Sources page then showed "home failed", and a Build could stop on the failed
-  manifest row. A year whose file is in place and is the national 30 m layer is now recorded as it is, with its checksum, by hand.
-  Only the missing years are fetched.
-- Run Figures and Compare Runs stopped with "Object reference not set to an instance of an object" when the Build result they
-  depend on had lost its maps from the library's data folder (Puget Lowlands). They now take the model grid from the run's own
-  initial conditions map when the Build's cannot be read, and say so in the log.
-- Compare Runs' summary tables: a long run name or many columns made the headers and values overlap. Columns are now sized by the
-  width of their text as drawn, and the table scaled to fit.
-
-### Changed
-- Projection pages reorganized by what drives the change. Transitions is now **Land Use** (urbanization, intensification,
-  agriculture, forest harvest), laid out as the management pages: each group with its choices and a short note beside them (how
-  much and by which strata or rate units, the shared draw, protected land as GAP check boxes, and where each of its types goes:
-  method, surface, adjacency for land use, patch sizes), written straight into its row, and an "In words" sentence per group.
-  Fire's row (rate units, shared draw, protected land) moved to the top of the **Fire** page. New **Natural Change** page:
-  Reforestation Options (moved from its own item) and the Reforestation row; insects and drought go here later. The two tables
-  stay on Land Use behind **Show tables** (source and event classes are edited there); Forest Management, Fuel Treatments and
-  Management Actions hide their tables behind **Show table** too. Management Actions is renamed **Post-Disturbance Recovery**
-  (its outputs: Post-Disturbance Recovery (as set up)). Projection menu: Run Settings, Land Use, Spatial Allocation, Fire, Natural
-  Change, Fuel Treatments, Forest Management, Post-Disturbance Recovery, Climate. Display only: no change to the sheets or results.
-
-## 1.3.2 - 2026-11-11
-
-A fix for projections started from a 1.3 historical run, and better starting ages for regrowing forest.
-
-**Upgrading:** install `lucasCore-1.3.2.ssimpkg` in place of 1.3.1. There is no library update: switch a library's lucasCore
-package to 1.3.2 (`SyncroSim.Console.exe --add --package --pkg=lucasCore --ver=1.3.2 --lib=<library.ssim>`). Both changes take
-effect at the next Build; rerun the Build and then the historical run before a Projection Setup that starts from it.
-
-### Fixed
-- A Projection Setup that starts from a historical run stopped with "historical run ... has no <year> map for DOM: Peat". The
-  stock output filter still had peat maps off from before 1.3.0 filled that stock, so a historical run wrote no final peat map.
-  Peat maps are now on (`defaults/stockflow/stsim_OutputFilterStocks.csv`).
-
-### Changed
-- Build stage 5: a cell that starts as forest only because NLCD shows it as forest in a later year, and whose record shows it
-  regrowing (not forest at the start, then forest within 20 years and staying forest), takes its starting stand age from that
-  record instead of from NASA CMS or TreeMap. Those sources gave 1980s clearcuts and burns ages of about 45 years, so they started
-  with mature forest carbon and their regrowth was missed. Settings in `defaults/landcover/regrowth-age.csv`. On existing maps this
-  resets 45 kha in the Northern Sierra Nevada (P26) and 58 kha in the Puget Lowlands. Changes Build results.
-- Build stage 5: reforestation (to-do 57). A natural cell that is barren, shrub, grass or emergent wetland at the start and that
-  NLCD later shows as forest no longer always starts as forest. It starts as its start-year class when its potential vegetation
-  (LANDFIRE BpS 2020) is not forest, or when it is forest potential but NLCD first shows forest only at or after its ecodivision's
-  cutoff: 11-12 years in the Southeast, 18-20 in the East and Marine lowlands, 23-24 in the Marine and Mediterranean mountains,
-  26-29 in the dry West (`defaults/landcover/reforestation-cutoff.csv`, fitted by `tools/fit_reforestation_cutoff.R` as the 90th
-  percentile of the years forest takes to come back after a dated clearcut or high-severity fire). Cells that come back before
-  the cutoff stay forest with the regrowth age, as do cells that flicker between forest and shrub or grass. On Lassen Volcanic
-  National Park (150 m) 117 of 6,591 such cells reforest, and the start has 0.8% less live carbon. Changes Build results.
-- Post-disturbance settings fitted (`defaults/transitions/post-disturbance-settings.csv`, to-do 57 step 7). Forest by ecodivision
-  from MTBS high-severity loss followed in NLCD (`tools/fit_post_disturbance.R`). Shrub classes from RCMAP sagebrush and shrub
-  cover after moderate and high severity fire on NLCD shrub pixels (`tools/fit_shrub_post_disturbance.R`): Sage and Native Sage
-  Steppe window 27 years, 43% back; Invaded Sage Steppe kept slower (0.6 times the return probability, reburns convert); Non-sage
-  20 years, 79% back; Chaparral 8 years, 87% back, reburn conversion 0.10. Changes Build and Run results.
-- Moderate-severity fire is now stand-replacing in the shrub classes (Sage, Native and Invaded Sage Steppe, Non-sage, Chaparral):
-  like high severity it moves the cell into its disturbed class (age reset), and a moderate or high reburn there can convert it.
-  RCMAP shows moderate-severity shrub fire losing and regaining cover as high-severity fire does. Its carbon follows: moderate fire
-  in these classes burns and kills what high-severity fire does (`defaults/stockflow/nonforest-fire.csv`). Forest is unchanged
-  (high only). Changes Run results.
-- `Forest Harvest: Salvage Logging` now acts on the 31 disturbed forest classes (28 upland, 3 wetland twins) instead of the live
-  forest classes: within 5 years of the disturbance (the class's age), staying in the class with its age, so return and conversion
-  keep their clock. Its carbon flows are unchanged and on a disturbed class take mostly snags to the forestry sector. Salvage has
-  no mapped source or default target, so results do not change; it is there for management scenarios (to-do 58).
-- Build stage 5: a check that every forest cell has an age failed when a fire perimeter started cells in a disturbed class; it now
-  allows the disturbed classes an age, and names any failing cells by class.
-
-### Removed
-- `Shrubland: Post Fire Shrub` (class 59) and the two transition types that led to it (`Ag Contraction Cropland: Shrubland Post
-  Fire Shrub`, `Ag Contraction Pasture: Shrubland Post Fire Shrub`). Nothing reached the class: no cell starts in it, agriculture
-  contracts to the nearest natural class, and fire now moves land into the disturbed classes. New libraries no longer have it;
-  existing libraries keep it in their lists, unused. No change to results.
-- The 28 `Succession Post Fire: <type>` transition types and their groups (`Succession: Post Fire Recovery` and the empty
-  `Succession`). No pathway used them: burned forest now returns from its disturbed class by `Post-disturbance: Forest Return`.
-  Same as above for new and existing libraries. No change to results.
-
-### Added
 - Management Actions (Projection > Management Actions; to-do 58): replanting after a disturbance, with or without site preparation
   (pile and burn, or mechanical), and salvage logging, as an area a year in chosen years and strata units, within a window of
   years since the disturbance. Replanting returns disturbed forest to its own type at age 0; a survival share fails and stays
@@ -223,7 +150,61 @@ effect at the next Build; rerun the Build and then the historical run before a P
   (custom sources now take Numbers 11-20).
 - `tools/new-projection.R --base=<id> --also=<ids>`: a projection on a Projection Setup made on a quick-test result.
 
+### Changed
+- Projection pages reorganized by what drives the change. Transitions is now **Land Use Change** (its layout: see Added; urbanization, intensification,
+  agriculture, forest harvest), laid out as the management pages: each group with its choices and a short note beside them (how
+  much and by which strata or rate units, the shared draw, protected land as GAP check boxes, and where each of its types goes:
+  method, surface, adjacency for land use, patch sizes), written straight into its row, and an "In words" sentence per group.
+  Fire's row (rate units, shared draw, protected land) moved to the top of the **Fire** page. New **Natural Change** page:
+  Reforestation Options (moved from its own item) and the Reforestation row; insects and drought go here later. The two tables
+  stay on Land Use behind **Show tables** (source and event classes are edited there); Forest Management, Fuel Treatments and
+  Management Actions hide their tables behind **Show table** too. Management Actions is renamed **Post-Disturbance Recovery**
+  (its outputs: Post-Disturbance Recovery (as set up)). Projection menu: Run Settings, Land Use Change, Spatial Allocation, Fire, Natural
+  Change, Fuel Treatments, Forest Management, Post-Disturbance Recovery, Climate. Display only: no change to the sheets or results.
+- Build stage 5: reforestation (to-do 57). A natural cell that is barren, shrub, grass or emergent wetland at the start and that
+  NLCD later shows as forest no longer always starts as forest. It starts as its start-year class when its potential vegetation
+  (LANDFIRE BpS 2020) is not forest, or when it is forest potential but NLCD first shows forest only at or after its ecodivision's
+  cutoff: 11-12 years in the Southeast, 18-20 in the East and Marine lowlands, 23-24 in the Marine and Mediterranean mountains,
+  26-29 in the dry West (`defaults/landcover/reforestation-cutoff.csv`, fitted by `tools/fit_reforestation_cutoff.R` as the 90th
+  percentile of the years forest takes to come back after a dated clearcut or high-severity fire). Cells that come back before
+  the cutoff stay forest with the regrowth age, as do cells that flicker between forest and shrub or grass. On Lassen Volcanic
+  National Park (150 m) 117 of 6,591 such cells reforest, and the start has 0.8% less live carbon. Changes Build results.
+- Post-disturbance settings fitted (`defaults/transitions/post-disturbance-settings.csv`, to-do 57 step 7). Forest by ecodivision
+  from MTBS high-severity loss followed in NLCD (`tools/fit_post_disturbance.R`). Shrub classes from RCMAP sagebrush and shrub
+  cover after moderate and high severity fire on NLCD shrub pixels (`tools/fit_shrub_post_disturbance.R`): Sage and Native Sage
+  Steppe window 27 years, 43% back; Invaded Sage Steppe kept slower (0.6 times the return probability, reburns convert); Non-sage
+  20 years, 79% back; Chaparral 8 years, 87% back, reburn conversion 0.10. Changes Build and Run results.
+- Moderate-severity fire is now stand-replacing in the shrub classes (Sage, Native and Invaded Sage Steppe, Non-sage, Chaparral):
+  like high severity it moves the cell into its disturbed class (age reset), and a moderate or high reburn there can convert it.
+  RCMAP shows moderate-severity shrub fire losing and regaining cover as high-severity fire does. Its carbon follows: moderate fire
+  in these classes burns and kills what high-severity fire does (`defaults/stockflow/nonforest-fire.csv`). Forest is unchanged
+  (high only). Changes Run results.
+- `Forest Harvest: Salvage Logging` now acts on the 31 disturbed forest classes (28 upland, 3 wetland twins) instead of the live
+  forest classes: within 5 years of the disturbance (the class's age), staying in the class with its age, so return and conversion
+  keep their clock. Its carbon flows are unchanged and on a disturbed class take mostly snags to the forestry sector. Salvage has
+  no mapped source or default target, so results do not change; it is there for management scenarios (to-do 58).
+- Build stage 5: a check that every forest cell has an age failed when a fire perimeter started cells in a disturbed class; it now
+  allows the disturbed classes an age, and names any failing cells by class.
+
+### Removed
+- `Shrubland: Post Fire Shrub` (class 59) and the two transition types that led to it (`Ag Contraction Cropland: Shrubland Post
+  Fire Shrub`, `Ag Contraction Pasture: Shrubland Post Fire Shrub`). Nothing reached the class: no cell starts in it, agriculture
+  contracts to the nearest natural class, and fire now moves land into the disturbed classes. New libraries no longer have it;
+  existing libraries keep it in their lists, unused. No change to results.
+- The 28 `Succession Post Fire: <type>` transition types and their groups (`Succession: Post Fire Recovery` and the empty
+  `Succession`). No pathway used them: burned forest now returns from its disturbed class by `Post-disturbance: Forest Return`.
+  Same as above for new and existing libraries. No change to results.
+
 ### Fixed
+- Data Download fetched the Cropland Data Layer again when its files had been unzipped into `land-cover/cdl` by hand over a failed
+  earlier download, and failed again. The Data Sources page then showed "home failed", and a Build could stop on the failed
+  manifest row. A year whose file is in place and is the national 30 m layer is now recorded as it is, with its checksum, by hand.
+  Only the missing years are fetched.
+- Run Figures and Compare Runs stopped with "Object reference not set to an instance of an object" when the Build result they
+  depend on had lost its maps from the library's data folder (Puget Lowlands). They now take the model grid from the run's own
+  initial conditions map when the Build's cannot be read, and say so in the log.
+- Compare Runs' summary tables: a long run name or many columns made the headers and values overlap. Columns are now sized by the
+  width of their text as drawn, and the table scaled to fit.
 - Ag Change targets were ignored in spatial projections (ST-Sim warned "At least one Transition Target has been defined with a
   non-primary Transition Group"; seen in 1.3.2 too). Ag Change was a transition simulation group, so it was the primary group of
   both its types, while their targets (one area per unit each) are on the types' own `[Type]` groups; ST-Sim's spatial allocation
@@ -233,9 +214,25 @@ effect at the next Build; rerun the Build and then the historical run before a P
   delete Ag Change from the project's Transition Simulation Groups. Changes projection results where cropland or pasture change
   (not Lassen). New `tests/unit-primary-groups.R`: every default and management target is on a primary group.
 
-**Upgrading (1.4):** library update 1.4 adds the Reforestation group and types, the simulation group, and the new columns (BpsFile,
-the Land Cover Layers maps). A library needs a Data Download of BpsFile and a new Build for reforestation; with BpS missing and
-Reforestation on, stage 5 stops with a message. Turn it off on Reforestation Options to build as before.
+## 1.3.2 - 2026-11-11
+
+A fix for projections started from a 1.3 historical run, and better starting ages for regrowing forest.
+
+**Upgrading:** install `lucasCore-1.3.2.ssimpkg` in place of 1.3.1. There is no library update: switch a library's lucasCore
+package to 1.3.2 (`SyncroSim.Console.exe --add --package --pkg=lucasCore --ver=1.3.2 --lib=<library.ssim>`). Both changes take
+effect at the next Build; rerun the Build and then the historical run before a Projection Setup that starts from it.
+
+### Fixed
+- A Projection Setup that starts from a historical run stopped with "historical run ... has no <year> map for DOM: Peat". The
+  stock output filter still had peat maps off from before 1.3.0 filled that stock, so a historical run wrote no final peat map.
+  Peat maps are now on (`defaults/stockflow/stsim_OutputFilterStocks.csv`).
+
+### Changed
+- Build stage 5: a cell that starts as forest only because NLCD shows it as forest in a later year, and whose record shows it
+  regrowing (not forest at the start, then forest within 20 years and staying forest), takes its starting stand age from that
+  record instead of from NASA CMS or TreeMap. Those sources gave 1980s clearcuts and burns ages of about 45 years, so they started
+  with mature forest carbon and their regrowth was missed. Settings in `defaults/landcover/regrowth-age.csv`. On existing maps this
+  resets 45 kha in the Northern Sierra Nevada (P26) and 58 kha in the Puget Lowlands. Changes Build results.
 
 ## 1.3.1 - 2026-11-11
 
