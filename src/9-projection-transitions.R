@@ -353,6 +353,20 @@ for (k in c("Ag Expansion", "Ag Contraction", "Forest Harvest")) { mk <- dm$ag[[
   if (!any(startsWith(tg$TransitionGroupId, k))) { say("Land Use Demand: %s has no Target group in Projection Transitions: its setting (%s) is not used", k, mk); next }
   dm_spec[[k]] <- if (mk == "Custom") dm_custom(k) else if (mk == "RPA") dm_harvest_rpa() else { say("Land Use Demand: %s at each target unit's %s third of reference years, capped at %g", k, if (mk == "High") "highest" else "lowest", dm$cap)
     list(method = mk, cover = FALSE, cap = dm$cap) } }
+# Ag Change (user 2026-11-15: "apply the base set of options to Ag Change ... More intensive and less intensive slider", kept to cropland
+# and pasture): one method for both directions (the record's high or low years, or as drawn), and a balance that moves them apart -
+# pasture to cropland times the balance, cropland to pasture over it, within the cap. A custom table sets each direction itself (Applies
+# To: Cropland to Pasture, Pasture to Cropland; a direction without rows stays as drawn), so the balance is not used with it
+dm_dirs <- c("Cropland to Pasture", "Pasture to Cropland")
+if (dm$change$method != "Historical" || dm$change$balance != 1) {
+  if (!any(startsWith(tg$TransitionGroupId, "Ag Change"))) say("Land Use Demand: Ag Change has no Target group in Projection Transitions: its setting is not used")
+  else if (dm$change$method == "Custom") { cr <- read_ds("LandUseDemandRatio"); ap <- if (nrow(cr) && "AppliesTo" %in% names(cr)) as.character(cr$AppliesTo) else character(0)
+    if (!any(ap %in% dm_dirs)) fail("Land Use Demand: Custom ratio table is chosen for cropland and pasture exchange, and the Land Use Change page has no custom multipliers for either direction")
+    for (k in intersect(dm_dirs, ap)) dm_spec[[paste("Ag Change:", k)]] <- dm_custom(k)
+  } else { b <- dm$change$balance
+    say("Land Use Demand: Ag Change %s; balance %.2f: pasture to cropland x %.2f, cropland to pasture x %.2f, capped at %g", c(Historical = "as the drawn historical years", High = "at each target unit's highest third of reference years",
+        Low = "at each target unit's lowest third of reference years")[[dm$change$method]], b, b, 1 / b, dm$cap)
+    for (j in 1:2) dm_spec[[paste("Ag Change:", dm_dirs[j])]] <- list(method = dm$change$method, cover = FALSE, cap = dm$cap, factor = if (j == 2) b else 1 / b) } }
 dm_kind <- function(g) { k <- names(dm_spec)[vapply(names(dm_spec), function(n) startsWith(g, n), TRUE)]; if (length(k)) dm_spec[[k[1]]] else NULL }
 for (i in seq_len(nrow(tg))) { g <- tg$TransitionGroupId[i]; L <- tg$StrataLevel[i]; u <- lev[[L]]; units <- sort(unique(u[land])); ms <- mem[[g]]
   sp <- dm_kind(g); dm_w <- !is.null(sp); wcell[] <- 0
@@ -379,7 +393,8 @@ for (i in seq_len(nrow(tg))) { g <- tg$TransitionGroupId[i]; L <- tg$StrataLevel
   d <- dr[, .(Unit = units), by = .(Iteration, Timestep, HistoricalYear)]
   d[, Amount := a[cbind(match(Unit, units), match(HistoricalYear, ref))]]
   if (dm_w) {   # Land Use Demand: each target unit's ratio by year
-    if (sp$method %in% c("High", "Low")) {   # the record's own range: the unit's highest or lowest third of the years its draws come from
+    if (sp$method == "Historical") RU <- matrix(1, nrow = length(units), ncol = length(pyrs), dimnames = list(units, pyrs))   # (as drawn: only a factor, below)
+    else if (sp$method %in% c("High", "Low")) {   # the record's own range: the unit's highest or lowest third of the years its draws come from
       hr <- demand_history_ratio(a[, as.character(ref_of(tg$SamplingSet[i])), drop = FALSE], sp$method, cap = sp$cap)
       RU <- matrix(rep(hr, length(pyrs)), nrow = length(units), dimnames = list(units, pyrs))
     } else {   # its cells' ratios (their county's pooled unit, or custom unit), weighted by their historical area
@@ -390,6 +405,7 @@ for (i in seq_len(nrow(tg))) { g <- tg$TransitionGroupId[i]; L <- tg$StrataLevel
       # Target Strata coarser than the ratio units (a state, an ecoregion): one blended ratio per target unit
       spn <- attr(RU, "span"); if (max(spn) > 1) say("%s: %d of %d %s target units span several ratio units (up to %d): each gets one ratio, the mean weighted by where its historical area was, so the differences inside a unit are not carried (use Counties as the Target Strata to keep them)",
                                                    g, sum(spn > 1), length(spn), L, max(spn)) }
+    if (!is.null(sp$factor) && sp$factor != 1) RU[] <- pmin(RU * sp$factor, sp$cap)   # (Ag Change's balance: this direction's share of it)
     d[, Ratio := RU[cbind(match(Unit, as.numeric(rownames(RU))), match(Timestep, pyrs))]]; d[is.na(Ratio), Ratio := 1]
     a0 <- d[, sum(Amount)]; d[, Amount := Amount * Ratio]
     dm_out[[g]] <- d[, .(Ratio = Ratio[1], MeanArea = mean(Amount) / cell_amt * cell_km2), by = .(Unit, Timestep)][, .(TransitionGroup = g, Unit = nm[match(Unit, units)], Timestep, Ratio, MeanArea)]

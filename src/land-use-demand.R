@@ -69,6 +69,9 @@ demand_options <- function(x) { v <- function(k, d) if (is.null(x) || !nrow(x) |
   hpair <- if (length(hg) == 4) sprintf("rcp%s%s_ssp%s", hg[2], hg[3], hg[4]) else NA_character_; if (!hpair %in% DEMAND_PAIRS) hpair <- NA_character_
   list(method = method, rpa = method == "RPA", pair = pair, scenario = sc, harvest_pair = hpair,
        ag = list(`Ag Expansion` = agm("AgExpansionMethod"), `Ag Contraction` = agm("AgContractionMethod"), `Forest Harvest` = if (grepl("RPA", hm, ignore.case = TRUE)) "RPA" else agm("HarvestMethod")), ssp = if (length(ssp) == 1 && ssp %in% DEMAND_SSPS) ssp else NA_character_, iclus = if (length(ic) == 1 && ic %in% c("SSP2", "SSP5")) ic else NA_character_,
+       # Ag Change (cropland to pasture, pasture to cropland): one method for both directions, and a balance that moves them apart
+       # (pasture to cropland times it, cropland to pasture over it; above 1 = more cropland, the more intensive agriculture)
+       change = list(method = agm("AgChangeMethod"), balance = { b <- num("AgChangeBalance", 1); if (b <= 0) 1 else b }),
        land = num("LandPerNewResident", 1), weight = num("NewResidentWeight", DEMAND_L), pooling = pool, cap = cap) }
 
 # ---- the common currency: ratios at anchor years to ratios by year ------------------------------------------------------------------

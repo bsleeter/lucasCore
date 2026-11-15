@@ -185,7 +185,7 @@ namespace lucasCoreUI
 
         public class Spec
         {
-            public string Title, Prefix, MethodCol, ScenarioCol, Fixed; public int AppliesTo; public int[] Means, Stored; public string[] Columns;
+            public string Title, Prefix, MethodCol, ScenarioCol, Fixed = null, BalanceCol; public int AppliesTo, AltAppliesTo; public int[] Means, Stored; public string[] Columns;
         }
         public static readonly Spec[] SPECS = {
             new Spec { Title = "Urbanization", Prefix = "Urbanization", MethodCol = "UrbanMethod", ScenarioCol = "UrbanScenario", AppliesTo = 1,
@@ -196,7 +196,9 @@ namespace lucasCoreUI
                        Means = new[] { SAME, HIGH, LOW, CUSTOM }, Stored = new[] { 1, 2, 3, 4 }, Columns = new[] { "AgExpansionMethod", "UrbanMaxRatio" } },
             new Spec { Title = "Agricultural contraction", Prefix = "Ag Contraction", MethodCol = "AgContractionMethod", AppliesTo = 3,
                        Means = new[] { SAME, HIGH, LOW, CUSTOM }, Stored = new[] { 1, 2, 3, 4 }, Columns = new[] { "AgContractionMethod", "UrbanMaxRatio" } },
-            new Spec { Title = "Cropland and pasture exchange", Prefix = "Ag Change", Fixed = "Same as the reference period: the drawn year's area of cropland becoming pasture and pasture becoming cropland. There are no alternatives for this kind." },
+            // both directions take the method; the balance moves them apart (user 2026-11-15: "More intensive and less intensive slider")
+            new Spec { Title = "Cropland and pasture exchange", Prefix = "Ag Change", MethodCol = "AgChangeMethod", AppliesTo = 5, AltAppliesTo = 6, BalanceCol = "AgChangeBalance",
+                       Means = new[] { SAME, HIGH, LOW, CUSTOM }, Stored = new[] { 1, 2, 3, 4 }, Columns = new[] { "AgChangeMethod", "AgChangeBalance", "UrbanMaxRatio" } },
             new Spec { Title = "Forest harvest", Prefix = "Forest Harvest", MethodCol = "HarvestMethod", ScenarioCol = "HarvestScenario", AppliesTo = 4,
                        Means = new[] { SAME, HIGH, LOW, RPA, CUSTOM }, Stored = new[] { 1, 2, 3, 5, 4 }, Columns = new[] { "HarvestMethod", "HarvestScenario", "UrbanMaxRatio" } } };
 
@@ -212,7 +214,12 @@ namespace lucasCoreUI
         private readonly ComboBox m_how = List(270), m_rpa = List(300), m_iclus = List(140), m_ssp = List(80), m_pool = List(300), m_kind = List(150);
         private readonly ComboBox m_unit = new ComboBox { DropDownStyle = ComboBoxStyle.DropDown, Width = 190, AutoCompleteMode = AutoCompleteMode.SuggestAppend, AutoCompleteSource = AutoCompleteSource.ListItems, MaxDropDownItems = 20, Margin = new Padding(3, 3, 8, 3) };
         private readonly TrackBar m_track = new TrackBar { Minimum = 5, Maximum = 40, TickFrequency = 5, SmallChange = 1, LargeChange = 5, AutoSize = false, Size = new Size(170, 28), Margin = new Padding(0, 2, 0, 0) };
-        private readonly TextBox m_land = Box(48), m_weight = Box(52), m_year = Box(52), m_mult = Box(52);
+        private readonly TextBox m_land = Box(48), m_weight = Box(52), m_year = Box(52), m_mult = Box(52), m_balBox = Box(48);
+        // the balance: 3^(v/20), so 1/3 to 3 with 1 in the middle
+        private readonly TrackBar m_bal = new TrackBar { Minimum = -20, Maximum = 20, TickFrequency = 10, SmallChange = 1, LargeChange = 5, AutoSize = false, Size = new Size(170, 28), Margin = new Padding(0, 2, 0, 0) };
+        private readonly ComboBox m_dir = List(110);
+        private static readonly string[] DIR = { "To pasture", "To cropland" };
+        private Control m_balLine;
         private readonly Button m_add = new Button { Text = "Add", AutoSize = true, Margin = new Padding(3, 2, 6, 3) };
         private readonly Label m_words = new Label { AutoSize = true, MaximumSize = new Size(600, 0), ForeColor = SystemColors.GrayText, Margin = new Padding(3, 6, 3, 3), Tag = Fit.Fixed };
         private readonly Label m_addSaid = Small(""), m_landNote = Small("x land per new resident");
@@ -254,12 +261,22 @@ namespace lucasCoreUI
                 left.Controls.Add(m_poolLine = ManagementActionsView.Line("Advanced:", Flow(Small("pooled by"), m_pool), null));
                 left.Controls.Add(m_weightPart = ManagementActionsView.Line("", Flow(Small("new resident weight, years (blank = 176)"), m_weight), null));
             }
+            if (S.BalanceCol != null)
+            {
+                left.Controls.Add(m_balLine = ManagementActionsView.Line("Balance:", Flow(Small("more pasture"), m_bal, Small("more cropland"), m_balBox, Small("x to cropland")), null));
+                m_bal.Scroll += (s, e) => { if (!H.Refreshing()) m_balBox.Text = BalanceOf(m_bal.Value).ToString("0.00"); };
+                m_bal.MouseUp += (s, e) => H.Put(S.BalanceCol, BalanceOf(m_bal.Value));
+                m_bal.KeyUp += (s, e) => H.Put(S.BalanceCol, BalanceOf(m_bal.Value));
+                m_balBox.Validated += (s, e) => { if (H.Refreshing()) return; string v = m_balBox.Text.Trim(); double d;
+                    if (v.Length == 0) H.Put(S.BalanceCol, null); else if (double.TryParse(v, out d) && d > 0) H.Put(S.BalanceCol, d); else H.Refresh(); };
+                m_dir.Items.AddRange(DIR); m_dir.SelectedIndex = 1; m_dir.Margin = new Padding(3, 3, 4, 3);
+            }
             left.Controls.Add(m_words);
             Head.Controls.Add(left, 0, 0); Head.Controls.Add(m_chart, 1, 0);
             if (S.AppliesTo > 0)
             {
                 m_kind.Margin = new Padding(3, 3, 4, 3);
-                var add = Flow(Small("Add:"), m_kind, m_unit, Small("year"), m_year, Small("multiplier"), m_mult, m_add, m_addSaid);
+                var add = S.AltAppliesTo > 0 ? Flow(Small("Add:"), m_dir, m_kind, m_unit, Small("year"), m_year, Small("multiplier"), m_mult, m_add, m_addSaid) : Flow(Small("Add:"), m_kind, m_unit, Small("year"), m_year, Small("multiplier"), m_mult, m_add, m_addSaid);
                 m_custom = ManagementActionsView.Line("Multipliers:", ManagementActionsView.Lines(m_rows, add), null);
                 Head.Controls.Add(m_custom, 0, 1); Head.SetColumnSpan(m_custom, 2);
             }
@@ -313,18 +330,23 @@ namespace lucasCoreUI
         }
         public int Meaning { get { if (S.MethodCol == null) return SAME; int i = Array.IndexOf(S.Stored, Stored()); return S.Means[Math.Max(0, i)]; } }
         private int Pick(string column, int blank, int n) { object v = H.Get(column); int k = v == DBNull.Value || v == null ? blank : Convert.ToInt32(v); return Math.Max(1, Math.Min(n, k)) - 1; }
+        private static double BalanceOf(int v) { return Math.Round(Math.Pow(3, v / 20.0), 2); }
+        private double Balance() { if (S.BalanceCol == null) return 1; object v = H.Get(S.BalanceCol); double b = v == DBNull.Value || v == null ? 1 : Convert.ToDouble(v); return b > 0 ? b : 1; }
+        private double Cap() { object v = H.Get("UrbanMaxRatio"); double c = v == DBNull.Value || v == null ? 3 : Convert.ToDouble(v); return c > 0 ? c : 3; }
+        private static int Applies(DataRow r) { return r["AppliesTo"] == DBNull.Value ? 1 : Convert.ToInt32(r["AppliesTo"]); }
         private double Land() { object v = H.Get("LandPerNewResident"); return v == DBNull.Value || v == null ? 1 : Convert.ToDouble(v); }
 
         // the rows of the custom table that belong to this kind (Applies To blank = Urbanization)
         private List<DataRow> Rows()
         {
             DataSheet ds = H.Ratios(); if (ds == null || !ds.HasData()) return new List<DataRow>();
-            return Live(ds.GetData()).Where(r => (r["AppliesTo"] == DBNull.Value ? 1 : Convert.ToInt32(r["AppliesTo"])) == S.AppliesTo).ToList();
+            return Live(ds.GetData()).Where(r => Applies(r) == S.AppliesTo || (S.AltAppliesTo > 0 && Applies(r) == S.AltAppliesTo)).ToList();
         }
         private string Where(DataRow r)
         {
-            if (r["UnitId"] == DBNull.Value) return "Everywhere";
-            UnitCatalog.Unit u; return m_units.Units.TryGetValue(Convert.ToInt32(r["UnitId"]), out u) ? u.Name : "(unit " + Txt(r["UnitId"]) + ")";
+            string dir = S.AltAppliesTo > 0 ? DIR[Applies(r) == S.AltAppliesTo ? 1 : 0] + ": " : "";
+            if (r["UnitId"] == DBNull.Value) return dir + "Everywhere";
+            UnitCatalog.Unit u; return dir + (m_units.Units.TryGetValue(Convert.ToInt32(r["UnitId"]), out u) ? u.Name : "(unit " + Txt(r["UnitId"]) + ")");
         }
 
         // urban: the Urbanization card's meaning (for a card that follows it)
@@ -343,10 +365,26 @@ namespace lucasCoreUI
                 object p = H.Get("UrbanPooling"); m_pool.SelectedIndex = p == DBNull.Value || p == null ? 0 : Math.Max(0, Math.Min(3, Convert.ToInt32(p)));
                 if (!m_weight.Focused) m_weight.Text = Txt(H.Get("NewResidentWeight"));
             }
+            if (m_balLine != null)
+            {
+                m_balLine.Visible = m != CUSTOM; double b = Balance();
+                m_bal.Value = Math.Max(m_bal.Minimum, Math.Min(m_bal.Maximum, (int)Math.Round(20 * Math.Log(b) / Math.Log(3))));
+                if (!m_balBox.Focused) m_balBox.Text = b.ToString("0.00");
+            }
             List<DataRow> rows = m == CUSTOM ? Rows() : new List<DataRow>();
             if (m_custom != null) { m_custom.Visible = m == CUSTOM; if (m == CUSTOM) ShowRows(rows); }
-            m_words.Text = Words(m, rows, urban); m_words.ForeColor = m == CUSTOM && rows.Count == 0 ? Color.Firebrick : SystemColors.GrayText;
+            m_words.Text = Words(m, rows, urban) + BalanceWords(m); m_words.ForeColor = m == CUSTOM && rows.Count == 0 ? Color.Firebrick : SystemColors.GrayText;
             Chart(m, rows, urban);
+        }
+
+        private string BalanceWords(int m)
+        {
+            if (S.BalanceCol == null) return "";
+            if (m == CUSTOM) return " Each direction has its own rows (to pasture, to cropland); a direction without rows stays as drawn. The balance is not used.";
+            double b = Balance(), cap = Cap();
+            if (Math.Abs(b - 1) < 0.005) return " Balance 1: both directions get the same multiplier. Move it to shift agriculture toward cropland (more intensive) or pasture (less intensive).";
+            return string.Format(" The balance then multiplies pasture to cropland by {0:0.00} and cropland to pasture by {1:0.00}: {2}. Neither goes above the highest multiplier allowed ({3:0.##}).",
+                b, 1 / b, b > 1 ? "more cropland, more intensive" : "more pasture, less intensive", cap);
         }
 
         private string Words(int m, List<DataRow> rows, DemandCard urban)
@@ -368,7 +406,8 @@ namespace lucasCoreUI
                     return u == SAME ? "Intensification takes urbanization's multiplier, which is 1 now (urbanization is the same as the reference period)."
                          : u == POP ? "Intensification follows urbanization's population growth, divided by the land per new resident: compact growth intensifies more."
                          : "Intensification takes urbanization's multiplier, unit by unit and year by year.";
-                default: return "Each year repeats a year drawn from the reference period, unchanged (" + what + " at the historical rate).";
+                default: if (S.BalanceCol != null) return "Both directions start from the area of a year drawn from the reference period.";
+                    return "Each year repeats a year drawn from the reference period, unchanged (" + what + " at the historical rate).";
             }
         }
 
@@ -379,17 +418,26 @@ namespace lucasCoreUI
         {
             ResultRatios res = H.Result(); int end = H.EndYear();
             int start = res != null && res.FirstYear > 0 ? res.FirstYear - 1 : 2020;
+            if (m == SAME && Math.Abs(Balance() - 1) >= 0.005)
+            {
+                double b = Balance(), up = Math.Min(b, Cap()), down = Math.Min(1 / b, Cap()); int x1 = Math.Max(end, start + 1);
+                m_chart.Set(new List<MultiplierChart.Line> {
+                    new MultiplierChart.Line { X = new double[] { start, x1 }, Y = new[] { up, up }, Bold = true },
+                    new MultiplierChart.Line { X = new double[] { start, x1 }, Y = new[] { down, down } } }, null, null, null,
+                    string.Format("To cropland x{0:0.00} (bold), to pasture x{1:0.00}.", up, down));
+                return;
+            }
             if (m == SAME || (m == FOLLOW && (urban == null || urban.Meaning == SAME)))
             { m_chart.Set(new List<MultiplierChart.Line> { Flat(start, Math.Max(end, start + 1)) }, null, null, null, "Multiplier 1 throughout."); return; }
             if (m == CUSTOM)
             {
                 var lines = new List<MultiplierChart.Line>();
-                foreach (var g in rows.Where(r => r["Year"] != DBNull.Value && r["Ratio"] != DBNull.Value).GroupBy(r => Txt(r["UnitId"])))
+                foreach (var g in rows.Where(r => r["Year"] != DBNull.Value && r["Ratio"] != DBNull.Value).GroupBy(r => (S.AltAppliesTo > 0 ? Applies(r) + ":" : "") + Txt(r["UnitId"])))
                 {
                     var pts = g.Select(r => new KeyValuePair<double, double>(Convert.ToDouble(r["Year"]), Convert.ToDouble(r["Ratio"]))).OrderBy(p => p.Key).ToList();
                     if (pts[0].Key > start) pts.Insert(0, new KeyValuePair<double, double>(start, 1));
                     if (pts[pts.Count - 1].Key < end) pts.Add(new KeyValuePair<double, double>(end, pts[pts.Count - 1].Value));
-                    lines.Add(new MultiplierChart.Line { X = pts.Select(p => p.Key).ToArray(), Y = pts.Select(p => p.Value).ToArray(), Bold = g.Key.Length == 0 });
+                    lines.Add(new MultiplierChart.Line { X = pts.Select(p => p.Key).ToArray(), Y = pts.Select(p => p.Value).ToArray(), Bold = g.Key.Length == 0 || g.Key.EndsWith(":") });
                 }
                 if (lines.Count == 0) m_chart.Say("No multipliers entered yet.");
                 else m_chart.Set(lines, null, null, null, lines.Count == 1 ? "As entered." : string.Format("As entered: {0} lines, one per unit{1}.", lines.Count, lines.Any(l => l.Bold) ? " (bold: everywhere)" : ""));
@@ -459,10 +507,11 @@ namespace lucasCoreUI
                 if (u == null) { m_addSaid.Text = "Pick a unit, or choose Everywhere."; return; }
                 unit = u.Key;
             }
-            if (Rows().Any(x => Txt(x["UnitId"]) == Txt(unit) && Txt(x["Year"]) == Convert.ToInt32(y).ToString())) { m_addSaid.Text = "That unit already has a row for " + Convert.ToInt32(y) + "."; return; }
+            int applies = S.AltAppliesTo > 0 && m_dir.SelectedIndex == 1 ? S.AltAppliesTo : S.AppliesTo;
+            if (Rows().Any(x => Applies(x) == applies && Txt(x["UnitId"]) == Txt(unit) && Txt(x["Year"]) == Convert.ToInt32(y).ToString())) { m_addSaid.Text = "That unit already has a row for " + Convert.ToInt32(y) + "."; return; }
             DataSheet ds = H.Ratios(); DataTable dt = ds.GetData();
             ds.BeginAddRows();
-            DataRow row = dt.NewRow(); row["AppliesTo"] = S.AppliesTo; row["UnitId"] = unit; row["Year"] = Convert.ToInt32(y); row["Ratio"] = r;
+            DataRow row = dt.NewRow(); row["AppliesTo"] = applies; row["UnitId"] = unit; row["Year"] = Convert.ToInt32(y); row["Ratio"] = r;
             dt.Rows.Add(row);
             ds.EndAddRows();
             m_addSaid.Text = ""; m_year.Text = ""; m_mult.Text = "";

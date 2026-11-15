@@ -9,7 +9,8 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   under different scenario assumptions. Every method is a ratio per unit and year that multiplies the Urbanization target's drawn
   area, as it is (a ratio of 1 keeps the reference period's rate). Set on the Projection > Land Use Change page: one page with a
   card per kind of change (urbanization, intensification, agricultural expansion and contraction, cropland and pasture exchange,
-  forest harvest). Each card asks how much (the choice shows only its own settings, custom multipliers are entered in the card,
+  forest harvest). Cropland and pasture exchange takes the same choices for both directions plus a balance (pasture to cropland times it, cropland to
+  pasture over it: above 1 is more cropland, the more intensive agriculture). Each card asks how much (the choice shows only its own settings, custom multipliers are entered in the card,
   with a sentence and a chart of the multiplier through time) and folds the units, shared draw, protected land and placement
   behind "Where and how". It replaces the Land Use page and the Land Use Demand sheets as separate pages. New output sheet Land
   Use Multipliers Applied (every unit and year). Urbanization is one of:

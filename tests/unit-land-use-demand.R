@@ -85,9 +85,14 @@ check("agriculture has its own settings, apart from urbanization's; blank = as d
   all(unlist(demand_options(data.table())$ag) == "Historical") && demand_options(data.table(AgExpansionMethod = "Historical low years (each unit's lowest third)"))$ag[["Ag Expansion"]] == "Low")
 x9a <- paste(readLines("package.xml", warn = FALSE), collapse = "\n"); s9 <- paste(readLines("src/9-projection-transitions.R", warn = FALSE), collapse = "\n")
 check("package.xml has the agriculture settings and the table's Applies To; every agriculture choice is one the stage knows", grepl('<column name="AgExpansionMethod"', x9a, fixed = TRUE) && grepl('<column name="AgContractionMethod"', x9a, fixed = TRUE) &&
-  grepl('<column name="AppliesTo"[^>]*formula1="1:Urbanization\\|2:Ag Expansion\\|3:Ag Contraction\\|4:Forest Harvest"', x9a) && grepl('<column name="HarvestMethod"', x9a, fixed = TRUE) &&
+  grepl('<column name="AppliesTo"[^>]*formula1="1:Urbanization\\|2:Ag Expansion\\|3:Ag Contraction\\|4:Forest Harvest\\|5:Cropland to Pasture\\|6:Pasture to Cropland"', x9a) && grepl('<column name="HarvestMethod"', x9a, fixed = TRUE) &&
   { it <- strsplit(sub('.*name="AgExpansionMethod"[^>]*formula1="([^"]*)".*', "\\1", x9a), "|", fixed = TRUE)[[1]]
     setequal(vapply(sub("^[0-9]+:", "", it), function(s) demand_options(data.table(AgExpansionMethod = s))$ag[[1]], ""), c("Historical", "High", "Low", "Custom")) })
+o <- demand_options(data.table(AgChangeMethod = "Historical high years (each unit's highest third)", AgChangeBalance = 2))
+check("cropland and pasture exchange has a method and a balance; blank = as drawn and 1; a balance of 0 or less is 1", o$change$method == "High" && o$change$balance == 2 &&
+  demand_options(data.table())$change$method == "Historical" && demand_options(data.table())$change$balance == 1 && demand_options(data.table(AgChangeBalance = 0))$change$balance == 1 &&
+  demand_options(data.table(AgChangeMethod = "Custom ratio table"))$change$method == "Custom" && grepl('<column name="AgChangeMethod"', x9a, fixed = TRUE) && grepl('<column name="AgChangeBalance"', x9a, fixed = TRUE) &&
+  grepl("factor = if (j == 2) b else 1 / b", s9, fixed = TRUE) && grepl("pmin(RU * sp$factor, sp$cap)", s9, fixed = TRUE))
 check("stage 9 gives each kind of group its own specification, and the custom table is read per kind", grepl('for (k in c("Ag Expansion", "Ag Contraction", "Forest Harvest"))', s9, fixed = TRUE) && grepl('dm_custom("Urbanization")', s9, fixed = TRUE) &&
   grepl("sp <- dm_kind(g)", s9, fixed = TRUE) && !grepl("dm_on", s9, fixed = TRUE))
 

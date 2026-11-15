@@ -47,9 +47,12 @@ VAR <- list(
                 r = data.frame(AppliesTo = c(NA, NA, "Urbanization", "Ag Expansion", "Forest Harvest"), UnitId = c(NA, NA, "County: King Washington", NA, "State: Washington"),
                                Year = c(2030L, 2050L, 2040L, 2030L, 2050L), Ratio = c(1.5, 2, 0.5, 2, 0.5))),
   harvest_rpa = list(d = data.frame(HarvestMethod = "RPA 2020 Assessment (forest products) ratio", HarvestScenario = "RCP4.5-SSP1 (lower emissions, medium growth)", AgContractionMethod = LO)),
+  ag_change_intensive = list(d = data.frame(AgChangeMethod = HI, AgChangeBalance = 2)),
+  ag_change_balance = list(d = data.frame(AgChangeBalance = 0.5)),
+  ag_change_custom = list(d = data.frame(AgChangeMethod = CU), r = data.frame(AppliesTo = "Pasture to Cropland", UnitId = NA, Year = 2050L, Ratio = 2)),
   primary_strata = list(d = data.frame(UrbanMethod = RPA, UrbanScenario = "RCP8.5-SSP5 (high emissions, high growth)"), primary = TRUE))
 only <- opt("only", NA); if (!is.na(only)) VAR <- VAR[intersect(strsplit(only, ",")[[1]], names(VAR))]
-KINDS <- c("Urbanization", "Intensification", "Ag Expansion", "Ag Contraction", "Forest Harvest")
+KINDS <- c("Urbanization", "Intensification", "Ag Expansion", "Ag Contraction", "Ag Change: Cropland to Pasture", "Ag Change: Pasture to Cropland", "Forest Harvest")
 kind <- function(g) { k <- KINDS[vapply(KINDS, function(n) startsWith(g, n), TRUE)]; if (length(k)) k[1] else NA_character_ }
 res <- list(); base <- NULL; fails <- character()
 for (nm in names(VAR)) { v <- VAR[[nm]]; sn <- paste("Demand test:", nm); for (i in sc()[Name == sn, ScenarioId]) delete(L, scenario = i, force = TRUE)
