@@ -5,10 +5,11 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
 ## Unreleased
 
 ### Fixed
-- Data Download page: RCMAP Cover Time Series could not be ticked (its row in `defaults/download/endpoints.csv` had no Fetched
-  value), yet a download with every dataset ticked fetched it anyway: 188 GB that only `tools/fit_shrub_post_disturbance.R` reads.
-  It is now an optional dataset (Fetched = optional): it can be ticked, it is left out of Tick all, and a blank dataset list no
-  longer fetches it.
+- Data Download page: RCMAP Cover Time Series was listed but could not be ticked (its row in `defaults/download/endpoints.csv`
+  had no Fetched value), yet a download with every dataset ticked fetched it anyway: 188 GB that no stage reads (only
+  `tools/fit_shrub_post_disturbance.R`, whose fitted settings ship in `defaults/transitions/post-disturbance-settings.csv`). It is
+  now a developer dataset (Fetched = optional): not listed on the page, and not fetched by a blank dataset list. To refit, run a
+  Data Download scenario whose Datasets is `RcmapCoverFolder`, set by script.
 
 ## 1.4.0 - 2026-11-15
 
