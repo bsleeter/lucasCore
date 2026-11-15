@@ -15,7 +15,7 @@
 # first, national: the region is made from the Study Area units' polygons.
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
-source(pkg_file("src", "strata.R")); source(pkg_file("src", "download.R")); source(pkg_file("src", "download-sources.R"))
+source(pkg_file("src", "strata.R")); source(pkg_file("src", "download.R")); source(pkg_file("src", "iclus.R")); source(pkg_file("src", "land-use-demand.R")); source(pkg_file("src", "download-sources.R"))
 suppressPackageStartupMessages({ library(terra); library(sf) })
 STAGE <- "15 Data Download"
 

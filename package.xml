@@ -42,6 +42,11 @@
 		<column name="NccpiFile" displayName="gNATSGO crop productivity NCCPI, 30 m (stage 10; blank = fetched for the fitting region from Planetary Computer)" dataType="String" isOptional="True"/>
 		<column name="ForestOwnerFile" displayName="USFS forest ownership circa 2017, 30 m (stage 10)" dataType="String" isOptional="True"/>
 		<column name="RapNppFolder" displayName="RAP vegetation NPP v3 Folder (rap-npp-v3-year.tif; Grass and Shrub Productivity, stage 8)" dataType="String" isOptional="True"/>
+		<column name="RpaLandUseFile" displayName="2020 RPA Assessment county land-use projections (county_landuse_projections_RPA.rds; USFS, doi 10.2737/RDS-2023-0026; Land Use Demand, stage 9)" dataType="String" isOptional="True"/>
+		<column name="RpaForestProductsFolder" displayName="2020 RPA Assessment forest products projections Folder (Ch7_LM_v2.csv, Ch7_HM_v2.csv, Ch7_HL_v2.csv, Ch7_HH_v2.csv; USFS, doi 10.2737/RDS-2022-0073-2; Land Use Demand: Forest Harvest, stage 9)" dataType="String" isOptional="True"/>
+		<column name="IclusCountyFile" displayName="EPA ICLUS v2.1.1 new developed land by county and decade (the Data Download's table from the 90 m maps; Land Use Demand, stage 9)" dataType="String" isOptional="True"/>
+		<column name="PopulationProjectionFile" displayName="County population projections by SSP, 2020-2100 (county totals of Hauer 2019, doi 10.17605/OSF.IO/9YNFC; Land Use Demand, stage 9)" dataType="String" isOptional="True"/>
+		<column name="CensusPopulationFile" displayName="Census county population estimates 2010-2020 (co-est2020-alldata.csv; Land Use Demand, stage 9)" dataType="String" isOptional="True"/>
 		<column name="CdlFolder" displayName="Cropland Data Layer Folder (year_30m_cdls.tif; Cropland Productivity, stage 8)" dataType="String" isOptional="True"/>
 		<column name="TidalMarshNppFolder" displayName="USGS tidal marsh NPP Folder (NPP_CONUSTidalEEM_gCm2.tif, NPP_CONUSTidalPEM_gCm2.tif; Tidal Marsh Productivity, stage 8)" dataType="String" isOptional="True"/>
 	</dataSheet>
@@ -309,7 +314,37 @@
 		<validation validationType="Unique" columns="TransitionGroupId"/>
 	</dataSheet>
 
-	<!-- to-do 58 (user 2026-11-13: "Start with replanting, salvage and site prep on a dedicated page"): management after a disturbance
+	<!-- stage 9 (user decisions 2026-11-14, dev/land-use-demand): how much urbanization a projection has. Historical = the area of the
+	     drawn historical year, as it is; RPA = that area times the 2020 RPA Assessment's urbanization relative to its own 2012-2020 step
+	     (defaults/projection/rpa-urban-ratios.csv: the mean of RPA's five climate models, pooled by metropolitan area or by state,
+	     interpolated between decade midpoints, the 2060-2070 value kept after 2065). An empty sheet = Historical -->
+	<dataSheet name="LandUseDemand" displayName="Land Use Demand" isSingleRow="True">
+		<column name="UrbanMethod" displayName="Urbanization Demand" dataType="Integer" validationType="List" formula1="1:Historical years as drawn|2:Historical high years (each unit's highest third)|3:Historical low years (each unit's lowest third)|4:RPA 2020 Assessment ratio|5:Population (SSP) x land per new resident|6:Custom ratio table|7:ICLUS v2.1.1 (EPA) ratio" defaultValue="1"/>
+		<column name="UrbanIclus" displayName="ICLUS Scenario (ICLUS; blank = SSP2-RCP4.5)" dataType="Integer" validationType="List" formula1="1:SSP2-RCP4.5|2:SSP5-RCP8.5" isOptional="True"/>
+		<column name="UrbanScenario" displayName="RPA Scenario (RPA; blank = RCP8.5-SSP2)" dataType="Integer" validationType="List" formula1="1:RCP4.5-SSP1 (lower emissions, medium growth)|2:RCP8.5-SSP2 (high emissions, medium growth)|3:RCP8.5-SSP3 (high emissions, low growth)|4:RCP8.5-SSP5 (high emissions, high growth)" isOptional="True"/>
+		<column name="UrbanSsp" displayName="Population Scenario (Population; blank = SSP2)" dataType="Integer" validationType="List" formula1="1:SSP1|2:SSP2|3:SSP3|4:SSP4|5:SSP5" isOptional="True"/>
+		<column name="LandPerNewResident" displayName="Land per New Resident, Relative to 2010-2020 (Population; blank = 1; 0.5 compact, 1.5 sprawl)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="NewResidentWeight" displayName="New Resident Weight, Years (Population; blank = 176, fitted on NLCD and Census 2000-2020)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="UrbanPooling" displayName="Ratio Pooled By (blank = RPA and ICLUS: metropolitan area; Population: county)" dataType="Integer" validationType="List" formula1="1:County|2:Metropolitan area (other counties by state)|3:State" isOptional="True"/>
+		<column name="UrbanMaxRatio" displayName="Highest Ratio Allowed (blank = 3; not applied to a custom table)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Greater" formula1="0"/>
+		<column name="IntensificationFollows" displayName="Intensification Follows the Urbanization Demand (Population: the people's ratio over the land factor, so compact growth intensifies more)" dataType="Boolean" isOptional="True"/>
+		<column name="AgExpansionMethod" displayName="Ag Expansion Demand (blank = historical years as drawn)" dataType="Integer" validationType="List" formula1="1:Historical years as drawn|2:Historical high years (each unit's highest third)|3:Historical low years (each unit's lowest third)|4:Custom ratio table" isOptional="True"/>
+		<column name="AgContractionMethod" displayName="Ag Contraction Demand (blank = historical years as drawn)" dataType="Integer" validationType="List" formula1="1:Historical years as drawn|2:Historical high years (each unit's highest third)|3:Historical low years (each unit's lowest third)|4:Custom ratio table" isOptional="True"/>
+		<column name="HarvestMethod" displayName="Forest Harvest Demand, clearcut and selection (blank = historical years as drawn)" dataType="Integer" validationType="List" formula1="1:Historical years as drawn|2:Historical high years (each unit's highest third)|3:Historical low years (each unit's lowest third)|4:Custom ratio table|5:RPA 2020 Assessment (forest products) ratio" isOptional="True"/>
+		<column name="HarvestScenario" displayName="RPA Scenario for Harvest (RPA; blank = RCP8.5-SSP2)" dataType="Integer" validationType="List" formula1="1:RCP4.5-SSP1 (lower emissions, medium growth)|2:RCP8.5-SSP2 (high emissions, medium growth)|3:RCP8.5-SSP3 (high emissions, low growth)|4:RCP8.5-SSP5 (high emissions, high growth)" isOptional="True"/>
+	</dataSheet>
+
+	<!-- Urbanization, Ag Expansion, Ag Contraction or Forest Harvest Demand = Custom ratio table: a multiplier on the drawn area by year, for any Stratum Source unit (a state, a county, a
+	     metropolitan area ...) or everywhere (blank unit). Linear between a unit's years, from 1 in the historical end year when its first
+	     year is later, the last value kept; where units overlap the smaller one decides -->
+	<dataSheet name="LandUseDemandRatio" displayName="Land Use Demand Ratios (custom table)">
+		<column name="AppliesTo" displayName="Applies To (blank = Urbanization)" dataType="Integer" validationType="List" formula1="1:Urbanization|2:Ag Expansion|3:Ag Contraction|4:Forest Harvest" isOptional="True"/>
+		<column name="UnitId" displayName="Unit (blank = everywhere)" dataType="Integer" validationType="Datasheet" formula1="stsim_SecondaryStratum" isOptional="True"/>
+		<column name="Year" dataType="Integer" validationType="WholeNumber" validationCondition="Greater" formula1="0"/>
+		<column name="Ratio" displayName="Ratio to the Drawn Area (1 = the historical rate)" dataType="Double" validationType="Decimal" validationCondition="GreaterEqual" formula1="0"/>
+	</dataSheet>
+
+	<!-- to-do 58(user 2026-11-13: "Start with replanting, salvage and site prep on a dedicated page"): management after a disturbance
 	     in a projection. Stage 9 turns each row into ST-Sim targets on the disturbed forest classes (an area a year), and stage 10
 	     sets the replanting priority. An empty sheet: no management (the baseline). Area above the historical rate: the fitted
 	     natural return already includes whatever planting followed past fires -->
@@ -920,6 +955,15 @@
 		<column name="AllowedShare" displayName="Share of Eligible Area Allowed (GAP)" dataType="Double" format="0.000"/>
 	</dataSheet>
 
+	<dataSheet name="OutputLandUseDemand" displayName="Land Use Demand Ratios (by unit and year)">
+		<!-- stage 9: the multiplier on each target unit's drawn area, when Land Use Demand is not Historical -->
+		<column name="TransitionGroup" displayName="Transition Group" dataType="String"/>
+		<column name="Unit" dataType="String"/>
+		<column name="Timestep" dataType="Integer"/>
+		<column name="Ratio" displayName="Ratio to the Drawn Area" dataType="Double" format="0.000"/>
+		<column name="MeanArea" displayName="Mean Annual Area After the Ratio (km2, over iterations)" dataType="Double" format="0.000"/>
+	</dataSheet>
+
 	<dataSheet name="OutputClimateSummary" displayName="Climate Multiplier Summary">
 		<column name="Timestep" dataType="Integer"/>
 		<column name="FlowGroup" displayName="Flow Group" dataType="String"/>
@@ -1416,6 +1460,8 @@
 		<dataSheet name="ProjectionOptions" type="Input"/>
 		<dataSheet name="ProjectionStart" type="Input"/>
 		<dataSheet name="ProjectionTransition" type="Input"/>
+		<dataSheet name="LandUseDemand" type="Input"/>
+		<dataSheet name="LandUseDemandRatio" type="Input"/>
 		<dataSheet name="OutputNlcdAnnual" type="Input"/>
 		<dataSheet name="MerchantableVolumeCurve" type="Input"/>
 		<dataSheet name="OutputHarvestAge" type="Input"/>
@@ -1430,6 +1476,7 @@
 		<dataSheet name="OutputFuelTreatment" type="Output"/>
 		<dataSheet name="core_SpatialMultiprocessing" type="Output"/>
 		<dataSheet name="OutputProjectionRate" type="Output"/>
+		<dataSheet name="OutputLandUseDemand" type="Output"/>
 		<dataSheet name="OutputFireSize" type="Output"/>
 		<dataSheet name="OutputFireSlope" type="Output"/>
 		<dataSheet name="stsim_TransitionSizeDistribution" type="Both"/>
@@ -1616,6 +1663,8 @@
 			<group name="lucasCoreProjection" displayName="Projection">
 				<item name="ProjectionRun"/>
 				<item name="ProjectionTransitions"/>
+				<item name="LandUseDemand"/>
+				<item name="LandUseDemandRatio"/>
 				<item name="SpatialAllocation"/>
 				<item name="FireOptions"/>
 				<item name="ReforestationOptions"/>
@@ -1647,6 +1696,7 @@
 				<item name="OutputTransitionSummary"/>
 				<item name="OutputHarvestAge"/>
 				<item name="OutputProjectionRate"/>
+				<item name="OutputLandUseDemand"/>
 				<item name="OutputProjectionSchedule"/>
 				<item name="OutputManagementAction"/>
 				<item name="OutputForestManagement"/>

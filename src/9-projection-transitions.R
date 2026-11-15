@@ -10,6 +10,9 @@
 #     maps), as Transition Targets; the group's spatial multiplier becomes 1 where it may happen (0 on excluded GAP status). Every unit
 #     gets a row for every iteration and year, zeros included, because without a target the multiplier alone would let every eligible
 #     cell transition
+#   * Land Use Demand (2026-11-14, src/land-use-demand.R): the Urbanization target's drawn area may be multiplied by a ratio per unit and
+#     year - the record's own high or low years, the 2020 RPA Assessment, EPA ICLUS, county population by SSP times land per new
+#     resident, or the user's table (Land Use Demand Ratios lists every unit and year). Default: the drawn area as it is
 #   * named groups (the default rules, 2026-10-22): a Target named group (Urbanization) gets one area per unit and year, its members'
 #     areas summed, and the spatial allocation decides which member type each cell gets; Historical Type Shares (Projection Options)
 #     weights the members by their historical shares instead. A Probability named group (Fire) is split into its members
@@ -237,7 +240,122 @@ if (tiles > 1) { chg <- pt[Method == "Target" & StrataLevel != tile_lvl, Transit
   if (length(chg)) say("Spatial tiles of %s units: Target Strata set to %s for %s", tile_lvl, tile_lvl, paste(chg, collapse = "; "))
   pt[Method == "Target", StrataLevel := tile_lvl] }
 tg <- pt[Method == "Target"]; new_tt <- list(); new_sm <- list(); rates <- list(); allow_files <- list()
+# Land Use Demand (user decisions 2026-11-14, src/land-use-demand.R): alternative amounts of urbanization. Every method is a ratio per
+# unit and year on the Urbanization target group's drawn area, as it is: the record's own high or low years, the 2020 RPA Assessment,
+# county population by SSP times land per new resident, or the user's own table. Intensification may follow it (Land Use Demand page)
+source(pkg_file("src", "land-use-demand.R")); dm <- demand_options(read_ds("LandUseDemand")); dm_out <- list(); wcell <- numeric(length(land))
+dm_Y <- NULL; dm_Yi <- NULL; dm_pool <- NULL; dm_cover <- FALSE
+dm_follow <- { v <- read_ds("LandUseDemand"); nrow(v) > 0 && "IntensificationFollows" %in% names(v) && toupper(as.character(v$IntensificationFollows[1])) %in% c("YES", "TRUE", "-1", "1") }
+if (dm$method != "Historical" && !any(grepl("^Urbanization", tg$TransitionGroupId))) fail("Land Use Demand: %s needs an Urbanization group with Method Target in Projection Transitions (the ratio multiplies its target)", dm$method)
+# each cell's county, whatever the Target Strata are: the Counties stratum source (its polygons come with every Data Download)
+dm_county <- function() { if (is.null(rows[["Counties"]])) fail("Land Use Demand: %s needs the Counties stratum source (Stratum Sources page): it is a county table, and each cell takes its county's ratio", dm$method)
+  tryCatch(unit_map("Counties"), error = function(e) fail("Land Use Demand: the county polygons could not be read (%s)", conditionMessage(e))) }
+dm_pool_name <- c(County = "county", Metro = "metropolitan area (other counties by state)", State = "state")
+# the user's table for one kind of change (Land Use Demand Ratios; Applies To blank = Urbanization): a ratio by year for any Stratum Source
+# unit, or everywhere (blank unit); where units overlap the smaller one decides. Returns the ratios by key and year and each cell's key
+dm_custom <- function(kind) { cr <- read_ds("LandUseDemandRatio")
+  if (nrow(cr)) { ap <- if ("AppliesTo" %in% names(cr)) as.character(cr$AppliesTo) else rep(NA_character_, nrow(cr)); ap[is.na(ap) | !nzchar(ap)] <- "Urbanization"; cr <- cr[ap == kind] }
+  if (!nrow(cr)) fail("Land Use Demand: Custom ratio table is chosen for %s, and the Land Use Demand Ratios table has no row for it", kind)
+  Y <- tryCatch(demand_custom(data.table(Key = if ("UnitId" %in% names(cr)) as.character(cr$UnitId) else NA_character_, Year = as.integer(cr$Year), Ratio = as.numeric(cr$Ratio)), pyrs, y1),
+                error = function(e) fail("Land Use Demand, %s: %s", kind, conditionMessage(e)))
+  pool <- rep(if (DEMAND_EVERYWHERE %in% rownames(Y)) DEMAND_EVERYWHERE else NA_character_, length(land)); keys <- setdiff(rownames(Y), DEMAND_EVERYWHERE)
+  ul9 <- stsim_list("SecondaryStratum"); by_num <- setNames(rows, vapply(rows, function(s) as.character(s$Number), ""))
+  cells <- lapply(keys, function(k) { id <- as.numeric(ul9$Id[match(k, ul9$Name)]); if (is.na(id)) fail("Land Use Demand Ratios: unit '%s' is not in the unit list", k)
+    s <- by_num[[as.character(unit_source(id))]]; if (is.null(s)) fail("Land Use Demand Ratios: no Stratum Source for unit '%s'", k)
+    which(land & unit_map(s$Preset) == unit_native(id)) })
+  for (j in order(-lengths(cells))) pool[cells[[j]]] <- keys[j]
+  if (any(lengths(cells) == 0)) say("Land Use Demand Ratios, %s: not in the study area, so unused: %s", kind, paste(keys[lengths(cells) == 0], collapse = "; "))
+  say("Land Use Demand: %s follows the Land Use Demand Ratios table: %d units%s; %.0f%% of the land has a ratio (1 elsewhere); ratios %.2f-%.2f, not capped", kind,
+      length(keys), if (DEMAND_EVERYWHERE %in% rownames(Y)) " and a row for everywhere" else "", 100 * mean(!is.na(pool[land])), min(Y), max(Y))
+  list(method = "Custom", Y = Y, pool = pool, cover = FALSE, cap = Inf) }
+if (dm$method == "RPA") { if (is.na(dm$pair)) fail("Land Use Demand: RPA scenario '%s' is not one of the four RPA pairs", dm$scenario)
+  if (dm$pooling == "County") { say("Land Use Demand: RPA is not used county by county (its single counties are unreliable): pooled by metropolitan area"); dm$pooling <- "Metro" }
+  # the published county table (Data Source RpaLandUseFile, fetched by Data Download): ratios computed here, not shipped
+  rpa_f <- read_data_sources("RpaLandUseFile")$RpaLandUseFile
+  dm_cw <- read_default("strata", "msa-crosswalk.csv")
+  dm_a <- tryCatch(demand_rpa_areas(readRDS(rpa_f), dm$pair), error = function(e) fail("Land Use Demand: %s could not be read as the RPA county projections (%s)", rpa_f, conditionMessage(e)))
+  dm_R <- demand_ratios(dm_a, dm_cw, dm$pooling, dm$cap)
+  dm_pool <- demand_unit(dm_county(), dm_cw, dm$pooling); here <- sort(unique(dm_pool[land]))
+  say("Land Use Demand: urbanization follows the 2020 RPA Assessment (%s), %s, the mean of %d climate models; pooled by %s; ratio capped at %g",
+      basename(rpa_f), dm$pair, attr(dm_a, "models"), dm_pool_name[[dm$pooling]], dm$cap)
+  inr <- intersect(here, rownames(dm_R)); if (!length(inr)) fail("Land Use Demand: no county of the study area is in the RPA projections (they cover the conterminous United States): set Urbanization Demand to Historical")
+  say("Land Use Demand: %d pooled units in the study area; their 2060-2070 ratios %s", length(here),
+      paste(sprintf("%s %.2f", head(inr, 12), dm_R[head(inr, 12), 5]), collapse = ", "))
+  fb <- intersect(attr(dm_R, "fallback"), here)
+  if (length(fb)) say("Land Use Demand: %s had under %g km2 a year of urbanization in RPA's 2012-2020 step: their state's ratio is used", paste(fb, collapse = ", "), DEMAND_MIN_CAL)
+  if (max(pyrs) <= DEMAND_MID[1]) say("Land Use Demand: the projection ends by %d, before RPA's first decade: every ratio is 1", DEMAND_MID[1])
+  else if (min(pyrs) > 2030) say("Land Use Demand: the projection starts in %d, so its first year already carries RPA's change since 2012-2020", min(pyrs))
+  if (rs > 2020 || re < 2012) say("Land Use Demand: the reference period %d-%d does not overlap RPA's 2012-2020 step; the ratio still multiplies the drawn years as they are", rs, re)
+  dm_Y <- demand_years(dm_R, DEMAND_MID, pyrs); dm_cover <- TRUE
+} else if (dm$method == "ICLUS") { if (is.na(dm$iclus)) fail("Land Use Demand: the ICLUS scenario is SSP2 (RCP4.5) or SSP5 (RCP8.5)")
+  # EPA ICLUS v2.1.1: the county table the Data Download makes from its 90 m maps (Data Source IclusCountyFile; src/iclus.R): new land
+  # in classes 12-16 by decade, against its first modelled decade 2010-2020
+  icf <- read_data_sources("IclusCountyFile")$IclusCountyFile; dm_cw <- read_default("strata", "msa-crosswalk.csv")
+  dm_a <- tryCatch(demand_iclus_areas(fread(icf, colClasses = list(character = "Fips")), dm$iclus), error = function(e) fail("Land Use Demand: %s could not be read as the ICLUS county table (%s)", icf, conditionMessage(e)))
+  rat <- function(pl) demand_ratios(dm_a, dm_cw, pl, dm$cap, DEMAND_ICLUS_MIN_CAL, DEMAND_ICLUS_CAL, attr(dm_a, "steps"))
+  dm_pool <- demand_unit(dm_county(), dm_cw, dm$pooling); here <- sort(unique(dm_pool[land]))
+  dm_R <- rat(dm$pooling); if (dm$pooling != "State") dm_R <- demand_fill(dm_R, here, rat("State"))
+  say("Land Use Demand: urbanization follows EPA ICLUS v2.1.1 (%s), %s, the mean of %d climate models, new suburban and denser land against 2010-2020; pooled by %s; ratio capped at %g",
+      basename(icf), dm$iclus, attr(dm_a, "models"), dm_pool_name[[dm$pooling]], dm$cap)
+  inr <- intersect(here, rownames(dm_R)); if (!length(inr)) fail("Land Use Demand: no county of the study area is in the ICLUS table (it covers the conterminous United States): set Urbanization Demand to Historical")
+  dm_Y <- demand_years(dm_R, attr(dm_a, "mid"), pyrs); dm_cover <- TRUE
+  yy <- intersect(c(min(pyrs), 2035L, 2050L, 2070L, max(pyrs)), pyrs)
+  say("Land Use Demand: %d pooled units in the study area; ratio to 2010-2020, median (lowest-highest): %s", length(inr),
+      paste(vapply(yy, function(y) { v <- dm_Y[inr, as.character(y)]; sprintf("%d %.2f (%.2f-%.2f)", y, median(v), min(v), max(v)) }, ""), collapse = ", "))
+  fb <- intersect(c(attr(dm_R, "fallback"), attr(dm_R, "filled")), here)
+  if (length(fb)) say("Land Use Demand: %d units had under %g km2 a year of new developed land in ICLUS's 2010-2020 decade, or are not in its table (%s%s): their state's ratio is used", length(fb), DEMAND_ICLUS_MIN_CAL,
+                      paste(head(fb, 8), collapse = ", "), if (length(fb) > 8) ", ..." else "")
+} else if (dm$method == "Population") { if (is.na(dm$ssp)) fail("Land Use Demand: choose the population scenario (SSP1 to SSP5)")
+  # how many people: Hauer's county populations by SSP on the Census 2020 population; how much land each new one takes: the factor
+  hf <- read_data_sources("PopulationProjectionFile")$PopulationProjectionFile; cf <- read_data_sources("CensusPopulationFile")$CensusPopulationFile
+  dm_cw <- read_default("strata", "msa-crosswalk.csv")
+  pop <- tryCatch(demand_population(fread(hf), fread(cf, encoding = "Latin-1"), dm$ssp), error = function(e) fail("Land Use Demand: the population tables could not be read (%s; %s): %s", basename(hf), basename(cf), conditionMessage(e)))
+  dm_pool <- demand_unit(dm_county(), dm_cw, dm$pooling); here <- sort(unique(dm_pool[land]))
+  mk <- function(f) { R <- demand_population_ratios(pop, dm_cw, dm$pooling, f, dm$weight, dm$cap)
+    if (dm$pooling != "State") R <- demand_fill(R, here, demand_population_ratios(pop, dm_cw, "State", f, dm$weight, dm$cap)); R }
+  R <- mk(dm$land); inr <- intersect(here, rownames(R))
+  if (!length(inr)) fail("Land Use Demand: no county of the study area is in the population projections: set Urbanization Demand to Historical")
+  dm_Y <- demand_years(R, attr(R, "mid"), pyrs); dm_cover <- TRUE
+  # Intensification, when it follows: the people's ratio (land factor 1) over the land factor - compact growth takes less new land and
+  # rebuilds more of the developed land, sprawl the reverse
+  if (dm_follow) { R1 <- mk(1); dm_Yi <- pmin(demand_years(R1, attr(R1, "mid"), pyrs) / max(dm$land, 0.05), dm$cap) }
+  say("Land Use Demand: urbanization follows county population, %s (%s on the Census 2020 population), land per new resident x %g (1 = as 2010-2020), new resident weight %g years; by %s; ratio capped at %g",
+      dm$ssp, basename(hf), dm$land, dm$weight, dm_pool_name[[dm$pooling]], dm$cap)
+  yy <- intersect(c(min(pyrs), 2035L, 2050L, 2070L, max(pyrs)), pyrs)
+  say("Land Use Demand: %d %s units in the study area; ratio to 2010-2020, median (lowest-highest): %s", length(inr), dm$pooling,
+      paste(vapply(yy, function(y) { v <- dm_Y[inr, as.character(y)]; sprintf("%d %.2f (%.2f-%.2f)", y, median(v), min(v), max(v)) }, ""), collapse = ", "))
+  fl <- attr(R, "filled"); if (length(fl)) say("Land Use Demand: %d units are not in the population tables (%s%s): their state's ratio is used", length(fl), paste(head(fl, 8), collapse = ", "), if (length(fl) > 8) ", ..." else "")
+  if (rs > 2020 || re < 2010) say("Land Use Demand: the reference period %d-%d does not overlap the population base 2010-2020; the ratio still multiplies the drawn years as they are", rs, re)
+} else if (dm$method == "Custom") { cs <- dm_custom("Urbanization"); dm_Y <- cs$Y; dm_pool <- cs$pool
+} else if (dm$method %in% c("High", "Low")) {
+  say("Land Use Demand: urbanization at each target unit's %s third of reference years (its mean area in them over its mean in all), capped at %g", if (dm$method == "High") "highest" else "lowest", dm$cap)
+} else say("Land Use Demand: urbanization as the drawn historical years (no ratio)")
+if (dm$method != "Historical" && dm_follow) say("Land Use Demand: Intensification follows%s", if (dm$method == "Population") sprintf(" the people's ratio over the land factor (x %.2f)", 1 / max(dm$land, 0.05)) else " the same method")
+# one specification per kind of target group: Urbanization by its method; Intensification when it follows; Ag Expansion and Ag Contraction by
+# their own settings (the record's high or low years, or the custom table - no published source models them usefully: RPA's agriculture does
+# not match Annual NLCD and ICLUS has none). A group is matched by the start of its name
+dm_spec <- list()
+if (dm$method != "Historical") { dm_spec$Urbanization <- list(method = dm$method, Y = dm_Y, pool = dm_pool, cover = dm_cover, cap = if (dm$method == "Custom") Inf else dm$cap)
+  if (dm_follow) dm_spec$Intensification <- modifyList(dm_spec$Urbanization, list(Y = if (!is.null(dm_Yi)) dm_Yi else dm_Y)) }
+# Forest Harvest (clearcut and selection, each with its own target) has the same settings, and the 2020 RPA Assessment's timber harvest by
+# region as a published path. Forest Management rows (below) then act on the targets this leaves
+dm_harvest_rpa <- function() { if (is.na(dm$harvest_pair)) fail("Land Use Demand: the harvest scenario is one of the four RPA pairs")
+  hd <- read_data_sources("RpaForestProductsFolder")$RpaForestProductsFolder; hf <- file.path(hd, DEMAND_HARVEST_FILE[[dm$harvest_pair]])
+  if (!file.exists(hf)) fail("Land Use Demand: %s is not in %s (run a Data Download with RpaForestProductsFolder)", basename(hf), hd)
+  R <- tryCatch(demand_harvest_ratios(fread(hf, header = TRUE), dm$cap), error = function(e) fail("Land Use Demand: %s could not be read as the RPA forest products table (%s)", hf, conditionMessage(e)))
+  pool <- demand_harvest_region(dm_county()); here <- sort(unique(pool[land])); if (!length(here)) fail("Land Use Demand: no county of the study area is in an RPA region (the conterminous United States): set Forest Harvest Demand to Historical")
+  Y <- demand_years(R, attr(R, "mid"), pyrs); yy <- intersect(c(2030L, 2050L, 2070L), pyrs)
+  say("Land Use Demand: Forest Harvest follows the 2020 RPA Assessment's timber harvest (%s), %s, relative to 2020; RPA region%s %s%s; the 2070 value is kept afterwards; a ratio of volume, so volume per hectare is taken as unchanged",
+      basename(hf), dm$harvest_pair, if (length(here) > 1) "s" else "", paste(here, collapse = ", "),
+      if (length(yy)) paste0(": ", paste(vapply(yy, function(y) sprintf("%d %s", y, paste(sprintf("%.2f", Y[here, as.character(y)]), collapse = "/")), ""), collapse = ", ")) else "")
+  list(method = "RPA", Y = Y, pool = pool, cover = TRUE, cap = dm$cap) }
+for (k in c("Ag Expansion", "Ag Contraction", "Forest Harvest")) { mk <- dm$ag[[k]]; if (mk == "Historical") next
+  if (!any(startsWith(tg$TransitionGroupId, k))) { say("Land Use Demand: %s has no Target group in Projection Transitions: its setting (%s) is not used", k, mk); next }
+  dm_spec[[k]] <- if (mk == "Custom") dm_custom(k) else if (mk == "RPA") dm_harvest_rpa() else { say("Land Use Demand: %s at each target unit's %s third of reference years, capped at %g", k, if (mk == "High") "highest" else "lowest", dm$cap)
+    list(method = mk, cover = FALSE, cap = dm$cap) } }
+dm_kind <- function(g) { k <- names(dm_spec)[vapply(names(dm_spec), function(n) startsWith(g, n), TRUE)]; if (length(k)) dm_spec[[k[1]]] else NULL }
 for (i in seq_len(nrow(tg))) { g <- tg$TransitionGroupId[i]; L <- tg$StrataLevel[i]; u <- lev[[L]]; units <- sort(unique(u[land])); ms <- mem[[g]]
+  sp <- dm_kind(g); dm_w <- !is.null(sp); wcell[] <- 0
   # area per unit and historical year, in the target's amount units: the sum of the members' areas
   am <- lapply(ms, function(m) {
     if (!is.null(TR)) { un <- lev_list[[L]]$Name[match(units, as.integer(lev_list[[L]]$Id))]; M <- realized_area(TR, m, lev_col[[L]], un, units, ref)
@@ -251,7 +369,8 @@ for (i in seq_len(nrow(tg))) { g <- tg$TransitionGroupId[i]; L <- tg$StrataLevel
           M[, j] <- M[, j] * ifelse(all_k > 0, first_k / all_k, 1) }
         if (sum(M0) > 0) say("%s: first-time gains are %.0f%% of what the run realized", m, 100 * sum(M) / sum(M0)) }
       return(M) }
-    a <- vapply(ref, function(y) { v <- hist_vals(m, y) * fits_prev(m, y) * first_time(m, y) * refo_ok(m, y); vapply(units, function(k) sum(v[land & u == k]), 0) }, numeric(length(units)))
+    a <- vapply(ref, function(y) { v <- hist_vals(m, y) * fits_prev(m, y) * first_time(m, y) * refo_ok(m, y); if (dm_w) wcell <<- wcell + v   # (the cells' historical area: Land Use Demand's weights)
+      vapply(units, function(k) sum(v[land & u == k]), 0) }, numeric(length(units)))
     matrix(a, nrow = length(units), dimnames = list(units, ref)) * cell_amt })
   a <- Reduce(`+`, am)
   dr <- sched[SamplingSet == tg$SamplingSet[i]]
@@ -259,6 +378,28 @@ for (i in seq_len(nrow(tg))) { g <- tg$TransitionGroupId[i]; L <- tg$StrataLevel
   if (anyNA(nm)) fail("%s: %d %s units are not in the stsim list", g, sum(is.na(nm)), L)
   d <- dr[, .(Unit = units), by = .(Iteration, Timestep, HistoricalYear)]
   d[, Amount := a[cbind(match(Unit, units), match(HistoricalYear, ref))]]
+  if (dm_w) {   # Land Use Demand: each target unit's ratio by year
+    if (sp$method %in% c("High", "Low")) {   # the record's own range: the unit's highest or lowest third of the years its draws come from
+      hr <- demand_history_ratio(a[, as.character(ref_of(tg$SamplingSet[i])), drop = FALSE], sp$method, cap = sp$cap)
+      RU <- matrix(rep(hr, length(pyrs)), nrow = length(units), dimnames = list(units, pyrs))
+    } else {   # its cells' ratios (their county's pooled unit, or custom unit), weighted by their historical area
+      if (!sum(wcell[land])) wcell <- as.numeric(elig(g))   # (targets from a run, or no history: the eligible cells)
+      RU <- demand_unit_ratio(ifelse(land, u, NA), sp$pool, wcell, sp$Y)
+      if (length(attr(RU, "missing"))) say("%s: no ratio for %s (ratio 1 there); %.0f%% of its historical area is in units with one", g, paste(head(attr(RU, "missing"), 12), collapse = ", "), 100 * attr(RU, "covered"))
+      if (sp$cover) check(STAGE, sprintf("%s: the %s table covers most of the study area's historical area", g, sp$method), attr(RU, "covered") >= 0.5, sprintf("%.0f%%", 100 * attr(RU, "covered")))
+      # Target Strata coarser than the ratio units (a state, an ecoregion): one blended ratio per target unit
+      spn <- attr(RU, "span"); if (max(spn) > 1) say("%s: %d of %d %s target units span several ratio units (up to %d): each gets one ratio, the mean weighted by where its historical area was, so the differences inside a unit are not carried (use Counties as the Target Strata to keep them)",
+                                                   g, sum(spn > 1), length(spn), L, max(spn)) }
+    d[, Ratio := RU[cbind(match(Unit, as.numeric(rownames(RU))), match(Timestep, pyrs))]]; d[is.na(Ratio), Ratio := 1]
+    a0 <- d[, sum(Amount)]; d[, Amount := Amount * Ratio]
+    dm_out[[g]] <- d[, .(Ratio = Ratio[1], MeanArea = mean(Amount) / cell_amt * cell_km2), by = .(Unit, Timestep)][, .(TransitionGroup = g, Unit = nm[match(Unit, units)], Timestep, Ratio, MeanArea)]
+    yy <- intersect(c(min(pyrs), 2035L, 2050L, 2065L, max(pyrs)), pyrs)
+    say("%s: %s ratio by %s unit, area-weighted mean %s; the projection's area is %.2f x the drawn years' (%.2f km2/yr against %.2f)", g, sp$method, L,
+        paste(vapply(yy, function(y) { x <- d[Timestep == y & Ratio > 0]; sprintf("%d %.2f", y, if (nrow(x) && sum(x$Amount) > 0) sum(x$Amount) / sum(x$Amount / x$Ratio) else mean(d[Timestep == y, Ratio])) }, ""), collapse = ", "),
+        d[, sum(Amount)] / max(a0, 1e-12), d[, sum(Amount)] / nit / length(pyrs) / cell_amt * cell_km2, a0 / nit / length(pyrs) / cell_amt * cell_km2)
+    check(STAGE, sprintf("%s: every Land Use Demand ratio is a number, not below 0%s", g, if (!is.finite(sp$cap)) "" else " and within the cap"),
+          all(is.finite(d$Ratio)) && all(d$Ratio >= 0) && (!is.finite(sp$cap) || all(d$Ratio <= sp$cap + 1e-9)), sprintf("%.2f-%.2f", min(d$Ratio), max(d$Ratio)))
+    d[, Ratio := NULL] }
   d[, (lev_col[[L]]) := nm[match(Unit, units)]]; d[, TransitionGroupId := g]
   new_tt[[g]] <- d[, c("Iteration", "Timestep", lev_col[[L]], "TransitionGroupId", "Amount"), with = FALSE]
   # where it may happen in the projection: everywhere but the excluded GAP statuses
@@ -629,6 +770,7 @@ if (nrow(fire_rows)) {
 if (nrow(tt_out)) write_stsim(tt_out[, setdiff(names(tt_out), c("TransitionTargetId", "ScenarioId")), with = FALSE], "TransitionTarget")
 write_ds(sched[order(SamplingSet, Iteration, Timestep), .(Iteration, Timestep, SamplingSet, HistoricalYear)], "OutputProjectionSchedule")
 if (length(rates)) write_ds(rbindlist(rates), "OutputProjectionRate")
+if (length(dm_out)) write_ds(rbindlist(dm_out), "OutputLandUseDemand")
 say("Projection inputs: %d target rows, %d multiplier rows", nrow(tt_out), nrow(sm_out))
 progressBar()
 finish_checks()

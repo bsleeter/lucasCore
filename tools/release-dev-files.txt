@@ -107,6 +107,15 @@ dev/resampling/match-all-classes.csv
 dev/resampling/match-all.csv
 dev/stsim/01-flow-row-precedence.R
 dev/stsim/02-stratum-row-precedence.R
+dev/land-use-demand/01-rpa-county-ratios.R
+dev/land-use-demand/02-rpa-vs-nlcd.R
+dev/land-use-demand/03-rpa-pooling.R
+dev/land-use-demand/04-nlcd-county-change.R
+dev/land-use-demand/05-population-demand.R
+dev/land-use-demand/06-iclus-county.R
+dev/land-use-demand/07-iclus-demand.R
+dev/land-use-demand/08-iclus-where.R
+dev/land-use-demand/09-rpa-harvest.R
 dev/urban/01-urban-suitability-p26.R
 dev/urban/02-urban-suitability-maps.R
 dev/urban/03-urban-refit-p26.R

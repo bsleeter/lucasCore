@@ -5,6 +5,53 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
 ## Unreleased
 
 ### Added
+- Land Use Demand: alternative amounts of urbanization in a projection, to see a wide range of what could happen with development
+  under different scenario assumptions. Every method is a ratio per unit and year that multiplies the Urbanization target's drawn
+  area, as it is (a ratio of 1 keeps the reference period's rate). New pages Projection > Land Use Demand and Land Use Demand
+  Ratios; new output sheet Land Use Demand Ratios (every unit and year). Urbanization Demand is one of:
+  - **Historical years as drawn** (the default: no ratio).
+  - **Historical high years / low years**: each target unit's mean area in its highest (lowest) third of reference years over its
+    mean in all of them.
+  - **RPA 2020 Assessment ratio**: RPA's urbanization relative to its own 2012-2020 step, for one of its four RCP-SSP pairs (the
+    mean of its five climate models), pooled by metropolitan area (other counties by state) or by state.
+  - **ICLUS v2.1.1 (EPA) ratio**: new suburban and denser land (ICLUS classes 12-16) relative to ICLUS's first modelled decade,
+    2010-2020, for SSP2-RCP4.5 or SSP5-RCP8.5 (the mean of its two climate models), to 2100; pooled as RPA.
+  - **Population (SSP) x land per new resident**: two levers. How many people: Hauer's (2019) county populations for SSP1 to SSP5,
+    2020-2100, on the Census 2020 population. How much land each new resident takes, relative to 2010-2020 (0.5 compact, 1.5
+    sprawl). By county (default), metropolitan area or state. New developed land a year = c0 x population + c1 x population gain,
+    fitted on Annual NLCD and Census estimates of 3,053 counties, 2000-2020 (c1 / c0 = 176 years, editable); as a ratio a county's
+    own land per person cancels, and a county that loses people keeps the development that goes on without growth.
+  - **Custom ratio table**: the user's own ratio by year for any Stratum Source unit, or everywhere; linear between its years.
+  Ratios are interpolated between the midpoints of each source's steps and keep the last value afterwards; every method but the
+  custom table is capped (Highest Ratio Allowed, 3). **Intensification Follows** applies the method to Intensification too (with
+  Population: the people's ratio over the land factor, so compact growth intensifies more). **Ag Expansion Demand** and **Ag
+  Contraction Demand** are settings of their own, with the methods that need no outside source: historical high or low years,
+  or the custom table (its rows say what they apply to: Urbanization, Ag Expansion or Ag Contraction). No published source is
+  offered for agriculture: RPA's does not match Annual NLCD and barely changes, and ICLUS models none. **Forest Harvest Demand**
+  (clearcut and selection) has the same three, and **RPA 2020 Assessment (forest products) ratio**: the timber harvest of the
+  study area's RPA region, for one of the four RCP-SSP pairs, relative to 2020 (Johnston, Guo and Prestemon 2023, FOROM; every
+  five years to 2070, then kept). It is a narrow, demand-driven outlook: harvest rises in every scenario (2070: 1.04 to 1.45
+  times 2020) and the six regions move together; a ratio of volume, so volume per hectare is taken as unchanged. Forest Management
+  rows act on the targets it leaves.
+  The ratios are computed in the stage from published data, five new Data Sources that Data Download fetches (group Land use
+  demand; nothing pre-computed ships): **RpaLandUseFile** (Mihiar, Lewis and Coulston 2023, https://doi.org/10.2737/RDS-2023-0026),
+  **IclusCountyFile** (U.S. EPA 2020; the four 90 m map sets, 6.3 GB, are tabulated by county and only the table is kept),
+  **PopulationProjectionFile** (Hauer 2019, https://doi.org/10.17605/OSF.IO/9YNFC; summed to county totals) and
+  **CensusPopulationFile** (county estimates 2010-2020), and **RpaForestProductsFolder** (https://doi.org/10.2737/RDS-2022-0073-2). The Target Strata need not be counties: every cell takes its county's
+  ratio (the Counties stratum source) and a target unit the mean of its cells, weighted by where its historical urbanization was.
+  The log says when target units span several ratio units (a state or ecoregion gets one blended ratio), when a unit takes its
+  state's ratio (too little urbanization in the source's base step, or a county its tables lack) and which units no source covers
+  (ratio 1); the stage stops when a table is missing, when there is no Counties source, or when no county of the study area is in
+  the source. The analysis behind the choices is in `dev/land-use-demand`: RPA against Annual NLCD 2012-2020 for 3,021 counties
+  (urbanization agrees in total, 0.96, not by county; agriculture does not agree); the population model explains where
+  development is (R2 0.67) but not how a county's rate changes between decades, so its county ratios are scenarios, not
+  predictions. Tests: `tests/unit-land-use-demand.R`, and
+  `tests/phaseZ32-land-use-demand.R` (stage 9 alone on a Build result, once per method: Puget Lowland at 990 m, 13 variants, every
+  check passed and the kinds without a setting kept the baseline's targets). Not done: `lucasCoreUI.dll` is not rebuilt, and the
+  new Data Sources columns are added in the 1.4 update, which a library already at 1.4 will not run again (it then fails to
+  open: add the columns with `tools/sync-library.R`, or move them to a 1.5 update); the download handlers have not fetched
+  through a Data Download run.
+
 - Stage 18 - Wood Products (to-do 59): what becomes of the carbon a run harvests. ST-Sim moves harvest and land-clearing wood to
   Forestry Sector and nothing flows out of it; this stage follows it through products in use, landfills and dumps, by year, with
   the USFS harvested wood products model (`src/wood-products.R`: Smith et al. 2006, Skog 2008, the HWP-C calculator; parameter

@@ -178,6 +178,11 @@ namespace lucasCoreUI
             AddColumn(store, "lucasCore_ManagementAction", "Budget", "DOUBLE");
             AddColumn(store, "lucasCore_OutputManagementAction", "RevenuePerArea", "DOUBLE");
             AddColumn(store, "lucasCore_DataSource", "RcmapCoverFolder", "TEXT");
+            AddColumn(store, "lucasCore_DataSource", "RpaLandUseFile", "TEXT");   // (Land Use Demand, 2026-11-14)
+            AddColumn(store, "lucasCore_DataSource", "RpaForestProductsFolder", "TEXT");
+            AddColumn(store, "lucasCore_DataSource", "IclusCountyFile", "TEXT");
+            AddColumn(store, "lucasCore_DataSource", "PopulationProjectionFile", "TEXT");
+            AddColumn(store, "lucasCore_DataSource", "CensusPopulationFile", "TEXT");
             AddColumn(store, "lucasCore_OutputLandCoverLayers", "ReforestTypeFileName", "TEXT");
             AddColumn(store, "lucasCore_OutputLandCoverLayers", "BpsForestShareFileName", "TEXT");
             AddColumn(store, "lucasCore_OutputLandCoverLayers", "StartRuleFileName", "TEXT");

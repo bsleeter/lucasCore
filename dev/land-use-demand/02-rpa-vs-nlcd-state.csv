@@ -1,0 +1,687 @@
+Item,State,Counties,Nlcd,Rpa,NlcdOverRpa,Correlation
+Ag Change: Cropland to Pasture,01,67,48.7,109,0.45,0.75
+Ag Change: Cropland to Pasture,04,15,1.1,5.1,0.22,0.31
+Ag Change: Cropland to Pasture,05,75,17.8,90.8,0.2,0.71
+Ag Change: Cropland to Pasture,06,56,10,111.6,0.09,0.44
+Ag Change: Cropland to Pasture,08,64,10.7,89,0.12,0.26
+Ag Change: Cropland to Pasture,09,8,2.2,2.3,0.97,0.6
+Ag Change: Cropland to Pasture,10,3,1.3,5.9,0.22,
+Ag Change: Cropland to Pasture,11,1,0,0,,
+Ag Change: Cropland to Pasture,12,40,71,72.1,0.98,0.85
+Ag Change: Cropland to Pasture,13,159,61.3,135.8,0.45,0.8
+Ag Change: Cropland to Pasture,16,44,16.9,83.6,0.2,0.41
+Ag Change: Cropland to Pasture,17,102,106,147.6,0.72,0.68
+Ag Change: Cropland to Pasture,18,92,97,106.7,0.91,0.47
+Ag Change: Cropland to Pasture,19,99,197.2,118.6,1.66,0.18
+Ag Change: Cropland to Pasture,20,105,31.7,211.1,0.15,-0.37
+Ag Change: Cropland to Pasture,21,120,45.3,236.3,0.19,0.85
+Ag Change: Cropland to Pasture,22,56,41.8,138.6,0.3,0.75
+Ag Change: Cropland to Pasture,23,16,6.1,5,1.21,0.41
+Ag Change: Cropland to Pasture,24,24,17.5,41.2,0.43,0.22
+Ag Change: Cropland to Pasture,25,13,2.1,13.9,0.15,0.89
+Ag Change: Cropland to Pasture,26,82,111.5,150.5,0.74,0.73
+Ag Change: Cropland to Pasture,27,87,158.1,208.7,0.76,0.59
+Ag Change: Cropland to Pasture,28,81,26.5,90.3,0.29,0.31
+Ag Change: Cropland to Pasture,29,115,87.5,303.5,0.29,0.78
+Ag Change: Cropland to Pasture,30,56,64.9,250.8,0.26,0.4
+Ag Change: Cropland to Pasture,31,93,16.1,80.1,0.2,0.22
+Ag Change: Cropland to Pasture,32,17,3.2,5.7,0.56,0.44
+Ag Change: Cropland to Pasture,33,10,0.6,3.4,0.17,0.61
+Ag Change: Cropland to Pasture,34,21,8.9,14.1,0.64,0.89
+Ag Change: Cropland to Pasture,35,33,5.5,40.1,0.14,0.23
+Ag Change: Cropland to Pasture,36,59,59.6,153.5,0.39,0.87
+Ag Change: Cropland to Pasture,37,99,47.5,139.2,0.34,0.39
+Ag Change: Cropland to Pasture,38,53,117.7,246.8,0.48,0.13
+Ag Change: Cropland to Pasture,39,84,88.1,139.1,0.63,0.58
+Ag Change: Cropland to Pasture,40,77,26.5,214.9,0.12,-0.16
+Ag Change: Cropland to Pasture,41,36,55.3,63,0.88,0.43
+Ag Change: Cropland to Pasture,42,66,65.2,97,0.67,0.66
+Ag Change: Cropland to Pasture,44,5,0.2,0.5,0.49,0.9
+Ag Change: Cropland to Pasture,45,45,21.3,68.1,0.31,0.51
+Ag Change: Cropland to Pasture,46,66,170.1,153.9,1.11,0.4
+Ag Change: Cropland to Pasture,47,95,49,166.7,0.29,0.79
+Ag Change: Cropland to Pasture,48,252,127.8,734.5,0.17,0.49
+Ag Change: Cropland to Pasture,49,29,10.2,63,0.16,0.58
+Ag Change: Cropland to Pasture,50,14,5,19.9,0.25,0.63
+Ag Change: Cropland to Pasture,51,100,23.4,83.7,0.28,0.56
+Ag Change: Cropland to Pasture,53,37,13,117.2,0.11,0.63
+Ag Change: Cropland to Pasture,54,55,2.6,42,0.06,0.46
+Ag Change: Cropland to Pasture,55,72,129.4,178.4,0.73,0.86
+Ag Change: Cropland to Pasture,56,23,23.3,46.9,0.5,0.24
+Ag Change: Pasture to Cropland,01,67,56.1,151.5,0.37,0.65
+Ag Change: Pasture to Cropland,04,15,0.6,2.3,0.25,0.45
+Ag Change: Pasture to Cropland,05,75,5.4,153.2,0.04,0.65
+Ag Change: Pasture to Cropland,06,56,17.9,55.8,0.32,0.69
+Ag Change: Pasture to Cropland,08,64,6,17.6,0.34,0.45
+Ag Change: Pasture to Cropland,09,8,0.7,3.7,0.19,0.71
+Ag Change: Pasture to Cropland,10,3,0.1,2.7,0.05,
+Ag Change: Pasture to Cropland,11,1,0,0,,
+Ag Change: Pasture to Cropland,12,40,57.7,114.7,0.5,0.68
+Ag Change: Pasture to Cropland,13,159,18.7,143,0.13,0.6
+Ag Change: Pasture to Cropland,16,44,19.4,32.4,0.6,0.36
+Ag Change: Pasture to Cropland,17,102,100.5,109.3,0.92,0.46
+Ag Change: Pasture to Cropland,18,92,51.5,93.7,0.55,0.57
+Ag Change: Pasture to Cropland,19,99,191.5,152.9,1.25,0.73
+Ag Change: Pasture to Cropland,20,105,80.7,137.8,0.59,0.58
+Ag Change: Pasture to Cropland,21,120,173,167.8,1.03,0.74
+Ag Change: Pasture to Cropland,22,56,24.8,125.8,0.2,0.51
+Ag Change: Pasture to Cropland,23,16,4.5,5.7,0.78,0.43
+Ag Change: Pasture to Cropland,24,24,14.2,24.7,0.58,0.74
+Ag Change: Pasture to Cropland,25,13,0.7,4.4,0.17,0.79
+Ag Change: Pasture to Cropland,26,82,27.6,87.6,0.31,0.63
+Ag Change: Pasture to Cropland,27,87,119.3,153.5,0.78,0.63
+Ag Change: Pasture to Cropland,28,81,38.6,132.1,0.29,0.43
+Ag Change: Pasture to Cropland,29,115,302.7,387.2,0.78,0.21
+Ag Change: Pasture to Cropland,30,56,112,77.3,1.45,0.52
+Ag Change: Pasture to Cropland,31,93,17.5,70.4,0.25,0.74
+Ag Change: Pasture to Cropland,32,17,2.7,4.4,0.61,0.85
+Ag Change: Pasture to Cropland,33,10,0.4,2.9,0.14,0.56
+Ag Change: Pasture to Cropland,34,21,3.2,7.5,0.43,0.74
+Ag Change: Pasture to Cropland,35,33,3,12.1,0.25,0.49
+Ag Change: Pasture to Cropland,36,59,79.2,106,0.75,0.7
+Ag Change: Pasture to Cropland,37,99,30.3,115.3,0.26,0.79
+Ag Change: Pasture to Cropland,38,53,199.5,74.2,2.69,0.26
+Ag Change: Pasture to Cropland,39,84,69.6,96.6,0.72,0.63
+Ag Change: Pasture to Cropland,40,77,8.3,328.7,0.03,0.48
+Ag Change: Pasture to Cropland,41,36,33,50.4,0.65,0.57
+Ag Change: Pasture to Cropland,42,66,83.1,76.5,1.09,0.55
+Ag Change: Pasture to Cropland,44,5,0.1,1.2,0.09,0.8
+Ag Change: Pasture to Cropland,45,45,7,60.9,0.11,0.5
+Ag Change: Pasture to Cropland,46,66,133.2,109.3,1.22,0.53
+Ag Change: Pasture to Cropland,47,95,91.7,146.2,0.63,0.64
+Ag Change: Pasture to Cropland,48,252,79.7,687.2,0.12,0.65
+Ag Change: Pasture to Cropland,49,29,11.7,11.1,1.05,0.42
+Ag Change: Pasture to Cropland,50,14,5.8,10.5,0.55,0.52
+Ag Change: Pasture to Cropland,51,100,39.4,82.6,0.48,0.68
+Ag Change: Pasture to Cropland,53,37,16,32.7,0.49,0.59
+Ag Change: Pasture to Cropland,54,55,4.1,18.1,0.22,0.62
+Ag Change: Pasture to Cropland,55,72,117.9,112.9,1.04,0.55
+Ag Change: Pasture to Cropland,56,23,15,12.4,1.21,0.02
+Ag Contraction: Cropland,01,67,11.7,24.5,0.48,0.39
+Ag Contraction: Cropland,04,15,27.9,9.4,2.97,0.93
+Ag Contraction: Cropland,05,75,22,23.9,0.92,0.88
+Ag Contraction: Cropland,06,56,119.6,18.5,6.47,0.88
+Ag Contraction: Cropland,08,64,222.9,45.6,4.89,0.84
+Ag Contraction: Cropland,09,8,0.3,0.1,4.35,0.67
+Ag Contraction: Cropland,10,3,2.6,0.6,4.42,
+Ag Contraction: Cropland,11,1,0,0,,
+Ag Contraction: Cropland,12,40,21.3,4.7,4.56,0.47
+Ag Contraction: Cropland,13,159,103.4,20.7,5,0.8
+Ag Contraction: Cropland,16,44,61.4,6.6,9.28,0.64
+Ag Contraction: Cropland,17,102,22.8,6.3,3.62,0.42
+Ag Contraction: Cropland,18,92,24.4,3.7,6.66,0.65
+Ag Contraction: Cropland,19,99,24.1,3.5,6.88,0.3
+Ag Contraction: Cropland,20,105,271.1,57,4.76,0.71
+Ag Contraction: Cropland,21,120,4.9,4.2,1.16,0.78
+Ag Contraction: Cropland,22,56,20,10.2,1.96,0.8
+Ag Contraction: Cropland,23,16,0.7,2.4,0.29,0.24
+Ag Contraction: Cropland,24,24,6.8,2.2,3.03,0.48
+Ag Contraction: Cropland,25,13,0.6,0.5,1.35,0.71
+Ag Contraction: Cropland,26,82,31.7,6.3,5.05,0.7
+Ag Contraction: Cropland,27,87,18.8,11.3,1.66,0.67
+Ag Contraction: Cropland,28,81,9.6,14.2,0.68,0.72
+Ag Contraction: Cropland,29,115,14,6.6,2.1,0.82
+Ag Contraction: Cropland,30,56,242,16.4,14.78,0.74
+Ag Contraction: Cropland,31,93,180.6,6.2,29.24,0.67
+Ag Contraction: Cropland,32,17,10.5,27.8,0.38,0.68
+Ag Contraction: Cropland,33,10,0.1,0,2.19,0.22
+Ag Contraction: Cropland,34,21,2.7,0.2,11.53,0.6
+Ag Contraction: Cropland,35,33,98.8,16.1,6.12,0.72
+Ag Contraction: Cropland,36,59,4.9,6.9,0.71,0.77
+Ag Contraction: Cropland,37,99,38.6,13.4,2.89,0.79
+Ag Contraction: Cropland,38,53,149.2,5.9,25.37,0.49
+Ag Contraction: Cropland,39,84,14,2.3,6.09,0.73
+Ag Contraction: Cropland,40,77,256.5,2.9,89.83,0.85
+Ag Contraction: Cropland,41,36,42.1,1,40.76,0.86
+Ag Contraction: Cropland,42,66,4.9,6.9,0.71,0.57
+Ag Contraction: Cropland,44,5,0,0,2.38,0.3
+Ag Contraction: Cropland,45,45,65.7,26.4,2.49,0.82
+Ag Contraction: Cropland,46,66,147.6,36.1,4.09,0.51
+Ag Contraction: Cropland,47,95,7.5,7.1,1.05,0.75
+Ag Contraction: Cropland,48,252,499.2,95.5,5.23,0.79
+Ag Contraction: Cropland,49,29,33.9,15.6,2.17,0.67
+Ag Contraction: Cropland,50,14,0.2,0.2,1.17,0.65
+Ag Contraction: Cropland,51,100,10.9,3.2,3.39,0.35
+Ag Contraction: Cropland,53,37,94.5,18.7,5.06,0.92
+Ag Contraction: Cropland,54,55,0.1,1.3,0.1,0.45
+Ag Contraction: Cropland,55,72,30.3,7.4,4.09,0.63
+Ag Contraction: Cropland,56,23,35.7,3.9,9.09,0.21
+Ag Contraction: Pasture,01,67,77.9,111.9,0.7,0.16
+Ag Contraction: Pasture,04,15,1.7,0.1,25.67,0.36
+Ag Contraction: Pasture,05,75,25,74.9,0.33,0.61
+Ag Contraction: Pasture,06,56,18.2,12.7,1.43,0.38
+Ag Contraction: Pasture,08,64,22,15.2,1.45,0.49
+Ag Contraction: Pasture,09,8,0.5,3.7,0.13,0.81
+Ag Contraction: Pasture,10,3,0,3.5,0.01,
+Ag Contraction: Pasture,11,1,0,0,Inf,
+Ag Contraction: Pasture,12,40,38.9,42.7,0.91,0.58
+Ag Contraction: Pasture,13,159,27.6,51.7,0.53,0.48
+Ag Contraction: Pasture,16,44,9.2,17.7,0.52,0.59
+Ag Contraction: Pasture,17,102,5.8,42.1,0.14,0.62
+Ag Contraction: Pasture,18,92,4.2,43.8,0.1,0.64
+Ag Contraction: Pasture,19,99,14.4,30.8,0.47,0.82
+Ag Contraction: Pasture,20,105,14,13.9,1.01,0.55
+Ag Contraction: Pasture,21,120,9.4,55,0.17,0.51
+Ag Contraction: Pasture,22,56,24.6,27,0.91,0.72
+Ag Contraction: Pasture,23,16,3.4,7.2,0.47,0.38
+Ag Contraction: Pasture,24,24,1.6,9.8,0.16,0.83
+Ag Contraction: Pasture,25,13,0.9,5.8,0.15,0.8
+Ag Contraction: Pasture,26,82,3.1,54,0.06,0.24
+Ag Contraction: Pasture,27,87,14,50.7,0.28,0.71
+Ag Contraction: Pasture,28,81,90.6,97.9,0.93,0.7
+Ag Contraction: Pasture,29,115,31.4,90,0.35,0.5
+Ag Contraction: Pasture,30,56,34.5,50.2,0.69,0.44
+Ag Contraction: Pasture,31,93,7.2,10.8,0.67,0.31
+Ag Contraction: Pasture,32,17,7.3,11.3,0.64,0.89
+Ag Contraction: Pasture,33,10,1,1.8,0.56,0.35
+Ag Contraction: Pasture,34,21,0.7,2.9,0.24,0.91
+Ag Contraction: Pasture,35,33,16,22.2,0.72,0.62
+Ag Contraction: Pasture,36,59,9,62.3,0.15,0.87
+Ag Contraction: Pasture,37,99,17.1,49.2,0.35,0.71
+Ag Contraction: Pasture,38,53,18.5,20.3,0.91,0.14
+Ag Contraction: Pasture,39,84,7.1,30,0.24,0.88
+Ag Contraction: Pasture,40,77,31.2,54.7,0.57,0.62
+Ag Contraction: Pasture,41,36,23.2,10.9,2.13,0.68
+Ag Contraction: Pasture,42,66,9.3,36,0.26,0.81
+Ag Contraction: Pasture,44,5,0.1,0.8,0.07,0.7
+Ag Contraction: Pasture,45,45,16.4,34,0.48,0.71
+Ag Contraction: Pasture,46,66,24.4,33.4,0.73,0.16
+Ag Contraction: Pasture,47,95,13.4,76,0.18,0.4
+Ag Contraction: Pasture,48,252,278.4,257.9,1.08,0.65
+Ag Contraction: Pasture,49,29,9.6,7.9,1.22,0.63
+Ag Contraction: Pasture,50,14,1.8,3.1,0.59,0.79
+Ag Contraction: Pasture,51,100,17.5,36.8,0.48,0.72
+Ag Contraction: Pasture,53,37,7.9,35.9,0.22,0.39
+Ag Contraction: Pasture,54,55,3.8,41.9,0.09,0.61
+Ag Contraction: Pasture,55,72,11.6,73.3,0.16,0.69
+Ag Contraction: Pasture,56,23,15.8,26.7,0.59,0.17
+Ag Expansion: Cropland,01,67,11.3,9.8,1.16,0.24
+Ag Expansion: Cropland,04,15,40.6,25.4,1.6,-0.38
+Ag Expansion: Cropland,05,75,5.4,5.8,0.92,0.41
+Ag Expansion: Cropland,06,56,140.5,46.9,3,0.59
+Ag Expansion: Cropland,08,64,185.7,15,12.42,0.66
+Ag Expansion: Cropland,09,8,0.4,1.3,0.28,0.62
+Ag Expansion: Cropland,10,3,0.9,0.8,1.09,
+Ag Expansion: Cropland,11,1,0,0,,
+Ag Expansion: Cropland,12,40,22.9,11.7,1.96,0.25
+Ag Expansion: Cropland,13,159,105.9,13.7,7.75,0.77
+Ag Expansion: Cropland,16,44,84,10.2,8.25,0.11
+Ag Expansion: Cropland,17,102,13.9,6.5,2.14,0.49
+Ag Expansion: Cropland,18,92,15.3,6.4,2.41,0.35
+Ag Expansion: Cropland,19,99,16.3,3.3,4.91,0.43
+Ag Expansion: Cropland,20,105,230.7,19.2,12.02,-0.24
+Ag Expansion: Cropland,21,120,11.6,2.7,4.38,0.54
+Ag Expansion: Cropland,22,56,5.2,6.6,0.78,0.02
+Ag Expansion: Cropland,23,16,1.5,14.3,0.1,0.44
+Ag Expansion: Cropland,24,24,1.3,3.6,0.36,0.59
+Ag Expansion: Cropland,25,13,0.4,2,0.2,0.88
+Ag Expansion: Cropland,26,82,41.4,18,2.3,-0.28
+Ag Expansion: Cropland,27,87,35.2,19.9,1.77,0.18
+Ag Expansion: Cropland,28,81,8.1,8.5,0.96,-0.17
+Ag Expansion: Cropland,29,115,14.4,12.1,1.2,-0.48
+Ag Expansion: Cropland,30,56,520.1,25.8,20.15,0.14
+Ag Expansion: Cropland,31,93,225.5,16.1,14.01,0.06
+Ag Expansion: Cropland,32,17,17.6,3.5,4.96,0.7
+Ag Expansion: Cropland,33,10,0.1,2.4,0.04,-0.01
+Ag Expansion: Cropland,34,21,1.3,3.1,0.43,0.73
+Ag Expansion: Cropland,35,33,52.4,29.3,1.79,0.23
+Ag Expansion: Cropland,36,59,7.7,17.3,0.44,0.44
+Ag Expansion: Cropland,37,99,37.6,11.6,3.23,0.67
+Ag Expansion: Cropland,38,53,312,9.5,32.98,0.65
+Ag Expansion: Cropland,39,84,9.4,9,1.04,0.12
+Ag Expansion: Cropland,40,77,90.6,11,8.26,0.58
+Ag Expansion: Cropland,41,36,56.2,4.7,11.89,0.79
+Ag Expansion: Cropland,42,66,4.4,14.6,0.3,0.17
+Ag Expansion: Cropland,44,5,0.1,0.4,0.17,0.9
+Ag Expansion: Cropland,45,45,25.4,7.6,3.35,0.39
+Ag Expansion: Cropland,46,66,179,15.6,11.47,0.67
+Ag Expansion: Cropland,47,95,8.4,3.5,2.42,0.49
+Ag Expansion: Cropland,48,252,344.4,58.1,5.93,0.36
+Ag Expansion: Cropland,49,29,24.8,5.6,4.4,0.65
+Ag Expansion: Cropland,50,14,0.4,2.4,0.16,-0.04
+Ag Expansion: Cropland,51,100,11.7,6,1.97,0.76
+Ag Expansion: Cropland,53,37,157.4,9.5,16.62,0.82
+Ag Expansion: Cropland,54,55,0.1,3.7,0.03,0.18
+Ag Expansion: Cropland,55,72,25.6,16,1.6,0.18
+Ag Expansion: Cropland,56,23,27,12.6,2.14,0.27
+Ag Expansion: Pasture,01,67,59.1,52.8,1.12,-0.15
+Ag Expansion: Pasture,04,15,1.5,10.3,0.14,0.28
+Ag Expansion: Pasture,05,75,43.9,38.9,1.13,0.13
+Ag Expansion: Pasture,06,56,12.5,3.1,4.04,0.49
+Ag Expansion: Pasture,08,64,8.6,10.3,0.83,0.38
+Ag Expansion: Pasture,09,8,1.3,0.4,3.33,0.81
+Ag Expansion: Pasture,10,3,0,0.2,0.08,
+Ag Expansion: Pasture,11,1,0,0,,
+Ag Expansion: Pasture,12,40,72.1,21.6,3.34,0.39
+Ag Expansion: Pasture,13,159,37.6,62.5,0.6,0.19
+Ag Expansion: Pasture,16,44,8.7,14.9,0.58,0.13
+Ag Expansion: Pasture,17,102,8.3,1.9,4.27,0.69
+Ag Expansion: Pasture,18,92,8.3,1.9,4.32,0.69
+Ag Expansion: Pasture,19,99,8.6,1,8.49,0.8
+Ag Expansion: Pasture,20,105,9.1,29.8,0.3,0.47
+Ag Expansion: Pasture,21,120,23.6,17,1.39,0.53
+Ag Expansion: Pasture,22,56,15,37.5,0.4,0.8
+Ag Expansion: Pasture,23,16,4.2,4.8,0.87,0.46
+Ag Expansion: Pasture,24,24,1.4,1.1,1.29,0.23
+Ag Expansion: Pasture,25,13,1.4,0.8,1.86,0.76
+Ag Expansion: Pasture,26,82,6.4,6.6,0.98,0.33
+Ag Expansion: Pasture,27,87,11.4,7.1,1.6,0.66
+Ag Expansion: Pasture,28,81,51.5,47.4,1.09,0.69
+Ag Expansion: Pasture,29,115,52.5,4.7,11.22,0.75
+Ag Expansion: Pasture,30,56,30.8,26.1,1.18,-0.25
+Ag Expansion: Pasture,31,93,2.8,9.8,0.28,0.08
+Ag Expansion: Pasture,32,17,9.9,0.6,15.2,0.16
+Ag Expansion: Pasture,33,10,1.3,0.9,1.43,0.82
+Ag Expansion: Pasture,34,21,0.8,0.7,1.12,0.41
+Ag Expansion: Pasture,35,33,4.9,13.9,0.35,0.2
+Ag Expansion: Pasture,36,59,10,6.3,1.58,0.59
+Ag Expansion: Pasture,37,99,30.9,48.6,0.64,0.22
+Ag Expansion: Pasture,38,53,22.2,13.6,1.63,0.26
+Ag Expansion: Pasture,39,84,14.7,3,4.93,0.8
+Ag Expansion: Pasture,40,77,49.2,26.4,1.87,0.19
+Ag Expansion: Pasture,41,36,23.8,2.6,9.14,0.16
+Ag Expansion: Pasture,42,66,13,5.2,2.48,0.61
+Ag Expansion: Pasture,44,5,0.2,0.1,2.14,1
+Ag Expansion: Pasture,45,45,17.1,37.1,0.46,-0.11
+Ag Expansion: Pasture,46,66,35,18.2,1.93,0.5
+Ag Expansion: Pasture,47,95,36.1,23.9,1.51,0.63
+Ag Expansion: Pasture,48,252,179.8,89.9,2,0.51
+Ag Expansion: Pasture,49,29,8.6,6.2,1.38,-0.03
+Ag Expansion: Pasture,50,14,1.9,1,1.96,0.56
+Ag Expansion: Pasture,51,100,20,36.1,0.55,0.54
+Ag Expansion: Pasture,53,37,7.8,3.4,2.31,0.57
+Ag Expansion: Pasture,54,55,5.8,2.2,2.69,0.39
+Ag Expansion: Pasture,55,72,5.9,5.8,1.02,0.37
+Ag Expansion: Pasture,56,23,11.9,5.5,2.16,0.25
+Developed land 2020,01,67,13028.1,10149.3,1.28,0.92
+Developed land 2020,04,15,7783,7971.2,0.98,0.87
+Developed land 2020,05,75,9160.6,6331.7,1.45,0.84
+Developed land 2020,06,56,22577.6,19631,1.15,0.91
+Developed land 2020,08,64,9311.6,6428.1,1.45,0.63
+Developed land 2020,09,8,3733.9,4138.2,0.9,0.98
+Developed land 2020,10,3,1215.9,1159,1.05,
+Developed land 2020,11,1,146.2,0,Inf,
+Developed land 2020,12,40,11630.2,10091.5,1.15,0.95
+Developed land 2020,13,159,18879.4,17305.7,1.09,0.89
+Developed land 2020,16,44,5729.1,2567.2,2.23,0.67
+Developed land 2020,17,102,17884.5,11573.9,1.55,0.91
+Developed land 2020,18,92,13026,8630.3,1.51,0.89
+Developed land 2020,19,99,10976.6,4454.7,2.46,0.78
+Developed land 2020,20,105,11683.8,4935.5,2.37,0.69
+Developed land 2020,21,120,10110.5,7235.3,1.4,0.87
+Developed land 2020,22,56,8928,6192.2,1.44,0.9
+Developed land 2020,23,16,3893.2,3069.4,1.27,0.78
+Developed land 2020,24,24,5703.8,5942.8,0.96,0.98
+Developed land 2020,25,13,6043.7,6830.8,0.88,0.96
+Developed land 2020,26,82,17364.6,16226.8,1.07,0.88
+Developed land 2020,27,87,13822.3,7446.1,1.86,0.71
+Developed land 2020,28,81,9285.6,5881.7,1.58,0.83
+Developed land 2020,29,115,14184,9161.7,1.55,0.79
+Developed land 2020,30,56,7641.5,2059.2,3.71,0.68
+Developed land 2020,31,93,8097.4,2332.4,3.47,0.75
+Developed land 2020,32,17,3506.8,2055.3,1.71,0.61
+Developed land 2020,33,10,2267.6,2670.6,0.85,0.98
+Developed land 2020,34,21,6765,7451.4,0.91,0.96
+Developed land 2020,35,33,5642.2,3754.7,1.5,0.68
+Developed land 2020,36,59,14608.9,13087.4,1.12,0.9
+Developed land 2020,37,99,18133,18030.9,1.01,0.94
+Developed land 2020,38,53,7381,1293.1,5.71,0.67
+Developed land 2020,39,84,16485.4,14365.8,1.15,0.92
+Developed land 2020,40,77,12091.1,6518.2,1.85,0.7
+Developed land 2020,41,36,9024.3,4753.3,1.9,0.7
+Developed land 2020,42,66,17048.9,16440.9,1.04,0.94
+Developed land 2020,44,5,967.8,880,1.1,1
+Developed land 2020,45,45,10023.9,9417.7,1.06,0.96
+Developed land 2020,46,66,6466.1,1626.1,3.98,0.58
+Developed land 2020,47,95,13407,11604.6,1.16,0.94
+Developed land 2020,48,252,46439.8,30294.6,1.53,0.85
+Developed land 2020,49,29,4474.5,3117.7,1.44,0.88
+Developed land 2020,50,14,1593.9,1340.9,1.19,0.87
+Developed land 2020,51,100,10928.1,11192.6,0.98,0.81
+Developed land 2020,53,37,11612.8,8924.5,1.3,0.86
+Developed land 2020,54,55,4335.2,3896.9,1.11,0.84
+Developed land 2020,55,72,12960.3,9161.3,1.41,0.88
+Developed land 2020,56,23,3768.1,1460.4,2.58,0.43
+Developed land 2020 (22-24),01,67,5050.8,10149.3,0.5,0.93
+Developed land 2020 (22-24),04,15,5141.8,7971.2,0.65,0.86
+Developed land 2020 (22-24),05,75,3978.1,6331.7,0.63,0.73
+Developed land 2020 (22-24),06,56,14696.5,19631,0.75,0.91
+Developed land 2020 (22-24),08,64,5231.6,6428.1,0.81,0.65
+Developed land 2020 (22-24),09,8,1712.4,4138.2,0.41,0.88
+Developed land 2020 (22-24),10,3,826.9,1159,0.71,
+Developed land 2020 (22-24),11,1,123.3,0,Inf,
+Developed land 2020 (22-24),12,40,7039.5,10091.5,0.7,0.95
+Developed land 2020 (22-24),13,159,8753,17305.7,0.51,0.88
+Developed land 2020 (22-24),16,44,3670.4,2567.2,1.43,0.58
+Developed land 2020 (22-24),17,102,11530.4,11573.9,1,0.89
+Developed land 2020 (22-24),18,92,7943.1,8630.3,0.92,0.78
+Developed land 2020 (22-24),19,99,6728.3,4454.7,1.51,0.76
+Developed land 2020 (22-24),20,105,5481.2,4935.5,1.11,0.77
+Developed land 2020 (22-24),21,120,3961.6,7235.3,0.55,0.91
+Developed land 2020 (22-24),22,56,4338.9,6192.2,0.7,0.89
+Developed land 2020 (22-24),23,16,1748.7,3069.4,0.57,0.78
+Developed land 2020 (22-24),24,24,3224.8,5942.8,0.54,0.95
+Developed land 2020 (22-24),25,13,3353.8,6830.8,0.49,0.89
+Developed land 2020 (22-24),26,82,10252,16226.8,0.63,0.84
+Developed land 2020 (22-24),27,87,7438,7446.1,1,0.72
+Developed land 2020 (22-24),28,81,3287.8,5881.7,0.56,0.82
+Developed land 2020 (22-24),29,115,6733.7,9161.7,0.73,0.69
+Developed land 2020 (22-24),30,56,3441.4,2059.2,1.67,0.74
+Developed land 2020 (22-24),31,93,3557.6,2332.4,1.53,0.77
+Developed land 2020 (22-24),32,17,2948.2,2055.3,1.43,0.61
+Developed land 2020 (22-24),33,10,1056.8,2670.6,0.4,0.95
+Developed land 2020 (22-24),34,21,4555.8,7451.4,0.61,0.84
+Developed land 2020 (22-24),35,33,2600.4,3754.7,0.69,0.67
+Developed land 2020 (22-24),36,59,7355.8,13087.4,0.56,0.85
+Developed land 2020 (22-24),37,99,8827.3,18030.9,0.49,0.86
+Developed land 2020 (22-24),38,53,3215.6,1293.1,2.49,0.64
+Developed land 2020 (22-24),39,84,9766.9,14365.8,0.68,0.77
+Developed land 2020 (22-24),40,77,5560.9,6518.2,0.85,0.84
+Developed land 2020 (22-24),41,36,4783.7,4753.3,1.01,0.73
+Developed land 2020 (22-24),42,66,8314.7,16440.9,0.51,0.89
+Developed land 2020 (22-24),44,5,600.5,880,0.68,1
+Developed land 2020 (22-24),45,45,4712.7,9417.7,0.5,0.95
+Developed land 2020 (22-24),46,66,2397.6,1626.1,1.47,0.66
+Developed land 2020 (22-24),47,95,5520.5,11604.6,0.48,0.95
+Developed land 2020 (22-24),48,252,27788.4,30294.6,0.92,0.82
+Developed land 2020 (22-24),49,29,3137.4,3117.7,1.01,0.79
+Developed land 2020 (22-24),50,14,645.7,1340.9,0.48,0.85
+Developed land 2020 (22-24),51,100,4643.7,11192.6,0.41,0.74
+Developed land 2020 (22-24),53,37,7342.3,8924.5,0.82,0.8
+Developed land 2020 (22-24),54,55,1510,3896.9,0.39,0.89
+Developed land 2020 (22-24),55,72,6854.9,9161.3,0.75,0.89
+Developed land 2020 (22-24),56,23,1662.2,1460.4,1.14,0.66
+Urbanization,01,67,86,118.8,0.72,0.29
+Urbanization,04,15,87.1,99.4,0.88,0.67
+Urbanization,05,75,62.6,101.7,0.62,0.22
+Urbanization,06,56,181.2,352.7,0.51,0.66
+Urbanization,08,64,80.1,77.8,1.03,0.58
+Urbanization,09,8,9.9,6.8,1.46,0.33
+Urbanization,10,3,12.3,9.9,1.25,
+Urbanization,11,1,0,0,Inf,
+Urbanization,12,40,95.1,90,1.06,0.36
+Urbanization,13,159,127.5,143.5,0.89,0.07
+Urbanization,16,44,50.9,33,1.54,0.51
+Urbanization,17,102,57.4,65.6,0.88,0.54
+Urbanization,18,92,64.7,58.4,1.11,0.28
+Urbanization,19,99,51.2,36.8,1.39,0.26
+Urbanization,20,105,50.2,32.5,1.55,-0.05
+Urbanization,21,120,57.6,63.5,0.91,0.37
+Urbanization,22,56,67.7,84.6,0.8,0.48
+Urbanization,23,16,23.9,48.2,0.5,0.67
+Urbanization,24,24,30.7,26.8,1.15,0.35
+Urbanization,25,13,19.8,9.9,1.99,0.35
+Urbanization,26,82,72.9,90,0.81,0.14
+Urbanization,27,87,55.9,81.5,0.69,0.14
+Urbanization,28,81,58.9,94.2,0.62,0.51
+Urbanization,29,115,67.1,78.3,0.86,0.26
+Urbanization,30,56,73,62.8,1.16,0.57
+Urbanization,31,93,37.6,29.3,1.29,0.37
+Urbanization,32,17,27.4,18.9,1.45,0.58
+Urbanization,33,10,12.7,11,1.15,-0.08
+Urbanization,34,21,21.8,18.3,1.19,0.53
+Urbanization,35,33,71,58.8,1.21,0.24
+Urbanization,36,59,41.7,79.7,0.52,0.51
+Urbanization,37,99,144.7,128.7,1.12,0.56
+Urbanization,38,53,70,23,3.04,0.7
+Urbanization,39,84,76.2,78.4,0.97,0.18
+Urbanization,40,77,85.3,80.3,1.06,0.23
+Urbanization,41,36,58.3,82.1,0.71,0.56
+Urbanization,42,66,73.9,89.3,0.83,0.38
+Urbanization,44,5,3,1.9,1.63,0.9
+Urbanization,45,45,76.8,81.4,0.94,0.47
+Urbanization,46,66,39.6,23.1,1.71,0.37
+Urbanization,47,95,92.5,89.3,1.04,0.55
+Urbanization,48,252,578.3,324.5,1.78,0.34
+Urbanization,49,29,45.2,45.6,0.99,0.38
+Urbanization,50,14,7,12.9,0.54,0.61
+Urbanization,51,100,65.3,93.9,0.7,0.32
+Urbanization,53,37,69.6,104.3,0.67,0.57
+Urbanization,54,55,19.1,31.7,0.6,0.52
+Urbanization,55,72,66.2,88.1,0.75,0.14
+Urbanization,56,23,45,42.1,1.07,0.65
+Urbanization (22-24),01,67,28.3,118.8,0.24,0.14
+Urbanization (22-24),04,15,34.7,99.4,0.35,0.39
+Urbanization (22-24),05,75,24.1,101.7,0.24,0.15
+Urbanization (22-24),06,56,68.1,352.7,0.19,0.64
+Urbanization (22-24),08,64,32.8,77.8,0.42,0.37
+Urbanization (22-24),09,8,4.4,6.8,0.64,0.17
+Urbanization (22-24),10,3,7.1,9.9,0.71,
+Urbanization (22-24),11,1,0,0,Inf,
+Urbanization (22-24),12,40,45.6,90,0.51,0.29
+Urbanization (22-24),13,159,48,143.5,0.33,-0.03
+Urbanization (22-24),16,44,21.6,33,0.65,0.43
+Urbanization (22-24),17,102,25.7,65.6,0.39,0.47
+Urbanization (22-24),18,92,33.9,58.4,0.58,0.21
+Urbanization (22-24),19,99,27.7,36.8,0.75,0.14
+Urbanization (22-24),20,105,19.8,32.5,0.61,0.03
+Urbanization (22-24),21,120,18.3,63.5,0.29,0.24
+Urbanization (22-24),22,56,27.2,84.6,0.32,0.34
+Urbanization (22-24),23,16,7.4,48.2,0.15,0.44
+Urbanization (22-24),24,24,12.3,26.8,0.46,0.3
+Urbanization (22-24),25,13,9.7,9.9,0.97,0.32
+Urbanization (22-24),26,82,28.5,90,0.32,0.15
+Urbanization (22-24),27,87,24.4,81.5,0.3,0.03
+Urbanization (22-24),28,81,17.9,94.2,0.19,0.44
+Urbanization (22-24),29,115,26.6,78.3,0.34,0.12
+Urbanization (22-24),30,56,15.2,62.8,0.24,0.51
+Urbanization (22-24),31,93,16.2,29.3,0.55,0.1
+Urbanization (22-24),32,17,16.6,18.9,0.88,0.33
+Urbanization (22-24),33,10,4.8,11,0.43,-0.18
+Urbanization (22-24),34,21,11.4,18.3,0.62,0.44
+Urbanization (22-24),35,33,16.9,58.8,0.29,0.06
+Urbanization (22-24),36,59,16.8,79.7,0.21,0.28
+Urbanization (22-24),37,99,63.1,128.7,0.49,0.56
+Urbanization (22-24),38,53,28.2,23,1.22,0.64
+Urbanization (22-24),39,84,38.9,78.4,0.5,0.02
+Urbanization (22-24),40,77,40.9,80.3,0.51,0.15
+Urbanization (22-24),41,36,16.3,82.1,0.2,0.27
+Urbanization (22-24),42,66,30.7,89.3,0.34,0.27
+Urbanization (22-24),44,5,1.5,1.9,0.84,0.8
+Urbanization (22-24),45,45,32.1,81.4,0.39,0.42
+Urbanization (22-24),46,66,12.2,23.1,0.53,0.08
+Urbanization (22-24),47,95,31.3,89.3,0.35,0.51
+Urbanization (22-24),48,252,305.7,324.5,0.94,0.3
+Urbanization (22-24),49,29,22.2,45.6,0.49,0.28
+Urbanization (22-24),50,14,2.1,12.9,0.16,0.53
+Urbanization (22-24),51,100,25.7,93.9,0.27,0.2
+Urbanization (22-24),53,37,27.5,104.3,0.26,0.41
+Urbanization (22-24),54,55,6.8,31.7,0.21,0.31
+Urbanization (22-24),55,72,29.6,88.1,0.34,0
+Urbanization (22-24),56,23,7.5,42.1,0.18,0.55
+Urbanization from cr,01,67,8.6,14,0.61,0.72
+Urbanization from cr,04,15,15.8,25.4,0.62,0.9
+Urbanization from cr,05,75,14.4,7.9,1.82,0.93
+Urbanization from cr,06,56,59.1,122.8,0.48,0.86
+Urbanization from cr,08,64,20.8,11.2,1.86,0.71
+Urbanization from cr,09,8,1,2.2,0.46,0.45
+Urbanization from cr,10,3,10.6,7.6,1.4,
+Urbanization from cr,11,1,0,0,Inf,
+Urbanization from cr,12,40,11.2,12,0.94,0.63
+Urbanization from cr,13,159,25,10.6,2.36,0.8
+Urbanization from cr,16,44,22.3,11,2.03,0.71
+Urbanization from cr,17,102,38.2,33.8,1.13,0.63
+Urbanization from cr,18,92,38.8,37.4,1.04,0.55
+Urbanization from cr,19,99,35.5,22.3,1.59,0.61
+Urbanization from cr,20,105,25,9.8,2.56,0.61
+Urbanization from cr,21,120,6.6,15.6,0.42,0.81
+Urbanization from cr,22,56,12.3,8.6,1.43,0.8
+Urbanization from cr,23,16,0.3,3.7,0.08,0.77
+Urbanization from cr,24,24,12,8.3,1.45,0.69
+Urbanization from cr,25,13,0.9,2.6,0.35,0.55
+Urbanization from cr,26,82,39.3,26,1.51,0.8
+Urbanization from cr,27,87,30,17.7,1.69,0.45
+Urbanization from cr,28,81,6.2,7.2,0.85,0.87
+Urbanization from cr,29,115,11.7,12.2,0.96,0.77
+Urbanization from cr,30,56,19.2,4.6,4.19,0.6
+Urbanization from cr,31,93,21.2,9.7,2.19,0.68
+Urbanization from cr,32,17,0.9,2.2,0.43,0.67
+Urbanization from cr,33,10,0.1,2,0.06,0.41
+Urbanization from cr,34,21,10.9,6.9,1.58,0.62
+Urbanization from cr,35,33,3.7,4.7,0.78,0.79
+Urbanization from cr,36,59,6.2,14,0.44,0.77
+Urbanization from cr,37,99,33.2,24.7,1.35,0.77
+Urbanization from cr,38,53,37.8,12.5,3.02,0.64
+Urbanization from cr,39,84,30.3,38.8,0.78,0.67
+Urbanization from cr,40,77,19.3,8.2,2.35,0.86
+Urbanization from cr,41,36,5.5,9,0.61,0.77
+Urbanization from cr,42,66,16.1,28,0.57,0.67
+Urbanization from cr,44,5,0.2,0.6,0.3,0.9
+Urbanization from cr,45,45,15,13.3,1.12,0.86
+Urbanization from cr,46,66,15.4,5.6,2.75,0.71
+Urbanization from cr,47,95,8.2,19,0.43,0.82
+Urbanization from cr,48,252,96.4,75.7,1.27,0.8
+Urbanization from cr,49,29,13.3,17.4,0.76,0.49
+Urbanization from cr,50,14,0.3,1.4,0.19,0.59
+Urbanization from cr,51,100,11.3,17.4,0.65,0.4
+Urbanization from cr,53,37,13,9.9,1.31,0.86
+Urbanization from cr,54,55,0.3,3.7,0.07,0.35
+Urbanization from cr,55,72,42.1,31.4,1.34,0.68
+Urbanization from cr,56,23,1.5,1.8,0.84,0.52
+Urbanization from fr,01,67,25.5,88.8,0.29,0.37
+Urbanization from fr,04,15,1.7,11.1,0.15,0.73
+Urbanization from fr,05,75,15.2,68,0.22,0.68
+Urbanization from fr,06,56,13.5,75.2,0.18,0.68
+Urbanization from fr,08,64,2.1,7.5,0.28,0.8
+Urbanization from fr,09,8,4.8,4,1.22,-0.05
+Urbanization from fr,10,3,1,1.9,0.54,
+Urbanization from fr,11,1,0,0,Inf,
+Urbanization from fr,12,40,27.8,38.8,0.72,0.7
+Urbanization from fr,13,159,51.3,106.2,0.48,-0.04
+Urbanization from fr,16,44,5.3,7.2,0.74,0.81
+Urbanization from fr,17,102,2.6,16.6,0.16,0.5
+Urbanization from fr,18,92,5.1,14,0.36,0.44
+Urbanization from fr,19,99,1.2,8.2,0.15,0.59
+Urbanization from fr,20,105,1,3.6,0.27,0.85
+Urbanization from fr,21,120,7.3,34.2,0.21,0.48
+Urbanization from fr,22,56,16,64.9,0.25,0.81
+Urbanization from fr,23,16,12.5,42.6,0.29,0.75
+Urbanization from fr,24,24,6.2,10.9,0.57,0.19
+Urbanization from fr,25,13,11.1,6.5,1.7,0.32
+Urbanization from fr,26,82,10.1,52.6,0.19,0.31
+Urbanization from fr,27,87,5.5,57.1,0.1,0.71
+Urbanization from fr,28,81,13.7,72.6,0.19,0.68
+Urbanization from fr,29,115,9.2,39.4,0.23,0.72
+Urbanization from fr,30,56,2.9,10.7,0.27,0.82
+Urbanization from fr,31,93,0.2,1.2,0.19,0.61
+Urbanization from fr,32,17,0.2,0.6,0.39,0.49
+Urbanization from fr,33,10,6.6,8.6,0.76,-0.26
+Urbanization from fr,34,21,5.5,8.2,0.67,0.63
+Urbanization from fr,35,33,1,7.6,0.13,0.76
+Urbanization from fr,36,59,10.3,55.5,0.19,0.38
+Urbanization from fr,37,99,50.2,87.3,0.58,0.42
+Urbanization from fr,38,53,0.2,0.8,0.26,0.5
+Urbanization from fr,39,84,9.9,23.3,0.42,0.54
+Urbanization from fr,40,77,8.5,30.2,0.28,0.86
+Urbanization from fr,41,36,14.4,47.2,0.31,0.7
+Urbanization from fr,42,66,16.3,47.7,0.34,0.1
+Urbanization from fr,44,5,1.6,1,1.63,0.9
+Urbanization from fr,45,45,30.5,61.2,0.5,0.44
+Urbanization from fr,46,66,1.3,0.7,1.91,0.31
+Urbanization from fr,47,95,17.1,43.4,0.39,0.39
+Urbanization from fr,48,252,59.3,81.7,0.73,0.85
+Urbanization from fr,49,29,0.9,4.5,0.2,0.57
+Urbanization from fr,50,14,1.5,9,0.16,0.44
+Urbanization from fr,51,100,19.2,64.1,0.3,0.43
+Urbanization from fr,53,37,15.5,59.6,0.26,0.8
+Urbanization from fr,54,55,5.6,22.5,0.25,0.19
+Urbanization from fr,55,72,5.5,45.8,0.12,0.6
+Urbanization from fr,56,23,0.4,1.8,0.21,0.38
+Urbanization from ps,01,67,40.4,16,2.53,0.57
+Urbanization from ps,04,15,0.4,0.9,0.49,0.7
+Urbanization from ps,05,75,28.7,25.7,1.12,0.82
+Urbanization from ps,06,56,2.6,29.4,0.09,0.29
+Urbanization from ps,08,64,1.8,2.6,0.68,0.28
+Urbanization from ps,09,8,3,0.6,4.92,0.6
+Urbanization from ps,10,3,0.2,0.4,0.48,
+Urbanization from ps,11,1,0,0,Inf,
+Urbanization from ps,12,40,40.2,37.2,1.08,0.6
+Urbanization from ps,13,159,35.8,26.8,1.34,0.42
+Urbanization from ps,16,44,3.6,5.9,0.6,0.25
+Urbanization from ps,17,102,14.5,15.2,0.96,0.63
+Urbanization from ps,18,92,19.3,7,2.76,0.63
+Urbanization from ps,19,99,13.3,6.2,2.13,0.54
+Urbanization from ps,20,105,10.4,4.7,2.22,0.74
+Urbanization from ps,21,120,42.3,13.6,3.11,0.67
+Urbanization from ps,22,56,26.3,11,2.38,0.51
+Urbanization from ps,23,16,5.6,1.9,2.92,0.49
+Urbanization from ps,24,24,10.3,7.6,1.37,0.76
+Urbanization from ps,25,13,4,0.8,4.78,0.77
+Urbanization from ps,26,82,10.7,11.4,0.94,0.34
+Urbanization from ps,27,87,16.9,6.7,2.54,0.45
+Urbanization from ps,28,81,31.4,14.3,2.19,0.66
+Urbanization from ps,29,115,44.3,26.6,1.67,0.49
+Urbanization from ps,30,56,3.6,7.6,0.47,0.49
+Urbanization from ps,31,93,1,1.4,0.74,0.53
+Urbanization from ps,32,17,0.4,0.8,0.5,0.5
+Urbanization from ps,33,10,3.2,0.4,8.67,0.67
+Urbanization from ps,34,21,2.9,3.1,0.91,0.67
+Urbanization from ps,35,33,2.6,1.1,2.35,-0.01
+Urbanization from ps,36,59,21.9,10.2,2.14,0.75
+Urbanization from ps,37,99,44.2,16.7,2.64,0.73
+Urbanization from ps,38,53,3.4,0.1,23.45,0.25
+Urbanization from ps,39,84,35.1,16.3,2.15,0.64
+Urbanization from ps,40,77,16.5,28.4,0.58,0.67
+Urbanization from ps,41,36,16.4,8.3,1.98,0.4
+Urbanization from ps,42,66,39.1,13.6,2.89,0.65
+Urbanization from ps,44,5,0.6,0.3,2.01,0.8
+Urbanization from ps,45,45,19.2,6.9,2.79,0.77
+Urbanization from ps,46,66,5.6,0.2,28.2,0.22
+Urbanization from ps,47,95,63.6,27,2.36,0.77
+Urbanization from ps,48,252,103.9,85.8,1.21,0.75
+Urbanization from ps,49,29,5.2,7,0.75,0.12
+Urbanization from ps,50,14,4.7,2.5,1.91,0.7
+Urbanization from ps,51,100,27.9,12.4,2.25,0.81
+Urbanization from ps,53,37,17.2,14.6,1.17,0.57
+Urbanization from ps,54,55,11.5,5.6,2.05,0.62
+Urbanization from ps,55,72,13.8,10.9,1.27,0.52
+Urbanization from ps,56,23,1.3,2.6,0.48,0.11
+Urbanization from rg,01,67,8.7,0.1,165.52,-0.19
+Urbanization from rg,04,15,68.6,62,1.11,0.6
+Urbanization from rg,05,75,2.9,0,122.05,0.17
+Urbanization from rg,06,56,101.9,125.3,0.81,0.54
+Urbanization from rg,08,64,54.7,56.5,0.97,0.52
+Urbanization from rg,09,8,0.6,0,Inf,
+Urbanization from rg,10,3,0.1,0,Inf,
+Urbanization from rg,11,1,0,0,Inf,
+Urbanization from rg,12,40,4.9,2,2.41,-0.26
+Urbanization from rg,13,159,10.9,0,Inf,
+Urbanization from rg,16,44,19.5,8.9,2.19,0.4
+Urbanization from rg,17,102,1,0,Inf,
+Urbanization from rg,18,92,0.9,0,Inf,
+Urbanization from rg,19,99,0.7,0,Inf,
+Urbanization from rg,20,105,13.4,14.4,0.93,0.55
+Urbanization from rg,21,120,1,0,Inf,
+Urbanization from rg,22,56,7.3,0.1,137.46,0.13
+Urbanization from rg,23,16,4.6,0,Inf,
+Urbanization from rg,24,24,1.5,0,Inf,
+Urbanization from rg,25,13,2.8,0,Inf,
+Urbanization from rg,26,82,9.7,0,Inf,
+Urbanization from rg,27,87,1.4,0,Inf,
+Urbanization from rg,28,81,5.7,0,Inf,
+Urbanization from rg,29,115,1,0,21.57,-0.07
+Urbanization from rg,30,56,47,39.9,1.18,0.61
+Urbanization from rg,31,93,14.7,17,0.86,0.56
+Urbanization from rg,32,17,23.3,15.4,1.52,0.54
+Urbanization from rg,33,10,2.1,0,Inf,
+Urbanization from rg,34,21,0.9,0,Inf,
+Urbanization from rg,35,33,63.3,45.3,1.4,0.08
+Urbanization from rg,36,59,1.9,0,Inf,
+Urbanization from rg,37,99,13.7,0,Inf,
+Urbanization from rg,38,53,28.2,9.5,2.96,0.78
+Urbanization from rg,39,84,0.5,0,Inf,
+Urbanization from rg,40,77,40.6,13.4,3.03,0.62
+Urbanization from rg,41,36,21.5,17.6,1.22,0.77
+Urbanization from rg,42,66,1.4,0,Inf,
+Urbanization from rg,44,5,0.4,0,Inf,
+Urbanization from rg,45,45,6.9,0,Inf,
+Urbanization from rg,46,66,17.1,16.6,1.03,0.54
+Urbanization from rg,47,95,2.8,0,Inf,
+Urbanization from rg,48,252,303.3,81.4,3.73,0.43
+Urbanization from rg,49,29,24.8,16.7,1.49,0.62
+Urbanization from rg,50,14,0.4,0,Inf,
+Urbanization from rg,51,100,5.4,0,Inf,
+Urbanization from rg,53,37,23.1,20.1,1.15,0.72
+Urbanization from rg,54,55,1.6,0,Inf,
+Urbanization from rg,55,72,3.2,0,Inf,
+Urbanization from rg,56,23,41.6,35.9,1.16,0.64
