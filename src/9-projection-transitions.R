@@ -12,7 +12,7 @@
 #     cell transition
 #   * Land Use Demand (2026-11-14, src/land-use-demand.R): the Urbanization target's drawn area may be multiplied by a ratio per unit and
 #     year - the record's own high or low years, the 2020 RPA Assessment, EPA ICLUS, county population by SSP times land per new
-#     resident, or the user's table (Land Use Demand Ratios lists every unit and year). Default: the drawn area as it is
+#     resident, or the user's table (Land Use Multipliers Applied lists every unit and year). Default: the drawn area as it is
 #   * named groups (the default rules, 2026-10-22): a Target named group (Urbanization) gets one area per unit and year, its members'
 #     areas summed, and the spatial allocation decides which member type each cell gets; Historical Type Shares (Projection Options)
 #     weights the members by their historical shares instead. A Probability named group (Fire) is split into its members
@@ -242,7 +242,7 @@ if (tiles > 1) { chg <- pt[Method == "Target" & StrataLevel != tile_lvl, Transit
 tg <- pt[Method == "Target"]; new_tt <- list(); new_sm <- list(); rates <- list(); allow_files <- list()
 # Land Use Demand (user decisions 2026-11-14, src/land-use-demand.R): alternative amounts of urbanization. Every method is a ratio per
 # unit and year on the Urbanization target group's drawn area, as it is: the record's own high or low years, the 2020 RPA Assessment,
-# county population by SSP times land per new resident, or the user's own table. Intensification may follow it (Land Use Demand page)
+# county population by SSP times land per new resident, or the user's own table. Intensification may follow it (Land Use Change page)
 source(pkg_file("src", "land-use-demand.R")); dm <- demand_options(read_ds("LandUseDemand")); dm_out <- list(); wcell <- numeric(length(land))
 dm_Y <- NULL; dm_Yi <- NULL; dm_pool <- NULL; dm_cover <- FALSE
 dm_follow <- { v <- read_ds("LandUseDemand"); nrow(v) > 0 && "IntensificationFollows" %in% names(v) && toupper(as.character(v$IntensificationFollows[1])) %in% c("YES", "TRUE", "-1", "1") }
@@ -251,21 +251,21 @@ if (dm$method != "Historical" && !any(grepl("^Urbanization", tg$TransitionGroupI
 dm_county <- function() { if (is.null(rows[["Counties"]])) fail("Land Use Demand: %s needs the Counties stratum source (Stratum Sources page): it is a county table, and each cell takes its county's ratio", dm$method)
   tryCatch(unit_map("Counties"), error = function(e) fail("Land Use Demand: the county polygons could not be read (%s)", conditionMessage(e))) }
 dm_pool_name <- c(County = "county", Metro = "metropolitan area (other counties by state)", State = "state")
-# the user's table for one kind of change (Land Use Demand Ratios; Applies To blank = Urbanization): a ratio by year for any Stratum Source
+# the user's table for one kind of change (the custom multipliers of the Land Use Change page; Applies To blank = Urbanization): a ratio by year for any Stratum Source
 # unit, or everywhere (blank unit); where units overlap the smaller one decides. Returns the ratios by key and year and each cell's key
 dm_custom <- function(kind) { cr <- read_ds("LandUseDemandRatio")
   if (nrow(cr)) { ap <- if ("AppliesTo" %in% names(cr)) as.character(cr$AppliesTo) else rep(NA_character_, nrow(cr)); ap[is.na(ap) | !nzchar(ap)] <- "Urbanization"; cr <- cr[ap == kind] }
-  if (!nrow(cr)) fail("Land Use Demand: Custom ratio table is chosen for %s, and the Land Use Demand Ratios table has no row for it", kind)
+  if (!nrow(cr)) fail("Land Use Demand: Custom ratio table is chosen for %s, and the Land Use Change page has no custom multipliers for it", kind)
   Y <- tryCatch(demand_custom(data.table(Key = if ("UnitId" %in% names(cr)) as.character(cr$UnitId) else NA_character_, Year = as.integer(cr$Year), Ratio = as.numeric(cr$Ratio)), pyrs, y1),
                 error = function(e) fail("Land Use Demand, %s: %s", kind, conditionMessage(e)))
   pool <- rep(if (DEMAND_EVERYWHERE %in% rownames(Y)) DEMAND_EVERYWHERE else NA_character_, length(land)); keys <- setdiff(rownames(Y), DEMAND_EVERYWHERE)
   ul9 <- stsim_list("SecondaryStratum"); by_num <- setNames(rows, vapply(rows, function(s) as.character(s$Number), ""))
-  cells <- lapply(keys, function(k) { id <- as.numeric(ul9$Id[match(k, ul9$Name)]); if (is.na(id)) fail("Land Use Demand Ratios: unit '%s' is not in the unit list", k)
-    s <- by_num[[as.character(unit_source(id))]]; if (is.null(s)) fail("Land Use Demand Ratios: no Stratum Source for unit '%s'", k)
+  cells <- lapply(keys, function(k) { id <- as.numeric(ul9$Id[match(k, ul9$Name)]); if (is.na(id)) fail("Land Use custom multipliers: unit '%s' is not in the unit list", k)
+    s <- by_num[[as.character(unit_source(id))]]; if (is.null(s)) fail("Land Use custom multipliers: no Stratum Source for unit '%s'", k)
     which(land & unit_map(s$Preset) == unit_native(id)) })
   for (j in order(-lengths(cells))) pool[cells[[j]]] <- keys[j]
-  if (any(lengths(cells) == 0)) say("Land Use Demand Ratios, %s: not in the study area, so unused: %s", kind, paste(keys[lengths(cells) == 0], collapse = "; "))
-  say("Land Use Demand: %s follows the Land Use Demand Ratios table: %d units%s; %.0f%% of the land has a ratio (1 elsewhere); ratios %.2f-%.2f, not capped", kind,
+  if (any(lengths(cells) == 0)) say("Land Use custom multipliers, %s: not in the study area, so unused: %s", kind, paste(keys[lengths(cells) == 0], collapse = "; "))
+  say("Land Use Demand: %s follows the custom multipliers of the Land Use Change page: %d units%s; %.0f%% of the land has a ratio (1 elsewhere); ratios %.2f-%.2f, not capped", kind,
       length(keys), if (DEMAND_EVERYWHERE %in% rownames(Y)) " and a row for everywhere" else "", 100 * mean(!is.na(pool[land])), min(Y), max(Y))
   list(method = "Custom", Y = Y, pool = pool, cover = FALSE, cap = Inf) }
 if (dm$method == "RPA") { if (is.na(dm$pair)) fail("Land Use Demand: RPA scenario '%s' is not one of the four RPA pairs", dm$scenario)

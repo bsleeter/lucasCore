@@ -211,9 +211,9 @@ demand_fill <- function(ratios, units_here, state_ratios) { miss <- setdiff(unit
 # the user's table (Key = a unit's name, or NA for everywhere; Year; Ratio) to keys x years: linear between a key's years, from 1 in the
 # historical end year when its first year is later, the last value kept
 demand_custom <- function(rows, years, y_end) { rows <- data.table::as.data.table(rows)[!is.na(Year) & !is.na(Ratio)]
-  if (!nrow(rows)) stop("the Land Use Demand Ratios table has no row with a year and a ratio", call. = FALSE)
+  if (!nrow(rows)) stop("the custom multipliers (Land Use Change page) have no row with a year and a multiplier", call. = FALSE)
   if (any(rows$Ratio < 0)) stop("a Land Use Demand ratio cannot be below 0", call. = FALSE)
-  rows[is.na(Key) | !nzchar(Key), Key := DEMAND_EVERYWHERE]; if (anyDuplicated(rows[, .(Key, Year)])) stop("the Land Use Demand Ratios table has two rows for one unit and year", call. = FALSE)
+  rows[is.na(Key) | !nzchar(Key), Key := DEMAND_EVERYWHERE]; if (anyDuplicated(rows[, .(Key, Year)])) stop("the custom multipliers (Land Use Change page) have two rows for one unit and year", call. = FALSE)
   keys <- unique(rows$Key)
   out <- t(vapply(keys, function(k) { x <- rows[Key == k][order(Year)]; yy <- x$Year; rr <- x$Ratio; if (yy[1] > y_end) { yy <- c(y_end, yy); rr <- c(1, rr) }
     if (length(yy) == 1) rep(rr, length(years)) else stats::approx(yy, rr, xout = years, rule = 2)$y }, numeric(length(years))))

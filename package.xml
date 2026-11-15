@@ -181,9 +181,12 @@
 		<dataSheet name="ProjectionOptions"/>
 		<dataSheet name="ProjectionStart"/>
 	</dataFeed>
-	<dataFeed name="ProjectionTransitions" displayName="Land Use" viewClassName="lucasCoreUI.ProjectionTransitionsView" viewClassAssembly="lucasCoreUI">
+	<dataFeed name="ProjectionTransitions" displayName="Land Use Change" viewClassName="lucasCoreUI.ProjectionTransitionsView" viewClassAssembly="lucasCoreUI">
+		<!-- one page (user 2026-11-15): a card per kind of change - how much (Land Use Demand, custom multipliers) and where and how -->
 		<dataSheet name="ProjectionTransition"/>
 		<dataSheet name="ProjectionAllocation"/>
+		<dataSheet name="LandUseDemand"/>
+		<dataSheet name="LandUseDemandRatio"/>
 	</dataFeed>
 	<dataFeed name="SpatialAllocation" displayName="Spatial Allocation" viewClassName="lucasCoreUI.SpatialAllocationView" viewClassAssembly="lucasCoreUI">
 		<dataSheet name="SuitabilityOptions"/>
@@ -337,11 +340,11 @@
 	<!-- Urbanization, Ag Expansion, Ag Contraction or Forest Harvest Demand = Custom ratio table: a multiplier on the drawn area by year, for any Stratum Source unit (a state, a county, a
 	     metropolitan area ...) or everywhere (blank unit). Linear between a unit's years, from 1 in the historical end year when its first
 	     year is later, the last value kept; where units overlap the smaller one decides -->
-	<dataSheet name="LandUseDemandRatio" displayName="Land Use Demand Ratios (custom table)">
+	<dataSheet name="LandUseDemandRatio" displayName="Land Use Custom Multipliers">
 		<column name="AppliesTo" displayName="Applies To (blank = Urbanization)" dataType="Integer" validationType="List" formula1="1:Urbanization|2:Ag Expansion|3:Ag Contraction|4:Forest Harvest" isOptional="True"/>
 		<column name="UnitId" displayName="Unit (blank = everywhere)" dataType="Integer" validationType="Datasheet" formula1="stsim_SecondaryStratum" isOptional="True"/>
 		<column name="Year" dataType="Integer" validationType="WholeNumber" validationCondition="Greater" formula1="0"/>
-		<column name="Ratio" displayName="Ratio to the Drawn Area (1 = the historical rate)" dataType="Double" validationType="Decimal" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="Ratio" displayName="Multiplier on the Drawn Area (1 = the historical rate)" dataType="Double" validationType="Decimal" validationCondition="GreaterEqual" formula1="0"/>
 	</dataSheet>
 
 	<!-- to-do 58(user 2026-11-13: "Start with replanting, salvage and site prep on a dedicated page"): management after a disturbance
@@ -955,13 +958,13 @@
 		<column name="AllowedShare" displayName="Share of Eligible Area Allowed (GAP)" dataType="Double" format="0.000"/>
 	</dataSheet>
 
-	<dataSheet name="OutputLandUseDemand" displayName="Land Use Demand Ratios (by unit and year)">
+	<dataSheet name="OutputLandUseDemand" displayName="Land Use Multipliers Applied (by unit and year)">
 		<!-- stage 9: the multiplier on each target unit's drawn area, when Land Use Demand is not Historical -->
 		<column name="TransitionGroup" displayName="Transition Group" dataType="String"/>
 		<column name="Unit" dataType="String"/>
 		<column name="Timestep" dataType="Integer"/>
-		<column name="Ratio" displayName="Ratio to the Drawn Area" dataType="Double" format="0.000"/>
-		<column name="MeanArea" displayName="Mean Annual Area After the Ratio (km2, over iterations)" dataType="Double" format="0.000"/>
+		<column name="Ratio" displayName="Multiplier on the Drawn Area" dataType="Double" format="0.000"/>
+		<column name="MeanArea" displayName="Mean Annual Area After the Multiplier (km2, over iterations)" dataType="Double" format="0.000"/>
 	</dataSheet>
 
 	<dataSheet name="OutputClimateSummary" displayName="Climate Multiplier Summary">
@@ -1663,8 +1666,6 @@
 			<group name="lucasCoreProjection" displayName="Projection">
 				<item name="ProjectionRun"/>
 				<item name="ProjectionTransitions"/>
-				<item name="LandUseDemand"/>
-				<item name="LandUseDemandRatio"/>
 				<item name="SpatialAllocation"/>
 				<item name="FireOptions"/>
 				<item name="ReforestationOptions"/>

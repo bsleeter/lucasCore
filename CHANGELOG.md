@@ -7,8 +7,12 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
 ### Added
 - Land Use Demand: alternative amounts of urbanization in a projection, to see a wide range of what could happen with development
   under different scenario assumptions. Every method is a ratio per unit and year that multiplies the Urbanization target's drawn
-  area, as it is (a ratio of 1 keeps the reference period's rate). New pages Projection > Land Use Demand and Land Use Demand
-  Ratios; new output sheet Land Use Demand Ratios (every unit and year). Urbanization Demand is one of:
+  area, as it is (a ratio of 1 keeps the reference period's rate). Set on the Projection > Land Use Change page: one page with a
+  card per kind of change (urbanization, intensification, agricultural expansion and contraction, cropland and pasture exchange,
+  forest harvest). Each card asks how much (the choice shows only its own settings, custom multipliers are entered in the card,
+  with a sentence and a chart of the multiplier through time) and folds the units, shared draw, protected land and placement
+  behind "Where and how". It replaces the Land Use page and the Land Use Demand sheets as separate pages. New output sheet Land
+  Use Multipliers Applied (every unit and year). Urbanization is one of:
   - **Historical years as drawn** (the default: no ratio).
   - **Historical high years / low years**: each target unit's mean area in its highest (lowest) third of reference years over its
     mean in all of them.

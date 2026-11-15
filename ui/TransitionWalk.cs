@@ -49,10 +49,21 @@ namespace lucasCoreUI
         {
             public string Key, Name; public int Family;
             public ComboBox Method, Strata, Units, Set; public readonly CheckBox[] Gap = new CheckBox[3];
-            public Label ByStrata, ByUnits, MethodNote;
+            public Label ByStrata, ByUnits, MethodNote; public Card Card;
             public readonly List<Place> Places = new List<Place>();
         }
         private class Place { public string Key, Name; public ComboBox Method, Size; public TextBox Surface; public CheckBox Adj; public Label Note; }
+
+        // a card (Land Use Change page): the groups whose names start with one of Prefixes, under the page's own Head (how much), with
+        // their walkthrough folded behind "Where and how" (closed: one sentence per group). Groups of no card go by family, as before
+        public class Card
+        {
+            public string Title; public string[] Prefixes; public Control Head;
+            internal FlowLayoutPanel Body; internal Label Summary; internal Button Toggle; internal bool Shown;
+            internal bool Has(string g) { return Prefixes.Any(x => g.StartsWith(x)); }
+        }
+        public List<Card> Cards;
+        private readonly HashSet<string> m_open = new HashSet<string>();
 
         private static readonly string[] METHOD = { "Target area", "Rate map", "Off" };
         private static readonly string[] METHOD_NOTE = { "The drawn year's area, per unit.", "The drawn year's rate, per unit.", "No change after the historical end." };
@@ -148,6 +159,7 @@ namespace lucasCoreUI
         private void Build()
         {
             Host.SuspendLayout();
+            if (Cards != null) foreach (Card k in Cards) { if (k.Head != null && k.Head.Parent != null) k.Head.Parent.Controls.Remove(k.Head); k.Shown = false; k.Body = null; k.Summary = null; }   // (the heads are the page's: kept)
             foreach (Control c in Host.Controls.Cast<Control>().ToList()) c.Dispose();
             Host.Controls.Clear(); Host.RowStyles.Clear(); m_blocks.Clear(); m_loose.Clear();
             DataSheet tr = m_tr(), al = m_al();
@@ -167,9 +179,25 @@ namespace lucasCoreUI
             var sets = new List<string> { "Land use", "Harvest", "Fire", "Reforestation" };
             foreach (DataRow r in Rows(tr)) { string s = Txt(Get(r, "SamplingSet")).Trim(); if (s.Length > 0 && !sets.Contains(s)) sets.Add(s); }
             var units = Choices(tr, "UnitSourceId");
+            if (Cards != null) foreach (Card k in Cards)
+            {
+                var kb = m_blocks.Where(x => x.Card == null && m_families.Contains(x.Family) && k.Has(x.Name)).ToList();
+                if (kb.Count == 0) continue;
+                k.Body = ManagementActionsView.Lines(); k.Body.Margin = new Padding(16, 0, 0, 0);
+                foreach (Block b in kb) { b.Card = k; MakeBlock(b, k.Body, sets, units); }
+                k.Toggle = new Button { FlatStyle = FlatStyle.Flat, AutoSize = true, TextAlign = ContentAlignment.MiddleLeft, Margin = new Padding(0, 2, 6, 2), Tag = Fit.Fixed };
+                k.Toggle.FlatAppearance.BorderSize = 0;
+                k.Summary = Note(""); k.Summary.Margin = new Padding(3, 8, 3, 3);
+                Card card = k;
+                k.Toggle.Click += (s, e) => { if (!m_open.Remove(card.Title)) m_open.Add(card.Title); Fold(card); m_refresh(); };
+                Fold(k); k.Shown = true;
+                var rule = new Label { AutoSize = false, Height = 1, Width = 760, BackColor = SystemColors.ControlLight, Margin = new Padding(3, 8, 3, 2), Tag = Fit.Fixed };
+                Host.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+                Host.Controls.Add(Group(k.Title, ManagementActionsView.Lines(k.Head, rule, Flow(k.Toggle, k.Summary), k.Body)));
+            }
             foreach (int f in m_families)
             {
-                var bs = m_blocks.Where(x => x.Family == f).ToList();
+                var bs = m_blocks.Where(x => x.Family == f && x.Card == null).ToList();
                 bool loose = f == OTHER && m_loose.Count > 0;
                 if (bs.Count == 0 && !loose) continue;
                 var col = ManagementActionsView.Lines(Note(FamilyNote[f]));
@@ -179,6 +207,12 @@ namespace lucasCoreUI
                 Host.Controls.Add(Group(Title[f], col));
             }
             Host.ResumeLayout(true);
+        }
+
+        private void Fold(Card k)
+        {
+            bool open = m_open.Contains(k.Title);
+            k.Toggle.Text = (open ? "▾" : "▸") + "  Where and how"; k.Body.Visible = open; k.Summary.Visible = !open;
         }
 
         private void MakeBlock(Block b, FlowLayoutPanel col, List<string> sets, List<KeyValuePair<object, string>> units)
@@ -319,14 +353,17 @@ namespace lucasCoreUI
             var setSize = new Dictionary<string, int>();
             foreach (DataRow r in Rows(tr)) { string s = Txt(Get(r, "SamplingSet")).Trim(); if (s.Length > 0) setSize[s] = setSize.ContainsKey(s) ? setSize[s] + 1 : 1; }
             var words = new List<string>();
+            var said = new Dictionary<Card, List<string>>();
             foreach (Block b in m_blocks)
             {
                 if (!m_families.Contains(b.Family)) continue;
                 DataRow r = Find(tr, b.Key); if (r == null) continue;
                 ShowBlock(b, r, units);
                 foreach (Place p in b.Places) { DataRow a = Find(al, p.Key); if (a != null) ShowPlace(p, a); }
-                words.Add(Describe(b, r, units, setSize));
+                string w = Describe(b, r, units, setSize); words.Add(w);
+                if (b.Card != null) { if (!said.ContainsKey(b.Card)) said[b.Card] = new List<string>(); said[b.Card].Add(w); }
             }
+            foreach (var kv in said) if (kv.Key.Summary != null) kv.Key.Summary.Text = string.Join("  ", kv.Value);
             if (m_families.Contains(OTHER)) foreach (Place p in m_loose) { DataRow a = Find(al, p.Key); if (a != null) ShowPlace(p, a); }
             return words;
         }
