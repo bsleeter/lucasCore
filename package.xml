@@ -1331,6 +1331,7 @@
 		<dataSheet name="stsim_OutputFilterStocks" type="Output"/>
 		<dataSheet name="stsim_OutputFilterTransitionGroups" type="Both"/>
 		<dataSheet name="stsim_OutputOptionsSpatial" type="Both"/>
+		<dataSheet name="stsim_OutputOptions" type="Both"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
 

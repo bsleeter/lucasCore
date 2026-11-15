@@ -9,7 +9,7 @@
 # When the scenario already has a flow pathway diagram (a Stock-Flow Definitions dependency), the stage writes none of these.
 # It also writes the transition group output filter (src/transition-filter.R: summaries for every group, maps only for the main groups
 # of defaults/stockflow/main-transition-groups.csv) and the spatial output options (state class, age and transition maps every year)
-# whenever the scenario has none, dependency or not.
+# and the tabular output options (state class and transition summaries every year) whenever the scenario has none, dependency or not.
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
 STAGE <- "0 Stock-Flow Definitions"
@@ -50,6 +50,15 @@ if (!nrow(as.data.table(datasheet(scn, "stsim_OutputOptionsSpatial", optional = 
   saveDatasheet(scn, as.data.frame(o), "stsim_OutputOptionsSpatial")
   check(STAGE, "spatial output options written (age maps on)", identical(o$RasterOutputAge[1], "Yes"),
         sprintf("state class every %s yr, age every %s yr, transitions every %s yr", o$RasterOutputSCTimesteps, o$RasterOutputAgeTimesteps, o$RasterOutputTRTimesteps))
+}
+# the tabular output options, written whenever the scenario has none: state class and transition summaries every year
+# (defaults/stockflow/stsim_OutputOptions.csv). User 2026-11-15: a Historical scenario made in Studio on a Build result had stocks,
+# flows, maps and the filters on, and no tabular state classes or transitions. A run scenario that sets its own replaces these whole.
+if (!nrow(as.data.table(datasheet(scn, "stsim_OutputOptions", optional = TRUE, lookupsAsFactors = FALSE)))) {
+  o <- read_default("stockflow", "stsim_OutputOptions.csv")
+  saveDatasheet(scn, as.data.frame(o), "stsim_OutputOptions")
+  check(STAGE, "tabular output options written (state classes and transitions)", identical(o$SummaryOutputSC[1], "Yes") && identical(o$SummaryOutputTR[1], "Yes"),
+        sprintf("state classes every %s yr, transitions every %s yr", o$SummaryOutputSCTimesteps, o$SummaryOutputTRTimesteps))
 }
 progressBar()
 finish_checks()
