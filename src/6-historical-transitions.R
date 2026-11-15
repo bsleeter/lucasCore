@@ -395,7 +395,8 @@ if (nrow(hg)) {
   # blocked, expected area: a cut on a cell not yet reset (chance 1 - pr) is blocked if the raised start age has not reached the minimum;
   # one on a reset cell (chance pr) if the years since its last clearcut have not
   last <- rep(NA_real_, length(vS)); pr <- rep(0, length(vS)); after <- 0
-  age_blocked <- rbindlist(lapply(seq_len(nrow(hl)), function(i) { v <- values(rast(hl$File[i]), mat = FALSE); y <- hl$Timestep[i]; vm <- vMin[[hl$TransitionGroupId[i]]]
+  # (a study area with no harvest at all, e.g. Hart Mountain 2026-11-14: no layers, so an empty table with the columns)
+  age_blocked <- if (!nrow(hl)) data.table(Timestep = integer(), TransitionGroupId = character(), AgeBlockedArea = numeric()) else rbindlist(lapply(seq_len(nrow(hl)), function(i) { v <- values(rast(hl$File[i]), mat = FALSE); y <- hl$Timestep[i]; vm <- vMin[[hl$TransitionGroupId[i]]]
     on <- !is.na(v) & v > 0 & !is.na(vm)
     b0 <- (vA2 + (y - y0 - 1)) < vm; b1 <- !is.na(last) & (y - last - 1) < vm
     e0 <- v * (1 - pr) * b0; e1 <- v * pr * b1; after <<- after + sum(e1[on]) * cell_km2

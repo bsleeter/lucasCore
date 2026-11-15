@@ -66,7 +66,8 @@ check(STAGE, "the model takes in every Mg C the run moved to Forestry Sector", {
 s <- wp_summary(m, interval = wp_setting(P, "Interval"))
 write_ds(s[order(Variable, Iteration, Year), .(Iteration, Year, Source, Variable, Mean, Lower, Upper, RunScenarioId = rid)], "OutputWoodProducts")
 write_ds(m$enduse[, .(InUse = mean(InUse)), by = .(Year, EndUse)][order(Year, -InUse), .(Year, EndUse, InUse, RunScenarioId = rid)], "OutputWoodProductsEndUse")
-if (!is.null(m$scale)) write_ds(m$scale[, .(Iteration, Region, Wood, RunCarbon, HistoryVolume, Scale)], "OutputWoodProductsScale")
+# (no removals in the spin-up years, e.g. Hart Mountain 2026-11-14 with no harvest: an empty table, which SyncroSim refuses to save)
+if (!is.null(m$scale) && nrow(m$scale)) write_ds(m$scale[, .(Iteration, Region, Wood, RunCarbon, HistoryVolume, Scale)], "OutputWoodProductsScale")
 A <- s[is.na(Iteration)]; g <- function(k, y) { z <- A[Variable == k & Year == y]; if (nrow(z)) z else data.table(Mean = 0, Lower = 0, Upper = 0) }
 say("%d: %.3f Tg C stored (%.3f-%.3f), %.3f Tg C/yr stock change; %.0f%% of what the run removed is still stored (the stock gained since %d over the removals)",
     R$end, g("Stored", R$end)$Mean / 1e6, g("Stored", R$end)$Lower / 1e6, g("Stored", R$end)$Upper / 1e6, g("StockChange", R$end)$Mean / 1e6,

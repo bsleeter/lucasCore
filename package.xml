@@ -314,7 +314,7 @@
 	     sets the replanting priority. An empty sheet: no management (the baseline). Area above the historical rate: the fitted
 	     natural return already includes whatever planting followed past fires -->
 	<dataSheet name="ManagementAction" displayName="Management Actions" viewClassName="lucasCoreUI.ManagementActionsView" viewClassAssembly="lucasCoreUI">
-		<column name="ActionId" displayName="Action" dataType="Integer" validationType="List" formula1="1:Replanting|2:Salvage logging"/>
+		<column name="ActionId" displayName="Action" dataType="Integer" validationType="List" formula1="1:Replanting|2:Salvage logging|3:Aerial seeding|4:Drill seeding|5:Sagebrush planting|6:Herbicide and seeding"/>
 		<column name="StartYear" displayName="Start Year (blank = the first projection year)" dataType="Integer" isOptional="True"/>
 		<column name="EndYear" displayName="End Year (blank = the projection end)" dataType="Integer" isOptional="True"/>
 		<column name="Amount" displayName="Area per Year (the library's amount units, e.g. hectares; or a Budget)" dataType="Double" validationType="Decimal" validationCondition="GreaterEqual" formula1="0" isOptional="True"/>
@@ -322,12 +322,12 @@
 		<column name="StratumId" displayName="Primary Stratum (ecodivision; blank = any)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
 		<column name="SecondaryStratumId" displayName="Secondary Stratum (blank = any)" dataType="Integer" validationType="Datasheet" formula1="stsim_SecondaryStratum" isOptional="True"/>
 		<column name="TertiaryStratumId" displayName="Tertiary Stratum (blank = any; blank at every level = the whole study area)" dataType="Integer" validationType="Datasheet" formula1="stsim_TertiaryStratum" isOptional="True"/>
-		<column name="MinAge" displayName="From Year Since the Disturbance (blank: replanting 1, salvage 0)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
-		<column name="MaxAge" displayName="To Year Since the Disturbance (blank: replanting 5, salvage 2)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="MinAge" displayName="From Year Since the Disturbance (blank: replanting 1, salvage 0, seeding 0, sagebrush planting 1, herbicide and seeding 0)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="MaxAge" displayName="To Year Since the Disturbance (blank: replanting 5, salvage 2, seeding 1, sagebrush planting 3, herbicide and seeding any)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
 		<column name="Priority" displayName="Priority (replanting)" dataType="Integer" validationType="List" formula1="1:None (random among eligible cells)|2:Far from live forest (least likely to return on its own)" defaultValue="1" isOptional="True"/>
-		<column name="Survival" displayName="Survival (replanting: share of the planted area that takes)" dataType="Double" defaultValue="0.8" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+		<column name="Survival" displayName="Survival or Success (share that takes; blank: replanting 0.8, aerial seeding 0.15, drill seeding 0.25, sagebrush planting 0.35, herbicide and seeding 0.3)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
 		<column name="SitePreparation" displayName="Site Preparation (replanting)" dataType="Integer" validationType="List" formula1="1:None|2:Pile and burn|3:Mechanical (mastication)" defaultValue="1" isOptional="True"/>
-		<column name="Cost" displayName="Cost per Area (USD per amount unit: planting, or salvage logging and haul; blank = the regional default)" dataType="Double" isOptional="True"/>
+		<column name="Cost" displayName="Cost per Area (USD per amount unit: planting, salvage logging and haul, or the restoration treatment; blank = the regional default)" dataType="Double" isOptional="True"/>
 		<column name="SitePrepCost" displayName="Site Preparation Cost per Area (USD per amount unit; blank = the regional default)" dataType="Double" isOptional="True"/>
 		<column name="Revenue" displayName="Salvage Timber Revenue per Area (USD per amount unit, the year of the fire; falls 25% a year; blank = the regional default)" dataType="Double" isOptional="True"/>
 		<column name="CostRange" displayName="Cost Range" dataType="Integer" validationType="List" formula1="1:Default ranges (sampled per iteration)|2:Fixed values" isOptional="True"/>

@@ -16,11 +16,25 @@
 #     ST-Sim plants what it can and reports the rest unmet).
 #   - The window: a multiplier on each type, 0 outside it. One window per action.
 #   - Priority (replanting, stage 10): None, or far from live forest (management_priority).
+#   - Rangeland restoration (mitigation measure 5; user 2026-11-14: "keep it straight to native sage steppe but with a corresponding
+#     failure rate"): Aerial seeding, Drill seeding, Sagebrush planting, Herbicide and seeding, as replanting is: the area a year
+#     times Success on the action's type (to Native Sage Steppe at age 0), the rest on its "(failed)" type (the cell stays in its
+#     class). Seeding and planting act on the burned sage family, herbicide and seeding on burned invaded steppe and converted annual
+#     grass in the Great Basin and steppe ecodivisions (tools/make_rangeland_restoration.R); a row's area is spread by that land.
+#     Success and window defaults: MG_RESTORE (dev/rangeland-restoration/research.md, provisional).
 # =============================================================================
 
 MG_REPLANT <- c(None = "Management: Replanting", Burn = "Management: Replanting after Burn Site Prep", Mechanical = "Management: Replanting after Mechanical Site Prep")
 MG_SALVAGE <- "Forest Harvest: Salvage Logging"
-MG_TYPES <- c(as.vector(rbind(MG_REPLANT, paste(MG_REPLANT, "(failed)"))), MG_SALVAGE)
+# rangeland restoration: the action's type, its default success and window (years since the disturbance; the cost item is the
+# action's name in defaults/management/costs.csv); the classes (state class Ids) a row's area is spread over; herbicide and seeding
+# on annual grass only in MG_RESTORE_ECO (the pathways' ecodivisions)
+MG_RESTORE <- data.table::data.table(Action = c("Aerial seeding", "Drill seeding", "Sagebrush planting", "Herbicide and seeding"),
+  Type = c("Management: Aerial Seeding", "Management: Drill Seeding", "Management: Sagebrush Planting", "Management: Herbicide and Seeding"),
+  Success = c(0.15, 0.25, 0.35, 0.30), A0 = c(0, 0, 1, 0), A1 = c(1, 1, 3, 999))
+MG_RESTORE_SAGE <- c(2051L, 2052L, 2053L)   # Disturbed: Native Sage Steppe, Invaded Sage Steppe, Sage
+MG_RESTORE_ECO <- c("Temperate Desert", "Temperate Desert Mountains", "Temperate Steppe", "Temperate Steppe Mountains")
+MG_TYPES <- c(as.vector(rbind(MG_REPLANT, paste(MG_REPLANT, "(failed)"))), MG_SALVAGE, as.vector(rbind(MG_RESTORE$Type, paste(MG_RESTORE$Type, "(failed)"))))
 MG_GROUPS <- paste0(MG_TYPES, " [Type]")
 MG_REPLANT_GROUP <- "Management: Replanting"
 
@@ -30,24 +44,26 @@ management_rows <- function(ma, y1, pend, say, fail) {
   num <- function(x) suppressWarnings(as.numeric(as.character(x))); or <- function(x, d) if (length(x) == 0 || is.na(x)) d else x
   col <- function(r, k) if (k %in% names(r)) r[[k]] else NA
   rows <- data.table::rbindlist(lapply(seq_len(nrow(ma)), function(i) { r <- ma[i]; act <- as.character(col(r, "ActionId"))
-    rep <- grepl("^Replanting", act); if (!rep && !grepl("^Salvage", act)) fail("Management Actions: row %d has no action (Replanting or Salvage logging)", i)
+    rep <- grepl("^Replanting", act); ri <- match(tolower(act), tolower(MG_RESTORE$Action)); rr <- !is.na(ri)
+    if (!rep && !rr && !grepl("^Salvage", act)) fail("Management Actions: row %d has no action (Replanting, Salvage logging, or a rangeland restoration action)", i)
     a <- num(col(r, "Amount")); bud <- num(col(r, "Budget"))
     if (!is.na(a) && !is.na(bud)) fail("Management Actions: row %d gives both an area a year and a budget: give one", i)
     if (is.na(bud) && (is.na(a) || a < 0)) fail("Management Actions: row %d needs an area a year (0 or more) or a budget", i)
     if (!is.na(bud) && bud < 0) fail("Management Actions: row %d's budget must be 0 or more", i)
     s0 <- max(y1 + 1, or(num(col(r, "StartYear")), y1 + 1)); s1 <- min(pend, or(num(col(r, "EndYear")), pend))
     if (s1 < s0) { say("Management Actions: row %d (%s) has no year in the projection (%d-%d): left out", i, act, y1 + 1, pend); return(NULL) }
-    a0 <- or(num(col(r, "MinAge")), if (rep) 1 else 0); a1 <- or(num(col(r, "MaxAge")), if (rep) 5 else 2)
+    a0 <- or(num(col(r, "MinAge")), if (rr) MG_RESTORE$A0[ri] else if (rep) 1 else 0); a1 <- or(num(col(r, "MaxAge")), if (rr) MG_RESTORE$A1[ri] else if (rep) 5 else 2)
     if (a1 < a0) fail("Management Actions: row %d's years since the disturbance run backwards (%g to %g)", i, a0, a1)
-    sv <- if (rep) or(num(col(r, "Survival")), 0.8) else 1; if (sv < 0 || sv > 1) fail("Management Actions: row %d's survival must be 0-1", i)
+    sv <- if (rr) or(num(col(r, "Survival")), MG_RESTORE$Success[ri]) else if (rep) or(num(col(r, "Survival")), 0.8) else 1
+    if (sv < 0 || sv > 1) fail("Management Actions: row %d's %s must be 0-1", i, if (rr) "success" else "survival")
     p <- as.character(col(r, "SitePreparation")); prep <- if (!rep) NA_character_ else if (is.na(p) || grepl("^None", p)) "None" else if (grepl("burn", p, ignore.case = TRUE)) "Burn" else "Mechanical"
     pri <- if (rep && grepl("^Far", as.character(col(r, "Priority")))) "Far from live forest" else "None"
     pri1 <- as.character(col(r, "StratumId")); sec <- as.character(col(r, "SecondaryStratumId")); ter <- as.character(col(r, "TertiaryStratumId"))
-    base <- if (rep) MG_REPLANT[[prep]] else MG_SALVAGE
+    base <- if (rr) MG_RESTORE$Type[ri] else if (rep) MG_REPLANT[[prep]] else MG_SALVAGE
     cost <- num(col(r, "Cost")); spc <- num(col(r, "SitePrepCost")); rev <- num(col(r, "Revenue")); crange <- as.character(col(r, "CostRange"))
-    out <- data.table::data.table(Row = i, Action = if (rep) "Replanting" else "Salvage logging", Type = base, Share = sv, S0 = s0, S1 = s1, A = a,
+    out <- data.table::data.table(Row = i, Action = if (rr) MG_RESTORE$Action[ri] else if (rep) "Replanting" else "Salvage logging", Type = base, Share = sv, S0 = s0, S1 = s1, A = a,
                                   A0 = a0, A1 = a1, Prep = prep, Priority = pri, Primary = pri1, Secondary = sec, Tertiary = ter, Cost = cost, PrepCost = spc, Revenue = rev, CostRange = crange, Budget = bud)
-    if (rep) out <- rbind(out, data.table::copy(out)[, `:=`(Type = paste(base, "(failed)"), Share = 1 - sv)])
+    if (rep || rr) out <- rbind(out, data.table::copy(out)[, `:=`(Type = paste(base, "(failed)"), Share = 1 - sv)])
     out }))
   if (!nrow(rows)) return(NULL)
   w <- unique(rows[, .(Action, A0, A1)]); if (anyDuplicated(w$Action)) fail("Management Actions: every %s row needs the same years since the disturbance", w$Action[duplicated(w$Action)][1])
@@ -70,13 +86,13 @@ management_rows <- function(ma, y1, pend, say, fail) {
 #   - Salvage revenue falls with years since the fire (the disturbed class's age): value at age a = revenue x (1 - loss)^a, a row per
 #     age of the window (loss: "Salvage revenue loss per year", 0.25).
 MG_COST_TYPES <- c(Planting = "Management Cost: Planting", Prep = "Management Cost: Site Preparation", Salvage = "Management Cost: Salvage Logging",
-                   Revenue = "Management Revenue: Salvage Timber")
+                   Revenue = "Management Revenue: Salvage Timber", Restoration = "Management Cost: Rangeland Restoration")
 MG_COST_ITEMS <- c(Planting = "Planting", Burn = "Site preparation: Pile and burn", Mechanical = "Site preparation: Mechanical",
                    Salvage = "Salvage logging", Revenue = "Salvage timber revenue")
 MG_LOSS_ITEM <- "Salvage revenue loss per year"
 management_cost_defaults <- function(file, per_ha = 1, regions = file.path(dirname(file), "cost-regions.csv")) {
   d <- data.table::fread(file, na.strings = "", colClasses = list(character = c("Region", "Item", "Unit")))
-  need <- c(MG_COST_ITEMS, MG_LOSS_ITEM)
+  need <- c(MG_COST_ITEMS, MG_LOSS_ITEM, MG_RESTORE$Action)
   miss <- setdiff(need, d[Region == "All", Item])
   if (length(miss)) stop(sprintf("%s needs national (Region All) rows for %s", basename(file), paste(miss, collapse = ", ")), call. = FALSE)
   bad <- d[Unit != "share" & !(Low <= Central & Central <= High)]
@@ -107,8 +123,8 @@ management_costs <- function(rows, defaults, prim_units, fail) {
     units <- if (!is.na(r$Primary)) r$Primary else prim_units
     if (!per_unit && is.na(r$Primary)) units <- NA_character_
     items <- if (r$Action == "Replanting") c(Planting = MG_COST_ITEMS[["Planting"]], if (r$Prep != "None") c(Prep = MG_COST_ITEMS[[r$Prep]])) else
-      c(Salvage = MG_COST_ITEMS[["Salvage"]], Revenue = MG_COST_ITEMS[["Revenue"]])
-    own <- c(Planting = r$Cost, Prep = r$PrepCost, Salvage = r$Cost, Revenue = r$Revenue)
+      if (r$Action %in% MG_RESTORE$Action) c(Restoration = r$Action) else c(Salvage = MG_COST_ITEMS[["Salvage"]], Revenue = MG_COST_ITEMS[["Revenue"]])
+    own <- c(Planting = r$Cost, Prep = r$PrepCost, Salvage = r$Cost, Revenue = r$Revenue, Restoration = r$Cost)
     tot <- c(cost = 0, rev = 0)
     for (u in units) { rg <- if (is.na(u)) reg[1] else mg_region(defaults, u)
       for (k in names(items)) { d <- mg_cost_default(defaults, rg, items[[k]]); v <- if (is.na(own[[k]])) d[["Central"]] else own[[k]]
@@ -119,7 +135,7 @@ management_costs <- function(rows, defaults, prim_units, fail) {
             AgeMin = a, AgeMax = a, Attr = MG_COST_TYPES[[k]], Value = round(v * f, 4), DistributionType = b$DistributionType,
             DistributionSD = b$DistributionSD, DistributionMin = b$DistributionMin, DistributionMax = b$DistributionMax) }
         if (k == "Revenue") tot[["rev"]] <- tot[["rev"]] + v * (1 - loss)^r$A0 / length(units) else tot[["cost"]] <- tot[["cost"]] + v / length(units) } }
-    sm[[j]] <- data.table::data.table(CostPerArea = tot[["cost"]], RevenuePerArea = if (r$Action == "Replanting") NA_real_ else tot[["rev"]]) }
+    sm[[j]] <- data.table::data.table(CostPerArea = tot[["cost"]], RevenuePerArea = if (r$Action == "Salvage logging") tot[["rev"]] else NA_real_) }
   a <- data.table::rbindlist(out, fill = TRUE)
   # two rows for the same type, place and age whose years overlap must agree: ST-Sim keeps one value per type, place, age and year
   a[, k := paste(Type, Attr, StratumId, Secondary, Tertiary, AgeMin)]
@@ -144,6 +160,7 @@ management_targets <- function(ma, y0, y1, pend, land, lev, lev_list, lev_col, t
   name_of <- function(L, ids) lev_list[[L]]$Name[match(ids, as.integer(lev_list[[L]]$Id))]
   fw <- !is.na(sc_vals) & ((sc_vals >= 100 & sc_vals <= 999) | (sc_vals >= 2100 & sc_vals <= 2999))
   cells <- data.table::data.table(w = as.numeric(fw[land]), one = 1)
+  scl <- sc_vals[land]   # (rangeland restoration spreads its rows by its own classes, below)
   for (L in LV) data.table::set(cells, j = L, value = name_of(L, lev[[L]][land]))
   key <- if (length(K)) do.call(paste, c(lapply(K, function(L) cells[[L]]), sep = "\r")) else rep("all", nrow(cells))
   cells[, Key := key]; combos <- unique(cells[, c("Key", K), with = FALSE])
@@ -151,7 +168,12 @@ management_targets <- function(ma, y0, y1, pend, land, lev, lev_list, lev_col, t
   alloc <- data.table::rbindlist(lapply(unique(rows$Row), function(i) { r <- rows[Row == i][1]
     m <- (is.na(r$Primary) | cells$Primary == r$Primary) & (is.na(r$Secondary) | cells$Secondary == r$Secondary) & (is.na(r$Tertiary) | cells$Tertiary == r$Tertiary)
     if (!any(m)) fail("Management Actions: row %d's strata (%s) have no land in the study area", i, paste(stats::na.omit(c(r$Primary, r$Secondary, r$Tertiary)), collapse = " / "))
-    x <- cells[m, .(w = sum(w), n = sum(one)), by = Key]; if (sum(x$w) > 0) x[, f := w / sum(w)] else x[, f := n / sum(n)]
+    # the land the row's area is spread over: forest and disturbed forest (replanting, salvage); the burned sage family (seeding,
+    # planting); burned invaded steppe and the steppe ecodivisions' annual grass (herbicide and seeding)
+    ww <- if (r$Action == "Herbicide and seeding") as.numeric(!is.na(scl) & (scl == 2052L | (scl == 71L & cells$Primary %in% MG_RESTORE_ECO))) else
+      if (r$Action %in% MG_RESTORE$Action) as.numeric(!is.na(scl) & scl %in% MG_RESTORE_SAGE) else cells$w
+    data.table::set(cells, j = "ww", value = ww)
+    x <- cells[m, .(w = sum(ww), n = sum(one)), by = Key]; if (sum(x$w) > 0) x[, f := w / sum(w)] else x[, f := n / sum(n)]
     x[, .(Row = i, Key, f)] }))
   # costs (on the rows, central per area), and budget mode (to-do 58 cost follow-ups, user 2026-11-13): a row with a budget (USD a
   # year) instead of an area gets the area its budget pays for at its central cost per area (replanting: planting + site preparation,
@@ -174,14 +196,19 @@ management_targets <- function(ma, y0, y1, pend, land, lev, lev_list, lev_col, t
   for (L in K) data.table::setnames(tt, L, lev_col[[L]])
   mult <- data.table::rbindlist(lapply(types, function(ty) { r <- rows[Type == ty][1]; g <- paste0(ty, " [Type]")
     data.table::data.table(Timestep = y1 + 1L, TransitionGroupId = g, AgeMin = c(0, r$A0, r$A1 + 1), AgeMax = c(r$A0 - 1, r$A1, NA), Amount = c(0, 1, 0))[is.na(AgeMax) | AgeMax >= AgeMin] }))
+  # herbicide and seeding: annual grass only in the steppe ecodivisions (its pathway has no stratum; tools/make_rangeland_restoration.R)
+  hb <- intersect(types, c(MG_RESTORE[Action == "Herbicide and seeding", Type], paste(MG_RESTORE[Action == "Herbicide and seeding", Type], "(failed)")))
+  off <- setdiff(unique(stats::na.omit(cells$Primary)), MG_RESTORE_ECO)
+  if (length(hb) && length(off)) mult <- rbind(mult, data.table::CJ(TransitionGroupId = paste0(hb, " [Type]"), StratumId = off)[, `:=`(Timestep = y1 + 1L, StateClassId = "Grassland: Annual", Amount = 0)], fill = TRUE)
   where <- function(p, s, t) { w <- mapply(function(a, b, c) paste(stats::na.omit(c(a, b, c)), collapse = " / "), p, s, t, USE.NAMES = FALSE); ifelse(nzchar(w), w, "study area") }
   sm <- rows[, .(Row, TransitionType = Type, StartYear = S0, EndYear = S1, AreaPerYear = A * Share, YearsSinceDisturbance = sprintf("%g-%g", A0, A1),
                  Where = where(Primary, Secondary, Tertiary),
-                 Note = paste0(ifelse(Action == "Replanting", sprintf("%s %g a year; survival %g; site preparation %s; priority %s", Action, round(A, 2), ifelse(grepl("failed", Type), 1 - Share, Share), Prep, Priority), Action),
+                 Note = paste0(ifelse(Action == "Replanting", sprintf("%s %g a year; survival %g; site preparation %s; priority %s", Action, round(A, 2), ifelse(grepl("failed", Type), 1 - Share, Share), Prep, Priority),
+                               ifelse(Action %in% MG_RESTORE$Action, sprintf("%s %g a year; success %g (to Native Sage Steppe)", Action, round(A, 2), ifelse(grepl("failed", Type), 1 - Share, Share)), Action)),
                                ifelse(is.na(Budget), "", sprintf("; from a budget of %s USD a year", format(Budget, big.mark = ",")))),
                  CostPerArea = if (!is.null(cst)) round(CostPerArea, 2) else NA_real_, RevenuePerArea = if (!is.null(cst)) round(RevenuePerArea, 2) else NA_real_)]
   for (i in unique(rows$Row)) with(rows[Row == i][1], say("Management Actions: row %d, %s %g a year %d-%d, %g-%g years since the disturbance, %s%s",
     i, Action, A, S0, S1, A0, A1, where(Primary, Secondary, Tertiary),
-    if (Action == "Replanting") sprintf("; survival %g, site preparation %s, priority %s", Share, Prep, Priority) else ""))
+    if (Action == "Replanting") sprintf("; survival %g, site preparation %s, priority %s", Share, Prep, Priority) else if (Action %in% MG_RESTORE$Action) sprintf("; success %g", Share) else ""))
   say("Management Actions: targets for %d types on %s (%d unit combinations)", length(types), if (length(K)) paste(K, collapse = " x ") else "the whole study area", nrow(combos))
   list(targets = tt, multipliers = mult, summary = sm, costs = if (!is.null(cst)) cst$values else NULL, groups = paste0(types, " [Type]"), far = any(rows$Priority == "Far from live forest")) }

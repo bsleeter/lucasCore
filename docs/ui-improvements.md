@@ -10,6 +10,7 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 
 | Order | Item | Changes results? | Why here | Depends on |
 | --- | --- | --- | --- | --- |
+| top | 65 Avoided conversion and projected development: scale and steering levers, and four ways to drive how much converts and where (LUCAS only, LUCAS + RPA or ICLUS steering, RPA or ICLUS alone, population-scaled) | Yes, in scenarios that use them | Added 2026-11-14 (user: "save this as a top to-do and pick it up after the Hart Mountain testing is complete"). Plan and decisions in the Avoided conversion doc | Hart Mountain rangeland restoration test |
 | 1 | 14 FGDC metadata | No | User order 2026-11-02: first. Plan (a working document, not in this repository) (phases 0-6; decisions settled 2026-11-02: CSDGM first, one release per Build, maps every year, model archive always, ScienceBase folder by hand; Phase 0 done with the user 2026-11-02; Phase 1 built 2026-11-02: defaults/metadata definitions, data dictionary, citations, src/metadata.R, tests/unit-metadata-definitions.R; citation questions in the plan); lineage from the home's manifest and each Build's Data Sources Used | 12 (done) |
 | 2 | 39 Grassland, shrubland and wetland carbon: options beyond today's crude method | Yes | User order 2026-11-02: third, with the other open science items (user: explore additional options).  Step 1 (rates on a page) and the diagram view done; the diagram shows emergent wetland rates settling far above their starting pools; suspect values (emergent wetland growth 31, irrigated grass 9.19 Mg C/ha/yr), root turnover splits. Review done 2026-11-06 (dev/nonforest/review). Revised approach accepted the same day: one stage 3 solver (measured stocks as targets, growth from data, rates solved; IPCC, IBIS or data as the target source), IPCC factors for soil change on conversion, carbon for pasture and cropland. Nine steps; step 1, the emergent wetland fix, is next | - |
 | next | 53 Forested wetlands as wetland counterparts of three forest type groups (spruce/fir, oak/gum/cypress, elm/ash/cottonwood), with burial, peat fire and drained peat | Yes (woody wetland classes, and the three upland types lose their hydric FIA plots) | Planned 2026-11-09; choices decided 2026-11-10 (other types by region, burial, peat fire now); not started | - |
@@ -19,6 +20,8 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | later | 57 A post-disturbance state for forest: regrowth after a delay, or conversion to non-forest, with adjacency to a seed source | Yes (burned forest waits, returns or converts; carbon of the waiting years) | Added 2026-11-11 (user). P26: about a quarter of single high-severity burns are not forest after 30 years in NLCD, and reburns mostly convert | 58 (developed together) |
 | next | 59 Harvested wood products: the fate of the carbon in Forestry Sector, after a run (stage 18, not spatial) | Yes, in reporting (wood products pools and their emissions; an NBP that counts storage in products). The ST-Sim runs do not change | Added 2026-11-11 (user). Forestry Sector has no flows out today, so harvested wood is stored forever | Steps 1-5 done outside Studio (tables, model, stage 18, Run Figures and Compare Runs, P26 and Puget results, guide section 7.5); left: run inside Studio, guide screenshots, the 1.4.0 release |
 | later | 58 Management and mitigation for disturbed forest: replanting and restoration, salvage, site preparation, fuel treatments | Yes, in scenarios that turn them on | Added 2026-11-11 (user). Developed with 57 so its structure takes these actions | 57 (developed together) |
+| next | 64 Guards against Build failures when a transition never occurs in the study area | No (Builds that now fail complete) | Added 2026-11-14 (user), after the Hart Mountain Build failed in stage 6 with no harvest in the area | 60 (the projection side, done) |
+| next | 63 The Build turns on tabular States and Transitions output by default (without ages) | No (which outputs a run saves) | Added 2026-11-14 (user): today ticked by hand in Studio; the scripts already set it | - |
 | release | 46 CO2 fertilization | Yes, in projections with a Projection Climate result (Central by default; None turns it off) | Added 2026-11-04; built, tested (Puget run, age-band check), documented (guide 7.3.1) and pushed 2026-11-06. Left: a release | - |
 | later | 47 Example libraries by region and resolution | No (each holds its own results) | Added 2026-11-04, replaces 13. Best built after the open science items, since each carbon change dates them | 14, restore test |
 | any | 49 Test national mode end to end | No | Added 2026-11-04. Never run end to end; fills about 175 GB overnight | 12 (done) |
@@ -2073,6 +2076,48 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       also mean the shrubs are gone?
     - options: treat moderate and high as stand-replacing for shrub classes; a per-class severity map (stage 6 and the projection's
       severity shares); RdNBR or RAVG instead of the MTBS classes.
+65. **Avoided conversion and projected development** - TO DO, top priority after the Hart Mountain rangeland restoration test
+    (user 2026-11-14: "save this as a top to-do and pick it up after the Hart Mountain testing is complete"). Mitigation measure 2,
+    rescoped by the user 2026-11-14: "simply providing a lever that reduces/scales down urbanization and ag expansion relative to a
+    no-management scenario. The assumption would be that there is no leakage"; then "the option of focusing development (whether
+    scaled or not) on lower carbon cells", "lower fire risk", and WUI data "to either focus development or prohibit development".
+    Plan, parameters and open decisions: the Avoided conversion doc (claude.ai artifact Ta6iPXbgp1kHYZCSxC8fRN); notes in
+    `dev/avoided-conversion/research.md` (protection literature, background) and `dev/avoided-conversion/ssp-projections.md` (ICLUS,
+    RPA 2020, county population projections).
+    - **Levers:** scale (a multiplier on the Urbanization and Ag Expansion targets by years and place, no leakage) and steering (a
+      weight on the allocation surface: lower carbon, lower fire risk (FSim burn probability), WUI prohibit or focus (SILVIS WUI), a
+      user map). Steering moves development within a county; scale changes the total.
+    - **How much and where (user's four options):** 1 LUCAS only (historical NLCD rates, all or a subset of the reference years;
+      LUCAS allocation); 2 LUCAS + RPA or ICLUS maps as steering; 3 RPA or ICLUS alone, their maps driving quantity and placement
+      (for an SSP ICLUS lacks, the user picks the ICLUS series); 4 county population projections scaling the urbanization rates,
+      with LUCAS allocation or RPA/ICLUS steering (not for agriculture). Option 4 is what earlier LUCAS work in California did.
+    - **Reporting:** conversion avoided and carbon kept against a matched baseline; new development by carbon band, burn
+      probability and WUI class.
+    - **Open:** build order (4, then 2, then 3 proposed); population source (Hauer 2019, Wear and Prestemon 2019, state
+      projections); option 4's form; ag expansion on historical rates or RPA; check the urbanization and ag expansion soil carbon
+      flows against the literature (IPCC 20% on developed land; grassland to crop -36%); test library Placer.
+64. **Guards against Build failures when a transition never occurs in the study area** - TO DO, added 2026-11-14 (user: "guards
+    against build failures due to conversions not occurring in the study area"). The Build counterpart of to-do 60 (which made
+    projections tolerate missing transitions). Found 2026-11-14: the Hart Mountain Build (no forest harvest anywhere) failed in stage 6
+    after 27 minutes, "object 'Timestep' not found": the harvest minimum-age check built its table from zero harvest layers, an empty
+    table with no columns (fixed for that table: `age_blocked` gets its columns when there is no harvest). To do:
+    - sweep the Build stages (1-8, 12) for the same pattern: `rbindlist` or `lapply` over zero rows, then a `by =`, `merge` or column
+      access, and give each its columns or skip the step with a note in the run log; for each family a small area may lack:
+      harvest (clearcut, selection), urbanization and intensification, ag expansion, contraction and change, fire (and each
+      severity), reforestation, post-disturbance return and conversion, wetland change;
+    - a test: a synthetic study area with none of them (or the stages' table builders called on empty inputs), so the case stays
+      covered; and Build Figures (stage 12) drawing "none in this study area" instead of failing;
+    - fail early, before the long stages, only on what a Build truly needs (land cover, strata), not on an absent transition.
+63. **The Build turns on tabular States and Transitions output by default (without ages)** - TO DO, added 2026-11-14 (user: "The
+    model Build should by default turn on tabular output for States and Transitions (without ages). Right now, this step has to be
+    done manually"). Today only the scripts set it (`tools/new-historical.R`, `tools/new-projection.R`: Output Options > Tabular >
+    States and Transitions every year, ages unchecked, since 2026-11-14; transition attributes too in projections). A historical
+    run or projection made in Studio inherits the Build's stsim_OutputOptions, which has none, so the user ticks them by hand. To do:
+    - the Build (stage 1 or 4, or `tools/new-library.R` on the Build template) writes stsim_OutputOptions with SummaryOutputSC and
+      SummaryOutputTR on, timestep 1, SummaryOutputSCAges and SummaryOutputTRAges off (and SummaryOutputTA on, ages off, for the
+      management costs), when the sheet is empty, so a user's own choice is kept;
+    - check that historical and projection scenarios made in Studio from the Build inherit it, and the Projection Setup (stage 9)
+      does not clear it.
     - First findings 2026-11-12 (to-do 57 step 7 shrub fit, 907 sampled western fires 1986-2010): only 396 had any high-severity
       pixel that lost shrub cover, 550 had moderate; and moderate-severity pixels lose and regain RCMAP shrub cover as high-severity
       ones do (same return curves and windows within 2 years). DONE 2026-11-12 (user: "Yes, do it here"): moderate (Medium) and

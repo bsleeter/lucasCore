@@ -12,7 +12,7 @@ source(file.path("src", "management.R"))
 # ---- defaults ----------------------------------------------------------------------------------------------------------------
 sc <- rd(D("stsim", "stsim_StateClass.csv")); id <- as.integer(sc$Id); disf <- sc[id >= 2100 & id < 3000]
 ty <- rd(D("stsim", "stsim_TransitionType.csv")); tg <- rd(D("stsim", "stsim_TransitionTypeGroup.csv")); gr <- rd(D("stsim", "stsim_TransitionGroup.csv"))
-rep6 <- setdiff(MG_TYPES, MG_SALVAGE)
+rep6 <- grep("^Management: Replanting", MG_TYPES, value = TRUE)
 check("six replanting types, Ids 1200-1205, unique", all(rep6 %in% ty$Name) && setequal(as.integer(ty$Id[match(rep6, ty$Name)]), 1200:1205) && !anyDuplicated(ty$Id))
 check("groups: Management: Replanting (the six), Site Preparation: Burn and Mechanical (two each)", all(c(MG_REPLANT_GROUP, "Site Preparation: Burn", "Site Preparation: Mechanical") %in% gr$Name) &&
       setequal(tg[TransitionGroupId == MG_REPLANT_GROUP, TransitionTypeId], rep6) &&

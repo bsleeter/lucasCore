@@ -72,8 +72,8 @@ if (!is.na(pit) && it > pit) stop(sprintf("the build's projection schedule has %
 bookends <- "--bookend-maps" %in% a; if (bookends) ev <- y1 - y0
 saveDatasheet(S, data.frame(MinimumTimestep = y0, MaximumTimestep = y1, MinimumIteration = 1L, MaximumIteration = it, IsSpatial = TRUE), "stsim_RunControl")
 # yearly state class and transition tables (by stratum); maps every --raster-every years
-saveDatasheet(S, data.frame(SummaryOutputSC = TRUE, SummaryOutputSCTimesteps = 1L, SummaryOutputSCZeroValues = FALSE,
-                            SummaryOutputTR = TRUE, SummaryOutputTRTimesteps = 1L, SummaryOutputTRIntervalMean = FALSE), "stsim_OutputOptions")
+saveDatasheet(S, data.frame(SummaryOutputSC = TRUE, SummaryOutputSCTimesteps = 1L, SummaryOutputSCAges = FALSE, SummaryOutputSCZeroValues = FALSE,
+                            SummaryOutputTR = TRUE, SummaryOutputTRTimesteps = 1L, SummaryOutputTRAges = FALSE, SummaryOutputTRIntervalMean = FALSE), "stsim_OutputOptions")
 if (ev > 0) saveDatasheet(S, data.frame(RasterOutputSC = TRUE, RasterOutputSCTimesteps = ev, RasterOutputAge = TRUE, RasterOutputAgeTimesteps = ev,
                                         RasterOutputTR = TRUE, RasterOutputTRTimesteps = ev), "stsim_OutputOptionsSpatial")
 # bookend maps: stock group maps (the groups Stock-Flow Definitions' filter maps) only in the first and last year, no flow maps; the

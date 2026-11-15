@@ -27,3 +27,12 @@ Management: Replanting after Mechanical Site Prep (failed) [Type],Yes,Yes
 Fuel Treatment: Mechanical Thinning [Type],Yes,Yes
 Fuel Treatment: Prescribed Burn [Type],Yes,Yes
 Fuel Treatment: Thin and Burn [Type],Yes,Yes
+Management: Rangeland Restoration,Yes,Yes
+Management: Aerial Seeding [Type],Yes,Yes
+Management: Aerial Seeding (failed) [Type],Yes,Yes
+Management: Drill Seeding [Type],Yes,Yes
+Management: Drill Seeding (failed) [Type],Yes,Yes
+Management: Sagebrush Planting [Type],Yes,Yes
+Management: Sagebrush Planting (failed) [Type],Yes,Yes
+Management: Herbicide and Seeding [Type],Yes,Yes
+Management: Herbicide and Seeding (failed) [Type],Yes,Yes

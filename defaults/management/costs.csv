@@ -23,3 +23,11 @@ Interior West,Salvage timber revenue,USD/ha,5500,3500,8000,2024,"As California (
 South,Salvage timber revenue,USD/ha,3000,1500,5000,2024,"No southern source: judgement","Roughly break-even"
 Northeast,Salvage timber revenue,USD/ha,3000,1500,5000,2024,"No source: as the South","Roughly break-even"
 All,Salvage revenue loss per year,share,0.25,0.15,0.35,2024,"Prestemon et al. 2006 (Forest Policy and Economics 8:312-322); OSU EM 9553 defect table","Share of the salvaged wood's value lost per year since the fire (the disturbed class's age): value at age a = revenue x (1 - loss)^a. Not sampled: the central value is used"
+All,Aerial seeding,USD/ha,120,90,200,2024,"Munson et al. 2020 (Utah WRI 2016: operation 39-44 + seed 57-91 USD/ha, CPI x1.31); native ES&R mixes cost more","Rangeland restoration: seed and aerial application per hectare treated (established and failed alike). Great Basin values, used nationally. Provisional: dev/rangeland-restoration/research.md; Meldrum et al. 2025 should replace"
+California,Aerial seeding,USD/ha,150,110,250,2024,"Great Basin x1.25 (judgement: no California records found)",
+All,Drill seeding,USD/ha,200,150,350,2024,"Munson et al. 2020 (Utah WRI 2016: operation 75 + seed 96 USD/ha) plus the native-mix premium","Flat, accessible ground only"
+California,Drill seeding,USD/ha,250,180,400,2024,"Great Basin x1.25 (judgement)",
+All,Sagebrush planting,USD/ha,2500,1500,5000,2024,"Utah WRI 6059 (about 3.5 USD a tubeling planted) at 500-1,500 plants/ha; USU Extension 2024","Per hectare planted: usually islands in 5-20% of a burn"
+California,Sagebrush planting,USD/ha,3100,1900,6250,2024,"Great Basin x1.25 (judgement)",
+All,Herbicide and seeding,USD/ha,330,220,550,2024,"Imazapic 75 + drill seeding 200 + a second entry about 55 (Munson et al. 2020; UNL CropWatch; NRCS EQIP 315 FY2024)","Two entries: spray, then seed a year later"
+California,Herbicide and seeding,USD/ha,400,260,650,2024,"Great Basin x1.25 (judgement)",

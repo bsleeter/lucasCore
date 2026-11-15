@@ -98,7 +98,13 @@ effect at the next Build; rerun the Build and then the historical run before a P
   minimum and maximum stand ages per harvest type (a maximum protects older forest). A row by a strata level the harvest targets
   are not keyed on splits them by each place's historical harvest. Stage 9 writes the reshaped targets and age multipliers;
   Projection Results > Forest Management (as set up) lists each row's drawn and managed harvest. An empty page is the drawn harvest.
-- Fuel Treatments (Projection > Fuel Treatments): mechanical thinning, prescribed burn, and thin and burn on upland forest, as an
+- Rangeland restoration after fire (Projection > Management Actions): aerial seeding, drill seeding and sagebrush planting on
+  burned sage and sage steppe, and herbicide then seeding on burned invaded steppe and on annual grass in the Great Basin and steppe
+  ecodivisions. Each is an area a year (or a budget) in chosen years and places, with a window in years since the fire and a
+  success share: what establishes goes to Native Sage Steppe at age 0, the rest stays as it was and can still return or convert.
+  Defaults from a literature review (success 0.15 aerial, 0.25 drill, 0.35 planting, 0.3 herbicide and seeding; costs per
+  hectare by region with ranges, `defaults/management/costs.csv`; provisional). Eight new transition types and a group: a new
+  Build is needed for restoration. Library update: the types, group and cost attribute type, and the output filter rows.- Fuel Treatments (Projection > Fuel Treatments): mechanical thinning, prescribed burn, and thin and burn on upland forest, as an
   area a year (or a budget) in chosen years and places, with a stand-age window, a retreatment interval and a priority (random,
   or where wildfire burned more often). A treatment keeps the forest type and stand age; its carbon moves when it happens
   (thinning: a quarter of live biomass cut, most merchantable wood to the forestry sector, slash piled and burned; prescribed burn:

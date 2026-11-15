@@ -155,7 +155,7 @@ namespace lucasCoreUI
         private class ActionForm
         {
             public readonly TextBox Start = Box(60), End = Box(60), Area = Box(80), From = Box(40), To = Box(40), Survival = Box(50), Cost = Box(70), PrepCost = Box(70), Revenue = Box(70), Budget = Box(90);
-            public readonly ComboBox Priority = List(330), Prep = List(250), Range = List(280);
+            public readonly ComboBox Priority = List(330), Prep = List(250), Range = List(280), Method = List(250);
             public readonly WherePicker Where = new WherePicker();
             public readonly Button Add;
             public readonly Label Said = new Label { AutoSize = true, MaximumSize = new Size(640, 0), ForeColor = SystemColors.GrayText, Margin = new Padding(3, 8, 3, 3) };
@@ -164,12 +164,24 @@ namespace lucasCoreUI
 
         private readonly ActionForm m_rep = new ActionForm("Add replanting");
         private readonly ActionForm m_sal = new ActionForm("Add salvage logging");
+        // rangeland restoration (mitigation measure 5; user 2026-11-14: "keep it straight to native sage steppe but with a corresponding
+        // failure rate"): Action 3-6, each with its default success and window (src/management.R MG_RESTORE; research:
+        // dev/rangeland-restoration/research.md); a success goes to Native Sage Steppe at age 0, the rest stays as it was
+        private readonly ActionForm m_res = new ActionForm("Add restoration");
+        private static readonly string[] RES_NAME = { "Aerial seeding", "Drill seeding", "Sagebrush planting", "Herbicide and seeding" };
+        private static readonly string[] RES_SUCCESS = { "0.15", "0.25", "0.35", "0.3" };
+        private static readonly int[] RES_FROM = { 0, 0, 1, 0 }, RES_TO = { 1, 1, 3, 999 };
+        private static readonly string[] RES_NOTE = {
+            "Grass, forb and sagebrush seed from the air, the first fall or winter after the fire. On burned sage, native and invaded sage steppe. Establishes mostly perennial grass; sagebrush rarely. Best on cooler, wetter, higher sites.",
+            "A native perennial grass mix drilled in (sagebrush broadcast with it), the first fall after the fire. Flat, accessible ground only. Native-only mixes do best.",
+            "Sagebrush seedlings planted (container stock or bare-root), 1-3 years after the fire, usually as islands that seed the rest. Costly per hectare; the surest way to bring sagebrush back.",
+            "Pre-emergent herbicide against cheatgrass (imazapic or indaziflam), then seeding a year later. On burned invaded steppe, and on land already converted to annual grass in the Great Basin and steppe ecodivisions (not California annual grassland)." };
         // costs (user 2026-11-13: "start with costs per hectare and research defaults"; ranges: "Transition Attribute Values ... can
         // also hold a distribution of cost values"): USD per hectare. A blank box = the package default of the cell's cost region
         // (defaults/management/costs.csv, each ecodivision's region in cost-regions.csv), applied by stage 9; a value typed in is the
         // row's own. The notes show the defaults of the model's region (with several regions in the study area, the national ones)
         private const string UNIT = "hectare";
-        private readonly Label m_repCostNote = Note(""), m_salCostNote = Note("");
+        private readonly Label m_repCostNote = Note(""), m_salCostNote = Note(""), m_resCostNote = Note(""), m_resNote = Note("");
         private readonly Dictionary<string, double[]> m_cost = new Dictionary<string, double[]>();   // "region|item" -> central, low, high
         private readonly Dictionary<string, string> m_regionOf = new Dictionary<string, string>();   // ecodivision -> cost region
         private string m_costYear = "", m_region = "All", m_regionNote = "";
@@ -214,6 +226,16 @@ namespace lucasCoreUI
             string yr = m_costYear.Length > 0 ? m_costYear + " " : "";
             m_repCostNote.Text = string.Format("Blank = default{0}, {1}USD: planting {2}, pile and burn {3}, mechanical {4}. Paid on failed plantings too. Provisional.", m_regionNote, yr, CostText("Planting"), CostText(PREP_ITEM[1]), CostText(PREP_ITEM[2]));
             m_salCostNote.Text = string.Format("Blank = default{0}, {1}USD: logging and haul {2}; revenue {3} in the fire year, 25% less each year after. Provisional.", m_regionNote, yr, CostText("Salvage logging"), CostText("Salvage timber revenue"));
+            int k = Math.Max(0, m_res.Method.SelectedIndex);
+            m_resCostNote.Text = string.Format("Blank = default{0}, {1}USD: {2} {3}{4}. Paid on failed treatments too. Provisional.", m_regionNote, yr, RES_NAME[k].ToLowerInvariant(), CostText(RES_NAME[k]),
+                                               k == 2 ? " per hectare planted" : "");
+        }
+        // a method's defaults into the form, and its note
+        private void ResMethod()
+        {
+            int k = Math.Max(0, m_res.Method.SelectedIndex);
+            m_res.Survival.Text = RES_SUCCESS[k]; m_res.From.Text = RES_FROM[k].ToString(); m_res.To.Text = RES_TO[k] >= 999 ? "" : RES_TO[k].ToString();
+            m_resNote.Text = RES_NOTE[k]; CostNotes();
         }
         private readonly Panel m_grid = GridHost(200);
         private readonly Button m_clear = new Button { Text = "Remove all rows", AutoSize = true, Margin = new Padding(3, 3, 12, 3) };
@@ -245,7 +267,7 @@ namespace lucasCoreUI
         {
             this.SuspendLayout();
             AddGroup(Group("What management does in a projection", ProjectionTransitionsView.Stack(
-                Note("Management acts on forest a high-severity fire has put into its disturbed class, while it waits to return or convert. Set an action below and add it; add it again for other years or places. No rows = the baseline. Areas are on top of the historical rate (the fitted natural return already includes past planting)."))));
+                Note("Management acts on forest and sage a high-severity fire has put into its disturbed class, while it waits to return or convert (rangeland restoration also on land already converted to annual grass). Set an action below and add it; add it again for other years or places. No rows = the baseline. Areas are on top of the historical rate (the fitted natural return already includes past planting)."))));
 
             // replanting: caption, control, then its note to the right edge
             AddGroup(Group("Replanting", Lines(
@@ -272,6 +294,19 @@ namespace lucasCoreUI
                 Line("Cost range:", m_sal.Range, Note("As for replanting. Net = revenue - cost, in the transition attribute outputs.")),
                 ActionRow(m_sal))));
 
+            // rangeland restoration after fire
+            AddGroup(Group("Rangeland restoration after fire", Lines(
+                Line("Treatment:", m_res.Method, m_resNote),
+                Line("Years:", Pair(m_res.Start, "to", m_res.End, null), Note("Blank = from the projection start, or to its end.")),
+                Line("Area per year:", m_res.Area, Note("In the library's units (hectares). Less is treated when less land is eligible; the run reports what was done.")),
+                Line("Or a budget:", m_res.Budget, Note("USD a year instead of an area (leave the area blank): the area it pays for at the central cost per hectare.")),
+                Line("Where:", m_res.Where.Panel(), m_res.Where.Info),
+                Line("Years since disturbance:", Pair(m_res.From, "to", m_res.To, null), Note("Ages a burned cell can be treated (0 = the fire year; blank = the treatment's default). Herbicide and seeding: any year by default, so annual grass converted long ago qualifies.")),
+                Line("Success:", m_res.Survival, Note("Share that establishes: to Native Sage Steppe at age 0. The rest stays as it was and can still return or convert. Defaults from the literature: aerial 0.15, drill 0.25, sagebrush planting 0.35, herbicide and seeding 0.3 (lower on hot, dry sites).")),
+                Line("Cost per " + UNIT + ":", m_res.Cost, m_resCostNote),
+                Line("Cost range:", m_res.Range, Note("As for replanting.")),
+                ActionRow(m_res))));
+
             // the rows
             var r = Row(); r.Controls.Add(m_clear); r.Controls.Add(m_state);
             AddGroup(Group("Actions (what the Projection Setup uses)", ProjectionTransitionsView.Stack(m_rows, m_grid, r,
@@ -280,11 +315,14 @@ namespace lucasCoreUI
 
             m_rep.Priority.Items.AddRange(new object[] { "None (random among eligible cells)", "Far from live forest (least likely to return on its own)" });
             m_rep.Prep.Items.AddRange(new object[] { "None", "Pile and burn", "Mechanical (mastication)" });
-            foreach (ComboBox c in new[] { m_rep.Range, m_sal.Range }) c.Items.AddRange(new object[] { "Default ranges (sampled per iteration)", "Fixed values" });
+            foreach (ComboBox c in new[] { m_rep.Range, m_sal.Range, m_res.Range }) c.Items.AddRange(new object[] { "Default ranges (sampled per iteration)", "Fixed values" });
+            m_res.Method.Items.AddRange(RES_NAME);
             LoadCosts(); FillDefaults(); CostNotes();
             m_rep.Prep.SelectedIndexChanged += (s, e) => ShowPrepCost();
+            m_res.Method.SelectedIndexChanged += (s, e) => ResMethod();
             m_rep.Add.Click += (s, e) => AddRow(1, m_rep);
             m_sal.Add.Click += (s, e) => AddRow(2, m_sal);
+            m_res.Add.Click += (s, e) => AddRow(3 + Math.Max(0, m_res.Method.SelectedIndex), m_res);
             m_clear.Click += (s, e) => ClearAll();
             this.ResumeLayout(false);
         }
@@ -293,14 +331,15 @@ namespace lucasCoreUI
         {
             m_rep.Area.Text = "100"; m_rep.Budget.Text = ""; m_rep.From.Text = "1"; m_rep.To.Text = "5"; m_rep.Survival.Text = "0.8"; m_rep.Priority.SelectedIndex = 0; m_rep.Prep.SelectedIndex = 0;
             m_sal.Area.Text = "100"; m_sal.From.Text = "0"; m_sal.To.Text = "2";
-            m_rep.Range.SelectedIndex = 0; m_sal.Range.SelectedIndex = 0; ShowPrepCost();
+            m_res.Area.Text = "100"; m_res.Method.SelectedIndex = 0; ResMethod();
+            m_rep.Range.SelectedIndex = 0; m_sal.Range.SelectedIndex = 0; m_res.Range.SelectedIndex = 0; ShowPrepCost();
         }
 
         public override void LoadDataFeed(DataFeed dataFeed)
         {
             base.LoadDataFeed(dataFeed);
             Project p = this.Scenario != null ? this.Scenario.Project : this.DataFeed.Project;
-            if (p != null) { var ms = new ModelStrata(); try { ms.Load(p, this.Scenario); } catch (Exception) { } m_rep.Where.Load(ms); m_sal.Where.Load(ms); SetRegions(ms.Units[0]); }
+            if (p != null) { var ms = new ModelStrata(); try { ms.Load(p, this.Scenario); } catch (Exception) { } m_rep.Where.Load(ms); m_sal.Where.Load(ms); m_res.Where.Load(ms); SetRegions(ms.Units[0]); }
             LoadGrid(m_grid, SheetName);
             RefreshControls();
         }
@@ -319,11 +358,11 @@ namespace lucasCoreUI
         // the form's choices as a new row of the grid
         private void AddRow(int action, ActionForm a)
         {
-            bool rep = action == 1; object start = DBNull.Value, end = DBNull.Value, area = DBNull.Value, from = DBNull.Value, to = DBNull.Value, surv = DBNull.Value, budget = DBNull.Value;
+            bool rep = action == 1, res = action >= 3; object start = DBNull.Value, end = DBNull.Value, area = DBNull.Value, from = DBNull.Value, to = DBNull.Value, surv = DBNull.Value, budget = DBNull.Value;
             string err = ReadNumber(a.Start, "the start year", true, false, 1900, 2200, out start) ?? ReadNumber(a.End, "the end year", true, false, 1900, 2200, out end)
                       ?? ReadNumber(a.Budget, "the budget", false, false, 0, 1e13, out budget) ?? ReadNumber(a.Area, "the area per year", false, a.Budget.Text.Trim().Length == 0, 0, 1e12, out area) ?? ReadNumber(a.From, "the first year since the disturbance", true, false, 0, 500, out from)
                       ?? ReadNumber(a.To, "the last year since the disturbance", true, false, 0, 500, out to)
-                      ?? (rep ? ReadNumber(a.Survival, "survival", false, false, 0, 1, out surv) : null);
+                      ?? (rep || res ? ReadNumber(a.Survival, res ? "success" : "survival", false, false, 0, 1, out surv) : null);
             if (err == null && start != DBNull.Value && end != DBNull.Value && (int)start > (int)end) err = "the start year is after the end year";
             if (err == null && area != DBNull.Value && budget != DBNull.Value) err = "give an area or a budget, not both";
             if (err == null && from != DBNull.Value && to != DBNull.Value && (int)from > (int)to) err = "the window runs backwards";
@@ -333,9 +372,10 @@ namespace lucasCoreUI
             nr["ActionId"] = action; nr["StartYear"] = start; nr["EndYear"] = end; nr["Amount"] = area; nr["MinAge"] = from; nr["MaxAge"] = to;
             if (nr.Table.Columns.Contains("Budget")) nr["Budget"] = budget; else if (budget != DBNull.Value) { a.Said.ForeColor = Color.Firebrick; a.Said.Text = "Not added: this library has no Budget column (update the package)."; return; }
             if (rep) { nr["Survival"] = surv; nr["Priority"] = a.Priority.SelectedIndex + 1; nr["SitePreparation"] = a.Prep.SelectedIndex + 1; }
+            if (res) nr["Survival"] = surv;
             object cost = DBNull.Value, pcost = DBNull.Value, rev = DBNull.Value; string ce = ReadNumber(a.Cost, "the cost", false, false, 0, 1e9, out cost);
             if (ce == null && rep && a.Prep.SelectedIndex > 0) ce = ReadNumber(a.PrepCost, "the site preparation cost", false, false, 0, 1e9, out pcost);
-            if (ce == null && !rep) ce = ReadNumber(a.Revenue, "the timber revenue", false, false, 0, 1e9, out rev);
+            if (ce == null && action == 2) ce = ReadNumber(a.Revenue, "the timber revenue", false, false, 0, 1e9, out rev);
             if (ce != null) { a.Said.ForeColor = Color.Firebrick; a.Said.Text = "Not added: " + ce + "."; return; }
             if (nr.Table.Columns.Contains("Cost")) nr["Cost"] = cost;
             if (nr.Table.Columns.Contains("SitePrepCost")) nr["SitePrepCost"] = pcost;
@@ -377,14 +417,20 @@ namespace lucasCoreUI
         private string Describe(DataRow r, int i)
         {
             int act = Int(r["ActionId"], 0);
-            if (act != 1 && act != 2) return string.Format("{0}. (no action chosen)", i);
-            bool rep = act == 1;
+            if (act < 1 || act > 6) return string.Format("{0}. (no action chosen)", i);
+            bool rep = act == 1, res = act >= 3;
             string where = string.Join(" / ", ModelStrata.Columns.Where(c => r.Table.Columns.Contains(c)).Select(c => Lookup(c, r[c])).Where(x => x != null));
             string years = r["StartYear"] == DBNull.Value && r["EndYear"] == DBNull.Value ? "every projection year"
                          : string.Format("{0} to {1}", Num(r["StartYear"], "the first projection year"), Num(r["EndYear"], "the end"));
             string amt = r["Amount"] == DBNull.Value && r.Table.Columns.Contains("Budget") && r["Budget"] != DBNull.Value ? Convert.ToDouble(r["Budget"]).ToString("#,0") + " USD" : Num(r["Amount"], "?");
-            string s = string.Format("{0}. {1} {2} a year, {3}, in {4}, {5}-{6} years after the disturbance", i, rep ? "Replant" : "Salvage", amt, years,
-                                     where.Length > 0 ? where : "the whole study area", Int(r["MinAge"], rep ? 1 : 0), Int(r["MaxAge"], rep ? 5 : 2));
+            int k = res ? act - 3 : -1, to = Int(r["MaxAge"], res ? RES_TO[k] : rep ? 5 : 2);
+            string s = string.Format("{0}. {1} {2} a year, {3}, in {4}, {5}{6} years after the disturbance", i, res ? RES_NAME[k] : rep ? "Replant" : "Salvage", amt, years,
+                                     where.Length > 0 ? where : "the whole study area", Int(r["MinAge"], res ? RES_FROM[k] : rep ? 1 : 0), to >= 999 ? " or more" : "-" + to);
+            if (res)
+            {
+                double sv = r["Survival"] == DBNull.Value ? double.Parse(RES_SUCCESS[k], System.Globalization.CultureInfo.InvariantCulture) : Convert.ToDouble(r["Survival"]);
+                s += string.Format("; {0:0}% establishes (to Native Sage Steppe)", 100 * sv);
+            }
             if (rep)
             {
                 double sv = r["Survival"] == DBNull.Value ? 0.8 : Convert.ToDouble(r["Survival"]);
@@ -394,9 +440,9 @@ namespace lucasCoreUI
             }
             Func<string, string> val = c => r.Table.Columns.Contains(c) && r[c] != DBNull.Value ? Num(r[c], "") : null;
             var money = new List<string>();
-            if (val("Cost") != null) money.Add((rep ? "planting " : "logging ") + val("Cost"));
+            if (val("Cost") != null) money.Add((rep ? "planting " : res ? "treatment " : "logging ") + val("Cost"));
             if (rep && val("SitePrepCost") != null) money.Add("site preparation " + val("SitePrepCost"));
-            if (!rep && val("Revenue") != null) money.Add("timber revenue " + val("Revenue"));
+            if (act == 2 && val("Revenue") != null) money.Add("timber revenue " + val("Revenue"));
             bool fixedC = r.Table.Columns.Contains("CostRange") && Int(r["CostRange"], 1) == 2;
             s += money.Count > 0 ? string.Format("; USD per {0}: {1}", UNIT, string.Join(", ", money)) + (fixedC ? ", fixed" : "") + " (the rest: regional defaults)" : "; regional default costs" + (fixedC ? ", fixed" : "");
             return s + ".";
@@ -406,7 +452,7 @@ namespace lucasCoreUI
         {
             bool edit = !(this.Scenario != null && this.Scenario.IsResult) && this.ShouldEnableView();
             List<DataRow> rows = Sheet.HasData() ? Live(Sheet.GetData()).ToList() : new List<DataRow>();
-            m_rep.Add.Enabled = m_sal.Add.Enabled = edit; m_clear.Enabled = edit && rows.Count > 0;
+            m_rep.Add.Enabled = m_sal.Add.Enabled = m_res.Add.Enabled = edit; m_clear.Enabled = edit && rows.Count > 0;
             m_state.Text = rows.Count == 0 ? "No actions: the projection is the baseline." : string.Format("{0} action{1}.", rows.Count, rows.Count == 1 ? "" : "s");
             int pri = rows.Where(x => Int(x["ActionId"], 0) == 1).Select(x => Int(x["Priority"], 1)).Distinct().Count();
             m_rows.Text = rows.Count == 0 ? "No actions yet." : string.Join(Environment.NewLine, rows.Select((x, i) => Describe(x, i + 1)))

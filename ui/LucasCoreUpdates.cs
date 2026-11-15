@@ -227,6 +227,13 @@ namespace lucasCoreUI
             AddNamed(store, "stsim_TransitionGroup", "TransitionGroupId", "Fuel Treatment", null, null, false);
             string[] ftTypes = { "Fuel Treatment: Mechanical Thinning", "Fuel Treatment: Prescribed Burn", "Fuel Treatment: Thin and Burn" };
             foreach (string t in ftTypes) { AddTransitionType(store, t, null); AddTypeToGroup(store, t, "Fuel Treatment"); }
+            // rangeland restoration (tools/make_rangeland_restoration.R): four treatments, each established or failed, in group
+            // Management: Rangeland Restoration; their pathways come with the next Build
+            AddNamed(store, "stsim_TransitionGroup", "TransitionGroupId", "Management: Rangeland Restoration", null, null, false);
+            var rrTypes = new List<string>();
+            foreach (string b in new[] { "Management: Aerial Seeding", "Management: Drill Seeding", "Management: Sagebrush Planting", "Management: Herbicide and Seeding" })
+                foreach (string end in new[] { "", " (failed)" }) rrTypes.Add(b + end);
+            foreach (string t in rrTypes) { AddTransitionType(store, t, null); AddTypeToGroup(store, t, "Management: Rangeland Restoration"); }
             // management costs (tools/make_management.R): a Management Cost attribute group and four transition attribute types, USD:
             // three costs and the salvaged timber's revenue (net = revenue - costs)
             AddNamed(store, "stsim_AttributeGroup", "AttributeGroupId", "Management Cost", null, null, false);
@@ -237,7 +244,8 @@ namespace lucasCoreUI
                                     { "Management Cost: Salvage Logging", "Salvage logging and haul cost per unit area (its timber revenue is Management Revenue: Salvage Timber)" },
                                     { "Management Revenue: Salvage Timber", "Revenue from the salvaged timber per unit area, falling with years since the fire (net = revenue - costs)" },
                                     { "Management Revenue: Harvest Timber", "Stumpage revenue of clearcut and selection harvest per unit area harvested: merchantable volume x removal share x regional stumpage price (src/forest-management.R)" },
-                                    { "Management Cost: Fuel Treatment", "Fuel treatment (mechanical thinning, prescribed burn, thin and burn) per unit area treated (src/fuel-treatments.R)" } };
+                                    { "Management Cost: Fuel Treatment", "Fuel treatment (mechanical thinning, prescribed burn, thin and burn) per unit area treated (src/fuel-treatments.R)" },
+                                    { "Management Cost: Rangeland Restoration", "Rangeland restoration (aerial or drill seeding, sagebrush planting, herbicide and seeding) per unit area treated, established and failed alike (src/management.R)" } };
                 foreach (DataRow r in Rows(store, "SELECT ProjectId FROM core_Project").Rows)
                 {
                     string pr = Id(r["ProjectId"]), ag = IdOf(store, "stsim_AttributeGroup", "AttributeGroupId", pr, "Management Cost");
@@ -262,6 +270,8 @@ namespace lucasCoreUI
                 names.Add("Forest Harvest: Salvage Logging [Type]");
                 foreach (string n in agTypes) { names.Add(n); mapped.Add(n); }
                 foreach (string t in ftTypes) { names.Add(t + " [Type]"); mapped.Add(t + " [Type]"); }   // (fuel treatments: summarized and mapped)
+                names.Add("Management: Rangeland Restoration"); mapped.Add("Management: Rangeland Restoration");
+                foreach (string t in rrTypes) { names.Add(t + " [Type]"); mapped.Add(t + " [Type]"); }   // (rangeland restoration: summarized and mapped)
                 for (int i = 0; i < preps.Length; i++)
                     foreach (string end in new[] { "", " (failed)" }) { string n = "Management: Replanting" + preps[i] + end + " [Type]"; names.Add(n); mapped.Add(n); }
                 foreach (DataRow r in Rows(store, "SELECT DISTINCT f.ScenarioId AS S, s.ProjectId AS P FROM stsim_OutputFilterTransitionGroups f JOIN core_Scenario s ON s.ScenarioId = f.ScenarioId").Rows)
@@ -381,7 +391,6 @@ namespace lucasCoreUI
 
         private static DataTable Rows(DataStore store, string sql) { return store.CreateDataTableFromQuery(sql, "rows"); }
         private static string Id(object v) { return Convert.ToInt64(v, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture); }
-
         // a project definition (Name, an optional extra column, IsAuto for ST-Sim's own type groups) in every project that lacks it
         // a project's transition simulation group (if the group exists and is not listed yet)
         private static void AddSimulationGroup(DataStore store, string name)
