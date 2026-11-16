@@ -25,6 +25,10 @@
   - `NlcdPersist`: NLCD classes the modal annual NLCD shows in year-1 and year; on where it does. Forest Return and Shrub Return
     (to-do 57) return a disturbed cell in the second year NLCD shows its type; Reforestation (41-43, not 90) takes a natural
     non-forest cell to forest the same way. Only cells with a pathway can use the map.
+    Forest Return has a second witness (2026-11-15, `src/post-disturbance.R`): a cell most of whose LANDFIRE 2016 pixels are a tree
+    type (`evt2016-tree-classes.csv`: the classes of LANDFIRE EVT 2016 whose lifeform is Tree, the three "Recently ..." classes left
+    out) and whose forest loss came at least 15 years before 2016 is also on, in the year 15 years after the loss. NLCD is slow to
+    call slow-growing regeneration forest (Yellowstone's 1988 burn: 2% forest in NLCD 2016, half trees in LANDFIRE 2016).
   - `All`: on everywhere (Post-disturbance: Conversion; the pathways' age limits decide).
 - `pathways/reforestation.csv` (2026-11-12, `tools/make_reforestation.R`): Barren, the sage family, Non-sage, Chaparral, the grass
   classes and Palustrine Emergent to every forest class, one type per forest class, age reset. Stage 6 gates each type to stage 5's

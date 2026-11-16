@@ -36,7 +36,7 @@ pd_varies <- function(res, cols = PD_COLS) {
 
 # ---- a second witness for forest return: LANDFIRE's 2016 vegetation type (user 2026-11-15) ------------------------------------------
 # NLCD is slow to call a regenerating stand forest where trees grow slowly: on Yellowstone's 1988 high-severity burn it shows 2% forest
-# in 2016, where LANDFIRE's Existing Vegetation Type of 2016 maps half as a tree type (dev/fire/README-return-witness.md). So a
+# in 2016, where LANDFIRE's Existing Vegetation Type of 2016 maps half as a tree type (tests on its 30 m layers, 2026-11-15; CHANGELOG). So a
 # disturbed forest cell also returns when LANDFIRE 2016 shows trees on it, but only a cell whose forest loss came at least
 # PD_WITNESS$min_years before 2016: on younger burns the label is not reliable (30-40% "tree" 3-4 years after a high-severity fire,
 # against 6-17% at 5-9 years), LANDFIRE treating the ten years before a mapping year as recent disturbance.

@@ -5,6 +5,24 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
 ## Unreleased
 
 ### Changed
+- Forest return after a stand-replacing fire has a second witness, LANDFIRE's 2016 vegetation type (user 2026-11-15). The
+  Yellowstone historical run converted 76,000 ha of the 1988 burn to shrubland and annual grassland in 2018: NLCD shows 2% of
+  that burn as forest in 2016, where LANDFIRE maps half of it as a tree type (and TreeMap 2016 agrees), so NLCD was missing
+  slow-growing lodgepole regeneration. Three changes, all in the package defaults, so a Build made before them needs stage 6
+  rerun (and a Projection Setup made from it, stage 9):
+  - Stage 6: a disturbed forest cell also returns where most of its LANDFIRE 2016 pixels are a tree type
+    (`defaults/transitions/evt2016-tree-classes.csv`) and its forest loss (the last year NLCD shows forest, or a later
+    high-severity fire on most of the cell) came at least 15 years before 2016. It returns 15 years after the loss. The guard is
+    there because the label is not reliable on young burns: at Yellowstone 31-39% of high-severity burns of 3-4 years earlier are
+    "tree", against 6-17% at 5-9 years (`src/post-disturbance.R`, `PD_WITNESS`). No new data: every Build already reads this layer.
+  - Settings (`tools/fit_post_disturbance.R`, refitted): the share back at the window counts the witness, so the yearly return
+    chance of projections rises (Temperate Steppe Mountains 0.015 to 0.031: 50% back by year 30, NLCD alone 29%). Where NLCD's
+    own curve is still rising by a point a year when the record ends, the window is left open to 40 years: 12 of the 20 rows,
+    Temperate Steppe Mountains among them (30 to 40; it was the one ecodivision where return was faster after the window than
+    before it). Return age and the fitted windows themselves are unchanged.
+  - Regions (`post-disturbance-regions.csv`, new column `ForestGrassClass`): disturbed forest that does not come back converts
+    to natural perennial grassland, not annual, in Temperate Steppe Mountains, Temperate Desert Mountains and
+    Tropical/Subtropical Steppe Mountains. Shrubland there still converts to annual grass; Mediterranean Mountains is unchanged.
 - Land Use Demand's five sources ship with the package instead of being downloaded (`defaults/land-use-demand`, 7 MB): the RPA
   county urbanization and timber harvest, the ICLUS county table, Hauer's county populations and the Census county populations,
   each reduced to what stage 9 reads by `tools/make_land_use_demand_tables.R` (sources, licences and what was reduced:
