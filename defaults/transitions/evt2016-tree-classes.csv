@@ -1,0 +1,440 @@
+Code,Name
+4604,Micronesian Lowland Rain Forest
+4605,Micronesian Lowland Limestone Forest
+4606,Central and Southern Polynesian Montane Rainforest
+4609,Micronesian Ravine and Riparian Forest
+4611,Micronesian Swamp Forest
+4612,Western Pacific Mangrove
+4614,Central and Southern Polynesian Coastal Wooded Strand
+4618,Central and Southern Polynesian Lowland Rain Forest
+4620,Central and Southern Polynesian Cloud Forest
+4621,Central and Southern Polynesian Littoral Forest
+4622,Central and Southern Polynesian Ravine and Riparian Forest
+4623,Central and Southern Polynesian Swamp Forest
+7008,North Pacific Oak Woodland
+7009,Northwestern Great Plains Aspen Forest and Parkland
+7010,Northern Rocky Mountain Western Larch Savanna
+7011,Rocky Mountain Aspen Forest and Woodland
+7012,Rocky Mountain Bigtooth Maple Ravine Woodland
+7013,Western Great Plains Dry Bur Oak Forest and Woodland
+7014,Central and Southern California Mixed Evergreen Woodland
+7015,California Coastal Redwood Forest
+7016,Colorado Plateau Pinyon-Juniper Woodland
+7017,Columbia Plateau Western Juniper Woodland and Savanna
+7018,East Cascades Mesic Montane Mixed-Conifer Forest and Woodland
+7019,Great Basin Pinyon-Juniper Woodland
+7020,Inter-Mountain Basins Subalpine Limber-Bristlecone Pine Woodland
+7021,Klamath-Siskiyou Lower Montane Serpentine Mixed Conifer Woodland
+7022,Klamath-Siskiyou Upper Montane Serpentine Mixed Conifer Woodland
+7023,Madrean Encinal
+7024,Madrean Lower Montane Pine-Oak Forest and Woodland
+7025,Madrean Pinyon-Juniper Woodland
+7026,Madrean Upper Montane Conifer-Oak Forest and Woodland
+7027,Mediterranean California Dry-Mesic Mixed Conifer Forest and Woodland
+7028,Mediterranean California Mesic Mixed Conifer Forest and Woodland
+7029,Mediterranean California Mixed Oak Woodland
+7030,Mediterranean California Lower Montane Conifer Forest and Woodland
+7031,California Montane Jeffrey Pine-(Ponderosa Pine) Woodland
+7032,Mediterranean California Red Fir Forest
+7033,Mediterranean California Subalpine Woodland
+7034,Mediterranean California Mesic Serpentine Woodland
+7035,North Pacific Dry Douglas-fir-(Madrone) Forest and Woodland
+7036,North Pacific Seasonal Sitka Spruce Forest
+7037,North Pacific Maritime Dry-Mesic Douglas-fir-Western Hemlock Forest
+7038,North Pacific Maritime Mesic Subalpine Parkland
+7039,North Pacific Maritime Mesic-Wet Douglas-fir-Western Hemlock Forest
+7041,North Pacific Mountain Hemlock Forest
+7042,North Pacific Mesic Western Hemlock-Silver Fir Forest
+7043,Mediterranean California Mixed Evergreen Forest
+7044,Northern California Mesic Subalpine Woodland
+7045,Northern Rocky Mountain Dry-Mesic Montane Mixed Conifer Forest
+7046,Northern Rocky Mountain Subalpine Woodland and Parkland
+7047,Northern Rocky Mountain Mesic Montane Mixed Conifer Forest
+7048,Northwestern Great Plains Highland White Spruce Woodland
+7049,Rocky Mountain Foothill Limber Pine-Juniper Woodland
+7050,Rocky Mountain Lodgepole Pine Forest
+7051,Southern Rocky Mountain Dry-Mesic Montane Mixed Conifer Forest and Woodland
+7052,Southern Rocky Mountain Mesic Montane Mixed Conifer Forest and Woodland
+7053,Northern Rocky Mountain Ponderosa Pine Woodland and Savanna
+7054,Southern Rocky Mountain Ponderosa Pine Woodland
+7055,Rocky Mountain Subalpine Dry-Mesic Spruce-Fir Forest and Woodland
+7056,Rocky Mountain Subalpine Mesic-Wet Spruce-Fir Forest and Woodland
+7057,Rocky Mountain Subalpine-Montane Limber-Bristlecone Pine Woodland
+7058,Sierra Nevada Subalpine Lodgepole Pine Forest and Woodland
+7059,Southern Rocky Mountain Pinyon-Juniper Woodland
+7060,East Cascades Ponderosa Pine Forest and Woodland
+7061,Inter-Mountain Basins Aspen-Mixed Conifer Forest and Woodland
+7062,Inter-Mountain Basins Curl-leaf Mountain Mahogany Woodland
+7063,North Pacific Broadleaf Landslide Forest
+7112,California Central Valley Mixed Oak Savanna
+7113,California Coastal Live Oak Woodland and Savanna
+7114,California Lower Montane Foothill Pine Woodland and Savanna
+7115,Inter-Mountain Basins Juniper Savanna
+7116,Madrean Juniper Savanna
+7117,Southern Rocky Mountain Ponderosa Pine Savanna
+7118,Southern California Oak Woodland and Savanna
+7119,Southern Rocky Mountain Juniper Woodland and Savanna
+7151,California Central Valley Riparian Woodland
+7156,North Pacific Lowland Riparian Forest
+7158,North Pacific Montane Riparian Woodland
+7161,Northern Rocky Mountain Conifer Swamp
+7165,Northern Rocky Mountain Foothill Conifer Wooded Steppe
+7166,Middle Rocky Mountain Montane Douglas-fir Forest and Woodland
+7167,Rocky Mountain Poor-Site Lodgepole Pine Forest
+7170,Klamath-Siskiyou Xeromorphic Serpentine Savanna
+7172,Sierran-Intermontane Desert Western White Pine-White Fir Woodland
+7173,North Pacific Wooded Volcanic Flowage
+7174,North Pacific Dry-Mesic Silver Fir-Western Hemlock-Douglas-fir Forest
+7177,California Coastal Closed-Cone Conifer Forest and Woodland
+7178,North Pacific Hypermaritime Western Red-cedar-Western Hemlock Forest
+7179,Northwestern Great Plains-Black Hills Ponderosa Pine Woodland and Savanna
+7238,Laurentian-Acadian Northern Oak Forest
+7239,Laurentian-Acadian Northern Pine-(Oak) Forest
+7240,Laurentian-Acadian Hardwood Forest
+7241,Laurentian-Acadian Pine-Hemlock-Hardwood Forest
+7242,Laurentian Oak Barrens
+7243,Laurentian Pine-Oak Barrens
+7260,Mediterranean California Lower Montane Black Oak Forest and Woodland
+7261,Mediterranean California Lower Montane Black Oak-Conifer Forest and Woodland
+7262,East Cascades Oak Forest and Woodland
+7263,East Cascades Oak-Ponderosa Pine Forest and Woodland
+7264,California Lower Montane Blue Oak Woodland and Savanna
+7265,California Lower Montane Blue Oak-Foothill Pine Woodland and Savanna
+7301,Laurentian-Acadian Sub-boreal Aspen-Birch Forest
+7302,Laurentian-Acadian Northern Hardwoods Forest
+7303,Northeastern Interior Dry-Mesic Oak Forest
+7304,Ozark-Ouachita Dry-Mesic Oak Forest
+7305,Southern Interior Low Plateau Dry-Mesic Oak Forest
+7306,East Gulf Coastal Plain Northern Loess Plain Oak-Hickory Upland
+7307,East Gulf Coastal Plain Northern Dry Upland Hardwood Forest
+7308,Crosstimbers Oak Forest and Woodland
+7309,Southern Appalachian Northern Hardwood Forest
+7310,North-Central Interior Dry-Mesic Oak Forest and Woodland
+7311,North-Central Interior Dry Oak Forest and Woodland
+7312,Ouachita Montane Oak Forest
+7313,North-Central Interior Beech-Maple Forest
+7314,North-Central Interior Maple-Basswood Forest
+7315,Southern Appalachian Oak Forest
+7316,Southern Piedmont Mesic Forest
+7317,Allegheny-Cumberland Dry Oak Forest and Woodland
+7318,Southern and Central Appalachian Cove Forest
+7320,Central and Southern Appalachian Montane Oak Forest
+7321,South-Central Interior Mesophytic Forest
+7322,Crowley's Ridge Mesic Loess Slope Forest
+7323,West Gulf Coastal Plain Mesic Hardwood Forest
+7324,Northern Atlantic Coastal Plain Hardwood Forest
+7325,East Gulf Coastal Plain Northern Mesic Hardwood Slope Forest
+7326,South-Central Interior/Upper Coastal Plain Flatwoods
+7327,East Gulf Coastal Plain Northern Loess Bluff Forest
+7328,Southern Coastal Plain Limestone Forest
+7329,East Gulf Coastal Plain Southern Loess Bluff Forest
+7330,Southern Coastal Plain Dry Upland Hardwood Forest
+7331,Eastern Great Plains Tallgrass Aspen Forest and Woodland
+7333,South Florida Hardwood Hammock
+7334,Ozark-Ouachita Mesic Hardwood Forest
+7335,Southern Atlantic Coastal Plain Dry and Dry-Mesic Oak Forest
+7336,Southwest Florida Maritime Hammock
+7337,Southeast Florida Maritime Hammock
+7338,Central and South Texas Coastal Fringe Forest and Woodland
+7339,West Gulf Coastal Plain Chenier and Upper Texas Coastal Fringe Forest and Woodland
+7340,Appalachian Shale Barrens
+7342,Piedmont Hardpan Woodland and Forest
+7343,Southern Atlantic Coastal Plain Mesic Hardwood Forest
+7346,Atlantic Coastal Plain Fall-line Sandhills Longleaf Pine Woodland
+7347,Atlantic Coastal Plain Upland Longleaf Pine Woodland
+7348,West Gulf Coastal Plain Upland Longleaf Pine Forest and Woodland
+7349,East Gulf Coastal Plain Interior Upland Longleaf Pine Woodland
+7350,Central and Southern Appalachian Spruce-Fir Forest
+7351,Southeastern Interior Longleaf Pine Woodland
+7352,Southern Appalachian Montane Pine Forest and Woodland
+7353,Southern Appalachian Low-Elevation Pine Forest
+7354,Northeastern Interior Pine Barrens
+7355,Northern Atlantic Coastal Plain Pitch Pine Barrens
+7356,Florida Longleaf Pine Sandhill
+7357,Southern Coastal Plain Mesic Slope Forest
+7358,Bastrop Lost Pines Forest and Woodland
+7360,South Florida Pine Rockland
+7361,Central Atlantic Coastal Plain Maritime Forest
+7362,Laurentian-Acadian Northern Pine Forest
+7363,Central Interior Highlands Dry Acidic Glade and Barrens
+7364,Ozark-Ouachita Dry Oak Woodland
+7366,Laurentian-Acadian Pine-Hemlock Forest
+7367,Ozark-Ouachita Shortleaf Pine Forest and Woodland
+7368,Southern Piedmont Dry Pine Forest
+7369,Central Appalachian Dry Pine Forest
+7370,Appalachian Hemlock Forest
+7371,West Gulf Coastal Plain Pine Forest
+7372,East Gulf Coastal Plain Interior Shortleaf Pine Forest
+7373,Acadian Low-Elevation Spruce-Fir Forest
+7374,Acadian-Appalachian Montane Spruce-Fir Forest
+7375,Eastern Serpentine Woodland
+7376,Southern Ridge and Valley/Cumberland Dry Calcareous Forest
+7377,Central Appalachian Pine Rocky Woodland
+7378,West Gulf Coastal Plain Sandhill Shortleaf Pine Forest and Woodland
+7379,Northern Atlantic Coastal Plain Maritime Forest
+7380,East Gulf Coastal Plain Maritime Forest
+7381,Lower Mississippi River Dune Woodland and Forest
+7382,Southern Atlantic Coastal Plain Maritime Forest
+7383,Edwards Plateau Limestone Savanna and Woodland
+7384,Mississippi Delta Maritime Forest
+7385,Great Plains Wooded Draw and Ravine Woodland
+7389,Acadian-Appalachian Subalpine Woodland
+7391,Tamaulipan Mesquite Upland Woodland
+7394,North-Central Interior Oak Savanna
+7395,North-Central Oak Barrens Woodland
+7397,Nashville Basin Limestone Glade and Woodland
+7398,Cumberland Sandstone Glade and Barrens
+7400,Central Appalachian Alkaline Glade and Woodland
+7401,Central Interior Highlands Calcareous Glade and Barrens Woodland
+7403,West Gulf Coastal Plain Catahoula Barrens
+7405,West Gulf Coastal Plain Nepheline Syenite Glade
+7406,Southern Piedmont Dry Oak Forest
+7407,Laurentian Pine Barrens
+7408,Alabama Ketona Glade and Woodland
+7410,Llano Uplift Acidic Forest and Woodland
+7441,Bluegrass Savanna and Woodland
+7442,Arkansas Valley Prairie and Woodland
+7444,Eastern Boreal Floodplain Woodland
+7445,South Florida Dwarf Cypress Savanna
+7446,South Florida Pine Flatwoods
+7447,South Florida Cypress Dome
+7448,Southern Piedmont Dry Oak-(Pine) Forest
+7449,Central Atlantic Coastal Plain Wet Longleaf Pine Savanna and Flatwoods
+7450,Southern Atlantic Coastal Plain Wet Pine Savanna and Flatwoods
+7451,West Gulf Coastal Plain Wet Longleaf Pine Savanna and Flatwoods
+7452,Atlantic Coastal Plain Peatland Pocosin and Canebrake Woodland
+7453,Central Florida Pine Flatwoods
+7454,East Gulf Coastal Plain Near-Coast Pine Flatwoods
+7455,East Gulf Coastal Plain Southern Loblolly Flatwoods
+7456,Northern Atlantic Coastal Plain Pitch Pine Lowland
+7457,South-Central Interior/Upper Coastal Plain Wet Flatwoods
+7458,West Gulf Coastal Plain Pine Flatwoods
+7459,Atlantic Coastal Plain Clay-Based Carolina Bay Wetland
+7460,Southern Coastal Plain Nonriverine Cypress Dome
+7461,Southern Coastal Plain Seepage Swamp and Baygall Woodland
+7462,West Gulf Coastal Plain Seepage Swamp and Baygall
+7463,Central Appalachian Dry Oak Forest
+7464,Acadian Sub-Boreal Spruce Barrens
+7465,Acadian Sub-Boreal Spruce Flat
+7466,Great Lakes Wooded Dune and Swale
+7467,Tamaulipan Floodplain Woodland
+7468,Atlantic Coastal Plain Streamhead Seepage Swamp-Pocosin-Baygall Woodland
+7476,Tamaulipan Riparian Woodland
+7481,Laurentian-Acadian Alkaline Conifer-Hardwood Swamp
+7501,Southern Atlantic Coastal Plain Nonriverine Swamp and Wet Hardwood Forest
+7502,Central Appalachian Dry Oak-Pine Forest
+7505,Ouachita Novaculite Glade and Woodland
+7506,West Gulf Coastal Plain Nonriverine Wet Hardwood Flatwoods
+7507,Ozark-Ouachita Shortleaf Pine-Bluestem Woodland
+7509,Mississippi River Alluvial Plain Dry-Mesic Loess Slope Forest
+7510,Crowley's Ridge Sand Forest
+7511,Appalachian Northern Hardwood Forest
+7512,Appalachian (Hemlock)-Northern Hardwood Forest
+7513,Lower Mississippi River Flatwoods
+7517,Paleozoic Plateau Bluff and Talus Woodland
+7518,North-Central Interior Wet Flatwoods
+7519,East-Central Texas Plains Post Oak Savanna and Woodland
+7523,Edwards Plateau Dry-Mesic Slope Forest and Woodland
+7524,Edwards Plateau Mesic Canyon
+7525,Edwards Plateau Riparian Forest and Woodland
+7527,East Gulf Coastal Plain Interior Oak Forest
+7545,East Gulf Coastal Plain Near-Coast Pine Wet Flatwoods
+7546,East Gulf Coastal Plain Interior Shortleaf Pine-Oak Forest
+7547,Central Florida Pine Wet Flatwoods
+7548,South Florida Pine Wet Flatwoods
+7554,Acadian Low-Elevation Hardwood Forest
+7555,Acadian Low-Elevation Spruce-Fir-Hardwood Forest
+7556,Central Appalachian Oak Rocky Woodland
+7557,Central Appalachian Pine-Oak Rocky Woodland
+7565,Florida Peninsula Inland Scrub Woodland
+7567,Southern Coastal Plain Blackland Prairie Woodland
+7578,East Gulf Coastal Plain Wet Savanna
+7582,Ozark-Ouachita Oak Forest and Woodland
+7583,Ozark-Ouachita Shortleaf Pine-Oak Forest and Woodland
+7584,West Gulf Coastal Plain Hardwood Forest
+7585,West Gulf Coastal Plain Pine-Hardwood Forest
+7586,West Gulf Coastal Plain Sandhill Oak Forest and Woodland
+7587,West Gulf Coastal Plain Sandhill Oak and Shortleaf Pine Forest and Woodland
+7588,East Gulf Coastal Plain Southern Hardwood Flatwoods
+7589,East Gulf Coastal Plain Southern Loblolly-Hardwood Flatwoods
+7590,West Gulf Coastal Plain Hardwood Flatwoods
+7591,West Gulf Coastal Plain Pine-Hardwood Flatwoods
+7800,Hawai'i Floodplain Forest
+7802,Hawai'i Riparian Forest
+7808,Hawai'i Lowland Rainforest
+7809,Hawai'i Montane Cloud Forest
+7810,Hawai'i Montane Rainforest
+7812,Hawai'i Mesic Coastal Forest
+7813,Hawai'i Lowland Dry Forest
+7814,Hawai'i Lowland Mesic Forest
+7815,Hawai'i Montane-Subalpine Dry Forest and Woodland
+7816,Hawai'i Montane-Subalpine Mesic Forest
+7834,Tropical Pacific Orchard
+7860,Caribbean Coastal Dry Evergreen Forest
+7861,Caribbean Coastal Mangrove
+7865,"Caribbean Edapho-Xerophilous """"Mogote"""" Complex"
+7867,Caribbean Estuary Mangrove
+7868,Caribbean Floodplain Forest
+7870,Caribbean Lowland Moist Serpentine Woodland
+7872,Caribbean Montane Wet Elfin Forest
+7873,Caribbean Montane Wet Serpentine Woodland
+7875,Caribbean Riparian Forest
+7878,Caribbean Sand Savanna
+7879,Caribbean Seasonal Evergreen Lowland Forest
+7880,Caribbean Seasonal Evergreen Submontane/Lowland Forest
+7881,Caribbean Semi-deciduous Lowland Forest
+7883,Caribbean Submontane/Montane Karstic Forest
+7884,Caribbean Wet Montane Forest
+7885,Caribbean Wet Submontane/Lowland Forest
+7900,Western Cool Temperate Urban Deciduous Forest
+7901,Western Cool Temperate Urban Evergreen Forest
+7902,Western Cool Temperate Urban Mixed Forest
+7905,Eastern Cool Temperate Urban Deciduous Forest
+7906,Eastern Cool Temperate Urban Evergreen Forest
+7907,Eastern Cool Temperate Urban Mixed Forest
+7910,Western Warm Temperate Urban Deciduous Forest
+7911,Western Warm Temperate Urban Evergreen Forest
+7912,Western Warm Temperate Urban Mixed Forest
+7915,Eastern Warm Temperate Urban Deciduous Forest
+7916,Eastern Warm Temperate Urban Evergreen Forest
+7917,Eastern Warm Temperate Urban Mixed Forest
+7920,Western Cool Temperate Developed Ruderal Deciduous Forest
+7921,Western Cool Temperate Developed Ruderal Evergreen Forest
+7922,Western Cool Temperate Developed Ruderal Mixed Forest
+7925,Western Warm Temperate Developed Ruderal Deciduous Forest
+7926,Western Warm Temperate Developed Ruderal Evergreen Forest
+7927,Western Warm Temperate Developed Ruderal Mixed Forest
+7930,Eastern Cool Temperate Developed Ruderal Deciduous Forest
+7931,Eastern Cool Temperate Developed Ruderal Evergreen Forest
+7932,Eastern Cool Temperate Developed Ruderal Mixed Forest
+7935,Eastern Warm Temperate Developed Ruderal Deciduous Forest
+7936,Eastern Warm Temperate Developed Ruderal Evergreen Forest
+7937,Eastern Warm Temperate Developed Ruderal Mixed Forest
+7940,Western Cool Temperate Developed Ruderal Deciduous Forested Wetland
+7941,Western Cool Temperate Developed Ruderal Evergreen Forested Wetland
+7942,Western Cool Temperate Developed Ruderal Mixed Forested Wetland
+7945,Western Warm Temperate Developed Ruderal Deciduous Forested Wetland
+7946,Western Warm Temperate Developed Ruderal Evergreen Forested Wetland
+7947,Western Warm Temperate Developed Ruderal Mixed Forested Wetland
+7950,Eastern Cool Temperate Developed Ruderal Deciduous Forested Wetland
+7951,Eastern Cool Temperate Developed Ruderal Evergreen Forested Wetland
+7952,Eastern Cool Temperate Developed Ruderal Mixed Forested Wetland
+7955,Eastern Warm Temperate Developed Ruderal Deciduous Forested Wetland
+7956,Eastern Warm Temperate Developed Ruderal Evergreen Forested Wetland
+7957,Eastern Warm Temperate Developed Ruderal Mixed Forested Wetland
+7960,Western Cool Temperate Orchard
+7970,Eastern Cool Temperate Orchard
+7980,Western Warm Temperate Orchard
+7990,Eastern Warm Temperate Orchard
+9002,Columbia Basin Foothill Riparian Woodland
+9003,Great Basin Foothill and Lower Montane Riparian Woodland
+9012,Northern Rocky Mountain Lower Montane Riparian Woodland
+9014,Northwestern Great Plains Floodplain Forest and Woodland
+9015,Northwestern Great Plains Riparian Forest
+9019,Rocky Mountain Lower Montane-Foothill Riparian Woodland
+9022,Rocky Mountain Subalpine-Montane Riparian Woodland
+9026,Western Great Plains Floodplain Forest and Woodland
+9028,Western Great Plains Riparian Woodland
+9034,North American Warm Desert Riparian Woodland
+9035,North American Warm Desert Lower Montane Riparian Woodland
+9039,Acadian-Appalachian Conifer Seepage Forest
+9041,Atlantic Coastal Plain Blackwater Stream Floodplain Forest
+9042,Atlantic Coastal Plain Brownwater Stream Floodplain Forest
+9050,Atlantic Coastal Plain Small Blackwater River Floodplain Forest
+9051,Atlantic Coastal Plain Small Brownwater River Floodplain Forest
+9056,Boreal-Laurentian Conifer Acidic Swamp and Treed Poor Fen
+9059,Central Appalachian River Floodplain Forest
+9060,Central Appalachian Stream and Riparian Woodland
+9066,Central Interior Highlands and Appalachian Sinkhole and Depression Pond
+9068,Central Texas Coastal Prairie Riparian Forest
+9069,Central Texas Coastal Prairie River Floodplain Forest
+9071,Columbia Bottomlands Forest and Woodland
+9075,Cumberland Seepage Forest
+9080,East Gulf Coastal Plain Freshwater Tidal Wooded Swamp
+9082,East Gulf Coastal Plain Large River Floodplain Forest
+9083,East Gulf Coastal Plain Northern Seepage Swamp
+9085,East Gulf Coastal Plain Small Stream and River Floodplain Forest
+9088,Laurentian-Acadian Sub-boreal Dry-Mesic Pine-Black Spruce Forest
+9089,Laurentian-Acadian Sub-boreal Mesic Balsam Fir-Spruce Forest
+9092,Edwards Plateau Floodplain Terrace Forest and Woodland
+9106,High Allegheny Wetland
+9111,Laurentian Acidic Rocky Outcrop Woodland
+9112,Laurentian Jack Pine-Red Pine Forest
+9116,Laurentian-Acadian Calcareous Rocky Outcrop Woodland
+9117,Laurentian-Acadian Floodplain Forest
+9129,Mediterranean California Foothill and Lower Montane Riparian Woodland
+9133,Mediterranean California Serpentine Foothill and Lower Montane Riparian Woodland and Seep
+9138,Mississippi River Bottomland Depression
+9139,Mississippi River High Floodplain (Bottomland) Forest
+9140,Mississippi River Low Floodplain (Bottomland) Forest
+9141,Mississippi River Riparian Forest
+9152,North American Warm Desert Riparian Mesquite Bosque Woodland
+9154,North American Warm Desert Wash Woodland
+9165,North Pacific Hardwood-Conifer Swamp
+9170,North Pacific Lowland Mixed Hardwood-Conifer Forest
+9174,North-Central Appalachian Acidic Swamp
+9177,North-Central Interior and Appalachian Acidic Peatland Woodland
+9178,North-Central Interior and Appalachian Rich Swamp
+9179,North-Central Interior Floodplain Forest
+9181,North-Central Interior Quartzite Glade
+9185,Northern Appalachian-Acadian Conifer-Hardwood Acidic Swamp
+9186,Northern Appalachian-Acadian Rocky Heath Outcrop Woodland
+9187,Northern Atlantic Coastal Plain Basin Peat Swamp
+9188,Northern Atlantic Coastal Plain Basin Swamp and Wet Hardwood Forest
+9190,Northern Atlantic Coastal Plain Calcareous Ravine
+9195,Northern Atlantic Coastal Plain Riparian and Floodplain Forest
+9198,Northern Atlantic Coastal Plain Tidal Swamp
+9207,Ozark-Ouachita Riparian Forest
+9208,Panhandle Florida Limestone Glade
+9209,Piedmont Seepage Wetland
+9210,Piedmont Upland Depression Swamp
+9211,Red River Large Floodplain Forest
+9216,South Florida Bayhead Swamp
+9218,South Florida Hydric Hammock
+9220,South Florida Pond-apple/Popash Slough
+9223,South-Central Interior Large Floodplain Forest
+9224,South-Central Interior Small Stream and Riparian Forest
+9229,Southeastern Coastal Plain Natural Lakeshore
+9230,Southeastern Great Plains Floodplain Forest and Woodland
+9231,Southeastern Great Plains Riparian Forest and Woodland
+9232,Southern and Central Appalachian Bog and Fen
+9233,Southern and Central Appalachian Mafic Glade and Barrens
+9242,Southern Atlantic Coastal Plain Large River Floodplain Forest
+9245,Southern Atlantic Coastal Plain Tidal Wooded Swamp
+9247,Southern Coastal Plain Blackwater River Floodplain Forest
+9248,Southern Coastal Plain Hydric Hammock
+9249,Southern Coastal Plain Nonriverine Basin Swamp
+9250,Southern Coastal Plain Oak Dome and Hammock
+9256,Southern Piedmont Glade and Barrens
+9258,Southern Piedmont Large Floodplain Forest
+9259,Southern Piedmont Small Floodplain and Riparian Forest
+9260,Southern Ridge and Valley Calcareous Glade and Woodland
+9266,Tamaulipan Closed Depression Wetland Woodland
+9282,West Gulf Coastal Plain Large River Floodplain Forest
+9283,West Gulf Coastal Plain Near-Coast Large River Swamp
+9284,West Gulf Coastal Plain Small Stream and River Forest
+9288,Northeastern Interior Calcareous Oak Forest
+9289,Madrean Mesic Canyon Forest and Woodland
+9295,Laurentian-Acadian Sub-boreal Dry-Mesic Pine-Black Spruce-Hardwood Forest
+9302,Californian Ruderal Forest
+9304,Caribbean Forest Plantation
+9305,Caribbean Ruderal Dry Forest
+9312,Northeastern North American Temperate Forest Plantation
+9314,Northern & Central Native Ruderal Flooded & Swamp Forest
+9315,Northern & Central Native Ruderal Forest
+9319,Southeastern Exotic Ruderal Forest
+9320,Southeastern Native Ruderal Flooded & Swamp Forest
+9321,Southeastern Native Ruderal Forest
+9322,Southeastern North American Temperate Forest Plantation
+9327,Interior West Ruderal Riparian Forest
+9332,Southeastern Exotic Ruderal Flooded & Swamp Forest
+9340,Caribbean Lowland Ruderal Rainforest
+9341,Caribbean Montane Ruderal Forest
+9343,Hawaiian Montane Ruderal Forest & Woodland
+9345,Hawaiian Ruderal Flooded & Swamp Forest
+9347,Hawaiian Ruderal Mangrove
+9348,Polynesian Ruderal Dry Woodland
+9349,Polynesian Ruderal Lowland Rainforest
+9353,Tropical Pacific Forest Plantation
+9355,Tropical Agroforestry Plantation
+9722,South Florida Slough Gator Hole and Willow Head Woodland

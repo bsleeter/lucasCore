@@ -108,7 +108,7 @@ progressBar()
 off_file <- write_raster(mask(init(P, 0), P), "Off.tif", "INT1U")
 # Each class pair belongs to one group, as in the pathways (user rule 2026-11-05: a map built from the class reached or left alone counted
 # Puget's cells going to developed or between pasture and cropland as Ag Contraction, ten times its real area)
-source(pkg_file("src", "transition-pairs.R")); source(pkg_file("src", "recover-area.R"))
+source(pkg_file("src", "transition-pairs.R")); source(pkg_file("src", "recover-area.R")); source(pkg_file("src", "post-disturbance.R"))
 lu <- so[Source %in% c("NlcdGain", "NlcdLoss", "NlcdChange")]
 pairs <- transition_pairs(pw, lu$TransitionGroupId, grp_types); clash <- transition_pair_clashes(pairs)
 check(STAGE, "every land-use class pair belongs to one transition group", !nrow(clash), paste(clash[, sprintf("%d to %d: %s", From, To, Groups)], collapse = "; "))
@@ -241,6 +241,33 @@ if (nrow(ncc)) {
     layers[[length(layers) + 1]] <- data.table(Timestep = y, TransitionGroupId = ncc$TransitionGroupId, Source = "NlcdClearcut", File = f) }
 }
 layers <- rbindlist(layers)
+
+# ---- forest return, the second witness: LANDFIRE 2016 shows trees where NLCD does not (src/post-disturbance.R, user 2026-11-15) -----
+# A cell most of whose LANDFIRE 2016 pixels are a tree type, and whose forest loss (the last year NLCD shows forest, or a later
+# high-severity fire on most of the cell) came at least PD_WITNESS$min_years before 2016, is on in the Forest Return map of the year
+# min_years after the loss. Only a cell in a disturbed forest class then has a pathway, so nothing else is touched.
+FRG <- paste0("Post-disturbance: Forest Return", TYPE_SUFFIX); HSG <- paste0("Fire: High Severity", TYPE_SUFFIX)
+if (FRG %in% pdg$TransitionGroupId && y0 + 1L <= PD_WITNESS$year) {
+  wy1 <- min(y1, PD_WITNESS$year); fcl <- codes(pdg[TransitionGroupId == FRG, Classes])
+  e16 <- rast(read_data_sources("Evt2016File")$Evt2016File); levels(e16) <- NULL
+  e16 <- crop(e16, project(as.polygons(ext(P) + 3000, crs = crs(P)), crs(e16)))
+  tcode <- as.integer(read_default("transitions", "evt2016-tree-classes.csv")$Code)
+  tsh <- values(mask(project(classify(e16, cbind(tcode, 1), others = 0), P, method = "average"), P), mat = FALSE)
+  lastf <- rep(NA_integer_, length(land0)); for (y in y0:wy1) lastf[NV[[as.character(y)]] %in% fcl] <- y
+  lastb <- rep(NA_integer_, length(land0)); hsf <- dl[TransitionGroupId == HSG & !is.na(File) & Timestep <= wy1][order(Timestep)]
+  for (i in seq_len(nrow(hsf))) lastb[which(values(rast(hsf$File[i]), mat = FALSE) >= 0.5)] <- hsf$Timestep[i]
+  wyr <- pd_witness_year(tsh, lastf, lastb, y0); wyr[!land0 | !(wyr %in% yrs)] <- NA_integer_
+  for (y in sort(unique(stats::na.omit(wyr)))) { i <- which(layers$TransitionGroupId == FRG & layers$Timestep == y)
+    on <- !is.na(wyr) & wyr == y; if (!is.na(layers$File[i])) on <- on | (values(rast(layers$File[i]), mat = FALSE) %in% 1L)
+    v <- as.integer(on); v[!land0] <- NA_integer_
+    set(layers, i, "File", write_raster(setValues(rast(P), v), sprintf("Return-Post-disturbance-Forest-Return_%d.tif", y), "INT1U")) }
+  n_w <- sum(!is.na(wyr)); n_nl <- sum(!is.na(wyr) & !is.na(lastf) & lastf >= y0)
+  say("Forest return, LANDFIRE 2016 as a second witness: %d cells (%.1f km2) are mostly a tree type in LANDFIRE 2016 with no forest in NLCD since at least %d (%d of them forest earlier in the record)%s",
+      n_w, n_w * cell_km2, PD_WITNESS$year - PD_WITNESS$min_years, n_nl,
+      if (n_w) sprintf("; on in the Forest Return map %d years after the loss, %d-%d (a cell returns only from a disturbed forest class)", PD_WITNESS$min_years, min(wyr, na.rm = TRUE), max(wyr, na.rm = TRUE)) else "")
+  check(STAGE, "forest return witness: years fall in the run and no cell has forest in NLCD within the guard", all(is.na(wyr) | (wyr %in% yrs & wyr <= PD_WITNESS$year)) &&
+        !any(!is.na(wyr) & !is.na(lastf) & lastf > PD_WITNESS$year - PD_WITNESS$min_years), sprintf("%d cells", n_w))
+}
 progressBar()
 
 # ---- minimum harvest ages, settled (user decisions 2026-10-30) -------------------------------------------------------------------

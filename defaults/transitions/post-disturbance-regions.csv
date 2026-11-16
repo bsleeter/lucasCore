@@ -1,20 +1,20 @@
-Ecodivision,ShrubClass,GrassClass,Note
-Hot Continental,Shrubland: Non-sage,Grassland: Natural Perennial,
-Hot Continental Mountains,Shrubland: Non-sage,Grassland: Natural Perennial,
-Marine,Shrubland: Non-sage,Grassland: Natural Perennial,
-Marine Mountains,Shrubland: Non-sage,Grassland: Natural Perennial,
-Mediterranean,Shrubland: Chaparral,Grassland: Annual,California's foothills and coast: burned forest regrows as chaparral; converted shrubland becomes annual grassland
-Mediterranean Mountains,Shrubland: Chaparral,Grassland: Annual,
-Prairie,Shrubland: Non-sage,Grassland: Natural Perennial,
-Savanna,Shrubland: Non-sage,Grassland: Natural Perennial,
-Subtropical,Shrubland: Non-sage,Grassland: Natural Perennial,
-Subtropical Mountains,Shrubland: Non-sage,Grassland: Natural Perennial,
-Temperate Desert,Shrubland: Non-sage,Grassland: Annual,Great Basin: converted shrubland becomes annual grass (cheatgrass)
-Temperate Desert Mountains,Shrubland: Non-sage,Grassland: Annual,
-Temperate Steppe,Shrubland: Non-sage,Grassland: Annual,
-Temperate Steppe Mountains,Shrubland: Non-sage,Grassland: Annual,
-Tropical/Subtropical Desert,Shrubland: Non-sage,Grassland: Annual,
-Tropical/Subtropical Steppe,Shrubland: Non-sage,Grassland: Annual,
-Tropical/Subtropical Steppe Mountains,Shrubland: Non-sage,Grassland: Annual,
-Warm Continental,Shrubland: Non-sage,Grassland: Natural Perennial,
-Warm Continental Mountains,Shrubland: Non-sage,Grassland: Natural Perennial,
+Ecodivision,ShrubClass,GrassClass,ForestGrassClass,Note
+Hot Continental,Shrubland: Non-sage,Grassland: Natural Perennial,,
+Hot Continental Mountains,Shrubland: Non-sage,Grassland: Natural Perennial,,
+Marine,Shrubland: Non-sage,Grassland: Natural Perennial,,
+Marine Mountains,Shrubland: Non-sage,Grassland: Natural Perennial,,
+Mediterranean,Shrubland: Chaparral,Grassland: Annual,,California's foothills and coast: burned forest regrows as chaparral; converted shrubland becomes annual grassland
+Mediterranean Mountains,Shrubland: Chaparral,Grassland: Annual,,
+Prairie,Shrubland: Non-sage,Grassland: Natural Perennial,,
+Savanna,Shrubland: Non-sage,Grassland: Natural Perennial,,
+Subtropical,Shrubland: Non-sage,Grassland: Natural Perennial,,
+Subtropical Mountains,Shrubland: Non-sage,Grassland: Natural Perennial,,
+Temperate Desert,Shrubland: Non-sage,Grassland: Annual,,Great Basin: converted shrubland becomes annual grass (cheatgrass)
+Temperate Desert Mountains,Shrubland: Non-sage,Grassland: Annual,Grassland: Natural Perennial,
+Temperate Steppe,Shrubland: Non-sage,Grassland: Annual,,
+Temperate Steppe Mountains,Shrubland: Non-sage,Grassland: Annual,Grassland: Natural Perennial,"Burned mountain forest that does not come back becomes perennial grass, not annual (user 2026-11-15: Yellowstone's 1988 burn converted to 28,000 ha of annual grassland); shrubland converts as in the lowland"
+Tropical/Subtropical Desert,Shrubland: Non-sage,Grassland: Annual,,
+Tropical/Subtropical Steppe,Shrubland: Non-sage,Grassland: Annual,,
+Tropical/Subtropical Steppe Mountains,Shrubland: Non-sage,Grassland: Annual,Grassland: Natural Perennial,
+Warm Continental,Shrubland: Non-sage,Grassland: Natural Perennial,,
+Warm Continental Mountains,Shrubland: Non-sage,Grassland: Natural Perennial,,

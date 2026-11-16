@@ -9,7 +9,8 @@
 #     grass class, disturbed sage, sage steppe and chaparral to Grassland: Annual, disturbed Non-sage to its ecodivision's grass class;
 #   - converts at a stand-replacing reburn inside the window (ReburnConversion of the reburns; the rest start again at age 0).
 # Settings: defaults/transitions/post-disturbance-settings.csv (window, return, reburn, by parent class and ecodivision; src/post-disturbance.R) and
-# post-disturbance-regions.csv (each ecodivision's shrub and grass class). Rerunnable: every disturbed row is written again.
+# post-disturbance-regions.csv (each ecodivision's shrub and grass class; ForestGrassClass, where set, is the grass class of disturbed forest
+# alone, user 2026-11-15: mountain forest that does not come back becomes perennial grass). Rerunnable: every disturbed row is written again.
 # Carbon rows (stage 3) are not written here.
 # Usage: Rscript tools/make_post_disturbance.R            (from the repository root)
 # =============================================================================
@@ -55,9 +56,11 @@ wr(ttg, D("stsim", "stsim_TransitionTypeGroup.csv"))
 
 # ---- settings, by class and ecodivision (src/post-disturbance.R) ---------------------------------------------------------------
 source(file.path(pkg, "src", "post-disturbance.R"))
-st <- fread(D("transitions", "post-disturbance-settings.csv"), na.strings = ""); rg <- fread(D("transitions", "post-disturbance-regions.csv"))
+st <- fread(D("transitions", "post-disturbance-settings.csv"), na.strings = ""); rg <- fread(D("transitions", "post-disturbance-regions.csv"), na.strings = "")
+if (!"ForestGrassClass" %in% names(rg)) rg[, ForestGrassClass := NA_character_]
+rg[, ForestGrassClass := fifelse(is.na(ForestGrassClass), GrassClass, as.character(ForestGrassClass))]
 eco <- rd(D("strata", "ecodivisions-list.csv"))$Name; stopifnot(setequal(rg$Ecodivision, eco))
-stopifnot(all(c(rg$ShrubClass, rg$GrassClass, "Grassland: Annual") %in% sc$Name))
+stopifnot(all(c(rg$ShrubClass, rg$GrassClass, rg$ForestGrassClass, "Grassland: Annual") %in% sc$Name))
 res <- pd_resolve(st, par$Name, par$kind == "Forest", eco)
 stopifnot(nrow(res) == nrow(par) * length(eco))   # every parent class has settings in every ecodivision
 res <- merge(res, par[, .(Parent = Name, dname, kind)], by = "Parent")
@@ -68,7 +71,7 @@ res <- merge(res, par[, .(Parent = Name, dname, kind)], by = "Parent")
 WET_DEST <- "Wetland: Palustrine Emergent"; stopifnot(WET_DEST %in% sc$Name)
 twins <- par[kind == "Forest" & StateLabelXId == "Wetland", Name]
 fr <- merge(res[kind == "Forest" & !Parent %in% twins], rg, by = "Ecodivision")
-dest <- rbind(fr[, .(From = dname, Ecodivision, To = ShrubClass, Share = ShrubShare)], fr[, .(From = dname, Ecodivision, To = GrassClass, Share = 1 - ShrubShare)],
+dest <- rbind(fr[, .(From = dname, Ecodivision, To = ShrubClass, Share = ShrubShare)], fr[, .(From = dname, Ecodivision, To = ForestGrassClass, Share = 1 - ShrubShare)],
               merge(res[Parent == "Shrubland: Non-sage"], rg, by = "Ecodivision")[, .(From = dname, Ecodivision, To = GrassClass, Share = 1)],
               res[kind == "Shrub" & Parent != "Shrubland: Non-sage", .(From = dname, Ecodivision, To = "Grassland: Annual", Share = 1)],
               res[Parent %in% twins, .(From = dname, Ecodivision, To = WET_DEST, Share = 1)])[Share > 0]

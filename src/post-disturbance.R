@@ -33,3 +33,25 @@ pd_varies <- function(res, cols = PD_COLS) {
   v <- res[, .(n = data.table::uniqueN(do.call(paste, lapply(cols, function(k) .SD[[k]])))), by = Parent, .SDcols = cols]
   stats::setNames(v$n > 1, v$Parent)
 }
+
+# ---- a second witness for forest return: LANDFIRE's 2016 vegetation type (user 2026-11-15) ------------------------------------------
+# NLCD is slow to call a regenerating stand forest where trees grow slowly: on Yellowstone's 1988 high-severity burn it shows 2% forest
+# in 2016, where LANDFIRE's Existing Vegetation Type of 2016 maps half as a tree type (dev/fire/README-return-witness.md). So a
+# disturbed forest cell also returns when LANDFIRE 2016 shows trees on it, but only a cell whose forest loss came at least
+# PD_WITNESS$min_years before 2016: on younger burns the label is not reliable (30-40% "tree" 3-4 years after a high-severity fire,
+# against 6-17% at 5-9 years), LANDFIRE treating the ten years before a mapping year as recent disturbance.
+# When the cell returns is not known (some year between the loss and 2016): it is taken at min_years after the loss, the youngest
+# stand the witness is trusted on. tools/fit_post_disturbance.R counts the same event at the same age, so the fitted return chance
+# and the historical maps agree.
+PD_WITNESS <- list(year = 2016L, min_years = 15L, share = 0.5)
+
+# tree_share: the share of each cell's LANDFIRE 2016 pixels that are a tree type (defaults/transitions/evt2016-tree-classes.csv);
+# last_forest: the last year up to the witness year that NLCD shows the cell as forest (NA = never since y0); last_fire: the last
+# year up to the witness year of a stand-replacing fire on most of the cell (NA = none); y0: the first year of the record.
+# Returns the year each cell returns by the witness, NA where it does not: the loss (the later of the two, y0 when neither is known)
+# plus min_years, when that is no later than the witness year.
+pd_witness_year <- function(tree_share, last_forest, last_fire, y0, w = PD_WITNESS) {
+  lost <- pmax(ifelse(is.na(last_forest), y0, last_forest), ifelse(is.na(last_fire), y0, last_fire))
+  yr <- as.integer(lost + w$min_years)
+  ifelse(!is.na(tree_share) & tree_share >= w$share & yr <= w$year, yr, NA_integer_)
+}

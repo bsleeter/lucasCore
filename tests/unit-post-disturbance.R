@@ -60,7 +60,7 @@ check("conversion at the window's end: proportions add to 1 in every ecodivision
         nrow(x) > 0 && abs(sum(num(x$Proportion)) - 1) < 1e-6 && all(num(x$AgeMin) == p$Window) }, TRUE)) && all(cv$StateClassIdDest %in% sc$Name))
 check("disturbed upland forest converts to its ecodivision's shrub or grass class; sage, sage steppe and chaparral to annual grass",
       all(cv[StateClassIdSource %in% par[as.integer(Id) >= 100 & StateLabelXId != "Wetland", dname], StateClassIdDest] %in%
-            unlist(fread(D("transitions", "post-disturbance-regions.csv"))[, .(ShrubClass, GrassClass)])) &&
+            stats::na.omit(unlist(fread(D("transitions", "post-disturbance-regions.csv"), na.strings = "")[, .(ShrubClass, GrassClass, ForestGrassClass)]))) &&
       all(cv[StateClassIdSource %in% par[Name %in% SHRUBS[c(1:3, 5)], dname], StateClassIdDest] == "Grassland: Annual"))
 check("a disturbed forested wetland twin converts to Wetland: Palustrine Emergent, at the window's end and at a reburn (user 2026-11-12)", {
   tw <- par[as.integer(Id) >= 100 & StateLabelXId == "Wetland", dname]; length(tw) == 3 &&
@@ -97,4 +97,25 @@ check("fire by state class: names a disturbed kind or a class, in a known ecodiv
 up <- grep("\\[Update\\(", readLines(file.path("ui", "LucasCoreUpdates.cs")), value = TRUE)
 check("library update 1.4 exists, and no update description holds an apostrophe (SyncroSim writes it unquoted: the 1.3.0 failure)",
       any(grepl("\\[Update\\(1\\.4,", up)) && !any(grepl("'", up)))
+# mountain forest that does not come back becomes perennial grass (user 2026-11-15): ForestGrassClass is the grass class of disturbed
+# forest alone, so the shrub classes of the same ecodivision still convert to its GrassClass
+rgn <- fread(D("transitions", "post-disturbance-regions.csv"), na.strings = ""); MT <- "Temperate Steppe Mountains"; lp <- "Disturbed: Lodgepole Pine Group"
+check("regions: in Temperate Steppe Mountains disturbed forest converts to non-sage shrub or perennial grass, never annual; disturbed non-sage still to annual grass",
+      rgn[Ecodivision == MT, ForestGrassClass == "Grassland: Natural Perennial" & GrassClass == "Grassland: Annual"] &&
+      setequal(in_eco(cv[StateClassIdSource == lp], MT)$StateClassIdDest, c("Shrubland: Non-sage", "Grassland: Natural Perennial")) &&
+      all(in_eco(cv[StateClassIdSource == "Disturbed: Non-sage"], MT)$StateClassIdDest == "Grassland: Annual") &&
+      all(stats::na.omit(rgn$ForestGrassClass) %in% sc$Name))
+# the second witness for forest return (LANDFIRE 2016; src/post-disturbance.R)
+tc <- fread(D("transitions", "evt2016-tree-classes.csv"))
+check("LANDFIRE 2016 tree classes: unique codes, lodgepole pine among them, no recently disturbed class",
+      !anyDuplicated(tc$Code) && nrow(tc) > 300 && any(tc$Name == "Rocky Mountain Lodgepole Pine Forest") && !any(grepl("^Recently", tc$Name)))
+W <- PD_WITNESS; wy <- function(...) pd_witness_year(..., y0 = 1985L)
+check("witness: a tree cell returns min_years after its loss (the later of the last NLCD forest and the last stand-replacing fire)",
+      identical(wy(c(1, 0.5, 0.9), c(1988L, 1988L, 1987L), c(NA, NA, 1988L)), rep(1988L + W$min_years, 3)) && identical(wy(1, 1990L, 2000L), 2000L + W$min_years))
+check("witness: none where the cell is not mostly trees, where the loss is inside the guard, or where the return would fall after the witness year",
+      all(is.na(wy(c(0.49, NA, 1, 1, 1), c(1988L, 1988L, W$year - W$min_years + 1L, 2016L, 1988L), c(NA, NA, NA, NA, 2005L)))) &&
+      identical(wy(1, W$year - W$min_years, NA), W$year))
+check("witness: a cell with no forest in the record counts its loss from the first year", identical(wy(1, NA, NA), 1985L + W$min_years))
+check("witness and windows: every forest window in an ecodivision is long enough for the witness to apply before conversion, or NLCD shows most back by then",
+      all(st[ParentClass == "Forest", Window > W$min_years | grepl("(8[0-9]|9[0-9])% back", Note)]))
 cat(sprintf("%d passed, %d failed\n", n_ok, n_bad)); if (n_bad) quit(status = 1)

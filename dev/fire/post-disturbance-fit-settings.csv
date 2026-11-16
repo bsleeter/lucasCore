@@ -1,0 +1,21 @@
+Ecodivision,Window,ReturnAgeMin,ReturnProbability,ReburnConversion,ShrubShare,W0,BackAtWindow,BackNlcd,BackAtEnd,RisePerYr,Witness,Followed,Events,Fires,OwnEvents,Source
+,40,4,0.043,0.91,0.79,26,0.63,0.4,0.45,0.0116,0.19,30,1954679,268,1954679,CONUS
+Warm Continental,40,1,0.214,0.91,0.92,18,0.99,0.83,0.83,0.0941,0.15,18,34155,11,34155,own fires
+Hot Continental,40,2,0.121,0.91,0.79,14,0.81,0.81,0.86,0.0239,0.01,16,559,9,33,with Hot Continental Mountains
+Subtropical,13,4,0.169,0.91,0.79,13,0.84,0.84,0.87,0.0052,0.06,19,2088,10,2088,own fires
+Marine,40,12,0.078,0.3,0.79,29,0.77,0.44,0.47,0.0268,0.27,30,667364,38,0,with Marine Mountains
+Prairie,40,4,0.062,0.92,0.83,27,0.78,0.54,0.58,0.0144,0.22,30,1080393,141,2556,domain 2
+Mediterranean,26,2,0.058,0.98,0.95,26,0.78,0.64,0.68,0.0081,0.19,31,187229,24,187229,own fires
+Tropical/Subtropical Steppe,22,3,0.064,0.82,0.97,22,0.73,0.48,0.53,0.0075,0.1,28,77366,28,28331,with Tropical/Subtropical Steppe Mountains
+Tropical/Subtropical Desert,23,3,0.048,0.94,0.84,23,0.65,0.41,0.44,0.0054,0.24,30,10522,14,10522,own fires
+Temperate Steppe,25,22,0.028,0.91,0.09,25,0.11,0.03,0.05,0.0053,0.03,28,26289,11,26289,own fires
+Temperate Desert,25,6,0.032,0.99,0.71,25,0.48,0.16,0.21,0.0042,0.2,34,22275,11,22275,own fires
+Savanna,40,4,0.043,0.91,0.79,26,0.63,0.4,0.45,0.0116,0.19,30,1954679,268,0,CONUS
+Warm Continental Mountains,40,1,0.214,0.91,0.92,18,0.99,0.83,0.83,0.0941,0.15,18,34155,11,0,with Warm Continental
+Hot Continental Mountains,40,2,0.13,0.91,0.79,15,0.86,0.83,0.87,0.0209,0.02,17,526,8,526,own fires
+Subtropical Mountains,40,4,0.128,0.91,0.3,16,0.83,0.83,0.87,0.033,0,18,10967,16,10967,own fires
+Marine Mountains,40,12,0.078,0.3,0.79,29,0.77,0.44,0.47,0.0268,0.27,30,667364,38,667364,own fires
+Mediterranean Mountains,40,11,0.078,0.95,0.81,25,0.7,0.37,0.4,0.0122,0.28,29,175475,30,175475,own fires
+Tropical/Subtropical Steppe Mountains,40,3,0.054,0.82,0.94,23,0.69,0.51,0.55,0.0138,0.07,26,49035,26,49035,own fires
+Temperate Steppe Mountains,40,9,0.031,0.92,0.67,30,0.5,0.29,0.33,0.0134,0.21,33,583222,35,583222,own fires
+Temperate Desert Mountains,24,8,0.023,0.79,0.74,24,0.33,0.18,0.23,0.0055,0.13,31,154612,28,154612,own fires
