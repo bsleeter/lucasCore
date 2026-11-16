@@ -2,7 +2,10 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
-## Unreleased
+## 1.4.1 - 2026-11-16
+
+No library update: a 1.4.0 library opens as it is. A Build made with 1.4.0 keeps working; rerun it (or stages 0 and 6) to get the
+tabular output options and the new forest return.
 
 ### Changed
 - Forest return after a stand-replacing fire has a second witness, LANDFIRE's 2016 vegetation type (user 2026-11-15). The
@@ -44,6 +47,11 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   `tools/fit_shrub_post_disturbance.R`, whose fitted settings ship in `defaults/transitions/post-disturbance-settings.csv`). It is
   now a developer dataset (Fetched = optional): not listed on the page, and not fetched by a blank dataset list. To refit, run a
   Data Download scenario whose Datasets is `RcmapCoverFolder`, set by script.
+- A Build could fail at the end of stage 8 on its own crop harvest check ("no agriculture cell harvests more than its foliage";
+  Dallas-Fort Worth metro, 154 pasture cells of 262,096 agriculture cells). An agriculture cell with no surveyed crop pixels takes
+  the crop harvest multiplier of its neighbours, and a pasture cell filled from cropland could end above all of its foliage,
+  because cropland's lower harvest rate allows a higher multiplier. A filled cell is now held to its own class's limit, as the
+  cells with their own crops already were, and the log says how many were held. No change to a Build that passed.
 
 ## 1.4.0 - 2026-11-15
 
