@@ -369,6 +369,11 @@ if (cp_on) {
   hmult <- rep(1, ncell(P)); huse <- isAG & !is.na(vR) & !is.na(trate) & trate > 0
   hmult[huse] <- pmin(pmax(vR[huse] / trate[huse], CAP[1]), CAP[2], 1 / trate[huse])
   hfl <- fill_multiplier(P, hmult, huse, land & !huse); hmult <- hfl$mult
+  # a filled agriculture cell takes its neighbours' multiplier, which can belong to a class with a lower rate (pasture filled from
+  # cropland): hold it to its own class's limit, as the cells with their own crops are held above
+  hover <- isAG & !huse & !is.na(trate) & trate > 0 & hmult * trate > 1
+  if (any(hover)) { say("Crop harvest: %d agriculture cells without surveyed crops (%s) took a neighbour's multiplier above their own class's limit; held to all of the foliage",
+                        sum(hover), paste(sprintf("%s %d", names(table(cname[hover])), as.integer(table(cname[hover]))), collapse = ", ")); hmult[hover] <- 1 / trate[hover] }
   check(STAGE, "crop harvest: every land cell's multiplier is finite and positive, and no agriculture cell harvests more than its foliage",
         all(is.finite(hmult[land]) & hmult[land] > 0) && all(is.na(trate[isAG]) | hmult[isAG] * trate[isAG] <= 1 + 1e-9))
   hsum <- data.table(cls = cname[isAG], m = hmult[isAG], r = hmult[isAG] * trate[isAG])[, .(Cells = .N, Mean = round(mean(m), 2), Rate = round(mean(r, na.rm = TRUE), 3),
