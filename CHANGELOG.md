@@ -2,6 +2,48 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## 1.5.1 - 2026-11-18
+
+No library update: the new Wood Products parameters are in a sheet of their own (Wood Products Future), which a 1.5 library
+gains when it is opened with this version. Existing Wood Products scenarios and their results are unchanged.
+
+### Added
+- Wood products futures (stage 18). The Wood Products page has a group "A different wood products future": a few parameters
+  that move harvested carbon from one path to another from a start year on, to explore, for example, a move to longer-lived
+  products or to more bioenergy. Left blank they reproduce the earlier results exactly (the model is not touched when none
+  is set). They act on top of the parameter draws, so the interval stays and the band moves, and none adds or loses carbon.
+  - **Apply from year** (blank: the projection's first year; a historical run: its first year) and **Fully reached by year**
+    (blank: at once; otherwise a straight-line ramp).
+  - **Shift to long-lived products** (0 to 1, default 0): that share of the carbon bound for paper and for end uses with a
+    half-life of 12 years or less goes to building end uses (67 years or more) instead, in the building mix of the year, and
+    is solid wood from there on.
+  - **Product lifetime multiplier** (default 1): multiplies every half-life in use, on everything in use from the start year.
+  - **Extra share burned for energy** (0 to 1, default 0): that share of the industrial roundwood is burned with energy
+    capture in the year harvested instead of made into products. The model does not credit the fossil fuel displaced.
+  - **Discarded wood recovered**, **Discarded paper recovered** (defaults: the table's last year, 0.09 and 0.50) and
+    **Discards burned for energy** (default 0): the set fates take the values given and the other fates keep their
+    proportions in what is left.
+  - The run log names each parameter that differs from its default, with the years it applies; the figures' note line says
+    when a result used them. A value out of range, or a start year after the run, stops the stage with a message.
+  - Code: `wp_levers`, `wp_lever_w` and `wp_lever_fates` in `src/wood-products.R`; the new single-row sheet `WoodProductsFuture`
+    (`LeverFromYear`, `LeverFullYear`, `LongLivedShift`, `LifetimeMultiplier`, `ExtraEnergyShare`, `RecoveredWood`,
+    `RecoveredPaper`, `DiscardEnergyShare`), shown with `WoodProductsOptions` on the one Wood Products page (data feed
+    `WoodProductsPage`).
+- Wood Products page: a diagram of where the carbon of one harvest goes. It follows 100 units of harvested carbon of a
+  region, wood type and log size for a chosen number of years, with the page's parameters in full effect beside the
+  defaults: products in use by class, what has been discarded, recovered products, landfills and dumps, and what has been
+  emitted with and without energy capture. It redraws as the parameters change (`ui/WoodProductsFate.cs`,
+  `ui/WoodProductsDiagram.cs`).
+
+### Tests
+- `tests/unit-wood-products.R`: the levers (no lever set gives identical results; carbon conserved with each; the years
+  before the start year untouched; a shift to long-lived products and longer lifetimes raise the stored carbon, more
+  bioenergy and burned discards lower it; by-hand cases of the shift, the fates, the ramp and the lifetime multiplier).
+- `tests/unit-wood-products-fate.R` (with `tests/wood-products-fate.ps1`): the diagram's C# model against the R model, six
+  cases, equal to 1e-9.
+- `tests/phaseZ30-wood-products.R`: the stage with blank levers (identical sheets), with a shift, with phased-in bioenergy,
+  with every lever and draws, and with bad values.
+
 ## 1.5.0 - 2026-11-18
 
 Library update 1.5: opening a library adds the wetland methane flow types, groups, flow order and output filters, the Marsh
