@@ -9,7 +9,9 @@
 # the products of the historical harvest keep decaying through the projection; two projections from one history share its years
 # exactly (same draws). Before the run, each region's harvest history from 1906, scaled to the run's first decade (spin-up).
 # Options (Wood Products page): the run; Region (blank = from the strata); Draws (blank = 100) and Seed; LandClearingUtilized (blank
-# = 0.5); Spinup (default on).
+# = 0.5); Spinup (default on). Sheet Wood Products Future: the levers of a different wood products future, each blank = its default (wp_levers in
+# src/wood-products.R): LeverFromYear, LeverFullYear, LongLivedShift, LifetimeMultiplier, ExtraEnergyShare, RecoveredWood,
+# RecoveredPaper, DiscardEnergyShare. The log names the ones that differ from their defaults.
 # Outputs: Wood Products (pools and flows by year: mean and 90% interval of the draws, per iteration and over all), Wood Products by
 # End Use (mean in use), Wood Products Spin-up (the history's scaling), Wood Products Figures (PNG).
 # =============================================================================
@@ -43,9 +45,33 @@ say("Carbon to Forestry Sector per iteration, by transition type: %s", paste(spr
 say("By Smith region: %s", paste(sprintf("%s %.0f Mg C", R$regions$Region, R$regions$Carbon), collapse = "; "))
 progressBar()
 
+# a different wood products future (lucasCore 1.5.1; the Wood Products Future sheet): the page's levers, from the projection's first year (a historical run: its own)
+# unless a year is given. Blank boxes are the defaults; with none set the model runs as it always has.
+fut <- read_ds("WoodProductsFuture")
+of <- function(k) if (nrow(fut) && k %in% names(fut) && !is.na(fut[[k]][1])) fut[[k]][1] else NA
+lev_from <- as.integer(if (!is.na(of("LeverFromYear"))) of("LeverFromYear") else if (is.na(R$proj_start)) R$start else R$proj_start + 1L)
+LV <- tryCatch(wp_levers(from = lev_from, full = of("LeverFullYear"), long = of("LongLivedShift"), life = of("LifetimeMultiplier"), energy = of("ExtraEnergyShare"),
+                         rec_wood = of("RecoveredWood"), rec_paper = of("RecoveredPaper"), disc_energy = of("DiscardEnergyShare")),
+               error = function(e) fail("Wood Products: %s", conditionMessage(e)))
+if (LV$active) {
+  if (lev_from > R$end) fail("Wood Products: Apply from year (%d) is after the run's last year (%d)", lev_from, R$end)
+  ly <- max(P$fates$Year); lf <- function(m) P$fates[Material == m & Year == ly & Fate == "Recovered", Fraction]
+  d <- c(if (LV$long != 0) sprintf("shift to long-lived products %g (default 0)", LV$long),
+         if (LV$life != 1) sprintf("product lifetime multiplier %g (default 1)", LV$life),
+         if (LV$energy != 0) sprintf("extra share burned for energy %g (default 0)", LV$energy),
+         if (!is.na(LV$rec_wood)) sprintf("discarded wood recovered %g (default %g, the %d value)", LV$rec_wood, lf("wood"), ly),
+         if (!is.na(LV$rec_paper)) sprintf("discarded paper recovered %g (default %g, the %d value)", LV$rec_paper, lf("paper"), ly),
+         if (!is.na(LV$disc_energy)) sprintf("discards burned for energy %g (default %g)", LV$disc_energy, P$fates[Material == "wood" & Year == ly & Fate == "Burned with energy capture", Fraction]))
+  say("A different wood products future, %s: %s", if (is.na(LV$full) || LV$full <= LV$from) sprintf("from %d", LV$from) else sprintf("phased in from %d, fully reached in %d", LV$from, LV$full), paste(d, collapse = "; "))
+  if (lev_from < R$start) say("Apply from year %d is before the run's first year (%d): the spin-up years from %d on take the levers too", lev_from, R$start, lev_from)
+} else {
+  say("Wood products future: every parameter at its default (the published tables)")
+  if (!is.na(of("LeverFromYear")) || !is.na(of("LeverFullYear"))) say("Apply from and Fully reached by are set, but no parameter differs from its default: they change nothing")
+}
+
 D <- if (nd == 0) wp_draws(P, central = TRUE) else wp_draws(P, n = nd, seed = seed)
 t0 <- Sys.time()
-m <- tryCatch(wp_model(R$rem, P, D, spinup = spin, start = R$start, end = R$end), error = function(e) fail("Wood Products: %s", conditionMessage(e)))
+m <- tryCatch(wp_model(R$rem, P, D, spinup = spin, start = R$start, end = R$end, levers = LV), error = function(e) fail("Wood Products: %s", conditionMessage(e)))
 say("Model: %d-%d, %d iteration(s) x %s, %.1f s", min(m$years$Year), max(m$years$Year), R$iterations,
     if (D$central) "the published values (no draws)" else sprintf("%d draws (seed %d)", D$n, seed), as.numeric(Sys.time() - t0, units = "secs"))
 if (length(m$unmatched)) say("Forest types with no row of their own in Smith Table 4, given the regional average (defaults/wood-products/README.md): %s", paste(m$unmatched, collapse = "; "))
@@ -78,6 +104,7 @@ sa <- read_ds("StudyArea"); label <- if (nrow(sa)) paste(sub("^[^:]*: ", "", sa$
 note <- sprintf("%s. Run %d (%s), %d-%d%s. USFS harvested wood products model (production approach); %s.", label, rid, rn, R$start - 1L, R$end,
                 if (is.na(R$history)) "" else sprintf(" from historical run %d", R$history),
                 if (D$central) "published parameter values" else sprintf("%d parameter draws per iteration", D$n))
+if (LV$active) note <- paste0(note, sprintf(" A different wood products future from %d (Wood Products page).", LV$from))
 figs <- tryCatch(wp_figures(m, s, file.path(TD(), "WoodProducts"), note, proj_start = R$proj_start), error = function(e) { say("Figures not drawn: %s", conditionMessage(e)); NULL })
 check(STAGE, "figures drawn", !is.null(figs) && nrow(figs) > 0 && all(file.exists(figs$FileName)), if (is.null(figs)) "" else sprintf("%d PNG", nrow(figs)))
 if (!is.null(figs) && nrow(figs)) write_ds(figs[, .(Figure, Title, Caption, FileName, RunScenarioId = rid)], "OutputWoodProductsFigure")

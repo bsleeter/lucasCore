@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<package name="lucasCore" displayName="LUCAS Core (model builder)" description="Builds LUCAS land-use and carbon models in ST-Sim from national datasets (FIA growth curves; CBM carbon parameters; spatial initial conditions; historical transitions and projections)" version="1.5.0" url="https://code.usgs.gov/LUCC/lucasCore" minSyncroSimVersion="3.1.29">
+<package name="lucasCore" displayName="LUCAS Core (model builder)" description="Builds LUCAS land-use and carbon models in ST-Sim from national datasets (FIA growth curves; CBM carbon parameters; spatial initial conditions; historical transitions and projections)" version="1.5.1" url="https://code.usgs.gov/LUCC/lucasCore" minSyncroSimVersion="3.1.29">
 
 	<builtFor package="stsim" version="4.5.4"/>
 
@@ -1159,7 +1159,7 @@
 		<column name="DevelopedChange" displayName="Developed area change (km2)" dataType="Double"/>
 	</dataSheet>
 
-	<dataSheet name="WoodProductsOptions" displayName="Wood Products" isSingleRow="True" viewClassName="lucasCoreUI.WoodProductsView" viewClassAssembly="lucasCoreUI">
+	<dataSheet name="WoodProductsOptions" displayName="Wood Products Options" isSingleRow="True">
 		<!-- stage 18: the run whose harvested carbon to follow (src/wood-products.R); the scenario depends on the run's Build result -->
 		<column name="RunScenarioId" displayName="Run (result scenario Id in this library; blank = the newest ST-Sim result)" dataType="Integer" isOptional="True"/>
 		<column name="Region" displayName="Smith region (NE, NLS, NPS, SE, SC, RMN, RMS, PSW, PWE, PWW; blank = from the strata)" dataType="String" isOptional="True"/>
@@ -1168,6 +1168,22 @@
 		<column name="LandClearingUtilized" displayName="Share of land-clearing wood made into products (blank = 0.5)" dataType="Double" isOptional="True"/>
 		<column name="Spinup" displayName="Start from the regional harvest history, 1906 (default on)" dataType="Boolean" defaultValue="-1" isOptional="True"/>
 	</dataSheet>
+	<!-- lucasCore 1.5.1: a different wood products future (wp_levers in src/wood-products.R). A sheet of its own, so a 1.5 library gains it on
+	     opening (a new table) with no library update. Every column blank = its default, and with none set the model is untouched -->
+	<dataSheet name="WoodProductsFuture" displayName="Wood Products Future" isSingleRow="True">
+		<column name="LeverFromYear" displayName="Apply from year (blank = the projection's first year; a historical run: its first)" dataType="Integer" isOptional="True"/>
+		<column name="LeverFullYear" displayName="Fully reached by year (blank = at once)" dataType="Integer" isOptional="True"/>
+		<column name="LongLivedShift" displayName="Share of paper and short-lived products made into building products instead (blank = 0)" dataType="Double" isOptional="True"/>
+		<column name="LifetimeMultiplier" displayName="Multiplier on the half-lives of products in use (blank = 1)" dataType="Double" isOptional="True"/>
+		<column name="ExtraEnergyShare" displayName="Extra share of industrial roundwood burned for energy (blank = 0)" dataType="Double" isOptional="True"/>
+		<column name="RecoveredWood" displayName="Share of discarded wood recovered (blank = the table: 0.09)" dataType="Double" isOptional="True"/>
+		<column name="RecoveredPaper" displayName="Share of discarded paper recovered (blank = the table: 0.5)" dataType="Double" isOptional="True"/>
+		<column name="DiscardEnergyShare" displayName="Share of discarded wood and paper burned for energy (blank = the table: 0)" dataType="Double" isOptional="True"/>
+	</dataSheet>
+	<dataFeed name="WoodProductsPage" displayName="Wood Products" viewClassName="lucasCoreUI.WoodProductsView" viewClassAssembly="lucasCoreUI">
+		<dataSheet name="WoodProductsOptions"/>
+		<dataSheet name="WoodProductsFuture"/>
+	</dataFeed>
 
 	<dataSheet name="OutputWoodProducts" displayName="Wood Products">
 		<!-- stage 18: pools and flows by year (Mg C): mean and interval over the parameter draws, per run iteration (blank = over all) -->
@@ -1657,6 +1673,7 @@
 
 	<transformer name="WoodProducts" displayName="18 - Wood Products" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/18-wood-products.R">
 		<dataSheet name="WoodProductsOptions" type="Input"/>
+		<dataSheet name="WoodProductsFuture" type="Input"/>
 		<dataSheet name="StudyArea" type="Input"/>
 		<dataSheet name="OutputWoodProducts" type="Output"/>
 		<dataSheet name="OutputWoodProductsEndUse" type="Output"/>
@@ -1720,7 +1737,7 @@
 			</group>
 			<item name="RunFigureOptions"/>
 			<item name="CompareRunOptions"/>
-			<item name="WoodProductsOptions"/>
+			<item name="WoodProductsPage"/>
 			<item name="DataDownloadOptions"/>
 			<item name="DataReleasePage"/>
 			<item name="ReleaseInformationPage"/>

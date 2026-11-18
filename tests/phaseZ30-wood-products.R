@@ -56,4 +56,28 @@ expect("a land-clearing share above 1 stops the stage", !is.null(B2$error) && gr
 N <- stage(data.frame(RunScenarioId = HID, Draws = 0L, Spinup = FALSE))
 expect("spin-up off: the model starts with the run, storage higher than with the history decaying",
        is.null(N$error) && N$sheets$OutputWoodProducts[, min(Year)] >= 1985L && is.null(N$sheets$OutputWoodProductsScale))
+# ---- a different wood products future (lucasCore 1.5.1): the page's levers on the projection ---------------------------------
+if (is.null(Pj$error)) {
+  wv <- function(x, v, y) x$sheets$OutputWoodProducts[is.na(Iteration) & Variable == v & Year == y, Mean]
+  ye <- max(Pj$sheets$OutputWoodProducts$Year); p0 <- min(Pj$sheets$OutputWoodProducts[Year > ys, Year])
+  B0 <- stage(data.frame(RunScenarioId = PID, Draws = 0L))
+  B1 <- stage(data.frame(RunScenarioId = PID, Draws = 0L, LeverFromYear = NA_integer_, LeverFullYear = NA_integer_, LongLivedShift = NA_real_, LifetimeMultiplier = NA_real_,
+                         ExtraEnergyShare = NA_real_, RecoveredWood = NA_real_, RecoveredPaper = NA_real_, DiscardEnergyShare = NA_real_))
+  expect("blank levers: the stage's results are identical to a sheet without the columns", is.null(B1$error) && identical(B0$sheets$OutputWoodProducts, B1$sheets$OutputWoodProducts) &&
+         any(grepl("every parameter at its default", B1$log)))
+  LL <- stage(data.frame(RunScenarioId = PID, Draws = 0L, LongLivedShift = 0.5))
+  expect("a shift to long-lived products: more stored at the end, the history's years unchanged, and the log says so",
+         is.null(LL$error) && wv(LL, "Stored", ye) > wv(B0, "Stored", ye) && abs(wv(LL, "Stored", ys) - wv(B0, "Stored", ys)) < 1e-6 &&
+         any(grepl(sprintf("from %d: shift to long-lived products 0.5 \\(default 0\\)", p0), LL$log)), paste(grep("wood products future", LL$log, value = TRUE), collapse = " "))
+  EN <- stage(data.frame(RunScenarioId = PID, Draws = 0L, ExtraEnergyShare = 0.3, LeverFromYear = p0 + 2L, LeverFullYear = p0 + 6L))
+  expect("more bioenergy: less stored at the end, phased in from the year given",
+         is.null(EN$error) && wv(EN, "Stored", ye) < wv(B0, "Stored", ye) && abs(wv(EN, "Stored", p0 + 1L) - wv(B0, "Stored", p0 + 1L)) < 1e-6 &&
+         any(grepl(sprintf("phased in from %d, fully reached in %d: extra share burned for energy 0.3", p0 + 2L, p0 + 6L), EN$log)), paste(grep("wood products future", EN$log, value = TRUE), collapse = " "))
+  expect("every check passes with levers and draws", { A <- stage(data.frame(RunScenarioId = PID, Draws = 10L, LongLivedShift = 0.3, LifetimeMultiplier = 1.2, ExtraEnergyShare = 0.1, RecoveredWood = 0.2, RecoveredPaper = 0.6, DiscardEnergyShare = 0.2))
+         is.null(A$error) && all(A$checks$Status == "Pass") })
+  B3 <- stage(data.frame(RunScenarioId = PID, LongLivedShift = 1.5))
+  expect("a shift above 1 stops the stage", !is.null(B3$error) && grepl("between 0 and 1", B3$error), B3$error %||% "")
+  B4 <- stage(data.frame(RunScenarioId = PID, ExtraEnergyShare = 0.2, LeverFromYear = ye + 5L))
+  expect("a start year after the run stops the stage", !is.null(B4$error) && grepl("after the run's last year", B4$error), B4$error %||% "")
+}
 cat(sprintf("%d passed, %d failed\n", n_ok, n_bad)); if (n_bad) quit(status = 1)

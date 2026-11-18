@@ -31,6 +31,16 @@
 # element and draw, held for the whole series: each primary product ratio, end-use ratio and discard fate (ratios renormalized to
 # sum to 1), each half-life, the landfill fixed shares, the industrial and fuelwood ratios, the harvest history (by period; the run's
 # own removals have none: they are the run's), and the land-clearing utilized share. Draw 0 is the central case (every multiplier 1).
+#
+# Levers (wp_levers; the Wood Products page's "A different wood products future", lucasCore 1.5.1): a few changes to the chain from a
+# start year on, reached at once or along a linear ramp, applied on top of every draw. None set: the model is untouched.
+#   long         share of the product carbon bound for paper and short-lived end uses (half-life 12 years or less) that goes to
+#                building end uses instead (67 years or more), in the building mix of the year; it is then solid wood (loss in use)
+#   life         multiplier on every half-life in use, on everything in use from the start year
+#   energy       share of the industrial roundwood burned with energy capture instead of made into products
+#   rec_wood, rec_paper   the recovered share of discarded wood and of paper; disc_energy: the share of discards burned with energy
+#                capture. The other fates are scaled to fill what is left.
+# No lever moves carbon in or out: removed = stored + emitted still holds.
 # =============================================================================
 
 WP_SOLID_LOSS <- "LossInUseWood"
@@ -68,6 +78,40 @@ wp_check_params <- function(P) {
   if (length(setdiff(P$products, unique(P$eu_ratio$Product)))) stop("a primary product has no end-use ratios")
   if (!setequal(unique(P$fates$Fate), WP_FATES)) stop("discard fates are not the six expected")
   invisible(TRUE)
+}
+
+# ---- levers ---------------------------------------------------------------------------------------------------------------------
+WP_SHORT_LIFE <- 12; WP_LONG_LIFE <- 67   # half-lives (years): end uses at or under the first give to those at or over the second
+# from: the first year the levers act; full: the year they are fully reached (NA or not after from: at once). NA = the default.
+wp_levers <- function(from, full = NA, long = 0, life = 1, energy = 0, rec_wood = NA, rec_paper = NA, disc_energy = NA) {
+  nz <- function(v, d) if (is.null(v) || length(v) != 1 || is.na(v)) d else as.numeric(v)
+  L <- list(from = as.integer(nz(from, NA)), full = as.integer(nz(full, NA)), long = nz(long, 0), life = nz(life, 1), energy = nz(energy, 0),
+            rec_wood = nz(rec_wood, NA_real_), rec_paper = nz(rec_paper, NA_real_), disc_energy = nz(disc_energy, NA_real_))
+  share <- function(k, what) { v <- L[[k]]; if (!is.na(v) && (v < 0 || v > 1)) stop(sprintf("%s must be between 0 and 1 (it is %g)", what, v)) }
+  share("long", "Shift to long-lived products"); share("energy", "Extra share burned for energy")
+  share("rec_wood", "Discarded wood recovered"); share("rec_paper", "Discarded paper recovered"); share("disc_energy", "Discards burned for energy")
+  if (L$life <= 0) stop(sprintf("Product lifetime multiplier must be above 0 (it is %g)", L$life))
+  for (k in c("rec_wood", "rec_paper")) if (!is.na(L[[k]]) && !is.na(L$disc_energy) && L[[k]] + L$disc_energy > 1)
+    stop(sprintf("Discards recovered (%g) and burned for energy (%g) add to more than 1", L[[k]], L$disc_energy))
+  L$active <- L$long != 0 || L$life != 1 || L$energy != 0 || !is.na(L$rec_wood) || !is.na(L$rec_paper) || !is.na(L$disc_energy)
+  if (L$active && is.na(L$from)) stop("the levers need a start year")
+  if (!is.na(L$full) && !is.na(L$from) && L$full < L$from) stop(sprintf("Fully reached by (%d) is before Apply from (%d)", L$full, L$from))
+  L
+}
+# How far the levers have come in each year: 0 before `from`, 1 from `full` on, linear between (the first step in `from` itself).
+wp_lever_w <- function(L, years) {
+  if (is.na(L$full) || L$full <= L$from) return(as.numeric(years >= L$from))
+  pmin(1, pmax(0, (years - L$from + 1) / (L$full - L$from + 1)))
+}
+# Discard fates (years x fates, rows summing to 1) of one material with the levers: the set fates move to their targets, the rest
+# keep their proportions in what is left.
+wp_lever_fates <- function(M, L, material, w) {
+  tg <- c(Recovered = if (material == "wood") L$rec_wood else L$rec_paper, `Burned with energy capture` = L$disc_energy); tg <- tg[!is.na(tg)]
+  if (!length(tg)) return(M)
+  N <- M; for (k in names(tg)) N[, k] <- M[, k] + w * (tg[[k]] - M[, k])
+  rest <- setdiff(colnames(M), names(tg)); rs <- rowSums(M[, rest, drop = FALSE])
+  N[, rest] <- M[, rest, drop = FALSE] * ifelse(rs > 0, (1 - rowSums(N[, names(tg), drop = FALSE])) / rs, 0)
+  N
 }
 
 # ---- triangular draws ---------------------------------------------------------------------------------------------------------
@@ -222,6 +266,9 @@ wp_inputs <- function(x, P, D, d, years) {
   wood <- util / (1 + b)
   emit_ec <- emit_ec + tabulate_sum(yi, util - wood + wood * fr / (irr + fr), ny)
   ind <- wood * irr / (irr + fr)
+  # lever: an extra share of the industrial roundwood burned for energy
+  if (!is.null(P$levers) && P$levers$energy > 0) { e <- ind * P$levers$energy * wp_lever_w(P$levers, x$Year)
+    emit_ec <- emit_ec + tabulate_sum(yi, e, ny); ind <- ind - e }
   # primary products (Smith Table D6), with their multipliers, renormalized per row
   pk <- paste(P$primary$Region, P$primary$Wood, P$primary$LogSize); xk <- paste(x$Region, x$Wood, x$LogSize)
   pp_per <- wp_period(D$pp_periods, x$Year)
@@ -246,20 +293,34 @@ wp_enduses <- function(prod, P, D, d, years, loss = TRUE) {
   eu_in <- matrix(0, ny, length(P$end_uses), dimnames = list(NULL, P$end_uses))
   ey <- pmin(pmax(years, min(P$eu_ratio$Year)), max(P$eu_ratio$Year))
   loss_w <- if (loss) wp_setting(P, WP_SOLID_LOSS) else 0; loss_p <- if (loss) wp_setting(P, "LossInUsePaper") else 0
-  for (p in colnames(prod)) {
-    if (!any(prod[, p] > 0)) next
-    if (p == WP_FUEL_PRODUCT) { emit_ec <- emit_ec + prod[, p]; next }
-    r <- P$eu_ratio[Product == p]
+  shift <- if (!is.null(P$levers) && P$levers$long > 0) P$levers$long * wp_lever_w(P$levers, years) else NULL
+  weights <- function(p) { r <- P$eu_ratio[Product == p]
     m <- D$eu[d, match(paste(r$Product, r$EndUse), paste(D$eu_pairs$Product, D$eu_pairs$EndUse))]
     r <- r[, .(EndUse, Year, R = Ratio * m)][, R := R / sum(R), by = Year]
     W <- matrix(0, ny, length(P$end_uses), dimnames = list(NULL, P$end_uses))
     for (u in unique(r$EndUse)) { ru <- r[EndUse == u]; W[, u] <- ru$R[match(ey, ru$Year)] }
-    W[is.na(W)] <- 0
-    pv <- prod[, p] * W
+    W[is.na(W)] <- 0; W }
+  solid <- pulp <- eu_in   # with the lever: the carbon bound for each end use before the loss in use, solid wood and paper apart
+  for (p in colnames(prod)) {
+    if (!any(prod[, p] > 0)) next
+    if (p == WP_FUEL_PRODUCT) { emit_ec <- emit_ec + prod[, p]; next }
+    pv <- prod[, p] * weights(p)
+    if (p != "Wood pulp") { fu <- pv[, WP_FUEL_USE]; pv[, WP_FUEL_USE] <- 0; emit_ec <- emit_ec + fu }
+    if (!is.null(shift)) { if (p == "Wood pulp") pulp <- pulp + pv else solid <- solid + pv; next }
     if (p == "Wood pulp") { loss_paper <- loss_paper + rowSums(pv) * loss_p; pv <- pv * (1 - loss_p) }
-    else { fu <- pv[, WP_FUEL_USE]; pv[, WP_FUEL_USE] <- 0; emit_ec <- emit_ec + fu
-      loss_wood <- loss_wood + rowSums(pv) * loss_w; pv <- pv * (1 - loss_w) }
+    else { loss_wood <- loss_wood + rowSums(pv) * loss_w; pv <- pv * (1 - loss_w) }
     eu_in <- eu_in + pv }
+  if (!is.null(shift)) {
+    # lever: part of what was bound for paper and short-lived end uses goes to buildings, in the year's building mix of the solid
+    # wood (a year with none: softwood lumber's), and is solid wood from there on
+    h <- P$half_life$HalfLife[match(P$end_uses, P$half_life$EndUse)]; short <- h > 0 & h <= WP_SHORT_LIFE; long <- h >= WP_LONG_LIFE
+    moved <- (rowSums(solid[, short, drop = FALSE]) + rowSums(pulp[, short, drop = FALSE])) * shift
+    solid[, short] <- solid[, short] * (1 - shift); pulp[, short] <- pulp[, short] * (1 - shift)
+    mix <- solid[, long, drop = FALSE]; none <- rowSums(mix) <= 0
+    if (any(none)) mix[none, ] <- weights("Softwood lumber")[none, long, drop = FALSE]
+    solid[, long] <- solid[, long] + moved * mix / rowSums(mix)
+    loss_wood <- rowSums(solid) * loss_w; loss_paper <- rowSums(pulp) * loss_p
+    eu_in <- solid * (1 - loss_w) + pulp * (1 - loss_p) }
   list(eu_in = eu_in, loss_wood = loss_wood, loss_paper = loss_paper, emit_ec = emit_ec)
 }
 
@@ -295,12 +356,17 @@ wp_pools <- function(inp, P, D, d, years) {
   fate <- lapply(c(wood = "wood", paper = "paper"), function(m) {
     f <- data.table::dcast(P$fates[Material == m], Year ~ Fate, value.var = "Fraction")
     M <- as.matrix(f[match(fy, Year), WP_FATES, with = FALSE]) * matrix(D$fate[[m]][d, WP_FATES], ny, length(WP_FATES), byrow = TRUE)
-    M / rowSums(M) })
+    M <- M / rowSums(M)
+    if (is.null(P$levers)) M else wp_lever_fates(M, P$levers, m, wp_lever_w(P$levers, years)) })
+  # lever: products last longer, the half-lives in use multiplied from the start year on
+  keep_t <- if (!is.null(P$levers) && P$levers$life != 1) { w <- wp_lever_w(P$levers, years)
+    K <- exp(-log(2) / outer(1 + (P$levers$life - 1) * w, hl)); K[, eu == WP_FUEL_USE | !(hl > 0)] <- 0; K } else NULL
   inuse <- matrix(0, ny, length(eu), dimnames = list(NULL, eu))
   out <- matrix(0, ny, 9, dimnames = list(NULL, c("Recovered", "LandfillDecaying", "LandfillFixed", "Dump", "EmittedEnergy", "EmittedNoEnergy",
                                                   "Discarded", "LandfillEmitted", "DumpEmitted")))
   P_eu <- rep(0, length(eu)); st <- list(wood = c(rec = 0, lfd = 0, lff = 0, dump = 0), paper = c(rec = 0, lfd = 0, lff = 0, dump = 0))
   for (t in seq_len(ny)) {
+    if (!is.null(keep_t)) keep <- keep_t[t, ]
     disc_eu <- P_eu * (1 - keep); P_eu <- P_eu * keep + inp$eu_in[t, ]
     inuse[t, ] <- P_eu
     disc <- c(wood = sum(disc_eu[!paper]) + inp$loss_wood[t], paper = sum(disc_eu[paper]) + inp$loss_paper[t])
@@ -324,12 +390,14 @@ wp_pools <- function(inp, P, D, d, years) {
 
 # ---- the model -----------------------------------------------------------------------------------------------------------------
 # rem: the run's removals (see wp_split). spinup: feed the scaled harvest history from 1906. end: the last year (default the run's).
+# levers: wp_levers(), a different wood products future from a start year on (NULL or none set: the tables as they are).
 # Returns list(
 #   years:  Iteration, Draw, Year, Removed (carbon entering, history included), InUse, Recovered, Landfill, Dump, Stored (their sum),
 #           EmittedEnergy, EmittedNoEnergy, StockChange (Stored less the year before), Source ("History" before the run, "Run" after)
 #   enduse: Iteration, Year, EndUse, InUse (mean over draws)
 #   scale:  the spin-up's scaling factors; unmatched: forest types that took the regional average; draws: D)
-wp_model <- function(rem, P, D = wp_draws(P), spinup = TRUE, start = NULL, end = NULL, first = 1906L) {
+wp_model <- function(rem, P, D = wp_draws(P), spinup = TRUE, start = NULL, end = NULL, first = 1906L, levers = NULL) {
+  P$levers <- if (!is.null(levers) && isTRUE(levers$active)) levers   # none set: the model is untouched
   x <- wp_split(rem, P); unmatched <- attr(x, "unmatched")
   if (is.null(start)) start <- min(x$Year); if (is.null(end)) end <- max(x$Year)
   sc <- NULL

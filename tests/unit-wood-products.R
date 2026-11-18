@@ -75,6 +75,52 @@ check("history years run from 1906 and are marked History", m$years[, min(Year)]
 check("the stock change is the change in stored carbon", m$years[order(Iteration, Draw, Year)][, max(abs(StockChange - c(Stored[1], diff(Stored)))), by = .(Iteration, Draw)][, max(V1)] < 1e-9)
 check("in use by end use adds up to the draw mean in use", { a <- m$enduse[Iteration == 1L & Year == 2000, sum(InUse)]; b <- m$years[Iteration == 1L & Year == 2000, mean(InUse)]; abs(a - b) < 1e-6 * b })
 
+# ---- levers: a different wood products future (wp_levers; the Wood Products page, lucasCore 1.5.1) ---------------------------------
+st <- function(m, y = 2030L, v = "Stored") m$years[Iteration == 1L & Year == y][[v]]
+lv <- function(..., D. = C) wp_model(rem, P, D., levers = wp_levers(...))
+cm <- wp_model(rem, P, C)
+check("no lever set: the model's results are identical, whatever the years given",
+      identical(as.data.frame(lv(from = 2010L, full = 2020L)$years), as.data.frame(cm$years)) && identical(as.data.frame(lv(from = NA)$enduse), as.data.frame(cm$enduse)) &&
+      identical(as.data.frame(wp_model(rem, P, D, levers = wp_levers(from = 2010L))$years), as.data.frame(m$years)))
+check("levers left at their default values are not active", !wp_levers(from = 2010L, long = 0, life = 1, energy = 0)$active && wp_levers(from = 2010L, long = 0.1)$active)
+long <- lv(2010L, long = 0.5); life <- lv(2010L, life = 1.5); en <- lv(2010L, energy = 0.3); rec <- lv(2010L, rec_wood = 0.4, rec_paper = 0.8); de <- lv(2010L, disc_energy = 0.3)
+all_l <- lv(2010L, 2020L, 0.3, 1.2, 0.1, 0.2, 0.6, 0.2, D. = D)
+for (x in list(list("long-lived shift", long), list("lifetime", life), list("extra energy", en), list("recovery", rec), list("discards burned", de), list("every lever, with draws", all_l))) {
+  y <- x[[2]]$years[order(Iteration, Draw, Year)]
+  check(sprintf("%s: carbon conserved in every iteration and draw", x[[1]]), y[, max(abs(cumsum(Removed) - Stored - cumsum(EmittedEnergy + EmittedNoEnergy)) / cumsum(Removed)), by = .(Iteration, Draw)][, max(V1)] < 1e-9)
+  check(sprintf("%s: the years before the start year are untouched", x[[1]]), isTRUE(all.equal(x[[2]]$years[Year < 2010L], (if (x[[1]] == "every lever, with draws") m else cm)$years[Year < 2010L], tolerance = 1e-12))) }
+check(sprintf("a shift to long-lived products raises the stored carbon (2030: %.0f against %.0f Mg C)", st(long), st(cm)), st(long) > st(cm) * 1.005 && st(long, v = "InUse") > st(cm, v = "InUse"))
+check(sprintf("longer product lifetimes raise the stored carbon (%.0f)", st(life)), st(life) > st(cm) * 1.005 && st(life, v = "InUse") > st(cm, v = "InUse"))
+check(sprintf("more bioenergy lowers the stored carbon (%.0f) and raises what is emitted with energy capture", st(en)),
+      st(en) < st(cm) * 0.99 && sum(en$years[Iteration == 1L & Year >= 2010L, EmittedEnergy]) > sum(cm$years[Iteration == 1L & Year >= 2010L, EmittedEnergy]))
+check("extra energy 0.3: 30% of the industrial roundwood of a year, burned that year", {
+  x1 <- wp_split(data.table(Iteration = 1L, Year = 2015L, Region = "PWW", ForestType = "Forest: Douglas-fir Group", Cause = "Harvest", Carbon = 100), P)
+  a <- wp_inputs(x1, P, C, 1L, 2015L); Pe <- P; Pe$levers <- wp_levers(2010L, energy = 0.3); b <- wp_inputs(x1, Pe, C, 1L, 2015L)
+  made <- function(z) sum(z$eu_in) + z$loss_wood + z$loss_paper
+  abs(made(b) - 0.7 * made(a)) < 1e-9 && abs(b$emit_ec + made(b) - 100) < 1e-9 })
+check("more recovery raises the recovered pool and the stored carbon", st(rec, v = "Recovered") > 2 * st(cm, v = "Recovered") && st(rec) > st(cm))
+check("discards burned for energy lower the landfill and the stored carbon", st(de, v = "Landfill") < st(cm, v = "Landfill") && st(de) < st(cm))
+check("the long-lived shift moves paper and short-lived end uses into buildings, by hand", {
+  x1 <- wp_split(data.table(Iteration = 1L, Year = 2015L, Region = "PWW", ForestType = "Forest: Douglas-fir Group", Cause = "Harvest", Carbon = 100), P)
+  a <- wp_inputs(x1, P, C, 1L, 2015L); Ps <- P; Ps$levers <- wp_levers(2010L, long = 0.5); b <- wp_inputs(x1, Ps, C, 1L, 2015L)
+  h <- P$half_life$HalfLife[match(P$end_uses, P$half_life$EndUse)]; short <- h > 0 & h <= WP_SHORT_LIFE; bld <- h >= WP_LONG_LIFE; lw <- wp_setting(P, WP_SOLID_LOSS)
+  pre <- function(z) { v <- z$eu_in[1, ]; v[P$end_uses != WP_PAPER_USE] <- v[P$end_uses != WP_PAPER_USE] / (1 - lw); v }   # before the loss in use (paper has none)
+  pa <- pre(a); pb <- pre(b)
+  abs(sum(pb[short]) - 0.5 * sum(pa[short])) < 1e-9 && abs(sum(pb[bld]) - sum(pa[bld]) - 0.5 * sum(pa[short])) < 1e-9 && all(abs(pb[!short & !bld] - pa[!short & !bld]) < 1e-9) &&
+    max(abs(pb[bld] / sum(pb[bld]) - pa[bld] / sum(pa[bld]))) < 1e-9 && abs(b$emit_ec - a$emit_ec) < 1e-9 })
+check("the discard fates with levers: targets met, the rest in proportion, rows adding to 1", {
+  M <- matrix(c(0, .14, .08, .09, .67, .02), 2, 6, byrow = TRUE, dimnames = list(NULL, WP_FATES)); N <- wp_lever_fates(M, wp_levers(2010L, rec_wood = 0.3, disc_energy = 0.1), "wood", c(0, 1))
+  all(abs(N[1, ] - M[1, ]) < 1e-12) && abs(N[2, "Recovered"] - 0.3) < 1e-12 && abs(N[2, "Burned with energy capture"] - 0.1) < 1e-12 && abs(sum(N[2, ]) - 1) < 1e-12 &&
+    abs(N[2, "Landfills"] / N[2, "Composted"] - 0.67 / 0.08) < 1e-9 })
+check("a ramp reaches the levers step by step: nothing before, a part in the first year, all in the last", {
+  w <- wp_lever_w(wp_levers(2021L, 2030L, long = 0.5), 2019:2032); all(w[1:2] == 0) && abs(w[3] - 0.1) < 1e-12 && all(w[12:14] == 1) && all(diff(w) >= 0) })
+check("a ramp sits between no lever and the lever at once", { r <- lv(2010L, 2030L, long = 0.5); st(r, 2025L) > st(cm, 2025L) && st(r, 2025L) < st(long, 2025L) })
+check("a lifetime multiplier acts on what is already in use: one pulse, the half-life doubled from year 21", {
+  Pl <- P; Pl$levers <- wp_levers(2020L, life = 2); p2 <- wp_pools(z, Pl, C, 1L, yrs)$inuse[, "new housing, single family"]
+  max(abs(p2[1:20] - 100 * 0.5^((0:19) / 100))) < 1e-9 && abs(p2[41] - 100 * 0.5^(19 / 100) * 0.5^(21 / 200)) < 1e-9 })
+bad <- function(...) inherits(tryCatch(wp_levers(...), error = identity), "error")
+check("bad lever values stop with a message", bad(2010L, long = 1.2) && bad(2010L, energy = -0.1) && bad(2010L, life = 0) && bad(2010L, rec_wood = 0.8, disc_energy = 0.3) && bad(2010L, 2005L, long = 0.2) && bad(NA, long = 0.2))
+
 # ---- land clearing: the unutilized share is emitted the year it is cleared ------------------------------------------------------
 cl <- data.table(Iteration = 1L, Year = 2000L, Region = "NE", ForestType = "Oak/Hickory Group", Cause = "Clearing", Carbon = 100)
 x <- wp_inputs(wp_split(cl, P), P, C, 1L, 2000L)

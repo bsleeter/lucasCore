@@ -82,6 +82,24 @@ four as inputs; the tests read the last two.
 - **Methane.** As in HWP-C, landfill and dump decay counts as CO2 without energy capture. The Inventory reports landfill methane in
   the waste sector.
 
+## A different wood products future (the Wood Products page, lucasCore 1.5.1)
+
+The tables above describe wood use as published. The Wood Products page can change a few things from a start year on, at once or
+along a straight-line ramp, to explore other futures (`wp_levers` in `src/wood-products.R`). They are scenario choices, not
+estimates: no file here holds them, and with none set the model runs the tables as they are. Each acts on top of the parameter
+draws and only moves carbon between paths.
+
+| Parameter | Default | What changes |
+| --- | --- | --- |
+| Shift to long-lived products | 0 | That share of the carbon bound for paper and for end uses with a half-life of 12 years or less (packaging, other manufacturing, manufactured housing, rail, other uses, other industrial products) goes to end uses of 67 years or more (housing, non-residential buildings), in the year's building mix of the solid wood (softwood lumber's where a harvest makes none). It is solid wood from there on (8% lost when placed in use). Furniture and repair and remodeling (30 years) are left as they are |
+| Product lifetime multiplier | 1 | Every half-life in use is multiplied, for everything in use from the start year (earlier products too) |
+| Extra share burned for energy | 0 | That share of the industrial roundwood is burned with energy capture in the year harvested, on top of bark, fuelwood and mill residue. No fossil fuel displacement is credited |
+| Discarded wood recovered, discarded paper recovered | the last year of `discard-fates.csv` (0.09, 0.50) | The recovered share takes the value; the other fates keep their proportions in what is left |
+| Discards burned for energy | 0 (Skog 2008) | The share of discarded wood and paper burned with energy capture takes the value; the other fates keep their proportions |
+
+Landfill and dump half-lives and the landfill share that never decays are not offered: they are physical values, varied in the
+draws only.
+
 ## Checks made when the tables were written (2026-11-11)
 
 - Smith's Table 8 (share of each product still in use 1-100 years after production) is rebuilt from Table D2's end uses and Table D3's

@@ -15,7 +15,7 @@ stage_18 <- function(pkg, lib, options, out = tempfile("wp"), study_area = NULL)
     say <- function(...) log <<- c(log, sprintf(...))
     fail <- function(...) stop(sprintf(...), call. = FALSE)
     progressBar <- function(...) invisible()
-    read_ds <- function(name, ...) if (name == "WoodProductsOptions") as.data.table(options) else if (name == "StudyArea" && length(study_area)) data.table(UnitId = study_area) else data.table()
+    read_ds <- function(name, ...) if (name %in% c("WoodProductsOptions", "WoodProductsFuture")) as.data.table(options) else if (name == "StudyArea" && length(study_area)) data.table(UnitId = study_area) else data.table()
     write_ds <- function(x, name, ...) sheets[[name]] <<- as.data.table(x)
     check <- function(stage, what, ok, detail = "") { if (length(ok) != 1 || is.na(ok)) ok <- FALSE
       checks[[length(checks) + 1]] <<- data.table(Check = what, Status = if (ok) "Pass" else "FAIL", Detail = detail); invisible(ok) }
