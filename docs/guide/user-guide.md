@@ -1705,6 +1705,7 @@ Set it up like Run Figures (section 5.6), one scenario per run:
    - **Seed**: the random seed of the draws, so a rerun gives the same result.
    - **Land clearing used**: the share of land-clearing wood that becomes products, 0.5 by default (no published source gives it).
    - **Spin-up**: on by default; off starts the products stock at zero when the run starts.
+   - **A different wood products future** (version 1.5.1): optional parameters that change how wood is used from a start year on, described below. Leave every box blank to run the published tables as they are.
 5. Save the library and run the scenario. Each P26 projection takes under a minute.
 6. Open the result. Under **LUCAS Core > Build Results** it holds **Wood Products** (pools and flows by year, the mean and the interval, per iteration and over all; blank Iteration = all), **Wood Products by End Use**, **Wood Products Spin-up** (the scaling of the harvest history) and **Wood Products Figures (PNG)**. **Export > LUCAS Core > Wood Products Figures** saves the figures to a folder.
 
@@ -1719,6 +1720,23 @@ The variables of the Wood Products sheet, all in Mg C (flows in Mg C per year):
 | EmittedEnergy | emitted with energy capture: fuel, mill residue, discards burned for energy |
 | EmittedNoEnergy | emitted without: other burning, decay in landfills and dumps, unused land-clearing wood |
 | StockChange | the change in Stored from the year before |
+
+**A different wood products future** (version 1.5.1). The published tables describe wood use as it has been. The parameters in this group of the Wood Products page change it from a start year on, to explore, for example, a move to longer-lived products or to more bioenergy. Each one moves carbon from one path to another, so no carbon is added or lost. They act on top of the parameter draws, so the interval stays and the whole band moves. With every box blank the stage gives the same results as before, and a library made with 1.5.0 needs no update to use them.
+
+| Parameter | Blank means | What it does |
+| --- | --- | --- |
+| Apply from year | the projection's first year; for a historical run, its first year | The first year the parameters act. Wood harvested and products discarded before it keep the published tables. |
+| Fully reached by year | at once, in the start year | The parameters are phased in along a straight line from the start year to this year. |
+| Shift to long-lived products | 0 | A share, 0 to 1, of the carbon bound for paper and short-lived end uses (half-life 12 years or less, such as packaging and pallets) goes to building end uses instead (housing and non-residential buildings, 67 to 100 years). Furniture and repair and remodeling are left as they are. |
+| Product lifetime multiplier | 1 | Multiplies the half-life of every product in use: 1.25 keeps products 25% longer. It acts on everything in use from the start year, earlier products included. |
+| Extra share burned for energy | 0 | A share, 0 to 1, of the industrial roundwood is burned with energy capture in the year harvested instead of made into products, on top of the bark, fuelwood and mill residue already burned. The model does not credit the fossil fuel displaced. |
+| Discarded wood recovered | 0.09, the last year of the table | The share of discarded solid wood recycled. Recovered products go back in use for a few years and are then discarded again. The other fates keep their proportions. |
+| Discarded paper recovered | 0.50, the last year of the table | The same for paper. |
+| Discards burned for energy | 0 | The share of discarded wood and paper burned with energy capture, taken in proportion from the other fates, mostly landfills. |
+
+In general, a shift to long-lived products, longer lifetimes and more recovery raise the carbon stored, and more burning for energy lowers it. The run log names each parameter that differs from its default and the years it applies, and the figures' note line says when a result used them. A value out of range, or a start year after the run's last year, stops the stage with a message. To compare futures, make one Wood Products scenario per future, each naming the same run.
+
+**The diagram** below the parameters shows where the carbon of one harvest goes. Choose a **Region**, **Wood** (softwood or hardwood), **Log size** and the **Years after harvest**. It follows 100 units of harvested carbon (wood and bark) with the parameters above in full effect and the published values, with no draws. From left to right: the harvest, the products in use by class, what has been discarded, recovered products and disposal sites, and what has been emitted with and without energy capture. A box gives the carbon there after the years chosen, in percent of the harvest, and a curve's width is the carbon that has passed along it. A value in bold differs from the one the default parameters give, which is shown beside it. Hover over a curve for what it is. The diagram redraws as the parameters change, so it is a quick way to see what a value does before running the stage. It is one harvest of one kind; the stage follows every year's harvest of the run by region, forest type and cause.
 
 **Run Figures and Compare Runs** (sections 5.6 and 7.4) find a run's newest Wood Products result by its result Id, so nothing else is named. Run Figures then adds a **Harvested wood products** figure: (a) carbon stored in use and in landfills and dumps, with the interval; (b) the ecosystem's net biome productivity, the change in products, and net biome productivity with products. Compare Runs adds the same two panels with a line per run, and two columns to its carbon summary: **HWP**, the mean change in products, and **NBP + HWP**. A historical run with no result of its own takes its projection's. Run stage 18 before these stages; a run with no Wood Products result is drawn as before.
 
