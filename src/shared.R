@@ -51,6 +51,11 @@ read_ds <- function(name, ...) { x <- as.data.table(datasheet(scn, ds(name), opt
     for (k in names(d)) if (k %in% names(x) && is.na(x[[k]][1]) && !is.na(d[[k]][1])) x[[k]] <- d[[k]] }
   x }
 
+# the Wetland Methane page's sheets and options (src/wetland-params.R): a library made before them has no such sheet, which reads as
+# nothing set; a list column (Region, Zone) reads as its label
+read_wetland <- function(name) tryCatch({ x <- read_ds(name); if (nrow(x)) x else NULL }, error = function(e) NULL)
+wetland_settings <- function() { if (!exists("wetland_options", mode = "function")) source(pkg_file("src", "wetland-params.R")); wetland_options(read_wetland("WetlandOptions")) }
+
 # the last projection year: Projection Options (Run Settings), else Build Options' legacy column (libraries made before 2026-10-24),
 # else 2100
 projection_end <- function() {

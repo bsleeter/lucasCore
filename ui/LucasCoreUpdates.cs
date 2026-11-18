@@ -300,6 +300,97 @@ namespace lucasCoreUI
             }
         }
 
+        // ---- 1.5 (wetland methane, 2026-11): wetland classes release part of what their soil and litter emit as CH4 (src/flows.R,
+        // src/nonforest-solve.R). The rows are the ones defaults/stsim and defaults/stockflow gained (generated from them). The three
+        // Wetland Methane sheets are new tables, which SyncroSim adds by itself. A library keeps running on its earlier Builds; the
+        // methane comes with its next Build (stages 0 and 3). No apostrophe in the description -----------------------------------------
+        [Update(1.5, "lucasCore 1.5: wetland methane - the CO2 and CH4 emission flow types of wetland soil, root litter and forest floor with their groups, orders and output filters; the Q10 Wetland Soil and Q10 Wetland CH4 groups; the Marsh Salinity and Methane Uncertainty flow multiplier types; and the Climate Options wetland growth choice")]
+        public static void Update_1_500(DataStore store)
+        {
+            AddColumn(store, "lucasCore_ClimateOptions", "WetlandGrowthModel", "INTEGER");
+            string[,] types = {
+                { "Emission: BG Slow -> Atmosphere (Wetland)", "Emergent wetlands: soil carbon released as CO2, with a temperature response of its own (Q10 Wetland Soil)" },
+                { "Emission: BG Slow -> Atmosphere CH4", "Emergent wetlands: soil carbon released as methane" },
+                { "Emission: BG Very Fast -> Atmosphere CH4", "Emergent wetlands: root litter carbon released as methane" },
+                { "Emission: BG Very Fast -> Atmosphere (Wetland)", "Emergent and forested wetlands: root litter carbon released as CO2 (the same response as every class, by a flow type of their own so a wetland cell can be told apart)" },
+                { "Emission: AG Very Fast -> Atmosphere (Wetland)", "Forested wetlands: ag very fast (forest floor) carbon released as CO2, by a flow type of their own so a wetland cell can be told apart" },
+                { "Emission: AG Fast -> Atmosphere (Wetland)", "Forested wetlands: ag fast (forest floor) carbon released as CO2, by a flow type of their own so a wetland cell can be told apart" },
+                { "Emission: AG Slow -> Atmosphere (Wetland)", "Forested wetlands: ag slow (forest floor) carbon released as CO2, by a flow type of their own so a wetland cell can be told apart" },
+                { "Emission: AG Very Fast -> Atmosphere CH4", "Forested wetlands: ag very fast (forest floor) carbon released as methane" },
+                { "Emission: AG Fast -> Atmosphere CH4", "Forested wetlands: ag fast (forest floor) carbon released as methane" },
+                { "Emission: AG Slow -> Atmosphere CH4", "Forested wetlands: ag slow (forest floor) carbon released as methane" }
+ };
+            for (int i = 0; i < types.GetLength(0); i++)
+            {
+                AddNamed(store, "stsim_FlowType", "FlowTypeId", types[i, 0], "Description", types[i, 1], false);
+                AddNamed(store, "stsim_FlowGroup", "FlowGroupId", types[i, 0] + " [Type]", null, null, true);
+            }
+            string[,] groups = {
+                { "Q10 Wetland Soil", "Temperature response of CO2 release from emergent wetland soil (BG Slow)" },
+                { "Q10 Wetland CH4", "Temperature response of methane release from emergent wetland soil and root litter" },
+                { "Emission: Wetland CH4", "Methane from emergent wetlands in C" },
+                { "Emission: Wetland CH4 (CO2e)", "Methane from emergent wetlands in CO2e" },
+                { "Emission: Wetland Methane Source CO2", "CO2 from the wetland pools that also release methane, in C: soil and root litter, and in forested wetlands the forest floor (the flows a marsh salinity or methane uncertainty multiplier adjusts)" }
+ };
+            for (int i = 0; i < groups.GetLength(0); i++) AddNamed(store, "stsim_FlowGroup", "FlowGroupId", groups[i, 0], "Description", groups[i, 1], false);
+            foreach (string m in new[] { "Marsh Salinity", "Methane Uncertainty" }) AddNamed(store, "stsim_FlowMultiplierType", "FlowMultiplierTypeId", m, null, null, false);
+            // stock-flow rows of the scenarios that hold their own (a library made in Studio has none: stage 0 writes them into each Build)
+            string[] memberships = {
+                "Emission: BG Slow -> Atmosphere (Wetland)|BG Slow ->|1", "Emission: BG Slow -> Atmosphere (Wetland)|Emission: Total|1", "Emission: BG Slow -> Atmosphere (Wetland)|Emission: Total (CO2e)|3.67",
+                "Emission: BG Slow -> Atmosphere (Wetland)|Emission: Total Rh|1", "Emission: BG Slow -> Atmosphere (Wetland)|Emission: Total Rh (CO2e)|3.67", "Emission: BG Slow -> Atmosphere (Wetland)|Net Biome Productivity|-1",
+                "Emission: BG Slow -> Atmosphere (Wetland)|Net Biome Productivity (CO2e)|-3.67", "Emission: BG Slow -> Atmosphere (Wetland)|Net Ecosystem Productivity|-1", "Emission: BG Slow -> Atmosphere (Wetland)|Net Ecosystem Productivity (CO2e)|-3.67",
+                "Emission: BG Slow -> Atmosphere (Wetland)|Q10 Wetland Soil|1", "Emission: BG Slow -> Atmosphere CH4|BG Slow ->|1", "Emission: BG Slow -> Atmosphere CH4|Q10 Wetland CH4|1",
+                "Emission: BG Slow -> Atmosphere CH4|Emission: Wetland CH4|1", "Emission: BG Slow -> Atmosphere CH4|Emission: Wetland CH4 (CO2e)|33.5", "Emission: BG Slow -> Atmosphere CH4|Emission: Total|1",
+                "Emission: BG Slow -> Atmosphere CH4|Emission: Total (CO2e)|33.5", "Emission: BG Slow -> Atmosphere CH4|Emission: Total Rh|1", "Emission: BG Slow -> Atmosphere CH4|Emission: Total Rh (CO2e)|33.5",
+                "Emission: BG Slow -> Atmosphere CH4|Net Biome Productivity|-1", "Emission: BG Slow -> Atmosphere CH4|Net Biome Productivity (CO2e)|-33.5", "Emission: BG Slow -> Atmosphere CH4|Net Ecosystem Productivity|-1",
+                "Emission: BG Slow -> Atmosphere CH4|Net Ecosystem Productivity (CO2e)|-33.5", "Emission: BG Very Fast -> Atmosphere CH4|BG Very Fast ->|1", "Emission: BG Very Fast -> Atmosphere CH4|Q10 Wetland CH4|1",
+                "Emission: BG Very Fast -> Atmosphere CH4|Emission: Wetland CH4|1", "Emission: BG Very Fast -> Atmosphere CH4|Emission: Wetland CH4 (CO2e)|33.5", "Emission: BG Very Fast -> Atmosphere CH4|Emission: Total|1",
+                "Emission: BG Very Fast -> Atmosphere CH4|Emission: Total (CO2e)|33.5", "Emission: BG Very Fast -> Atmosphere CH4|Emission: Total Rh|1", "Emission: BG Very Fast -> Atmosphere CH4|Emission: Total Rh (CO2e)|33.5",
+                "Emission: BG Very Fast -> Atmosphere CH4|Net Biome Productivity|-1", "Emission: BG Very Fast -> Atmosphere CH4|Net Biome Productivity (CO2e)|-33.5", "Emission: BG Very Fast -> Atmosphere CH4|Net Ecosystem Productivity|-1",
+                "Emission: BG Very Fast -> Atmosphere CH4|Net Ecosystem Productivity (CO2e)|-33.5", "Emission: BG Very Fast -> Atmosphere (Wetland)|BG Very Fast ->|1", "Emission: BG Very Fast -> Atmosphere (Wetland)|Emission: Total|1",
+                "Emission: BG Very Fast -> Atmosphere (Wetland)|Emission: Total (CO2e)|3.67", "Emission: BG Very Fast -> Atmosphere (Wetland)|Emission: Total Rh|1", "Emission: BG Very Fast -> Atmosphere (Wetland)|Emission: Total Rh (CO2e)|3.67",
+                "Emission: BG Very Fast -> Atmosphere (Wetland)|Net Biome Productivity|-1", "Emission: BG Very Fast -> Atmosphere (Wetland)|Net Biome Productivity (CO2e)|-3.67", "Emission: BG Very Fast -> Atmosphere (Wetland)|Net Ecosystem Productivity|-1",
+                "Emission: BG Very Fast -> Atmosphere (Wetland)|Net Ecosystem Productivity (CO2e)|-3.67", "Emission: BG Very Fast -> Atmosphere (Wetland)|Q10 Slow Flows|1", "Emission: BG Slow -> Atmosphere (Wetland)|Emission: Wetland Methane Source CO2|1",
+                "Emission: BG Very Fast -> Atmosphere (Wetland)|Emission: Wetland Methane Source CO2|1", "Emission: AG Very Fast -> Atmosphere (Wetland)|AG Very Fast ->|1", "Emission: AG Very Fast -> Atmosphere (Wetland)|Emission: Total|1",
+                "Emission: AG Very Fast -> Atmosphere (Wetland)|Emission: Total (CO2e)|3.67", "Emission: AG Very Fast -> Atmosphere (Wetland)|Emission: Total Rh|1", "Emission: AG Very Fast -> Atmosphere (Wetland)|Emission: Total Rh (CO2e)|3.67",
+                "Emission: AG Very Fast -> Atmosphere (Wetland)|Net Biome Productivity|-1", "Emission: AG Very Fast -> Atmosphere (Wetland)|Net Biome Productivity (CO2e)|-3.67", "Emission: AG Very Fast -> Atmosphere (Wetland)|Net Ecosystem Productivity|-1",
+                "Emission: AG Very Fast -> Atmosphere (Wetland)|Net Ecosystem Productivity (CO2e)|-3.67", "Emission: AG Very Fast -> Atmosphere (Wetland)|Q10 Fast Flows|1", "Emission: AG Very Fast -> Atmosphere (Wetland)|Emission: Wetland Methane Source CO2|1",
+                "Emission: AG Very Fast -> Atmosphere CH4|AG Very Fast ->|1", "Emission: AG Very Fast -> Atmosphere CH4|Emission: Total|1", "Emission: AG Very Fast -> Atmosphere CH4|Emission: Total (CO2e)|33.5",
+                "Emission: AG Very Fast -> Atmosphere CH4|Emission: Total Rh|1", "Emission: AG Very Fast -> Atmosphere CH4|Emission: Total Rh (CO2e)|33.5", "Emission: AG Very Fast -> Atmosphere CH4|Net Biome Productivity|-1",
+                "Emission: AG Very Fast -> Atmosphere CH4|Net Biome Productivity (CO2e)|-33.5", "Emission: AG Very Fast -> Atmosphere CH4|Net Ecosystem Productivity|-1", "Emission: AG Very Fast -> Atmosphere CH4|Net Ecosystem Productivity (CO2e)|-33.5",
+                "Emission: AG Very Fast -> Atmosphere CH4|Q10 Wetland CH4|1", "Emission: AG Very Fast -> Atmosphere CH4|Emission: Wetland CH4|1", "Emission: AG Very Fast -> Atmosphere CH4|Emission: Wetland CH4 (CO2e)|33.5",
+                "Emission: AG Fast -> Atmosphere (Wetland)|Emission: Total|1", "Emission: AG Fast -> Atmosphere (Wetland)|Emission: Total (CO2e)|3.67", "Emission: AG Fast -> Atmosphere (Wetland)|Emission: Total Rh|1",
+                "Emission: AG Fast -> Atmosphere (Wetland)|Emission: Total Rh (CO2e)|3.67", "Emission: AG Fast -> Atmosphere (Wetland)|Net Biome Productivity|-1", "Emission: AG Fast -> Atmosphere (Wetland)|Net Biome Productivity (CO2e)|-3.67",
+                "Emission: AG Fast -> Atmosphere (Wetland)|Net Ecosystem Productivity|-1", "Emission: AG Fast -> Atmosphere (Wetland)|Net Ecosystem Productivity (CO2e)|-3.67", "Emission: AG Fast -> Atmosphere (Wetland)|Q10 Slow Flows|1",
+                "Emission: AG Fast -> Atmosphere (Wetland)|Emission: Wetland Methane Source CO2|1", "Emission: AG Fast -> Atmosphere CH4|Emission: Total|1", "Emission: AG Fast -> Atmosphere CH4|Emission: Total (CO2e)|33.5",
+                "Emission: AG Fast -> Atmosphere CH4|Emission: Total Rh|1", "Emission: AG Fast -> Atmosphere CH4|Emission: Total Rh (CO2e)|33.5", "Emission: AG Fast -> Atmosphere CH4|Net Biome Productivity|-1",
+                "Emission: AG Fast -> Atmosphere CH4|Net Biome Productivity (CO2e)|-33.5", "Emission: AG Fast -> Atmosphere CH4|Net Ecosystem Productivity|-1", "Emission: AG Fast -> Atmosphere CH4|Net Ecosystem Productivity (CO2e)|-33.5",
+                "Emission: AG Fast -> Atmosphere CH4|Q10 Wetland CH4|1", "Emission: AG Fast -> Atmosphere CH4|Emission: Wetland CH4|1", "Emission: AG Fast -> Atmosphere CH4|Emission: Wetland CH4 (CO2e)|33.5",
+                "Emission: AG Slow -> Atmosphere (Wetland)|Emission: Total|1", "Emission: AG Slow -> Atmosphere (Wetland)|Emission: Total (CO2e)|3.67", "Emission: AG Slow -> Atmosphere (Wetland)|Emission: Total Rh|1",
+                "Emission: AG Slow -> Atmosphere (Wetland)|Emission: Total Rh (CO2e)|3.67", "Emission: AG Slow -> Atmosphere (Wetland)|Net Biome Productivity|-1", "Emission: AG Slow -> Atmosphere (Wetland)|Net Biome Productivity (CO2e)|-3.67",
+                "Emission: AG Slow -> Atmosphere (Wetland)|Net Ecosystem Productivity|-1", "Emission: AG Slow -> Atmosphere (Wetland)|Net Ecosystem Productivity (CO2e)|-3.67", "Emission: AG Slow -> Atmosphere (Wetland)|Q10 Fast Flows|1",
+                "Emission: AG Slow -> Atmosphere (Wetland)|Emission: Wetland Methane Source CO2|1", "Emission: AG Slow -> Atmosphere CH4|Emission: Total|1", "Emission: AG Slow -> Atmosphere CH4|Emission: Total (CO2e)|33.5",
+                "Emission: AG Slow -> Atmosphere CH4|Emission: Total Rh|1", "Emission: AG Slow -> Atmosphere CH4|Emission: Total Rh (CO2e)|33.5", "Emission: AG Slow -> Atmosphere CH4|Net Biome Productivity|-1",
+                "Emission: AG Slow -> Atmosphere CH4|Net Biome Productivity (CO2e)|-33.5", "Emission: AG Slow -> Atmosphere CH4|Net Ecosystem Productivity|-1", "Emission: AG Slow -> Atmosphere CH4|Net Ecosystem Productivity (CO2e)|-33.5",
+                "Emission: AG Slow -> Atmosphere CH4|Q10 Wetland CH4|1", "Emission: AG Slow -> Atmosphere CH4|Emission: Wetland CH4|1", "Emission: AG Slow -> Atmosphere CH4|Emission: Wetland CH4 (CO2e)|33.5"
+ };
+            foreach (string m in memberships) { string[] p = m.Split('|'); AddMembership(store, p[0], p[1], p[2]); }
+            string[] orders = {
+                "Emission: BG Slow -> Atmosphere (Wetland)|5", "Emission: BG Slow -> Atmosphere CH4|5", "Emission: BG Very Fast -> Atmosphere CH4|6.5",
+                "Emission: BG Very Fast -> Atmosphere (Wetland)|6.5", "Emission: AG Very Fast -> Atmosphere (Wetland)|6.5", "Emission: AG Fast -> Atmosphere (Wetland)|6.5",
+                "Emission: AG Slow -> Atmosphere (Wetland)|6.6", "Emission: AG Very Fast -> Atmosphere CH4|6.5", "Emission: AG Fast -> Atmosphere CH4|6.5",
+                "Emission: AG Slow -> Atmosphere CH4|6.6"
+ };
+            foreach (string o in orders) { string[] p = o.Split('|'); AddScenarioRow(store, "stsim_FlowOrder", "FlowOrderId", "FlowTypeId", "stsim_FlowType", "FlowTypeId", p[0], "\"Order\"", p[1]); }
+            string[] filters = {
+                "Emission: Wetland CH4", "Emission: Wetland CH4 (CO2e)", "Emission: BG Slow -> Atmosphere (Wetland) [Type]",
+                "Emission: BG Slow -> Atmosphere CH4 [Type]", "Emission: BG Very Fast -> Atmosphere CH4 [Type]", "Emission: Wetland Methane Source CO2",
+                "Emission: BG Very Fast -> Atmosphere (Wetland) [Type]", "Emission: AG Very Fast -> Atmosphere (Wetland) [Type]", "Emission: AG Fast -> Atmosphere (Wetland) [Type]",
+                "Emission: AG Slow -> Atmosphere (Wetland) [Type]", "Emission: AG Very Fast -> Atmosphere CH4 [Type]", "Emission: AG Fast -> Atmosphere CH4 [Type]",
+                "Emission: AG Slow -> Atmosphere CH4 [Type]"
+ };
+            foreach (string f in filters) AddFilter(store, "stsim_OutputFilterFlows", "OutputFilterFlowsId", "FlowGroupId", "stsim_FlowGroup", f, false);
+        }
         // a state class (with its Id, labels by name) in every project that lacks it
         private static void AddStateClass(DataStore store, string name, string labelX, string labelY, string id, string color)
         {

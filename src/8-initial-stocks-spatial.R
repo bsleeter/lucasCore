@@ -101,12 +101,12 @@ put_multipliers_save <- function() {
   # carried over (with their files' full paths), as stage 7 and stage 11 do
   if (!nrow(x)) { d <- dependency_multipliers(stsim_list("FlowMultiplierType")$Name); if (!is.null(d)) { x <- d; say("Flow Spatial Multipliers: %d rows carried over from the dependency", nrow(d)) } }
   if (nrow(x)) x <- x[if ("FlowMultiplierTypeId" %in% names(x)) !FlowMultiplierTypeId %in% new$FlowMultiplierTypeId else TRUE,
-                     intersect(names(x), c("Timestep", "FlowGroupId", "FlowMultiplierTypeId", "MultiplierFileName")), with = FALSE]
+                     intersect(names(x), c("Iteration", "Timestep", "FlowGroupId", "FlowMultiplierTypeId", "MultiplierFileName")), with = FALSE]
   write_stsim(rbind(x, new, fill = TRUE), "FlowSpatialMultiplier")
   say("Flow Spatial Multipliers: %s written (%d other rows kept)", paste(unique(new$FlowMultiplierTypeId), collapse = ", "), nrow(x))
   # (an output sheet reads back empty until the stage ends, so the rows cannot be checked here; tests/unit-agriculture.R checks the
   # code path, and a run's result holds them)
-  check(STAGE, "each productivity multiplier has one Flow Spatial Multiplier row a year and flow group", !anyDuplicated(new[, .(if ("Timestep" %in% names(new)) Timestep else NA, FlowGroupId, FlowMultiplierTypeId)]) && all(file.exists(new$MultiplierFileName))) }
+  check(STAGE, "each productivity multiplier has one Flow Spatial Multiplier row a year and flow group", !anyDuplicated(new[, .(if ("Iteration" %in% names(new)) Iteration else NA, if ("Timestep" %in% names(new)) Timestep else NA, FlowGroupId, FlowMultiplierTypeId)]) && all(file.exists(new$MultiplierFileName))) }
 # ---- Site Productivity (Build Options; to-do 35, docs/treemap-plan.md) ------------------------------------------------------
 # A forest cell's growth multiplier = sum over FIA site classes of the share of its TreeMap pixels in the class (stage 5) x its forest
 # type x ecodivision's multiplier for the class (stage 2). It becomes the Site Productivity flow spatial multiplier on forest growth,
@@ -284,6 +284,68 @@ if (tm_on) {
   np_add("Tidal Marsh Productivity", isTM, tmult, thas, "USGS tidal marsh NPP 2015 / ecodivision map mean (no map data = 1)", CAP)
   fg <- "Net Growth Wetland: Total"; if (!fg %in% stsim_list("FlowGroup")$Name) fail("Tidal Marsh Productivity: flow group '%s' not found", fg)
   put_multiplier("Tidal Marsh Productivity", fg, write_raster(setValues(rast(P), ifelse(land, tmult, NA)), "TidalMarshProductivity.tif", "FLT4S"))
+}
+# ---- Marsh salinity (2026-11-16): the methane of estuarine emergent cells by salinity zone ---------------------------------------
+# Salinity is the largest source of difference in tidal marsh methane (saline marsh about 0.01 Mg C/ha/yr as CH4, oligohaline over 1),
+# and the class's regional target (defaults/stockflow/emergent-wetland-regions.csv) is one blend for a whole coast. The model has no
+# salinity map, but LANDFIRE EVT 2016 (Data Sources: Evt2016File, the layer stage 5 reads for forest types) names its tidal marsh
+# classes by salinity: "Fresh and Oligohaline" and "Salt and Brackish" (on the northern Atlantic coast brackish and salt apart);
+# defaults/stockflow/marsh-salinity-evt.csv. C-CAP has already put marsh under 0.5 ppt in the palustrine class, so within the
+# estuarine class LANDFIRE's fresh-and-oligohaline marsh is the oligohaline part (0.5 to 5), the rest mesohaline and saltier.
+# A cell's methane target = the zone targets of its region (defaults/stockflow/marsh-salinity-ch4.csv) weighted by the share of its
+# 30 m pixels in each zone, and the class's regional target for the pixels LANDFIRE gives no zone (open water, burned, other cover).
+# It becomes two Flow Spatial Multipliers of type Marsh Salinity: on Emission: Wetland CH4, the cell's target over the class's
+# (capped so methane stays within the cap share of the belowground emission); and on Emission: Wetland Methane Source CO2 the factor
+# that takes the same carbon off the CO2, (1 - f m) / (1 - f) with f the class's methane fraction, so the cell's soil and litter lose
+# what they were fitted to lose and its starting pools hold. Every other cell, and palustrine marsh, is 1. (Marsh elevation, which
+# matters as much in cooler marsh, is future work: docs/ui-improvements.md item 66.) A cell that changes class
+# later keeps its two factors (the methane fraction they were built on is its first class's).
+# Carbon Assumptions: Wetland Methane (src/wetland-params.R) may set the class and zone targets, the cap and ranges. With Uncertainty
+# Draws and a range on the estuarine class's target or on a zone's, each of the first draws' iterations gets a pair of maps of its own,
+# built from that iteration's draw of every target (the same quantile stage 3 uses for the other classes), so the cell's factors are
+# exact in every iteration; the maps without an iteration serve the rest. Without LANDFIRE the cells have no zones and the pair is
+# the class's own draw.
+SAL_EE <- "Wetland: Estuarine Emergent"; SAL_FG <- c("Emission: Wetland CH4", "Emission: Wetland Methane Source CO2"); isEE <- land & cname == SAL_EE
+sal_evt <- if (any(isEE)) read_data_sources("Evt2016File", optional = TRUE)$Evt2016File else NA
+if (any(isEE) && (!"Marsh Salinity" %in% stsim_list("FlowMultiplierType")$Name || !all(SAL_FG %in% stsim_list("FlowGroup")$Name))) {
+  say("Marsh salinity: this library has no Marsh Salinity multiplier type or wetland methane flow groups (it predates them); estuarine marsh keeps its regional methane target")
+} else if (any(isEE)) {
+  wopt <- wetland_settings(); cap_share <- wopt$MethaneCapShare
+  wct <- wetland_class_targets(read_default("stockflow", "emergent-wetland-regions.csv"), read_default("spinup", "wetland-ch4.csv"), read_wetland("WetlandMethaneTarget"), read_default("stockflow", "wetland-methane-targets.csv"))[StateClassId == SAL_EE]
+  zt <- wetland_zone_targets(read_default("stockflow", "marsh-salinity-ch4.csv"), read_wetland("MarshSalinityTarget")); zc <- read_default("stockflow", "marsh-salinity-evt.csv")
+  wfit <- read_default("stockflow", "emergent-wetland-fit.csv")[StateClassId == SAL_EE]; zones <- unique(zc$Zone); ee <- which(isEE)
+  has_evt <- !(is.null(sal_evt) || is.na(sal_evt) || !file.exists(sal_evt))
+  fz <- matrix(0, length(ee), length(zones), dimnames = list(NULL, zones))
+  if (has_evt) { ev <- rast(sal_evt); levels(ev) <- NULL; ev <- crop(ev, project(as.polygons(ext(P) + 1000, crs = crs(P)), crs(ev)), snap = "out")
+    fr <- vapply(zones, function(z) values(project(classify(ev, cbind(as.integer(zc[Zone == z, Code]), 1), others = 0), P, method = "average"), mat = FALSE), numeric(ncell(P)))
+    fr[is.na(fr)] <- 0; fz <- fr[ee, , drop = FALSE]; colnames(fz) <- zones }
+  zoned <- pmin(rowSums(fz), 1); k <- match(sname[ee], wfit$StratumId); region <- wfit$Region[k]; kt <- match(region, wct$Region)
+  base <- wct$Target[kt]; blo <- wct$Low[kt]; bhi <- wct$High[kt]; bg <- as.numeric(wfit$BelowgroundEmission)[k]; f0 <- as.numeric(wfit$CH4Share)[k]
+  # the class's methane fraction at its (central) target, as stage 3 writes it
+  fch4 <- ifelse(wct$Source[kt] == "scenario" | f0 > cap_share, wetland_share(base, bg, cap_share), f0)
+  zk <- function(col) vapply(zones, function(z) zt[[col]][match(paste(region, z), paste(zt$Region, zt$Zone))], numeric(length(ee)))
+  tz <- zk("Target"); tzl <- zk("Low"); tzh <- zk("High"); for (nm in c("tz", "tzl", "tzh")) if (!is.matrix(get(nm))) assign(nm, matrix(get(nm), nrow = length(ee), dimnames = list(NULL, zones)))
+  check(STAGE, "marsh salinity: a methane target for every salinity zone of every estuarine region in the study area, and a fitted methane fraction for every estuarine cell",
+        !anyNA(tz) && !anyNA(base) && !anyNA(fch4) && all(base > 0), paste(unique(region[rowSums(is.na(tz)) > 0]), collapse = "; "))
+  # the pair of factors of every estuarine cell for given class and zone targets (the class's central target and fraction stay the yardstick)
+  pair <- function(b, t) { target <- rowSums(fz * t) + (1 - zoned) * b; fa <- wetland_factors(fch4, target / base, cap_share); list(target = target, m = fa$ch4, cf = fa$co2, capped = target / base > cap_share / fch4 + 1e-12) }
+  maps <- function(p, tag) { s <- rep(1, ncell(P)); cc <- rep(1, ncell(P)); s[ee] <- p$m; cc[ee] <- p$cf
+    c(write_raster(setValues(rast(P), ifelse(land, s, NA)), sprintf("MarshSalinityCH4%s.tif", tag), "FLT4S"), write_raster(setValues(rast(P), ifelse(land, cc, NA)), sprintf("MarshSalinityCO2%s.tif", tag), "FLT4S")) }
+  p0 <- pair(base, tz)
+  check(STAGE, "marsh salinity: both factors are finite and not negative, and a cell's belowground emission is unchanged (CO2 share x its factor + methane share x its factor = 1)",
+        all(is.finite(p0$m) & p0$m >= 0 & is.finite(p0$cf) & p0$cf >= 0) && max(abs((1 - fch4) * p0$cf + fch4 * p0$m - 1)) < 1e-9)
+  ranged <- any((!is.na(blo) & blo < base) | (!is.na(bhi) & bhi > base)) || (has_evt && any((!is.na(tzl) & tzl < tz) | (!is.na(tzh) & tzh > tz)))
+  if (!has_evt) say("Marsh salinity: no LANDFIRE EVT 2016 (Data Sources: Evt2016File); estuarine marsh keeps its regional methane target%s", if (ranged && wopt$UncertaintyDraws > 0) " (its uncertainty draws are still written)" else "")
+  else say("Marsh salinity (LANDFIRE EVT 2016): %d estuarine emergent cells; by pixel share %s, no zone %.1f%%; methane target %.3f -> %.3f Mg C/ha/yr on average (cell range %.3f-%.3f); methane factor %.2f-%.2f, CO2 factor %.2f-%.2f; %d cells held at the cap of %.0f%%",
+           length(ee), paste(sprintf("%s %.1f%%", zones, 100 * colMeans(fz)), collapse = ", "), 100 * mean(1 - zoned), mean(base), mean(p0$m * base), min(p0$m * base), max(p0$m * base), min(p0$m), max(p0$m), min(p0$cf), max(p0$cf), sum(p0$capped), 100 * cap_share)
+  srows <- NULL
+  if (has_evt) srows <- data.table(Iteration = NA_integer_, FlowGroupId = SAL_FG, FlowMultiplierTypeId = "Marsh Salinity", MultiplierFileName = maps(p0, ""))
+  if (ranged && wopt$UncertaintyDraws > 0) { q <- wetland_quantiles(wopt$UncertaintyDraws); tm <- numeric(length(q))
+    it <- rbindlist(lapply(seq_along(q), function(i) { ti <- matrix(target_at(q[i], as.vector(tz), as.vector(tzl), as.vector(tzh)), nrow = length(ee)); pi <- pair(target_at(q[i], base, blo, bhi), ti); tm[i] <<- mean(pi$m * base)
+      data.table(Iteration = i, FlowGroupId = SAL_FG, FlowMultiplierTypeId = "Marsh Salinity", MultiplierFileName = maps(pi, sprintf("_it%03d", i))) }))
+    # ST-Sim carries an iteration's rows on to the later iterations, so the one after the last draw goes back to the central maps
+    srows <- rbind(srows, it, data.table(Iteration = length(q) + 1L, FlowGroupId = SAL_FG, FlowMultiplierTypeId = "Marsh Salinity", MultiplierFileName = maps(p0, "_central"))); say("Marsh salinity: %d uncertainty draws, a pair of maps for each of iterations 1 to %d; the cells' mean methane target runs %.3f to %.3f Mg C/ha/yr across them (%.3f at the targets)", length(q), length(q), min(tm), max(tm), mean(p0$m * base)) }
+  if (!is.null(srows)) put_multiplier("Marsh Salinity", rows = srows)
 }
 # ---- Organic soil (to-do 53: the Peat stock) -------------------------------------------------------------------------------------
 # Each cell's share of organic soil: the mean over its 10 m gNATSGO map units of their percent of Histosol components (Data Source

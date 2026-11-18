@@ -1,0 +1,14 @@
+StateClassId,Region,Target,TargetLow,TargetHigh,RangeBasis
+Wetland: Estuarine Emergent,Pacific Northwest,0.025,0.0135,0.052,Arias-Ortiz et al. 2024: all polyhaline marsh (mean 0.0135; 24 sites) to all cooler mesohaline marsh (0.052; 39 sites); the target is a 70:30 mix
+Wetland: Estuarine Emergent,California,0.058,0.0135,0.161,Arias-Ortiz et al. 2024: all polyhaline marsh (0.0135) to all warm mesohaline marsh (0.161; 8 sites); the target is a 70:30 mix
+Wetland: Estuarine Emergent,Gulf and South Atlantic,0.111,0.062,0.21,Target: Krauss et al. 2016 Louisiana brackish marsh tower (the class taken as brackish). Low: half salt and half brackish marsh. High: a third of the class as fresh and oligohaline marsh at 0.40
+Wetland: Estuarine Emergent,Mid-Atlantic,0.033,0.0135,0.052,Arias-Ortiz et al. 2024: all polyhaline marsh (0.0135) to all cooler mesohaline marsh (0.052); the target is a 50:50 mix
+Wetland: Estuarine Emergent,Northeast,0.025,0.0135,0.052,Arias-Ortiz et al. 2024: all polyhaline marsh (0.0135) to all cooler mesohaline marsh (0.052); the target is a 70:30 mix
+Wetland: Estuarine Emergent,CONUS,0.03,0.0135,0.135,Arias-Ortiz et al. 2024: polyhaline mean (0.0135) to the 75th percentile of 108 conterminous tidal marsh sites (0.135); the target is their median
+Wetland: Palustrine Emergent,West,0.18,0.095,0.257,"IPCC 2013 Wetlands Supplement Table 5.4, temperate inland mineral soil: the 95% confidence interval of the default (0.176 +/- 0.081)"
+Wetland: Palustrine Emergent,Interior Plains,0.075,0.04,0.176,Low: Bansal et al. 2023 region-wide Prairie Pothole rate (0.85 mg CH4 m-2 h-1 over a 266 day season). High: the IPCC temperate mineral soil default (0.176)
+Wetland: Palustrine Emergent,Coastal Plains,0.4,0.25,0.55,Delwiche et al. 2021 subtropical towers: the mean 0.401 less and plus one standard deviation (0.146; 39 site-years). Warm tidal fresh marsh runs higher (Arias-Ortiz 1.29)
+Wetland: Palustrine Emergent,Eastern Mountains and Upper Midwest,0.27,0.1,0.47,Knox et al. 2019 temperate freshwater towers: the interquartile range (0.100 to 0.473; 47 site-years)
+Wetland: Spruce/Fir Group,,0.09,0.005,0.19,Low: Great Dismal Swamp Atlantic white cedar peat soils (0.005). High: SOCCR2 forested peatland mean plus two standard errors (0.089 + 2 x 0.052)
+Wetland: Oak/Gum/Cypress Group,,0.27,0.11,0.43,SOCCR2 (Kolka et al. 2018) forested mineral soil wetland: the mean 0.269 less and plus two standard errors (0.080; 16 studies). Single sites run 0.17 to 1.35
+Wetland: Elm/Ash/Cottonwood Group,,0.27,0.06,0.43,"Low: Pulliam 1993 Georgia floodplain as a whole (0.17 in the wettest 30%, which gave more than 90% of the methane). High: SOCCR2 forested mineral mean plus two standard errors"

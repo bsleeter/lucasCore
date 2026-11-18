@@ -26,7 +26,7 @@ opt <- read_ds("BuildOptions"); y1 <- opt$EndYear[1]
 ic <- as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", optional = TRUE, lookupsAsFactors = FALSE))
 if (!nrow(ic) || is.na(ic$StratumFileName[1])) fail("no strata rasters: this scenario must depend on a Build result")
 P <- rast(ic$StratumFileName[1])
-fm <- climate_flows(read_ds("ClimateOptions"), STAGE)
+wopt <- wetland_settings(); fm <- climate_flows(read_ds("ClimateOptions"), STAGE, c(`Q10 Wetland CH4` = wopt$MethaneQ10, `Q10 Wetland Soil` = wopt$SoilQ10))   # (Carbon Assumptions: Wetland Methane)
 
 # ---- the run: SSP, model and replicate --------------------------------------------------------------------------------------
 pc <- as.data.table(datasheet(scn, ds("ProjectionClimate"), optional = TRUE, lookupsAsFactors = FALSE))
@@ -58,7 +58,7 @@ if (nrow(fm)) {
   } else member <- rep_name
   label <- sprintf("LOCA2 %s %s %s", gcm, member, sc_name)
   say("Projection climate: %s, %d-%d (the Build's historical end is %d)", label, y1 + 1, last, y1)
-  prm <- climate_params(fm, P, STAGE)
+  prm <- climate_params(fm, P, STAGE, ic$StateClassFileName[1])
   if (any(vapply(.checks, function(x) x$Status != "Pass", TRUE))) finish_checks()
 }
 progressBar()
@@ -132,11 +132,11 @@ progressBar()
 # ---- outputs: the projection years only (the Build's summary rows are not carried into this result) ------------------------
 if (nrow(out$rows) && "Climate" %in% stsim_list("FlowMultiplierType")$Name) out$rows[, FlowMultiplierTypeId := "Climate"]
 # this scenario's rows hide the Build's, so the Build's Site Productivity and Grass and Shrub Productivity multipliers (stage 8) come along
-spm <- dependency_multipliers(c("Site Productivity", "Grass and Shrub Productivity", "Cropland Productivity", "Crop Harvest", "Crop Mix", "Tidal Marsh Productivity"))
+spm <- dependency_multipliers(c("Site Productivity", "Grass and Shrub Productivity", "Cropland Productivity", "Crop Harvest", "Crop Mix", "Tidal Marsh Productivity", "Marsh Salinity"))
 spv <- opt$SiteProductivity[1]
 if (is.null(spm) && !is.null(spv) && !is.na(spv) && (identical(suppressWarnings(as.integer(spv)), 2L) || startsWith(as.character(spv), "TreeMap")))
   fail("Site Productivity is on in the Build Options, but no dependency has its flow multiplier: depend on a Build result that ran stage 8")
-if (!is.null(spm)) { out$rows <- rbind(out$rows, spm[, intersect(names(spm), c("Timestep", "FlowGroupId", "FlowMultiplierTypeId", "MultiplierFileName")), with = FALSE], fill = TRUE)
+if (!is.null(spm)) { out$rows <- rbind(out$rows, spm[, intersect(names(spm), c("Iteration", "Timestep", "FlowGroupId", "FlowMultiplierTypeId", "MultiplierFileName")), with = FALSE], fill = TRUE)
   say("%s: the Build's flow multiplier carried over (%s)", paste(unique(spm$FlowMultiplierTypeId), collapse = " and "), paste(unique(spm$FlowGroupId), collapse = ", ")) }
 if (nrow(out$rows)) write_stsim(out$rows, "FlowSpatialMultiplier")
 if (nrow(out$summ)) write_ds(out$summ[, .(Timestep, FlowGroup, Model, Climate, Mean = round(Mean, 4), Min, Max)], "OutputClimateSummary")

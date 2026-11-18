@@ -8,7 +8,7 @@
 #   2. "Quick test: <N> years": tools/new-historical.R --build=<1's result> --also=<Stock-Flow Definitions>,<the Build result> --years=N
 # and runs both, printing the result ids and minutes. Inputs come from the Build result as it ran: to test an option, change it in
 # the Build scenario and use --options, which copies that scenario's options sheets into the quick test first.
-# Usage: Rscript tools/quick-test.R <library.ssim> --stages=8[,3,...] [--build=<Build result id>] [--years=10] [--options] [--no-run]
+# Usage: Rscript tools/quick-test.R <library.ssim> --stages=8[,3,...] [--build=<Build result id>] [--years=10] [--iterations=<n>] [--options] [--no-run]
 #   --build    the Build result to start from (default: the newest result whose name starts with "Build")
 #   --options  the Build scenario's current options sheets (its parent's), not the result's copies
 #   --no-run   make the scenarios only
@@ -39,8 +39,8 @@ saveDatasheet(S, data.frame(StageNameId = pick, RunOrder = seq_along(pick)), "co
 # copied from the result, or with --options from the Build scenario (its current options)
 src_id <- bid
 if ("--options" %in% a) { src_id <- sc[ScenarioId == bid, ParentId]; if (is.na(src_id)) stop("--options: the Build result has no parent scenario") }
-for (sh in paste0("lucasCore_", c("BuildOptions", "ClimateOptions", "GrowthOptions", "CarbonOptions", "FireOptions", "HarvestAgeOptions", "ReforestationOptions", "StudyAreaOptions"))) {
-  x <- datasheet(scenario(L, src_id), sh, optional = TRUE); if (nrow(x)) saveDatasheet(S, x, sh) }
+for (sh in paste0("lucasCore_", c("BuildOptions", "ClimateOptions", "GrowthOptions", "CarbonOptions", "FireOptions", "HarvestAgeOptions", "ReforestationOptions", "StudyAreaOptions", "WetlandOptions", "WetlandMethaneTarget", "MarshSalinityTarget"))) {   # (the Wetland Methane page, 2026-11-17)
+  x <- tryCatch(datasheet(scenario(L, src_id), sh, optional = TRUE), error = function(e) NULL); if (!is.null(x) && nrow(x)) saveDatasheet(S, x, sh) }   # (a library made before a sheet has none)
 description(S) <- sprintf("Quick test (tools/quick-test.R): reruns %s on top of Build result %d, which supplies everything else.", paste(pick, collapse = "; "), bid)
 cat(sprintf("scenario %d: %s, on Build result %d\n", scenarioId(S), paste(pick, collapse = "; "), bid))
 if ("--no-run" %in% a) quit(save = "no")
@@ -49,7 +49,7 @@ cat(sprintf("stages: %.1f min, result %d\n", as.numeric(difftime(Sys.time(), t0,
 
 # 2. the short run
 rs <- system2(file.path(R.home("bin"), "Rscript"), c(shQuote(file.path(here, "new-historical.R")), shQuote(lib), sprintf("--build=%d", r1), sprintf("--also=%s", paste(c(if (!is.na(sfd)) sfd, bid), collapse = ",")),
-              sprintf("--years=%d", yrs), "--historical-only", "--raster-every=0", "--replace", shQuote(sprintf("--name=Quick test: %d years", yrs))), stdout = TRUE, stderr = TRUE)
+              sprintf("--years=%d", yrs), if (nzchar(opt("iterations", ""))) sprintf("--iterations=%s", opt("iterations", "")), "--historical-only", "--raster-every=0", "--replace", shQuote(sprintf("--name=Quick test: %d years", yrs))), stdout = TRUE, stderr = TRUE)
 cat(rs, sep = "\n"); hid <- suppressWarnings(as.integer(trimws(tail(rs, 1)))); if (is.na(hid)) stop("new-historical.R did not make the run")
 t0 <- Sys.time(); R2 <- run(scenario(L, hid)); cat(sprintf("historical: %.1f min, result %d\n", as.numeric(difftime(Sys.time(), t0, units = "mins")), scenarioId(R2)))
 cat(r1, scenarioId(R2), "\n")

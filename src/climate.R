@@ -5,6 +5,8 @@
 #   Forest growth      None | Miami NPP | Tree ring (default)
 #   Non-forest growth  None | Miami NPP | RAP fit (default)
 #   Decomposition      None | Q10 (default)
+#   Wetland growth     None | Miami NPP | Temperature (default) | Temperature and Miami NPP: emergent marsh, the flow group Net Growth
+#                      Wetland: Total (to-do 54, 2026-11-16). Forested wetlands grow on the forest flows and take Forest growth
 #   Miami NPP   forest NPP = min(f(MAT), f(MAP)), non-forest NPP = f(MAP) (Lieth 1975); multiplier = year / normal
 #   Tree ring   1 + PrecipCoef (P/Pn - 1) + PrecipLagCoef (P last year/Pn - 1) + TempCoef (T - Tn), coefficients by ecodivision
 #               (defaults/climate/tree-ring-coefficients.csv, tools/make_tree_ring_coefficients.R)
@@ -14,28 +16,42 @@
 #               s_k = (season k's rain - its normal) / the water year's normal, for Oct-Dec, Jan-Mar, Apr-Jun, Jul-Sep of the
 #               October-September water year; pl = last water year / normal - 1; ar = log(water-year normal / 500 mm), clamped to the
 #               range the ecodivision's fit saw. PRISM monthly in stage 7; LOCA2 monthly in stage 11
+#   Temperature the temperature term of Miami NPP alone, f(T) / f(Tn) with f = 1 / (1 + exp(1.584 - 0.0622 T)): about 4% more growth
+#               per degree C near 15 C. For tidal marsh, which tides and rivers water (rain is a poor driver of its growth)
+#   Temperature and Miami NPP   Temperature in the cells that start as estuarine emergent marsh, Miami NPP (the smaller of its
+#               temperature and precipitation terms) in every other cell: inland marsh
 #   Q10         Q10 ^ ((T - Tn) / 10), Q10 read from the CBM DOM table for the listed pools (the same values stage 3 uses)
 #   None        no multiplier: the flow runs at normal climate every year
 # Every multiplier is an anomaly against the 1991-2020 normal of its own data, so 1.0 means "the climate the curves and decay rates
 # were fitted to" for PRISM years and LOCA2 years alike (the delta method).
 # =============================================================================
 
+WETLAND_GROWTH <- c("None", "Miami NPP", "Temperature", "Temperature and Miami NPP")   # Climate Options: Wetland Growth, 1 to 4
+TIDAL_MARSH_CLASS <- "Wetland: Estuarine Emergent"
 # the flow groups and model of each climate effect, from Climate Options; None effects dropped
-climate_flows <- function(co, stage) {
+climate_flows <- function(co, stage, q10 = NULL) {   # q10: fixed Q10s by flow group that replace the table's (Wetland Methane)
   choice <- function(v, labels) { v <- v[1]; if (is.null(v) || is.na(v)) return(NA_character_)
     if (is.numeric(v)) labels[v] else labels[match(tolower(v), tolower(labels))] }
   model <- c(ForestGrowth = choice(co$ForestGrowthModel, c("None", "Miami NPP", "Tree ring")),
              NonForestGrowth = choice(co$NonForestGrowthModel, c("None", "Miami NPP", "RAP fit")),
-             Decomposition = choice(co$DecompositionModel, c("None", "Q10")))
+             Decomposition = choice(co$DecompositionModel, c("None", "Q10")),
+             WetlandGrowth = choice(co$WetlandGrowthModel, WETLAND_GROWTH))
+  # a scenario or library from before the choice (no value): the default, as the Climate Options page shows it
+  if (is.na(model[["WetlandGrowth"]])) model[["WetlandGrowth"]] <- WETLAND_GROWTH[3]
   if (anyNA(model)) fail("Climate Options: unrecognised choice for %s", paste(names(model)[is.na(model)], collapse = ", "))
   fm <- read_default("climate", "flow-multipliers.csv"); fg <- stsim_list("FlowGroup")$Name
+  # a group with its own fixed Q10 (Q10 Wetland CH4) that a library made before it lacks is left out: its flows then run at 1
+  if (!"Q10" %in% names(fm)) fm[, Q10 := NA_character_]
+  for (g in intersect(names(q10), fm$FlowGroupId)) if (!is.na(q10[[g]]) && !isTRUE(all.equal(as.numeric(fm[FlowGroupId == g, Q10]), q10[[g]]))) { say("%s: Q10 %s set by the scenario (Wetland Methane; the package value is %s)", g, format(q10[[g]]), fm[FlowGroupId == g, Q10]); fm[FlowGroupId == g, Q10 := as.character(q10[[g]])] }
+  old <- !is.na(fm$Q10) & !fm$FlowGroupId %in% fg
+  if (any(old)) { say("Not in this library (it predates them), so no multiplier: %s", paste(fm$FlowGroupId[old], collapse = "; ")); fm <- fm[!old] }
   check(stage, "every climate flow group exists", all(fm$FlowGroupId %in% fg), paste(setdiff(fm$FlowGroupId, fg), collapse = "; "))
   fm[, Model := model[Role]]
-  say("Climate Options: forest growth = %s; non-forest growth = %s; decomposition = %s", model[["ForestGrowth"]], model[["NonForestGrowth"]], model[["Decomposition"]])
+  say("Climate Options: forest growth = %s; non-forest growth = %s; wetland growth = %s; decomposition = %s", model[["ForestGrowth"]], model[["NonForestGrowth"]], model[["WetlandGrowth"]], model[["Decomposition"]])
   fm[Model != "None"] }
 
 # the parameters the models need on the model grid P: Q10 by flow group, tree-ring and RAP fit coefficients by primary stratum
-climate_params <- function(fm, P, stage) {
+climate_params <- function(fm, P, stage, state_class_file = NULL) {
   # Q10s from Carbon Assumptions: Dead Organic Matter Parameters (to-do 21; package default = CBM-CFS3's). The pools of one climate flow
   # group must share a Q10; where ecodivision rows give a group a different Q10, it is a raster on the model grid (P holds stratum ids).
   dpt <- read_dom_parameters(); stl <- stsim_list("Stratum")
@@ -44,6 +60,7 @@ climate_params <- function(fm, P, stage) {
   q_at <- function(pools, st) { x <- dpt[!is.na(StratumId) & StratumId %in% st & Pool %in% pools]; x <- rbind(x, dpt[is.na(StratumId) & Pool %in% setdiff(pools, x$Pool)])
     unique(round(x$Q10, 4)) }
   q10 <- setNames(lapply(seq_len(nrow(fm)), function(i) { if (fm$Model[i] != "Q10") return(NA_real_)
+    if ("Q10" %in% names(fm) && !is.na(fm$Q10[i]) && nzchar(fm$Q10[i])) { say("%s: Q10 %s (defaults/climate/flow-multipliers.csv)", fm$FlowGroupId[i], fm$Q10[i]); return(as.numeric(fm$Q10[i])) }
     pools <- unique(pool_of[strsplit(fm$CbmPools[i], "|", fixed = TRUE)[[1]]]); base <- q_at(pools, NA_character_)
     ss <- unique(na.omit(dpt[Pool %in% pools, StratumId])); qs <- lapply(ss, function(s) q_at(pools, s))
     if (length(base) != 1 || any(lengths(qs) != 1)) { check(stage, sprintf("the dead pools of %s (%s) share one Q10 (Dead Organic Matter Parameters)", fm$FlowGroupId[i],
@@ -71,7 +88,13 @@ climate_params <- function(fm, P, stage) {
         paste(sprintf("%s %s/%s/%s/%s/%s/%s x%s (%s)", used$StratumId, used$OndCoef, used$JfmCoef, used$AmjCoef, used$JasCoef, used$PrecipLagCoef,
                       used$TempCoef, used$Scale, used$Source), collapse = "; "))
   }
-  list(q10 = q10, coef = coef, coef_r = coef[["Tree ring"]]) }
+  # Wetland growth = Temperature and Miami NPP: the cells that start as estuarine emergent marsh (the scenario's state class map)
+  tidal <- NULL
+  if ("Temperature and Miami NPP" %in% fm$Model) { scl <- stsim_list("StateClass"); id <- as.integer(scl$Id[match(TIDAL_MARSH_CLASS, scl$Name)])
+    if (is.null(state_class_file) || is.na(state_class_file) || !file.exists(state_class_file) || is.na(id)) { say("Wetland growth: no state class map (or no %s class), so every marsh cell takes Miami NPP", TIDAL_MARSH_CLASS)
+    } else { S <- rast(state_class_file); tidal <- mask(ifel(!is.na(S) & S == id, 1, 0), P)
+      say("Wetland growth: %d cells start as estuarine emergent marsh and take the temperature response; every other cell Miami NPP", as.integer(global(tidal, "sum", na.rm = TRUE)[[1]])) } }
+  list(q10 = q10, coef = coef, coef_r = coef[["Tree ring"]], tidal = tidal) }
 
 # the RAP fit columns of defaults/climate/rap-climate-coefficients.csv, by the names emit() uses
 RAP_COEF <- c(ond = "OndCoef", jfm = "JfmCoef", amj = "AmjCoef", jas = "JasCoef", bl = "PrecipLagCoef", bt = "TempCoef",
@@ -81,6 +104,7 @@ RAP_SEASONS <- list(ond = 10:12, jfm = 1:3, amj = 4:6, jas = 7:9)   # months of 
 # what emit() takes for RAP fit: S, the year's rain by season (a list by RAP_SEASONS); S1, last year's; Sn, the 1991-2020 normals
 rap_water_year <- function(S, S1, Sn) list(S = S, Sn = Sn, Pn = Reduce(`+`, Sn), Pl = Reduce(`+`, S1))
 
+miami_t <- function(t) 2540 / (1 + exp(1.584 - 0.0622 * t))   # the temperature term of Miami NPP (Lieth 1975), alone
 miami <- function(t, p, forest) { if (!forest) return(6116 * (1 - exp(-6.05e-5 * p)))
   min(2540 / (1 + exp(1.584 - 0.0622 * t)), (0.551 * p^1.055) / exp(0.000306 * p)) }
 climate_normals <- function(Tn, Pn) list(forest = miami(Tn, Pn, TRUE), nonforest = miami(Tn, Pn, FALSE))
@@ -112,7 +136,10 @@ climate_emitter <- function(fm, P, prm) {
         pl <- to_grid(wy$Pl / wy$Pn - 1, fill = 0)
         max(1 + (cf$ond + cf$ond_a * ar) * s$ond + (cf$jfm + cf$jfm_a * ar) * s$jfm + (cf$amj + cf$amj_a * ar) * s$amj + cf$jas * s$jas +
               (cf$bl + cf$bl_a * ar) * pl + cf$bt * to_grid(Ty - Tn, fill = 0), 0)
-      } else if (md == "Miami NPP") { forest <- fm$Role[j] == "ForestGrowth"; to_grid(miami(Ty, Py, forest) / nrm[[if (forest) "forest" else "nonforest"]])
+      } else if (md == "Miami NPP") { forest <- fm$Role[j] %in% c("ForestGrowth", "WetlandGrowth"); to_grid(miami(Ty, Py, forest) / nrm[[if (forest) "forest" else "nonforest"]])   # marsh: the smaller of the temperature and precipitation terms, as forest
+      } else if (md == "Temperature") { to_grid(miami_t(Ty) / miami_t(Tn))
+      } else if (md == "Temperature and Miami NPP") { rm <- to_grid(miami(Ty, Py, TRUE) / nrm$forest)
+        if (is.null(prm$tidal)) rm else { rt <- to_grid(miami_t(Ty) / miami_t(Tn)); x <- ifel(prm$tidal == 1, rt, rm); attr(x, "unfilled") <- max(attr(rm, "unfilled"), attr(rt, "unfilled")); x }
       } else { q <- prm$q10[[g]]; if (inherits(q, "SpatRaster")) q^(to_grid(Ty - Tn, fill = 0) / 10) else to_grid(q^((Ty - Tn) / 10)) }   # Q10 by ecodivision: a raster
       if (!is.null(attr(r, "unfilled"))) e$unfilled <- max(e$unfilled, attr(r, "unfilled"))
       r <- round(r, 3)

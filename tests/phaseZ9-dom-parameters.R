@@ -69,7 +69,7 @@ local({
   Pg <- rast(nrows = 1, ncols = 2, vals = c(1L, 2L))
   base <- fread(file.path(pkg, "defaults/cbm/dom-parameters.csv"), na.strings = "")[, .(StratumId = NA_character_, Pool, BaseDecayRate, ReferenceTemperature, Q10, ShareEmitted, TransferToBGSlow)]
   env$read_dom_parameters <- function() base; p0 <- env$climate_params(fm, Pg, "t")
-  expect("climate Q10s by default: 2.65 fast, 2.0 slow, single numbers", identical(unname(unlist(p0$q10)), c(2.65, 2)))
+  expect("climate Q10s by default: 2.65 fast, 2.0 slow, and the emergent wetland soil CO2 (2.0) and methane (3.83) values of their own, single numbers", identical(unname(unlist(p0$q10)), c(2.65, 2, 2, 3.83)))
   mm <- rbind(base, base[Pool %in% c("AG Very Fast", "AG Slow")][, `:=`(StratumId = "Marine Mountains", Q10 = 3.0)])
   env$read_dom_parameters <- function() mm; p1 <- env$climate_params(fm, Pg, "t")
   q <- p1$q10[["Q10 Fast Flows"]]

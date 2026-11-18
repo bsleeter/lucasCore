@@ -142,6 +142,30 @@ namespace lucasCoreUI
             return l;
         }
 
+        // the Wetland Methane page's cap and class targets in this scenario (Carbon Assumptions > Wetland Methane), which change how an
+        // emergent wetland's soil and root litter emission is split between CO2 and CH4; a library without the sheets has none
+        private static readonly string[] MethaneRegions = { "Pacific Northwest", "California", "Gulf and South Atlantic", "Mid-Atlantic", "Northeast", "CONUS", "West", "Interior Plains", "Coastal Plains", "Eastern Mountains and Upper Midwest" };
+        private NonForestBudget.MethaneInput Methane()
+        {
+            var m = new NonForestBudget.MethaneInput();
+            try
+            {
+                DataSheet o = this.Scenario.GetDataSheet("lucasCore_WetlandOptions"), t = this.Scenario.GetDataSheet("lucasCore_WetlandMethaneTarget");
+                DataRow first = CarbonPages.Rows(o).FirstOrDefault();
+                if (first != null && first["MethaneCapShare"] != DBNull.Value) m.Cap = Convert.ToDouble(first["MethaneCapShare"]);
+                Dictionary<int, string> cls = CarbonPages.Names(t, "StateClassId"); string c;
+                foreach (DataRow x in CarbonPages.Rows(t))
+                {
+                    if (x["StateClassId"] == DBNull.Value || x["Target"] == DBNull.Value || !cls.TryGetValue(Convert.ToInt32(x["StateClassId"]), out c)) continue;
+                    string r = null;
+                    if (x["Region"] != DBNull.Value) { int k = Convert.ToInt32(x["Region"]); r = k >= 1 && k <= MethaneRegions.Length ? MethaneRegions[k - 1] : "?"; }
+                    m.Targets.Add(Tuple.Create(c, r, Convert.ToDouble(x["Target"])));
+                }
+            }
+            catch (Exception) { }
+            return m;
+        }
+
         private void Draw()
         {
             if (m_viewTables.Checked || this.DataFeed == null) return;
@@ -149,12 +173,15 @@ namespace lucasCoreUI
             if (eco == null || cls == null) { m_diagram.Budget = null; m_budget.Text = ""; m_diagram.Invalidate(); return; }
             bool ages = NonForestBudget.HasAges(eco, cls);
             m_age.Visible = m_ageLabel.Visible = m_ageNote.Visible = ages;
-            NonForestBudget b = NonForestBudget.Make(eco, cls, ages ? (int)m_age.Value : 0, SheetRows(Sheet, "Value", true), SheetRows(Growth, "NetGrowth", false));
+            NonForestBudget b = NonForestBudget.Make(eco, cls, ages ? (int)m_age.Value : 0, SheetRows(Sheet, "Value", true), SheetRows(Growth, "NetGrowth", false), Methane());
             m_diagram.Budget = b; m_diagram.ShowFlux = m_flux.Checked; m_diagram.HideEmpty = m_hide.Checked;
             if (b == null) m_budget.Text = "";
             else
             {
                 string text = string.Format("Net growth (NPP) {0} Mg C/ha/yr{1}; released as CO₂ {2}", NonForestDiagram.Num(b.Growth), b.GrowthYours ? " (this page's row)" : "", NonForestDiagram.Num(b.Co2));
+                // wetland methane (lucasCore 1.5): what the class releases as CH4 at this steady state, beside its target and where the split comes from
+                if (b.HasMethane) text += string.Format(" and as CH₄ {0} ({1:0.0#}% of what soil and root litter emit; target {2} for {3}{4}{5})", NonForestDiagram.Num(b.Ch4), 100 * b.MethaneShare,
+                    NonForestDiagram.Num(b.MethaneTarget), b.MethaneRegion, b.MethaneCapped ? string.Format(", held at the cap of {0:0.#}%", 100 * b.MethaneCap) : "", b.MethaneYours ? ", set on the Wetland Methane page" : "");
                 if (b.Aquatic > 0) text += ", to water " + NonForestDiagram.Num(b.Aquatic);
                 if (b.Burial > 0) text += ", buried in deep soil " + NonForestDiagram.Num(b.Burial);
                 text += string.Format(".\nSteady state: live {0}, dead {1}, soil {2} Mg C/ha", NonForestDiagram.Num(b.Live), NonForestDiagram.Num(b.Dead), NonForestDiagram.Num(b.Soil));

@@ -21,7 +21,9 @@ if (!nrow(cc)) fail("Live-Tree Carbon Curves are empty: run stage 2 first (same 
 dc <- as.data.table(datasheet(scn, ds("OutputDecayCalibration"), optional = TRUE, lookupsAsFactors = FALSE))
 if (!nrow(dc)) fail("Decay Calibration is empty: run stage 3 first (same pipeline, or depend on a stage 3 result)")
 fm <- as.data.table(datasheet(scn, "stsim_FlowMultiplier", optional = TRUE, lookupsAsFactors = FALSE))
-fm <- fm[is.na(AgeMin) & grepl("^(Biomass Turnover|Decay|Emission|Transfer|Stabilization):", FlowGroupId) & is_forest_class(StateClassId)]
+# (the rates are the flow types' own "[Type]" groups; other multipliers on forest classes, such as the Wetland Methane uncertainty draws, are not rates)
+fm <- fm[is.na(AgeMin) & grepl("^(Biomass Turnover|Decay|Emission|Transfer|Stabilization):", FlowGroupId) & endsWith(FlowGroupId, " [Type]") & is_forest_class(StateClassId)]
+if ("Iteration" %in% names(fm)) fm <- fm[is.na(Iteration)]
 if (!nrow(fm)) fail("no forest turnover and decay flow multipliers: run stage 3 first")
 setnames(cc, c("StratumId", "StateClassId"), c("Stratum", "StateClass"))
 fo <- fread(pkg_file("defaults", "stockflow", "stsim_FlowOrder.csv"))
@@ -46,7 +48,7 @@ POOL_COLS <- c(names(LIVE_POOLS), names(DOM_POOLS))
 res <- vector("list", nrow(cells)); bal <- 0
 for (i in seq_len(nrow(cells))) { s <- cells$Stratum[i]; c0 <- cells$StateClass[i]; ri <- cells$ri[i]
   x <- fm[StratumId == s & StateClassId == c0]
-  vals <- setNames(as.numeric(x$Value), sub(" \\[Type\\]$", "", x$FlowGroupId))
+  vals <- ch4_unsplit(setNames(as.numeric(x$Value), sub(" \\[Type\\]$", "", x$FlowGroupId)))   # a wetland class's CO2 and CH4 emissions back as one (src/flows.R)
   m <- dom_matrices(vals, fo)                                   # already calibrated: no further multipliers
   live <- as.matrix(cc[Stratum == s & StateClass == c0][order(Age), names(LIVE_POOLS), with = FALSE])
   ages <- cc[Stratum == s & StateClass == c0][order(Age), Age]

@@ -47,3 +47,8 @@ Net Growth Agriculture: Total,Net uptake of carbon by cropland and pasture (NASS
 Harvest: Agriculture,Carbon removed from cropland and pasture by crop harvest and hay and grazing removal,,
 LULC: Emission Peat,Peat burned by fire,,
 LULC: Emission Peat (CO2e),Peat burned by fire (CO2e),,
+Q10 Wetland Soil,Temperature response of CO2 release from emergent wetland soil (BG Slow),,
+Q10 Wetland CH4,Temperature response of methane release from emergent wetland soil and root litter,,
+Emission: Wetland CH4,Methane from emergent wetlands in C,,
+Emission: Wetland CH4 (CO2e),Methane from emergent wetlands in CO2e,,
+Emission: Wetland Methane Source CO2,"CO2 from the wetland pools that also release methane, in C: soil and root litter, and in forested wetlands the forest floor (the flows a marsh salinity or methane uncertainty multiplier adjusts)",,

@@ -27,6 +27,8 @@ guide's numbers and figures) after them, so it is redone only once. Within that,
 | any | 49 Test national mode end to end | No | Added 2026-11-04. Never run end to end; fills about 175 GB overnight | 12 (done) |
 | next | 51 After the 1.1.0 release: P26 rebuild and rerun (moved and synced 2026-11-06), Puget parents to Build 58, guide sections, code.usgs.gov resync, safeguards | Only the P26 rerun | Added 2026-11-05: what the release left | 43 (done) |
 | open, paused | 50 Water, wetland and barren change | Yes (historical and projected land change, wetland carbon) | Added 2026-11-05. Not modelled today; P26 swaps about 150 km2 each way between water and land (reservoirs), Puget has river bars, ponds and shoreline wetland change | - |
+| later | 66 Marsh elevation for tidal marsh methane (a relative tidal elevation map, as salinity came from LANDFIRE) | Yes (methane of oligohaline marsh outside the Gulf and South Atlantic) | Added 2026-11-16 (user: "mark the tidal elevation map as future work in this branch"), on the wetland methane branch. In cooler regions high marsh emits a tenth of low and mid marsh; the model uses one site-weighted value | The wetland methane branch (marsh salinity, stage 8) |
+| later | 67 Monthly temperature for the wetland Q10s and the marsh growth response | Yes (methane, wetland soil CO2 and marsh growth in years and places with warm summers) | Added 2026-11-16 (user), on the wetland methane branch. The multipliers use the annual mean temperature, which understates a curved response | PRISM monthly mean temperature in the Data Download |
 
 Finished items were removed from this list on 2026-11-05 at the user's request: 1-12, 15-25, 28-30, 32, 34, 35, 37, 40, 41, 42, 43, 45, 48 (42 the Fill prompt's grassland table names and 48 gNATSGO wording, both done 2026-11-05; 43 the historical land-use and harvest shortfall, verified on Puget and released in 1.1.0, its follow-ups in 51; item 10 went into 35; the text is in git history). Removed by the user without being done: 13, the Calaveras demo bundle (which library serves as the demo is undecided, not Puget, which has no fire), and 26, 27, 31, 33, 36, 38, 44.
 Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions by class pair, Ag Change, targets from a historical run, USGS release files, data release stages 16-17; v1.0.1 2026-11-02, v1.0.0 the same day); the repo is public, so push only when the user asks.
@@ -1082,6 +1084,13 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     eddy flux at marsh sites such as AmeriFlux US-Myb, US-Tw1), with sea-level rise and salinity as covariates to consider.
   - **Tests:** a quick test on a library with emergent wetland (Solano: Suisun Marsh; Calaveras has 21 inland cells), stage 7 and a
     Projection Climate result under two SSPs, checking the series against the forest and grass ones and that 1.0 holds at the normal.
+  - **BUILT 2026-11-16 on the wetland methane branch (user: option b, with the choice broken out like forest and grass and shrub):**
+    Climate Options: Wetland Growth = None / Miami NPP / Temperature / Temperature and Miami NPP (default; a scenario without a value
+    takes it). Temperature is Miami's temperature term alone, f(T) / f(Tn), about 4% per degree C; Temperature and Miami NPP gives it
+    to the cells that start as estuarine emergent marsh and Miami NPP (the smaller of its temperature and precipitation terms) to every
+    other cell. `WetlandGrowth` role row in defaults/climate/flow-multipliers.csv, src/climate.R (stages 7 and 11 pass the state class
+    map), the options page (ui/ClimateOptionsView.cs), tests/unit-wetland-climate.R. Run on the Sabine and Lacassine test library.
+    Left: option c (a fit to marsh productivity data), the library update method for the new column, and the guide.
 55. **Shrubland growth: chaparral and non-sage on different bases** - REFIT 2026-11-09 (steps 1 and 2 done; first noted the same day, user: "option 1 but note
   this for later follow up work"). Found in the Calaveras test: in the Mediterranean ecodivision non-sage shrub grows at 3.9 Mg
   C/ha/yr and chaparral at about 2.0, although RAP NPP is nearly the same for both (3.92 and 3.85).
@@ -2270,3 +2279,36 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
     ecodivisions map to it; whether `Forest Harvest: Forest Selection 20%` (thinning) gets a pulpwood-heavy product mix; whether
     fuelwood counts as energy capture (the Inventory does); exports and imports (the production approach counts wood harvested here
     wherever it goes, so no trade data is needed).
+
+66. **Marsh elevation for tidal marsh methane** - TO DO (future work), added 2026-11-16 on the wetland methane branch (user: "Lets
+    mark the tidal elevation map as future work in this branch").
+    - Why: Arias-Ortiz et al. 2024 (Table 3, given by the user 2026-11-16) split fresh-oligohaline tidal marsh at or under a
+      daily-maximum temperature normal of 25.6 C by marsh elevation: low and mid marsh 54.9 g CH4 per m2 per yr (20 sites; 0.412 Mg C
+      per ha per yr as CH4) against high marsh 5.3 (10 sites; 0.040), a tenfold difference. The model has no marsh elevation, so
+      `defaults/stockflow/marsh-salinity-ch4.csv` uses their site-weighted mean, 0.288, for oligohaline marsh in every region but
+      the Gulf and South Atlantic. The warm group (above 25.6 C; 7 sites; 1.286) has no elevation split in the table, so the Gulf
+      values would not change.
+    - How: a relative tidal elevation map for the conterminous US at 30 m exists (Holmquist and Windham-Myers, relative tidal marsh
+      elevation Z* for 2010; ORNL DAAC Coastal_US_Elevation_Data; also in the USGS coastal wetland collection). Not read or
+      downloaded yet: its classes against the paper's low, mid and high marsh are to be checked. It would come in as salinity did
+      (stage 8, `src/8-initial-stocks-spatial.R`, Marsh salinity): a Data Sources entry and a Data Download dataset, the share of
+      each estuarine emergent cell's pixels in each elevation class, and a zone table by salinity and elevation, feeding the same
+      pair of Marsh Salinity flow spatial multipliers (methane up or down, CO2 the other way, the cell's decomposition unchanged).
+    - Open: whether the paper's elevation classes can be reproduced from Z*; whether the palustrine emergent class (tidal fresh
+      marsh) should take an elevation value too; the mesohaline and polyhaline groups have no elevation split in the table.
+
+67. **Monthly temperature for the wetland Q10s (and the marsh growth response)** - TO DO, added 2026-11-16 on the wetland methane
+    branch (user: "Add monthly temp as another to do in this work").
+    - Why: the wetland multipliers are written from the year's mean temperature against the 1991-2020 normal: methane
+      3.83 ^ ((T - Tn) / 10), wetland soil CO2 2.0 ^ ((T - Tn) / 10), marsh growth f(T) / f(Tn) (src/climate.R). A response this
+      curved is not the response at the mean: the year's flux is the sum of the months', and warm months count for more than cool
+      ones take away. Where summers are warm and winters cold the annual-mean form understates how much a warm summer adds (and a
+      warm winter adds little methane). The 3.83 is Yvon-Durocher et al.'s 0.96 eV between 10 and 20 C; it is 4.22 between 0 and 10
+      C and 3.50 between 20 and 30 C, so a monthly form could also use the activation energy itself in place of one Q10.
+    - How: PRISM monthly mean temperature is not downloaded today (stage 7 reads monthly precipitation for the RAP fit; the Data
+      Download would add monthly-us25m/tmean), and LOCA2 is monthly already (stage 11). The year's multiplier = the mean over months
+      of Q10 ^ ((Tm - Tnm) / 10) weighted by the normal month's share of the year's flux (itself Q10 ^ ((Tnm - Tn) / 10)), so it is
+      still 1 at the normal climate. One function in src/climate.R for both stages, behind the existing groups (Q10 Wetland CH4, Q10
+      Wetland Soil, Net Growth Wetland: Total); the dead-pool Q10 groups of every other class could take it too, a wider change.
+    - Open: whether to keep Q10 or move to the activation energy; whether Chang et al. 2021's seasonal hysteresis (a different
+      response in the warming and the cooling half of the year) is worth representing; the cost of 12 times the climate rasters read.

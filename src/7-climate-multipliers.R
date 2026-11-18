@@ -24,9 +24,9 @@ if (!nrow(ic) || is.na(ic$StratumFileName[1])) fail("no strata rasters: run stag
 P <- rast(ic$StratumFileName[1])
 home_coverage(P)   # Data Sources read from the home folder must hold the study area (shared.R)
 
-fm <- climate_flows(read_ds("ClimateOptions"), STAGE)
+wopt <- wetland_settings(); fm <- climate_flows(read_ds("ClimateOptions"), STAGE, c(`Q10 Wetland CH4` = wopt$MethaneQ10, `Q10 Wetland Soil` = wopt$SoilQ10))   # (Carbon Assumptions: Wetland Methane)
 if (!nrow(fm)) { say("Every climate effect is None: no climate multipliers written (every flow runs at normal climate)"); finish_checks(); progressBar(type = "end"); quit(save = "no") }
-prm <- climate_params(fm, P, STAGE)
+prm <- climate_params(fm, P, STAGE, ic$StateClassFileName[1])
 if (any(vapply(.checks, function(x) x$Status != "Pass", TRUE))) finish_checks()
 progressBar()
 
@@ -70,8 +70,8 @@ progressBar()
 if ("Climate" %in% stsim_list("FlowMultiplierType")$Name) out$rows[, FlowMultiplierTypeId := "Climate"]   # its own Flow Multiplier Type, so stage 8's Site Productivity multiplies with it (a library without the type: tools/sync-library.R)
 # rerun on its own (tools/quick-test.R), this result's rows hide the Build's: bring its Site Productivity and Grass and Shrub
 # Productivity multipliers (stage 8) along. In a Build the dependencies hold none, and stage 8 replaces its own types after this
-spm <- dependency_multipliers(c("Site Productivity", "Grass and Shrub Productivity", "Cropland Productivity", "Crop Harvest", "Crop Mix", "Tidal Marsh Productivity"))
-if (!is.null(spm)) { out$rows <- rbind(out$rows, spm[, intersect(names(spm), c("Timestep", "FlowGroupId", "FlowMultiplierTypeId", "MultiplierFileName")), with = FALSE], fill = TRUE)
+spm <- dependency_multipliers(c("Site Productivity", "Grass and Shrub Productivity", "Cropland Productivity", "Crop Harvest", "Crop Mix", "Tidal Marsh Productivity", "Marsh Salinity"))
+if (!is.null(spm)) { out$rows <- rbind(out$rows, spm[, intersect(names(spm), c("Iteration", "Timestep", "FlowGroupId", "FlowMultiplierTypeId", "MultiplierFileName")), with = FALSE], fill = TRUE)
   say("%s: the dependency's flow multiplier carried over (%s)", paste(unique(spm$FlowMultiplierTypeId), collapse = " and "), paste(unique(spm$FlowGroupId), collapse = ", ")) }
 write_stsim(out$rows, "FlowSpatialMultiplier")
 keep_ic_properties(scn, ic, 7)

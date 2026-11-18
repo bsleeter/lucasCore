@@ -12,6 +12,11 @@
 // steady state moves, from the stock at the start of that flow's step (Edge.Base). Deep soil only accumulates. With the package rates
 // it lands on the Build's starting pools. (Before 2026-11-06 this solved stock = inputs / loss, which ignores the order: emergent
 // wetlands, which grow at order 1 and die back at 6, showed live 36 and dead 49 Mg C/ha instead of ST-Sim's 4.9 and 17.4.)
+// Wetland methane (lucasCore 1.5): an emergent wetland's soil and root litter each have a CO2 flow ("-> Atmosphere (Wetland)") and a CH4
+// flow ("-> Atmosphere CH4"), two shares of the pool's loss. Both go to the atmosphere here, the CH4 one marked (Edge.Gas). The split
+// is the package's fitted one unless the Wetland Methane page sets the class's target or a cap the fitted share exceeds: then, as
+// stage 3 does (src/3-carbon-flows.R), the methane fraction is the target over the class's belowground emission
+// (defaults/stockflow/emergent-wetland-fit.csv), held at the cap, and each pool's emission is split by it.
 // =============================================================================
 using System;
 using System.Collections.Generic;
@@ -39,13 +44,20 @@ namespace lucasCoreUI
         private static readonly Regex Flow = new Regex(@"^(Net Growth[^:]*|Biomass Turnover|Decay|Emission|Transfer|Lateral Transport|Stabilization): (.+?) -> (.+?) \[Type\]$");
         private static readonly Regex Total = new Regex(@"^(.+?) ->$");
 
-        public class Edge { public string Kind, From, To, Group; public double Entered, Rate, Flux, Base, Order; public bool Yours; }
-        public class Pool { public string Key, Label; public int Col; public bool Above; public double Stock, In, Out, Co2, Aquatic, Total; }
+        public class Edge { public string Kind, From, To, Group, Gas; public double Entered, Rate, Flux, Base, Order; public bool Yours; }   // Gas: CO2 or CH4 on a flow to the atmosphere
+        public class Pool { public string Key, Label; public int Col; public bool Above; public double Stock, In, Out, Co2, Ch4, Aquatic, Total; }
 
         public double Growth; public bool GrowthYours, Emergent, AgeVarying;
         public readonly List<Edge> Edges = new List<Edge>();
         public readonly Dictionary<string, Pool> P = new Dictionary<string, Pool>();
         public readonly List<string> Totals = new List<string>();   // emergent pools with a total-loss group
+        // wetland methane of the class: its target (Mg C/ha/yr as CH4), the share of the belowground emission that meets it, and where they come from
+        public bool HasMethane, MethaneCapped, MethaneYours; public double MethaneTarget, MethaneShare, MethaneCap; public string MethaneRegion;
+        // the Wetland Methane page's settings: the cap, and its target rows (class, region or null for every region, target)
+        public class MethaneInput { public double Cap = 0.3; public readonly List<Tuple<string, string, double>> Targets = new List<Tuple<string, string, double>>(); }
+        private class Fit { public string Region; public double Target, Share, Bg; }
+        private static Dictionary<string, Fit> s_fit;
+        private static readonly string[] MethanePools = { "BG Slow", "BG Very Fast" };
 
         // ---- package tables, read once --------------------------------------------------------------------------------------
         private class Row { public int? Min, Max; public string Flow; public double V; }
@@ -77,7 +89,21 @@ namespace lucasCoreUI
             {
                 double v; if (r.Length >= 4 && double.TryParse(r[3], NumberStyles.Float, CultureInfo.InvariantCulture, out v)) order[r[2].Trim()] = v;
             }
-            s_rates = rates; s_growth = growth; s_order = order;
+            // the emergent wetland budgets' methane: region, package target, fitted share and belowground emission, by column name
+            var fit = new Dictionary<string, Fit>(StringComparer.OrdinalIgnoreCase);
+            List<string[]> fr = Defaults.ReadCsv(Defaults.PackageFile("defaults", "stockflow", "emergent-wetland-fit.csv"));
+            if (fr.Count > 1)
+            {
+                Func<string, int> col = n => Array.IndexOf(fr[0], n); int cs = col("StratumId"), cc = col("StateClassId"), cr = col("Region"), ct = col("CH4"), ch = col("CH4Share"), cb = col("BelowgroundEmission");
+                if (cs >= 0 && cc >= 0 && cr >= 0 && ct >= 0 && ch >= 0 && cb >= 0)
+                    foreach (string[] r in fr.Skip(1))
+                    {
+                        double t, s, bg; if (r.Length <= Math.Max(ct, Math.Max(ch, cb))) continue;
+                        if (!double.TryParse(r[ct], NumberStyles.Float, CultureInfo.InvariantCulture, out t) || !double.TryParse(r[ch], NumberStyles.Float, CultureInfo.InvariantCulture, out s) || !double.TryParse(r[cb], NumberStyles.Float, CultureInfo.InvariantCulture, out bg) || bg <= 0) continue;
+                        fit[Key(r[cs].Trim(), r[cc].Trim())] = new Fit { Region = r[cr].Trim(), Target = t, Share = s, Bg = bg };
+                    }
+            }
+            s_rates = rates; s_growth = growth; s_order = order; s_fit = fit;
         }
 
         // the classes the package has values for in an ecodivision (by name)
@@ -122,7 +148,7 @@ namespace lucasCoreUI
             return v;
         }
 
-        public static NonForestBudget Make(string eco, string cls, int age, List<SheetRow> rateRows, List<SheetRow> growthRows)
+        public static NonForestBudget Make(string eco, string cls, int age, List<SheetRow> rateRows, List<SheetRow> growthRows, MethaneInput methane = null)
         {
             Load();
             var b = new NonForestBudget();
@@ -140,18 +166,40 @@ namespace lucasCoreUI
                 values[kv.Key] = new KeyValuePair<double, bool>(v, y);
             }
             foreach (string[] p in Pools) b.P[p[0]] = new Pool { Key = p[0], Label = p[1], Col = int.Parse(p[2]), Above = p[3] == "1" };
+            // wetland methane: the class's target and fraction, and (as stage 3) the pools' emission split by a fraction of this scenario's own
+            Fit wf;
+            if (s_fit.TryGetValue(Key(eco, cls), out wf))
+            {
+                double cap = methane == null ? 0.3 : methane.Cap; double? own = null;
+                if (methane != null)
+                    foreach (bool regional in new[] { false, true })   // the class-wide row, then the region's own
+                        foreach (var t in methane.Targets.Where(x => x.Item1 == cls && (x.Item2 != null) == regional && (x.Item2 == null || string.Equals(x.Item2, wf.Region, StringComparison.OrdinalIgnoreCase)))) own = t.Item3;
+                bool refit = own.HasValue || wf.Share > cap; double target = own ?? wf.Target, share = refit ? Math.Min(target / wf.Bg, cap) : wf.Share;
+                b.HasMethane = true; b.MethaneTarget = target; b.MethaneShare = share; b.MethaneCap = cap; b.MethaneCapped = share >= cap - 1e-9; b.MethaneYours = refit; b.MethaneRegion = wf.Region;
+                if (refit)
+                    foreach (string pool in MethanePools)
+                    {
+                        string kc = "Emission: " + pool + " -> Atmosphere (Wetland) [Type]", kh = "Emission: " + pool + " -> Atmosphere CH4 [Type]";
+                        if (!values.ContainsKey(kc) || !values.ContainsKey(kh)) continue;
+                        double e = values[kc].Key + values[kh].Key;
+                        values[kh] = new KeyValuePair<double, bool>(e * share, true); values[kc] = new KeyValuePair<double, bool>(e - e * share, true);
+                    }
+            }
             // emergent wetlands: a pool's total loss, of which its outflows are shares
             var total = new Dictionary<string, double>();
             foreach (var kv in values) { Match m = Total.Match(kv.Key); string pk; if (m.Success && Names.TryGetValue(m.Groups[1].Value, out pk)) { total[pk] = kv.Value.Key; b.Totals.Add(pk); b.P[pk].Total = kv.Value.Key; } }
             b.Emergent = total.Count > 0;
             foreach (var kv in values)
             {
-                Match m = Flow.Match(kv.Key); string a, t;
-                if (!m.Success || !Names.TryGetValue(m.Groups[2].Value, out a) || !Names.TryGetValue(m.Groups[3].Value, out t)) continue;
+                Match m = Flow.Match(kv.Key); string a, t, gas = null;
+                if (!m.Success) continue;
+                string to = m.Groups[3].Value;   // a wetland's own CO2 flow and its methane flow both go to the atmosphere
+                if (to == "Atmosphere (Wetland)") to = "Atmosphere"; else if (to == "Atmosphere CH4") { to = "Atmosphere"; gas = "CH4"; }
+                if (!Names.TryGetValue(m.Groups[2].Value, out a) || !Names.TryGetValue(to, out t)) continue;
                 string kind = m.Groups[1].Value.StartsWith("Net Growth") ? "Net growth" : m.Groups[1].Value;
                 double v = kv.Value.Key, rate = kind != "Net growth" && kind != "Biomass Turnover" && total.ContainsKey(a) ? total[a] * v : v;
                 double ord; string ft = kv.Key.EndsWith(" [Type]") ? kv.Key.Substring(0, kv.Key.Length - 7) : kv.Key;
-                b.Edges.Add(new Edge { Kind = kind, From = a, To = t, Group = kv.Key, Entered = v, Rate = rate, Yours = kv.Value.Value,
+                b.Edges.Add(new Edge { Kind = kind, From = a, To = t, Group = kv.Key, Gas = t == "ATM" && kind != "Net growth" ? (gas ?? "CO2") : null, Entered = v, Rate = rate, Yours = kv.Value.Value,
                                        Order = s_order.TryGetValue(ft, out ord) ? ord : double.MaxValue });   // a flow with no order runs last
             }
             foreach (Edge e in b.Edges.Where(x => x.Kind != "Net growth" && b.P.ContainsKey(x.From))) b.P[e.From].Out += e.Rate;
@@ -189,7 +237,7 @@ namespace lucasCoreUI
                 double[] x = Gauss(Q, k.Count);
                 for (int r = 0; r < k.Count; r++) S[k[r]] = Math.Max(0, x[r]);
             }
-            foreach (Pool p in P.Values) { p.Stock = S[at[p.Key]]; p.In = 0; p.Co2 = 0; p.Aquatic = 0; }
+            foreach (Pool p in P.Values) { p.Stock = S[at[p.Key]]; p.In = 0; p.Co2 = 0; p.Ch4 = 0; p.Aquatic = 0; }
             // one year from the steady state: each flow from the stocks at the start of its order's step
             double[] cur = (double[])S.Clone();
             foreach (double o in orders)
@@ -200,7 +248,7 @@ namespace lucasCoreUI
                     double amt; if (e.Kind == "Net growth") { e.Base = 0; amt = Growth * e.Rate; } else { e.Base = start[at[e.From]]; amt = e.Rate * e.Base; cur[at[e.From]] -= amt; }
                     e.Flux = amt; int t;
                     if (at.TryGetValue(e.To, out t)) { cur[t] += amt; P[e.To].In += amt; }
-                    else if (e.Kind != "Net growth") { if (e.To == "ATM") P[e.From].Co2 += amt; if (e.To == "AQ") P[e.From].Aquatic += amt; }
+                    else if (e.Kind != "Net growth") { if (e.To == "ATM") { if (e.Gas == "CH4") P[e.From].Ch4 += amt; else P[e.From].Co2 += amt; } if (e.To == "AQ") P[e.From].Aquatic += amt; }
                 }
             }
             foreach (Edge e in Edges.Where(x => x.Rate == 0)) { e.Flux = 0; e.Base = 0; }
@@ -236,6 +284,7 @@ namespace lucasCoreUI
         public double Dead { get { return Sum(p => p.Col > 0 && p.Key != "BGS" && p.Key != "DS", p => p.Stock); } }
         public double Soil { get { return P["BGS"].Stock; } }
         public double Co2 { get { return Sum(p => true, p => p.Co2); } }
+        public double Ch4 { get { return Sum(p => true, p => p.Ch4); } }
         public double Aquatic { get { return Sum(p => true, p => p.Aquatic); } }
         public double Burial { get { return P["DS"].In; } }
     }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<package name="lucasCore" displayName="LUCAS Core (model builder)" description="Builds LUCAS land-use and carbon models in ST-Sim from national datasets (FIA growth curves; CBM carbon parameters; spatial initial conditions; historical transitions and projections)" version="1.4.1" url="https://code.usgs.gov/LUCC/lucasCore" minSyncroSimVersion="3.1.29">
+<package name="lucasCore" displayName="LUCAS Core (model builder)" description="Builds LUCAS land-use and carbon models in ST-Sim from national datasets (FIA growth curves; CBM carbon parameters; spatial initial conditions; historical transitions and projections)" version="1.5.0" url="https://code.usgs.gov/LUCC/lucasCore" minSyncroSimVersion="3.1.29">
 
 	<builtFor package="stsim" version="4.5.4"/>
 
@@ -464,6 +464,7 @@
 		<column name="ForestGrowthModel" displayName="Forest Growth (None = normal climate every year)" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP|3:Tree ring" defaultValue="3"/>
 		<column name="NonForestGrowthModel" displayName="Non-Forest Growth" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP|3:RAP fit" defaultValue="3"/>
 		<column name="DecompositionModel" displayName="Decomposition" dataType="Integer" validationType="List" formula1="1:None|2:Q10" defaultValue="2"/>
+		<column name="WetlandGrowthModel" displayName="Wetland Growth (emergent marsh)" dataType="Integer" isOptional="True" validationType="List" formula1="1:None|2:Miami NPP|3:Temperature|4:Temperature and Miami NPP" defaultValue="3"/>
 		<!-- legacy (libraries made before 2026-10-24): the LOCA2 run is now chosen in a Projection Climate scenario (stage 11); stage 7 no longer reads these -->
 		<column name="ClimateScenarioId" displayName="Projection Scenario (legacy)" dataType="Integer" isOptional="True" isVisible="False" validationType="Datasheet" formula1="lucasCore_ClimateScenario"/>
 		<column name="ClimateModelId" displayName="Projection Climate Model (legacy)" dataType="Integer" isOptional="True" isVisible="False" validationType="Datasheet" formula1="lucasCore_ClimateModel"/>
@@ -547,6 +548,36 @@
 	<dataFeed name="NonForestCarbon" displayName="Grassland, Shrubland and Wetland Carbon" viewClassName="lucasCoreUI.NonForestCarbonView" viewClassAssembly="lucasCoreUI">
 		<dataSheet name="NonForestGrowth"/>
 		<dataSheet name="NonForestRate"/>
+	</dataFeed>
+
+	<!-- Carbon Assumptions - Wetland Methane (src/wetland-params.R; to-do: the wetland methane branch, 2026-11-17): what a scenario may set about
+	     wetland methane. Blank or empty = the package values (defaults/stockflow/emergent-wetland-regions.csv, marsh-salinity-ch4.csv,
+	     defaults/spinup/wetland-ch4.csv; WETLAND_OPTION_DEFAULTS). Region names are those of emergent-wetland-regions.csv. -->
+	<dataSheet name="WetlandOptions" displayName="Wetland Options" isSingleRow="True">
+		<column name="MethaneQ10" displayName="Methane Q10 (blank = 3.83)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="1" formula2="10"/>
+		<column name="SoilQ10" displayName="Wetland Soil CO2 Q10 (blank = 2.0)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="1" formula2="10"/>
+		<column name="MethaneCapShare" displayName="Methane Cap, share of the source emission (blank = 0.3)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0.01" formula2="0.5"/>
+		<column name="MethaneCO2e" displayName="CO2e per Mg C emitted as CH4 (blank = 33.5)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="3.67" formula2="200"/>
+		<column name="UncertaintyDraws" displayName="Uncertainty Draws (iterations that draw their targets; blank = 0)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="0" formula2="1000"/>
+	</dataSheet>
+	<dataSheet name="WetlandMethaneTarget" displayName="Wetland Methane Targets">
+		<column name="StateClassId" displayName="Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="Region" displayName="Region (blank = every region of the class)" dataType="Integer" isOptional="True" validationType="List" formula1="1:Pacific Northwest|2:California|3:Gulf and South Atlantic|4:Mid-Atlantic|5:Northeast|6:CONUS|7:West|8:Interior Plains|9:Coastal Plains|10:Eastern Mountains and Upper Midwest"/>
+		<column name="Target" displayName="Target (Mg C/ha/yr as CH4)" dataType="Double" format="0.000" validationType="Decimal" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="TargetLow" displayName="Low (blank = no range)" dataType="Double" format="0.000" isOptional="True" validationType="Decimal" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="TargetHigh" displayName="High (blank = no range)" dataType="Double" format="0.000" isOptional="True" validationType="Decimal" validationCondition="GreaterEqual" formula1="0"/>
+	</dataSheet>
+	<dataSheet name="MarshSalinityTarget" displayName="Marsh Salinity Targets">
+		<column name="Region" displayName="Region" dataType="Integer" validationType="List" formula1="1:Pacific Northwest|2:California|3:Gulf and South Atlantic|4:Mid-Atlantic|5:Northeast|6:CONUS"/>
+		<column name="Zone" displayName="Salinity Zone" dataType="Integer" validationType="List" formula1="1:oligohaline|2:salt-brackish|3:brackish|4:salt"/>
+		<column name="Target" displayName="Target (Mg C/ha/yr as CH4)" dataType="Double" format="0.000" validationType="Decimal" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="TargetLow" displayName="Low (blank = no range)" dataType="Double" format="0.000" isOptional="True" validationType="Decimal" validationCondition="GreaterEqual" formula1="0"/>
+		<column name="TargetHigh" displayName="High (blank = no range)" dataType="Double" format="0.000" isOptional="True" validationType="Decimal" validationCondition="GreaterEqual" formula1="0"/>
+	</dataSheet>
+	<dataFeed name="WetlandCarbon" displayName="Wetland Methane" viewClassName="lucasCoreUI.WetlandCarbonView" viewClassAssembly="lucasCoreUI">
+		<dataSheet name="WetlandOptions"/>
+		<dataSheet name="WetlandMethaneTarget"/>
+		<dataSheet name="MarshSalinityTarget"/>
 	</dataFeed>
 
 	<dataSheet name="LiveTurnover" displayName="Live Turnover" viewClassName="lucasCoreUI.LiveTurnoverView" viewClassAssembly="lucasCoreUI">
@@ -1321,14 +1352,15 @@
 	<!-- =================================================================================================== -->
 
 	<transformer name="StockFlowDefinitions" displayName="0 - Stock-Flow Definitions" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/0-stock-flow-definitions.R">
+		<dataSheet name="WetlandOptions" type="Input"/>
 		<dataSheet name="stsim_FlowPathwayDiagram" type="Both"/>
-		<dataSheet name="stsim_FlowOrder" type="Output"/>
-		<dataSheet name="stsim_FlowOrderOptions" type="Output"/>
-		<dataSheet name="stsim_FlowTypeGroupMembership" type="Output"/>
-		<dataSheet name="stsim_StockTypeGroupMembership" type="Output"/>
-		<dataSheet name="stsim_OutputOptionsStockFlow" type="Output"/>
-		<dataSheet name="stsim_OutputFilterFlows" type="Output"/>
-		<dataSheet name="stsim_OutputFilterStocks" type="Output"/>
+		<dataSheet name="stsim_FlowOrder" type="Both"/>
+		<dataSheet name="stsim_FlowOrderOptions" type="Both"/>
+		<dataSheet name="stsim_FlowTypeGroupMembership" type="Both"/>
+		<dataSheet name="stsim_StockTypeGroupMembership" type="Both"/>
+		<dataSheet name="stsim_OutputOptionsStockFlow" type="Both"/>
+		<dataSheet name="stsim_OutputFilterFlows" type="Both"/>
+		<dataSheet name="stsim_OutputFilterStocks" type="Both"/>
 		<dataSheet name="stsim_OutputFilterTransitionGroups" type="Both"/>
 		<dataSheet name="stsim_OutputOptionsSpatial" type="Both"/>
 		<dataSheet name="stsim_OutputOptions" type="Both"/>
@@ -1360,6 +1392,8 @@
 	</transformer>
 
 	<transformer name="CarbonFlows" displayName="3 - Carbon Flows" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/3-carbon-flows.R">
+		<dataSheet name="WetlandOptions" type="Input"/>
+		<dataSheet name="WetlandMethaneTarget" type="Input"/>
 		<dataSheet name="LiveTurnover" type="Input"/>
 		<dataSheet name="NonForestGrowth" type="Input"/>
 		<dataSheet name="NonForestRate" type="Input"/>
@@ -1378,6 +1412,7 @@
 		<dataSheet name="stsim_FlowPathwayDiagram" type="Input"/>
 		<dataSheet name="OutputReturnInterval" type="Input"/>
 		<dataSheet name="OutputSoilTarget" type="Input"/>
+		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
 		<dataSheet name="stsim_FlowPathway" type="Output"/>
 		<dataSheet name="stsim_FlowMultiplier" type="Output"/>
 		<dataSheet name="stsim_StateAttributeValue" type="Output"/>
@@ -1430,6 +1465,7 @@
 	</transformer>
 
 	<transformer name="ClimateMultipliers" displayName="7 - Climate Multipliers" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/7-climate-multipliers.R">
+		<dataSheet name="WetlandOptions" type="Input"/>
 		<dataSheet name="DomParameter" type="Input"/>
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="ClimateOptions" type="Input"/>
@@ -1441,6 +1477,9 @@
 	</transformer>
 
 	<transformer name="InitialStocksSpatial" displayName="8 - Initial Stock Maps" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/8-initial-stocks-spatial.R">
+		<dataSheet name="WetlandOptions" type="Input"/>
+		<dataSheet name="WetlandMethaneTarget" type="Input"/>
+		<dataSheet name="MarshSalinityTarget" type="Input"/>
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="Spinup" type="Input"/>
 		<dataSheet name="InitialStockCurve" type="Input"/>
@@ -1522,6 +1561,7 @@
 	</transformer>
 
 	<transformer name="ProjectionClimate" displayName="11 - Projection Climate" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/11-projection-climate.R">
+		<dataSheet name="WetlandOptions" type="Input"/>
 		<dataSheet name="DomParameter" type="Input"/>
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="ClimateOptions" type="Input"/>
@@ -1665,6 +1705,7 @@
 				<item name="MatureAge"/>
 				<item name="FixedDecayMultiplier"/>
 				<item name="NonForestCarbon"/>
+				<item name="WetlandCarbon"/>
 			</group>
 			<group name="lucasCoreProjection" displayName="Projection">
 				<item name="ProjectionRun"/>

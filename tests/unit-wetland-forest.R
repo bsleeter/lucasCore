@@ -76,4 +76,56 @@ check("drained emissions count as emissions and against net biome productivity",
 ofs <- rd(D("stockflow", "stsim_OutputFilterStocks.csv")); st8 <- paste(unique(rd(D("initialstocks", "stock-types.csv"))$StockTypeId), "[Type]")
 check("every stock stage 8 starts (DOM: Peat too) is mapped, so a projection can start from a historical run's final maps (2026-11-11: peat was not)",
       all(st8 %in% ofs$StockGroupId) && all(ofs[StockGroupId %in% st8, Spatial == "Yes" & AvgSpatial == "Yes"]))
+
+# ---- methane from the forested wetland twins (2026-11-16; src/flows.R METHANE_POOLS): soil, root litter and the forest floor ---------
+local({ e <- new.env(); sys.source(file.path(pkg, "src", "dom.R"), envir = e); sys.source(file.path(pkg, "src", "flows.R"), envir = e); sys.source(file.path(pkg, "src", "nonforest-solve.R"), envir = e)
+  g <- e$CH4_FLOWS; n <- e$NF_CH4; p <- e$METHANE_POOLS; w4 <- rd(D("spinup", "wetland-ch4.csv"))
+  memb <- rd(D("stockflow", "stsim_FlowTypeGroupMembership.csv")); fo <- rd(D("stockflow", "stsim_FlowOrder.csv")); ft <- fread(D("stsim", "stsim_FlowType.csv"), sep = ",")$Name
+  o <- function(x) as.numeric(fo$Order[match(x, fo$FlowTypeId)]); mg <- function(x) memb[FlowTypeId == x]
+  check("the forested and emergent wetland methane flows are the same flow types for soil and root litter", identical(unname(n$co2), c(g$soil_co2, g$litter_co2)) && identical(unname(n$ch4), c(g$soil_ch4, g$litter_ch4)) &&
+        identical(unname(n$shared), c(g$shared_soil, g$shared_litter)) && n$sink == g$sink && n$max_share == g$max_share && identical(p$co2[1:2], unname(n$co2)) && identical(p$ch4[1:2], unname(n$ch4)))
+  check("five source pools: soil and root litter, and the forest floor (leaf litter, twig litter, humus)", identical(p$code, c("BGS", "BGVF", "AGVF", "AGF", "AGS")) && identical(p[forest_floor == TRUE, code], e$FIA_DOM$litter) &&
+        all(p$shared %in% e$FOREST_PATHWAYS$FlowType) && all(p[!is.na(other), other] %in% e$FOREST_PATHWAYS$FlowType))
+  check("every source pool's flow types are defined, at the flow order of the pool's shared emission", all(c(p$co2, p$ch4) %in% ft) && all(o(p$co2) == o(p$shared)) && all(o(p$ch4) == o(p$shared)))
+  check("each wetland CO2 flow keeps its pool's Q10 group (the soil's has its own); each CH4 flow has Q10 Wetland CH4 alone, counts as carbon (1) and as methane in CO2e (33.5)",
+        all(vapply(seq_len(nrow(p)), function(i) { q <- function(x) grep("^Q10", mg(x)$FlowGroupId, value = TRUE); v <- function(x, k) as.numeric(mg(x)[FlowGroupId == k, Value])
+          identical(q(p$co2[i]), if (p$code[i] == "BGS") "Q10 Wetland Soil" else q(p$shared[i])) && identical(q(p$ch4[i]), "Q10 Wetland CH4") &&
+            "Emission: Wetland Methane Source CO2" %in% mg(p$co2[i])$FlowGroupId && v(p$ch4[i], "Emission: Total Rh") == 1 && v(p$ch4[i], "Net Biome Productivity") == -1 &&
+            v(p$ch4[i], "Emission: Total (CO2e)") == 33.5 && v(p$ch4[i], "Net Ecosystem Productivity (CO2e)") == -33.5 && v(p$ch4[i], "Emission: Wetland CH4") == 1 &&
+            v(p$co2[i], "Emission: Total (CO2e)") == 3.67 }, TRUE)))
+  check("a methane target for each of the three twins and no other class, all positive", setequal(w4$StateClass, TW) && all(as.numeric(w4$CH4) > 0))
+  vals <- c("Emission: BG Slow -> Atmosphere" = 0.004, "Stabilization: BG Slow -> Deep Soil" = 0.0005, "Emission: BG Very Fast -> Atmosphere" = 0.4, "Decay: BG Very Fast -> BG Slow" = 0.08,
+            "Emission: AG Very Fast -> Atmosphere" = 0.3, "Decay: AG Very Fast -> AG Slow" = 0.07, "Emission: AG Fast -> Atmosphere" = 0.12, "Decay: AG Fast -> AG Slow" = 0.02,
+            "Emission: AG Slow -> Atmosphere" = 0.015, "Transfer: AG Slow -> BG Slow" = 0.006, "Emission: AG Medium -> Atmosphere" = 0.03)
+  s <- e$ch4_split(vals, 0.25)
+  check("the split: every source pool's emission as CO2 (three quarters, by its wetland flow type) and CH4 (a quarter); down wood and every decay, transfer and burial untouched",
+        !any(p$shared %in% names(s)) && isTRUE(all.equal(unname(s[p$co2]), unname(0.75 * vals[p$shared]))) && isTRUE(all.equal(unname(s[p$ch4]), unname(0.25 * vals[p$shared]))) &&
+        identical(s[setdiff(names(vals), p$shared)], vals[setdiff(names(vals), p$shared)]) && length(s) == length(vals) + nrow(p))
+  u <- e$ch4_unsplit(s)
+  check("and back: the spin-up sees the rates it always did (each pool's total loss unchanged)", setequal(names(u), names(vals)) && isTRUE(all.equal(u[names(vals)], vals)) && identical(e$ch4_unsplit(vals), vals))
+  # the year's emission: a fast pool emits from its stock plus the litter the live pools shed into it that year; a slow pool from its stock
+  vt <- c(vals, "Biomass Turnover: Foliage -> AG Very Fast" = 0.9, "Biomass Turnover: Fine Roots -> AG Very Fast" = 0.3, "Biomass Turnover: Fine Roots -> BG Very Fast" = 0.3,
+          "Biomass Turnover: Other Wood -> AG Fast" = 0.03, "Biomass Turnover: Coarse Roots -> AG Fast" = 0.01, "Transfer: Snag Branch -> AG Fast" = 0.07)
+  stock <- c(BGS = 200, BGVF = 1, AGVF = 0, AGF = 8, AGS = 20, SnagBranch = 2); live <- c(Merchantable = 60, Other = 20, Foliage = 2, FineRoots = 1.5, CoarseRoots = 12)
+  em <- e$methane_source_emission(stock, live, vt)
+  want <- c(BGS = 200 * 0.004, BGVF = (1 + 1.5 * 0.3) * 0.4, AGVF = (0 + 2 * 0.9 + 1.5 * 0.3) * 0.3, AGF = (8 + 20 * 0.03 + 12 * 0.01 + 2 * 0.07) * 0.12, AGS = 20 * 0.015)
+  check("the source emission: a fast pool emits from its stock and the year's litter (one that empties every year still emits its intake), a slow pool from its stock", isTRUE(all.equal(em, want)) && em[["AGVF"]] > 0)
+  # the reference stand of the share: the ages the library has for the class, else one disturbance cycle
+  wa <- e$methane_age_weights(c(80, 80, 120, 500, NA), 11, 201); wc <- e$methane_age_weights(numeric(), 11, 201)
+  check("the share's reference stand: the stand ages present (an age past the curve counts as its last age), and one disturbance cycle only where the class has no cells",
+        isTRUE(all.equal(sum(wa), 1)) && isTRUE(all.equal(wa[c(81, 121, 201)], c(0.5, 0.25, 0.25))) && sum(wa > 0) == 3 &&
+        isTRUE(all.equal(wc, c(rep(1 / 11, 11), rep(0, 190)))) && isTRUE(all.equal(e$methane_age_weights(numeric(), 300, 50), rep(1 / 50, 50))) &&
+        isTRUE(all.equal(e$methane_age_weights(c(-3, 0.4), 11, 5), c(1, 0, 0, 0, 0))))
+  fp <- rbind(e$FOREST_PATHWAYS[, .(FromStateClassId = TW[1], FromStockTypeId = From, ToStockTypeId = To, FlowTypeId = FlowType, TransitionGroupId = NA_character_)],
+              e$FOREST_PATHWAYS[, .(FromStateClassId = UP[1], FromStockTypeId = From, ToStockTypeId = To, FlowTypeId = FlowType, TransitionGroupId = NA_character_)],
+              data.table(FromStateClassId = TW[1], FromStockTypeId = "DOM: Belowground Slow", ToStockTypeId = "Atmosphere: CO2", FlowTypeId = "LULC: Emission DOM CO2", TransitionGroupId = "Fire"))
+  q <- e$ch4_pathways(fp, TW[1]); tw <- q[FromStateClassId == TW[1] & is.na(TransitionGroupId)]
+  check("pathways: the twin's five source pools emit CO2 by their wetland flow types and CH4 beside them, each from its own pool to Atmosphere: CH4; the upland class and the event rows as they were; a second pass adds nothing",
+        !any(p$shared %in% tw$FlowTypeId) && all(vapply(seq_len(nrow(p)), function(i) tw[FlowTypeId == p$co2[i], .N == 1 && ToStockTypeId == "Atmosphere"] &&
+          tw[FlowTypeId == p$ch4[i], .N == 1 && ToStockTypeId == g$sink] && tw[FlowTypeId == p$ch4[i], FromStockTypeId] == tw[FlowTypeId == p$co2[i], FromStockTypeId], TRUE)) &&
+        identical(q[FromStateClassId == UP[1]], fp[FromStateClassId == UP[1]]) && identical(q[!is.na(TransitionGroupId)], fp[!is.na(TransitionGroupId)]) && nrow(e$ch4_pathways(q, TW[1])) == nrow(q))
+  s3 <- paste(readLines(file.path(pkg, "src", "3-carbon-flows.R")), collapse = "\n"); s4 <- paste(readLines(file.path(pkg, "src", "4-initial-stocks.R")), collapse = "\n")
+  check("stage 3 splits a twin's rates after the Carbon Rates read-out, on the emission of all its source pools, and gives the classes with methane their pathways; stage 4 steps the pools with the rates put back together",
+        grepl("dv <- ch4_split(dv, f)", s3, fixed = TRUE) && regexpr("rates[[i]] <- cbind", s3, fixed = TRUE) < regexpr("dv <- ch4_split(dv, f)", s3, fixed = TRUE) &&
+        grepl("methane_source_emission(drop(w4 %*% d[seq_len(n4), c(METHANE_POOLS$code,", s3, fixed = TRUE) && grepl("w4 <- methane_age_weights(a4, cm$ri, n4)", s3, fixed = TRUE) && grepl("fp <- ch4_pathways(fp, ", s3, fixed = TRUE) && grepl("vals <- ch4_unsplit(", s4, fixed = TRUE)) })
 cat(sprintf("%d passed, %d failed\n", n_ok, n_bad)); if (n_bad) quit(status = 1)

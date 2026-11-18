@@ -14,6 +14,9 @@
 #                                                        (0-30 + 30-100 cm) and Deep Soil starts at 0, so a cell's soil means the same in
 #                                                        every class (user 2026-11-07); Deep Soil gains only the carbon buried during a run
 #   defaults/stockflow/emergent-wetland-fit.csv          one row per ecodivision x class: targets, fitted rates, burial share
+#   defaults/stockflow/nonforest-pathways.csv            emergent rows: soil CO2 by the wetland flow type and a CH4 flow beside each belowground CO2 emission
+# Methane (2026-11-16): the region's CH4 target (Mg C/ha/yr) is met by a share of the carbon BG Slow and BG Very Fast already emit
+# (src/nonforest-solve.R nf_fit_ch4), solved after the budget is fitted, so no rate, pool, burial or lateral flux of the fit changes.
 # The values these replace (the CONUS 1 km build's, from coastal Louisiana field data via IBIS; the same in every ecodivision) are kept
 # once in defaults/stockflow/legacy-ibis/ for the step 3 target-source choice. The carbon method presets lose their emergent rows, so a
 # filled Grassland, Shrubland and Wetland Carbon sheet no longer overrides the package's ecodivision values (tools/sync-library.R drops
@@ -30,7 +33,7 @@ fm <- rd("stockflow", "nonforest-multipliers-wetland.csv"); ng <- rd("stockflow"
 pa <- rd("stockflow", "nonforest-pathways.csv"); memb <- rd("stockflow", "stsim_FlowTypeGroupMembership.csv"); ord <- rd("stockflow", "stsim_FlowOrder.csv")
 ini <- rd("initialstocks", "emergent-wetland.csv"); st <- rd("initialstocks", "stock-types.csv")
 reg <- rd("stockflow", "emergent-wetland-regions.csv"); eco <- rd("stockflow", "emergent-wetland-ecodivisions.csv")
-num <- c("NPP", "AgShare", "PeakFoliage", "RootShoot", "AgLitter", "BgLitter", "Soil0to30", "Soil30to100", "Burial")
+num <- c("NPP", "AgShare", "PeakFoliage", "RootShoot", "AgLitter", "BgLitter", "Soil0to30", "Soil30to100", "Burial", "CH4")
 for (k in num) set(reg, j = k, value = as.numeric(reg[[k]]))
 tmap <- rd("stockflow", "tidal-marsh-npp.csv")[, `:=`(Km2 = as.numeric(Km2), MapNPP = as.numeric(MapNPP))]; MIN_KM2 <- 10
 stopifnot(!anyNA(reg[, ..num]),all(eco$StratumId %in% fm$StratumId), all(unique(fm[StateClassId %in% EMERGENT, StratumId]) %in% eco$StratumId))
@@ -46,6 +49,16 @@ if (!file.exists(d("stockflow", "legacy-ibis", "emergent-multipliers.csv"))) {
   cat("Kept the legacy emergent wetland values in defaults/stockflow/legacy-ibis/\n") }
 leg_m <- rd("stockflow", "legacy-ibis", "emergent-multipliers.csv")   # fit from the legacy shares, so a rerun gives the same values
 
+# ---- methane pathways: the emergent classes' soil CO2 by its own flow type, and a CH4 flow beside each belowground CO2 emission
+# (a rerun changes nothing) --------------------------------------------------------------------------------------------------
+g4 <- NF_CH4; em <- pa$FromStateClassId %in% EMERGENT
+for (k in names(g4$co2)) pa[em & FlowTypeId == g4$shared[[k]], FlowTypeId := g4$co2[[k]]]
+if (!any(em & pa$FlowTypeId %in% g4$ch4)) {
+  add <- pa[em & FlowTypeId %in% g4$co2][, `:=`(ToStockTypeId = g4$sink, FlowTypeId = unname(g4$ch4[match(FlowTypeId, g4$co2)]))]
+  pa <- rbind(pa, add)[order(match(FromStratumId, unique(FromStratumId)), match(FromStateClassId, unique(FromStateClassId)))] }
+o4 <- function(x) as.numeric(ord$Order[match(x, ord$FlowTypeId)])   # each CH4 flow at the order of its pool's CO2 emission
+stopifnot(!anyNA(o4(c(g4$ch4, g4$co2))), all(o4(g4$ch4) == o4(g4$co2)), all(o4(g4$co2) == o4(g4$shared)))
+
 # ---- fit each ecodivision x class --------------------------------------------------------------------------------------------
 fits <- list(); newm <- list(); pools <- list()
 for (i in seq_len(nrow(eco))) for (cls in EMERGENT) {
@@ -57,7 +70,7 @@ for (i in seq_len(nrow(eco))) for (cls in EMERGENT) {
   # which the map does not cover.
   tm <- tmap[StratumId == e & StateClassId == cls & Km2 >= MIN_KM2]
   if (cls == EMERGENT[1] && nrow(tm)) { t <- copy(t); t[, `:=`(NPP = round(tm$MapNPP, 2), PeakFoliage = round(tm$MapNPP / 3, 3))]; nsrc <- "USGS tidal marsh map" } else nsrc <- "region"
-  p <- pa[FromStratumId == e & FromStateClassId == cls]; m0 <- leg_m[StratumId == e & StateClassId == cls, .(FlowGroupId, Value)]
+  p <- pa[FromStratumId == e & FromStateClassId == cls]; m0 <- nf_ch4_prepare(leg_m[StratumId == e & StateClassId == cls, .(FlowGroupId, Value)])
   tgt <- function(t) list(npp = t$NPP, ag_share = t$AgShare, foliage = t$PeakFoliage, roots = t$PeakFoliage * t$RootShoot, ag_litter = t$AgLitter,
                           bg_litter = t$BgLitter, soil = t$Soil0to30 + t$Soil30to100, burial = t$Burial)
   tg <- tgt(t); fit <- tryCatch(nf_fit_emergent(p, m0, memb, ord, tg), error = function(err) err)
@@ -71,6 +84,9 @@ for (i in seq_len(nrow(eco))) for (cls in EMERGENT) {
     cat(sprintf("%s %s: map NPP %.2f; burial lowered from %.2f to %.3f Mg C/ha/yr\n", e, cls, t$NPP, b0, t$Burial)) }
   if (inherits(fit, "error")) stop(sprintf("%s %s (NPP %s, %s): %s", e, cls, t$NPP, nsrc, conditionMessage(fit)), call. = FALSE)
   m1 <- fit$mult[, Value := round(Value, 6)]
+  # methane: the share of the belowground emission that meets the region's target, on the rates as written
+  c4 <- tryCatch(nf_fit_ch4(p, m1, memb, ord, t$NPP, t$CH4), error = function(err) stop(sprintf("%s %s: %s", e, cls, conditionMessage(err)), call. = FALSE))
+  m1 <- c4$mult[, Value := round(Value, 6)]
   # starting pools: the steady state of the rates as written (rounded), so a Build starts where the rates hold it
   ss <- nf_steady(nf_flows(p, m1, memb, ord), t$NPP)
   newm[[length(newm) + 1]] <- m1[, `:=`(StratumId = e, StateClassId = cls)]
@@ -80,11 +96,15 @@ for (i in seq_len(nrow(eco))) for (cls in EMERGENT) {
     FoliageTurnover = v(g$k_fol), RootTurnover = v(g$k_root), AgLitterLoss = v(g$k_ag), BgLitterLoss = v(g$k_bg), SoilLoss = v(g$k_soil),
     BurialShare = v(g$burial), SoilEmissionShare = v(g$soil_emit), Burial = round(ss$sink[["Deep Soil"]], 4), Aquatic = round(ss$sink[["Aquatic"]], 4),
     YearEndLive = round(sum(ss$stock[c("Biomass: Foliage", "Biomass: Fine Root")]), 3), Soil = round(ss$stock[["DOM: Belowground Slow"]], 2),
-    Dieback = paste(fit$dieback, collapse = "; ")) }
+    Dieback = paste(fit$dieback, collapse = "; "), CH4 = round(ss$sink[[g4$sink]], 4), CH4Share = round(c4$share, 6), BelowgroundEmission = round(c4$gas, 4)) }
 fits <- rbindlist(fits); newm <- rbindlist(newm); pools <- rbindlist(pools)
 
 # ---- write the package tables ------------------------------------------------------------------------------------------------
+fm <- fm[!(StateClassId %in% EMERGENT & FlowGroupId %in% paste(g4$shared, "[Type]"))]   # the emergent soil emission is under the wetland flow type now
 fm[newm, on = .(StratumId, StateClassId, FlowGroupId), Value := as.character(i.Value)]
+add <- newm[!fm, on = .(StratumId, StateClassId, FlowGroupId)]   # the methane share rows, the first time
+if (nrow(add)) fm <- rbind(fm, add[, .(StratumId, StateClassId, FlowGroupId, Value = as.character(Value))], fill = TRUE)
+wr(pa, "stockflow", "nonforest-pathways.csv")
 wr(fm, "stockflow", "nonforest-multipliers-wetland.csv")
 ng[fits, on = .(StratumId, StateClassId), Value := as.character(i.NPP)]
 wr(ng, "stockflow", "nonforest-net-growth.csv")

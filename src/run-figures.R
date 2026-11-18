@@ -35,6 +35,9 @@ emis_driver <- function(type) data.table::fcase(grepl("^Fire", type), "Fire", gr
                                                grepl("^Urbanization", type), "Urbanization", default = "Other land change")
 REM_COLS <- c(`Forest harvest wood` = "#6b6b6b", `Wood from land use change` = "#8c6d31", `Crop harvest` = "#e3b23c", `Lateral export (water)` = "#6baed6")
 BAL_COLS <- c(Forest = "#2b8152", Disturbed = "#b5651d", `Forested wetland` = "#66c2a5", `Emergent wetland` = "#9ecae1", Agriculture = "#d98b3a", `Grass and shrub` = "#c9a26b", Developed = "#c0392b", Other = "#a3a3a3")
+# wetland methane (lucasCore 1.5) by the kind of wetland it came from: the two emergent classes, and the forested wetland classes together
+CH4_COLS <- c(`Palustrine emergent marsh` = "#7fb6d9", `Estuarine emergent marsh` = "#2c7fb8", `Forested wetland` = "#66c2a5")
+methane_kind <- function(x) data.table::fcase(grepl("Palustrine Emergent", x), "Palustrine emergent marsh", grepl("Estuarine Emergent", x), "Estuarine emergent marsh", default = "Forested wetland")
 balance_group <- function(x) data.table::fcase(grepl("^Forest", x), "Forest", grepl("^Disturbed", x), "Disturbed", grepl("^Wetland: .*(Group|Forested)$", x), "Forested wetland", grepl("^Wetland", x), "Emergent wetland",
                                                grepl("^Agriculture", x), "Agriculture", grepl("^(Grassland|Shrubland)", x), "Grass and shrub", grepl("^Developed", x), "Developed", default = "Other")
 RAMP_CHG <- colorRampPalette(c("#7a3b12", "#c98b4f", "#efd9b4", "#f5f2ec", "#cfe3b8", "#6fae74", "#1f5f3f"))
@@ -66,6 +69,9 @@ load_run <- function(lib, rid) {
   # net biome productivity by the class it came from (a transition's losses count to the class the cell left)
   nbp_cls <- if (dbExistsTable(con, "stsim_OutputFlow")) q("SELECT o.Timestep, c.Name AS Class, SUM(o.Amount) / %d AS Mg FROM stsim_OutputFlow o JOIN stsim_FlowGroup g ON g.FlowGroupId = o.FlowGroupId
               JOIN stsim_StateClass c ON c.StateClassId = o.FromStateClassId WHERE o.ScenarioId = %d AND g.Name = 'Net Biome Productivity' GROUP BY o.Timestep, c.Name", nit, rid) else NULL
+  # wetland methane by the class that released it, in carbon and in CO2 equivalent (none in a run made before lucasCore 1.5)
+  ch4 <- if (dbExistsTable(con, "stsim_OutputFlow")) q("SELECT o.Timestep, c.Name AS Class, g.Name AS FlowGroup, SUM(o.Amount) / %d AS Mg FROM stsim_OutputFlow o JOIN stsim_FlowGroup g ON g.FlowGroupId = o.FlowGroupId
+              JOIN stsim_StateClass c ON c.StateClassId = o.FromStateClassId WHERE o.ScenarioId = %d AND g.Name IN ('Emission: Wetland CH4', 'Emission: Wetland CH4 (CO2e)') GROUP BY o.Timestep, c.Name, g.Name", nit, rid) else NULL
   unit_c <- if (!is.null(stocks)) q("SELECT s.Name AS Unit, o.Timestep, SUM(o.Amount) / %d AS Mg FROM stsim_OutputStock o JOIN stsim_StockGroup g ON g.StockGroupId = o.StockGroupId
               JOIN stsim_SecondaryStratum s ON s.SecondaryStratumId = o.SecondaryStratumId WHERE o.ScenarioId = %d AND g.Name = 'Total Ecosystem' AND o.Timestep IN (%d, %d)
               GROUP BY s.Name, o.Timestep", nit, rid, yrs[1], yrs[2]) else NULL
@@ -84,7 +90,7 @@ load_run <- function(lib, rid) {
   pdm <- q("SELECT o.Timestep, g.Name AS Grp, o.Filename FROM stsim_OutputSpatialTransition o JOIN stsim_TransitionGroup g ON g.TransitionGroupId = o.TransitionGroupId
            WHERE o.ScenarioId = %d AND o.Iteration = 1 AND (g.Name LIKE 'Post-disturbance: %%' OR g.Name = 'Reforestation')", rid)
   if (nrow(pdm)) pdm[, File := vapply(Filename, function(f) path("stsim_OutputSpatialTransition", f), "")]
-  list(rid = rid, nit = nit, years = yrs, sc_list = sc, tt_list = tt, area = area, trans = trans, stocks = stocks, flows = flows, losses = losses, nbp_cls = nbp_cls, unit_c = unit_c, unit_a = unit_a, te_it = te_it,
+  list(rid = rid, nit = nit, years = yrs, sc_list = sc, tt_list = tt, area = area, trans = trans, stocks = stocks, flows = flows, losses = losses, nbp_cls = nbp_cls, ch4 = ch4, unit_c = unit_c, unit_a = unit_a, te_it = te_it,
        sc0 = path("stsim_OutputSpatialState", ssm[Timestep == yrs[1], Filename]), sc1 = path("stsim_OutputSpatialState", ssm[Timestep == yrs[2], Filename]),
        fire = if (nrow(fm)) setNames(vapply(fm$Filename, function(f) path("stsim_OutputSpatialTransition", f), ""), fm$Timestep) else character(),
        harvest = if (nrow(hm)) setNames(vapply(hm$Filename, function(f) path("stsim_OutputSpatialTransition", f), ""), hm$Timestep) else character(),
@@ -112,7 +118,7 @@ join_runs <- function(H, P) {
   ys <- P$years[1]
   cut <- function(a, b) if (is.null(a) || is.null(b)) NULL else rbind(a[Timestep <= ys], b[Timestep > ys])
   J <- P; J$years <- c(H$years[1], P$years[2])
-  for (k in c("area", "trans", "stocks", "flows", "losses", "nbp_cls")) J[k] <- list(cut(H[[k]], P[[k]]))
+  for (k in c("area", "trans", "stocks", "flows", "losses", "nbp_cls", "ch4")) J[k] <- list(cut(H[[k]], P[[k]]))
   J$unit_c <- if (!is.null(H$unit_c) && !is.null(P$unit_c)) rbind(H$unit_c[Timestep == H$years[1]], P$unit_c[Timestep == P$years[2]]) else NULL
   J$unit_a <- H$unit_a; J$sc0 <- H$sc0; J$carbon0 <- H$carbon0
   late <- function(m) m[as.integer(names(m)) > ys]
@@ -459,6 +465,36 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
         s <- stack_bars(ymat(nc, "Group", names(BAL_COLS)), BAL_COLS, "Tg C per year", line = nbp)
         ptitle(6, "Net biome productivity by land cover"); legend_means(s$M, s$cols, "Net biome productivity")
       } else { plot.new(); ptitle(6, "Net biome productivity by land cover: not in this run's output") } }) }
+
+  # ---- charts: wetland methane (lucasCore 1.5; drawn when the run's wetlands released any) -----------------------------------
+  # (a) carbon released as methane each year by the kind of wetland; (b) net biome productivity as CO2, and with that methane counted
+  # at its CO2 equivalent instead of as CO2. Methane is part of heterotrophic respiration, so (a) is already inside NEP and NBP.
+  M4 <- X$ch4
+  if (!is.null(M4) && nrow(M4) && !is.null(X$flows) && nrow(X$flows) && M4[FlowGroup == "Emission: Wetland CH4", sum(Mg)] > 0) {
+    y4 <- sort(unique(X$flows$Timestep)); ser <- function(d) { s <- d[, .(v = sum(Mg)), by = Timestep]; v <- s[match(y4, Timestep), v]; v[is.na(v)] <- 0; v }
+    c4 <- M4[FlowGroup == "Emission: Wetland CH4"][, Kind := methane_kind(Class)]; kinds <- names(CH4_COLS)[names(CH4_COLS) %in% c4$Kind]
+    Mk <- do.call(rbind, lapply(kinds, function(k) ser(c4[Kind == k]) / 1e3)); rownames(Mk) <- kinds   # Gg C as CH4 per year
+    tot <- colSums(Mk) / 1e3; e4 <- ser(M4[FlowGroup == "Emission: Wetland CH4 (CO2e)"]) / 1e6          # Tg C; Tg CO2e
+    wgt <- if (sum(tot) > 0 && sum(e4) > 0) sum(e4) / sum(tot) else NA_real_                               # CO2e per unit of methane carbon, as the run counted it
+    extra <- e4 - 3.67 * tot                                                                                 # what methane adds over the same carbon as CO2
+    nb <- ser(X$flows[FlowGroup == "Net Biome Productivity"]) / 1e6 * 3.67; rh <- ser(X$flows[FlowGroup == "Emission: Total Rh"]) / 1e6
+    chart_figure("wetland_methane", "Wetland methane", paste0(
+      "(a) Carbon released to the atmosphere as methane by wetland soil and litter each year, by the kind of wetland, in thousand tonnes of carbon (Gg C). It is part of heterotrophic respiration ",
+      sprintf("(%.2g%% of it over the run), so it is already inside net ecosystem and net biome productivity. ", 100 * sum(tot) / sum(rh)),
+      if (is.na(wgt)) "(b) Net biome productivity as CO2 (carbon x 3.67); this run has no CO2 equivalent for its methane. " else
+        sprintf("(b) Net biome productivity as CO2 (carbon x 3.67), and with wetland methane counted at its CO2 equivalent (%.3g per unit of methane carbon) instead of as CO2; the bars are the difference. ", wgt),
+      "Positive is uptake by the land. Legends give each series' mean per year."), 1, 2, h = 1150, draw = function() {
+        low(); Ms <- Mk[rowSums(Mk) > 0, , drop = FALSE]; cs <- CH4_COLS[rownames(Ms)]
+        b <- barplot(Ms, col = cs, border = NA, ylim = c(0, max(colSums(Ms)) * 1.1), ylab = "Gg C as CH4 per year"); hgrid(); barplot(Ms, col = cs, border = NA, add = TRUE, axes = FALSE)
+        at <- which(y4 %% 5 == 0); axis(1, at = b[at], labels = y4[at], cex.axis = .75); mark_bar(b, y4)
+        ptitle(1, sprintf("Methane from wetlands (mean %.3g Gg C/yr)", mean(colSums(Ms)))); under_legend(sprintf("%s (%.3g)", rownames(Ms), rowMeans(Ms)), fill = cs)
+        low(); wm <- nb - extra
+        plot(NA, xlim = range(y4) + c(-.6, .6), ylim = range(c(0, nb, wm, -extra)) * 1.08, xlab = "", ylab = "Tg CO2e per year", bty = "l"); hgrid(); abline(h = 0, col = MUTED, lty = 2)
+        rect(y4 - .4, 0, y4 + .4, -extra, col = "#a0468c", border = NA)
+        lines(y4, nb, col = "#3b6ea8", lwd = 2); lines(y4, wm, col = "#6a3d9a", lwd = 2); mark_line()
+        ptitle(2, sprintf("NBP with methane as CO2e (mean %+.3g Tg CO2e/yr)", mean(wm)))
+        under_legend(c(sprintf("NBP as CO2 (%+.3g)", mean(nb)), sprintf("Methane beyond its carbon as CO2 (%+.3g)", -mean(extra)), sprintf("NBP with methane as CO2e (%+.3g)", mean(wm))),
+                     col = c("#3b6ea8", NA, "#6a3d9a"), lwd = c(2, NA, 2), fill = c(NA, "#a0468c", NA)) }) }
 
   # ---- charts: harvested wood products (stage 18's result on this run, when there is one) ------------------------------------
   # (a) carbon stored in products in use and in landfills and dumps, with the interval of the total; (b) NBP with and without the

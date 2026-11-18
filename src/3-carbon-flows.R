@@ -166,6 +166,11 @@ cells[, soil_target := as.numeric(soil_t$SoilTarget)[match(paste(Stratum, StateC
 # burial of the forested wetland twins (to-do 53): Mg C/ha/yr over the soil target = the yearly share of BG Slow
 bur <- read_default("spinup", "wetland-burial.csv")
 cells[, burial_rate := as.numeric(bur$Burial)[match(StateClass, bur$StateClass)] / soil_target][is.na(burial_rate), burial_rate := 0]
+# methane of the forested wetland twins (defaults/spinup/wetland-ch4.csv, Mg C/ha/yr as CH4; a class without a row releases none)
+# (Carbon Assumptions: Wetland Methane, src/wetland-params.R: a scenario may set its own targets, with ranges, and the cap)
+wopt <- wetland_settings(); wtg <- wetland_class_targets(read_default("stockflow", "emergent-wetland-regions.csv"), read_default("spinup", "wetland-ch4.csv"), read_wetland("WetlandMethaneTarget"), read_default("stockflow", "wetland-methane-targets.csv"))
+if (length(wopt$changed) || any(wtg$Source == "scenario")) say("Wetland Methane: %s; %d of %d methane targets set in this scenario", if (length(wopt$changed)) paste(sprintf("%s = %s", wopt$changed, vapply(wopt$changed, function(k) format(wopt[[k]]), "")), collapse = ", ") else "the package settings", sum(wtg$Source == "scenario"), nrow(wtg))
+cells[, ch4_target := wtg[is.na(Region), Target][match(StateClass, wtg[is.na(Region), StateClassId])]][is.na(ch4_target), ch4_target := 0]
 if (any(cells$burial_rate > 0)) say("Burial (BG Slow -> Deep Soil): %s", paste(cells[burial_rate > 0, sprintf("%s %s %.5f/yr", Stratum, sub("^Wetland: ", "", StateClass), burial_rate)], collapse = "; "))
 fx <- fia_tables(gopt, src$EcodivisionFile)   # Growth Curve Options: FIA Data (src/fia.R)
 dat <- fia_dom_data(fx$cond, fx$dist, gopt, cw); rm(fx)
@@ -352,6 +357,9 @@ if (soil_mode == 1L) {   # Soil Organic Carbon: gNATSGO
   cells[, SoilSource := ifelse(is.na(m_soil), ifelse(is.na(soil_target), "Forest type median (no gNATSGO target)", "Forest type median (target unreachable)"), "gNATSGO target")]
   cells[is.na(m_soil), m_soil := median(cells[sc == .BY$sc, m_soil], na.rm = TRUE), by = sc]
   cells[is.na(m_soil), m_soil := median(cells$m_soil, na.rm = TRUE)]
+  # no cell of the study area reaches a gNATSGO target (2026-11-16: Sabine and Lacassine refuges, one forest cell with a target and
+  # that one out of reach): nothing to take a median of, so the CBM soil decay as it is; before this the spin-up below stopped on NA
+  cells[is.na(m_soil), `:=`(m_soil = 1, SoilSource = "CBM default (no cell of the study area reaches a gNATSGO target)")]
 } else cells[, `:=`(m_soil = 1, SoilSource = "CBM default")]
 cells[!is.na(fx_soil), `:=`(m_soil = fx_soil, SoilSource = "User (Carbon Assumptions: Fixed Decay Multipliers)")]
 parallel::clusterExport(cl, "cells", envir = environment())
@@ -387,7 +395,15 @@ progressBar()
 
 # ---- forest: net growth, growth split, turnover and decay per cell ----------------------------------------------------
 # live turnover per cell, from its CBM Crosswalk row (Carbon Assumptions)
-ng <- list(); fm_g <- list(); fm_d <- list(); rates <- list(); err <- 0; nneg <- 0
+ng <- list(); fm_g <- list(); fm_d <- list(); rates <- list(); err <- 0; nneg <- 0; ch4_cells <- list()
+# the stand ages present, by ecodivision and class, for the methane share of the forested wetlands (stage 5's state class, age and
+# strata maps; none when stage 5 has not run): the share is calibrated on the stands the library has, not on a disturbance cycle
+ch4_ages <- NULL
+if (any(cells$ch4_target > 0, na.rm = TRUE)) { ic3 <- as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", optional = TRUE, lookupsAsFactors = FALSE)); f3 <- c("StratumFileName", "StateClassFileName", "AgeFileName")
+  if (nrow(ic3) && all(f3 %in% names(ic3)) && !anyNA(unlist(ic3[1, f3, with = FALSE])) && all(file.exists(unlist(ic3[1, f3, with = FALSE])))) {
+    v3 <- as.data.table(terra::values(terra::rast(unlist(ic3[1, f3, with = FALSE])), mat = TRUE)); setnames(v3, c("P", "S", "A"))
+    ch4_ages <- v3[!is.na(P) & !is.na(S) & !is.na(A)][, `:=`(Stratum = stl$Name[match(P, as.integer(stl$Id))], StateClass = scl$Name[match(S, as.integer(scl$Id))])][
+      StateClass %in% cells[ch4_target > 0, StateClass], .(Stratum, StateClass, A)] } }
 for (i in seq_len(nrow(cells))) { s <- cells$Stratum[i]; c0 <- cells$StateClass[i]; k <- cw[StateClass == c0]; r <- turnover_rates(c0, k$softwood, k$deciduous, cbm, cells$cbm_eco[i], cells$cbm_species[i], lt_user(cells[i]))
   p <- cc[Stratum == s & StateClass == c0][order(Age)]
   g <- net_growth(p, r)
@@ -409,7 +425,22 @@ for (i in seq_len(nrow(cells))) { s <- cells$Stratum[i]; c0 <- cells$StateClass[
   rates[[i]] <- cbind(data.table(StratumId = s, StateClassId = c0, MeanTemperature = cells$temp[i]),
                       rate_rows(dv, r, dom_parameters(dpt, s), cells$temp[i], c(mult_i(which(cells$Stratum == s & cells$StateClass == c0)), list(soil = cm$m_soil)), fxg,
                                 cm$Level, cm$SoilSource, if (!is.na(cm$snag_fall)) cm$SnagFallSource else NA_character_))
+  # methane (forested wetlands; src/flows.R METHANE_POOLS): the fraction of what the class's source pools emit (soil, root litter and
+  # the forest floor) that meets its target, over the cell's disturbance cycle at the rates just built; each pool's emission then split
+  # into CO2 and CH4. The emission is worked out from the mean pools of the reference stand and the litter the live pools shed into the fast ones
+  # (methane_source_emission): a fast pool loses most of its litter within the year, so its own stock says little about what passed through it.
+  # The reference stand has the ages the library's cells of the class have (this ecodivision's, else every ecodivision's), and is one
+  # disturbance cycle only where the library has no cell of the class (methane_age_weights, src/flows.R)
+  if (isTRUE(cm$ch4_target > 0)) { S4 <- cal_setup(cells[i], ctx); d <- cal_dom(S4, ctx$fo, c(mult_i(i), list(soil = cm$m_soil)), w_i(i)); n4 <- min(nrow(d), nrow(S4$live))
+    a4 <- if (is.null(ch4_ages)) numeric() else { a <- ch4_ages[Stratum == s & StateClass == c0, A]; if (length(a)) a else ch4_ages[StateClass == c0, A] }
+    w4 <- methane_age_weights(a4, cm$ri, n4); src4 <- if (length(a4)) sprintf("%d cells, mean age %.0f", length(a4), mean(a4)) else sprintf("no cells: a %d-year cycle", cm$ri)
+    ems <- methane_source_emission(drop(w4 %*% d[seq_len(n4), c(METHANE_POOLS$code, "SnagBranch"), drop = FALSE]), drop(w4 %*% S4$live[seq_len(n4), , drop = FALSE]), dv); em <- sum(ems); f <- min(cm$ch4_target / em, wopt$MethaneCapShare)
+    ch4_cells[[length(ch4_cells) + 1]] <- data.table(StratumId = s, StateClassId = c0, Target = cm$ch4_target, SourceEmission = em, ForestFloor = sum(ems[METHANE_POOLS[forest_floor == TRUE, code]]), Share = f, Stand = src4)
+    dv <- ch4_split(dv, f) }
   fm_d[[i]] <- data.table(StratumId = s, StateClassId = c0, AgeMin = NA_integer_, AgeMax = NA_integer_, FlowGroupId = paste(names(dv), "[Type]"), Value = unname(dv)) }
+if (length(ch4_cells)) { ch4_cells <- rbindlist(ch4_cells)
+  say("Forested wetland methane: %s", paste(ch4_cells[, sprintf("%s %s target %.3f Mg C/ha/yr = %.1f%% of a source emission of %.2f (forest floor %.2f, soil and root litter %.2f; %s)%s", StratumId, sub("^Wetland: ", "", StateClassId), Target, 100 * Share,
+                                                            SourceEmission, ForestFloor, SourceEmission - ForestFloor, Stand, ifelse(Share >= wopt$MethaneCapShare - 1e-9, sprintf(" (capped: %.3f delivered)", Share * SourceEmission), ""))], collapse = "; ")) }
 ng <- rbindlist(ng); fm_g <- rbindlist(fm_g); fm_d <- rbindlist(fm_d)
 fm_d <- fm_d[!(FlowGroupId == paste(BURIAL_FLOW, "[Type]") & Value == 0)]   # burial only where a class has it
 rates <- rbindlist(rates)
@@ -472,6 +503,19 @@ sh <- rbindlist(lapply(names(POOL_OUT), function(p) { pool <- sub(" ->$", "", p)
        grepl(sprintf("^(Decay|Emission|Lateral Transport|Stabilization): %s -> ", pool), FlowGroupId), .(pool = pool, s = sum(as.numeric(Value))), by = .(StratumId, StateClassId)] }))
 check(STAGE, "emergent wetland shares out of each pool's total loss add to 1", !nrow(sh) || all(abs(sh$s - 1) < 1e-3), paste(head(sh[abs(s - 1) >= 1e-3, sprintf("%s %s %s %.3f", StratumId, StateClassId, pool, s)], 5), collapse = "; "))
 check(STAGE, "grassland, shrubland and wetland rates are between 0 and 1 and net growth is not negative", all(between(as.numeric(gs_m$Value), 0, 1)) && all(as.numeric(nf_g$Value) >= 0))
+# Wetland Methane (src/wetland-params.R): an emergent class whose target the scenario sets, or whose fitted methane fraction is above
+# the scenario's cap, takes the fraction that target asks of its fitted belowground emission (defaults/stockflow/emergent-wetland-fit.csv:
+# no refit). Each pool's CO2 and CH4 shares still add to its emission share, so the pools, burial and lateral export stay as fitted.
+source(pkg_file("src", "nonforest-solve.R"))
+wfit <- read_default("stockflow", "emergent-wetland-fit.csv")
+wb <- merge(wfit[, .(StratumId, StateClassId, Region, Bg = as.numeric(BelowgroundEmission), f0 = as.numeric(CH4Share))], wtg[!is.na(Region), .(StateClassId, Region, Target, Low, High, Source)], by = c("StateClassId", "Region"))
+wb[, f := ifelse(Source == "scenario" | f0 > wopt$MethaneCapShare, wetland_share(Target, Bg, wopt$MethaneCapShare), f0)]
+for (r in which(abs(wb$f - wb$f0) > 1e-12)) for (k in names(NF_CH4$ch4)) {
+  ic <- which(gs_m$StratumId == wb$StratumId[r] & gs_m$StateClassId == wb$StateClassId[r] & gs_m$FlowGroupId == paste(NF_CH4$co2[[k]], "[Type]")); ih <- which(gs_m$StratumId == wb$StratumId[r] & gs_m$StateClassId == wb$StateClassId[r] & gs_m$FlowGroupId == paste(NF_CH4$ch4[[k]], "[Type]"))
+  if (length(ic) != 1 || length(ih) != 1) next
+  e <- as.numeric(gs_m$Value[ic]) + as.numeric(gs_m$Value[ih]); h <- round(e * wb$f[r], 8); set(gs_m, ih, "Value", as.character(h)); set(gs_m, ic, "Value", as.character(round(e - h, 10))) }
+if (any(abs(wb$f - wb$f0) > 1e-12)) say("Wetland Methane: %d emergent wetland budgets take a methane fraction of their own (target or cap of this scenario): %s", sum(abs(wb$f - wb$f0) > 1e-12),
+    paste(head(wb[abs(f - f0) > 1e-12, sprintf("%s %s %.3f Mg C/ha/yr = %.1f%% (%.1f%% as fitted)%s", StratumId, sub("^Wetland: ", "", StateClassId), Target, 100 * f, 100 * f0, ifelse(f >= wopt$MethaneCapShare - 1e-9, " at the cap", ""))], 6), collapse = "; "))
 if (all(is.na(gs_m$AgeMin))) gs_m[, AgeMin := NULL]
 # post-disturbance classes (to-do 57; src/disturbed-carbon.R): derived from the rows above, so they follow their parents
 dcl <- disturbed_classes(scl)
@@ -498,6 +542,39 @@ if (nrow(cy)) {
 
 # every flow type, flow group, stock type and state class named must exist in the library's definitions
 ft <- stsim_list("FlowType")$Name; fg <- stsim_list("FlowGroup")$Name; stt <- stsim_list("StockType")$Name
+# methane from emergent wetlands (2026-11-16; src/nonforest-solve.R NF_CH4): BG Slow and BG Very Fast each release carbon as CO2 and
+# as CH4, both shares of the pool's total loss, each with its own Q10 (stage 7: Q10 Wetland CH4 on the methane; Q10 Wetland Soil on the
+# soil's CO2, which has a flow type of its own in these classes; the litter's CO2 keeps Q10 Slow Flows). A library made before these
+# definitions runs as before: the soil's emission by the shared flow type and no methane, each pool's CH4 share put back into its CO2
+# share, so the pools, burial and lateral export at the normal climate are the same either way.
+source(pkg_file("src", "nonforest-solve.R")); g4 <- NF_CH4; ty4 <- function(x) paste(x, "[Type]")
+mp4 <- METHANE_POOLS   # every methane source pool: soil and root litter (emergent and forested wetlands), the forest floor (forested)
+has_ch4 <- all(c(mp4$co2, mp4$ch4) %in% ft) && all(c(ty4(c(mp4$co2, mp4$ch4)), g4$q10, g4$soil_q10) %in% fg)
+c4 <- rbindlist(lapply(seq_len(nrow(mp4)), function(k) merge(fm[FlowGroupId == ty4(mp4$ch4[k]), .(StratumId, StateClassId, ch4 = as.numeric(Value))],
+                                                            fm[FlowGroupId == ty4(mp4$co2[k]), .(StratumId, StateClassId, co2 = as.numeric(Value))], by = c("StratumId", "StateClassId"))[, pool := mp4$code[k]]))
+if (has_ch4) {
+  # the forested wetland classes that release methane, and their Disturbed classes (which take their parents' rates): their pathways
+  fp <- ch4_pathways(fp, unique(fm[FlowGroupId == ty4(CH4_FLOWS$soil_ch4), StateClassId]))
+  sh4 <- c4[, ifelse(ch4 + co2 > 0, ch4 / (ch4 + co2), 0)]   # (a share at the cap is the cap to rounding: 2026-11-16, the Great Dismal Swamp twins at 0.3 failed an exact test)
+  say("Wetland methane: %d wetland classes (emergent, forested and their disturbed classes) release %.1f-%.1f%% of what their source pools emit as CH4 at the normal climate", uniqueN(c4$StateClassId), 100 * min(sh4), 100 * max(sh4))
+  check(STAGE, "the methane share of what a wetland's source pools emit is between 0 and the cap", all(sh4 >= 0 & sh4 <= wopt$MethaneCapShare + 1e-7), sprintf("cap %.2f; largest %.4f", wopt$MethaneCapShare, max(sh4)))
+  # the uncertainty draws: a class whose target has a range gets, for each of the first Uncertainty Draws iterations, a methane factor
+  # and the CO2 factor that takes the same carbon off its CO2 (tabular, by ecodivision and class). Estuarine emergent marsh is left to
+  # stage 8, which writes its factors per cell (they depend on the salinity zones in each cell)
+  if (wopt$UncertaintyDraws > 0) { if (!all(c(METHANE_UNCERTAINTY_TYPE) %in% stsim_list("FlowMultiplierType")$Name) || !all(WETLAND_FACTOR_GROUPS %in% fg)) {
+      say("Wetland Methane: %d uncertainty draws asked for, but this library has no '%s' multiplier type or wetland methane flow groups (it predates them): every iteration runs at the targets", wopt$UncertaintyDraws, METHANE_UNCERTAINTY_TYPE)
+    } else { bs <- c4[pool == "BGS", .(StratumId, StateClassId, f = ifelse(ch4 + co2 > 0, ch4 / (ch4 + co2), 0))][StateClassId != "Wetland: Estuarine Emergent"]
+      bs[, parent := sub("^Disturbed: Wetland (.+ Group)$", "Wetland: \\1", StateClassId)][, Region := wb$Region[match(paste(StratumId, parent), paste(wb$StratumId, wb$StateClassId))]]
+      tk <- match(paste(bs$parent, bs$Region), paste(wtg$StateClassId, wtg$Region)); bs[, `:=`(Target = wtg$Target[tk], Low = wtg$Low[tk], High = wtg$High[tk])]
+      ir <- wetland_iteration_rows(bs[!is.na(Target)], wopt$UncertaintyDraws, wopt$MethaneCapShare); if (nrow(ir)) fm <- rbind(fm, ir, fill = TRUE)
+      say("Wetland Methane: %d uncertainty draws; %d classes with a target range get their own methane and CO2 factors in iterations 1 to %d (%d rows)%s", wopt$UncertaintyDraws, uniqueN(ir$StateClassId), wopt$UncertaintyDraws, nrow(ir),
+          if (nrow(ir)) sprintf("; methane factor %.2f to %.2f", min(ir[FlowGroupId == WETLAND_FACTOR_GROUPS[["ch4"]], Value]), max(ir[FlowGroupId == WETLAND_FACTOR_GROUPS[["ch4"]], Value])) else "") } }
+} else { say("Wetland methane: this library lacks the wetland CO2 and CH4 emission flow types (it predates them, or the forest floor ones), so wetland emission is all counted as CO2 and wetland soil has no temperature response")
+  num <- is.numeric(fm$Value)
+  for (k in seq_len(nrow(mp4))) { x <- c4[pool == mp4$code[k]]; if (!nrow(x)) next; at <- fm[, which(FlowGroupId == ty4(mp4$co2[k]) & paste(StratumId, StateClassId) %in% x[, paste(StratumId, StateClassId)])]
+    v <- x[match(fm[at, paste(StratumId, StateClassId)], paste(StratumId, StateClassId)), ch4 + co2]; set(fm, at, "Value", if (num) v else as.character(v)) }
+  fm <- fm[!FlowGroupId %in% ty4(mp4$ch4)]; fp <- fp[!FlowTypeId %in% mp4$ch4]
+  for (k in seq_len(nrow(mp4))) { fm[FlowGroupId == ty4(mp4$co2[k]), FlowGroupId := ty4(mp4$shared[k])]; fp[FlowTypeId == mp4$co2[k], FlowTypeId := mp4$shared[k]] } }
 bad <- unique(c(setdiff(fp$FlowTypeId, ft), setdiff(unique(fm$FlowGroupId), fg), setdiff(c(fp$FromStockTypeId, fp$ToStockTypeId), stt),
                 setdiff(na.omit(c(fp$FromStateClassId, fm$StateClassId, sav$StateClassId)), scl$Name)))
 check(STAGE, "every flow type, flow group, stock type and state class used is defined", !length(bad),

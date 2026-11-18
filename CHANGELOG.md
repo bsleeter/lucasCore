@@ -2,6 +2,69 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+### Added
+- Wetland methane (to-do 54). Emergent and forested wetlands release part of the carbon their soil and litter already emit as
+  CH4 instead of CO2, so no carbon is added or lost: in a normal climate year every pool loses what it lost before, and the
+  starting stocks a Build writes are unchanged. This is minor version 1.5: a library gains the definitions when it is opened
+  (update 1.5) and the methane with its next Build (stages 0, 3, 7 and 8; a Projection Climate with stage 11).
+  - Source pools: soil (BG Slow) and root litter (BG Very Fast) in emergent wetland; in the forested wetland classes also the
+    three forest-floor pools (AG Very Fast, AG Fast, AG Slow), because most decay in a forest is on the forest floor (Great
+    Dismal Swamp test: 3.6 to 4.1 Mg C/ha/yr from the five pools, about 3.0 to 3.5 of it from the forest floor). Each source pool
+    has a CO2 flow of its own (`Emission: <pool> -> Atmosphere (Wetland)`) and a CH4 flow (`Emission: <pool> -> Atmosphere CH4`).
+    Estuarine forested wetland has no methane yet.
+  - The split: a class's methane fraction is its target (Mg C/ha/yr as CH4) over what its source pools emit, held at 30% of that
+    emission (`src/nonforest-solve.R`, `src/flows.R`). Targets by class and region are literature values (SOCCR2 chapters 13 and
+    15, the IPCC 2013 Wetlands Supplement, Krauss et al. 2016, Knox et al. 2019, Delwiche et al. 2021, Bansal et al. 2023,
+    Arias-Ortiz et al. 2024): `defaults/stockflow/emergent-wetland-regions.csv` (column `CH4`) and
+    `defaults/spinup/wetland-ch4.csv`. Where the cap binds a class releases less than its target and stage 3 says so; no package
+    target reaches it.
+  - Temperature: methane has a Q10 of 3.83 (Yvon-Durocher et al. 2014) and wetland soil CO2 a Q10 of 2.0, in new flow groups
+    `Q10 Wetland CH4` and `Q10 Wetland Soil` (`defaults/climate/flow-multipliers.csv`, new column `Q10`); wetland litter CO2 keeps
+    the Q10 of its pool. In a warm year the pools lose more and a larger share of it is methane. Soil of every other class still
+    has no temperature response.
+  - Marsh salinity: an estuarine emergent cell takes the methane target of the salinity zones LANDFIRE EVT 2016 maps in it
+    (`defaults/stockflow/marsh-salinity-evt.csv`, `marsh-salinity-ch4.csv`; Arias-Ortiz et al. 2024 Table 3), written by stage 8 as
+    a pair of flow spatial multipliers (type Marsh Salinity): one on the methane and one on the matching CO2, so the cell's
+    carbon loss is unchanged. A cell with no zone keeps its class target. Marsh elevation is not modelled (to-do 66). Gulf
+    fresh and oligohaline marsh takes the Coastal Plains palustrine target (0.40), not the synthesis mean for warm sites (1.286):
+    that mean is chamber-dominated, three times the tower-based fresh marsh value, and more than the cap allows. Gulf brackish
+    marsh, and the Gulf class target used where no zone is mapped, are the Krauss et al. 2016 Louisiana brackish tower (0.111)
+    for the same reason, in place of the synthesis mean (0.161).
+  - Carbon Assumptions > Wetland Methane (new page; sheets Wetland Options, Wetland Methane Targets, Marsh Salinity Targets):
+    the two Q10s, the cap, the CO2 equivalent of methane carbon (33.5 by default; stage 0 writes it into the CO2e group weights),
+    a target for any class and region or salinity zone, and a low and a high beside any target. Left empty, the package values
+    apply. The package targets carry draft literature ranges (`defaults/stockflow/wetland-methane-targets.csv`,
+    `marsh-salinity-ch4.csv`, each with its basis). Uncertainty Draws = n makes each of a run's first n Monte Carlo iterations
+    draw every target from its range (triangular, one quantile for all targets) as a methane factor and the CO2 factor that
+    offsets it (flow multiplier type Methane Uncertainty; per-iteration salinity maps), so each iteration conserves carbon;
+    later iterations run at the targets. With 0 draws, the default, the ranges do nothing.
+  - Climate Options > Wetland Growth (new): how emergent marsh growth follows the year's climate: None, Miami NPP, Temperature
+    (the default: the temperature term of Miami NPP) or Temperature and Miami NPP (temperature for tidal marsh, Miami NPP
+    inland). Before, marsh growth had no climate response.
+  - Outputs: flow groups `Emission: Wetland CH4`, `Emission: Wetland CH4 (CO2e)` and `Emission: Wetland Methane Source CO2`;
+    methane is inside `Emission: Total Rh`, so NEP and NBP in carbon are unchanged and their CO2e versions count methane at its
+    CO2 equivalent.
+  - Run Figures (stage 13) and Compare Runs (stage 14): a Wetland methane figure when a run's wetlands released any: methane per year (by the kind of
+    wetland in Run Figures, a line per run in Compare Runs), and net biome productivity as CO2 with that methane at its CO2 equivalent.
+  - Tested at 300 m on Sabine and Lacassine NWRs (Louisiana) and the Great Dismal Swamp: the yearly change in ecosystem carbon
+    matches NBP to within 1 Mg C in every iteration. Method summary: `dev/wetland-ch4/wetland-methane-method.html`; literature:
+    `dev/wetland-ch4/literature-ch4.md`. Methane follows the yearly mean temperature, not the warm season (to-do 67), and water
+    level is not modelled.
+
+### Fixed
+- Stage 3 stopped with a missing soil multiplier where no cell of an emergent wetland budget reached its gNATSGO soil target
+  (Sabine and Lacassine NWRs at 300 m): the soil multiplier now falls back to 1 there, the package rate.
+- Forested wetland methane overshot its target where the fire return interval is short and the stands are old (Sabine and
+  Lacassine NWRs: swamp at 0.99 Mg C/ha/yr against 0.27). Stage 3 set the methane share on a stand averaged over one disturbance
+  cycle, 11 years there, which emits far less than the stands the library has. The share is now set on the stand ages present
+  (stage 5's maps), and on a disturbance cycle only where the library has no cell of the class.
+- A Build whose Stock-Flow Definitions dependency was made with an earlier lucasCore ran with the new flow types missing from the
+  flow order, group memberships and output filters, so those flows moved carbon that net biome productivity never counted (Sabine
+  and Lacassine at 300 m: about 1,200 Mg C a year from 424 ha of forested wetland litter). Stage 0 now stops and names the missing
+  flow types; `tools/sync-library.R` adds them to the library.
+
 ## 1.4.1 - 2026-11-16
 
 No library update: a 1.4.0 library opens as it is. A Build made with 1.4.0 keeps working; rerun it (or stages 0 and 6) to get the

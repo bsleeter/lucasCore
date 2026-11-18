@@ -52,6 +52,12 @@ te_of <- function(X) if (is.null(X$stocks)) data.table(Timestep = integer(), Tg 
 flow_of <- function(X, g) if (is.null(X$flows)) data.table(Timestep = integer(), Tg = numeric()) else X$flows[FlowGroup == g, .(Tg = sum(Mg) / 1e6), by = Timestep][order(Timestep)]
 # a cause of carbon loss (run-figures.R loss_cause: Fire, Forest harvest, Land use change, Crop harvest, ...): "cause:<name>"
 cause_of <- function(X, k) if (is.null(X$losses)) data.table(Timestep = integer(), Tg = numeric()) else X$losses[Cause == k, .(Tg = sum(Mg) / 1e6), by = Timestep][order(Timestep)]
+# wetland methane of a run per year (lucasCore 1.5; src/run-figures.R's load_run reads it by class): in Gg C, and the run's net biome
+# productivity as CO2 with that methane counted at its CO2 equivalent instead of as CO2 (Tg CO2e)
+ch4_of <- function(X) if (is.null(X$ch4) || !nrow(X$ch4)) data.table(Timestep = integer(), Gg = numeric()) else X$ch4[FlowGroup == "Emission: Wetland CH4", .(Gg = sum(Mg) / 1e3), by = Timestep][order(Timestep)]
+nbp_co2e_of <- function(X) { n <- flow_of(X, "Net Biome Productivity"); if (!nrow(n)) return(data.table(Timestep = integer(), Tg = numeric()))
+  g <- function(grp) { d <- if (is.null(X$ch4) || !nrow(X$ch4)) NULL else X$ch4[FlowGroup == grp, .(v = sum(Mg) / 1e6), by = Timestep]; v <- if (is.null(d)) NA_real_ else d$v[match(n$Timestep, d$Timestep)]; v[is.na(v)] <- 0; v }
+  data.table(Timestep = n$Timestep, Tg = 3.67 * n$Tg - (g("Emission: Wetland CH4 (CO2e)") - 3.67 * g("Emission: Wetland CH4"))) }
 series_of <- function(X, g) if (startsWith(g, "cause:")) cause_of(X, sub("^cause:", "", g)) else flow_of(X, g)
 trans_of <- function(X, f) X$trans[TransitionGroup == f, .(km2 = sum(ha) / 100), by = Timestep][order(Timestep)]
 at_year <- function(d, y, v = "Tg") { x <- d[Timestep == y][[v]]; if (length(x)) x[1] else NA_real_ }
@@ -212,6 +218,20 @@ compare_figures <- function(R, grid, dem, label, outdir) {
           sprintf("Carbon stored in wood products, %d: %s Tg C", ye, paste(vapply(P, function(r) sprintf("%.3g", at_year(wp_tg(r$X, "Stored"), r$X$years[2])), ""), collapse = " / ")))
         under_legend(labs, col = cols, lwd = 2, ncol = 1)
         low(); run_lines(function(X) nbp_products(X)[, .(Timestep, Tg)], "Tg C per year", 2, "Net biome productivity with wood products", zero = TRUE, legend = FALSE) }) }
+
+  # ---- charts: wetland methane (runs whose wetlands released any) ------------------------------------------------------------
+  has_m <- vapply(R, function(r) sum(ch4_of(r$X)$Gg) > 0, TRUE)
+  if (any(has_m)) {
+    miss <- vapply(R[!has_m], `[[`, "", "label")
+    pmean <- function(get, v) vapply(P, function(r) { d <- get(r$X); d <- d[Timestep > r$X$years[1]]; if (nrow(d)) sprintf("%.3g", mean(d[[v]])) else "-" }, "")
+    chart_figure("wetland_methane", "Wetland methane", paste0("(a) Carbon released to the atmosphere as methane by wetland soil and litter in each run, per year, in thousand tonnes of carbon (Gg C); ",
+      "it is part of heterotrophic respiration, so it is already inside net ecosystem and net biome productivity. ",
+      "(b) Net biome productivity as CO2 (carbon x 3.67) with that methane counted at its CO2 equivalent instead of as CO2; positive is uptake by the land. Titles give each projection's mean.",
+      if (length(miss)) sprintf(" No wetland methane in %s (a run made before lucasCore 1.5, or one without wetlands).", paste(miss, collapse = ", ")) else ""),
+      1, 2, h = 1150, draw = function() {
+        low(); run_lines(function(X) ch4_of(X), "Gg C as CH4 per year", 1, sprintf("Methane from wetlands (mean %s Gg C/yr)", paste(pmean(ch4_of, "Gg"), collapse = " / ")), zero = TRUE, legend = FALSE)
+        under_legend(labs, col = cols, lwd = 2, ncol = 1)
+        low(); run_lines(function(X) nbp_co2e_of(X), "Tg CO2e per year", 2, sprintf("NBP with methane as CO2e (mean %s Tg CO2e/yr)", paste(pmean(nbp_co2e_of, "Tg"), collapse = " / ")), zero = TRUE, legend = FALSE) }) }
 
   # ---- charts: flux means by period ------------------------------------------------------------------------------------------
   # the history as one period, the projections by decade (2024-2030, 2031-2040, ...); a bar per run that covers the period

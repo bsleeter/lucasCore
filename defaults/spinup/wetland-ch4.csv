@@ -1,0 +1,4 @@
+StateClass,CH4,Source
+Wetland: Spruce/Fir Group,0.09,SOCCR2 (Kolka et al. 2018) forested peatland 0.089 (14 studies). the class is northern forested peatland (literature draft accepted by the user 2026-11-16; dev/wetland-ch4/literature-ch4.csv; confidence low; before it 0.53)
+Wetland: Oak/Gum/Cypress Group,0.27,SOCCR2 (Kolka et al. 2018) forested mineral soil wetland 0.269 (16 studies); sites 0.17 to 1.35. No further assumption (literature draft accepted by the user 2026-11-16; dev/wetland-ch4/literature-ch4.csv; confidence low; before it 0.53)
+Wetland: Elm/Ash/Cottonwood Group,0.27,SOCCR2 (Kolka et al. 2018) forested mineral soil wetland 0.269. floodplain forest flooded part of the year is probably lower (Pulliam 1993: 0.17 in the low habitats only) (literature draft accepted by the user 2026-11-16; dev/wetland-ch4/literature-ch4.csv; confidence low; before it 0.53)

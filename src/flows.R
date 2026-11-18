@@ -148,6 +148,63 @@ BURIAL_FLOW <- "Stabilization: BG Slow -> Deep Soil"
 PEAT_FIRE_FLOWS <- paste("LULC: Emission Peat", c("CO2", "CO", "CH4"))
 add_burial <- function(vals, rate) { vals[[BURIAL_FLOW]] <- if (is.null(rate) || !length(rate) || is.na(rate)) 0 else rate; vals }
 
+# Methane from wetlands (2026-11-16; the emergent classes: src/nonforest-solve.R NF_CH4, the same flow types for soil and root
+# litter). A forested wetland class (defaults/spinup/wetland-ch4.csv, Mg C/ha/yr as CH4) releases a fraction of what its methane
+# source pools emit as CH4: each pool's emission rate is split into a CO2 flow and a CH4 flow (to Atmosphere: CH4), so the pool's
+# total loss, and with it the calibration, the spin-up and the starting stocks, is what it was. The source pools are the soil and the
+# root litter (BG Slow, BG Very Fast) and the forest floor (AG Very Fast, AG Fast, AG Slow: leaf and twig litter and humus, which a
+# swamp floods; user 2026-11-16: with the soil and root litter alone a swamp could not reach its target, most of its soil carbon
+# being peat, which has no yearly emission). The CO2 flows go by wetland flow types (so a marsh salinity or methane uncertainty
+# multiplier reaches wetland cells only); the soil's carries a Q10 of its own (stage 7: Q10 Wetland Soil), the others the Q10 their
+# pool always had; the CH4 flows carry Q10 Wetland CH4. The fraction is the target over the class's cycle-averaged emission from
+# those pools in that ecodivision, capped at max_share (user 2026-11-16: 30%, half until then; where the target asks for more, the
+# class releases what the cap allows and stage 3 says how much).
+METHANE_POOLS <- data.table::data.table(
+  code = c("BGS", "BGVF", "AGVF", "AGF", "AGS"), pool = c("BG Slow", "BG Very Fast", "AG Very Fast", "AG Fast", "AG Slow"),
+  other = c(NA, "Decay: BG Very Fast -> BG Slow", "Decay: AG Very Fast -> AG Slow", "Decay: AG Fast -> AG Slow", NA),   # the pool's other loss in the same step as its emission
+  forest_floor = c(FALSE, FALSE, TRUE, TRUE, TRUE))
+METHANE_POOLS[, `:=`(shared = sprintf("Emission: %s -> Atmosphere", pool), co2 = sprintf("Emission: %s -> Atmosphere (Wetland)", pool), ch4 = sprintf("Emission: %s -> Atmosphere CH4", pool))]
+CH4_FLOWS <- list(shared_soil = "Emission: BG Slow -> Atmosphere", shared_litter = "Emission: BG Very Fast -> Atmosphere",
+                  soil_co2 = "Emission: BG Slow -> Atmosphere (Wetland)", litter_co2 = "Emission: BG Very Fast -> Atmosphere (Wetland)",
+                  soil_ch4 = "Emission: BG Slow -> Atmosphere CH4", litter_ch4 = "Emission: BG Very Fast -> Atmosphere CH4", sink = "Atmosphere: CH4", max_share = 0.3)
+# the year's emission (Mg C/ha) of each source pool, from the pools at the start of the year and the rates (named flow values). A fast
+# pool takes the year's litter (flow order 6; snag branches fall at 3) before it decays and emits (6.5), so what emits is its stock plus
+# that litter: a pool that empties every year emits its whole intake, and its year-end stock says nothing about it (2026-11-17: the
+# Great Dismal Swamp spruce/fir twin, whose leaf litter is lost within the year). A slow pool hardly moves: its stock times its rate.
+#   stock: the dead pools by code (METHANE_POOLS$code and SnagBranch); live: the live pools by name (names(LIVE_POOLS))
+METHANE_LITTER_IN <- list(AGVF = c(Foliage = "Biomass Turnover: Foliage -> AG Very Fast", FineRoots = "Biomass Turnover: Fine Roots -> AG Very Fast"),
+                          BGVF = c(FineRoots = "Biomass Turnover: Fine Roots -> BG Very Fast"),
+                          AGF = c(Other = "Biomass Turnover: Other Wood -> AG Fast", CoarseRoots = "Biomass Turnover: Coarse Roots -> AG Fast"))
+methane_source_emission <- function(stock, live, vals) { p <- METHANE_POOLS; v <- function(n) if (n %in% names(vals)) vals[[n]] else 0
+  inp <- vapply(p$code, function(k) { x <- METHANE_LITTER_IN[[k]]; s <- if (is.null(x)) 0 else sum(vapply(names(x), function(lp) live[[lp]] * v(x[[lp]]), 1))
+    if (k == "AGF" && "SnagBranch" %in% names(stock)) s <- s + stock[["SnagBranch"]] * v("Transfer: Snag Branch -> AG Fast"); s }, 1)
+  stats::setNames((unname(stock[p$code]) + inp) * vapply(p$shared, v, 1), p$code) }
+# the weight of each age (rows of a by-age matrix, ages 0..n-1) in the stand a methane share is calibrated on: the stand ages the
+# library has for the class (stage 5's maps; an age past the curve counts as its last age), else one disturbance cycle (ages 0..ri-1).
+# 2026-11-17: the cycle alone made the Louisiana swamp (LANDFIRE return interval 11 yr, stands far older) a stand aged 0-10 emitting
+# 0.97 Mg C/ha/yr where the real ones emit 3.5, so its share was 3.6 times too large.
+methane_age_weights <- function(ages, ri, n) { ages <- ages[is.finite(ages)]
+  if (!length(ages)) { k <- max(1L, min(as.integer(ri), n)); return(c(rep(1 / k, k), rep(0, n - k))) }
+  t <- tabulate(pmin(pmax(as.integer(round(ages)), 0L), n - 1L) + 1L, n); t / sum(t) }
+# named flow values (dom_flow_values, after scaling) with every source pool's emission split at fraction f
+ch4_split <- function(vals, f) { p <- METHANE_POOLS[shared %in% names(vals)]; e <- unname(vals[p$shared])
+  c(vals[!names(vals) %in% p$shared], stats::setNames(e * (1 - f), p$co2), stats::setNames(e * f, p$ch4)) }
+# and back: the values as the forest pathways name them (the spin-up and anything else that steps the pools by FOREST_PATHWAYS)
+ch4_unsplit <- function(vals) { p <- METHANE_POOLS; v <- function(n) if (n %in% names(vals)) vals[[n]] else 0
+  if (!any(c(p$co2, p$ch4) %in% names(vals))) return(vals)
+  for (i in seq_len(nrow(p))) if (any(c(p$co2[i], p$ch4[i]) %in% names(vals))) { e <- v(p$shared[i]) + v(p$co2[i]) + v(p$ch4[i])
+    vals <- vals[!names(vals) %in% c(p$co2[i], p$ch4[i], p$shared[i])]; vals[[p$shared[i]]] <- e }
+  vals }
+# the flow pathways (stsim_FlowPathway columns) of the classes that release methane: each source pool's CO2 by its wetland flow type
+# and a CH4 row beside it. `pools` (codes) are the class's source pools; a class that already has CH4 rows is left as it is
+ch4_pathways <- function(fp, classes, pools = METHANE_POOLS$code) { p <- METHANE_POOLS[code %in% pools]; fp <- data.table::copy(fp)
+  todo <- setdiff(classes, fp[FlowTypeId %in% METHANE_POOLS$ch4, unique(FromStateClassId)]); if (!length(todo)) return(fp)
+  k <- fp$FromStateClassId %in% todo & is.na(fp$TransitionGroupId %||% NA)
+  for (i in seq_len(nrow(p))) fp[k & FlowTypeId == p$shared[i], FlowTypeId := p$co2[i]]
+  add <- fp[k & FlowTypeId %in% p$co2]
+  add[, `:=`(ToStockTypeId = CH4_FLOWS$sink, FlowTypeId = p$ch4[match(FlowTypeId, p$co2)])]
+  rbind(fp, add) }
+
 # ---- Carbon Rates read-out (to-do 30) -----------------------------------------------------------------------------------
 # one cell's rows for the Carbon Rates output: every turnover and DOM flow it runs with (vals: the named flow values after snag fall and
 # decay scaling, exactly what stage 3 writes), with where each came from. r: turnover_rates(); dp: dom_parameters() of the cell; temp: its

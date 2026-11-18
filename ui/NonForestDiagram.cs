@@ -4,7 +4,8 @@
 // =============================================================================
 // Net growth enters the live pools from the left, labelled with its share. Each box gives the pool's steady-state stock and turnover
 // time (and, for emergent wetlands, its total loss rate). What a pool releases leaves it as an arrow: curving up from its top right
-// corner to the atmosphere, out of its right side to water; there are no atmosphere or water boxes. A value set by this scenario's
+// corner to the atmosphere (a wetland pool's methane as a second arrow to its left), out of its right side to water; there are no
+// atmosphere or water boxes. A value set by this scenario's
 // rows is drawn bold. Hovering a curve or arrow shows its rate, stock and flux.
 // =============================================================================
 using System;
@@ -132,13 +133,13 @@ namespace lucasCoreUI
                     }
                 }
                 // what leaves the system: up to the atmosphere from each box's top right corner, sideways to water from its right side
-                Color air = Color.FromArgb(120, 120, 116), water = Color.FromArgb(55, 138, 221);
+                Color air = Color.FromArgb(120, 120, 116), water = Color.FromArgb(55, 138, 221), methane = Color.FromArgb(160, 70, 140);
                 foreach (var ed in Budget.Edges.Where(x => (x.To == "ATM" || x.To == "AQ") && x.Flux > 1e-9 && pos.ContainsKey(x.From)))
                 {
-                    RectangleF r = pos[ed.From]; bool up = ed.To == "ATM"; Color col = up ? air : water;
+                    RectangleF r = pos[ed.From]; bool up = ed.To == "ATM", ch4 = up && ed.Gas == "CH4"; Color col = ch4 ? methane : up ? air : water; float off = ch4 ? 44 : 0;   // methane leaves to the left of the CO2 arrow
                     float w = (float)(1 + 7 * Math.Sqrt(ed.Flux / Math.Max(maxF, 1e-9)));
-                    PointF a = up ? new PointF(r.Right - 26, r.Top) : new PointF(r.Right, r.Bottom - 12);
-                    PointF b = up ? new PointF(r.Right - 8, r.Top - 26) : new PointF(r.Right + 26, r.Bottom - 12);
+                    PointF a = up ? new PointF(r.Right - 26 - off, r.Top) : new PointF(r.Right, r.Bottom - 12);
+                    PointF b = up ? new PointF(r.Right - 8 - off, r.Top - 26) : new PointF(r.Right + 26, r.Bottom - 12);
                     PointF c1 = up ? new PointF(a.X, a.Y - 14) : new PointF(a.X + 9, a.Y), c2 = up ? new PointF(a.X + 2, b.Y + 4) : new PointF(b.X - 9, b.Y);
                     using (var pen = new Pen(Color.FromArgb(150, col), w)) g.DrawBezier(pen, a, c1, c2, b);
                     // the head points along the curve's last stretch
@@ -149,8 +150,9 @@ namespace lucasCoreUI
                     var pts = new PointF[11];
                     for (int i = 0; i <= 10; i++) { float u = i / 10f, v = 1 - u; pts[i] = new PointF(v * v * v * a.X + 3 * v * v * u * c1.X + 3 * v * u * u * c2.X + u * u * u * b.X, v * v * v * a.Y + 3 * v * v * u * c1.Y + 3 * v * u * u * c2.Y + u * u * u * b.Y); }
                     m_hits.Add(new KeyValuePair<PointF[], NonForestBudget.Edge>(pts, ed));
-                    string txt = (up ? "CO\u2082 " : "water ") + (ShowFlux ? Num(ed.Flux) : RateText(ed.Entered));
-                    labels.Add(Tuple.Create(up ? new PointF(tip.X + 3, tip.Y - 8) : new PointF(a.X + 3, a.Y + 4), txt, ed.Yours, col, false));
+                    string txt = (ch4 ? "CH\u2084 " : up ? "CO\u2082 " : "water ") + (ShowFlux ? Num(ed.Flux) : RateText(ed.Entered));
+                    // the methane label sits left of its arrow, in the gap above the box; the CO2 label right of its arrow's tip
+                    labels.Add(Tuple.Create(ch4 ? new PointF(a.X - 4 - g.MeasureString(txt, ed.Yours ? bold : small).Width, r.Top - 20) : up ? new PointF(tip.X + 3, tip.Y - 8) : new PointF(a.X + 3, a.Y + 4), txt, ed.Yours, col, false));
                 }
                 foreach (var l in labels)
                     using (var lb = new SolidBrush(Color.FromArgb(Math.Min(255, l.Item4.R / 2), Math.Min(255, l.Item4.G / 2), Math.Min(255, l.Item4.B / 2))))
@@ -180,12 +182,12 @@ namespace lucasCoreUI
                     var ed = h.Value; var b = Budget;
                     text = ed.Kind == "Net growth"
                         ? string.Format("Net growth to {0}: {1:0.#}% of {2} = {3} Mg C/ha/yr{4}", b.P[ed.To].Label.ToLower(), ed.Entered * 100, Num(b.Growth), Num(ed.Flux), ed.Yours ? " (this page's row)" : "")
-                        : string.Format("{0}: {1} to {2}\n{3} {4} x {5} Mg C/ha = {6} Mg C/ha/yr{7}{8}", ed.Kind, b.P[ed.From].Label.ToLower(), ed.To == "ATM" ? "the atmosphere" : ed.To == "AQ" ? "water" : b.P[ed.To].Label.ToLower(),
+                        : string.Format("{0}: {1} to {2}\n{3} {4} x {5} Mg C/ha = {6} Mg C/ha/yr{7}{8}", ed.Kind, b.P[ed.From].Label.ToLower(), ed.To == "ATM" ? (ed.Gas == "CH4" ? "the atmosphere as methane" : "the atmosphere") : ed.To == "AQ" ? "water" : b.P[ed.To].Label.ToLower(),
                             b.Totals.Contains(ed.From) && ed.Kind != "Biomass Turnover" ? "share " + RateText(ed.Entered) + " of loss " + RateText(b.P[ed.From].Total) + "/yr =" : "rate", RateText(ed.Rate) + "/yr",
                             Num(ed.Base), Num(ed.Flux),
                             // ST-Sim computes a flow from the pool's stock at the start of its step in the year's flow order
                             Math.Abs(ed.Base - b.P[ed.From].Stock) > 1e-6 ? string.Format("\n(the pool's stock at flow order {0}; {1} Mg C/ha at year end)", ed.Order == double.MaxValue ? "last" : ed.Order.ToString("0.##", CultureInfo.InvariantCulture), Num(b.P[ed.From].Stock)) : "",
-                            ed.Yours ? "\n(set by this page's rows)" : "");
+                            ed.Yours ? (ed.Gas != null && b.HasMethane && b.MethaneYours ? "\n(set by this page's rows or the Wetland Methane page)" : "\n(set by this page's rows)") : "");
                     break;
                 }
             if (text != m_tipText) { m_tipText = text; if (text.Length > 0) m_tip.Show(text, this, e.X + 14, e.Y + 14); else m_tip.Hide(this); }

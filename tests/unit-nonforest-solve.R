@@ -30,7 +30,7 @@ check("the simulated year agrees with the steady state", abs(sim[["Biomass: Foli
 lm <- rd("stockflow", "legacy-ibis", "emergent-multipliers.csv"); lg <- rd("stockflow", "legacy-ibis", "emergent-net-growth.csv")
 li <- rd("stockflow", "legacy-ibis", "emergent-initial-stocks.csv"); st <- rd("initialstocks", "stock-types.csv")
 for (cls in EM) {
-  f <- nf_flows(pa[FromStratumId == "Marine" & FromStateClassId == cls], lm[StratumId == "Marine" & StateClassId == cls, .(FlowGroupId, Value)], memb, ord)
+  f <- nf_flows(pa[FromStratumId == "Marine" & FromStateClassId == cls], nf_ch4_prepare(lm[StratumId == "Marine" & StateClassId == cls, .(FlowGroupId, Value)]), memb, ord)
   s <- nf_steady(f, as.numeric(lg[StratumId == "Marine" & StateClassId == cls, Value]))$stock
   tab <- li[StateClassID == cls & as.numeric(Value) > 0][, .(pool = st$StockTypeId[match(StateAttributeTypeID, st$Attribute)], v = as.numeric(Value))]
   live_dom <- tab[!pool %in% "DOM: Belowground Slow"]
@@ -74,6 +74,60 @@ check("Pacific values: Marine estuarine burial 1.10, Mediterranean 1.04 (Wang et
 pr <- unlist(lapply(c("cbm-defaults", "fia-measured"), function(m) c(rd("carbon-assumptions", m, "nonforest-rates.csv")$StateClassId, rd("carbon-assumptions", m, "nonforest-growth.csv")$StateClassId)))
 check("the carbon method presets hold no emergent rows (they would override the ecodivision values)", !any(pr %in% EM))
 check("Deep Soil is in stage 8's stock list with no forest curve column", { s <- st[StockTypeId == "Deep Soil"]; nrow(s) == 1 && is.na(s$CurveColumn) })
+
+# ---- methane from emergent wetlands (2026-11-16): CO2 and CH4 flows from BG Slow and BG Very Fast, each with its own Q10 --------------
+g4 <- NF_CH4; ty4 <- function(x) paste(x, "[Type]"); dd <- function(f) fread(file.path("defaults", "stsim", f), sep = ",", colClasses = "character", encoding = "UTF-8")$Name
+o4 <- function(x) as.numeric(ord$Order[match(x, ord$FlowTypeId)]); mg <- function(ft) memb[FlowTypeId == ft]
+check("methane definitions: the wetland soil CO2 flow type, a CH4 flow type for each pool, the two Q10 groups and the reporting groups; no holding stock",
+      all(c(g4$co2, g4$ch4) %in% dd("stsim_FlowType.csv")) && all(c(g4$q10, g4$soil_q10, "Emission: Wetland CH4", "Emission: Wetland CH4 (CO2e)") %in% dd("stsim_FlowGroup.csv")) &&
+      !any(grepl("Wetland.*Gas", c(dd("stsim_StockType.csv"), dd("stsim_FlowType.csv")))))
+check("flow order: each CH4 flow at the order of its pool's CO2 emission (flows of one order draw on the same stock)", all(o4(g4$ch4) == o4(g4$co2)) && o4(g4$co2[["soil"]]) == o4(g4$shared_soil))
+wv <- function(ft, g) as.numeric(mg(ft)[FlowGroupId == g, Value])
+WCO2 <- "Emission: Wetland Methane Source CO2"   # the group a marsh salinity multiplier adjusts (stage 8)
+check("each wetland CO2 flow is in every group its shared counterpart is in (the same weights), plus the wetland CO2 group; the soil's also in its own Q10 group; the shared soil emission has no Q10",
+      all(vapply(names(g4$co2), function(k) { w <- mg(g4$co2[[k]])$FlowGroupId; s <- mg(g4$shared[[k]])$FlowGroupId; own <- c(WCO2, if (k == "soil") g4$soil_q10)
+        setequal(setdiff(w, own), s) && all(own %in% w) && all(vapply(s, function(g) wv(g4$co2[[k]], g) == wv(g4$shared[[k]], g), TRUE)) }, TRUE)) && !any(grepl("^Q10", mg(g4$shared_soil)$FlowGroupId)) &&
+      "Q10 Slow Flows" %in% mg(g4$co2[["litter"]])$FlowGroupId)
+check("each CH4 flow: in its pool's total loss, in the carbon groups as carbon (1) and the CO2e groups as methane (33.5), in Q10 Wetland CH4 and no other Q10 group",
+      all(vapply(names(g4$ch4), function(k) { ft <- g4$ch4[[k]]; pool <- c(soil = "BG Slow ->", litter = "BG Very Fast ->")[[k]]
+        wv(ft, pool) == 1 && all(vapply(c("Emission: Total", "Emission: Total Rh", "Emission: Wetland CH4"), function(g) wv(ft, g) == 1, TRUE)) &&
+          all(vapply(c("Net Ecosystem Productivity", "Net Biome Productivity"), function(g) wv(ft, g) == -1, TRUE)) &&
+          all(vapply(c("Emission: Total (CO2e)", "Emission: Total Rh (CO2e)", "Emission: Wetland CH4 (CO2e)"), function(g) wv(ft, g) == 33.5, TRUE)) &&
+          all(vapply(c("Net Ecosystem Productivity (CO2e)", "Net Biome Productivity (CO2e)"), function(g) wv(ft, g) == -33.5, TRUE)) &&
+          identical(grep("^Q10", mg(ft)$FlowGroupId, value = TRUE), g4$q10) }, TRUE)))
+check("the two wetland Q10s are fixed values in the climate table (methane, and the soil's CO2)",
+      { cf <- fread("defaults/climate/flow-multipliers.csv", colClasses = "character", na.strings = ""); x <- cf[match(c(g4$q10, g4$soil_q10), FlowGroupId)]
+        !anyNA(x$FlowGroupId) && all(x$Role == "Decomposition") && all(as.numeric(x$Q10) >= 1) })
+check("only the emergent classes have the wetland CO2 and CH4 flows in the package pathways, every one of them has all four, and none keeps a shared belowground emission",
+      setequal(unique(pa[FlowTypeId %in% c(g4$co2, g4$ch4), FromStateClassId]), EM) && pa[FromStateClassId %in% EM & FlowTypeId %in% c(g4$co2, g4$ch4), .N] == 4 * nrow(fit) &&
+      !nrow(pa[FromStateClassId %in% EM & FlowTypeId %in% g4$shared]) && all(pa[FlowTypeId %in% g4$ch4, ToStockTypeId] == g4$sink) &&
+      all(pa[FlowTypeId == g4$ch4[["soil"]], FromStockTypeId] == "DOM: Belowground Slow") && all(pa[FlowTypeId == g4$ch4[["litter"]], FromStockTypeId] == "DOM: Belowground Very Fast") &&
+      !nrow(fm[StateClassId %in% EM & FlowGroupId %in% ty4(g4$shared)]))
+sh4 <- rbindlist(lapply(names(g4$ch4), function(k) merge(fm[FlowGroupId == ty4(g4$ch4[[k]]), .(StratumId, StateClassId, ch4 = as.numeric(Value))],
+                                                        fm[FlowGroupId == ty4(g4$co2[[k]]) & StateClassId %in% EM, .(StratumId, StateClassId, co2 = as.numeric(Value))])[, pool := k]))[, f := ch4 / (ch4 + co2)]
+check("a methane target for every region; one methane fraction for both pools of a class (to the 6 decimals written), at or under the cap",
+      !anyNA(as.numeric(reg$CH4)) && nrow(sh4) == 2 * nrow(fit) && sh4[, .(d = diff(range(f))), by = .(StratumId, StateClassId)][, all(d < 1e-4)] && all(sh4$f <= g4$max_share) &&
+      merge(sh4[, .(f = mean(f)), by = .(StratumId, StateClassId)], fit[, .(StratumId, StateClassId, s = as.numeric(CH4Share))])[, all(abs(f - s) < 1e-4)])
+cw <- 0; pw <- 0; qw <- 0; mw <- 0; lost <- Inf
+for (i in seq_len(nrow(fit))) {
+  e <- fit$StratumId[i]; cls <- fit$StateClassId[i]; npp <- as.numeric(fit$NPP[i]); tg <- as.numeric(reg[StateClassId == cls & Region == fit$Region[i], CH4])
+  p <- pa[FromStratumId == e & FromStateClassId == cls]; m <- fm[StratumId == e & StateClassId == cls, .(FlowGroupId, Value)]
+  ss <- nf_steady(nf_flows(p, m, memb, ord), npp); cw <- max(cw, abs(ss$sink[[g4$sink]] - tg))
+  # the same class before methane: each pool's CH4 share back in its CO2 share
+  m0 <- copy(m)[, Value := as.numeric(Value)]; for (k in names(g4$ch4)) m0[FlowGroupId == ty4(g4$co2[[k]]), Value := Value + m0[FlowGroupId == ty4(g4$ch4[[k]]), Value]]
+  m0[FlowGroupId %in% ty4(g4$ch4), Value := 0]; s0 <- nf_steady(nf_flows(p, m0, memb, ord), npp); k <- names(s0$stock)
+  pw <- max(pw, max(abs(ss$stock[k] - s0$stock[k])), max(abs(ss$sink[names(s0$sink)] - s0$sink)))
+  # a warm year: methane's multiplier at 1.3, everything else normal. From the same pools the year's methane is 1.3 times a normal
+  # year's (its own Q10, from both pools), and the extra comes out of the pools gram for gram (nothing else leaves faster)
+  S0 <- c(ss$stock, setNames(rep(0, length(ss$sink)), names(ss$sink)))
+  a <- nf_simulate(nf_flows(p, m, memb, ord), npp, S0, 1); b <- nf_simulate(nf_flows(p, rbind(m, data.table(FlowGroupId = g4$q10, Value = "1.3")), memb, ord), npp, S0, 1)
+  qw <- max(qw, abs(b[[g4$sink]] / a[[g4$sink]] - 1.3)); mw <- max(mw, abs(sum(b) - sum(a)))
+  lost <- min(lost, sum(a[names(ss$stock)]) - sum(b[names(ss$stock)])) }
+check(sprintf("methane at the steady state is the region's target (largest gap %.1e Mg C/ha/yr)", cw), cw < 1e-4)
+check(sprintf("mass balance at the normal climate: with and without methane every pool, burial and lateral export are the same (largest gap %.1e)", pw), pw < 1e-6)
+check(sprintf("in a warm year methane release responds by exactly its own Q10 multiplier (largest gap %.1e)", qw), qw < 1e-9)
+check(sprintf("and carbon is conserved: the extra methane leaves the pools and reaches the atmosphere gram for gram (largest gap %.1e); the pools do fall (%.3f Mg C/ha or more)", mw, lost), mw < 1e-9 && lost > 0)
+check("a target above the cap is refused", inherits(tryCatch(nf_fit_ch4(p, m, memb, ord, npp, 10), error = function(err) err), "error"))
 
 # ---- grassland and shrubland by ecodivision, literature rates (tools/make_grass_shrub.R; to-do 39, 2026-11-06) --------------------
 gm <- rd("stockflow", "nonforest-multipliers-grassland-shrubland.csv"); gi <- rd("initialstocks", "grassland-shrubland.csv"); gt <- rd("stockflow", "grass-shrub-targets.csv")
@@ -159,6 +213,21 @@ check("Tidal Marsh Productivity: a Build Option, a data source, a multiplier typ
       grepl('name="TidalMarshProductivity"', px, fixed = TRUE) && grepl('name="TidalMarshNppFolder"', px, fixed = TRUE) && "Tidal Marsh Productivity" %in% mt &&
       "TidalMarshNppFolder" %in% fread(file.path(pkg, "defaults", "library", "data-sources.csv"))$Column &&
       grepl('put_multiplier("Tidal Marsh Productivity", fg', s8, fixed = TRUE) && grepl('fg <- "Net Growth Wetland: Total"', s8, fixed = TRUE) &&
-      all(vapply(c("7-climate-multipliers.R", "11-projection-climate.R"), function(f) grepl('"Crop Mix", "Tidal Marsh Productivity")', paste(readLines(file.path(pkg, "src", f)), collapse = "\n"), fixed = TRUE), TRUE)))
+      all(vapply(c("7-climate-multipliers.R", "11-projection-climate.R"), function(f) grepl('"Crop Mix", "Tidal Marsh Productivity", "Marsh Salinity")', paste(readLines(file.path(pkg, "src", f)), collapse = "\n"), fixed = TRUE), TRUE)))
+
+# ---- marsh salinity (2026-11-16): estuarine marsh methane by LANDFIRE salinity zone, as a pair of flow spatial multipliers (stage 8) ----
+zt <- rd("stockflow", "marsh-salinity-ch4.csv"); zc <- rd("stockflow", "marsh-salinity-evt.csv"); evx <- fread(file.path(pkg, "defaults", "landcover", "evt2016-crosswalk-CONUS-v2.csv"))
+check("marsh salinity: a methane value for every salinity zone in every estuarine region, saltier zones lower",
+      setequal(zt$Region, unique(eco$EstuarineRegion)) && zt[, .N, by = Region][, all(N == uniqueN(zc$Zone))] && setequal(zt$Zone, zc$Zone) && all(as.numeric(zt$CH4) > 0) &&
+      dcast(zt[, .(Region, Zone, v = as.numeric(CH4))], Region ~ Zone, value.var = "v")[, all(oligohaline > brackish & brackish > salt & `salt-brackish` < brackish & `salt-brackish` > salt)])
+check("marsh salinity: every zoned LANDFIRE code is a tidal marsh class of the EVT crosswalk under the same name, each once",
+      !anyDuplicated(zc$Code) && all(as.integer(zc$Code) %in% evx$VALUE) && all(zc$EvtName == evx$EVT_NAME[match(as.integer(zc$Code), evx$VALUE)]) && all(grepl("Marsh", zc$EvtName)))
+f4 <- as.numeric(fit[StateClassId == EM[1], CH4Share]); b4 <- as.numeric(fit[StateClassId == EM[1], CH4])
+mm <- outer(seq_along(f4), c(0.0135, 0.087, 0.412, 1.286), function(i, t) pmin(t / b4[i], g4$max_share / f4[i])); cf <- (1 - f4 * mm) / (1 - f4)
+check("marsh salinity: for every estuarine budget and zone value, the CO2 factor takes off what the methane factor adds (a cell's belowground emission unchanged) and neither is negative",
+      max(abs((1 - f4) * cf + f4 * mm - 1)) < 1e-12 && all(cf >= 0) && all(mm >= 0) && all(f4 * mm <= g4$max_share + 1e-12))
+check("marsh salinity: the multiplier type and both flow groups are defined, the wetland CO2 group holds wetland CO2 flows only (the emergent classes' two among them), the CH4 group CH4 flows only; stage 8 writes the pair and stages 7 and 11 carry it",
+      "Marsh Salinity" %in% mt && WCO2 %in% dd("stsim_FlowGroup.csv") && all(g4$co2 %in% memb[FlowGroupId == WCO2, FlowTypeId]) && all(grepl("(Wetland)", memb[FlowGroupId == WCO2, FlowTypeId], fixed = TRUE)) && all(g4$ch4 %in% memb[FlowGroupId == "Emission: Wetland CH4", FlowTypeId]) && all(grepl("CH4$", memb[FlowGroupId == "Emission: Wetland CH4", FlowTypeId])) &&
+      grepl('put_multiplier("Marsh Salinity", rows = srows)', s8, fixed = TRUE) && grepl('SAL_FG <- c("Emission: Wetland CH4", "Emission: Wetland Methane Source CO2")', s8, fixed = TRUE))
 
 cat(sprintf("\n%d of %d checks passed\n", n - fails, n)); if (fails) quit(status = 1)

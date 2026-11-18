@@ -1,0 +1,207 @@
+<title>Wetland Methane Method</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap">
+<style>
+/* layout: one reading column (about 68 characters), diagrams and tables break out to the column's full width */
+:root {
+  --bg: #f6f8f6; --surface: #ffffff; --fg: #17211c; --muted: #56655d; --line: #d5ddd7;
+  --accent: #1f6b4f; --co2: #3d6787; --ch4: #b06a12; --co2-soft: #dfe9f1; --ch4-soft: #f6e6cd; --pool: #e6efe9;
+  --display: "Space Grotesk", "Segoe UI", system-ui, sans-serif; --body: Inter, "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #111815; --surface: #19221e; --fg: #e6ede8; --muted: #9db0a5; --line: #2e3b34;
+  --accent: #6cc7a0; --co2: #8fbadb; --ch4: #e5a84e; --co2-soft: #1f3040; --ch4-soft: #3d2c12; --pool: #223029; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #111815; --surface: #19221e; --fg: #e6ede8; --muted: #9db0a5; --line: #2e3b34;
+  --accent: #6cc7a0; --co2: #8fbadb; --ch4: #e5a84e; --co2-soft: #1f3040; --ch4-soft: #3d2c12; --pool: #223029; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font: 16px/1.6 var(--body); padding-block: 40px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+main { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+h1, h2 { font-family: var(--display); text-wrap: balance; line-height: 1.2; margin: 0; }
+h1 { font-size: 2rem; } h2 { font-size: 1.3rem; margin-top: 22px; }
+p, ul { margin: 0; } ul { padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }
+.lede { font-size: 1.08rem; color: var(--fg); }
+.eyebrow { font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.note { color: var(--muted); font-size: .9rem; }
+.fig { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px; overflow-x: auto; }
+.fig svg { display: block; min-width: 620px; width: 100%; height: auto; font-family: var(--body); }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .92rem; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 600; color: var(--muted); font-size: .8rem; letter-spacing: .03em; }
+td.n, th.n { text-align: right; white-space: nowrap; }
+.split { display: flex; height: 44px; border-radius: 6px; overflow: hidden; font-size: .88rem; font-weight: 600; min-width: 0; }
+.split div { display: flex; align-items: center; padding: 0 12px; white-space: nowrap; }
+.split .c { background: var(--co2-soft); color: var(--co2); flex: 1; } .split .m { background: var(--ch4-soft); color: var(--ch4); flex: 0 0 26%; }
+.formula { font-family: ui-monospace, Consolas, monospace; font-size: .9rem; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; overflow-x: auto; white-space: nowrap; }
+.box { fill: var(--pool); stroke: var(--line); } .live { fill: var(--surface); stroke: var(--accent); }
+.t { fill: var(--fg); font-size: 13px; font-weight: 600; } .s { fill: var(--muted); font-size: 11px; }
+.a { stroke: var(--muted); stroke-width: 1.5; fill: none; } .ac { stroke: var(--co2); stroke-width: 2; fill: none; } .am { stroke: var(--ch4); stroke-width: 2; fill: none; }
+.lc { fill: var(--co2); font-size: 12px; font-weight: 600; } .lm { fill: var(--ch4); font-size: 12px; font-weight: 600; }
+.hm { fill: var(--muted); } .hc { fill: var(--co2); } .hch { fill: var(--ch4); } .hg { fill: var(--accent); } .ag { stroke: var(--accent); stroke-width: 2; fill: none; }
+</style>
+<main>
+  <div class="eyebrow">lucasCore · wetland carbon · working branch, not yet committed</div>
+  <h1>How the model releases methane from wetlands</h1>
+  <p class="lede">Wetland soil and litter already lose carbon to the atmosphere every year. The method takes that existing loss and sends part of it out as methane instead of carbon dioxide. No new carbon is created and none goes missing: in a normal climate year every pool loses exactly what it lost before.</p>
+
+  <h2>Where the methane comes from</h2>
+  <p>In an emergent marsh, plants take up carbon, shed it as shoot and root litter, and the litter either decays to the atmosphere or is stabilised into soil. Two of those pools sit in waterlogged conditions: root litter and soil. Each of them now has two exits to the atmosphere, one as CO<sub>2</sub> and one as CH<sub>4</sub>. Shoot litter still releases only CO<sub>2</sub>.</p>
+  <div class="fig">
+    <svg viewBox="0 0 720 370" role="img" aria-label="Carbon flow in an emergent marsh: growth into live plants, litter into shoot litter and root litter, both feeding soil; shoot litter emits CO2, soil and root litter emit both CO2 and methane">
+      <defs>
+        <marker id="hm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="hm"/></marker>
+        <marker id="hc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="hc"/></marker>
+        <marker id="hch" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="hch"/></marker>
+        <marker id="hg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="hg"/></marker>
+      </defs>
+      <text x="95" y="88" text-anchor="middle" class="s">CO2 taken up by growth</text>
+      <line x1="95" y1="96" x2="95" y2="146" class="ag" marker-end="url(#hg)"/>
+      <rect x="20" y="150" width="150" height="70" rx="6" class="live"/>
+      <text x="95" y="181" text-anchor="middle" class="t">Live plants</text><text x="95" y="199" text-anchor="middle" class="s">shoots and roots</text>
+
+      <rect x="260" y="36" width="170" height="56" rx="6" class="box"/>
+      <text x="345" y="60" text-anchor="middle" class="t">Shoot litter</text><text x="345" y="77" text-anchor="middle" class="s">aboveground, very fast</text>
+      <rect x="260" y="157" width="170" height="56" rx="6" class="box"/>
+      <text x="345" y="181" text-anchor="middle" class="t">Soil</text><text x="345" y="198" text-anchor="middle" class="s">belowground, slow</text>
+      <rect x="260" y="278" width="170" height="56" rx="6" class="box"/>
+      <text x="345" y="302" text-anchor="middle" class="t">Root litter</text><text x="345" y="319" text-anchor="middle" class="s">belowground, very fast</text>
+
+      <line x1="170" y1="165" x2="257" y2="76" class="a" marker-end="url(#hm)"/>
+      <line x1="170" y1="205" x2="257" y2="294" class="a" marker-end="url(#hm)"/>
+      <line x1="345" y1="92" x2="345" y2="154" class="a" marker-end="url(#hm)"/>
+      <line x1="345" y1="278" x2="345" y2="216" class="a" marker-end="url(#hm)"/>
+      <text x="353" y="128" class="s">stabilised</text><text x="353" y="251" class="s">stabilised</text>
+
+      <text x="640" y="20" text-anchor="middle" class="s">to the atmosphere</text>
+      <line x1="430" y1="64" x2="566" y2="64" class="ac" marker-end="url(#hc)"/><text x="574" y="68" class="lc">CO2 · Q10 2.65</text>
+      <line x1="430" y1="173" x2="566" y2="173" class="ac" marker-end="url(#hc)"/><text x="574" y="177" class="lc">CO2 · Q10 2.0</text>
+      <line x1="430" y1="198" x2="566" y2="198" class="am" marker-end="url(#hch)"/><text x="574" y="202" class="lm">CH4 · Q10 3.83</text>
+      <line x1="430" y1="294" x2="566" y2="294" class="ac" marker-end="url(#hc)"/><text x="574" y="298" class="lc">CO2 · Q10 2.0</text>
+      <line x1="430" y1="319" x2="566" y2="319" class="am" marker-end="url(#hch)"/><text x="574" y="323" class="lm">CH4 · Q10 3.83</text>
+      <text x="20" y="358" class="s">Each litter and soil pool also loses a little carbon to water (lateral export). That part is unchanged.</text>
+    </svg>
+  </div>
+  <p class="note">There is no intermediate "gas" pool. An earlier version held the released carbon in one before dividing it; the adopted design lets each pool emit both gases directly.</p>
+
+  <h2>How the split is set</h2>
+  <p>For each wetland class in each ecological division, the model already knows how much carbon the source pools release in a normal year. A literature value says how much methane that kind of wetland emits per hectare. The methane fraction is simply one divided by the other.</p>
+  <div class="formula">methane fraction f = methane target ÷ what the source pools emit &nbsp;(never more than 30%)</div>
+  <div class="split" aria-hidden="true"><div class="c">leaves as CO2: emission × (1 − f)</div><div class="m">as CH4: emission × f</div></div>
+  <p>The two parts always add back to the original emission, so pool sizes, soil accumulation and lateral export are the same as before the change. The starting carbon stocks the Build writes are identical, file for file, to those from before this work.</p>
+  <p>The 30% ceiling stops a target from demanding more methane than the wetland's decay can plausibly supply. Measured methane is typically 0.4 to 8% of ecosystem respiration (Knox et al. 2019), so a class that reaches the ceiling is a sign that the target and the modelled productivity disagree. Where it binds, the class releases less than its target.</p>
+
+  <h2>The methane targets</h2>
+  <p>Values are tonnes of carbon released as methane per hectare per year (Mg CH<sub>4</sub>-C ha<sup>−1</sup> yr<sup>−1</sup>).</p>
+  <div class="scroll"><table>
+    <tr><th>Class</th><th>Region</th><th class="n">Target</th><th class="n">Low to high</th></tr>
+    <tr><td rowspan="6">Estuarine emergent</td><td>Gulf and South Atlantic</td><td class="n">0.111</td><td class="n">0.062 – 0.21</td></tr>
+    <tr><td>California</td><td class="n">0.058</td><td class="n">0.0135 – 0.161</td></tr>
+    <tr><td>Mid-Atlantic</td><td class="n">0.033</td><td class="n">0.0135 – 0.052</td></tr>
+    <tr><td>Pacific Northwest</td><td class="n">0.025</td><td class="n">0.0135 – 0.052</td></tr>
+    <tr><td>Northeast</td><td class="n">0.025</td><td class="n">0.0135 – 0.052</td></tr>
+    <tr><td>Elsewhere</td><td class="n">0.03</td><td class="n">0.0135 – 0.135</td></tr>
+    <tr><td rowspan="4">Palustrine emergent</td><td>Coastal Plains</td><td class="n">0.40</td><td class="n">0.25 – 0.55</td></tr>
+    <tr><td>Eastern Mountains and Upper Midwest</td><td class="n">0.27</td><td class="n">0.10 – 0.47</td></tr>
+    <tr><td>West</td><td class="n">0.18</td><td class="n">0.095 – 0.257</td></tr>
+    <tr><td>Interior Plains</td><td class="n">0.075</td><td class="n">0.04 – 0.176</td></tr>
+    <tr><td rowspan="3">Forested wetland</td><td>Oak/Gum/Cypress</td><td class="n">0.27</td><td class="n">0.11 – 0.43</td></tr>
+    <tr><td>Elm/Ash/Cottonwood</td><td class="n">0.27</td><td class="n">0.06 – 0.43</td></tr>
+    <tr><td>Spruce/Fir</td><td class="n">0.09</td><td class="n">0.005 – 0.19</td></tr>
+  </table></div>
+  <p class="note">The low and high values are draft ranges for the regional mean, not the spread of single sites. They are used only when uncertainty draws are turned on. Each row's basis is recorded beside it in <code>defaults/stockflow/wetland-methane-targets.csv</code>.</p>
+  <p class="note">Sources: SOCCR2 chapters 13 and 15, the IPCC 2013 Wetlands Supplement, Krauss et al. 2016, Knox et al. 2019 and Arias-Ortiz et al. 2024. The full reading list is in <code>dev/wetland-ch4/literature-ch4.md</code>.</p>
+
+  <h2>Tidal marsh: salinity changes the target cell by cell</h2>
+  <p>Methane from tidal marsh falls about a hundredfold from fresh to salty water, so one value per region hides most of the variation. Each estuarine marsh cell is given a salinity zone from its LANDFIRE vegetation type, and the zone has its own target (Arias-Ortiz et al. 2024, Table 3).</p>
+  <div class="scroll"><table>
+    <tr><th>Zone</th><th class="n">Gulf and South Atlantic</th><th class="n">Mid-Atlantic, Northeast, Pacific NW</th></tr>
+    <tr><td>Fresh to oligohaline</td><td class="n">0.40 (0.16 – 1.29)</td><td class="n">0.288 (0.215 – 0.412)</td></tr>
+    <tr><td>Brackish</td><td class="n">0.111 (0.06 – 0.161)</td><td class="n">0.052 (0.023 – 0.077)</td></tr>
+    <tr><td>Salt and brackish, not separated</td><td class="n">0.062 (0.0135 – 0.111)</td><td class="n">0.033 (0.0135 – 0.052)</td></tr>
+    <tr><td>Salt</td><td class="n">0.0135 (0.005 – 0.02)</td><td class="n">0.0135 (0.005 – 0.02)</td></tr>
+  </table></div>
+  <p>The Build writes two maps for these cells. One scales the methane up or down to the zone's target. The other scales the matching CO<sub>2</sub> the opposite way by exactly the amount needed, so the cell's total carbon loss does not change. A cell with no zone keeps its regional target. Along the Gulf and South Atlantic the fresh, oligohaline and brackish values are the Louisiana tower estimates of Krauss et al. 2016 (0.471 fresh, rounded with other subtropical towers to 0.40, and 0.111 brackish) in place of the synthesis means, which come mostly from chambers and read higher. California uses the synthesis's warm-group brackish values (0.161; 0.087 where salt and brackish are not separated) with the cooler oligohaline value.</p>
+
+  <h2>Forested wetlands</h2>
+  <p>Swamp forests use the same idea with a wider source. Their soil and root litter alone release too little carbon to supply the literature target, because most decay in a forest happens on the forest floor. So methane in forested wetland draws on five pools: soil, root litter, and the three forest-floor litter pools (very fast, fast and slow). One fraction applies to all five.</p>
+  <div class="fig">
+    <svg viewBox="0 0 720 462" role="img" aria-label="Carbon flow in a forested wetland: live trees shed litter into three forest-floor pools and root litter; forest-floor litter stabilises into the slow forest-floor pool and root litter into soil; all five pools emit both CO2 and methane">
+      <text x="640" y="12" text-anchor="middle" class="s">to the atmosphere</text>
+      <rect x="240" y="20" width="200" height="232" rx="8" fill="none" stroke-dasharray="4 4" class="a"/>
+      <text x="340" y="14" text-anchor="middle" class="s">Forest floor</text>
+
+      <text x="90" y="128" text-anchor="middle" class="s">CO2 taken up by growth</text>
+      <line x1="90" y1="136" x2="90" y2="186" class="ag" marker-end="url(#hg)"/>
+      <rect x="20" y="190" width="140" height="70" rx="6" class="live"/>
+      <text x="90" y="221" text-anchor="middle" class="t">Live trees</text><text x="90" y="239" text-anchor="middle" class="s">wood, leaves, roots</text>
+
+      <rect x="250" y="30" width="180" height="50" rx="6" class="box"/>
+      <text x="340" y="51" text-anchor="middle" class="t">Leaf and fine litter</text><text x="340" y="68" text-anchor="middle" class="s">aboveground, very fast</text>
+      <rect x="250" y="111" width="180" height="50" rx="6" class="box"/>
+      <text x="340" y="132" text-anchor="middle" class="t">Humus layer</text><text x="340" y="149" text-anchor="middle" class="s">aboveground, slow</text>
+      <rect x="250" y="192" width="180" height="50" rx="6" class="box"/>
+      <text x="340" y="213" text-anchor="middle" class="t">Branch and root wood</text><text x="340" y="230" text-anchor="middle" class="s">aboveground, fast</text>
+      <rect x="250" y="286" width="180" height="50" rx="6" class="box"/>
+      <text x="340" y="307" text-anchor="middle" class="t">Soil</text><text x="340" y="324" text-anchor="middle" class="s">belowground, slow</text>
+      <rect x="250" y="367" width="180" height="50" rx="6" class="box"/>
+      <text x="340" y="388" text-anchor="middle" class="t">Root litter</text><text x="340" y="405" text-anchor="middle" class="s">belowground, very fast</text>
+
+      <line x1="160" y1="200" x2="247" y2="60" class="a" marker-end="url(#hm)"/>
+      <line x1="160" y1="222" x2="247" y2="218" class="a" marker-end="url(#hm)"/>
+      <line x1="160" y1="250" x2="247" y2="388" class="a" marker-end="url(#hm)"/>
+      <line x1="340" y1="80" x2="340" y2="108" class="a" marker-end="url(#hm)"/>
+      <line x1="340" y1="192" x2="340" y2="164" class="a" marker-end="url(#hm)"/>
+      <line x1="340" y1="367" x2="340" y2="339" class="a" marker-end="url(#hm)"/>
+
+      <line x1="430" y1="46" x2="566" y2="46" class="ac" marker-end="url(#hc)"/><text x="574" y="50" class="lc">CO2</text>
+      <line x1="430" y1="66" x2="566" y2="66" class="am" marker-end="url(#hch)"/><text x="574" y="70" class="lm">CH4 · Q10 3.83</text>
+      <line x1="430" y1="127" x2="566" y2="127" class="ac" marker-end="url(#hc)"/><text x="574" y="131" class="lc">CO2</text>
+      <line x1="430" y1="147" x2="566" y2="147" class="am" marker-end="url(#hch)"/><text x="574" y="151" class="lm">CH4 · Q10 3.83</text>
+      <line x1="430" y1="208" x2="566" y2="208" class="ac" marker-end="url(#hc)"/><text x="574" y="212" class="lc">CO2</text>
+      <line x1="430" y1="228" x2="566" y2="228" class="am" marker-end="url(#hch)"/><text x="574" y="232" class="lm">CH4 · Q10 3.83</text>
+      <line x1="430" y1="302" x2="566" y2="302" class="ac" marker-end="url(#hc)"/><text x="574" y="306" class="lc">CO2 · Q10 2.0</text>
+      <line x1="430" y1="322" x2="566" y2="322" class="am" marker-end="url(#hch)"/><text x="574" y="326" class="lm">CH4 · Q10 3.83</text>
+      <line x1="430" y1="383" x2="566" y2="383" class="ac" marker-end="url(#hc)"/><text x="574" y="387" class="lc">CO2</text>
+      <line x1="430" y1="403" x2="566" y2="403" class="am" marker-end="url(#hch)"/><text x="574" y="407" class="lm">CH4 · Q10 3.83</text>
+      <text x="20" y="450" class="s">Simplified. Standing dead trees and large logs release CO2 only, and litter CO2 keeps the Q10 each pool already had.</text>
+    </svg>
+  </div>
+  <p>In the Great Dismal Swamp test, the five pools together release 3.6 to 4.1 Mg C per hectare per year in the hardwood swamp types, about 3.0 to 3.5 of it from the forest floor. The 0.27 target is 6.6 to 7.5% of that, well under the ceiling. With soil and roots alone it had needed 45%.</p>
+  <p class="note">Estuarine forested wetland (mangrove) has no methane yet.</p>
+
+  <h2>Response to temperature</h2>
+  <p>Each emission flow is multiplied every year by a temperature factor, Q10 raised to the power of (the year's temperature minus the long-term normal, divided by 10). A Q10 of 2 doubles the rate for 10 °C of warming.</p>
+  <ul>
+    <li><strong>Methane: Q10 3.83</strong> (Yvon-Durocher et al. 2014). Methane responds to warming much more strongly than CO<sub>2</sub>.</li>
+    <li><strong>Wetland soil CO<sub>2</sub>: Q10 2.0.</strong> Soil in every other land class has no temperature response in the model; wetland soil now does.</li>
+    <li><strong>Litter CO<sub>2</sub></strong> keeps the Q10 it already had.</li>
+  </ul>
+  <p>The balance described above holds exactly in a normal year. In a warm year both gases speed up, methane more than CO<sub>2</sub>, so the methane share rises and the pools drain a little faster. That is intended: warming really does deplete wetland carbon, and the stocks respond. Carbon is still conserved, since everything that leaves a pool is counted in one flow or the other. In the Louisiana test, methane rose about 55% by 2100 under SSP5-8.5.</p>
+  <p>Marsh growth can also respond to climate, chosen on the Climate Options page: no response, Miami NPP (temperature and rainfall), temperature only (the default), or temperature for tidal marsh with Miami NPP for inland marsh. Tidal marsh is not short of water, so rainfall should not limit it.</p>
+
+  <h2>Settings a user can change</h2>
+  <p>A new Wetland Methane page holds the assumptions:</p>
+  <ul>
+    <li>The methane Q10, the wetland soil Q10 and the ceiling on the methane share.</li>
+    <li>The CO<sub>2</sub> equivalent of methane, 33.5 Mg CO<sub>2</sub>e per Mg of methane carbon by default (a 100-year warming potential of about 25).</li>
+    <li>A target for any class and region, and for any salinity zone, replacing the package value.</li>
+    <li>A low and a high value beside any target; the package targets come with the draft ranges shown above. With uncertainty draws turned on, each Monte Carlo iteration picks a point in that range (triangular, peaked at the central value) and applies it to all classes together. The CO<sub>2</sub> side is adjusted to match, so every iteration conserves carbon.</li>
+  </ul>
+
+  <h2>What has been checked</h2>
+  <ul>
+    <li>Starting stocks unchanged, and pool losses unchanged in a normal year (unit tests).</li>
+    <li>A full Louisiana run at 300 m, from Build through history to a 2100 projection: the yearly change in ecosystem carbon matches net biome productivity to within 0.05 Mg C across the study area.</li>
+    <li>Great Dismal Swamp runs with forest-floor methane, the page's settings and five uncertainty draws: carbon balances in every iteration, the draws change the split between the two gases and not the pool loss, and iterations after the last draw run at the central targets. The swamp delivers about 0.25 against its 0.27 target at normal climate.</li>
+  </ul>
+
+  <h2>Known limits</h2>
+  <ul>
+    <li><strong>Gulf fresh and oligohaline marsh uses the fresh marsh value.</strong> The synthesis mean for warm fresh and oligohaline sites (1.286) is mostly from chambers and is three times the tower-based fresh marsh target, so the zone takes 0.40, the same as fresh marsh, with 1.29 kept as the top of its range.</li>
+    <li><strong>Salt and brackish marsh cannot always be told apart.</strong> Several LANDFIRE types combine them, and those cells take a mid-way value.</li>
+    <li><strong>No marsh elevation.</strong> Low and high marsh differ tenfold in the source data; the model uses a site-weighted mean. Marked as future work.</li>
+    <li><strong>Yearly temperature only.</strong> Methane follows the annual mean, not the warm season. Marked as future work.</li>
+    <li><strong>Water level is not modelled.</strong> Drought, drainage and flooding do not change the methane share.</li>
+  </ul>
+</main>

@@ -109,7 +109,7 @@ NF_EMERGENT <- list(
   growth_fol = "Net Growth Wetland Emergent: Atmosphere -> Foliage [Type]", growth_root = "Net Growth Wetland Emergent: Atmosphere -> Fine Roots [Type]",
   k_fol = "Biomass Turnover: Foliage -> AG Very Fast [Type]", k_root = "Biomass Turnover: Fine Roots -> BG Very Fast [Type]",
   k_ag = "AG Very Fast ->", k_bg = "BG Very Fast ->", k_soil = "BG Slow ->",
-  burial = "Stabilization: BG Slow -> Deep Soil [Type]", soil_emit = "Emission: BG Slow -> Atmosphere [Type]", soil_lat = "Lateral Transport: BG Slow -> Aquatic [Type]")
+  burial = "Stabilization: BG Slow -> Deep Soil [Type]", soil_emit = "Emission: BG Slow -> Atmosphere (Wetland) [Type]", soil_lat = "Lateral Transport: BG Slow -> Aquatic [Type]")
 NF_EMERGENT_POOLS <- c(k_fol = "Biomass: Foliage", k_root = "Biomass: Fine Root", k_ag = "DOM: Aboveground Very Fast", k_bg = "DOM: Belowground Very Fast", k_soil = "DOM: Belowground Slow")
 
 nf_fit_emergent <- function(path, mult, memb, order, tg, tol = 1e-10, max_iter = 5000) {
@@ -144,3 +144,34 @@ nf_fit_emergent <- function(path, mult, memb, order, tg, tol = 1e-10, max_iter =
   hit <- max(abs(ss$stock[NF_EMERGENT_POOLS[names(target)]] / target - 1))
   if (any(m$Value[m$FlowGroupId %in% unlist(g)] > 1) || hit > 1e-6) stop("a fitted rate is above 1 or a target is not met (a pool turns over faster than once a year)")
   list(mult = m, steady = ss, dieback = unname(NF_EMERGENT_POOLS[dieback])) }
+
+# ---- emergent wetlands: methane -------------------------------------------------------------------------------------------------
+# BG Slow and BG Very Fast each release carbon to the atmosphere by two flows: as CO2 and as CH4 (to Atmosphere: CH4), both shares of
+# the pool's total loss. Each has its own temperature response, as every dead pool's decay has: methane the group Q10 Wetland CH4 (from
+# both pools); the litter's CO2 the Q10 its emission always had (Q10 Slow Flows); the soil's CO2 the group Q10 Wetland Soil, which is
+# why emergent wetlands have a soil CO2 flow type of their own (the soil emission of every other class has no Q10).
+# At the normal climate (every multiplier 1) methane is carved out of the emission the class already had: a pool's CO2 and CH4 shares
+# add to its emission share before methane, so no pool, burial or lateral export of the fit changes. Away from the normal climate
+# the pools' losses follow the Q10s, so their stocks do move. One fraction of the belowground emission serves both pools, solved so
+# the steady state releases the target (Mg C/ha/yr as CH4).
+NF_CH4 <- list(sink = "Atmosphere: CH4", max_share = 0.3, q10 = "Q10 Wetland CH4", soil_q10 = "Q10 Wetland Soil", shared_soil = "Emission: BG Slow -> Atmosphere",
+               shared = c(soil = "Emission: BG Slow -> Atmosphere", litter = "Emission: BG Very Fast -> Atmosphere"),   # the flow types of every other class
+               co2 = c(soil = "Emission: BG Slow -> Atmosphere (Wetland)", litter = "Emission: BG Very Fast -> Atmosphere (Wetland)"),
+               ch4 = c(soil = "Emission: BG Slow -> Atmosphere CH4", litter = "Emission: BG Very Fast -> Atmosphere CH4"))
+# rates written before methane (the legacy tables): the soil's and the litter's emission under the shared flows' names and no CH4 rows. A flow without a
+# row would count 1, so the CH4 rows are added at 0
+nf_ch4_prepare <- function(mult) { g <- NF_CH4; ty <- function(x) paste(x, "[Type]"); m <- copy(mult)[, Value := as.numeric(Value)]
+  for (k in names(g$co2)) if (!ty(g$co2[[k]]) %in% m$FlowGroupId) m[FlowGroupId == ty(g$shared[[k]]), FlowGroupId := ty(g$co2[[k]])]
+  add <- setdiff(ty(g$ch4), m$FlowGroupId); if (length(add)) m <- rbind(m, data.table(FlowGroupId = add, Value = 0), fill = TRUE)
+  m }
+# the methane fraction of the belowground emission that meets the target; each pool's CH4 share is written to `digits` decimals and its
+# CO2 share is what is left of the pool's emission share, so the two add to it exactly
+nf_fit_ch4 <- function(path, mult, memb, order, growth, target, digits = 6) {
+  g <- NF_CH4; co2 <- paste(g$co2, "[Type]"); ch4 <- paste(g$ch4, "[Type]"); m <- nf_ch4_prepare(mult)
+  if (!all(c(g$co2, g$ch4) %in% path$FlowTypeId) || any(g$shared %in% path$FlowTypeId) || !all(path[FlowTypeId %in% g$ch4, ToStockTypeId] == g$sink)) stop("the pathways do not hold the wetland CO2 and CH4 emission flows")
+  e <- m$Value[match(co2, m$FlowGroupId)] + m$Value[match(ch4, m$FlowGroupId)]   # each pool's whole emission share
+  set <- function(f) { x <- copy(m); c4 <- round(e * f, digits); x[match(ch4, FlowGroupId), Value := c4]; x[match(co2, FlowGroupId), Value := round(e - c4, digits + 2)]; x }
+  all_gas <- nf_steady(nf_flows(path, set(1), memb, order), growth)$sink[[g$sink]]   # fraction 1: every bit of the belowground emission
+  share <- target / all_gas
+  if (share > g$max_share) stop(sprintf("methane %.3f Mg C/ha/yr is %.0f%% of the belowground emission (%.3f); the most allowed is %.0f%%", target, 100 * share, all_gas, 100 * g$max_share))
+  list(mult = set(share), share = share, gas = all_gas) }
