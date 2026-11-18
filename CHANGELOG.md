@@ -2,7 +2,11 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
-## Unreleased
+## 1.5.0 - 2026-11-18
+
+Library update 1.5: opening a library adds the wetland methane flow types, groups, flow order and output filters, the Marsh
+Salinity and Methane Uncertainty flow multiplier types and the Climate Options wetland growth choice. A Build made with 1.4
+keeps working; wetlands release methane after its next Build (stages 0, 3, 7 and 8; a Projection Climate after stage 11).
 
 ### Added
 - Wetland methane (to-do 54). Emergent and forested wetlands release part of the carbon their soil and litter already emit as
