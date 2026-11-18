@@ -46,7 +46,7 @@ desc <- c(`0` = "Writes the fixed LUCAS stock-flow definitions from defaults/sto
   `5` = "Maps state class and stand age at the model resolution (for chaparral, non-sage shrub and the sage family, years since fire from the fire perimeter history), resamples annual NLCD to the model grid, and writes the per-cell spin-up return intervals and soil carbon targets.",
   `6` = "Derives the historical transition pathways and annual transition spatial multipliers from the same resampled maps as the state classes.",
   `7` = "Writes annual climate flow spatial multipliers for the historical years from PRISM, with the Climate Options growth and decomposition methods (non-forest growth by RAP fit, from water-year rain by season, by default).",
-  `8` = "Maps the initial carbon stocks (ST-Sim Initial Stocks, spatial) from the stock curves, stand age and soil carbon, and writes the site productivity multipliers (forest from TreeMap; grass and shrub from RAP NPP; cropland, crop harvest and crop mix from the Cropland Data Layer and NASS; tidal marsh from the USGS NPP map) with a Non-Forest Productivity table.",
+  `8` = "Maps the initial carbon stocks (ST-Sim Initial Stocks, spatial) from the stock curves, stand age and soil carbon, and writes the site productivity multipliers (forest from TreeMap; grass and shrub from RAP NPP; cropland, crop harvest and crop mix from the Cropland Data Layer and NASS; tidal marsh from the USGS NPP map) with a Non-Forest Productivity table. Also writes the carbon carrying capacity: what each cell would hold in live biomass, dead wood and litter under its potential natural vegetation and natural fire regime (maps and tables that Run Figures and Compare Runs measure a run against).",
   `9` = "Sets projection transitions by drawing a whole historical year for each projection year and iteration; transition groups in one sampling set share the draw.",
   `10` = "Makes the surfaces that place projected transitions: fitted suitability (logistic GAM on the annual NLCD record) or WUI/PAD rules, with adjacency and patch sizes.",
   `11` = "Writes the climate flow spatial multipliers of the projection years from one LOCA2 run, and the CO2 fertilization growth multipliers from its SSP (beta by vegetation type, ECM share and stand age).",
@@ -181,11 +181,11 @@ reports <- list("Strata Summary" = "OutputStrataSummary", "State Class Summary" 
   "Growth and carbon curve parameters" = c("OutputGrowthParameter", "OutputCarbonParameter", "OutputGrowthReport"),
   "Decay Calibration" = "OutputDecayCalibration", "Return intervals, soil targets" = c("OutputReturnInterval", "OutputSoilTarget"),
   "Historical Transition Summary" = "OutputTransitionSummary", "Climate and CO2 summaries" = c("OutputClimateSummary", "OutputCo2Beta", "OutputCo2Series"),
-  "Initial stocks, non-forest productivity" = c("OutputInitialStockSummary", "OutputNonForestProductivity"),
+  "Initial stocks, non-forest productivity, carbon capacity" = c("OutputInitialStockSummary", "OutputNonForestProductivity", "OutputCarbonCapacity", "OutputCarbonCapacityType", "OutputCarbonCapacityMap"),
   "Projection schedule, rates, fires" = c("OutputProjectionSchedule", "OutputProjectionRate", "OutputFireSize", "OutputFireSlope"),
   "Suitability maps and curves" = c("OutputSuitability", "OutputSuitabilityCurve", "OutputSuitabilityMap", "OutputPatchSize"),
   "Figures (PNG)" = c("OutputBuildFigure", "OutputRunFigure", "OutputCompareFigure"),
-  "Run comparison summaries" = c("OutputCompareCarbon", "OutputCompareLand", "OutputCompareCost"),
+  "Run and comparison summaries" = c("OutputRunCapacity", "OutputCompareCarbon", "OutputCompareCapacity", "OutputCompareLand", "OutputCompareCost"),
   "Wood products" = c("OutputWoodProducts", "OutputWoodProductsEndUse", "OutputWoodProductsScale", "OutputWoodProductsFigure"), "Download Results" = "OutputDataDownload")
 row <- function(label, sheets, y) { w <- writers(sheets); if (!length(w)) stop("no stage writes ", paste(sheets, collapse = ", "))
   add(sprintf('<g class="row" data-sheet="%s" data-stages="%s">', paste(sheets, collapse = " "), paste(w, collapse = " ")),

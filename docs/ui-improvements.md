@@ -2312,3 +2312,88 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       Wetland Soil, Net Growth Wetland: Total); the dead-pool Q10 groups of every other class could take it too, a wider change.
     - Open: whether to keep Q10 or move to the activation energy; whether Chang et al. 2021's seasonal hysteresis (a different
       response in the warming and the cooling half of the year) is worth representing; the cost of 12 times the climate rasters read.
+
+68. **Carbon carrying capacity (a PNV carbon metric)** - DONE in code 2026-11-18 (branch `claude/pnv-carbon-metric-lucascore-1d71ac`;
+    user: "a metric where historical and/or projections for a region can be compared back to what the true carbon carrying
+    capacity of the region was"). Tested by `tests/unit-capacity.R`; outside SyncroSim on the
+    Yellowstone library with `dev/capacity/check-library.R` (Build 14, run 15); and inside SyncroSim on a copy of it (stage 8 rerun
+    on Build 14, then stages 13 and 14 on runs 15 and 11: all checks pass, the same numbers as outside).
+    - Decisions (user, 2026-11-18): the natural-regime mean, not the old-growth maximum (kept as an upper bound); the model's own
+      curves and return intervals with LANDFIRE BpS as the potential vegetation map, fixed, computed once in the Build; hybrid
+      forest typing (forest today keeps its type, BpS only for developed and farmed land); live biomass, dead wood and litter,
+      soil left out. Alternatives set aside: external potential carbon maps (Walker et al. 2022; Sanderman et al. 2017 for soil),
+      reference lands (GAP 1, wilderness, FIA upper quantiles), and a dynamic counterfactual run (below).
+    - Code: `src/capacity.R`; stage 8 writes Carbon Capacity Summary, by Type and Maps; stages 13 and 14 draw runs against it
+      and write Run Carbon Against Capacity and Compare Carbon Against Capacity. User Guide section 7.6.
+    - Natural non-forest land (user, 2026-11-18, after the first Yellowstone numbers): natural grassland, shrubland and barren
+      land keeps its own class, "with the logic being that NLCD directly maps these main groups from satellite observations with
+      relatively high accuracy while BpS is a modeled product. However, this would be good to have as a user selection option."
+      The option is the single-row sheet Carbon Capacity Options (Carbon Assumptions), NaturalNonForest: 1 its own class
+      (default), 2 LANDFIRE BpS potential (forest on the cell's BpS forest share). Its page (ui/CarbonCapacityView.cs; user: "a
+      simple selection rather than a dropdown ... some explanation text"): two radio buttons, each with what it means.
+    - Seen on Yellowstone (300 m, 1985-2023; BpS reads 87.5% of the land as forest potential, the annual NLCD has 31% of it in
+      grass and shrub). Default: capacity 62.2 Tg C (upper bound 70.9), stock 53.6 in 1985 (86%) and 52.0 in 2023 (84%); the
+      1985 deficit of 8.6 is 8.1 forest condition and 0.5 land use. With the BpS option: capacity 89.7 (102.5), 60% and 58%; of
+      the 1985 deficit of 36.1, 26.4 is natural grass, shrub and barren land on BpS forest potential.
+    - The deficit by cause (user, 2026-11-18: "What does Condition really include? A shift in stand age? Disturbed forest?", then
+      "Yes, split it"): land use; non-forest cover; disturbed land; and, on land in its potential cover, live biomass (stand age
+      and stocking) apart from dead wood and litter. Yellowstone 1985: live biomass 2.4 Tg C (forest of 101 years on average
+      against a regime mean age of 200), dead wood and litter 5.7, disturbed land 0.02 (3.9 by 2023, after the 1988 fires).
+      Fire as the last disturbance (user, 2026-11-18: "Can we re-run stage 8 where we assume fire as the last disturbance for all
+      cells?"): outside the 1900-1985 fire perimeters (98% of the land) stage 8 starts forest on the post-clearcut curve, the
+      capacity uses the post-fire one. With Carbon Assumptions: Spin-up set to high-severity fire for every forest type (stage 8
+      rerun on a second copy, dev/libs/capacity-test-fire): starting stock 53.6 -> 55.0 Tg C, 86% -> 88% of the capacity, dead
+      wood and litter deficit 5.65 -> 4.25, live biomass unchanged at 2.44. So the clearcut start is about a quarter of the dead
+      wood deficit and stand age the rest (an earlier note here, and to the user, said most: wrong). For a park that was never
+      logged, fire is the better start. Open: whether a park or wilderness study area should default to it; a historical run
+      from the fire-start Build has not been made.
+    - Two checks of what the Yellowstone share rests on (user, 2026-11-18: "Run both checks on the scratch library").
+      Return interval: lodgepole pine at 200 years in place of LANDFIRE's 338 (Carbon Assumptions: Spin-up; stages 3, 4 and 8
+      rerun, capacity-test scenario 23): regime mean age 199 -> 155, capacity 62.2 -> 59.6 Tg C, the 1985 share 86% -> 90%, the
+      live biomass deficit 2.44 -> 0.54, dead wood and litter 5.65 -> 5.02. Stand age: this Build's ages are TreeMap 2016 FIA
+      plot ages moved back to 1985 (Stand Age Source = TreeMap; an earlier note to the user said CMS: wrong), forest mean 101
+      years, 8% over 150, the same inside and outside the 1988 perimeters. NASA CMS 1990 less 5 years gives 110 (27% over 150)
+      on forest never inside a 1986-2016 perimeter and 143 (52% over 150) on forest that burned only after 1990. Both maps
+      post-date 1988, so neither holds the pre-fire age of the 40% of forest cells inside the 1986-1990 perimeters (CMS reads
+      them as just burned; TreeMap gives them the age of their unburned remnants). Also: a cell's age is the mean of its 30 m
+      pixels, which pulls every 300 m cell toward 100 and leaves almost none over 200. Open: a pre-fire age source for land that
+      burned between the start year and the age map's year; whether the age classes should be kept (a distribution per cell).
+      What if the forest that burned in 1988 was old (user, 2026-11-18; estimated outside SyncroSim from Build 14's curves, which
+      reproduce the Build's 86% and the fire-start 88%): with the 40% of forest cells inside a 1988 perimeter at 200, 250 or 300
+      years in place of 99, the park starts at 95%, 96% or 97% of its capacity (96%, 98%, 98% with fire as the last
+      disturbance); live biomass is then 0.6 to 1.2 Tg C above its capacity and the deficit left is dead wood and litter.
+    - Forest cover: tree canopy cover against NLCD and BpS (user, 2026-11-18: "we do not have enough forest cover either (reality
+      somewhere between NLCD and BpS)"; "Run the offline tree-cover test"; "NLCD also publishes a canopy cover product"). USFS
+      Science Tree Canopy Cover v2025-6, 1985 and 2023, 30 m, read as a window from the national files (stored zips at
+      data.fs.usda.gov/geodata/rastergateway/treecanopycover, 6 GB a year; /vsizip//vsicurl/ reads 11 MB for the park; the
+      geoplatform image service needs a token). The Science version, since the NLCD one zeroes pixels NLCD calls non-treed.
+      Park, 1985: NLCD forest 55.9% (canopy median 50%); NLCD grass or shrub on BpS forest 26.1% (median 35%; 95% at or over
+      10%, 79% over 20%, 62% over 30%); NLCD grass or shrub on BpS non-forest 5.3% (median 20%; 85%, 52%, 30%). So the raw product
+      reads some canopy on open land too, and a 10% threshold passes nearly everything: the BpS gate does the work, and the
+      threshold wants calibrating (20 to 30%). Forest share with the rule "NLCD forest, or NLCD grass or shrub on BpS forest with
+      canopy at or over the threshold": 80.6% at 10%, 76.5% at 20%, 71.9% at 30% (the park is usually given as about 80% forest).
+      Two thirds or more of the added land is inside the 1988 perimeters, where its 1985 canopy (median 39%) is higher than
+      outside (24%): the land that burned was treed, and the annual NLCD's grass and shrub labels there in 1985-1987 look like an
+      artefact of its time series. 2023, inside the 1988 perimeters: NLCD has 22% forest and 69% shrub, the shrub with a canopy
+      median of 29% (65% over 20%), which is young forest; forest share of the park 41% by NLCD, 75% by the 10% rule.
+      Capacity: 1,840 to 2,200 km2 more forest adds 21 to 25 Tg C of capacity (62 -> 83 to 87); the share stays 86% if the added
+      forest starts at the forest's mean stock and falls toward 75% at half of it, so cover changes the totals and age the share.
+      Not built: a stage 5 rule (its own branch), and the same test for when burned forest returns (stage 6).
+    - Follow-ups, not started: a Build figure of the capacity; the capacity by tertiary stratum; a surface-fire regime for
+      frequent-fire types (LANDFIRE FRI_SURFAC, FRI_MIXED); a natural fire regime for shrubland (chaparral and the sage family
+      are counted at their mature stock); potential soil carbon; a dynamic counterfactual run (an ST-Sim scenario started from
+      potential vegetation with natural disturbance only, under the same climate and CO2, so the capacity moves with climate).
+
+69. **A full BpS crosswalk for the carbon capacity, as a user choice** - TO DO, added 2026-11-18 (user: "adding a full BpS cross walk
+    in the future would be a to-do item and then an optional user choice").
+    - Why: the hybrid choice of item 68 takes today's forest type as the natural one, so planted or shifted composition
+      (loblolly on former longleaf land, fir where fire exclusion replaced pine) counts as on-type. BpS names the pre-settlement
+      type of every pixel.
+    - How: a table from BpS name (`defaults/landcover/LF20_BPS_220.csv`, about 925 forest settings in the groups Conifer,
+      Hardwood, Conifer-Hardwood, Hardwood-Conifer and Peatland Forest, plus Riparian and Savanna) to the 28 FIA forest type
+      groups, and for non-forest settings to the grass and shrub classes; `capacity_build()` then takes each cell's type from the
+      share of its BpS pixels by type instead of its own. A setting on the Build Options (or a Carbon Capacity) page: Potential
+      forest type = Current type (default) / LANDFIRE BpS. A new column of an existing sheet needs an update method (a minor
+      version); a sheet of its own does not.
+    - Open: who builds and reviews the crosswalk (it sets the quality of the metric); whether BpS's own fire regime attributes
+      (the return intervals in the BpS table of the national release) should replace the FRI layer's for the regime mean.

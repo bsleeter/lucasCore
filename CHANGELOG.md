@@ -2,6 +2,44 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+No library update needed: the new outputs are sheets of their own, which a 1.5 library gains when it is opened with this
+version. A Build made before it has no carbon capacity until the Build (or its stage 8) is rerun; runs already made on that
+Build can then be drawn against it.
+
+### Added
+- Carbon carrying capacity (stage 8, `src/capacity.R`): what each cell would hold in live biomass, dead wood and litter
+  under its potential natural vegetation and natural fire regime, as a yardstick for historical runs and projections.
+  - **Definition.** The natural-regime mean: for each ecodivision and forest type, the type's stock curve after a
+    high-severity fire (stage 4) averaged over the stand ages of a landscape burning at its replacement-fire return
+    interval (the one the spin-up used), a stand burning with the same chance every year. The old-growth end of the curve
+    is kept as an upper bound. Soil is not counted (the model's soil starts from gNATSGO, which carries the land's use).
+  - **Potential vegetation.** A cell that is forest today keeps its type. LANDFIRE Biophysical Settings decide where land
+    is off its potential: developed and farmed land takes the BpS mix of forest (the type stage 5 says the cell would
+    reach), grassland, shrubland and bare ground. Natural grassland, shrubland and barren land keeps its own class (the annual
+    NLCD maps these groups from satellite observations, BpS is a modeled product); the new page Carbon Capacity
+    Options (Carbon Assumptions; two choices, each explained; `ui/CarbonCapacityView.cs`) can count it as forest on its BpS
+    forest share instead.
+    `defaults/landcover/bps-groups.csv` gained a `NonForestCover` column for this. Without a BpS file the
+    capacity of developed and farmed land is its starting stock, and the log says so.
+  - **Build outputs:** Carbon Capacity Summary (by ecodivision, secondary stratum and land cover at the start), Carbon
+    Capacity by Type, and Carbon Capacity Maps (capacity, upper bound, its live biomass part, starting stock, forest share).
+  - **Run Figures (stage 13):** a figure of the run's stock against the capacity, its share of the capacity, and the
+    deficit by cause in the first and last year (land use; natural non-forest cover on land counted as forest; disturbed land
+    waiting to return; and, on land in its potential cover, live biomass apart from dead wood and litter), a map figure, and
+    the sheet Run Carbon Against Capacity (one row per year).
+  - **Compare Runs (stage 14):** a figure of each run's share of the capacity and last-year deficit by cause, and the sheet
+    Compare Carbon Against Capacity.
+  - **Limits:** stand-replacing fire only; today's forest type taken as natural; fixed at the Build's historical climate.
+    A full BpS to forest type group crosswalk, as a user choice, is to-do 69 in `docs/ui-improvements.md`.
+  - `dev/capacity/check-library.R` computes the capacity of an existing Build result outside SyncroSim (read-only) and
+    draws a run against it.
+
+### Tests
+- `tests/unit-capacity.R`: the regime weights and mean against hand values and their limits, the table by type, the BpS
+  cover lookup, the cell rules under both settings of the option, and the run side (series, deficit by cause).
+
 ## 1.5.1 - 2026-11-18
 
 No library update: the new Wood Products parameters are in a sheet of their own (Wood Products Future), which a 1.5 library

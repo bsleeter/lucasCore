@@ -237,6 +237,17 @@ run_dependencies <- function() {
   if (length(p) != 1 || is.na(p)) return(integer(0))
   d <- as.data.table(rsyncrosim::dependency(rsyncrosim::scenario(L, p))); if (nrow(d)) as.integer(d[order(Priority), ScenarioId]) else integer(0) }
 
+# a file a sheet names (fn), where it is: as given, else under this scenario's or one of its dependencies' folders for the sheet in
+# the library's data folder (a stage rerun on its own reads a dependency's sheet, whose file stays in the dependency's folder); NA
+# when it is in none
+dependency_file <- function(fn, sheet) { if (is.null(fn) || !length(fn) || is.na(fn[1])) return(NA_character_); fn <- fn[1]; if (file.exists(fn)) return(fn)
+  p <- file.path(paste0(main_library(), ".data"), sprintf("Scenario-%d", c(rsyncrosim::scenarioId(scn), run_dependencies())), sheet, basename(fn))
+  if (any(file.exists(p))) p[file.exists(p)][1] else NA_character_ }
+# the Build's Carbon Capacity Maps row with each file where it is (src/capacity.R; stages 13 and 14 read it from the Build result they
+# depend on); no rows when the Build has none
+read_capacity_maps <- function() { x <- tryCatch(read_ds("OutputCarbonCapacityMap"), error = function(e) data.table()); if (!nrow(x)) return(x)
+  for (k in grep("FileName$", names(x), value = TRUE)) x[[k]] <- dependency_file(x[[k]], ds("OutputCarbonCapacityMap")); x }
+
 # the flow spatial multiplier rows of one Flow Multiplier Type in this scenario's dependencies (the first that has any), with each file's
 # full path: a scenario that writes its own rows hides its dependencies' (stage 11's climate rows would hide the Build's Site
 # Productivity row), so it carries these over

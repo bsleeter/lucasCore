@@ -86,6 +86,10 @@ load_run <- function(lib, rid) {
   hm <- q("SELECT o.Timestep, o.Filename FROM stsim_OutputSpatialTransition o JOIN stsim_TransitionGroup g ON g.TransitionGroupId = o.TransitionGroupId
            WHERE o.ScenarioId = %d AND o.Iteration = 1 AND g.Name LIKE 'Forest Harvest%%'", rid)
   te <- q("SELECT o.Timestep, o.Filename FROM stsim_OutputAverageSpatialStockGroup o JOIN stsim_StockGroup g ON g.StockGroupId = o.StockGroupId WHERE o.ScenarioId = %d AND g.Name = 'Total Ecosystem'", rid)
+  # the pools the carbon capacity counts (src/capacity.R): their average maps in the first and last year, for the deficit by cause
+  hl <- q("SELECT o.Timestep, g.Name AS Grp, o.Filename FROM stsim_OutputAverageSpatialStockGroup o JOIN stsim_StockGroup g ON g.StockGroupId = o.StockGroupId
+           WHERE o.ScenarioId = %d AND g.Name IN ('Biomass: Total', 'DOM: Deadwood', 'DOM: Litter') AND o.Timestep IN (%d, %d)", rid, yrs[1], yrs[2])
+  hl_of <- function(y) { d <- hl[Timestep == y]; if (uniqueN(d$Grp) < 3) character() else vapply(c("Biomass: Total", "DOM: Deadwood", "DOM: Litter"), function(g) path("stsim_OutputAverageSpatialStockGroup", d[Grp == g, Filename]), "") }
   # post-disturbance return and conversion, and reforestation (to-do 57 step 6): their yearly maps of iteration 1
   pdm <- q("SELECT o.Timestep, g.Name AS Grp, o.Filename FROM stsim_OutputSpatialTransition o JOIN stsim_TransitionGroup g ON g.TransitionGroupId = o.TransitionGroupId
            WHERE o.ScenarioId = %d AND o.Iteration = 1 AND (g.Name LIKE 'Post-disturbance: %%' OR g.Name = 'Reforestation')", rid)
@@ -95,6 +99,7 @@ load_run <- function(lib, rid) {
        fire = if (nrow(fm)) setNames(vapply(fm$Filename, function(f) path("stsim_OutputSpatialTransition", f), ""), fm$Timestep) else character(),
        harvest = if (nrow(hm)) setNames(vapply(hm$Filename, function(f) path("stsim_OutputSpatialTransition", f), ""), hm$Timestep) else character(),
        carbon0 = path("stsim_OutputAverageSpatialStockGroup", te[Timestep == yrs[1], Filename]), carbon1 = path("stsim_OutputAverageSpatialStockGroup", te[Timestep == yrs[2], Filename]),
+       hl0 = hl_of(yrs[1]), hl1 = hl_of(yrs[2]),
        pd = if (nrow(pdm)) pdm[, .(Timestep, Grp, File)] else NULL)
 }
 
@@ -120,7 +125,7 @@ join_runs <- function(H, P) {
   J <- P; J$years <- c(H$years[1], P$years[2])
   for (k in c("area", "trans", "stocks", "flows", "losses", "nbp_cls", "ch4")) J[k] <- list(cut(H[[k]], P[[k]]))
   J$unit_c <- if (!is.null(H$unit_c) && !is.null(P$unit_c)) rbind(H$unit_c[Timestep == H$years[1]], P$unit_c[Timestep == P$years[2]]) else NULL
-  J$unit_a <- H$unit_a; J$sc0 <- H$sc0; J$carbon0 <- H$carbon0
+  J$unit_a <- H$unit_a; J$sc0 <- H$sc0; J$carbon0 <- H$carbon0; J["hl0"] <- list(H$hl0)
   late <- function(m) m[as.integer(names(m)) > ys]
   J$fire <- c(H$fire, late(P$fire)); J$harvest <- c(H$harvest, late(P$harvest))
   J$pd <- rbind(H$pd, if (!is.null(P$pd)) P$pd[Timestep > ys])
@@ -379,6 +384,47 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
       lines(yy, te, lwd = 2, col = INK); mark_line(); ptitle(1, sprintf("Carbon stocks: %.0f to %.0f Tg C", te[1], te[length(te)])); under_legend(c(names(pc), "Total"), fill = c(pc, NA), lty = c(rep(NA, 4), 1), col = c(rep(NA, 4), INK))
       low(); d <- diff(te); b <- barplot(d, col = ifelse(d >= 0, "#2b8152", "#a81d1a"), border = NA, ylab = "Tg C per year"); hgrid(); abline(h = 0, col = MUTED)
       at <- which(yy[-1] %% 5 == 0); axis(1, at = b[at], labels = yy[-1][at], cex.axis = .75); mark_bar(b, yy[-1]); ptitle(2, sprintf("Net ecosystem carbon balance (mean %+.2f Tg C/yr)", mean(d))) }) }
+
+  # ---- carbon against the carrying capacity (the Build's Carbon Capacity maps; src/capacity.R; user 2026-11-18) -----------------
+  # X$cap: capacity_maps() of the Build result, set by the stage. (a) the run's live biomass, dead wood and litter against the capacity
+  # (the natural-regime mean) and its upper bound (old growth); (b) the stock as a share of the capacity; (c) the deficit by cause in
+  # the first and last year, from the run's maps (when it wrote them); and maps of the capacity, the last year's stock and the difference
+  C <- X$cap; cs <- if (!is.null(C) && exists("capacity_series", mode = "function")) capacity_series(X$stocks, C$total, C$upper_total) else NULL
+  if (!is.null(cs)) {
+    c0y <- capacity_year(C, X$sc0, X$hl0, scn); c1y <- capacity_year(C, X$sc1, X$hl1, scn); has_split <- !is.null(c0y) && !is.null(c1y)
+    pools <- c(`Live biomass` = "Biomass: Total", `Dead wood` = "DOM: Deadwood", Litter = "DOM: Litter"); pc <- c(`Live biomass` = "#2b8152", `Dead wood` = "#a6611a", Litter = "#dfc27d")
+    stc <- X$stocks[, .(Tg = sum(Mg) / 1e6), by = .(Timestep, StockGroup)]; yy <- cs$Timestep
+    M <- sapply(pools, function(g) stc[StockGroup == g][match(yy, Timestep), Tg]); M[is.na(M)] <- 0; n1 <- nrow(cs); has_up <- !is.na(C$upper_total)
+    chart_figure("carbon_capacity", "Carbon against the carrying capacity", paste0(
+      "The carrying capacity is what the land would hold in live biomass, dead wood and litter under its potential natural vegetation and natural fire regime: for forest, the mean stock of a landscape of the type ",
+      "burning at its natural stand-replacing fire return interval (LANDFIRE), from the Build's own stock curves; land that is forest keeps its type, natural grassland and shrubland their class (unless Carbon Capacity Options says otherwise), and LANDFIRE Biophysical Settings say what developed and farmed ",
+      "land would carry. Soil is not counted. It is fixed at the Build's historical climate. ",
+      sprintf("(a) The run's stock of the three pools against the capacity%s. (b) The stock as a share of the capacity; above 100%% the land holds more than its natural regime would keep (fire exclusion, for one). ", if (has_up) " and its upper bound, the same land at the old-growth end of its curves" else ""),
+      if (has_split) sprintf("(c) The deficit (capacity less stock) by cause in %d and %d, from the run's maps: developed and farmed land; disturbed land waiting to return to its cover; and, on land in its potential cover, live biomass (for forest, stands younger or older than the natural regime's mean age, and their stocking) apart from dead wood and litter (which also follow stand age: a landscape under its natural regime holds recently burned stands, rich in dead wood, and old ones; and, in part, the disturbance the Build starts each stand after, Carbon Assumptions: Spin-up). A cause's value is net of land above its capacity; and natural grassland, shrubland and barren land whose capacity is mostly forest (forest at the start that has since converted and, when Carbon Capacity Options counts it so, land LANDFIRE BpS maps as forest potential).", y0, y1) else ""),
+      1, if (has_split) 3 else 2, h = 1150, draw = function() {
+        low(); cum <- t(apply(M, 1, cumsum)); top <- max(cum, cs$Capacity, if (has_up) cs$UpperBound, na.rm = TRUE) * 1.06
+        plot(NA, xlim = range(yy), ylim = c(0, top), xlab = "", ylab = "Tg C", bty = "l"); hgrid()
+        for (j in rev(seq_len(ncol(M)))) polygon(c(yy, rev(yy)), c(cum[, j], rev(if (j > 1) cum[, j - 1] else rep(0, length(yy)))), col = pc[j], border = NA)
+        abline(h = C$total, lwd = 2, col = INK); if (has_up) abline(h = C$upper_total, lty = 2, col = MUTED); mark_line()
+        ptitle(1, sprintf("Stock %.0f of %.0f Tg C capacity in %d", cs$Stock[n1], C$total, y1))
+        under_legend(c(names(pc), "Carrying capacity", if (has_up) "Upper bound (old growth)"), fill = c(pc, NA, if (has_up) NA), lty = c(rep(NA, 3), 1, if (has_up) 2), col = c(rep(NA, 3), INK, if (has_up) MUTED))
+        low(); plot(NA, xlim = range(yy), ylim = range(c(cs$RealisedShare, 100)) + c(-3, 3), xlab = "", ylab = "% of the carrying capacity", bty = "l"); hgrid(); abline(h = 100, col = MUTED, lty = 2)
+        lines(yy, cs$RealisedShare, lwd = 2, col = "#2b8152"); mark_line(); ptitle(2, sprintf("Share of the capacity: %.0f%% in %d, %.0f%% in %d", cs$RealisedShare[1], y0, cs$RealisedShare[n1], y1))
+        if (has_split) { low(); S <- rbind(c0y$split, c1y$split); S <- S[, colSums(abs(S)) > 1e-9, drop = FALSE]; colnames(S) <- CAPACITY_CAUSE_LABELS[match(colnames(S), CAPACITY_CAUSES)]; bc <- c("#b9b4a6", "#8c6d31")
+          b <- barplot(S, beside = TRUE, col = bc, border = NA, ylim = range(c(0, S)) * 1.15, ylab = "Tg C below the capacity", cex.names = .75); hgrid(); abline(h = 0, col = MUTED)
+          barplot(S, beside = TRUE, col = bc, border = NA, add = TRUE, axes = FALSE, names.arg = rep("", ncol(S)))
+          ptitle(3, sprintf("Deficit by cause: %.0f Tg C in %d, %.0f in %d", sum(S[1, ]), y0, sum(S[2, ]), y1)); under_legend(c(as.character(y0), as.character(y1)), fill = bc) } })
+    if (!is.null(c1y)) {
+      rc <- C$grid; rs <- setValues(rast(C$grid), c1y$stock); vc <- cv(rc); vs1 <- cv(rs); s <- steps(c(vc, vs1)); dv <- vs1 - vc
+      m <- unname(quantile(abs(dv[inz]), 0.99, na.rm = TRUE)); m <- if (is.finite(m) && m > 0) m else 1; b <- unique(signif(m * c(-1, -.5, -.2, -.05, .05, .2, .5, 1), 1))
+      dbrk <- c(-Inf, b, Inf); fm <- function(x) format(x, trim = TRUE)
+      dlab <- c(paste0("<", fm(b[1])), ifelse(abs(b[-length(b)] + b[-1]) < 1e-9, paste0("±", fm(b[-1])), fm(b[-length(b)])), paste0(">", fm(b[length(b)])))
+      tot <- function(v) sum(v[inz], na.rm = TRUE) * prod(res(el)) / 1e4 / 1e6
+      map_figure("carbon_capacity_map", sprintf("Carbon against the carrying capacity, %d", y1), list(
+        list(k = classed(vc, s$brk), cols = RAMP_C(length(s$brk) - 1), lab = s$lab, title = "Carrying capacity (Mg C/ha)", sub = sprintf("%.1f Tg C; live biomass, dead wood and litter", C$total)),
+        list(k = classed(vs1, s$brk), cols = RAMP_C(length(s$brk) - 1), lab = s$lab, title = sprintf("Stock of the same pools, %d (Mg C/ha)", y1), sub = sprintf("%.1f Tg C", tot(vs1))),
+        list(k = classed(dv, dbrk), cols = RAMP_CHG(length(dbrk) - 1), lab = dlab, title = sprintf("Stock less capacity, %d (Mg C/ha)", y1), sub = "brown below the capacity, green above")),
+        sprintf("(a) The carbon carrying capacity: live biomass, dead wood and litter under each cell's potential natural vegetation and natural fire regime (the Build's Carbon Capacity map). (b) The run's stock of those pools in its last year (the average over its iterations). (c) The difference; a forest cell older than its regime's mean stands above its capacity, a young or cleared one below. (a) and (b) share one scale.%s", relief)) } }
 
   # ---- charts: carbon fluxes -------------------------------------------------------------------------------------------------
   # (a) productivity and respiration; (b) losses by cause and NBP; (c) emissions to the atmosphere by driver; (d) carbon carried off the

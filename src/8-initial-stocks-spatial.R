@@ -19,6 +19,9 @@
 #   soil (BG slow)          gNATSGO wherever the class's value is 0 (the build's rule). Forest keeps its spin-up value: stage 3
 #                           calibrated soil decay to each ecodivision x class's mean gNATSGO, so forest cells start at the class's
 #                           gNATSGO mean and in balance with their decay rates
+# Also writes the carbon carrying capacity (src/capacity.R): each cell's live biomass, dead wood and litter under its potential natural
+# vegetation and natural fire regime, as maps and tables (Carbon Capacity Maps, by Type, Summary) that Run Figures and Compare Runs
+# measure a run against.
 # Stand age is the stage 6 map when it ran (clearcut minimum age applied), else stage 5's.
 # Needs stages 4 and 5 (6 recommended): same pipeline, or dependencies on their results.
 # =============================================================================
@@ -526,6 +529,44 @@ if (any(hp)) {
 } else say("Peat: no cell starts with peat (no Histosol components, or no gNATSGO soil above the class's)")
 out[!land, ] <- NA
 progressBar()
+# ---- Carbon carrying capacity (src/capacity.R; user 2026-11-18) ---------------------------------------------------------------
+# What each cell would hold in live biomass, dead wood and litter under its potential natural vegetation and natural fire regime, as a
+# yardstick for the runs (Run Figures, Compare Runs). Forest: the natural-regime mean of its type's stock curve (stage 4) at its return
+# interval (the one the spin-up used), times the cell's site productivity multiplier as its starting stocks are. A cell that is forest
+# today keeps its type; LANDFIRE BpS decides what developed and farmed land would carry (the hybrid choice; a full BpS crosswalk is
+# to-do 69), the forest type being the one stage 5 says the cell would reach (ReforestType). Natural grassland, shrubland and barren
+# land keeps its own class, or counts as forest on its BpS forest share when Carbon Capacity Options says so. Grass and the steady
+# shrub classes: their starting stock (the steady state of their rates); chaparral and the sage family: their mature stock (no natural
+# fire regime for shrubland in the package). Emergent wetland, water and ice: their starting stock. Without BpS (Data Sources:
+# BpsFile) developed and farmed land keeps its starting stock too, and the log says so.
+source(pkg_file("src", "capacity.R")); source(pkg_file("src", "reforestation.R"))
+cap_out <- NULL
+if (!all(CAPACITY_GROUPS %in% stsim_list("StockGroup")$Name)) say("Carbon capacity: this library lacks the stock groups %s; not computed", paste(CAPACITY_GROUPS, collapse = ", ")) else {
+  # return intervals: the spin-up's (Decay Calibration), else stage 5's, else the package table (which also holds the forested wetlands')
+  rtab <- function(x) if (nrow(x) && all(c("StratumId", "StateClassId", "ReturnInterval") %in% names(x))) x[, .(StratumId = as.character(StratumId), StateClassId = as.character(StateClassId), ReturnInterval = as.numeric(ReturnInterval))] else NULL
+  ri_c <- rbind(rtab(tryCatch(read_ds("OutputDecayCalibration"), error = function(e) data.table())), rtab(tryCatch(read_ds("OutputReturnInterval"), error = function(e) data.table())),
+                read_default("spinup", "return-interval.csv")[, .(StratumId = Stratum, StateClassId = StateClass, ReturnInterval = as.numeric(ReturnInterval))])
+  # the forest type stage 5 says each cell would reach (ReforestType), by name
+  lcl <- tryCatch(read_ds("OutputLandCoverLayers"), error = function(e) data.table())
+  rtf <- dependency_file(if (nrow(lcl) && "ReforestTypeFileName" %in% names(lcl)) lcl$ReforestTypeFileName[1] else NA, ds("OutputLandCoverLayers"))
+  if (is.na(rtf)) say("Carbon capacity: no ReforestType map from stage 5 in reach; land off its potential takes its ecodivision's most common forest type")
+  ro_c <- tryCatch(reforest_options(read_ds("ReforestationOptions")), error = function(e) list(riparian_as = "forest"))
+  bf <- read_data_sources("BpsFile", optional = TRUE)$BpsFile
+  secn <- NULL
+  if ("SecondaryStratumFileName" %in% names(ic) && !is.na(ic$SecondaryStratumFileName[1]) && file.exists(ic$SecondaryStratumFileName[1])) { sl <- stsim_list("SecondaryStratum")
+    secn <- sl$Name[match(values(rast(ic$SecondaryStratumFileName[1]), mat = FALSE), as.integer(sl$Id))] }
+  cb <- capacity_build(P = P, land = land, sname = sname, cname = cname, pname = capacity_parent(cname, scl), out = out, st = st, cv = cv, ri = ri_c,
+    membership = read_default("stockflow", "stsim_StockTypeGroupMembership.csv"), steady = lt("grassland-shrubland.csv"), aged = rbind(lt("chaparral.csv"), lt("shrub-age.csv"), fill = TRUE),
+    regions = read_default("transitions", "post-disturbance-regions.csv"), m_site = if (site_on) mult else NULL, m_gs = if (gs_on) gmult else NULL,
+    reach = if (is.na(rtf)) NULL else scl$Name[match(values(rast(rtf), mat = FALSE), as.integer(scl$Id))], bps_file = bf, bps = bps_lookup(), bps_groups = read_default("landcover", "bps-groups.csv"),
+    riparian_as = ro_c$riparian_as, secondary = secn, say = say,
+    natural = tryCatch(capacity_natural(read_ds("CarbonCapacityOptions")), error = function(e) if (grepl("^Carbon Capacity Options", conditionMessage(e))) fail("%s", conditionMessage(e)) else "own"))
+  check(STAGE, "carbon capacity: every land cell has a capacity, finite and not negative", all(is.finite(cb$capacity[land]) & cb$capacity[land] >= 0), sprintf("%d cells", sum(!(is.finite(cb$capacity[land]) & cb$capacity[land] >= 0))))
+  wr <- function(v, f) write_raster(setValues(rast(P), v), f, "FLT4S")
+  cap_out <- list(maps = data.table(CapacityFileName = wr(cb$capacity, "CarbonCapacity.tif"), UpperBoundFileName = wr(cb$upper, "CarbonCapacityUpperBound.tif"),
+                                    StartStockFileName = wr(cb$start, "CarbonCapacityStartStock.tif"), LiveFileName = wr(cb$live, "CarbonCapacityLive.tif"), ForestShareFileName = wr(cb$forest_share, "CarbonCapacityForestShare.tif")),
+                  type = cb$type, summary = cb$summary)
+}
 # ---- checks, summary, outputs -----------------------------------------------------------------------------------------
 check(STAGE, "every land cell has every pool, none negative", !anyNA(out[land, ]) && all(out[land, ] >= 0), sprintf("%d NA, %d negative", sum(is.na(out[land, ])), sum(out[land, ] < 0, na.rm = TRUE)))
 soil_j <- which(st$StockTypeId %in% c("DOM: Belowground Slow", "Deep Soil", "DOM: Peat"))   # soil = BG Slow + Deep Soil + Peat
@@ -545,6 +586,9 @@ keep_ic_properties(scn, ic, 8)
 write_ds(summ[, .(StateClassId, Cells, PostFire, Live, Dom, Soil, TotalTg, Source)], "OutputInitialStockSummary")
 if (length(np_rows)) { np <- rbindlist(np_rows)[, .(Multiplier, StratumId, StateClassId, Cells, WithData, Mean, P10, Median, P90, AtCap, Source)]
   tryCatch(write_ds(np, "OutputNonForestProductivity"), error = function(e) say("Non-Forest Productivity table not written (%s): reopen the library in SyncroSim Studio so it adds the table", conditionMessage(e))) }
+# Carbon capacity: its maps and tables (a library made before them has no such sheets until it is opened in SyncroSim Studio)
+if (!is.null(cap_out)) tryCatch({ write_ds(cap_out$maps, "OutputCarbonCapacityMap"); write_ds(cap_out$type, "OutputCarbonCapacityType"); write_ds(cap_out$summary, "OutputCarbonCapacity") },
+  error = function(e) say("Carbon capacity tables not written (%s): reopen the library in SyncroSim Studio so it adds the tables", conditionMessage(e)))
 progressBar()
 finish_checks()
 progressBar(type = "end")

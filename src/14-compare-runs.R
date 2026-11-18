@@ -12,7 +12,7 @@
 # (Wood Products) has followed get the wood products figure and summary columns (a history takes its projection's when it has none).
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
-source(pkg_file("src", "figures.R")); source(pkg_file("src", "run-figures.R")); source(pkg_file("src", "compare-figures.R"))
+source(pkg_file("src", "figures.R")); source(pkg_file("src", "run-figures.R")); source(pkg_file("src", "compare-figures.R")); source(pkg_file("src", "capacity.R"))
 STAGE <- "14 Compare Runs"
 progressBar(type = "begin", totalSteps = 3)
 
@@ -41,8 +41,13 @@ sa <- read_ds("StudyArea"); label <- if (nrow(sa)) paste(sub("^[^:]*: ", "", sa$
 dem <- tryCatch(read_data_sources("ElevationFile")$ElevationFile, error = function(e) { say("No hillshade: %s", conditionMessage(e)); NULL })
 progressBar()
 
-res <- compare_figures(R, grid, dem, label, file.path(TD(), "CompareFigures"))
-S <- attr(res, "carbon"); Ld <- attr(res, "land")
+# the carbon carrying capacity (src/capacity.R): the Build result's Carbon Capacity maps, written by stage 8
+cap <- tryCatch(capacity_maps(read_capacity_maps()), error = function(e) { say("Carbon capacity not readable: %s", conditionMessage(e)); NULL })
+if (is.null(cap)) say("No Carbon Capacity maps in the Build result this scenario depends on: rerun the Build's stage 8 with this version of lucasCore to compare the runs against the carrying capacity")
+res <- compare_figures(R, grid, dem, label, file.path(TD(), "CompareFigures"), cap = cap)
+S <- attr(res, "carbon"); Ld <- attr(res, "land"); Cc <- attr(res, "capacity")
+if (!is.null(Cc)) { for (i in seq_len(nrow(Cc))) say("%s: %.0f%% of the carrying capacity in %d, %.0f%% in %d (%.2f of %.2f Tg C; deficit %.2f)", Cc$Label[i], Cc$ShareStart[i], Cc$StartYear[i], Cc$ShareEnd[i], Cc$EndYear[i], Cc$StockEnd[i], Cc$Capacity[i], Cc$DeficitEnd[i])
+  tryCatch(write_ds(Cc, "OutputCompareCapacity"), error = function(e) say("Compare Carbon Against Capacity not written (%s): reopen the library in SyncroSim Studio so it adds the table", conditionMessage(e))) }
 say("%d figures drawn (%s)", nrow(res), paste(res$Title, collapse = "; "))
 for (i in seq_len(nrow(S))) say("%s: %.1f to %.1f Tg C (%+.1f)%s", S$Label[i], S$CarbonStart[i], S$CarbonEnd[i], S$CarbonChange[i],
                                  if (is.na(S$VsBaseline[i])) "" else sprintf(", %+.1f against the baseline", S$VsBaseline[i]))

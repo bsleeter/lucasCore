@@ -1762,6 +1762,57 @@ The three projections store almost the same carbon in products, 9.05 to 9.12 Tg 
 
 *Figure 7.35. The Compare Runs carbon summary of the P26 runs with their Wood Products results: HWP, the mean change in carbon stored in products, and NBP + HWP.*
 
+### 7.6 Carbon against the carrying capacity
+
+How much carbon could this land hold? The Build answers with a **carbon carrying capacity**: what each cell would hold in live biomass, dead wood and litter under its potential natural vegetation and its natural fire regime. Run Figures (stage 13) and Compare Runs (stage 14) then show a historical run or a projection as a share of that capacity, and how far below it the land is.
+
+**What the capacity is.** It is the *natural-regime mean*, not the old-growth maximum. A landscape that burns at its natural stand-replacing fire return interval always holds stands of every age, so its mean stock is below what an old stand holds. For each ecodivision and forest type the Build averages the type's stock curve (stage 4, after a high-severity fire) over the ages such a landscape holds: a stand burns with the same chance every year, one over the return interval (LANDFIRE, the interval the spin-up used). The old-growth end of the curve is kept as an **upper bound**.
+
+**Which vegetation.** A cell that is forest today keeps its forest type. LANDFIRE Biophysical Settings (BpS, the potential vegetation map the reforestation transition already uses) decides only where land use has taken land off its potential:
+
+- **developed and farmed land** takes the mix BpS gives its 30 m pixels: forest (the type stage 5 says the cell would reach), grassland, shrubland or bare ground;
+- **natural grassland, shrubland and barren land** keeps its own class. The annual NLCD maps these main groups from satellite observations with relatively high accuracy, while BpS is a modeled product, so where the two disagree the capacity follows NLCD. **Carbon Assumptions > Carbon Capacity Options** can instead count such land as forest on the share of its pixels BpS maps as forest potential (see the note below);
+- **emergent wetland, water and ice** keep their starting stock.
+
+Grassland and the steady shrub classes are counted at their starting stock; chaparral and the sage family at their mature stock. Forest capacity is multiplied by the cell's site productivity multiplier, as its starting stocks are.
+
+**What it leaves out, and its limits.**
+
+- **Soil is not counted.** The model's soil starts from gNATSGO, which already carries the land's use, so a potential soil stock would be an assumption.
+- **Replacement fire only.** Types with frequent surface fire (ponderosa pine, for one) are counted as if only stand-replacing fire shaped them, so their dead wood and litter are on the high side.
+- **Today's forest type is taken as natural.** Planted pine on former hardwood land counts as its present type.
+- **Fixed climate.** The capacity is built on the Build's historical climate. A projection's climate and CO2 change the run, not the yardstick.
+- **Natural non-forest land is taken as natural.** Forest cleared or burned before the start year that the annual NLCD now maps as grassland or shrubland is counted at its present class, so the deficit there is missed. The Carbon Capacity Options setting counts it, at the cost of trusting BpS over NLCD everywhere: in the Yellowstone test area BpS reads 87.5% of the land as forest potential where NLCD maps 31% of it as grass and shrub, and the land's share of its capacity in 1985 falls from 86% to 60% with the setting on.
+
+**Where to find it.** The Build writes three sheets under **Build Results**:
+
+- **Carbon Capacity Summary**: capacity, upper bound and starting stock (Tg C) by ecodivision, secondary stratum and land cover at the start, with the starting stock as a share of the capacity;
+- **Carbon Capacity by Type**: for each ecodivision and forest type, the return interval, the mean stand age under that regime, and the capacity by pool beside the upper bound (Mg C/ha);
+- **Carbon Capacity Maps**: the capacity, its upper bound, its live biomass part, the starting stock of the same pools and the share of each cell counted at a forest capacity.
+
+The run log gives the totals, the potential cover BpS found, and the starting deficit by cause. Without a BpS file (Data Sources: BpsFile; a Data Download fetches it) developed and farmed land keeps its starting stock as its capacity, and the log says so.
+
+**In Run Figures.** Two figures are added when the Build result holds the capacity maps:
+
+- *Carbon against the carrying capacity*: (a) the run's live biomass, dead wood and litter against the capacity and its upper bound; (b) the stock as a share of the capacity; (c) the deficit by cause in the first and last year (see below).
+- A map figure of the capacity, the last year's stock and the difference.
+
+**The causes of the deficit.** Each cell's deficit (its capacity less its stock) goes to one cause, or is divided between the last two:
+
+- **Land use**: the cell is developed or farmed.
+- **Non-forest cover**: natural grassland, shrubland or barren land whose capacity is mostly forest: forest at the start that has since converted and, with the Carbon Capacity Options setting, land BpS maps as forest potential.
+- **Disturbed land**: the cell is in a disturbed class, after a stand-replacing fire, waiting to return to its forest or shrub type.
+- **Live biomass**: on every other cell (land in its potential cover), its live biomass against the live part of its capacity. For forest this is stand age and stocking: stands younger than the mean age of the natural regime hold less, older stands more.
+- **Dead wood and litter**: on the same cells, their dead wood and litter against the capacity's. This is mostly stand age as well: a landscape under its natural regime holds recently burned stands, which are rich in dead wood, and old stands, where it has built up again, while a landscape of middle-aged stands holds less of both. A smaller part comes from the disturbance the Build starts each stand after. The capacity's stand starts after a fire, which leaves its wood on the site as snags; the Build starts forest outside the 1900 to start-year fire perimeters after a clearcut, which takes the wood away. Where the land was never logged, **Carbon Assumptions > Spin-up** can set high-severity fire as the last disturbance of a forest type outside the perimeters.
+
+A cause's value is net: land above its capacity counts against it. In the Yellowstone test area the land's 1985 deficit is 2.4 Tg C of live biomass (forest of 101 years on average, against a mean age of 200 under a return interval of 346 years) and 5.7 Tg C of dead wood and litter. Starting every forest type after fire instead of clearcut lowers the second to 4.3 Tg C and raises the land's share of its capacity from 86% to 88%: the clearcut start accounts for about a quarter of it, stand age for the rest.
+
+The yearly values are in **Run Carbon Against Capacity**. A share above 100% is possible and is not an error: fire exclusion lets forest grow older than its natural regime would.
+
+**In Compare Runs.** One figure shows each run's share of the capacity through time and each projection's deficit in its last year by cause; **Compare Carbon Against Capacity** has a row per run.
+
+> **A Build made before this version** has no capacity. Rerun the Build (or its stage 8 on the Build result) to add it; runs already made on that Build can then be drawn against it without rerunning them.
+
 ## 8. Viewing results in SyncroSim
 
 Results can be viewed without leaving SyncroSim Studio in two ways: the lucasCore figures, drawn by stages 12, 13 and 14 (section 8.1), and the charts and maps you build yourself from a run's ST-Sim output (section 8.2).
@@ -1940,6 +1991,9 @@ Besides the inputs they write for ST-Sim, the lucasCore stages save summary tabl
 | Minimum Harvest Ages | OutputHarvestAge | 6 | The minimum age of each forest type's clearcut and selection, the FIA and study area values behind it, and where it came from (section 3.6). |
 | Climate Multiplier Summary | OutputClimateSummary | 7 | Each climate multiplier (growth, decay) per year: the study-area mean and the cell range. |
 | Initial Stock Summary | OutputInitialStockSummary | 8 | Starting carbon by state class: live, dead organic matter and soil, in Mg C/ha, and the total in Tg C. |
+| Carbon Capacity Summary | OutputCarbonCapacity | 8 | The carbon carrying capacity (live biomass, dead wood and litter under potential natural vegetation and its natural fire regime), its upper bound and the starting stock, in Tg C, by ecodivision, secondary stratum and land cover at the start (section 7.6). |
+| Carbon Capacity by Type | OutputCarbonCapacityType | 8 | For each ecodivision and forest type: the return interval, the mean stand age under it, and the capacity by pool beside the old-growth upper bound, in Mg C/ha. |
+| Carbon Capacity Maps | OutputCarbonCapacityMap | 8 | Maps of the capacity, its upper bound, the starting stock of the same pools and the share of each cell counted at a forest capacity. |
 
 **The Projection Setup** (stages 9 and 10) and **Projection Climate** (stage 11):
 
@@ -1955,7 +2009,7 @@ Besides the inputs they write for ST-Sim, the lucasCore stages save summary tabl
 | Historical Patch Sizes | OutputPatchSize | 10 | The sizes of each year's patches of change, by size class. |
 | Climate Multiplier Summary | OutputClimateSummary | 11 | As for stage 7, for the projection's climate future. |
 
-**Figures and comparisons** (stages 12 to 14): **Build Figures (PNG)**, **Run Figures (PNG)** and **Compare Figures (PNG)** open in the figure viewer (section 8.1). Stage 14 also writes **Compare Carbon Summary**, Compare Land Change Summary and, with management costs, Compare Cost **Summary** (section 7.4). Stage 18 writes Wood Products, Wood Products by End Use, Wood Products Spin-up and Wood Products Figures (PNG) (section 7.5).
+**Figures and comparisons** (stages 12 to 14): **Build Figures (PNG)**, **Run Figures (PNG)** and **Compare Figures (PNG)** open in the figure viewer (section 8.1). Stage 14 also writes **Compare Carbon Summary**, Compare Land Change Summary and, with management costs, Compare Cost **Summary** (section 7.4). Stage 18 writes Wood Products, Wood Products by End Use, Wood Products Spin-up and Wood Products Figures (PNG) (section 7.5). With a Build that holds the carbon capacity, stage 13 writes **Run Carbon Against Capacity** and stage 14 **Compare Carbon Against Capacity** (section 7.6).
 
 **Validation.** Every stage adds its checks to **Validation**: one row per check, with the stage, what was checked, **Pass** or **Fail**, and the numbers behind it. The same lines are in the run log. Look here first when a result looks wrong.
 

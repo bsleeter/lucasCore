@@ -132,8 +132,10 @@ compare_cost <- function(R, lib) {
                UsdPerMgCWithProductsHigh = per(max(xn), gain_p), UsdPerMgCO2eWithProducts = per(net, gain_p) / (44 / 12)) })) }
 
 # ---- the figures -----------------------------------------------------------------------------------------------------------
-# R: compare_runs(); grid: the Build's state class map; dem; label: the study area
-compare_figures <- function(R, grid, dem, label, outdir) {
+# R: compare_runs(); grid: the Build's state class map; dem; label: the study area; cap: the Build's carbon capacity maps
+# (src/capacity.R's capacity_maps()) or NULL: with them, the figure of each run against the carrying capacity and the table in
+# attribute "capacity" (compare_capacity)
+compare_figures <- function(R, grid, dem, label, outdir, cap = NULL) {
   B <- Filter(function(r) r$base, R)[[1]]; P <- Filter(function(r) !r$hist, R); O <- Filter(function(r) !r$hist && !r$base, R)
   H <- Filter(function(r) r$hist, R)
   ps <- sort(unique(vapply(P, function(r) r$X$years[1], 0)))      # the projections' start years (the joins with their history)
@@ -196,6 +198,26 @@ compare_figures <- function(R, grid, dem, label, outdir) {
       map_figure("carbon_difference", sprintf("Total ecosystem carbon in %d, against the baseline", ye), PN,
         sprintf("(a) Total ecosystem carbon in the baseline run's final year. (%s) Each other run's final-year carbon minus the baseline's, cell by cell (iteration 1; one scale, to the 99th percentile of the differences).%s",
                 paste(letters[seq_len(sum(keep)) + 1], collapse = ", "), relief)) } }
+
+  # ---- charts: carbon against the carrying capacity (cap: capacity_maps() of the Build result; src/capacity.R) -----------------
+  # (a) each run's live biomass, dead wood and litter as a share of the capacity; (b) each projection's deficit in its last year by cause
+  Cc <- if (!is.null(cap) && exists("compare_capacity", mode = "function")) compare_capacity(R, cap) else NULL
+  if (!is.null(Cc)) {
+    Pc <- Cc[Role != "History"]; has_split <- !anyNA(Pc$DeficitLandUse)
+    chart_figure("carbon_capacity", "Carbon against the carrying capacity", paste0(
+      "The carrying capacity is what the land would hold in live biomass, dead wood and litter under its potential natural vegetation and natural fire regime (the Build's Carbon Capacity maps: for forest, the mean stock of a landscape of ",
+      sprintf("the type burning at its natural stand-replacing fire return interval; soil is not counted; fixed at the Build's historical climate): %.1f Tg C here%s. ", cap$total, if (is.na(cap$upper_total)) "" else sprintf(", %.1f at the old-growth end of the curves", cap$upper_total)),
+      "(a) Each run's stock of those pools as a share of the capacity. ",
+      if (has_split) "(b) Each projection's deficit (capacity less stock) in its last year by cause, from its maps: developed and farmed land; disturbed land waiting to return to its cover; and, on land in its potential cover, live biomass (for forest, stands younger or older than the natural regime's mean age, and their stocking) apart from dead wood and litter (which also follow stand age: a landscape under its natural regime holds recently burned stands, rich in dead wood, and old ones; and, in part, the disturbance the Build starts each stand after, Carbon Assumptions: Spin-up). A cause's value is net of land above its capacity; and natural grassland, shrubland and barren land whose capacity is mostly forest (forest at the start that has since converted and, when Carbon Capacity Options counts it so, land LANDFIRE BpS maps as forest potential)." else
+        "(b) Each projection's deficit (capacity less stock) in its last year."), 1, 2, h = 1150, draw = function() {
+      low(); run_lines(function(X) capacity_series(X$stocks, cap$total)[, .(Timestep, RealisedShare)], "% of the carrying capacity", 1, legend = FALSE,
+        sprintf("Share of the capacity, %d: %s%%", ye, paste(sprintf("%.0f", Pc$ShareEnd), collapse = " / "))); under_legend(labs, col = cols, lwd = 2, ncol = 2)
+      low(); pcol <- vapply(P, `[[`, "", "col")
+      if (has_split) { S <- as.matrix(Pc[, CAPACITY_CAUSE_COLS, with = FALSE]); colnames(S) <- CAPACITY_CAUSE_LABELS; S <- S[, colSums(abs(S)) > 1e-9, drop = FALSE]
+        barplot(S, beside = TRUE, col = pcol, border = NA, ylim = range(c(0, S)) * 1.15, ylab = "Tg C below the capacity", cex.names = .75); hgrid(); abline(h = 0, col = MUTED)
+        barplot(S, beside = TRUE, col = pcol, border = NA, add = TRUE, axes = FALSE, names.arg = rep("", ncol(S)))
+      } else { barplot(Pc$DeficitEnd, col = pcol, border = NA, ylim = range(c(0, Pc$DeficitEnd)) * 1.15, ylab = "Tg C below the capacity"); hgrid(); abline(h = 0, col = MUTED) }
+      ptitle(2, sprintf("Deficit in the last year: %s Tg C", paste(sprintf("%.1f", Pc$DeficitEnd), collapse = " / "))); under_legend(Pc$Label, fill = pcol) }) }
 
   # ---- charts: carbon fluxes per year ----------------------------------------------------------------------------------------
   FL <- c(`Net primary productivity` = "Net Primary Productivity", `Heterotrophic respiration` = "Emission: Total Rh",
@@ -318,4 +340,4 @@ compare_figures <- function(R, grid, dem, label, outdir) {
            Forest = s0(ForestChange), Developed = s0(DevelopedChange))],
     c("", "", "km2", "km2", "km2", "change, km2", "change, km2"))
 
-  out <- rbindlist(K$rows); attr(out, "carbon") <- Cb; attr(out, "land") <- Ld; out }
+  out <- rbindlist(K$rows); attr(out, "carbon") <- Cb; attr(out, "land") <- Ld; attr(out, "capacity") <- Cc; out }

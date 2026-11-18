@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<package name="lucasCore" displayName="LUCAS Core (model builder)" description="Builds LUCAS land-use and carbon models in ST-Sim from national datasets (FIA growth curves; CBM carbon parameters; spatial initial conditions; historical transitions and projections)" version="1.5.1" url="https://code.usgs.gov/LUCC/lucasCore" minSyncroSimVersion="3.1.29">
+<package name="lucasCore" displayName="LUCAS Core (model builder)" description="Builds LUCAS land-use and carbon models in ST-Sim from national datasets (FIA growth curves; CBM carbon parameters; spatial initial conditions; historical transitions and projections)" version="1.5.2" url="https://code.usgs.gov/LUCC/lucasCore" minSyncroSimVersion="3.1.29">
 
 	<builtFor package="stsim" version="4.5.4"/>
 
@@ -1057,6 +1057,90 @@
 		<column name="Source" dataType="String"/>
 	</dataSheet>
 
+	<!-- stage 8 (src/capacity.R): the carbon carrying capacity - what each cell would hold in live biomass, dead wood and litter under
+	     its potential natural vegetation (its own forest type; LANDFIRE BpS where land is off its potential) and natural fire regime
+	     (the natural-regime mean of the type's stock curve at its return interval). Run Figures and Compare Runs measure runs against it -->
+	<dataSheet name="CarbonCapacityOptions" displayName="Carbon Capacity Options" isSingleRow="True" viewClassName="lucasCoreUI.CarbonCapacityView" viewClassAssembly="lucasCoreUI">
+		<!-- how natural grassland, shrubland and barren land counts in the capacity (user 2026-11-18): its own class by default, because
+		     the annual NLCD maps these groups from satellite observations while BpS is a modeled product; or forest on the share of its
+		     pixels BpS maps as forest potential. Developed and farmed land always takes the BpS mix -->
+		<column name="NaturalNonForest" displayName="Natural Grassland, Shrubland and Barren Land Counts As (blank = its own class)" dataType="Integer" validationType="List" formula1="1:Its own class (annual NLCD)|2:LANDFIRE BpS potential" isOptional="True" defaultValue="1"/>
+	</dataSheet>
+
+	<dataSheet name="OutputCarbonCapacityMap" displayName="Carbon Capacity Maps" isSingleRow="True">
+		<column name="CapacityFileName" displayName="Carbon Capacity: Live Biomass, Dead Wood and Litter (Mg C/ha)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
+		<column name="UpperBoundFileName" displayName="Upper Bound: the Same at the Old-Growth End (Mg C/ha)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
+		<column name="StartStockFileName" displayName="Starting Stock of the Same Pools (Mg C/ha)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
+		<column name="LiveFileName" displayName="Live Biomass Part of the Capacity (Mg C/ha)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif" isOptional="True"/>
+		<column name="ForestShareFileName" displayName="Share of the Cell Counted at a Forest Capacity" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
+	</dataSheet>
+
+	<dataSheet name="OutputCarbonCapacityType" displayName="Carbon Capacity by Type">
+		<!-- one row per ecodivision x forest (or forested wetland) type the capacity maps use -->
+		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum"/>
+		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="Cells" displayName="Cells Counted at This Type" dataType="Integer" isOptional="True"/>
+		<column name="ReturnInterval" displayName="Replacement-Fire Return Interval (yr)" dataType="Integer"/>
+		<column name="MeanAge" displayName="Mean Stand Age Under That Regime (yr, within the curve)" dataType="Double" format="0.0"/>
+		<column name="Live" displayName="Live Biomass (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="DeadWood" displayName="Dead Wood (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="Litter" displayName="Litter (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="Capacity" displayName="Carbon Capacity: Natural-Regime Mean (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="UpperBound" displayName="Upper Bound: Old Growth (Mg C/ha)" dataType="Double" format="0.00"/>
+	</dataSheet>
+
+	<dataSheet name="OutputCarbonCapacity" displayName="Carbon Capacity Summary">
+		<!-- one row per ecodivision x secondary stratum x start-year land cover group -->
+		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum"/>
+		<column name="SecondaryStratumId" displayName="Secondary Stratum" dataType="Integer" validationType="Datasheet" formula1="stsim_SecondaryStratum" isOptional="True"/>
+		<column name="Cover" displayName="Land Cover at the Start" dataType="String"/>
+		<column name="Cells" dataType="Integer"/>
+		<column name="MeanCapacity" displayName="Mean Capacity (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="MeanStart" displayName="Mean Starting Stock (Mg C/ha)" dataType="Double" format="0.00"/>
+		<column name="Capacity" displayName="Carbon Capacity (Tg C)" dataType="Double" format="0.0000"/>
+		<column name="UpperBound" displayName="Upper Bound: Old Growth (Tg C)" dataType="Double" format="0.0000"/>
+		<column name="StartStock" displayName="Starting Stock (Tg C)" dataType="Double" format="0.0000"/>
+		<column name="RealisedShare" displayName="Starting Stock as a Share of the Capacity (%)" dataType="Double" format="0.0" isOptional="True"/>
+	</dataSheet>
+
+	<dataSheet name="OutputRunCapacity" displayName="Run Carbon Against Capacity">
+		<!-- stage 13: one row per year of the run - its live biomass, dead wood and litter against the Build's carbon capacity -->
+		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer"/>
+		<column name="Year" dataType="Integer"/>
+		<column name="Stock" displayName="Live Biomass, Dead Wood and Litter (Tg C)" dataType="Double"/>
+		<column name="Capacity" displayName="Carbon Capacity (Tg C)" dataType="Double"/>
+		<column name="UpperBound" displayName="Upper Bound: Old Growth (Tg C)" dataType="Double" isOptional="True"/>
+		<column name="RealisedShare" displayName="Stock as a Share of the Capacity (%)" dataType="Double" format="0.0"/>
+		<column name="Deficit" displayName="Deficit: Capacity Minus Stock (Tg C)" dataType="Double"/>
+		<column name="DeficitLandUse" displayName="Deficit on Developed and Farmed Land (Tg C; first and last year, from the maps)" dataType="Double" isOptional="True"/>
+		<column name="DeficitCover" displayName="Deficit on Natural Non-Forest Land on Forest Potential (Tg C)" dataType="Double" isOptional="True"/>
+		<column name="DeficitDisturbed" displayName="Deficit on Disturbed Land Waiting to Return (Tg C)" dataType="Double" isOptional="True"/>
+		<column name="DeficitLive" displayName="Deficit in the Live Biomass of Land in Its Potential Cover: Stand Age and Stocking (Tg C)" dataType="Double" isOptional="True"/>
+		<column name="DeficitDead" displayName="Deficit in the Dead Wood and Litter of Land in Its Potential Cover (Tg C)" dataType="Double" isOptional="True"/>
+	</dataSheet>
+
+	<dataSheet name="OutputCompareCapacity" displayName="Compare Carbon Against Capacity">
+		<!-- stage 14: one row per run compared - its live biomass, dead wood and litter against the Build's carbon capacity -->
+		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer"/>
+		<column name="Label" dataType="String"/>
+		<column name="Role" displayName="Role (History, Baseline or Run)" dataType="String"/>
+		<column name="StartYear" dataType="Integer"/>
+		<column name="EndYear" dataType="Integer"/>
+		<column name="Capacity" displayName="Carbon Capacity (Tg C)" dataType="Double"/>
+		<column name="UpperBound" displayName="Upper Bound: Old Growth (Tg C)" dataType="Double" isOptional="True"/>
+		<column name="StockStart" displayName="Live Biomass, Dead Wood and Litter, start (Tg C)" dataType="Double"/>
+		<column name="StockEnd" displayName="Live Biomass, Dead Wood and Litter, end (Tg C)" dataType="Double"/>
+		<column name="ShareStart" displayName="Share of the Capacity, start (%)" dataType="Double" format="0.0"/>
+		<column name="ShareEnd" displayName="Share of the Capacity, end (%)" dataType="Double" format="0.0"/>
+		<column name="DeficitEnd" displayName="Deficit, end (Tg C)" dataType="Double"/>
+		<column name="VsBaseline" displayName="Share of the Capacity at the end, minus the baseline's (percentage points)" dataType="Double" isOptional="True"/>
+		<column name="DeficitLandUse" displayName="End Deficit on Developed and Farmed Land (Tg C; from the maps)" dataType="Double" isOptional="True"/>
+		<column name="DeficitCover" displayName="End Deficit on Natural Non-Forest Land on Forest Potential (Tg C)" dataType="Double" isOptional="True"/>
+		<column name="DeficitDisturbed" displayName="End Deficit on Disturbed Land Waiting to Return (Tg C)" dataType="Double" isOptional="True"/>
+		<column name="DeficitLive" displayName="End Deficit in the Live Biomass of Land in Its Potential Cover: Stand Age and Stocking (Tg C)" dataType="Double" isOptional="True"/>
+		<column name="DeficitDead" displayName="End Deficit in the Dead Wood and Litter of Land in Its Potential Cover (Tg C)" dataType="Double" isOptional="True"/>
+	</dataSheet>
+
 	<dataSheet name="OutputSiteClassMap" displayName="Site Class Shares (TreeMap)">
 		<!-- stage 5 when Build Options: Site Productivity = TreeMap site class (to-do 35 step 4): per cell, the share of its TreeMap 30 m
 		     pixels whose FIA plot is in each site class; stage 8 combines them with Site Productivity's multipliers -->
@@ -1504,9 +1588,17 @@
 		<dataSheet name="OutputSiteClassMap" type="Input"/>
 		<dataSheet name="OutputSiteProductivity" type="Input"/>
 		<dataSheet name="OutputNlcdAnnual" type="Input"/>
+		<dataSheet name="OutputDecayCalibration" type="Input"/>
+		<dataSheet name="OutputReturnInterval" type="Input"/>
+		<dataSheet name="OutputLandCoverLayers" type="Input"/>
+		<dataSheet name="ReforestationOptions" type="Input"/>
+		<dataSheet name="CarbonCapacityOptions" type="Input"/>
 		<dataSheet name="stsim_FlowSpatialMultiplier" type="Output"/>
 		<dataSheet name="OutputInitialStockSummary" type="Output"/>
 		<dataSheet name="OutputNonForestProductivity" type="Output"/>
+		<dataSheet name="OutputCarbonCapacityMap" type="Output"/>
+		<dataSheet name="OutputCarbonCapacityType" type="Output"/>
+		<dataSheet name="OutputCarbonCapacity" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
@@ -1624,7 +1716,9 @@
 		<dataSheet name="StudyArea" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
 		<dataSheet name="OutputTransitionSummary" type="Input"/>
+		<dataSheet name="OutputCarbonCapacityMap" type="Input"/>
 		<dataSheet name="OutputRunFigure" type="Output"/>
+		<dataSheet name="OutputRunCapacity" type="Output"/>
 		<dataSheet name="OutputValidation" type="Both"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
@@ -1636,8 +1730,10 @@
 		<dataSheet name="CompareRunOptions" type="Input"/>
 		<dataSheet name="StudyArea" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
+		<dataSheet name="OutputCarbonCapacityMap" type="Input"/>
 		<dataSheet name="OutputCompareFigure" type="Output"/>
 		<dataSheet name="OutputCompareCarbon" type="Output"/>
+		<dataSheet name="OutputCompareCapacity" type="Output"/>
 		<dataSheet name="OutputCompareLand" type="Output"/>
 		<dataSheet name="OutputCompareCost" type="Output"/>
 		<dataSheet name="OutputValidation" type="Both"/>
@@ -1722,6 +1818,7 @@
 				<item name="MatureAge"/>
 				<item name="FixedDecayMultiplier"/>
 				<item name="NonForestCarbon"/>
+				<item name="CarbonCapacityOptions"/>
 				<item name="WetlandCarbon"/>
 			</group>
 			<group name="lucasCoreProjection" displayName="Projection">
@@ -1779,6 +1876,9 @@
 				<item name="OutputCarbonParameter"/>
 				<item name="OutputSiteProductivity"/>
 				<item name="OutputNonForestProductivity"/>
+				<item name="OutputCarbonCapacity"/>
+				<item name="OutputCarbonCapacityType"/>
+				<item name="OutputCarbonCapacityMap"/>
 				<item name="OutputDecayCalibration"/>
 				<item name="OutputCarbonRate"/>
 				<item name="OutputGrowthReport"/>
@@ -1788,7 +1888,9 @@
 				<item name="OutputReleaseContents"/>
 				<item name="OutputRunFigure"/>
 				<item name="OutputCompareFigure"/>
+				<item name="OutputRunCapacity"/>
 				<item name="OutputCompareCarbon"/>
+				<item name="OutputCompareCapacity"/>
 				<item name="OutputCompareLand"/>
 				<item name="OutputCompareCost"/>
 				<item name="OutputWoodProducts"/>

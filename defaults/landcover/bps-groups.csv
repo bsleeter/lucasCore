@@ -1,18 +1,18 @@
-GROUPVEG,Potential,Note
-Conifer,forest,
-Conifer-Hardwood,forest,
-Hardwood,forest,
-Hardwood-Conifer,forest,
-Peatland Forest,forest,
-Riparian,riparian or savanna,"read as forest potential by default (user, 2026-11-12; Reforestation Options can read it as non-forest)"
-Savanna,riparian or savanna,
-Grassland,non-forest,
-Shrubland,non-forest,
-Sparse,non-forest,
-Barren-Rock/Sand/Clay,non-forest,
-Peatland non-forest,non-forest,
-Open Water,other,
-Perennial Ice/Snow,other,
-Missing,other,
-Fill-NoData,other,
-Fill-Not Mapped,other,
+GROUPVEG,Potential,Note,NonForestCover
+Conifer,forest,,
+Conifer-Hardwood,forest,,
+Hardwood,forest,,
+Hardwood-Conifer,forest,,
+Peatland Forest,forest,,
+Riparian,riparian or savanna,"read as forest potential by default (user, 2026-11-12; Reforestation Options can read it as non-forest)",shrub
+Savanna,riparian or savanna,,grass
+Grassland,non-forest,,grass
+Shrubland,non-forest,,shrub
+Sparse,non-forest,,bare
+Barren-Rock/Sand/Clay,non-forest,,bare
+Peatland non-forest,non-forest,,grass
+Open Water,other,,
+Perennial Ice/Snow,other,,
+Missing,other,,
+Fill-NoData,other,,
+Fill-Not Mapped,other,,

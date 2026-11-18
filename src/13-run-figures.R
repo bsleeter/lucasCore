@@ -11,9 +11,11 @@
 # and its maps from its data folder, so the run's own outputs set what can be drawn: a figure whose maps the run did not write is left
 # out (state class maps for the land cover figure, Fire transition maps, Total Ecosystem average stock maps). The wood products figure
 # (carbon stored in products, NBP with products) is drawn when stage 18 has been run on the run (its newest Wood Products result).
+# The figures of carbon against the carrying capacity (src/capacity.R) are drawn when the Build result holds stage 8's Carbon
+# Capacity maps; the run's stock, share of the capacity and deficit by year go to Run Carbon Against Capacity.
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
-source(pkg_file("src", "figures.R")); source(pkg_file("src", "run-figures.R"))
+source(pkg_file("src", "figures.R")); source(pkg_file("src", "run-figures.R")); source(pkg_file("src", "capacity.R"))
 STAGE <- "13 Run Figures"
 progressBar(type = "begin", totalSteps = 3)
 
@@ -49,6 +51,15 @@ if (is.null(X$wp)) say("No Wood Products result on run %d: run stage 18 on it fo
   say("Wood products from result %d: %d-%d", attr(X$wp, "scenario"), wy[1], wy[2])
   check(STAGE, "the wood products result covers the run's years", wy[1] <= X$years[1] + 1 && wy[2] >= X$years[2], sprintf("wood products %d-%d, run %d-%d", wy[1], wy[2], X$years[1], X$years[2])) }
 
+# the carbon carrying capacity (src/capacity.R): the Build result's Carbon Capacity maps, written by stage 8
+X$cap <- tryCatch(capacity_maps(read_capacity_maps()), error = function(e) { say("Carbon capacity not readable: %s", conditionMessage(e)); NULL })
+cser <- if (is.null(X$cap)) NULL else capacity_series(X$stocks, X$cap$total, X$cap$upper_total)
+if (is.null(X$cap)) say("No Carbon Capacity maps in the Build result this scenario depends on: rerun the Build's stage 8 with this version of lucasCore for the figures of carbon against the carrying capacity") else
+  if (is.null(cser)) say("Carbon capacity: the run has no stock output for Biomass: Total, DOM: Deadwood and DOM: Litter; no capacity figure") else {
+    n1 <- nrow(cser); say("Carbon against the carrying capacity (live biomass, dead wood and litter): %.2f Tg C of %.2f in %d (%.0f%%), %.2f in %d (%.0f%%); upper bound %.2f",
+                         cser$Stock[1], X$cap$total, cser$Timestep[1], cser$RealisedShare[1], cser$Stock[n1], cser$Timestep[n1], cser$RealisedShare[n1], X$cap$upper_total)
+    if (!is.na(X$cap$start_total)) say("  the Build's starting stock of those pools is %.2f Tg C; the run's first year holds %.2f", X$cap$start_total, cser$Stock[1]) }
+
 ic <- tryCatch(as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", optional = TRUE, lookupsAsFactors = FALSE)), error = function(e) e)
 gf <- figures_grid(ic, lib_file, c(rid, hid), say)   # the Build's state class map, else the run's own (src/run-figures.R)
 if (is.na(gf)) fail("no state class map: this scenario must depend on the run's Build result, and neither it nor the run has its map in the library's data folder")
@@ -65,6 +76,12 @@ progressBar()
 check(STAGE, "figures drawn", nrow(res) > 0, sprintf("%d PNG of run %d", nrow(res), rid))
 check(STAGE, "every figure file was written", nrow(res) > 0 && all(file.exists(res$FileName)), paste(basename(res$FileName[!file.exists(res$FileName)]), collapse = "; "))
 write_ds(res[, .(Figure, Title, Caption, FileName, RunScenarioId = rid)], "OutputRunFigure")
+# the run against the carbon capacity, year by year, with the deficit by cause in the first and last year (where the run wrote its maps)
+if (!is.null(cser)) { cser[, (CAPACITY_CAUSE_COLS) := NA_real_]
+  for (e in list(list(X$years[1], X$sc0, X$hl0), list(X$years[2], X$sc1, X$hl1))) { cy <- capacity_year(X$cap, e[[2]], e[[3]], X$sc_list)
+    if (!is.null(cy)) cser[Timestep == e[[1]], (CAPACITY_CAUSE_COLS) := as.list(unname(cy$split))] }
+  tryCatch(write_ds(cser[, .(RunScenarioId = rid, Year = Timestep, Stock, Capacity, UpperBound, RealisedShare, Deficit, DeficitLandUse, DeficitCover, DeficitDisturbed, DeficitLive, DeficitDead)], "OutputRunCapacity"),
+           error = function(e) say("Run Carbon Against Capacity not written (%s): reopen the library in SyncroSim Studio so it adds the table", conditionMessage(e))) }
 progressBar()
 finish_checks()
 progressBar(type = "end")

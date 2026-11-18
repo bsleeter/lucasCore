@@ -19,7 +19,7 @@ check("water, fill, unknown values and NA read as other", all(p[9:12] == "other"
 check("riparian and savanna read as non-forest when set", all(bps_potential(c(v("Riparian"), v("Savanna")), lk, "non-forest") == "non-forest"))
 check("a bad riparian setting stops", inherits(try(bps_potential(1L, lk, "maybe"), silent = TRUE), "try-error"))
 check("Hawaii types with no GROUPVEG read as other", all(bps_potential(tab[is.na(GROUPVEG) | GROUPVEG == "", VALUE], lk) == "other"))
-g2 <- rbind(grp, data.table(GROUPVEG = "Conifer", Potential = "forest", Note = ""))
+g2 <- rbind(grp, data.table(GROUPVEG = "Conifer", Potential = "forest", Note = ""), fill = TRUE)   # (bps-groups.csv gained NonForestCover for the carbon capacity)
 check("a GROUPVEG listed twice stops", inherits(try(bps_lookup(tab, g2), silent = TRUE), "try-error"))
 g3 <- copy(grp)[GROUPVEG == "Sparse", Potential := "sparse"]
 check("an unknown potential stops", inherits(try(bps_lookup(tab, g3), silent = TRUE), "try-error"))

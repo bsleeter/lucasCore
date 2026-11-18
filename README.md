@@ -125,7 +125,7 @@ stage: SyncroSim discards project-scope sheets that a stage saves during a run.
 | 5 - Initial Conditions | `src/5-initial-conditions.R` | Annual NLCD on the grid; state class and stand age maps; return intervals and soil targets for stage 3 |
 | 6 - Historical Transitions | `src/6-historical-transitions.R` | Transition pathways and annual spatial multipliers (NLCD land use and clearcut, MTBS fire, LANDFIRE thinning) |
 | 7 - Climate Multipliers | `src/7-climate-multipliers.R`, `src/loca2.R` | Growth and decomposition multipliers: PRISM historical, LOCA2 projections (Climate Options) |
-| 8 - Initial Stock Maps | `src/8-initial-stocks-spatial.R` | The 14 carbon pools of every cell as ST-Sim initial stocks |
+| 8 - Initial Stock Maps | `src/8-initial-stocks-spatial.R` | The 14 carbon pools of every cell as ST-Sim initial stocks; the carbon carrying capacity (potential natural vegetation, natural fire regime) that runs are measured against |
 | 9 - Projection Transitions | `src/9-projection-transitions.R` | Projection targets and multiplier maps that resample whole historical years (only with a projection); with Projection Start, the starting maps of a stand-alone projection |
 | 10 - Transition Suitability | `src/10-transition-suitability.R` | Transition suitability maps from a logistic GAM on the annual NLCD record |
 | 11 - Projection Climate | `src/11-projection-climate.R` | Climate multipliers for a projection, in a scenario of its own |
