@@ -29,7 +29,8 @@ fia_note <- "Growth Curve Options > FIA Data: USGS condition tables (the default
 D <- list(
   list("FIA and strata", "EcodivisionFile", "FIA ecodivisions", "dissolved shapefile · StrtmId, StrtmNm", list(
     u(1, "Primary strata and the model lattice"), u(2, "Each plot's ecodivision, and the ecodivision climate the curves use"),
-    u(3, "Ecodivisions of the decay calibration and their climate"), u(5, "The model lattice (the same grid as stage 1)"), u(6, "The model lattice"))),
+    u(3, "Ecodivisions of the decay calibration and their climate"), u(5, "The model lattice (the same grid as stage 1)"), u(6, "The model lattice"),
+    u(10, "Each cell's ecodivision, for the reforestation potential by ecodivision", "Reforestation Options"))),
   list("FIA and strata", "FiaConditionFile", "FIA condition carbon and volume", "USGS data release · 2024-02-12 · .Rds", list(
     u(2, "Condition carbon and merchantable volume the curves are fitted to", fia_note, TRUE), u(3, "Condition carbon pools for the decay calibration", fia_note, TRUE))),
   list("FIA and strata", "FiaDisturbanceFile", "FIA disturbance and treatment codes", "USGS data release · 2024-02-13 · .Rds", list(
@@ -42,8 +43,11 @@ D <- list(
     u(1, "Start-year land mask, modal on the model grid"), u(5, "Annual land cover on the model grid; developed, agriculture, water and ice classes", "Build Options > Land Cover Resampling"),
     u(6, "Land-use change (class gains and losses) and the clearcut rule"), u(10, "The 30 m annual record the suitability surfaces are fitted on"))),
   list("Land cover, age and soil", "Evt2016File", "LANDFIRE EVT 2016", "LF 2.0.0 · 30 m", list(
-    u(5, "Forest, shrub and grass types: the most common 30 m class in each cell", "Build Options > Forest Type Map: LANDFIRE EVT (default)"))),
+    u(5, "Forest, shrub and grass types: the most common 30 m class in each cell", "Build Options > Forest Type Map: LANDFIRE EVT (default)"),
+    u(6, "Tree cover in 2016: a second witness that forest returned after a disturbance"),
+    u(8, "Salinity zones of estuarine emergent marsh, which set its methane target"))),
   list("Land cover, age and soil", "RcmapFile", "RCMAP vegetation state", "1985 · published 2025 · western US", list(u(5, "Grassland and shrubland types (classes 2 to 9)", "Land Cover Crosswalks > RCMAP"))),
+  list("Land cover, age and soil", "RcmapCoverFolder", "RCMAP cover time series", "V8 · 30 m · 1985 to 2025 · sagebrush, shrub", list()),   # no stage reads it: tools/fit_shrub_post_disturbance.R fits the package table from it
   list("Land cover, age and soil", "CcapFile", "C-CAP land cover", "2001 · coastal wetlands", list(u(5, "Wetland types (C-CAP classes 90 and up)", "Land Cover Crosswalks > C-CAP"))),
   list("Land cover, age and soil", "ForestTypeGroupFolder", "USFS forest type groups", "NFCMS v3 · regional maps", list(
     u(5, "Forest types in place of LANDFIRE EVT, or filling its gaps", "Build Options > Forest Type Map: USFS forest type groups", TRUE))),
@@ -54,6 +58,9 @@ D <- list(
     u(5, "Replacement-fire return interval per ecodivision and forest class, for spin-up"))),
   list("Land cover, age and soil", "SoilCarbonFile", "gNATSGO soil organic carbon", "soc0_999 · 10 m", list(
     u(5, "Mean soil carbon per ecodivision and forest class: the target stage 3 calibrates to"), u(8, "Soil carbon map for the initial soil pool"))),
+  list("Land cover, age and soil", "HistosolFile", "gNATSGO histosol share", "map units · % organic soil", list(u(8, "Organic soil share: the cells that start with peat"))),
+  list("Land cover, age and soil", "BpsFile", "LANDFIRE Biophysical Settings", "LF 2020 · 30 m · potential vegetation", list(
+    u(5, "Forest potential of each cell, for the reforestation transition", "Reforestation Options"), u(10, "Forest potential covariates that place reforestation", "Reforestation Options"))),
   list("Disturbance", "MtbsSeverityFolder", "MTBS burn severity", "annual CONUS mosaics", list(
     u(6, "Wildfire by severity (burned share of 30 m pixels), and burned cells kept out of the clearcut rule"))),
   list("Disturbance", "LcmsFolder", "USFS LCMS annual change", "v2025-11 · 30 m · 1985 on", list(
@@ -89,7 +96,12 @@ D <- list(
   list("Covariates", "WuiFolder", "SILVIS WUI blocks", "v4 · 1990 to 2020 change", list(u(10, "Housing density and WUI classes of the census blocks", "Suitability Covariates; Rule Weights"))),
   list("Covariates", "NccpiFile", "gNATSGO crop productivity", "NCCPI · 30 m", list(
     u(10, "Crop productivity covariate of ag expansion and contraction (blank path = fetched from Planetary Computer)", "Suitability Covariates"))),
-  list("Covariates", "ForestOwnerFile", "USFS forest ownership", "circa 2017 · 30 m", list(u(10, "Forest owner type covariate of clearcut and selection", "Suitability Covariates"))))
+  list("Covariates", "ForestOwnerFile", "USFS forest ownership", "circa 2017 · 30 m", list(u(10, "Forest owner type covariate of clearcut and selection", "Suitability Covariates"))),
+  list("Land-use demand", "RpaLandUseFile", "RPA 2020 county land use", "USFS RDS-2023-0026 · to 2070", list(u(9, "Urbanization demand as a ratio to the RPA projection", "Land Use Change (a demand method other than historical years); blank = the table the package ships", TRUE))),
+  list("Land-use demand", "RpaForestProductsFolder", "RPA 2020 forest products", "USFS RDS-2022-0073-2 · four scenarios", list(u(9, "Forest harvest demand as a ratio to the RPA projection", "Land Use Change (a demand method other than historical years); blank = the table the package ships", TRUE))),
+  list("Land-use demand", "IclusCountyFile", "EPA ICLUS new developed land", "v2.1.1 · county and decade", list(u(9, "Urbanization demand from ICLUS new developed land", "Land Use Change (a demand method other than historical years); blank = the table the package ships", TRUE))),
+  list("Land-use demand", "PopulationProjectionFile", "County population projections", "Hauer 2019 · SSPs · 2020 to 2100", list(u(9, "Urbanization demand from population growth and land per new resident", "Land Use Change (a demand method other than historical years); blank = the table the package ships", TRUE))),
+  list("Land-use demand", "CensusPopulationFile", "Census county population", "estimates 2010 to 2020", list(u(9, "Land developed per new resident in the record", "Land Use Change (a demand method other than historical years); blank = the table the package ships", TRUE))))
 names(D) <- vapply(D, `[[`, "", 2)
 if (length(m <- setdiff(names(ds_display), names(D)))) stop("Data Sources column(s) not in the data blueprint: ", paste(m, collapse = ", "))
 if (length(m <- setdiff(names(D), names(ds_display)))) stop("not a Data Sources column in package.xml: ", paste(m, collapse = ", "))
@@ -118,7 +130,7 @@ for (id in names(S)) { txt <- src_text(id)
   if (length(m <- setdiff(mine, reads))) stop(sprintf("the data blueprint says stage %s reads %s, but its script does not mention it", id, paste(m, collapse = ", "))) }
 
 # ---- drawing ----------------------------------------------------------------
-W <- 1600; H <- 1100   # 1000 until 2026-11-09, when three non-forest datasets were added
+W <- 1600; H <- 1320   # 1000 until 2026-11-09 (three non-forest datasets), 1100 until 2026-11-18 (eight more)
 g <- character(); add <- function(...) g <<- c(g, ...)
 add(sprintf('<rect class="bg" width="%d" height="%d"/>', W, H), TX(24, 44, "lucasCore data blueprint", "h1"),
     TX(24, 66, sprintf("The national datasets lucasCore reads, the stages that read them, what for, and the option that switches each one · version %s", version), "sub"))
@@ -130,14 +142,14 @@ leg(list(list(fam = "setup", label = "Setup"), list(fam = "land", label = "Land 
          list(fam = "climate", label = "Climate"), list(fam = "fig", label = "Figures")), 38)
 leg(list(list(alt = FALSE, label = "read with the default settings"), list(alt = TRUE, label = "read only under a non-default option")), 62)
 
-add(box(24, 104, 600, 930, "Data Sources sheet · filled by stage 15 Data Download", "National datasets"), TX(312, 146, "VINTAGE · RESOLUTION", "ghead"))
+add(box(24, 104, 600, 1150, "Data Sources sheet · filled by stage 15 Data Download", "National datasets"), TX(312, 146, "VINTAGE · RESOLUTION", "ghead"))
 y <- 172; sy <- c(); grp <- ""
 for (d in D) {
   if (d[[1]] != grp) { if (nzchar(grp)) y <- y + 12; grp <- d[[1]]; add(TX(40, y, toupper(grp), "ghead")); y <- y + 21 }
   add(sprintf('<g class="ds" data-ds="%s" tabindex="0" role="button" aria-label="%s"><rect class="dsbg" x="32" y="%d" width="584" height="22" rx="3"/>', d[[2]], esc(d[[3]]), y - 15),
       TX(40, y, d[[3]], "dsn"), TX(312, y, d[[4]], "dsv"), "</g>")
   sy[d[[2]]] <- y - 4; y <- y + 23 }
-if (y > 1034) stop("the dataset column runs past its box (y = ", y, ")")
+if (y > 1254) stop("the dataset column runs past its box (y = ", y, ")")
 
 BX <- 1000; BWD <- 576; BHT <- 64
 by <- setNames(104 + (seq_along(S) - 1) * 76, names(S))
@@ -157,8 +169,8 @@ for (id in names(S)) { s <- S[[id]]; yy <- by[[id]]; bw <- if (nchar(s[[1]]) > 2
       TX(BX + 20 + bw, yy + 24, s[[2]], "sn2"), TX(BX + 12, yy + 43, s[[3]], "mk"), TX(BX + 12, yy + 57, paste("Set by:", s[[4]]), "ch"), "</g>")
   for (ty in uses$ty[uses$stage == id]) add(sprintf('<circle class="port f-%s" cx="%d" cy="%.1f" r="2.4"/>', fam[[id]], BX, ty)) }
 
-add(TX(24, 1062, "Wires run from a dataset to each stage that reads it, coloured by the stage. Vintages are those stage 15 Data Download fetches into Data Sources Home, where a blank path reads them.", "foot"),
-    TX(24, 1078, sprintf("Stages 0 and 4 read no national data. Generated by docs/blueprint/build-data.R from package.xml (lucasCore %s), %s.", version, format(Sys.Date())), "foot"))
+add(TX(24, 1282, "Wires run from a dataset to each stage that reads it, coloured by the stage. Vintages are those stage 15 Data Download fetches into Data Sources Home, where a blank path reads them.", "foot"),
+    TX(24, 1298, sprintf("Stages 0 and 4 read no national data. Generated by docs/blueprint/build-data.R from package.xml (lucasCore %s), %s.", version, format(Sys.Date())), "foot"))
 body <- paste(c(defs, g), collapse = "\n")
 head <- svg_head(W, H, "lucasCore data blueprint: national datasets and the stages that read them")
 svg_file <- file.path(out, "lucascore-data-blueprint.svg")

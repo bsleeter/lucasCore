@@ -495,6 +495,8 @@ The two methods turn the same 30 m Annual NLCD into the model grid in different 
 2. Under **Climate effects**, set **Forest growth** to **Tree ring** (default), **Non-forest growth** to **Miami NPP** (default) and **Decomposition** to **Q10** (default). Each gives year-to-year multipliers from PRISM relative to each cell's 1991-2020 normal; **None** turns an effect off.
 3. The same effects apply in projections. The climate that drives a projection (a LOCA2 scenario, climate model and replicate) is not chosen here: each climate future is its own small Projection Climate scenario on the Build's result (chapter 6), so one Build serves any number of them.
 
+From lucasCore 1.5 the page also has **Wetland growth**, for emergent marsh: **None**, **Miami NPP**, **Temperature** (default: growth follows the year's temperature only) or **Temperature and Miami NPP** (temperature for tidal marsh, which is not short of water, and Miami NPP for inland marsh). Wetland methane and wetland soil CO2 follow the year's temperature whenever Decomposition is Q10; their Q10 values are on Carbon Assumptions > Wetland Methane (section 3.7).
+
 &#91;image: The Climate Options page: Climate Options marked 1, the climate effects (tree ring forest growth, Miami NPP non-forest growth, Q10 decomposition) 2 and the note on projection climate 3\]
 
 *Figure 3.5. Climate Options.*
@@ -598,6 +600,7 @@ The other pages now hold the method's rows; edit any of them, or press Fill agai
 | Mature Age by Forest Type | A forest type's own mature age, and optionally its own years without fire or cutting, for the measured calibration | Empty: every type uses Decay Calibration Settings' values |
 | Fixed Decay Multipliers | Decay multipliers you set instead of calibrating | Empty: every pool calibrated; the page lists the Build's multipliers |
 | Grassland, Shrubland and Wetland Carbon | Net growth and the yearly flow rates of the grassland, shrubland and wetland classes (stage 3) | The package values: 11 growth and 434 rate rows |
+| Wetland Methane (from lucasCore 1.5) | How much of a wetland's soil and litter emission leaves as methane: targets by class, region and salinity zone, their ranges, the two wetland Q10s, the cap and the CO2 equivalent of methane (stages 0, 3, 7 and 8) | Empty: the package targets and settings; the page's own Fill writes the targets and their ranges |
 
 &#91;image: The CBM Crosswalk page: CBM Crosswalk marked 7 and the table of forest types with their CBM ecozone and species type outlined\]
 
@@ -643,11 +646,39 @@ Change a value to override it; a row with an ecodivision or an age applies there
 
 **Diagram view.** **Show: Diagram** (23) draws one class as an ecologist would sketch it. Pick the class and ecodivision (24), and an age for forested wetlands, whose rates change with age. The values are the ones the Build uses: the package's, with this page's rows on top, drawn bold. Live pools sit on the left, fast dead pools in the middle and slow pools on the right, above and below the soil surface. Net growth (NPP) enters the live pools from the left, split by its shares. Each box gives the pool's carbon at steady state, where inputs and losses balance, and its turnover time; an emergent wetland pool also gives its total yearly loss, which its outflows share. What a pool releases leaves it as an arrow: curving up from its top right corner to the atmosphere, and for emergent wetlands sideways to water. A curve's or arrow's width is the carbon it carries at steady state; label them with the rates as entered or with the fluxes (25), and hover over one for the rate x stock = flux arithmetic.
 
+From lucasCore 1.5 the soil and root litter boxes of an emergent wetland have two arrows to the atmosphere: grey for CO2 and, to its left, purple for methane (CH4). The line above the drawing adds what the class releases as CH4, the share of the soil and root litter emission that is, and the class's target and region. The split is the package's unless the Wetland Methane page sets a target for the class or a cap the package share exceeds; then both arrows are drawn bold and the line says so.
+
 The line above the drawing (26) totals the budget: NPP, what leaves as CO2, to water and into deep soil, the steady-state live, dead and soil carbon, and the class's starting pools in the newest Build result. Grassland and shrubland starting pools came from a spin-up with these rates, so the budget lands near them (chaparral in P26: live 7.0, dead 33.8 and soil 75.3 Mg C/ha, against starting pools of 7.0, 29.8 and 74.6), and a changed rate shows its long-run effect in the drawing (27) at once. The emergent wetlands' rates settle well above their starting pools (palustrine emergent live 36 against 4.9 Mg C/ha), a mismatch for the science step to resolve.
 
 &#91;image: The diagram view for Wetland: Estuarine Emergent in Hot Continental: Show Diagram marked 23, the Class and Ecodivision drop-downs marked 24, the Rates as entered / Fluxes choice marked 25, the budget line (net growth 31.1 Mg C/ha/yr; released as CO2 23.0, to water 5.12, buried in deep soil 3.01; steady state live 37.2, dead 54.9, soil 479.3 Mg C/ha) marked 26, and the drawing marked 27: net growth entering foliage (19.9%) and fine roots (80.1%), turnover to AG very fast (0.798) and BG very fast (0.848), decay to BG slow (0.629) and from it to deep soil (0.192), with CO2 arrows curving up from AG very fast (0.818), BG very fast (0.304) and BG slow (0.661) and water arrows to the right (0.182, 0.068 and 0.147)\]
 
 *Figure 3.17. The diagram view for estuarine emergent wetland in the Hot Continental ecodivision: 31.1 Mg C/ha/yr of net growth leaves as CO2 (23.0), to water (5.1) and into deep soil (3.0).*
+
+**Wetland Methane** (from lucasCore 1.5) sets how much of the carbon a wetland's soil and litter already emit leaves as methane (CH4) instead of CO2. No carbon is added or lost: in a normal climate year each pool loses what it lost before, and the starting carbon of these classes does not change. In emergent wetland the methane comes from soil and root litter; in the forested wetland classes also from the three forest-floor litter pools. Estuarine forested wetland has no methane yet.
+
+Each class has a methane target in Mg C/ha/yr as CH4, taken from the literature by class and region. The Build turns a target into a share of what the class's source pools emit, and holds that share at the cap (30%). Where the cap binds, the class releases less than its target and stage 3 says so in the run log.
+
+**Forested wetland.** Stage 3 sets a forested wetland's share on the stands the library has: the stand ages of its cells in the start year (stage 5's maps), or one disturbance cycle where the library has no cell of the class. The run log gives the share, the source emission and the cells and mean age behind them. The target is met in the start year; as the stands age and the climate warms, a run's mean sits above it (about 10% over 1986-2023 in the Louisiana and Great Dismal Swamp tests, 0.30 and 0.29 Mg C/ha/yr against 0.27).
+
+The page has three parts, and anything left empty is the package value:
+
+- **Settings.** The methane Q10 (3.83), the wetland soil CO2 Q10 (2.0), the cap on methane's share (0.3), the CO2 equivalent of a tonne of methane carbon (33.5) and the number of uncertainty draws (0).
+- **Methane targets.** One row per wetland class, or per class and region. A row without a region sets every region of the class; a region's own row wins there.
+- **Marsh salinity targets.** An estuarine emergent cell takes the target of the salinity zones LANDFIRE maps in it (fresh and oligohaline, brackish, salt, or salt and brackish together), weighted by their share of the cell, in place of its class target. A cell with no zone keeps the class target.
+
+**Fill with the package targets** writes the package's targets into both tables with their low and high values, so they can be read and changed. A row you enter replaces the package's target and its range together: leave low and high blank for no range.
+
+**Uncertainty.** A low and a high beside a target describe how well that target is known. Set **Uncertainty draws** to a number and each of a run's first iterations up to that number draws every target from its range, most often near the target, and all classes high or low together. The CO2 from the same pools is adjusted to match, so every iteration conserves carbon. Later iterations run at the targets. With 0 draws, the default, the ranges do nothing. The package ranges are a first draft from the literature; some are lopsided, so the average of many draws can sit above or below the target.
+
+**Temperature.** Methane responds to the year's temperature more strongly than CO2 does (Q10 3.83 against 2.0), so in a warm year a wetland loses more carbon and a larger share of it is methane. In a Louisiana coastal marsh test, methane rose about 55% by 2100 under SSP5-8.5.
+
+**In the results.** Methane is reported in the flow groups Emission: Wetland CH4 (in carbon) and Emission: Wetland CH4 (CO2e). It is part of heterotrophic respiration, so net ecosystem and net biome productivity in carbon are unchanged, and their CO2e versions count methane at its CO2 equivalent. A library made before 1.5 gets methane with its next Build.
+
+Run Figures (section 5.6) and Compare Runs (section 7.4) add a **Wetland methane** figure when a run's wetlands released any: methane per year, and net biome productivity as CO2 beside the same with methane at its CO2 equivalent.
+
+> **A Stock-Flow Definitions scenario made before 1.5** lacks the new flow types. Stage 0 then stops the Build and names them. Close Studio and run `tools/sync-library.R` on the library, or remove that dependency so the Build writes the current definitions itself.
+
+Limits to keep in mind: methane follows the yearly mean temperature, not the warm season; water level and marsh elevation are not modelled; and several LANDFIRE types do not separate salt from brackish marsh, so those cells take a value midway.
 
 **Spin-up** (28) sets the history each forest cell's starting carbon is spun up with. Its defaults come from the study area, so the Build works them out: the return interval of stand-replacing fire from LANDFIRE's fire regime maps (stage 5), every past cycle ended by high-severity fire, and a cell outside the fire perimeters of 1900 to the start year starting from a clearcut (stage 8). Fill writes nothing here. The page lists each ecodivision and forest type with its cells and its LANDFIRE interval (29) from the newest Build result, named above the table; before the first Build it shows the package's provisional intervals. Type a value in a shaded column to replace a default: your interval (30), with the interval the run takes beside it (31), or the share of past cycles ended by clearcut and the last disturbance outside fire perimeters (32). **All rows**, below, also takes rows for a forest type in all ecodivisions; an ecodivision row wins over them.
 
@@ -916,7 +947,7 @@ The Build result supplies the model and, through stage 0, the map and carbon out
 
 > The start year is the initial state the Build mapped, so the first transitions happen in 1986. Transitions are random wherever a multiplier covers only part of a cell, so more iterations give a range of outcomes, at proportionally more run time and disk space. One iteration is enough to check the run.
 
-6. Open **Output Options > Tabular** (10). Tick **State classes every** `1` years (11) and **Transitions every** `1` years (12). These yearly tables, by stratum, are what the results charts use. With Management Actions (Projection > Management Actions), also tick **Transition attributes every** `1` years: the actions' costs.
+6. Open **Output Options > Tabular** (10). Tick **State classes every** `1` years (11) and **Transitions every** `1` years (12). These yearly tables, by stratum, are what the results charts use. With Management Actions (Projection > Management Actions), also tick Transition attributes every 1 years: the actions' costs.
 
 &#91;image: The Output Options Tabular page: Tabular marked 10, State classes every 1 years marked 11 and Transitions every 1 years marked 12\]
 
@@ -1062,7 +1093,7 @@ A historical run should reproduce the history the Build mapped. Three checks are
 
 ### 5.6 Run Figures (stage 13)
 
-Stage 13 draws report figures of a run in the same format as the Build figures (section 4.5): nine PNGs with a *Figure N* header, lettered panels, and maps on shaded relief. It works for historical runs and projections.
+Stage 13 draws report figures of a run in the same format as the Build figures (section 4.5): up to ten PNGs with a *Figure N* header, lettered panels, and maps on shaded relief. It works for historical runs and projections.
 
 | Figure | Shows |
 | --- | --- |
@@ -1075,6 +1106,7 @@ Stage 13 draws report figures of a run in the same format as the Build figures (
 | Carbon stocks | (a) carbon by pool per year; (b) the net ecosystem carbon balance |
 | Carbon fluxes | (a) net primary productivity, heterotrophic respiration and net ecosystem productivity; (b) fire and harvest losses and net biome productivity |
 | Carbon by secondary stratum | (a) change in carbon density; (b) total carbon in the last year, by county |
+| Wetland methane (from lucasCore 1.5) | (a) methane per year by wetland type: palustrine emergent, estuarine emergent and forested; (b) net biome productivity as CO2, and with methane at its CO2 equivalent. Drawn when the run's wetlands released methane |
 
 Each figure is drawn only when the run wrote what it needs: the land cover figure needs the run's state class maps, the fire figure its Fire transition maps, the harvest figure and the change map's harvest classes its clearcut and selection type group maps (section 5.2), and the carbon maps its Total Ecosystem average stock maps (all on by default in sections 5.2 and the Build's stock-flow output).
 
@@ -1562,7 +1594,7 @@ Stage 14 draws one set of figures that puts several runs side by side:
 
 - total ecosystem carbon, and each run's difference from a baseline run;
 - a map of that difference in the final year;
-- the carbon fluxes, per year and by decade;
+- the carbon fluxes, per year and by decade, and wetland methane when a run's wetlands released any;
 - the transitions, carbon by pool and land cover change;
 - a summary table.
 
@@ -1645,6 +1677,70 @@ The land change summary (Figure 7.32) shows that the three projections harvest a
 &#91;image: Figure 9 of the comparison, the land change summary: one row per run with the area burned, harvested and urbanized and the change in forest and developed area\]
 
 *Figure 7.32. The land change summary of the comparison (also the Compare Land Change Summary output).*
+
+### 7.5 Harvested wood products (stage 18)
+
+Stage 18 follows the carbon a run harvests after it leaves the forest. ST-Sim moves harvested wood and the wood of land clearing to the Forestry Sector stock, and nothing flows out of it, so the run treats that carbon as stored forever. The stage sends it through products in use, landfills and dumps, and emissions, year by year, with the USFS harvested wood products model (the production approach of the US greenhouse gas inventory; Smith et al. 2006, Skog 2008, the HWP-C calculator). It is not spatial and it does not change the run: it reads the run's output and writes its own tables and figures.
+
+What the stage does with a run:
+
+- **Removals.** It reads the run's `LULC: Harvest` flows to Forestry Sector by transition type and forest type. Forest Harvest transitions are harvest; Urbanization and Ag Expansion are land clearing, of which a share is used (0.5 by default) and the rest burned or left to decay in the year cleared.
+- **Region.** Each cell takes a Smith region from its secondary stratum's state (or county), and Oregon and Washington are split at the Cascades by ecodivision. A study area whose strata name no state needs the **Region** option.
+- **Products.** Each region's factors split the wood into lumber, panels, paper, fuel and the rest, then into end uses (housing, repair, furniture, packaging and others), each with its own half-life. Discarded products go to recovery, burning, landfills and dumps.
+- **Before the run.** Wood harvested before the run is still in use or in landfills when it starts. The stage builds that stock from the region's harvest history since 1906, scaled to the run's first ten years of removals.
+- **Uncertainty.** It repeats the model with 100 parameter draws for each iteration (decay rates, product shares, landfill shares, the land-clearing share) and reports the mean and a 90% interval.
+- **Projections.** A projection is joined to its historical run (its Projection Setup's Projection Start), so one Wood Products result covers both, and wood harvested in the history keeps decaying through the projection. Run the stage on each projection; a separate run on the historical run is needed only to look at the history alone.
+
+Set it up like Run Figures (section 5.6), one scenario per run:
+
+1. Right-click the **Figures** folder, choose **New > Scenario** and name it, for example `Wood Products No Climate`.
+2. Add the **Build result** as its dependency, as in section 5.6, not the run.
+3. On **General > Pipeline**, untick **Inherit values**, choose **No Data**, and add **18 - Wood Products** as the only stage, with Run Order 1.
+4. On the **LUCAS Core (model builder)** tab, open **Wood Products** and set:
+   - **Run**: the run to follow, from the drop-down of this project's historical runs and projections. For P26, pick `[65] P26 - Projection No Climate`. Blank follows the newest run.
+   - **Region**: blank to take each cell's region from the strata; otherwise one of the ten Smith regions for every cell.
+   - **Draws**: parameter draws per iteration, 100 by default; 0 runs the published values alone, with no interval.
+   - **Seed**: the random seed of the draws, so a rerun gives the same result.
+   - **Land clearing used**: the share of land-clearing wood that becomes products, 0.5 by default (no published source gives it).
+   - **Spin-up**: on by default; off starts the products stock at zero when the run starts.
+5. Save the library and run the scenario. Each P26 projection takes under a minute.
+6. Open the result. Under **LUCAS Core > Build Results** it holds **Wood Products** (pools and flows by year, the mean and the interval, per iteration and over all; blank Iteration = all), **Wood Products by End Use**, **Wood Products Spin-up** (the scaling of the harvest history) and **Wood Products Figures (PNG)**. **Export > LUCAS Core > Wood Products Figures** saves the figures to a folder.
+
+The variables of the Wood Products sheet, all in Mg C (flows in Mg C per year):
+
+| Variable | Means |
+| --- | --- |
+| Removed | carbon the run moved to Forestry Sector that year (before the run: the scaled harvest history) |
+| InUse, Recovered | carbon in products in use, and in discarded products recovered for reuse |
+| Landfill, Dump | carbon in landfills and dumps |
+| Stored | the sum of the four |
+| EmittedEnergy | emitted with energy capture: fuel, mill residue, discards burned for energy |
+| EmittedNoEnergy | emitted without: other burning, decay in landfills and dumps, unused land-clearing wood |
+| StockChange | the change in Stored from the year before |
+
+**Run Figures and Compare Runs** (sections 5.6 and 7.4) find a run's newest Wood Products result by its result Id, so nothing else is named. Run Figures then adds a **Harvested wood products** figure: (a) carbon stored in use and in landfills and dumps, with the interval; (b) the ecosystem's net biome productivity, the change in products, and net biome productivity with products. Compare Runs adds the same two panels with a line per run, and two columns to its carbon summary: **HWP**, the mean change in products, and **NBP + HWP**. A historical run with no result of its own takes its projection's. Run stage 18 before these stages; a run with no Wood Products result is drawn as before.
+
+> **A library made before lucasCore 1.4** does not list stage 18 or the new Compare Carbon Summary columns. Close Studio and run `tools/sync-library.R` on the library first (section 10).
+
+**Examples from P26.** P26 harvested 17.2 Tg C of wood from 1986 to 2050 in the no-climate projection, and cleared 1.0 Tg C, almost all for urbanization. All of it is in the Pacific Southwest region; a few cells in Nevada take Rocky Mountain South.
+
+Wood harvested before 1985 left 4.1 Tg C in products and landfills when the run starts. By 2050 the store holds 9.1 Tg C (8.4 to 9.8), about half of it in landfills (Figure 7.33). It grows 0.08 Tg C a year on average, about 27% of what the run removes.
+
+&#91;image: Wood Products Figure 1 of the P26 no-climate projection: (a) stacked areas of carbon in use, recovered, in landfills and in dumps from 1906 to 2050, rising from 4.09 Tg C in 1985 to 9.06 in 2050, with a grey band for the interval; (b) the stock change per year, 1986 to 2050, mostly between 0.02 and 0.15 Tg C a year, mean +0.076\]
+
+*Figure 7.33. Carbon in harvested wood products from the P26 no-climate projection (result 65, joined to historical run 54): (a) the stores by pool since 1906, the shading the 90% interval of the total; (b) the stock change each year of the run.*
+
+In the Run Figures of the no-climate projection (Figure 7.34), counting the products raises net biome productivity from +0.16 to +0.24 Tg C a year over 1986 to 2050. The fires of 2020 and 2021 dwarf that difference year by year.
+
+&#91;image: Run Figure 9 of the P26 no-climate projection: (a) carbon stored in products, in use and in landfills and dumps, 1985 to 2050, 9.06 Tg C in 2050 (8.37 to 9.83); (b) net biome productivity with and without products, the two lines almost on top of each other, with fire years near -15 Tg C\]
+
+*Figure 7.34. The Harvested wood products figure of Run Figures for the P26 no-climate projection: (a) carbon stored in products; (b) net biome productivity of the ecosystem (+0.163 Tg C a year), the change in products (+0.076) and the two together (+0.239).*
+
+The three projections store almost the same carbon in products, 9.05 to 9.12 Tg C in 2050, because their harvest is set by area, not by climate (Figure 7.35). Counting the products adds about 0.09 Tg C a year to each projection's net biome productivity: the no-climate run goes from +0.02 to +0.11, SSP5-8.5 from -0.16 to -0.07, and SSP2-4.5 from -0.21 to -0.12. The climate runs stay net sources, and their order is unchanged.
+
+&#91;image: Compare Runs carbon summary of P26 with the HWP and NBP + HWP columns: the history +0.26 and +0.07 giving +0.33; no climate +0.02 and +0.09 giving +0.11; SSP5-8.5 -0.16 and +0.09 giving -0.07; SSP2-4.5 -0.21 and +0.09 giving -0.12 Tg C a year\]
+
+*Figure 7.35. The Compare Runs carbon summary of the P26 runs with their Wood Products results: HWP, the mean change in carbon stored in products, and NBP + HWP.*
 
 ## 8. Viewing results in SyncroSim
 
@@ -1839,7 +1935,7 @@ Besides the inputs they write for ST-Sim, the lucasCore stages save summary tabl
 | Historical Patch Sizes | OutputPatchSize | 10 | The sizes of each year's patches of change, by size class. |
 | Climate Multiplier Summary | OutputClimateSummary | 11 | As for stage 7, for the projection's climate future. |
 
-**Figures and comparisons** (stages 12 to 14): **Build Figures (PNG)**, **Run Figures (PNG)** and **Compare Figures (PNG)** open in the figure viewer (section 8.1). Stage 14 also writes **Compare Carbon Summary**, **Compare Land Change Summary** and, with management costs, **Compare Cost Summary** (section 7.4).
+**Figures and comparisons** (stages 12 to 14): **Build Figures (PNG)**, **Run Figures (PNG)** and **Compare Figures (PNG)** open in the figure viewer (section 8.1). Stage 14 also writes **Compare Carbon Summary**, Compare Land Change Summary and, with management costs, Compare Cost **Summary** (section 7.4). Stage 18 writes Wood Products, Wood Products by End Use, Wood Products Spin-up and Wood Products Figures (PNG) (section 7.5).
 
 **Validation.** Every stage adds its checks to **Validation**: one row per check, with the stage, what was checked, **Pass** or **Fail**, and the numbers behind it. The same lines are in the run log. Look here first when a result looks wrong.
 
