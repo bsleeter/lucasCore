@@ -36,9 +36,28 @@ Build can then be drawn against it.
   - `dev/capacity/check-library.R` computes the capacity of an existing Build result outside SyncroSim (read-only) and
     draws a run against it.
 
+- Stand age (stage 5, `src/stand-age.R`; the new page LUCAS Core > Stand Age and the table Stand Age: Unknown Ages).
+  - **A cell's stand age** is now the age of the 30 m pixel at its centre (a cell whose centre pixel has none takes the mean
+    of its pixels that do). It was the mean of the cell's pixels, which leaves a landscape short of young and old stands;
+    Stand Age can set the mean again.
+  - **Forest burned between the start year and the age map's year** (NASA CMS 1990, TreeMap 2016) showed in the age map as
+    what grew back or as its unburned remnants. A forest cell inside an interagency fire perimeter of those years now takes,
+    in order: the user's stand age raster; the user's age for its forest type (Unknown Ages); NASA CMS 1990 where it saw
+    the stand before its fire (a TreeMap Build); else the percentile (default the 75th) of the ages of unburned forest of
+    its type in its ecodivision. Stand Age can keep the age map's value instead.
+  - **A stand age raster** (optional, with the year of its ages) sets the age of every forest cell it covers.
+  - **Stand Age Summary** (Build Results) lists, by forest type and rule, the cells, their mean age and the age map's.
+  - **This changes a Build's starting ages and carbon** wherever fires fall between the start year and the age map's year,
+    and, through the centre pixel, everywhere a little. Yellowstone at 300 m (TreeMap ages): 49% of forest cells are inside
+    a 1986-2016 perimeter and go from a mean of about 100 years to 140; the land starts at 90% of its carbon capacity
+    instead of 86%. To reproduce an earlier Build, set Stand Age to the mean of the cell's pixels and to keep the age map's
+    value.
+
 ### Tests
 - `tests/unit-capacity.R`: the regime weights and mean against hand values and their limits, the table by type, the BpS
   cover lookup, the cell rules under both settings of the option, and the run side (series, deficit by cause).
+- `tests/unit-stand-age.R`: the options, the Unknown Ages table, the percentiles of the unburned forest, and the order of the
+  rules.
 
 ## 1.5.1 - 2026-11-18
 

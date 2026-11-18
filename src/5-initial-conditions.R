@@ -11,6 +11,9 @@
 #     applies only to natural cells (user decision 2026-10-20: the build turned 69,895 developed/ag cells of 1985 into forest)
 #   * one Douglas-fir class (200; user decision 2026-10-21): coastal vs inland is carried by the ecodivision of its curves
 #   * the clearcut minimum-age rule needs the clearcut maps and moves to stage 6
+#   * stand age (src/stand-age.R, lucasCore 1.5.2): a cell takes the age of the 30 m pixel at its centre, not the mean of its pixels;
+#     a forest cell that burned between the start year and the age map's year takes an age from Stand Age Options (a raster, an age
+#     by forest type, an earlier age map, or the upper part of the unburned forest's ages), since the map only shows what grew back
 # Also writes the annual NLCD at the model's resolution (stage 6 builds the transitions from it), and per ecodivision x forest class
 # the replacement-fire return interval (LANDFIRE FRI_REPLAC) and the mean gNATSGO soil carbon that stage 3 calibrates with.
 # Needs stage 1 (same pipeline, or a dependency on its result).
@@ -244,17 +247,24 @@ progressBar()
 #   TreeMap             each 30 m pixel's FIA plot's STDAGE minus (its inventory year - start year), averaged over the cell's pixels
 #                       with an age; a plot younger than that (a stand that started after the start year) counts as unknown
 # A cell left without an age (or 0 or less: started after the start year) takes its neighbours'
+# Stand Age Options (src/stand-age.R; lucasCore 1.5.2): a cell takes the age of the 30 m pixel at its centre (default; where that pixel
+# has none, the mean of the cell's pixels that do), or the mean of its pixels as before, which leaves the landscape short of young
+# and old stands. A_px always holds the centre pixel's age: the ages of stands, for the unknown-age percentiles below
+source(pkg_file("src", "stand-age.R"))
+ao <- tryCatch(age_options(tryCatch(read_ds("StandAgeOptions"), error = function(e) data.table())), error = function(e) fail("%s", conditionMessage(e)))
 if (identical(asrc, "TreeMap")) {
   ok <- tpl[!is.na(stdage) & !is.na(invyr)]
   a30 <- classify(tm30, cbind(ok$Value, as.numeric(ok$stdage - (ok$invyr - y0))), others = NA); a30[a30 <= 0] <- NA
-  A <- round(project(a30, R, method = "average"))
+  A_mean <- round(project(a30, R, method = "average")); A_px <- round(project(a30, R, method = "near")); age_map_year <- 2016L
   say("Stand age: TreeMap 2016 (FIA plot stand age moved from each plot's inventory year, %d-%d, to %d)", min(ok$invyr), max(ok$invyr), y0)
 } else {
-  A <- project(crop_to(rast(read_data_sources("StandAgeFile")$StandAgeFile)), R, method = "average")
-  A <- round(A - (1990 - y0))
+  c30 <- crop_to(rast(read_data_sources("StandAgeFile")$StandAgeFile))
+  A_mean <- round(project(c30, R, method = "average") - (1990 - y0)); A_px <- round(project(c30, R, method = "near") - (1990 - y0)); age_map_year <- 1990L
   say("Stand age: NASA CMS Forest Age 1990, moved to %d", y0)
 }
-A[A <= 0] <- NA
+A_mean[A_mean <= 0] <- NA; A_px[A_px <= 0] <- NA
+A <- if (ao$aggregate == "centre") cover(A_px, A_mean) else A_mean
+say("Stand age of a cell: %s (Stand Age Options)", if (ao$aggregate == "centre") "the 30 m pixel at its centre, or the mean of its pixels where that one has no age" else "the mean of its 30 m pixels")
 if (site_on) {   # 7 single-band maps: share of the cell's TreeMap pixels (with a site class) in site class 1 ... 7; no pixels = NA
   s30 <- classify(tm30, cbind(tpl$Value, as.numeric(tpl$siteclcd)), others = NA)
   sh <- lapply(1:7, function(k) mask(project(ifel(is.na(s30), NA, s30 == k), R, method = "average"), P))
@@ -268,6 +278,37 @@ if (site_on) {   # 7 single-band maps: share of the cell's TreeMap pixels (with 
 }
 A <- fill_modal(mask(A, m), m, round(global(A, "mean", na.rm = TRUE)[[1]]))
 A <- mask(ifel(forest, max(A, 1), 0), m)
+# ---- stand age where the age map cannot know it (src/stand-age.R; lucasCore 1.5.2) --------------------------------------------
+# A forest cell inside a fire perimeter of a year after the start year, up to the age map's year, shows in the map as what grew back
+# or as its unburned remnants. Its age is, in order: the user's stand age raster (which applies to every forest cell it covers), the
+# user's age for its forest type (Unknown Ages), NASA CMS 1990 where that saw the stand before its fire (a TreeMap Build), the given
+# percentile of the unburned forest of its type in its ecodivision, else the map's own value. The regrowth and reforestation rules
+# below still set the age of the cells they pick.
+fa <- values(forest, mat = FALSE) %in% 1; cls_a <- scl$Name[match(values(S, mat = FALSE), as.integer(scl$Id))]; eco_a <- stl$Name[match(values(P, mat = FALSE), as.integer(stl$Id))]
+src_age <- values(A, mat = FALSE); burn_yr <- rep(NA_integer_, ncell(R))
+if (ao$unknown == "default" && age_map_year > y0) {
+  fpf_a <- read_data_sources("FirePerimeterHistoryFile", optional = TRUE)$FirePerimeterHistoryFile
+  if (is.na(fpf_a)) say("Stand age: no fire perimeter file (Data Sources: FirePerimeterHistoryFile), so cells burned between %d and the age map's year (%d) are not looked for", y0, age_map_year) else {
+    fpa <- read_fire_perimeters(fpf_a, y0 + 1, age_map_year)
+    if (nrow(fpa)) { fpa <- sf::st_make_valid(sf::st_transform(fpa, crs(R))); burn_yr <- as.integer(values(rasterize(vect(fpa), R, field = "yr", fun = "min"), mat = FALSE)) } } }
+ras_age <- rep(NA_real_, ncell(R))
+if (!is.na(ao$raster)) { if (!file.exists(ao$raster)) fail("Stand Age Options: the stand age raster %s was not found", ao$raster)
+  ry <- if (is.na(ao$raster_year)) y0 else ao$raster_year; ras_age <- values(project(crop_to(rast(ao$raster)[[1]]), R, method = "near"), mat = FALSE) - (ry - y0); ras_age[!is.na(ras_age) & ras_age < 1] <- NA
+  say("Stand age raster (Stand Age Options): %s, ages of %d; it gives %d of the %d forest cells an age", basename(ao$raster), ry, sum(fa & !is.na(ras_age)), sum(fa)) }
+early <- rep(NA_real_, ncell(R)); early_yr <- NA_integer_
+if (identical(asrc, "TreeMap") && any(fa & !is.na(burn_yr) & burn_yr > 1990)) { cmsf <- read_data_sources("StandAgeFile", optional = TRUE)$StandAgeFile
+  if (!is.na(cmsf)) { early <- values(project(crop_to(rast(cmsf)), R, method = "near"), mat = FALSE) - (1990 - y0); early[!is.na(early) & early < 1] <- NA; early_yr <- 1990L } }
+utab <- tryCatch(age_type_table(tryCatch(read_ds("StandAgeUnknown"), error = function(e) data.table())), error = function(e) fail("%s", conditionMessage(e)))
+apct <- age_percentiles(eco_a, cls_a, values(A_px, mat = FALSE), fa & is.na(burn_yr), ao$percentile)
+aa <- age_assign(fa, eco_a, cls_a, src_age, burn_yr, ras_age, early, early_yr, utab, apct, ao$unknown); A <- setValues(A, aa$age)
+age_tab <- age_summary(cls_a, aa$rule, aa$age, src_age); n_unk <- sum(fa & !is.na(burn_yr))
+if (ao$unknown == "source") say("Stand age: Unknown Ages is set to keep the age map's value (Stand Age Options)") else
+  say("Stand age unknown to the age map: %d of %d forest cells (%.1f%%) are inside a fire perimeter of %d-%d", n_unk, sum(fa), 100 * n_unk / max(sum(fa), 1), y0 + 1, age_map_year)
+ar <- data.table(r = aa$rule, a = aa$age, s = src_age)[!is.na(r) & r != "source", .(Cells = .N, Age = mean(a), Was = mean(s)), by = r]
+for (i in seq_len(nrow(ar))) say("  %s: %d cells, mean age %.0f (the age map gave %.0f)", AGE_RULES[[ar$r[i]]], ar$Cells[i], ar$Age[i], ar$Was[i])
+if (n_unk && ao$unknown == "default" && any(aa$rule %in% "percentile")) { up <- apct[!is.na(StateClassId)][paste(StratumId, StateClassId) %in% unique(paste(eco_a, cls_a)[aa$rule %in% "percentile"])][order(-Cells)]
+  say("  the %gth percentile of the unburned forest (one pixel a cell): %s", ao$percentile, paste(sprintf("%s %.0f", sub("^Forest: ", "", up$StateClassId), up$Age), collapse = ", ")) }
+check(STAGE, "stand age: every forest cell has an age of at least 1 after the unknown-age rules", all(aa$age[fa] >= 1), sprintf("%d cells", sum(!(aa$age[fa] >= 1))))
 # regrowing forest (src/regrowth-age.R; to-do 57, user decision 2026-11-11): a cell that is forest only by the any-year rule (grass,
 # shrub or barren in the start year) and that NLCD shows regrowing takes its starting age from the record, not from CMS or TreeMap
 source(pkg_file("src", "regrowth-age.R")); rg <- regrowth_settings(read_default("landcover", "regrowth-age.csv"))
@@ -427,6 +468,8 @@ write_ds(data.frame(ForestTypeFileName = write_raster(Fz, "ForestType.tif"), Gra
                     StartRuleFileName = if (exists("fSR")) fSR else NA_character_, FirstForestYearFileName = if (exists("fFY")) fFY else NA_character_),
          "OutputLandCoverLayers")
 write_ds(ri, "OutputReturnInterval"); write_ds(st, "OutputSoilTarget")
+# how each forest type's stand ages were set (a library made before lucasCore 1.5.2 has no such sheet until it is opened in Studio)
+if (nrow(age_tab)) tryCatch(write_ds(age_tab, "OutputStandAge"), error = function(e) say("Stand Age Summary not written (%s): reopen the library in SyncroSim Studio so it adds the table", conditionMessage(e)))
 summ <- data.table(S = vS, A = vA)[!is.na(S), .(Cells = .N, MeanAge = round(mean(A), 1)), by = S][, StateClassId := scl$Name[match(S, as.integer(scl$Id))]]
 write_ds(summ[order(-Cells), .(StateClassId, Cells, MeanAge)], "OutputStateClassSummary")
 progressBar()

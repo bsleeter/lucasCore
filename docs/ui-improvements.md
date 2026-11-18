@@ -2397,3 +2397,28 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       version); a sheet of its own does not.
     - Open: who builds and reviews the crosswalk (it sets the quality of the metric); whether BpS's own fire regime attributes
       (the return intervals in the BpS table of the national release) should replace the FRI layer's for the regime mean.
+
+70. **Stand age options: a cell's age, and the age of forest the age map cannot know** - DONE in code 2026-11-18 (branch
+    `claude/pnv-carbon-metric-lucascore-1d71ac`; user: "For stands where the age is unknown, have a default approach, one based of a
+    user input value for each forest type, or an uploaded raster would all be good options to have in place").
+    - Why: item 68's Yellowstone checks. The Build's ages (TreeMap 2016, or CMS 1990) post-date the 1988 fires, so the 40% of the
+      park's forest that burned started at the age of its unburned remnants (99 years); and a cell's age was the mean of its 30 m
+      pixels, which leaves almost no cell over 200 years.
+    - What: `src/stand-age.R` and stage 5. A cell takes the age of the pixel at its centre (default; the mean is still a choice). A
+      forest cell inside an interagency fire perimeter of a year after the start year, up to the age map's year, takes: the user's
+      stand age raster; the user's age for its forest type (sheet Stand Age: Unknown Ages); NASA CMS 1990 where it predates the
+      cell's first fire (a TreeMap Build); else the percentile (default 75) of the ages of unburned forest of its type in its
+      ecodivision, over one pixel a cell. Sheets StandAgeOptions (page ui/StandAgeView.cs; the raster is a path, as Data Sources
+      are), StandAgeUnknown, OutputStandAge. No update method: new sheets only.
+    - Yellowstone, in SyncroSim (capacity-test library, stages 5 and 8 on Build 14, default settings): 29,171 of 59,764 forest
+      cells (48.8%) are inside a 1986-2016 perimeter; 24,331 take the 75th percentile of the unburned forest of their type (mean
+      140 years, the age map gave 100; lodgepole pine 135, fir/spruce 165, Douglas-fir 108) and 4,840 the CMS 1990 age (147, the
+      age map gave 104). The land starts with 55.97 Tg C, 90% of its capacity (86% before); live biomass deficit 1.62 (2.44).
+      With Unknown Ages set to 250 years for lodgepole pine, fir/spruce and Douglas-fir (26,267 cells): 58.94 Tg C, 95% of the
+      capacity, the live biomass deficit gone (0.07) and 2.71 left in dead wood and litter.
+    - Open: the default percentile (75 is a judgement: CMS gives 143 years on forest that burned after 1990 against 110 on forest
+      that never did, but that is one park); harvest between the start year and the age map's year is not looked for (stage 5
+      runs before stage 6's harvest maps; the LCMS record could be read here); a Build figure of the age rules; the per-type
+      table is a plain grid, not part of the page. Related, not started: forest from tree canopy cover instead of NLCD, at the
+      start and for recovery (item 68's canopy test), which will add forest cells with no age in the age map: they would take
+      these same rules.

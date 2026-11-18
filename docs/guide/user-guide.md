@@ -491,6 +491,29 @@ The two methods turn the same 30 m Annual NLCD into the model grid in different 
 
 **Two limits of Area-matched.** The cells it makes developed are partly developed at 30 m, so the developed area is right over a county but not cell by cell. And a county's change follows its net change: where one place gains forest while another loses it, the two cancel, so gross transitions within a county are understated. The finer splits within an NLCD class (forest type, grassland and shrubland type, wetland type) still come from each cell's most common type with either method.
 
+#### 3.3.2 Stand age
+
+**LUCAS Core > Stand Age** sets two things about the starting stand ages that stage 5 maps from the Stand Age Source (NASA CMS 1990 or TreeMap 2016, both at 30 m, moved to the start year).
+
+**A cell's stand age.** A model cell holds many 30 m pixels. By default the cell takes the age of **the pixel at its centre**, so the landscape keeps the young and old stands the age map has; a cell whose centre pixel has no age takes the mean of its pixels that do. **Mean of the cell's pixels** was the rule until lucasCore 1.5.2. It is smoother from cell to cell but pulls every cell toward the middle: in the Yellowstone test area at 300 m it leaves almost no cell over 200 years, where 6% of the age map's pixels are. Since carbon does not rise in a straight line with age, a landscape of cell means does not hold the carbon of the stands it came from.
+
+**Forest burned between the start year and the age map's year.** The age maps were made after the start year. A stand that burned between 1985 and the map's year shows in the map as what grew back, or as its unburned remnants, not as what stood there in 1985. With **Estimate it** (the default), a forest cell inside an interagency fire perimeter of those years takes its start-year age from the first of:
+
+1. the **stand age raster**, where it has a value;
+2. the age for its forest type in **Stand Age: Unknown Ages** (a row for its ecodivision before a row for all ecodivisions);
+3. **NASA CMS 1990**, where that map saw the stand before its fire (a TreeMap Build, for a first fire after 1990);
+4. the **percentile** (blank = the 75th) of the ages of unburned forest of its type in its ecodivision. The upper part is used because the stands a fire takes are on average older than the ones it leaves; 50 assumes they were alike.
+
+**Keep the age map's value** turns this off (the rule until lucasCore 1.5.2).
+
+**Stand age raster.** Optional: a raster of stand age in years, with the year its ages are for (blank = the start year). Every forest cell it gives a value takes that age, burned or not, so it serves both a local age map for part of the study area and a full replacement of the age source.
+
+**Stand Age: Unknown Ages** is a table: a forest type, optionally an ecodivision, and the stand age in the start year for forest of that type that burned after it. Use it where the fire history is known. In the Yellowstone test area, 49% of the forest cells are inside a fire perimeter of 1986 to 2016, most of them the fires of 1988, and the fire history literature describes the stands that burned as old; an age of 200 years or more for lodgepole pine is the kind of value this table is for.
+
+**Build Results > Stand Age Summary** lists, for each forest type, how many cells each rule set, their mean age and the mean age the age map had given them. The run log has the same, with the percentile age of each forest type.
+
+> **The rules below still apply.** A cell the annual NLCD shows regrowing, starting in a disturbed class or reforesting later takes its age from those rules (section 3.3), after the stand age rules here.
+
 ### 3.4 Climate Options
 
 1. Choose **Climate Options**.
@@ -1978,6 +2001,7 @@ Besides the inputs they write for ST-Sim, the lucasCore stages save summary tabl
 | --- | --- | --- | --- |
 | Strata Summary | OutputStrataSummary | 1 | Each primary, secondary and tertiary stratum unit, with its Id and its area in cells. |
 | State Class Summary | OutputStateClassSummary | 5 | Each state class in the start year: its area in cells and mean age. |
+| Stand Age Summary | OutputStandAge | 5 | For each forest type and rule (the age map, the stand age raster, Unknown Ages, an earlier age map, unburned forest of its type): the cells whose start-year age it set, their mean age, and the mean age the age map gave them (section 3.3.2). |
 | Land Cover Layers | OutputLandCoverLayers | 5 | The forest type, grassland and shrubland type, wetland type and "forest in any year" maps behind the state classes. |
 | Annual NLCD (model grid) | OutputNlcdAnnual | 5 | The NLCD land cover map of each year, resampled to the model grid; stage 6 reads the change between years. |
 | Spin-up Return Intervals | OutputReturnInterval | 5 | The replacement-fire return interval used to spin up each ecodivision and state class. |
