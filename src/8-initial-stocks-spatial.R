@@ -146,6 +146,65 @@ if (site_on) {
   fg <- "Net Growth Forest: Total"; if (!fg %in% stsim_list("FlowGroup")$Name) fail("Site Productivity: flow group '%s' not found", fg)
   put_multiplier("Site Productivity", fg, write_raster(setValues(rast(P), ifelse(land, mult, NA)), "SiteProductivity.tif", "FLT4S"))
 }
+# ---- Forest stocking (Forest Cover page; src/forest-cover.R, stocking_multiplier; user 2026-11-19) ----------------------------------
+# A mature forest cell's starting live and dead carbon and its growth are scaled by its mean tree canopy cover over the mean of the
+# mature cells of its forest type and ecodivision. It multiplies with the site productivity multiplier and goes into the same flow
+# spatial multiplier (Site Productivity on forest growth), the product kept within 0.3-2.5. Young forest, forest that starts in a
+# disturbed class and every other land cell take the value of the mature forest near them (src/productivity-fill.R), and a cell keeps
+# its multiplier through a fire or a cut: the stand grows back to the density the site carried. The carbon capacity is not scaled
+# (an open stand is below its type's capacity, not on a poorer site).
+source(pkg_file("src", "forest-cover.R"))
+fo8 <- tryCatch(forest_cover_options(tryCatch(read_ds("ForestCoverOptions"), error = function(e) data.table())), error = function(e) fail("%s", conditionMessage(e)))
+stock_out <- NULL
+if (fo8$stocking == "canopy") {
+  tcd <- if (!is.na(fo8$folder)) fo8$folder else read_data_sources("TreeCanopyFolder")$TreeCanopyFolder; tf8 <- file.path(tcd, sprintf(TCC_FILE, y0))
+  if (!file.exists(tf8)) fail("Forest Cover: stocking by tree canopy cover needs the canopy of %d (%s): run a Data Download with Datasets = TreeCanopyFolder, or set Stocking to the same for every cell on the Forest Cover page", y0, tf8)
+  if (!"Site Productivity" %in% stsim_list("FlowMultiplierType")$Name) fail("Forest Cover: stocking needs the Flow Multiplier Type 'Site Productivity' - run tools/sync-library.R on the library")
+  fg <- "Net Growth Forest: Total"; if (!fg %in% stsim_list("FlowGroup")$Name) fail("Forest Cover: stocking: flow group '%s' not found", fg)
+  cell_canopy <- function(tf) { t30 <- rast(tf); t30 <- crop(t30, terra::project(as.polygons(ext(P) + 3000, crs = crs(P)), crs(t30)))
+    values(mask(terra::project(subst(classify(t30, cbind(100.5, Inf, NA)), NA, 0), P, method = "average"), P), mat = FALSE) }   # (no data counts as no canopy)
+  cmean <- cell_canopy(tf8)
+  mature8 <- isF & !is.na(vA) & vA >= fo8$mature_age
+  # the shape of carbon against canopy: fitted to TreeMap 2016 over this study area's mature forest where the Build has TreeMap and
+  # the canopy of that year, else carbon in proportion to canopy
+  TM_YEAR <- 2016L; fit8 <- NULL; why8 <- ""; source(pkg_file("src", "treemap.R"))
+  tmd8 <- tryCatch(read_data_sources("TreeMapFolder", optional = TRUE)$TreeMapFolder, error = function(e) NA_character_); tfm <- file.path(tcd, sprintf(TCC_FILE, TM_YEAR))
+  tmf <- if (is.na(tmd8)) NULL else tryCatch(treemap_files(tmd8, TM_YEAR), error = function(e) NULL)
+  if (is.null(tmf) || !all(file.exists(unlist(tmf)))) why8 <- "no TreeMap in Data Sources (TreeMapFolder)" else if (!file.exists(tfm)) why8 <- sprintf("no tree canopy cover of %d, TreeMap's year, in %s", TM_YEAR, tcd) else {
+    tm8 <- rast(tmf$raster); levels(tm8) <- NULL; tm8 <- crop(tm8, terra::project(as.polygons(ext(P) + 1000, crs = crs(P)), crs(tm8)))
+    vat8 <- data.table::as.data.table(foreign::read.dbf(tmf$vat, as.is = TRUE))
+    if (!"CARBON_L" %in% names(vat8)) why8 <- "TreeMap's attribute table has no CARBON_L" else { cl8 <- as.numeric(vat8$CARBON_L) * 2.2417; cl8[is.na(cl8) | cl8 < 0] <- 0   # tons/acre to Mg/ha; pixels TreeMap does not map hold none
+      tmc8 <- values(mask(terra::project(subst(classify(tm8, cbind(as.integer(vat8$Value), cl8), others = 0), NA, 0), P, method = "average"), P), mat = FALSE)
+      # fitted on stands as they stood through TreeMap's year: a cell that burned or lost canopy between the start year and TreeMap's
+      # shows what a fire or a cut leaves, not how carbon follows stocking (Yellowstone, 2026-11-19: with the 1988 burns in the fit
+      # the curve was too steep and dense stands started with 1.5 times TreeMap's carbon). Left out: cells inside a fire perimeter of
+      # those years, and cells whose mean canopy fell by more than 10 points
+      ctm8 <- cell_canopy(tfm); fpl <- tryCatch({ q <- read_fire_perimeters(src$FirePerimeterHistoryFile, y0 + 1L, TM_YEAR); q <- st_make_valid(st_transform(q, crs(P))); q <- q[lengths(st_intersects(q, bb)) > 0, ]
+        if (nrow(q)) !is.na(values(rasterize(vect(q), P, field = 1), mat = FALSE)) else rep(FALSE, ncell(P)) }, error = function(e) rep(FALSE, ncell(P)))
+      fitc8 <- mature8 & !fpl & !is.na(ctm8) & !is.na(cmean) & ctm8 >= cmean - 10; n_fit8 <- sum(fitc8)
+      fit8 <- stocking_fit(ctm8[fitc8], tmc8[fitc8], cname[fitc8]); if (is.null(fit8)) why8 <- "too few mature forest cells for a fit" } }
+  if (is.null(fit8)) say("Forest stocking: carbon in proportion to canopy (%s)", why8) else {
+    say("Forest stocking: carbon against canopy fitted to TreeMap %d over %d mature forest cells with no fire perimeter and no canopy loss since the start year (live carbon = a ceiling x c^b / (c^b + k^b), c the cell's mean canopy): all forest half its ceiling at %g%% canopy, steepness %g (R2 %.2f); %d forest types have their own curve",
+        TM_YEAR, fit8$Cells[1], fit8$K[1], fit8$B[1], fit8$R2[1], sum(fit8$Own) - 1L)
+    for (i in utils::head(order(-fit8$Cells * (fit8$Type != "(all forest)") * fit8$Own), 6)) if (fit8$Own[i] && fit8$Type[i] != "(all forest)") say("  %s: half at %g%%, steepness %g (R2 %.2f, %d cells)", fit8$Type[i], fit8$K[i], fit8$B[i], fit8$R2[i], fit8$Cells[i]) }
+  sk <- stocking_multiplier(if (is.null(fit8)) cmean else stocking_value(cmean, cname, fit8), paste(sname, cname, sep = "|"), mature8)
+  smult <- ifelse(is.na(sk$mult), 1, sk$mult); fls <- fill_multiplier(P, smult, sk$own, land & !sk$own); smult <- fls$mult
+  m_site8 <- if (site_on) mult else rep(1, ncell(P)); comb <- pmin(pmax(m_site8 * smult, 0.3), 2.5); eff <- comb / m_site8   # the stocking part after the joint cap
+  check(STAGE, "forest stocking: every land cell's growth multiplier is finite and within 0.3-2.5", all(is.finite(comb[land]) & comb[land] >= 0.3 - 1e-9 & comb[land] <= 2.5 + 1e-9))
+  bgs8 <- which(st$StockTypeId == "DOM: Belowground Slow"); live8 <- which(startsWith(st$StockTypeId, "Biomass")); before8 <- sum(out[isF, live8], na.rm = TRUE)
+  out[isF, -bgs8] <- out[isF, -bgs8] * eff[isF]; after8 <- sum(out[isF, live8], na.rm = TRUE)
+  qs <- stats::quantile(eff[isF], c(0.1, 0.5, 0.9))
+  say("Forest stocking (tree canopy cover %d, USFS Science TCC): a forest cell's starting live and dead carbon and its growth follow its canopy over the mean of the mature forest (%g years or more) of its type and ecodivision; multiplier mean %.2f (10%% %.2f, median %.2f, 90%% %.2f); %d of %d forest cells have their own, the rest take the mature forest's near them",
+      y0, fo8$mature_age, mean(eff[isF]), qs[1], qs[2], qs[3], sum(isF & sk$own), sum(isF))
+  say("Forest stocking: the forest's starting live carbon goes from %.2f to %.2f Tg C (%+.1f%%); %d of %d forest type x ecodivision groups have too few mature cells for their own mean and keep 1%s",
+      before8 * cell_ha / 1e6, after8 * cell_ha / 1e6, 100 * (after8 / before8 - 1), sum(!sk$table$Own), nrow(sk$table), if (site_on) "; multiplied with the site productivity multiplier in the Site Productivity flow multiplier" else "")
+  put_multiplier("Site Productivity", fg, write_raster(setValues(rast(P), ifelse(land, comb, NA)), "SiteProductivityStocking.tif", "FLT4S"))
+  stt8 <- data.table(StateClassId = cname, canopy = cmean, m = eff, own = sk$own)[isF]
+  stb8 <- stt8[, .(Cells = .N, MatureCells = sum(own), MeanCanopy = mean(canopy, na.rm = TRUE), Multiplier = mean(m), P10 = stats::quantile(m, 0.1), P90 = stats::quantile(m, 0.9)), by = StateClassId][order(-Cells)]
+  stb8[, Curve := if (is.null(fit8)) "In proportion to canopy" else { i <- match(StateClassId, fit8$Type); i[is.na(i)] <- 1L; paste0(mapply(stocking_curve_label, fit8$K[i], fit8$B[i]), ifelse(fit8$Own[i] & fit8$Type[i] != "(all forest)", "", " (all forest's)")) }]
+  stock_out <- list(table = stb8,
+                    maps = data.table(StockingFileName = write_raster(setValues(rast(P), ifelse(land, eff, NA)), "ForestStocking.tif", "FLT4S"), CanopyFileName = write_raster(setValues(rast(P), ifelse(land, cmean, NA)), "MeanTreeCanopy.tif", "FLT4S"), MatureAge = fo8$mature_age))
+}
 # class tables: by class (and age for forested wetland, and ecodivision where the table has a StratumID column)
 lt <- function(f) { x <- read_default("initialstocks", f); setnames(x, gsub("ID$", "Id", names(x)))
   x[, `:=`(Value = as.numeric(Value), AgeMin = suppressWarnings(as.integer(AgeMin)))][StateAttributeTypeId %in% st$Attribute] }
@@ -363,7 +422,6 @@ if (!is.null(hf) && length(hf) && !is.na(hf) && nzchar(hf) && file.exists(hf)) {
   say("Organic Soil Share (gNATSGO Histosols): %d of %d land cells at least half organic (mean share %.3f)", sum(os_v[land] >= 0.5), sum(land), mean(os_v[land]))
   for (i in seq_len(min(nrow(os), 8))) with(os[i], say("  %s: %d of %d cells at least half organic (mean share %.2f)", cls, Organic, Cells, Mean))
 } else say("Organic soil: no HistosolFile in the Data Sources (run a Data Download with it), so no cell starts with peat")
-
 # ---- Cropland Productivity (Build Options; to-do 39 step 6, user 2026-11-07) -------------------------------------------------
 # The agriculture counterpart: each 30 m Cropland Data Layer pixel of CDL_YEARS takes its county's NASS growth of its crop group
 # (defaults/stockflow/ag-county-crop-npp.csv: the 1985-2023 mean, yields converted with USDA Tech. Bull. 1939 coefficients;
@@ -587,6 +645,7 @@ write_ds(summ[, .(StateClassId, Cells, PostFire, Live, Dom, Soil, TotalTg, Sourc
 if (length(np_rows)) { np <- rbindlist(np_rows)[, .(Multiplier, StratumId, StateClassId, Cells, WithData, Mean, P10, Median, P90, AtCap, Source)]
   tryCatch(write_ds(np, "OutputNonForestProductivity"), error = function(e) say("Non-Forest Productivity table not written (%s): reopen the library in SyncroSim Studio so it adds the table", conditionMessage(e))) }
 # Carbon capacity: its maps and tables (a library made before them has no such sheets until it is opened in SyncroSim Studio)
+if (!is.null(stock_out)) tryCatch({ write_ds(stock_out$table, "OutputForestStocking"); write_ds(stock_out$maps, "OutputForestStockingMap") }, error = function(e) say("Forest Stocking tables not written (%s): reopen the library in SyncroSim Studio so it adds them", conditionMessage(e)))
 if (!is.null(cap_out)) tryCatch({ write_ds(cap_out$maps, "OutputCarbonCapacityMap"); write_ds(cap_out$type, "OutputCarbonCapacityType"); write_ds(cap_out$summary, "OutputCarbonCapacity") },
   error = function(e) say("Carbon capacity tables not written (%s): reopen the library in SyncroSim Studio so it adds the tables", conditionMessage(e)))
 progressBar()
