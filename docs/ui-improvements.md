@@ -2416,8 +2416,17 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       age map gave 104). The land starts with 55.97 Tg C, 90% of its capacity (86% before); live biomass deficit 1.62 (2.44).
       With Unknown Ages set to 250 years for lodgepole pine, fir/spruce and Douglas-fir (26,267 cells): 58.94 Tg C, 95% of the
       capacity, the live biomass deficit gone (0.07) and 2.71 left in dead wood and litter.
+    - Cut stands (user, 2026-11-18: "we should probably enable this for cut stands as well?"): stage 6, which has the harvest maps,
+      gives a forest cell clearcut between the start year and the age map's year (its chance of a clearcut reaching one half) the
+      same rules, where stage 5 left it at the age map's value; the percentile is of forest that neither burned nor was cut.
+      Stage 5 saves the rule map and the centre-pixel ages for it (Stand Age Maps); the table is Stand Age Summary: Cut Stands.
+      The harvest minimum age still applies after. Great Dismal Swamp, in SyncroSim (capacity-test-gds, stages 5 and 6 on Build
+      18, TreeMap ages): no fire perimeters of 1986-2016; 3,643 forest cells clearcut in those years, 3,118 take the CMS 1990 age
+      (mean 29) and 525 the 75th percentile of undisturbed forest (mean 51); mean 32 where the age map gave 31, so little
+      changes here (short pine rotations, and CMS agrees with TreeMap); 1,118 start ages were then raised by the minimum harvest
+      age, by 8 years on average.
     - Open: the default percentile (75 is a judgement: CMS gives 143 years on forest that burned after 1990 against 110 on forest
-      that never did, but that is one park); harvest between the start year and the age map's year is not looked for (stage 5
+      that never did, but that is one park); selection harvest is left alone; (was: harvest not looked for, since stage 5
       runs before stage 6's harvest maps; the LCMS record could be read here); a Build figure of the age rules; the per-type
       table is a plain grid, not part of the page. Related, not started: forest from tree canopy cover instead of NLCD, at the
       start and for recovery (item 68's canopy test), which will add forest cells with no age in the age map: they would take

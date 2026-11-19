@@ -33,21 +33,21 @@ namespace lucasCoreUI
             AddGroup(Group("A cell's stand age", a));
 
             var u = Column();
-            u.Controls.Add(Note("The age maps were made after the start year. Forest that burned between the start year and the map's year shows in the map as what grew back, or as its unburned remnants, not as what stood there in the start year."));
+            u.Controls.Add(Note("The age maps were made after the start year. Forest that burned or was clearcut between the start year and the map's year shows in the map as what grew back, or as its unburned remnants, not as what stood there in the start year."));
             u.Controls.Add(Option(m_unknown, 1, "Estimate it"));
-            u.Controls.Add(Indent(Note("A forest cell inside a fire perimeter of those years takes, in this order: the stand age raster below; the age for its forest type in Stand Age: Unknown Ages; NASA CMS 1990 where that saw the stand before its fire (a TreeMap Build); else the percentile below of the ages of unburned forest of its type in its ecodivision.")));
-            var p = Row(); p.Controls.Add(Caption("Percentile:")); p.Controls.Add(m_pct); p.Controls.Add(Note("Blank = 75. The upper part, because the stands a fire takes are on average older than the ones it leaves; 50 assumes they were alike."));
+            u.Controls.Add(Indent(Note("A forest cell inside a fire perimeter of those years (stage 5), or clearcut in them (stage 6, from the harvest maps), takes, in this order: the stand age raster below; the age for its forest type in Stand Age: Unknown Ages; NASA CMS 1990 where that saw the stand before its fire or cut (a TreeMap Build); else the percentile below of the ages of forest of its type in its ecodivision that neither burned nor was cut. A cut stand is then still at least its minimum harvest age at its cut.")));
+            var p = Row(); p.Controls.Add(Caption("Percentile:")); p.Controls.Add(m_pct); p.Controls.Add(Note("Blank = 75. The upper part, because the stands a fire or a harvest takes are on average older than the ones it leaves; 50 assumes they were alike."));
             u.Controls.Add(Indent(p));
             u.Controls.Add(Option(m_unknown, 2, "Keep the age map's value"));
             u.Controls.Add(Indent(Note("As before lucasCore 1.5.2. The stand age raster below is still used where it has a value.")));
-            AddGroup(Group("Forest burned between the start year and the age map's year", u));
+            AddGroup(Group("Forest burned or clearcut between the start year and the age map's year", u));
 
             var r = Column();
             r.Controls.Add(Note("Optional. A raster of stand age in years. Every forest cell it gives a value takes that age, burned or not; cells it leaves empty follow the rules above."));
             var f = Row(); f.Controls.Add(Caption("Raster:")); f.Controls.Add(m_file); f.Controls.Add(m_browse); r.Controls.Add(f);
             var y = Row(); y.Controls.Add(Caption("Its ages are for the year:")); y.Controls.Add(m_year); y.Controls.Add(Note("Blank = the start year. Another year's ages are moved to the start year.")); r.Controls.Add(y);
             AddGroup(Group("Stand age raster", r));
-            var n = Column(); n.Controls.Add(Note("These settings take effect when stage 5 runs (a new Build). Build Results > Stand Age Summary lists, by forest type, how many cells each rule set and the ages it gave."));
+            var n = Column(); n.Controls.Add(Note("These settings take effect when stages 5 and 6 run (a new Build). Build Results > Stand Age Summary (burned forest) and Stand Age Summary: Cut Stands list, by forest type, how many cells each rule set and the ages it gave."));
             AddGroup(Group("When it applies", n));
             EndGroups();
             BindNumber(m_pct, () => Sheet, "UnknownPercentile", true); BindNumber(m_year, () => Sheet, "AgeRasterYear", true);

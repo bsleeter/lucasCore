@@ -45,6 +45,10 @@ Build can then be drawn against it.
     in order: the user's stand age raster; the user's age for its forest type (Unknown Ages); NASA CMS 1990 where it saw
     the stand before its fire (a TreeMap Build); else the percentile (default the 75th) of the ages of unburned forest of
     its type in its ecodivision. Stand Age can keep the age map's value instead.
+  - **Forest clearcut in those years** gets the same rules in stage 6, which has the harvest maps (a cell counts once its
+    chance of a clearcut reaches one half; the percentile is of forest that neither burned nor was cut). Until now such a
+    stand was only raised to its minimum harvest age at its cut, which still applies after. Its table is Stand Age Summary:
+    Cut Stands; stage 5 saves the maps stage 6 needs as Stand Age Maps.
   - **A stand age raster** (optional, with the year of its ages) sets the age of every forest cell it covers.
   - **Stand Age Summary** (Build Results) lists, by forest type and rule, the cells, their mean age and the age map's.
   - **This changes a Build's starting ages and carbon** wherever fires fall between the start year and the age map's year,

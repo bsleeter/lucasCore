@@ -24,8 +24,8 @@
 
 AGE_AGGREGATION <- c(centre = "The pixel at the cell's centre", mean = "Mean of the cell's pixels")
 AGE_UNKNOWN <- c(default = "Estimate it", source = "Keep the age map's value")
-AGE_RULES <- c(raster = "Stand age raster", type = "Unknown Ages: forest type value", earlier = "Earlier age map (before the fire)",
-               percentile = "Unburned forest of its type", source = "Age map")
+AGE_RULES <- c(raster = "Stand age raster", type = "Unknown Ages: forest type value", earlier = "Earlier age map (before the fire or cut)",
+               percentile = "Undisturbed forest of its type", source = "Age map")
 
 # Stand Age Options (single row; a list column reads as its number or its label; blank = the default): aggregate ("centre" or
 # "mean"), unknown ("default" or "source"), percentile (1-99, blank 75), raster (a path or NA) and raster_year (NA = the start year)

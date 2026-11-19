@@ -938,14 +938,14 @@
 	     map that saw the stand before its fire, the percentile of the unburned forest of the type, else the map's own -->
 	<dataSheet name="StandAgeOptions" displayName="Stand Age" isSingleRow="True" viewClassName="lucasCoreUI.StandAgeView" viewClassAssembly="lucasCoreUI">
 		<column name="Aggregation" displayName="A Cell's Age (blank = the pixel at its centre)" dataType="Integer" validationType="List" formula1="1:The pixel at the cell's centre|2:Mean of the cell's pixels" isOptional="True" defaultValue="1"/>
-		<column name="UnknownRule" displayName="Forest Burned Between the Start Year and the Age Map's Year (blank = estimate it)" dataType="Integer" validationType="List" formula1="1:Estimate it|2:Keep the age map's value" isOptional="True" defaultValue="1"/>
+		<column name="UnknownRule" displayName="Forest Burned or Clearcut Between the Start Year and the Age Map's Year (blank = estimate it)" dataType="Integer" validationType="List" formula1="1:Estimate it|2:Keep the age map's value" isOptional="True" defaultValue="1"/>
 		<column name="UnknownPercentile" displayName="Percentile of the Unburned Forest of Its Type (blank = 75)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="1" formula2="99"/>
 		<column name="AgeRasterFile" displayName="Stand Age Raster (a path; years; used wherever it has a value)" dataType="String" isOptional="True"/>
 		<column name="AgeRasterYear" displayName="Year the Raster's Ages Are For (blank = the start year)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="1800" formula2="2100"/>
 	</dataSheet>
 
 	<dataSheet name="StandAgeUnknown" displayName="Stand Age: Unknown Ages">
-		<!-- the start-year age of forest of a type that burned between the start year and the age map's year; no row = the default rule -->
+		<!-- the start-year age of forest of a type that burned or was clearcut between the start year and the age map's year; no row = the default rule -->
 		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
 		<column name="StateClassId" displayName="Forest Type" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
 		<column name="Age" displayName="Stand Age in the Start Year (yr)" dataType="Integer" validationType="WholeNumber" validationCondition="Between" formula1="1" formula2="1000"/>
@@ -953,6 +953,21 @@
 
 	<dataSheet name="OutputStandAge" displayName="Stand Age Summary">
 		<!-- stage 5: per forest type and rule, the cells whose start-year age it set, their mean age and the mean age the age map gave them -->
+		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="Rule" displayName="Age From" dataType="String"/>
+		<column name="Cells" dataType="Integer"/>
+		<column name="MeanAge" displayName="Mean Age (yr)" dataType="Double" format="0.0"/>
+		<column name="SourceAge" displayName="Mean Age the Age Map Gave (yr)" dataType="Double" format="0.0"/>
+	</dataSheet>
+
+	<dataSheet name="OutputStandAgeMap" displayName="Stand Age Maps" isSingleRow="True">
+		<!-- stage 5: the rule that set each forest cell's age, and the age of the 30 m pixel at each cell's centre; stage 6 reads them -->
+		<column name="RuleFileName" displayName="Age From (1 raster, 2 forest type value, 3 earlier age map, 4 undisturbed forest of its type, 5 the age map)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
+		<column name="PixelAgeFileName" displayName="Age of the Pixel at the Cell's Centre, Start Year (age map)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
+	</dataSheet>
+
+	<dataSheet name="OutputStandAgeCut" displayName="Stand Age Summary: Cut Stands">
+		<!-- stage 6: as Stand Age Summary, for the forest cells clearcut between the start year and the age map's year -->
 		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
 		<column name="Rule" displayName="Age From" dataType="String"/>
 		<column name="Cells" dataType="Integer"/>
@@ -1565,6 +1580,7 @@
 		<dataSheet name="StandAgeOptions" type="Input"/>
 		<dataSheet name="StandAgeUnknown" type="Input"/>
 		<dataSheet name="OutputStandAge" type="Output"/>
+		<dataSheet name="OutputStandAgeMap" type="Output"/>
 		<dataSheet name="LandCoverCrosswalk" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Both"/>
 		<dataSheet name="OutputNlcdAnnual" type="Output"/>
@@ -1579,6 +1595,10 @@
 
 	<transformer name="HistoricalTransitions" displayName="6 - Historical Transitions" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/6-historical-transitions.R">
 		<dataSheet name="BuildOptions" type="Input"/>
+		<dataSheet name="StandAgeOptions" type="Input"/>
+		<dataSheet name="StandAgeUnknown" type="Input"/>
+		<dataSheet name="OutputStandAgeMap" type="Input"/>
+		<dataSheet name="OutputStandAgeCut" type="Output"/>
 		<dataSheet name="OutputNlcdAnnual" type="Input"/>
 		<dataSheet name="MinimumHarvestAge" type="Input"/>
 		<dataSheet name="HarvestAgeOptions" type="Input"/>
@@ -1883,6 +1903,8 @@
 				<item name="OutputStrataSummary"/>
 				<item name="OutputStateClassSummary"/>
 				<item name="OutputStandAge"/>
+				<item name="OutputStandAgeCut"/>
+				<item name="OutputStandAgeMap"/>
 				<item name="OutputLandCoverLayers"/>
 				<item name="OutputSiteClassMap"/>
 				<item name="OutputNlcdAnnual"/>

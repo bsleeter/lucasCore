@@ -26,6 +26,8 @@
 #     where the NLCD clearcut rule was half fire, drought and pixel noise and LANDFIRE Thinning (fuels treatments, mostly invisible to
 #     Landsat) overlapped LCMS on 9% of its area (dev/harvest). If LANDFIRE is used, its type names cover codes the build's ranges
 #     (441-443, 741-743, 941) missed (940, 942-948, the 4-digit codes from 2024)
+#   * a stand clearcut between the start year and the age map's year takes its start age from the Stand Age rules (src/stand-age.R),
+#     as a burned one does in stage 5: the age map only shows what grew back
 #   * harvested cells get at least their pathway's minimum age at their first cut, clearcut or selection (to-do 34: the minimum ages are
 #     FIA's 10th percentile of age at the cut, defaults/transitions/harvest-age.csv and the Minimum Harvest Age page; the build
 #     required the minimum age in the start year)
@@ -351,6 +353,38 @@ for (i in seq_len(nrow(here))) with(here[i], say("  %s %s%s: %g yr (FIA %s, stud
 check(STAGE, "selection minimum ages are not above clearcut's", { cs <- here[TransitionTypeId == SEL & Basis != "Minimum Harvest Age page"]
   all(is.na(cs$AgeMin) | cs$AgeMin <= pmax(H_FLOOR, ccap(cs$Ecodivision, cs$StateClassId) - H_OFFSET) + 1e-9, na.rm = TRUE) })
 
+# ---- stand age of stands clearcut between the start year and the age map's year (src/stand-age.R; user 2026-11-18) ----------------
+# The age map shows such a stand as what grew back (CMS 1990 moved back to 1985 puts a 1988 clearcut at about 0), as it does a stand
+# that burned, which stage 5 handles from the fire perimeters. A forest cell counts as cut once its chance of a clearcut reaches one
+# half (as below), in a year up to the age map's. Where stage 5 left it at the age map's value it takes, in order: the user's age for
+# its forest type (Stand Age: Unknown Ages), NASA CMS 1990 where the cut came after 1990 (a TreeMap Build), else the percentile of the
+# ages of forest of its type in its ecodivision that neither burned nor was cut (stage 5's one pixel a cell). The harvest minimum age
+# below then still applies, so a cut stand is at least its pathway's minimum age at its cut.
+source(pkg_file("src", "stand-age.R")); age_cut <- NULL
+ao6 <- tryCatch(age_options(tryCatch(read_ds("StandAgeOptions"), error = function(e) data.table())), error = function(e) fail("%s", conditionMessage(e)))
+asv6 <- opt$StandAgeSource[1]; tm6 <- !is.null(asv6) && !is.na(asv6) && (identical(suppressWarnings(as.integer(asv6)), 2L) || startsWith(as.character(asv6), "TreeMap")); amy6 <- if (tm6) 2016L else 1990L
+cl6 <- if (nrow(hl)) hl[kind == "clearcut" & Timestep <= amy6][order(Timestep)] else hl
+if (ao6$unknown == "default" && nrow(cl6)) {
+  prc <- rep(0, length(vS)); cut_yr <- rep(NA_integer_, length(vS))
+  for (i in seq_len(nrow(cl6))) { v <- values(rast(cl6$File[i]), mat = FALSE); on <- !is.na(v) & v > 0; prc[on] <- 1 - (1 - prc[on]) * (1 - v[on])
+    k <- is.na(cut_yr) & prc >= 0.5; cut_yr[k] <- as.integer(cl6$Timestep[i]) }
+  sam <- tryCatch(read_ds("OutputStandAgeMap"), error = function(e) data.table()); rf <- function(k) if (nrow(sam) && k %in% names(sam)) dependency_file(sam[[k]][1], ds("OutputStandAgeMap")) else NA_character_
+  rule5 <- if (!is.na(rf("RuleFileName"))) values(rast(rf("RuleFileName")), mat = FALSE) else rep(5L, length(vS))   # (no map: a stage 5 result made before lucasCore 1.5.2)
+  px5 <- if (!is.na(rf("PixelAgeFileName"))) values(rast(rf("PixelAgeFileName")), mat = FALSE) else vA
+  fc6 <- land & is_forest_class(cn) & !is.na(vA) & vA >= 1; todo <- fc6 & !is.na(cut_yr) & rule5 %in% 5L
+  if (any(todo)) {
+    early <- rep(NA_real_, length(vS)); early_yr <- NA_integer_
+    if (tm6 && any(todo & cut_yr > 1990)) { cmsf <- read_data_sources("StandAgeFile", optional = TRUE)$StandAgeFile
+      if (!is.na(cmsf)) { cr <- rast(cmsf); early <- values(project(crop(cr, project(as.polygons(ext(P) + 3000, crs = crs(P)), crs(cr))), P, method = "near"), mat = FALSE) - (1990 - y0)
+        early[!is.na(early) & early < 1] <- NA; early_yr <- 1990L } }
+    utab6 <- tryCatch(age_type_table(tryCatch(read_ds("StandAgeUnknown"), error = function(e) data.table())), error = function(e) fail("%s", conditionMessage(e)))
+    pct6 <- age_percentiles(en, cn, px5, fc6 & is.na(cut_yr) & rule5 %in% 5L, ao6$percentile)
+    a6 <- age_assign(todo, en, cn, vA, cut_yr, NA, early, early_yr, utab6, pct6, "default")
+    age_cut <- age_summary(cn[todo], a6$rule[todo], a6$age[todo], vA[todo]); was <- vA[todo]; vA[todo] <- a6$age[todo]
+    say("Stand age of stands clearcut in %d-%d (before the age map's year): %d forest cells, mean age %.0f (the age map gave %.0f)", y0 + 1, amy6, sum(todo), mean(vA[todo]), mean(was))
+    for (r in unique(a6$rule[todo])) say("  %s: %d cells, mean age %.0f", AGE_RULES[[r]], sum(a6$rule[todo] == r), mean(a6$age[todo][a6$rule[todo] == r]))
+  } else say("Stand age: no forest cell was clearcut in %d-%d with its age still the age map's", y0 + 1, amy6)
+}
 # ---- harvest minimum age: a harvested cell is at least its pathway's minimum age at its first cut -------------------------------
 # Clearcut and selection (LCMS standrep / partial). The start age is raised so the first cut before any clearcut meets the minimum
 # (a clearcut resets the age; a later cut on the regrowing stand cannot be helped by the start age and counts as blocked if young).
@@ -512,6 +546,7 @@ write_stsim(loc, "DeterministicTransition")
 write_stsim(sm, "TransitionSpatialMultiplier")
 if (nrow(tt0)) write_stsim(tt0, "TransitionTarget")
 if (!is.null(age_blocked)) { row <- ic[1]; row$AgeFileName <- write_raster(A, "StandAge.tif"); saveDatasheet(scn, as.data.frame(row), "stsim_InitialConditionsSpatial") }
+if (!is.null(age_cut) && nrow(age_cut)) tryCatch(write_ds(age_cut, "OutputStandAgeCut"), error = function(e) say("Stand Age Summary: Cut Stands not written (%s): reopen the library in SyncroSim Studio so it adds the table", conditionMessage(e)))
 write_ds(summ[order(Timestep, Source, TransitionGroupId), .(Timestep, TransitionGroup = TransitionGroupId, Source, Area, Cells, IneligibleArea, AgeBlockedArea)], "OutputTransitionSummary")
 write_ds(here[, .(StratumId = Ecodivision, StateClassId, TransitionTypeId, FiaAge = FIA, StudyAreaAge = Map, StudyAreaKm2 = round(MapArea, 2), AgeMin, Basis)], "OutputHarvestAge")
 progressBar()

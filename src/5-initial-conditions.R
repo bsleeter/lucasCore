@@ -470,6 +470,11 @@ write_ds(data.frame(ForestTypeFileName = write_raster(Fz, "ForestType.tif"), Gra
 write_ds(ri, "OutputReturnInterval"); write_ds(st, "OutputSoilTarget")
 # how each forest type's stand ages were set (a library made before lucasCore 1.5.2 has no such sheet until it is opened in Studio)
 if (nrow(age_tab)) tryCatch(write_ds(age_tab, "OutputStandAge"), error = function(e) say("Stand Age Summary not written (%s): reopen the library in SyncroSim Studio so it adds the table", conditionMessage(e)))
+# the rule that set each forest cell's age (1 raster, 2 forest type value, 3 earlier age map, 4 unburned forest of its type, 5 the age
+# map) and the centre pixel's age: stage 6 gives the stands cut between the start year and the age map's year the same rules
+tryCatch(write_ds(data.frame(RuleFileName = write_raster(setValues(rast(R), match(aa$rule, names(AGE_RULES))), "StandAgeRule.tif", "INT1U"),
+                            PixelAgeFileName = write_raster(mask(A_px, m), "StandAgePixel.tif", "INT2U")), "OutputStandAgeMap"),
+         error = function(e) say("Stand Age Maps not written (%s): reopen the library in SyncroSim Studio so it adds the table", conditionMessage(e)))
 summ <- data.table(S = vS, A = vA)[!is.na(S), .(Cells = .N, MeanAge = round(mean(A), 1)), by = S][, StateClassId := scl$Name[match(S, as.integer(scl$Id))]]
 write_ds(summ[order(-Cells), .(StateClassId, Cells, MeanAge)], "OutputStateClassSummary")
 progressBar()
