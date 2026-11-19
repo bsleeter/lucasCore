@@ -2,6 +2,17 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## 1.5.4 - 2026-11-19
+
+No library update.
+
+### Fixed
+- Projection Climate page: **Rescan LOCA2 folder** stopped Studio with "Object cannot be cast from DBNull to other types" when
+  the folder held runs that the project's lists did not have yet (for example after a Data Download of more models). The rows
+  a rescan adds to the scenario, model and member lists had no id until the library was saved, and the page read the ids at
+  once. Each new row now takes the library's next id, and the page skips a row without one (`Merge` in `ui/Loca2Lists.cs`,
+  `Read` in `ui/ProjectionClimateView.cs`).
+
 ## 1.5.3 - 2026-11-19
 
 No library update. There is no 1.5.2 release.
