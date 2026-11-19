@@ -176,7 +176,11 @@ if (nrow(lfg)) { nolf <- yrs[vapply(lf, is.null, TRUE)]; if (length(nolf)) say("
 year_layers <- function(y, a) {
   library(terra); library(data.table); a$clear(); terraOptions(memfrac = a$memfrac, progress = 0)
   P <- rast(a$pf); E <- ext(a$E)
-  rd <- function(f, ref = NULL) { r <- crop(rast(f), E, snap = "near", extend = TRUE); levels(r) <- NULL
+  # a file that does not reach the model area is all no data there (an MTBS mosaic is only as large as its year's fires: the clip of
+  # a region can be a strip along its edge, Olympic 1991, 2026-11-19); crop() stops on extents that do not overlap
+  rd <- function(f, ref = NULL) { r <- rast(f)
+    r <- if (is.null(intersect(ext(r), E))) init(rast(ext = align(E, r, snap = "near"), resolution = res(r), crs = crs(r)), NA) else crop(r, E, snap = "near", extend = TRUE)
+    levels(r) <- NULL
     if (!is.null(ref)) { if (any(dim(r)[1:2] != dim(ref)[1:2])) stop("30 m grid of ", f, " does not match the NLCD grid")
       ext(r) <- ext(ref); crs(r) <- crs(ref) }
     r }
