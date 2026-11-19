@@ -98,6 +98,8 @@ fwrite(data.table(CN = c("1", "2", "3"), INVYR = 2015L, STATECD = 6L, UNITCD = 1
 fwrite(data.table(PLT_CN = c("1", "2", "3"), CONDID = 1L, COND_STATUS_CD = 1L, CONDPROP_UNADJ = 1), file.path(td, "CA_COND.csv"))
 pb <- fia_plots_box(td, c(-121, 38, -119, 40)); cb <- fia_conds(td, pb)
 expect("FIA: the plots inside the box and their conditions, read from the state tables", nrow(pb) == 2 && all(pb$State == "CA") && nrow(cb) == 2 && !nrow(fia_plots_box(tempdir(), c(-121, 38, -119, 40))))
+expect("recovery: a cell that lost its forest in either of the two years does not return, however much canopy the maps still show",
+       identical(canopy_return_on(c(0.9, 0.9, 0.9), c(0.9, 0.9, 0.9), 0.5, lost = c(FALSE, TRUE, FALSE)), c(TRUE, FALSE, TRUE)))
 expect("package.xml: stage 5 writes the Forest Area Check", "OutputForestAreaCheck" %in% tr)
 
 cat(sprintf("\n%d passed, %d failed\n", ok, bad)); if (bad) quit(status = 1)

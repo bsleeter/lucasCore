@@ -74,7 +74,10 @@ canopy_area_match <- function(share, cand, unit, target, existing, land = !is.na
 # forest_cover_options) has been at or over the cell share for two
 # years running (as NLCD's rule asks two years). The pathways still hold a cell in its disturbed class for its minimum return age.
 #   prev, cur  each cell's share of passing pixels the year before and in the year (NA = no canopy read)
-canopy_return_on <- function(prev, cur, min_share = 0.5) !is.na(prev) & !is.na(cur) & prev >= min_share & cur >= min_share
+# lost = the cell lost its forest (a high-severity fire or a clearcut on most of it) in either of the two years: both passing years
+# must come after the loss, because the canopy map of the loss year still shows the stand that stood before it (P26, 2026-11-19:
+# 1,150 of 3,900 returning cells came back the year after their fire)
+canopy_return_on <- function(prev, cur, min_share = 0.5, lost = FALSE) !is.na(prev) & !is.na(cur) & prev >= min_share & cur >= min_share & !lost
 
 # years from a disturbance to the first return map that is on after it: on = a cells x years logical matrix (columns = years),
 # lost = each cell's disturbance year (NA = none). Returns the lag in years, NA where no map is on after the disturbance.

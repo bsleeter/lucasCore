@@ -38,7 +38,6 @@ source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.
 suppressPackageStartupMessages({ library(terra); library(sf); library(parallel) })
 STAGE <- "6 Historical Transitions"
 progressBar(type = "begin", totalSteps = 9)
-
 src <- read_data_sources(c("EcodivisionFile", "NlcdFolder", "MtbsSeverityFolder", "LandfireDisturbanceFolder", "LcmsFolder"))
 opt <- read_ds("BuildOptions"); y0 <- opt$StartYear[1]; y1 <- opt$EndYear[1]; yrs <- (y0 + 1):y1
 ic <- as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", optional = TRUE, lookupsAsFactors = FALSE))
@@ -55,7 +54,6 @@ sid <- function(nm) as.integer(scl$Id[match(nm, scl$Name)])
 vS <- values(S, mat = FALSE); vA <- values(A, mat = FALSE); land <- !is.na(values(P, mat = FALSE))
 say("Grid: %d land cells of %d m; transitions %d-%d", sum(land), res_m, min(yrs), max(yrs))
 progressBar()
-
 # ---- pathways ---------------------------------------------------------------------------------------------------------
 pf <- list.files(pkg_file("defaults", "transitions", "pathways"), "[.]csv$", full.names = TRUE)
 pw <- rbindlist(lapply(pf, function(f) { x <- fread(f, colClasses = "character", na.strings = ""); setnames(x, gsub("ID", "Id", names(x)))
@@ -90,7 +88,6 @@ tr <- tr[is.na(Eco) | Eco %in% eco_here]
 tr[, StratumIdSource := NA_character_]
 loc <- read_default("transitions", "state-locations.csv")[StateClassIdSource %in% scl$Name, .(StateClassIdSource, StateClassIdDest, Location)]
 say("Pathways: %d rows in %d sets (%s); %d transition types", nrow(tr), uniqueN(pw$Set), paste(unique(pw$Set), collapse = ", "), uniqueN(pw$TransitionTypeId))
-
 # a transition group's types, and the start-year state classes any of them can leave
 TYPE_SUFFIX <- " [Type]"
 grp_types <- function(g) if (endsWith(g, TYPE_SUFFIX)) substr(g, 1, nchar(g) - nchar(TYPE_SUFFIX)) else ttg[TransitionGroupId == g, TransitionTypeId]
@@ -105,7 +102,6 @@ if (length(nopw)) say("Sources with no pathway (skipped): %s", paste(nopw, colla
 so <- so[ok_g & !TransitionGroupId %in% nopw]
 codes <- function(x) as.integer(strsplit(x, "|", fixed = TRUE)[[1]])
 progressBar()
-
 # ---- land-use change from the modal annual NLCD (stage 5) ----------------------------------------------------------------
 off_file <- write_raster(mask(init(P, 0), P), "Off.tif", "INT1U")
 # Each class pair belongs to one group, as in the pathways (user rule 2026-11-05: a map built from the class reached or left alone counted
@@ -130,7 +126,6 @@ say("Land-use change: cells whose held class differs from the %d map (changes wi
 check(STAGE, "no cell is on in two land-use groups in one year", lu_twice == 0L, sprintf("%d cell-years", lu_twice))
 say("Land-use change: %d groups from the annual NLCD's class pairs (%d cell changes); %.1f km2 of change left out as it reversed within %d years", nrow(lu), sum(lengths(lu_on)), lu_brief * cell_km2, LU_PERSIST)
 progressBar()
-
 # ---- post-disturbance return and conversion (to-do 57, user 2026-11-11: historical runs follow NLCD) ----------------------------
 # NlcdPersist: on in year y where the modal NLCD shows one of the group's classes in y - 1 and y, so a disturbed cell returns to its type
 # in the year NLCD shows it back for the second year running (the pathways allow it at any age in the window). All: on everywhere,
@@ -149,7 +144,6 @@ if (nrow(pdg)) { on_file <- NULL; pd_n <- list()
       pd_n[[g]] <- n } }
   say("Post-disturbance: %s", paste(c(sprintf("%s on NLCD %s two years running (%d yearly maps)", names(pd_n), pdg[match(names(pd_n), TransitionGroupId), Classes], unlist(pd_n)),
                                       if (!is.null(on_file)) sprintf("%s on everywhere (the window's end decides)", paste(pdg[Source == "All", TransitionGroupId], collapse = ", "))), collapse = "; ")) }
-
 # ---- 30 m disturbances: fraction of each cell's 30 m pixels, one year per worker ------------------------------------------
 fire <- so[Source == "Mtbs"]; ncc <- so[Source == "NlcdClearcut"]; lfg <- so[Source == "Landfire"]; lcg <- so[Source == "Lcms"]
 # the clearcut group (for the minimum-age rule): the NLCD clearcut source, or LCMS stand-replacing tree removal
@@ -170,7 +164,6 @@ lf <- setNames(lapply(yrs, function(y) {
   list(tif = tif[1], codes = lapply(lf_types, function(t) as.integer(a[DIST_TYPE %in% t, VALUE]))) }), yrs)
 if (nrow(fire) && any(is.na(mt[as.character(yrs)]))) say("MTBS missing for %s: no fire in those years", paste(yrs[is.na(mt[as.character(yrs)])], collapse = ", "))
 if (nrow(lfg)) { nolf <- yrs[vapply(lf, is.null, TRUE)]; if (length(nolf)) say("LANDFIRE disturbance missing for %s: no %s in those years", paste(range(nolf), collapse = "-"), paste(lfg$TransitionGroupId, collapse = ", ")) }
-
 # per-year worker: reads the 30 m layers over the aggregation blocks of the model grid (shared.R, grid_blocks), flags each pixel, and
 # writes one fraction raster per group
 year_layers <- function(y, a) {
@@ -210,7 +203,6 @@ year_layers <- function(y, a) {
     data.table(Timestep = y, TransitionGroupId = grp[j], Source = c(fire = "Mtbs", lf = "Landfire", lc = "Lcms")[[part[j]]], File = f,
                Max = global(r, "max", na.rm = TRUE)[[1]]) }))
   tmpFiles(remove = TRUE); out }
-
 dl <- data.table(Timestep = integer(), TransitionGroupId = character(), Source = character(), File = character(), Max = numeric())
 if (nrow(fire) || nrow(lfg) || nrow(lcg)) {
   b <- grid_blocks(rast(nf[[1]]), L, P)
@@ -230,7 +222,6 @@ if (nrow(fire) || nrow(lfg) || nrow(lcg)) {
   say("30 m disturbances done in %.1f min", as.numeric(Sys.time() - t0, units = "mins"))
   check(STAGE, "30 m disturbance multipliers are between 0 and 1", nrow(dl) > 0 && max(dl$Max, na.rm = TRUE) <= 1 + 1e-6, sprintf("max %.4f", max(dl$Max, na.rm = TRUE)))
 }
-
 # ---- clearcut from the modal annual NLCD: the cell's class goes from forest to shrub or grass, and most of the cell did not burn
 # that year or the year before. Mapped on the same 1 km NLCD as the state class map, so a clearcut cell was forest in some year and
 # the any-year forest rule has made it a forest class: only the pathway minimum age can stop it.
@@ -243,7 +234,6 @@ if (nrow(ncc)) {
     layers[[length(layers) + 1]] <- data.table(Timestep = y, TransitionGroupId = ncc$TransitionGroupId, Source = "NlcdClearcut", File = f) }
 }
 layers <- rbindlist(layers)
-
 # ---- forest return, the second witness: LANDFIRE 2016 shows trees where NLCD does not (src/post-disturbance.R, user 2026-11-15) -----
 # A cell most of whose LANDFIRE 2016 pixels are a tree type, and whose forest loss (the last year NLCD shows forest, or a later
 # high-severity fire on most of the cell) came at least PD_WITNESS$min_years before 2016, is on in the Forest Return map of the year
@@ -300,14 +290,19 @@ if (fo6$definition == "canopy" && fo6$recovery == "canopy" && FRG %in% pdg$Trans
                        cap = max(1L, min(20L, detectCores() - 2L)), init = function(cl, nw) parallel::clusterExport(cl, "canopy_year", envir = environment(canopy_year)),
                        args = function(nw) list(a = list(clear = clear_syncrosim_proj, pf = ic$StratumFileName[1], E = as.vector(Ec), th = fo6$recovery_threshold, pot = potf, td = TD(), tf = as.list(tf), memfrac = 0.6 / nw)))
   sh <- setNames(lapply(cs, function(f) values(rast(unlist(f)), mat = FALSE)), cy); ry <- intersect(yrs, cy[cy - 1L >= min(cy)]); n_new <- 0L; n_maps <- 0L
+  # the years a cell lost its forest: a high-severity fire or a clearcut on half or more of it. Neither of the two passing years may be one
+  lossf <- rbind(dl[TransitionGroupId %in% c(HSG, ncc$TransitionGroupId) & !is.na(File), .(Timestep, File, cut = 0.5)], layers[Source == "NlcdClearcut" & !is.na(File), .(Timestep, File, cut = 1)])
+  lost_in <- function(y) { o <- rep(FALSE, length(land0)); for (i in which(lossf$Timestep == y)) o <- o | (values(rast(lossf$File[i]), mat = FALSE) >= lossf$cut[i]) %in% TRUE; o }
+  lostp <- lost_in(min(ry) - 1L); n_held <- 0L
   onC <- matrix(FALSE, length(land0), length(ry)); onN <- onC
-  for (j in seq_along(ry)) { y <- ry[j]; on_c <- land0 & canopy_return_on(sh[[as.character(y - 1L)]], sh[[as.character(y)]], fo6$share)
+  for (j in seq_along(ry)) { y <- ry[j]; lostc <- lost_in(y); raw <- land0 & canopy_return_on(sh[[as.character(y - 1L)]], sh[[as.character(y)]], fo6$share)
+    on_c <- raw & !(lostp | lostc); n_held <- n_held + sum(raw & !on_c); lostp <- lostc
     i <- which(layers$TransitionGroupId == FRG & layers$Timestep == y); had <- if (!is.na(layers$File[i])) values(rast(layers$File[i]), mat = FALSE) %in% 1L else rep(FALSE, length(land0))
     onC[, j] <- on_c; onN[, j] <- had; add <- on_c & !had; n_new <- n_new + sum(add)
     if (any(add)) { v <- as.integer(on_c | had); v[!land0] <- NA_integer_; n_maps <- n_maps + 1L
       set(layers, i, "File", write_raster(setValues(rast(P), v), sprintf("Canopy-Post-disturbance-Forest-Return_%d.tif", y), "INT1U")) } }
-  say("Forest return by tree canopy cover: canopy at or over %g%%%s on at least %g of a cell's pixels two years running (%d years read in %.1f min); it adds %d cell-years to the Forest Return maps of %d years",
-      fo6$recovery_threshold, if (fo6$gate == "bps") " where LANDFIRE BpS is forest" else "", fo6$share, length(cy), as.numeric(Sys.time() - t0, units = "mins"), n_new, n_maps)
+  say("Forest return by tree canopy cover: canopy at or over %g%%%s on at least %g of a cell's pixels two years running, both after any high-severity fire or clearcut of the cell (%d years read in %.1f min); it adds %d cell-years to the Forest Return maps of %d years (%d cell-years held back for a loss in one of the two years)",
+      fo6$recovery_threshold, if (fo6$gate == "bps") " where LANDFIRE BpS is forest" else "", fo6$share, length(cy), as.numeric(Sys.time() - t0, units = "mins"), n_new, n_maps, n_held)
   # what it changes where it matters: cells most of which burned at high severity, by how soon each record shows them back
   hb <- rep(NA_integer_, length(land0)); hsf <- dl[TransitionGroupId == HSG & !is.na(File) & Timestep %in% yrs][order(Timestep)]
   for (i in seq_len(nrow(hsf))) { k <- which(values(rast(hsf$File[i]), mat = FALSE) >= 0.5); hb[k[is.na(hb[k])]] <- hsf$Timestep[i] }
@@ -318,7 +313,6 @@ if (fo6$definition == "canopy" && fo6$recovery == "canopy" && FRG %in% pdg$Trans
   check(STAGE, "forest return by canopy: every map year is in the run", all(ry %in% yrs), sprintf("%d years", length(ry)))
 } else if (fo6$definition == "canopy") say("Forest return: by NLCD%s (Forest Cover: Recovery is set to NLCD forest only)", if (FRG %in% pdg$TransitionGroupId) " and the LANDFIRE witness" else "")
 progressBar()
-
 # ---- minimum harvest ages, settled (user decisions 2026-10-30) -------------------------------------------------------------------
 # 1. the study area's own value: each forest type's 10th percentile of stand age at a cell's first cut (stage 5's age map, weighted by
 #    the cut share of the cell), where the type has at least Minimum Harvest Age > Minimum mapped area of such cuts (LCMS in P26 cut
@@ -399,7 +393,6 @@ for (i in seq_len(nrow(here))) with(here[i], say("  %s %s%s: %g yr (FIA %s, stud
   if (is.na(Ecodivision)) "" else paste0(" in ", Ecodivision), AgeMin, if (is.na(FIA)) "-" else format(FIA), if (is.na(Map)) "-" else sprintf("%g over %.1f km2", Map, MapArea), Basis))
 check(STAGE, "selection minimum ages are not above clearcut's", { cs <- here[TransitionTypeId == SEL & Basis != "Minimum Harvest Age page"]
   all(is.na(cs$AgeMin) | cs$AgeMin <= pmax(H_FLOOR, ccap(cs$Ecodivision, cs$StateClassId) - H_OFFSET) + 1e-9, na.rm = TRUE) })
-
 # ---- stand age of stands clearcut between the start year and the age map's year (src/stand-age.R; user 2026-11-18) ----------------
 # The age map shows such a stand as what grew back (CMS 1990 moved back to 1985 puts a 1988 clearcut at about 0), as it does a stand
 # that burned, which stage 5 handles from the fire perimeters. A forest cell counts as cut once its chance of a clearcut reaches one
@@ -461,7 +454,6 @@ if (nrow(hg)) {
       sum(cut), first[["selection"]], first[["clearcut"]], sum(raise), if (any(raise)) mean(req[raise] - vA[raise]) else 0, if (any(raise)) median(req[raise] - vA[raise]) else 0)
   for (t in unique(cn[raise])) say("  %s: %d cells raised by %.0f years on average", sub("^Forest: ", "", t), sum(raise & cn == t), mean((req - vA)[raise & cn == t]))
 }
-
 # ---- 30 m disturbances on cells that cannot take them: masked, then placed nearby (user decision 2026-11-05) ------------------------
 # The initial state class map sets which cells a transition can leave. A fraction of a cell with no pathway for the group is taken off it and
 # put on the nearest cells of the same secondary stratum unit that have a pathway, room in the year (one transition per cell per timestep) and
@@ -498,7 +490,6 @@ if (nrow(frac)) {
   check(STAGE, "30 m disturbance multipliers are still between 0 and 1", max(bad$top) <= 1 + 1e-6, sprintf("max %.4f", max(bad$top)))
 }
 progressBar()
-
 if (nrow(hg)) {
   # blocked, expected area: a cut on a cell not yet reset (chance 1 - pr) is blocked if the raised start age has not reached the minimum;
   # one on a reset cell (chance pr) if the years since its last clearcut have not
@@ -515,7 +506,6 @@ if (nrow(hg)) {
   A <- setValues(A, vA2)
 }
 progressBar()
-
 # ---- ag contraction destinations: the nearest natural state class of the start year --------------------------------------
 gates <- NULL; nv <- so[Source == "NaturalVeg"]
 if (nrow(nv)) {
@@ -530,7 +520,6 @@ if (nrow(nv)) {
   gates <- gt[, .(Timestep = y0, TransitionGroupId = paste0(TransitionTypeId, TYPE_SUFFIX), MultiplierFileName = unlist(gfile[StateClassIdDest]))]
   say("Ag contraction: %d types gated to %d natural classes (%d present in the study area)", nrow(gt), length(gfile), sum(unlist(gfile) != off_file))
 }
-
 # ---- reforestation destinations (to-do 57 step 7): each "Reforestation: <type>" only where stage 5's ReforestType map holds that type -
 # (the group's yearly maps are the NlcdPersist ones above: on where NLCD shows forest two years running; only cells in a natural
 # non-forest class have a pathway, so these are the cells stage 5 started as their start-year class and those a fire converted)
@@ -547,7 +536,6 @@ if ("Reforestation" %in% so$TransitionGroupId) {
   say("Reforestation: %d types gated to their destination forest class (%d present in the study area)", nrow(rgt), sum(unlist(rfile) != off_file))
 }
 progressBar()
-
 # ---- spatial multipliers, zero targets, checks ---------------------------------------------------------------------------
 # every group with a time-varying source has a row in every year (Off when nothing happened), Off in the start year, and Off after
 # the end year so that a projection does not inherit the last historical year
@@ -558,13 +546,11 @@ sm[is.na(File), File := off_file]
 sm <- rbind(sm[, .(Timestep, TransitionGroupId, MultiplierFileName = File)], gates)
 full <- sm[TransitionGroupId %in% dyn & Timestep %in% c(y0, yrs, y1 + 1) & !is.na(MultiplierFileName), .(N = uniqueN(Timestep)), by = TransitionGroupId][N == length(yrs) + 2]
 check(STAGE, "every time-varying group has a multiplier in every year", setequal(full$TransitionGroupId, dyn), paste(setdiff(dyn, full$TransitionGroupId), collapse = "; "))
-
 covered <- unique(unlist(lapply(dyn, grp_types)))
 zero <- setdiff(unique(pw$TransitionTypeId), covered)
 tt0 <- data.table(Timestep = y0, TransitionGroupId = paste0(zero, TYPE_SUFFIX), Amount = 0)
 check(STAGE, "every pathway type has a time-varying multiplier or a zero target", length(covered) + length(zero) >= uniqueN(pw$TransitionTypeId),
       sprintf("%d with multipliers, %d with zero targets (%s)", length(intersect(covered, pw$TransitionTypeId)), length(zero), paste(zero, collapse = "; ")))
-
 # expected area per group and year; the area on start-year classes no type of the group can leave (land use moves on, so later-year
 # figures are indicative)
 el <- setNames(lapply(dyn, elig_cells), dyn)
@@ -586,7 +572,6 @@ tot <- summ[, .(Area = sum(Area), Inel = sum(IneligibleArea), Blocked = sum(AgeB
 for (i in seq_len(nrow(tot))) with(tot[i], say("%s (%s): %.0f km2 over %d years with any; %.1f%% on classes with no pathway%s", TransitionGroupId, Source, Area, Years,
                                                100 * Inel / max(Area, 1e-9), if (Blocked > 0) sprintf("; %.1f%% below the minimum age", 100 * Blocked / Area) else ""))
 progressBar()
-
 # ---- outputs ----------------------------------------------------------------------------------------------------------
 write_stsim(tr, "Transition")
 write_stsim(loc, "DeterministicTransition")
