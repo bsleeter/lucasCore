@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package name="lucasCore" displayName="LUCAS Core (model builder)" description="Builds LUCAS land-use and carbon models in ST-Sim from national datasets (FIA growth curves; CBM carbon parameters; spatial initial conditions; historical transitions and projections)" version="1.5.2" url="https://code.usgs.gov/LUCC/lucasCore" minSyncroSimVersion="3.1.29">
+
 	<builtFor package="stsim" version="4.5.4"/>
+
 	<!-- =================================================================================================== -->
 	<!-- PROJECT DATASHEETS                                                                                  -->
 	<!-- =================================================================================================== -->
+
 	<dataSheet name="DataSource" displayName="Data Sources" dataScope="Project" isSingleRow="True" viewClassName="lucasCoreUI.DataSourcesView" viewClassAssembly="lucasCoreUI">
 		<!-- plain paths: these files are GBs and are read, never copied into the library; an empty sheet uses the defaults -->
 		<!-- Data Sources Home (to-do 12, src/datahome.R): a blank path below reads its standard place in this folder -->
@@ -28,6 +31,7 @@
 		<column name="FpaFodFile" displayName="FPA-FOD fire occurrence geopackage (ignition density, fire method 2)" dataType="String" isOptional="True"/>
 		<column name="FriFile" displayName="LANDFIRE Mean Fire Return Interval" dataType="String" isOptional="True"/>
 		<column name="BpsFile" displayName="LANDFIRE Biophysical Settings 2020 (potential vegetation; reforestation, stage 5)" dataType="String" isOptional="True"/>
+		<column name="TreeCanopyFolder" displayName="USFS Tree Canopy Cover Folder (science_tcc_conus_year.tif; Forest Cover: canopy forest, recovery and stocking)" dataType="String" isOptional="True"/>
 		<column name="PrismFolder" displayName="PRISM Folder (annual and normals)" dataType="String" isOptional="True"/>
 		<column name="Loca2Folder" displayName="LOCA2 Folder (gcm/r1i1p1f1/ssp)" dataType="String" isOptional="True"/>
 		<column name="SoilCarbonFile" displayName="Soil Organic Carbon (gNATSGO soc0_999; gSSURGO also reads)" dataType="String" isOptional="True"/>
@@ -47,27 +51,32 @@
 		<column name="CdlFolder" displayName="Cropland Data Layer Folder (year_30m_cdls.tif; Cropland Productivity, stage 8)" dataType="String" isOptional="True"/>
 		<column name="TidalMarshNppFolder" displayName="USGS tidal marsh NPP Folder (NPP_CONUSTidalEEM_gCm2.tif, NPP_CONUSTidalPEM_gCm2.tif; Tidal Marsh Productivity, stage 8)" dataType="String" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="DataSourceEdition" displayName="Data Source Editions" dataScope="Project">
 		<!-- which edition of a Data Sources Home dataset this library reads (src/datahome.R, editions; set on the Data Sources page): no row = the first edition -->
 		<column name="DataSource" displayName="Data Sources column" dataType="String"/>
 		<column name="Edition" displayName="Edition (the folder under editions/; blank = the first)" dataType="String" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="ClimateScenario" displayName="Climate Scenarios (LOCA2)" dataScope="Project" displayMember="Name">
 		<!-- the SSP folders found under Data Sources: LOCA2 Folder (ui/Loca2Lists.cs at library setup and Projection Climate > Rescan; tools/new-library.R) -->
 		<column name="Name" dataType="String"/>
 		<column name="Code" displayName="Folder" dataType="String"/>
 		<column name="Description" dataType="String" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="ClimateModel" displayName="Climate Models (LOCA2)" dataScope="Project" displayMember="Name">
 		<!-- one row per GCM found under the LOCA2 folder (ui/Loca2Lists.cs; tools/new-library.R) -->
 		<column name="Name" displayName="GCM" dataType="String"/>
 		<column name="Runs" displayName="Replicates by Scenario" dataType="String" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="ClimateReplicate" displayName="Climate Replicates (LOCA2)" dataScope="Project" displayMember="Name">
 		<!-- every ensemble member found under the LOCA2 folder (ui/Loca2Lists.cs; tools/new-library.R) -->
 		<column name="Name" displayName="Ensemble Member" dataType="String"/>
 		<column name="Runs" displayName="Models and Scenarios" dataType="String" isOptional="True"/>
 	</dataSheet>
+
 	<!-- CBM-CFS3 lists for the Carbon Assumptions sheets (to-do 21): the ecozones and species types of defaults/cbm, with the rates each one sets -->
 	<dataSheet name="CbmEcozone" displayName="CBM Ecozones" dataScope="Project" displayMember="Name">
 		<column name="Name" displayName="Ecozone" dataType="String"/>
@@ -77,6 +86,7 @@
 		<column name="Name" displayName="Species Type" dataType="String"/>
 		<column name="Description" displayName="Rates it sets" dataType="String" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="Person" displayName="People" dataScope="Project" displayMember="Name" viewClassName="lucasCoreUI.PeopleView" viewClassAssembly="lucasCoreUI">
 		<!-- to-do 14, Phase 4: people a release can name, so that each release picks them. CSDGM requires an address, phone and email in every contact -->
 		<column name="Name" displayName="Name (as cited: Sleeter, B.M.)" dataType="String"/>
@@ -89,6 +99,7 @@
 		<column name="Phone" dataType="String" isOptional="True"/>
 		<column name="Email" dataType="String" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="StratumSource" displayName="Stratum Sources" dataScope="Project" displayMember="Name" viewClassName="lucasCoreUI.StratumSourcesView" viewClassAssembly="lucasCoreUI">
 		<!-- written by tools/new-library.R from defaults/strata/presets.csv; add a custom row and run new-library.R with the rebuild-strata flag.
 		     The stsim Secondary and Tertiary Strata lists hold every unit of every row (stages cannot write project lists). -->
@@ -110,9 +121,11 @@
 		<column name="DefaultId" displayName="Default Id" dataType="Integer" isOptional="True"/>
 		<validation validationType="Unique" columns="Number"/>
 	</dataSheet>
+
 	<!-- =================================================================================================== -->
 	<!-- SCENARIO DATASHEETS                                                                                 -->
 	<!-- =================================================================================================== -->
+
 	<!-- Not shown in any layout, and declared after the other project sheets. Its class fills a new project (an Empty Library with
 	     lucasCore added, or a new project) with the ST-Sim definitions, Stratum Sources, strata unit lists and LOCA2 lists from defaults/
 	     (ui/LibrarySetup.cs), and records the outcome here. -->
@@ -122,6 +135,7 @@
 		<column name="Detail" dataType="String" isOptional="True"/>
 		<record columns="Status" values="Pending"/>
 	</dataSheet>
+
 	<dataSheet name="BuildOptions" displayName="Build Options" isSingleRow="True" viewClassName="lucasCoreUI.BuildOptionsView" viewClassAssembly="lucasCoreUI">
 		<column name="Resolution" displayName="Cell Size (m)" dataType="Integer" defaultValue="1000" validationType="WholeNumber" validationCondition="Greater" formula1="0"/>
 		<column name="SecondarySourceId" displayName="Secondary Strata (blank = States)" dataType="Integer" isOptional="True" validationType="Datasheet" formula1="lucasCore_StratumSource"/>
@@ -146,6 +160,7 @@
 		<column name="SpatialTiles" displayName="Spatial Multiprocessing Tiles (blank = none; 0 = automatic)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
 		<column name="SpatialTilesStrata" displayName="Spatial Tiles Strata (tiles are whole units of this level; every projection Target group uses it)" dataType="Integer" validationType="List" formula1="1:Primary|2:Secondary|3:Tertiary" defaultValue="2" isOptional="True"/>
 	</dataSheet>
+
 	<!-- the Study Area page (ui/StudyAreaView.cs): a custom view on a feed, as ST-Sim does for multi-row sheets (a view on the dataSheet itself requires a single-row sheet) -->
 	<dataFeed name="StudyArea" displayName="Study Area" viewClassName="lucasCoreUI.StudyAreaView" viewClassAssembly="lucasCoreUI">
 		<dataSheet name="StudyAreaOptions"/>
@@ -160,6 +175,7 @@
 		<column name="UnitId" displayName="Unit" dataType="Integer" validationType="Datasheet" formula1="stsim_SecondaryStratum" allowDbNull="False"/>
 		<validation validationType="Unique" columns="UnitId"/>
 	</dataSheet>
+
 	<!-- the three Projection pages (ui/ProjectionRunView.cs, ProjectionTransitionsView.cs, SpatialAllocationView.cs). A dependency supplies
 	     whole feeds: a scenario with its own rows in one sheet of a feed does not see the other sheets of that feed from its dependencies -->
 	<dataFeed name="ProjectionRun" displayName="Run Settings" viewClassName="lucasCoreUI.ProjectionRunView" viewClassAssembly="lucasCoreUI">
@@ -179,6 +195,7 @@
 		<dataSheet name="SuitabilityCovariate"/>
 		<dataSheet name="RuleWeight"/>
 	</dataFeed>
+
 	<dataSheet name="FireOptions" displayName="Fire" isSingleRow="True" viewClassName="lucasCoreUI.FireOptionsView" viewClassAssembly="lucasCoreUI">
 		<!-- stage 9 (user decisions 2026-10-23): how projected fire works. 1 = the drawn historical year's burned fraction per pyrome, fires
 		     sized from the interagency perimeters, the drawn year's severity mix, slope selectivity; 2 = as 1, spread and ignitions guided by
@@ -192,6 +209,7 @@
 		<column name="C2FLibrary" displayName="lucasFireC2F Library (method 3; .ssim path)" dataType="String" isOptional="True"/>
 		<column name="C2FScenarioId" displayName="lucasFireC2F Result Scenario Id (method 3; a run or merge with the per-burn effects table)" dataType="Integer" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="ProjectionOptions" displayName="Projection Options" isSingleRow="True">
 		<!-- stage 9: projection transitions resample whole historical years, from the historical end to ProjectionEndYear -->
 		<column name="ProjectionEndYear" displayName="Projection End Year (blank = 2100)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="LessEqual" formula1="2100"/>
@@ -204,6 +222,7 @@
 		<column name="HistoricalTypeShares" displayName="Weight a named group's types by their historical shares (default; off = the spatial allocation decides)" dataType="Boolean" defaultValue="-1" isOptional="True"/>
 		<column name="TargetsScenarioId" displayName="Targets From Historical Run (result scenario Id: each Target group's area is what that run realized; blank = the historical maps)" dataType="Integer" isOptional="True"/>
 	</dataSheet>
+
 	<!-- stage 10: where projected transitions go (user decisions 2026-10-22: fitted regression or the old rules, chosen per group) -->
 	<dataSheet name="ProjectionAllocation" displayName="Projection Allocation (where transitions go)">
 		<!-- one row per transition group; a group without a row is placed at random within its strata. An empty sheet uses defaults/projection/allocation.csv -->
@@ -216,6 +235,7 @@
 		<column name="SizeDistribution" displayName="Size Distribution (historical patch sizes in ST-Sim; Auto = when patches span several model cells)" dataType="Integer" validationType="List" formula1="1:Auto|2:On|3:Off" defaultValue="1" isOptional="True"/>
 		<validation validationType="Unique" columns="TransitionGroupId"/>
 	</dataSheet>
+
 	<dataSheet name="SuitabilityOptions" displayName="Suitability Options" isSingleRow="True">
 		<column name="FitResolution" displayName="Fitting Resolution (m; 30 = native NLCD, coarser is faster)" dataType="Integer" defaultValue="30" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="30"/>
 		<column name="BurnWindow" displayName="Leave Out Pixels Burned in the Last N Years (post-fire relabelling)" dataType="Integer" defaultValue="3" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
@@ -227,6 +247,7 @@
 		<column name="PatchSizes" displayName="Patch Sizes (master switch for the Size Distribution of each allocated group; off = none)" dataType="Boolean" defaultValue="-1"/>
 		<column name="FlickerYears" displayName="Agriculture Flicker Window (years; drops events that undo a change of the last N years; 0 = off)" dataType="Integer" defaultValue="5" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
 	</dataSheet>
+
 	<dataSheet name="SuitabilityRegion" displayName="Suitability Fitting Region (blank = the study area)">
 		<!-- the units whose historical record the regression is fitted on: adjacent counties, the pyrome, an ecoregion, a state - any Stratum Source.
 		     Per surface (user decision 2026-10-23): rows with a Surface fit that surface; rows without one fit every surface without rows of its own -->
@@ -234,6 +255,7 @@
 		<column name="Surface" displayName="Surface (blank = every surface without rows of its own)" dataType="String" isOptional="True"/>
 		<validation validationType="Unique" columns="UnitId|Surface"/>
 	</dataSheet>
+
 	<dataSheet name="SuitabilityCovariate" displayName="Suitability Covariates (empty = defaults/projection/covariates.csv)">
 		<column name="Covariate" dataType="Integer" validationType="List" formula1="1:Distance to developed land|2:Developed share within 1 km|3:Housing density (census decade)|4:Distance to roads|5:Slope|6:Elevation|7:Land cover|8:GAP status|9:County|10:Custom raster|11:Distance to agriculture|12:Agriculture share within 1 km|13:Crop productivity (NCCPI)|14:Forest owner type"/>
 		<column name="Surface" displayName="Surface (blank = every surface)" dataType="String" isOptional="True"/>
@@ -241,6 +263,7 @@
 		<column name="Name" displayName="Name (custom raster)" dataType="String" isOptional="True"/>
 		<column name="File" displayName="Raster File (custom; resampled to the fitting grid)" dataType="String" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="RuleWeight" displayName="Allocation Rule Weights (Rules method)">
 		<!-- the old LUCAS rules: a weight per WUI class and per GAP status; the surface is their product. An empty sheet uses defaults/projection/rule-weights.csv -->
 		<column name="Surface" dataType="String"/>
@@ -248,18 +271,21 @@
 		<column name="Class" dataType="String"/>
 		<column name="Weight" dataType="Double" validationType="Decimal" validationCondition="GreaterEqual" formula1="0"/>
 	</dataSheet>
+
 	<dataSheet name="OutputSuitability" displayName="Suitability Summary">
 		<column name="Surface" dataType="String"/>
 		<column name="Item" dataType="String"/>
 		<column name="Value" dataType="Double" format="0.000"/>
 		<column name="Note" dataType="String" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="OutputSuitabilityCurve" displayName="Suitability Response Curves">
 		<column name="Surface" dataType="String"/>
 		<column name="Covariate" dataType="String"/>
 		<column name="X" dataType="Double" format="0.000"/>
 		<column name="Effect" displayName="Effect on Log-Odds (0 = the covariate's best value)" dataType="Double" format="0.000"/>
 	</dataSheet>
+
 	<dataSheet name="OutputPatchSize" displayName="Historical Patch Sizes (per Target group, model cells)">
 		<!-- stage 10: the patches of each year's events (8-connected pixels of the fitting grid) by size class, whether or not a size distribution is written -->
 		<column name="TransitionGroup" dataType="String"/>
@@ -269,15 +295,18 @@
 		<column name="Share" displayName="Share of Patches" dataType="Double" format="0.000"/>
 		<column name="Written" displayName="Written as a Size Distribution" dataType="Boolean"/>
 	</dataSheet>
+
 	<dataSheet name="OutputSuitabilityMap" displayName="Suitability Maps">
 		<column name="Surface" dataType="String"/>
 		<column name="FileName" displayName="Multiplier (model grid, 0-1)" dataType="String" isExternalFile="True" isRaster="True"/>
 	</dataSheet>
+
 	<dataSheet name="ProjectionStart" displayName="Projection Start (from a historical run)" isSingleRow="True">
 		<!-- mode 2: stage 9 also writes the initial conditions and stocks of a stand-alone projection from a historical run's final maps -->
 		<column name="HistoricalScenarioId" displayName="Historical Run (result scenario Id in this library; blank = a continuous run)" dataType="Integer" isOptional="True"/>
 		<column name="StartYear" displayName="Start Year (blank = the historical end)" dataType="Integer" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="ProjectionTransition" displayName="Projection Transitions">
 		<!-- one row per transition group; an empty sheet uses defaults/projection/transitions.csv -->
 		<column name="TransitionGroupId" displayName="Transition Group" dataType="Integer" validationType="Datasheet" formula1="stsim_TransitionGroup"/>
@@ -288,6 +317,7 @@
 		<column name="ExcludeGap" displayName="Excluded GAP Status (e.g. 1|2|3)" dataType="String" isOptional="True"/>
 		<validation validationType="Unique" columns="TransitionGroupId"/>
 	</dataSheet>
+
 	<!-- stage 9 (user decisions 2026-11-14, dev/land-use-demand): how much urbanization a projection has. Historical = the area of the
 	     drawn historical year, as it is; RPA = that area times the 2020 RPA Assessment's urbanization relative to its own 2012-2020 step
 	     (defaults/projection/rpa-urban-ratios.csv: the mean of RPA's five climate models, pooled by metropolitan area or by state,
@@ -309,6 +339,7 @@
 		<column name="HarvestMethod" displayName="Forest Harvest Demand, clearcut and selection (blank = historical years as drawn)" dataType="Integer" validationType="List" formula1="1:Historical years as drawn|2:Historical high years (each unit's highest third)|3:Historical low years (each unit's lowest third)|4:Custom ratio table|5:RPA 2020 Assessment (forest products) ratio" isOptional="True"/>
 		<column name="HarvestScenario" displayName="RPA Scenario for Harvest (RPA; blank = RCP8.5-SSP2)" dataType="Integer" validationType="List" formula1="1:RCP4.5-SSP1 (lower emissions, medium growth)|2:RCP8.5-SSP2 (high emissions, medium growth)|3:RCP8.5-SSP3 (high emissions, low growth)|4:RCP8.5-SSP5 (high emissions, high growth)" isOptional="True"/>
 	</dataSheet>
+
 	<!-- Urbanization, Ag Expansion, Ag Contraction or Forest Harvest Demand = Custom ratio table: a multiplier on the drawn area by year, for any Stratum Source unit (a state, a county, a
 	     metropolitan area ...) or everywhere (blank unit). Linear between a unit's years, from 1 in the historical end year when its first
 	     year is later, the last value kept; where units overlap the smaller one decides -->
@@ -318,6 +349,7 @@
 		<column name="Year" dataType="Integer" validationType="WholeNumber" validationCondition="Greater" formula1="0"/>
 		<column name="Ratio" displayName="Multiplier on the Drawn Area (1 = the historical rate)" dataType="Double" validationType="Decimal" validationCondition="GreaterEqual" formula1="0"/>
 	</dataSheet>
+
 	<!-- to-do 58(user 2026-11-13: "Start with replanting, salvage and site prep on a dedicated page"): management after a disturbance
 	     in a projection. Stage 9 turns each row into ST-Sim targets on the disturbed forest classes (an area a year), and stage 10
 	     sets the replanting priority. An empty sheet: no management (the baseline). Area above the historical rate: the fitted
@@ -341,6 +373,7 @@
 		<column name="Revenue" displayName="Salvage Timber Revenue per Area (USD per amount unit, the year of the fire; falls 25% a year; blank = the regional default)" dataType="Double" isOptional="True"/>
 		<column name="CostRange" displayName="Cost Range" dataType="Integer" validationType="List" formula1="1:Default ranges (sampled per iteration)|2:Fixed values" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="OutputManagementAction" displayName="Post-Disturbance Recovery (as set up)">
 		<!-- stage 9: each Management Actions row as the transition types and areas it drives -->
 		<column name="Row" dataType="Integer"/>
@@ -354,6 +387,7 @@
 		<column name="CostPerArea" displayName="Cost per Area (USD per amount unit, central)" dataType="Double"/>
 		<column name="RevenuePerArea" displayName="Revenue per Area (USD per amount unit, central, at the window start)" dataType="Double"/>
 	</dataSheet>
+
 	<!-- forest management (user 2026-11-13: "changes/improved forest management ... change the target areas for clearcut and selection
 	     ..., increase the minimum harvest age"; "Protecting old forest should just use the MaxAge field"): changes to the harvest a
 	     projection draws from the historical record, by years and place (src/forest-management.R, stage 9). An empty sheet: the drawn harvest -->
@@ -374,6 +408,7 @@
 		<validation validationType="LessEqual" columns="ClearcutMinAge|ClearcutMaxAge"/>
 		<validation validationType="LessEqual" columns="SelectionMinAge|SelectionMaxAge"/>
 	</dataSheet>
+
 	<dataSheet name="OutputForestManagement" displayName="Forest Management (as set up)">
 		<!-- stage 9: each Forest Management row as the harvest it changes (area a year, the mean of the iterations and years) -->
 		<column name="Row" dataType="Integer"/>
@@ -389,6 +424,7 @@
 		<column name="SelectionAges" displayName="Selection Ages" dataType="String"/>
 		<column name="Note" dataType="String"/>
 	</dataSheet>
+
 	<!-- fuel treatments (user 2026-11-13: "Next is Fuel Treatments"; "Lets go with the severity shift"): an area a year of a treatment on
 	     upland forest in its years and place; for a wildfire in a treated cell, less high- and medium-severity fire and more low for
 	     some years after (src/fuel-treatments.R, stage 9). An empty sheet: no treatments -->
@@ -409,6 +445,7 @@
 		<column name="CostRange" displayName="Cost Range" dataType="Integer" validationType="List" formula1="1:Default ranges (sampled per iteration)|2:Fixed values" isOptional="True"/>
 		<validation validationType="LessEqual" columns="MinAge|MaxAge"/>
 	</dataSheet>
+
 	<dataSheet name="OutputFuelTreatment" displayName="Fuel Treatments (as set up)">
 		<!-- stage 9: each Fuel Treatments row as set up -->
 		<column name="Row" dataType="Integer"/>
@@ -423,6 +460,7 @@
 		<column name="CostPerArea" displayName="Cost per Area (USD per amount unit, central)" dataType="Double" isOptional="True"/>
 		<column name="Note" dataType="String" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="ClimateOptions" displayName="Climate Options" isSingleRow="True" viewClassName="lucasCoreUI.ClimateOptionsView" viewClassAssembly="lucasCoreUI">
 		<column name="ForestGrowthModel" displayName="Forest Growth (None = normal climate every year)" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP|3:Tree ring" defaultValue="3"/>
 		<column name="NonForestGrowthModel" displayName="Non-Forest Growth" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP|3:RAP fit" defaultValue="3"/>
@@ -433,6 +471,7 @@
 		<column name="ClimateModelId" displayName="Projection Climate Model (legacy)" dataType="Integer" isOptional="True" isVisible="False" validationType="Datasheet" formula1="lucasCore_ClimateModel"/>
 		<column name="ClimateReplicateId" displayName="Projection Replicate (legacy)" dataType="Integer" isOptional="True" isVisible="False" validationType="Datasheet" formula1="lucasCore_ClimateReplicate"/>
 	</dataSheet>
+
 	<!-- stage 11: the LOCA2 run whose climate drives projections. A Projection Climate scenario depends on a Build result (strata, the
 	     historical end year and the Climate Options effects) and writes the flow multipliers of the projection years; projections
 	     depend on it after the Projection Setup, so one Build and one Projection Setup serve any number of climate futures -->
@@ -446,6 +485,7 @@
 		<column name="Co2Ceiling" displayName="CO2 Ceiling (ppm; blank = none)" dataType="Double" isOptional="True"/>
 		<column name="Co2Reference" displayName="Reference CO2 (ppm; blank = the SSP's CO2 in the historical end year)" dataType="Double" isOptional="True"/>
 	</dataSheet>
+
 	<!-- CO2 Betas: the betas of the chosen series (not None), loaded by the Climate page from defaults/climate/co2-default-betas.csv for the
 	     study area's strata and editable; a class with no row takes the series' default. Blank stratum = every stratum, blank age band = every
 	     band; a stratum row wins over a blank-stratum row, a band row over a blank-band row -->
@@ -456,11 +496,13 @@
 		<column name="Beta" displayName="Beta (per ln CO2)" dataType="Double" format="0.000"/>
 		<validation validationType="Unique" columns="StateClassId|StratumId|AgeBand"/>
 	</dataSheet>
+
 	<!-- the Climate page of a Projection Climate scenario (ui/ProjectionClimateView.cs): the LOCA2 run and CO2 fertilization -->
 	<dataFeed name="ProjectionClimatePage" displayName="Climate" viewClassName="lucasCoreUI.ProjectionClimateView" viewClassAssembly="lucasCoreUI">
 		<dataSheet name="ProjectionClimate"/>
 		<dataSheet name="Co2Adjustment"/>
 	</dataFeed>
+
 	<!-- Carbon Assumptions (to-do 21; docs/carbon-assumptions.md): kept in their own scenario that Builds depend on. CBM Crosswalk: the CBM-CFS3
 	     ecozone and species type each forest type takes its live turnover and snag rates from, optionally per ecodivision (a row for an
 	     ecodivision overrides the forest type's blank-ecodivision row), and an optional mean annual temperature for the dead-pool decay
@@ -472,6 +514,7 @@
 		<column name="CbmSpeciesTypeId" displayName="CBM Species Type" dataType="Integer" validationType="Datasheet" formula1="lucasCore_CbmSpeciesType"/>
 		<column name="MeanTemperature" displayName="Mean Annual Temperature (C; blank = PRISM)" dataType="Double" format="0.0" isOptional="True"/>
 	</dataSheet>
+
 	<!-- Carbon Assumptions: Dead Organic Matter Parameters - per dead pool, optionally per ecodivision (a row for an ecodivision overrides the
 	     pool's blank-ecodivision row): CBM-CFS3's base decay rate at the reference temperature, the Q10 of its temperature response, and the
 	     share of decay emitted (the rest goes to the next pool: AG Slow from the aboveground and snag pools, BG Slow from the belowground);
@@ -507,6 +550,7 @@
 		<dataSheet name="NonForestGrowth"/>
 		<dataSheet name="NonForestRate"/>
 	</dataFeed>
+
 	<!-- Carbon Assumptions - Wetland Methane (src/wetland-params.R; to-do: the wetland methane branch, 2026-11-17): what a scenario may set about
 	     wetland methane. Blank or empty = the package values (defaults/stockflow/emergent-wetland-regions.csv, marsh-salinity-ch4.csv,
 	     defaults/spinup/wetland-ch4.csv; WETLAND_OPTION_DEFAULTS). Region names are those of emergent-wetland-regions.csv. -->
@@ -536,6 +580,7 @@
 		<dataSheet name="WetlandMethaneTarget"/>
 		<dataSheet name="MarshSalinityTarget"/>
 	</dataFeed>
+
 	<dataSheet name="LiveTurnover" displayName="Live Turnover" viewClassName="lucasCoreUI.LiveTurnoverView" viewClassAssembly="lucasCoreUI">
 		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
 		<column name="StateClassId" displayName="Forest Type" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
@@ -550,6 +595,7 @@
 		<column name="StemSnagFall" displayName="Stem Snag Fall (/yr, to AG Medium)" dataType="Double" format="0.0000" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
 		<column name="BranchSnagFall" displayName="Branch Snag Fall (/yr, to AG Fast)" dataType="Double" format="0.0000" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
 	</dataSheet>
+
 	<!-- Carbon Assumptions: Spin-up - per forest type, optionally per ecodivision (each blank value takes the forest type's all-ecodivisions
 	     row, then the default). Return interval of the spin-up cycles: blank = stage 5's LANDFIRE fire return interval of the cell (stage 3
 	     calibrates with it, stage 4 spins up with it). Historical clearcut share: the share of past cycles that ended in a clearcut rather
@@ -572,6 +618,7 @@
 		<column name="ToStockTypeId" displayName="To Pool (Atmosphere = burned)" dataType="Integer" validationType="Datasheet" formula1="stsim_StockType"/>
 		<column name="Share" displayName="Share of the From Pool" dataType="Double" format="0.0000" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
 	</dataSheet>
+
 	<!-- Carbon Assumptions: Fire Snag Share - per forest type (optionally per ecodivision): the share of live aboveground wood (stands 11
 	     years and older) high-severity fire leaves standing as snags, split between stems and branches as the blank fire rows split them;
 	     the rest of that wood burns. Applied on top of the Disturbance Flows rows of the cell; a Disturbance Flows row for an ecodivision
@@ -581,6 +628,7 @@
 		<column name="StateClassId" displayName="Forest Type" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
 		<column name="Share" displayName="Share of Live Aboveground Wood Left as Snags" dataType="Double" format="0.00" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
 	</dataSheet>
+
 	<!-- Carbon Assumptions: Decay Calibration Settings (to-do 18) - the numbers stage 3's decay calibration uses; blank = the default shown.
 	     Measured dead wood (Carbon Options 4): target plots are mature (stand age >= Mature Age) with no fire or cutting recorded in the past
 	     Exclusion Years; an ecodivision is fitted on its own with at least Min Plots mature conditions of a forest type, else the type is
@@ -598,6 +646,7 @@
 		<column name="SoilMultiplierMin" displayName="Soil Multiplier Min (blank = 0.02)" dataType="Double" format="0.000" isOptional="True" validationType="Decimal" validationCondition="Greater" formula1="0"/>
 		<column name="SoilMultiplierMax" displayName="Soil Multiplier Max (blank = 50)" dataType="Double" format="0.00" isOptional="True" validationType="Decimal" validationCondition="Greater" formula1="0"/>
 	</dataSheet>
+
 	<!-- Carbon Assumptions: Fixed Decay Multipliers (to-do 20) - a decay multiplier set by the user instead of calibrated, per pool, for a
 	     forest type and/or an ecodivision (ecodivision + forest type, then ecodivision, then forest type, then blank). The pools fitted after
 	     a fixed one (snags -> down logs, fine woody debris -> litter -> duff, then soil) are fitted with it. Forest floor stands for fine woody
@@ -609,6 +658,7 @@
 		<column name="Pool" displayName="Pool" dataType="Integer" validationType="List" formula1="1:Snags|2:Down logs|3:Fine woody debris|4:Litter|5:Duff|6:Forest floor|7:Soil"/>
 		<column name="Multiplier" displayName="Decay Multiplier (x CBM rate)" dataType="Double" format="0.000" validationType="Decimal" validationCondition="Greater" formula1="0"/>
 	</dataSheet>
+
 	<!-- Carbon Assumptions: Mature Age by Forest Type (to-do 28) - the stand age from which an FIA plot of a forest type counts as mature
 	     in the measured dead wood calibration, and optionally its own disturbance-free window, for a forest type and optionally one
 	     ecodivision (an ecodivision row overrides the type's blank-ecodivision row). Forest types reach a steady dead-wood level at
@@ -619,6 +669,7 @@
 		<column name="MatureAge" displayName="Mature Age (yr)" dataType="Integer" validationType="WholeNumber" validationCondition="Between" formula1="1" formula2="250"/>
 		<column name="ExclusionYears" displayName="No Fire or Cutting Within (yr, blank = Decay Calibration Settings)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
 	</dataSheet>
+
 	<!-- Minimum Harvest Age (to-do 34): rows that replace or add to the package's minimum harvest ages (defaults/transitions/harvest-age.csv,
 	     tools/calibrate-harvest-age.R: FIA's 10th percentile of stand age at the cut). Stage 6 writes them into the harvest pathways and
 	     raises the start age of cells cut in the historical period before they reached it. Empty = the package values. -->
@@ -653,6 +704,7 @@
 		<column name="RiparianAs" displayName="LANDFIRE BpS Riparian and Savanna Read As" dataType="Integer" validationType="List" formula1="1:Forest potential|2:Non-forest potential" isOptional="True" defaultValue="1"/>
 		<column name="RecentYears" displayName="Projection Draws From the Last N Historical Years (blank = 10)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="1"/>
 	</dataSheet>
+
 	<!-- Carbon Assumptions: Growth Inputs (to-do 29) - per forest type, the inputs of the growth curves (stage 2) and live carbon flows
 	     (stage 3) that were package files: the FIA forest type groups whose plots it is fitted to (codes, ';' between) and its growth class
 	     (east/west x softwood/hardwood: the lag class of the curves, and softwood or hardwood CBM turnover and snag rates), the carbon
@@ -667,6 +719,7 @@
 		<column name="DeciduousShare" displayName="Deciduous Share (foliage fall)" dataType="Double" format="0.000" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
 		<column name="FineRootShare" displayName="Fine Root Share of Roots (blank = Li et al. 2003)" dataType="Double" format="0.000" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
 	</dataSheet>
+
 	<dataSheet name="Spinup" displayName="Spin-up" viewClassName="lucasCoreUI.SpinupView" viewClassAssembly="lucasCoreUI">
 		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
 		<column name="StateClassId" displayName="Forest Type" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
@@ -674,6 +727,7 @@
 		<column name="HistoricalClearcutShare" displayName="Historical Cycles: Share Ended by Clearcut (blank = 0, all fire)" dataType="Double" format="0.00" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
 		<column name="LastDisturbanceUnburned" displayName="Last Disturbance Where No Fire Perimeter (blank = clearcut)" dataType="Integer" validationType="List" formula1="1:Clearcut|2:High-severity fire" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="DomParameter" displayName="Dead Organic Matter Parameters">
 		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
 		<column name="Pool" displayName="Dead Pool" dataType="Integer" validationType="List" formula1="1:AG Very Fast|2:BG Very Fast|3:AG Fast|4:BG Fast|5:AG Medium|6:AG Slow|7:BG Slow|8:Snag Stem|9:Snag Branch"/>
@@ -683,6 +737,7 @@
 		<column name="ShareEmitted" displayName="Share Emitted (rest to the next pool)" dataType="Double" format="0.000" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
 		<column name="TransferToBGSlow" displayName="Transfer to BG Slow (/yr; AG Slow only)" dataType="Double" format="0.0000" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="CarbonOptions" displayName="Carbon Method" isSingleRow="True" viewClassName="lucasCoreUI.CarbonOptionsView" viewClassAssembly="lucasCoreUI">
 		<!-- 2026-10-28 (user): two dead organic matter methods on the page; the FIA condition-pool options 1 and 2 stay in this list (older libraries hold them, and a value missing from the list cannot even be read) but are not offered (stage 3 still
 		     reads them in older libraries). Soil organic carbon is its own choice (blank = gNATSGO soil carbon with measured dead wood, CBM with CBM
@@ -690,6 +745,7 @@
 		<column name="DeadOrganicMatterModel" displayName="Dead Organic Matter" dataType="Integer" validationType="List" formula1="4:FIA measured dead wood (down woody material and snags in mature stands)|3:CBM defaults (no calibration)|1:FIA condition pools (older option)|2:FIA condition pools, CBM-default soil (older option)" defaultValue="4"/>
 		<column name="SoilCarbonModel" displayName="Soil Organic Carbon" dataType="Integer" validationType="List" formula1="1:gNATSGO (soil decay calibrated to its soil organic carbon)|2:CBM defaults (soil from the spin-up)" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="LandCoverCrosswalk" displayName="Land Cover Crosswalks" viewClassName="lucasCoreUI.LandCoverCrosswalkView" viewClassAssembly="lucasCoreUI">
 		<!-- stage 5: forest types (state classes 100-999) from EVT, grassland and shrubland types from RCMAP, wetland types (90-96) from C-CAP -->
 		<column name="Source" dataType="Integer" validationType="List" formula1="1:EVT 2016|2:EVT 2001 (retired)|3:RCMAP|4:C-CAP|5:USFS Forest Type Group"/>
@@ -699,6 +755,7 @@
 		<column name="Note" dataType="String" isOptional="True"/>
 		<validation validationType="Unique" columns="Source|Code"/>
 	</dataSheet>
+
 	<dataSheet name="GrowthOptions" displayName="Growth Curve Options" isSingleRow="True" viewClassName="lucasCoreUI.GrowthOptionsView" viewClassAssembly="lucasCoreUI">
 		<column name="CurveSource" displayName="Growth Curves" dataType="Integer" validationType="List" formula1="1:Fit new curves|2:Copy from another library" defaultValue="1"/>
 		<column name="CurveLibrary" displayName="Source Library (.ssim path; when copying)" dataType="String" isOptional="True"/>
@@ -715,12 +772,14 @@
 		<column name="FiaSource" displayName="FIA Data" dataType="Integer" validationType="List" formula1="1:USGS condition tables (.Rds)|2:FIA DataMart (state CSVs)" defaultValue="2" isOptional="True"/>
 		<column name="DownDeadCarbon" displayName="Down Dead Carbon (FIA DataMart)" dataType="Integer" validationType="List" formula1="1:Adjusted to field measurements (state factors, as the USGS tables)|2:As in FIADB (model, unadjusted)" defaultValue="1" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="MerchantableVolumeCurve" displayName="Merchantable Volume Curves">
 		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" allowDbNull="False"/>
 		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass" allowDbNull="False"/>
 		<column name="Age" dataType="Integer"/>
 		<column name="MerchantableVolume" displayName="Merchantable Volume (m3/ha)" dataType="Double" format="0.0"/>
 	</dataSheet>
+
 	<dataSheet name="CarbonCurve" displayName="Live-Tree Carbon Curves (CBM pools)">
 		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" allowDbNull="False"/>
 		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass" allowDbNull="False"/>
@@ -732,6 +791,7 @@
 		<column name="FineRoots" displayName="Fine Roots (Mg C/ha)" dataType="Double" format="0.00"/>
 		<column name="TotalLive" displayName="Total Live (Mg C/ha)" dataType="Double" format="0.00"/>
 	</dataSheet>
+
 	<dataSheet name="OutputSiteProductivity" displayName="Site Productivity" viewClassName="lucasCoreUI.SiteProductivityView" viewClassAssembly="lucasCoreUI">
 		<!-- stage 2 when Build Options: Site Productivity = TreeMap site class (to-do 35, src/siteproductivity.R): the growth multiplier per
 		     forest type x ecodivision x FIA site class, from the fitting plots' live carbon / the curve at their age -->
@@ -743,6 +803,7 @@
 		<column name="Multiplier" dataType="Double" format="0.000"/>
 		<column name="Basis" dataType="String"/>
 	</dataSheet>
+
 	<dataSheet name="OutputCarbonParameter" displayName="Carbon Curve Parameters">
 		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum"/>
 		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
@@ -760,6 +821,7 @@
 		<column name="MerchCarbonDensity" displayName="Merchantable Carbon Density (Mg C/m3; FIA wood + bark)" dataType="Double" format="0.000"/>
 		<column name="MerchCappedAges" displayName="Ages Where Merchantable Was Capped" dataType="Integer"/>
 	</dataSheet>
+
 	<dataSheet name="OutputGrowthParameter" displayName="Growth Curve Parameters">
 		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum"/>
 		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
@@ -773,6 +835,7 @@
 		<column name="VolumeAtMaxAge" displayName="Volume at Maximum Age (m3/ha)" dataType="Double" format="0.0"/>
 		<column name="FiaTypeGroups" displayName="FIA Type Groups" dataType="String"/>
 	</dataSheet>
+
 	<dataSheet name="OutputDecayCalibration" displayName="Decay Calibration">
 		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum"/>
 		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
@@ -797,6 +860,7 @@
 		<column name="HistoricalClearcutShare" displayName="Spin-up Cycles Ended by Clearcut (share)" dataType="Double" format="0.00" isOptional="True"/>
 		<column name="FixedMultipliers" displayName="Multipliers Fixed by the User" dataType="String" isOptional="True"/>
 	</dataSheet>
+
 	<!-- Carbon Rates (to-do 30; stage 3): every live turnover and dead organic matter flow rate a forest cell (ecodivision x forest type)
 	     runs with, exactly as written to stsim_FlowMultiplier, and where it came from. For dead pools also the base rate at the reference
 	     temperature (Dead Organic Matter Parameters), the temperature effect at the cell's mean annual temperature (Q10), and the decay
@@ -815,6 +879,7 @@
 		<column name="MeanTemperature" displayName="Mean Annual Temperature (C)" dataType="Double" format="0.0" isOptional="True"/>
 		<column name="Source" displayName="Source" dataType="String"/>
 	</dataSheet>
+
 	<dataSheet name="InitialStockCurve" displayName="Initial Stock Curves (spin-up)">
 		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" allowDbNull="False"/>
 		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass" allowDbNull="False"/>
@@ -837,10 +902,12 @@
 		<column name="TotalLive" displayName="Total Live (Mg C/ha)" dataType="Double" format="0.00"/>
 		<column name="TotalDOM" displayName="Total DOM (Mg C/ha)" dataType="Double" format="0.00"/>
 	</dataSheet>
+
 	<dataSheet name="OutputNlcdAnnual" displayName="Annual NLCD (model grid)">
 		<column name="Year" dataType="Integer"/>
 		<column name="FileName" displayName="NLCD Land Cover" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
 	</dataSheet>
+
 	<dataSheet name="OutputLandCoverLayers" displayName="Land Cover Layers" isSingleRow="True">
 		<column name="ForestTypeFileName" displayName="Forest Type (EVT)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
 		<column name="GrassShrubFileName" displayName="Grassland/Shrubland Type (RCMAP)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
@@ -851,18 +918,21 @@
 		<column name="StartRuleFileName" displayName="How Forest Only by the Any-Year Rule Starts (1 regrowth age, 2 disturbed, 3 slow recovery, 4 encroachment, 5 source age)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif" isOptional="True"/>
 		<column name="FirstForestYearFileName" displayName="Year NLCD First Shows Forest (cells forest only by the any-year rule)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="OutputReturnInterval" displayName="Spin-up Return Intervals">
 		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum"/>
 		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
 		<column name="ReturnInterval" displayName="Replacement-Fire Return Interval (yr)" dataType="Integer"/>
 		<column name="Cells" dataType="Integer"/>
 	</dataSheet>
+
 	<dataSheet name="OutputSoilTarget" displayName="Soil Carbon Targets (gNATSGO)">
 		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum"/>
 		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
 		<column name="SoilTarget" displayName="Mean Soil Organic Carbon (Mg C/ha)" dataType="Double" format="0.0"/>
 		<column name="Cells" dataType="Integer"/>
 	</dataSheet>
+
 	<!-- Forest Cover (stage 5, src/forest-cover.R; lucasCore 1.5.2): what is forest in the start year. Annual NLCD under-maps open western
 	     forest (Yellowstone 2016: 44% of the land, FIA 83%). With tree canopy cover, a natural cell NLCD calls barren, shrub or grass starts
 	     as forest when at least CellShare of its 30 m pixels have canopy cover at or over the threshold in the start year (USFS Science
@@ -875,11 +945,11 @@
 		<column name="CellRule" displayName="Cells That Become Forest (blank = a share of the cell's pixels)" dataType="Integer" validationType="List" formula1="1:A share of the cell's pixels|2:Area-matched" isOptional="True" defaultValue="1"/>
 		<column name="CellShare" displayName="Share of a Cell's 30 m Pixels That Must Pass (blank = 0.5)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0.01" formula2="1"/>
 		<column name="CanopyRecovery" displayName="When a Disturbed Stand Is Forest Again (blank = NLCD forest, or tree canopy cover at the threshold)" dataType="Integer" validationType="List" formula1="1:NLCD forest, or tree canopy cover at the threshold|2:NLCD forest only" isOptional="True" defaultValue="1"/>
-		<column name="RecoveryThreshold" displayName="Tree Canopy Cover Threshold for Recovery (percent; blank = 30)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="1" formula2="100"/>
+		<column name="RecoveryThreshold" displayName="Tree Canopy Cover Threshold for Recovery (percent; blank = 40)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="1" formula2="100"/>
 		<column name="Stocking" displayName="Carbon of a Forest Cell (blank = the same for every cell of a forest type)" dataType="Integer" validationType="List" formula1="1:The same for every cell of a forest type|2:By the cell's tree canopy cover" isOptional="True" defaultValue="1"/>
 		<column name="StockingMatureAge" displayName="Stand Age from Which Canopy Shows Stocking (yr; blank = 30)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="0" formula2="300"/>
-		<column name="TreeCanopyFolder" displayName="Tree Canopy Cover Folder (science_tcc_conus_year.tif; blank = Data Sources Home)" dataType="String" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="OutputForestCover" displayName="Forest by Tree Canopy Cover">
 		<!-- stage 5, Forest Cover = tree canopy: per forest type, the cells the canopy rule made forest and what NLCD calls them in the start year -->
 		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
@@ -906,6 +976,7 @@
 		<column name="CanopyFileName" displayName="Mean Tree Canopy Cover of the Cell (percent)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
 		<column name="MatureAge" displayName="Stand Age from Which Canopy Shows Stocking (yr)" dataType="Double"/>
 	</dataSheet>
+
 	<dataSheet name="OutputForestCoverMap" displayName="Forest by Tree Canopy Cover: Map" isSingleRow="True">
 		<!-- stage 5, Forest Cover = tree canopy: the share of each cell's 30 m pixels that pass the rule, and the settings it ran with -->
 		<column name="CanopyShareFileName" displayName="Share of the Cell's Pixels That Pass the Canopy Rule" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
@@ -914,6 +985,7 @@
 		<column name="CellShare" displayName="Share of a Cell's Pixels That Must Pass" dataType="Double"/>
 		<column name="Cells" displayName="Cells Made Forest" dataType="Integer"/>
 	</dataSheet>
+
 	<dataSheet name="OutputForestAreaCheck" displayName="Forest Area Check (FIA)">
 		<!-- stage 5: the Build's forest share of the land in the start year beside FIA's (the newest visit of each plot in the study area), to tune Forest Cover -->
 		<column name="Source" dataType="String"/>
@@ -922,6 +994,7 @@
 		<column name="Plots" displayName="FIA Plots" dataType="Integer" isOptional="True"/>
 		<column name="Note" dataType="String" isOptional="True"/>
 	</dataSheet>
+
 	<!-- Stand Age (stage 5, src/stand-age.R; lucasCore 1.5.2): how a cell takes its age from its 30 m pixels, and the age of forest the
 	     age map cannot know - cells that burned between the start year and the map's year (NASA CMS 1990, TreeMap 2016), which the map
 	     shows as what grew back. Their age is, in order: the stand age raster, the manual age for the forest type, an earlier age
@@ -933,6 +1006,7 @@
 		<column name="AgeRasterFile" displayName="Stand Age Raster (a path; years; used wherever it has a value)" dataType="String" isOptional="True"/>
 		<column name="AgeRasterYear" displayName="Year the Raster's Ages Are For (blank = the start year)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="1800" formula2="2100"/>
 	</dataSheet>
+
 	<dataSheet name="StandAgeUnknown" displayName="Stand Age: Manual Ages by Forest Type">
 		<!-- the start-year age of forest of a type that burned or was clearcut between the start year and the age map's year; no row = the default rule -->
 		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
@@ -944,6 +1018,7 @@
 		<dataSheet name="StandAgeOptions"/>
 		<dataSheet name="StandAgeUnknown"/>
 	</dataFeed>
+
 	<dataSheet name="OutputStandAge" displayName="Stand Age Summary">
 		<!-- stage 5: per forest type and rule, the cells whose start-year age it set, their mean age and the mean age the age map gave them -->
 		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
@@ -952,11 +1027,13 @@
 		<column name="MeanAge" displayName="Mean Age (yr)" dataType="Double" format="0.0"/>
 		<column name="SourceAge" displayName="Mean Age the Age Map Gave (yr)" dataType="Double" format="0.0"/>
 	</dataSheet>
+
 	<dataSheet name="OutputStandAgeMap" displayName="Stand Age Maps" isSingleRow="True">
 		<!-- stage 5: the rule that set each forest cell's age, and the age of the 30 m pixel at each cell's centre; stage 6 reads them -->
 		<column name="RuleFileName" displayName="Age From (1 raster, 2 forest type value, 3 earlier age map, 4 undisturbed forest of its type, 5 the age map)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
 		<column name="PixelAgeFileName" displayName="Age of the Pixel at the Cell's Centre, Start Year (age map)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
 	</dataSheet>
+
 	<dataSheet name="OutputStandAgeCut" displayName="Stand Age Summary: Cut Stands">
 		<!-- stage 6: as Stand Age Summary, for the forest cells clearcut between the start year and the age map's year -->
 		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
@@ -965,11 +1042,13 @@
 		<column name="MeanAge" displayName="Mean Age (yr)" dataType="Double" format="0.0"/>
 		<column name="SourceAge" displayName="Mean Age the Age Map Gave (yr)" dataType="Double" format="0.0"/>
 	</dataSheet>
+
 	<dataSheet name="OutputStateClassSummary" displayName="State Class Summary">
 		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
 		<column name="Cells" dataType="Integer"/>
 		<column name="MeanAge" displayName="Mean Age (yr)" dataType="Double" format="0.0"/>
 	</dataSheet>
+
 	<dataSheet name="OutputTransitionSummary" displayName="Historical Transition Summary">
 		<column name="Timestep" dataType="Integer"/>
 		<column name="TransitionGroup" displayName="Transition Group" dataType="String"/>
@@ -979,6 +1058,7 @@
 		<column name="IneligibleArea" displayName="Area on Start-Year Classes with no Pathway (km2)" dataType="Double" format="0.00"/>
 		<column name="AgeBlockedArea" displayName="Area below the Pathway Minimum Age (km2)" dataType="Double" format="0.00"/>
 	</dataSheet>
+
 	<dataSheet name="OutputHarvestAge" displayName="Minimum Harvest Ages">
 		<!-- stage 6 (to-do 34): the minimum harvest age of each forest type of the study area, and where it came from -->
 		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
@@ -990,6 +1070,7 @@
 		<column name="AgeMin" displayName="Minimum Age Used (yr)" dataType="Double" format="0"/>
 		<column name="Basis" dataType="String"/>
 	</dataSheet>
+
 	<dataSheet name="OutputFireSize" displayName="Historical Fire Sizes (interagency perimeters, model cells)">
 		<column name="MaximumCells" displayName="Size Class (up to N model cells)" dataType="Integer"/>
 		<column name="MaximumArea" displayName="Size Class (up to, amount units)" dataType="Double" format="0.00"/>
@@ -1003,12 +1084,14 @@
 		<column name="BurnedPerYear" displayName="Burned Fraction per Year" dataType="Double" format="0.00000"/>
 		<column name="Ratio" displayName="Selectivity (1 = average)" dataType="Double" format="0.000"/>
 	</dataSheet>
+
 	<dataSheet name="OutputProjectionSchedule" displayName="Projection Schedule (historical year drawn)">
 		<column name="Iteration" dataType="Integer"/>
 		<column name="Timestep" dataType="Integer"/>
 		<column name="SamplingSet" displayName="Sampling Set" dataType="String"/>
 		<column name="HistoricalYear" displayName="Historical Year Drawn" dataType="Integer"/>
 	</dataSheet>
+
 	<dataSheet name="OutputProjectionRate" displayName="Projection Rates (historical, by unit)">
 		<column name="TransitionGroup" displayName="Transition Group" dataType="String"/>
 		<column name="Method" dataType="String"/>
@@ -1018,6 +1101,7 @@
 		<column name="MaxArea" displayName="Max (km2)" dataType="Double" format="0.000"/>
 		<column name="AllowedShare" displayName="Share of Eligible Area Allowed (GAP)" dataType="Double" format="0.000"/>
 	</dataSheet>
+
 	<dataSheet name="OutputLandUseDemand" displayName="Land Use Multipliers Applied (by unit and year)">
 		<!-- stage 9: the multiplier on each target unit's drawn area, when Land Use Demand is not Historical -->
 		<column name="TransitionGroup" displayName="Transition Group" dataType="String"/>
@@ -1026,6 +1110,7 @@
 		<column name="Ratio" displayName="Multiplier on the Drawn Area" dataType="Double" format="0.000"/>
 		<column name="MeanArea" displayName="Mean Annual Area After the Multiplier (km2, over iterations)" dataType="Double" format="0.000"/>
 	</dataSheet>
+
 	<dataSheet name="OutputClimateSummary" displayName="Climate Multiplier Summary">
 		<column name="Timestep" dataType="Integer"/>
 		<column name="FlowGroup" displayName="Flow Group" dataType="String"/>
@@ -1035,6 +1120,7 @@
 		<column name="Min" displayName="Cell Minimum" dataType="Double" format="0.000"/>
 		<column name="Max" displayName="Cell Maximum" dataType="Double" format="0.000"/>
 	</dataSheet>
+
 	<!-- stage 11: the CO2 betas applied (one row per state class x stratum x age band) and the CO2 series -->
 	<dataSheet name="OutputCo2Beta" displayName="CO2 Fertilization Betas">
 		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
@@ -1054,6 +1140,7 @@
 		<column name="Reference" displayName="Reference CO2 (ppm)" dataType="Double" format="0.00"/>
 		<column name="LnRatio" displayName="ln(CO2 / Reference)" dataType="Double" format="0.0000"/>
 	</dataSheet>
+
 	<dataSheet name="OutputInitialStockSummary" displayName="Initial Stock Summary">
 		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
 		<column name="Cells" dataType="Integer"/>
@@ -1064,6 +1151,7 @@
 		<column name="TotalTg" displayName="Total Carbon (Tg C)" dataType="Double" format="0.00"/>
 		<column name="Source" dataType="String"/>
 	</dataSheet>
+
 	<!-- stage 8 (Build Options: Site Productivity): each grass and shrub, tidal marsh, cropland and crop harvest multiplier's spread, one
 	     row per multiplier x ecodivision x class, over the class's own cells (other land cells take filled values and are not here) -->
 	<dataSheet name="OutputNonForestProductivity" displayName="Non-Forest Productivity">
@@ -1079,6 +1167,7 @@
 		<column name="AtCap" displayName="Cells at 0.3 or 2.5 (%)" dataType="Double" format="0.0"/>
 		<column name="Source" dataType="String"/>
 	</dataSheet>
+
 	<!-- stage 8 (src/capacity.R): the carbon carrying capacity - what each cell would hold in live biomass, dead wood and litter under
 	     its potential natural vegetation (its own forest type; LANDFIRE BpS where land is off its potential) and natural fire regime
 	     (the natural-regime mean of the type's stock curve at its return interval). Run Figures and Compare Runs measure runs against it -->
@@ -1088,6 +1177,7 @@
 		     pixels BpS maps as forest potential. Developed and farmed land always takes the BpS mix -->
 		<column name="NaturalNonForest" displayName="Natural Grassland, Shrubland and Barren Land Counts As (blank = its own class)" dataType="Integer" validationType="List" formula1="1:Its own class (annual NLCD)|2:LANDFIRE BpS potential" isOptional="True" defaultValue="1"/>
 	</dataSheet>
+
 	<dataSheet name="OutputCarbonCapacityMap" displayName="Carbon Capacity Maps" isSingleRow="True">
 		<column name="CapacityFileName" displayName="Carbon Capacity: Live Biomass, Dead Wood and Litter (Mg C/ha)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
 		<column name="UpperBoundFileName" displayName="Upper Bound: the Same at the Old-Growth End (Mg C/ha)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
@@ -1095,6 +1185,7 @@
 		<column name="LiveFileName" displayName="Live Biomass Part of the Capacity (Mg C/ha)" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif" isOptional="True"/>
 		<column name="ForestShareFileName" displayName="Share of the Cell Counted at a Forest Capacity" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
 	</dataSheet>
+
 	<dataSheet name="OutputCarbonCapacityType" displayName="Carbon Capacity by Type">
 		<!-- one row per ecodivision x forest (or forested wetland) type the capacity maps use -->
 		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum"/>
@@ -1108,6 +1199,7 @@
 		<column name="Capacity" displayName="Carbon Capacity: Natural-Regime Mean (Mg C/ha)" dataType="Double" format="0.00"/>
 		<column name="UpperBound" displayName="Upper Bound: Old Growth (Mg C/ha)" dataType="Double" format="0.00"/>
 	</dataSheet>
+
 	<dataSheet name="OutputCarbonCapacity" displayName="Carbon Capacity Summary">
 		<!-- one row per ecodivision x secondary stratum x start-year land cover group -->
 		<column name="StratumId" displayName="Ecodivision" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum"/>
@@ -1121,6 +1213,7 @@
 		<column name="StartStock" displayName="Starting Stock (Tg C)" dataType="Double" format="0.0000"/>
 		<column name="RealisedShare" displayName="Starting Stock as a Share of the Capacity (%)" dataType="Double" format="0.0" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="OutputRunCapacity" displayName="Run Carbon Against Capacity">
 		<!-- stage 13: one row per year of the run - its live biomass, dead wood and litter against the Build's carbon capacity -->
 		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer"/>
@@ -1136,6 +1229,7 @@
 		<column name="DeficitLive" displayName="Deficit in the Live Biomass of Land in Its Potential Cover: Stand Age and Stocking (Tg C)" dataType="Double" isOptional="True"/>
 		<column name="DeficitDead" displayName="Deficit in the Dead Wood and Litter of Land in Its Potential Cover (Tg C)" dataType="Double" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="OutputCompareCapacity" displayName="Compare Carbon Against Capacity">
 		<!-- stage 14: one row per run compared - its live biomass, dead wood and litter against the Build's carbon capacity -->
 		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer"/>
@@ -1157,19 +1251,23 @@
 		<column name="DeficitLive" displayName="End Deficit in the Live Biomass of Land in Its Potential Cover: Stand Age and Stocking (Tg C)" dataType="Double" isOptional="True"/>
 		<column name="DeficitDead" displayName="End Deficit in the Dead Wood and Litter of Land in Its Potential Cover (Tg C)" dataType="Double" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="OutputSiteClassMap" displayName="Site Class Shares (TreeMap)">
 		<!-- stage 5 when Build Options: Site Productivity = TreeMap site class (to-do 35 step 4): per cell, the share of its TreeMap 30 m
 		     pixels whose FIA plot is in each site class; stage 8 combines them with Site Productivity's multipliers -->
 		<column name="SiteClass" displayName="Site Class (1 = 225+ ... 7 = 0-19 cu ft/ac/yr)" dataType="Integer"/>
 		<column name="FileName" displayName="Share of the Cell" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
 	</dataSheet>
+
 	<dataSheet name="OutputGrowthReport" displayName="Growth Curve Report" isSingleRow="True">
 		<column name="FileName" displayName="Report (PDF)" dataType="String" isExternalFile="True" isRaster="False" externalFileFilter="PDF Files (*.pdf)|*.pdf"/>
 	</dataSheet>
+
 	<dataSheet name="RunFigureOptions" displayName="Run Figures" isSingleRow="True" viewClassName="lucasCoreUI.RunFiguresView" viewClassAssembly="lucasCoreUI">
 		<!-- stage 13: which ST-Sim run (a historical run or a projection) to draw; the scenario depends on the run's Build result -->
 		<column name="RunScenarioId" displayName="Run (result scenario Id in this library; blank = the newest ST-Sim result)" dataType="Integer" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="OutputRunFigure" displayName="Run Figures (PNG)" viewClassName="lucasCoreUI.RunFigureView" viewClassAssembly="lucasCoreUI">
 		<!-- stage 13: one row per figure of the run (src/run-figures.R); Export > LUCAS Core > Run Figures saves them all to a folder -->
 		<column name="Figure" dataType="Integer"/>
@@ -1178,6 +1276,7 @@
 		<column name="FileName" displayName="Figure (PNG)" dataType="String" isExternalFile="True" isRaster="False" externalFileFilter="PNG Files (*.png)|*.png"/>
 		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="CompareRunOptions" displayName="Compare Runs" viewClassName="lucasCoreUI.CompareRunsView" viewClassAssembly="lucasCoreUI">
 		<!-- stage 14: the runs to compare, one row each (result scenario Ids in this library); the scenario depends on their Build result -->
 		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer"/>
@@ -1185,6 +1284,7 @@
 		<column name="Colour" displayName="Colour (#rrggbb; blank = the default palette)" dataType="String" isOptional="True"/>
 		<column name="Baseline" displayName="Baseline (the run the others are compared with; none ticked = the first projection)" dataType="Boolean" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="OutputCompareFigure" displayName="Compare Figures (PNG)" viewClassName="lucasCoreUI.CompareFigureView" viewClassAssembly="lucasCoreUI">
 		<!-- stage 14: one row per comparison figure (src/compare-figures.R); Export > LUCAS Core > Compare Figures saves them all to a folder -->
 		<column name="Figure" dataType="Integer"/>
@@ -1192,6 +1292,7 @@
 		<column name="Caption" dataType="String"/>
 		<column name="FileName" displayName="Figure (PNG)" dataType="String" isExternalFile="True" isRaster="False" externalFileFilter="PNG Files (*.png)|*.png"/>
 	</dataSheet>
+
 	<dataSheet name="OutputCompareCarbon" displayName="Compare Carbon Summary">
 		<!-- stage 14: one row per run compared - carbon stocks (Tg C) and mean annual fluxes over the run (Tg C/yr) -->
 		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer"/>
@@ -1213,6 +1314,7 @@
 		<column name="HwpStockChange" displayName="Mean change in carbon stored in harvested wood products (Tg C/yr)" dataType="Double" isOptional="True"/>
 		<column name="NbpWithProducts" displayName="Mean net biome productivity with wood products (Tg C/yr)" dataType="Double" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="OutputCompareCost" displayName="Compare Cost Summary">
 		<!-- stage 14: one row per projection with Management Actions costs (transition attribute output) - money over the run (USD, mean
 		     of the iterations), and the extra net cost per unit of carbon gained over the baseline (src/compare-figures.R compare_cost) -->
@@ -1237,6 +1339,7 @@
 		<column name="UsdPerMgCWithProductsHigh" displayName="USD per Mg C with wood products, highest-cost iteration" dataType="Double" isOptional="True"/>
 		<column name="UsdPerMgCO2eWithProducts" displayName="USD per Mg CO2e gained, with wood products" dataType="Double" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="OutputCompareLand" displayName="Compare Land Change Summary">
 		<!-- stage 14: one row per run compared - transition areas over the run and the change in forest and developed area (km2) -->
 		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer"/>
@@ -1250,6 +1353,7 @@
 		<column name="ForestChange" displayName="Forest area change (km2)" dataType="Double"/>
 		<column name="DevelopedChange" displayName="Developed area change (km2)" dataType="Double"/>
 	</dataSheet>
+
 	<dataSheet name="WoodProductsOptions" displayName="Wood Products Options" isSingleRow="True">
 		<!-- stage 18: the run whose harvested carbon to follow (src/wood-products.R); the scenario depends on the run's Build result -->
 		<column name="RunScenarioId" displayName="Run (result scenario Id in this library; blank = the newest ST-Sim result)" dataType="Integer" isOptional="True"/>
@@ -1275,6 +1379,7 @@
 		<dataSheet name="WoodProductsOptions"/>
 		<dataSheet name="WoodProductsFuture"/>
 	</dataFeed>
+
 	<dataSheet name="OutputWoodProducts" displayName="Wood Products">
 		<!-- stage 18: pools and flows by year (Mg C): mean and interval over the parameter draws, per run iteration (blank = over all) -->
 		<column name="Iteration" displayName="Iteration (blank = all)" dataType="Integer" isOptional="True"/>
@@ -1286,6 +1391,7 @@
 		<column name="Upper" displayName="Upper bound of the interval" dataType="Double"/>
 		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="OutputWoodProductsEndUse" displayName="Wood Products by End Use">
 		<!-- stage 18: carbon in use by end use and year (Mg C), the mean over iterations and draws -->
 		<column name="Year" dataType="Integer"/>
@@ -1293,6 +1399,7 @@
 		<column name="InUse" displayName="In use (Mg C)" dataType="Double"/>
 		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="OutputWoodProductsScale" displayName="Wood Products Spin-up">
 		<!-- stage 18: the harvest history scaled to the run: the run's first-decade removals over the history's in those years -->
 		<column name="Iteration" dataType="Integer"/>
@@ -1302,6 +1409,7 @@
 		<column name="HistoryVolume" displayName="History removals, same years (million cubic feet)" dataType="Double"/>
 		<column name="Scale" displayName="Scale (Mg C per million cubic feet)" dataType="Double"/>
 	</dataSheet>
+
 	<dataSheet name="OutputWoodProductsFigure" displayName="Wood Products Figures (PNG)" viewClassName="lucasCoreUI.WoodProductsFigureView" viewClassAssembly="lucasCoreUI">
 		<!-- stage 18: one row per figure; Export > LUCAS Core > Wood Products Figures saves them all to a folder -->
 		<column name="Figure" dataType="Integer"/>
@@ -1310,6 +1418,7 @@
 		<column name="FileName" displayName="Figure (PNG)" dataType="String" isExternalFile="True" isRaster="False" externalFileFilter="PNG Files (*.png)|*.png"/>
 		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="OutputBuildFigure" displayName="Build Figures (PNG)" viewClassName="lucasCoreUI.BuildFigureView" viewClassAssembly="lucasCoreUI">
 		<!-- stage 12: one row per publication figure (src/figures.R); Export > LUCAS Core > Build Figures saves them all to a folder -->
 		<column name="Figure" dataType="Integer"/>
@@ -1317,6 +1426,7 @@
 		<column name="Caption" dataType="String"/>
 		<column name="FileName" displayName="Figure (PNG)" dataType="String" isExternalFile="True" isRaster="False" externalFileFilter="PNG Files (*.png)|*.png"/>
 	</dataSheet>
+
 	<dataSheet name="OutputModelRecord" displayName="Model Record (FGDC metadata)">
 		<!-- stage 16: the Build result's CSDGM record (src/metadata-record.R); Export > LUCAS Core > Model Record saves it -->
 		<column name="BuildResult" displayName="Build result" dataType="Integer"/>
@@ -1325,6 +1435,7 @@
 		<column name="ToSupply" displayName="Still placeholder or drafted" dataType="String" isOptional="True"/>
 		<column name="Notes" displayName="What the record had to infer" dataType="String" isOptional="True"/>
 	</dataSheet>
+
 	<!-- a page with a second sheet needs a feed holding both: outside the feed this.DataFeed.GetDataSheet returns null (tests/unit-page-feeds.R) -->
 	<dataFeed name="DataReleasePage" displayName="Data Release" viewClassName="lucasCoreUI.DataReleaseView" viewClassAssembly="lucasCoreUI">
 		<dataSheet name="DataReleaseOptions"/>
@@ -1334,11 +1445,13 @@
 		<dataSheet name="ReleaseInformation"/>
 		<dataSheet name="ReleaseOriginator"/>
 	</dataFeed>
+
 	<dataSheet name="DataReleaseOptions" displayName="Data Release" isSingleRow="True">
 		<!-- stage 17 (to-do 14, src/release.R): where to write the release and how many years of maps; the runs are in DataReleaseRun, on the same page -->
 		<column name="OutputFolder" displayName="Release folder (blank = a folder named after the library, beside it)" dataType="String" isOptional="True"/>
 		<column name="MapEvery" displayName="Maps every (years; blank or 1 = every year)" dataType="Integer" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="ReleaseInformation" displayName="Release Information" isSingleRow="True">
 		<!-- stage 17 (to-do 14, Phase 4): what only a person can supply. Blank = the drafted text or package default, listed as still to supply. The originators are in ReleaseOriginator, on the same page -->
 		<column name="ReleaseStatus" displayName="Release status" dataType="Integer" validationType="List" formula1="1:Draft|2:Provisional|3:Approved" defaultValue="1" isOptional="True"/>
@@ -1361,15 +1474,18 @@
 		<column name="ThemeKeywords" displayName="More theme keywords (separated by ;)" dataType="String" isOptional="True"/>
 		<column name="PlaceKeywords" displayName="More place keywords (separated by ;)" dataType="String" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="ReleaseOriginator" displayName="Release Originators">
 		<!-- stage 17: the release's originators in citation order, picked from the project's People; edited on the Release Information page -->
 		<column name="PersonId" displayName="Originator" dataType="Integer" validationType="Datasheet" formula1="lucasCore_Person"/>
 		<column name="SortOrder" displayName="Citation order" dataType="Integer" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="DataReleaseRun" displayName="Data Release Runs">
 		<!-- stage 17: the runs to release, one row each (result scenario Ids in this library); edited on the Data Release page -->
 		<column name="RunScenarioId" displayName="Run (result scenario Id)" dataType="Integer"/>
 	</dataSheet>
+
 	<dataSheet name="OutputDataRelease" displayName="Data Release">
 		<!-- stage 17: the release folder on disk, and what is left to supply -->
 		<column name="Folder" displayName="Release folder" dataType="String"/>
@@ -1379,6 +1495,7 @@
 		<column name="Mp" displayName="USGS metadata parser (mp)" dataType="String" isOptional="True"/>
 		<column name="ToSupply" displayName="Still placeholder or drafted" dataType="String" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="OutputReleaseContents" displayName="Release Contents">
 		<!-- stage 17: one row per file of the release -->
 		<column name="File" dataType="String"/>
@@ -1386,18 +1503,21 @@
 		<column name="Bytes" dataType="Double"/>
 		<column name="Sha256" displayName="SHA-256" dataType="String"/>
 	</dataSheet>
+
 	<dataSheet name="OutputStrataSummary" displayName="Strata Summary">
 		<column name="Level" dataType="String"/>
 		<column name="Name" dataType="String"/>
 		<column name="Id" dataType="Integer"/>
 		<column name="Cells" dataType="Integer"/>
 	</dataSheet>
+
 	<dataSheet name="OutputValidation" displayName="Validation">
 		<column name="Stage" dataType="String"/>
 		<column name="Check" dataType="String"/>
 		<column name="Status" dataType="String"/>
 		<column name="Detail" dataType="String" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="DataDownloadOptions" displayName="Data Download" isSingleRow="True" viewClassName="lucasCoreUI.DataDownloadView" viewClassAssembly="lucasCoreUI">
 		<!-- stage 15 (to-do 12, src/download.R): fetch the Data Sources into Data Sources Home for the Study Area units plus a buffer -->
 		<column name="BufferKm" displayName="Buffer around the study area (km)" dataType="Double" defaultValue="10" isOptional="True"/>
@@ -1414,6 +1534,7 @@
 		<column name="Loca2Scenarios" displayName="LOCA2 scenarios (blank = ssp245, ssp370, ssp585; historical always comes)" dataType="String" isOptional="True"/>
 		<column name="Loca2Member" displayName="LOCA2 members (blank = each model&apos;s r1i1p1f1, else its first)" dataType="String" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="OutputDataDownload" displayName="Download Results">
 		<!-- stage 15: one row per dataset -->
 		<column name="DataSource" displayName="Data Sources column" dataType="String"/>
@@ -1424,6 +1545,7 @@
 		<column name="Minutes" dataType="Double" isOptional="True"/>
 		<column name="Next" displayName="What to do next" dataType="String" isOptional="True"/>
 	</dataSheet>
+
 	<dataSheet name="OutputDataSources" displayName="Data Sources Used">
 		<!-- every Build stage (shared.R, finish_checks): the Data Sources it read, where from, and the checksums the home's files.csv records -->
 		<column name="Stage" dataType="String"/>
@@ -1435,9 +1557,11 @@
 		<column name="Sha256" displayName="SHA-256 (one file; a folder: of its sorted file checksums)" dataType="String" isOptional="True"/>
 		<column name="Note" dataType="String" isOptional="True"/>
 	</dataSheet>
+
 	<!-- =================================================================================================== -->
 	<!-- TRANSFORMERS                                                                                        -->
 	<!-- =================================================================================================== -->
+
 	<transformer name="StockFlowDefinitions" displayName="0 - Stock-Flow Definitions" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/0-stock-flow-definitions.R">
 		<dataSheet name="WetlandOptions" type="Input"/>
 		<dataSheet name="stsim_FlowPathwayDiagram" type="Both"/>
@@ -1453,6 +1577,7 @@
 		<dataSheet name="stsim_OutputOptions" type="Both"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
+
 	<transformer name="StudyArea" displayName="1 - Study Area and Strata" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/1-study-area.R">
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="StudyArea" type="Input"/>
@@ -1462,6 +1587,7 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
+
 	<transformer name="GrowthCurves" displayName="2 - Fit Growth Curves" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/2-growth-curves.R">
 		<dataSheet name="GrowthOptions" type="Input"/>
 		<dataSheet name="GrowthInput" type="Input"/>
@@ -1475,6 +1601,7 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
+
 	<transformer name="CarbonFlows" displayName="3 - Carbon Flows" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/3-carbon-flows.R">
 		<dataSheet name="WetlandOptions" type="Input"/>
 		<dataSheet name="WetlandMethaneTarget" type="Input"/>
@@ -1505,6 +1632,7 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
+
 	<transformer name="InitialStocks" displayName="4 - Spin-up and Initial Stocks" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/4-initial-stocks.R">
 		<dataSheet name="CarbonCurve" type="Input"/>
 		<dataSheet name="OutputDecayCalibration" type="Input"/>
@@ -1513,6 +1641,7 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
+
 	<transformer name="InitialConditions" displayName="5 - Initial Conditions" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/5-initial-conditions.R">
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="ReforestationOptions" type="Input"/>
@@ -1535,6 +1664,7 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
+
 	<transformer name="HistoricalTransitions" displayName="6 - Historical Transitions" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/6-historical-transitions.R">
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="StandAgeOptions" type="Input"/>
@@ -1557,6 +1687,7 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
+
 	<transformer name="ClimateMultipliers" displayName="7 - Climate Multipliers" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/7-climate-multipliers.R">
 		<dataSheet name="WetlandOptions" type="Input"/>
 		<dataSheet name="DomParameter" type="Input"/>
@@ -1568,6 +1699,7 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
+
 	<transformer name="InitialStocksSpatial" displayName="8 - Initial Stock Maps" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/8-initial-stocks-spatial.R">
 		<dataSheet name="WetlandOptions" type="Input"/>
 		<dataSheet name="WetlandMethaneTarget" type="Input"/>
@@ -1597,6 +1729,7 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
+
 	<transformer name="ProjectionTransitions" displayName="9 - Projection Transitions" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/9-projection-transitions.R">
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="ManagementAction" type="Input"/>
@@ -1632,6 +1765,7 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
+
 	<transformer name="TransitionSuitability" displayName="10 - Transition Suitability" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/10-transition-suitability.R">
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="ManagementAction" type="Input"/>
@@ -1660,6 +1794,7 @@
 		<dataSheet name="OutputDataSources" type="Output"/>
 		<dataSheet name="ProjectionOptions" type="Input"/>
 	</transformer>
+
 	<transformer name="ProjectionClimate" displayName="11 - Projection Climate" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/11-projection-climate.R">
 		<dataSheet name="WetlandOptions" type="Input"/>
 		<dataSheet name="DomParameter" type="Input"/>
@@ -1676,6 +1811,7 @@
 		<dataSheet name="OutputValidation" type="Output"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
+
 	<transformer name="BuildFigures" displayName="12 - Build Figures" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/12-build-figures.R">
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="StudyArea" type="Input"/>
@@ -1697,9 +1833,11 @@
 		<dataSheet name="OutputValidation" type="Both"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
+
 	<!-- export: every Build figure to a folder -->
 	<transformer name="BuildFiguresExport" displayName="Build Figures" dataSheet="OutputBuildFigure" column="FileName" isFolderExport="True"/>
 	<transformer name="ModelRecordExport" displayName="Model Record" dataSheet="OutputModelRecord" column="FileName" isFolderExport="True"/>
+
 	<transformer name="RunFigures" displayName="13 - Run Figures" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/13-run-figures.R">
 		<dataSheet name="RunFigureOptions" type="Input"/>
 		<dataSheet name="StudyArea" type="Input"/>
@@ -1711,8 +1849,10 @@
 		<dataSheet name="OutputValidation" type="Both"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
+
 	<!-- export: every run figure to a folder -->
 	<transformer name="RunFiguresExport" displayName="Run Figures" dataSheet="OutputRunFigure" column="FileName" isFolderExport="True"/>
+
 	<transformer name="CompareRuns" displayName="14 - Compare Runs" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/14-compare-runs.R">
 		<dataSheet name="CompareRunOptions" type="Input"/>
 		<dataSheet name="StudyArea" type="Input"/>
@@ -1726,20 +1866,24 @@
 		<dataSheet name="OutputValidation" type="Both"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
+
 	<!-- export: every comparison figure to a folder -->
 	<transformer name="CompareFiguresExport" displayName="Compare Figures" dataSheet="OutputCompareFigure" column="FileName" isFolderExport="True"/>
+
 	<transformer name="DataDownload" displayName="15 - Data Download" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/15-data-download.R">
 		<dataSheet name="DataDownloadOptions" type="Input"/>
 		<dataSheet name="StudyArea" type="Input"/>
 		<dataSheet name="OutputDataDownload" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
+
 	<transformer name="ModelRecord" displayName="16 - Model Record" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/16-model-record.R">
 		<dataSheet name="ReleaseInformation" type="Input"/>
 		<dataSheet name="ReleaseOriginator" type="Input"/>
 		<dataSheet name="OutputModelRecord" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
+
 	<transformer name="DataRelease" displayName="17 - Data Release" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/17-data-release.R">
 		<dataSheet name="DataReleaseOptions" type="Input"/>
 		<dataSheet name="DataReleaseRun" type="Input"/>
@@ -1749,6 +1893,7 @@
 		<dataSheet name="OutputReleaseContents" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
+
 	<transformer name="WoodProducts" displayName="18 - Wood Products" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/18-wood-products.R">
 		<dataSheet name="WoodProductsOptions" type="Input"/>
 		<dataSheet name="WoodProductsFuture" type="Input"/>
@@ -1759,11 +1904,14 @@
 		<dataSheet name="OutputWoodProductsFigure" type="Output"/>
 		<dataSheet name="OutputValidation" type="Both"/>
 	</transformer>
+
 	<!-- export: every wood products figure to a folder -->
 	<transformer name="WoodProductsFiguresExport" displayName="Wood Products Figures" dataSheet="OutputWoodProductsFigure" column="FileName" isFolderExport="True"/>
+
 	<!-- =================================================================================================== -->
 	<!-- LAYOUTS                                                                                           -->
 	<!-- =================================================================================================== -->
+
 	<layout type="Project" appendTo="stsim_Advanced">
 		<group name="lucasCoreGroup" displayName="LUCAS Core">
 			<item name="DataSource"/>
@@ -1776,6 +1924,7 @@
 			<item name="CbmSpeciesType"/>
 		</group>
 	</layout>
+
 	<layout type="Scenario" appendTo="stsim_Advanced">
 		<group name="lucasCoreGroup" displayName="LUCAS Core">
 			<item name="StudyArea"/>
@@ -1891,6 +2040,7 @@
 			</group>
 		</group>
 	</layout>
+
 	<layout type="Export">
 		<group name="lucasCoreExport" displayName="LUCAS Core">
 			<item name="BuildFiguresExport" displayName="Build Figures (PNG)"/>
@@ -1900,6 +2050,7 @@
 			<item name="WoodProductsFiguresExport" displayName="Wood Products Figures (PNG)"/>
 		</group>
 	</layout>
+
 	<!-- library updates (ui/LucasCoreUpdates.cs): a library made with an earlier version is brought up to this one when SyncroSim opens it -->
 	<updateProvider className="lucasCoreUI.LucasCoreUpdates" classAssembly="lucasCoreUI"/>
 </package>

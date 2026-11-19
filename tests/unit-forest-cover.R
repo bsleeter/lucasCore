@@ -12,13 +12,14 @@ source(file.path(pkg, "src", "forest-cover.R"))
 ok <- 0; bad <- 0
 expect <- function(what, cond) { if (isTRUE(cond)) { ok <<- ok + 1; cat("pass:", what, "\n") } else { bad <<- bad + 1; cat("FAIL:", what, "\n") } }
 err <- function(e) inherits(try(e, silent = TRUE), "try-error")
+
 # ---- options ------------------------------------------------------------------------------------------------------------------
 o <- forest_cover_options(data.table())
-expect("options: an empty sheet is Annual NLCD, 10%, the BpS gate, half the cell, no folder", o$definition == "nlcd" && o$threshold == 10 && o$gate == "bps" && o$rule == "share" && o$recovery == "canopy" && o$recovery_threshold == 30 && o$share == 0.5 && is.na(o$folder))
-o <- forest_cover_options(data.table(ForestDefinition = 2L, CanopyThreshold = 15L, CanopyGate = 2L, CellShare = 0.3, TreeCanopyFolder = "D:/tcc"))
-expect("options: numbers", o$definition == "canopy" && o$threshold == 15 && o$gate == "none" && o$share == 0.3 && o$folder == "D:/tcc")
-o <- forest_cover_options(data.table(ForestDefinition = "Annual NLCD and tree canopy cover", CanopyThreshold = NA, CanopyGate = "Only where LANDFIRE BpS is forest", CellShare = NA, TreeCanopyFolder = ""))
-expect("options: the list labels rsyncrosim gives, blanks as defaults", o$definition == "canopy" && o$threshold == 10 && o$gate == "bps" && o$share == 0.5 && is.na(o$folder))
+expect("options: an empty sheet is Annual NLCD, 10%, the BpS gate, half the cell", o$definition == "nlcd" && o$threshold == 10 && o$gate == "bps" && o$rule == "share" && o$recovery == "canopy" && o$recovery_threshold == 40 && o$share == 0.5)
+o <- forest_cover_options(data.table(ForestDefinition = 2L, CanopyThreshold = 15L, CanopyGate = 2L, CellShare = 0.3))
+expect("options: numbers", o$definition == "canopy" && o$threshold == 15 && o$gate == "none" && o$share == 0.3)
+o <- forest_cover_options(data.table(ForestDefinition = "Annual NLCD and tree canopy cover", CanopyThreshold = NA, CanopyGate = "Only where LANDFIRE BpS is forest", CellShare = NA))
+expect("options: the list labels rsyncrosim gives, blanks as defaults", o$definition == "canopy" && o$threshold == 10 && o$gate == "bps" && o$share == 0.5)
 expect("options: an unknown choice, a threshold and a share out of range are errors", err(forest_cover_options(data.table(ForestDefinition = "LANDFIRE"))) &&
        err(forest_cover_options(data.table(CanopyThreshold = 0L))) && err(forest_cover_options(data.table(CanopyThreshold = 101L))) && err(forest_cover_options(data.table(CellShare = 0))) && err(forest_cover_options(data.table(CellShare = 1.2))))
 px <- xml2::read_xml(file.path(pkg, "package.xml")); f1 <- function(k) xml2::xml_attr(xml2::xml_find_first(px, sprintf("//dataSheet[@name='ForestCoverOptions']/column[@name='%s']", k)), "formula1")
@@ -26,12 +27,14 @@ lab <- function(v) paste(sprintf("%d:%s", seq_along(v), v), collapse = "|")
 expect("package.xml: the two lists' labels are the ones the code reads", identical(f1("ForestDefinition"), lab(FOREST_DEFINITION)) && identical(f1("CanopyGate"), lab(FOREST_GATE)) && identical(f1("CellRule"), lab(FOREST_CELL_RULE)) && identical(f1("CanopyRecovery"), lab(FOREST_RECOVERY)))
 tr <- xml2::xml_attr(xml2::xml_find_all(px, "//transformer[@name='InitialConditions']/dataSheet"), "name")
 expect("package.xml: stage 5 reads the options and writes both outputs", all(c("ForestCoverOptions", "OutputForestCover", "OutputForestCoverMap") %in% tr))
+
 # ---- which cells the canopy makes forest ------------------------------------------------------------------------------------------
 nl <- c(31L, 52L, 71L, 41L, 90L, 95L, 21L, 82L, 11L, 52L, 52L, 52L, NA)
 sh <- c(0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.49, 0.5, NA, 0.9)
 expect("cells: barren, shrub and grass at or over the share; no other class, no cell under it or without canopy", identical(canopy_forest(nl, sh), c(TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE)))
 expect("cells: a woody wetland cell keeps its class", identical(canopy_forest(c(52L, 52L), c(1, 1), c(TRUE, FALSE)), c(FALSE, TRUE)))
 expect("cells: the share is a setting", identical(canopy_forest(c(52L, 52L), c(0.2, 0.4), FALSE, 0.3), c(FALSE, TRUE)))
+
 # ---- area-matched cells ------------------------------------------------------------------------------------------------------------
 # two units of 10 cells. Unit 1: 30 m forest share sums to 6 cells, 3 are forest already -> 3 of its 5 candidates, the highest shares.
 # Unit 2: the target (2) is under the forest it already has (4) -> none. A candidate with no passing pixels is never taken.
@@ -43,6 +46,7 @@ expect("area-matched: a unit with more forest than its target gains none", !any(
 expect("area-matched: never more cells than candidates, and none without passing pixels", sum(canopy_area_match(c(0.9, 0, 0.5, 0.4), c(TRUE, TRUE, FALSE, FALSE), 1L, rep(1, 4), rep(FALSE, 4))) == 1)
 expect("area-matched: cells off the land do not count", sum(canopy_area_match(c(0.9, 0.8, 0.7, 0.6), rep(TRUE, 4), 1L, c(1, 1, 1, 1), rep(FALSE, 4), land = c(TRUE, TRUE, FALSE, FALSE))) == 2)
 o <- forest_cover_options(data.table(CellRule = 2L)); expect("options: the cell rule", o$rule == "area" && forest_cover_options(data.table(CellRule = "Area-matched"))$rule == "area")
+
 # ---- recovery by canopy (stage 6) -----------------------------------------------------------------------------------------------------
 expect("recovery: on when the share is at or over the cell share in the year and the year before; a year without canopy is never on",
        identical(canopy_return_on(c(0.6, 0.6, 0.4, NA, 0.5), c(0.6, 0.4, 0.6, 0.9, 0.5)), c(TRUE, FALSE, FALSE, FALSE, TRUE)) && identical(canopy_return_on(0.6, 0.6, 0.7), FALSE))
@@ -52,6 +56,7 @@ expect("options: the recovery threshold is its own, 1 to 100", forest_cover_opti
 expect("options: recovery can be left to NLCD", forest_cover_options(data.table(CanopyRecovery = 2L))$recovery == "nlcd" && forest_cover_options(data.table(CanopyRecovery = "NLCD forest only"))$recovery == "nlcd")
 tr6 <- xml2::xml_attr(xml2::xml_find_all(px, "//transformer[@name='HistoricalTransitions']/dataSheet"), "name")
 expect("package.xml: stage 6 reads the Forest Cover options", "ForestCoverOptions" %in% tr6)
+
 # ---- the 30 m pass raster ---------------------------------------------------------------------------------------------------------
 if (requireNamespace("terra", quietly = TRUE)) {
   r <- terra::rast(nrows = 2, ncols = 4, xmin = 0, xmax = 4, ymin = 0, ymax = 2, crs = "EPSG:5070"); terra::values(r) <- c(0, 9, 10, 55, 100, 101, 255, NA)
@@ -60,16 +65,19 @@ if (requireNamespace("terra", quietly = TRUE)) {
   g <- r; terra::values(g) <- c(1, 1, 0, 1, NA, 1, 1, 1)
   expect("pass: with a gate, only where the potential is forest (no potential = not forest)", identical(as.numeric(terra::values(canopy_pass(r, 10, g), mat = FALSE)), c(0, 0, 0, 1, 0, 0, 0, 0)))
 } else cat("skip: terra not installed (the pass raster)\n")
+
 # ---- the dataset is registered ------------------------------------------------------------------------------------------------------
 dsr <- fread(file.path(pkg, "defaults", "library", "data-sources.csv"), colClasses = "character")[Column == "TreeCanopyFolder"]
 expect("data-sources.csv has a TreeCanopyFolder row with a home place", nrow(dsr) == 1 && dsr$HomePath == "land-cover/tree-canopy")
 ep <- fread(file.path(pkg, "defaults", "download", "endpoints.csv"), colClasses = "character")[Column == "TreeCanopyFolder"]
-expect("endpoints.csv has it as optional (a Data Download fetches it only when asked)", nrow(ep) == 1 && ep$Fetched == "optional")
+expect("endpoints.csv has it as a dataset the Data Download page lists and fetches", nrow(ep) == 1 && ep$Fetched == "yes")
+expect("package.xml: the folder is a Data Sources column and not a Forest Cover setting", length(xml2::xml_find_all(xml2::read_xml(file.path(pkg, "package.xml")), "//dataSheet[@name='DataSource']/column[@name='TreeCanopyFolder']")) == 1 && length(xml2::xml_find_all(xml2::read_xml(file.path(pkg, "package.xml")), "//dataSheet[@name='ForestCoverOptions']/column[@name='TreeCanopyFolder']")) == 0)
 expect("citations.csv has a TreeCanopyFolder citation", nrow(fread(file.path(pkg, "defaults", "metadata", "citations.csv"))[Column == "TreeCanopyFolder"]) == 1)
 h <- readLines(file.path(pkg, "src", "download-sources.R"))
 expect("the download handler writes the file names stage 5 reads", any(grepl("H$TreeCanopyFolder <- list(", h, fixed = TRUE)) && any(grepl(sub("%d", "%d", TCC_FILE, fixed = TRUE), h, fixed = TRUE)))
 s5 <- paste(readLines(file.path(pkg, "src", "5-initial-conditions.R")), collapse = "\n")
 expect("stage 5 keeps canopy cells out of the regrowth, start-rule and reforestation picks", lengths(regmatches(s5, gregexpr("& !canopy_cell", s5, fixed = TRUE))) >= 3)
+
 # ---- the forest area check against FIA ------------------------------------------------------------------------------------------------
 # 40 plots, the first 30 all forest, 5 half forest and half other land, 5 all other land; plot 1 has an older visit that is all other
 # land (ignored: the newest visit counts) and a water condition that is not land
@@ -108,4 +116,5 @@ expect("stocking curve: a saturating type gets its half-ceiling canopy and steep
 expect("stocking curve: a type with too few cells takes all forest's curve, as does one the fit never saw", sf[Type == "rare", !Own && K == sf[Type == "(all forest)", K]] && identical(stocking_value(50, "new", sf), stocking_curve(50, sf$K[1], sf$B[1])))
 expect("stocking curve: it rises with canopy and flattens", { v <- stocking_curve(c(10, 30, 50, 70, 90), 40, 2); all(diff(v) > 0) && diff(v)[4] < diff(v)[2] })
 expect("package.xml: stage 5 writes the Forest Area Check", "OutputForestAreaCheck" %in% tr)
+
 cat(sprintf("\n%d passed, %d failed\n", ok, bad)); if (bad) quit(status = 1)

@@ -1,9 +1,13 @@
 # Changelog
+
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
+
 ## Unreleased
+
 No library update needed: the new outputs are sheets of their own, which a 1.5 library gains when it is opened with this
 version. A Build made before it has no carbon capacity until the Build (or its stage 8) is rerun; runs already made on that
 Build can then be drawn against it.
+
 ### Added
 - Forest by tree canopy cover (stage 5, `src/forest-cover.R`; new page **Forest Cover**, `ui/ForestCoverView.cs`): an option for
   what starts as forest. Annual NLCD maps much open western forest as shrub or grass: in 2016 it has 44% of Yellowstone's
@@ -20,9 +24,9 @@ Build can then be drawn against it.
     A canopy cell is forest from the start, so the regrowth, disturbed-start and reforestation rules do not touch it.
   - **Recovery (stage 6).** With the canopy rule on, a disturbed forest cell is also on in the Forest Return map of the year
     its share of pixels at the recovery threshold has been at or over the cell share for two years running, both after any high-severity fire or clearcut of the cell, beside NLCD's
-    forest two years running and the LANDFIRE 2016 witness. The recovery threshold is its own (blank = 30%): the canopy
+    forest two years running and the LANDFIRE 2016 witness. The recovery threshold is its own (blank = 40%): the canopy
     product reads about 20% on forest that has just burned at high severity (Yellowstone 1988: 97% of the pixels still at or
-    over 10% in 1989), so the start-year 10% would return it the next year. It reads the canopy of every year of the Build.
+    over 10% in 1989), so the start-year 10% would return it the next year. At 30% shrub regrowth passed as forest in P26 (median return 4 years after high-severity fire); at 40% the return matches the projection curve. It reads the canopy of every year of the Build.
     *NLCD forest only* on the page turns it off. Not changed: the projection's return chance by age, still fitted to NLCD
     and LANDFIRE (`tools/fit_post_disturbance.R`).
   - **Stocking (stage 8; off by default).** *By the cell's tree canopy cover* on the Forest Cover page multiplies a forest
@@ -36,10 +40,9 @@ Build can then be drawn against it.
     Where the Build has TreeMap 2016 and the canopy of 2016, carbon follows canopy along a saturating curve fitted to
     TreeMap per forest type (on mature forest with no fire perimeter or canopy loss since the start year); otherwise in
     proportion to canopy.
-  - **Data.** USFS Science Tree Canopy Cover v2025-6 (30 m, 1985 to 2023) is a new Data Download dataset, `TreeCanopyFolder`,
-    fetched only when the Data Download's Datasets names it, the region read out of each year's zip. It has no Data Sources
-    column yet (that needs a library update, so it waits for the next minor version): it is read from Data Sources Home, or
-    from the folder set on the Forest Cover page.
+  - **Data.** USFS Science Tree Canopy Cover v2025-6 (30 m, 1985 to 2023) is a new dataset on the Data Download page (USFS
+    Tree Canopy Cover), the region read out of each year's zip, and a new folder on the Data Sources page
+    (`TreeCanopyFolder`). The new Data Sources column needs a library update, so this is a minor version.
   - **Outputs:** Forest by Tree Canopy Cover (cells made forest, by forest type and NLCD class) and its map (the share of
     each cell's pixels that pass the rule); the start-rule map of Build Figures gains the class Forest by tree canopy cover.
   - **Forest Area Check (FIA):** every Build now compares its forest share of the land in the start year with FIA's forest
@@ -72,6 +75,7 @@ Build can then be drawn against it.
     A full BpS to forest type group crosswalk, as a user choice, is to-do 69 in `docs/ui-improvements.md`.
   - `dev/capacity/check-library.R` computes the capacity of an existing Build result outside SyncroSim (read-only) and
     draws a run against it.
+
 - Stand age (stage 5, `src/stand-age.R`; the new page LUCAS Core > Stand Age, which holds the options and, under Manual settings, the ages by forest type and the stand age raster).
   - **A cell's stand age** is now the age of the 30 m pixel at its centre (a cell whose centre pixel has none takes the mean
     of its pixels that do). It was the mean of the cell's pixels, which leaves a landscape short of young and old stands;
@@ -92,14 +96,18 @@ Build can then be drawn against it.
     a 1986-2016 perimeter and go from a mean of about 100 years to 140; the land starts at 90% of its carbon capacity
     instead of 86%. To reproduce an earlier Build, set Stand Age to the mean of the cell's pixels and to keep the age map's
     value.
+
 ### Tests
 - `tests/unit-capacity.R`: the regime weights and mean against hand values and their limits, the table by type, the BpS
   cover lookup, the cell rules under both settings of the option, and the run side (series, deficit by cause).
 - `tests/unit-stand-age.R`: the options, the manual ages by forest type, the percentiles of the unburned forest, and the order of the
   rules.
+
 ## 1.5.1 - 2026-11-18
+
 No library update: the new Wood Products parameters are in a sheet of their own (Wood Products Future), which a 1.5 library
 gains when it is opened with this version. Existing Wood Products scenarios and their results are unchanged.
+
 ### Added
 - Wood products futures (stage 18). The Wood Products page has a group "A different wood products future": a few parameters
   that move harvested carbon from one path to another from a start year on, to explore, for example, a move to longer-lived
@@ -127,6 +135,7 @@ gains when it is opened with this version. Existing Wood Products scenarios and 
   defaults: products in use by class, what has been discarded, recovered products, landfills and dumps, and what has been
   emitted with and without energy capture. It redraws as the parameters change (`ui/WoodProductsFate.cs`,
   `ui/WoodProductsDiagram.cs`).
+
 ### Tests
 - `tests/unit-wood-products.R`: the levers (no lever set gives identical results; carbon conserved with each; the years
   before the start year untouched; a shift to long-lived products and longer lifetimes raise the stored carbon, more
@@ -135,10 +144,13 @@ gains when it is opened with this version. Existing Wood Products scenarios and 
   cases, equal to 1e-9.
 - `tests/phaseZ30-wood-products.R`: the stage with blank levers (identical sheets), with a shift, with phased-in bioenergy,
   with every lever and draws, and with bad values.
+
 ## 1.5.0 - 2026-11-18
+
 Library update 1.5: opening a library adds the wetland methane flow types, groups, flow order and output filters, the Marsh
 Salinity and Methane Uncertainty flow multiplier types and the Climate Options wetland growth choice. A Build made with 1.4
 keeps working; wetlands release methane after its next Build (stages 0, 3, 7 and 8; a Projection Climate after stage 11).
+
 ### Added
 - Wetland methane (to-do 54). Emergent and forested wetlands release part of the carbon their soil and litter already emit as
   CH4 instead of CO2, so no carbon is added or lost: in a normal climate year every pool loses what it lost before, and the
@@ -187,6 +199,7 @@ keeps working; wetlands release methane after its next Build (stages 0, 3, 7 and
     matches NBP to within 1 Mg C in every iteration. Method summary: `dev/wetland-ch4/wetland-methane-method.html`; literature:
     `dev/wetland-ch4/literature-ch4.md`. Methane follows the yearly mean temperature, not the warm season (to-do 67), and water
     level is not modelled.
+
 ### Fixed
 - Stage 3 stopped with a missing soil multiplier where no cell of an emergent wetland budget reached its gNATSGO soil target
   (Sabine and Lacassine NWRs at 300 m): the soil multiplier now falls back to 1 there, the package rate.
@@ -198,9 +211,12 @@ keeps working; wetlands release methane after its next Build (stages 0, 3, 7 and
   flow order, group memberships and output filters, so those flows moved carbon that net biome productivity never counted (Sabine
   and Lacassine at 300 m: about 1,200 Mg C a year from 424 ha of forested wetland litter). Stage 0 now stops and names the missing
   flow types; `tools/sync-library.R` adds them to the library.
+
 ## 1.4.1 - 2026-11-16
+
 No library update: a 1.4.0 library opens as it is. A Build made with 1.4.0 keeps working; rerun it (or stages 0 and 6) to get the
 tabular output options and the new forest return.
+
 ### Changed
 - Forest return after a stand-replacing fire has a second witness, LANDFIRE's 2016 vegetation type (user 2026-11-15). The
   Yellowstone historical run converted 76,000 ha of the 1988 burn to shrubland and annual grassland in 2018: NLCD shows 2% of
@@ -228,6 +244,7 @@ tabular output options and the new forest return.
   stage, and `tests/unit-land-use-demand.R` checks that each table gives the same ratios as its published file. The Data
   Download handlers are removed and the Data Download page lists the five as shipped; a path set on the Data Sources page still
   wins (the published file, or another edition). No change to results; no library update.
+
 ### Fixed
 - A Historical or Projection scenario made in Studio on a Build result had no tabular state class or transition output: the Build
   wrote the stock and flow output options, the spatial output options and the three output filters, and not ST-Sim's Output
@@ -245,13 +262,17 @@ tabular output options and the new forest return.
   the crop harvest multiplier of its neighbours, and a pasture cell filled from cropland could end above all of its foliage,
   because cropland's lower harvest rate allows a higher multiplier. A filled cell is now held to its own class's limit, as the
   cells with their own crops already were, and the log says how many were held. No change to a Build that passed.
+
 ## 1.4.0 - 2026-11-15
+
 What happens after a disturbance, and what people do about it: burned and harvested land now sits in disturbed classes that return
 or convert, land reforests, and projections can carry post-disturbance recovery, forest management, fuel treatments and rangeland
 restoration with their costs. Also new: harvested wood products, and alternative amounts of land use change in projections.
+
 **Upgrading:** install `lucasCore-1.4.0.ssimpkg` in place of 1.3.2, and back up each library's .ssim before opening it: library update 1.4 runs when a 1.3 library is opened. It adds the Disturbed state classes with their return and conversion transitions, the management transitions and their costs, the Reforestation group and types, the simulation group, and the new columns (BpsFile,
 the Land Cover Layers maps). A library needs a Data Download of BpsFile and a new Build for reforestation; with BpS missing and
 Reforestation on, stage 5 stops with a message. Turn it off on Reforestation Options to build as before.
+
 ### Added
 - Land Use Demand: alternative amounts of urbanization in a projection, to see a wide range of what could happen with development
   under different scenario assumptions. Every method is a ratio per unit and year that multiplies the Urbanization target's drawn
@@ -301,6 +322,7 @@ Reforestation on, stage 5 stops with a message. Turn it off on Reforestation Opt
   predictions. Tests: `tests/unit-land-use-demand.R`, and `tests/phaseZ32-land-use-demand.R` (stage 9 alone on a Build result, once
   per method: Puget Lowland at 990 m; every check passed and the kinds without a setting kept the baseline's targets). Known
   limit: the five download handlers have not yet fetched their sources through a Data Download run.
+
 - Stage 18 - Wood Products (to-do 59): what becomes of the carbon a run harvests. ST-Sim moves harvest and land-clearing wood to
   Forestry Sector and nothing flows out of it; this stage follows it through products in use, landfills and dumps, by year, with
   the USFS harvested wood products model (`src/wood-products.R`: Smith et al. 2006, Skog 2008, the HWP-C calculator; parameter
@@ -388,6 +410,7 @@ Reforestation on, stage 5 stops with a message. Turn it off on Reforestation Opt
   `tools/make_nps_units.R` writes the unit list with stable ids. Existing libraries: `tools/new-library.R <library> --rebuild-strata`
   (custom sources now take Numbers 11-20).
 - `tools/new-projection.R --base=<id> --also=<ids>`: a projection on a Projection Setup made on a quick-test result.
+
 ### Changed
 - Projection pages reorganized by what drives the change. Transitions is now **Land Use Change** (its layout: see Added; urbanization, intensification,
   agriculture, forest harvest), laid out as the management pages: each group with its choices and a short note beside them (how
@@ -423,6 +446,7 @@ Reforestation on, stage 5 stops with a message. Turn it off on Reforestation Opt
   no mapped source or default target, so results do not change; it is there for management scenarios (to-do 58).
 - Build stage 5: a check that every forest cell has an age failed when a fire perimeter started cells in a disturbed class; it now
   allows the disturbed classes an age, and names any failing cells by class.
+
 ### Removed
 - `Shrubland: Post Fire Shrub` (class 59) and the two transition types that led to it (`Ag Contraction Cropland: Shrubland Post
   Fire Shrub`, `Ag Contraction Pasture: Shrubland Post Fire Shrub`). Nothing reached the class: no cell starts in it, agriculture
@@ -431,6 +455,7 @@ Reforestation on, stage 5 stops with a message. Turn it off on Reforestation Opt
 - The 28 `Succession Post Fire: <type>` transition types and their groups (`Succession: Post Fire Recovery` and the empty
   `Succession`). No pathway used them: burned forest now returns from its disturbed class by `Post-disturbance: Forest Return`.
   Same as above for new and existing libraries. No change to results.
+
 ### Fixed
 - Data Download fetched the Cropland Data Layer again when its files had been unzipped into `land-cover/cdl` by hand over a failed
   earlier download, and failed again. The Data Sources page then showed "home failed", and a Build could stop on the failed
@@ -449,26 +474,35 @@ Reforestation on, stage 5 stops with a message. Turn it off on Reforestation Opt
   Ag Change group still sums both, and the two `[Type]` groups are mapped. The 1.4 library update removes the row; on 1.3.x,
   delete Ag Change from the project's Transition Simulation Groups. Changes projection results where cropland or pasture change
   (not Lassen). New `tests/unit-primary-groups.R`: every default and management target is on a primary group.
+
 ## 1.3.2 - 2026-11-11
+
 A fix for projections started from a 1.3 historical run, and better starting ages for regrowing forest.
+
 **Upgrading:** install `lucasCore-1.3.2.ssimpkg` in place of 1.3.1. There is no library update: switch a library's lucasCore
 package to 1.3.2 (`SyncroSim.Console.exe --add --package --pkg=lucasCore --ver=1.3.2 --lib=<library.ssim>`). Both changes take
 effect at the next Build; rerun the Build and then the historical run before a Projection Setup that starts from it.
+
 ### Fixed
 - A Projection Setup that starts from a historical run stopped with "historical run ... has no <year> map for DOM: Peat". The
   stock output filter still had peat maps off from before 1.3.0 filled that stock, so a historical run wrote no final peat map.
   Peat maps are now on (`defaults/stockflow/stsim_OutputFilterStocks.csv`).
+
 ### Changed
 - Build stage 5: a cell that starts as forest only because NLCD shows it as forest in a later year, and whose record shows it
   regrowing (not forest at the start, then forest within 20 years and staying forest), takes its starting stand age from that
   record instead of from NASA CMS or TreeMap. Those sources gave 1980s clearcuts and burns ages of about 45 years, so they started
   with mature forest carbon and their regrowth was missed. Settings in `defaults/landcover/regrowth-age.csv`. On existing maps this
   resets 45 kha in the Northern Sierra Nevada (P26) and 58 kha in the Puget Lowlands. Changes Build results.
+
 ## 1.3.1 - 2026-11-11
+
 A fix for library update 1.3.
+
 **Upgrading:** install `lucasCore-1.3.1.ssimpkg` in place of 1.3.0. Opening a 1.2 library runs library update 1.3, as in 1.3.0
 it was meant to. A library already at 1.3 needs no update; switch its lucasCore package to 1.3.1
 (`SyncroSim.Console.exe --add --package --pkg=lucasCore --ver=1.3.1 --lib=<library.ssim>`). Builds and results are as in 1.3.0.
+
 ### Fixed
 - Projection Setup (stage 10) no longer stops when a study area has too few historical events of a kind to fit its suitability
   surface (fewer than 30 in the fitting region: a park with almost no urbanization, a county with no agriculture). The surface
@@ -487,12 +521,16 @@ it was meant to. A library already at 1.3 needs no update; switch its lucasCore 
   Setup (stage 10) fits a suitability surface whose covariate has fewer distinct values than its smooth term allows.
 - Library update 1.3 stopped with "SQL logic error, near "s": syntax error", and the library stayed at 1.2. The update's
   description had an apostrophe in it, and SyncroSim writes that text into the library without quoting it.
+
 ## 1.3.0 - 2026-11-11
+
 Forested wetlands as classes of their own, peat as its own soil stock, and a carbon fluxes figure that breaks the balance down by
 driver. Tested on the Great Dismal Swamp (Chesapeake and Suffolk, Virginia). Includes every fix from 1.2.1 to 1.2.3.
+
 **Upgrading:** install `lucasCore-1.3.0.ssimpkg`. Opening a 1.2 library with it runs library update 1.3, which adds the new state
 classes, transition types, stock, flows and groups. Close Studio before you update. A library needs a new Build to give its forested
 wetlands their own classes and peat. Until then its results stay as they were in 1.2.
+
 ### Added
 - Forested wetland classes Wetland: Spruce/Fir Group (121), Wetland: Oak/Gum/Cypress Group (601) and Wetland: Elm/Ash/Cottonwood
   Group (701). Each one twins its upland group. FIA conditions on hydric sites (physiographic class 31-39) are split off to the twin,
@@ -511,10 +549,12 @@ wetlands their own classes and peat. Until then its results stay as they were in
   crop harvest, drained peat) with NBP; emissions by driver (fire on vegetation and on peat, insect, harvest, urbanization, other
   land change, drained peat); removals (harvested wood, wood from land use change, crop harvest, lateral export); a waterfall from
   NPP to NBP; and NBP by land cover. Compare Figures uses the same causes.
+
 ### Changed
 - Dead wood decay: a wetland class with enough FIA plots gets its own fit, with duff held at its upland type's value (FIA hydric
   duff is muck or peat). A wetland class with too few plots takes its ecodivision's upland values.
 - The Organic Soil Share flow multiplier and the Organic Soil flow group are retired. Peat flows now draw on DOM: Peat.
+
 ### Fixed
 - Build stage 4: the soil spin-up leaves peat fire out, as stage 3 calibrates. Before this, wetland soil started at a quarter of its
   target.
@@ -523,33 +563,46 @@ wetlands their own classes and peat. Until then its results stay as they were in
   some firewalls, the climate step stopped with "invalid extent".
 - Run Figures: the carbon by secondary stratum chart is at least one chart row tall per unit. A run with many units failed with
   "figure margins too large".
+
 ## 1.2.3 - 2026-11-10
+
 A Build fix for machines with less memory than cores.
+
 **Upgrading:** install `lucasCore-1.2.3.ssimpkg`. There are no schema changes from 1.2.0, so a 1.2 library needs no update; switch
 its lucasCore package to 1.2.3 (`SyncroSim.Console.exe --add --package --pkg=lucasCore --ver=1.2.3 --lib=<library.ssim>`).
 Results are as in 1.2.2; only how many parallel workers stages 5 and 6 start changes.
+
 ### Fixed
 - Build stage 5 (and stage 6): the parallel NLCD steps start no more workers than the free memory allows (2 GB each), and each
   worker's terra memory share is divided among them. Left at terra's own share, every worker planned on most of the free memory,
   and on a machine with less memory than cores stage 5 failed with `std::bad_alloc`. tests/unit-par-workers.R checks it.
+
 ## 1.2.2 - 2026-11-10
+
 USFS forest type tiles kept whole in the data home, and a Data Download fix for networks that block remote reads of Box.
+
 **Upgrading:** install `lucasCore-1.2.2.ssimpkg`. There are no schema changes from 1.2.0, so a 1.2 library needs no update; switch
 its lucasCore package to 1.2.2 (`SyncroSim.Console.exe --add --package --pkg=lucasCore --ver=1.2.2 --lib=<library.ssim>`).
 Only the Data Download changes; Builds and their results are as in 1.2.1.
+
 ### Changed
 - Data Download, USFS forest type groups: each FIA region's tile is kept whole at the top of the data home, like TreeMap, and only
   the tiles a study area touches are fetched; a second study area in the same region reads the tile already there. A region
   downloaded earlier keeps reading its clipped copy. A tile's zip (any name) or its `<REGION>_ForestType.tif` saved by hand in
   `<home>/supplied` is used instead of fetching.
+
 ### Fixed
 - Data Download, USFS forest type groups: on a network where GDAL cannot read the Box zips remotely, the stage stopped with "file
   does not exist". It now fetches every tile whose extent touches the study area instead.
+
 ## 1.2.1 - 2026-11-10
+
 Grass and shrub live carbon fitted to field biomass, and California's crop mix filled where a county's report leaves a crop out.
+
 **Upgrading:** install `lucasCore-1.2.1.ssimpkg`. There are no schema changes from 1.2.0, so a 1.2 library needs no update; switch
 its lucasCore package to 1.2.1 (`SyncroSim.Console.exe --add --package --pkg=lucasCore --ver=1.2.1 --lib=<library.ssim>`).
 The changes are in the package defaults, so rerun the Build to use them; results made with 1.2.0 keep their values.
+
 ### Changed
 - Grassland and shrubland (to-do 55): growth stays on RAP NPP for every class, and each class's turnover is now fitted so its live
   stocks match field biomass (aboveground and roots, from a literature review). Chaparral's wood turnover is 0.08 a year (was
@@ -561,16 +614,22 @@ The changes are in the package defaults, so rerun the Build to use them; results
 - Crop Mix (California): a crop missing from a year of a county's commissioners' report (counted under "unspecified" so growers
   stay private) takes its area interpolated between the years it was reported, or its 2019 area when 2020 is missing. 3,404
   crop-years filled; Calaveras's 2020 crop mix goes from 0.37 to 0.85 of its 2014-2020 level (its walnuts had been left out).
+
 ## 1.2.0 - 2026-11-09
+
 Grassland, shrubland, wetland and agriculture carbon rebuilt from data, CO2 fertilization in projections, and library updates.
+
 **Upgrading:** install `lucasCore-1.2.0.ssimpkg` (File > Packages > Install from file in SyncroSim Studio), then update each
 library made with 1.0 or 1.1: switch its lucasCore package to 1.2.0 and let SyncroSim update it, or from a command prompt
+
     SyncroSim.Console.exe --add --package --pkg=lucasCore --ver=1.2.0 --lib=<library.ssim>
     SyncroSim.Console.exe --update --lib=<library.ssim> --backup
+
 (--backup keeps a .ssimbak copy in the library's .backup folder). The update adds the new columns, the agriculture stock, flows and
 flow groups, the new Flow Multiplier Types, and the stock-flow rows of a Stock-Flow Definitions scenario; tools/sync-library.R is
 no longer needed for that. Results made with 1.1 keep their values; rerun the Build to use the new non-forest carbon. Needs
 SyncroSim 3.1.29 or later with ST-Sim 4.5.4.
+
 ### Added
 - Library updates (ui/LucasCoreUpdates.cs, SyncroSim's .NET update provider): each version's schema and definition changes are applied
   when a library made with an earlier version is opened. Every step checks first, so a library that already has a change is left as
@@ -600,6 +659,7 @@ SyncroSim 3.1.29 or later with ST-Sim 4.5.4.
   shrubland net growth by years since fire and the other non-forest classes' net growth (Figure 6), burned area by land type
   (Figure 9) and an agriculture panel of Crop Yield and Crop Mix (Figure 10).
 - The data home keeps each dataset's download records in records/, so a home copied or restored whole is not downloaded again (to-do 52).
+
 ### Changed
 - FIA Data in Growth Curve Options defaults to the FIA DataMart. A library set to the USGS condition tables whose files are not set
   reads the DataMart instead and says so in the log (a new library's Build stopped in stage 2).
@@ -611,6 +671,7 @@ SyncroSim 3.1.29 or later with ST-Sim 4.5.4.
   writes CO2 rows.
 - Minimum SyncroSim version raised from 3.1.9 to 3.1.29, the version lucasCore is tested on (3.1.9 was never tested). The README
   names the rsyncrosim version tested with (2.1.13).
+
 ### Fixed
 - The data home no longer counts a Build's FIA caches or a GIS overview (.ovr) beside a raster as part of a dataset, which made
   the FIA DataMart and the Cropland Data Layer look out of date and download again.
@@ -619,13 +680,18 @@ SyncroSim 3.1.29 or later with ST-Sim 4.5.4.
   wraps (Figures 7, 8, 10); the decay and checks charts no longer fail with few rows.
 - Stage 8 run alone keeps the Initial Conditions Spatial feed and the dependency's flow spatial multipliers; stage 7 run alone keeps
   the Build's productivity multipliers.
+
 ## 1.1.1 - 2026-11-09
+
 Released from v1.1.0 (branch release/1.1.1); main has the same fix.
+
 ### Fixed
 - Every stage failed with "more columns than column names" on a machine with only a few SyncroSim packages installed. rsyncrosim
   reads the installed-package list by turning runs of spaces into commas, so the commas in the package description added columns.
   The description no longer has commas; tests/unit-package-description.R checks it. Libraries made with 1.1.0 open unchanged.
+
 ## 1.1.0 - 2026-11-05
+
 ### Added
 - Ag Change, a new land-use transition group: Pasture to Cropland and Cropland to Pasture, from the NLCD class changes, historical and projected.
 - Projection Run Settings, "Target areas from": each Target group's projected area is what a historical run realized (gains counted as first-time gains only), instead of the area on the historical maps.
@@ -639,6 +705,7 @@ Released from v1.1.0 (branch release/1.1.1); main has the same fix.
 - User Guide Appendix B: the USGS data release workflow, worked on Puget Lowlands.
 - Repository files for a USGS software release: code.json, LICENSE.md, DISCLAIMER.md, CHANGELOG.md, CONTRIBUTING.md.
 - Stages 16 and 17 in the package blueprint; links between the guide and blueprints are relative.
+
 ### Changed
 - Historical land-use maps follow the transition pathways: a cell is in a group's map only when the pair (class the model holds, mapped class) is one of that group's pathway pairs, and a change the map reverses within 3 years does not count. On Puget Lowlands every land-use group now lands within 3% of its maps (agriculture contraction had been 6.6 times too large).
 - Harvest mapped on cells with no harvest pathway is placed on the nearest eligible forest cells in the same unit; minimum harvest ages are kept. Historical harvest on Puget Lowlands rose from 80% to 87% of mapped.
@@ -649,18 +716,25 @@ Released from v1.1.0 (branch release/1.1.1); main has the same fix.
 - Model records cite the copy of each dataset the Build read, and say when it came by hand.
 - Stratum Sources page redrawn in the style of the Data Sources page.
 - Tests and tools take their locations from the script's folder and environment variables instead of paths on the build machine.
+
 ### Fixed
 - Carbon Method page: the Fill prompt named the grassland tables by their old sheet names.
 - Data Release page: "What to write" was cut off.
 - Data Release and Release Information pages: Add a run crashed SyncroSim Studio.
+
 ## 1.0.1 - 2026-11-02
+
 ### Added
 - Metadata definitions, data dictionary and input citations.
+
 ### Changed
 - Stratum Sources polygons come from Data Download; Federal Lands come from PAD-US 4.0.
+
 ### Fixed
 - Data Sources defaults no longer name folders on the build machine.
 - Metadata citations match what Data Download fetches; ecodivisions cite Bailey.
+
 ## 1.0.0 - 2026-11-02
+
 First packaged version: stages 0-15, from study area and strata through growth curves, carbon flows, initial conditions,
 historical transitions, climate multipliers, projections, figures and Data Download.

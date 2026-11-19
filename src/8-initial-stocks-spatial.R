@@ -157,8 +157,8 @@ source(pkg_file("src", "forest-cover.R"))
 fo8 <- tryCatch(forest_cover_options(tryCatch(read_ds("ForestCoverOptions"), error = function(e) data.table())), error = function(e) fail("%s", conditionMessage(e)))
 stock_out <- NULL
 if (fo8$stocking == "canopy") {
-  tcd <- if (!is.na(fo8$folder)) fo8$folder else read_data_sources("TreeCanopyFolder")$TreeCanopyFolder; tf8 <- file.path(tcd, sprintf(TCC_FILE, y0))
-  if (!file.exists(tf8)) fail("Forest Cover: stocking by tree canopy cover needs the canopy of %d (%s): run a Data Download with Datasets = TreeCanopyFolder, or set Stocking to the same for every cell on the Forest Cover page", y0, tf8)
+  tcd <- read_data_sources("TreeCanopyFolder")$TreeCanopyFolder; tf8 <- file.path(tcd, sprintf(TCC_FILE, y0))
+  if (!file.exists(tf8)) fail("Forest Cover: stocking by tree canopy cover needs the canopy of %d (%s): tick USFS Tree Canopy Cover on the Data Download page and run it, or set Stocking to the same for every cell on the Forest Cover page", y0, tf8)
   if (!"Site Productivity" %in% stsim_list("FlowMultiplierType")$Name) fail("Forest Cover: stocking needs the Flow Multiplier Type 'Site Productivity' - run tools/sync-library.R on the library")
   fg <- "Net Growth Forest: Total"; if (!fg %in% stsim_list("FlowGroup")$Name) fail("Forest Cover: stocking: flow group '%s' not found", fg)
   cell_canopy <- function(tf) { t30 <- rast(tf); t30 <- crop(t30, terra::project(as.polygons(ext(P) + 3000, crs = crs(P)), crs(t30)))
@@ -422,6 +422,7 @@ if (!is.null(hf) && length(hf) && !is.na(hf) && nzchar(hf) && file.exists(hf)) {
   say("Organic Soil Share (gNATSGO Histosols): %d of %d land cells at least half organic (mean share %.3f)", sum(os_v[land] >= 0.5), sum(land), mean(os_v[land]))
   for (i in seq_len(min(nrow(os), 8))) with(os[i], say("  %s: %d of %d cells at least half organic (mean share %.2f)", cls, Organic, Cells, Mean))
 } else say("Organic soil: no HistosolFile in the Data Sources (run a Data Download with it), so no cell starts with peat")
+
 # ---- Cropland Productivity (Build Options; to-do 39 step 6, user 2026-11-07) -------------------------------------------------
 # The agriculture counterpart: each 30 m Cropland Data Layer pixel of CDL_YEARS takes its county's NASS growth of its crop group
 # (defaults/stockflow/ag-county-crop-npp.csv: the 1985-2023 mean, yields converted with USDA Tech. Bull. 1939 coefficients;

@@ -555,7 +555,7 @@ download_handlers <- function() {
 
   # ---- USFS Science Tree Canopy Cover v2025-6: one CONUS 30 m GeoTIFF a year (percent canopy cover 0-100; larger values no data),
   # each in a zip of about 2 GB whose members are stored, so the region is read where it sits. For Forest Cover = tree canopy
-  # (stage 5 reads the start year; src/forest-cover.R). Optional: a Data Download fetches it only when its Datasets names it
+  # (the Forest Cover page: stage 5 reads the start year, stage 6 every year, stage 8 the start year and 2016; src/forest-cover.R)
   H$TreeCanopyFolder <- list(column = "TreeCanopyFolder", name = "USFS Science Tree Canopy Cover", version = "v2025-6", method = "zip-window", clips = TRUE,
     note = "Read for the region only from the USFS raster gateway's yearly zips (percent tree canopy cover, 30 m; values over 100 are no data)",
     plan = function(ctx) {

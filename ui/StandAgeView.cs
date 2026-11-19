@@ -10,6 +10,7 @@
 using System;
 using System.Windows.Forms;
 using SyncroSim.Core;
+
 namespace lucasCoreUI
 {
     public class StandAgeView : LucasView
@@ -21,6 +22,7 @@ namespace lucasCoreUI
         private readonly Button m_browse = new Button { Text = "Browse...", AutoSize = true };
         private const string AGES = "lucasCore_StandAgeUnknown";
         private readonly Panel m_grid = GridHost(190);
+
         public StandAgeView()
         {
             this.SuspendLayout();
@@ -31,6 +33,7 @@ namespace lucasCoreUI
             a.Controls.Add(Option(m_agg, 2, "Mean of the cell's pixels"));
             a.Controls.Add(Indent(Note("The rule until lucasCore 1.5.2. Smoother from cell to cell, but it pulls every cell toward the middle: a landscape of cell means has few young and few old stands, and carbon does not rise in a straight line with age.")));
             AddGroup(Group("A cell's stand age", a));
+
             var u = Column();
             u.Controls.Add(Note("The age maps were made after the start year. Forest that burned or was clearcut between the start year and the map's year shows in the map as what grew back, or as its unburned remnants, not as what stood there in the start year."));
             u.Controls.Add(Option(m_unknown, 1, "Estimate it"));
@@ -40,6 +43,7 @@ namespace lucasCoreUI
             u.Controls.Add(Option(m_unknown, 2, "Keep the age map's value"));
             u.Controls.Add(Indent(Note("As before lucasCore 1.5.2. The stand age raster under Manual settings is still used where it has a value.")));
             AddGroup(Group("Forest burned or clearcut between the start year and the age map's year", u));
+
             var f = Row(); f.Controls.Add(Caption("Raster:")); f.Controls.Add(m_file); f.Controls.Add(m_browse);
             var y = Row(); y.Controls.Add(Caption("Its ages are for the year:")); y.Controls.Add(m_year); y.Controls.Add(Note("Blank = the start year. Another year's ages are moved to the start year."));
             AddGroup(Group("Manual settings", ProjectionTransitionsView.Stack(
@@ -65,14 +69,17 @@ namespace lucasCoreUI
             };
             this.ResumeLayout(false);
         }
+
         private static Control Indent(Control c) { c.Margin = new Padding(22, 0, 3, 8); return c; }
         private static Label Heading(string text) { return new Label { Text = text, AutoSize = true, Font = new System.Drawing.Font(System.Drawing.SystemFonts.DefaultFont, System.Drawing.FontStyle.Bold), Margin = new Padding(3, 10, 3, 0) }; }
+
         public override void LoadDataFeed(DataFeed dataFeed)
         {
             base.LoadDataFeed(dataFeed);
             LoadGrid(m_grid, AGES);
             RefreshControls();
         }
+
         protected override void ShowData()
         {
             ShowChoice(m_agg); ShowChoice(m_unknown);

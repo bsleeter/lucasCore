@@ -250,9 +250,9 @@ fo <- tryCatch(forest_cover_options(tryCatch(read_ds("ForestCoverOptions"), erro
 canopy_cell <- rep(FALSE, ncell(R))
 if (fo$definition == "canopy") {
   if (!y0 %in% TCC_YEARS) fail("Forest Cover: tree canopy cover has the years %d-%d and the start year is %d; choose Annual NLCD on the Forest Cover page", min(TCC_YEARS), max(TCC_YEARS), y0)
-  tcd <- if (!is.na(fo$folder)) fo$folder else read_data_sources("TreeCanopyFolder")$TreeCanopyFolder
+  tcd <- read_data_sources("TreeCanopyFolder")$TreeCanopyFolder
   tcf <- file.path(tcd, sprintf(TCC_FILE, y0))
-  if (!file.exists(tcf)) fail("Forest Cover: no tree canopy cover for %d (%s): run a Data Download with Datasets = TreeCanopyFolder for this study area and year, or choose Annual NLCD on the Forest Cover page", y0, tcf)
+  if (!file.exists(tcf)) fail("Forest Cover: no tree canopy cover for %d (%s): tick USFS Tree Canopy Cover on the Data Download page and run it for this study area and year (or set the folder on the Data Sources page), or choose Annual NLCD on the Forest Cover page", y0, tcf)
   t30 <- crop_to(rast(tcf)); pot30 <- NULL
   if (fo$gate == "bps") {
     bf <- read_data_sources("BpsFile", optional = TRUE)$BpsFile
