@@ -112,8 +112,12 @@ if (co2_choice == "None") say("CO2 fertilization: None (growth does not respond 
   if (length(bad)) fail("CO2 fertilization: flow groups not in the library: %s", paste(bad, collapse = "; "))
   adj <- as.data.table(datasheet(scn, ds("Co2Adjustment"), optional = TRUE, lookupsAsFactors = FALSE))
   if (nrow(adj)) { adj[, AgeBand := co2_band_id(AgeBand)]
+    # a row for a class with no CO2 response changes nothing and is left out: a scenario made before 1.4.0 holds the defaults of
+    # `Shrubland: Post Fire Shrub`, retired then and kept in the lists of existing libraries (its rerun failed a check here)
     bad <- adj[!StateClassId %in% cl$StateClassId, unique(StateClassId)]
-    check(STAGE, "every CO2 Betas row names a class that grows (forest, shrubland, grassland, wetland, agriculture)", !length(bad), paste(bad, collapse = "; ")) }
+    if (length(bad)) { say("CO2 Betas: %d row(s) left out, for classes with no CO2 response here (retired, or not forest, shrubland, grassland, wetland or agriculture): %s",
+                           adj[StateClassId %in% bad, .N], paste(bad, collapse = "; "))
+      adj <- adj[!StateClassId %in% bad] } }
   bands <- rdc("co2-age-bands.csv")
   bt <- co2_betas(cl, strata, co2_choice, rdc("co2-betas.csv"), bands, rdc("co2-ecm-share.csv"), if (nrow(adj)) adj else NULL)
   rows <- co2_rows(bt, ser, bands)
