@@ -516,6 +516,28 @@ A cut stand is then still raised to its minimum harvest age at its cut where the
 
 > **The rules below still apply.** A cell the annual NLCD shows regrowing, starting in a disturbed class or reforesting later takes its age from those rules (section 3.3), after the stand age rules here.
 
+#### 3.3.3 Forest cover
+
+**LUCAS Core > Forest Cover** sets what starts as forest. Every class comes from the annual NLCD of the start year; this page decides what else is forest.
+
+**Annual NLCD** (the default). A natural cell is forest when NLCD maps it as forest in the start year or in any later year; cells that NLCD shows becoming forest later are then given their own start (regrowing, disturbed, or reforesting later; section 3.5). Annual NLCD maps much open western forest as shrub or grass. In 2016 it has 44% of Yellowstone's land and 66% of the Northern Sierra Nevada pyrome's as forest or woody wetland, where the forest inventory (FIA) has 83% and 85%.
+
+**Annual NLCD and tree canopy cover.** As above, and a cell NLCD maps as barren, shrub or grass in the start year also starts as forest when at least half of its 30 m pixels pass the canopy rule: tree canopy cover in the start year at or over the **threshold** (blank = 10%, FIA's own definition of forest land), on land whose LANDFIRE BpS is forest. The cell takes the forest type map's type and the age map's age; where it burned or was cut before the age map's year, the Stand Age rules apply (section 3.3.2). The canopy is the USFS Science Tree Canopy Cover (30 m, 1985 to 2023), so the start year must be one of those years.
+
+| Region | FIA forest, share of land | NLCD forest and woody wetland | Canopy 10% on BpS forest | Canopy 10% anywhere |
+|---|---|---|---|---|
+| Yellowstone | 83.3% (s.e. 1.9) | 44.0% | 85.8% | 90.9% |
+| Northern Sierra Nevada (P26) | 85.3% (s.e. 1.0) | 65.8% | 85.8% | 90.1% |
+| Great Dismal Swamp | 52.1% (s.e. 5.2) | 53.6% | 57.5% | 57.7% |
+
+The table is for 2016, at 30 m, against the newest FIA plot visits of 2012 to 2022. **Anywhere** drops the BpS gate: the canopy product gives western shrubland and grassland a cover of 20 to 25%, so at 10% it takes in most of it; use about 15% with it. **Share of a cell's pixels** (blank = 0.5) is how much of a cell must pass.
+
+What the option does not change: forest that NLCD maps is never removed (a burned or cut stand with little canopy is still forest land); developed land, farm land, water and wetlands keep their NLCD class; and when a disturbed stand counts as regrown still follows NLCD in stage 6.
+
+**Data.** The Build needs the tree canopy cover of the start year. Run a Data Download whose **Datasets** names `TreeCanopyFolder` (it is not fetched otherwise) for the study area and the start year; it lands in `land-cover/tree-canopy` of Data Sources Home. The folder can also be set on the page. The USFS server is slow on some days; a download that fails can be rerun.
+
+**Build Results > Forest by Tree Canopy Cover** lists, by forest type, the cells the rule made forest, what NLCD maps them as, and how many NLCD maps as forest in a later year. Its map is the share of each cell's pixels that pass the rule.
+
 ### 3.4 Climate Options
 
 1. Choose **Climate Options**.
@@ -2005,6 +2027,8 @@ Besides the inputs they write for ST-Sim, the lucasCore stages save summary tabl
 | State Class Summary | OutputStateClassSummary | 5 | Each state class in the start year: its area in cells and mean age. |
 | Stand Age Summary | OutputStandAge | 5 | For each forest type and rule (the age map, the stand age raster, Unknown Ages, an earlier age map, undisturbed forest of its type): the cells whose start-year age it set, their mean age, and the mean age the age map gave them (section 3.3.2). |
 | Stand Age Summary: Cut Stands | OutputStandAgeCut | 6 | The same for forest cells clearcut between the start year and the age map's year, whose ages stage 6 sets from its harvest maps. |
+| Forest by Tree Canopy Cover | OutputForestCover | 5 | With Forest Cover = Annual NLCD and tree canopy cover: per forest type, the cells the canopy rule made forest, what NLCD maps them as in the start year, and how many NLCD maps as forest later (section 3.3.3). |
+| Forest by Tree Canopy Cover: Map | OutputForestCoverMap | 5 | The share of each cell's 30 m pixels that pass the canopy rule, with the threshold and gate the Build ran with. |
 | Land Cover Layers | OutputLandCoverLayers | 5 | The forest type, grassland and shrubland type, wetland type and "forest in any year" maps behind the state classes. |
 | Annual NLCD (model grid) | OutputNlcdAnnual | 5 | The NLCD land cover map of each year, resampled to the model grid; stage 6 reads the change between years. |
 | Spin-up Return Intervals | OutputReturnInterval | 5 | The replacement-fire return interval used to spin up each ecodivision and state class. |

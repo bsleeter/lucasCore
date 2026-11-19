@@ -188,10 +188,11 @@ build_figures <- function(I, outdir) {
   # disturbed at the start (a fire perimeter dates it), reforests later (starts as its start-year class: slow recovery on BpS forest,
   # encroachment on BpS non-forest), or forest with its source age (flickers, late first forest on other potential, reforestation off)
   sm <- I$start_maps
-  if (!is.null(sm$kind)) { kv <- cv(sm$kind); km <- values(sm$kind, mat = FALSE); nk <- tabulate(km[!is.na(km)], 5)   # (areas from the model grid; cv() samples the finer display grid)
+  if (!is.null(sm$kind)) { kv <- cv(sm$kind); km <- values(sm$kind, mat = FALSE); nk <- tabulate(km[!is.na(km)], 6)   # (areas from the model grid; cv() samples the finer display grid)
     if (sum(nk) > 0) {
-      SR_LAB <- c("Regrowth: forest, NLCD age", "Disturbed at the start", "Reforests: slow recovery", "Reforests: encroachment", "Forest, source age")
-      SR_COL <- c("#6fae74", "#d9822b", "#c0392b", "#7b3294", "#9fb7c9")
+      SR_LAB <- c("Regrowth: forest, NLCD age", "Disturbed at the start", "Reforests: slow recovery", "Reforests: encroachment", "Forest, source age", "Forest by tree canopy cover")   # (6: Forest Cover page)
+      SR_COL <- c("#6fae74", "#d9822b", "#c0392b", "#7b3294", "#9fb7c9", "#1b7837")
+      if (!nk[6]) { SR_LAB <- SR_LAB[1:5]; SR_COL <- SR_COL[1:5]; nk <- nk[1:5] }
       P <- list(list(k = kv, cols = SR_COL, lab = sprintf("%s (%s km2)", SR_LAB, format(round(nk * cell_km2, 1), trim = TRUE)), key = TRUE,
                      title = "How natural cells NLCD shows as forest later start", sub = sprintf("%s km2 of barren, shrub, grass or emergent wetland in %s; grey: other cells", format(round(sum(nk) * cell_km2, 1), trim = TRUE), I$years[1])))
       if (!is.null(sm$first)) { fv <- cv(sm$first); fb <- c(I$years[1], seq(I$years[1] + 5, I$years[2], by = 5), I$years[2] + 1)

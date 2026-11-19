@@ -177,7 +177,7 @@ stsim <- list(
     "Flow Spatial Multipliers" = "stsim_FlowSpatialMultiplier", "State Attribute Values" = "stsim_StateAttributeValue"))
 written <- unique(unlist(lapply(st, function(s) s$sheet[grepl("^(stsim|core)_", s$sheet) & s$type %in% c("Output", "Both")])))
 if (length(miss <- setdiff(written, unlist(stsim)))) stop("ST-Sim sheet(s) written but not placed in the blueprint: ", paste(miss, collapse = ", "))
-reports <- list("Strata Summary" = "OutputStrataSummary", "State class and stand age summaries" = c("OutputStateClassSummary", "OutputStandAge", "OutputStandAgeCut", "OutputStandAgeMap"),
+reports <- list("Strata Summary" = "OutputStrataSummary", "State class and stand age summaries" = c("OutputStateClassSummary", "OutputStandAge", "OutputStandAgeCut", "OutputStandAgeMap", "OutputForestCover", "OutputForestCoverMap"),
   "Growth and carbon curve parameters" = c("OutputGrowthParameter", "OutputCarbonParameter", "OutputGrowthReport"),
   "Decay Calibration" = "OutputDecayCalibration", "Return intervals, soil targets" = c("OutputReturnInterval", "OutputSoilTarget"),
   "Historical Transition Summary" = "OutputTransitionSummary", "Climate and CO2 summaries" = c("OutputClimateSummary", "OutputCo2Beta", "OutputCo2Series"),

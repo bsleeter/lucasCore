@@ -932,6 +932,38 @@
 		<column name="Cells" dataType="Integer"/>
 	</dataSheet>
 
+	<!-- Forest Cover (stage 5, src/forest-cover.R; lucasCore 1.5.2): what is forest in the start year. Annual NLCD under-maps open western
+	     forest (Yellowstone 2016: 44% of the land, FIA 83%). With tree canopy cover, a natural cell NLCD calls barren, shrub or grass starts
+	     as forest when at least CellShare of its 30 m pixels have canopy cover at or over the threshold in the start year (USFS Science
+	     Tree Canopy Cover) and, with the default gate, forest as their LANDFIRE BpS. 10% on BpS forest matched FIA forest area in
+	     Yellowstone, P26 and Great Dismal Swamp (2026-11-18) -->
+	<dataSheet name="ForestCoverOptions" displayName="Forest Cover" isSingleRow="True" viewClassName="lucasCoreUI.ForestCoverView" viewClassAssembly="lucasCoreUI">
+		<column name="ForestDefinition" displayName="Forest in the Start Year (blank = Annual NLCD)" dataType="Integer" validationType="List" formula1="1:Annual NLCD|2:Annual NLCD and tree canopy cover" isOptional="True" defaultValue="1"/>
+		<column name="CanopyThreshold" displayName="Tree Canopy Cover Threshold (percent; blank = 10)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="1" formula2="100"/>
+		<column name="CanopyGate" displayName="Where Canopy Cover Makes Forest (blank = only where LANDFIRE BpS is forest)" dataType="Integer" validationType="List" formula1="1:Only where LANDFIRE BpS is forest|2:Anywhere" isOptional="True" defaultValue="1"/>
+		<column name="CellShare" displayName="Share of a Cell's 30 m Pixels That Must Pass (blank = 0.5)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0.01" formula2="1"/>
+		<column name="TreeCanopyFolder" displayName="Tree Canopy Cover Folder (science_tcc_conus_year.tif; blank = Data Sources Home)" dataType="String" isOptional="True"/>
+	</dataSheet>
+
+	<dataSheet name="OutputForestCover" displayName="Forest by Tree Canopy Cover">
+		<!-- stage 5, Forest Cover = tree canopy: per forest type, the cells the canopy rule made forest and what NLCD calls them in the start year -->
+		<column name="StateClassId" displayName="State Class" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
+		<column name="Cells" dataType="Integer"/>
+		<column name="Barren" displayName="NLCD Barren in the Start Year (cells)" dataType="Integer"/>
+		<column name="Shrub" displayName="NLCD Shrub in the Start Year (cells)" dataType="Integer"/>
+		<column name="Grass" displayName="NLCD Grass in the Start Year (cells)" dataType="Integer"/>
+		<column name="NlcdForestLater" displayName="NLCD Forest in a Later Year (cells)" dataType="Integer"/>
+	</dataSheet>
+
+	<dataSheet name="OutputForestCoverMap" displayName="Forest by Tree Canopy Cover: Map" isSingleRow="True">
+		<!-- stage 5, Forest Cover = tree canopy: the share of each cell's 30 m pixels that pass the rule, and the settings it ran with -->
+		<column name="CanopyShareFileName" displayName="Share of the Cell's Pixels That Pass the Canopy Rule" dataType="String" isExternalFile="True" isRaster="True" externalFileFilter="GeoTIFF Files (*.tif)|*.tif"/>
+		<column name="Threshold" displayName="Canopy Cover Threshold (percent)" dataType="Double"/>
+		<column name="Gate" displayName="Where" dataType="String"/>
+		<column name="CellShare" displayName="Share of a Cell's Pixels That Must Pass" dataType="Double"/>
+		<column name="Cells" displayName="Cells Made Forest" dataType="Integer"/>
+	</dataSheet>
+
 	<!-- Stand Age (stage 5, src/stand-age.R; lucasCore 1.5.2): how a cell takes its age from its 30 m pixels, and the age of forest the
 	     age map cannot know - cells that burned between the start year and the map's year (NASA CMS 1990, TreeMap 2016), which the map
 	     shows as what grew back. Their age is, in order: the stand age raster, Unknown Ages' value for the forest type, an earlier age
@@ -1581,6 +1613,9 @@
 		<dataSheet name="StandAgeUnknown" type="Input"/>
 		<dataSheet name="OutputStandAge" type="Output"/>
 		<dataSheet name="OutputStandAgeMap" type="Output"/>
+		<dataSheet name="ForestCoverOptions" type="Input"/>
+		<dataSheet name="OutputForestCover" type="Output"/>
+		<dataSheet name="OutputForestCoverMap" type="Output"/>
 		<dataSheet name="LandCoverCrosswalk" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Both"/>
 		<dataSheet name="OutputNlcdAnnual" type="Output"/>
@@ -1855,6 +1890,7 @@
 			<item name="BuildOptions"/>
 			<item name="StandAgeOptions"/>
 			<item name="StandAgeUnknown"/>
+			<item name="ForestCoverOptions"/>
 			<item name="ClimateOptions"/>
 			<item name="GrowthOptions"/>
 			<item name="HarvestAge"/>
@@ -1905,6 +1941,8 @@
 				<item name="OutputStandAge"/>
 				<item name="OutputStandAgeCut"/>
 				<item name="OutputStandAgeMap"/>
+				<item name="OutputForestCover"/>
+				<item name="OutputForestCoverMap"/>
 				<item name="OutputLandCoverLayers"/>
 				<item name="OutputSiteClassMap"/>
 				<item name="OutputNlcdAnnual"/>

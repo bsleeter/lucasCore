@@ -239,6 +239,39 @@ if (wf_n > 0) {
   for (j in seq_len(min(nrow(r), 12))) with(r[j], say("  %s, %s -> %s: %d cells", stl$Name[match(Eco, stl$Id)], if (is.na(Fz)) "no forest type" else scl$Name[match(Fz, scl$Id)], scl$Name[match(Tw, scl$Id)], N)) }
 S <- ifel(woody, tw, S)
 S <- mask(S, m)
+# ---- forest by tree canopy cover (Forest Cover page; src/forest-cover.R) ----------------------------------------------------------
+# Annual NLCD calls much open western forest shrub or grass (Yellowstone 2016: 44% of the land forest or woody wetland, FIA 83%).
+# With Forest in the Start Year = Annual NLCD and tree canopy cover, a natural cell NLCD calls barren, shrub or grass in the start year
+# starts as forest, of the forest type map's type and the age map's age, when at least half of its 30 m pixels have canopy cover at or
+# over the threshold in the start year and (the default gate) forest as their LANDFIRE BpS. It is then forest from the start: the
+# regrowth, disturbed-start and reforestation rules below, which read when NLCD first shows forest, leave it alone.
+source(pkg_file("src", "forest-cover.R")); source(pkg_file("src", "reforestation.R"))
+fo <- tryCatch(forest_cover_options(tryCatch(read_ds("ForestCoverOptions"), error = function(e) data.table())), error = function(e) fail("%s", conditionMessage(e)))
+canopy_cell <- rep(FALSE, ncell(R))
+if (fo$definition == "canopy") {
+  if (!y0 %in% TCC_YEARS) fail("Forest Cover: tree canopy cover has the years %d-%d and the start year is %d; choose Annual NLCD on the Forest Cover page", min(TCC_YEARS), max(TCC_YEARS), y0)
+  tcd <- if (!is.na(fo$folder)) fo$folder else read_data_sources("TreeCanopyFolder")$TreeCanopyFolder
+  tcf <- file.path(tcd, sprintf(TCC_FILE, y0))
+  if (!file.exists(tcf)) fail("Forest Cover: no tree canopy cover for %d (%s): run a Data Download with Datasets = TreeCanopyFolder for this study area and year, or choose Annual NLCD on the Forest Cover page", y0, tcf)
+  t30 <- crop_to(rast(tcf)); pot30 <- NULL
+  if (fo$gate == "bps") {
+    bf <- read_data_sources("BpsFile", optional = TRUE)$BpsFile
+    if (is.na(bf)) fail("Forest Cover: the canopy rule is set to forest BpS only and needs LANDFIRE BpS (Data Sources: BpsFile; a Data Download fetches it), or set it to Anywhere")
+    b30 <- crop_to(rast(bf)); levels(b30) <- NULL; lk <- bps_lookup(); rip <- reforest_options(read_ds("ReforestationOptions"))$riparian_as
+    pot30 <- project(classify(b30, cbind(lk$VALUE, as.integer(bps_potential(lk$VALUE, lk, rip) == "forest")), others = 0L), t30, method = "near") }
+  Cs <- mask(project(canopy_pass(t30, fo$threshold, pot30), R, method = "average"), m)
+  canopy_cell <- canopy_forest(values(n0, mat = FALSE), values(Cs, mat = FALSE), values(woody, mat = FALSE), fo$share) & values(m, mat = FALSE) %in% TRUE
+  vS <- values(S, mat = FALSE); was_f <- vS >= 100 & vS <= 999; n_land <- global(m, "sum", na.rm = TRUE)[[1]]
+  f_before <- sum(was_f | vS == 91, na.rm = TRUE); vS[canopy_cell] <- values(Fz, mat = FALSE)[canopy_cell]; S <- setValues(S, vS)
+  f_nlcd <- sum(values(n0, mat = FALSE) %in% 41:43 & values(m, mat = FALSE) %in% TRUE)
+  say("Forest Cover: tree canopy cover %d (USFS Science TCC) at or over %g%%%s, on at least %g of a cell's 30 m pixels", y0, fo$threshold, if (fo$gate == "bps") " where LANDFIRE BpS is forest" else "", fo$share)
+  say("Forest Cover: %d barren, shrub and grass cells of %d start as forest by their canopy (%d of them NLCD shows as forest in a later year); forest cells: NLCD %d %.1f%% of land, with the any-year rule %.1f%%, with the canopy %.1f%%",
+      sum(canopy_cell), y0, sum(canopy_cell & was_f, na.rm = TRUE), y0, 100 * f_nlcd / n_land, 100 * f_before / n_land, 100 * sum((vS >= 100 & vS <= 999) | vS == 91, na.rm = TRUE) / n_land)
+  ct <- data.table(StateClassId = scl$Name[match(vS[canopy_cell], as.integer(scl$Id))], Nlcd = values(n0, mat = FALSE)[canopy_cell], Later = was_f[canopy_cell] %in% TRUE)
+  fc_tab <- ct[, .(Cells = .N, Barren = sum(Nlcd == 31), Shrub = sum(Nlcd == 52), Grass = sum(Nlcd == 71), NlcdForestLater = sum(Later)), by = StateClassId][order(-Cells)]
+  for (i in seq_len(min(nrow(fc_tab), 8))) with(fc_tab[i], say("  %s: %d cells (NLCD %d: %d shrub, %d grass, %d barren)", StateClassId, Cells, y0, Shrub, Grass, Barren))
+  fCS <- write_raster(Cs, "CanopyForestShare.tif", "FLT4S")
+} else say("Forest Cover: Annual NLCD (the any-year rule); tree canopy cover is not used (Forest Cover page)")
 forest <- (S >= 100 & S <= 999) | S == 91   # forest type groups (100-999); disturbed classes (2000 + parent, to-do 57) are not forest
 progressBar()
 
@@ -307,7 +340,9 @@ if (ao$unknown == "source") say("Stand age: Unknown Ages is set to keep the age 
 ar <- data.table(r = aa$rule, a = aa$age, s = src_age)[!is.na(r) & r != "source", .(Cells = .N, Age = mean(a), Was = mean(s)), by = r]
 for (i in seq_len(nrow(ar))) say("  %s: %d cells, mean age %.0f (the age map gave %.0f)", AGE_RULES[[ar$r[i]]], ar$Cells[i], ar$Age[i], ar$Was[i])
 if (n_unk && ao$unknown == "default" && any(aa$rule %in% "percentile")) { up <- apct[!is.na(StateClassId)][paste(StratumId, StateClassId) %in% unique(paste(eco_a, cls_a)[aa$rule %in% "percentile"])][order(-Cells)]
-  say("  the %gth percentile of the unburned forest (one pixel a cell): %s", ao$percentile, paste(sprintf("%s %.0f", sub("^Forest: ", "", up$StateClassId), up$Age), collapse = ", ")) }
+  # one part per ecodivision, named: a forest type has a percentile in each ecodivision it grows in (P26, 2026-11-18: two ponderosa ages, unlabelled)
+  ue <- up[, .(Txt = paste(sprintf("%s %.0f", sub("^Forest: ", "", StateClassId), Age), collapse = ", ")), by = StratumId]
+  say("  the %gth percentile of the unburned forest (one pixel a cell), by ecodivision: %s", ao$percentile, paste(sprintf("%s: %s", ue$StratumId, ue$Txt), collapse = "; ")) }
 check(STAGE, "stand age: every forest cell has an age of at least 1 after the unknown-age rules", all(aa$age[fa] >= 1), sprintf("%d cells", sum(!(aa$age[fa] >= 1))))
 # regrowing forest (src/regrowth-age.R; to-do 57, user decision 2026-11-11): a cell that is forest only by the any-year rule (grass,
 # shrub or barren in the start year) and that NLCD shows regrowing takes its starting age from the record, not from CMS or TreeMap
@@ -320,8 +355,9 @@ cut_all <- if (ro$enabled) reforest_cutoff(eco_nm, override = ro$cutoff) else re
 if (ro$enabled) { cu <- unique(data.table(e = eco_nm, c = cut_all)[!is.na(e)])
   say("Reforestation: on; cutoff %s (%s)", if (is.na(ro$cutoff)) "fitted by ecodivision" else sprintf("%d years, set on Reforestation Options", as.integer(ro$cutoff)),
       paste(sprintf("%s %d", cu$e, as.integer(cu$c)), collapse = ", ")) } else say("Reforestation: off (Reforestation Options); regrowth up to RegrowthLag (%d years)", as.integer(rg$lag))
-rc <- which(values(forest, mat = FALSE) %in% 1 & values(n0, mat = FALSE) %in% c(31, 52, 71))
-rule <- which(values(forest, mat = FALSE) %in% 1 & values(n0, mat = FALSE) %in% c(31, 52, 71, 95) & !values(woody, mat = FALSE) %in% TRUE)   # (to-do 57 step 6: the start rule map)
+# (a cell forest by its start-year tree canopy is forest from the start: none of these rules, which date forest from NLCD, touch it)
+rc <- which(values(forest, mat = FALSE) %in% 1 & values(n0, mat = FALSE) %in% c(31, 52, 71) & !canopy_cell)
+rule <- which(values(forest, mat = FALSE) %in% 1 & values(n0, mat = FALSE) %in% c(31, 52, 71, 95) & !values(woody, mat = FALSE) %in% TRUE & !canopy_cell)   # (to-do 57 step 6: the start rule map)
 kind <- rep(NA_integer_, ncell(R)); kind[rule] <- 5L
 if (length(rc)) {
   ra <- regrowth_age(as.matrix(N[rc]), years, rg$lag, rg$share, rg$nonforest_years, cutoff = cut_all[rc]); hit <- !is.na(ra)
@@ -372,7 +408,7 @@ if (ro$enabled) {
   b30 <- classify(b30, cbind(lk$VALUE, match(bps_potential(lk$VALUE, lk, ro$riparian_as), POT)), others = 3L)
   Bp <- mask(project(b30, R, method = "mode"), m); Bf <- mask(project(ifel(b30 == 1, 1, 0), R, method = "average"), m)
   v0a <- values(n0, mat = FALSE); vW <- values(W, mat = FALSE)
-  cand <- which(vS >= 100 & vS <= 999 & v0a %in% c(31, 52, 71, 95) & !values(woody, mat = FALSE) %in% TRUE & !(v0a == 95 & vW %in% c(90, 91)))
+  cand <- which(vS >= 100 & vS <= 999 & v0a %in% c(31, 52, 71, 95) & !values(woody, mat = FALSE) %in% TRUE & !(v0a == 95 & vW %in% c(90, 91)) & !canopy_cell)
   if (length(cand)) {
     pot <- POT[values(Bp, mat = FALSE)[cand]]; pot[is.na(pot)] <- "other"
     pk <- reforest_pick(as.matrix(N[cand]), years, pot, cut_all[cand], rg$share); rf <- cand[pk$reforest]; n_rf <- length(rf)
@@ -395,10 +431,12 @@ fRT <- write_raster(ft, "ReforestType.tif")
 # 2 disturbed at the start (fire-dated), 3 reforests later on BpS forest (slow recovery), 4 reforests later on BpS non-forest
 # (encroachment), 5 forest with the CMS or TreeMap age (flickers, or first forest late on other potential, or reforestation off);
 # and the year NLCD first shows it as forest two years running
-if (length(rule)) { ffy <- reforest_pick(as.matrix(N[rule]), years, "other", Inf)$first
-  kv <- rep(NA_integer_, ncell(R)); kv[rule] <- kind[rule]; fv <- rep(NA_integer_, ncell(R)); fv[rule] <- as.integer(y0 + ffy)
-  fSR <- write_raster(setValues(rast(R), kv), "StartRule.tif", "INT1U"); fFY <- write_raster(setValues(rast(R), fv), "FirstForestYear.tif", "INT2U")
-  say("Start of the %d natural cells forest only by the any-year rule: %s", length(rule), paste(sprintf("%s %d", c("regrowth age", "disturbed", "slow recovery", "encroachment", "source age"),
+# 6 (Forest Cover: tree canopy): forest from the start by its start-year canopy cover, with the CMS or TreeMap age
+if (length(rule) || any(canopy_cell)) { kv <- rep(NA_integer_, ncell(R)); fv <- rep(NA_integer_, ncell(R))
+  if (length(rule)) { ffy <- reforest_pick(as.matrix(N[rule]), years, "other", Inf)$first; kv[rule] <- kind[rule]; fv[rule] <- as.integer(y0 + ffy) }
+  kv[canopy_cell] <- 6L
+  fSR <- write_raster(setValues(rast(R), kv), "StartRule.tif", "INT1U"); if (length(rule)) fFY <- write_raster(setValues(rast(R), fv), "FirstForestYear.tif", "INT2U")
+  if (length(rule)) say("Start of the %d natural cells forest only by the any-year rule: %s", length(rule), paste(sprintf("%s %d", c("regrowth age", "disturbed", "slow recovery", "encroachment", "source age"),
       tabulate(kind[rule], 5)), collapse = ", ")) }
 forest <- (S >= 100 & S <= 999) | S == 91
 # chaparral (to-do 39, 2026-11-06: it grows by age since fire): the years since the last interagency fire perimeter of 1900 to the start
@@ -451,8 +489,8 @@ check(STAGE, "forest and disturbed cells have an age of at least 1, chaparral an
       if (length(bad_age)) { b <- data.table(S = vS[bad_age], A = vA[bad_age])[, .(n = .N, ages = paste(range(A, na.rm = TRUE), collapse = "-")), by = S]
         paste(sprintf("%s: %d cells, age %s", scl$Name[match(b$S, as.integer(scl$Id))], b$n, b$ages), collapse = "; ") } else "")
 check(STAGE, "every forest ecodivision x class has a return interval", nrow(ri) == nrow(fc), sprintf("%d of %d", nrow(ri), nrow(fc)))
-say("Forest cells: %d (%.1f%% of land); natural cells made forest by the any-year rule: %d; developed/ag/water/ice kept: %d",
-    sum(vF == 1, na.rm = TRUE), 100 * mean(vF[!is.na(vP)] == 1), sum(!is.na(v0) & !(v0 %in% 41:43) & vS >= 100 & vS <= 999 & !lu, na.rm = TRUE), sum(lu))
+say("Forest cells: %d (%.1f%% of land); natural cells made forest by the any-year rule: %d; by tree canopy cover: %d; developed/ag/water/ice kept: %d",
+    sum(vF == 1, na.rm = TRUE), 100 * mean(vF[!is.na(vP)] == 1), sum(!is.na(v0) & !(v0 %in% 41:43) & vS >= 100 & vS <= 999 & !lu & !canopy_cell, na.rm = TRUE), sum(canopy_cell), sum(lu))
 say("Return intervals: %d cells, %d-%d yr (median %d); gNATSGO soil targets: %d cells, median %.0f Mg C/ha",
     nrow(ri), min(ri$ReturnInterval), max(ri$ReturnInterval), as.integer(median(ri$ReturnInterval)), nrow(st), median(st$SoilTarget))
 progressBar()
@@ -475,6 +513,9 @@ if (nrow(age_tab)) tryCatch(write_ds(age_tab, "OutputStandAge"), error = functio
 tryCatch(write_ds(data.frame(RuleFileName = write_raster(setValues(rast(R), match(aa$rule, names(AGE_RULES))), "StandAgeRule.tif", "INT1U"),
                             PixelAgeFileName = write_raster(mask(A_px, m), "StandAgePixel.tif", "INT2U")), "OutputStandAgeMap"),
          error = function(e) say("Stand Age Maps not written (%s): reopen the library in SyncroSim Studio so it adds the table", conditionMessage(e)))
+# Forest Cover = tree canopy: the share of each cell's pixels that pass the rule, and the cells it made forest by forest type
+if (exists("fCS")) tryCatch({ write_ds(data.frame(CanopyShareFileName = fCS, Threshold = fo$threshold, Gate = unname(FOREST_GATE[fo$gate]), CellShare = fo$share, Cells = sum(canopy_cell)), "OutputForestCoverMap")
+  if (nrow(fc_tab)) write_ds(fc_tab, "OutputForestCover") }, error = function(e) say("Forest Cover outputs not written (%s): reopen the library in SyncroSim Studio so it adds the tables", conditionMessage(e)))
 summ <- data.table(S = vS, A = vA)[!is.na(S), .(Cells = .N, MeanAge = round(mean(A), 1)), by = S][, StateClassId := scl$Name[match(S, as.integer(scl$Id))]]
 write_ds(summ[order(-Cells), .(StateClassId, Cells, MeanAge)], "OutputStateClassSummary")
 progressBar()

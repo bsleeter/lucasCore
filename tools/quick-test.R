@@ -39,7 +39,7 @@ saveDatasheet(S, data.frame(StageNameId = pick, RunOrder = seq_along(pick)), "co
 # copied from the result, or with --options from the Build scenario (its current options)
 src_id <- bid
 if ("--options" %in% a) { src_id <- sc[ScenarioId == bid, ParentId]; if (is.na(src_id)) stop("--options: the Build result has no parent scenario") }
-for (sh in paste0("lucasCore_", c("BuildOptions", "ClimateOptions", "GrowthOptions", "CarbonOptions", "FireOptions", "HarvestAgeOptions", "ReforestationOptions", "StudyAreaOptions", "WetlandOptions", "WetlandMethaneTarget", "MarshSalinityTarget"))) {   # (the Wetland Methane page, 2026-11-17)
+for (sh in paste0("lucasCore_", c("BuildOptions", "ClimateOptions", "GrowthOptions", "CarbonOptions", "FireOptions", "HarvestAgeOptions", "ReforestationOptions", "StandAgeOptions", "StandAgeUnknown", "ForestCoverOptions", "CarbonCapacityOptions", "StudyAreaOptions", "WetlandOptions", "WetlandMethaneTarget", "MarshSalinityTarget"))) {   # (the Wetland Methane page, 2026-11-17)
   x <- tryCatch(datasheet(scenario(L, src_id), sh, optional = TRUE), error = function(e) NULL); if (!is.null(x) && nrow(x)) saveDatasheet(S, x, sh) }   # (a library made before a sheet has none)
 description(S) <- sprintf("Quick test (tools/quick-test.R): reruns %s on top of Build result %d, which supplies everything else.", paste(pick, collapse = "; "), bid)
 cat(sprintf("scenario %d: %s, on Build result %d\n", scenarioId(S), paste(pick, collapse = "; "), bid))

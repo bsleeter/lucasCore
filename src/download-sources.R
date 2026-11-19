@@ -553,6 +553,28 @@ download_handlers <- function() {
         ctx$log(sprintf("  RAP NPP %d", items$year[i])) }
       ctx$place })
 
+  # ---- USFS Science Tree Canopy Cover v2025-6: one CONUS 30 m GeoTIFF a year (percent canopy cover 0-100; larger values no data),
+  # each in a zip of about 2 GB whose members are stored, so the region is read where it sits. For Forest Cover = tree canopy
+  # (stage 5 reads the start year; src/forest-cover.R). Optional: a Data Download fetches it only when its Datasets names it
+  H$TreeCanopyFolder <- list(column = "TreeCanopyFolder", name = "USFS Science Tree Canopy Cover", version = "v2025-6", method = "zip-window", clips = TRUE,
+    note = "Read for the region only from the USFS raster gateway's yearly zips (percent tree canopy cover, 30 m; values over 100 are no data)",
+    plan = function(ctx) {
+      if (whole_conus(ctx)) stop("Tree canopy cover is read for a region only: run the Data Download with a Study Area (Home layout By region)", call. = FALSE)
+      y <- years_of(ctx, TCC_YEARS_SOURCE); if (!length(y)) stop(sprintf("Tree canopy cover has the years %d-%d: ask for years that include them", min(TCC_YEARS_SOURCE), max(TCC_YEARS_SOURCE)), call. = FALSE)
+      data.table::data.table(year = y, url = sprintf(TCC_ZIP, y), member = sprintf(TCC_MEMBER, y, y), file = sprintf("science_tcc_conus_%d.tif", y), fetch = FALSE) },
+    have = function(ctx, items) recorded(ctx, "TreeCanopyFolder", file.path(ctx$place, items$file)),
+    finish = function(ctx, items) { dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE); gdal_remote()
+      # each year is written under a part name and renamed when whole: a read that breaks off (the gateway now and then returns an
+      # empty range; P26 1985, 2026-11-18) leaves a partial file that terra still holds, so it is released and removed before the next try
+      for (i in seq_len(nrow(items))) { dest <- file.path(ctx$place, items$file[i]); part <- paste0(dest, ".part.tif")
+        for (k in 1:4) { ok <- tryCatch({ clip_raster(remote_member(items$url[i], items$member[i]), part, ctx$region); TRUE },
+            error = function(e) { ctx$log(sprintf("  Tree canopy cover %d: %s (try %d)", items$year[i], conditionMessage(e), k)); FALSE })
+          gc(); if (ok) break; unlink(part); Sys.sleep(10 * k) }
+        if (!ok) stop(sprintf("Tree canopy cover %d could not be read", items$year[i]), call. = FALSE)
+        if (file.exists(dest)) file.remove(dest); file.rename(part, dest)
+        ctx$log(sprintf("  Tree canopy cover %d", items$year[i])) }
+      ctx$place })
+
   # ---- USDA NASS Cropland Data Layer: one national 30 m GeoTIFF a year (in a 1.6-2.0 GB zip), kept whole at the top of the home
   # (user 2026-11-07: 2014-2023 nationally, 2026-11-08: to 2025; read remotely a zip this size does not answer, and CropScape's clip service did not).
   # Stage 8 crops its window (Build Options: Cropland Productivity); only CDL_YEARS are fetched
@@ -653,6 +675,9 @@ NIFC <- sprintf("https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/servi
 # where a PRISM item unpacks: the normals, monthly precipitation, or the annual files of its variable
 prism_dir <- function(items) ifelse(is.na(items$year), "normals", ifelse(items$monthly %in% TRUE, "monthly-us25m/ppt", file.path("annual-us25m", items$var)))
 RAP_NPP <- "https://rangeland.ntsg.umt.edu/data/rap/rap-vegetation-npp/v3/vegetation-npp-v3-%d.tif"
+# USFS Science Tree Canopy Cover v2025-6 (read 2026-11-18): the year's zip and the GeoTIFF in it
+TCC_ZIP <- "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/docs/v2025-6/science_tcc_conus_%d_v2025-6_wgs84.zip"
+TCC_MEMBER <- "science_tcc_conus_wgs84_v2025-6_%d0101_%d1231.tif"; TCC_YEARS_SOURCE <- 1985:2023
 CDL_ZIP <- "https://www.nass.usda.gov/sites/default/files/Research_and_Science/Cropland/Release/datasets/%d_30m_cdls.zip"
 CDL_YEARS <- 2014:2025   # the years stage 8's Cropland Productivity reads
 CCAP <- "https://ocmgeodatastor1.blob.core.windows.net/ccap/bulk_download/C-CAP_Regional_30-meter_Data/C-CAP_Regional_Land_Cover_Classification/CONUS/conus_2001_ccap_landcover.tif"

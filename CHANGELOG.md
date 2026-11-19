@@ -9,6 +9,23 @@ version. A Build made before it has no carbon capacity until the Build (or its s
 Build can then be drawn against it.
 
 ### Added
+- Forest by tree canopy cover (stage 5, `src/forest-cover.R`; new page **Forest Cover**, `ui/ForestCoverView.cs`): an option for
+  what starts as forest. Annual NLCD maps much open western forest as shrub or grass: in 2016 it has 44% of Yellowstone's
+  land and 66% of the Northern Sierra Nevada pyrome's as forest or woody wetland, where FIA has 83% and 85%.
+  - **The rule.** With *Annual NLCD and tree canopy cover*, a natural cell NLCD maps as barren, shrub or grass in the start
+    year starts as forest, of the forest type map's type and the age map's age, when at least half of its 30 m pixels have
+    tree canopy cover at or over the threshold (blank = 10%) in the start year and, by default, forest as their LANDFIRE
+    BpS. At 10% on BpS forest the 30 m rule gave 85.8% forest in Yellowstone and in P26 and 57.5% in Great Dismal Swamp in
+    2016, against FIA's 83.3%, 85.3% and 52.1%. Without the BpS gate 10% takes in most western shrubland (about 90%).
+  - **What it leaves alone.** Annual NLCD stays the default. Forest NLCD maps is never removed, and every other class still
+    comes from NLCD. When a disturbed stand counts as regrown still follows NLCD (stage 6); a canopy rule for that is not built.
+    A canopy cell is forest from the start, so the regrowth, disturbed-start and reforestation rules do not touch it.
+  - **Data.** USFS Science Tree Canopy Cover v2025-6 (30 m, 1985 to 2023) is a new Data Download dataset, `TreeCanopyFolder`,
+    fetched only when the Data Download's Datasets names it, the region read out of each year's zip. It has no Data Sources
+    column yet (that needs a library update, so it waits for the next minor version): it is read from Data Sources Home, or
+    from the folder set on the Forest Cover page.
+  - **Outputs:** Forest by Tree Canopy Cover (cells made forest, by forest type and NLCD class) and its map (the share of
+    each cell's pixels that pass the rule); the start-rule map of Build Figures gains the class Forest by tree canopy cover.
 - Carbon carrying capacity (stage 8, `src/capacity.R`): what each cell would hold in live biomass, dead wood and litter
   under its potential natural vegetation and natural fire regime, as a yardstick for historical runs and projections.
   - **Definition.** The natural-regime mean: for each ecodivision and forest type, the type's stock curve after a

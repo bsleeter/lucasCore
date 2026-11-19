@@ -2431,3 +2431,13 @@ Pushed: everything through the v1.1.0 release (2026-11-05: land-use transitions 
       table is a plain grid, not part of the page. Related, not started: forest from tree canopy cover instead of NLCD, at the
       start and for recovery (item 68's canopy test), which will add forest cells with no age in the age map: they would take
       these same rules.
+
+71. **Forest by tree canopy cover** - DONE in code 2026-11-18 for the start year (stage 5, `src/forest-cover.R`, page Forest Cover):
+      a barren, shrub or grass cell starts as forest when half its 30 m pixels have canopy cover of 10% or more (USFS Science
+      TCC) on BpS forest; the rule matched FIA forest area in Yellowstone, P26 and Great Dismal Swamp. TO DO: (a) recovery -
+      a disturbed stand returning to forest when its canopy passes the threshold, in stage 6 and the projection, where NLCD
+      decides today (user 2026-11-18: one threshold, consistent from the start year on); (b) a Data Sources column for
+      TreeCanopyFolder with a library update, at the next minor version (it is read from the home or the page's folder now);
+      (c) harvest on canopy cells: LCMS tree removal counts only pixels NLCD called forest the year before; (d) the citation's
+      wording is unchecked against the product's metadata; (e) a check of the rule in an eastern upland and a pinyon-juniper
+      region, where a 10% threshold matters most.
