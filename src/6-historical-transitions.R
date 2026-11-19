@@ -421,7 +421,7 @@ if (ao6$unknown == "default" && nrow(cl6)) {
   for (i in seq_len(nrow(cl6))) { v <- values(rast(cl6$File[i]), mat = FALSE); on <- !is.na(v) & v > 0; prc[on] <- 1 - (1 - prc[on]) * (1 - v[on])
     k <- is.na(cut_yr) & prc >= 0.5; cut_yr[k] <- as.integer(cl6$Timestep[i]) }
   sam <- tryCatch(read_ds("OutputStandAgeMap"), error = function(e) data.table()); rf <- function(k) if (nrow(sam) && k %in% names(sam)) dependency_file(sam[[k]][1], ds("OutputStandAgeMap")) else NA_character_
-  rule5 <- if (!is.na(rf("RuleFileName"))) values(rast(rf("RuleFileName")), mat = FALSE) else rep(5L, length(vS))   # (no map: a stage 5 result made before lucasCore 1.5.2)
+  rule5 <- if (!is.na(rf("RuleFileName"))) values(rast(rf("RuleFileName")), mat = FALSE) else rep(5L, length(vS))   # (no map: a stage 5 result made before lucasCore 1.6.0)
   px5 <- if (!is.na(rf("PixelAgeFileName"))) values(rast(rf("PixelAgeFileName")), mat = FALSE) else vA
   fc6 <- land & is_forest_class(cn) & !is.na(vA) & vA >= 1; todo <- fc6 & !is.na(cut_yr) & rule5 %in% 5L
   if (any(todo)) {

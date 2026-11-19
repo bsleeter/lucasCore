@@ -148,7 +148,10 @@ namespace lucasCoreUI
             List<string[]> add = rows.Where(r => !byName.ContainsKey(r[0])).ToList();
             if (add.Count == 0) return 0;
             ds.BeginAddRows();
-            try { foreach (string[] r in add) { DataRow n = dt.NewRow(); n["Name"] = r[0]; n[col] = r[1]; dt.Rows.Add(n); } }
+            // a row added in code has no id until the library is saved, and the Projection Climate lists read the id at once (a rescan that
+            // found new runs stopped Studio: "Object cannot be cast from DBNull"), so each new row takes the library's next id here
+            string pk = ds.PrimaryKeyColumn == null ? null : ds.PrimaryKeyColumn.Name;
+            try { foreach (string[] r in add) { DataRow n = dt.NewRow(); n["Name"] = r[0]; n[col] = r[1]; if (pk != null && n[pk] == DBNull.Value) n[pk] = ds.Project.Library.GetNextSequenceId(); dt.Rows.Add(n); } }
             finally { ds.EndAddRows(); }
             return add.Count;
         }

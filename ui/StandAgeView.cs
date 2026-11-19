@@ -31,7 +31,7 @@ namespace lucasCoreUI
             a.Controls.Add(Option(m_agg, 1, "The pixel at the cell's centre"));
             a.Controls.Add(Indent(Note("One stand's age for each cell, so the landscape keeps the young and old stands the age map has. A cell whose centre pixel has no age takes the mean of its pixels that do.")));
             a.Controls.Add(Option(m_agg, 2, "Mean of the cell's pixels"));
-            a.Controls.Add(Indent(Note("The rule until lucasCore 1.5.2. Smoother from cell to cell, but it pulls every cell toward the middle: a landscape of cell means has few young and few old stands, and carbon does not rise in a straight line with age.")));
+            a.Controls.Add(Indent(Note("The rule until lucasCore 1.6.0. Smoother from cell to cell, but it pulls every cell toward the middle: a landscape of cell means has few young and few old stands, and carbon does not rise in a straight line with age.")));
             AddGroup(Group("A cell's stand age", a));
 
             var u = Column();
@@ -41,7 +41,7 @@ namespace lucasCoreUI
             var p = Row(); p.Controls.Add(Caption("Percentile:")); p.Controls.Add(m_pct); p.Controls.Add(Note("Blank = 75. The upper part, because the stands a fire or a harvest takes are on average older than the ones it leaves; 50 assumes they were alike."));
             u.Controls.Add(Indent(p));
             u.Controls.Add(Option(m_unknown, 2, "Keep the age map's value"));
-            u.Controls.Add(Indent(Note("As before lucasCore 1.5.2. The stand age raster under Manual settings is still used where it has a value.")));
+            u.Controls.Add(Indent(Note("As before lucasCore 1.6.0. The stand age raster under Manual settings is still used where it has a value.")));
             AddGroup(Group("Forest burned or clearcut between the start year and the age map's year", u));
 
             var f = Row(); f.Controls.Add(Caption("Raster:")); f.Controls.Add(m_file); f.Controls.Add(m_browse);

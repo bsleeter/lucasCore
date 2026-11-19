@@ -2,11 +2,13 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
-## Unreleased
+## 1.6.0 - 2026-11-19
 
-No library update needed: the new outputs are sheets of their own, which a 1.5 library gains when it is opened with this
-version. A Build made before it has no carbon capacity until the Build (or its stage 8) is rerun; runs already made on that
-Build can then be drawn against it.
+A minor version: Data Sources gains the USFS Tree Canopy Cover folder, which a library gets from the 1.6 update when it is
+opened with this version. The other new settings and outputs are sheets of their own. Nothing changes in a library until a
+Build is rerun, and the new options are off by default: forest by tree canopy cover, recovery by canopy and stocking are
+chosen on the Forest Cover page. A Build made before this version has no carbon capacity until the Build (or its stage 8)
+is rerun; runs already made on that Build can then be drawn against it.
 
 ### Added
 - Forest by tree canopy cover (stage 5, `src/forest-cover.R`; new page **Forest Cover**, `ui/ForestCoverView.cs`): an option for
@@ -102,6 +104,41 @@ Build can then be drawn against it.
   cover lookup, the cell rules under both settings of the option, and the run side (series, deficit by cause).
 - `tests/unit-stand-age.R`: the options, the manual ages by forest type, the percentiles of the unburned forest, and the order of the
   rules.
+
+## 1.5.5 - 2026-11-19
+
+No library update.
+
+### Fixed
+- Projection Climate (stage 11): a climate scenario made before 1.4.0 could not be run again. Its CO2 betas table holds the
+  defaults of `Shrubland: Post Fire Shrub`, a class retired in 1.4.0 that existing libraries keep in their lists, and the stage
+  failed the check "every CO2 Betas row names a class that grows". A row for a class with no CO2 response (a retired class, or
+  one that is not forest, shrubland, grassland, wetland or agriculture) is now left out and named in the run log. No cell is in
+  such a class, so results do not change (`src/11-projection-climate.R`).
+
+## 1.5.4 - 2026-11-19
+
+No library update.
+
+### Fixed
+- Projection Climate page: **Rescan LOCA2 folder** stopped Studio with "Object cannot be cast from DBNull to other types" when
+  the folder held runs that the project's lists did not have yet (for example after a Data Download of more models). The rows
+  a rescan adds to the scenario, model and member lists had no id until the library was saved, and the page read the ids at
+  once. Each new row now takes the library's next id, and the page skips a row without one (`Merge` in `ui/Loca2Lists.cs`,
+  `Read` in `ui/ProjectionClimateView.cs`).
+
+## 1.5.3 - 2026-11-19
+
+No library update. There is no 1.5.2 release.
+
+### Fixed
+- Data Download: LOCA2 for a study area in the west. UCSD's server now refuses every folder of its regional files
+  (`CONUS_regions_split`, HTTP 403, seen 2026-11-19), so a study area inside the "west" cut found no listing and the log said
+  "no ... files" for every model, variable and run. A run whose regional folder lists nothing is now taken from the CONUS
+  files (`NAmer`), which the stages already crop to the study window. They are larger: about 9 GB a model and scenario
+  (the historical run about 3.9 GB, each SSP about 5.3 GB). The log says once that the CONUS files are taken, and a run that
+  still finds nothing reports the server's answer and the address tried. If UCSD reopens the regional files they are used
+  again (`H$Loca2Folder` in `src/download-sources.R`).
 
 ## 1.5.1 - 2026-11-18
 

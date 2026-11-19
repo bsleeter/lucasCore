@@ -178,7 +178,7 @@ namespace lucasCoreUI
         private static List<Item> Read(Project p, string sheet, string key, bool runs)
         {
             DataTable dt = p.GetDataSheet(sheet).GetData();
-            return dt.Rows.Cast<DataRow>().Where(r => r.RowState != DataRowState.Deleted)
+            return dt.Rows.Cast<DataRow>().Where(r => r.RowState != DataRowState.Deleted && r[key] != DBNull.Value)   // a row without an id yet cannot be chosen
                 .Select(r => new Item { Key = Convert.ToInt32(r[key]), Name = Convert.ToString(r["Name"]), Runs = runs && r["Runs"] != DBNull.Value ? Convert.ToString(r["Runs"]) : null })
                 .OrderBy(i => i.Name, StringComparer.OrdinalIgnoreCase).ToList();
         }

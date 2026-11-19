@@ -11,7 +11,7 @@
 #     applies only to natural cells (user decision 2026-10-20: the build turned 69,895 developed/ag cells of 1985 into forest)
 #   * one Douglas-fir class (200; user decision 2026-10-21): coastal vs inland is carried by the ecodivision of its curves
 #   * the clearcut minimum-age rule needs the clearcut maps and moves to stage 6
-#   * stand age (src/stand-age.R, lucasCore 1.5.2): a cell takes the age of the 30 m pixel at its centre, not the mean of its pixels;
+#   * stand age (src/stand-age.R, lucasCore 1.6.0): a cell takes the age of the 30 m pixel at its centre, not the mean of its pixels;
 #     a forest cell that burned between the start year and the age map's year takes an age from Stand Age Options (a raster, an age
 #     by forest type, an earlier age map, or the upper part of the unburned forest's ages), since the map only shows what grew back
 # Also writes the annual NLCD at the model's resolution (stage 6 builds the transitions from it), and per ecodivision x forest class
@@ -288,7 +288,7 @@ progressBar()
 #   TreeMap             each 30 m pixel's FIA plot's STDAGE minus (its inventory year - start year), averaged over the cell's pixels
 #                       with an age; a plot younger than that (a stand that started after the start year) counts as unknown
 # A cell left without an age (or 0 or less: started after the start year) takes its neighbours'
-# Stand Age Options (src/stand-age.R; lucasCore 1.5.2): a cell takes the age of the 30 m pixel at its centre (default; where that pixel
+# Stand Age Options (src/stand-age.R; lucasCore 1.6.0): a cell takes the age of the 30 m pixel at its centre (default; where that pixel
 # has none, the mean of the cell's pixels that do), or the mean of its pixels as before, which leaves the landscape short of young
 # and old stands. A_px always holds the centre pixel's age: the ages of stands, for the unknown-age percentiles below
 source(pkg_file("src", "stand-age.R"))
@@ -319,7 +319,7 @@ if (site_on) {   # 7 single-band maps: share of the cell's TreeMap pixels (with 
 }
 A <- fill_modal(mask(A, m), m, round(global(A, "mean", na.rm = TRUE)[[1]]))
 A <- mask(ifel(forest, max(A, 1), 0), m)
-# ---- stand age where the age map cannot know it (src/stand-age.R; lucasCore 1.5.2) --------------------------------------------
+# ---- stand age where the age map cannot know it (src/stand-age.R; lucasCore 1.6.0) --------------------------------------------
 # A forest cell inside a fire perimeter of a year after the start year, up to the age map's year, shows in the map as what grew back
 # or as its unburned remnants. Its age is, in order: the user's stand age raster (which applies to every forest cell it covers), the
 # user's age for its forest type (the Stand Age page's manual ages), NASA CMS 1990 where that saw the stand before its fire (a TreeMap Build), the given
@@ -534,7 +534,7 @@ write_ds(data.frame(ForestTypeFileName = write_raster(Fz, "ForestType.tif"), Gra
                     StartRuleFileName = if (exists("fSR")) fSR else NA_character_, FirstForestYearFileName = if (exists("fFY")) fFY else NA_character_),
          "OutputLandCoverLayers")
 write_ds(ri, "OutputReturnInterval"); write_ds(st, "OutputSoilTarget")
-# how each forest type's stand ages were set (a library made before lucasCore 1.5.2 has no such sheet until it is opened in Studio)
+# how each forest type's stand ages were set (a library made before lucasCore 1.6.0 has no such sheet until it is opened in Studio)
 if (nrow(age_tab)) tryCatch(write_ds(age_tab, "OutputStandAge"), error = function(e) say("Stand Age Summary not written (%s): reopen the library in SyncroSim Studio so it adds the table", conditionMessage(e)))
 # the rule that set each forest cell's age (1 raster, 2 forest type value, 3 earlier age map, 4 unburned forest of its type, 5 the age
 # map) and the centre pixel's age: stage 6 gives the stands cut between the start year and the age map's year the same rules

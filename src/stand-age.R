@@ -17,7 +17,7 @@
 #      on average older than the ones it leaves (Yellowstone: CMS gives 143 years where a fire came after 1990, 110 where none did)
 #   5. what the age map gives (as before; also when the page is set to keep the source's)
 # Stand Age Options also sets how a cell takes its age from its 30 m pixels: the pixel at its centre (default), or their mean, which
-# was the rule until lucasCore 1.5.2 and pulls every cell toward the middle (Yellowstone at 300 m: almost no cell over 200 years
+# was the rule until lucasCore 1.6.0 and pulls every cell toward the middle (Yellowstone at 300 m: almost no cell over 200 years
 # where 6% of the pixels are), so the landscape has fewer young and old stands than the map it came from.
 # No rsyncrosim here: tests/unit-stand-age.R sources it.
 # =============================================================================

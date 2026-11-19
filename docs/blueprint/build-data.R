@@ -52,15 +52,24 @@ D <- list(
   list("Land cover, age and soil", "ForestTypeGroupFolder", "USFS forest type groups", "NFCMS v3 · regional maps", list(
     u(5, "Forest types in place of LANDFIRE EVT, or filling its gaps", "Build Options > Forest Type Map: USFS forest type groups", TRUE))),
   list("Land cover, age and soil", "TreeMapFolder", "TreeMap", "2016 · 30 m FIA plot ids", list(
-    u(5, "Forest type, stand age or site class from each pixel's FIA plot", "Build Options > Forest Type Map, Stand Age Source or Site Productivity: TreeMap", TRUE))),
-  list("Land cover, age and soil", "StandAgeFile", "NASA CMS forest age", "1990 · ORNL DAAC 1829", list(u(5, "Stand age, averaged over each cell"))),
+    u(5, "Forest type, stand age or site class from each pixel's FIA plot", "Build Options > Forest Type Map, Stand Age Source or Site Productivity: TreeMap", TRUE),
+    u(8, "Live carbon against canopy, for the stocking curve of each forest type", "Forest Cover > Stocking: by the cell's tree canopy cover", TRUE))),
+  list("Land cover, age and soil", "StandAgeFile", "NASA CMS forest age", "1990 · ORNL DAAC 1829", list(u(5, "Stand age of each cell, and the age of forest that burned before a later age map"),
+    u(6, "The age of stands clearcut before a later age map", "Stand Age > Estimate it", TRUE))),
   list("Land cover, age and soil", "FriFile", "LANDFIRE fire return interval", "LF 2016 · FRI_REPLAC", list(
     u(5, "Replacement-fire return interval per ecodivision and forest class, for spin-up"))),
   list("Land cover, age and soil", "SoilCarbonFile", "gNATSGO soil organic carbon", "soc0_999 · 10 m", list(
     u(5, "Mean soil carbon per ecodivision and forest class: the target stage 3 calibrates to"), u(8, "Soil carbon map for the initial soil pool"))),
   list("Land cover, age and soil", "HistosolFile", "gNATSGO histosol share", "map units · % organic soil", list(u(8, "Organic soil share: the cells that start with peat"))),
   list("Land cover, age and soil", "BpsFile", "LANDFIRE Biophysical Settings", "LF 2020 · 30 m · potential vegetation", list(
-    u(5, "Forest potential of each cell, for the reforestation transition", "Reforestation Options"), u(10, "Forest potential covariates that place reforestation", "Reforestation Options"))),
+    u(5, "Forest potential of each cell, for the reforestation transition and the canopy forest rule", "Reforestation Options; Forest Cover"),
+    u(6, "Where canopy counts as forest returning after a fire or a cut", "Forest Cover > Recovery by tree canopy cover", TRUE),
+    u(8, "Potential vegetation of each cell, for the carbon carrying capacity", "Carbon Capacity Options"),
+    u(10, "Forest potential covariates that place reforestation", "Reforestation Options"))),
+  list("Land cover, age and soil", "TreeCanopyFolder", "USFS Tree Canopy Cover", "v2025-6 · 30 m · annual 1985 to 2023", list(
+    u(5, "Forest in the start year where NLCD maps open forest as shrub or grass", "Forest Cover > Forest in the start year: NLCD and tree canopy cover", TRUE),
+    u(6, "A disturbed stand counts as forest again when its canopy is back", "Forest Cover > Recovery by tree canopy cover", TRUE),
+    u(8, "Starting carbon and growth of a forest cell by its canopy (stocking)", "Forest Cover > Stocking: by the cell's tree canopy cover", TRUE))),
   list("Disturbance", "MtbsSeverityFolder", "MTBS burn severity", "annual CONUS mosaics", list(
     u(6, "Wildfire by severity (burned share of 30 m pixels), and burned cells kept out of the clearcut rule"))),
   list("Disturbance", "LcmsFolder", "USFS LCMS annual change", "v2025-11 · 30 m · 1985 on", list(
@@ -130,7 +139,7 @@ for (id in names(S)) { txt <- src_text(id)
   if (length(m <- setdiff(mine, reads))) stop(sprintf("the data blueprint says stage %s reads %s, but its script does not mention it", id, paste(m, collapse = ", "))) }
 
 # ---- drawing ----------------------------------------------------------------
-W <- 1600; H <- 1320   # 1000 until 2026-11-09 (three non-forest datasets), 1100 until 2026-11-18 (eight more)
+W <- 1600; H <- 1344   # 1000 until 2026-11-09 (three non-forest datasets), 1100 until 2026-11-18 (eight more), 1320 until 2026-11-19 (tree canopy)
 g <- character(); add <- function(...) g <<- c(g, ...)
 add(sprintf('<rect class="bg" width="%d" height="%d"/>', W, H), TX(24, 44, "lucasCore data blueprint", "h1"),
     TX(24, 66, sprintf("The national datasets lucasCore reads, the stages that read them, what for, and the option that switches each one · version %s", version), "sub"))
@@ -142,14 +151,14 @@ leg(list(list(fam = "setup", label = "Setup"), list(fam = "land", label = "Land 
          list(fam = "climate", label = "Climate"), list(fam = "fig", label = "Figures")), 38)
 leg(list(list(alt = FALSE, label = "read with the default settings"), list(alt = TRUE, label = "read only under a non-default option")), 62)
 
-add(box(24, 104, 600, 1150, "Data Sources sheet · filled by stage 15 Data Download", "National datasets"), TX(312, 146, "VINTAGE · RESOLUTION", "ghead"))
+add(box(24, 104, 600, 1174, "Data Sources sheet · filled by stage 15 Data Download", "National datasets"), TX(312, 146, "VINTAGE · RESOLUTION", "ghead"))
 y <- 172; sy <- c(); grp <- ""
 for (d in D) {
   if (d[[1]] != grp) { if (nzchar(grp)) y <- y + 12; grp <- d[[1]]; add(TX(40, y, toupper(grp), "ghead")); y <- y + 21 }
   add(sprintf('<g class="ds" data-ds="%s" tabindex="0" role="button" aria-label="%s"><rect class="dsbg" x="32" y="%d" width="584" height="22" rx="3"/>', d[[2]], esc(d[[3]]), y - 15),
       TX(40, y, d[[3]], "dsn"), TX(312, y, d[[4]], "dsv"), "</g>")
   sy[d[[2]]] <- y - 4; y <- y + 23 }
-if (y > 1254) stop("the dataset column runs past its box (y = ", y, ")")
+if (y > 1278) stop("the dataset column runs past its box (y = ", y, ")")
 
 BX <- 1000; BWD <- 576; BHT <- 64
 by <- setNames(104 + (seq_along(S) - 1) * 76, names(S))
@@ -169,8 +178,8 @@ for (id in names(S)) { s <- S[[id]]; yy <- by[[id]]; bw <- if (nchar(s[[1]]) > 2
       TX(BX + 20 + bw, yy + 24, s[[2]], "sn2"), TX(BX + 12, yy + 43, s[[3]], "mk"), TX(BX + 12, yy + 57, paste("Set by:", s[[4]]), "ch"), "</g>")
   for (ty in uses$ty[uses$stage == id]) add(sprintf('<circle class="port f-%s" cx="%d" cy="%.1f" r="2.4"/>', fam[[id]], BX, ty)) }
 
-add(TX(24, 1282, "Wires run from a dataset to each stage that reads it, coloured by the stage. Vintages are those stage 15 Data Download fetches into Data Sources Home, where a blank path reads them.", "foot"),
-    TX(24, 1298, sprintf("Stages 0 and 4 read no national data. Generated by docs/blueprint/build-data.R from package.xml (lucasCore %s), %s.", version, format(Sys.Date())), "foot"))
+add(TX(24, 1306, "Wires run from a dataset to each stage that reads it, coloured by the stage. Vintages are those stage 15 Data Download fetches into Data Sources Home, where a blank path reads them.", "foot"),
+    TX(24, 1322, sprintf("Stages 0 and 4 read no national data. Generated by docs/blueprint/build-data.R from package.xml (lucasCore %s), %s.", version, format(Sys.Date())), "foot"))
 body <- paste(c(defs, g), collapse = "\n")
 head <- svg_head(W, H, "lucasCore data blueprint: national datasets and the stages that read them")
 svg_file <- file.path(out, "lucascore-data-blueprint.svg")

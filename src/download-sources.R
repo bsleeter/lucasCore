@@ -281,12 +281,21 @@ download_handlers <- function() {
       runs[, tree := if (west) ifelse(West == "yes", "west", "conus") else "conus"]
       ctx$log(sprintf("  LOCA2: %d runs of %d models (%d west regional, %d CONUS)", nrow(runs), data.table::uniqueN(runs$Model), sum(runs$tree == "west"), sum(runs$tree == "conus")))
       base <- c(west = "https://cirrus.ucsd.edu/~pierce/LOCA2/CONUS_regions_split/%s/west/0p0625deg/%s/%s/%s/", conus = "https://cirrus.ucsd.edu/~pierce/LOCA2/NAmer/%s/0p0625deg/%s/%s/%s/")
+      # the monthly files a folder lists, with the server's answer (UCSD closed the regional tree in November 2026: 403 on every
+      # folder under CONUS_regions_split). A run whose west folder lists none is taken from the CONUS tree, whose files src/loca2.R
+      # crops to the study window: about 9 GB a model and scenario in place of the regional cut
+      listed <- function(d, v) { a <- tryCatch(curl::curl_fetch_memory(d), error = function(e) list(status_code = conditionMessage(e), content = raw()))
+        h <- if (identical(a$status_code, 200L)) rawToChar(a$content) else ""
+        list(f = unique(regmatches(h, gregexpr(sprintf('%s[.][^"]*?[.](west[.]monthly|monthly[.]west|monthly)[.]nc(?=")', v), h, perl = TRUE))[[1]]), status = a$status_code) }
+      told <- FALSE
       data.table::rbindlist(lapply(seq_len(nrow(runs)), function(k) data.table::rbindlist(lapply(c("pr", "tasmax", "tasmin"), function(v) {
         g <- runs$Model[k]; mem <- runs$Member[k]; r <- runs$Scenario[k]
-        d <- sprintf(base[[runs$tree[k]]], g, mem, r, v); h <- tryCatch(rawToChar(curl::curl_fetch_memory(d)$content), error = function(e) "")
-        f <- unique(regmatches(h, gregexpr(sprintf('%s[.][^"]*?[.](west[.]monthly|monthly[.]west|monthly)[.]nc(?=")', v), h, perl = TRUE))[[1]])
-        if (!length(f)) { ctx$log(sprintf("  LOCA2: no %s %s %s %s files", g, mem, r, v)); return(NULL) }
-        data.table::data.table(url = paste0(d, f), file = file.path(g, mem, r, v, sub("[.]monthly[.]west[.]nc$", ".west.monthly.nc", f))) }))))[, fetch := TRUE][] },
+        d <- sprintf(base[[runs$tree[k]]], g, mem, r, v); l <- listed(d, v)
+        if (!length(l$f) && runs$tree[k] == "west" && runs$Conus[k] == "yes") {
+          if (!told) { ctx$log(sprintf("  LOCA2: UCSD's west regional files cannot be read (the server answered %s); taking the CONUS files instead, which are larger (about 9 GB a model and scenario)", l$status)); told <<- TRUE }
+          d <- sprintf(base[["conus"]], g, mem, r, v); l <- listed(d, v) }
+        if (!length(l$f)) { ctx$log(sprintf("  LOCA2: no %s %s %s %s files (the server answered %s for %s)", g, mem, r, v, l$status, d)); return(NULL) }
+        data.table::data.table(url = paste0(d, l$f), file = file.path(g, mem, r, v, sub("[.]monthly[.]west[.]nc$", ".west.monthly.nc", l$f))) }))))[, fetch := TRUE][] },
     # in place = at the size files.csv recorded for it (a file put there by hand, unrecorded, is fetched again)
     have = function(ctx, items) recorded(ctx, "Loca2Folder", file.path(ctx$place, items$file)),
     finish = function(ctx, items) { for (i in seq_len(nrow(items))) { dest <- file.path(ctx$place, items$file[i]); dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)

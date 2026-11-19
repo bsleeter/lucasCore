@@ -300,13 +300,19 @@ namespace lucasCoreUI
             }
         }
 
+        // ---- 1.6 (forest cover, 2026-11): Data Sources holds the USFS Tree Canopy Cover folder (Forest Cover page: canopy forest,
+        // recovery and stocking; src/forest-cover.R). The Forest Cover, Stand Age and Carbon Capacity sheets and their outputs are
+        // new tables, which SyncroSim adds by itself. No apostrophe in the description ------------------------------------------------
+        [Update(1.6, "lucasCore 1.6: Data Sources folder for the USFS Tree Canopy Cover (forest by tree canopy cover, recovery after disturbance and forest stocking on the Forest Cover page)")]
+        public static void Update_1_600(DataStore store)
+        {
+            AddColumn(store, "lucasCore_DataSource", "TreeCanopyFolder", "TEXT");
+        }
+
         // ---- 1.5 (wetland methane, 2026-11): wetland classes release part of what their soil and litter emit as CH4 (src/flows.R,
         // src/nonforest-solve.R). The rows are the ones defaults/stsim and defaults/stockflow gained (generated from them). The three
         // Wetland Methane sheets are new tables, which SyncroSim adds by itself. A library keeps running on its earlier Builds; the
         // methane comes with its next Build (stages 0 and 3). No apostrophe in the description -----------------------------------------
-        // TO DO with the next minor version (1.6): lucasCore_DataSource gained TreeCanopyFolder on the branch pnv-carbon-metric (2026-11-19).
-        // A new column of an existing table needs an update method: [Update(1.6, ...)] with AddColumn(store, "lucasCore_DataSource",
-        // "TreeCanopyFolder", "TEXT"). It is not here yet because the package version is still 1.5.x; add it with the version bump.
         [Update(1.5, "lucasCore 1.5: wetland methane - the CO2 and CH4 emission flow types of wetland soil, root litter and forest floor with their groups, orders and output filters; the Q10 Wetland Soil and Q10 Wetland CH4 groups; the Marsh Salinity and Methane Uncertainty flow multiplier types; and the Climate Options wetland growth choice")]
         public static void Update_1_500(DataStore store)
         {
