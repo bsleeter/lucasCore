@@ -209,7 +209,7 @@ download_handlers <- function() {
       x[year %in% years_of(ctx, x$year)][order(year)][, fetch := TRUE][] },
     finish = function(ctx, items) { dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE)
       for (i in seq_len(nrow(items))) { t <- sprintf("mtbs_CONUS_%d.tif", items$year[i]); x <- unzip_to(items$dest[i], file.path(ctx$dl, "unzip"), t)
-        clip_raster(x, file.path(ctx$place, t), if (clipping(ctx)) ctx$region else list(poly = NULL)); unlink(x) }
+        clip_raster(x, file.path(ctx$place, t), if (clipping(ctx)) ctx$region else list(poly = NULL), empty_ok = TRUE); unlink(x) }   # a year's mosaic is only as large as its fires
       ctx$place })
 
   # ---- LCMS annual change: one zip a year, read remotely ------------------------------------------------------------

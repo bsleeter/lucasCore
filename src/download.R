@@ -24,12 +24,20 @@ region_box_ll <- function(region) {   # the box in lon/lat (EPSG:4326), for serv
 
 # ---- clipping ------------------------------------------------------------------------------------------------------------
 # a raster cut to the region (its own grid and values, compressed); a categorical raster's .vat.dbf / .vat.cpg go with it
-clip_raster <- function(src, dest, region) {
+# empty_ok: a source that stops short of the region gives a file of the region's box with no data, on the source's grid, instead
+# of an error. For mosaics whose extent is only as large as that year's events (MTBS: the 1993 mosaic ends south of the Olympic
+# Peninsula, 2026-11-19): no data there means nothing happened there, and the year still counts as fetched
+clip_raster <- function(src, dest, region, empty_ok = FALSE) {
   dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)
   r <- terra::rast(src)
   if (is.null(region$poly)) { if (normalizePath(src, mustWork = FALSE) != normalizePath(dest, mustWork = FALSE)) file.copy(src, dest, overwrite = TRUE) } else {
     b <- terra::project(terra::vect(sf::st_as_sfc(sf::st_bbox(setNames(region$box, c("xmin", "ymin", "xmax", "ymax")), crs = sf::st_crs(5070)))), terra::crs(r))
-    e <- terra::intersect(terra::ext(b), terra::ext(r)); if (is.null(e)) stop(sprintf("%s does not reach the region", basename(src)), call. = FALSE)
+    e <- terra::intersect(terra::ext(b), terra::ext(r))
+    if (is.null(e) && empty_ok) { res <- terra::res(r); o <- c(terra::xmin(r), terra::ymin(r)); bb <- as.vector(terra::ext(b))   # xmin, xmax, ymin, ymax
+      g <- terra::rast(xmin = o[1] + floor((bb[1] - o[1]) / res[1]) * res[1], xmax = o[1] + ceiling((bb[2] - o[1]) / res[1]) * res[1],
+                       ymin = o[2] + floor((bb[3] - o[2]) / res[2]) * res[2], ymax = o[2] + ceiling((bb[4] - o[2]) / res[2]) * res[2], resolution = res, crs = terra::crs(r))
+      terra::init(g, NA, filename = dest, overwrite = TRUE, datatype = terra::datatype(r)[1], gdal = c("COMPRESS=DEFLATE", "TILED=YES")); return(dest) }
+    if (is.null(e)) stop(sprintf("%s does not reach the region", basename(src)), call. = FALSE)
     terra::crop(r, e, snap = "out", filename = dest, overwrite = TRUE, datatype = terra::datatype(r)[1], gdal = c("COMPRESS=DEFLATE", "TILED=YES", "BIGTIFF=IF_SAFER")) }
   for (s in c(".vat.dbf", ".vat.cpg")) if (file.exists(paste0(src, s))) file.copy(paste0(src, s), paste0(dest, s), overwrite = TRUE)
   dest }
