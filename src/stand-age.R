@@ -10,12 +10,12 @@
 # map's year. Its start-year age is the first of (user, 2026-11-18: "have a default approach, one based of a user input value for
 # each forest type, or an uploaded raster would all be good options to have in place"):
 #   1. the user's stand age raster, where it has a value (this one applies to every forest cell, unknown or not)
-#   2. the user's age for its forest type (Stand Age: Unknown Ages; its ecodivision's row before the all-ecodivisions row)
+#   2. the user's age for its forest type (the Stand Age page's manual ages by forest type; its ecodivision's row before the all-ecodivisions row)
 #   3. an earlier age map that saw the stand before it burned (NASA CMS 1990 under a TreeMap Build, for a first fire after 1990)
 #   4. the given percentile (default the 75th) of the ages of the unburned forest of its type in its ecodivision, taken over one
 #      30 m pixel a cell (so the percentile is of stands, not of cell means); the upper part because the stands a fire takes are
 #      on average older than the ones it leaves (Yellowstone: CMS gives 143 years where a fire came after 1990, 110 where none did)
-#   5. what the age map gives (as before; also when Unknown Ages is set to keep the source's)
+#   5. what the age map gives (as before; also when the page is set to keep the source's)
 # Stand Age Options also sets how a cell takes its age from its 30 m pixels: the pixel at its centre (default), or their mean, which
 # was the rule until lucasCore 1.5.2 and pulls every cell toward the middle (Yellowstone at 300 m: almost no cell over 200 years
 # where 6% of the pixels are), so the landscape has fewer young and old stands than the map it came from.
@@ -24,7 +24,7 @@
 
 AGE_AGGREGATION <- c(centre = "The pixel at the cell's centre", mean = "Mean of the cell's pixels")
 AGE_UNKNOWN <- c(default = "Estimate it", source = "Keep the age map's value")
-AGE_RULES <- c(raster = "Stand age raster", type = "Unknown Ages: forest type value", earlier = "Earlier age map (before the fire or cut)",
+AGE_RULES <- c(raster = "Stand age raster", type = "Manual age for the forest type", earlier = "Earlier age map (before the fire or cut)",
                percentile = "Undisturbed forest of its type", source = "Age map")
 
 # Stand Age Options (single row; a list column reads as its number or its label; blank = the default): aggregate ("centre" or
@@ -40,14 +40,14 @@ age_options <- function(x) {
   list(aggregate = pick("Aggregation", AGE_AGGREGATION, "Cell Age"), unknown = pick("UnknownRule", AGE_UNKNOWN, "Unknown Ages"), percentile = p,
        raster = f, raster_year = suppressWarnings(as.integer(g("AgeRasterYear")))) }
 
-# the user's ages by forest type (Stand Age: Unknown Ages): StratumId (blank = every ecodivision), StateClassId, Age; checked
+# the user's ages by forest type (the Stand Age page's manual ages by forest type): StratumId (blank = every ecodivision), StateClassId, Age; checked
 age_type_table <- function(x) {
   x <- data.table::as.data.table(x); if (!nrow(x)) return(data.table::data.table(StratumId = character(), StateClassId = character(), Age = numeric()))
   x <- x[, .(StratumId = if ("StratumId" %in% names(x)) as.character(StratumId) else NA_character_, StateClassId = as.character(StateClassId), Age = as.numeric(Age))]
   x[!is.na(StratumId) & !nzchar(StratumId), StratumId := NA_character_]
-  if (anyNA(x$StateClassId) || anyNA(x$Age)) stop("Stand Age: Unknown Ages: every row needs a forest type and an age", call. = FALSE)
-  if (any(x$Age < 1 | x$Age > 1000)) stop("Stand Age: Unknown Ages: ages run from 1 to 1000 years", call. = FALSE)
-  if (anyDuplicated(x[, .(StratumId, StateClassId)])) stop("Stand Age: Unknown Ages: a forest type appears twice for one ecodivision", call. = FALSE)
+  if (anyNA(x$StateClassId) || anyNA(x$Age)) stop("Stand Age, manual ages by forest type: every row needs a forest type and an age", call. = FALSE)
+  if (any(x$Age < 1 | x$Age > 1000)) stop("Stand Age, manual ages by forest type: ages run from 1 to 1000 years", call. = FALSE)
+  if (anyDuplicated(x[, .(StratumId, StateClassId)])) stop("Stand Age, manual ages by forest type: a forest type appears twice for one ecodivision", call. = FALSE)
   x[] }
 
 # the percentile of the ages of the unburned forest of each ecodivision x forest type. age: one stand's age per cell (a pixel's, not

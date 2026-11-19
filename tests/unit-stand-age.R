@@ -1,7 +1,7 @@
 # =============================================================================
 # unit-stand-age.R - stand age where the age map cannot know it, and the Stand Age Options (src/stand-age.R; stage 5)
 # =============================================================================
-# Plain R, made-up cells, no SyncroSim. Checks the options (defaults, labels and numbers, bad values), the Unknown Ages table, the
+# Plain R, made-up cells, no SyncroSim. Checks the options (defaults, labels and numbers, bad values), the manual ages by forest type, the
 # percentiles of the unburned forest (own type, the ecodivision's when a type has too few cells), and the order of the rules of
 # age_assign: raster, forest type value, earlier age map, percentile, the age map.
 # Usage: Rscript tests/unit-stand-age.R
@@ -25,7 +25,7 @@ px <- xml2::read_xml(file.path(pkg, "package.xml")); f1 <- function(k) xml2::xml
 lab <- function(v) paste(sprintf("%d:%s", seq_along(v), v), collapse = "|")
 expect("package.xml: the two lists' labels are the ones the code reads", identical(f1("Aggregation"), lab(AGE_AGGREGATION)) && identical(f1("UnknownRule"), lab(AGE_UNKNOWN)))
 
-# ---- the Unknown Ages table ---------------------------------------------------------------------------------------------------
+# ---- the manual ages by forest type ---------------------------------------------------------------------------------------------------
 tt <- age_type_table(data.table(StratumId = c(NA, "Marine", ""), StateClassId = c("Forest: A", "Forest: A", "Forest: B"), Age = c(250, 180, 120)))
 expect("type table: a blank ecodivision is every ecodivision", nrow(tt) == 3 && sum(is.na(tt$StratumId)) == 2)
 expect("type table: empty gives no rows", nrow(age_type_table(data.frame())) == 0)

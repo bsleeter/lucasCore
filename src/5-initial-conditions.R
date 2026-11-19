@@ -322,7 +322,7 @@ A <- mask(ifel(forest, max(A, 1), 0), m)
 # ---- stand age where the age map cannot know it (src/stand-age.R; lucasCore 1.5.2) --------------------------------------------
 # A forest cell inside a fire perimeter of a year after the start year, up to the age map's year, shows in the map as what grew back
 # or as its unburned remnants. Its age is, in order: the user's stand age raster (which applies to every forest cell it covers), the
-# user's age for its forest type (Unknown Ages), NASA CMS 1990 where that saw the stand before its fire (a TreeMap Build), the given
+# user's age for its forest type (the Stand Age page's manual ages), NASA CMS 1990 where that saw the stand before its fire (a TreeMap Build), the given
 # percentile of the unburned forest of its type in its ecodivision, else the map's own value. The regrowth and reforestation rules
 # below still set the age of the cells they pick.
 fa <- values(forest, mat = FALSE) %in% 1; cls_a <- scl$Name[match(values(S, mat = FALSE), as.integer(scl$Id))]; eco_a <- stl$Name[match(values(P, mat = FALSE), as.integer(stl$Id))]
@@ -343,7 +343,7 @@ utab <- tryCatch(age_type_table(tryCatch(read_ds("StandAgeUnknown"), error = fun
 apct <- age_percentiles(eco_a, cls_a, values(A_px, mat = FALSE), fa & is.na(burn_yr), ao$percentile)
 aa <- age_assign(fa, eco_a, cls_a, src_age, burn_yr, ras_age, early, early_yr, utab, apct, ao$unknown); A <- setValues(A, aa$age)
 age_tab <- age_summary(cls_a, aa$rule, aa$age, src_age); n_unk <- sum(fa & !is.na(burn_yr))
-if (ao$unknown == "source") say("Stand age: Unknown Ages is set to keep the age map's value (Stand Age Options)") else
+if (ao$unknown == "source") say("Stand age: forest burned before the age map's year keeps the age map's value (the Stand Age page)") else
   say("Stand age unknown to the age map: %d of %d forest cells (%.1f%%) are inside a fire perimeter of %d-%d", n_unk, sum(fa), 100 * n_unk / max(sum(fa), 1), y0 + 1, age_map_year)
 ar <- data.table(r = aa$rule, a = aa$age, s = src_age)[!is.na(r) & r != "source", .(Cells = .N, Age = mean(a), Was = mean(s)), by = r]
 for (i in seq_len(nrow(ar))) say("  %s: %d cells, mean age %.0f (the age map gave %.0f)", AGE_RULES[[ar$r[i]]], ar$Cells[i], ar$Age[i], ar$Was[i])

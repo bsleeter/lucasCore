@@ -233,6 +233,8 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
       sprintf("(a, b) State class in the first and last year of the run (the twelve largest named). (c) What changed between them: development of non-developed land, a higher development intensity, gain or loss of agriculture, %sor another class change. A cell that changed and changed back counts as no change.%s",
               if (any(hv)) "forest harvested at least once during the run (its most intensive harvest type, from the yearly harvest transition maps of iteration 1), " else "", relief)) }
 
+  # a run that mapped its transitions in a few years only (bookend maps) shows the fire and harvest of those years alone: say so
+  part_maps <- function(files) { n <- length(unique(names(files))); if (n < y1 - y0) sprintf("; MAPPED IN %d OF %d YEARS ONLY (%s): the run did not write yearly transition maps", n, y1 - y0, paste(range(as.integer(names(files))), collapse = "-")) else "" }
   # ---- maps: fire --------------------------------------------------------------------------------------------------------------
   if (length(X$fire)) {
     n_burn <- integer(sum(TRUE, length(inz) - 1)); sev <- integer(length(inz)); last <- rep(NA_integer_, length(inz))
@@ -243,7 +245,7 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
     yb <- c(y0, 1995, 2005, 2015, 2020, y1 + 1); yb <- unique(yb[yb >= y0 & yb <= y1 + 1]); ylab <- sprintf("%d-%d", head(yb, -1) + c(1, rep(0, length(yb) - 2)), tail(yb, -1) - 1)
     burned_km2 <- sum(n_burn > 0 & inz) * prod(res(el)) / 1e6
     map_figure("fire", sprintf("Fire, %d-%d", y0 + 1, y1), list(
-      list(k = nb, cols = c("#fbe3a2", "#ef8f2a", "#c93a1d", "#5c0f14"), lab = c("1", "2", "3", "4+"), title = "Times burned", sub = sprintf("%.0f km2 burned at least once; grey: not burned", burned_km2)),
+      list(k = nb, cols = c("#fbe3a2", "#ef8f2a", "#c93a1d", "#5c0f14"), lab = c("1", "2", "3", "4+"), title = "Times burned", sub = sprintf("%.0f km2 burned at least once; grey: not burned%s", burned_km2, part_maps(X$fire))),
       list(k = ifelse(sev == 0, NA, sev), cols = c("#fbe3a2", "#ef8f2a", "#a81d1a"), lab = c("Low", "Medium", "High"), key = TRUE, title = "Highest burn severity", sub = "MTBS severity classes, as simulated"),
       list(k = ifelse(is.na(last), NA, findInterval(last, yb, rightmost.closed = TRUE)), cols = colorRampPalette(c("#fde7b0", "#e0702b", "#6b1a10"))(length(yb) - 1), lab = ylab,
            title = "Year of the last fire", sub = "grey: not burned")),
@@ -254,7 +256,7 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
     yb <- c(y0, 1995, 2005, 2015, y1 + 1); yb <- unique(yb[yb >= y0 & yb <= y1 + 1]); ylab <- sprintf("%d-%d", head(yb, -1) + c(1, rep(0, length(yb) - 2)), tail(yb, -1) - 1)
     harv_km2 <- sum(n_harv > 0 & inz) * prod(res(el)) / 1e6; pk <- sort(unique(hkind[hkind > 0]))
     map_figure("harvest", sprintf("Forest harvest, %d-%d", y0 + 1, y1), list(
-      list(k = ifelse(n_harv == 0, NA, pmin(n_harv, 3L)), cols = c("#e0b43a", "#a0612a", "#3d230b"), lab = c("1", "2", "3+"), title = "Times harvested", sub = sprintf("%.0f km2 harvested at least once; grey: not harvested", harv_km2)),
+      list(k = ifelse(n_harv == 0, NA, pmin(n_harv, 3L)), cols = c("#e0b43a", "#a0612a", "#3d230b"), lab = c("1", "2", "3+"), title = "Times harvested", sub = sprintf("%.0f km2 harvested at least once; grey: not harvested%s", harv_km2, part_maps(X$harvest))),
       list(k = ifelse(hkind == 0, NA, match(hkind, pk)), cols = HARV_COLS[pk], lab = HARV_LAB[pk], key = TRUE, title = "Most intensive harvest", sub = "clearcut over salvage over selection"),
       list(k = ifelse(is.na(last_h), NA, findInterval(last_h, yb, rightmost.closed = TRUE)), cols = colorRampPalette(c("#efe3bd", "#b8894a", "#4a2c10"))(length(yb) - 1), lab = ylab,
            title = "Year of the last harvest", sub = "grey: not harvested")),

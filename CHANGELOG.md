@@ -66,13 +66,13 @@ Build can then be drawn against it.
   - `dev/capacity/check-library.R` computes the capacity of an existing Build result outside SyncroSim (read-only) and
     draws a run against it.
 
-- Stand age (stage 5, `src/stand-age.R`; the new page LUCAS Core > Stand Age and the table Stand Age: Unknown Ages).
+- Stand age (stage 5, `src/stand-age.R`; the new page LUCAS Core > Stand Age, which holds the options and, under Manual settings, the ages by forest type and the stand age raster).
   - **A cell's stand age** is now the age of the 30 m pixel at its centre (a cell whose centre pixel has none takes the mean
     of its pixels that do). It was the mean of the cell's pixels, which leaves a landscape short of young and old stands;
     Stand Age can set the mean again.
   - **Forest burned between the start year and the age map's year** (NASA CMS 1990, TreeMap 2016) showed in the age map as
     what grew back or as its unburned remnants. A forest cell inside an interagency fire perimeter of those years now takes,
-    in order: the user's stand age raster; the user's age for its forest type (Unknown Ages); NASA CMS 1990 where it saw
+    in order: the user's stand age raster; the user's age for its forest type (Manual settings); NASA CMS 1990 where it saw
     the stand before its fire (a TreeMap Build); else the percentile (default the 75th) of the ages of unburned forest of
     its type in its ecodivision. Stand Age can keep the age map's value instead.
   - **Forest clearcut in those years** gets the same rules in stage 6, which has the harvest maps (a cell counts once its
@@ -90,7 +90,7 @@ Build can then be drawn against it.
 ### Tests
 - `tests/unit-capacity.R`: the regime weights and mean against hand values and their limits, the table by type, the BpS
   cover lookup, the cell rules under both settings of the option, and the run side (series, deficit by cause).
-- `tests/unit-stand-age.R`: the options, the Unknown Ages table, the percentiles of the unburned forest, and the order of the
+- `tests/unit-stand-age.R`: the options, the manual ages by forest type, the percentiles of the unburned forest, and the order of the
   rules.
 
 ## 1.5.1 - 2026-11-18

@@ -404,7 +404,7 @@ check(STAGE, "selection minimum ages are not above clearcut's", { cs <- here[Tra
 # The age map shows such a stand as what grew back (CMS 1990 moved back to 1985 puts a 1988 clearcut at about 0), as it does a stand
 # that burned, which stage 5 handles from the fire perimeters. A forest cell counts as cut once its chance of a clearcut reaches one
 # half (as below), in a year up to the age map's. Where stage 5 left it at the age map's value it takes, in order: the user's age for
-# its forest type (Stand Age: Unknown Ages), NASA CMS 1990 where the cut came after 1990 (a TreeMap Build), else the percentile of the
+# its forest type (the Stand Age page's manual ages), NASA CMS 1990 where the cut came after 1990 (a TreeMap Build), else the percentile of the
 # ages of forest of its type in its ecodivision that neither burned nor was cut (stage 5's one pixel a cell). The harvest minimum age
 # below then still applies, so a cut stand is at least its pathway's minimum age at its cut.
 source(pkg_file("src", "stand-age.R")); age_cut <- NULL

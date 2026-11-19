@@ -978,9 +978,9 @@
 
 	<!-- Stand Age (stage 5, src/stand-age.R; lucasCore 1.5.2): how a cell takes its age from its 30 m pixels, and the age of forest the
 	     age map cannot know - cells that burned between the start year and the map's year (NASA CMS 1990, TreeMap 2016), which the map
-	     shows as what grew back. Their age is, in order: the stand age raster, Unknown Ages' value for the forest type, an earlier age
+	     shows as what grew back. Their age is, in order: the stand age raster, the manual age for the forest type, an earlier age
 	     map that saw the stand before its fire, the percentile of the unburned forest of the type, else the map's own -->
-	<dataSheet name="StandAgeOptions" displayName="Stand Age" isSingleRow="True" viewClassName="lucasCoreUI.StandAgeView" viewClassAssembly="lucasCoreUI">
+	<dataSheet name="StandAgeOptions" displayName="Stand Age Options" isSingleRow="True">
 		<column name="Aggregation" displayName="A Cell's Age (blank = the pixel at its centre)" dataType="Integer" validationType="List" formula1="1:The pixel at the cell's centre|2:Mean of the cell's pixels" isOptional="True" defaultValue="1"/>
 		<column name="UnknownRule" displayName="Forest Burned or Clearcut Between the Start Year and the Age Map's Year (blank = estimate it)" dataType="Integer" validationType="List" formula1="1:Estimate it|2:Keep the age map's value" isOptional="True" defaultValue="1"/>
 		<column name="UnknownPercentile" displayName="Percentile of the Unburned Forest of Its Type (blank = 75)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="1" formula2="99"/>
@@ -988,12 +988,17 @@
 		<column name="AgeRasterYear" displayName="Year the Raster's Ages Are For (blank = the start year)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="1800" formula2="2100"/>
 	</dataSheet>
 
-	<dataSheet name="StandAgeUnknown" displayName="Stand Age: Unknown Ages">
+	<dataSheet name="StandAgeUnknown" displayName="Stand Age: Manual Ages by Forest Type">
 		<!-- the start-year age of forest of a type that burned or was clearcut between the start year and the age map's year; no row = the default rule -->
 		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
 		<column name="StateClassId" displayName="Forest Type" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
 		<column name="Age" displayName="Stand Age in the Start Year (yr)" dataType="Integer" validationType="WholeNumber" validationCondition="Between" formula1="1" formula2="1000"/>
 	</dataSheet>
+	<!-- one page for both (user 2026-11-19: no reason for two pages; the ages by forest type are a manual setting) -->
+	<dataFeed name="StandAge" displayName="Stand Age" viewClassName="lucasCoreUI.StandAgeView" viewClassAssembly="lucasCoreUI">
+		<dataSheet name="StandAgeOptions"/>
+		<dataSheet name="StandAgeUnknown"/>
+	</dataFeed>
 
 	<dataSheet name="OutputStandAge" displayName="Stand Age Summary">
 		<!-- stage 5: per forest type and rule, the cells whose start-year age it set, their mean age and the mean age the age map gave them -->
@@ -1902,8 +1907,7 @@
 		<group name="lucasCoreGroup" displayName="LUCAS Core">
 			<item name="StudyArea"/>
 			<item name="BuildOptions"/>
-			<item name="StandAgeOptions"/>
-			<item name="StandAgeUnknown"/>
+			<item name="StandAge"/>
 			<item name="ForestCoverOptions"/>
 			<item name="ClimateOptions"/>
 			<item name="GrowthOptions"/>
