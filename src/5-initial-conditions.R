@@ -260,11 +260,19 @@ if (fo$definition == "canopy") {
     b30 <- crop_to(rast(bf)); levels(b30) <- NULL; lk <- bps_lookup(); rip <- reforest_options(read_ds("ReforestationOptions"))$riparian_as
     pot30 <- project(classify(b30, cbind(lk$VALUE, as.integer(bps_potential(lk$VALUE, lk, rip) == "forest")), others = 0L), t30, method = "near") }
   Cs <- mask(project(canopy_pass(t30, fo$threshold, pot30), R, method = "average"), m)
-  canopy_cell <- canopy_forest(values(n0, mat = FALSE), values(Cs, mat = FALSE), values(woody, mat = FALSE), fo$share) & values(m, mat = FALSE) %in% TRUE
+  cand_c <- canopy_forest(values(n0, mat = FALSE), values(Cs, mat = FALSE), values(woody, mat = FALSE), 0) & values(m, mat = FALSE) %in% TRUE
+  if (fo$rule == "area") {   # as many cells as bring each secondary unit's forest area up to the 30 m rule's (canopy_area_match)
+    n30 <- project(crop_to(rast(nfs[1])), t30, method = "near"); rule30 <- ifel(n30 %in% c(41:43, 90), 1, ifel(n30 %in% c(31, 52, 71), canopy_pass(t30, fo$threshold, pot30), 0))
+    Rs <- values(mask(project(rule30, R, method = "average"), m), mat = FALSE); vS1 <- values(S, mat = FALSE); ex <- (vS1 >= 100 & vS1 <= 999) | vS1 %in% 91
+    un <- if (!is.na(ic$SecondaryStratumFileName[1])) values(rast(ic$SecondaryStratumFileName[1]), mat = FALSE) else 1L; lnd <- values(m, mat = FALSE) %in% TRUE & !(values(n0, mat = FALSE) %in% c(11, 12))
+    canopy_cell <- canopy_area_match(values(Cs, mat = FALSE), cand_c, un, Rs, ex, lnd)
+    say("Forest Cover: area-matched by secondary stratum unit: the rule gives %.1f%% forest at 30 m; %.1f%% of the cells are forest already; %d of %d candidate cells are added (down to %.2f of a cell's pixels passing)",
+        100 * sum(Rs[lnd], na.rm = TRUE) / sum(lnd), 100 * sum(ex & lnd, na.rm = TRUE) / sum(lnd), sum(canopy_cell), sum(cand_c), if (any(canopy_cell)) min(values(Cs, mat = FALSE)[canopy_cell]) else NA_real_)
+  } else canopy_cell <- cand_c & values(Cs, mat = FALSE) >= fo$share
   vS <- values(S, mat = FALSE); was_f <- vS >= 100 & vS <= 999; n_land <- global(m, "sum", na.rm = TRUE)[[1]]
   f_before <- sum(was_f | vS == 91, na.rm = TRUE); vS[canopy_cell] <- values(Fz, mat = FALSE)[canopy_cell]; S <- setValues(S, vS)
   f_nlcd <- sum(values(n0, mat = FALSE) %in% 41:43 & values(m, mat = FALSE) %in% TRUE)
-  say("Forest Cover: tree canopy cover %d (USFS Science TCC) at or over %g%%%s, on at least %g of a cell's 30 m pixels", y0, fo$threshold, if (fo$gate == "bps") " where LANDFIRE BpS is forest" else "", fo$share)
+  say("Forest Cover: tree canopy cover %d (USFS Science TCC) at or over %g%%%s; %s", y0, fo$threshold, if (fo$gate == "bps") " where LANDFIRE BpS is forest" else "", if (fo$rule == "area") "cells area-matched to the 30 m forest area" else sprintf("cells with at least %g of their 30 m pixels passing", fo$share))
   say("Forest Cover: %d barren, shrub and grass cells of %d start as forest by their canopy (%d of them NLCD shows as forest in a later year); forest cells: NLCD %d %.1f%% of land, with the any-year rule %.1f%%, with the canopy %.1f%%",
       sum(canopy_cell), y0, sum(canopy_cell & was_f, na.rm = TRUE), y0, 100 * f_nlcd / n_land, 100 * f_before / n_land, 100 * sum((vS >= 100 & vS <= 999) | vS == 91, na.rm = TRUE) / n_land)
   ct <- data.table(StateClassId = scl$Name[match(vS[canopy_cell], as.integer(scl$Id))], Nlcd = values(n0, mat = FALSE)[canopy_cell], Later = was_f[canopy_cell] %in% TRUE)
@@ -491,6 +499,26 @@ check(STAGE, "forest and disturbed cells have an age of at least 1, chaparral an
 check(STAGE, "every forest ecodivision x class has a return interval", nrow(ri) == nrow(fc), sprintf("%d of %d", nrow(ri), nrow(fc)))
 say("Forest cells: %d (%.1f%% of land); natural cells made forest by the any-year rule: %d; by tree canopy cover: %d; developed/ag/water/ice kept: %d",
     sum(vF == 1, na.rm = TRUE), 100 * mean(vF[!is.na(vP)] == 1), sum(!is.na(v0) & !(v0 %in% 41:43) & vS >= 100 & vS <= 999 & !lu & !canopy_cell, na.rm = TRUE), sum(canopy_cell), sum(lu))
+# ---- forest area against FIA (src/forest-cover.R; user 2026-11-18: a check after a Build, to tune the Forest Cover settings) ------
+# FIA's forest share of the study area's land (the newest visit of each plot inside it, the last 12 inventory years) beside the
+# Build's in the start year. FIA keeps a burned or cut stand as forest land, so the Build's disturbed classes count as forest here.
+# Not a pass or fail: the years differ (FIA's are recent, the Build's is the start year) and the estimate is approximate.
+fa_tab <- tryCatch({
+  dmf <- read_data_sources("FiaDataMartFolder", optional = TRUE)$FiaDataMartFolder
+  if (is.na(dmf)) { say("Forest area check: no FIA DataMart Folder (Data Sources), so the Build's forest area is not compared with FIA"); NULL } else {
+    bx <- as.vector(ext(project(as.polygons(ext(R), crs = crs(R)), "EPSG:4269")))[c(1, 3, 2, 4)]; pl <- fia_plots_box(dmf, bx)
+    if (nrow(pl)) pl <- pl[!is.na(extract(P, project(as.matrix(pl[, .(LON, LAT)]), from = "EPSG:4269", to = crs(P)))[[1]])]
+    fi <- fia_forest_share(pl, fia_conds(dmf, pl))
+    landc <- !is.na(vP) & !(vS %in% c(11, 12)); pc <- function(k) sum(k & landc, na.rm = TRUE) / sum(landc)
+    b_for <- pc(vF %in% 1 | (vS >= 2091 & vS <= 2999)); n_for <- pc(v0 %in% c(41:43, 90)); verdict <- forest_area_verdict(b_for, fi$share, fi$se)
+    if (is.na(fi$share)) say("Forest area check: %d FIA plots in the study area, too few to compare (the Build: %.1f%% of the land is forest in %d)", fi$plots, 100 * b_for, y0) else
+      say("Forest area check: the Build starts with forest on %.1f%% of the land, water and ice left out (%d; the modal NLCD of that year %.1f%%); FIA has %.1f%% (s.e. %.1f; %d plots, newest visits %d-%d): %s. FIA's years are later than the start year, and its plot locations are approximate",
+          100 * b_for, y0, 100 * n_for, 100 * fi$share, 100 * fi$se, fi$plots, fi$from, fi$to, verdict)
+    data.table(Source = c(sprintf("The Build, %d (forest, forested wetland and disturbed forest)", y0), sprintf("Annual NLCD %d on the model grid (forest and woody wetland)", y0), "FIA forest land"),
+               ForestPercent = round(100 * c(b_for, n_for, fi$share), 1), StdError = c(NA, NA, round(100 * fi$se, 1)), Plots = c(NA, NA, fi$plots),
+               Note = c(verdict, if (fo$definition == "canopy") sprintf("before the any-year and canopy rules (Forest Cover: canopy %g%%, %s, %s)", fo$threshold, if (fo$gate == "bps") "on BpS forest" else "anywhere", if (fo$rule == "area") "area-matched" else sprintf("cell share %g", fo$share)) else "before the any-year rule",
+                        if (is.na(fi$share)) "too few plots" else sprintf("newest visit of each plot, %d-%d (median %d); a ratio over plots, not FIA's stratified estimate", fi$from, fi$to, fi$median))) } },
+  error = function(e) { say("Forest area check not made (%s)", conditionMessage(e)); NULL })
 say("Return intervals: %d cells, %d-%d yr (median %d); gNATSGO soil targets: %d cells, median %.0f Mg C/ha",
     nrow(ri), min(ri$ReturnInterval), max(ri$ReturnInterval), as.integer(median(ri$ReturnInterval)), nrow(st), median(st$SoilTarget))
 progressBar()
@@ -514,8 +542,9 @@ tryCatch(write_ds(data.frame(RuleFileName = write_raster(setValues(rast(R), matc
                             PixelAgeFileName = write_raster(mask(A_px, m), "StandAgePixel.tif", "INT2U")), "OutputStandAgeMap"),
          error = function(e) say("Stand Age Maps not written (%s): reopen the library in SyncroSim Studio so it adds the table", conditionMessage(e)))
 # Forest Cover = tree canopy: the share of each cell's pixels that pass the rule, and the cells it made forest by forest type
-if (exists("fCS")) tryCatch({ write_ds(data.frame(CanopyShareFileName = fCS, Threshold = fo$threshold, Gate = unname(FOREST_GATE[fo$gate]), CellShare = fo$share, Cells = sum(canopy_cell)), "OutputForestCoverMap")
+if (exists("fCS")) tryCatch({ write_ds(data.frame(CanopyShareFileName = fCS, Threshold = fo$threshold, Gate = unname(FOREST_GATE[fo$gate]), CellShare = if (fo$rule == "area") NA_real_ else fo$share, Cells = sum(canopy_cell)), "OutputForestCoverMap")
   if (nrow(fc_tab)) write_ds(fc_tab, "OutputForestCover") }, error = function(e) say("Forest Cover outputs not written (%s): reopen the library in SyncroSim Studio so it adds the tables", conditionMessage(e)))
+if (!is.null(fa_tab)) tryCatch(write_ds(fa_tab, "OutputForestAreaCheck"), error = function(e) say("Forest Area Check not written (%s): reopen the library in SyncroSim Studio so it adds the table", conditionMessage(e)))
 summ <- data.table(S = vS, A = vA)[!is.na(S), .(Cells = .N, MeanAge = round(mean(A), 1)), by = S][, StateClassId := scl$Name[match(S, as.integer(scl$Id))]]
 write_ds(summ[order(-Cells), .(StateClassId, Cells, MeanAge)], "OutputStateClassSummary")
 progressBar()

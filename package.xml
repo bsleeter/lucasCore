@@ -941,6 +941,7 @@
 		<column name="ForestDefinition" displayName="Forest in the Start Year (blank = Annual NLCD)" dataType="Integer" validationType="List" formula1="1:Annual NLCD|2:Annual NLCD and tree canopy cover" isOptional="True" defaultValue="1"/>
 		<column name="CanopyThreshold" displayName="Tree Canopy Cover Threshold (percent; blank = 10)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="1" formula2="100"/>
 		<column name="CanopyGate" displayName="Where Canopy Cover Makes Forest (blank = only where LANDFIRE BpS is forest)" dataType="Integer" validationType="List" formula1="1:Only where LANDFIRE BpS is forest|2:Anywhere" isOptional="True" defaultValue="1"/>
+		<column name="CellRule" displayName="Cells That Become Forest (blank = a share of the cell's pixels)" dataType="Integer" validationType="List" formula1="1:A share of the cell's pixels|2:Area-matched" isOptional="True" defaultValue="1"/>
 		<column name="CellShare" displayName="Share of a Cell's 30 m Pixels That Must Pass (blank = 0.5)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0.01" formula2="1"/>
 		<column name="TreeCanopyFolder" displayName="Tree Canopy Cover Folder (science_tcc_conus_year.tif; blank = Data Sources Home)" dataType="String" isOptional="True"/>
 	</dataSheet>
@@ -962,6 +963,15 @@
 		<column name="Gate" displayName="Where" dataType="String"/>
 		<column name="CellShare" displayName="Share of a Cell's Pixels That Must Pass" dataType="Double"/>
 		<column name="Cells" displayName="Cells Made Forest" dataType="Integer"/>
+	</dataSheet>
+
+	<dataSheet name="OutputForestAreaCheck" displayName="Forest Area Check (FIA)">
+		<!-- stage 5: the Build's forest share of the land in the start year beside FIA's (the newest visit of each plot in the study area), to tune Forest Cover -->
+		<column name="Source" dataType="String"/>
+		<column name="ForestPercent" displayName="Forest (% of land)" dataType="Double" format="0.0"/>
+		<column name="StdError" displayName="Standard Error (points)" dataType="Double" format="0.0" isOptional="True"/>
+		<column name="Plots" displayName="FIA Plots" dataType="Integer" isOptional="True"/>
+		<column name="Note" dataType="String" isOptional="True"/>
 	</dataSheet>
 
 	<!-- Stand Age (stage 5, src/stand-age.R; lucasCore 1.5.2): how a cell takes its age from its 30 m pixels, and the age of forest the
@@ -1616,6 +1626,7 @@
 		<dataSheet name="ForestCoverOptions" type="Input"/>
 		<dataSheet name="OutputForestCover" type="Output"/>
 		<dataSheet name="OutputForestCoverMap" type="Output"/>
+		<dataSheet name="OutputForestAreaCheck" type="Output"/>
 		<dataSheet name="LandCoverCrosswalk" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Both"/>
 		<dataSheet name="OutputNlcdAnnual" type="Output"/>
@@ -1941,6 +1952,7 @@
 				<item name="OutputStandAge"/>
 				<item name="OutputStandAgeCut"/>
 				<item name="OutputStandAgeMap"/>
+				<item name="OutputForestAreaCheck"/>
 				<item name="OutputForestCover"/>
 				<item name="OutputForestCoverMap"/>
 				<item name="OutputLandCoverLayers"/>

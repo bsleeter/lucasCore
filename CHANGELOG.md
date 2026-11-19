@@ -17,6 +17,8 @@ Build can then be drawn against it.
     tree canopy cover at or over the threshold (blank = 10%) in the start year and, by default, forest as their LANDFIRE
     BpS. At 10% on BpS forest the 30 m rule gave 85.8% forest in Yellowstone and in P26 and 57.5% in Great Dismal Swamp in
     2016, against FIA's 83.3%, 85.3% and 52.1%. Without the BpS gate 10% takes in most western shrubland (about 90%).
+  - **Cells that become forest:** a share of the cell's pixels (default 0.5), or **Area-matched**: per secondary stratum
+    unit, only as many cells as bring the Build's forest area up to the 30 m rule's, the cells with the most canopy first.
   - **What it leaves alone.** Annual NLCD stays the default. Forest NLCD maps is never removed, and every other class still
     comes from NLCD. When a disturbed stand counts as regrown still follows NLCD (stage 6); a canopy rule for that is not built.
     A canopy cell is forest from the start, so the regrowth, disturbed-start and reforestation rules do not touch it.
@@ -26,6 +28,10 @@ Build can then be drawn against it.
     from the folder set on the Forest Cover page.
   - **Outputs:** Forest by Tree Canopy Cover (cells made forest, by forest type and NLCD class) and its map (the share of
     each cell's pixels that pass the rule); the start-rule map of Build Figures gains the class Forest by tree canopy cover.
+  - **Forest Area Check (FIA):** every Build now compares its forest share of the land in the start year with FIA's forest
+    land share for the study area (the newest visit of each plot, with a standard error), in the log and as a Build result,
+    so the threshold and cell share can be tuned. On a coarse grid the majority rule adds forest: P26 at 500 m has 6.5 points
+    more than the same rule gives at 30 m.
 - Carbon carrying capacity (stage 8, `src/capacity.R`): what each cell would hold in live biomass, dead wood and litter
   under its potential natural vegetation and natural fire regime, as a yardstick for historical runs and projections.
   - **Definition.** The natural-regime mean: for each ecodivision and forest type, the type's stock curve after a

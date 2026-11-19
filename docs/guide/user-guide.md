@@ -532,11 +532,15 @@ A cut stand is then still raised to its minimum harvest age at its cut where the
 
 The table is for 2016, at 30 m, against the newest FIA plot visits of 2012 to 2022. **Anywhere** drops the BpS gate: the canopy product gives western shrubland and grassland a cover of 20 to 25%, so at 10% it takes in most of it; use about 15% with it. **Share of a cell's pixels** (blank = 0.5) is how much of a cell must pass.
 
+**Cells that become forest.** A cell is larger than a 30 m pixel and takes one class. With **A share of the cell's pixels** (the default), a cell becomes forest when that share of its pixels pass (blank = 0.5). On a coarse grid this adds forest where the land is mostly forest, as taking each cell's most common NLCD class does: at 500 m the Northern Sierra Nevada pyrome gets 93.7% forest where the same rule gives 87.2% at 30 m. With **Area-matched**, in each secondary stratum unit only as many cells become forest as bring the Build's forest area up to the area the rule gives at 30 m (NLCD forest and woody wetland, plus the barren, shrub and grass pixels that pass), taking the cells with the most canopy first, so the result does not depend on the cell size. Where the Build already has more forest than that (the any-year rule and the most-common-class rule can do this), no cell is added; Build Options: Land Cover Resampling = Area-matched removes that part.
+
 What the option does not change: forest that NLCD maps is never removed (a burned or cut stand with little canopy is still forest land); developed land, farm land, water and wetlands keep their NLCD class; and when a disturbed stand counts as regrown still follows NLCD in stage 6.
 
 **Data.** The Build needs the tree canopy cover of the start year. Run a Data Download whose **Datasets** names `TreeCanopyFolder` (it is not fetched otherwise) for the study area and the start year; it lands in `land-cover/tree-canopy` of Data Sources Home. The folder can also be set on the page. The USFS server is slow on some days; a download that fails can be rerun.
 
 **Build Results > Forest by Tree Canopy Cover** lists, by forest type, the cells the rule made forest, what NLCD maps them as, and how many NLCD maps as forest in a later year. Its map is the share of each cell's pixels that pass the rule.
+
+**Build Results > Forest Area Check (FIA)** is made by every Build, whichever choice is set. It puts the Build's forest share of the land in the start year (forest, forested wetland and disturbed forest) beside FIA's forest land share for the study area, with FIA's standard error and plot count, and says whether the two are within two standard errors. Use it to tune the threshold and the cell share: rerun stage 5 with another value and read the table again. Three cautions: FIA's plots are recent (the newest visit of each plot in the last 12 inventory years) while the Build's figure is for the start year; plot locations are approximate, which matters for a small study area; and the figure is a simple ratio over plots, not FIA's stratified estimate. With fewer than 20 plots no comparison is made.
 
 ### 3.4 Climate Options
 
@@ -2029,6 +2033,7 @@ Besides the inputs they write for ST-Sim, the lucasCore stages save summary tabl
 | Stand Age Summary: Cut Stands | OutputStandAgeCut | 6 | The same for forest cells clearcut between the start year and the age map's year, whose ages stage 6 sets from its harvest maps. |
 | Forest by Tree Canopy Cover | OutputForestCover | 5 | With Forest Cover = Annual NLCD and tree canopy cover: per forest type, the cells the canopy rule made forest, what NLCD maps them as in the start year, and how many NLCD maps as forest later (section 3.3.3). |
 | Forest by Tree Canopy Cover: Map | OutputForestCoverMap | 5 | The share of each cell's 30 m pixels that pass the canopy rule, with the threshold and gate the Build ran with. |
+| Forest Area Check (FIA) | OutputForestAreaCheck | 5 | The Build's forest share of the land in the start year, the modal NLCD's, and FIA's forest land share for the study area with its standard error and plot count (section 3.3.3). |
 | Land Cover Layers | OutputLandCoverLayers | 5 | The forest type, grassland and shrubland type, wetland type and "forest in any year" maps behind the state classes. |
 | Annual NLCD (model grid) | OutputNlcdAnnual | 5 | The NLCD land cover map of each year, resampled to the model grid; stage 6 reads the change between years. |
 | Spin-up Return Intervals | OutputReturnInterval | 5 | The replacement-fire return interval used to spin up each ecodivision and state class. |

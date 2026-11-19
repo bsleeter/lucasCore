@@ -2,7 +2,7 @@
 // ForestCoverView.cs - the Forest Cover page of a Build: what counts as forest in the start year
 // =============================================================================
 // User 2026-11-18: "rather than use NLCD to tell us what is forest in 1985, we use the tree cover product ... set the tree cover %
-// threshold (i.e. 10%)". Single-row sheet lucasCore_ForestCoverOptions (ForestDefinition, CanopyThreshold, CanopyGate, CellShare,
+// threshold (i.e. 10%)". Single-row sheet lucasCore_ForestCoverOptions (ForestDefinition, CanopyThreshold, CanopyGate, CellRule, CellShare,
 // TreeCanopyFolder); stage 5 reads it (src/forest-cover.R, forest_cover_options). Choices as radio buttons with what each means, as
 // on the Stand Age page.
 // =============================================================================
@@ -15,7 +15,7 @@ namespace lucasCoreUI
     public class ForestCoverView : LucasView
     {
         protected override string SheetName { get { return "lucasCore_ForestCoverOptions"; } }
-        private readonly Choice m_def = new Choice("ForestDefinition", 1), m_gate = new Choice("CanopyGate", 1);
+        private readonly Choice m_def = new Choice("ForestDefinition", 1), m_gate = new Choice("CanopyGate", 1), m_rule = new Choice("CellRule", 1);
         private readonly TextBox m_th = Box(50), m_share = Box(50);
         private readonly TextBox m_folder = new TextBox { Width = 460, Margin = new Padding(3, 3, 6, 3) };
         private readonly Button m_browse = new Button { Text = "Browse...", AutoSize = true };
@@ -38,16 +38,23 @@ namespace lucasCoreUI
             c.Controls.Add(Indent(Note("A pixel counts when its canopy cover is at or over the threshold and its potential vegetation (LANDFIRE Biophysical Settings) is forest. At 10% this gave 86% forest in Yellowstone and in the Northern Sierra Nevada and 57% in Great Dismal Swamp, against FIA's 83%, 85% and 52%.")));
             c.Controls.Add(Option(m_gate, 2, "Anywhere"));
             c.Controls.Add(Indent(Note("Canopy cover alone. The canopy product gives shrubland and grassland a cover of 20 to 25% in the West, so at 10% this takes in most of it (about 90% forest in both western regions); use a threshold of about 15% with it.")));
-            var s = Row(); s.Controls.Add(Caption("Share of a cell's 30 m pixels that must count:")); s.Controls.Add(m_share); s.Controls.Add(Note("Blank = 0.5 (most of the cell), as a cell takes its most common NLCD class."));
-            c.Controls.Add(s);
             AddGroup(Group("The canopy rule", c));
+
+            var k = Column();
+            k.Controls.Add(Note("A cell is larger than a 30 m pixel and takes one class. This sets which cells the canopy rule turns into forest."));
+            k.Controls.Add(Option(m_rule, 1, "A share of the cell's pixels"));
+            var s = Row(); s.Controls.Add(Caption("Share that must count:")); s.Controls.Add(m_share); s.Controls.Add(Note("Blank = 0.5 (most of the cell), as a cell takes its most common NLCD class. On a coarse grid this adds forest where the land is mostly forest: at 500 m the Northern Sierra Nevada gets 6.5 points more forest than the same rule gives at 30 m."));
+            k.Controls.Add(Indent(s));
+            k.Controls.Add(Option(m_rule, 2, "Area-matched"));
+            k.Controls.Add(Indent(Note("In each secondary stratum unit, only as many cells become forest as bring the Build's forest area up to the area the rule gives at 30 m, taking the cells with the most canopy first. The result does not depend on the cell size.")));
+            AddGroup(Group("Cells that become forest", k));
 
             var f = Column();
             f.Controls.Add(Note("Optional. A folder holding science_tcc_conus_<year>.tif for the start year. Blank = the tree-canopy folder of Data Sources Home, where a Data Download puts it."));
             var r = Row(); r.Controls.Add(Caption("Folder:")); r.Controls.Add(m_folder); r.Controls.Add(m_browse); f.Controls.Add(r);
             AddGroup(Group("Tree canopy cover folder", f));
 
-            var n = Column(); n.Controls.Add(Note("These settings take effect when stage 5 runs (a new Build). Build Results > Forest by Tree Canopy Cover lists, by forest type, the cells the canopy rule made forest and what NLCD maps them as. Forest that NLCD maps is never removed: a burned or cut stand with little canopy is still forest land. When a disturbed stand counts as regrown still follows NLCD."));
+            var n = Column(); n.Controls.Add(Note("These settings take effect when stage 5 runs (a new Build). Build Results > Forest by Tree Canopy Cover lists, by forest type, the cells the canopy rule made forest and what NLCD maps them as; Forest Area Check (FIA) puts the Build's forest share beside the forest inventory's, to tune these settings. Forest that NLCD maps is never removed: a burned or cut stand with little canopy is still forest land. When a disturbed stand counts as regrown still follows NLCD."));
             AddGroup(Group("When it applies", n));
             EndGroups();
             BindNumber(m_th, () => Sheet, "CanopyThreshold", true); BindNumber(m_share, () => Sheet, "CellShare", false);
@@ -73,12 +80,13 @@ namespace lucasCoreUI
 
         protected override void ShowData()
         {
-            ShowChoice(m_def); ShowChoice(m_gate);
+            ShowChoice(m_def); ShowChoice(m_gate); ShowChoice(m_rule);
             m_th.Text = Show(Value("CanopyThreshold")); m_share.Text = Show(Value("CellShare"));
             object f = Value("TreeCanopyFolder"); m_folder.Text = f == DBNull.Value ? "" : Convert.ToString(f);
             bool on = IntValue("ForestDefinition", 1) == 2;
-            m_th.Enabled = on; m_share.Enabled = on; m_folder.Enabled = on; m_browse.Enabled = on;
+            m_th.Enabled = on; m_share.Enabled = on && IntValue("CellRule", 1) == 1; m_folder.Enabled = on; m_browse.Enabled = on;
             foreach (RadioButton b in m_gate.Buttons) b.Enabled = on;
+            foreach (RadioButton b in m_rule.Buttons) b.Enabled = on;
         }
     }
 }
