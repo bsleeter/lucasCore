@@ -270,6 +270,53 @@ if (FRG %in% pdg$TransitionGroupId && y0 + 1L <= PD_WITNESS$year) {
   check(STAGE, "forest return witness: years fall in the run and no cell has forest in NLCD within the guard", all(is.na(wyr) | (wyr %in% yrs & wyr <= PD_WITNESS$year)) &&
         !any(!is.na(wyr) & !is.na(lastf) & lastf > PD_WITNESS$year - PD_WITNESS$min_years), sprintf("%d cells", n_w))
 }
+# ---- forest return by tree canopy cover (Forest Cover page; src/forest-cover.R; user 2026-11-18) ------------------------------------
+# With Forest in the Start Year = Annual NLCD and tree canopy cover, a disturbed forest cell is also on in the Forest Return map of the
+# year its share of pixels at the recovery threshold (the page's; with its BpS gate) has been at or over the cell share for two years
+# running. The recovery threshold is higher than the start-year one (30% against 10%): the canopy product reads about 20% on a
+# stand that has just burned at high severity, so 10% would return it the next year. NLCD and the LANDFIRE witness still
+# count. Only a cell in a disturbed forest class has the pathway, and the pathway holds it for its minimum return age.
+source(pkg_file("src", "forest-cover.R")); source(pkg_file("src", "reforestation.R"))
+fo6 <- tryCatch(forest_cover_options(tryCatch(read_ds("ForestCoverOptions"), error = function(e) data.table())), error = function(e) fail("%s", conditionMessage(e)))
+if (fo6$definition == "canopy" && fo6$recovery == "canopy" && FRG %in% pdg$TransitionGroupId) {
+  tcd <- if (!is.na(fo6$folder)) fo6$folder else read_data_sources("TreeCanopyFolder")$TreeCanopyFolder
+  cy <- intersect(y0:y1, TCC_YEARS); tf <- setNames(file.path(tcd, sprintf(TCC_FILE, cy)), cy); miss <- cy[!file.exists(tf)]
+  if (length(miss)) fail("Forest Cover: recovery by tree canopy cover reads the canopy of every year %d-%d, and %d %s missing in %s (%s): run a Data Download with Datasets = TreeCanopyFolder for those years, or set Recovery to NLCD forest only on the Forest Cover page",
+                         min(cy), max(cy), length(miss), if (length(miss) == 1) "is" else "are", tcd, paste(utils::head(miss, 12), collapse = ", "))
+  if (y1 > max(TCC_YEARS)) say("Forest Cover: tree canopy cover ends in %d; %d-%d return by NLCD alone", max(TCC_YEARS), max(TCC_YEARS) + 1L, y1)
+  t1 <- rast(tf[1]); Ec <- ext(project(as.polygons(ext(P) + 3000, crs = crs(P)), crs(t1))); potf <- NA_character_
+  if (fo6$gate == "bps") { bf <- read_data_sources("BpsFile", optional = TRUE)$BpsFile
+    if (is.na(bf)) fail("Forest Cover: the canopy rule is set to forest BpS only and needs LANDFIRE BpS (Data Sources: BpsFile; a Data Download fetches it), or set it to Anywhere")
+    b30 <- rast(bf); b30 <- crop(b30, project(as.polygons(ext(P) + 3000, crs = crs(P)), crs(b30))); levels(b30) <- NULL; lk <- bps_lookup(); rip <- reforest_options(read_ds("ReforestationOptions"))$riparian_as
+    potf <- file.path(TD(), "CanopyPotential.tif")
+    writeRaster(project(classify(b30, cbind(lk$VALUE, as.integer(bps_potential(lk$VALUE, lk, rip) == "forest")), others = 0L), crop(t1, Ec), method = "near"), potf, overwrite = TRUE, datatype = "INT1U", gdal = "COMPRESS=DEFLATE") }
+  # per-year worker: the share of each cell's 30 m pixels that pass the rule in that year
+  canopy_year <- function(y, a) { library(terra); a$clear(); terraOptions(memfrac = a$memfrac, progress = 0); P <- rast(a$pf)
+    t <- crop(rast(a$tf[[as.character(y)]]), ext(a$E)); p <- subst(classify(t, rbind(c(-Inf, a$th, 0), c(a$th, 100.5, 1), c(100.5, Inf, 0)), right = FALSE), NA, 0)
+    if (!is.na(a$pot)) { g <- rast(a$pot); if (!compareGeom(p, g, stopOnError = FALSE)) stop("the canopy grid of ", y, " differs from the first year's: download the years again for one region"); p <- p * g }
+    f <- file.path(a$td, sprintf("CanopyShare_%d.tif", y)); writeRaster(mask(project(p, P, method = "average"), P), f, overwrite = TRUE, datatype = "FLT4S", gdal = "COMPRESS=DEFLATE"); f }
+  t0 <- Sys.time()
+  cs <- par_lapply_mem(cy, function(y, a) tryCatch(canopy_year(y, a), error = function(e) stop(sprintf("tree canopy cover %d: %s", y, conditionMessage(e)), call. = FALSE)), "Tree canopy cover",
+                       cap = max(1L, min(20L, detectCores() - 2L)), init = function(cl, nw) parallel::clusterExport(cl, "canopy_year", envir = environment(canopy_year)),
+                       args = function(nw) list(a = list(clear = clear_syncrosim_proj, pf = ic$StratumFileName[1], E = as.vector(Ec), th = fo6$recovery_threshold, pot = potf, td = TD(), tf = as.list(tf), memfrac = 0.6 / nw)))
+  sh <- setNames(lapply(cs, function(f) values(rast(unlist(f)), mat = FALSE)), cy); ry <- intersect(yrs, cy[cy - 1L >= min(cy)]); n_new <- 0L; n_maps <- 0L
+  onC <- matrix(FALSE, length(land0), length(ry)); onN <- onC
+  for (j in seq_along(ry)) { y <- ry[j]; on_c <- land0 & canopy_return_on(sh[[as.character(y - 1L)]], sh[[as.character(y)]], fo6$share)
+    i <- which(layers$TransitionGroupId == FRG & layers$Timestep == y); had <- if (!is.na(layers$File[i])) values(rast(layers$File[i]), mat = FALSE) %in% 1L else rep(FALSE, length(land0))
+    onC[, j] <- on_c; onN[, j] <- had; add <- on_c & !had; n_new <- n_new + sum(add)
+    if (any(add)) { v <- as.integer(on_c | had); v[!land0] <- NA_integer_; n_maps <- n_maps + 1L
+      set(layers, i, "File", write_raster(setValues(rast(P), v), sprintf("Canopy-Post-disturbance-Forest-Return_%d.tif", y), "INT1U")) } }
+  say("Forest return by tree canopy cover: canopy at or over %g%%%s on at least %g of a cell's pixels two years running (%d years read in %.1f min); it adds %d cell-years to the Forest Return maps of %d years",
+      fo6$recovery_threshold, if (fo6$gate == "bps") " where LANDFIRE BpS is forest" else "", fo6$share, length(cy), as.numeric(Sys.time() - t0, units = "mins"), n_new, n_maps)
+  # what it changes where it matters: cells most of which burned at high severity, by how soon each record shows them back
+  hb <- rep(NA_integer_, length(land0)); hsf <- dl[TransitionGroupId == HSG & !is.na(File) & Timestep %in% yrs][order(Timestep)]
+  for (i in seq_len(nrow(hsf))) { k <- which(values(rast(hsf$File[i]), mat = FALSE) >= 0.5); hb[k[is.na(hb[k])]] <- hsf$Timestep[i] }
+  if (any(!is.na(hb))) { k <- which(!is.na(hb)); lc6 <- return_lag(onC[k, , drop = FALSE], ry, hb[k]); ln6 <- return_lag(onN[k, , drop = FALSE], ry, hb[k]); lb6 <- pmin(lc6, ln6, na.rm = TRUE)
+    md <- function(v) if (any(!is.na(v))) as.integer(stats::median(v, na.rm = TRUE)) else NA_integer_
+    say("  cells burned at high severity over most of their area, %d-%d: %d; back by %d by NLCD or LANDFIRE %.0f%% (median %s years after the fire), by canopy %.0f%% (median %s), by either %.0f%% (median %s)",
+        min(hb[k]), max(hb[k]), length(k), y1, 100 * mean(!is.na(ln6)), md(ln6), 100 * mean(!is.na(lc6)), md(lc6), 100 * mean(!is.na(lb6)), md(lb6)) }
+  check(STAGE, "forest return by canopy: every map year is in the run", all(ry %in% yrs), sprintf("%d years", length(ry)))
+} else if (fo6$definition == "canopy") say("Forest return: by NLCD%s (Forest Cover: Recovery is set to NLCD forest only)", if (FRG %in% pdg$TransitionGroupId) " and the LANDFIRE witness" else "")
 progressBar()
 
 # ---- minimum harvest ages, settled (user decisions 2026-10-30) -------------------------------------------------------------------

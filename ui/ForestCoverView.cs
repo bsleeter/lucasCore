@@ -2,7 +2,7 @@
 // ForestCoverView.cs - the Forest Cover page of a Build: what counts as forest in the start year
 // =============================================================================
 // User 2026-11-18: "rather than use NLCD to tell us what is forest in 1985, we use the tree cover product ... set the tree cover %
-// threshold (i.e. 10%)". Single-row sheet lucasCore_ForestCoverOptions (ForestDefinition, CanopyThreshold, CanopyGate, CellRule, CellShare,
+// threshold (i.e. 10%)". Single-row sheet lucasCore_ForestCoverOptions (ForestDefinition, CanopyThreshold, CanopyGate, CellRule, CellShare, CanopyRecovery,
 // TreeCanopyFolder); stage 5 reads it (src/forest-cover.R, forest_cover_options). Choices as radio buttons with what each means, as
 // on the Stand Age page.
 // =============================================================================
@@ -15,8 +15,8 @@ namespace lucasCoreUI
     public class ForestCoverView : LucasView
     {
         protected override string SheetName { get { return "lucasCore_ForestCoverOptions"; } }
-        private readonly Choice m_def = new Choice("ForestDefinition", 1), m_gate = new Choice("CanopyGate", 1), m_rule = new Choice("CellRule", 1);
-        private readonly TextBox m_th = Box(50), m_share = Box(50);
+        private readonly Choice m_def = new Choice("ForestDefinition", 1), m_gate = new Choice("CanopyGate", 1), m_rule = new Choice("CellRule", 1), m_rec = new Choice("CanopyRecovery", 1);
+        private readonly TextBox m_th = Box(50), m_share = Box(50), m_rth = Box(50);
         private readonly TextBox m_folder = new TextBox { Width = 460, Margin = new Padding(3, 3, 6, 3) };
         private readonly Button m_browse = new Button { Text = "Browse...", AutoSize = true };
 
@@ -49,15 +49,25 @@ namespace lucasCoreUI
             k.Controls.Add(Indent(Note("In each secondary stratum unit, only as many cells become forest as bring the Build's forest area up to the area the rule gives at 30 m, taking the cells with the most canopy first. The result does not depend on the cell size.")));
             AddGroup(Group("Cells that become forest", k));
 
+            var q = Column();
+            q.Controls.Add(Note("In the historical years (stage 6) a burned or cut forest cell waits in a disturbed class until the record shows it as forest again."));
+            q.Controls.Add(Option(m_rec, 1, "NLCD forest, or tree canopy cover at the threshold"));
+            var rt = Row(); rt.Controls.Add(Caption("Canopy cover threshold for recovery (percent):")); rt.Controls.Add(m_rth); rt.Controls.Add(Note("Blank = 30. Higher than the start-year threshold on purpose: the canopy product reads about 20% on forest that has just burned at high severity, so 10% would call it forest again the next year."));
+            q.Controls.Add(Indent(rt));
+            q.Controls.Add(Indent(Note("The cell returns to its forest type in the year NLCD maps it as forest for the second year running, or the year its tree canopy cover has been at or over the recovery threshold (same BpS gate and cell share) for two years running, whichever comes first. Needs the tree canopy cover of every year of the Build: run the Data Download with Datasets = TreeCanopyFolder for all its years.")));
+            q.Controls.Add(Option(m_rec, 2, "NLCD forest only"));
+            q.Controls.Add(Indent(Note("As without tree canopy cover. NLCD is slow to map an open regrowing stand as forest, and never does on a cell the canopy rule made forest, so such a cell waits to the end of its window and then converts to shrub or grass.")));
+            AddGroup(Group("When a disturbed stand is forest again", q));
+
             var f = Column();
             f.Controls.Add(Note("Optional. A folder holding science_tcc_conus_<year>.tif for the start year. Blank = the tree-canopy folder of Data Sources Home, where a Data Download puts it."));
             var r = Row(); r.Controls.Add(Caption("Folder:")); r.Controls.Add(m_folder); r.Controls.Add(m_browse); f.Controls.Add(r);
             AddGroup(Group("Tree canopy cover folder", f));
 
-            var n = Column(); n.Controls.Add(Note("These settings take effect when stage 5 runs (a new Build). Build Results > Forest by Tree Canopy Cover lists, by forest type, the cells the canopy rule made forest and what NLCD maps them as; Forest Area Check (FIA) puts the Build's forest share beside the forest inventory's, to tune these settings. Forest that NLCD maps is never removed: a burned or cut stand with little canopy is still forest land. When a disturbed stand counts as regrown still follows NLCD."));
+            var n = Column(); n.Controls.Add(Note("These settings take effect when stages 5 and 6 run (a new Build). Build Results > Forest by Tree Canopy Cover lists, by forest type, the cells the canopy rule made forest and what NLCD maps them as; Forest Area Check (FIA) puts the Build's forest share beside the forest inventory's, to tune these settings. Forest that NLCD maps is never removed at the start: a burned or cut stand with little canopy is still forest land."));
             AddGroup(Group("When it applies", n));
             EndGroups();
-            BindNumber(m_th, () => Sheet, "CanopyThreshold", true); BindNumber(m_share, () => Sheet, "CellShare", false);
+            BindNumber(m_th, () => Sheet, "CanopyThreshold", true); BindNumber(m_rth, () => Sheet, "RecoveryThreshold", true); BindNumber(m_share, () => Sheet, "CellShare", false);
             m_folder.Validated += (o, e) => { if (!Refreshing) Write("TreeCanopyFolder", m_folder.Text.Trim().Length == 0 ? (object)DBNull.Value : m_folder.Text.Trim()); };
             m_browse.Click += (o, e) =>
             {
@@ -80,13 +90,14 @@ namespace lucasCoreUI
 
         protected override void ShowData()
         {
-            ShowChoice(m_def); ShowChoice(m_gate); ShowChoice(m_rule);
-            m_th.Text = Show(Value("CanopyThreshold")); m_share.Text = Show(Value("CellShare"));
+            ShowChoice(m_def); ShowChoice(m_gate); ShowChoice(m_rule); ShowChoice(m_rec);
+            m_th.Text = Show(Value("CanopyThreshold")); m_rth.Text = Show(Value("RecoveryThreshold")); m_rth.Enabled = IntValue("ForestDefinition", 1) == 2 && IntValue("CanopyRecovery", 1) == 1; m_share.Text = Show(Value("CellShare"));
             object f = Value("TreeCanopyFolder"); m_folder.Text = f == DBNull.Value ? "" : Convert.ToString(f);
             bool on = IntValue("ForestDefinition", 1) == 2;
             m_th.Enabled = on; m_share.Enabled = on && IntValue("CellRule", 1) == 1; m_folder.Enabled = on; m_browse.Enabled = on;
             foreach (RadioButton b in m_gate.Buttons) b.Enabled = on;
             foreach (RadioButton b in m_rule.Buttons) b.Enabled = on;
+            foreach (RadioButton b in m_rec.Buttons) b.Enabled = on;
         }
     }
 }

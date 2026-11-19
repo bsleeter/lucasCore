@@ -943,6 +943,8 @@
 		<column name="CanopyGate" displayName="Where Canopy Cover Makes Forest (blank = only where LANDFIRE BpS is forest)" dataType="Integer" validationType="List" formula1="1:Only where LANDFIRE BpS is forest|2:Anywhere" isOptional="True" defaultValue="1"/>
 		<column name="CellRule" displayName="Cells That Become Forest (blank = a share of the cell's pixels)" dataType="Integer" validationType="List" formula1="1:A share of the cell's pixels|2:Area-matched" isOptional="True" defaultValue="1"/>
 		<column name="CellShare" displayName="Share of a Cell's 30 m Pixels That Must Pass (blank = 0.5)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0.01" formula2="1"/>
+		<column name="CanopyRecovery" displayName="When a Disturbed Stand Is Forest Again (blank = NLCD forest, or tree canopy cover at the threshold)" dataType="Integer" validationType="List" formula1="1:NLCD forest, or tree canopy cover at the threshold|2:NLCD forest only" isOptional="True" defaultValue="1"/>
+		<column name="RecoveryThreshold" displayName="Tree Canopy Cover Threshold for Recovery (percent; blank = 30)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="1" formula2="100"/>
 		<column name="TreeCanopyFolder" displayName="Tree Canopy Cover Folder (science_tcc_conus_year.tif; blank = Data Sources Home)" dataType="String" isOptional="True"/>
 	</dataSheet>
 
@@ -1649,6 +1651,7 @@
 		<dataSheet name="MinimumHarvestAge" type="Input"/>
 		<dataSheet name="HarvestAgeOptions" type="Input"/>
 		<dataSheet name="ReforestationOptions" type="Input"/>
+		<dataSheet name="ForestCoverOptions" type="Input"/>
 		<dataSheet name="OutputLandCoverLayers" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Both"/>
 		<dataSheet name="stsim_Transition" type="Output"/>

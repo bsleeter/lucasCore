@@ -20,8 +20,15 @@ Build can then be drawn against it.
   - **Cells that become forest:** a share of the cell's pixels (default 0.5), or **Area-matched**: per secondary stratum
     unit, only as many cells as bring the Build's forest area up to the 30 m rule's, the cells with the most canopy first.
   - **What it leaves alone.** Annual NLCD stays the default. Forest NLCD maps is never removed, and every other class still
-    comes from NLCD. When a disturbed stand counts as regrown still follows NLCD (stage 6); a canopy rule for that is not built.
+    comes from NLCD.
     A canopy cell is forest from the start, so the regrowth, disturbed-start and reforestation rules do not touch it.
+  - **Recovery (stage 6).** With the canopy rule on, a disturbed forest cell is also on in the Forest Return map of the year
+    its share of pixels at the recovery threshold has been at or over the cell share for two years running, beside NLCD's
+    forest two years running and the LANDFIRE 2016 witness. The recovery threshold is its own (blank = 30%): the canopy
+    product reads about 20% on forest that has just burned at high severity (Yellowstone 1988: 97% of the pixels still at or
+    over 10% in 1989), so the start-year 10% would return it the next year. It reads the canopy of every year of the Build.
+    *NLCD forest only* on the page turns it off. Not changed: the projection's return chance by age, still fitted to NLCD
+    and LANDFIRE (`tools/fit_post_disturbance.R`).
   - **Data.** USFS Science Tree Canopy Cover v2025-6 (30 m, 1985 to 2023) is a new Data Download dataset, `TreeCanopyFolder`,
     fetched only when the Data Download's Datasets names it, the region read out of each year's zip. It has no Data Sources
     column yet (that needs a library update, so it waits for the next minor version): it is read from Data Sources Home, or

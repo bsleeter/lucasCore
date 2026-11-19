@@ -15,7 +15,7 @@ err <- function(e) inherits(try(e, silent = TRUE), "try-error")
 
 # ---- options ------------------------------------------------------------------------------------------------------------------
 o <- forest_cover_options(data.table())
-expect("options: an empty sheet is Annual NLCD, 10%, the BpS gate, half the cell, no folder", o$definition == "nlcd" && o$threshold == 10 && o$gate == "bps" && o$rule == "share" && o$share == 0.5 && is.na(o$folder))
+expect("options: an empty sheet is Annual NLCD, 10%, the BpS gate, half the cell, no folder", o$definition == "nlcd" && o$threshold == 10 && o$gate == "bps" && o$rule == "share" && o$recovery == "canopy" && o$recovery_threshold == 30 && o$share == 0.5 && is.na(o$folder))
 o <- forest_cover_options(data.table(ForestDefinition = 2L, CanopyThreshold = 15L, CanopyGate = 2L, CellShare = 0.3, TreeCanopyFolder = "D:/tcc"))
 expect("options: numbers", o$definition == "canopy" && o$threshold == 15 && o$gate == "none" && o$share == 0.3 && o$folder == "D:/tcc")
 o <- forest_cover_options(data.table(ForestDefinition = "Annual NLCD and tree canopy cover", CanopyThreshold = NA, CanopyGate = "Only where LANDFIRE BpS is forest", CellShare = NA, TreeCanopyFolder = ""))
@@ -24,7 +24,7 @@ expect("options: an unknown choice, a threshold and a share out of range are err
        err(forest_cover_options(data.table(CanopyThreshold = 0L))) && err(forest_cover_options(data.table(CanopyThreshold = 101L))) && err(forest_cover_options(data.table(CellShare = 0))) && err(forest_cover_options(data.table(CellShare = 1.2))))
 px <- xml2::read_xml(file.path(pkg, "package.xml")); f1 <- function(k) xml2::xml_attr(xml2::xml_find_first(px, sprintf("//dataSheet[@name='ForestCoverOptions']/column[@name='%s']", k)), "formula1")
 lab <- function(v) paste(sprintf("%d:%s", seq_along(v), v), collapse = "|")
-expect("package.xml: the two lists' labels are the ones the code reads", identical(f1("ForestDefinition"), lab(FOREST_DEFINITION)) && identical(f1("CanopyGate"), lab(FOREST_GATE)) && identical(f1("CellRule"), lab(FOREST_CELL_RULE)))
+expect("package.xml: the two lists' labels are the ones the code reads", identical(f1("ForestDefinition"), lab(FOREST_DEFINITION)) && identical(f1("CanopyGate"), lab(FOREST_GATE)) && identical(f1("CellRule"), lab(FOREST_CELL_RULE)) && identical(f1("CanopyRecovery"), lab(FOREST_RECOVERY)))
 tr <- xml2::xml_attr(xml2::xml_find_all(px, "//transformer[@name='InitialConditions']/dataSheet"), "name")
 expect("package.xml: stage 5 reads the options and writes both outputs", all(c("ForestCoverOptions", "OutputForestCover", "OutputForestCoverMap") %in% tr))
 
@@ -46,6 +46,16 @@ expect("area-matched: a unit with more forest than its target gains none", !any(
 expect("area-matched: never more cells than candidates, and none without passing pixels", sum(canopy_area_match(c(0.9, 0, 0.5, 0.4), c(TRUE, TRUE, FALSE, FALSE), 1L, rep(1, 4), rep(FALSE, 4))) == 1)
 expect("area-matched: cells off the land do not count", sum(canopy_area_match(c(0.9, 0.8, 0.7, 0.6), rep(TRUE, 4), 1L, c(1, 1, 1, 1), rep(FALSE, 4), land = c(TRUE, TRUE, FALSE, FALSE))) == 2)
 o <- forest_cover_options(data.table(CellRule = 2L)); expect("options: the cell rule", o$rule == "area" && forest_cover_options(data.table(CellRule = "Area-matched"))$rule == "area")
+
+# ---- recovery by canopy (stage 6) -----------------------------------------------------------------------------------------------------
+expect("recovery: on when the share is at or over the cell share in the year and the year before; a year without canopy is never on",
+       identical(canopy_return_on(c(0.6, 0.6, 0.4, NA, 0.5), c(0.6, 0.4, 0.6, 0.9, 0.5)), c(TRUE, FALSE, FALSE, FALSE, TRUE)) && identical(canopy_return_on(0.6, 0.6, 0.7), FALSE))
+onm <- rbind(c(TRUE, FALSE, TRUE, TRUE), c(FALSE, FALSE, FALSE, TRUE), c(FALSE, FALSE, FALSE, FALSE), c(TRUE, TRUE, TRUE, TRUE))
+expect("recovery: the lag is to the first map on after the disturbance; none on, or no disturbance, gives NA", identical(return_lag(onm, 2001:2004, c(2001L, 2000L, 2000L, NA)), c(2L, 4L, NA, NA)))
+expect("options: the recovery threshold is its own, 1 to 100", forest_cover_options(data.table(RecoveryThreshold = 40L))$recovery_threshold == 40 && err(forest_cover_options(data.table(RecoveryThreshold = 0L))))
+expect("options: recovery can be left to NLCD", forest_cover_options(data.table(CanopyRecovery = 2L))$recovery == "nlcd" && forest_cover_options(data.table(CanopyRecovery = "NLCD forest only"))$recovery == "nlcd")
+tr6 <- xml2::xml_attr(xml2::xml_find_all(px, "//transformer[@name='HistoricalTransitions']/dataSheet"), "name")
+expect("package.xml: stage 6 reads the Forest Cover options", "ForestCoverOptions" %in% tr6)
 
 # ---- the 30 m pass raster ---------------------------------------------------------------------------------------------------------
 if (requireNamespace("terra", quietly = TRUE)) {

@@ -20,6 +20,8 @@ FOREST_DEFINITION <- c(nlcd = "Annual NLCD", canopy = "Annual NLCD and tree cano
 FOREST_GATE <- c(bps = "Only where LANDFIRE BpS is forest", none = "Anywhere")
 # which cells become forest: those with enough passing pixels, or as many as make the Build's forest area the 30 m rule's
 FOREST_CELL_RULE <- c(share = "A share of the cell's pixels", area = "Area-matched")
+# when a disturbed forest cell counts as forest again in the historical record (stage 6): NLCD shows forest, or its canopy is back
+FOREST_RECOVERY <- c(canopy = "NLCD forest, or tree canopy cover at the threshold", nlcd = "NLCD forest only")
 # USFS Science Tree Canopy Cover (CONUS, 30 m, one file a year, percent 0-100; larger values are no data), as Data Download names it
 TCC_FILE <- "science_tcc_conus_%d.tif"; TCC_YEARS <- 1985:2023
 
@@ -35,8 +37,13 @@ forest_cover_options <- function(x) {
   if (th < 1 || th > 100) stop(sprintf("Forest Cover: Canopy Threshold is %s; give 1 to 100 (percent)", th), call. = FALSE)
   sh <- suppressWarnings(as.numeric(g("CellShare"))); if (is.na(sh)) sh <- 0.5
   if (sh <= 0 || sh > 1) stop(sprintf("Forest Cover: Share of the Cell is %s; give more than 0, up to 1", sh), call. = FALSE)
+  # the recovery threshold is its own: the canopy product does not fall under about 20% on burned forest (Yellowstone, MTBS high
+  # severity 1988: median 56% in 1987, 20% in 1989, 97% of the pixels still at or over 10%; at or over 30%: 8% in 1989, 33% in 2000,
+  # 53% in 2023), so the start-year threshold would call a stand forest again the year after it burned
+  rt <- suppressWarnings(as.numeric(g("RecoveryThreshold"))); if (is.na(rt)) rt <- 30
+  if (rt < 1 || rt > 100) stop(sprintf("Forest Cover: Recovery Threshold is %s; give 1 to 100 (percent)", rt), call. = FALSE)
   f <- g("TreeCanopyFolder"); f <- if (is.na(f) || !nzchar(as.character(f))) NA_character_ else as.character(f)
-  list(definition = pick("ForestDefinition", FOREST_DEFINITION, "Forest in the Start Year"), threshold = th, gate = pick("CanopyGate", FOREST_GATE, "Where"), rule = pick("CellRule", FOREST_CELL_RULE, "Cells That Become Forest"), share = sh, folder = f) }
+  list(definition = pick("ForestDefinition", FOREST_DEFINITION, "Forest in the Start Year"), threshold = th, gate = pick("CanopyGate", FOREST_GATE, "Where"), rule = pick("CellRule", FOREST_CELL_RULE, "Cells That Become Forest"), recovery = pick("CanopyRecovery", FOREST_RECOVERY, "Recovery"), recovery_threshold = rt, share = sh, folder = f) }
 
 # the cells tree canopy makes forest. One element per cell:
 #   nlcd    the start-year NLCD class        share   the share of the cell's 30 m pixels that pass the rule (NA = none read)
@@ -59,6 +66,21 @@ canopy_area_match <- function(share, cand, unit, target, existing, land = !is.na
   need <- d[, .(n = max(0, round(sum(target) - sum(existing)))), by = unit]
   pick <- d[cand == TRUE][order(unit, -share)][, k := seq_len(.N), by = unit][need, on = "unit", nomatch = 0][k <= n, i]
   out[pick] <- TRUE; out }
+
+# Recovery (stage 6; user 2026-11-18: "we could also use that to tell us when a disturbed stand has recovered ... everything forward
+# from there is consistent using that threshold"). A disturbed forest cell returns to its type in the year NLCD shows forest for the
+# second year running; NLCD is slow to call an open regrowing stand forest, and never does on a cell the canopy rule made forest.
+# With the canopy rule on, the cell also returns in the year its share of pixels at the recovery threshold (its own, default 30%: see
+# forest_cover_options) has been at or over the cell share for two
+# years running (as NLCD's rule asks two years). The pathways still hold a cell in its disturbed class for its minimum return age.
+#   prev, cur  each cell's share of passing pixels the year before and in the year (NA = no canopy read)
+canopy_return_on <- function(prev, cur, min_share = 0.5) !is.na(prev) & !is.na(cur) & prev >= min_share & cur >= min_share
+
+# years from a disturbance to the first return map that is on after it: on = a cells x years logical matrix (columns = years),
+# lost = each cell's disturbance year (NA = none). Returns the lag in years, NA where no map is on after the disturbance.
+return_lag <- function(on, years, lost) { out <- rep(NA_integer_, length(lost))
+  for (j in seq_along(years)) { k <- is.na(out) & !is.na(lost) & years[j] > lost & on[, j]; out[k] <- years[j] - lost[k] }
+  out }
 
 # the 0/1 raster of 30 m pixels that pass: canopy cover (percent; over 100 or NA = no data, which never passes) at or over the
 # threshold, and - with a gate - a 1 in `potential` (same grid: 1 where BpS is forest)
