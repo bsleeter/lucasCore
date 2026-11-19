@@ -2,6 +2,19 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## 1.5.3 - 2026-11-19
+
+No library update. There is no 1.5.2 release.
+
+### Fixed
+- Data Download: LOCA2 for a study area in the west. UCSD's server now refuses every folder of its regional files
+  (`CONUS_regions_split`, HTTP 403, seen 2026-11-19), so a study area inside the "west" cut found no listing and the log said
+  "no ... files" for every model, variable and run. A run whose regional folder lists nothing is now taken from the CONUS
+  files (`NAmer`), which the stages already crop to the study window. They are larger: about 9 GB a model and scenario
+  (the historical run about 3.9 GB, each SSP about 5.3 GB). The log says once that the CONUS files are taken, and a run that
+  still finds nothing reports the server's answer and the address tried. If UCSD reopens the regional files they are used
+  again (`H$Loca2Folder` in `src/download-sources.R`).
+
 ## 1.5.1 - 2026-11-18
 
 No library update: the new Wood Products parameters are in a sheet of their own (Wood Products Future), which a 1.5 library
