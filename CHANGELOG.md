@@ -2,6 +2,17 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## 1.5.5 - 2026-11-19
+
+No library update.
+
+### Fixed
+- Projection Climate (stage 11): a climate scenario made before 1.4.0 could not be run again. Its CO2 betas table holds the
+  defaults of `Shrubland: Post Fire Shrub`, a class retired in 1.4.0 that existing libraries keep in their lists, and the stage
+  failed the check "every CO2 Betas row names a class that grows". A row for a class with no CO2 response (a retired class, or
+  one that is not forest, shrubland, grassland, wetland or agriculture) is now left out and named in the run log. No cell is in
+  such a class, so results do not change (`src/11-projection-climate.R`).
+
 ## 1.5.4 - 2026-11-19
 
 No library update.
