@@ -489,6 +489,72 @@ The two methods turn the same 30 m Annual NLCD into the model grid in different 
 
 **Two limits of Area-matched.** The cells it makes developed are partly developed at 30 m, so the developed area is right over a county but not cell by cell. And a county's change follows its net change: where one place gains forest while another loses it, the two cancel, so gross transitions within a county are understated. The finer splits within an NLCD class (forest type, grassland and shrubland type, wetland type) still come from each cell's most common type with either method.
 
+#### 3.3.2 Stand age
+
+**LUCAS Core > Stand Age** sets three things about the starting stand ages that stage 5 maps from the Stand Age Source (NASA CMS 1990 or TreeMap 2016, both at 30 m, moved to the start year).
+
+**A cell's stand age.** A model cell holds many 30 m pixels. By default the cell takes the age of **the pixel at its centre**, so the landscape keeps the young and old stands the age map has; a cell whose centre pixel has no age takes the mean of its pixels that do. **Mean of the cell's pixels** was the rule until lucasCore 1.6.0. It is smoother from cell to cell but pulls every cell toward the middle: in the Yellowstone test area at 300 m it leaves almost no cell over 200 years, where 6% of the age map's pixels are. Since carbon does not rise in a straight line with age, a landscape of cell means does not hold the carbon of the stands it came from.
+
+**Forest burned or clearcut between the start year and the age map's year.** The age maps were made after the start year. A stand that burned or was clearcut between 1985 and the map's year shows in the map as what grew back, or as its unburned remnants, not as what stood there in 1985. With **Estimate it** (the default), a forest cell inside an interagency fire perimeter of those years (found by stage 5), or clearcut in them (found by stage 6 from its harvest maps: a cell counts once its chance of a clearcut reaches one half), takes its start-year age from the first of:
+
+1. the **stand age raster** under Manual settings, where it has a value;
+2. the age for its forest type in **Ages by forest type** under Manual settings (a row for its ecodivision before a row for all ecodivisions);
+3. **NASA CMS 1990**, where that map saw the stand before its fire or cut (a TreeMap Build, for a first fire or cut after 1990);
+4. the **percentile** (blank = the 75th) of the ages of forest of its type in its ecodivision that neither burned nor was cut. The upper part is used because the stands a fire or a harvest takes are on average older than the ones it leaves; 50 assumes they were alike.
+
+A cut stand is then still raised to its minimum harvest age at its cut where the estimate falls short (section 3.6). Selection harvest leaves the stand's age alone, as it does in a run.
+
+**Keep the age map's value** turns this off (the rule until lucasCore 1.6.0).
+
+**Manual settings.** Both are optional and come before the estimates above. The **stand age raster** is a raster of stand age in years, with the year its ages are for (blank = the start year). Every forest cell it gives a value takes that age, burned or not, so it serves both a local age map for part of the study area and a full replacement of the age source.
+
+**Ages by forest type** is a table on the same page: a forest type, optionally an ecodivision, and the stand age in the start year for forest of that type that burned after it. Use it where the fire history is known. In the Yellowstone test area, 49% of the forest cells are inside a fire perimeter of 1986 to 2016, most of them the fires of 1988, and the fire history literature describes the stands that burned as old; an age of 200 years or more for lodgepole pine is the kind of value this table is for.
+
+**Build Results > Stand Age Summary** lists, for each forest type, how many cells each rule set, their mean age and the mean age the age map had given them; **Stand Age Summary: Cut Stands** does the same for the stands stage 6 set. The run log has the same, with the percentile age of each forest type.
+
+> **The rules below still apply.** A cell the annual NLCD shows regrowing, starting in a disturbed class or reforesting later takes its age from those rules (section 3.3), after the stand age rules here.
+
+#### 3.3.3 Forest cover
+
+**LUCAS Core > Forest Cover** sets what starts as forest. Every class comes from the annual NLCD of the start year; this page decides what else is forest.
+
+**Annual NLCD** (the default). A natural cell is forest when NLCD maps it as forest in the start year or in any later year; cells that NLCD shows becoming forest later are then given their own start (regrowing, disturbed, or reforesting later; section 3.5). Annual NLCD maps much open western forest as shrub or grass. In 2016 it has 44% of Yellowstone's land and 66% of the Northern Sierra Nevada pyrome's as forest or woody wetland, where the forest inventory (FIA) has 83% and 85%.
+
+**Annual NLCD and tree canopy cover.** As above, and a cell NLCD maps as barren, shrub or grass in the start year also starts as forest when at least half of its 30 m pixels pass the canopy rule: tree canopy cover in the start year at or over the **threshold** (blank = 10%, FIA's own definition of forest land), on land whose LANDFIRE BpS is forest. The cell takes the forest type map's type and the age map's age; where it burned or was cut before the age map's year, the Stand Age rules apply (section 3.3.2). The canopy is the USFS Science Tree Canopy Cover (30 m, 1985 to 2023), so the start year must be one of those years.
+
+| Region | FIA forest, share of land | NLCD forest and woody wetland | Canopy 10% on BpS forest | Canopy 10% anywhere |
+| --- | --- | --- | --- | --- |
+| Yellowstone | 83.3% (s.e. 1.9) | 44.0% | 85.8% | 90.9% |
+| Northern Sierra Nevada (P26) | 85.3% (s.e. 1.0) | 65.8% | 85.8% | 90.1% |
+| Great Dismal Swamp | 52.1% (s.e. 5.2) | 53.6% | 57.5% | 57.7% |
+
+The table is for 2016, at 30 m, against the newest FIA plot visits of 2012 to 2022. **Anywhere** drops the BpS gate: the canopy product gives western shrubland and grassland a cover of 20 to 25%, so at 10% it takes in most of it; use about 15% with it. **Share of a cell's pixels** (blank = 0.5) is how much of a cell must pass.
+
+**Cells that become forest.** A cell is larger than a 30 m pixel and takes one class. With **A share of the cell's pixels** (the default), a cell becomes forest when that share of its pixels pass (blank = 0.5). On a coarse grid this adds forest where the land is mostly forest, as taking each cell's most common NLCD class does: at 500 m the Northern Sierra Nevada pyrome gets 93.7% forest where the same rule gives 87.2% at 30 m. With **Area-matched**, in each secondary stratum unit only as many cells become forest as bring the Build's forest area up to the area the rule gives at 30 m (NLCD forest and woody wetland, plus the barren, shrub and grass pixels that pass), taking the cells with the most canopy first, so the result does not depend on the cell size. Where the Build already has more forest than that (the any-year rule and the most-common-class rule can do this), no cell is added; Build Options: Land Cover Resampling = Area-matched removes that part.
+
+What the option does not change at the start: forest that NLCD maps is never removed (a burned or cut stand with little canopy is still forest land), and developed land, farm land, water and wetlands keep their NLCD class.
+
+**When a disturbed stand is forest again.** In the historical years (stage 6, section 3.6) a forest cell that burns at high severity or is clearcut waits in a disturbed class until the record shows it as forest. With **NLCD forest, or tree canopy cover at the threshold** (the default once the canopy rule is on), the cell returns to its forest type in the year NLCD maps it as forest for the second year running, or the year its share of pixels at the **recovery threshold** (blank = 40%; same BpS gate) has been at or over the cell share for two years running, whichever comes first. Both of those canopy years must come after any high-severity fire or clearcut on half or more of the cell, because the canopy map of the fire year still shows the stand that stood before it; LANDFIRE 2016 still counts as before. NLCD is slow to map an open regrowing stand as forest, and never does on a cell the canopy rule made forest, which would otherwise wait to the end of its window and convert to shrub or grass. The recovery threshold is higher than the start-year threshold on purpose. The canopy product does not fall under about 20% on forest that has just burned: on the pixels of Yellowstone's 1988 fires that MTBS maps as high severity, median canopy cover goes from 56% in 1987 to 20% in 1989, and 97% of them are still at or over 10%. At 30%, 8% of them count in 1989, 33% in 2000 and 53% in 2023. **NLCD forest only** leaves the return as it is without tree canopy cover. The run log gives, for the cells that burned at high severity over most of their area, the share each record shows back by the end year and the median years it took.
+
+Canopy recovery reads the tree canopy cover of every year of the Build, not only the start year: run the Data Download with **USFS Tree Canopy Cover** ticked for all the Build's years (the product ends in 2023; later years return by NLCD alone).
+
+**Data.** Tree canopy cover is a data source like the others. Tick **USFS Tree Canopy Cover** on the Data Download page and run it for the study area: it lands in `land-cover/tree-canopy` of Data Sources Home, one file a year. A folder of your own can be set on the Data Sources page (USFS Tree Canopy Cover Folder). The canopy rule needs the start year, recovery by canopy every year of the Build, and stocking the start year and 2016. The USFS server is slow on some days; a download that fails can be rerun and fetches only the years still missing.
+
+**Build Results > Forest by Tree Canopy Cover** lists, by forest type, the cells the rule made forest, what NLCD maps them as, and how many NLCD maps as forest in a later year. Its map is the share of each cell's pixels that pass the rule.
+
+**Carbon of a forest cell (stocking).** The growth curves give every cell of a forest type the same carbon at an age. They are FIA's average over all forest land, open stands included, so a region's total is about right, but an open stand starts with too much carbon and a dense one with too little. With **By the cell's tree canopy cover** (off by default), stage 8 multiplies a forest cell's starting live and dead carbon and its growth by a stocking multiplier:
+
+- For a forest cell at least as old as the **stand age from which canopy shows stocking** (blank = 30 years), the multiplier is the cell's mean tree canopy cover in the start year over the mean of such cells of its forest type and ecodivision. It is kept within 0.3 to 2.5, and its mean is 1 in each forest type and ecodivision, so the type's total carbon stays about where FIA puts it.
+- **How carbon follows canopy.** Where the Build has TreeMap 2016 (Data Sources: TreeMapFolder) and the tree canopy cover of 2016, stage 8 fits a curve for each forest type of the study area: TreeMap's live carbon of a cell against the cell's mean canopy, as a ceiling times c^b / (c^b + k^b), where k is the canopy at half the ceiling and b the steepness. The curve flattens where dense stands stop gaining carbon with canopy. It is fitted on mature forest with no fire perimeter and no loss of canopy between the start year and 2016, so that it shows stocking and not what a fire leaves; a forest type with fewer than 200 such cells takes the curve of all forest. The multiplier is then the curve's value at the cell's start-year canopy over its mean. Without TreeMap or the 2016 canopy, carbon is taken in proportion to canopy, and the run log says so.
+- A younger stand has a low canopy for its age, which its growth curve already holds, so it takes the multiplier of the mature forest near it (within 10 km, in its ecodivision). So does forest that starts in a disturbed class, and every other land cell, which matters if it becomes forest during a run.
+- A cell keeps its multiplier through a fire or a cut: the stand is assumed to grow back to the density the site carried.
+- It multiplies with the site productivity multiplier (Build Options: Site productivity), which is about how fast a site grows trees, not how fully trees occupy it. The two go into one flow multiplier (Site Productivity), their product kept within 0.3 to 2.5.
+- The carbon carrying capacity is not scaled: an open stand counts as below its type's capacity.
+
+It works with either forest definition and needs the tree canopy cover of the start year. **Build Results > Forest Stocking** lists, by forest type, the cells, those with a multiplier of their own, their mean canopy, the multiplier and the curve used; **Forest Stocking: Maps** has the multiplier and the mean canopy of each cell.
+
+**Build Results > Forest Area Check (FIA)** is made by every Build, whichever choice is set. It puts the Build's forest share of the land in the start year (forest, forested wetland and disturbed forest) beside FIA's forest land share for the study area, with FIA's standard error and plot count, and says whether the two are within two standard errors. Use it to tune the threshold and the cell share: rerun stage 5 with another value and read the table again. Three cautions: FIA's plots are recent (the newest visit of each plot in the last 12 inventory years) while the Build's figure is for the start year; plot locations are approximate, which matters for a small study area; and the figure is a simple ratio over plots, not FIA's stratified estimate. With fewer than 20 plots no comparison is made.
+
 ### 3.4 Climate Options
 
 1. Choose **Climate Options**.
@@ -1760,6 +1826,57 @@ The three projections store almost the same carbon in products, 9.05 to 9.12 Tg 
 
 *Figure 7.35. The Compare Runs carbon summary of the P26 runs with their Wood Products results: HWP, the mean change in carbon stored in products, and NBP + HWP.*
 
+### 7.6 Carbon against the carrying capacity
+
+How much carbon could this land hold? The Build answers with a **carbon carrying capacity**: what each cell would hold in live biomass, dead wood and litter under its potential natural vegetation and its natural fire regime. Run Figures (stage 13) and Compare Runs (stage 14) then show a historical run or a projection as a share of that capacity, and how far below it the land is.
+
+**What the capacity is.** It is the *natural-regime mean*, not the old-growth maximum. A landscape that burns at its natural stand-replacing fire return interval always holds stands of every age, so its mean stock is below what an old stand holds. For each ecodivision and forest type the Build averages the type's stock curve (stage 4, after a high-severity fire) over the ages such a landscape holds: a stand burns with the same chance every year, one over the return interval (LANDFIRE, the interval the spin-up used). The old-growth end of the curve is kept as an **upper bound**.
+
+**Which vegetation.** A cell that is forest today keeps its forest type. LANDFIRE Biophysical Settings (BpS, the potential vegetation map the reforestation transition already uses) decides only where land use has taken land off its potential:
+
+- **developed and farmed land** takes the mix BpS gives its 30 m pixels: forest (the type stage 5 says the cell would reach), grassland, shrubland or bare ground;
+- **natural grassland, shrubland and barren land** keeps its own class. The annual NLCD maps these main groups from satellite observations with relatively high accuracy, while BpS is a modeled product, so where the two disagree the capacity follows NLCD. **Carbon Assumptions > Carbon Capacity Options** can instead count such land as forest on the share of its pixels BpS maps as forest potential (see the note below);
+- **emergent wetland, water and ice** keep their starting stock.
+
+Grassland and the steady shrub classes are counted at their starting stock; chaparral and the sage family at their mature stock. Forest capacity is multiplied by the cell's site productivity multiplier, as its starting stocks are.
+
+**What it leaves out, and its limits.**
+
+- **Soil is not counted.** The model's soil starts from gNATSGO, which already carries the land's use, so a potential soil stock would be an assumption.
+- **Replacement fire only.** Types with frequent surface fire (ponderosa pine, for one) are counted as if only stand-replacing fire shaped them, so their dead wood and litter are on the high side.
+- **Today's forest type is taken as natural.** Planted pine on former hardwood land counts as its present type.
+- **Fixed climate.** The capacity is built on the Build's historical climate. A projection's climate and CO2 change the run, not the yardstick.
+- **Natural non-forest land is taken as natural.** Forest cleared or burned before the start year that the annual NLCD now maps as grassland or shrubland is counted at its present class, so the deficit there is missed. The Carbon Capacity Options setting counts it, at the cost of trusting BpS over NLCD everywhere: in the Yellowstone test area BpS reads 87.5% of the land as forest potential where NLCD maps 31% of it as grass and shrub, and the land's share of its capacity in 1985 falls from 86% to 60% with the setting on.
+
+**Where to find it.** The Build writes three sheets under **Build Results**:
+
+- **Carbon Capacity Summary**: capacity, upper bound and starting stock (Tg C) by ecodivision, secondary stratum and land cover at the start, with the starting stock as a share of the capacity;
+- **Carbon Capacity by Type**: for each ecodivision and forest type, the return interval, the mean stand age under that regime, and the capacity by pool beside the upper bound (Mg C/ha);
+- **Carbon Capacity Maps**: the capacity, its upper bound, its live biomass part, the starting stock of the same pools and the share of each cell counted at a forest capacity.
+
+The run log gives the totals, the potential cover BpS found, and the starting deficit by cause. Without a BpS file (Data Sources: BpsFile; a Data Download fetches it) developed and farmed land keeps its starting stock as its capacity, and the log says so.
+
+**In Run Figures.** Two figures are added when the Build result holds the capacity maps:
+
+- *Carbon against the carrying capacity*: (a) the run's live biomass, dead wood and litter against the capacity and its upper bound; (b) the stock as a share of the capacity; (c) the deficit by cause in the first and last year (see below).
+- A map figure of the capacity, the last year's stock and the difference.
+
+**The causes of the deficit.** Each cell's deficit (its capacity less its stock) goes to one cause, or is divided between the last two:
+
+- **Land use**: the cell is developed or farmed.
+- **Non-forest cover**: natural grassland, shrubland or barren land whose capacity is mostly forest: forest at the start that has since converted and, with the Carbon Capacity Options setting, land BpS maps as forest potential.
+- **Disturbed land**: the cell is in a disturbed class, after a stand-replacing fire, waiting to return to its forest or shrub type.
+- **Live biomass**: on every other cell (land in its potential cover), its live biomass against the live part of its capacity. For forest this is stand age and stocking: stands younger than the mean age of the natural regime hold less, older stands more.
+- **Dead wood and litter**: on the same cells, their dead wood and litter against the capacity's. This is mostly stand age as well: a landscape under its natural regime holds recently burned stands, which are rich in dead wood, and old stands, where it has built up again, while a landscape of middle-aged stands holds less of both. A smaller part comes from the disturbance the Build starts each stand after. The capacity's stand starts after a fire, which leaves its wood on the site as snags; the Build starts forest outside the 1900 to start-year fire perimeters after a clearcut, which takes the wood away. Where the land was never logged, **Carbon Assumptions > Spin-up** can set high-severity fire as the last disturbance of a forest type outside the perimeters.
+
+A cause's value is net: land above its capacity counts against it. In the Yellowstone test area the land's 1985 deficit is 2.4 Tg C of live biomass (forest of 101 years on average, against a mean age of 200 under a return interval of 346 years) and 5.7 Tg C of dead wood and litter. Starting every forest type after fire instead of clearcut lowers the second to 4.3 Tg C and raises the land's share of its capacity from 86% to 88%: the clearcut start accounts for about a quarter of it, stand age for the rest.
+
+The yearly values are in **Run Carbon Against Capacity**. A share above 100% is possible and is not an error: fire exclusion lets forest grow older than its natural regime would.
+
+**In Compare Runs.** One figure shows each run's share of the capacity through time and each projection's deficit in its last year by cause; **Compare Carbon Against Capacity** has a row per run.
+
+> **A Build made before this version** has no capacity. Rerun the Build (or its stage 8 on the Build result) to add it; runs already made on that Build can then be drawn against it without rerunning them.
+
 ## 8. Viewing results in SyncroSim
 
 Results can be viewed without leaving SyncroSim Studio in two ways: the lucasCore figures, drawn by stages 12, 13 and 14 (section 8.1), and the charts and maps you build yourself from a run's ST-Sim output (section 8.2).
@@ -1925,6 +2042,13 @@ Besides the inputs they write for ST-Sim, the lucasCore stages save summary tabl
 | --- | --- | --- | --- |
 | Strata Summary | OutputStrataSummary | 1 | Each primary, secondary and tertiary stratum unit, with its Id and its area in cells. |
 | State Class Summary | OutputStateClassSummary | 5 | Each state class in the start year: its area in cells and mean age. |
+| Stand Age Summary | OutputStandAge | 5 | For each forest type and rule (the age map, the stand age raster, the manual age for the forest type, an earlier age map, undisturbed forest of its type): the cells whose start-year age it set, their mean age, and the mean age the age map gave them (section 3.3.2). |
+| Stand Age Summary: Cut Stands | OutputStandAgeCut | 6 | The same for forest cells clearcut between the start year and the age map's year, whose ages stage 6 sets from its harvest maps. |
+| Forest by Tree Canopy Cover | OutputForestCover | 5 | With Forest Cover = Annual NLCD and tree canopy cover: per forest type, the cells the canopy rule made forest, what NLCD maps them as in the start year, and how many NLCD maps as forest later (section 3.3.3). |
+| Forest by Tree Canopy Cover: Map | OutputForestCoverMap | 5 | The share of each cell's 30 m pixels that pass the canopy rule, with the threshold and gate the Build ran with. |
+| Forest Stocking | OutputForestStocking | 8 | With Forest Cover: stocking by tree canopy cover: for each forest type, the cells, those mature enough for a multiplier of their own, their mean canopy, and the mean, 10th and 90th percentile of the multiplier (section 3.3.3). |
+| Forest Stocking: Maps | OutputForestStockingMap | 8 | The stocking multiplier and the mean tree canopy cover of each cell. |
+| Forest Area Check (FIA) | OutputForestAreaCheck | 5 | The Build's forest share of the land in the start year, the modal NLCD's, and FIA's forest land share for the study area with its standard error and plot count (section 3.3.3). |
 | Land Cover Layers | OutputLandCoverLayers | 5 | The forest type, grassland and shrubland type, wetland type and "forest in any year" maps behind the state classes. |
 | Annual NLCD (model grid) | OutputNlcdAnnual | 5 | The NLCD land cover map of each year, resampled to the model grid; stage 6 reads the change between years. |
 | Spin-up Return Intervals | OutputReturnInterval | 5 | The replacement-fire return interval used to spin up each ecodivision and state class. |
@@ -1938,6 +2062,9 @@ Besides the inputs they write for ST-Sim, the lucasCore stages save summary tabl
 | Minimum Harvest Ages | OutputHarvestAge | 6 | The minimum age of each forest type's clearcut and selection, the FIA and study area values behind it, and where it came from (section 3.6). |
 | Climate Multiplier Summary | OutputClimateSummary | 7 | Each climate multiplier (growth, decay) per year: the study-area mean and the cell range. |
 | Initial Stock Summary | OutputInitialStockSummary | 8 | Starting carbon by state class: live, dead organic matter and soil, in Mg C/ha, and the total in Tg C. |
+| Carbon Capacity Summary | OutputCarbonCapacity | 8 | The carbon carrying capacity (live biomass, dead wood and litter under potential natural vegetation and its natural fire regime), its upper bound and the starting stock, in Tg C, by ecodivision, secondary stratum and land cover at the start (section 7.6). |
+| Carbon Capacity by Type | OutputCarbonCapacityType | 8 | For each ecodivision and forest type: the return interval, the mean stand age under it, and the capacity by pool beside the old-growth upper bound, in Mg C/ha. |
+| Carbon Capacity Maps | OutputCarbonCapacityMap | 8 | Maps of the capacity, its upper bound, the starting stock of the same pools and the share of each cell counted at a forest capacity. |
 
 **The Projection Setup** (stages 9 and 10) and **Projection Climate** (stage 11):
 
@@ -1953,7 +2080,7 @@ Besides the inputs they write for ST-Sim, the lucasCore stages save summary tabl
 | Historical Patch Sizes | OutputPatchSize | 10 | The sizes of each year's patches of change, by size class. |
 | Climate Multiplier Summary | OutputClimateSummary | 11 | As for stage 7, for the projection's climate future. |
 
-**Figures and comparisons** (stages 12 to 14): **Build Figures (PNG)**, **Run Figures (PNG)** and **Compare Figures (PNG)** open in the figure viewer (section 8.1). Stage 14 also writes **Compare Carbon Summary**, Compare Land Change Summary and, with management costs, Compare Cost **Summary** (section 7.4). Stage 18 writes Wood Products, Wood Products by End Use, Wood Products Spin-up and Wood Products Figures (PNG) (section 7.5).
+**Figures and comparisons** (stages 12 to 14): **Build Figures (PNG)**, **Run Figures (PNG)** and **Compare Figures (PNG)** open in the figure viewer (section 8.1). Stage 14 also writes **Compare Carbon Summary**, Compare Land Change Summary and, with management costs, Compare Cost **Summary** (section 7.4). Stage 18 writes Wood Products, Wood Products by End Use, Wood Products Spin-up and Wood Products Figures (PNG) (section 7.5). With a Build that holds the carbon capacity, stage 13 writes **Run Carbon Against Capacity** and stage 14 **Compare Carbon Against Capacity** (section 7.6).
 
 **Validation.** Every stage adds its checks to **Validation**: one row per check, with the stage, what was checked, **Pass** or **Fail**, and the numbers behind it. The same lines are in the run log. Look here first when a result looks wrong.
 

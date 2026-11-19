@@ -1,6 +1,6 @@
 # lucasCore User Guide
 
-*A snapshot of the lucasCore User Guide, exported 2026-11-18. Also as a [web page](index.html), beside the [package](../blueprint/index.html) and [data](../blueprint/data.html) blueprints.*
+*A snapshot of the lucasCore User Guide, exported 2026-11-19. Also as a [web page](index.html), beside the [package](../blueprint/index.html) and [data](../blueprint/data.html) blueprints.*
 
 How to build and run a LUCAS land-use and carbon model with the lucasCore SyncroSim package, walked through on the Northern Sierra Nevada pyrome (P26) at 150 m.
 
@@ -495,7 +495,7 @@ The two methods turn the same 30 m Annual NLCD into the model grid in different 
 
 **LUCAS Core > Stand Age** sets three things about the starting stand ages that stage 5 maps from the Stand Age Source (NASA CMS 1990 or TreeMap 2016, both at 30 m, moved to the start year).
 
-**A cell's stand age.** A model cell holds many 30 m pixels. By default the cell takes the age of **the pixel at its centre**, so the landscape keeps the young and old stands the age map has; a cell whose centre pixel has no age takes the mean of its pixels that do. **Mean of the cell's pixels** was the rule until lucasCore 1.5.2. It is smoother from cell to cell but pulls every cell toward the middle: in the Yellowstone test area at 300 m it leaves almost no cell over 200 years, where 6% of the age map's pixels are. Since carbon does not rise in a straight line with age, a landscape of cell means does not hold the carbon of the stands it came from.
+**A cell's stand age.** A model cell holds many 30 m pixels. By default the cell takes the age of **the pixel at its centre**, so the landscape keeps the young and old stands the age map has; a cell whose centre pixel has no age takes the mean of its pixels that do. **Mean of the cell's pixels** was the rule until lucasCore 1.6.0. It is smoother from cell to cell but pulls every cell toward the middle: in the Yellowstone test area at 300 m it leaves almost no cell over 200 years, where 6% of the age map's pixels are. Since carbon does not rise in a straight line with age, a landscape of cell means does not hold the carbon of the stands it came from.
 
 **Forest burned or clearcut between the start year and the age map's year.** The age maps were made after the start year. A stand that burned or was clearcut between 1985 and the map's year shows in the map as what grew back, or as its unburned remnants, not as what stood there in 1985. With **Estimate it** (the default), a forest cell inside an interagency fire perimeter of those years (found by stage 5), or clearcut in them (found by stage 6 from its harvest maps: a cell counts once its chance of a clearcut reaches one half), takes its start-year age from the first of:
 
@@ -506,7 +506,7 @@ The two methods turn the same 30 m Annual NLCD into the model grid in different 
 
 A cut stand is then still raised to its minimum harvest age at its cut where the estimate falls short (section 3.6). Selection harvest leaves the stand's age alone, as it does in a run.
 
-**Keep the age map's value** turns this off (the rule until lucasCore 1.5.2).
+**Keep the age map's value** turns this off (the rule until lucasCore 1.6.0).
 
 **Manual settings.** Both are optional and come before the estimates above. The **stand age raster** is a raster of stand age in years, with the year its ages are for (blank = the start year). Every forest cell it gives a value takes that age, burned or not, so it serves both a local age map for part of the study area and a full replacement of the age source.
 
@@ -525,7 +525,7 @@ A cut stand is then still raised to its minimum harvest age at its cut where the
 **Annual NLCD and tree canopy cover.** As above, and a cell NLCD maps as barren, shrub or grass in the start year also starts as forest when at least half of its 30 m pixels pass the canopy rule: tree canopy cover in the start year at or over the **threshold** (blank = 10%, FIA's own definition of forest land), on land whose LANDFIRE BpS is forest. The cell takes the forest type map's type and the age map's age; where it burned or was cut before the age map's year, the Stand Age rules apply (section 3.3.2). The canopy is the USFS Science Tree Canopy Cover (30 m, 1985 to 2023), so the start year must be one of those years.
 
 | Region | FIA forest, share of land | NLCD forest and woody wetland | Canopy 10% on BpS forest | Canopy 10% anywhere |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Yellowstone | 83.3% (s.e. 1.9) | 44.0% | 85.8% | 90.9% |
 | Northern Sierra Nevada (P26) | 85.3% (s.e. 1.0) | 65.8% | 85.8% | 90.1% |
 | Great Dismal Swamp | 52.1% (s.e. 5.2) | 53.6% | 57.5% | 57.7% |
