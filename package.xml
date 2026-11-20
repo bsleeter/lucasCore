@@ -164,7 +164,7 @@
 	<dataSheet name="BuildReuse" displayName="Build Stage Reuse" isSingleRow="True">
 		<!-- user 2026-11-19 (src/resume.R): a Build stage whose settings, input tables, data source files and code are those of an earlier result of
 		     the same scenario is not run again; its tables are copied from that result. Yes here runs every stage. A sheet of its own, so a library
-		     needs no update for it -->
+		     needs no update for it. It has no page of its own: the Build Options page shows it as a tick box at its top (ui/BuildOptionsView.cs, user 2026-11-20) -->
 		<column name="Rebuild" displayName="Rebuild Every Stage (blank = no: a stage that would give the same result is copied from an earlier result)" dataType="Integer" validationType="List" formula1="1:No|2:Yes" isOptional="True" defaultValue="1"/>
 	</dataSheet>
 
@@ -1995,7 +1995,6 @@
 		<group name="lucasCoreGroup" displayName="LUCAS Core">
 			<item name="StudyArea"/>
 			<item name="BuildOptions"/>
-			<item name="BuildReuse"/>
 			<item name="StandAge"/>
 			<item name="ForestCoverOptions"/>
 			<item name="ClimateOptions"/>

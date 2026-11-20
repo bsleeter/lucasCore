@@ -13,7 +13,7 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   earlier results, failed ones included, and a stage whose record matches copies its tables into the new result, repeats its
   log lines, and ends; anything else and the stage runs, and the log says what changed. A stage after one that ran again is
   still reused when that one wrote what it wrote before. **Build Results > Build Stages** lists each stage as Ran or Reused
-  from result N; **Build Stage Reuse > Rebuild Every Stage** turns the reuse off. Both are sheets of their own, so a library
+  from result N; **Build Options > Rebuild every stage**, a tick box at the top of the page, turns the reuse off. Both are sheets of their own, so a library
   needs no update. Of the Data Sources page a stage counts only the datasets it reads, so a path put right for stage 6 runs
   stage 6 and copies the rest. A stage checks its inputs in the library file (SQLite), not through a SyncroSim process a
   table, so a copied stage takes well under a minute: stages 0, 1 and 5 of a Great Dismal Swamp Build at 150 m took 16

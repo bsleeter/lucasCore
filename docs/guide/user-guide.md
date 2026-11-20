@@ -994,9 +994,9 @@ A Build that is run again does not repeat the stages that would give the same re
 
 **Seeing what happened.** **LUCAS Core > Build Results > Build Stages** lists each stage of the result as **Ran** or **Reused from result N**, with its minutes. In the run log a copied stage says "not run again" and names the result it came from, then repeats its log lines from that run. A stage that ran says what changed, for example "5 Initial Conditions runs: since result 43, lucasCore_StandAgeFia changed".
 
-**Turning it off.** On the Build scenario open **LUCAS Core > Build Stage Reuse** and set **Rebuild Every Stage** to Yes. Every stage then runs, and no earlier result is looked at. Set it back to No afterwards.
+**Turning it off.** On the Build scenario open **LUCAS Core > Build Options** and tick **Rebuild every stage**, at the top of the page. Every stage then runs, and no earlier result is looked at. Untick it afterwards.
 
-**What a stage does not notice.** Set Rebuild Every Stage to Yes for one run after any of these:
+**What a stage does not notice.** Tick Rebuild every stage for one run after any of these:
 
 - a new version of R or of an R package;
 - a file in Data Sources Home replaced by another of the same size and date;

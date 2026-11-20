@@ -6,6 +6,8 @@
 // (stage 11). Spatial multiprocessing: a tile count and strata level that stage 1 turns into the Build result's tile mask. Text fields and
 // the forest type list use SyncroSim's bindings; the strata and tile lists are set by hand because they write
 // blanks (the default sources). The page wraps to the window and scrolls (Fit, in LucasView.cs).
+// Rebuild every stage, at the top, is the one field of another sheet (lucasCore_BuildReuse, read by src/resume.R): it is a sheet of its
+// own so that a library needs no update, and it is reached through the scenario, not this page's feed (user 2026-11-20).
 // Built by tools/build_ui.ps1 into lucasCoreUI.dll.
 // =============================================================================
 using System;
@@ -23,6 +25,7 @@ namespace lucasCoreUI
     {
         private const string SHEET = "lucasCore_BuildOptions";
         private const string SOURCES = "lucasCore_StratumSource";
+        private const string REUSE = "lucasCore_BuildReuse";
 
         private class Item
         {
@@ -47,6 +50,7 @@ namespace lucasCoreUI
         private readonly TextBox m_tiles = new TextBox();
         private readonly ComboBox m_tileLevel = new ComboBox();
         private readonly Label m_tileState = new Label { AutoSize = true, MaximumSize = new Size(680, 0), ForeColor = SystemColors.GrayText, Margin = new Padding(3, 3, 3, 3) };
+        private readonly CheckBox m_rebuild = new CheckBox { Text = "Rebuild every stage", AutoSize = true, Margin = new Padding(3, 5, 6, 3) };
         private readonly TableLayoutPanel m_root = new TableLayoutPanel();
         private readonly Panel m_scroll = new Panel { Dock = DockStyle.Fill, AutoScroll = true };   // the page scrolls here (see LucasView)
         private bool m_refreshing;
@@ -79,6 +83,11 @@ namespace lucasCoreUI
             m_root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
             Fit.Attach(m_scroll);
             FlowLayoutPanel r;
+
+            GroupBox gReuse = Group("Running the Build again", out r,
+                Note("A Build that is run again copies the stages that would give the same result from the scenario's earlier results, failed ones included, and runs only the rest: Build Results > Build Stages lists which ran. Tick this to run every stage whatever the earlier results hold, and untick it afterwards."));
+            r.Controls.Add(m_rebuild);
+            m_rebuild.CheckedChanged += (s, e) => { if (m_refreshing) return; DataSheet ds = Reuse; if (ds != null) ds.SetSingleRowData("Rebuild", m_rebuild.Checked ? 2 : 1); };
 
             GroupBox gGrid = Group("Model grid", out r, Note("1000 = 1 km. Finer cells take longer: a 150 m pyrome runs about 12 minutes per simulated year."));
             r.Controls.Add(Caption("Cell size (m):")); r.Controls.Add(Number(m_resolution, 70));
@@ -124,7 +133,7 @@ namespace lucasCoreUI
             r.Controls.Add(Note("Cropland productivity does the same for cropland and pasture: each cell's crops in the Cropland Data Layer (2014-2025) take their county's NASS growth (yields converted with USDA Tech. Bull. 1939 coefficients), fallow counting as no growth; in California, tomatoes, vegetables, orchards and vineyards take the county's growth from the County Agricultural Commissioners' reports, and elsewhere crops NASS does not survey are left out. The cell's growth over its ecodivision and class rate is its multiplier, capped at 0.3-2.5, so each cell grows at its own crops' county rates. Stage 8 scales the cell's starting litter by it and writes it as a Cropland Productivity flow multiplier on agriculture growth, and writes a Crop Harvest multiplier from the same crops' harvested shares. In California a yearly Crop Mix multiplier follows each county's crops and harvested area in the reports, 1985-2020, so years before the Cropland Data Layer grow the crops of their time. Data Sources: Cropland Data Layer Folder (national files, about 2 GB a year). Older libraries need tools/sync-library.R first."));
             r.Controls.Add(Caption("Cropland productivity:")); r.Controls.Add(List(m_crop, 200));
 
-            foreach (GroupBox g in new[] { gGrid, gHist, gStrata, gCover, gGrowth, gTiles }) { m_root.RowStyles.Add(new RowStyle(SizeType.AutoSize)); m_root.Controls.Add(g); }
+            foreach (GroupBox g in new[] { gReuse, gGrid, gHist, gStrata, gCover, gGrowth, gTiles }) { m_root.RowStyles.Add(new RowStyle(SizeType.AutoSize)); m_root.Controls.Add(g); }
 
             m_scroll.Controls.Add(m_root); this.Controls.Add(m_scroll);
             this.ResumeLayout(false);
@@ -195,6 +204,8 @@ namespace lucasCoreUI
         }
 
         private DataSheet Sheet { get { return this.DataFeed.GetDataSheet(SHEET); } }
+        // the Build Stage Reuse sheet of this scenario; null in a library that has no such sheet (the box is then greyed out)
+        private DataSheet Reuse { get { try { return this.DataFeed == null || this.DataFeed.Scenario == null ? null : this.DataFeed.Scenario.GetDataSheet(REUSE); } catch (Exception) { return null; } } }
 
         private object Value(string column)
         {
@@ -234,6 +245,9 @@ namespace lucasCoreUI
                 m_tileState.Text = !on ? "Off: runs on this Build are one job (unless a projection sets its own tiles in Run Settings). Stage 1's log says how many tiles automatic would use."
                     : nt == 0 ? string.Format("Automatic: stage 1 packs whole {0} units into as many tiles as still shorten the run (the largest unit sets the limit, capped by the cores) and logs the choice, the speed-up and the memory each job needs. Type a number to choose it yourself.", m_tileLevel.SelectedItem)
                     : string.Format("{0} tiles of whole {1} units: written by stage 1, which logs whether more tiles could help (type auto for the automatic number).", nt, m_tileLevel.SelectedItem);
+                DataSheet ru = Reuse; object rb = DBNull.Value;
+                try { if (ru != null && ru.HasData()) { DataRow rr = ru.GetDataRow(); if (rr != null) rb = rr["Rebuild"]; } } catch (Exception) { ru = null; }
+                m_rebuild.Checked = rb != DBNull.Value && Convert.ToInt32(rb) == 2; m_rebuild.Enabled = ru != null;
                 m_root.Enabled = this.ShouldEnableView();
             }
             finally { m_refreshing = false; }
