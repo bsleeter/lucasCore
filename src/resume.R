@@ -17,7 +17,7 @@
 # shared.R holds the hooks (datasheet, saveDatasheet, updateRunLog, pkg_file); a stage calls stage_begin() after STAGE and
 # stage_done() at its end.
 # =============================================================================
-RS_VERSION <- 3L; RS_SHEET <- "OutputBuildStage"; RS_FILE <- "\001file|"
+RS_VERSION <- 4L; RS_SHEET <- "OutputBuildStage"; RS_FILE <- "\001file|"
 # sheets whose files a later stage replaces (stage 6 writes the stand age map again where a cut or fire dates a stand, and SyncroSim
 # then drops stage 5's file from the result): a record keeps these files itself, so the stage can still be copied
 RS_KEEP <- "stsim_InitialConditionsSpatial"
@@ -51,6 +51,36 @@ rs_call <- function(a, first = c("ssimObject", "name")) { nm <- names(a); if (is
   for (k in first) { if (k %in% nm) out[[k]] <- a[[k]] else if (length(pos)) { out[[k]] <- pos[[1]]; pos <- pos[-1] } }
   out$extra <- c(pos, a[nzchar(nm) & !nm %in% first]); out }
 
+# ---- the library file read directly ---------------------------------------------------------------------------------------
+# A read through rsyncrosim starts a SyncroSim process: about 4 seconds a sheet, and the nine stages read 127 sheets between
+# them, so checking a Build that changed nothing took 13 minutes (Great Dismal Swamp, 2026-11-20). The library is a SQLite
+# file. A read is therefore noted twice: the checksum of the rows as rsyncrosim gave them, and the checksum of the same rows
+# as the file holds them (lookups as ids, a file as its name). The later check reads the file, in milliseconds; a sheet whose
+# rows in the file differ is read through rsyncrosim before it counts as changed, and any sheet the file cannot answer for (no
+# table, another row count, no RSQLite) is checked through rsyncrosim as before. The file holds a lookup as an id, so the names
+# behind the ids are checked apart (rs_defs).
+rs_sql <- function(q) { if (!requireNamespace("RSQLite", quietly = TRUE)) stop("RSQLite is not installed")
+  con <- DBI::dbConnect(RSQLite::SQLite(), main_library(), flags = RSQLite::SQLITE_RO); on.exit(DBI::dbDisconnect(con)); DBI::dbGetQuery(con, q) }
+rs_table <- function(name) { if (!grepl("^[A-Za-z0-9_]+$", name)) stop("not a table name: ", name); name }
+rs_cols <- function(name) { k <- paste("cols", name); if (is.null(.rs$meta[[k]])) .rs$meta[[k]] <- rs_sql(sprintf("pragma table_info(\"%s\")", rs_table(name)))$name; .rs$meta[[k]] }
+rs_project <- function() { if (is.null(.rs$meta$project)) .rs$meta$project <- as.integer(rs_sql(sprintf("select ProjectId from core_Scenario where ScenarioId = %d", as.integer(rs_me())))$ProjectId[1]); .rs$meta$project }
+# the rows of a sheet as the file holds them, for the scope a read had: list(hash, n)
+rs_raw <- function(scope, name) { cols <- rs_cols(name); if (!length(cols)) stop("no table ", name)
+  id <- if (scope == "scn") as.integer(rs_me()) else if (startsWith(scope, "scenario:")) as.integer(sub("scenario:", "", scope)) else NA_integer_
+  where <- if (!is.na(id) && "ScenarioId" %in% cols) sprintf(" where ScenarioId = %d", id) else if (scope != "lib" && "ProjectId" %in% cols) sprintf(" where ProjectId = %d", rs_project())
+           else if ("ScenarioId" %in% cols) stop("a scenario sheet read without a scenario") else ""
+  x <- rs_sql(sprintf("select * from \"%s\"%s", rs_table(name), where)); n <- nrow(x)
+  x <- x[, setdiff(names(x), c("ScenarioId", "ProjectId", paste0(sub("^[^_]*_", "", name), "Id"))), drop = FALSE]
+  for (k in rs_file_cols(x)) { v <- as.character(x[[k]]); p <- if (is.na(id)) v else file.path(rs_data_dir(id, name), basename(v))
+    e <- !is.na(v) & nzchar(v) & file.exists(p) & !dir.exists(p); v[e] <- rs_md5(p[e]); x[[k]] <- v }
+  if (nrow(x) > 1 && ncol(x)) x <- x[do.call(order, unname(as.list(x))), , drop = FALSE]
+  rownames(x) <- NULL; list(hash = digest::digest(x, algo = "md5"), n = n) }
+# the names behind every lookup id: the project's definition tables of stsim and lucasCore (not People, which no stage reads)
+rs_defs <- function() { tb <- rs_sql("select name from sqlite_master where type = 'table'")$name; tb <- sort(tb[grepl("^(stsim|lucasCore)_[A-Za-z0-9]+$", tb) & tb != "lucasCore_Person"])
+  digest::digest(lapply(tb, function(t) { cols <- rs_cols(t); if (!all(c("Name", "ProjectId") %in% cols) || "ScenarioId" %in% cols) return(NULL)
+    key <- paste0(sub("^[^_]*_", "", t), "Id"); if (!key %in% cols) return(NULL)
+    rs_sql(sprintf("select \"%s\", Name from \"%s\" where ProjectId = %d order by 1", key, t, rs_project())) }), algo = "md5") }
+
 # shared.R's datasheet() calls this with each read: the first read of a sheet counts, and none after the stage wrote it itself
 rs_note_read <- function(a, r) { cl <- rs_call(a); name <- cl$name
   if (is.null(name) || !is.character(name) || length(name) != 1 || is.na(name)) return(invisible())   # (a list of sheets, not a sheet's rows)
@@ -58,7 +88,8 @@ rs_note_read <- function(a, r) { cl <- rs_call(a); name <- cl$name
   scope <- rs_scope(cl$ssimObject); if (is.na(scope)) return(rs_off(sprintf("%s was read from an unknown object", name)))
   if (scope == "scn" && name %in% .rs$written) return(invisible())
   key <- paste(scope, name, digest::digest(cl$extra, algo = "md5")); if (!is.null(.rs$reads[[key]])) return(invisible())
-  .rs$reads[[key]] <- list(scope = scope, name = name, args = cl$extra, hash = rs_hash(r, name)); invisible() }
+  raw <- tryCatch(rs_raw(scope, name), error = function(e) NULL)   # (kept only when the file shows the rows rsyncrosim gave)
+  .rs$reads[[key]] <- list(scope = scope, name = name, args = cl$extra, hash = rs_hash(r, name), raw = if (!is.null(raw) && raw$n == nrow(r)) raw$hash); invisible() }
 
 # shared.R's read_data_sources() calls this: of the Data Sources page, a stage depends on the home and on the columns it asked for
 # (a path set or corrected for a dataset another stage reads does not run this one again)
@@ -92,22 +123,32 @@ rs_changed <- function(rec) {
   if (!identical(rec$defaults, rs_defaults())) return("the package's option defaults changed")
   cur <- rs_code_sig(names(rec$files)); d <- names(rec$files)[cur != unlist(rec$files)]
   if (length(d)) return(sprintf("the package's %s changed", paste(utils::head(d, 3), collapse = ", ")))
-  if (length(rec$set)) { d <- tryCatch(as.data.frame(rs_datasheet(prj, ds("DataSource"), lookupsAsFactors = FALSE, optional = TRUE)), error = function(e) NULL)
+  if (length(rec$set)) {   # (paths are text in the file as in the sheet, so the file's row serves; else the sheet)
+    d <- tryCatch(rs_sql(sprintf("select * from \"%s\" where ProjectId = %d", rs_table(ds("DataSource")), rs_project())), error = function(e) NULL)
+    if (is.null(d)) d <- tryCatch(as.data.frame(rs_datasheet(prj, ds("DataSource"), lookupsAsFactors = FALSE, optional = TRUE)), error = function(e) NULL)
     if (is.null(d)) return("Data Sources could not be read")
     for (k in names(rec$set)) if (!identical(rs_set_value(d, k), rec$set[[k]])) return(sprintf("Data Sources > %s changed", k)) }
   for (s in rec$sources) if (!identical(rs_path_sig(s$path), s$sig)) return(sprintf("the data source %s changed (%s)", s$column, s$path))
-  for (r in rec$reads) { x <- tryCatch(do.call(rs_datasheet, c(list(rs_object(r$scope), r$name), r$args)), error = function(e) NULL)
+  # the file answers for a sheet when the record holds its rows as the file had them and the names behind the ids are the same
+  fast <- !is.null(rec$defs) && identical(rec$defs, tryCatch(rs_defs(), error = function(e) NULL)); .rs$nfast <- 0L; .rs$nslow <- 0L
+  for (r in rec$reads) {
+    if (fast && !is.null(r$raw) && identical(tryCatch(rs_raw(r$scope, r$name)$hash, error = function(e) NULL), r$raw)) { .rs$nfast <- .rs$nfast + 1L; next }
+    .rs$nslow <- .rs$nslow + 1L; x <- tryCatch(do.call(rs_datasheet, c(list(rs_object(r$scope), r$name), r$args)), error = function(e) NULL)
     if (is.null(x) || !is.data.frame(x) || !identical(rs_hash(x, r$name), r$hash))
       return(sprintf("%s%s changed", r$name, if (r$scope == "prj") " (a project table)" else "")) }
   NULL }
 
 # ---- reuse ------------------------------------------------------------------------------------------------------------
-rs_enabled <- function() { x <- tryCatch(rs_datasheet(scn, ds("BuildReuse"), optional = TRUE, lookupsAsFactors = FALSE), error = function(e) NULL)
+rs_enabled <- function() {
+  x <- tryCatch(rs_sql(sprintf("select Rebuild from \"%s\" where ScenarioId = %d", rs_table(ds("BuildReuse")), as.integer(rs_me()))), error = function(e) NULL)
+  if (is.null(x)) x <- tryCatch(rs_datasheet(scn, ds("BuildReuse"), optional = TRUE, lookupsAsFactors = FALSE), error = function(e) NULL)
   if (is.null(x) || !nrow(x) || !"Rebuild" %in% names(x)) return(TRUE)
   v <- as.character(x$Rebuild[1]); !(!is.na(v) && (v %in% c("2", "TRUE", "-1") || startsWith(v, "Yes"))) }
 rs_data_dir <- function(id, sheet) file.path(paste0(main_library(), ".data"), sprintf("Scenario-%d", id), sheet)
 rs_read_record <- function(L, id) {
-  x <- tryCatch(as.data.frame(rs_datasheet(rsyncrosim::scenario(L, id), ds(RS_SHEET), optional = TRUE, lookupsAsFactors = FALSE)), error = function(e) NULL)
+  x <- tryCatch(rs_sql(sprintf("select Stage, RecordFileName from \"%s\" where ScenarioId = %d order by 1", rs_table(ds(RS_SHEET)), as.integer(id))), error = function(e) NULL)
+  if (is.null(x)) { if (is.null(L)) L <- rsyncrosim::ssimLibrary(main_library())
+    x <- tryCatch(as.data.frame(rs_datasheet(rsyncrosim::scenario(L, id), ds(RS_SHEET), optional = TRUE, lookupsAsFactors = FALSE)), error = function(e) NULL) }
   if (is.null(x) || !nrow(x) || !all(c("Stage", "RecordFileName") %in% names(x))) return(NULL)
   f <- as.character(x$RecordFileName[x$Stage %in% STAGE]); if (!length(f)) return(NULL); f <- f[length(f)]; if (is.na(f)) return(NULL)
   if (!file.exists(f)) f <- file.path(rs_data_dir(id, ds(RS_SHEET)), basename(f)); if (!file.exists(f)) return(NULL)
@@ -142,15 +183,20 @@ rs_replay <- function(rec, id) {
   .rs$replaying <- TRUE
   for (w in W) do.call(rsyncrosim::saveDatasheet, c(list(scn, w$data, w$name), w$args))
   m <- as.numeric(difftime(Sys.time(), .rs$t0, units = "mins")); rs_write_record(rec, sprintf("Reused from result %d", id), m)
-  rsyncrosim::updateRunLog(sprintf("%s: copied in %.1f min (%.1f of them checking that nothing changed)", STAGE, m, .rs$tcheck))
+  rsyncrosim::updateRunLog(sprintf("%s: copied in %.1f min (%.1f of them checking that nothing changed: %d tables read from the library file, %d through SyncroSim)",
+                                   STAGE, m, .rs$tcheck, .rs$nfast, .rs$nslow))
   NULL }
 
 rs_reuse <- function() {
   if (!rs_enabled()) { rsyncrosim::updateRunLog(sprintf("%s: Build Options > Rebuild every stage is on, so no earlier result is looked at", STAGE)); return(FALSE) }
-  L <- rsyncrosim::ssimLibrary(main_library()); s <- data.table::as.data.table(rsyncrosim::scenario(L, summary = TRUE)); me <- rs_me()
-  p <- if ("ParentId" %in% names(s)) s[ScenarioId == me, ParentId] else NA
-  if (length(p) != 1 || is.na(p)) return(FALSE)
-  ids <- sort(s[ParentId %in% p & ScenarioId != me, ScenarioId], decreasing = TRUE); why <- character()
+  me <- as.integer(rs_me()); L <- NULL
+  # the other results of the scenario this result was run from: the file's own list, else rsyncrosim's
+  ids <- tryCatch(rs_sql(sprintf("select ResultId from core_ScenarioResult where ScenarioId in (select ScenarioId from core_ScenarioResult where ResultId = %d) and ResultId <> %d", me, me))$ResultId, error = function(e) NULL)
+  if (is.null(ids)) { L <- rsyncrosim::ssimLibrary(main_library()); s <- data.table::as.data.table(rsyncrosim::scenario(L, summary = TRUE))
+    p <- if ("ParentId" %in% names(s)) s[ScenarioId == me, ParentId] else NA
+    if (length(p) != 1 || is.na(p)) return(FALSE)
+    ids <- s[ParentId %in% p & ScenarioId != me, ScenarioId] }
+  ids <- sort(as.integer(ids), decreasing = TRUE); why <- character()
   for (id in utils::head(ids, 8)) { rec <- rs_read_record(L, id); if (is.null(rec)) next
     w <- rs_changed(rec); .rs$tcheck <- as.numeric(difftime(Sys.time(), .rs$t0, units = "mins")); if (is.null(w)) w <- rs_replay(rec, id)
     if (is.null(w)) return(TRUE)
@@ -175,7 +221,7 @@ stage_done <- function() { if (!isTRUE(.rs$on)) return(invisible()); .rs$on <- F
   if (!.rs$ok) { rsyncrosim::updateRunLog(sprintf("%s: no record for a later Build to reuse (%s)", STAGE, .rs$why)); return(invisible()) }
   tryCatch({
     rel <- rs_rel(unique(c(rs_script(), file.path(env$PackageDirectory, "src", c("shared.R", "resume.R", "datahome.R")), .rs$files))); rel <- sort(unique(rel[!is.na(rel)]))
-    rec <- list(version = RS_VERSION, stage = STAGE, ran = format(Sys.time(), "%d %b %Y"), result = rs_me(), defaults = rs_defaults(),
+    rec <- list(version = RS_VERSION, stage = STAGE, ran = format(Sys.time(), "%d %b %Y"), result = rs_me(), defaults = rs_defaults(), defs = tryCatch(rs_defs(), error = function(e) NULL),
                 files = as.list(rs_code_sig(rel)),
                 sources = lapply(.home_cov$read, function(x) list(column = x$DataSource, path = x$Path, sig = rs_path_sig(x$Path))),
                 set = .rs$set, reads = unname(.rs$reads), writes = .rs$writes, kept = .rs$keep, log = .rs$log)

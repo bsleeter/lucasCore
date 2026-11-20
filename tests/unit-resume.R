@@ -66,5 +66,33 @@ writeLines("another table, longer", file.path(dirname(d1), "a.dbf")); expect("da
 g0 <- rs_path_sig(dirname(d1)); invisible(put("src", "b.tif", "new year")); expect("data source: a file added to a folder counts", g0 != rs_path_sig(dirname(d1)))
 expect("data source: a path that is not there", rs_path_sig(file.path(tmp, "none")) == "missing" && rs_path_sig(NA_character_) == "missing")
 
+# ---- the library file read directly (a made-up SQLite library) ----
+if (requireNamespace("RSQLite", quietly = TRUE)) {
+  db <- file.path(tmp, "lib.ssim"); main_library <- function() db; rs_me <- function() 9L; .rs$meta <- NULL
+  rs_data_dir <- function(id, sheet) file.path(paste0(db, ".data"), sprintf("Scenario-%d", id), sheet)
+  con <- DBI::dbConnect(RSQLite::SQLite(), db)
+  DBI::dbWriteTable(con, "core_Scenario", data.frame(ScenarioId = c(8L, 9L), ProjectId = 1L))
+  DBI::dbWriteTable(con, "lucasCore_X", data.frame(XId = 1:4, ScenarioId = c(8L, 8L, 9L, 9L), StratumId = c(5L, 6L, 6L, 5L), Value = c(1, 2, 2, 1)))
+  DBI::dbWriteTable(con, "stsim_Stratum", data.frame(StratumId = 5:6, ProjectId = 1L, Name = c("A", "B")))
+  DBI::dbWriteTable(con, "lucasCore_Person", data.frame(PersonId = 1L, ProjectId = 1L, Name = "someone"))
+  DBI::dbWriteTable(con, "lucasCore_M", data.frame(MId = 1:2, ScenarioId = 8:9, AgeFileName = "Age.tif"))
+  DBI::dbDisconnect(con); sqlx <- function(q) { con <- DBI::dbConnect(RSQLite::SQLite(), db); on.exit(DBI::dbDisconnect(con)); invisible(DBI::dbExecute(con, q)) }
+  r9 <- rs_raw("scn", "lucasCore_X"); r8 <- rs_raw("scenario:8", "lucasCore_X")
+  expect("file: a scenario's rows only, and how many", r9$n == 2 && r8$n == 2)
+  expect("file: two scenarios with the same rows in another order give the same checksum (keys do not count)", r9$hash == r8$hash)
+  sqlx("update lucasCore_X set Value = 3 where XId = 4"); expect("file: a changed value counts", rs_raw("scn", "lucasCore_X")$hash != r9$hash && rs_raw("scenario:8", "lucasCore_X")$hash == r8$hash)
+  p0 <- rs_raw("prj", "stsim_Stratum"); expect("file: a project table by its project", p0$n == 2 && rs_raw("scn", "stsim_Stratum")$hash == p0$hash)
+  expect("file: a table that is not there is an error, not a checksum", inherits(try(rs_raw("scn", "lucasCore_None"), silent = TRUE), "try-error"))
+  d0 <- rs_defs(); sqlx("update lucasCore_Person set Name = 'another'"); expect("names behind the ids: People do not count", rs_defs() == d0)
+  sqlx("update stsim_Stratum set Name = 'C' where StratumId = 6"); expect("names behind the ids: a renamed stratum counts", rs_defs() != d0)
+  invisible(put("lib.ssim.data/Scenario-8/lucasCore_M", "Age.tif", "old forest")); invisible(put("lib.ssim.data/Scenario-9/lucasCore_M", "Age.tif", "old forest")); m9 <- rs_raw("scn", "lucasCore_M")$hash
+  expect("file: a file counts by its content in the result's folder", m9 == rs_raw("scenario:8", "lucasCore_M")$hash)
+  invisible(put("lib.ssim.data/Scenario-9/lucasCore_M", "Age.tif", "young forest")); expect("file: the same name with other content counts", rs_raw("scn", "lucasCore_M")$hash != m9)
+  # a read notes the file's checksum only when the file shows the rows rsyncrosim gave
+  .rs$reads <- list(); .rs$written <- character(); rs_scope <- function(obj) obj
+  rs_note_read(list("scn", "lucasCore_X"), data.frame(StratumId = c("B", "A"), Value = c(2, 3))); rs_note_read(list("scn", "lucasCore_M"), data.frame(AgeFileName = character()))
+  expect("a read: the file's checksum is kept when the row counts agree, and not otherwise", !is.null(.rs$reads[[1]]$raw) && is.null(.rs$reads[[2]]$raw))
+} else cat("skipped: the library file checks (RSQLite is not installed)\n")
+
 unlink(tmp, recursive = TRUE)
 cat(sprintf("\n%d passed, %d failed\n", ok, bad)); if (bad) quit(status = 1)

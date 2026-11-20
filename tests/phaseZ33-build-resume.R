@@ -57,6 +57,10 @@ if (!all(same)) cat("  differ:", paste(sheets[!same], collapse = ", "), "\n")
 expect("B: the validation table is whole", nrow(B$v) == nrow(A$v) && all(B$v$Status == "Pass"))
 if (length(stg) > 2) expect("B: far faster than A", B$min < 0.5 * A$min)   # (a copied stage still costs about a minute: SyncroSim starts it, it checks and writes)
 cat(sprintf("  A %.1f min, B %.1f min\n", A$min, B$min))
+# the checks read the library file, not a SyncroSim process a table ("... N tables read from the library file, M through SyncroSim")
+cp <- regmatches(logl(B$R), regexec("([0-9]+) tables read from the library file, ([0-9]+) through SyncroSim", logl(B$R))); cp <- do.call(rbind, cp[lengths(cp) == 3])
+nf <- sum(as.integer(cp[, 2])); ns <- sum(as.integer(cp[, 3])); cat(sprintf("  B: %d tables checked in the library file, %d through SyncroSim\n", nf, ns))
+expect("B: at least nine in ten of the tables are checked in the library file", nrow(cp) == length(stg) && nf >= 9 * ns)
 
 # C. a setting only stage 5 reads
 if ("5" %in% stg) {

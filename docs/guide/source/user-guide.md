@@ -986,9 +986,9 @@ A Build that is run again does not repeat the stages that would give the same re
 
 **After a failure.** Fix the cause and run the Build again. The stages that finished are copied, and the Build goes on from the stage that failed. Keep the failed result until the new run is done: it holds the records.
 
-**After a change.** Only the stages that read what changed run again. A change on the Stand Age pages runs stage 5 again; the stages after it are still copied when stage 5 writes the same tables and maps as before. A path set on the Data Sources page runs only the stages that read that dataset. A fix to one stage's code runs that stage; a new version of the package's shared code runs every stage.
+**After a change.** Only the stages that read what changed run again. A change on the Stand Age pages runs stage 5 again; the stages after it are still copied when stage 5 writes the same tables and maps as before. A path set on the Data Sources page runs only the stages that read that dataset. A fix to one stage's code runs that stage; a new version of the package's shared code runs every stage, and so does a change to the project's definitions, such as a new stratum source or a renamed state class.
 
-**What it costs.** A copied stage takes one to three minutes, most of it checking that nothing changed. A Great Dismal Swamp Build at 150 m took 53 minutes the first time and 16 minutes when run again with nothing changed.
+**What it costs.** A copied stage takes well under a minute: it checks its inputs in the library file and writes its tables. Stages 0, 1 and 5 of a Great Dismal Swamp Build at 150 m took 16 minutes the first time and 2 minutes when run again with nothing changed.
 
 **Seeing what happened.** **LUCAS Core > Build Results > Build Stages** lists each stage of the result as **Ran** or **Reused from result N**, with its minutes. In the run log a copied stage says "not run again" and names the result it came from, then repeats its log lines from that run. A stage that ran says what changed, for example "5 Initial Conditions runs: since result 43, lucasCore_StandAgeFia changed".
 

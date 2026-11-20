@@ -15,8 +15,9 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   still reused when that one wrote what it wrote before. **Build Results > Build Stages** lists each stage as Ran or Reused
   from result N; **Build Stage Reuse > Rebuild Every Stage** turns the reuse off. Both are sheets of their own, so a library
   needs no update. Of the Data Sources page a stage counts only the datasets it reads, so a path put right for stage 6 runs
-  stage 6 and copies the rest. A copied stage takes one to three minutes (it reads its inputs again to check them): a Great
-  Dismal Swamp Build at 150 m took 53 minutes, then 16 run again unchanged, and 16 after a failure at stage 6 was put right.
+  stage 6 and copies the rest. A stage checks its inputs in the library file (SQLite), not through a SyncroSim process a
+  table, so a copied stage takes well under a minute: stages 0, 1 and 5 of a Great Dismal Swamp Build at 150 m took 16
+  minutes, then 2 run again unchanged. A change to the project's definitions runs every stage again.
   Not seen by a record: a change to R or its packages. User Guide section 4.6. `src/resume.R`, `tests/unit-resume.R`,
   `tests/phaseZ33-build-resume.R`.
 - **Stand age matched to the study area's FIA plots.** The age maps can misread a landscape's age structure: Olympic National
