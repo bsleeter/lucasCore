@@ -1013,10 +1013,18 @@
 		<column name="StateClassId" displayName="Forest Type" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass"/>
 		<column name="Age" displayName="Stand Age in the Start Year (yr)" dataType="Integer" validationType="WholeNumber" validationCondition="Between" formula1="1" formula2="1000"/>
 	</dataSheet>
+	<dataSheet name="StandAgeFia" displayName="Stand Age: FIA Plots" isSingleRow="True">
+		<!-- user 2026-11-19 (src/stand-age.R, age_fia_match): the age maps misread a landscape's age structure (Olympic National Park: 40% of the
+		     forest under 80 years in the maps, 18% on the park's FIA plots). On: forest cells keep the map's order within their forest type and
+		     take the ages of the study area's plots at the same rank. A sheet of its own, so a library needs no update for it -->
+		<column name="FiaMatch" displayName="Match the Age Map to the Study Area's FIA Plots (blank = no)" dataType="Integer" validationType="List" formula1="1:No|2:Yes" isOptional="True" defaultValue="1"/>
+		<column name="MinPlots" displayName="Fewest Plots for a Forest Type's Own Match (blank = 30)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="10" formula2="1000"/>
+	</dataSheet>
 	<!-- one page for both (user 2026-11-19: no reason for two pages; the ages by forest type are a manual setting) -->
 	<dataFeed name="StandAge" displayName="Stand Age" viewClassName="lucasCoreUI.StandAgeView" viewClassAssembly="lucasCoreUI">
 		<dataSheet name="StandAgeOptions"/>
 		<dataSheet name="StandAgeUnknown"/>
+		<dataSheet name="StandAgeFia"/>
 	</dataFeed>
 
 	<dataSheet name="OutputStandAge" displayName="Stand Age Summary">
@@ -1041,6 +1049,26 @@
 		<column name="Cells" dataType="Integer"/>
 		<column name="MeanAge" displayName="Mean Age (yr)" dataType="Double" format="0.0"/>
 		<column name="SourceAge" displayName="Mean Age the Age Map Gave (yr)" dataType="Double" format="0.0"/>
+	</dataSheet>
+
+	<dataSheet name="OutputStandAgeDistribution" displayName="Stand Age by Age Class">
+		<!-- stage 5: the share of forest in each age class in the start year, for the age map, the study area's FIA plots and the Build; all forest and each forest type with at least 10 plots. Build Figures draws it -->
+		<column name="Source" dataType="String"/>
+		<column name="ForestType" displayName="Forest Type" dataType="String"/>
+		<column name="Number" displayName="Cells or Plots" dataType="Integer"/>
+		<column name="MedianAge" displayName="Median Age (yr)" dataType="Double" format="0"/>
+		<column name="AgeClass" displayName="Age Class (yr)" dataType="String"/>
+		<column name="Percent" displayName="Share of the Forest (%)" dataType="Double" format="0.0"/>
+	</dataSheet>
+
+	<dataSheet name="OutputStandAgeFia" displayName="Stand Age Matched to FIA Plots">
+		<!-- stage 5, with Stand Age: FIA Plots on: per forest type matched, its plots and cells and the median age before and after -->
+		<column name="ForestType" displayName="Forest Type" dataType="String"/>
+		<column name="Plots" dataType="Integer"/>
+		<column name="Cells" dataType="Integer"/>
+		<column name="MapMedianAge" displayName="Median Age in the Age Map (yr)" dataType="Integer"/>
+		<column name="PlotMedianAge" displayName="Median Age of the Plots (yr)" dataType="Integer"/>
+		<column name="MatchedMedianAge" displayName="Median Age After Matching (yr)" dataType="Integer"/>
 	</dataSheet>
 
 	<dataSheet name="OutputStateClassSummary" displayName="State Class Summary">
@@ -1649,6 +1677,9 @@
 		<dataSheet name="StandAgeUnknown" type="Input"/>
 		<dataSheet name="OutputStandAge" type="Output"/>
 		<dataSheet name="OutputStandAgeMap" type="Output"/>
+		<dataSheet name="StandAgeFia" type="Input"/>
+		<dataSheet name="OutputStandAgeDistribution" type="Output"/>
+		<dataSheet name="OutputStandAgeFia" type="Output"/>
 		<dataSheet name="ForestCoverOptions" type="Input"/>
 		<dataSheet name="OutputForestCover" type="Output"/>
 		<dataSheet name="OutputForestCoverMap" type="Output"/>
@@ -1829,6 +1860,7 @@
 		<dataSheet name="stsim_TransitionSpatialMultiplier" type="Input"/>
 		<dataSheet name="OutputSiteClassMap" type="Input"/>
 		<dataSheet name="OutputLandCoverLayers" type="Input"/>
+		<dataSheet name="OutputStandAgeDistribution" type="Input"/>
 		<dataSheet name="OutputBuildFigure" type="Output"/>
 		<dataSheet name="OutputValidation" type="Both"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
@@ -1981,6 +2013,8 @@
 				<item name="OutputStandAge"/>
 				<item name="OutputStandAgeCut"/>
 				<item name="OutputStandAgeMap"/>
+				<item name="OutputStandAgeDistribution"/>
+				<item name="OutputStandAgeFia"/>
 				<item name="OutputForestAreaCheck"/>
 				<item name="OutputForestCover"/>
 				<item name="OutputForestCoverMap"/>

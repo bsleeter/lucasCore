@@ -78,6 +78,7 @@ I <- list(strata = list(prim, opt_rast(ic$SecondaryStratumFileName[1]), opt_rast
           stock_summary = sheet("OutputInitialStockSummary"), trans = sheet("OutputTransitionSummary"),
           climate = sheet("OutputClimateSummary"), site = site_m, site_class = site_class, validation = sheet("OutputValidation"), dem = dem,
           nf_maps = nf_maps, crop_mix = crop_mix, nf_growth = nf_growth, crop_yield = crop_yield, fire_maps = fire_maps, start_maps = start_maps,
+          age_dist = tryCatch(sheet("OutputStandAgeDistribution"), error = function(e) NULL),   # (a Build made before it has none)
           label = if (nrow(sa)) paste(sub("^[^:]*: ", "", sa$UnitId), collapse = ", ") else "CONUS", years = c(opt$StartYear[1], opt$EndYear[1]),
           result = rsyncrosim::scenarioId(scn))
 progressBar()

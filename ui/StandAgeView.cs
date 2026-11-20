@@ -22,6 +22,12 @@ namespace lucasCoreUI
         private readonly Button m_browse = new Button { Text = "Browse...", AutoSize = true };
         private const string AGES = "lucasCore_StandAgeUnknown";
         private readonly Panel m_grid = GridHost(190);
+        // the FIA matching is a sheet of its own in this feed (lucasCore_StandAgeFia: FiaMatch 1 no / 2 yes, MinPlots), so a library made
+        // before it needs no update (user 2026-11-19)
+        private const string FIA = "lucasCore_StandAgeFia";
+        private readonly CheckBox m_fia = new CheckBox { Text = "Match the age map to the FIA plots", AutoSize = true, Margin = new Padding(3, 6, 3, 3) };
+        private readonly TextBox m_minPlots = Box(50);
+        private DataSheet FiaSheet { get { return this.DataFeed.GetDataSheet(FIA); } }
 
         public StandAgeView()
         {
@@ -44,6 +50,14 @@ namespace lucasCoreUI
             u.Controls.Add(Indent(Note("As before lucasCore 1.6.0. The stand age raster under Manual settings is still used where it has a value.")));
             AddGroup(Group("Forest burned or clearcut between the start year and the age map's year", u));
 
+            var fi = Column();
+            fi.Controls.Add(Note("The age maps can misread how old a landscape is. Olympic National Park: 40% of the forest is under 80 years in TreeMap and in NASA CMS, where the park's FIA plots have 18%. Build Figures > Forest stand age draws the age map beside the FIA plots of the study area, whichever is chosen here."));
+            fi.Controls.Add(m_fia);
+            fi.Controls.Add(Indent(Note("Within each forest type the cells keep the age map's order from youngest to oldest and take the ages of the study area's FIA plots at the same rank: the map says where the old forest is, the plots how much of it there is. The plots are the newest visit of each plot inside the study area, their stand age moved to the start year (Data Sources: FIA DataMart Folder). Applied before the rules for burned and clearcut forest above; the manual settings below still come first.")));
+            var mp = Row(); mp.Controls.Add(Caption("Fewest plots for a forest type's own match:")); mp.Controls.Add(m_minPlots); mp.Controls.Add(Note("Blank = 30. A forest type with fewer is matched, with the other such types, to all the study area's plots; with fewer plots than this in all, nothing is matched and the Build log says so."));
+            fi.Controls.Add(Indent(mp));
+            AddGroup(Group("The age map against the FIA plots of the study area", fi));
+
             var f = Row(); f.Controls.Add(Caption("Raster:")); f.Controls.Add(m_file); f.Controls.Add(m_browse);
             var y = Row(); y.Controls.Add(Caption("Its ages are for the year:")); y.Controls.Add(m_year); y.Controls.Add(Note("Blank = the start year. Another year's ages are moved to the start year."));
             AddGroup(Group("Manual settings", ProjectionTransitionsView.Stack(
@@ -58,6 +72,8 @@ namespace lucasCoreUI
             AddGroup(Group("When it applies", n));
             EndGroups();
             BindNumber(m_pct, () => Sheet, "UnknownPercentile", true); BindNumber(m_year, () => Sheet, "AgeRasterYear", true);
+            m_fia.CheckedChanged += (s, e) => { if (!Refreshing) { Write(FiaSheet, "FiaMatch", m_fia.Checked ? 2 : 1); RefreshControls(); } };
+            BindNumber(m_minPlots, () => FiaSheet, "MinPlots", true);
             m_file.Validated += (s, e) => { if (!Refreshing) Write("AgeRasterFile", m_file.Text.Trim().Length == 0 ? (object)DBNull.Value : m_file.Text.Trim()); };
             m_browse.Click += (s, e) =>
             {
@@ -86,6 +102,8 @@ namespace lucasCoreUI
             m_pct.Text = Show(Value("UnknownPercentile")); m_year.Text = Show(Value("AgeRasterYear"));
             object f = Value("AgeRasterFile"); m_file.Text = f == DBNull.Value ? "" : Convert.ToString(f);
             m_pct.Enabled = IntValue("UnknownRule", 1) == 1;
+            object fm = Value(FiaSheet, "FiaMatch"); m_fia.Checked = fm != DBNull.Value && Convert.ToInt32(fm) == 2;
+            m_minPlots.Text = Show(Value(FiaSheet, "MinPlots")); m_minPlots.Enabled = m_fia.Checked;
         }
     }
 }

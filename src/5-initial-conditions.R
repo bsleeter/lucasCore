@@ -332,6 +332,35 @@ if (ao$unknown == "default" && age_map_year > y0) {
   if (is.na(fpf_a)) say("Stand age: no fire perimeter file (Data Sources: FirePerimeterHistoryFile), so cells burned between %d and the age map's year (%d) are not looked for", y0, age_map_year) else {
     fpa <- read_fire_perimeters(fpf_a, y0 + 1, age_map_year)
     if (nrow(fpa)) { fpa <- sf::st_make_valid(sf::st_transform(fpa, crs(R))); burn_yr <- as.integer(values(rasterize(vect(fpa), R, field = "yr", fun = "min"), mat = FALSE)) } } }
+# ---- the age map against the study area's FIA plots (src/stand-age.R; user 2026-11-19) -----------------------------------------
+# The plots inside the study area (newest visit of each, stand age moved to the start year) give how much forest of each age there
+# is; Build Figures draws them beside the age map and the Build. Stand Age page, "Match the age map to the FIA plots": the forest
+# cells whose age the map knows keep the map's order within their forest type and take the plots' ages at the same rank, as does
+# the centre-pixel age the unknown-age percentiles are taken from. Off by default; too few plots = not matched, and the log says so
+map_age <- src_age; fia_age <- NULL; fia_tab <- NULL; fia_pl <- NULL
+afo <- tryCatch(age_fia_options(tryCatch(read_ds("StandAgeFia"), error = function(e) data.table())), error = function(e) fail("%s", conditionMessage(e)))
+tryCatch({
+  dma <- read_data_sources("FiaDataMartFolder", optional = TRUE)$FiaDataMartFolder
+  if (is.na(dma)) say("Stand age, FIA plots: no FIA DataMart Folder (Data Sources), so the age map is not compared with the plots") else {
+    bx <- as.vector(ext(project(as.polygons(ext(R), crs = crs(R)), "EPSG:4269")))[c(1, 3, 2, 4)]; fia_pl <- fia_plots_box(dma, bx)
+    if (nrow(fia_pl)) fia_pl <- fia_pl[!is.na(extract(P, project(as.matrix(fia_pl[, .(LON, LAT)]), from = "EPSG:4269", to = crs(P)))[[1]])]
+    if (!exists("fia_forest_types")) source(pkg_file("src", "treemap.R")); ftr <- fia_forest_types(dma)
+    fia_age <- age_fia_plots(fia_pl, age_fia_conds(dma, fia_pl), y0, function(code) ftr$TYPGRPCD[match(code, ftr$VALUE)])
+    if (nrow(fia_age$plots)) say("Stand age, FIA plots: %d forest conditions with a stand age on the newest visit (%d-%d) of the plots inside the study area; median age in %d %.0f years (the age map: %.0f over the forest cells). %d more left out: their stand started after %d. Plot locations are approximate",
+                                 nrow(fia_age$plots), fia_age$visits[1], fia_age$visits[2], y0, age_quantile(fia_age$plots$Age, fia_age$plots$Weight, 0.5), stats::median(map_age[fa], na.rm = TRUE), fia_age$dropped, y0) else
+      say("Stand age, FIA plots: no FIA plot with a stand age inside the study area") } },
+  error = function(e) say("Stand age, FIA plots: not read (%s)", conditionMessage(e)))
+if (afo$match) {
+  n_fia <- if (is.null(fia_age)) 0L else nrow(fia_age$plots)
+  if (n_fia < afo$min_plots) say("Stand age: the age map is NOT matched to the FIA plots (the Stand Age page asks for it): %d plots with a stand age inside the study area, fewer than the %d it needs", n_fia, afo$min_plots) else {
+    ty_a <- as.integer(values(S, mat = FALSE)); ty_a[!(ty_a >= 100 & ty_a <= 999)] <- NA; kn_a <- fa & is.na(burn_yr)
+    fm <- age_fia_match(src_age, ty_a, kn_a, fia_age$plots, afo$min_plots); src_age <- fm$age
+    pxa <- values(A_px, mat = FALSE); A_px <- setValues(A_px, age_fia_match(pxa, ty_a, kn_a & !is.na(pxa), fia_age$plots, afo$min_plots)$age)
+    fia_tab <- fm$table[, .(ForestType = ifelse(is.na(Group), "Other forest types (matched to all the plots)", scl$Name[match(Group, as.integer(scl$Id))]), Plots, Cells, MapMedianAge = round(MapMedian), PlotMedianAge = round(PlotMedian), MatchedMedianAge = round(Median))]
+    say("Stand age matched to the FIA plots (Stand Age page): %d of %d forest cells keep the age map's order within their forest type and take the plots' ages at the same rank; their median age goes from %.0f to %.0f years",
+        sum(fm$matched), sum(fa), stats::median(map_age[fm$matched]), stats::median(src_age[fm$matched]))
+    for (i in seq_len(nrow(fia_tab))) say("  %s: %d plots, %d cells, median %d -> %d years", fia_tab$ForestType[i], fia_tab$Plots[i], fia_tab$Cells[i], fia_tab$MapMedianAge[i], fia_tab$MatchedMedianAge[i])
+    check(STAGE, "stand age matched to FIA: every matched cell has an age of at least 1", all(src_age[fm$matched] >= 1)) } }
 ras_age <- rep(NA_real_, ncell(R))
 if (!is.na(ao$raster)) { if (!file.exists(ao$raster)) fail("Stand Age Options: the stand age raster %s was not found", ao$raster)
   ry <- if (is.na(ao$raster_year)) y0 else ao$raster_year; ras_age <- values(project(crop_to(rast(ao$raster)[[1]]), R, method = "near"), mat = FALSE) - (ry - y0); ras_age[!is.na(ras_age) & ras_age < 1] <- NA
@@ -506,8 +535,9 @@ say("Forest cells: %d (%.1f%% of land); natural cells made forest by the any-yea
 fa_tab <- tryCatch({
   dmf <- read_data_sources("FiaDataMartFolder", optional = TRUE)$FiaDataMartFolder
   if (is.na(dmf)) { say("Forest area check: no FIA DataMart Folder (Data Sources), so the Build's forest area is not compared with FIA"); NULL } else {
-    bx <- as.vector(ext(project(as.polygons(ext(R), crs = crs(R)), "EPSG:4269")))[c(1, 3, 2, 4)]; pl <- fia_plots_box(dmf, bx)
-    if (nrow(pl)) pl <- pl[!is.na(extract(P, project(as.matrix(pl[, .(LON, LAT)]), from = "EPSG:4269", to = crs(P)))[[1]])]
+    if (!is.null(fia_pl)) pl <- fia_pl else {   # (the stand age block above has read them)
+      bx <- as.vector(ext(project(as.polygons(ext(R), crs = crs(R)), "EPSG:4269")))[c(1, 3, 2, 4)]; pl <- fia_plots_box(dmf, bx)
+      if (nrow(pl)) pl <- pl[!is.na(extract(P, project(as.matrix(pl[, .(LON, LAT)]), from = "EPSG:4269", to = crs(P)))[[1]])] }
     fi <- fia_forest_share(pl, fia_conds(dmf, pl))
     landc <- !is.na(vP) & !(vS %in% c(11, 12)); pc <- function(k) sum(k & landc, na.rm = TRUE) / sum(landc)
     b_for <- pc(vF %in% 1 | (vS >= 2091 & vS <= 2999)); n_for <- pc(v0 %in% c(41:43, 90)); verdict <- forest_area_verdict(b_for, fi$share, fi$se)
@@ -536,6 +566,20 @@ write_ds(data.frame(ForestTypeFileName = write_raster(Fz, "ForestType.tif"), Gra
 write_ds(ri, "OutputReturnInterval"); write_ds(st, "OutputSoilTarget")
 # how each forest type's stand ages were set (a library made before lucasCore 1.6.0 has no such sheet until it is opened in Studio)
 if (nrow(age_tab)) tryCatch(write_ds(age_tab, "OutputStandAge"), error = function(e) say("Stand Age Summary not written (%s): reopen the library in SyncroSim Studio so it adds the table", conditionMessage(e)))
+# the share of forest by age class in the start year: the age map, the study area's FIA plots and the Build (Build Figures draws it),
+# for all forest and for each forest type with at least 10 plots; and the groups of the FIA matching when it ran
+tryCatch({
+  dist1 <- function(src, ft, a, w = rep(1, length(a)), n) { d <- age_distribution(a, w); k <- !is.na(a) & a >= 1
+    cbind(data.table(Source = src, ForestType = ft, Number = n, MedianAge = if (any(k)) round(age_quantile(a[k], w[k], 0.5)) else NA_real_), d[, .(AgeClass, Percent = round(Percent, 2))]) }
+  ffin <- vF %in% 1; tyf <- ifelse(vS >= 100 & vS <= 999, vS, NA); fp <- if (is.null(fia_age)) NULL else fia_age$plots
+  types <- if (is.null(fp)) integer() else fp[!is.na(Group), .N, by = Group][N >= 10 & Group %in% tyf[ffin], Group]
+  ad <- list(dist1("Age map", "All forest", map_age[fa], n = sum(fa)), dist1("The Build", "All forest", vA[ffin], n = sum(ffin)))
+  if (!is.null(fp) && nrow(fp)) ad[[length(ad) + 1]] <- dist1("FIA plots", "All forest", fp$Age, fp$Weight, nrow(fp))
+  for (g in types) { nm <- scl$Name[match(g, as.integer(scl$Id))]; km <- fa & tyf %in% g; kb <- ffin & tyf %in% g
+    ad <- c(ad, list(dist1("Age map", nm, map_age[km], n = sum(km)), dist1("The Build", nm, vA[kb], n = sum(kb)), dist1("FIA plots", nm, fp[Group %in% g, Age], fp[Group %in% g, Weight], fp[Group %in% g, .N]))) }
+  write_ds(rbindlist(ad), "OutputStandAgeDistribution")
+  if (!is.null(fia_tab) && nrow(fia_tab)) write_ds(fia_tab, "OutputStandAgeFia") },
+  error = function(e) say("Stand Age Distribution not written (%s): reopen the library in SyncroSim Studio so it adds the table", conditionMessage(e)))
 # the rule that set each forest cell's age (1 raster, 2 forest type value, 3 earlier age map, 4 unburned forest of its type, 5 the age
 # map) and the centre pixel's age: stage 6 gives the stands cut between the start year and the age map's year the same rules
 tryCatch(write_ds(data.frame(RuleFileName = write_raster(setValues(rast(R), match(aa$rule, names(AGE_RULES))), "StandAgeRule.tif", "INT1U"),

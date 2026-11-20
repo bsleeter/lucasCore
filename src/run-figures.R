@@ -81,6 +81,8 @@ load_run <- function(lib, rid) {
               WHERE o.ScenarioId = %d AND g.Name = 'Total Ecosystem' GROUP BY o.Iteration, o.Timestep", rid) else NULL
   path <- function(folder, f) if (length(f) && !is.na(f[1])) file.path(dd, folder, basename(f[1])) else NA_character_
   ssm <- q("SELECT Timestep, Filename FROM stsim_OutputSpatialState WHERE ScenarioId = %d AND Iteration = 1", rid)
+  # the stand age maps of iteration 1 in the first and last year (the stand age figure; a run without spatial age output has none)
+  agm <- if (dbExistsTable(con, "stsim_OutputSpatialAge")) q("SELECT Timestep, Filename FROM stsim_OutputSpatialAge WHERE ScenarioId = %d AND Iteration = 1", rid) else data.table(Timestep = integer(), Filename = character())
   fire_id <- q("SELECT TransitionGroupId FROM stsim_TransitionGroup WHERE Name = 'Fire'")$TransitionGroupId
   fm <- if (length(fire_id)) q("SELECT Timestep, Filename FROM stsim_OutputSpatialTransition WHERE ScenarioId = %d AND Iteration = 1 AND TransitionGroupId = %d", rid, fire_id[1]) else data.table()
   hm <- q("SELECT o.Timestep, o.Filename FROM stsim_OutputSpatialTransition o JOIN stsim_TransitionGroup g ON g.TransitionGroupId = o.TransitionGroupId
@@ -99,7 +101,7 @@ load_run <- function(lib, rid) {
        fire = if (nrow(fm)) setNames(vapply(fm$Filename, function(f) path("stsim_OutputSpatialTransition", f), ""), fm$Timestep) else character(),
        harvest = if (nrow(hm)) setNames(vapply(hm$Filename, function(f) path("stsim_OutputSpatialTransition", f), ""), hm$Timestep) else character(),
        carbon0 = path("stsim_OutputAverageSpatialStockGroup", te[Timestep == yrs[1], Filename]), carbon1 = path("stsim_OutputAverageSpatialStockGroup", te[Timestep == yrs[2], Filename]),
-       hl0 = hl_of(yrs[1]), hl1 = hl_of(yrs[2]),
+       hl0 = hl_of(yrs[1]), hl1 = hl_of(yrs[2]), age0 = path("stsim_OutputSpatialAge", agm[Timestep == yrs[1], Filename]), age1 = path("stsim_OutputSpatialAge", agm[Timestep == yrs[2], Filename]),
        pd = if (nrow(pdm)) pdm[, .(Timestep, Grp, File)] else NULL)
 }
 
@@ -125,7 +127,7 @@ join_runs <- function(H, P) {
   J <- P; J$years <- c(H$years[1], P$years[2])
   for (k in c("area", "trans", "stocks", "flows", "losses", "nbp_cls", "ch4")) J[k] <- list(cut(H[[k]], P[[k]]))
   J$unit_c <- if (!is.null(H$unit_c) && !is.null(P$unit_c)) rbind(H$unit_c[Timestep == H$years[1]], P$unit_c[Timestep == P$years[2]]) else NULL
-  J$unit_a <- H$unit_a; J$sc0 <- H$sc0; J$carbon0 <- H$carbon0; J["hl0"] <- list(H$hl0)
+  J$unit_a <- H$unit_a; J$sc0 <- H$sc0; J$carbon0 <- H$carbon0; J$age0 <- H$age0; J["hl0"] <- list(H$hl0)
   late <- function(m) m[as.integer(names(m)) > ys]
   J$fire <- c(H$fire, late(P$fire)); J$harvest <- c(H$harvest, late(P$harvest))
   J$pd <- rbind(H$pd, if (!is.null(P$pd)) P$pd[Timestep > ys])
@@ -328,6 +330,29 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
         for (j in seq_along(TL)) lines(yrs, S[, j], col = TC[j], lwd = 2, type = "s")
         mark_line(); ptitle(2, "Leaving the disturbed classes, and reforestation")
         under_legend(sprintf("%s (%.1f km2 in all)", TL, colSums(S)), col = TC, lwd = 2) }) }
+
+  # ---- forest stand age in the first and last year (user 2026-11-19: stand age is the model's least certain input) --------------
+  # the age maps of iteration 1 on forest and forested wetland (a disturbed class counts its years since the disturbance and is left out)
+  g0 <- rd(X$age0 %||% NA_character_); g1 <- rd(X$age1 %||% NA_character_)
+  if (!is.null(g0) && !is.null(g1) && !is.null(r0) && !is.null(r1)) local({
+    is_for <- function(nm) !is.na(nm) & grepl("Group$|Forested$", nm) & grepl("^(Forest|Wetland)", nm)
+    n0 <- scn$Name[match(values(r0, mat = FALSE), scn$Id)]; n1 <- scn$Name[match(values(r1, mat = FALSE), scn$Id)]; f0 <- is_for(n0); f1 <- is_for(n1)
+    v0 <- values(g0, mat = FALSE); v1 <- values(g1, mat = FALSE); v0[!f0 | v0 < 1] <- NA; v1[!f1 | v1 < 1] <- NA
+    if (sum(!is.na(v0)) > 0 && sum(!is.na(v1)) > 0) {
+      shr <- function(v) { t <- tabulate(cut(v[!is.na(v)], AGE_BRK, labels = FALSE), length(AGE_LAB)); 100 * t / sum(t) }
+      M <- rbind(shr(v0), shr(v1)); dimnames(M) <- list(as.character(c(y0, y1)), AGE_LAB); ycol <- setNames(c("#a9a498", "#2b8152"), c(y0, y1))
+      md <- function(v, nm) data.table(a = v, n = nm)[!is.na(a), .(m = as.numeric(median(a)), cells = .N), by = n]
+      m0 <- md(v0, n0); m1 <- md(v1, n1); ft <- m0[order(-cells)][seq_len(min(.N, 10)), n]
+      D <- data.table(Group = c("All forest", ft)); D[[as.character(y0)]] <- c(median(v0, na.rm = TRUE), m0$m[match(ft, m0$n)]); D[[as.character(y1)]] <- c(median(v1, na.rm = TRUE), m1$m[match(ft, m1$n)])
+      km2 <- function(v) sum(!is.na(v)) * ha_cell / 100; u80 <- function(i) sum(M[i, 1:3]); o250 <- function(i) sum(M[i, 8:9])
+      mv <- function(g, f) { v <- cv(g); nm <- scn$Name[match(cv(f), scn$Id)]; v[!is_for(nm) | v < 1] <- NA; v }
+      map_figure("stand_age_maps", sprintf("Forest stand age, %d and %d", y0, y1), list(
+        list(k = classed(mv(g0, r0), AGE_MAP_BRK), cols = RAMP_AGE(length(AGE_LAB)), lab = AGE_LAB, title = sprintf("Stand age, %d (years)", y0), sub = sprintf("%s km2 of forest; median %.0f years; grey: not forest", format(round(km2(v0)), big.mark = ","), median(v0, na.rm = TRUE))),
+        list(k = classed(mv(g1, r1), AGE_MAP_BRK), cols = RAMP_AGE(length(AGE_LAB)), lab = AGE_LAB, title = sprintf("Stand age, %d (years)", y1), sub = sprintf("%s km2 of forest; median %.0f years; grey: not forest", format(round(km2(v1)), big.mark = ","), median(v1, na.rm = TRUE)))),
+        sprintf("Stand age of the forest and forested wetland cells in the first and last year of the run (iteration 1), in the classes of the next figure. A stand ages a year each year; a stand-replacing fire or a clearcut sets it back to zero, and the cell is left out while it sits in a disturbed class.%s", relief))
+      chart_figure("stand_age", "Forest by stand age", sprintf(paste0("(a) The share of the forest in each stand age class in %d and %d (iteration 1). Forest under 80 years goes from %.0f%% to %.0f%%, forest over 250 years from %.0f%% to %.0f%%. ",
+          "(b) Median stand age of all forest and of the ten most extensive forest types of %d. The starting ages come from the Build's age map and the Stand Age page's rules, and are the model's least certain input (Build Figures: Forest stand age compares them with the study area's FIA plots)."),
+          y0, y1, u80(1), u80(2), o250(1), o250(2), y0), 1, 2, h = 1150, draw = function() age_panels(M, ycol, D, ptitle, "Forest by stand age class", "Median stand age")) } })
 
   # ---- maps: carbon ------------------------------------------------------------------------------------------------------------
   c0 <- rd(X$carbon0); c1 <- rd(X$carbon1)

@@ -25,6 +25,24 @@ suppressPackageStartupMessages({ library(terra); library(sf); library(data.table
 
 INK <- "#20211f"; MUTED <- "#55534c"; GRID <- "#e3e1db"
 RAMP_AGE <- colorRampPalette(c("#f5efe3", "#e9dfa6", "#b9cf86", "#6fae74", "#2f8a6f", "#1f5f63", "#22314f"))
+# stand age classes of the age figures (as src/stand-age.R's AGE_CLASSES): AGE_BRK for cut() (right-closed), AGE_MAP_BRK for the maps' classed()
+AGE_BRK <- c(0, 20, 40, 80, 120, 160, 200, 250, 300, Inf); AGE_MAP_BRK <- c(1, AGE_BRK[2:9] + 1, Inf)
+AGE_LAB <- c("1-20", "21-40", "41-80", "81-120", "121-160", "161-200", "201-250", "251-300", "Over 300")
+AGE_SRC_COLS <- c(`Age map` = "#a9a498", `FIA plots` = "#c8553d", `The Build` = "#2b8152")
+# the two panels of an age figure: (a) the share of forest in each age class, one bar colour per series (M: series x age class, in %);
+# (b) the median age of each group (rows of D: Group, then one column per series), the groups in the order given, a point per series
+age_panels <- function(M, cols, D, ptitle, t1, t2, xlab2 = "Median stand age (years)") {
+  par(mar = c(5, 5, 3, 1)); b <- barplot(M, beside = TRUE, col = cols[rownames(M)], border = NA, axisnames = FALSE, ylab = "Share of the forest (%)", xlab = "Stand age (years)", ylim = c(0, max(M, na.rm = TRUE) * 1.15))
+  abline(h = axTicks(2), col = GRID, lwd = .6); barplot(M, beside = TRUE, col = cols[rownames(M)], border = NA, axes = FALSE, axisnames = FALSE, add = TRUE); ptitle(1, t1)
+  mtext(AGE_LAB, side = 1, at = colMeans(b), line = .5, cex = .58, col = MUTED)   # (axis() drops labels that crowd)
+  legend("bottomright", rownames(M), fill = cols[rownames(M)], border = NA, bty = "n", cex = .78, horiz = TRUE, inset = c(0, 1.01), xpd = NA)   # above the plot, clear of the bars
+  s <- setdiff(names(D), "Group"); n <- nrow(D); yy <- rev(seq_len(n)); par(mar = c(5, 13, 3, 1))
+  plot(NA, xlim = c(0, max(unlist(D[, s, with = FALSE]), na.rm = TRUE) * 1.08), ylim = c(0.5, n + 0.5), yaxt = "n", xlab = xlab2, ylab = "", bty = "l")
+  abline(v = axTicks(1), col = GRID, lwd = .6); axis(2, at = yy, labels = short_class(D$Group), las = 1, tick = FALSE, cex.axis = .72)
+  for (k in seq_len(n)) { v <- unlist(D[k, s, with = FALSE]); if (sum(!is.na(v)) > 1) segments(min(v, na.rm = TRUE), yy[k], max(v, na.rm = TRUE), yy[k], col = GRID, lwd = 3) }
+  for (j in s) points(D[[j]], yy, pch = 19, cex = 1.25, col = cols[j])
+  if ("FIA plots" %in% s) points(D[["FIA plots"]], yy, pch = 1, cex = 2, lwd = 1.8, col = cols[["FIA plots"]])   # a ring: seen when the Build sits on the plots
+  ptitle(2, t2) }
 RAMP_C <- colorRampPalette(c("#f5efe3", "#dfe6b4", "#a9cf86", "#62ab68", "#2b8152", "#195c3f", "#0f3a2b"))
 RAMP_SOIL <- colorRampPalette(c("#f5efe3", "#ead7ab", "#d4ae73", "#b07f45", "#85572b", "#5a3a1c", "#33210f"))
 RAMP_SITE <- colorRampPalette(c("#a6561c", "#d99a4e", "#f0d3a0", "#f5efe3", "#bcd9a4", "#6fae74", "#1f6f50"))   # below 1 brown, 1 cream, above green
@@ -142,6 +160,26 @@ figure_kit <- function(sc, dem, outdir, NOTE) {
 # the kit's functions and frame values into the calling function's environment (the functions keep counting figures in the kit)
 use_kit <- function(K, into) for (nm in setdiff(ls(K), c("I", "rows", "n"))) assign(nm, get(nm, envir = K), envir = into)
 
+# the Build's stand age figure (build_figures): ad = stage 5's Stand Age by Age Class rows (Source, ForestType, Number, MedianAge,
+# AgeClass, Percent); chart_figure and ptitle from the figure kit
+stand_age_figure <- function(ad, year, chart_figure, ptitle) {
+  ad <- as.data.table(ad); ad[, Percent := as.numeric(Percent)]; srcs <- names(AGE_SRC_COLS)[names(AGE_SRC_COLS) %in% ad$Source]
+    al <- ad[ForestType == "All forest"]; M <- t(sapply(srcs, function(s) al[Source == s][match(AGE_LAB, AgeClass), Percent])); M[is.na(M)] <- 0; dimnames(M) <- list(srcs, AGE_LAB)
+    md <- unique(ad[, .(Source, ForestType, MedianAge = as.numeric(MedianAge), Number = as.integer(Number))]); ft <- c("All forest", md[ForestType != "All forest" & Source == "The Build"][order(-Number), ForestType])
+    D <- data.table(Group = ft); for (s in srcs) D[[s]] <- md[Source == s][match(ft, ForestType), MedianAge]
+    hasF <- "FIA plots" %in% srcs; nF <- if (hasF) md[Source == "FIA plots" & ForestType == "All forest", Number] else 0L
+    u80 <- function(s) sum(M[s, 1:3]); o250 <- function(s) sum(M[s, 8:9])
+    chart_figure("stand_age", sprintf("Forest stand age, %s", year), paste0(
+      sprintf("(a) The share of the forest in each stand age class in the start year (%s): the age map as read (Build Options: Stand Age Source), ", year),
+      if (hasF) sprintf("the %d FIA forest conditions inside the study area (the newest visit of each plot, its stand age moved to %s; stands that started later are left out) ", nF, year) else "",
+      "and the ages the Build starts with, after the Stand Age page's rules and the regrowth and reforestation rules. ",
+      if (hasF) sprintf("Forest under 80 years: %.0f%% in the age map, %.0f%% on the plots, %.0f%% in the Build; over 250 years: %.0f%%, %.0f%% and %.0f%%. ", u80("Age map"), u80("FIA plots"), u80("The Build"), o250("Age map"), o250("FIA plots"), o250("The Build")) else
+        sprintf("Forest under 80 years: %.0f%% in the age map, %.0f%% in the Build. No FIA plots were read. ", u80("Age map"), u80("The Build")),
+      "(b) Median stand age of all forest and of each forest type with at least 10 plots. ",
+      "Plot locations are public coordinates, moved by up to a mile, so the plots say how much forest of each age there is, not where it is. Stand age is the model's least certain input: a Build well below its carbon capacity may be reading its forest too young (Stand Age page: Match the age map to the FIA plots)."),
+      1, 2, h = 1150, draw = function() age_panels(M, AGE_SRC_COLS, D, ptitle, "Forest by stand age class", "Median stand age"))
+}
+
 build_figures <- function(I, outdir) {
   scn <- I$sc_list; scol <- setNames(argb(scn$Color), scn$Name)
   cell_km2 <- prod(res(I$sc)) / 1e6; area <- cell_km2 * sum(!is.na(values(I$sc, mat = FALSE)))
@@ -205,6 +243,11 @@ build_figures <- function(I, outdir) {
         sprintf("(a) Natural cells that are barren, shrub, grass or emergent wetland in %s and that NLCD shows as forest later. Cells that come back before their ecodivision's reforestation cutoff start as forest with their age from the NLCD record (regrowth), or in their type's disturbed class where a fire perimeter dates the disturbance. Cells that come back later on forest potential (slow recovery), or at any time on non-forest potential (encroachment), start as their %s class and reforest when NLCD shows forest. Cells that flicker between forest and shrub or grass start as forest with their CMS or TreeMap age.%s%s%s",
                 I$years[1], I$years[1], if (length(P) > 1) " (b) The year NLCD first shows each of them as forest." else "",
                 if (!is.null(sm$bpsf)) sprintf(" (%s) The share of each cell on forest potential (LANDFIRE BpS 2020), which decides between slow recovery and encroachment.", letters[length(P)]) else "", relief)) } }
+
+  # ---- charts: forest stand age against the study area's FIA plots (stage 5's Stand Age by Age Class; user 2026-11-19) ---------
+  # stand age is the model's least certain input: the age map, the FIA plots inside the study area (stand age moved to the start year)
+  # and the ages the Build starts with, as shares of the forest by age class and as median ages by forest type
+  if (!is.null(I$age_dist) && nrow(I$age_dist)) stand_age_figure(I$age_dist, I$years[1], chart_figure, ptitle)
 
   # ---- maps: initial carbon ----------------------------------------------------------------------------------------------------
   if (!is.null(I$stocks) && length(I$stocks)) {

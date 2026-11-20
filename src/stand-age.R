@@ -93,3 +93,72 @@ age_assign <- function(forest, eco, cls, age, burn_year = NA, raster_age = NA, e
 age_summary <- function(cls, rule, age, source_age) {
   d <- data.table::data.table(StateClassId = cls, Rule = rule, age, source_age)[!is.na(rule)]
   d[, .(Cells = .N, MeanAge = round(mean(age), 1), SourceAge = round(mean(source_age), 1)), by = .(StateClassId, Rule = unname(AGE_RULES[Rule]))][order(StateClassId, -Cells)] }
+
+# ---- stand age against the FIA plots of the study area (user 2026-11-19) ------------------------------------------------------
+# The age maps misread a landscape's age structure: Olympic National Park starts with 40% of its forest under 80 years in TreeMap
+# and in NASA CMS alike, where the park's 104 FIA plots have 18% (and 45% over 250 years against 23 and 21%), and the park starts
+# at 74% of its carbon capacity. A plot cannot correct the map where it stands (public coordinates are moved by up to a mile; plot
+# age against the map at its place correlates at 0.18), but the plots of a study area do give how much forest of each age there is.
+# Stand Age page, "Match the age map to the FIA plots" (sheet StandAgeFia; off by default): within each forest type the cells keep
+# the map's order from youngest to oldest and take the plots' ages at the same rank (quantile mapping), so the map says where the
+# old forest is and the plots how much of it there is. A forest type with fewer than MinPlots plots (blank 30) is matched with the
+# other such types to all the study area's plots; with fewer plots than that in all, nothing is matched.
+AGE_CLASSES <- c(0, 20, 40, 80, 120, 160, 200, 250, 300, Inf)
+AGE_CLASS_LABELS <- c("1-20", "21-40", "41-80", "81-120", "121-160", "161-200", "201-250", "251-300", "Over 300")
+age_class <- function(a) AGE_CLASS_LABELS[cut(a, AGE_CLASSES, labels = FALSE)]
+
+# Stand Age: FIA (single row): match (TRUE / FALSE) and min_plots (blank 30, at least 10)
+age_fia_options <- function(x) {
+  x <- data.table::as.data.table(x); g <- function(k) if (nrow(x) && k %in% names(x)) x[[k]][1] else NA
+  v <- as.character(g("FiaMatch")); on <- !is.na(v) && (v %in% c("2", "Yes", "TRUE", "-1") || startsWith(v, "Yes"))
+  n <- suppressWarnings(as.integer(g("MinPlots"))); if (is.na(n)) n <- 30L
+  if (n < 10L) stop(sprintf("Stand Age: FIA: the fewest plots is %d; give at least 10", n), call. = FALSE)
+  list(match = on, min_plots = n) }
+
+# the forest conditions of the given plots with their stand age (PLT_CN, CONDID, COND_STATUS_CD, CONDPROP_UNADJ, STDAGE, FORTYPCD)
+age_fia_conds <- function(dm, plots) {
+  none <- data.table::data.table(PLT_CN = character(), CONDID = integer(), COND_STATUS_CD = integer(), CONDPROP_UNADJ = numeric(), STDAGE = numeric(), FORTYPCD = integer())
+  if (!nrow(plots)) return(none)
+  x <- data.table::rbindlist(lapply(unique(plots$State), function(s) { f <- file.path(dm, paste0(s, "_COND.csv")); if (!file.exists(f)) return(NULL)
+    data.table::fread(f, select = c("PLT_CN", "CONDID", "COND_STATUS_CD", "CONDPROP_UNADJ", "STDAGE", "FORTYPCD"), colClasses = list(character = "PLT_CN"), showProgress = FALSE)[PLT_CN %in% plots$CN] }))
+  if (is.null(x) || !nrow(x)) none else x }
+
+# The plots' stands at the start year. plots: CN, INVYR, STATECD, UNITCD, COUNTYCD, PLOT (inside the study area); conds as above;
+# group_of: FORTYPCD -> forest type group code. The newest visit of each plot; a forest condition with a stand age; its age moved to
+# the start year (STDAGE - (INVYR - y0)). A stand that started after the start year says nothing of what stood there then: left
+# out and counted. Returns list(plots = data.table(Age, Weight, Group), dropped, visits = c(from, to))
+age_fia_plots <- function(plots, conds, y0, group_of = function(code) code) {
+  none <- list(plots = data.table::data.table(Age = numeric(), Weight = numeric(), Group = integer()), dropped = 0L, visits = c(NA_integer_, NA_integer_))
+  if (!nrow(plots) || !nrow(conds)) return(none)
+  p <- data.table::as.data.table(plots)[INVYR < 9999][order(-INVYR)]; p <- p[!duplicated(p[, .(STATECD, UNITCD, COUNTYCD, PLOT)])]
+  cd <- data.table::as.data.table(conds)[PLT_CN %in% p$CN & COND_STATUS_CD %in% 1 & !is.na(STDAGE) & STDAGE > 0 & !is.na(CONDPROP_UNADJ) & CONDPROP_UNADJ > 0]
+  if (!nrow(cd)) return(none)
+  cd[, yr := p$INVYR[match(PLT_CN, p$CN)]][, a0 := STDAGE - (yr - y0)]
+  keep <- cd[a0 >= 1]
+  list(plots = keep[, .(Age = as.numeric(a0), Weight = as.numeric(CONDPROP_UNADJ), Group = as.integer(group_of(FORTYPCD)))], dropped = nrow(cd) - nrow(keep), visits = range(cd$yr)) }
+
+# a weighted quantile function of the plots' ages: p in 0-1 -> age (straight lines between the plots' mid-ranks)
+age_quantile <- function(age, w, p) {
+  o <- order(age); a <- age[o]; w <- w[o]; if (length(a) == 1) return(rep(a, length(p)))
+  stats::approx((cumsum(w) - w / 2) / sum(w), a, xout = p, rule = 2, ties = "ordered")$y }
+
+# Quantile mapping of the cells' ages onto the plots'. One element per cell: age (the map's, at the start year), type (the cell's
+# forest type group code, as the plots' Group) and ok (the cells to match: forest with an age the map knows). fia = age_fia_plots()$plots.
+# Returns list(age = the ages with the matched cells replaced (whole years, at least 1), matched = which cells,
+#              table = one row per group: Group (a code, or NA = the other types together), Plots, Cells, MapMedian, PlotMedian, Median)
+age_fia_match <- function(age, type, ok, fia, min_plots = 30L) {
+  out <- as.numeric(age); matched <- rep(FALSE, length(out)); tab <- list()
+  ok <- ok & !is.na(age); if (nrow(fia) < min_plots || !any(ok)) return(list(age = out, matched = matched, table = data.table::data.table()))
+  np <- fia[, .N, by = Group]; own <- np$Group[np$N >= min_plots & !is.na(np$Group)]
+  one <- function(k, f, g) { if (!any(k)) return(invisible())
+    a <- out[k]; p <- (rank(a, ties.method = "average") - 0.5) / length(a); new <- pmax(round(age_quantile(f$Age, f$Weight, p)), 1)
+    tab[[length(tab) + 1]] <<- data.table::data.table(Group = g, Plots = nrow(f), Cells = sum(k), MapMedian = stats::median(a), PlotMedian = age_quantile(f$Age, f$Weight, 0.5), Median = stats::median(new))
+    out[k] <<- new; matched[k] <<- TRUE }
+  for (g in own) one(ok & type %in% g, fia[Group %in% g], g)
+  one(ok & !(type %in% own), fia, NA_integer_)
+  list(age = out, matched = matched, table = data.table::rbindlist(tab)) }
+
+# the share of forest in each age class: age and weight (cells: 1; plots: their condition share). Returns AgeClass, Percent, in order
+age_distribution <- function(age, w = rep(1, length(age))) {
+  k <- !is.na(age) & age >= 1 & !is.na(w); cl <- factor(age_class(age[k]), AGE_CLASS_LABELS); s <- tapply(w[k], cl, sum); s[is.na(s)] <- 0
+  data.table::data.table(AgeClass = AGE_CLASS_LABELS, Percent = if (sum(s) > 0) as.numeric(100 * s / sum(s)) else NA_real_) }

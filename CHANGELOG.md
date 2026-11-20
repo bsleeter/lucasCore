@@ -4,6 +4,22 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
 
 ## Unreleased
 
+### Added
+
+- **Stand age matched to the study area's FIA plots.** The age maps can misread a landscape's age structure: Olympic National
+  Park starts with 40% of its forest under 80 years in TreeMap and in NASA CMS, where the park's 104 FIA plots have 18%, and
+  it started at 74% of its carbon capacity. Stand Age page, **Match the age map to the FIA plots** (off by default): within
+  each forest type the cells keep the map's order from youngest to oldest and take the plots' ages at the same rank (the
+  newest visit of each plot inside the study area, its stand age moved to the start year). A forest type with fewer than 30
+  plots (a setting) is matched with the other such types to all the plots; too few plots in all and nothing is matched.
+  Olympic: the median forest age goes from 152 to 233 years, and live carbon from the growth curves alone from 63 to 80 Tg C.
+  The setting is a sheet of its own, so a library needs no update. Build Results > Stand Age Matched to FIA Plots.
+- **Build Figures: Forest stand age.** The share of the forest in each stand age class in the age map, on the study area's
+  FIA plots and in the Build, and the median age by forest type; drawn whether or not the matching is on (stage 5 writes
+  Build Results > Stand Age by Age Class).
+- **Run Figures: Forest stand age (maps) and Forest by stand age (chart).** Stand age of the forest cells in the first and
+  last year of a run, the share of the forest in each age class in those years and the median age by forest type.
+
 ### Changed
 
 - **Carbon capacity: a forest cell's capacity follows its stocking.** With stocking on (Forest Cover page), the capacity of a

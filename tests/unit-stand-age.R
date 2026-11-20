@@ -72,4 +72,34 @@ s <- age_summary(clsc, age_assign(forest, ecoc, clsc, agec, burn, pct = pct)$rul
 expect("summary: a row per forest type and rule, with the cells and both mean ages", nrow(s) == 4 && s[StateClassId == "Forest: A" & Rule == AGE_RULES[["percentile"]], Cells] == 5 &&
        s[StateClassId == "Forest: A" & Rule == AGE_RULES[["percentile"]], MeanAge] == 140 && s[StateClassId == "Forest: A" & Rule == AGE_RULES[["percentile"]], SourceAge] == 107)
 
+# ---- the age map matched to the FIA plots (age_fia_options, age_fia_plots, age_quantile, age_fia_match, age_distribution) ----
+o <- age_fia_options(data.frame())
+expect("FIA options: off and 30 plots when the sheet is empty", !o$match && o$min_plots == 30L)
+expect("FIA options: 2 and Yes turn it on, 1 and No leave it off", age_fia_options(data.frame(FiaMatch = 2))$match && age_fia_options(data.frame(FiaMatch = "Yes"))$match &&
+       !age_fia_options(data.frame(FiaMatch = 1))$match && !age_fia_options(data.frame(FiaMatch = "No"))$match)
+expect("FIA options: the fewest plots is read, and under 10 is refused", age_fia_options(data.frame(FiaMatch = 2, MinPlots = 12))$min_plots == 12L && err(age_fia_options(data.frame(MinPlots = 5))))
+pl <- data.table(CN = c("a1", "a2", "b1", "c1", "d1"), INVYR = c(2005L, 2015L, 2010L, 2020L, 9999L), STATECD = 53L, UNITCD = 1L, COUNTYCD = 9L, PLOT = c(1L, 1L, 2L, 3L, 4L))
+cd <- data.table(PLT_CN = c("a1", "a2", "a2", "b1", "c1", "c1", "d1"), CONDID = c(1L, 1L, 2L, 1L, 1L, 2L, 1L), COND_STATUS_CD = c(1L, 1L, 2L, 1L, 1L, 1L, 1L),
+                 CONDPROP_UNADJ = c(1, 0.75, 0.25, 1, 0.5, 0.5, 1), STDAGE = c(100, 230, NA, 20, 300, -999, 80), FORTYPCD = c(201L, 201L, NA, 301L, 301L, 301L, 201L))
+fp <- age_fia_plots(pl, cd, 1985L, function(code) code %/% 100L * 100L)
+expect("FIA plots: the newest visit of each plot, forest conditions with an age, moved to the start year", nrow(fp$plots) == 2 && setequal(fp$plots$Age, c(200, 265)) && identical(fp$visits, c(2010L, 2020L)))
+expect("FIA plots: a stand that started after the start year is left out and counted; weights and type groups kept", fp$dropped == 1L && fp$plots[Age == 200, Weight] == 0.75 && fp$plots[Age == 265, Group] == 300L)
+expect("FIA plots: no plots or no conditions gives none", nrow(age_fia_plots(pl[0], cd, 1985L)$plots) == 0 && nrow(age_fia_plots(pl, cd[0], 1985L)$plots) == 0)
+expect("age quantile: the plots' own ages at their mid-ranks, flat beyond the ends", isTRUE(all.equal(age_quantile(c(10, 20, 30), c(1, 1, 1), c(0, 1 / 6, 0.5, 5 / 6, 1)), c(10, 10, 20, 30, 30))))
+expect("age quantile: a heavier plot takes more of the range", age_quantile(c(10, 100), c(3, 1), 0.5) < age_quantile(c(10, 100), c(1, 3), 0.5))
+fia <- data.table(Age = c(seq(210, 400, length.out = 40), seq(20, 59, length.out = 40)), Weight = 1, Group = rep(c(200L, 260L), each = 40))
+age <- c(1:100, 1:100, 1:60, NA, 50); type <- c(rep(200L, 100), rep(260L, 100), rep(280L, 60), 200L, 200L); okc <- c(rep(TRUE, 261), FALSE)
+m <- age_fia_match(age, type, okc, fia, min_plots = 30L)
+expect("FIA match: a type with enough plots takes its own plots' range", all(m$age[1:100] >= 210 & m$age[1:100] <= 400) && all(m$age[101:200] >= 20 & m$age[101:200] <= 59))
+expect("FIA match: the cells keep the map's order", all(diff(m$age[1:100]) >= 0) && all(diff(m$age[101:200]) >= 0) && cor(age[1:100], m$age[1:100], method = "spearman") > 0.99)
+expect("FIA match: the other types are matched together to all the plots", all(m$matched[201:260]) && min(m$age[201:260]) < 60 && max(m$age[201:260]) > 210 && is.na(m$table[Cells == 60, Group]) && m$table[Cells == 60, Plots] == 80)
+expect("FIA match: cells without an age or not asked for are left as they were", is.na(m$age[261]) && !m$matched[261] && m$age[262] == 50 && !m$matched[262])
+expect("FIA match: the matched median is the plots' median", abs(m$table[Group == 200, Median] - m$table[Group == 200, PlotMedian]) <= 3 && m$table[Group == 200, MapMedian] == 50.5)
+expect("FIA match: whole years of at least 1", all(m$age[m$matched] == round(m$age[m$matched])) && all(m$age[m$matched] >= 1))
+few <- age_fia_match(age, type, okc, fia[1:20], min_plots = 30L)
+expect("FIA match: fewer plots than the minimum in all matches nothing", !any(few$matched) && identical(few$age, as.numeric(age)) && nrow(few$table) == 0)
+d <- age_distribution(c(1, 20, 21, 80, 81, 250, 251, 301, NA, 0))
+expect("age distribution: nine classes that add up to 100, class edges on the upper side", nrow(d) == 9 && abs(sum(d$Percent) - 100) < 1e-9 && d[AgeClass == "1-20", Percent] == 25 && d[AgeClass == "41-80", Percent] == 12.5 && d[AgeClass == "Over 300", Percent] == 12.5)
+expect("age distribution: weights count", age_distribution(c(10, 400), c(3, 1))[AgeClass == "1-20", Percent] == 75)
+
 cat(sprintf("\n%d passed, %d failed\n", ok, bad)); if (bad) quit(status = 1)
