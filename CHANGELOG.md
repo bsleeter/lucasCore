@@ -2,6 +2,25 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+### Changed
+
+- **Carbon capacity: a forest cell's capacity follows its stocking.** With stocking on (Forest Cover page), the capacity of a
+  forest cell is scaled by the same combined multiplier as its growth and its starting stock (site productivity times
+  stocking), not by site productivity alone. The model grows a cell to its type's curve times the multiplier, so against the
+  unscaled capacity an open cell never closed its deficit and a dense one overshot. Olympic National Park: forest over 200
+  years stood at 0.90 to 1.27 of its capacity by cell, now 0.94 to 1.02; the total moves little (101.5 to 103.3 Tg C).
+  It assumes today's canopy is the density the site can hold. Takes effect when stage 8 is rerun.
+
+### Fixed
+
+- **Data Download: MTBS in a region its yearly mosaic does not reach.** A year's burn severity mosaic is only as large as
+  that year's fires (1993 ends south of the Olympic Peninsula). Such a year is now an empty file for the region, not a
+  failed dataset.
+- **Stage 6: a 30 m file that does not reach the model area** reads as no data there (no fire), where it stopped the Build
+  with "extents do not overlap" (Olympic: seven MTBS years are a strip along the region's edge).
+
 ## 1.6.0 - 2026-11-19
 
 A minor version: Data Sources gains the USFS Tree Canopy Cover folder, which a library gets from the 1.6 update when it is

@@ -200,7 +200,7 @@ capacity_parent <- function(cls, scl) { id <- as.integer(scl$Id); p <- scl$Name[
 #   steady     the steady non-forest classes' pools (StratumId, StateClassId, StateAttributeTypeId, Value); aged: the same by AgeMin for
 #              the classes that grow by age since fire (chaparral, the sage family): their last age is their mature stock
 #   regions    defaults/transitions/post-disturbance-regions.csv (Ecodivision, ShrubClass, GrassClass)
-#   m_site, m_gs   the site productivity and grass and shrub productivity multiplier of every cell, or NULL (1)
+#   m_site, m_gs   the site productivity multiplier (times the stocking multiplier when stocking is on: stage 8) and the grass and shrub productivity multiplier of every cell, or NULL (1)
 #   reach      the forest type each cell would reach (stage 5's ReforestType, by name), or NULL
 #   bps_file   LANDFIRE BpS (30 m), or NA; bps: bps_lookup(); bps_groups: bps-groups.csv; riparian_as: Reforestation Options
 #   secondary  each cell's secondary stratum name, or NULL

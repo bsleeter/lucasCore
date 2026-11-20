@@ -151,11 +151,13 @@ if (site_on) {
 # mature cells of its forest type and ecodivision. It multiplies with the site productivity multiplier and goes into the same flow
 # spatial multiplier (Site Productivity on forest growth), the product kept within 0.3-2.5. Young forest, forest that starts in a
 # disturbed class and every other land cell take the value of the mature forest near them (src/productivity-fill.R), and a cell keeps
-# its multiplier through a fire or a cut: the stand grows back to the density the site carried. The carbon capacity is not scaled
-# (an open stand is below its type's capacity, not on a poorer site).
+# its multiplier through a fire or a cut: the stand grows back to the density the site carried. The carbon capacity is scaled by the
+# same combined multiplier (user 2026-11-19: a fair comparison needs it; the model grows the cell to its type's curve times the
+# multiplier, so against an unscaled capacity an open cell never closes its deficit and a dense one overshoots. Olympic: old forest
+# at 0.90-1.27 of the unscaled capacity by cell, 0.94-1.02 of the scaled one). It assumes today's canopy is what the site carries.
 source(pkg_file("src", "forest-cover.R"))
 fo8 <- tryCatch(forest_cover_options(tryCatch(read_ds("ForestCoverOptions"), error = function(e) data.table())), error = function(e) fail("%s", conditionMessage(e)))
-stock_out <- NULL
+stock_out <- NULL; m_cap8 <- if (site_on) mult else NULL   # the multiplier of a forest cell's carbon capacity
 if (fo8$stocking == "canopy") {
   tcd <- read_data_sources("TreeCanopyFolder")$TreeCanopyFolder; tf8 <- file.path(tcd, sprintf(TCC_FILE, y0))
   if (!file.exists(tf8)) fail("Forest Cover: stocking by tree canopy cover needs the canopy of %d (%s): tick USFS Tree Canopy Cover on the Data Download page and run it, or set Stocking to the same for every cell on the Forest Cover page", y0, tf8)
@@ -198,7 +200,7 @@ if (fo8$stocking == "canopy") {
       y0, fo8$mature_age, mean(eff[isF]), qs[1], qs[2], qs[3], sum(isF & sk$own), sum(isF))
   say("Forest stocking: the forest's starting live carbon goes from %.2f to %.2f Tg C (%+.1f%%); %d of %d forest type x ecodivision groups have too few mature cells for their own mean and keep 1%s",
       before8 * cell_ha / 1e6, after8 * cell_ha / 1e6, 100 * (after8 / before8 - 1), sum(!sk$table$Own), nrow(sk$table), if (site_on) "; multiplied with the site productivity multiplier in the Site Productivity flow multiplier" else "")
-  put_multiplier("Site Productivity", fg, write_raster(setValues(rast(P), ifelse(land, comb, NA)), "SiteProductivityStocking.tif", "FLT4S"))
+  put_multiplier("Site Productivity", fg, write_raster(setValues(rast(P), ifelse(land, comb, NA)), "SiteProductivityStocking.tif", "FLT4S")); m_cap8 <- comb
   stt8 <- data.table(StateClassId = cname, canopy = cmean, m = eff, own = sk$own)[isF]
   stb8 <- stt8[, .(Cells = .N, MatureCells = sum(own), MeanCanopy = mean(canopy, na.rm = TRUE), Multiplier = mean(m), P10 = stats::quantile(m, 0.1), P90 = stats::quantile(m, 0.9)), by = StateClassId][order(-Cells)]
   stb8[, Curve := if (is.null(fit8)) "In proportion to canopy" else { i <- match(StateClassId, fit8$Type); i[is.na(i)] <- 1L; paste0(mapply(stocking_curve_label, fit8$K[i], fit8$B[i]), ifelse(fit8$Own[i] & fit8$Type[i] != "(all forest)", "", " (all forest's)")) }]
@@ -616,7 +618,7 @@ if (!all(CAPACITY_GROUPS %in% stsim_list("StockGroup")$Name)) say("Carbon capaci
     secn <- sl$Name[match(values(rast(ic$SecondaryStratumFileName[1]), mat = FALSE), as.integer(sl$Id))] }
   cb <- capacity_build(P = P, land = land, sname = sname, cname = cname, pname = capacity_parent(cname, scl), out = out, st = st, cv = cv, ri = ri_c,
     membership = read_default("stockflow", "stsim_StockTypeGroupMembership.csv"), steady = lt("grassland-shrubland.csv"), aged = rbind(lt("chaparral.csv"), lt("shrub-age.csv"), fill = TRUE),
-    regions = read_default("transitions", "post-disturbance-regions.csv"), m_site = if (site_on) mult else NULL, m_gs = if (gs_on) gmult else NULL,
+    regions = read_default("transitions", "post-disturbance-regions.csv"), m_site = m_cap8, m_gs = if (gs_on) gmult else NULL,
     reach = if (is.na(rtf)) NULL else scl$Name[match(values(rast(rtf), mat = FALSE), as.integer(scl$Id))], bps_file = bf, bps = bps_lookup(), bps_groups = read_default("landcover", "bps-groups.csv"),
     riparian_as = ro_c$riparian_as, secondary = secn, say = say,
     natural = tryCatch(capacity_natural(read_ds("CarbonCapacityOptions")), error = function(e) if (grepl("^Carbon Capacity Options", conditionMessage(e))) fail("%s", conditionMessage(e)) else "own"))
