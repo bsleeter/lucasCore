@@ -36,7 +36,7 @@
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
 suppressPackageStartupMessages({ library(terra); library(sf); library(parallel) })
-STAGE <- "6 Historical Transitions"
+STAGE <- "6 Historical Transitions"; stage_begin()
 progressBar(type = "begin", totalSteps = 9)
 
 src <- read_data_sources(c("EcodivisionFile", "NlcdFolder", "MtbsSeverityFolder", "LandfireDisturbanceFolder", "LcmsFolder"))
@@ -607,4 +607,5 @@ write_ds(summ[order(Timestep, Source, TransitionGroupId), .(Timestep, Transition
 write_ds(here[, .(StratumId = Ecodivision, StateClassId, TransitionTypeId, FiaAge = FIA, StudyAreaAge = Map, StudyAreaKm2 = round(MapArea, 2), AgeMin, Basis)], "OutputHarvestAge")
 progressBar()
 finish_checks()
+stage_done()
 progressBar(type = "end")

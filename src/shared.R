@@ -18,7 +18,10 @@ PKG <- "lucasCore"
 ds  <- function(name) paste0(PKG, "_", name)
 
 # datasheet reads retry: the console occasionally fails a read with "Object reference not set to an instance of an object"
-datasheet <- function(...) { for (k in 1:3) { r <- tryCatch(rsyncrosim::datasheet(...), error = function(e) e)
+# (rs_datasheet is the read itself; datasheet() also notes it for the Build's reuse of stages, src/resume.R)
+.rs <- new.env(); .rs$on <- FALSE; .rs$ok <- TRUE; .rs$files <- character(); .rs$md5 <- new.env(); .rs$written <- character()
+datasheet <- function(...) { r <- rs_datasheet(...); if (isTRUE(.rs$on)) tryCatch(rs_note_read(list(...), r), error = function(e) rs_off(conditionMessage(e))); r }
+rs_datasheet <- function(...) { for (k in 1:3) { r <- tryCatch(rsyncrosim::datasheet(...), error = function(e) e)
     if (!inherits(r, "error")) return(r)
     if (k < 3) { message("datasheet read failed (", conditionMessage(r), "); retrying"); Sys.sleep(3 * k) } }
   stop(r) }
@@ -34,6 +37,12 @@ fail <- function(...) stop(sprintf(...), call. = FALSE)
 # a forest class: the upland forest type groups and their forested wetland twins (Wetland: Spruce/Fir Group etc., to-do 53)
 is_forest_class <- function(x) !is.na(x) & grepl("^(Forest: |Wetland: .+ Group$)", x)
 is_wetland_forest <- function(x) !is.na(x) & grepl("^Wetland: .+ Group$", x)   # the three forested wetland classes (to-do 53)
+# (a Build stage keeps the lines it logs and the sheets it writes: a later Build that reuses the stage repeats them, src/resume.R)
+updateRunLog <- function(...) { if (isTRUE(.rs$on)) .rs$log <- c(.rs$log, paste0(...)); rsyncrosim::updateRunLog(...) }
+saveDatasheet <- function(ssimObject, data, name = NULL, ...) {
+  w <- if (isTRUE(.rs$on)) tryCatch(rs_note_write(ssimObject, data, name, list(...)), error = function(e) { rs_off(conditionMessage(e)); NULL }) else NULL
+  r <- rsyncrosim::saveDatasheet(ssimObject, data, name, ...)
+  if (!is.null(w)) { .rs$writes[[length(.rs$writes) + 1]] <- w; .rs$written <- union(.rs$written, name) }; invisible(r) }
 say  <- function(...) updateRunLog(sprintf(...))
 
 # the R version and, in a git checkout of the package, its commit: a Build logs this line and the model record reads it from the log
@@ -95,7 +104,7 @@ PACKAGE_SOURCES <- list(EcodivisionFile = c("defaults", "strata", "ecodivisions"
 source(file.path(env$PackageDirectory, "src", "datahome.R"))
 # optional = TRUE: a column with nothing set, at home or by default, gives NA instead of stopping (NCCPI, fetched when blank)
 read_data_sources <- function(cols, optional = FALSE) {
-  d <- as.data.table(datasheet(prj, ds("DataSource"), lookupsAsFactors = FALSE, optional = TRUE))
+  d <- as.data.table(rs_datasheet(prj, ds("DataSource"), lookupsAsFactors = FALSE, optional = TRUE)); rs_note_sources(d, cols)   # (resume.R: only the columns asked for count)
   def <- sheet_defaults("DataSource", quiet = TRUE)
   home <- if (nrow(d) && "DataSourcesHome" %in% names(d)) d$DataSourcesHome[1] else NA_character_
   hl <- if (!is.na(home) && nzchar(home)) home_layout(env$PackageDirectory) else NULL
@@ -134,7 +143,7 @@ read_data_sources <- function(cols, optional = FALSE) {
 # copy a Data Download scenario puts at the top of the home (looked up with no study area box: study_box() reads strata polygons
 # itself). Recorded in Data Sources Used like the Data Sources the stage read.
 strata_from_home <- function(col, layer = NA_character_) {
-  d <- as.data.table(datasheet(prj, ds("DataSource"), lookupsAsFactors = FALSE, optional = TRUE))
+  d <- as.data.table(rs_datasheet(prj, ds("DataSource"), lookupsAsFactors = FALSE, optional = TRUE)); rs_note_sources(d, character())
   home <- if (nrow(d) && "DataSourcesHome" %in% names(d)) d$DataSourcesHome[1] else NA_character_
   if (is.na(home) || !nzchar(home)) return(NA_character_)
   hp <- home_layout(env$PackageDirectory)[Column == col, HomePath]; if (length(hp) != 1) return(NA_character_)
@@ -293,7 +302,7 @@ write_size_dist <- function(sd, pri, groups, ts) {
   invisible(nrow(a)) }
 
 # a package file (defaults/...) as a data.table, every column as read
-pkg_file <- function(...) file.path(env$PackageDirectory, ...)
+pkg_file <- function(...) { p <- file.path(env$PackageDirectory, ...); if (exists(".rs")) .rs$files <- c(.rs$files, p); p }   # (noted: the package files a stage used)
 read_default <- function(...) { f <- pkg_file("defaults", ...); if (!file.exists(f)) fail("package default %s is missing", f)
   fread(f, sep = ",", colClasses = "character", na.strings = "", encoding = "UTF-8") }
 
@@ -499,3 +508,6 @@ raster_ids_in_list <- function(r, list_name) {
   v <- terra::unique(r)[[1]]; v <- v[!is.na(v)]
   ids <- as.integer(stsim_list(list_name)$Id)
   setdiff(as.integer(v), ids) }
+
+# ---- a Build stage that would give the same result again is not run again ---------------------------------------------
+source(file.path(env$PackageDirectory, "src", "resume.R"))

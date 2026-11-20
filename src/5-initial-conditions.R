@@ -20,7 +20,7 @@
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
 suppressPackageStartupMessages({ library(terra); library(sf); library(parallel) })
-STAGE <- "5 Initial Conditions"
+STAGE <- "5 Initial Conditions"; stage_begin()
 progressBar(type = "begin", totalSteps = 9)
 
 src <- read_data_sources(c("EcodivisionFile", "NlcdFolder", "Evt2016File", "CcapFile", "FriFile", "SoilCarbonFile"))   # StandAgeFile is read only for NASA CMS stand age (below): TreeMap needs no CMS map
@@ -593,4 +593,5 @@ summ <- data.table(S = vS, A = vA)[!is.na(S), .(Cells = .N, MeanAge = round(mean
 write_ds(summ[order(-Cells), .(StateClassId, Cells, MeanAge)], "OutputStateClassSummary")
 progressBar()
 finish_checks()
+stage_done()
 progressBar(type = "end")

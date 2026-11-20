@@ -13,7 +13,7 @@
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
 for (f in c("flows.R", "dom.R")) source(pkg_file("src", f))
-STAGE <- "4 Initial Stocks"
+STAGE <- "4 Initial Stocks"; stage_begin()
 progressBar(type = "begin", totalSteps = 4)
 
 cc <- as.data.table(datasheet(scn, ds("CarbonCurve"), optional = TRUE, lookupsAsFactors = FALSE))
@@ -80,4 +80,5 @@ write_ds(out[, c(list(StratumId = StratumId, StateClassId = StateClassId, Transi
                  lapply(.SD, r4)), .SDcols = c(POOL_COLS, "TotalLive", "TotalDOM")], "InitialStockCurve")
 progressBar()
 finish_checks()
+stage_done()
 progressBar(type = "end")

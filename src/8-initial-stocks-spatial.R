@@ -27,7 +27,7 @@
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
 suppressPackageStartupMessages({ library(terra); library(sf) })
-STAGE <- "8 Initial Stocks Spatial"
+STAGE <- "8 Initial Stocks Spatial"; stage_begin()
 progressBar(type = "begin", totalSteps = 5)
 src <- read_data_sources(c("FirePerimeterHistoryFile", "SoilCarbonFile"))
 opt <- read_ds("BuildOptions"); y0 <- opt$StartYear[1]
@@ -653,4 +653,5 @@ if (!is.null(cap_out)) tryCatch({ write_ds(cap_out$maps, "OutputCarbonCapacityMa
   error = function(e) say("Carbon capacity tables not written (%s): reopen the library in SyncroSim Studio so it adds the tables", conditionMessage(e)))
 progressBar()
 finish_checks()
+stage_done()
 progressBar(type = "end")

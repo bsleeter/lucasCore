@@ -9,7 +9,7 @@
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
 source(pkg_file("src", "growth.R")); source(pkg_file("src", "carbon.R")); source(pkg_file("src", "fia.R"))
 suppressPackageStartupMessages({ library(terra); library(sf); library(parallel) })
-STAGE <- "2 Growth Curves"
+STAGE <- "2 Growth Curves"; stage_begin()
 progressBar(type = "begin", totalSteps = 6)
 
 opt <- as.list(read_ds("GrowthOptions"))
@@ -46,7 +46,7 @@ if (identical(src_choice, "Copy from another library")) {
     cc <- as.data.table(got$CarbonCurve)   # names, as the sheet holds them
     cc <- cc[, .(StateClassId = as.integer(scl$Id[match(StateClassId, scl$Name)]), StratumId = as.integer(stl$Id[match(StratumId, stl$Name)]), Age, TotalLive)]
     site_table(xc, cc, cw, eco, scl, stl) }
-  finish_checks(); progressBar(type = "end"); quit(save = "no") }
+  finish_checks(); stage_done(); progressBar(type = "end"); quit(save = "no") }
 
 src <- read_data_sources(c("EcodivisionFile", "PrismFolder"))
 fixed_lag <- !is.null(opt$LagYears) && !is.na(opt$LagYears)
@@ -217,4 +217,5 @@ grDevices::dev.off()
 write_ds(data.frame(FileName = pdf_file), "OutputGrowthReport")
 progressBar()
 finish_checks()
+stage_done()
 progressBar(type = "end")

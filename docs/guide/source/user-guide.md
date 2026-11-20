@@ -809,7 +809,7 @@ Studio opens the **Run Monitor** tab when a run starts.
 
 1. **Run Monitor** lists each run in progress.
 2. **Result Id** is the number the result scenario will have (here 2), and **Status** reads Running. Write the Result Id down: the historical run and the Projection Setup depend on this result.
-3. The red square stops the run. A stopped Build leaves an incomplete result; delete it and run again.
+3. The red square stops the run. A stopped Build leaves an incomplete result. Run the Build again: the stages that finished are not repeated (section 4.6).
 4. **Run Log** stays grey while the model runs; the log opens once the run ends (section 4.3).
 
 &#91;image: The Run Monitor tab marked 1: P26 - Build with Result Id 2 and status Running marked 2, the stop button 3 and the Run Log link 4\]
@@ -979,6 +979,28 @@ The export names each file after its result scenario, for example `scn4.Fig02_la
 &#91;image: Figure 8 of the P26 Build: stacked bar charts of the area burned each year by severity, peaking in 2021, and the area harvested each year by clearcut and selection\]
 
 *Figure 4.22. Disturbance history, 1986 to 2023: (a) area burned each year by MTBS severity class and (b) area harvested each year by clearcut and selection (LCMS tree removal).*
+
+### 4.6 Running the Build again
+
+A Build that is run again does not repeat the stages that would give the same result. Each stage keeps a record of what it read: its settings and tables, the Data Sources it used with the size and date of their files, and the package's code. The next run of the same Build scenario compares each stage with the records in the scenario's earlier results, failed and stopped ones included. A stage with nothing changed copies its tables and maps from that result. Any other stage runs.
+
+**After a failure.** Fix the cause and run the Build again. The stages that finished are copied, and the Build goes on from the stage that failed. Keep the failed result until the new run is done: it holds the records.
+
+**After a change.** Only the stages that read what changed run again. A change on the Stand Age pages runs stage 5 again; the stages after it are still copied when stage 5 writes the same tables and maps as before. A path set on the Data Sources page runs only the stages that read that dataset. A fix to one stage's code runs that stage; a new version of the package's shared code runs every stage.
+
+**What it costs.** A copied stage takes one to three minutes, most of it checking that nothing changed. A Great Dismal Swamp Build at 150 m took 53 minutes the first time and 16 minutes when run again with nothing changed.
+
+**Seeing what happened.** **LUCAS Core > Build Results > Build Stages** lists each stage of the result as **Ran** or **Reused from result N**, with its minutes. In the run log a copied stage says "not run again" and names the result it came from, then repeats its log lines from that run. A stage that ran says what changed, for example "5 Initial Conditions runs: since result 43, lucasCore_StandAgeFia changed".
+
+**Turning it off.** On the Build scenario open **LUCAS Core > Build Stage Reuse** and set **Rebuild Every Stage** to Yes. Every stage then runs, and no earlier result is looked at. Set it back to No afterwards.
+
+**What a stage does not notice.** Set Rebuild Every Stage to Yes for one run after any of these:
+
+- a new version of R or of an R package;
+- a file in Data Sources Home replaced by another of the same size and date;
+- a Data Download that adds a closer-fitting region to the home, which a blank Data Source would now read.
+
+Only the eight newest results of the same Build scenario are looked at, so a copy of the scenario starts with nothing to reuse, and deleting the results removes what could be copied.
 
 ## 5. The historical run
 

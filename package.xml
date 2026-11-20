@@ -161,6 +161,13 @@
 		<column name="SpatialTilesStrata" displayName="Spatial Tiles Strata (tiles are whole units of this level; every projection Target group uses it)" dataType="Integer" validationType="List" formula1="1:Primary|2:Secondary|3:Tertiary" defaultValue="2" isOptional="True"/>
 	</dataSheet>
 
+	<dataSheet name="BuildReuse" displayName="Build Stage Reuse" isSingleRow="True">
+		<!-- user 2026-11-19 (src/resume.R): a Build stage whose settings, input tables, data source files and code are those of an earlier result of
+		     the same scenario is not run again; its tables are copied from that result. Yes here runs every stage. A sheet of its own, so a library
+		     needs no update for it -->
+		<column name="Rebuild" displayName="Rebuild Every Stage (blank = no: a stage that would give the same result is copied from an earlier result)" dataType="Integer" validationType="List" formula1="1:No|2:Yes" isOptional="True" defaultValue="1"/>
+	</dataSheet>
+
 	<!-- the Study Area page (ui/StudyAreaView.cs): a custom view on a feed, as ST-Sim does for multi-row sheets (a view on the dataSheet itself requires a single-row sheet) -->
 	<dataFeed name="StudyArea" displayName="Study Area" viewClassName="lucasCoreUI.StudyAreaView" viewClassAssembly="lucasCoreUI">
 		<dataSheet name="StudyAreaOptions"/>
@@ -1539,6 +1546,15 @@
 		<column name="Cells" dataType="Integer"/>
 	</dataSheet>
 
+	<dataSheet name="OutputBuildStage" displayName="Build Stages">
+		<!-- every Build stage (src/resume.R, stage_done): whether it ran or was copied from an earlier result, and its record - the sheets it read
+		     (by checksum), the data source files, the code, and the sheets it wrote - which a later Build compares itself with -->
+		<column name="Stage" dataType="String"/>
+		<column name="Status" displayName="Ran, or Reused from Result" dataType="String"/>
+		<column name="Minutes" dataType="Double" format="0.0" isOptional="True"/>
+		<column name="RecordFileName" displayName="Record (for a later Build)" dataType="String" isExternalFile="True" isRaster="False" isOptional="True"/>
+	</dataSheet>
+
 	<dataSheet name="OutputValidation" displayName="Validation">
 		<column name="Stage" dataType="String"/>
 		<column name="Check" dataType="String"/>
@@ -1604,6 +1620,8 @@
 		<dataSheet name="stsim_OutputOptionsSpatial" type="Both"/>
 		<dataSheet name="stsim_OutputOptions" type="Both"/>
 		<dataSheet name="OutputValidation" type="Output"/>
+		<dataSheet name="BuildReuse" type="Input"/>
+		<dataSheet name="OutputBuildStage" type="Output"/>
 	</transformer>
 
 	<transformer name="StudyArea" displayName="1 - Study Area and Strata" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/1-study-area.R">
@@ -1614,6 +1632,8 @@
 		<dataSheet name="core_SpatialMultiprocessing" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
+		<dataSheet name="BuildReuse" type="Input"/>
+		<dataSheet name="OutputBuildStage" type="Output"/>
 	</transformer>
 
 	<transformer name="GrowthCurves" displayName="2 - Fit Growth Curves" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/2-growth-curves.R">
@@ -1628,6 +1648,8 @@
 		<dataSheet name="OutputGrowthReport" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
+		<dataSheet name="BuildReuse" type="Input"/>
+		<dataSheet name="OutputBuildStage" type="Output"/>
 	</transformer>
 
 	<transformer name="CarbonFlows" displayName="3 - Carbon Flows" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/3-carbon-flows.R">
@@ -1659,6 +1681,8 @@
 		<dataSheet name="OutputCarbonRate" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
+		<dataSheet name="BuildReuse" type="Input"/>
+		<dataSheet name="OutputBuildStage" type="Output"/>
 	</transformer>
 
 	<transformer name="InitialStocks" displayName="4 - Spin-up and Initial Stocks" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/4-initial-stocks.R">
@@ -1668,6 +1692,8 @@
 		<dataSheet name="InitialStockCurve" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
+		<dataSheet name="BuildReuse" type="Input"/>
+		<dataSheet name="OutputBuildStage" type="Output"/>
 	</transformer>
 
 	<transformer name="InitialConditions" displayName="5 - Initial Conditions" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/5-initial-conditions.R">
@@ -1694,6 +1720,8 @@
 		<dataSheet name="OutputStateClassSummary" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
+		<dataSheet name="BuildReuse" type="Input"/>
+		<dataSheet name="OutputBuildStage" type="Output"/>
 	</transformer>
 
 	<transformer name="HistoricalTransitions" displayName="6 - Historical Transitions" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/6-historical-transitions.R">
@@ -1717,6 +1745,8 @@
 		<dataSheet name="OutputHarvestAge" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
+		<dataSheet name="BuildReuse" type="Input"/>
+		<dataSheet name="OutputBuildStage" type="Output"/>
 	</transformer>
 
 	<transformer name="ClimateMultipliers" displayName="7 - Climate Multipliers" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/7-climate-multipliers.R">
@@ -1729,6 +1759,8 @@
 		<dataSheet name="OutputClimateSummary" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
+		<dataSheet name="BuildReuse" type="Input"/>
+		<dataSheet name="OutputBuildStage" type="Output"/>
 	</transformer>
 
 	<transformer name="InitialStocksSpatial" displayName="8 - Initial Stock Maps" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/8-initial-stocks-spatial.R">
@@ -1759,6 +1791,8 @@
 		<dataSheet name="OutputCarbonCapacity" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
+		<dataSheet name="BuildReuse" type="Input"/>
+		<dataSheet name="OutputBuildStage" type="Output"/>
 	</transformer>
 
 	<transformer name="ProjectionTransitions" displayName="9 - Projection Transitions" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/9-projection-transitions.R">
@@ -1961,6 +1995,7 @@
 		<group name="lucasCoreGroup" displayName="LUCAS Core">
 			<item name="StudyArea"/>
 			<item name="BuildOptions"/>
+			<item name="BuildReuse"/>
 			<item name="StandAge"/>
 			<item name="ForestCoverOptions"/>
 			<item name="ClimateOptions"/>
@@ -2070,6 +2105,7 @@
 				<item name="OutputWoodProductsFigure"/>
 				<item name="OutputDataDownload"/>
 				<item name="OutputDataSources"/>
+				<item name="OutputBuildStage"/>
 				<item name="OutputValidation"/>
 			</group>
 		</group>

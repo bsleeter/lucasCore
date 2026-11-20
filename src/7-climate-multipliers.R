@@ -14,7 +14,7 @@
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
 source(pkg_file("src", "climate.R"))
 suppressPackageStartupMessages({ library(terra) })
-STAGE <- "7 Climate Multipliers"
+STAGE <- "7 Climate Multipliers"; stage_begin()
 progressBar(type = "begin", totalSteps = 5)
 
 src <- read_data_sources(c("PrismFolder"))
@@ -25,7 +25,7 @@ P <- rast(ic$StratumFileName[1])
 home_coverage(P)   # Data Sources read from the home folder must hold the study area (shared.R)
 
 wopt <- wetland_settings(); fm <- climate_flows(read_ds("ClimateOptions"), STAGE, c(`Q10 Wetland CH4` = wopt$MethaneQ10, `Q10 Wetland Soil` = wopt$SoilQ10))   # (Carbon Assumptions: Wetland Methane)
-if (!nrow(fm)) { say("Every climate effect is None: no climate multipliers written (every flow runs at normal climate)"); finish_checks(); progressBar(type = "end"); quit(save = "no") }
+if (!nrow(fm)) { say("Every climate effect is None: no climate multipliers written (every flow runs at normal climate)"); finish_checks(); stage_done(); progressBar(type = "end"); quit(save = "no") }
 prm <- climate_params(fm, P, STAGE, ic$StateClassFileName[1])
 if (any(vapply(.checks, function(x) x$Status != "Pass", TRUE))) finish_checks()
 progressBar()
@@ -78,4 +78,5 @@ keep_ic_properties(scn, ic, 7)
 write_ds(summ[, .(Timestep, FlowGroup, Model, Climate, Mean = round(Mean, 4), Min, Max)], "OutputClimateSummary")
 progressBar()
 finish_checks()
+stage_done()
 progressBar(type = "end")

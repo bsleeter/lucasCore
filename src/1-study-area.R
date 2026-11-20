@@ -19,7 +19,7 @@ source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.
 source(pkg_file("src", "strata.R"))
 suppressPackageStartupMessages({ library(terra); library(sf) })
 say(software_line())
-STAGE <- "1 Study Area"
+STAGE <- "1 Study Area"; stage_begin()
 progressBar(type = "begin", totalSteps = 6)
 
 src <- read_data_sources(c("EcodivisionFile", "NlcdFolder"))
@@ -132,4 +132,5 @@ for (lv in list(list("Secondary", sec), list("Tertiary", ter)))
   say("%s: %d of %d %s units have cells", lv[[1]], summ[Level == lv[[1]], .N], sum(unit_source(ul$Id) == lv[[2]]$Number), lv[[2]]$Preset)
 progressBar()
 finish_checks()
+stage_done()
 progressBar(type = "end")

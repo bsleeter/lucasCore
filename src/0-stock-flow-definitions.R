@@ -15,7 +15,7 @@
 # and the tabular output options (state class, transition and transition attribute summaries every year) whenever the scenario has none, dependency or not.
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
-STAGE <- "0 Stock-Flow Definitions"
+STAGE <- "0 Stock-Flow Definitions"; stage_begin()
 SHEETS <- c("stsim_FlowPathwayDiagram", "stsim_FlowOrder", "stsim_FlowTypeGroupMembership", "stsim_StockTypeGroupMembership",
             "stsim_OutputOptionsStockFlow", "stsim_OutputFilterFlows", "stsim_OutputFilterStocks")
 progressBar(type = "begin", totalSteps = length(SHEETS) + 1)
@@ -78,4 +78,5 @@ if (!nrow(as.data.table(datasheet(scn, "stsim_OutputOptions", optional = TRUE, l
 }
 progressBar()
 finish_checks()
+stage_done()
 progressBar(type = "end")

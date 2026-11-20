@@ -18,7 +18,7 @@
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
 source(pkg_file("src", "growth.R")); source(pkg_file("src", "flows.R")); source(pkg_file("src", "dom.R")); source(pkg_file("src", "calibrate.R")); source(pkg_file("src", "fia.R")); source(pkg_file("src", "disturbed-carbon.R"))
 suppressPackageStartupMessages({ library(terra); library(sf) })
-STAGE <- "3 Carbon Flows"
+STAGE <- "3 Carbon Flows"; stage_begin()
 progressBar(type = "begin", totalSteps = 6)
 
 src <- read_data_sources(c("EcodivisionFile", "PrismFolder"))
@@ -587,4 +587,5 @@ saveDatasheet(scn, as.data.frame(int_cols(fm)), "stsim_FlowMultiplier")
 saveDatasheet(scn, as.data.frame(int_cols(sav)), "stsim_StateAttributeValue")
 progressBar()
 finish_checks()
+stage_done()
 progressBar(type = "end")

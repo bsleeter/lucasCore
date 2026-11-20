@@ -6,6 +6,19 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
 
 ### Added
 
+- **A Build run again does not repeat the stages that would give the same result.** SyncroSim has no resume: a Build that
+  failed at stage 6 ran stages 0 to 5 again (40 minutes on Olympic). Each Build stage now keeps a record of its run: the
+  tables it read (by checksum; a file by its content), the Data Sources files it read (size and date), the package files it
+  used (by content), the tables it wrote and the lines it logged. The next run of the same scenario looks at its newest
+  earlier results, failed ones included, and a stage whose record matches copies its tables into the new result, repeats its
+  log lines, and ends; anything else and the stage runs, and the log says what changed. A stage after one that ran again is
+  still reused when that one wrote what it wrote before. **Build Results > Build Stages** lists each stage as Ran or Reused
+  from result N; **Build Stage Reuse > Rebuild Every Stage** turns the reuse off. Both are sheets of their own, so a library
+  needs no update. Of the Data Sources page a stage counts only the datasets it reads, so a path put right for stage 6 runs
+  stage 6 and copies the rest. A copied stage takes one to three minutes (it reads its inputs again to check them): a Great
+  Dismal Swamp Build at 150 m took 53 minutes, then 16 run again unchanged, and 16 after a failure at stage 6 was put right.
+  Not seen by a record: a change to R or its packages. User Guide section 4.6. `src/resume.R`, `tests/unit-resume.R`,
+  `tests/phaseZ33-build-resume.R`.
 - **Stand age matched to the study area's FIA plots.** The age maps can misread a landscape's age structure: Olympic National
   Park starts with 40% of its forest under 80 years in TreeMap and in NASA CMS, where the park's 104 FIA plots have 18%, and
   it started at 74% of its carbon capacity. Stand Age page, **Match the age map to the FIA plots** (off by default): within
