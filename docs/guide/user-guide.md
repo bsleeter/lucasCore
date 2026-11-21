@@ -1,6 +1,6 @@
 # lucasCore User Guide
 
-*A snapshot of the lucasCore User Guide, exported 2026-11-20. Also as a [web page](index.html), beside the [package](../blueprint/index.html) and [data](../blueprint/data.html) blueprints.*
+*A snapshot of the lucasCore User Guide, exported 2026-11-21. Also as a [web page](index.html), beside the [package](../blueprint/index.html) and [data](../blueprint/data.html) blueprints.*
 
 How to build and run a LUCAS land-use and carbon model with the lucasCore SyncroSim package, walked through on the Northern Sierra Nevada pyrome (P26) at 150 m.
 
@@ -261,7 +261,7 @@ Data Download for P26 Northern Sierra Nevada (Pyrome P26 + 10 km), By region, in
 
 #### 1.6.3 Study Area
 
-The region is the scenario's own **Study Area** page: give it the same units as the Build (section 3.2). For the example, add **Pyromes: P26 Northern Sierra Nevada**.
+The region is the scenario's own **Study Area** page: give it the Build's study area (section 3.2): named units, of one kind or several, or a boundary file of your own. A Build that lists this scenario as a dependency takes its study area from here, so it is entered once (section 3.2.3). For the example, add **Pyromes: P26 Northern Sierra Nevada**.
 
 > Counties and States are filled to their neighbours over 29 km when the Build makes its strata, so a Build of those units reaches 29 km past them. A Data Download for counties or states widens its buffer to at least 30 km to match, and the run log says so.
 
@@ -440,24 +440,68 @@ Dependencies: none. Pipeline: stages 0, 1, 5, 2, 3, 4, 6, 7, 8.
 
 ### 3.2 Study Area
 
-The study area is one or more units of one kind: states, counties, HUCs, EPA ecoregions, pyromes, ecodivisions, federal lands, GAP status, National Park Service units, FWS refuges, DoD installations, national forests, wilderness areas, tribal lands, BLM National Conservation Lands or metropolitan areas. All of CONUS is the default.
+The study area is one or more named units, of one kind or of several (section 3.2.1), or a boundary file of your own (section 3.2.2). The kinds of unit are states, counties, HUCs, EPA ecoregions, pyromes, ecodivisions, federal lands, GAP status, National Park Service units, FWS refuges, DoD installations, national forests, wilderness areas, tribal lands, BLM National Conservation Lands or metropolitan areas. All of CONUS is the default.
 
 1. Choose the **LUCAS Core (model builder)** tab.
 2. Choose **LUCAS Core > Study Area**.
 3. In **Define the study area by**, pick the kind of unit from the drop-down: **Pyromes**.
 4. Type or pick the unit in the box below, here **P26 Northern Sierra Nevada**.
-5. Click **Add**. The unit appears in the list (outlined), and the line at the bottom of the page reads "Study area: 1 unit". Add more units of the same kind to build a larger area; **Remove** takes the selected one out. Changing the kind of unit clears the list.
+5. Click **Add**. The unit appears in the list (outlined), and the line at the bottom of the page reads "Study area: 1 unit". Add more units to build a larger area; **Remove** takes the selected one out. To add units of another kind, pick that kind in the drop-down: the units already chosen stay. Picking All of CONUS clears the list, after asking.
 
 ![The Study Area page: the LUCAS Core (model builder) tab marked 1, Study Area 2, the kind of unit (Pyromes) 3, the unit box 4 and Add 5, with P26 Northern Sierra Nevada in the list](images/fig-3.3.png)
 
 *Figure 3.3. P26 Northern Sierra Nevada as the study area.*
+
+#### 3.2.1 Units of several kinds
+
+A study area can mix kinds of unit. For Olympic National Park, the national forest around it and their wilderness areas:
+
+1. Pick **National Parks** and add **Olympic National Park**.
+2. Pick **National Forests** and add **Olympic National Forest**. The park stays in the list.
+3. Pick **Wilderness** and add each wilderness area.
+
+The line at the bottom of the page then reads "Study area: 8 units of 3 kinds, taken together". The study area is every cell inside any of the units; where units overlap, a cell is counted once.
+
+**Units you did not name leave the study area.** Where the boundaries of two sources disagree by a cell or two, the secondary or tertiary strata pick up slivers of units you did not name. Stage 1 removes those cells from the study area, and the run log names each unit removed with its cells. The rule, for a strata source you named units of:
+
+- A unit you named stays, whatever its size.
+- A unit you did not name is removed. One that holds 1% of the land or more is kept and logged instead: it is the land of a named unit of another kind, such as a named wilderness inside a forest you did not name.
+- The class for cells no unit covers (Not designated wilderness, Non Federal) stays, unless it holds under 0.1% of the land.
+
+Strata of a kind you named no unit of, such as states or HUCs under a park, are left alone. For the Olympic park and forest at 150 m, stage 1 removed 57 of 275,745 cells: 54 with no manager polygon, 1 of another owner class and 2 of a wilderness that was not named.
+
+#### 3.2.2 A boundary file of your own
+
+A file of polygons can be the study area in place of named units.
+
+1. On the **Study Area** page, under **Or a boundary file of your own**, click **Browse...** and choose the file: a shapefile, GeoPackage, GeoJSON, KML or zipped shapefile, in any projection. A shapefile needs its .prj file beside it.
+2. In **Study area name**, type the name the logs and figures use. Left blank, it is the file's name.
+
+Choosing a file removes any units already chosen, after asking, and the unit list is switched off while a file is named. **Clear** takes the file out.
+
+What the Build does with it:
+
+- All the polygons of the file, in every layer, are taken together as one outline. A cell is in the study area when its centre is inside.
+- The primary strata stay the FIA ecodivisions, and the secondary and tertiary strata are the sources chosen in Build Options (section 3.3). Every unit inside the outline is kept, since no unit is named.
+- The Data Download makes its region from the outline plus the buffer. Its folder is named from the study area name and a short code of the outline, so an edited boundary gets a region of its own. The **Region name** on the Data Download page (section 1.6.4) still overrides it.
+- The file is read where it is and is not copied into the library: keep it with the library when you move or share it. A Build run again after the file changed runs every stage (section 4.6).
+- The run stops with what is wrong when the file has no projection, has no polygons, or lies outside the lower 48 states.
+
+#### 3.2.3 Taking the study area from the Data Download
+
+The Build can take its study area from the Data Download scenario, so it is entered once.
+
+1. On the Build's **General > Dependencies** page, add the Data Download scenario (the scenario itself, not one of its results).
+2. Leave the Build's own **Study Area** page empty: All of CONUS, and no boundary file.
+
+The Build's Study Area page then lists the units, or names the boundary file, and says which scenario they come from. Stage 1 logs "Study area: taken from the scenario this Build depends on". No download is run by this. A study area set on the Build's own page replaces the one from the Data Download.
 
 ### 3.3 Build Options
 
 1. Choose **Build Options**.
 2. **Cell size (m)**: `150`. A finer grid takes longer in every stage and every run; at 150 m a pyrome runs about 12 minutes per simulated year.
 3. **Historical period**: start year `1985`, end year `2023`. Land use, disturbance and climate come from these years' data. Projections start the year after the end year; their end year is set in the Projection Setup (chapter 6) and their climate in a Projection Climate scenario, so the Build itself knows nothing about projections.
-4. **Strata**: the primary strata are always the FIA ecodivisions (the growth curves are fitted on them). Choose the **Secondary** and **Tertiary** sources; here Counties and Federal Lands.
+4. **Strata**: the primary strata are always the FIA ecodivisions (the growth curves are fitted on them). Choose the **Secondary** and **Tertiary** sources; here Counties and Federal Lands. Two sources, Land Manager and Land Designation, are made of the others (section 3.3.4).
 5. **Land cover**: choose the **Forest type map** (LANDFIRE EVT, the default; USFS forest type groups; or TreeMap) and where **Stand age** comes from (NASA CMS Forest Age 1990, the default, or TreeMap). TreeMap (USFS, 30 m) gives every forest pixel an FIA plot: its forest type group, and its stand age moved from the plot's inventory year to the start year. Here USFS forest type groups and NASA CMS.
 6. **Resampling to the grid**: how each year's 30 m Annual NLCD becomes the model grid. **Modal** (default) gives each cell its most common 30 m class; **Area-matched** makes every class's area in each secondary stratum unit equal its 30 m area, year by year, changing cells only where the 30 m totals move and never removing developed land. The start-year state classes and the land-use transitions both come from these maps. Here Area-matched; section 3.3.1 compares the two.
 7. **Growth**: **Site productivity** is None (the default) or TreeMap site class. With TreeMap site class, each forest cell's growth is scaled by how productive its land is, on top of the climate multipliers, and its starting live and dead carbon by the same multiplier. The multiplier comes from the FIA site class of the cell's TreeMap plots, set for each forest type and ecodivision from the plots' live carbon against the growth curve. **Build Results > Site Productivity** lists the multipliers, and Build Figures maps them. A library made before 30 October 2026 needs tools/sync-library.R first. Here None.
@@ -560,6 +604,23 @@ Canopy recovery reads the tree canopy cover of every year of the Build, not only
 It works with either forest definition and needs the tree canopy cover of the start year. **Build Results > Forest Stocking** lists, by forest type, the cells, those with a multiplier of their own, their mean canopy, the multiplier and the curve used; **Forest Stocking: Maps** has the multiplier and the mean canopy of each cell.
 
 **Build Results > Forest Area Check (FIA)** is made by every Build, whichever choice is set. It puts the Build's forest share of the land in the start year (forest, forested wetland and disturbed forest) beside FIA's forest land share for the study area, with FIA's standard error and plot count, and says whether the two are within two standard errors. Use it to tune the threshold and the cell share: rerun stage 5 with another value and read the table again. Three cautions: FIA's plots are recent (the newest visit of each plot in the last 12 inventory years) while the Build's figure is for the start year; plot locations are approximate, which matters for a small study area; and the figure is a simple ratio over plots, not FIA's stratified estimate. With fewer than 20 plots no comparison is made.
+
+#### 3.3.4 Land Manager and Land Designation
+
+Two strata sources are stacks of the others: each cell takes the unit of the first source in the stack whose polygons cover it. They suit a study area of public lands of several kinds, where no single source tells a park from a forest or wilderness from the rest.
+
+| Source | Meant for | The stack, first to last | Cells none covers |
+| --- | --- | --- | --- |
+| **Land Manager** | Secondary strata | National Parks, FWS Refuges, National Forests, DoD Installations, Tribal Lands, Federal Lands | The Federal Lands owner class, or Non Federal |
+| **Land Designation** | Tertiary strata | Wilderness, BLM National Conservation Lands | Not designated wilderness |
+
+With Land Manager as secondary and Land Designation as tertiary, a cell keeps both: a park cell inside a wilderness is that park and that wilderness. A whole park boundary therefore stays one secondary unit, and its wilderness and non-wilderness parts are told apart by the tertiary strata.
+
+Stage 1 logs how many cells each source of a stack gave. For Olympic National Park and Olympic National Forest at 150 m, Land Manager gave the park 162,722 cells and the forest 112,966; Land Designation gave six wilderness areas and 104,623 cells not designated wilderness.
+
+- **Tiles.** Land Manager gives few secondary units (two here, the park with 59% of the land), so tiles of secondary units shorten a run little. Choose the Primary level for the tiles, or leave tiling off.
+- **Wood products.** Neither stack names a state, so the wood products stage (section 7.5) asks for the Region on its own page.
+- **Older libraries.** A library made before these sources has no rows for them in Stratum Sources. Close the library in Studio and run `Rscript tools/add-strata-stacks.R <library.ssim>` to add them.
 
 ### 3.4 Climate Options
 
