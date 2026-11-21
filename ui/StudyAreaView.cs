@@ -7,6 +7,10 @@
 // The units may be of several kinds (stage 1 takes the cells of any of them): the kind chosen only says which is added next.
 // Built by tools/build_ui.ps1 into lucasCoreUI.dll (C# 5, .NET Framework 4.8, against SyncroSim's own assemblies).
 // =============================================================================
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using System.Windows.Forms;
 using SyncroSim.Core;
 using SyncroSim.Core.Forms;
@@ -23,7 +27,26 @@ namespace lucasCoreUI
             m_picker.UnitSheet = () => this.DataFeed.GetDataSheet("lucasCore_StudyArea");
             m_picker.KindSheet = () => this.DataFeed.GetDataSheet("lucasCore_StudyAreaOptions");
             m_picker.Changed = RefreshControls; m_picker.MixKinds = true;
+            m_picker.EmptyNote = Inherited;
             this.Controls.Add(m_picker);
+        }
+
+        // With no units chosen here, the study area of the first scenario this one depends on that has one (a Build that depends on
+        // its Data Download scenario: the units are entered once; user 2026-11-21). SyncroSim hands a run the dependency's rows, so
+        // the page says so in place of "all of CONUS". A result holds the rows itself.
+        private string Inherited()
+        {
+            Scenario sc = this.Scenario; if (sc == null || sc.IsResult) return null;
+            foreach (Scenario d in sc.Dependencies)
+            {
+                DataSheet x = d.GetDataSheet("lucasCore_StudyArea"); if (x == null || !x.HasData()) continue;
+                List<string> names = x.GetData().Rows.Cast<DataRow>().Where(r => r.RowState != DataRowState.Deleted && r["UnitId"] != DBNull.Value)
+                    .Select(r => m_picker.UnitName(Convert.ToInt32(r["UnitId"])) ?? "unit " + r["UnitId"]).OrderBy(n => n, StringComparer.CurrentCultureIgnoreCase).ToList();
+                if (names.Count == 0) continue;
+                return string.Format("Study area: {0} unit{1} from \"{2}\", a scenario this one depends on: {3}. Units chosen here would replace them.",
+                                     names.Count, names.Count == 1 ? "" : "s", d.Name, string.Join("; ", names));
+            }
+            return null;
         }
 
         public override void LoadDataFeed(DataFeed dataFeed)

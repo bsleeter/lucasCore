@@ -18,6 +18,11 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   cells, forest 112,966, six wilderness areas and 104,623 cells not wilderness. A library made before this needs the two
   rows in Stratum Sources: `tools/add-strata-stacks.R` adds them (a library update will with the next release).
   `src/strata.R` (`strata_stack`, `strata_cover`, `strata_units`), `tests/unit-strata-stack.R`.
+- **A Build takes its study area from the Data Download it depends on.** The units were typed twice, once for the download
+  and once for the Build. A Build scenario whose Study Area page is empty and that lists the Data Download scenario as a
+  dependency now runs with the download's units (SyncroSim's own dependencies hand them over; no download is run). Stage 1
+  logs which scenario the study area came from, and the Build's Study Area page lists the units and names that scenario in
+  place of "all of CONUS". Units chosen on the Build's own page replace them.
 - **Units the study area does not name leave it.** Where boundaries disagree, a study area of named units picked up slivers
   in a slot: 2 cells of a wilderness nobody named, 1 cell of another owner class, 54 cells no manager polygon covers. In a
   slot the study area names units of, stage 1 now removes the cells of a unit that is not named, and of the slot's uncovered

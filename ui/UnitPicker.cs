@@ -49,7 +49,9 @@ namespace lucasCoreUI
         public Action Changed;                       // after the host's sheets change
         public Func<DataRow, bool> RowFilter = r => true;   // the rows this picker shows and edits (e.g. one surface's)
         public Action<DataRow> NewRow = r => { };           // fills the other columns of a row it adds
-        public bool MixKinds = false;                // true: units of several kinds may be chosen together (changing the kind keeps them)
+        public Func<string> EmptyNote = () => null;  // with no units chosen: what stands in for them (units a dependency supplies), or null
+        public string UnitName(int key) { Unit u; return m_unitsByKey.TryGetValue(key, out u) ? u.Name : null; }
+        public bool MixKinds = false;               // true: units of several kinds may be chosen together (changing the kind keeps them)
 
         private class KindItem { public int Number; public string Name; public override string ToString() { return Name; } }
         private readonly ComboBox m_kind = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = 320, MaxDropDownItems = 20, Margin = new Padding(3, 3, 3, 3) };
@@ -101,7 +103,7 @@ namespace lucasCoreUI
             grid.Controls.Add(m_list, 0, 2); grid.Controls.Add(m_remove, 1, 2);
             m_gbUnits.Controls.Add(grid);
 
-            m_summary.AutoSize = true; m_summary.ForeColor = SystemColors.GrayText; m_summary.Margin = new Padding(3, 6, 3, 3);
+            m_summary.AutoSize = true; m_summary.MaximumSize = new Size(640, 0);m_summary.ForeColor = SystemColors.GrayText; m_summary.Margin = new Padding(3, 6, 3, 3);
             root.Controls.Add(gbKind, 0, 0); root.Controls.Add(m_gbUnits, 0, 1); root.Controls.Add(m_summary, 0, 2);
             this.Controls.Add(root);
         }
@@ -188,7 +190,8 @@ namespace lucasCoreUI
                 bool all = m_current == 0 || s == null;
                 m_gbUnits.Enabled = !all;
                 m_gbUnits.Text = all ? "Units" : s.Name;
-                m_unitsLabel.Text = all ? AllText + ". " + AllNote : MixKinds ? "Type or pick a unit and press Add. To add units of another kind, choose that kind above: the units already chosen stay." : "Type or pick a unit and press Add.";
+                string inherited = sel.Count == 0 ? EmptyNote() : null;
+                m_unitsLabel.Text = all && inherited != null ? "No units chosen here: they come from another scenario (below). Choose a kind of unit above to set them here." : all ? AllText + ". " + AllNote : MixKinds ? "Type or pick a unit and press Add. To add units of another kind, choose that kind above: the units already chosen stay." : "Type or pick a unit and press Add.";
                 m_unitBox.BeginUpdate();
                 m_unitBox.Items.Clear();
                 if (!all)
@@ -203,7 +206,7 @@ namespace lucasCoreUI
                 m_list.Items.Clear();
                 foreach (Unit u in sel.OrderBy(x => x.Name, StringComparer.CurrentCultureIgnoreCase)) m_list.Items.Add(new ListItem(u, kinds.Count > 1));
                 m_list.EndUpdate();
-                m_summary.Text = sel.Count == 0 ? Subject + ": " + AllSummary + "."
+                m_summary.Text = inherited != null ? inherited : sel.Count == 0 ? Subject + ": " + AllSummary + "."
                     : kinds.Count > 1 ? string.Format(MixKinds ? "{0}: {1} units of {2} kinds, taken together." : "{0}: {1} units of {2} kinds (choose one kind to tidy it up).", Subject, sel.Count, kinds.Count)
                     : string.Format("{0}: {1} {2}.", Subject, sel.Count, sel.Count == 1 ? "unit" : "units");
                 m_kind.Enabled = editable; m_add.Enabled = editable; m_remove.Enabled = editable; m_unitBox.Enabled = editable;

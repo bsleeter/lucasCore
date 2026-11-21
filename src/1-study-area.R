@@ -59,6 +59,14 @@ if (length(want)) {
     e <- ext(vect(sp)) + pad; ex <- if (is.null(ex)) e else union(ex, e) }
   R <- crop(L, align(intersect(ex, ext(L)), L, snap = "out"))
   say("Study area: %s (%d x %d cells of %d m)", paste(want, collapse = ", "), ncol(R), nrow(R), res_m)
+  # a Build whose own Study Area page is empty takes the study area of a scenario it depends on (SyncroSim's dependencies: a Data
+  # Download scenario, so the units are entered once; user 2026-11-21). The result holds the rows either way, so the log says which
+  sa_from <- tryCatch({ me <- as.integer(rs_me()); tb <- rs_table(ds("StudyArea"))
+    p <- rs_sql(sprintf("select ScenarioId from core_ScenarioResult where ResultId = %d", me))$ScenarioId; p <- if (length(p)) as.integer(p[1]) else me
+    if (rs_sql(sprintf("select count(*) n from \"%s\" where ScenarioId = %d", tb, p))$n > 0) NULL else {
+      d <- rs_sql(sprintf("select d.DependencyId id, s.Name nm from core_ScenarioDependency d join core_Scenario s on s.ScenarioId = d.DependencyId where d.ScenarioId = %d and exists (select 1 from \"%s\" a where a.ScenarioId = d.DependencyId) order by d.Priority", p, tb))
+      if (nrow(d)) sprintf("%s [%d]", d$nm[1], d$id[1]) else NULL } }, error = function(e) NULL)
+  if (!is.null(sa_from)) say("Study area: taken from the scenario this Build depends on, %s (the Build's own Study Area page is empty)", sa_from)
 } else { R <- L; say("Study area: all of CONUS (%d x %d cells of %d m)", ncol(R), nrow(R), res_m) }
 home_coverage(R)   # every Data Source read from the home folder must hold the study area (shared.R)
 progressBar()
