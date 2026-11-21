@@ -374,6 +374,9 @@ rl_release <- function(lib, build, runs, out, dir, every = 1L, years = NULL, map
   fwrite(setnames(facts$validation[, .(Stage, Check, Status, Detail)], tolower), file.path(mdir, "validation.csv"), na = "NA")
   su <- facts$sources_used
   if (nrow(su)) fwrite(su[, .(stage = Stage, data_source = DataSource, origin = Origin, files = Files, bytes = Bytes, sha256 = Sha256, note = Note)], file.path(mdir, "data-sources-used.csv"), na = "NA")
+  if (!is.null(facts$boundary)) { bf <- as.character(facts$boundary$BoundaryFileName[1])   # (the study area's own boundary: stage 1's copy of its outline)
+    if (!is.na(bf) && file.exists(bf)) { file.copy(bf, file.path(mdir, "study-area-boundary.geojson"), overwrite = TRUE); say("Model: the study area boundary (study-area-boundary.geojson)") }
+    else say(sprintf("Model: the study area boundary's outline is not in the Build result (%s): run the Build again to keep it", basename(bf))) }
   xml <- c(xml, rl_write_xml(model, file.path(mdir, "model.xml")))
   say(sprintf("Model: definitions of %d names; record model.xml", nrow(defs)))
 

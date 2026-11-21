@@ -26,7 +26,9 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   page's Region name still overrides it). The primary strata stay the FIA ecodivisions and the secondary and tertiary strata
   are whatever Build Options names; no unit is removed as not named, since none is named. The file is read where it is (a
   path, as the other files a user names are), and a Build stage's record counts its content, so an edited boundary runs the
-  Build again. Stops with what is wrong: no projection, no polygons, outside the lower 48 states. A sheet of its own
+  Build again. Stage 1 keeps the outline with the Build result (**Build Results > Study Area Boundary**: its name, the
+  file it came from with its SHA-256, its area, and the outline as GeoJSON), so later stages and figures read that copy,
+  the model record names the boundary, and a data release carries it as `model/study-area-boundary.geojson`. Stops with what is wrong: no projection, no polygons, outside the lower 48 states. A sheet of its own
   (`StudyAreaBoundary`), so a library needs no update. `boundary_polygon` in `src/strata.R`, `study_boundary` in
   `src/shared.R`, `tests/unit-study-boundary.R`.
 - **A Build takes its study area from the Data Download it depends on.** The units were typed twice, once for the download

@@ -81,8 +81,10 @@ md_build_facts <- function(lib, sid) {
     m[, Origin := if (dirname(f) == home) "top" else paste0("regions/", basename(dirname(f)))]; man <- rbind(man, m)
   }
 
-  list(lib = basename(lib), result_id = sid, result_name = me$Name, parent_id = me$ParentId,
-       build = as.list(ds("lucasCore_BuildOptions")[1]), study_area = ds("lucasCore_StudyArea")$UnitId,
+  # a study area from the user's own boundary file (stage 1 keeps its outline with the result): its name stands for the units
+  bd <- ds("lucasCore_OutputStudyBoundary"); if (!nrow(bd) || !"Name" %in% names(bd) || is.na(bd$Name[1])) bd <- NULL
+  list(lib = basename(lib), result_id = sid, result_name = me$Name, parent_id = me$ParentId, boundary = bd,
+       build = as.list(ds("lucasCore_BuildOptions")[1]), study_area = if (is.null(bd)) ds("lucasCore_StudyArea")$UnitId else as.character(bd$Name[1]),
        validation = ds("lucasCore_OutputValidation"), sources_used = ds("lucasCore_OutputDataSources"), log = log,
        state_classes = sc_cls[, .(Id, Name, Description = if ("Description" %in% names(sc_cls)) Description else NA_character_)],
        map_values = vals,
@@ -236,9 +238,12 @@ md_model_content <- function(facts, dir, info = NULL) {
   acc_pat <- "^(Land cover resampling|Developed land|Decay calibration|Initial carbon|Study area: [0-9]+ of)"
   acc <- unlist(lapply(lg$stages, function(s) grep(acc_pat, s$lines, value = TRUE)))
   attracc <- paste("Each Build stage compares its products with their sources and records the result as validation checks (see Logical Consistency). Comparisons the Build reports:", md_sentences(acc))
+  bnote <- if (is.null(facts$boundary)) "" else sprintf(" The study area is a boundary supplied by the model's authors (%s, %s square kilometers; file %s, SHA-256 %s); its outline is in the model folder as study-area-boundary.geojson.",
+    facts$boundary$Name[1], format(facts$boundary$AreaKm2[1], big.mark = ","), basename(as.character(facts$boundary$SourceFile[1])), facts$boundary$Sha256[1])
   complete <- sprintf("The model covers %s land cells of %s meters in %s. Cells outside the study area carry no data. Every land cell has a primary, secondary and tertiary stratum, a state class, a stand age and all 14 carbon pools (checked by the Build).",
                       format(g$land_cells, big.mark = ","), res, where)
-  horizpa <- sprintf("Not assessed. Positions are inherited from the inputs (mostly 30-meter rasters, and vector strata) as resampled to the %s-meter model grid in NAD83 Conus Albers (EPSG:5070).", res)
+  complete <- paste0(complete, bnote)
+  horizpa <-sprintf("Not assessed. Positions are inherited from the inputs (mostly 30-meter rasters, and vector strata) as resampled to the %s-meter model grid in NAD83 Conus Albers (EPSG:5070).", res)
 
   # entities: the state class map, and the definitions table
   defs <- md_definitions(dir)

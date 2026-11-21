@@ -76,7 +76,7 @@ hl <- o("HomeLayout", 2L)   # a list column reads as its label ("National (...)"
 national <- if (is.numeric(hl)) identical(as.integer(hl), 1L) else grepl("^National", as.character(hl))
 sa <- read_ds("StudyArea"); want <- if (nrow(sa) && !national) unique(as.character(sa$UnitId)) else character()
 # the user's own boundary file replaces the named units (Study Area page, "A boundary file"; shared.R, study_boundary)
-bd <- if (national) NULL else tryCatch(study_boundary(), error = function(e) fail("%s", conditionMessage(e)))
+bd <- if (national) NULL else tryCatch(study_boundary(original = TRUE), error = function(e) fail("%s", conditionMessage(e)))
 if (!is.null(bd)) want <- character()
 rows <- sources_from_sheet(as.data.table(datasheet(prj, ds("StratumSource"), optional = TRUE, lookupsAsFactors = FALSE)))
 by_num <- setNames(rows, vapply(rows, function(s) as.character(s$Number), ""))

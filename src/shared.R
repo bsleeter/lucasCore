@@ -165,9 +165,16 @@ strata_edition_with_layer <- function(home, col, hp, pk, layer) {
   pk }
 
 # the study area's own boundary file, when the Study Area page names one (it then replaces the named units; user 2026-11-21):
-# list(name, file, poly = its outline in EPSG:5070), or NULL. Read once a stage. src/strata.R: boundary_polygon
+# list(name, file, poly = its outline in EPSG:5070), or NULL. Read once a stage. src/strata.R: boundary_polygon. Stage 1 keeps the
+# outline with the Build result (Study Area Boundary, OutputStudyBoundary), and every later stage reads that copy, so a result
+# does not need the user's file to be where it was; original = TRUE (stage 1, the Data Download) reads the user's file itself
 .study_bd <- new.env()
-study_boundary <- function() { if (!is.null(.study_bd$done)) return(.study_bd$b)
+study_boundary <- function(original = FALSE) { if (!is.null(.study_bd$done)) return(.study_bd$b)
+  if (!original) { o <- tryCatch(as.data.table(datasheet(scn, ds("OutputStudyBoundary"), optional = TRUE, lookupsAsFactors = FALSE)), error = function(e) data.table())
+    f <- if (nrow(o) && "BoundaryFileName" %in% names(o)) dependency_file(as.character(o$BoundaryFileName[1]), ds("OutputStudyBoundary")) else NA_character_
+    if (!is.na(f) && file.exists(f)) { out <- list(name = as.character(o$Name[1]), file = as.character(o$SourceFile[1]), copy = f,
+                                                   poly = sf::st_union(sf::st_transform(sf::st_geometry(sf::read_sf(f, quiet = TRUE)), 5070)))
+      .study_bd$b <- out; .study_bd$done <- TRUE; return(out) } }
   b <- tryCatch(as.data.table(datasheet(scn, ds("StudyAreaBoundary"), optional = TRUE, lookupsAsFactors = FALSE)), error = function(e) data.table())
   f <- if (nrow(b) && "BoundaryFileName" %in% names(b)) trimws(as.character(b$BoundaryFileName[1])) else NA_character_
   out <- if (is.na(f) || !nzchar(f)) NULL else { if (!exists("boundary_polygon", mode = "function")) source(pkg_file("src", "strata.R"))

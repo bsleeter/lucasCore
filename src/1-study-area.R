@@ -46,7 +46,7 @@ L <- model_lattice(eco, res_m)
 sa <- as.data.table(datasheet(scn, ds("StudyArea"), optional = TRUE, lookupsAsFactors = FALSE))
 want <- if (nrow(sa)) unique(as.character(sa$UnitId)) else character()
 # the user's own boundary file replaces the named units (Study Area page, "A boundary file"; shared.R, study_boundary)
-bd <- tryCatch(study_boundary(), error = function(e) fail("%s", conditionMessage(e)))
+bd <- tryCatch(study_boundary(original = TRUE), error = function(e) fail("%s", conditionMessage(e)))
 if (!is.null(bd)) {
   if (length(want)) say("Study area: the boundary file is used; the %d named unit%s on the Study Area page %s ignored", length(want), if (length(want) == 1) "" else "s", if (length(want) == 1) "is" else "are")
   want <- character()
@@ -140,6 +140,12 @@ for (lv in list(list(P, "Stratum"), list(S, "SecondaryStratum"), list(Tr, "Terti
   check(STAGE, sprintf("%s raster values are stsim %s Ids", lv[[2]], lv[[2]]), !length(miss),
         if (length(miss)) sprintf("not in the list: %s", paste(miss, collapse = ", ")) else "") }
 
+# the boundary file's outline stays with the result (Build Results > Study Area Boundary): GeoJSON in longitude and latitude, which is
+# written the same byte for byte each time, so a stage that reads it is still copied when stage 1 runs again on the same file
+if (!is.null(bd)) { bf <- file.path(TD(), "study-area-boundary.geojson"); if (file.exists(bf)) file.remove(bf)
+  write_sf(st_sf(name = bd$name, geometry = st_transform(bd$poly, 4326)), bf, driver = "GeoJSON", quiet = TRUE)
+  write_ds(data.table(Name = bd$name, SourceFile = bd$file, Sha256 = digest::digest(file = bd$file, algo = "sha256"), AreaKm2 = round(as.numeric(st_area(bd$poly)) / 1e6, 1), BoundaryFileName = bf), "OutputStudyBoundary")
+  say("Study area: the outline is kept with this result (Build Results > Study Area Boundary), so the model record and a data release carry it") }
 fp <- write_raster(P, "PrimaryStrata.tif"); fs <- write_raster(S, "SecondaryStrata.tif"); ft <- write_raster(Tr, "TertiaryStrata.tif")
 ic <- as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", optional = TRUE, lookupsAsFactors = FALSE))
 row <- if (nrow(ic)) ic[1] else data.table(StratumFileName = NA_character_)

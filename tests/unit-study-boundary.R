@@ -55,5 +55,15 @@ R <- rast(xmin = -2101500, xmax = -2088500, ymin = 3048500, ymax = 3061500, reso
 n <- sum(!is.na(values(rasterize(vect(boundary_polygon(g1)), R, 1))))
 expect("on a 150 m grid the outline keeps the cells whose centres it holds (100 km2: about 4,444 cells)", abs(n * 0.0225 - 100) < 1.5, sprintf("%d cells", n))
 
+# the outline kept with the Build result (stage 1): GeoJSON in longitude and latitude, the same bytes each time, the same cells read back
+keep <- function(p, f) { if (file.exists(f)) file.remove(f); write_sf(st_sf(name = "x", geometry = st_transform(p, 4326)), f, driver = "GeoJSON", quiet = TRUE); f }
+dir.create(file.path(tmp, "a")); dir.create(file.path(tmp, "b"))   # (the file's name is written into it: stage 1 always uses the same one)
+p0 <- boundary_polygon(g2); k1 <- keep(p0, file.path(tmp, "a", "study-area-boundary.geojson")); k2 <- keep(p0, file.path(tmp, "b", "study-area-boundary.geojson"))
+expect("the kept outline is written the same byte for byte each time", unname(tools::md5sum(k1)) == unname(tools::md5sum(k2)))
+back <- st_union(st_transform(st_geometry(read_sf(k1, quiet = TRUE)), 5070))
+expect("read back, the kept outline has the area of the file's", abs(km2(back) - km2(p0)) < 1e-4)
+cells <- function(p) which(!is.na(values(rasterize(vect(p), R, 1), mat = FALSE)))
+expect("read back, the kept outline keeps the same cells", identical(cells(back), cells(p0)) && length(cells(p0)) > 1000)
+
 unlink(tmp, recursive = TRUE)
 cat(sprintf("\n%d passed, %d failed\n", ok, bad)); if (bad) quit(status = 1)

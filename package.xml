@@ -1548,6 +1548,15 @@
 		<column name="Sha256" displayName="SHA-256" dataType="String"/>
 	</dataSheet>
 
+	<dataSheet name="OutputStudyBoundary" displayName="Study Area Boundary">
+		<!-- stage 1, when the study area is a boundary file (StudyAreaBoundary; user 2026-11-21): the outline it used, kept with the result as GeoJSON
+		     (longitude and latitude), so the model record and a data release carry it and a later stage does not need the user's file -->
+		<column name="Name" displayName="Study Area Name" dataType="String"/>
+		<column name="SourceFile" displayName="File It Came From" dataType="String" isOptional="True"/>
+		<column name="Sha256" displayName="That File's SHA-256" dataType="String" isOptional="True"/>
+		<column name="AreaKm2" displayName="Area (km2)" dataType="Double" format="0.0" isOptional="True"/>
+		<column name="BoundaryFileName" displayName="Outline (GeoJSON)" dataType="String" isExternalFile="True" isRaster="False" isOptional="True"/>
+	</dataSheet>
 	<dataSheet name="OutputStrataSummary" displayName="Strata Summary">
 		<column name="Level" dataType="String"/>
 		<column name="Name" dataType="String"/>
@@ -1639,6 +1648,7 @@
 		<dataSheet name="StudyAreaBoundary" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Both"/>
 		<dataSheet name="OutputStrataSummary" type="Output"/>
+		<dataSheet name="OutputStudyBoundary" type="Output"/>
 		<dataSheet name="core_SpatialMultiprocessing" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
@@ -1846,6 +1856,7 @@
 		<dataSheet name="ManagementAction" type="Input"/>
 		<dataSheet name="StudyArea" type="Input"/>
 		<dataSheet name="StudyAreaBoundary" type="Input"/>
+		<dataSheet name="OutputStudyBoundary" type="Input"/>
 		<dataSheet name="ProjectionTransition" type="Input"/>
 		<dataSheet name="ProjectionAllocation" type="Input"/>
 		<dataSheet name="SuitabilityOptions" type="Input"/>
@@ -1892,6 +1903,7 @@
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="StudyArea" type="Input"/>
 		<dataSheet name="StudyAreaBoundary" type="Input"/>
+		<dataSheet name="OutputStudyBoundary" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
 		<dataSheet name="stsim_InitialStockSpatial" type="Input"/>
 		<dataSheet name="MerchantableVolumeCurve" type="Input"/>
@@ -1920,6 +1932,7 @@
 		<dataSheet name="RunFigureOptions" type="Input"/>
 		<dataSheet name="StudyArea" type="Input"/>
 		<dataSheet name="StudyAreaBoundary" type="Input"/>
+		<dataSheet name="OutputStudyBoundary" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
 		<dataSheet name="OutputTransitionSummary" type="Input"/>
 		<dataSheet name="OutputCarbonCapacityMap" type="Input"/>
@@ -1936,6 +1949,7 @@
 		<dataSheet name="CompareRunOptions" type="Input"/>
 		<dataSheet name="StudyArea" type="Input"/>
 		<dataSheet name="StudyAreaBoundary" type="Input"/>
+		<dataSheet name="OutputStudyBoundary" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
 		<dataSheet name="OutputCarbonCapacityMap" type="Input"/>
 		<dataSheet name="OutputCompareFigure" type="Output"/>
@@ -1954,6 +1968,7 @@
 		<dataSheet name="DataDownloadOptions" type="Input"/>
 		<dataSheet name="StudyArea" type="Input"/>
 		<dataSheet name="StudyAreaBoundary" type="Input"/>
+		<dataSheet name="OutputStudyBoundary" type="Input"/>
 		<dataSheet name="OutputDataDownload" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
@@ -1980,6 +1995,7 @@
 		<dataSheet name="WoodProductsFuture" type="Input"/>
 		<dataSheet name="StudyArea" type="Input"/>
 		<dataSheet name="StudyAreaBoundary" type="Input"/>
+		<dataSheet name="OutputStudyBoundary" type="Input"/>
 		<dataSheet name="OutputWoodProducts" type="Output"/>
 		<dataSheet name="OutputWoodProductsEndUse" type="Output"/>
 		<dataSheet name="OutputWoodProductsScale" type="Output"/>
@@ -2059,6 +2075,7 @@
 			</group>
 			<group name="lucasCoreResults" displayName="Build Results">
 				<item name="OutputStrataSummary"/>
+				<item name="OutputStudyBoundary"/>
 				<item name="OutputStateClassSummary"/>
 				<item name="OutputStandAge"/>
 				<item name="OutputStandAgeCut"/>
