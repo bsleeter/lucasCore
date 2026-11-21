@@ -75,6 +75,9 @@ fetch_one <- function(k, ctx, check_only) { h <- H[[k]]
 hl <- o("HomeLayout", 2L)   # a list column reads as its label ("National (...)") or its number
 national <- if (is.numeric(hl)) identical(as.integer(hl), 1L) else grepl("^National", as.character(hl))
 sa <- read_ds("StudyArea"); want <- if (nrow(sa) && !national) unique(as.character(sa$UnitId)) else character()
+# the user's own boundary file replaces the named units (Study Area page, "A boundary file"; shared.R, study_boundary)
+bd <- if (national) NULL else tryCatch(study_boundary(), error = function(e) fail("%s", conditionMessage(e)))
+if (!is.null(bd)) want <- character()
 rows <- sources_from_sheet(as.data.table(datasheet(prj, ds("StratumSource"), optional = TRUE, lookupsAsFactors = FALSE)))
 by_num <- setNames(rows, vapply(rows, function(s) as.character(s$Number), ""))
 ul <- stsim_list("SecondaryStratum"); ul[, Id := as.integer(Id)]
@@ -93,7 +96,10 @@ if (nrow(res0) && any(res0$Status == "failed" & res0$DataSource %in% need))
 # ---- the region ------------------------------------------------------------------------------------------------------------
 buffer_km <- as.numeric(o("BufferKm", 10))
 region_home <- NULL
-if (length(want)) {
+if (length(want) || !is.null(bd)) {
+  if (!is.null(bd)) { poly <- bd$poly; label <- sprintf("%s (%s)", bd$name, basename(bd$file)); 
+    # (the folder: the boundary's name and a short code of its outline, so an edited boundary gets a region of its own)
+    rn0 <- sprintf("%s-%s", bd$name, substr(digest::digest(sf::st_as_binary(bd$poly), algo = "md5"), 1, 8)) } else {
   parts <- split(unit_native(uid), unit_source(uid))
   poly <- do.call(c, lapply(names(parts), function(k) { sp <- strata_polygons(by_num[[k]], env$PackageDirectory); sp <- sp[sp$StratumId %in% parts[[k]], ]
     if (!nrow(sp)) fail("no %s polygons for the study area units %s", by_num[[k]]$Preset, paste(parts[[k]], collapse = ", "))
@@ -103,12 +109,13 @@ if (length(want)) {
   fill_km <- max(0, vapply(by_num[names(parts)], function(s) if (identical(tolower(s$Fill), "modal")) as.numeric(s$FillDistance) / 1000 + 1 else 0, 0), na.rm = TRUE)
   if (fill_km > buffer_km) { say("Buffer %g km widened to %g km: the Build pads %s by its modal fill distance", buffer_km, fill_km,
                                  paste(unique(vapply(by_num[names(parts)], function(s) s$Preset, "")), collapse = ", ")); buffer_km <- fill_km }
+  label <- paste(want, collapse = "; "); rn0 <- want }
   poly <- st_buffer(st_union(poly), buffer_km * 1000)
   box <- as.numeric(st_bbox(poly))
-  region <- list(box = box, poly = poly, units = paste(want, collapse = "; "), buffer_km = buffer_km)
+  region <- list(box = box, poly = poly, units = label, buffer_km = buffer_km)
   say("Region: %s + %g km (%.0f x %.0f km)", region$units, buffer_km, (box[3] - box[1]) / 1000, (box[4] - box[2]) / 1000)
   # its own folder: the clips of one region never share a folder with another region's
-  rn <- o("RegionName", ""); rn <- tryCatch(region_name(if (!is.na(rn) && nzchar(trimws(rn))) trimws(rn) else want), error = function(e) fail("Data Download: Region name: %s", conditionMessage(e)))
+  rn <- o("RegionName", ""); rn <- tryCatch(region_name(if (!is.na(rn) && nzchar(trimws(rn))) trimws(rn) else rn0), error = function(e) fail("Data Download: Region name: %s", conditionMessage(e)))
   region_home <- file.path(home, "regions", rn); home_create(region_home, env$PackageDirectory)
   say("Region folder: regions/%s (national copies at the top of the home)", rn)
 } else {

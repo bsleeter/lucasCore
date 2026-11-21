@@ -45,7 +45,15 @@ if (!"StrtmId" %in% names(eco)) fail("%s has no StrtmId field", basename(src$Eco
 L <- model_lattice(eco, res_m)
 sa <- as.data.table(datasheet(scn, ds("StudyArea"), optional = TRUE, lookupsAsFactors = FALSE))
 want <- if (nrow(sa)) unique(as.character(sa$UnitId)) else character()
-if (length(want)) {
+# the user's own boundary file replaces the named units (Study Area page, "A boundary file"; shared.R, study_boundary)
+bd <- tryCatch(study_boundary(), error = function(e) fail("%s", conditionMessage(e)))
+if (!is.null(bd)) {
+  if (length(want)) say("Study area: the boundary file is used; the %d named unit%s on the Study Area page %s ignored", length(want), if (length(want) == 1) "" else "s", if (length(want) == 1) "is" else "are")
+  want <- character()
+  ex <- intersect(ext(vect(bd$poly)) + res_m, ext(L)); if (is.null(ex)) fail("Study Area boundary file: %s lies outside the model's grid", basename(bd$file))
+  R <- crop(L, align(ex, L, snap = "out"))
+  say("Study area: %s, the polygons of %s (%.0f km2; %d x %d cells of %d m)", bd$name, bd$file, as.numeric(st_area(bd$poly)) / 1e6, ncol(R), nrow(R), res_m)
+} else if (length(want)) {
   uid <- ul$Id[match(want, ul$Name)]
   if (anyNA(uid)) fail("Study Area units not in the unit list: %s", paste(want[is.na(uid)], collapse = ", "))
   parts <- split(unit_native(uid), unit_source(uid))
@@ -59,15 +67,17 @@ if (length(want)) {
     e <- ext(vect(sp)) + pad; ex <- if (is.null(ex)) e else union(ex, e) }
   R <- crop(L, align(intersect(ex, ext(L)), L, snap = "out"))
   say("Study area: %s (%d x %d cells of %d m)", paste(want, collapse = ", "), ncol(R), nrow(R), res_m)
+} else { R <- L; say("Study area: all of CONUS (%d x %d cells of %d m)", ncol(R), nrow(R), res_m) }
+if (length(want) || !is.null(bd)) {
   # a Build whose own Study Area page is empty takes the study area of a scenario it depends on (SyncroSim's dependencies: a Data
   # Download scenario, so the units are entered once; user 2026-11-21). The result holds the rows either way, so the log says which
-  sa_from <- tryCatch({ me <- as.integer(rs_me()); tb <- rs_table(ds("StudyArea"))
+  sa_from <- tryCatch({ me <- as.integer(rs_me()); tb <- rs_table(ds("StudyArea")); tb2 <- rs_table(ds("StudyAreaBoundary"))
     p <- rs_sql(sprintf("select ScenarioId from core_ScenarioResult where ResultId = %d", me))$ScenarioId; p <- if (length(p)) as.integer(p[1]) else me
-    if (rs_sql(sprintf("select count(*) n from \"%s\" where ScenarioId = %d", tb, p))$n > 0) NULL else {
-      d <- rs_sql(sprintf("select d.DependencyId id, s.Name nm from core_ScenarioDependency d join core_Scenario s on s.ScenarioId = d.DependencyId where d.ScenarioId = %d and exists (select 1 from \"%s\" a where a.ScenarioId = d.DependencyId) order by d.Priority", p, tb))
+    if (rs_sql(sprintf("select (select count(*) from \"%s\" where ScenarioId = %d) + (select count(*) from \"%s\" where ScenarioId = %d and BoundaryFileName is not null) n", tb, p, tb2, p))$n > 0) NULL else {
+      d <- rs_sql(sprintf("select d.DependencyId id, s.Name nm from core_ScenarioDependency d join core_Scenario s on s.ScenarioId = d.DependencyId where d.ScenarioId = %d and (exists (select 1 from \"%s\" a where a.ScenarioId = d.DependencyId) or exists (select 1 from \"%s\" b where b.ScenarioId = d.DependencyId and b.BoundaryFileName is not null)) order by d.Priority", p, tb, tb2))
       if (nrow(d)) sprintf("%s [%d]", d$nm[1], d$id[1]) else NULL } }, error = function(e) NULL)
   if (!is.null(sa_from)) say("Study area: taken from the scenario this Build depends on, %s (the Build's own Study Area page is empty)", sa_from)
-} else { R <- L; say("Study area: all of CONUS (%d x %d cells of %d m)", ncol(R), nrow(R), res_m) }
+}
 home_coverage(R)   # every Data Source read from the home folder must hold the study area (shared.R)
 progressBar()
 
@@ -76,7 +86,8 @@ nf <- nlcd_file(src$NlcdFolder, y0)
 if (!file.exists(nf)) fail("Annual NLCD %d not found: %s", y0, nf)
 n <- nlcd_on_grid(nf, L, R); say("NLCD %d: modal aggregation to %d m", y0, res_m)
 P <- mask(rasterize(vect(eco), R, "StrtmId"), n)
-if (length(want)) {
+if (!is.null(bd)) { P <- mask(P, rasterize(vect(bd$poly), R, 1))   # (a cell is in when its centre is)
+} else if (length(want)) {
   keep <- NULL
   for (k in names(parts)) { r <- strata_raster(by_num[[k]], env$PackageDirectory, R, P); hit <- r %in% parts[[k]]
     keep <- if (is.null(keep)) hit else keep | hit }

@@ -106,7 +106,7 @@ units_poly <- function(names) { uid <- ul$Id[match(names, ul$Name)]; if (anyNA(u
   do.call(rbind, lapply(names(parts), function(k) { s <- by_num[[k]]; p <- strata_polygons(s, env$PackageDirectory); p <- p[p$StratumId %in% parts[[k]], ]; st_sf(geometry = st_union(st_geometry(p))) })) }
 sa <- read_ds("StudyArea"); sr <- read_ds("SuitabilityRegion")
 if (!"Surface" %in% names(sr)) sr[, Surface := NA_character_]; sr[is.na(Surface), Surface := ""]
-study <- if (nrow(sa)) st_union(units_poly(as.character(sa$UnitId))) else st_as_sfc(st_bbox(ext(P), crs = st_crs(crs(P))))
+study <- if (!is.null(bd <- study_boundary())) bd$poly else if (nrow(sa)) st_union(units_poly(as.character(sa$UnitId))) else st_as_sfc(st_bbox(ext(P), crs = st_crs(crs(P))))
 # each surface's fitting region (user decision 2026-10-23: agriculture fits where there is agriculture): its own rows, else the rows
 # for every surface, else the study area. The fitting grid covers all of them and the study area.
 reg_units <- function(s) { u <- sr[Surface == s, UnitId]; if (!length(u)) u <- sr[Surface == "", UnitId]; sort(as.character(u)) }

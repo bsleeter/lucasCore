@@ -172,10 +172,19 @@
 	<dataFeed name="StudyArea" displayName="Study Area" viewClassName="lucasCoreUI.StudyAreaView" viewClassAssembly="lucasCoreUI">
 		<dataSheet name="StudyAreaOptions"/>
 		<dataSheet name="StudyArea"/>
+		<dataSheet name="StudyAreaBoundary"/>
 	</dataFeed>
 	<dataSheet name="StudyAreaOptions" displayName="Study Area Type" isSingleRow="True">
 		<!-- the kind of unit chosen on the Study Area page; stage 1 reads only the units (StudyArea) -->
 		<column name="SourceId" displayName="Define the study area by (blank = all of CONUS)" dataType="Integer" validationType="Datasheet" formula1="lucasCore_StratumSource" isOptional="True"/>
+	</dataSheet>
+	<dataSheet name="StudyAreaBoundary" displayName="Study Area Boundary File" isSingleRow="True">
+		<!-- user 2026-11-21: a study area from the user's own polygons, in place of named units (src/strata.R, boundary_polygon). A sheet of its own, so a
+		     library needs no update. The file is a path, as the other files a user names are (a shapefile keeps its companions); the column is named
+		     ...FileName so a Build stage's record counts the file's content (src/resume.R). Name: the study area's name in logs, figures and the
+		     Data Download's region folder (blank = the file's name) -->
+		<column name="Name" displayName="Study Area Name (blank = the file's name)" dataType="String" isOptional="True"/>
+		<column name="BoundaryFileName" displayName="Boundary File (polygons: shapefile, GeoPackage, GeoJSON, KML or a zipped shapefile)" dataType="String" isOptional="True"/>
 	</dataSheet>
 	<dataSheet name="StudyArea" displayName="Study Area (blank = all of CONUS)">
 		<!-- one row per unit, from any source (ecodivision, state, county, HUC, pyrome, ...): the universal unit list is stsim's Secondary Strata list -->
@@ -1627,6 +1636,7 @@
 	<transformer name="StudyArea" displayName="1 - Study Area and Strata" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/1-study-area.R">
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="StudyArea" type="Input"/>
+		<dataSheet name="StudyAreaBoundary" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Both"/>
 		<dataSheet name="OutputStrataSummary" type="Output"/>
 		<dataSheet name="core_SpatialMultiprocessing" type="Output"/>
@@ -1835,6 +1845,7 @@
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="ManagementAction" type="Input"/>
 		<dataSheet name="StudyArea" type="Input"/>
+		<dataSheet name="StudyAreaBoundary" type="Input"/>
 		<dataSheet name="ProjectionTransition" type="Input"/>
 		<dataSheet name="ProjectionAllocation" type="Input"/>
 		<dataSheet name="SuitabilityOptions" type="Input"/>
@@ -1880,6 +1891,7 @@
 	<transformer name="BuildFigures" displayName="12 - Build Figures" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/12-build-figures.R">
 		<dataSheet name="BuildOptions" type="Input"/>
 		<dataSheet name="StudyArea" type="Input"/>
+		<dataSheet name="StudyAreaBoundary" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
 		<dataSheet name="stsim_InitialStockSpatial" type="Input"/>
 		<dataSheet name="MerchantableVolumeCurve" type="Input"/>
@@ -1907,6 +1919,7 @@
 	<transformer name="RunFigures" displayName="13 - Run Figures" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/13-run-figures.R">
 		<dataSheet name="RunFigureOptions" type="Input"/>
 		<dataSheet name="StudyArea" type="Input"/>
+		<dataSheet name="StudyAreaBoundary" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
 		<dataSheet name="OutputTransitionSummary" type="Input"/>
 		<dataSheet name="OutputCarbonCapacityMap" type="Input"/>
@@ -1922,6 +1935,7 @@
 	<transformer name="CompareRuns" displayName="14 - Compare Runs" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/14-compare-runs.R">
 		<dataSheet name="CompareRunOptions" type="Input"/>
 		<dataSheet name="StudyArea" type="Input"/>
+		<dataSheet name="StudyAreaBoundary" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
 		<dataSheet name="OutputCarbonCapacityMap" type="Input"/>
 		<dataSheet name="OutputCompareFigure" type="Output"/>
@@ -1939,6 +1953,7 @@
 	<transformer name="DataDownload" displayName="15 - Data Download" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/15-data-download.R">
 		<dataSheet name="DataDownloadOptions" type="Input"/>
 		<dataSheet name="StudyArea" type="Input"/>
+		<dataSheet name="StudyAreaBoundary" type="Input"/>
 		<dataSheet name="OutputDataDownload" type="Output"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 	</transformer>
@@ -1964,6 +1979,7 @@
 		<dataSheet name="WoodProductsOptions" type="Input"/>
 		<dataSheet name="WoodProductsFuture" type="Input"/>
 		<dataSheet name="StudyArea" type="Input"/>
+		<dataSheet name="StudyAreaBoundary" type="Input"/>
 		<dataSheet name="OutputWoodProducts" type="Output"/>
 		<dataSheet name="OutputWoodProductsEndUse" type="Output"/>
 		<dataSheet name="OutputWoodProductsScale" type="Output"/>

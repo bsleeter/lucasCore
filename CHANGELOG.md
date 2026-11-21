@@ -18,6 +18,17 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   cells, forest 112,966, six wilderness areas and 104,623 cells not wilderness. A library made before this needs the two
   rows in Stratum Sources: `tools/add-strata-stacks.R` adds them (a library update will with the next release).
   `src/strata.R` (`strata_stack`, `strata_cover`, `strata_units`), `tests/unit-strata-stack.R`.
+- **A study area from your own boundary file.** The study area was named units only (parks, forests, states, watersheds).
+  The **Study Area** page now also takes a file of polygons: a shapefile, GeoPackage, GeoJSON, KML or zipped shapefile, in
+  any projection. Its polygons, taken together, are the study area in place of named units (choosing a file removes the
+  units chosen), and a cell is in when its centre is. A **Study area name** on the same page is used in logs and figures
+  and, with a short code of the outline, for the Data Download's region folder (blank = the file's name; the Data Download
+  page's Region name still overrides it). The primary strata stay the FIA ecodivisions and the secondary and tertiary strata
+  are whatever Build Options names; no unit is removed as not named, since none is named. The file is read where it is (a
+  path, as the other files a user names are), and a Build stage's record counts its content, so an edited boundary runs the
+  Build again. Stops with what is wrong: no projection, no polygons, outside the lower 48 states. A sheet of its own
+  (`StudyAreaBoundary`), so a library needs no update. `boundary_polygon` in `src/strata.R`, `study_boundary` in
+  `src/shared.R`, `tests/unit-study-boundary.R`.
 - **A Build takes its study area from the Data Download it depends on.** The units were typed twice, once for the download
   and once for the Build. A Build scenario whose Study Area page is empty and that lists the Data Download scenario as a
   dependency now runs with the download's units (SyncroSim's own dependencies hand them over; no download is run). Stage 1

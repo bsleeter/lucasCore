@@ -37,7 +37,7 @@ ic <- tryCatch(as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", op
 gf <- figures_grid(ic, lib_file, vapply(R, function(r) as.integer(r$rid), 0L), say)   # the Build's state class map, else a run's own (src/run-figures.R)
 if (is.na(gf)) fail("no state class map: this scenario must depend on the runs' Build result, and neither it nor the runs have their map in the library's data folder")
 grid <- rast(gf)
-sa <- read_ds("StudyArea"); label <- if (nrow(sa)) paste(sub("^[^:]*: ", "", sa$UnitId), collapse = ", ") else "CONUS"
+sa <- read_ds("StudyArea"); label <- study_label(sa)
 dem <- tryCatch(read_data_sources("ElevationFile")$ElevationFile, error = function(e) { say("No hillshade: %s", conditionMessage(e)); NULL })
 progressBar()
 

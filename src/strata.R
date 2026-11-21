@@ -223,3 +223,33 @@ strata_unnamed <- function(v, named, numbers, defaults, sliver = 0.001, keep = 0
   t[, Share := Cells / length(v)][, Default := Id %in% as.numeric(defaults)]
   t[, Drop := ifelse(Default, Share < sliver, Share < keep)]
   t[order(-Cells)] }
+
+# ---- a study area from the user's own boundary file (Study Area page, "A boundary file"; user 2026-11-21) --------------------------
+# The polygons of file f as one outline in the model's projection (EPSG:5070): every polygon of the file, taken together. A shapefile,
+# GeoPackage, GeoJSON or KML (whatever GDAL reads), or a zipped shapefile. Stops with what is wrong: no such file, not readable, no
+# projection, no polygons, or nothing inside the lower 48 states (CONUS_BOX: xmin, ymin, xmax, ymax, the model lattice's reach).
+CONUS_BOX <- c(-2400000, 200000, 2300000, 3200000)
+boundary_polygon <- function(f) {
+  f <- trimws(as.character(f)[1]); stopf <- function(...) stop(sprintf("Study Area boundary file: %s", sprintf(...)), call. = FALSE)
+  if (is.na(f) || !nzchar(f)) stopf("no file named")
+  if (!file.exists(f)) stopf("%s does not exist", f)
+  src <- if (grepl("[.]zip$", f, ignore.case = TRUE)) paste0("/vsizip/", normalizePath(f, winslash = "/")) else f
+  ly <- tryCatch(sf::st_layers(src), error = function(e) stopf("%s could not be read (%s)", basename(f), conditionMessage(e)))
+  if (!length(ly$name)) stopf("%s has no layers", basename(f))
+  parts <- lapply(ly$name, function(n) { g <- tryCatch(sf::st_geometry(sf::read_sf(src, layer = n, quiet = TRUE)), error = function(e) NULL); if (is.null(g) || !length(g)) return(NULL)
+    if (is.na(sf::st_crs(g))) stopf("%s has no projection (a shapefile needs its .prj file)", basename(f))
+    g <- sf::st_zm(g); g <- g[!sf::st_is_empty(g)]; if (!length(g)) return(NULL)
+    g <- sf::st_make_valid(g); t <- as.character(sf::st_geometry_type(g)); gc <- g[t == "GEOMETRYCOLLECTION"]; g <- g[t %in% c("POLYGON", "MULTIPOLYGON")]
+    if (length(gc)) g <- c(g, tryCatch(suppressWarnings(sf::st_collection_extract(gc, "POLYGON")), error = function(e) gc[0]))
+    if (!length(g)) return(NULL)
+    sf::st_transform(g, 5070) })
+  parts <- parts[!vapply(parts, is.null, TRUE)]
+  if (!length(parts)) stopf("%s has no polygons (points and lines cannot bound a study area)", basename(f))
+  p <- sf::st_make_valid(sf::st_union(do.call(c, parts)))
+  if (!(as.numeric(sf::st_area(p)) > 0)) stopf("the polygons of %s have no area", basename(f))
+  b <- as.numeric(sf::st_bbox(p))
+  if (b[3] <= CONUS_BOX[1] || b[1] >= CONUS_BOX[3] || b[4] <= CONUS_BOX[2] || b[2] >= CONUS_BOX[4]) stopf("%s lies outside the lower 48 states, which is all the model covers", basename(f))
+  p }
+# the name of a boundary's study area: the one typed, else the file's name without its folder and ending
+boundary_name <- function(name, f) { n <- if (length(name) && !is.na(name[1])) trimws(as.character(name[1])) else ""
+  if (nzchar(n)) n else sub("[.][^.]*$", "", basename(as.character(f)[1])) }

@@ -65,7 +65,7 @@ gf <- figures_grid(ic, lib_file, c(rid, hid), say)   # the Build's state class m
 if (is.na(gf)) fail("no state class map: this scenario must depend on the run's Build result, and neither it nor the run has its map in the library's data folder")
 grid <- rast(gf)
 scl <- stsim_list("StateClass"); cols <- setNames(argb(scl$Color), scl$Name)
-sa <- read_ds("StudyArea"); label <- if (nrow(sa)) paste(sub("^[^:]*: ", "", sa$UnitId), collapse = ", ") else "CONUS"
+sa <- read_ds("StudyArea"); label <- study_label(sa)
 obs <- read_ds("OutputTransitionSummary"); if (!nrow(obs)) obs <- NULL
 dem <- tryCatch(read_data_sources("ElevationFile")$ElevationFile, error = function(e) { say("No hillshade: %s", conditionMessage(e)); NULL })
 progressBar()

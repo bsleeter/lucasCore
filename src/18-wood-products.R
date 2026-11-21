@@ -100,7 +100,7 @@ say("%d: %.3f Tg C stored (%.3f-%.3f), %.3f Tg C/yr stock change; %.0f%% of what
     100 * (g("Stored", R$end)$Mean - g("Stored", R$start - 1L)$Mean) / A[Variable == "Removed" & Source == "Run", sum(Mean)], R$start - 1L)
 progressBar()
 
-sa <- read_ds("StudyArea"); label <- if (nrow(sa)) paste(sub("^[^:]*: ", "", sa$UnitId), collapse = ", ") else "Study area"
+sa <- read_ds("StudyArea"); label <- study_label(sa, "Study area")
 note <- sprintf("%s. Run %d (%s), %d-%d%s. USFS harvested wood products model (production approach); %s.", label, rid, rn, R$start - 1L, R$end,
                 if (is.na(R$history)) "" else sprintf(" from historical run %d", R$history),
                 if (D$central) "published parameter values" else sprintf("%d parameter draws per iteration", D$n))

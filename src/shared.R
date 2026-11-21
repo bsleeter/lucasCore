@@ -164,6 +164,19 @@ strata_edition_with_layer <- function(home, col, hp, pk, layer) {
   for (i in seq_len(nrow(ed))) { p <- home_path(ed$Dir[i], hp); if (!is.na(p) && has(p)) return(list(dir = ed$Dir[i], path = p)) }
   pk }
 
+# the study area's own boundary file, when the Study Area page names one (it then replaces the named units; user 2026-11-21):
+# list(name, file, poly = its outline in EPSG:5070), or NULL. Read once a stage. src/strata.R: boundary_polygon
+.study_bd <- new.env()
+study_boundary <- function() { if (!is.null(.study_bd$done)) return(.study_bd$b)
+  b <- tryCatch(as.data.table(datasheet(scn, ds("StudyAreaBoundary"), optional = TRUE, lookupsAsFactors = FALSE)), error = function(e) data.table())
+  f <- if (nrow(b) && "BoundaryFileName" %in% names(b)) trimws(as.character(b$BoundaryFileName[1])) else NA_character_
+  out <- if (is.na(f) || !nzchar(f)) NULL else { if (!exists("boundary_polygon", mode = "function")) source(pkg_file("src", "strata.R"))
+    list(name = boundary_name(if ("Name" %in% names(b)) b$Name[1] else NA, f), file = f, poly = boundary_polygon(f)) }
+  .study_bd$b <- out; .study_bd$done <- TRUE; out }
+# the study area's name for a figure or a table: the boundary's name, else the units' names without their kind, else `none`
+study_label <- function(sa, none = "CONUS") { bd <- tryCatch(study_boundary(), error = function(e) NULL)
+  if (!is.null(bd)) bd$name else if (nrow(sa)) paste(sub("^[^:]*: ", "", sa$UnitId), collapse = ", ") else none }
+
 # the study area's box (EPSG:5070, xmin, ymin, xmax, ymax), for choosing among region folders: stage 1's primary strata raster
 # when the scenario has one, else the Study Area units' polygons; all of CONUS with no Study Area
 study_box <- function() {
@@ -173,7 +186,7 @@ study_box <- function() {
     sa <- read_ds("StudyArea"); want <- if (nrow(sa)) unique(as.character(sa$UnitId)) else character()
     if (nrow(ic) && "StratumFileName" %in% names(ic) && !is.na(ic$StratumFileName[1]) && file.exists(ic$StratumFileName[1])) {
       r <- terra::rast(ic$StratumFileName[1]); as.vector(terra::ext(terra::project(terra::as.polygons(terra::ext(r), crs = terra::crs(r)), "EPSG:5070")))[c(1, 3, 2, 4)]
-    } else if (!length(want)) c(-2400000, 200000, 2300000, 3200000) else {
+    } else if (!is.null(bd <- study_boundary())) as.numeric(sf::st_bbox(bd$poly)) else if (!length(want)) c(-2400000, 200000, 2300000, 3200000) else {
       if (!exists("strata_polygons", mode = "function")) source(pkg_file("src", "strata.R"))
       ul <- stsim_list("SecondaryStratum"); uid <- as.integer(ul$Id)[match(want, ul$Name)]
       if (anyNA(uid)) stop("Study Area units not in the unit list: ", paste(want[is.na(uid)], collapse = ", "))
