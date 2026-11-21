@@ -6,6 +6,25 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
 
 ### Added
 
+- **Land Manager and Land Designation as strata, and a study area of units of several kinds.** A study area such as Olympic
+  National Park, Olympic National Forest and the wilderness areas in them could be named only one kind of unit at a time, and
+  no one strata source told park from forest or wilderness from the rest. Two new Stratum Sources are stacks of the others: a
+  cell takes the unit of the first source in the stack whose polygons cover it. **Land Manager** (National Parks, FWS Refuges,
+  National Forests, DoD Installations, Tribal Lands, then the Federal Lands owner classes) is meant for the secondary strata,
+  and **Land Designation** (Wilderness, BLM National Conservation Lands, then Not designated wilderness) for the tertiary, so
+  a cell keeps both its manager and its designation. A stack has no polygons or units of its own (`Stack` and `StackRest` in
+  `defaults/strata/presets.csv`); stage 1 logs how many cells each source gave. On the **Study Area** page the units may now be
+  of several kinds: choosing another kind keeps the units already chosen. Olympic park and forest at 150 m: park 162,724
+  cells, forest 112,966, six wilderness areas and 104,623 cells not wilderness. A library made before this needs the two
+  rows in Stratum Sources: `tools/add-strata-stacks.R` adds them (a library update will with the next release).
+  `src/strata.R` (`strata_stack`, `strata_cover`, `strata_units`), `tests/unit-strata-stack.R`.
+- **Units the study area does not name leave it.** Where boundaries disagree, a study area of named units picked up slivers
+  in a slot: 2 cells of a wilderness nobody named, 1 cell of another owner class, 54 cells no manager polygon covers. In a
+  slot the study area names units of, stage 1 now removes the cells of a unit that is not named, and of the slot's uncovered
+  class when that holds under 0.1% of the land (Not designated wilderness, most of a forest, stays). A unit not named that
+  holds 1% of the land or more is kept and logged: it is the land of a named unit of another kind (a named wilderness inside
+  a forest that was not named). A slot the study area names no unit of (states or watersheds under a park) is left alone.
+  The log names each unit removed with its cells. Always on. `strata_unnamed` in `src/strata.R`.
 - **A Build run again does not repeat the stages that would give the same result.** SyncroSim has no resume: a Build that
   failed at stage 6 ran stages 0 to 5 again (40 minutes on Olympic). Each Build stage now keeps a record of its run: the
   tables it read (by checksum; a file by its content), the Data Sources files it read (size and date), the package files it
@@ -45,6 +64,10 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
 
 ### Fixed
 
+- **Initial Conditions: a forest type with no replacement-fire interval on the map stopped the Build.** Stage 5 required a
+  LANDFIRE return interval for every ecodivision and forest type; one cell of Western Oak in the Marine Mountains of the
+  Olympic park and forest Build had none, and the Build stopped after 18 minutes. Such a pair now takes the median of its
+  forest type in the other ecodivisions, or of every type (the rule stage 3 already used), and the log names it.
 - **Data Download: MTBS in a region its yearly mosaic does not reach.** A year's burn severity mosaic is only as large as
   that year's fires (1993 ends south of the Olympic Peninsula). Such a year is now an empty file for the region, not a
   failed dataset.

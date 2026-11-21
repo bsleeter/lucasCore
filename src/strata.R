@@ -21,6 +21,12 @@
 # A source's own ids must be below UNIT_OFFSET (1e8) and Number x 1e8 must fit stsim's 32-bit integers (Number <= 20), so HUC10 and
 # HUC12 codes cannot be ids. Files named in a row are read relative to defaults/strata when they are not absolute. A preset whose File
 # is blank, or names a file this machine lacks, reads its polygons from Data Sources Home (strata_path; presets.csv DataSource).
+# A stack (user 2026-11-20: Secondary = Land Manager, Tertiary = Land Designation) is a source with no polygons or units of its own:
+# presets.csv Stack names other sources in order, and each cell takes the unit of the first of them whose polygons cover it (a park
+# before the national forest whose boundary overlaps it; wilderness before a monument that holds it). Cells none covers take the
+# StackRest source's unit under its own fill rule (blank = the last of the stack): Land Manager's are the Federal Lands owner classes,
+# Land Designation's "Not designated wilderness". Its cells carry the members' own unit ids, so the unit lists need nothing new, and
+# its Number (100 and up) is never a unit id. The Stratum Sources sheet has no Stack column: a row is a stack by its preset's name.
 # =============================================================================
 
 STRATA_COLS <- c("Preset", "Number", "Prefix", "File", "Layer", "IdField", "NameTemplate", "ValueField", "CrosswalkFile", "ListFile",
@@ -31,7 +37,7 @@ unit_source <- function(uid) as.integer(as.numeric(uid) %/% UNIT_OFFSET)
 unit_native <- function(uid) as.integer(as.numeric(uid) %% UNIT_OFFSET)
 
 # the universal unit list (Name, Id) over every source row: "<Prefix>: <name>", Number x 1e8 + id
-universal_list <- function(rows, pkgdir) data.table::rbindlist(lapply(rows, function(s) {
+universal_list <- function(rows, pkgdir) data.table::rbindlist(lapply(Filter(function(s) is.null(strata_stack(s, pkgdir)), rows), function(s) {
   if (is.na(s$Number) || is.na(s$Prefix)) stop(sprintf("strata source %s needs a Number and a Prefix", s$Preset), call. = FALSE)
   l <- strata_list(s, pkgdir)
   if (any(l$Id >= UNIT_OFFSET)) stop(sprintf("%s: ids must be below %.0f", s$Preset, UNIT_OFFSET), call. = FALSE)
@@ -53,6 +59,14 @@ sources_from_sheet <- function(ss) { ss <- data.table::as.data.table(ss); if ("N
 strata_presets <- function(pkgdir) {
   p <- data.table::fread(file.path(pkgdir, "defaults", "strata", "presets.csv"), sep = ",", colClasses = "character", na.strings = "")
   setNames(lapply(seq_len(nrow(p)), function(i) strata_row(p[i])), p$Preset) }
+
+# a stack's members (in order) and the source of its uncovered cells, from the preset of its name; NULL for a source of its own polygons
+strata_stack <- function(s, pkgdir) {
+  p <- data.table::fread(file.path(pkgdir, "defaults", "strata", "presets.csv"), sep = ",", colClasses = "character", na.strings = "")
+  i <- match(s$Preset, p$Preset); if (is.na(i) || !"Stack" %in% names(p) || is.na(p$Stack[i]) || !nzchar(p$Stack[i])) return(NULL)
+  m <- trimws(strsplit(p$Stack[i], ";", fixed = TRUE)[[1]]); m <- m[nzchar(m)]
+  rest <- if ("StackRest" %in% names(p) && !is.na(p$StackRest[i]) && nzchar(p$StackRest[i])) trimws(p$StackRest[i]) else m[length(m)]
+  list(members = m, rest = rest) }
 
 strata_file <- function(f, pkgdir) if (is.na(f)) NA_character_ else if (grepl("^([A-Za-z]:|/|\\\\)", f)) f else file.path(pkgdir, "defaults", "strata", f)
 
@@ -136,11 +150,17 @@ strata_list <- function(s, pkgdir) {
   if (anyDuplicated(l$Name)) stop(sprintf("%s: several ids share a name - add the id to the NameTemplate", s$Preset), call. = FALSE)
   l[order(Id)] }
 
-# a strata raster on grid R for the land cells of P (the primary strata): rasterize, resolve overlaps, fill uncovered land cells
-strata_raster <- function(s, pkgdir, R, P) {
+# a source's polygons on grid R with overlaps resolved and nothing filled: cells no polygon covers stay NA. list(r, p = the polygons)
+strata_cover <- function(s, pkgdir, R) {
   p <- strata_polygons(s, pkgdir, bbox = sf::st_bbox(terra::ext(R) + 50000, crs = sf::st_crs(5070)))
   fun <- switch(tolower(s$Overlap), last = "last", min = "min", max = "max", first = "first", stop(sprintf("unknown Overlap %s", s$Overlap)))
-  if (fun == "last") r <- terra::rasterize(terra::vect(p), R, "StratumId") else r <- terra::rasterize(terra::vect(p), R, "StratumId", fun = fun)
+  if (!nrow(p)) return(list(r = terra::init(R, NA_integer_), p = p))   # (no polygon of the source reaches the grid)
+  r <- if (fun == "last") terra::rasterize(terra::vect(p), R, "StratumId") else terra::rasterize(terra::vect(p), R, "StratumId", fun = fun)
+  list(r = r, p = p) }
+
+# a strata raster on grid R for the land cells of P (the primary strata): rasterize, resolve overlaps, fill uncovered land cells
+strata_raster <- function(s, pkgdir, R, P) {
+  cv <- strata_cover(s, pkgdir, R); r <- cv$r; p <- cv$p
   gap <- !is.na(P) & is.na(r)
   n_gap <- terra::global(gap, "sum", na.rm = TRUE)[[1]]
   if (n_gap > 0) {
@@ -152,9 +172,54 @@ strata_raster <- function(s, pkgdir, R, P) {
     } else if (fill != "nearest") stop(sprintf("unknown Fill %s", s$Fill), call. = FALSE)
     # Nearest, and any land cell a modal window did not reach: the id of the nearest polygon
     cells <- which(terra::values(!is.na(P) & is.na(r), mat = FALSE) == 1)
+    if (length(cells) && !nrow(p)) stop(sprintf("%s: no polygon reaches the study area, so its uncovered cells cannot take the nearest unit", s$Preset), call. = FALSE)
     if (length(cells)) { pts <- sf::st_as_sf(as.data.frame(terra::xyFromCell(R, cells)), coords = c("x", "y"), crs = 5070)
       r[cells] <- p$StratumId[sf::st_nearest_feature(pts, p)] }
   }
   r <- terra::mask(r, P)
   attr(r, "filled") <- n_gap; attr(r, "unmatched") <- attr(p, "unmatched")
   r }
+
+# a slot's units on grid R for the land cells of P, as universal ids (Number x UNIT_OFFSET + the source's own id). A source of its
+# own polygons: strata_raster. A stack: the first member whose polygons cover the cell, the rest from its StackRest source.
+# rows: every source row by name. Attributes: filled (cells no polygon covered), unmatched, numbers (the Numbers its units can
+# have), and for a stack cells (land cells each member gave, in order) and rest (the source of the others)
+strata_units <- function(s, pkgdir, R, P, rows) {
+  st <- strata_stack(s, pkgdir)
+  if (is.null(st)) { r <- strata_raster(s, pkgdir, R, P); out <- r + s$Number * UNIT_OFFSET
+    attr(out, "filled") <- attr(r, "filled"); attr(out, "unmatched") <- attr(r, "unmatched"); attr(out, "numbers") <- s$Number; return(out) }
+  miss <- setdiff(c(st$members, st$rest), names(rows))
+  if (length(miss)) stop(sprintf("%s stacks %s, which Stratum Sources does not list: add the source%s to the library", s$Preset, paste(miss, collapse = ", "), if (length(miss) > 1) "s" else ""), call. = FALSE)
+  land <- !is.na(P); out <- NULL; um <- character(); n <- integer()
+  for (k in st$members) { m <- rows[[k]]; cv <- strata_cover(m, pkgdir, R); u <- terra::mask(cv$r + m$Number * UNIT_OFFSET, P)
+    new <- if (is.null(out)) !is.na(u) else is.na(out) & !is.na(u)
+    n[k] <- as.integer(terra::global(new & land, "sum", na.rm = TRUE)[[1]]); out <- if (is.null(out)) u else terra::cover(out, u)
+    um <- c(um, attr(cv$p, "unmatched")) }
+  n_gap <- as.integer(terra::global(land & is.na(out), "sum", na.rm = TRUE)[[1]])
+  if (n_gap > 0) { m <- rows[[st$rest]]; out <- terra::cover(out, strata_raster(m, pkgdir, R, P) + m$Number * UNIT_OFFSET) }
+  out <- terra::mask(out, P)
+  attr(out, "filled") <- n_gap; attr(out, "unmatched") <- unique(um); attr(out, "cells") <- n; attr(out, "rest") <- st$rest
+  attr(out, "numbers") <- unique(vapply(rows[unique(c(st$members, st$rest))], function(m) as.integer(m$Number), 1L))
+  out }
+
+# ---- units the study area does not name (user 2026-11-20: remove them from the study area) ------------------------------------------
+# A study area of named units (a park, the forest around it, their wilderness areas) leaves cells in a slot that belong to none of
+# them: a sliver of another unit where two boundaries disagree (2 cells of a wilderness nobody named), or the few cells no polygon of
+# the slot covers. Those cells leave the study area. v: a slot's universal unit ids by cell (NA = not land); named: the universal ids
+# of the study area's units; numbers: the Numbers the slot's units can have; defaults: the universal ids of its sources' uncovered
+# classes (Non Federal, Not designated wilderness). The rule, for a slot the study area names units of (any other slot - states or
+# watersheds under a park - is left alone: an empty table):
+#   a named unit stays, whatever its size;
+#   a unit not named is removed, unless it holds `keep` of the land or more (1%): that is no sliver but land a named unit of another
+#     kind brought in (a named wilderness inside a forest that was not named), and removing it would take a named unit's land;
+#   an uncovered class stays (Not designated wilderness is most of a forest), unless it holds under `sliver` of the land (0.1%).
+# Returns Id, Cells, Share, Default, Drop for the units present and not named.
+strata_unnamed <- function(v, named, numbers, defaults, sliver = 0.001, keep = 0.01) {
+  none <- data.table::data.table(Id = numeric(), Cells = integer(), Share = numeric(), Default = logical(), Drop = logical())
+  if (!length(named) || !any(unit_source(named) %in% numbers)) return(none)
+  v <- v[!is.na(v)]; if (!length(v)) return(none)
+  t <- data.table::data.table(Id = as.numeric(v))[, .(Cells = .N), by = Id][!Id %in% as.numeric(named)]
+  if (!nrow(t)) return(none)
+  t[, Share := Cells / length(v)][, Default := Id %in% as.numeric(defaults)]
+  t[, Drop := ifelse(Default, Share < sliver, Share < keep)]
+  t[order(-Cells)] }

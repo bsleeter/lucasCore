@@ -4,6 +4,7 @@
 // Replaces the default grid of lucasCore_StudyArea, whose single drop-down listed all 6,221 units of every source. The sheet itself
 // is unchanged (one row per unit, UnitId = a stsim_SecondaryStratum row), so stage 1 reads it as before; the kind chosen is kept in
 // Study Area Type (lucasCore_StudyAreaOptions.SourceId). The picker itself is UnitPicker (shared with the Spatial Allocation page).
+// The units may be of several kinds (stage 1 takes the cells of any of them): the kind chosen only says which is added next.
 // Built by tools/build_ui.ps1 into lucasCoreUI.dll (C# 5, .NET Framework 4.8, against SyncroSim's own assemblies).
 // =============================================================================
 using System.Windows.Forms;
@@ -21,7 +22,7 @@ namespace lucasCoreUI
             m_picker.Dock = DockStyle.Fill; m_picker.Padding = new Padding(8);
             m_picker.UnitSheet = () => this.DataFeed.GetDataSheet("lucasCore_StudyArea");
             m_picker.KindSheet = () => this.DataFeed.GetDataSheet("lucasCore_StudyAreaOptions");
-            m_picker.Changed = RefreshControls;
+            m_picker.Changed = RefreshControls; m_picker.MixKinds = true;
             this.Controls.Add(m_picker);
         }
 

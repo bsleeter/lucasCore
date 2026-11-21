@@ -97,7 +97,8 @@ namespace lucasCoreUI
             r.Controls.Add(Caption("Start year:")); r.Controls.Add(Number(m_start, 60));
             r.Controls.Add(Caption("End year:")); r.Controls.Add(Number(m_end, 60));
 
-            GroupBox gStrata = Group("Strata", out r, Note("Primary strata are always the FIA ecodivisions."));
+            GroupBox gStrata = Group("Strata", out r, Note("Primary strata are always the FIA ecodivisions."),
+                Note("Land Manager and Land Designation are made of several sources. Land Manager names each cell's National Park Service unit, wildlife refuge, national forest, military installation or tribal land, in that order where boundaries overlap, and gives all other land its federal owner class. Land Designation names its wilderness, else its BLM monument, conservation area or wilderness study area. Used together (Land Manager as secondary, Land Designation as tertiary) every cell carries both, so a park's wilderness and the rest of the park are told apart while the park stays whole."));
             r.Controls.Add(Caption("Secondary:")); r.Controls.Add(List(m_secondary, 200));
             r.Controls.Add(Caption("Tertiary:")); r.Controls.Add(List(m_tertiary, 200));
             m_secondary.SelectionChangeCommitted += (s, e) => WriteSource(m_secondary, "SecondarySourceId");

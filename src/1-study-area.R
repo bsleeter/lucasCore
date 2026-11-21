@@ -35,6 +35,7 @@ by_num <- setNames(rows, vapply(rows, function(s) as.character(s$Number), ""))
 pick <- function(v, default, what) { nm <- if (is.null(v) || !length(v) || is.na(v[1])) default else v[1]
   if (!nm %in% names(rows)) fail("Build Options: %s source '%s' is not in Stratum Sources (%s)", what, nm, paste(names(rows), collapse = ", "))
   rows[[nm]] }
+SMALL_UNIT_CELLS <- 25L
 sec <- pick(opt$SecondarySourceId, "States", "Secondary Strata"); ter <- pick(opt$TertiarySourceId, "Federal Lands", "Tertiary Strata")
 say("Strata: primary = FIA ecodivisions; secondary = %s; tertiary = %s", sec$Preset, ter$Preset)
 
@@ -76,16 +77,38 @@ if (length(want)) {
 progressBar()
 
 # ---- strata: the chosen sources on the study area's land cells, as universal unit ids ------------------------------------
-S <- strata_raster(sec, env$PackageDirectory, R, P); um_s <- attr(S, "unmatched"); fs_ <- attr(S, "filled")
-if (fs_ > 0) say("Secondary: %d land cells outside the %s polygons filled (%s)", fs_, sec$Preset, sec$Fill)
-S <- S + sec$Number * UNIT_OFFSET
+# (strata_units: universal unit ids. A stack - Land Manager, Land Designation - takes each cell's unit from the first of its sources
+# that covers the cell, and says which gave how many cells: a source listed below ones that cover it gives none)
+stack_say <- function(level, s, r) { n <- attr(r, "cells"); if (is.null(n)) return(invisible())
+  say("%s: %s takes each cell from the first of its sources that covers it: %s; the other %d cells from %s", level, s$Preset,
+      paste(sprintf("%s %d cells", names(n), n), collapse = ", "), attr(r, "filled"), attr(r, "rest"))
+  if (any(n == 0)) say("%s: no cells from %s (no unit of %s in the study area, or the sources above cover it)", level, paste(names(n)[n == 0], collapse = ", "),
+                       if (sum(n == 0) == 1) "it" else "them") }
+S <- strata_units(sec, env$PackageDirectory, R, P, rows); um_s <- attr(S, "unmatched"); fs_ <- attr(S, "filled"); num_s <- attr(S, "numbers")
+if (fs_ > 0 && is.null(attr(S, "cells"))) say("Secondary: %d land cells outside the %s polygons filled (%s)", fs_, sec$Preset, sec$Fill)
+stack_say("Secondary", sec, S)
 P <- mask(P, S)
 progressBar()
-Tr <- strata_raster(ter, env$PackageDirectory, R, P); um_t <- attr(Tr, "unmatched"); ft_ <- attr(Tr, "filled")
-if (ft_ > 0) say("Tertiary: %d land cells outside the %s polygons filled (%s)", ft_, ter$Preset, ter$Fill)
-Tr <- Tr + ter$Number * UNIT_OFFSET
+Tr <- strata_units(ter, env$PackageDirectory, R, P, rows); um_t <- attr(Tr, "unmatched"); ft_ <- attr(Tr, "filled"); num_t <- attr(Tr, "numbers")
+if (ft_ > 0 && is.null(attr(Tr, "cells"))) say("Tertiary: %d land cells outside the %s polygons filled (%s)", ft_, ter$Preset, ter$Fill)
+stack_say("Tertiary", ter, Tr)
 for (u in list(list(um_s, "Secondary"), list(um_t, "Tertiary"))) if (length(u[[1]]))
   say("%s: source values with no crosswalk id (treated as uncovered): %s", u[[2]], paste(u[[1]], collapse = ", "))
+# units the study area does not name leave it (strata.R, strata_unnamed): boundary slivers of other units, and the few cells no
+# polygon of a slot covers. Each is named in the log with its cells; a unit not named that holds 1% of the land or more is kept and said
+if (length(want)) {
+  gone <- NULL
+  for (lv in list(list("Secondary", S, num_s), list("Tertiary", Tr, num_t))) {
+    dflt <- unlist(lapply(rows, function(m) if (as.integer(m$Number) %in% lv[[3]] && !is.na(m$DefaultId)) as.numeric(m$Number) * UNIT_OFFSET + as.numeric(m$DefaultId)))
+    d <- strata_unnamed(values(lv[[2]], mat = FALSE), uid, lv[[3]], dflt); if (!nrow(d)) next
+    d[, Name := ul$Name[match(Id, ul$Id)]]; rm_ <- d[Drop == TRUE]; kp <- d[Drop == FALSE & Default == FALSE]
+    if (nrow(rm_)) { say("%s: %d unit%s the study area does not name removed from it (%d cells): %s", lv[[1]], nrow(rm_), if (nrow(rm_) == 1) "" else "s", sum(rm_$Cells),
+                         paste(sprintf("%s %d%s", rm_$Name, rm_$Cells, ifelse(rm_$Default, " (cells no unit covers, under 0.1% of the land)", "")), collapse = "; "))
+      hit <- lv[[2]] %in% rm_$Id; gone <- if (is.null(gone)) hit else gone | hit }
+    if (nrow(kp)) say("%s: kept though the study area does not name %s (1%% of the land or more, so not a sliver): %s. These are cells of a named unit of another kind; add the unit to the Study Area page if all of it is wanted",
+                      lv[[1]], if (nrow(kp) == 1) "it" else "them", paste(sprintf("%s %d cells (%.1f%%)", kp$Name, kp$Cells, 100 * kp$Share), collapse = "; ")) }
+  if (!is.null(gone)) { P <- mask(P, gone, maskvalues = 1); S <- mask(S, P); Tr <- mask(Tr, P) }
+}
 progressBar()
 
 # ---- checks and outputs ---------------------------------------------------------------------------------------------
@@ -128,8 +151,12 @@ summ <- rbindlist(lapply(list(list(P, "Primary", "Stratum"), list(S, "Secondary"
   f <- as.data.table(freq(lv[[1]]))[, .(Id = as.integer(value), Cells = as.integer(count))]
   l <- stsim_list(lv[[3]]); f[, Name := l$Name[match(Id, as.integer(l$Id))]]; f[, Level := lv[[2]]]; f[, .(Level, Name, Id, Cells)] }))
 write_ds(summ, "OutputStrataSummary")
-for (lv in list(list("Secondary", sec), list("Tertiary", ter)))
-  say("%s: %d of %d %s units have cells", lv[[1]], summ[Level == lv[[1]], .N], sum(unit_source(ul$Id) == lv[[2]]$Number), lv[[2]]$Preset)
+for (lv in list(list("Secondary", sec, num_s), list("Tertiary", ter, num_t))) {
+  say("%s: %d of %d %s units have cells", lv[[1]], summ[Level == lv[[1]], .N], sum(unit_source(ul$Id) %in% lv[[3]]), lv[[2]]$Preset)
+  # small units are kept (a park's land outside its wilderness can be small and matter) and named, so a boundary sliver is seen
+  sm <- summ[Level == lv[[1]] & Cells < SMALL_UNIT_CELLS][order(Cells)]
+  if (nrow(sm)) say("%s: %d unit%s under %d cells (kept: named in the study area, or of a kind the study area names no unit of): %s%s", lv[[1]], nrow(sm), if (nrow(sm) == 1) "" else "s", SMALL_UNIT_CELLS,
+                    paste(sprintf("%s %d", head(sm$Name, 12), head(sm$Cells, 12)), collapse = "; "), if (nrow(sm) > 12) sprintf("; and %d more (Build Results > Strata Summary)", nrow(sm) - 12) else "") }
 progressBar()
 finish_checks()
 stage_done()

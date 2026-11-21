@@ -23,7 +23,7 @@ lay <- home_layout(pkg); ep <- fread(file.path(pkg, "defaults", "download", "end
 H <- download_handlers()
 
 # ---- presets -> datasets --------------------------------------------------------------------------------------------------
-dl <- pre[Preset != "FIA Ecodivisions"]
+dl <- pre[Preset != "FIA Ecodivisions" & is.na(Stack)]   # (a stack - Land Manager, Land Designation - reads its members' polygons)
 expect("every preset but the ecodivisions names a dataset", !anyNA(dl$DataSource))
 expect("each dataset has a data-sources.csv row with a home place", all(dl$DataSource %in% lay[!is.na(HomePath), Column]))
 expect("each dataset has a handler", all(dl$DataSource %in% names(H)), paste(setdiff(dl$DataSource, names(H)), collapse = ", "))
@@ -38,7 +38,10 @@ expect("data-sources.csv and endpoints.csv parse with their columns", ncol(lay) 
 # ---- shipped unit lists ---------------------------------------------------------------------------------------------------
 ul <- fread(file.path(pkg, "defaults", "library", "project", "stsim_SecondaryStratum.csv"), colClasses = c(Name = "character", Id = "numeric"))
 rows <- strata_presets(pkg)
-expect("every preset has a ListFile on disk", all(vapply(rows, function(s) !is.na(s$ListFile) && file.exists(strata_file(s$ListFile, pkg)), TRUE)))
+expect("every preset with units of its own has a ListFile on disk", all(vapply(Filter(function(s) is.null(strata_stack(s, pkg)), rows), function(s) !is.na(s$ListFile) && file.exists(strata_file(s$ListFile, pkg)), TRUE)))
+st <- lapply(Filter(function(s) !is.null(strata_stack(s, pkg)), rows), strata_stack, pkgdir = pkg)
+expect("the stacks name sources that are presets with polygons of their own, and no stack", length(st) == 2 && all(vapply(st, function(k) all(c(k$members, k$rest) %in% dl$Preset) && k$rest %in% k$members, TRUE)))
+expect("a stack's Number is not a unit number (100 and up)", all(as.integer(pre[!is.na(Stack), Number]) >= 100) && all(as.integer(pre[is.na(Stack), Number]) <= 20))
 u2 <- universal_list(rows, pkg)
 expect(sprintf("the presets' lists give the shipped universal list (%d units)", nrow(ul)), nrow(u2) == nrow(ul) && setequal(paste(u2$Name, u2$Id), paste(ul$Name, as.integer(ul$Id))))
 

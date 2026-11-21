@@ -511,6 +511,16 @@ z[, `:=`(StratumId = stl$Name[match(P, as.integer(stl$Id))], StateClassId = scl$
 ri <- z[!is.na(fri), .(ReturnInterval = as.integer(round(mean(fri))), Cells = .N), by = .(StratumId, StateClassId)]
 st <- z[!is.na(soil) & soil > 0, .(SoilTarget = round(mean(soil), 2), Cells = .N), by = .(StratumId, StateClassId)]
 fc <- unique(z[, .(StratumId, StateClassId)])
+# An ecodivision x class whose cells have no replacement-fire interval on the LANDFIRE map (a few cells of a rare type, all on a
+# setting with no replacement fire) takes the median of its class in the other ecodivisions, or of every class: the rule stage 3
+# uses for a class it has no interval for (Olympic NP + NF Build, 2026-11-20: 21 of 22 had one, and the Build stopped here).
+ri_fill <- fc[!ri, on = .(StratumId, StateClassId)]
+if (nrow(ri_fill) && nrow(ri)) {
+  ri_fill[, Cells := z[.SD, on = .(StratumId, StateClassId), .N, by = .EACHI]$N]
+  ri_fill[, ReturnInterval := vapply(StateClassId, function(k) { v <- ri[StateClassId == k, ReturnInterval]; as.integer(round(median(if (length(v)) v else ri$ReturnInterval))) }, 1L)]
+  say("Return intervals: %d ecodivision x class with no replacement-fire interval on the map take the median of their class elsewhere (or of every class): %s",
+      nrow(ri_fill), paste(sprintf("%s / %s (%d cells) %d yr", ri_fill$StratumId, ri_fill$StateClassId, ri_fill$Cells, ri_fill$ReturnInterval), collapse = "; "))
+  ri <- rbind(ri, ri_fill[, .(StratumId, StateClassId, ReturnInterval, Cells)]) }
 progressBar()
 
 # ---- checks -----------------------------------------------------------------------------------------------------------

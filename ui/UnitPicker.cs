@@ -4,7 +4,9 @@
 // Shared by the Study Area page and the Suitability Fitting Region on the Spatial Allocation page. The host gives the multi-row
 // sheet of units (UnitId = a stsim_SecondaryStratum row) and where the chosen kind is saved (a StratumSource key in a single-row
 // sheet column), loads the lists when its feed loads and calls ShowData from its RefreshControls. A unit's source is its universal
-// Id / 100,000,000 (src/strata.R, UNIT_OFFSET).
+// Id / 100,000,000 (src/strata.R, UNIT_OFFSET). A source with no units of its own is not a kind (Land Manager and Land Designation
+// are stacks of other sources). MixKinds (the Study Area page; user 2026-11-20: a park, the national forest around it and their
+// wilderness areas as one study area): the units chosen may be of several kinds, and the drop-down only says which kind is added next.
 // =============================================================================
 using System;
 using System.Collections.Generic;
@@ -47,6 +49,7 @@ namespace lucasCoreUI
         public Action Changed;                       // after the host's sheets change
         public Func<DataRow, bool> RowFilter = r => true;   // the rows this picker shows and edits (e.g. one surface's)
         public Action<DataRow> NewRow = r => { };           // fills the other columns of a row it adds
+        public bool MixKinds = false;                // true: units of several kinds may be chosen together (changing the kind keeps them)
 
         private class KindItem { public int Number; public string Name; public override string ToString() { return Name; } }
         private readonly ComboBox m_kind = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = 320, MaxDropDownItems = 20, Margin = new Padding(3, 3, 3, 3) };
@@ -129,7 +132,8 @@ namespace lucasCoreUI
             m_refreshing = true;
             m_kind.BeginUpdate(); m_kind.Items.Clear();
             m_kind.Items.Add(new KindItem { Number = 0, Name = AllText });
-            foreach (Source s in m_sources) m_kind.Items.Add(new KindItem { Number = s.Number, Name = s.Name });
+            var withUnits = new HashSet<int>(m_unitsByKey.Values.Select(SourceOf));   // (a stack has no units of its own: not a kind)
+            foreach (Source s in m_sources.Where(q => withUnits.Contains(q.Number))) m_kind.Items.Add(new KindItem { Number = s.Number, Name = s.Name });
             m_kind.EndUpdate();
             m_refreshing = false;
         }
@@ -173,7 +177,9 @@ namespace lucasCoreUI
                 List<Unit> sel = SelectedUnits();
                 List<int> kinds = sel.Select(SourceOf).Distinct().ToList();
                 // the chosen kind follows the units when there are any, else the saved kind
-                m_current = sel.Count > 0 ? kinds[0] : SavedKind();
+                // (MixKinds: the kind last picked, while it is a kind; else that of the units)
+                int saved = SavedKind();
+                m_current = sel.Count == 0 ? saved : MixKinds && saved != 0 ? saved : kinds[0];
                 int idx = 0;
                 for (int k = 0; k < m_kind.Items.Count; k++) if (((KindItem)m_kind.Items[k]).Number == m_current) idx = k;
                 if (m_kind.Items.Count > 0) m_kind.SelectedIndex = idx;
@@ -182,7 +188,7 @@ namespace lucasCoreUI
                 bool all = m_current == 0 || s == null;
                 m_gbUnits.Enabled = !all;
                 m_gbUnits.Text = all ? "Units" : s.Name;
-                m_unitsLabel.Text = all ? AllText + ". " + AllNote : "Type or pick a unit and press Add.";
+                m_unitsLabel.Text = all ? AllText + ". " + AllNote : MixKinds ? "Type or pick a unit and press Add. To add units of another kind, choose that kind above: the units already chosen stay." : "Type or pick a unit and press Add.";
                 m_unitBox.BeginUpdate();
                 m_unitBox.Items.Clear();
                 if (!all)
@@ -198,7 +204,7 @@ namespace lucasCoreUI
                 foreach (Unit u in sel.OrderBy(x => x.Name, StringComparer.CurrentCultureIgnoreCase)) m_list.Items.Add(new ListItem(u, kinds.Count > 1));
                 m_list.EndUpdate();
                 m_summary.Text = sel.Count == 0 ? Subject + ": " + AllSummary + "."
-                    : kinds.Count > 1 ? string.Format("{0}: {1} units of {2} kinds (choose one kind to tidy it up).", Subject, sel.Count, kinds.Count)
+                    : kinds.Count > 1 ? string.Format(MixKinds ? "{0}: {1} units of {2} kinds, taken together." : "{0}: {1} units of {2} kinds (choose one kind to tidy it up).", Subject, sel.Count, kinds.Count)
                     : string.Format("{0}: {1} {2}.", Subject, sel.Count, sel.Count == 1 ? "unit" : "units");
                 m_kind.Enabled = editable; m_add.Enabled = editable; m_remove.Enabled = editable; m_unitBox.Enabled = editable;
             }
@@ -212,9 +218,10 @@ namespace lucasCoreUI
             int number = item.Number;
             if (number == m_current) return;
             List<Unit> sel = SelectedUnits();
-            if (sel.Count > 0)
+            // MixKinds: another kind keeps the units chosen; only "all" (no kind) removes them
+            if (sel.Count > 0 && !(MixKinds && number != 0))
             {
-                string msg = string.Format("Changing the kind of unit removes the {0} unit{1} already chosen. Continue?", sel.Count, sel.Count == 1 ? "" : "s");
+                string msg = string.Format(MixKinds ? "{2} removes the {0} unit{1} already chosen. Continue?" : "Changing the kind of unit removes the {0} unit{1} already chosen. Continue?", sel.Count, sel.Count == 1 ? "" : "s", AllText);
                 if (MessageBox.Show(this, msg, Confirm, MessageBoxButtons.OKCancel, MessageBoxIcon.Question) != DialogResult.OK) { Changed(); return; }
                 DataSheet ds = UnitSheet(); ds.DeleteRows(Live(ds.GetData()).Where(RowFilter).ToList());
             }
