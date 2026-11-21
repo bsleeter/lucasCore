@@ -309,6 +309,37 @@ namespace lucasCoreUI
             AddColumn(store, "lucasCore_DataSource", "TreeCanopyFolder", "TEXT");
         }
 
+        // ---- 1.7 (strata stacks, 2026-11): the Stratum Sources Land Manager and Land Designation (src/strata.R: a stack takes each
+        // cell's unit from the first of its sources that covers it; defaults/strata/presets.csv, Stack). A stack has no units of its own,
+        // so its row in Stratum Sources is all a library needs. A project gets a stack only when it lists every source the stack is
+        // made of (a library from before the public-lands sources, 9 sources and 6,221 units, lacks them: tools/new-library.R
+        // <library> --rebuild-strata adds those and their units first, then tools/add-strata-stacks.R the stacks). The Study Area
+        // Boundary and Build Stage sheets are new tables, which SyncroSim adds by itself. No apostrophe in the description ---------------
+        [Update(1.7, "lucasCore 1.7: the Stratum Sources Land Manager and Land Designation, which take each cell from the first of several sources that covers it, in every project that lists the sources they are made of")]
+        public static void Update_1_700(DataStore store)
+        {
+            const string T = "lucasCore_StratumSource";
+            if (!store.TableExists(T)) return;
+            string[][] stacks = {
+                new[] { "Land Manager", "101", "Manager", "Each cell's land manager by unit name: National Park Service units, then National Wildlife Refuges, national forests and grasslands, DoD installations and tribal lands, each from its own source and in that order where their boundaries overlap; all other land takes its Federal Lands owner class. A stack of other sources: it has no polygons or units of its own (user 2026-11-20: Secondary Strata = Land Manager)",
+                        "National Parks|FWS Refuges|National Forests|DoD Installations|Tribal Lands|Federal Lands" },
+                new[] { "Land Designation", "102", "Designation", "Each cell's designation by unit name: designated wilderness, then the BLM National Conservation Lands (monuments, conservation areas, wilderness study areas); all other land = Not designated wilderness. A stack of other sources: it has no polygons or units of its own (user 2026-11-20: Tertiary Strata = Land Designation)",
+                        "Wilderness|BLM National Conservation Lands" } };
+            foreach (DataRow p in Rows(store, "SELECT ProjectId FROM core_Project").Rows)
+            {
+                string pr = Id(p["ProjectId"]);
+                foreach (string[] s in stacks)
+                {
+                    Func<string, long> count = where => Convert.ToInt64(store.ExecuteScalar("SELECT COUNT(*) FROM " + T + " WHERE ProjectId = " + pr + " AND " + where), CultureInfo.InvariantCulture);
+                    if (count("(Name = " + Q(s[0]) + " OR Number = " + s[1] + ")") > 0) continue;
+                    string[] members = s[4].Split('|');
+                    if (count("Name IN (" + string.Join(", ", Array.ConvertAll(members, Q)) + ")") < members.Length) continue;
+                    store.ExecuteNonQuery("INSERT INTO " + T + " (StratumSourceId, ProjectId, Name, Number, Prefix, Description, Dissolve, Overlap, Fill) VALUES (" +
+                        NewId(store).ToString(CultureInfo.InvariantCulture) + ", " + pr + ", " + Q(s[0]) + ", " + s[1] + ", " + Q(s[2]) + ", " + Q(s[3]) + ", 0, 'Last', 'Default')");
+                }
+            }
+        }
+
         // ---- 1.5 (wetland methane, 2026-11): wetland classes release part of what their soil and litter emit as CH4 (src/flows.R,
         // src/nonforest-solve.R). The rows are the ones defaults/stsim and defaults/stockflow gained (generated from them). The three
         // Wetland Methane sheets are new tables, which SyncroSim adds by itself. A library keeps running on its earlier Builds; the

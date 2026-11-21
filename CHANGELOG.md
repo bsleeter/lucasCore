@@ -2,7 +2,7 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
-## Unreleased
+## 1.7.0 - 2026-11-21
 
 ### Added
 
@@ -16,7 +16,9 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   `defaults/strata/presets.csv`); stage 1 logs how many cells each source gave. On the **Study Area** page the units may now be
   of several kinds: choosing another kind keeps the units already chosen. Olympic park and forest at 150 m: park 162,724
   cells, forest 112,966, six wilderness areas and 104,623 cells not wilderness. A library made before this needs the two
-  rows in Stratum Sources: `tools/add-strata-stacks.R` adds them (a library update will with the next release).
+  rows in Stratum Sources: the library update of this release adds them to every library that lists the sources they are made of. A library from
+  before the public-lands sources (9 Stratum Sources) is left as it is: `tools/new-library.R <library> --rebuild-strata`
+  adds those sources, then `tools/add-strata-stacks.R` the two stacks.
   `src/strata.R` (`strata_stack`, `strata_cover`, `strata_units`), `tests/unit-strata-stack.R`.
 - **A study area from your own boundary file.** The study area was named units only (parks, forests, states, watersheds).
   The **Study Area** page now also takes a file of polygons: a shapefile, GeoPackage, GeoJSON, KML or zipped shapefile, in
