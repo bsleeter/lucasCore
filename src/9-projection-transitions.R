@@ -50,6 +50,11 @@ ref <- rs:re; nit <- nz(po$Iterations, 10L); seed <- nz(po$RandomSeed, 1L)
 build_tiles <- if ("SpatialTiles" %in% names(opt)) nz(opt$SpatialTiles, 1L) else 1L
 own_tiles <- "SpatialTiles" %in% names(po) && !is.na(nz(po$SpatialTiles, NA))
 tiles <- if (own_tiles) nz(po$SpatialTiles, 1L) else build_tiles
+# the Build's tiles are a grid (Build Options, Spatial Tiles Strata = Grid): they split strata units, and a target must not be split
+# between tiles, so a projection that sets no tiles of its own takes the automatic number of whole Secondary units (tile_level reads Grid so)
+build_grid <- "SpatialTilesStrata" %in% names(opt) && is_grid_level(opt$SpatialTilesStrata[1])
+if (build_grid && !own_tiles && build_tiles != 1L) { tiles <- 0L
+  say("Spatial tiles: the Build's tiles are a grid, which is for runs with no targets; this projection uses whole Secondary units (Run Settings sets its own)") }
 say("Projection %d-%d, %d iterations; each year draws a historical year from %d-%d (seed %d)", min(pyrs), pend, nit, rs, re, seed)
 
 # ---- the rules ----------------------------------------------------------------------------------------------------------

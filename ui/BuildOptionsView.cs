@@ -49,6 +49,7 @@ namespace lucasCoreUI
         private readonly CheckBox m_tiled = new CheckBox { Text = "Split runs into tiles:", AutoSize = true, Margin = new Padding(3, 5, 6, 3) };
         private readonly TextBox m_tiles = new TextBox();
         private readonly ComboBox m_tileLevel = new ComboBox();
+        private const string GRID = "Grid: blocks of equal land cells";
         private readonly Label m_tileState = new Label { AutoSize = true, MaximumSize = new Size(680, 0), ForeColor = SystemColors.GrayText, Margin = new Padding(3, 3, 3, 3) };
         private readonly CheckBox m_rebuild = new CheckBox { Text = "Rebuild every stage", AutoSize = true, Margin = new Padding(3, 5, 6, 3) };
         private readonly TableLayoutPanel m_root = new TableLayoutPanel();
@@ -106,7 +107,7 @@ namespace lucasCoreUI
 
             GroupBox gTiles = Group("Spatial multiprocessing", out r, m_tileState,
                 Note("ST-Sim runs the tiles of a spatial run in parallel and merges them. Stage 1 writes the tile map into the Build result, so the historical run and every projection on this Build are split the same way (a projection can set its own in Run Settings). Units are packed into tiles of about equal area, largest first, so no unit is split. A projection target must not be split between tiles, so every Target group uses this strata level. Tiled runs also need Library > Properties > Multiprocessing on, with about as many jobs as tiles. A run cannot finish before its largest unit, so more tiles than 1 / that unit's share of the land only add jobs. A change takes effect the next time the Build runs."));
-            r.Controls.Add(m_tiled); r.Controls.Add(Number(m_tiles, 50)); r.Controls.Add(Caption("of whole units of")); r.Controls.Add(List(m_tileLevel, 240));
+            r.Controls.Add(m_tiled); r.Controls.Add(Number(m_tiles, 50)); r.Controls.Add(Caption("tiles of")); r.Controls.Add(List(m_tileLevel, 240));
             // ticked = automatic (0: stage 1 picks the number); a typed number wins; "auto" or an empty box while ticked = automatic again
             m_tiled.CheckedChanged += (s, e) => { if (m_refreshing) return; Sheet.SetSingleRowData("SpatialTiles", m_tiled.Checked ? (object)0 : DBNull.Value); RefreshControls(); };
             m_tiles.Validated += (s, e) => { if (m_refreshing) return; int n; string v = m_tiles.Text.Trim();
@@ -149,7 +150,8 @@ namespace lucasCoreUI
                 int k = m_tileLevel.SelectedIndex;
                 m_tileLevel.Items.Clear();
                 m_tileLevel.Items.Add("Primary: FIA ecodivisions"); m_tileLevel.Items.Add("Secondary: " + Bare(m_secondary)); m_tileLevel.Items.Add("Tertiary: " + Bare(m_tertiary));
-                m_tileLevel.SelectedIndex = k >= 0 && k < 3 ? k : 1;
+                m_tileLevel.Items.Add(GRID);   // (user 2026-11-21: blocks of equal land cells, whatever the strata)
+                m_tileLevel.SelectedIndex = k >= 0 && k < 4 ? k : 1;
             }
             finally { m_refreshing = was; }
             if (!was) RefreshControls();
@@ -242,8 +244,11 @@ namespace lucasCoreUI
                 Select(m_tertiary, Value("TertiarySourceId"));
                 object tiles = Value("SpatialTiles"); int nt = tiles == DBNull.Value ? 1 : Convert.ToInt32(tiles); bool on = nt == 0 || nt > 1;
                 m_tiled.Checked = on; m_tiles.Enabled = m_tileLevel.Enabled = on; m_tiles.Text = tiles == DBNull.Value ? "" : nt == 0 ? "auto" : Convert.ToString(nt);
-                object lvl = Value("SpatialTilesStrata"); if (m_tileLevel.Items.Count == 3) m_tileLevel.SelectedIndex = lvl == DBNull.Value ? 1 : Math.Max(0, Math.Min(2, Convert.ToInt32(lvl) - 1));
+                object lvl = Value("SpatialTilesStrata"); if (m_tileLevel.Items.Count == 4) m_tileLevel.SelectedIndex = lvl == DBNull.Value ? 1 : Math.Max(0, Math.Min(3, Convert.ToInt32(lvl) - 1));
+                bool grid = m_tileLevel.SelectedIndex == 3;
                 m_tileState.Text = !on ? "Off: runs on this Build are one job (unless a projection sets its own tiles in Run Settings). Stage 1's log says how many tiles automatic would use."
+                    : grid ? (nt == 0 ? "Automatic grid: stage 1 cuts the land into rectangles of equal land cells and logs the cells in a tile. The number is the square root of the land cells in thousands (17 tiles for 275,000 cells, 32 for a million), capped by the cores: past that, merging the tiles costs more than smaller tiles save. " : string.Format("{0} grid tiles: rectangles of equal land cells, written by stage 1. ", nt)) +
+                             "A tile's size follows the number of cells, not km, so the same number suits a 30 m and a 150 m model. Grid tiles split strata units: they are for the historical run, and a projection with targets uses whole Secondary units or its own Run Settings."
                     : nt == 0 ? string.Format("Automatic: stage 1 packs whole {0} units into as many tiles as still shorten the run (the largest unit sets the limit, capped by the cores) and logs the choice, the speed-up and the memory each job needs. Type a number to choose it yourself.", m_tileLevel.SelectedItem)
                     : string.Format("{0} tiles of whole {1} units: written by stage 1, which logs whether more tiles could help (type auto for the automatic number).", nt, m_tileLevel.SelectedItem);
                 DataSheet ru = Reuse; object rb = DBNull.Value;

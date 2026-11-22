@@ -2,6 +2,25 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+### Added
+
+- **Grid tiles for spatial multiprocessing.** Tiles were whole units of one strata level, so a run could not finish before its
+  largest unit: with Land Manager as the secondary strata Olympic National Park holds 59% of the land, and two tiles were the
+  most that helped. Build Options, **Spatial multiprocessing**, now offers **Grid: blocks of equal land cells** beside the
+  three strata levels: the land is cut into rectangles of the model grid that each hold about the same number of land cells,
+  whatever the strata. The size follows cells, not km, so the same number of tiles suits a 30 m and a 150 m model. Automatic
+  takes the square root of the land cells in thousands (17 tiles for Olympic's 275,745 cells, 32 for a million), capped by
+  the cores. Grid tiles split strata units, so they are for runs with no targets: the historical run, whose change comes from
+  maps. A projection on a Build with grid tiles uses whole Secondary units, or the tiles of its Run Settings (stage 9 says so).
+  Timed on the first 5 years of the Olympic historical run (112 cores): one job 18:47; 2, 4, 8, 16, 32 and 60 grid tiles
+  12:02, 9:25, 7:24, 7:09, 8:03 and 10:35. A job costs about a minute a simulated year whatever its cells, which caps the
+  gain at 2.6 times here; merging the tiles costs more with every tile (0:49 at 16, 2:28 at 60) and is quicker on more merge
+  threads (32 tiles: 2:34 on 1 thread, 0:51 on 8). Square tiles of a fixed size were tried and were slower: 8:59 for 16
+  squares against 7:09, and 18:56 for 48 small squares on 16 jobs. A list value of an existing setting, so a library needs no
+  update. `grid_tiles` and `auto_grid` in `src/shared.R`, `tests/unit-grid-tiles.R`.
+
 ## 1.7.0 - 2026-11-21
 
 ### Added

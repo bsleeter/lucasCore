@@ -420,6 +420,53 @@ auto_tiles <- function(u, land, cores = parallel::detectCores()) {
   hi <- max(1L, min(as.integer(ceiling(1 / s - 1e-9)), length(ua), as.integer(cores)))
   mk <- vapply(seq_len(hi), function(n) { load <- numeric(n); for (v in x) { k <- which.min(load); load[k] <- load[k] + v }; max(load) }, 0)
   list(n = which(mk <= 1.05 * min(mk))[1], share = s, unit = names(ua)[which.max(ua)], units = length(ua), cores = as.integer(cores)) }
+# Grid tiles (Spatial Tiles Strata = Grid; user 2026-11-21): n rectangles that each hold about the same number of land cells, whatever
+# the strata, so a run's time does not hang on its largest unit (Olympic by Land Manager: the park is 59% of the land, so 2 tiles at
+# best). The land is cut in two across its longer side, at the row or column that leaves each part its share of the cells, and each part
+# is cut again until there are n: the cuts are whole rows and columns, so a tile is a rectangle of the grid and tiles differ in area
+# where land is sparse (water, the study area's edge), not in cells. Sized in cells, not km, since a job's time and memory follow its
+# cells: the same n suits a 30 m and a 150 m model of the same cell count. A tile's units are split between tiles, so this is for runs
+# with no target above zero (the historical run, whose change comes from maps); a projection with targets keeps whole-unit tiles
+# (stage 9). land: the study area's cells in raster order; nr, nc: the raster's rows and columns. Returns values (tile by cell), load
+# (land cells by tile) and box (rows and columns of each tile).
+is_grid_level <- function(v) { v <- as.character(v[1]); length(v) == 1 && !is.na(v) && grepl("^4$|^Grid", v) }
+grid_tiles <- function(land, nr, nc, n) {
+  stopifnot(length(land) == nr * nc); i <- which(land); n <- max(1L, min(as.integer(n), length(i)))
+  rw <- (i - 1L) %/% nc + 1L; cl <- (i - 1L) %% nc + 1L; tile <- integer(length(i)); nxt <- 0L
+  cut2 <- function(k, m) {   # k: positions in i; m: tiles to make of them
+    if (m == 1L || length(k) < 2L) { nxt <<- nxt + 1L; tile[k] <<- nxt; return(invisible()) }
+    m1 <- m %/% 2L; r <- rw[k]; cc <- cl[k]
+    for (v in if (diff(range(r)) >= diff(range(cc))) list(r, cc) else list(cc, r)) {   # (the longer side first; the other if that side is one line)
+      tb <- cumsum(tabulate(v - min(v) + 1L)); if (length(tb) < 2L) next
+      at <- which.min(abs(tb[-length(tb)] - length(k) * m1 / m)); left <- v - min(v) + 1L <= at
+      cut2(k[left], m1); cut2(k[!left], m - m1); return(invisible()) }
+    nxt <<- nxt + 1L; tile[k] <<- nxt }
+  cut2(seq_along(i), n)
+  tv <- rep(NA_integer_, length(land)); tv[i] <- tile
+  box <- data.table::data.table(tile = tile, r = rw, c = cl)[, .(cells = .N, rows = max(r) - min(r) + 1L, cols = max(c) - min(c) + 1L), keyby = tile]
+  list(values = tv, load = as.numeric(box$cells), n = nxt, box = box) }
+# Automatic grid tiles: the square root of the land cells in thousands, capped by the cores; one job under GRID_MIN_CELLS. Timed on
+# 2026-11-21 (Olympic park and forest, 150 m, 275,745 land cells, the first 5 years of the historical run, 112 cores; User Guide 5.3):
+# a job costs about a minute a simulated year whatever its cells, plus about 0.6 s per 1,000 cells, and merging costs about 0.6 s a
+# tile a year. More tiles shorten each job's cells and lengthen the merge, and the two balance at sqrt(cells / 1000) tiles:
+#   tiles  1      2      4     8     16    32    60        rectangles of equal cells against squares, 16 tiles: 7:09 and 8:59;
+#   total  18:47  12:02  9:25  7:24  7:09  8:03  10:35     48 squares on 16 jobs: 18:56 (each job pays its minute a year again)
+# So equal cells, not squares (user 2026-11-21, after the timings), and no more tiles than this: 17 here, 32 for a million cells.
+GRID_MIN_CELLS <- 20000L; GRID_JOB_S <- 60; GRID_CELL_S <- 0.6; GRID_MERGE_S <- 0.6
+auto_grid <- function(land_cells, cores = parallel::detectCores(), min_cells = GRID_MIN_CELLS)
+  if (land_cells < min_cells) 1L else as.integer(max(1, min(cores, round(sqrt(land_cells / 1000)))))
+grid_summary <- function(g, res_m) sprintf("%d grid tiles of about %s land cells each (largest %s, smallest %s; a tile of that many cells is about %.0f km2 of land at %d m)", g$n,
+  format(round(mean(g$load)), big.mark = ","), format(max(g$load), big.mark = ","), format(min(g$load), big.mark = ","), mean(g$load) * res_m^2 / 1e6, as.integer(res_m))
+grid_notes <- function(g, cores = parallel::detectCores()) {
+  job <- TILE_JOB_GB + TILE_CELL_KB * max(g$load) / 2^20; all <- g$n * TILE_JOB_GB + TILE_CELL_KB * sum(g$load) / 2^20
+  # the gain expected from the costs timed on 2026-11-21 (seconds a simulated year: a job, 1,000 cells of it, a tile merged), not
+  # the share of the cells in the largest tile: Olympic's 17 tiles hold 1/17 of the cells each and ran 2.6 times faster, not 17
+  one <- GRID_JOB_S + GRID_CELL_S * sum(g$load) / 1000; many <- GRID_JOB_S + GRID_CELL_S * max(g$load) / 1000 + GRID_MERGE_S * g$n * max(1, g$n / cores)
+  c(sprintf("Spatial tiles: %d grid tiles, about %.1fx faster than one job on the timings of November 2026 (a job costs about a minute a simulated year whatever its cells, so the gain is far less than the number of tiles); estimated peak memory %.1f GB for the largest tile's job, %.0f GB for all %d at once (Library > Properties > Multiprocessing sets how many run at once)",
+            g$n, one / many, job, all, g$n),
+    if (g$n > cores) sprintf("Spatial tiles: %d tiles is more than this machine's %d cores, so the extra jobs wait their turn, and each pays a job's fixed cost again: fewer tiles would be faster", g$n, as.integer(cores)),
+    if (g$n >= 16) "Spatial tiles: merging the tiles is quicker with more merge threads (Library > Properties > Multiprocessing; 32 tiles merged in 2:34 on 1 thread, 1:27 on 2 and 0:51 on 8)",
+    "Spatial tiles: grid tiles split strata units, so they are for runs with no targets (the historical run). A projection with targets on this Build uses whole Secondary units instead, or the tiles set in its Run Settings") }
 tile_unit_name <- function(lvl, id) { l <- stsim_list(c(Primary = "Stratum", Secondary = "SecondaryStratum", Tertiary = "TertiaryStratum")[[lvl]])
   nm <- l$Name[match(as.character(id), as.character(l$Id))]; if (length(nm) && !is.na(nm)) nm else as.character(id) }
 # log lines on the tiles: the largest unit and the best count, the speed-up and peak memory of the tiles used (tl = pack_tiles' result,

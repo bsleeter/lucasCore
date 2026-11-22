@@ -153,6 +153,7 @@ namespace lucasCoreUI
                 if (bo != null) { sec = name(bo["SecondarySourceId"], sec); ter = name(bo["TertiarySourceId"], ter); }
                 if (bo != null && bo.Table.Columns.Contains("SpatialTiles") && bo["SpatialTiles"] != DBNull.Value) m_buildTiles = Convert.ToInt32(bo["SpatialTiles"]);
                 if (bo != null && bo.Table.Columns.Contains("SpatialTilesStrata") && bo["SpatialTilesStrata"] != DBNull.Value) m_buildLevel = Convert.ToInt32(bo["SpatialTilesStrata"]);
+                if (m_buildLevel == 4) m_buildLevel = 2;   // (a Build's Grid tiles: a projection uses whole Secondary units, as stage 9 does)
             }
             catch (Exception) { }
             m_tileLevel.Items.Clear(); m_tileLevel.Items.Add("Primary: FIA ecodivisions"); m_tileLevel.Items.Add("Secondary: " + sec); m_tileLevel.Items.Add("Tertiary: " + ter);

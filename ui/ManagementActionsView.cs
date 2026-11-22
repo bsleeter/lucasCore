@@ -64,7 +64,7 @@ namespace lucasCoreUI
                 object tiles = v(po, "SpatialTiles") != DBNull.Value ? v(po, "SpatialTiles") : v(bo, "SpatialTiles");
                 object lvl = v(po, "SpatialTiles") != DBNull.Value ? v(po, "SpatialTilesStrata") : v(bo, "SpatialTilesStrata");
                 bool on = tiles != DBNull.Value && (Convert.ToInt32(tiles) == 0 || Convert.ToInt32(tiles) > 1);
-                TileLevel = on ? Math.Max(0, Math.Min(2, (lvl == DBNull.Value ? 2 : Convert.ToInt32(lvl)) - 1)) : -1;
+                TileLevel = on ? Math.Max(0, Math.Min(2, (lvl == DBNull.Value || Convert.ToInt32(lvl) == 4 ? 2 : Convert.ToInt32(lvl)) - 1)) : -1;   // (4 = a Build's Grid tiles: Secondary for a projection)
                 // keys of every unit by name, at each level
                 string[] lists = { "stsim_Stratum", "stsim_SecondaryStratum", "stsim_TertiaryStratum" };
                 var ids = new Dictionary<string, long>[] { new Dictionary<string, long>(), new Dictionary<string, long>(), new Dictionary<string, long>() };

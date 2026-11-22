@@ -157,6 +157,18 @@ saveDatasheet(scn, as.data.frame(row), "stsim_InitialConditionsSpatial")
 # Spatial Tiles: blank = one job, 0 = automatic (auto_tiles), a number = that many
 tiles_in <- if ("SpatialTiles" %in% names(opt) && !is.na(opt$SpatialTiles[1])) as.integer(opt$SpatialTiles[1]) else NA_integer_
 lvl <- tile_level(if ("SpatialTilesStrata" %in% names(opt)) opt$SpatialTilesStrata[1] else NA)
+# Grid (user 2026-11-21; shared.R, grid_tiles): rectangles of about equal land cells, whatever the strata. They split strata units, so
+# they serve the historical run (its change comes from maps, its only targets are zeros); stage 9 gives a projection whole-unit tiles
+grid <- "SpatialTilesStrata" %in% names(opt) && is_grid_level(opt$SpatialTilesStrata[1])
+if (grid) {
+  tiles <- if (is.na(tiles_in)) 1L else if (tiles_in == 0L) auto_grid(sum(!na_p)) else tiles_in
+  if (!is.na(tiles_in) && tiles_in == 0L) say("Spatial tiles: automatic (Build Options) -> %d grid %s (the square root of the study area's %s land cells in thousands, capped by the %d cores: past that, merging the tiles costs more than smaller tiles save)", tiles,
+                                              if (tiles == 1) "tile: one job" else "tiles", format(sum(!na_p), big.mark = ","), parallel::detectCores())
+  if (tiles > 1) { g <- grid_tiles(!na_p, nrow(P), ncol(P), tiles)
+    saveDatasheet(scn, data.frame(MaskFileName = write_raster(setValues(rast(P), g$values), "Build-Tiles.tif", "INT2U")), "core_SpatialMultiprocessing")
+    say("Spatial multiprocessing: %s", grid_summary(g, res_m)); for (m in grid_notes(g)) say("%s", m)
+    check(STAGE, "every land cell is in a tile", !any(is.na(g$values[!na_p])), sprintf("%d cells without a tile", sum(is.na(g$values[!na_p])))) }
+} else {
 tu <- values(list(Primary = P, Secondary = S, Tertiary = Tr)[[lvl]], mat = FALSE)
 ta <- auto_tiles(tu, !na_p); tnm <- tile_unit_name(lvl, ta$unit)
 tiles <- if (is.na(tiles_in)) 1L else if (tiles_in == 0L) ta$n else tiles_in
@@ -171,6 +183,7 @@ if (tiles > 1) {
 } else if (!is.na(tiles_in) && tiles_in == 0L) { for (m in tile_notes(ta, NULL, 1L, lvl, tnm)) say("%s", m)
 } else if (is.na(tiles_in) && ta$n > 1) say("Spatial tiles: none (one job). Build Options > Split runs into tiles, automatic, would use %d tiles of whole %s units (the largest, %s, holds %.1f%% of the land)",
                                              ta$n, lvl, tnm, 100 * ta$share)
+}
 
 summ <- rbindlist(lapply(list(list(P, "Primary", "Stratum"), list(S, "Secondary", "SecondaryStratum"), list(Tr, "Tertiary", "TertiaryStratum")), function(lv) {
   f <- as.data.table(freq(lv[[1]]))[, .(Id = as.integer(value), Cells = as.integer(count))]

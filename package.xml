@@ -158,7 +158,7 @@
 		<column name="LandCoverResampling" displayName="Land Cover Resampling" dataType="Integer" validationType="List" formula1="1:Modal (most common 30 m class)|2:Area-matched (30 m class areas per secondary stratum unit)" defaultValue="1" isOptional="True"/>
 		<!-- spatial multiprocessing (stage 1 writes the tile mask into the Build result; runs on the Build inherit it, a projection may set its own in Run Settings) -->
 		<column name="SpatialTiles" displayName="Spatial Multiprocessing Tiles (blank = none; 0 = automatic)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
-		<column name="SpatialTilesStrata" displayName="Spatial Tiles Strata (tiles are whole units of this level; every projection Target group uses it)" dataType="Integer" validationType="List" formula1="1:Primary|2:Secondary|3:Tertiary" defaultValue="2" isOptional="True"/>
+		<column name="SpatialTilesStrata" displayName="Spatial Tiles Strata (tiles are whole units of this level, which every projection Target group uses; or Grid: blocks of equal land cells, for runs with no targets)" dataType="Integer" validationType="List" formula1="1:Primary|2:Secondary|3:Tertiary|4:Grid" defaultValue="2" isOptional="True"/>
 	</dataSheet>
 
 	<dataSheet name="BuildReuse" displayName="Build Stage Reuse" isSingleRow="True">
