@@ -102,6 +102,7 @@ namespace lucasCoreUI
                 }
             }
             log.Append(AutoGroups(p, store));
+            log.Append(MergeThreads(p, store));
             // transition simulation groups that are automatic "[Type]" groups (forest clearcut and selection, which ST-Sim must simulate and map
             // as separate groups, not as the Forest Harvest family) can only be named once AutoGroups has made them
             string simTypes = Path.Combine(dir, "defaults", "stsim", "stsim_TransitionSimulationGroup-types.csv");
@@ -182,6 +183,26 @@ namespace lucasCoreUI
         // after its own package records, so ST-Sim's sheets are already saved when this runs; and DataSheet.EndAddRows would raise
         // RowsAdded, whose listeners (Studio's open windows, ST-Sim's handlers) read on Studio's own connection and fail with "database
         // is locked" while the package add holds the write lock - which rolls the whole add back.
+        // Merging the tiles of a spatial multiprocessing run: 8 threads in a new library, where SyncroSim starts one with 2 (17 tiles over
+        // 10 years merged in 1:49 on 2 threads, 0:57 on 8 and 0:50 on 16, 2026-11-22). A library setting (System > Multiprocessing >
+        // Spatial); a value other than SyncroSim's 2 is someone's choice and is left. Never stops the setup: the outcome goes in the log.
+        public const int MergeThreadsDefault = 8;
+        private static string MergeThreads(Project p, DataStore store)
+        {
+            try
+            {
+                DataSheet ds = p.Library.GetDataSheet("core_SpatialMultiprocessingOption");
+                if (ds == null) return "merge threads: no such sheet; ";
+                DataTable dt = ds.GetData(store); DataRow r = Live(dt).FirstOrDefault();
+                if (r == null) r = NewRow(ds, store, dt);
+                else if (r["MaxThreadsForMerge"] != DBNull.Value && Convert.ToInt32(r["MaxThreadsForMerge"], CultureInfo.InvariantCulture) != 2)
+                    return "merge threads: left at " + r["MaxThreadsForMerge"] + "; ";
+                r["MaxThreadsForMerge"] = MergeThreadsDefault; Save(ds, store);
+                return "merge threads: " + MergeThreadsDefault + "; ";
+            }
+            catch (Exception ex) { return "merge threads: not set (" + ex.Message + "); "; }
+        }
+
         private static void Save(DataSheet ds, DataStore store)
         {
             try { store.Update(ds); }

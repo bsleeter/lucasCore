@@ -1240,7 +1240,7 @@ What the timings show:
 - **Merging costs more with every tile.** It took 46 seconds at 16 tiles and 3 minutes 56 seconds at 100, longer than running the 100 jobs. The automatic number is where a smaller tile's saving and one more tile's merge balance.
 - **More tiles than cores is slower.** Each waiting job pays its fixed cost again. Timed before version 1.8, when that cost was a minute a year, 48 tiles on 16 jobs took 18:56, no faster than one job.
 - **Equal cells beat equal areas.** Timed before version 1.8, sixteen square tiles of a fixed size took 8:59 against 7:09 for sixteen of equal cells, because the run lasts as long as its largest tile and a full square holds more cells than an equal share.
-- **More merge threads shorten the merge.** With 32 tiles the merge took 2:34 on 1 thread, 1:27 on 2 and 0:51 on 8. The setting is in the library's properties, System > Multiprocessing > Spatial: Number of threads to use when merging tiles.
+- **More merge threads shorten the merge.** With 17 tiles over 10 years the merge took 2:29 on 1 thread, 1:49 on 2, 0:57 on 8 and 0:50 on 16; more than that added nothing. A new library starts with 8, where SyncroSim's own default is 2. A library made before that keeps its own number: set it in the library's properties, System > Multiprocessing > Spatial: Number of threads to use when merging tiles. On a computer short of memory a lower number may be faster.
 
 The whole historical run, 39 years on 17 tiles, took 21:30: 13:52 running the jobs and 7:24 merging the tiles. A library made before version 1.8 and not yet updated runs slower than this table: 16 tiles took 7:09 there, because every job spent about a minute a year on strata the model does not use (the update of 1.8 removes them).
 

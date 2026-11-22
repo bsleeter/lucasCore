@@ -6,6 +6,14 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
 
 ### Changed
 
+- **A new library merges tiles on 8 threads.** SyncroSim starts a library with 2 threads for merging the tiles of a spatial
+  multiprocessing run (library properties, System > Multiprocessing > Spatial). Timed on Olympic, 17 grid tiles over 10 years,
+  every map on: 2:29, 1:49, 1:21, 0:57, 0:50 and 0:51 on 1, 2, 4, 8, 16 and 32 threads, so 8 halves the merge and more adds
+  little. A library made in Studio or by `tools/new-library.R` now starts with 8; a value someone has set is left, and an
+  existing library keeps its own (set it by hand). Of what is left of the merge at 8 threads, maps are about 40% (0:57 with
+  every map, 0:36 with state class and age maps only, 0:35 with none) and the rest is the tables. `MergeThreads` in
+  `ui/LibrarySetup.cs`.
+
 - **Grid tiles: the gain stage 1 states, timed again on version 1.8.** With the Tertiary Stratum list short, a job's fixed cost
   fell from about a minute a simulated year to about 17 seconds. The first 5 years of the Olympic historical run (150 m,
   275,745 cells, 112 cores), 1, 2, 4, 8, 16, 32, 60 and 100 grid tiles: 15:32, 8:32, 5:46, 3:52, 3:01, 3:27, 5:36 and 8:39.

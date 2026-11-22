@@ -35,6 +35,9 @@ P <- rsyncrosim::project(L, pname)
 
 # library settings: no multiprocessing for build stages (they read and write whole national grids), conda off
 saveDatasheet(L, data.frame(EnableMultiprocessing = FALSE, MaximumJobs = 1), "core_Multiprocessing")
+# merging the tiles of a spatial multiprocessing run: 8 threads, where SyncroSim starts a library with 2 (17 tiles over 10 years merged in
+# 1:49 on 2 threads, 0:57 on 8 and 0:50 on 16, 2026-11-22; ui/LibrarySetup.cs does the same for a library made in Studio)
+saveDatasheet(L, data.frame(MaxThreadsForMerge = 8L), "core_SpatialMultiprocessingOption")
 op <- datasheet(L, "core_Option"); op$UseConda <- FALSE; saveDatasheet(L, op, "core_Option")
 
 man <- rd("stsim", "manifest.csv")[order(as.integer(Order))]
