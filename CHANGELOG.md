@@ -2,7 +2,10 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
-## Unreleased
+## 1.8.1 - 2026-11-22
+
+A patch: no library update. An existing library keeps its own number of merge threads (library properties, System >
+Multiprocessing > Spatial); set it to 8 by hand to merge tiles as a new library does.
 
 ### Changed
 
