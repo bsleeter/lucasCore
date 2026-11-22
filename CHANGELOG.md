@@ -2,7 +2,10 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
-## Unreleased
+## 1.8.0 - 2026-11-22
+
+A minor version: the 1.8 library update shortens a library's Tertiary Stratum list to the strata its Builds use when the
+library is opened with this version. Runs are faster from the next one on; no Build needs to be run again.
 
 ### Changed
 
@@ -13,7 +16,7 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   short is enough, since the cost is the two multiplied (timed with 10,235 and 10, 14 and 10,235, and 1,000 each: all as
   fast as 14 and 10). So the secondary list stays whole, as the unit list of the Study Area page and the other unit pickers,
   and the tertiary list, which only names tertiary strata, starts empty: stage 1 adds the units on each Build's tertiary
-  strata map and logs them. The library update of the next release removes the unused tertiary strata of an existing library,
+  strata map and logs them. The library update of this release removes the unused tertiary strata of an existing library,
   keeping every one that a table names or a Build result lists in its Strata Summary. Timed on the Olympic park and forest
   (150 m, 275,745 cells, the first 5 years of the historical run, every summary on): one job 18:47 before and 15:32 after;
   16 grid tiles 7:09 and 3:12, which is 5.9 times faster than one job where it was 2.6. Found by elimination: not map
