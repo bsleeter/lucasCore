@@ -340,6 +340,33 @@ namespace lucasCoreUI
             }
         }
 
+        // ---- 1.8 (tertiary strata, 2026-11): the Tertiary Stratum list keeps only the strata in use. A library listed every unit of
+        // every Stratum Source in both the secondary and the tertiary list (10,235 each), and ST-Sim's state class and transition
+        // summaries do work at every timestep for every secondary x tertiary pair defined: about 43 s a job a timestep (src/strata.R,
+        // strata_to_define). The secondary list stays whole (it is the unit list of the Study Area page); from this version stage 1
+        // adds the tertiary strata of each Build. Kept here: a tertiary stratum that any table names (results, targets, management
+        // rows) or that a Build result lists in its Strata Summary (written by stage 1 since the first version, so a Build with a
+        // tertiary strata map and no run yet keeps its strata). The first update that deletes rows. No apostrophe in the description
+        [Update(1.8, "lucasCore 1.8: the Tertiary Stratum list keeps only the strata that results, settings or a Build use; the unused ones, which slowed every run, are removed and each Build adds the ones it needs")]
+        public static void Update_1_800(DataStore store)
+        {
+            const string T = "stsim_TertiaryStratum", K = "TertiaryStratumId";
+            if (!store.TableExists(T)) return;
+            var keep = new HashSet<long>();
+            foreach (DataRow t in Rows(store, "SELECT name FROM sqlite_master WHERE type = 'table'").Rows)
+            {
+                string name = Convert.ToString(t["name"], CultureInfo.InvariantCulture);
+                if (string.Equals(name, T, StringComparison.OrdinalIgnoreCase) || !HasColumn(store, name, K)) continue;
+                foreach (DataRow r in Rows(store, "SELECT DISTINCT " + K + " AS v FROM [" + name + "] WHERE " + K + " IS NOT NULL").Rows) keep.Add(Convert.ToInt64(r["v"], CultureInfo.InvariantCulture));
+            }
+            if (store.TableExists("lucasCore_OutputStrataSummary"))
+                foreach (DataRow r in Rows(store, "SELECT DISTINCT l." + K + " AS v FROM " + T + " l JOIN lucasCore_OutputStrataSummary s ON s.Id = l.Id AND s.Level = 'Tertiary' " +
+                                                  "JOIN core_Scenario c ON c.ScenarioId = s.ScenarioId AND c.ProjectId = l.ProjectId").Rows) keep.Add(Convert.ToInt64(r["v"], CultureInfo.InvariantCulture));
+            if (keep.Count == 0) { store.ExecuteNonQuery("DELETE FROM " + T); return; }
+            var ids = new List<string>(); foreach (long v in keep) ids.Add(v.ToString(CultureInfo.InvariantCulture));
+            store.ExecuteNonQuery("DELETE FROM " + T + " WHERE " + K + " NOT IN (" + string.Join(",", ids) + ")");
+        }
+
         // ---- 1.5 (wetland methane, 2026-11): wetland classes release part of what their soil and litter emit as CH4 (src/flows.R,
         // src/nonforest-solve.R). The rows are the ones defaults/stsim and defaults/stockflow gained (generated from them). The three
         // Wetland Methane sheets are new tables, which SyncroSim adds by itself. A library keeps running on its earlier Builds; the

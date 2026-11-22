@@ -5,7 +5,8 @@
 #   Strata sources: every preset in defaults/strata/presets.csv (FIA Ecodivisions, States, Counties, HUC6, HUC8, EPA Level III
 #                              Ecoregions, Pyromes, Federal Lands, GAP Status, National Parks, FWS Refuges, DoD Installations, National
 #                              Forests, Wilderness, Tribal Lands, BLM National Conservation Lands, Metropolitan Areas) becomes a Stratum Sources row, and the stsim Secondary
-#                              and Tertiary Strata lists hold every unit of every source. Scenarios pick their sources in Build Options.
+#                              Strata list holds every unit of every source (the unit list). The Tertiary Strata list is left alone: stage 1 adds
+#                              the strata each Build uses (ST-Sim's summaries cost time for every stratum defined). Scenarios pick their sources in Build Options.
 #   --rebuild-strata           rewrite Stratum Sources and the unit lists (after adding a custom source row with a new Number;
 #                              existing unit ids keep their meaning, so scenario data stays valid)
 #   --rebuild-climate          rewrite the LOCA2 Climate Scenario and Climate Model lists from the LOCA2 folder (after adding runs)
@@ -97,7 +98,8 @@ if (nrow(have_l) && !rebuild && all(as.integer(have_l$Id) >= UNIT_OFFSET)) {
 } else {
   t0 <- Sys.time(); ul <- universal_list(rows, pkgdir)
   if (anyDuplicated(ul$Name)) stop("universal unit list: duplicate names ", paste(head(ul$Name[duplicated(ul$Name)], 3), collapse = "; "))
-  for (sheet in c("stsim_SecondaryStratum", "stsim_TertiaryStratum")) saveDatasheet(P, as.data.frame(ul), sheet, append = FALSE, force = TRUE)
+  # (the Secondary Stratum list is the unit list; the Tertiary Stratum list is left as it is: stage 1 adds the strata each Build uses)
+  saveDatasheet(P, as.data.frame(ul), "stsim_SecondaryStratum", append = FALSE, force = TRUE)
   cat(sprintf("%-34s %4d units from %d sources (%s) in %.1f min\n", "stsim_Secondary/TertiaryStratum", nrow(ul), length(rows),
               paste(sprintf("%s %d", names(rows), vapply(rows, function(s) sum(unit_source(ul$Id) == s$Number), 0L)), collapse = ", "),
               as.numeric(Sys.time() - t0, units = "mins")))

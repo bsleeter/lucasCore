@@ -76,7 +76,7 @@ rs_raw <- function(scope, name) { cols <- rs_cols(name); if (!length(cols)) stop
   if (nrow(x) > 1 && ncol(x)) x <- x[do.call(order, unname(as.list(x))), , drop = FALSE]
   rownames(x) <- NULL; list(hash = digest::digest(x, algo = "md5"), n = n) }
 # the names behind every lookup id: the project's definition tables of stsim and lucasCore (not People, which no stage reads)
-rs_defs <- function() { tb <- rs_sql("select name from sqlite_master where type = 'table'")$name; tb <- sort(tb[grepl("^(stsim|lucasCore)_[A-Za-z0-9]+$", tb) & tb != "lucasCore_Person"])
+rs_defs <- function() { tb <- rs_sql("select name from sqlite_master where type = 'table'")$name; tb <- sort(tb[grepl("^(stsim|lucasCore)_[A-Za-z0-9]+$", tb) & !tb %in% c("lucasCore_Person", "stsim_TertiaryStratum")])   # (stage 1 adds tertiary strata as Builds need them: a stage that reads the list has it among its reads)
   digest::digest(lapply(tb, function(t) { cols <- rs_cols(t); if (!all(c("Name", "ProjectId") %in% cols) || "ScenarioId" %in% cols) return(NULL)
     key <- paste0(sub("^[^_]*_", "", t), "Id"); if (!key %in% cols) return(NULL)
     rs_sql(sprintf("select \"%s\", Name from \"%s\" where ProjectId = %d order by 1", key, t, rs_project())) }), algo = "md5") }

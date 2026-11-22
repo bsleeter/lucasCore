@@ -253,3 +253,17 @@ boundary_polygon <- function(f) {
 # the name of a boundary's study area: the one typed, else the file's name without its folder and ending
 boundary_name <- function(name, f) { n <- if (length(name) && !is.na(name[1])) trimws(as.character(name[1])) else ""
   if (nzchar(n)) n else sub("[.][^.]*$", "", basename(as.character(f)[1])) }
+
+# ---- the tertiary strata list holds only the strata Builds have (user 2026-11-21) -------------------------------------------------
+# ST-Sim's state class and transition summaries do work at every timestep for every secondary x tertiary stratum the project
+# defines, present in the run or not. A library listed every unit of every source in both lists (10,235 x 10,235, 105 million pairs),
+# which cost each job about 43 s a timestep whatever its cells: the Olympic historical run's 16 tiles took 7:09 for five years and
+# 3:12 with the unused strata deleted, every summary on (timed 2026-11-21). Either list short is enough, since the cost is their
+# product. The secondary list stays whole: it is the unit list of the Study Area page and the other unit pickers. The tertiary
+# list, which only names tertiary strata, starts empty and stage 1 adds the units on the Build's tertiary strata map.
+# ids: the universal ids on a strata map; have: the ids the list holds; units: the national unit list (Name, Id). Returns the rows
+# to add (Name, Id), and stops on an id the unit list does not know.
+strata_to_define <- function(ids, have, units) { ids <- unique(as.numeric(ids)); ids <- ids[!is.na(ids)]; miss <- setdiff(ids, as.numeric(have))
+  nm <- as.character(units$Name)[match(miss, as.numeric(units$Id))]
+  if (anyNA(nm)) stop(sprintf("strata ids not in the unit list: %s", paste(utils::head(miss[is.na(nm)], 5), collapse = ", ")), call. = FALSE)
+  data.frame(Name = nm, Id = as.integer(miss), stringsAsFactors = FALSE) }

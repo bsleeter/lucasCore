@@ -4,6 +4,23 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
 
 ## Unreleased
 
+### Changed
+
+- **The Tertiary Stratum list holds only the strata Builds use, which makes every run faster.** A library listed every unit of
+  every Stratum Source as both a secondary and a tertiary stratum, 10,235 of each. ST-Sim's state class and transition
+  summaries do work at every timestep for every secondary and tertiary pair the project defines, present in the run or not:
+  about 43 seconds a job a timestep here, whatever the job's cells, which also capped what tiles could gain. Either list
+  short is enough, since the cost is the two multiplied (timed with 10,235 and 10, 14 and 10,235, and 1,000 each: all as
+  fast as 14 and 10). So the secondary list stays whole, as the unit list of the Study Area page and the other unit pickers,
+  and the tertiary list, which only names tertiary strata, starts empty: stage 1 adds the units on each Build's tertiary
+  strata map and logs them. The library update of the next release removes the unused tertiary strata of an existing library,
+  keeping every one that a table names or a Build result lists in its Strata Summary. Timed on the Olympic park and forest
+  (150 m, 275,745 cells, the first 5 years of the historical run, every summary on): one job 18:47 before and 15:32 after;
+  16 grid tiles 7:09 and 3:12, which is 5.9 times faster than one job where it was 2.6. Found by elimination: not map
+  writing, the stock and flow tables, the multiplier lists, the flow multiplier table or job start-up, and ST-Sim's option
+  to omit the secondary and tertiary strata from the summaries does not avoid it. Reported to the SyncroSim developers.
+  `strata_to_define` in `src/strata.R`, `define_tertiary_strata` in `src/shared.R`, `Update_1_800`, `tests/unit-strata-define.R`.
+
 ### Added
 
 - **Grid tiles for spatial multiprocessing.** Tiles were whole units of one strata level, so a run could not finish before its

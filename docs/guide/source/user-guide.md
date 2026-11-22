@@ -503,7 +503,7 @@ The Build's Study Area page then lists the units, or names the boundary file, an
 5. **Land cover**: choose the **Forest type map** (LANDFIRE EVT, the default; USFS forest type groups; or TreeMap) and where **Stand age** comes from (NASA CMS Forest Age 1990, the default, or TreeMap). TreeMap (USFS, 30 m) gives every forest pixel an FIA plot: its forest type group, and its stand age moved from the plot's inventory year to the start year. Here USFS forest type groups and NASA CMS.
 6. **Resampling to the grid**: how each year's 30 m Annual NLCD becomes the model grid. **Modal** (default) gives each cell its most common 30 m class; **Area-matched** makes every class's area in each secondary stratum unit equal its 30 m area, year by year, changing cells only where the 30 m totals move and never removing developed land. The start-year state classes and the land-use transitions both come from these maps. Here Area-matched; section 3.3.1 compares the two.
 7. **Growth**: **Site productivity** is None (the default) or TreeMap site class. With TreeMap site class, each forest cell's growth is scaled by how productive its land is, on top of the climate multipliers, and its starting live and dead carbon by the same multiplier. The multiplier comes from the FIA site class of the cell's TreeMap plots, set for each forest type and ecodivision from the plots' live carbon against the growth curve. **Build Results > Site Productivity** lists the multipliers, and Build Figures maps them. A library made before 30 October 2026 needs tools/sync-library.R first. Here None.
-8. **Spatial multiprocessing**: tick **Split runs into tiles** and choose the strata level the tiles follow. The number box then shows auto: stage 1 picks as many tiles as still shorten the run, and logs its choice, the speed-up and an estimate of each job's memory. Type a number to choose it yourself. P26 uses 5 tiles of whole Counties, the number automatic also picks. Stage 1 writes the tile map into the Build result, so the historical run and every projection on this Build are split the same way; a projection can set its own tiles in its Run Settings. Units are packed into tiles of about equal area, largest first, so no county is split between tiles. Tiled runs also need library multiprocessing on (section 1.4), with about as many jobs as tiles. A change takes effect the next time the Build runs.
+8. **Spatial multiprocessing**: tick **Split runs into tiles** and choose the strata level the tiles follow. The number box then shows auto: stage 1 picks as many tiles as still shorten the run, and logs its choice, the speed-up and an estimate of each job's memory. Type a number to choose it yourself. P26 uses 5 tiles of whole Counties, the number automatic also picks. Stage 1 writes the tile map into the Build result, so the historical run and every projection on this Build are split the same way; a projection can set its own tiles in its Run Settings. Units are packed into tiles of about equal area, largest first, so no county is split between tiles. The list also offers Grid: tiles of equal land cells that ignore the strata, for the historical run (section 5.3.1). Tiled runs also need library multiprocessing on (section 1.4), with about as many jobs as tiles. A change takes effect the next time the Build runs.
 
 &#91;image: The Build Options page: Build Options marked 1, cell size 150 marked 2, years 1985 to 2023 marked 3, strata Counties and Federal Lands marked 4, forest type map USFS forest type groups and stand age NASA CMS Forest Age 1990 marked 5, resampling Area-matched marked 6, site productivity None marked 7, and spatial multiprocessing with 5 tiles of whole Secondary: Counties units marked 8\]
 
@@ -1208,6 +1208,38 @@ A job's memory has two parts: a fixed part that every job loads whatever its siz
 | All 17 jobs, in use at one moment mid-run | 25 GB |
 
 Even the smallest county's job peaks at about 1.4 GB, so for P26 roughly 1.5 GB of each job is the fixed part; only the remaining 2.4 GB of the largest job comes from its cells. The jobs do not all peak at once, so the run needed about 25 GB at a time, but plan for the sum of peaks. On the 1 TB, 112-core server this run used, 17 jobs is far inside both limits. On a 32 GB workstation the same run should use at most about 6 jobs, and on 64 GB about 12. At 30 m, with 25 times the cells, the part that grows with cells would dominate: expect tens of GB for the largest county alone, and plan for fewer jobs or smaller tiles.
+
+#### 5.3.1 Grid tiles
+
+Tiles of whole strata units cannot finish before their largest unit. With Land Manager as the secondary strata, Olympic National Park holds 59% of the land, so two tiles are the most that help. Grid tiles ignore the strata: stage 1 cuts the land into rectangles of the model grid that each hold about the same number of land cells.
+
+To use them, on **Build Options** tick **Split runs into tiles** and pick **Grid: blocks of equal land cells** in the list beside it. Leave the number at auto, or type the number of tiles.
+
+- **For the historical run only.** Grid tiles split strata units, and a transition target must not be split between tiles. The historical run has no targets above zero, so any tiles suit it. A projection on a Build with grid tiles does not inherit them: stage 9 gives it whole Secondary units, or the tiles of its Run Settings, and says so in its log.
+- **Sized in cells, not km.** A job's time and memory follow the number of cells in its tile, so the same number of tiles suits a 30 m and a 150 m model with the same number of cells. Stage 1 logs the cells in a tile and what that is in km² at the model's cell size.
+- **Automatic.** The number of tiles is the square root of the land cells in thousands, capped by the processor cores: 17 tiles for 275,000 cells, 32 for a million, 71 for five million. A study area under 20,000 cells runs as one job.
+
+*Table 5.2. Grid tiles timed on the first five years of the Olympic National Park and Forest historical run: 150 m, 275,745 land cells, a 112-core server, 21 November 2026. Times are minutes:seconds.*
+
+| Tiles | Land cells per tile | Running the jobs | Merging the tiles | Total | Times faster |
+| --: | --: | --: | --: | --: | --: |
+| 1 | 275,700 | 18:40 | 0:03 | 18:47 | 1.0 |
+| 2 | 138,000 | 11:45 | 0:12 | 12:02 | 1.6 |
+| 4 | 69,000 | 9:00 | 0:18 | 9:25 | 2.0 |
+| 8 | 34,500 | 6:45 | 0:30 | 7:24 | 2.5 |
+| 16 | 17,200 | 6:06 | 0:49 | 7:09 | 2.6 |
+| 32 | 8,600 | 6:11 | 1:27 | 8:03 | 2.3 |
+| 60 | 4,600 | 7:26 | 2:28 | 10:35 | 1.8 |
+
+What the timings show:
+
+- **More tiles stop helping early.** Every job costs about a minute for each simulated year whatever the size of its tile, plus about 0.6 seconds for each 1,000 cells. Below about 20,000 cells a tile, smaller tiles save almost nothing. The best here was 16 tiles, 2.6 times faster than one job, on a computer with 112 cores.
+- **Merging costs more with every tile.** It took 49 seconds at 16 tiles and 2 minutes 28 seconds at 60. The automatic number is where a smaller tile's saving and one more tile's merge balance.
+- **More tiles than cores is slower.** Each waiting job pays its minute a year again: 48 tiles on 16 jobs took 18:56, no faster than one job.
+- **Equal cells beat equal areas.** Sixteen square tiles of a fixed size took 8:59 against 7:09, because the run lasts as long as its largest tile and a full square holds more cells than an equal share.
+- **More merge threads shorten the merge.** With 32 tiles the merge took 2:34 on 1 thread, 1:27 on 2 and 0:51 on 8. The setting is in the library's properties, System > Multiprocessing > Spatial: Number of threads to use when merging tiles.
+
+These are one model on one computer. A model with more cells gains more from tiles, since the fixed minute is a smaller share of each job.
 
 ### 5.4 Run the historical run
 

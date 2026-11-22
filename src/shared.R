@@ -373,6 +373,26 @@ read_growth_inputs <- function(scl = stsim_list("StateClass")) {
       else sprintf("%d rows from Carbon Assumptions; differing from the package: %s", nrow(u), paste(g$changed, collapse = "; ")))
   g }
 
+# The Build's tertiary strata, added to the project's Tertiary Stratum list when it lacks them (src/strata.R, strata_to_define; the list
+# holds only what Builds use, since ST-Sim's summaries cost time for every stratum defined). r: the tertiary strata map; units: the
+# national unit list (the Secondary Stratum list). The list is read and written past the Build's record (rsyncrosim's own calls): a
+# stage's record counts the list as it stands after this, so the next Build of the same study area finds it unchanged. Returns the names added.
+# Inside a run rsyncrosim's saveDatasheet only leaves a file in the transfer folder, which SyncroSim takes in for the scenario's own
+# output sheets and not for a project's definitions (found 2026-11-21: the strata were logged as added and the list was unchanged).
+# So the rows go in through the SyncroSim console's own import, a separate process, and the list is read back to be sure.
+define_tertiary_strata <- function(r, units) {
+  read <- function() as.data.table(rsyncrosim::datasheet(prj, "stsim_TertiaryStratum", lookupsAsFactors = FALSE, optional = TRUE))
+  v <- terra::unique(r)[[1]]; have <- read()
+  add <- strata_to_define(v, if (nrow(have)) have$Id else numeric(), units); if (!nrow(add)) return(character())
+  f <- tempfile(fileext = ".csv"); on.exit(unlink(f)); data.table::fwrite(add, f)
+  exe <- file.path(rsyncrosim::filepath(rsyncrosim::session()), "SyncroSim.Console.exe")
+  out <- tryCatch(suppressWarnings(system2(exe, c("--import", sprintf("--lib=\"%s\"", main_library()), "--sheet=stsim_TertiaryStratum", sprintf("--file=\"%s\"", normalizePath(f, winslash = "/")),
+                                                 sprintf("--pid=%d", as.integer(rsyncrosim::projectId(prj)))), stdout = TRUE, stderr = TRUE)), error = function(e) conditionMessage(e))
+  now <- read(); left <- setdiff(add$Id, if (nrow(now)) as.integer(now$Id) else integer())
+  if (length(left)) stop(sprintf("%d strata could not be added to the project's Tertiary Stratum list (%s)%s", length(left), paste(utils::head(add$Name[add$Id %in% left], 3), collapse = "; "),
+                                 if (length(out)) paste0(": ", paste(utils::tail(out, 2), collapse = " ")) else ""), call. = FALSE)
+  add$Name }
+
 # a project-scope stsim list (Name, Id) as a data.table
 stsim_list <- function(name) as.data.table(datasheet(prj, paste0("stsim_", name), lookupsAsFactors = FALSE, optional = TRUE))
 
@@ -465,7 +485,7 @@ grid_notes <- function(g, cores = parallel::detectCores()) {
   c(sprintf("Spatial tiles: %d grid tiles, about %.1fx faster than one job on the timings of November 2026 (a job costs about a minute a simulated year whatever its cells, so the gain is far less than the number of tiles); estimated peak memory %.1f GB for the largest tile's job, %.0f GB for all %d at once (Library > Properties > Multiprocessing sets how many run at once)",
             g$n, one / many, job, all, g$n),
     if (g$n > cores) sprintf("Spatial tiles: %d tiles is more than this machine's %d cores, so the extra jobs wait their turn, and each pays a job's fixed cost again: fewer tiles would be faster", g$n, as.integer(cores)),
-    if (g$n >= 16) "Spatial tiles: merging the tiles is quicker with more merge threads (Library > Properties > Multiprocessing; 32 tiles merged in 2:34 on 1 thread, 1:27 on 2 and 0:51 on 8)",
+    if (g$n >= 16) "Spatial tiles: merging the tiles is quicker with more merge threads (library properties, System > Multiprocessing > Spatial, Number of threads to use when merging tiles; 32 tiles merged in 2:34 on 1 thread, 1:27 on 2 and 0:51 on 8)",
     "Spatial tiles: grid tiles split strata units, so they are for runs with no targets (the historical run). A projection with targets on this Build uses whole Secondary units instead, or the tiles set in its Run Settings") }
 tile_unit_name <- function(lvl, id) { l <- stsim_list(c(Primary = "Stratum", Secondary = "SecondaryStratum", Tertiary = "TertiaryStratum")[[lvl]])
   nm <- l$Name[match(as.character(id), as.character(l$Id))]; if (length(nm) && !is.na(nm)) nm else as.character(id) }

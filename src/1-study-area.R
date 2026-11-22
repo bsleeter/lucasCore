@@ -25,7 +25,7 @@ progressBar(type = "begin", totalSteps = 6)
 src <- read_data_sources(c("EcodivisionFile", "NlcdFolder"))
 opt <- read_ds("BuildOptions")
 res_m <- opt$Resolution[1]; y0 <- opt$StartYear[1]
-for (k in c("Stratum", "SecondaryStratum", "TertiaryStratum"))
+for (k in c("Stratum", "SecondaryStratum"))   # (the Tertiary Stratum list starts empty: this stage adds the strata the Build has, below)
   if (!nrow(stsim_list(k))) fail("stsim %s is empty: create the library with tools/new-library.R (or File > New from the lucasCore template)", k)
 ul <- stsim_list("SecondaryStratum"); ul[, Id := as.integer(Id)]
 if (!all(ul$Id >= UNIT_OFFSET)) fail("this library's strata lists predate universal unit lists: run tools/new-library.R <library> --rebuild-strata")
@@ -128,6 +128,10 @@ if (length(want)) {
                       lv[[1]], if (nrow(kp) == 1) "it" else "them", paste(sprintf("%s %d cells (%.1f%%)", kp$Name, kp$Cells, 100 * kp$Share), collapse = "; ")) }
   if (!is.null(gone)) { P <- mask(P, gone, maskvalues = 1); S <- mask(S, P); Tr <- mask(Tr, P) }
 }
+# the tertiary strata of this Build join the project's Tertiary Stratum list, which holds only the strata Builds use (shared.R)
+tadd <- tryCatch(define_tertiary_strata(Tr, ul), error = function(e) fail("Tertiary strata: %s", conditionMessage(e)))
+if (length(tadd)) say("Tertiary strata: %d unit%s added to the project's Tertiary Stratum list (%s%s). The list holds only the strata Builds use: ST-Sim's summary output costs time for every stratum defined",
+                      length(tadd), if (length(tadd) == 1) "" else "s", paste(utils::head(tadd, 8), collapse = "; "), if (length(tadd) > 8) sprintf("; and %d more", length(tadd) - 8) else "")
 progressBar()
 
 # ---- checks and outputs ---------------------------------------------------------------------------------------------

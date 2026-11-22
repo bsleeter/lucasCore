@@ -13,7 +13,7 @@ pkgdir <- normalizePath(file.path(here, ".."), winslash = "/")
 f <- if (length(a)) a[1] else file.path(pkgdir, "Starter", "LUCAS Core (CONUS).ssim")
 P <- rsyncrosim::project(ssimLibrary(normalizePath(f, winslash = "/")), "Definitions")
 out <- file.path(pkgdir, "defaults", "library", "project"); dir.create(out, recursive = TRUE, showWarnings = FALSE)
-sheets <- c("lucasCore_StratumSource", "stsim_SecondaryStratum", "stsim_TertiaryStratum", "lucasCore_ClimateScenario",
+sheets <- c("lucasCore_StratumSource", "stsim_SecondaryStratum", "lucasCore_ClimateScenario",
             "lucasCore_ClimateModel", "lucasCore_ClimateReplicate")
 for (s in sheets) {
   x <- as.data.table(datasheet(P, s, lookupsAsFactors = FALSE)); if (!nrow(x)) stop(s, " is empty in ", f)
