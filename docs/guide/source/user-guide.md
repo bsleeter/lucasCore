@@ -1219,27 +1219,30 @@ To use them, on **Build Options** tick **Split runs into tiles** and pick **Grid
 - **Sized in cells, not km.** A job's time and memory follow the number of cells in its tile, so the same number of tiles suits a 30 m and a 150 m model with the same number of cells. Stage 1 logs the cells in a tile and what that is in km² at the model's cell size.
 - **Automatic.** The number of tiles is the square root of the land cells in thousands, capped by the processor cores: 17 tiles for 275,000 cells, 32 for a million, 71 for five million. A study area under 20,000 cells runs as one job.
 
-*Table 5.2. Grid tiles timed on the first five years of the Olympic National Park and Forest historical run: 150 m, 275,745 land cells, a 112-core server, 21 November 2026. Times are minutes:seconds.*
+*Table 5.2. Grid tiles timed on the first five years of the Olympic National Park and Forest historical run: 150 m, 275,745 land cells, a 112-core server, 22 November 2026, in a library of version 1.8. Times are minutes:seconds.*
 
 | Tiles | Land cells per tile | Running the jobs | Merging the tiles | Total | Times faster |
 | --: | --: | --: | --: | --: | --: |
-| 1 | 275,700 | 18:40 | 0:03 | 18:47 | 1.0 |
-| 2 | 138,000 | 11:45 | 0:12 | 12:02 | 1.6 |
-| 4 | 69,000 | 9:00 | 0:18 | 9:25 | 2.0 |
-| 8 | 34,500 | 6:45 | 0:30 | 7:24 | 2.5 |
-| 16 | 17,200 | 6:06 | 0:49 | 7:09 | 2.6 |
-| 32 | 8,600 | 6:11 | 1:27 | 8:03 | 2.3 |
-| 60 | 4,600 | 7:26 | 2:28 | 10:35 | 1.8 |
+| 1 | 275,700 | 15:24 | 0:02 | 15:32 | 1.0 |
+| 2 | 138,000 | 8:12 | 0:14 | 8:32 | 1.8 |
+| 4 | 69,000 | 5:19 | 0:19 | 5:46 | 2.7 |
+| 8 | 34,500 | 3:12 | 0:30 | 3:52 | 4.0 |
+| 16 | 17,200 | 2:02 | 0:46 | 3:01 | 5.1 |
+| 32 | 8,600 | 1:44 | 1:20 | 3:27 | 4.5 |
+| 60 | 4,600 | 2:12 | 2:42 | 5:36 | 2.8 |
+| 100 | 2,800 | 3:34 | 3:56 | 8:39 | 1.8 |
 
 What the timings show:
 
-- **More tiles stop helping early.** Every job costs about a minute for each simulated year whatever the size of its tile, plus about 0.6 seconds for each 1,000 cells. Below about 20,000 cells a tile, smaller tiles save almost nothing. The best here was 16 tiles, 2.6 times faster than one job, on a computer with 112 cores.
-- **Merging costs more with every tile.** It took 49 seconds at 16 tiles and 2 minutes 28 seconds at 60. The automatic number is where a smaller tile's saving and one more tile's merge balance.
-- **More tiles than cores is slower.** Each waiting job pays its minute a year again: 48 tiles on 16 jobs took 18:56, no faster than one job.
-- **Equal cells beat equal areas.** Sixteen square tiles of a fixed size took 8:59 against 7:09, because the run lasts as long as its largest tile and a full square holds more cells than an equal share.
+- **More tiles stop helping early.** Every job costs about 17 seconds for each simulated year whatever the size of its tile, plus about 0.6 seconds for each 1,000 cells. Below about 10,000 cells a tile, smaller tiles save almost nothing. The best here was 16 tiles, 5.1 times faster than one job, on a computer with 112 cores.
+- **Merging costs more with every tile.** It took 46 seconds at 16 tiles and 3 minutes 56 seconds at 100, longer than running the 100 jobs. The automatic number is where a smaller tile's saving and one more tile's merge balance.
+- **More tiles than cores is slower.** Each waiting job pays its fixed cost again. Timed before version 1.8, when that cost was a minute a year, 48 tiles on 16 jobs took 18:56, no faster than one job.
+- **Equal cells beat equal areas.** Timed before version 1.8, sixteen square tiles of a fixed size took 8:59 against 7:09 for sixteen of equal cells, because the run lasts as long as its largest tile and a full square holds more cells than an equal share.
 - **More merge threads shorten the merge.** With 32 tiles the merge took 2:34 on 1 thread, 1:27 on 2 and 0:51 on 8. The setting is in the library's properties, System > Multiprocessing > Spatial: Number of threads to use when merging tiles.
 
-These are one model on one computer. A model with more cells gains more from tiles, since the fixed minute is a smaller share of each job.
+The whole historical run, 39 years on 17 tiles, took 21:30: 13:52 running the jobs and 7:24 merging the tiles. A library made before version 1.8 and not yet updated runs slower than this table: 16 tiles took 7:09 there, because every job spent about a minute a year on strata the model does not use (the update of 1.8 removes them).
+
+These are one model on one computer. A model with more cells gains more from tiles, since the fixed cost is a smaller share of each job.
 
 ### 5.4 Run the historical run
 

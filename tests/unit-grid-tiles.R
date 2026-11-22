@@ -49,7 +49,8 @@ g <- grid_tiles(disc, nr, nc, 16)
 expect("the log line gives the cells in a tile and what that is in km2", grepl("16 grid tiles of about", grid_summary(g, 150)) && grepl("km2 of land at 150 m", grid_summary(g, 150)))
 expect("the notes say grid tiles are for runs with no targets", any(grepl("no targets", grid_notes(g, 112))) && !any(grepl("wait their turn", grid_notes(g, 112))) && any(grepl("wait their turn", grid_notes(g, 8))) && any(grepl("merge threads", grid_notes(g, 112))))
 
-# the gain the log states is the one the timings give, not the share of cells: Olympic, 17 tiles of 16,217 cells, ran 2.6 times faster
+# the gain the log states is the one the timings give, not the share of cells: Olympic, 16 tiles of about 17,200 cells, ran 5.1 times
+# faster than one job (2026-11-22, a library of version 1.8)
 go <- list(load = rep(16217, 17), n = 17L); gain <- as.numeric(sub(".*about ([0-9.]+)x faster.*", "\\1", grid_notes(go, 112)[1]))
-expect("the stated gain for Olympic's 17 tiles is near the 2.6 times measured, not 17", gain > 2.3 && gain < 3.1, sprintf("%.1f", gain))
+expect("the stated gain for Olympic's 17 tiles is near the 5.1 times measured, not 17", gain > 4.5 && gain < 5.7, sprintf("%.1f", gain))
 cat(sprintf("\n%d passed, %d failed\n", ok, bad)); if (bad) quit(status = 1)

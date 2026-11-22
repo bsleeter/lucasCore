@@ -2,6 +2,18 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+### Changed
+
+- **Grid tiles: the gain stage 1 states, timed again on version 1.8.** With the Tertiary Stratum list short, a job's fixed cost
+  fell from about a minute a simulated year to about 17 seconds. The first 5 years of the Olympic historical run (150 m,
+  275,745 cells, 112 cores), 1, 2, 4, 8, 16, 32, 60 and 100 grid tiles: 15:32, 8:32, 5:46, 3:52, 3:01, 3:27, 5:36 and 8:39.
+  The best number of tiles did not move (it depends on the cost of a tile's cells and of merging it, not on the fixed cost),
+  so automatic is still the square root of the land cells in thousands; the gain at 16 tiles went from 2.6 times to 5.1, and
+  stage 1's log line now says so. Past 60 tiles the merge takes longer than the jobs (3:56 against 3:34 at 100). The full 39
+  years on 17 tiles: 21:30 (jobs 13:52, merge 7:24), where it was 57:49. `GRID_JOB_S` in `src/shared.R`; User Guide Table 5.2.
+
 ## 1.8.0 - 2026-11-22
 
 A minor version: the 1.8 library update shortens a library's Tertiary Stratum list to the strata its Builds use when the

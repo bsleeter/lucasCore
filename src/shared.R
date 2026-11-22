@@ -466,23 +466,28 @@ grid_tiles <- function(land, nr, nc, n) {
   box <- data.table::data.table(tile = tile, r = rw, c = cl)[, .(cells = .N, rows = max(r) - min(r) + 1L, cols = max(c) - min(c) + 1L), keyby = tile]
   list(values = tv, load = as.numeric(box$cells), n = nxt, box = box) }
 # Automatic grid tiles: the square root of the land cells in thousands, capped by the cores; one job under GRID_MIN_CELLS. Timed on
-# 2026-11-21 (Olympic park and forest, 150 m, 275,745 land cells, the first 5 years of the historical run, 112 cores; User Guide 5.3):
-# a job costs about a minute a simulated year whatever its cells, plus about 0.6 s per 1,000 cells, and merging costs about 0.6 s a
-# tile a year. More tiles shorten each job's cells and lengthen the merge, and the two balance at sqrt(cells / 1000) tiles:
-#   tiles  1      2      4     8     16    32    60        rectangles of equal cells against squares, 16 tiles: 7:09 and 8:59;
-#   total  18:47  12:02  9:25  7:24  7:09  8:03  10:35     48 squares on 16 jobs: 18:56 (each job pays its minute a year again)
-# So equal cells, not squares (user 2026-11-21, after the timings), and no more tiles than this: 17 here, 32 for a million cells.
-GRID_MIN_CELLS <- 20000L; GRID_JOB_S <- 60; GRID_CELL_S <- 0.6; GRID_MERGE_S <- 0.6
+# 2026-11-22 (Olympic park and forest, 150 m, 275,745 land cells, the first 5 years of the historical run, 112 cores; User Guide 5.3),
+# in a library of version 1.8 (short Tertiary Stratum list): a job costs about 17 s a simulated year whatever its cells, plus about
+# 0.6 s per 1,000 cells, and merging costs about 0.6 s a tile a year. More tiles shorten each job's cells and lengthen the merge,
+# and the two balance at sqrt(cells / 1000) tiles whatever the job's fixed cost is:
+#   tiles  1      2     4     8     16    32    60    100
+#   total  15:32  8:32  5:46  3:52  3:01  3:27  5:36  8:39     (run 2:02 and merge 0:46 at 16; run 3:34 and merge 3:56 at 100)
+# The same rule fitted the timings of 2026-11-21, made with 10,235 tertiary strata defined, when a job cost a minute a year (totals
+# 18:47, 12:02, 9:25, 7:24, 7:09, 8:03 and 10:35 for 1 to 60 tiles): only the gain changed, from 2.6 times to 5.1. From those runs:
+# rectangles of equal cells against squares, 16 tiles, 7:09 and 8:59; 48 squares on 16 jobs 18:56 (a waiting job pays its fixed
+# cost again). So equal cells, not squares (user 2026-11-21, after the timings), and no more tiles than this: 17 here, 32 for a
+# million cells. The full 39 years on 17 tiles: 21:30 (run 13:52, merge 7:24); 57:49 before 1.8.
+GRID_MIN_CELLS <- 20000L; GRID_JOB_S <- 17; GRID_CELL_S <- 0.6; GRID_MERGE_S <- 0.6
 auto_grid <- function(land_cells, cores = parallel::detectCores(), min_cells = GRID_MIN_CELLS)
   if (land_cells < min_cells) 1L else as.integer(max(1, min(cores, round(sqrt(land_cells / 1000)))))
 grid_summary <- function(g, res_m) sprintf("%d grid tiles of about %s land cells each (largest %s, smallest %s; a tile of that many cells is about %.0f km2 of land at %d m)", g$n,
   format(round(mean(g$load)), big.mark = ","), format(max(g$load), big.mark = ","), format(min(g$load), big.mark = ","), mean(g$load) * res_m^2 / 1e6, as.integer(res_m))
 grid_notes <- function(g, cores = parallel::detectCores()) {
   job <- TILE_JOB_GB + TILE_CELL_KB * max(g$load) / 2^20; all <- g$n * TILE_JOB_GB + TILE_CELL_KB * sum(g$load) / 2^20
-  # the gain expected from the costs timed on 2026-11-21 (seconds a simulated year: a job, 1,000 cells of it, a tile merged), not
-  # the share of the cells in the largest tile: Olympic's 17 tiles hold 1/17 of the cells each and ran 2.6 times faster, not 17
+  # the gain expected from the costs timed on 2026-11-22 (seconds a simulated year: a job, 1,000 cells of it, a tile merged), not
+  # the share of the cells in the largest tile: Olympic's 16 tiles hold 1/16 of the cells each and ran 5.1 times faster, not 16
   one <- GRID_JOB_S + GRID_CELL_S * sum(g$load) / 1000; many <- GRID_JOB_S + GRID_CELL_S * max(g$load) / 1000 + GRID_MERGE_S * g$n * max(1, g$n / cores)
-  c(sprintf("Spatial tiles: %d grid tiles, about %.1fx faster than one job on the timings of November 2026 (a job costs about a minute a simulated year whatever its cells, so the gain is far less than the number of tiles); estimated peak memory %.1f GB for the largest tile's job, %.0f GB for all %d at once (Library > Properties > Multiprocessing sets how many run at once)",
+  c(sprintf("Spatial tiles: %d grid tiles, about %.1fx faster than one job on the timings of November 2026 (a job has a fixed cost each simulated year whatever its cells, and every tile adds to the merge, so the gain is less than the number of tiles); estimated peak memory %.1f GB for the largest tile's job, %.0f GB for all %d at once (Library > Properties > Multiprocessing sets how many run at once)",
             g$n, one / many, job, all, g$n),
     if (g$n > cores) sprintf("Spatial tiles: %d tiles is more than this machine's %d cores, so the extra jobs wait their turn, and each pays a job's fixed cost again: fewer tiles would be faster", g$n, as.integer(cores)),
     if (g$n >= 16) "Spatial tiles: merging the tiles is quicker with more merge threads (library properties, System > Multiprocessing > Spatial, Number of threads to use when merging tiles; 32 tiles merged in 2:34 on 1 thread, 1:27 on 2 and 0:51 on 8)",
