@@ -565,14 +565,27 @@ download_handlers <- function() {
   # ---- USFS Science Tree Canopy Cover v2025-6: one CONUS 30 m GeoTIFF a year (percent canopy cover 0-100; larger values no data),
   # each in a zip of about 2 GB whose members are stored, so the region is read where it sits. For Forest Cover = tree canopy
   # (the Forest Cover page: stage 5 reads the start year, stage 6 every year, stage 8 the start year and 2016; src/forest-cover.R)
+  # All of CONUS (no Study Area; user 2026-11-23, for the drought and insect mortality line fitted by ecodivision): each year's
+  # zip is fetched whole (about 6 GB a year, 230 GB for 1985-2023) and its GeoTIFF unpacked to the top of the home under the name
+  # a region's file has. A zip already saved by hand in <home>/supplied/ (the source's own file name) is read from there and left
+  # where it is, not fetched again. The stages crop the file to their window, so a national copy serves any region
   H$TreeCanopyFolder <- list(column = "TreeCanopyFolder", name = "USFS Science Tree Canopy Cover", version = "v2025-6", method = "zip-window", clips = TRUE,
-    note = "Read for the region only from the USFS raster gateway's yearly zips (percent tree canopy cover, 30 m; values over 100 are no data)",
+    note = "From the USFS raster gateway's yearly zips (percent tree canopy cover, 30 m; values over 100 are no data): the region read where it sits, or (all of CONUS) the whole files",
     plan = function(ctx) {
-      if (whole_conus(ctx)) stop("Tree canopy cover is read for a region only: run the Data Download with a Study Area (Home layout By region)", call. = FALSE)
       y <- years_of(ctx, TCC_YEARS_SOURCE); if (!length(y)) stop(sprintf("Tree canopy cover has the years %d-%d: ask for years that include them", min(TCC_YEARS_SOURCE), max(TCC_YEARS_SOURCE)), call. = FALSE)
-      data.table::data.table(year = y, url = sprintf(TCC_ZIP, y), member = sprintf(TCC_MEMBER, y, y), file = sprintf("science_tcc_conus_%d.tif", y), fetch = FALSE) },
-    have = function(ctx, items) recorded(ctx, "TreeCanopyFolder", file.path(ctx$place, items$file)),
-    finish = function(ctx, items) { dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE); gdal_remote()
+      it <- data.table::data.table(year = y, url = sprintf(TCC_ZIP, y), member = sprintf(TCC_MEMBER, y, y), out = sprintf("science_tcc_conus_%d.tif", y))
+      if (!whole_conus(ctx)) return(it[, `:=`(file = out, fetch = FALSE)][])
+      own <- file.path(ctx$home, "supplied", basename(it$url)); own <- ifelse(file.exists(own), normalizePath(own, winslash = "/", mustWork = FALSE), NA_character_)
+      it[, `:=`(file = basename(url), supplied = own, fetch = is.na(own))][] },
+    have = function(ctx, items) recorded(ctx, "TreeCanopyFolder", file.path(ctx$place, items$out)),
+    finish = function(ctx, items) { dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE)
+      if (whole_conus(ctx)) {
+        for (i in seq_len(nrow(items))) { own <- !is.na(items$supplied[i]); zip <- if (own) items$supplied[i] else items$dest[i]
+          if (!items$member[i] %in% utils::unzip(zip, list = TRUE)$Name) stop(sprintf("%s does not hold %s", basename(zip), items$member[i]), call. = FALSE)
+          zip_tif(ctx, zip, file.path(ctx$place, items$out[i])); if (!own) unlink(zip)   # a zip saved by hand stays where it is
+          ctx$log(sprintf("  Tree canopy cover %d (national%s)", items$year[i], if (own) ", from supplied/" else "")) }
+        return(ctx$place) }
+      gdal_remote()
       # each year is written under a part name and renamed when whole: a read that breaks off (the gateway now and then returns an
       # empty range; P26 1985, 2026-11-18) leaves a partial file that terra still holds, so it is released and removed before the next try
       for (i in seq_len(nrow(items))) { dest <- file.path(ctx$place, items$file[i]); part <- paste0(dest, ".part.tif")
