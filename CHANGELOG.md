@@ -2,7 +2,7 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
-## 1.9.0 - 2026-11-23
+## 1.9.0 - 2026-11-24
 
 A minor version: the 1.9 library update adds the PRISM Grid choice to the Climate Options and Data Download sheets. It writes
 no value, and no value means 800 m, so an existing library reads PRISM on the 800 m grid at its next Build. That Build stops

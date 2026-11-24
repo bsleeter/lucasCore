@@ -185,7 +185,7 @@ The stages read national data from disk, and there are two ways to give a librar
 
 1. In the Definitions project's settings, choose the **LUCAS Core (model builder)** tab.
 2. Choose **LUCAS Core > Data Sources**. The datasets are grouped by kind: study area and strata, land cover, forest inventory and age, disturbance and fire, climate, soils and terrain, infrastructure and ownership. Hover a dataset's name for its full description, source and download link; a grey note under a name says when it is needed.
-3. In **Data Sources Home**, type the folder the Data Download will fill, or click **Browse...** to pick it. Choose a drive with room: P26 needs about 33 GB, 31 GB of which are copies shared by every study area (section 1.6). **Make folders** creates the empty layout; the Data Download does this too.
+3. In **Data Sources Home**, type the folder the Data Download will fill, or click **Browse...** to pick it. Choose a drive with room: P26 needs about 33 GB, 31 GB of which are copies shared by every study area (section 1.6). From lucasCore 1.9 add about 34 GB to both figures: the shared copies then hold PRISM on its 800 m grid (36 GB, where the 4 km grid is 2 GB). **Make folders** creates the empty layout; the Data Download does this too.
 4. Each dataset has a path box. A new library starts with every path blank, and a blank path reads the dataset from the home. To use a copy you already have, type or paste its path; a long path shows its end, and hovering it shows the whole path. You can also
 5. click **Browse...** to pick the file or folder.
 6. **Download** opens the page where the dataset can be downloaded by hand. Datasets in the USFS Research Data Archive open the archive and name their RDS identifier.
@@ -298,7 +298,7 @@ Choose **LUCAS Core > Data Download**. The page has five groups.
 
 **Years**
 
-6. **Years**: the annual datasets (NLCD, MTBS, LCMS, LANDFIRE disturbance, PRISM). Blank means 1985 to the latest each source has.
+6. **Years**: the annual datasets (NLCD, MTBS, LCMS, LANDFIRE disturbance, PRISM). Blank means 1985 to the latest each source has. From lucasCore 1.9 the same group holds **PRISM grid**, the grid to fetch: **800 m** (default, about 36 GB for 1985 on) or **4 km** (about 2 GB). Fetch the grid the Build's Climate Options page names (section 3.4).
 
 **LOCA2 climate projections**
 
@@ -344,6 +344,8 @@ For P26 the first download took about 2.5 hours:
 
 In all, the P26 region's folder holds 1.5 GB and the shared copies 31 GB. A rerun with nothing to fetch takes under a minute. A second study area downloads only its own clips; the shared copies are already there.
 
+These figures are from a download made with PRISM on its 4 km grid. From lucasCore 1.9 the download fetches PRISM on the 800 m grid unless the page's **PRISM grid** is set to 4 km: 602 files, about 36 GB, for annual temperature and precipitation and monthly precipitation from 1985 on, so the shared copies come to about 65 GB. The same server delivered 140 GB in 67 minutes when this was tested. A home that already holds the 4 km grids keeps them; the 800 m grids are added beside them in the same `climate/prism` folder.
+
 Then build. With the home set and the paths blank, every stage reads from the home. The Data Sources page marks each dataset **✓ home: regions/Pyrome-P26-Northern-Sierra-Nevada**, and the run log names the folder each dataset came from.
 
 #### 1.6.6 When something goes wrong
@@ -359,7 +361,7 @@ Then build. With the home set and the paths blank, every stage reads from the ho
 
 With **By region**, each new study area gets its own download and folder, and the shared copies are fetched only the first time. A Build reads each dataset from the smallest region whose box covers its study area, so one large download, such as all of California, serves every Build inside it: P26, P29 and Placer County.
 
-**National** keeps every dataset whole at the top of the home, so any study area in CONUS reads from it with no further download. It is about 175 GB: Annual NLCD alone is 56 GB, at 1.4 GB a year, and the gNATSGO soil layers are about 9 GB each. MRLC served the NLCD files at about 1.3 MB/s when this was tested, so a national home is an overnight job; a stopped run resumes. The national files and a region's clips are the same cell for cell.
+**National** keeps every dataset whole at the top of the home, so any study area in CONUS reads from it with no further download. It is about 175 GB: Annual NLCD alone is 56 GB, at 1.4 GB a year, and the gNATSGO soil layers are about 9 GB each. MRLC served the NLCD files at about 1.3 MB/s when this was tested, so a national home is an overnight job; a stopped run resumes. The national files and a region's clips are the same cell for cell. From lucasCore 1.9 a national home also takes PRISM at 800 m for five variables (precipitation, mean, maximum and minimum temperature, and maximum vapour pressure deficit), annual and monthly: about 130 GB more for 1985 on.
 
 #### 1.6.8 New editions
 
@@ -629,6 +631,8 @@ Stage 1 logs how many cells each source of a stack gave. For Olympic National Pa
 3. The same effects apply in projections. The climate that drives a projection (a LOCA2 scenario, climate model and replicate) is not chosen here: each climate future is its own small Projection Climate scenario on the Build's result (chapter 6), so one Build serves any number of them.
 
 From lucasCore 1.5 the page also has **Wetland growth**, for emergent marsh: **None**, **Miami NPP**, **Temperature** (default: growth follows the year's temperature only) or **Temperature and Miami NPP** (temperature for tidal marsh, which is not short of water, and Miami NPP for inland marsh). Wetland methane and wetland soil CO2 follow the year's temperature whenever Decomposition is Q10; their Q10 values are on Carbon Assumptions > Wetland Methane (section 3.7).
+
+From lucasCore 1.9 the page starts with **PRISM grid**: **800 m** (default) or **4 km**. It is the PRISM grid the Build reads, for the yearly climate multipliers here (stage 7) and for the ecodivision climate normals behind the growth curves and decay rates (stages 2 and 3). 800 m follows terrain more closely; 4 km is what every Build before 1.9 read. The choice changes results little: in test Builds the growth curves moved by 0.02% on average and the multipliers by under 1% per cell and year. The PRISM folder must hold the grid chosen. If it does not, the Build stops at stage 2 and says what the folder holds: run a Data Download with PRISM ticked (section 1.6), or choose the other grid. A library made before 1.9 reads 800 m at its next Build.
 
 ![The Climate Options page: Climate Options marked 1, the climate effects (tree ring forest growth, Miami NPP non-forest growth, Q10 decomposition) 2 and the note on projection climate 3](images/fig-3.5.png)
 
@@ -1053,7 +1057,7 @@ A Build that is run again does not repeat the stages that would give the same re
 
 **What it costs.** A copied stage takes well under a minute: it checks its inputs in the library file and writes its tables. Stages 0, 1 and 5 of a Great Dismal Swamp Build at 150 m took 16 minutes the first time and 2 minutes when run again with nothing changed.
 
-**Seeing what happened.** **LUCAS Core > Build Results > Build Stages** lists each stage of the result as **Ran** or **Reused from result N**, with its minutes. In the run log a copied stage says "not run again" and names the result it came from, then repeats its log lines from that run. A stage that ran says what changed, for example "5 Initial Conditions runs: since result 43, lucasCore_StandAgeFia changed".
+**Seeing what happened.** **LUCAS Core > Build Results > Build Stages** lists each stage of the result as **Ran** or **Reused from result N**, with its minutes. In the run log a copied stage says "not run again" and names the result it came from, then repeats its log lines from that run. A stage that ran says what changed, for example "5 Initial Conditions runs: since result 43, lucasCore\_StandAgeFia changed".
 
 **Turning it off.** On the Build scenario open **LUCAS Core > Build Options** and tick **Rebuild every stage**, at the top of the page. Every stage then runs, and no earlier result is looked at. Untick it afterwards.
 
