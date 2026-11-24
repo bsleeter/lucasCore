@@ -20,12 +20,15 @@ namespace lucasCoreUI
         private readonly Choice m_nonForest = new Choice("NonForestGrowthModel", 3);
         private readonly Choice m_decomp = new Choice("DecompositionModel", 2);
         private readonly Choice m_wetland = new Choice("WetlandGrowthModel", 3);
+        private readonly Choice m_prism = new Choice("PrismGrid", 1);
 
         public ClimateOptionsView()
         {
             this.SuspendLayout();
             var hist = Column();
             hist.Controls.Add(Note("Year-to-year multipliers from PRISM, relative to each cell's 1991-2020 normal (1 = the climate the curves were fitted to)."));
+            hist.Controls.Add(ChoiceRow("PRISM grid:", m_prism, new[] { 1, 2 }, new[] { "800 m (default)", "4 km" }));
+            hist.Controls.Add(Wrapped("The PRISM grid the Build reads: the yearly climate here, and the ecodivision normals of the growth curves and decay rates. 800 m follows terrain more closely; 4 km is what every Build before lucasCore 1.9 read. The PRISM folder must hold the grid chosen (Data Download, PRISM).", 640));
             hist.Controls.Add(ChoiceRow("Forest growth:", m_forest, new[] { 1, 2, 3 }, new[] { "None", "Miami NPP", "Tree ring (default)" }));
             hist.Controls.Add(Wrapped("Tree ring: growth responds to this year's and last year's precipitation and to temperature, fitted to 1,288 ITRDB chronologies by ecodivision. Miami NPP swings about twice as much from year to year.", 640));
             hist.Controls.Add(ChoiceRow("Non-forest growth:", m_nonForest, new[] { 1, 2, 3 }, new[] { "None", "Miami NPP", "RAP fit (default)" }));
@@ -51,6 +54,6 @@ namespace lucasCoreUI
             return r;
         }
 
-        protected override void ShowData() { ShowChoice(m_forest); ShowChoice(m_nonForest); ShowChoice(m_wetland); ShowChoice(m_decomp); }
+        protected override void ShowData() { ShowChoice(m_prism); ShowChoice(m_forest); ShowChoice(m_nonForest); ShowChoice(m_wetland); ShowChoice(m_decomp); }
     }
 }

@@ -7,7 +7,8 @@
   `multiplier = 1 + PrecipCoef (P/Pn - 1) + PrecipLagCoef (P last year/Pn - 1) + TempCoef (T - Tn)`, floored at 0, with Pn and Tn the
   1991-2020 mean of the same PRISM files. Built by `tools/make_tree_ring_coefficients.R`: standard ring-width indices of 1,288 CONUS
   ITRDB chronologies (NOAA NCEI, `Data Sources/ITRDB`) regressed on PRISM annual climate at each site (1895-2023, current PRISM release,
-  `Data Sources/Climate/prism/annual-us25m`), pooled by ecodivision with a random-effects mean. Ecodivisions with fewer than 10 sites
+  on the 800 m grid, `climate/prism/annual-us30s` in a data home: refitted 2026-11-23, when the model moved from PRISM 4 km to
+  800 m; no coefficient moved by more than 0.007 and the leave-one-site-out skill is the same), pooled by ecodivision with a random-effects mean. Ecodivisions with fewer than 10 sites
   (Marine, Savanna) take the pooled CONUS coefficients. `MiamiBeta` is the ring-width slope on the Miami multiplier (for reference).
 
 Why tree ring is the default (2026-10-20, dev/climate/05-07): predicting each site's annual ring-width index from the other sites'
@@ -19,7 +20,9 @@ the sensitivity of total growth. FIA remeasurement could not test annual sensiti
 
 Tree rings say nothing about grassland and shrubland growth. For those, `rap-climate-coefficients.csv` (2026-11-07, to-do 39
 step 7) is fitted to RAP vegetation NPP v3 (Robinson et al. 2019): yearly NPP 1986-2023 at the grass and shrub sample windows
-(`dev/nonforest/04-rap-climate-sample.R`), each window and life form's NPP over its 1991-2020 mean, regressed on PRISM at the window.
+(`dev/nonforest/04-rap-climate-sample.R`), each window and life form's NPP over its 1991-2020 mean, regressed on PRISM at the window
+(the 800 m grid since 2026-11-23: refitted at 4 km the fit reproduces the first table exactly, and at 800 m the coefficients move by 1 to 4%
+of their size with the same R2, 0.23).
 The form (`dev/nonforest/07-rap-climate-seasonal-fit.R`, chosen in `06-rap-climate-explore.R` by leave-one-window-out prediction):
 
   `multiplier = 1 + sum_k (Coef_k + AridCoef_k ar) s_k + (PrecipLagCoef + PrecipLagAridCoef ar) pl + TempCoef (T - Tn)`, floored at 0
@@ -36,7 +39,7 @@ are scaled by `Scale` = k^0.5, k = RAP's SD over the fit's in the ecodivision (1
 4-7% more RMSE and beating the window's own mean in 57-69% of windows (84% unscaled). Fully matching RAP's SD would cost far more
 (beats the mean in 27-45%), and part of RAP's variation is likely retrieval noise. Earlier forms (calendar-year and water-year
 total rain, `05-rap-climate-fit.R`) reproduced 0.33-0.45 of the variation. Climate Options: Non-Forest Growth = RAP fit uses it, the
-default since 2026-11-07 (Miami NPP swings 1.0-2.4 times RAP's variation). Rain is PRISM monthly (`monthly-us25m/ppt`) in stage 7 and LOCA2 monthly (`loca2_annual("ppt_seasons")`)
+default since 2026-11-07 (Miami NPP swings 1.0-2.4 times RAP's variation). Rain is PRISM monthly (on the grid Climate Options picks, 800 m or 4 km: `src/prism.R`) in stage 7 and LOCA2 monthly (`loca2_annual("ppt_seasons")`)
 in stage 11, against each source's own 1991-2020 seasonal normals.
 
 ## Projections (LOCA2)

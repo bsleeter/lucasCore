@@ -233,25 +233,19 @@ download_handlers <- function() {
       if (clipping(ctx)) clip_vector(x, dest, ctx$region, layer = "Fires") else { dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE); file.rename(x, dest) }
       dest })
 
-  # ---- PRISM: annual tmean and ppt (4 km, "us_25m") and the 1991-2020 normals, national (small) ------------------------
-  # from PRISM's HTTP mirror (sizes and byte ranges; the web service blocks a file fetched twice in 24 h). Stage 7 needs the year
-  # before the first year, and 1991-2020 for its normal
-  H$PrismFolder <- list(column = "PrismFolder", name = "PRISM annual climate and normals", national = TRUE, version = "PRISM AN (us_25m, 4 km)",
-    plan = function(ctx) { last <- as.integer(format(Sys.Date(), "%Y")) - 1L; y <- sort(unique(c(years_of(ctx, 1895:last), 1991:2020, min(years_of(ctx, 1895:last)) - 1L)))
-      a <- data.table::CJ(var = c("tmean", "ppt"), year = y)[, .(var, year, url = sprintf("https://data.prism.oregonstate.edu/time_series/us/an/4km/%s/monthly/%d/prism_%s_us_25m_%d.zip", var, year, var, year),
-                                                                 file = sprintf("prism_%s_us_25m_%d.zip", var, year))]
-      n <- data.table::data.table(var = c("tmean", "ppt"), year = NA_integer_, url = sprintf("https://data.prism.oregonstate.edu/normals/us/4km/%s/monthly/prism_%s_us_25m_2020_avg_30y.zip", c("tmean", "ppt"), c("tmean", "ppt")),
-                                  file = sprintf("prism_%s_us_25m_2020_avg_30y.zip", c("tmean", "ppt")))
-      # monthly precipitation (2026-11-07, to-do 39 step 7): the October-September water year of the RAP fit grass and shrub response;
-      # the region's years from the October before the first, and 1990-2020 for the water-year normal
-      y0 <- min(years_of(ctx, 1895:last)); ym <- sort(unique(c(max(y0 - 2L, 1981L):last, 1990:2020)))   # the first year's lag needs October two years before
-      m <- data.table::CJ(year = ym, mon = 1:12)[, .(var = "ppt", year, url = sprintf("https://data.prism.oregonstate.edu/time_series/us/an/4km/ppt/monthly/%d/prism_ppt_us_25m_%d%02d.zip", year, year, mon),
-                                                       file = sprintf("prism_ppt_us_25m_%d%02d.zip", year, mon), monthly = TRUE)]
-      rbind(a[, monthly := FALSE], n[, monthly := FALSE], m)[, fetch := TRUE][] },
-    # in place = the tif a zip unpacks to, at its recorded size: a rerun fetches only what is new (the monthly files, first time)
+  # ---- PRISM: annual and monthly grids and the 1991-2020 normals, national ---------------------------------------------
+  # 800 m ("us_30s") since 2026-11-23 (prism_plan below); the 4 km grids ("us_25m") an earlier version fetched stay beside them in
+  # their own subfolders, so a version change here adds files and is not a new edition. From PRISM's HTTP mirror (sizes and byte
+  # ranges; the web service blocks a file fetched twice in 24 h). A zip already on disk, saved by hand, is unpacked, not fetched
+  H$PrismFolder <- list(column = "PrismFolder", name = "PRISM climate and normals", national = TRUE, version = "PRISM AN (us_30s, 800 m)",
+    url = "https://data.prism.oregonstate.edu/time_series/us/an https://data.prism.oregonstate.edu/normals/us", same_edition = function(v) grepl("^PRISM AN", v),
+    plan = function(ctx) prism_plan(ctx),
+    # in place = the tif a zip unpacks to, at its recorded size: a rerun fetches or unpacks only what is new
     have = function(ctx, items) recorded(ctx, "PrismFolder", file.path(ctx$place, prism_dir(items), sub("[.]zip$", ".tif", items$file))),
     finish = function(ctx, items) {
-      d <- prism_dir(items); for (i in seq_len(nrow(items))) utils::unzip(items$dest[i], exdir = file.path(ctx$place, d[i]))
+      d <- prism_dir(items); z <- ifelse(is.na(items$supplied), items$dest, items$supplied)
+      for (i in seq_len(nrow(items))) { ex <- file.path(ctx$place, d[i]); utils::unzip(z[i], exdir = ex)
+        if (!file.exists(file.path(ex, sub("[.]zip$", ".tif", items$file[i])))) stop(sprintf("%s did not unpack to %s", z[i], sub("[.]zip$", ".tif", items$file[i])), call. = FALSE) }
       ctx$place })
 
   # ---- LOCA2: monthly pr, tasmax, tasmin of each model's historical and SSP runs. The UCSD regional cut when the region
@@ -681,8 +675,55 @@ LFPS <- "https://lfps.usgs.gov/api"
 NIFC <- sprintf("https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/%s/FeatureServer/0", c("InterAgencyFirePerimeterHistory_1979_And_Prior_Read_Only",
   "InteragencyFirePerimeterHistory_1980s_Read_Only", "InteragencyFirePerimeterHistory_1990s_Read_Only", "InteragencyFirePerimeterHistor_2000s_Read_Only",
   "InteragencyFirePerimeterHistory_2010s_Read_Only", "InterAgencyFirePerimeterHistory_2020s_Read_Only"))
-# where a PRISM item unpacks: the normals, monthly precipitation, or the annual files of its variable
-prism_dir <- function(items) ifelse(is.na(items$year), "normals", ifelse(items$monthly %in% TRUE, "monthly-us25m/ppt", file.path("annual-us25m", items$var)))
+# ---- PRISM ---------------------------------------------------------------------------------------------------------------
+# the two grids PRISM serves: the token in its file names and the folder of its directory tree. 800 m is the one fetched; 4 km
+# stays readable and can be asked for (a Data Download option PrismGrid, when the sheet has one)
+PRISM_RES <- list(`800 m` = c(tok = "30s", dir = "800m"), `4 km` = c(tok = "25m", dir = "4km"))
+PRISM_VARS <- c("ppt", "tmean", "tmax", "tmin", "vpdmax")   # the national copy; the stages read tmean and ppt
+PRISM_SUPPLIED <- c("climate/prism-800m-source", "supplied/prism-800m")   # under the home: 800 m zips saved by hand, in any subfolders
+prism_resolution <- function(ctx) { v <- if (!is.null(ctx$opts) && nrow(ctx$opts) && "PrismGrid" %in% names(ctx$opts)) ctx$opts$PrismGrid[1] else NA
+  if (!is.na(v) && (identical(suppressWarnings(as.integer(v)), 2L) || grepl("4 ?km", as.character(v), ignore.case = TRUE))) "4 km" else "800 m" }
+# the items of a set of grids: var, year (NA for a normal), mon (NA for an annual grid), normal, res, the zip's name and its address
+prism_items <- function(res, var, year = NA_integer_, mon = NA_integer_, normal = FALSE) {
+  if (!length(var)) return(data.table::data.table(var = character(), year = integer(), mon = integer(), normal = logical(), res = character(), file = character(), url = character()))
+  r <- PRISM_RES[[res]]; x <- data.table::data.table(var = var, year = as.integer(year), mon = as.integer(mon), normal = normal, res = res)
+  x[, stamp := paste0(ifelse(normal, "2020", as.character(year)), ifelse(is.na(mon), "", sprintf("%02d", mon)))]
+  x[, file := sprintf("prism_%s_us_%s_%s%s.zip", var, r[["tok"]], stamp, ifelse(normal, "_avg_30y", ""))]
+  x[, url := ifelse(normal, sprintf("https://data.prism.oregonstate.edu/normals/us/%s/%s/monthly/%s", r[["dir"]], var, file),
+                    sprintf("https://data.prism.oregonstate.edu/time_series/us/an/%s/%s/monthly/%d/%s", r[["dir"]], var, year, file))]
+  x[, stamp := NULL][] }
+# a PRISM zip's name read back into an item (no rows for a name that is not one)
+prism_parse <- function(file) { rx <- "^prism_([a-z]+)_us_(30s|25m)_([0-9]{4})([0-9]{2})?(_avg_30y)?[.]zip$"; file <- file[grepl(rx, file)]
+  if (!length(file)) return(prism_items("800 m", character()))
+  tok <- sub(rx, "\\2", file); nrm <- nzchar(sub(rx, "\\5", file)); mon <- suppressWarnings(as.integer(sub(rx, "\\4", file)))
+  data.table::rbindlist(lapply(unique(tok), function(k) { i <- tok == k
+    prism_items(names(PRISM_RES)[vapply(PRISM_RES, function(r) r[["tok"]] == k, TRUE)], sub(rx, "\\1", file[i]), ifelse(nrm[i], NA_integer_, as.integer(sub(rx, "\\3", file[i]))), mon[i], nrm[i]) })) }
+# what a run asks of PRISM. A region: annual tmean and ppt for its years, the year before the first (stage 7's lagged rain) and
+# 1991-2020 (the normal of the same files), their 30-year normals, and monthly ppt (the RAP fit's October-September water year:
+# from October two years before the first year, and 1990-2020). All of CONUS at 800 m, the national copy: the same for all five
+# variables with the monthly normals, and every 800 m zip saved by hand, whatever its year
+prism_plan <- function(ctx) { res <- prism_resolution(ctx)
+  last <- as.integer(format(Sys.Date(), "%Y")) - 1L; ya <- years_of(ctx, 1895:last); y0 <- min(ya)
+  full <- whole_conus(ctx) && res == "800 m"; vars <- if (full) PRISM_VARS else c("tmean", "ppt"); mvars <- if (full) PRISM_VARS else "ppt"
+  y <- sort(unique(c(ya, 1991:2020, y0 - 1L))); ym <- sort(unique(c(max(y0 - 2L, if (res == "4 km") 1981L else 1895L):last, 1990:2020)))
+  a <- data.table::CJ(var = vars, year = y); m <- data.table::CJ(var = mvars, year = ym, mon = 1:12)
+  items <- rbind(prism_items(res, a$var, a$year), prism_items(res, vars, normal = TRUE), prism_items(res, m$var, m$year, m$mon),
+                 if (full) { n <- data.table::CJ(var = vars, mon = 1:12); prism_items(res, n$var, mon = n$mon, normal = TRUE) })
+  sup <- if (res == "800 m") prism_supplied(ctx$home) else character()
+  if (full && length(sup)) { more <- prism_parse(setdiff(names(sup), items$file)); items <- rbind(items, more[res == "800 m" & var %in% PRISM_VARS]) }
+  items[, supplied := unname(sup[file])][, fetch := is.na(supplied)]
+  if (res == "800 m" && !is.null(ctx$place) && dir.exists(file.path(ctx$place, "annual-us25m")))
+    items[, note := "The 4 km grids (us_25m) of an earlier download are kept beside the 800 m ones, in annual-us25m, monthly-us25m and normals"]
+  items[] }
+# 800 m zips saved by hand under the home, by file name (the first found of a name)
+prism_supplied <- function(home) { f <- unlist(lapply(file.path(home, PRISM_SUPPLIED), function(d) if (dir.exists(d)) list.files(d, "^prism_.*_us_30s_.*[.]zip$", recursive = TRUE, full.names = TRUE) else character()))
+  if (!length(f)) return(character())
+  f <- f[!duplicated(basename(f))]; stats::setNames(normalizePath(f, winslash = "/"), basename(f)) }
+# where a PRISM item unpacks. 4 km, as that version laid it out: normals, monthly-us25m/ppt, annual-us25m/<var>. 800 m:
+# normals-us30s/<var>, monthly-us30s/<var>, annual-us30s/<var>
+prism_dir <- function(items) { k <- paste0("us", vapply(items$res, function(r) PRISM_RES[[r]][["tok"]], ""))
+  ifelse(items$res == "4 km", ifelse(items$normal, "normals", ifelse(!is.na(items$mon), file.path("monthly-us25m", items$var), file.path("annual-us25m", items$var))),
+         file.path(paste0(ifelse(items$normal, "normals-", ifelse(!is.na(items$mon), "monthly-", "annual-")), k), items$var)) }
 RAP_NPP <- "https://rangeland.ntsg.umt.edu/data/rap/rap-vegetation-npp/v3/vegetation-npp-v3-%d.tif"
 # USFS Science Tree Canopy Cover v2025-6 (read 2026-11-18): the year's zip and the GeoTIFF in it
 TCC_ZIP <- "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/docs/v2025-6/science_tcc_conus_%d_v2025-6_wgs84.zip"

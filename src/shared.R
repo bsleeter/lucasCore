@@ -205,6 +205,8 @@ study_box <- function() {
     error = function(e) { say("Data Sources Home: the study area is not known yet (%s); reading the top of the home first", conditionMessage(e)); NULL })
   .home_cov$study_box <- b; b }
 
+# a note on a Data Source a stage read, shown in Data Sources Used and the Model Record (the PRISM grid read: src/prism.R)
+source_note <- function(col, text) { if (!is.null(.home_cov$read[[col]])) .home_cov$read[[col]]$Note <- text; invisible() }
 # the Data Sources a stage read, for Data Sources Used (written by finish_checks): where each came from, and its files' sizes and
 # checksum (from the home's files.csv: one file's sha256, or the sha256 of the sorted path and sha256 list of a folder). A path set
 # by hand has no checksum. A home dataset whose files no longer match files.csv is noted: the write-once rule was broken
@@ -216,11 +218,11 @@ data_sources_used <- function() {
     if (nrow(f)) { fp <- file.path(x$Dir, f$Path); ok <- all(file.exists(fp)) && all(file.size(fp) == as.numeric(f$Bytes))
       sh <- if (nrow(f) == 1) f$Sha256 else digest::digest(paste(sort(paste(f$Path, f$Sha256)), collapse = "\n"), algo = "sha256", serialize = FALSE)
       return(data.table(Stage = stage, DataSource = x$DataSource, Origin = home_label(.home_cov$home, x$Dir), Path = x$Path,
-                        Files = nrow(f), Bytes = sum(as.numeric(f$Bytes)), Sha256 = sh, Note = if (ok) NA_character_ else "files on disk differ from files.csv")) }
+                        Files = nrow(f), Bytes = sum(as.numeric(f$Bytes)), Sha256 = sh, Note = if (!ok) "files on disk differ from files.csv" else if (is.null(x$Note)) NA_character_ else x$Note)) }
     fl <- if (dir.exists(x$Path)) list.files(x$Path, recursive = TRUE, full.names = TRUE) else x$Path
     data.table(Stage = stage, DataSource = x$DataSource, Origin = x$Origin, Path = x$Path, Files = length(fl),
                Bytes = sum(as.numeric(file.size(fl)), na.rm = TRUE), Sha256 = NA_character_,
-               Note = if (identical(x$Origin, "home")) "no files.csv rows (laid out by hand)" else "not from Data Sources Home: no checksum") })) }
+               Note = if (identical(x$Origin, "home")) "no files.csv rows (laid out by hand)" else paste(c("not from Data Sources Home: no checksum", x$Note), collapse = "; ")) })) }
 
 # ---- Data Sources Home coverage (to-do 12, phase 5) -------------------------------------------------------------------------
 # A dataset read from the home folder holds only the region its Data Download was run for (manifest.csv). Each Build stage calls

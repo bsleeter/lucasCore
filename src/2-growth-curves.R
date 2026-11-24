@@ -7,7 +7,7 @@
 # Growth Curve Options can instead copy all of these from a result scenario of another lucasCore library (src/growth-copy.R).
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
-source(pkg_file("src", "growth.R")); source(pkg_file("src", "carbon.R")); source(pkg_file("src", "fia.R"))
+source(pkg_file("src", "growth.R")); source(pkg_file("src", "prism.R")); source(pkg_file("src", "carbon.R")); source(pkg_file("src", "fia.R"))
 suppressPackageStartupMessages({ library(terra); library(sf); library(parallel) })
 STAGE <- "2 Growth Curves"; stage_begin()
 progressBar(type = "begin", totalSteps = 6)
@@ -70,7 +70,9 @@ progressBar()
 fx <- fia_tables(opt, src$EcodivisionFile)   # Growth Curve Options: FIA Data (src/fia.R)
 x <- growth_data(fx$cond, fx$dist, opt)
 say("FIA: %d plot-conditions after filters (%d plots)", nrow(x), uniqueN(x$pid))
-clim <- ecodiv_climate(src$EcodivisionFile, src$PrismFolder)
+# (Climate Options: PRISM Grid, 800 m or 4 km; the ecodivision means are the same to two decimals)
+pres <- tryCatch(prism_pick(src$PrismFolder, prism_choice(read_ds("ClimateOptions")$PrismGrid)), error = function(e) fail("%s", conditionMessage(e))); source_note("PrismFolder", sprintf("PRISM %s grid", pres))
+clim <- ecodiv_climate(src$EcodivisionFile, src$PrismFolder, pres); say("Ecodivision climate: PRISM %s normals (1991-2020)", pres)
 progressBar()
 
 grp_of <- function(s) as.integer(unlist(strsplit(s, ";")))

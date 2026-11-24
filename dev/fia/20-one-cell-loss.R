@@ -6,7 +6,7 @@
 suppressPackageStartupMessages({ library(data.table); library(DBI) })
 pkg <- "F:/lucasCore"; dm <- "F:/lucas-master/Data Sources/FIA/DataMart"
 say <- function(...) invisible(); fail <- function(...) stop(sprintf(...), call. = FALSE)
-for (f in c("growth.R", "flows.R", "dom.R", "calibrate.R", "fia.R")) source(file.path(pkg, "src", f))
+for (f in c("growth.R", "prism.R", "flows.R", "dom.R", "calibrate.R", "fia.R")) source(file.path(pkg, "src", f))
 q <- function(lib, s) { con <- dbConnect(RSQLite::SQLite(), lib, flags = RSQLite::SQLITE_RO); on.exit(dbDisconnect(con)); as.data.table(dbGetQuery(con, s)) }
 tl <- file.path(pkg, "dev/libs/lucasCore-suitability.ssim"); p26 <- file.path(pkg, "dev/libs/LUCAS P26 Demo Library.ssim")
 scl <- q(tl, "SELECT StateClassId, Name, Id FROM stsim_StateClass"); stl <- q(tl, "SELECT StratumId, Name FROM stsim_Stratum")

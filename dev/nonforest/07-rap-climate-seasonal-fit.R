@@ -30,7 +30,8 @@ d[, nppNormal := mean(npp[Year %in% NORMAL]), by = .(StratumId, window, LifeForm
 # ---- seasonal water-year precipitation at the window centres (as 06) ---------------------------------------------------------
 ctr <- unique(d[, .(StratumId, window, x, y)]); pts <- vect(as.matrix(ctr[, .(x, y)]), crs = "EPSG:5070")
 yrs <- sort(unique(d$Year)); mons <- unique(unlist(lapply(c(yrs, NORMAL), function(y) c(sprintf("%d%02d", y - 1, 10:12), sprintf("%d%02d", y, 1:9)))))
-mf <- file.path(PRISM, "monthly-us25m", "ppt", sprintf("prism_ppt_us_25m_%s.tif", mons)); if (!all(file.exists(mf))) stop("PRISM monthly missing")
+source(file.path(pkg, "src", "prism.R")); GRID <- Sys.getenv("PRISM_GRID", "800 m"); cat(sprintf("PRISM %s grid\n", GRID))   # (800 m since 2026-11-23; "4 km" = the first fit)
+mf <- prism_monthly(PRISM, GRID, "ppt", substr(mons, 1, 4), substr(mons, 5, 6)); if (!all(file.exists(mf))) stop("PRISM monthly missing")
 mv <- as.matrix(terra::extract(rast(mf), project(pts, crs(rast(mf[1]))), method = "bilinear", ID = FALSE)); colnames(mv) <- mons
 season <- list(OND = 10:12, JFM = 1:3, AMJ = 4:6, JAS = 7:9)
 sp <- function(y, k) { m <- if (k == "OND") sprintf("%d%02d", y - 1, 10:12) else sprintf("%d%02d", y, season[[k]]); rowSums(mv[, m, drop = FALSE]) }

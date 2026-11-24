@@ -114,16 +114,18 @@ home_restore_records <- function(home, log = message, label = home) {
 
 # the file rows of one dataset as on disk now: every file under its home place, path relative to the home folder. sha256 only
 # when asked (it reads every byte)
-files_rows <- function(home, column, path, sha = FALSE) {
+files_rows <- function(home, column, path, sha = FALSE, known = NULL) {   # known: files.csv rows whose checksum stands for a file still at its recorded size and time (a dataset that grows: PRISM's 156 GB took 41 minutes to checksum again)
   # a file column: the file and its sidecars (a shapefile's .dbf, .shx, .prj; a raster's .aux.xml)
   f <- if (dir.exists(path)) list.files(path, recursive = TRUE, full.names = TRUE) else {
     a <- list.files(dirname(path), full.names = TRUE); a[startsWith(basename(a), paste0(tools::file_path_sans_ext(basename(path)), "."))] }
   f <- f[!grepl(BUILD_CACHES, f)]
   if (!length(f)) return(data.table::data.table())
   i <- file.info(f, extra_cols = FALSE); rel <- substring(normalizePath(f, winslash = "/"), nchar(normalizePath(home, winslash = "/")) + 2)
-  data.table::data.table(Column = column, Path = rel, Bytes = sprintf("%.0f", i$size),
-                         Sha256 = if (sha) vapply(f, function(x) digest::digest(file = x, algo = "sha256"), "") else NA_character_,
-                         Modified = format(i$mtime, "%Y-%m-%dT%H:%M:%S")) }
+  out <- data.table::data.table(Column = column, Path = rel, Bytes = sprintf("%.0f", i$size), Sha256 = NA_character_, Modified = format(i$mtime, "%Y-%m-%dT%H:%M:%S"))
+  if (sha) { if (!is.null(known) && nrow(known)) { k <- match(paste(out$Path, out$Bytes, out$Modified), paste(known$Path, known$Bytes, known$Modified)); ok <- !is.na(k) & !is.na(known$Sha256[k]) & nchar(known$Sha256[k]) == 64
+      out$Sha256[ok] <- known$Sha256[k[ok]] }
+    todo <- which(is.na(out$Sha256)); out$Sha256[todo] <- vapply(f[todo], function(x) digest::digest(file = x, algo = "sha256"), "") }
+  out }
 
 # does the manifest show a dataset done for a box (EPSG:5070: xmin, ymin, xmax, ymax)? TRUE / FALSE, or NA when the manifest has no
 # row for it (a path set by hand, or a home folder laid out by hand: nothing to check against). National copies cover everything
