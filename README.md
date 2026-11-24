@@ -62,7 +62,7 @@ lucasCore ships a starter library. An Empty Library does not work: it has no def
    `Rscript tools/build_starter.R` if it is missing: it is not in git).
 2. In SyncroSim Studio, File > Open the copy.
 3. Fetch the data: on the project's **Data Sources** page set **Data Sources Home** (an empty folder with room: about 1.5 GB for a
-   pyrome-sized region, plus about 30 GB of national files every region shares: FIA, PRISM, LOCA2), then run a **Data Download** scenario (pipeline 15) with the
+   pyrome-sized region, plus about 65 GB of national files every region shares: FIA, PRISM on its 800 m grid (36 GB; 2 GB on the 4 km grid), LOCA2), then run a **Data Download** scenario (pipeline 15) with the
    same Study Area units as the Build (User Guide, section 1.6). It fetches every national dataset the Build reads, and the polygons
    of the Stratum Sources (states, counties, watersheds, ecoregions, pyromes, federal lands, GAP status), into the home, where a blank
    path reads them.

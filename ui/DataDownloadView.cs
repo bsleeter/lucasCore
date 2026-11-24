@@ -34,6 +34,7 @@ namespace lucasCoreUI
         private class Ds { public string Column, Name, Category, Method, Login, Note, Comes; public double SizeGb, DlMb, DiskMb; public bool Fetched; public CheckBox Box; }
         private readonly List<Ds> m_ds = new List<Ds>();
         private readonly Choice m_layout = new Choice("HomeLayout", 2);
+        private readonly Choice m_prism = new Choice("PrismGrid", 1);
         private readonly TextBox m_region = new TextBox { Width = 200, Margin = new Padding(3, 3, 6, 3) };
         private readonly Label m_regions = new Label { AutoSize = true, MaximumSize = new Size(680, 0), ForeColor = SystemColors.GrayText, Margin = new Padding(3, 2, 3, 4) };
         private readonly TextBox m_buffer = Box(60), m_from = Box(60), m_to = Box(60), m_con = Box(40);
@@ -127,7 +128,9 @@ namespace lucasCoreUI
             var yr = Column();
             var y = Row(); y.Controls.Add(Caption("Years:")); y.Controls.Add(m_from); y.Controls.Add(Caption("to")); y.Controls.Add(m_to);
             y.Controls.Add(Note("the annual datasets (MTBS, LCMS, PRISM); blank = 1985 to the latest each source has")); yr.Controls.Add(y);
-            AddGroup(Group("Years", yr));
+            var pg = Row(); pg.Controls.Add(Caption("PRISM grid:")); pg.Controls.Add(Option(m_prism, 1, "800 m (default)")); pg.Controls.Add(Option(m_prism, 2, "4 km"));
+            pg.Controls.Add(Note("800 m: about 36 GB for 1985 on; 4 km: about 2 GB. A Build reads the one its Climate Options page names")); yr.Controls.Add(pg);
+            AddGroup(Group("Years and PRISM grid", yr));
 
             AddGroup(Group("LOCA2 climate projections", BuildLoca2()));
 
@@ -331,7 +334,7 @@ namespace lucasCoreUI
             m_home.ForeColor = home.Length > 0 ? SystemColors.ControlText : Color.Firebrick;
             m_homeDir = home; m_email.Enabled = home.Length > 0; m_email.Text = Setting("LfpsEmail");
             m_token.Enabled = home.Length > 0; m_token.Text = Setting("EarthdataToken");
-            ShowChoice(m_layout); m_region.Text = Show(Value("RegionName")); m_region.Enabled = IntValue("HomeLayout", 2) == 2;
+            ShowChoice(m_layout); ShowChoice(m_prism); m_region.Text = Show(Value("RegionName")); m_region.Enabled = IntValue("HomeLayout", 2) == 2;
             string[] regs = new string[0];
             try { string rd = Path.Combine(home, "regions"); if (home.Length > 0 && Directory.Exists(rd)) regs = Directory.GetDirectories(rd).Select(Path.GetFileName).OrderBy(x => x).ToArray(); }
             catch (Exception) { }

@@ -6,7 +6,7 @@
 # Cells: the test library's (phaseZ7) with the most plots, and P26's Mixed Conifer. Read-only. Usage: Rscript dev/fia/19-litter-input-sources.R
 # =============================================================================
 suppressPackageStartupMessages({ library(data.table); library(DBI) })
-pkg <- "F:/lucasCore"; for (f in c("growth.R", "flows.R", "dom.R")) source(file.path(pkg, "src", f))
+pkg <- "F:/lucasCore"; for (f in c("growth.R", "prism.R", "flows.R", "dom.R")) source(file.path(pkg, "src", f))
 q <- function(lib, s) { con <- dbConnect(RSQLite::SQLite(), lib, flags = RSQLite::SQLITE_RO); on.exit(dbDisconnect(con)); as.data.table(dbGetQuery(con, s)) }
 p26 <- file.path(pkg, "dev/libs/LUCAS P26 Demo Library.ssim"); tl <- file.path(pkg, "dev/libs/lucasCore-suitability.ssim")
 ds <- q(p26, "SELECT PrismFolder, EcodivisionFile FROM lucasCore_DataSource"); clim <- ecodiv_climate(ds$EcodivisionFile, ds$PrismFolder)

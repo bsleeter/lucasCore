@@ -16,7 +16,7 @@
 # Needs the Live-Tree Carbon Curves of stage 2 (same pipeline, or a dependency on a stage 2 result).
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
-source(pkg_file("src", "growth.R")); source(pkg_file("src", "flows.R")); source(pkg_file("src", "dom.R")); source(pkg_file("src", "calibrate.R")); source(pkg_file("src", "fia.R")); source(pkg_file("src", "disturbed-carbon.R"))
+source(pkg_file("src", "growth.R")); source(pkg_file("src", "prism.R")); source(pkg_file("src", "flows.R")); source(pkg_file("src", "dom.R")); source(pkg_file("src", "calibrate.R")); source(pkg_file("src", "fia.R")); source(pkg_file("src", "disturbed-carbon.R"))
 suppressPackageStartupMessages({ library(terra); library(sf) })
 STAGE <- "3 Carbon Flows"; stage_begin()
 progressBar(type = "begin", totalSteps = 6)
@@ -37,12 +37,13 @@ if (anyNA(cw$deciduous)) fail("Growth Inputs / merch-carbon-density.csv has no D
 say("Carbon curves: %d cells x %d ages", uniqueN(cc[, .(Stratum, StateClass)]), uniqueN(cc$Age))
 
 # ecodivision mean annual temperature (PRISM normals) for DOM decay
-clim <- ecodiv_climate(src$EcodivisionFile, src$PrismFolder)
+pres <- tryCatch(prism_pick(src$PrismFolder, prism_choice(read_ds("ClimateOptions")$PrismGrid)), error = function(e) fail("%s", conditionMessage(e))); source_note("PrismFolder", sprintf("PRISM %s grid", pres))   # (Climate Options: PRISM Grid)
+clim <- ecodiv_climate(src$EcodivisionFile, src$PrismFolder, pres)
 eco <- unique(data.table(ecodiv = as.character(st_drop_geometry(read_sf(src$EcodivisionFile))$ecodiv),
                          StratumId = as.integer(st_drop_geometry(read_sf(src$EcodivisionFile))$StrtmId)))
 eco[, Stratum := stl$Name[match(StratumId, as.integer(stl$Id))]][, temp := clim$mat[match(ecodiv, clim$ecodiv)]]
 eco <- eco[!is.na(Stratum)]
-say("Ecodivision mean annual temperature (PRISM): %s", paste(sprintf("%s %.1f C", eco$ecodiv, eco$temp), collapse = ", "))
+say("Ecodivision mean annual temperature (PRISM %s normals): %s", pres, paste(sprintf("%s %.1f C", eco$ecodiv, eco$temp), collapse = ", "))
 progressBar()
 
 # ---- 3b: calibrate DOM decay (src/calibrate.R): snags, down wood, forest floor to FIA; soil to gNATSGO ----------------------

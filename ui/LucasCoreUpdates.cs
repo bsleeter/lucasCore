@@ -367,6 +367,17 @@ namespace lucasCoreUI
             store.ExecuteNonQuery("DELETE FROM " + T + " WHERE " + K + " NOT IN (" + string.Join(",", ids) + ")");
         }
 
+        // ---- 1.9 (PRISM 800 m, 2026-11): stages 2, 3 and 7 read PRISM on the 800 m grid, or on the 4 km grid of every earlier Build
+        // (src/prism.R), as the Climate Options page says, and the Data Download fetches the grid its page names. No value means
+        // 800 m, so nothing is written here: an existing library reads 800 m at its next Build, once its PRISM folder holds that grid
+        // (Data Download, PRISM), or 4 km when set so. Results already made are not changed. No apostrophe in the description ------
+        [Update(1.9, "lucasCore 1.9: the PRISM Grid choice (800 m or 4 km) on the Climate Options and Data Download pages")]
+        public static void Update_1_900(DataStore store)
+        {
+            AddColumn(store, "lucasCore_ClimateOptions", "PrismGrid", "INTEGER");
+            AddColumn(store, "lucasCore_DataDownloadOptions", "PrismGrid", "INTEGER");
+        }
+
         // ---- 1.5 (wetland methane, 2026-11): wetland classes release part of what their soil and litter emit as CH4 (src/flows.R,
         // src/nonforest-solve.R). The rows are the ones defaults/stsim and defaults/stockflow gained (generated from them). The three
         // Wetland Methane sheets are new tables, which SyncroSim adds by itself. A library keeps running on its earlier Builds; the

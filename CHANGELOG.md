@@ -2,6 +2,50 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## 1.9.0 - 2026-11-24
+
+A minor version: the 1.9 library update adds the PRISM Grid choice to the Climate Options and Data Download sheets. It writes
+no value, and no value means 800 m, so an existing library reads PRISM on the 800 m grid at its next Build. That Build stops
+at stage 2, saying what to do, until the library's PRISM folder holds the 800 m grids: run a Data Download with PrismFolder
+(about 36 GB for 1985 on), or set PRISM Grid to 4 km on the Climate Options page. Results already made are not changed.
+
+### Changed
+
+- **PRISM temperature and precipitation on the 800 m grid.** Stages 2, 3 and 7 read PRISM on its 800 m grid (file names
+  `us_30s`) where they read the 4 km grid (`us_25m`). **Climate Options > PRISM grid** picks 800 m (the default) or 4 km, and
+  the same choice on the **Data Download** page picks the grid to fetch. A PRISM folder holds either grid or both, each in its
+  own subfolders (`annual-us30s`, `monthly-us30s`, `normals-us30s` beside `annual-us25m`, `monthly-us25m`, `normals`), so a
+  home that already holds 4 km keeps it and earlier versions still read it. A Build whose folder lacks the grid chosen stops
+  and names both ways out. The stage log, Data Sources Used and the Model Record name the grid read. Stage 11 reads no PRISM
+  (each LOCA2 year is set against the same run's own 1991-2020 normal) and is unchanged. `src/prism.R`.
+
+  What moves, from stages 2, 3 and 7 run at both grids on copies of the Yellowstone and Great Dismal Swamp libraries: growth
+  curve parameters by 0.02% on average (largest 0.8%) and decay rates by at most 0.1%, because they use ecodivision means,
+  which agree to 0.012 C and 0.22%; the forest growth multiplier by 0.3 to 0.4% per cell and year on average (1 to 2% at the
+  99th percentile), the grass and shrub one by 0.5 to 0.8% (2 to 4%); a year's study-area mean by up to 2.6%. Stage 7 takes
+  the same time (3.6 against 3.2 minutes, 9.4 against 8.8).
+
+- **Tree-ring and RAP fit coefficients refitted on the 800 m grid.** The same 1,288 tree-ring sites (1896-2023) and 2,703
+  grass and shrub window fits (1986-2023), with PRISM read at 800 m. Tree ring: no coefficient moves by more than 0.007, and
+  the leave-one-site-out error is 0.2595 where it was 0.2600. RAP fit: refitted at 4 km the table comes out as it was, and at
+  800 m the coefficients move by 1 to 4% of their size, R2 0.232 where it was 0.233. In stage 7 the two tables change forest
+  growth by under 0.1% per cell and year and grass and shrub growth by about 0.35%. A Build set to 4 km uses the same tables.
+  `defaults/climate/tree-ring-coefficients.csv`, `rap-climate-coefficients.csv`; the fits take `PRISM_GRID`.
+
+- **Data Download: PRISM.** At 800 m a region asks for annual tmean and ppt, their normals and monthly ppt (about 36 GB for
+  1985 on, where 4 km was about 2 GB), kept whole at the top of the home. All of CONUS (Home layout National) takes ppt,
+  tmean, tmax, tmin and vpdmax, annual and monthly, with the monthly normals (140 GB for 1978-2025). A zip already under the
+  home in `climate/prism-800m-source` or `supplied/prism-800m` is unpacked from there and not fetched, whatever its year. The
+  800 m grids are added beside a home's 4 km ones, not as a new edition.
+
+- **Data Download: a dataset that grows keeps its checksums.** Adding files to a dataset recorded before (PRISM years, LOCA2
+  runs) no longer checksums every file again: a file at its recorded size and time keeps its recorded checksum. Adding 83
+  years to the 156 GB PRISM copy took 2 minutes to record where the first recording took 41.
+
+- **Coastal cells take their climate from the same distance at either grid.** Stage 7 and stage 11 fill land the climate grid
+  leaves empty at the coast from neighbouring cells. The reach was two cells of the source grid, 9 km for PRISM 4 km but under
+  2 km for 800 m; it is now about 9 km whatever the grid (LOCA2: two cells, as before). `to_grid` in `src/climate.R`.
+
 ## 1.8.1 - 2026-11-22
 
 A patch: no library update. An existing library keeps its own number of merge threads (library properties, System >

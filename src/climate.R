@@ -116,8 +116,9 @@ climate_window <- function(P) ext(project(as.polygons(ext(P) + 20000, crs = crs(
 climate_emitter <- function(fm, P, prm) {
   land <- !is.na(values(P, mat = FALSE))
   e <- new.env(); e$rows <- list(); e$summ <- list(); e$unfilled <- 0
-  # grow the source field two cells into its no-data margin (coast), then interpolate to the model grid; anything still empty is the fill
-  to_grid <- function(x, fill = 1) { for (k in 1:2) x <- focal(x, 3, "mean", na.policy = "only", na.rm = TRUE)
+  # grow the source field about 9 km into its no-data margin (coast), then interpolate to the model grid; anything still empty is the
+  # fill. 9 km is two cells of PRISM's 4 km grid, the reach this had before PRISM 800 m (ten cells of that; LOCA2's 6 km: two)
+  to_grid <- function(x, fill = 1) { if (global(is.na(x), "sum")[[1]] > 0) for (k in seq_len(max(2L, as.integer(round((2 / 24) / res(x)[1]))))) x <- focal(x, 3, "mean", na.policy = "only", na.rm = TRUE)
     r <- mask(project(x, P, method = "bilinear"), P); n <- global(is.na(r) & !is.na(P), "sum")[[1]]
     r <- mask(cover(r, init(P, fill)), P); attr(r, "unfilled") <- n; r }
   # Ty, Py: the year's annual mean temperature and precipitation; Pl: last year's precipitation; Tn, Pn: the 1991-2020 normal of the same

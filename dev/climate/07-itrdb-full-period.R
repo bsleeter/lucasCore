@@ -13,9 +13,10 @@ pkg <- local({ d <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", c
 DS <- Sys.getenv("LUCAS_DATA_HOME", file.path(pkg, "dev/libs/Data Sources"))   # the Data Sources folder
 suppressPackageStartupMessages({ library(data.table); library(terra) })
 for (v in c("PROJ_LIB", "PROJ_DATA", "GDAL_DATA")) if (grepl("syncro", tolower(Sys.getenv(v)))) Sys.unsetenv(v)
-OUT <- file.path(pkg, "dev/climate"); PR <- file.path(DS, "Climate/prism/annual-us25m")
+source(file.path(pkg, "src", "prism.R")); GRID <- Sys.getenv("PRISM_GRID", "800 m")   # the PRISM grid (800 m since 2026-11-23; "4 km" = the first fit)
+OUT <- file.path(pkg, "dev/climate"); PR <- file.path(DS, "Climate/prism")
 YRS <- 1895:2023
-tfile <- function(v, y) file.path(PR, v, sprintf("prism_%s_us_25m_%d.tif", v, y))
+tfile <- function(v, y) prism_annual(PR, GRID, v, y); cat(sprintf("PRISM %s grid under %s\n", GRID, PR))
 miss <- c(YRS[!file.exists(tfile("tmean", YRS))], YRS[!file.exists(tfile("ppt", YRS))]); if (length(miss)) stop("PRISM files missing: ", paste(unique(miss), collapse = ", "))
 sites <- fread(file.path(OUT, "itrdb-sites.csv"))[!is.na(lat) & !is.na(ecodiv)]
 ser <- fread(file.path(OUT, "itrdb-series.csv"))[site %in% sites$site & year %between% c(1895, 2023)]

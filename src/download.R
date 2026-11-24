@@ -155,7 +155,8 @@ run_dataset <- function(h, ctx, layout, check_only = FALSE) {
   # a new edition (the folder holds this dataset for the region, at another version): into <folder>/editions/<tag>/ when Fetch new
   # editions is ticked, else skipped; the first edition is never touched, and a library reads it until its Data Sources page says
   m0 <- read_manifest(ctx$store)[Column == col]
-  newer <- up && !is.null(h$version) && nrow(m0) == 1 && !is.na(m0$Version) && !identical(m0$Version, h$version)
+  # (a handler's same_edition(old version) says the new version only adds files beside the old ones: PRISM 800 m beside 4 km)
+  newer <- up && !is.null(h$version) && nrow(m0) == 1 && !is.na(m0$Version) && !identical(m0$Version, h$version) && !(is.function(h$same_edition) && isTRUE(h$same_edition(m0$Version)))
   if (newer) { ed <- file.path(ctx$store, "editions", edition_tag(h$version))
     if (!isTRUE(ctx$new_editions) && !dataset_up_to_date(ed, col, ctx$region)) {
       log(sprintf("%s: %s holds %s; this version fetches %s, a new edition (tick Fetch new editions to download it)", h$name, where, m0$Version, h$version))
@@ -209,7 +210,7 @@ run_dataset <- function(h, ctx, layout, check_only = FALSE) {
   if (nrow(get)) { sizes <- url_sizes(get$url)
     log(sprintf("%s: fetching %d files (%.0f MB%s)", h$name, nrow(get), sum(sizes, na.rm = TRUE) / 1e6, if (anyNA(sizes)) ", some sizes unknown" else ""))
     fetch_files(get$url, get$dest, ctx$connections, log, sizes); mb <- sum(file.size(get$dest), na.rm = TRUE) / 1e6 }
-  if (length(sup)) log(sprintf("%s: reading %s, supplied by hand", h$name, paste(sup, collapse = ", ")))
+  if (length(sup)) log(sprintf("%s: reading %s, supplied by hand", h$name, if (length(sup) > 4) sprintf("%d files under %s", length(sup), paste(unique(dirname(dirname(sup))), collapse = ", ")) else paste(sup, collapse = ", ")))
   else if (nrow(remote)) log(if (!is.null(h$method)) sprintf("%s: %s by its source (%s)", h$name, if (is.null(ctx$region$poly)) "read whole" else "clipped", h$method) else sprintf("%s: reading %d archives remotely, writing the region only", h$name, nrow(remote)))
   log(sprintf("%s: %.0f MB fetched; unpacking%s", h$name, mb, if (is.null(ctx$region$poly) || ctx$keep) "" else " and clipping to the region"))
   # finish writes into a staging folder; commit_staged moves its files into place without replacing any a library may have read
@@ -222,14 +223,15 @@ run_dataset <- function(h, ctx, layout, check_only = FALSE) {
 # record: every file under the place, with checksums; the manifest row (done); records/; the downloaded archives deleted
 record_dataset <- function(h, ctx, layout, col, path, items, method, where, log, out) {
   if (identical(method, "by hand")) log(sprintf("%s: checksums of the files in place", h$name))
-  fr <- files_rows(ctx$store, col, path, sha = TRUE); write_files(ctx$store, fr)
+  # a handler that grows (have) keeps the checksums of the files already recorded and unchanged in size and time
+  fr <- files_rows(ctx$store, col, path, sha = TRUE, known = if (!is.null(h$have)) read_files(ctx$store)[Column == col]); write_files(ctx$store, fr)
   # a region's download is a national copy only when whole files were kept: a source that clips (NLCD, LANDFIRE, perimeters,
   # gNATSGO, stand age tiles) gives the region alone, Keep national copies or not
   by_source <- isTRUE(h$method %in% c("wcs", "lfps", "rest", "stac", "login")) || isTRUE(h$clips)
   copy <- if (is.null(ctx$region$poly) || isTRUE(h$national) || (ctx$keep && !by_source)) "national" else "clipped"
   src <- layout[Column == col]
   write_manifest(ctx$store, data.table::data.table(Column = col, Dataset = h$name, Source = src$Source, Version = if (!is.null(h$version)) h$version else src$Version,
-    Url = paste(unique(dirname(items$url)), collapse = " "), Doi = src$Doi, Method = method, Copy = copy,
+    Url = if (!is.null(h$url)) h$url else paste(unique(dirname(items$url)), collapse = " "), Doi = src$Doi, Method = method, Copy = copy,
     Units = ctx$region$units, BufferKm = ctx$region$buffer_km, Xmin = ctx$region$box[1], Ymin = ctx$region$box[2], Xmax = ctx$region$box[3], Ymax = ctx$region$box[4],
     Files = nrow(fr), Bytes = sprintf("%.0f", sum(as.numeric(fr$Bytes))), Downloaded = format(Sys.time(), "%Y-%m-%dT%H:%M:%S"), Status = "done",
     Note = if ("note" %in% names(items)) items$note[1] else if (!is.null(h$note)) h$note else NA_character_))

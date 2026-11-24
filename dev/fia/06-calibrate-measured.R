@@ -20,7 +20,7 @@ dm <- file.path(DS, "FIA/DataMart")
 # dev variants (09-fit-events.R): LUCAS_CAL_OUT = output folder, LUCAS_EVENT_FILE = event flow table in place of the package's
 out <- Sys.getenv("LUCAS_CAL_OUT", file.path(pkg, "dev/fia/out-cal")); dir.create(out, showWarnings = FALSE)
 event_file <- Sys.getenv("LUCAS_EVENT_FILE", file.path(pkg, "defaults/stockflow/event-pathways.csv")); cat("event flows:", event_file, "\n")
-for (f in c("growth.R", "flows.R", "dom.R", "calibrate.R")) source(file.path(pkg, "src", f))
+for (f in c("growth.R", "prism.R", "flows.R", "dom.R", "calibrate.R")) source(file.path(pkg, "src", f))
 # LUCAS_SNAG_FALL (dev, 13-snag-fall-fixed.R): a csv of measured annual stem snag fall rates per FIA forest type group (Group, StemFall).
 # Snag fall is then fixed at that rate (branch snags scaled alike relative to CBM's rates) and the snag multiplier scales only decay and
 # emission of the snags, not their fall.

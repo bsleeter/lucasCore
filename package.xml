@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<package name="lucasCore" displayName="LUCAS Core (model builder)" description="Builds LUCAS land-use and carbon models in ST-Sim from national datasets (FIA growth curves; CBM carbon parameters; spatial initial conditions; historical transitions and projections)" version="1.8.1" url="https://code.usgs.gov/LUCC/lucasCore" minSyncroSimVersion="3.1.29">
+<package name="lucasCore" displayName="LUCAS Core (model builder)" description="Builds LUCAS land-use and carbon models in ST-Sim from national datasets (FIA growth curves; CBM carbon parameters; spatial initial conditions; historical transitions and projections)" version="1.9.0" url="https://code.usgs.gov/LUCC/lucasCore" minSyncroSimVersion="3.1.29">
 
 	<builtFor package="stsim" version="4.5.4"/>
 
@@ -32,7 +32,7 @@
 		<column name="FriFile" displayName="LANDFIRE Mean Fire Return Interval" dataType="String" isOptional="True"/>
 		<column name="BpsFile" displayName="LANDFIRE Biophysical Settings 2020 (potential vegetation; reforestation, stage 5)" dataType="String" isOptional="True"/>
 		<column name="TreeCanopyFolder" displayName="USFS Tree Canopy Cover Folder (science_tcc_conus_year.tif; Forest Cover: canopy forest, recovery and stocking)" dataType="String" isOptional="True"/>
-		<column name="PrismFolder" displayName="PRISM Folder (annual and normals)" dataType="String" isOptional="True"/>
+		<column name="PrismFolder" displayName="PRISM Folder (annual, monthly and normals; 800 m, 4 km or both)" dataType="String" isOptional="True"/>
 		<column name="Loca2Folder" displayName="LOCA2 Folder (gcm/r1i1p1f1/ssp)" dataType="String" isOptional="True"/>
 		<column name="SoilCarbonFile" displayName="Soil Organic Carbon (gNATSGO soc0_999; gSSURGO also reads)" dataType="String" isOptional="True"/>
 		<column name="HistosolFile" displayName="Histosol share (gNATSGO map units, % organic soil; peat fire and drained organic soils, to-do 53)" dataType="String" isOptional="True"/>
@@ -482,6 +482,8 @@
 		<column name="NonForestGrowthModel" displayName="Non-Forest Growth" dataType="Integer" validationType="List" formula1="1:None|2:Miami NPP|3:RAP fit" defaultValue="3"/>
 		<column name="DecompositionModel" displayName="Decomposition" dataType="Integer" validationType="List" formula1="1:None|2:Q10" defaultValue="2"/>
 		<column name="WetlandGrowthModel" displayName="Wetland Growth (emergent marsh)" dataType="Integer" isOptional="True" validationType="List" formula1="1:None|2:Miami NPP|3:Temperature|4:Temperature and Miami NPP" defaultValue="3"/>
+		<!-- the PRISM grid stages 2, 3 and 7 read (src/prism.R): 800 m since lucasCore 1.9, or the 4 km grid of every earlier Build. No value = 800 m -->
+		<column name="PrismGrid" displayName="PRISM Grid (the historical climate, and the normals of the growth curves and decay rates)" dataType="Integer" isOptional="True" validationType="List" formula1="1:800 m|2:4 km" defaultValue="1"/>
 		<!-- legacy (libraries made before 2026-10-24): the LOCA2 run is now chosen in a Projection Climate scenario (stage 11); stage 7 no longer reads these -->
 		<column name="ClimateScenarioId" displayName="Projection Scenario (legacy)" dataType="Integer" isOptional="True" isVisible="False" validationType="Datasheet" formula1="lucasCore_ClimateScenario"/>
 		<column name="ClimateModelId" displayName="Projection Climate Model (legacy)" dataType="Integer" isOptional="True" isVisible="False" validationType="Datasheet" formula1="lucasCore_ClimateModel"/>
@@ -1592,6 +1594,7 @@
 		<column name="FetchNewEditions" displayName="Fetch new editions (a dataset the home holds at an older version: the new one beside it, in editions/)" dataType="Boolean" defaultValue="0" isOptional="True"/>
 		<column name="CheckOnly" displayName="Check only: list what would download, and how big, without fetching" dataType="Boolean" defaultValue="0" isOptional="True"/>
 		<column name="Connections" displayName="Downloads at once" dataType="Integer" defaultValue="4" isOptional="True"/>
+		<column name="PrismGrid" displayName="PRISM grid to fetch (800 m: about 36 GB for 1985 on; 4 km: about 2 GB)" dataType="Integer" isOptional="True" validationType="List" formula1="1:800 m|2:4 km" defaultValue="1"/>
 		<column name="Loca2Models" displayName="LOCA2 models (blank = the project&apos;s Climate Model list; the page ticks them from defaults/download/loca2-catalog.csv)" dataType="String" isOptional="True"/>
 		<column name="Loca2Scenarios" displayName="LOCA2 scenarios (blank = ssp245, ssp370, ssp585; historical always comes)" dataType="String" isOptional="True"/>
 		<column name="Loca2Member" displayName="LOCA2 members (blank = each model&apos;s r1i1p1f1, else its first)" dataType="String" isOptional="True"/>
@@ -1660,6 +1663,7 @@
 		<dataSheet name="GrowthOptions" type="Input"/>
 		<dataSheet name="GrowthInput" type="Input"/>
 		<dataSheet name="BuildOptions" type="Input"/>
+		<dataSheet name="ClimateOptions" type="Input"/>
 		<dataSheet name="MerchantableVolumeCurve" type="Output"/>
 		<dataSheet name="CarbonCurve" type="Output"/>
 		<dataSheet name="OutputGrowthParameter" type="Output"/>
@@ -1675,6 +1679,7 @@
 	<transformer name="CarbonFlows" displayName="3 - Carbon Flows" isRunnable="True" isMultiprocessing="False" programName="Rscript" programArguments="src/3-carbon-flows.R">
 		<dataSheet name="WetlandOptions" type="Input"/>
 		<dataSheet name="WetlandMethaneTarget" type="Input"/>
+		<dataSheet name="ClimateOptions" type="Input"/>
 		<dataSheet name="LiveTurnover" type="Input"/>
 		<dataSheet name="NonForestGrowth" type="Input"/>
 		<dataSheet name="NonForestRate" type="Input"/>

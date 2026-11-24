@@ -35,19 +35,20 @@ NW <- Sys.getenv("N_WINDOWS"); if (nzchar(NW)) { centres <- centres[seq_len(as.i
 cat(sprintf("%d windows, %d years, %d workers\n", nrow(centres), length(YEARS), WORKERS))
 
 # ---- climate at the window centres (PRISM in the home: no download) ---------------------------------------------------------
-pf <- function(v, y) { f <- Sys.glob(file.path(PRISM, "annual-us25m", v, sprintf("prism_%s_us_25m_%d*.tif", v, y))); if (length(f) != 1) stop(sprintf("PRISM %s %d: %d files", v, y, length(f))); f }
+source(file.path(pkg, "src", "prism.R")); GRID <- Sys.getenv("PRISM_GRID", "800 m"); cat(sprintf("PRISM %s grid\n", GRID))   # (800 m since 2026-11-23; "4 km" = the first fit)
+pf <- function(v, y) { f <- prism_annual(PRISM, GRID, v, y); if (!file.exists(f)) stop(sprintf("PRISM %s %d: no %s", v, y, f)); f }
 pts <- vect(as.matrix(centres[, .(x, y)]), crs = "EPSG:5070")
 ex <- function(f) { r <- rast(f); terra::extract(r, project(pts, crs(r)), method = "bilinear")[, 2] }
 yy <- c(min(YEARS) - 1, YEARS)
 clim <- rbindlist(lapply(yy, function(y) data.table(centres[, .(StratumId, window)], Year = y, Ppt = ex(pf("ppt", y)), Tmean = ex(pf("tmean", y)))))
-nrm <- data.table(centres[, .(StratumId, window)], PptNormal = ex(Sys.glob(file.path(PRISM, "normals", "prism_ppt_us_25m_2020_avg_30y.tif"))),
-                  TmeanNormal = ex(Sys.glob(file.path(PRISM, "normals", "prism_tmean_us_25m_2020_avg_30y.tif"))))
+nrm <- data.table(centres[, .(StratumId, window)], PptNormal = ex(prism_normal(PRISM, "ppt", GRID)),
+                  TmeanNormal = ex(prism_normal(PRISM, "tmean", GRID)))
 cat(sprintf("PRISM: %d window-years; %d windows without a value\n", nrow(clim), clim[is.na(Ppt), uniqueN(paste(StratumId, window))]))
 # water-year precipitation (October of the year before to September; 2026-11-07): Mediterranean grass grows on autumn and winter rain,
 # which a calendar year splits between two growing seasons. From PRISM monthly (monthly-us25m/ppt); normal = the mean of water years
 # 1991-2020
 wy_years <- c(min(YEARS) - 1, YEARS); mons <- unique(unlist(lapply(c(wy_years, 1991:2020), function(y) c(sprintf("%d%02d", y - 1, 10:12), sprintf("%d%02d", y, 1:9)))))
-mf <- vapply(mons, function(m) { f <- Sys.glob(file.path(PRISM, "monthly-us25m", "ppt", sprintf("prism_ppt_us_25m_%s.tif", m))); if (length(f) != 1) stop("PRISM monthly ppt ", m, ": ", length(f), " files"); f }, "")
+mf <- vapply(mons, function(m) { f <- prism_monthly(PRISM, GRID, "ppt", substr(m, 1, 4), substr(m, 5, 6)); if (!file.exists(f)) stop("PRISM monthly ppt ", m, ": no ", f); f }, "")
 mv <- as.matrix(terra::extract(rast(mf), project(pts, crs(rast(mf[1]))), method = "bilinear", ID = FALSE)); colnames(mv) <- mons
 wy <- function(y) rowSums(mv[, c(sprintf("%d%02d", y - 1, 10:12), sprintf("%d%02d", y, 1:9)), drop = FALSE])
 wyc <- rbindlist(lapply(wy_years, function(y) data.table(centres[, .(StratumId, window)], Year = y, WyPpt = wy(y))))
