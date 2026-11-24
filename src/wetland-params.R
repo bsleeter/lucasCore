@@ -21,7 +21,14 @@
 # =============================================================================
 suppressPackageStartupMessages(library(data.table))
 
-WETLAND_OPTION_DEFAULTS <- list(MethaneQ10 = 3.83, SoilQ10 = 2.0, MethaneCapShare = 0.3, MethaneCO2e = 33.5, UncertaintyDraws = 0L)
+# the Q10s are lucasWet's (user 2026-11-24; the Barataria model): methane 2.57 (Delwiche et al. 2021; 3.83 until then) and 1.5 for what an
+# emergent wetland's litter and soil lose otherwise (SoilQ10: the group Q10 Wetland Flows; 2.0 on the soil's CO2 alone until then)
+WETLAND_OPTION_DEFAULTS <- list(MethaneQ10 = 2.57, SoilQ10 = 1.5, MethaneCapShare = 0.3, MethaneCO2e = 33.5, UncertaintyDraws = 0L)
+FORESTED_WETLAND_SOIL_Q10 <- "Q10 Wetland Soil"   # the forested wetland classes' soil CO2: 2.0 (defaults/climate/flow-multipliers.csv) unless the scenario sets SoilQ10
+# the fixed Q10s by climate flow group that stages 7 and 11 hand to climate_flows (src/climate.R): methane; the emergent classes' litter
+# and soil (SoilQ10, 1.5 when blank); and the forested wetland soil, which takes SoilQ10 only when the scenario sets it (NA = the table's
+# 2.0: forested wetlands were left as they were on 2026-11-24, to be brought onto the wetland Q10 in a second pass)
+wetland_q10s <- function(o) c(`Q10 Wetland CH4` = o$MethaneQ10, `Q10 Wetland Flows` = o$SoilQ10, `Q10 Wetland Soil` = if ("SoilQ10" %in% o$changed) o$SoilQ10 else NA_real_)
 WETLAND_OPTION_RANGE <- list(MethaneQ10 = c(1, 10), SoilQ10 = c(1, 10), MethaneCapShare = c(0.01, 0.5), MethaneCO2e = c(3.67, 200), UncertaintyDraws = c(0, 1000))
 METHANE_UNCERTAINTY_TYPE <- "Methane Uncertainty"   # the Flow Multiplier Type of the per-iteration factors
 WETLAND_FACTOR_GROUPS <- c(ch4 = "Emission: Wetland CH4", co2 = "Emission: Wetland Methane Source CO2")

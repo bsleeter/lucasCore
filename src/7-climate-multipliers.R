@@ -25,7 +25,7 @@ if (!nrow(ic) || is.na(ic$StratumFileName[1])) fail("no strata rasters: run stag
 P <- rast(ic$StratumFileName[1])
 home_coverage(P)   # Data Sources read from the home folder must hold the study area (shared.R)
 
-wopt <- wetland_settings(); fm <- climate_flows(read_ds("ClimateOptions"), STAGE, c(`Q10 Wetland CH4` = wopt$MethaneQ10, `Q10 Wetland Soil` = wopt$SoilQ10))   # (Carbon Assumptions: Wetland Methane)
+wopt <- wetland_settings(); fm <- climate_flows(read_ds("ClimateOptions"), STAGE, wetland_q10s(wopt))   # (Carbon Assumptions: Wetland Methane)
 if (!nrow(fm)) { say("Every climate effect is None: no climate multipliers written (every flow runs at normal climate)"); finish_checks(); stage_done(); progressBar(type = "end"); quit(save = "no") }
 prm <- climate_params(fm, P, STAGE, ic$StateClassFileName[1])
 if (any(vapply(.checks, function(x) x$Status != "Pass", TRUE))) finish_checks()

@@ -24,7 +24,7 @@ namespace lucasCoreUI
         private const string TARGETS = "lucasCore_WetlandMethaneTarget", ZONES = "lucasCore_MarshSalinityTarget";
         // column, package value, integer
         private static readonly object[][] Options = {
-            new object[] { "MethaneQ10", "3.83", false }, new object[] { "SoilQ10", "2", false }, new object[] { "MethaneCapShare", "0.3", false },
+            new object[] { "MethaneQ10", "2.57", false }, new object[] { "SoilQ10", "1.5", false }, new object[] { "MethaneCapShare", "0.3", false },
             new object[] { "MethaneCO2e", "33.5", false }, new object[] { "UncertaintyDraws", "0", true } };
 
         private readonly Dictionary<string, TextBox> m_box = new Dictionary<string, TextBox>();
@@ -38,8 +38,8 @@ namespace lucasCoreUI
             this.SuspendLayout();
             foreach (object[] o in Options) { TextBox t = Box(70); m_box[(string)o[0]] = t; string col = (string)o[0]; BindNumber(t, () => Sheet, col, (bool)o[2]); }
             var f = Form();
-            FormRow(f, "Methane Q10", m_box["MethaneQ10"], "How fast methane release rises with temperature, from wetland soil and root litter alike (blank = 3.83, the value of Yvon-Durocher et al. 2014 between 10 and 20 C).");
-            FormRow(f, "Wetland soil CO2 Q10", m_box["SoilQ10"], "The same for the CO2 of wetland soil (blank = 2.0). The soil of every other class has no temperature response.");
+            FormRow(f, "Methane Q10", m_box["MethaneQ10"], "How fast methane release rises with temperature, from wetland soil and root litter alike (blank = 2.57, the value of Delwiche et al. 2021 that lucasWet uses; 3.83 before lucasCore 1.10).");
+            FormRow(f, "Wetland Q10", m_box["SoilQ10"], "The same for what an emergent wetland's litter and soil lose otherwise: their CO2, litter moved to the soil and litter exported to water (blank = 1.5, as in lucasWet; soil export and burial have no response). A value here also sets the Q10 of forested wetland soil CO2, which is 2.0 when this is blank.");
             FormRow(f, "Methane cap", m_box["MethaneCapShare"], "The most of a wetland's belowground emission that may leave as methane, as a share (blank = 0.3). A target that asks for more is held here, and the Build log says how much is released.");
             FormRow(f, "CO2 equivalent of methane", m_box["MethaneCO2e"], "Mg CO2e per Mg of carbon emitted as methane, for every methane flow of the model, fire included (blank = 33.5, a 100-year warming potential of 25; 27 gives 36).");
             FormRow(f, "Uncertainty draws", m_box["UncertaintyDraws"], "The number of Monte Carlo iterations that draw their methane targets from the low-to-high ranges below (blank or 0 = none: every iteration runs at the targets). Later iterations run at the targets. The package targets have literature ranges of their own, so a number here is enough to turn the uncertainty on.");

@@ -105,12 +105,36 @@ nf_after_fire <- function(path, memb, order, rates_at, growth_at, S0, fire, max_
 # pool's loss (emission, lateral transport, decay to BG Slow) and BG Slow's lateral share are kept from `mult`; BG Slow's emission
 # share is what burial and lateral transport leave. Each pool's total loss is fitted so its steady stock hits the target; the burial
 # share so the burial flux does.
+# Structure as lucasWet's (2026-11-24, the Barataria model; user: "as close as possible"): aboveground litter feeds the soil (Decay: AG
+# Very Fast -> BG Slow, a share of the litter's loss taken from its emission share: NF_AG_TO_SOIL); the soil's CO2 and CH4 leave after
+# the year's litter has arrived (flow order 6.6, with burial and lateral export; 5 until then); and the classes' litter and soil flows
+# go by flow types of their own (NF_EMERGENT_TYPES), so one temperature response (the group Q10 Wetland Flows) reaches these classes only.
 NF_EMERGENT <- list(
   growth_fol = "Net Growth Wetland Emergent: Atmosphere -> Foliage [Type]", growth_root = "Net Growth Wetland Emergent: Atmosphere -> Fine Roots [Type]",
   k_fol = "Biomass Turnover: Foliage -> AG Very Fast [Type]", k_root = "Biomass Turnover: Fine Roots -> BG Very Fast [Type]",
-  k_ag = "AG Very Fast ->", k_bg = "BG Very Fast ->", k_soil = "BG Slow ->",
-  burial = "Stabilization: BG Slow -> Deep Soil [Type]", soil_emit = "Emission: BG Slow -> Atmosphere (Wetland) [Type]", soil_lat = "Lateral Transport: BG Slow -> Aquatic [Type]")
+  k_ag = "AG Very Fast ->", k_bg = "BG Very Fast ->", k_soil = "BG Slow ->", ag_soil = "Decay: AG Very Fast -> BG Slow [Type]", ag_emit = "Emission Emergent: AG Very Fast -> Atmosphere [Type]",
+  burial = "Stabilization: BG Slow -> Deep Soil [Type]", soil_emit = "Emission Emergent: BG Slow -> Atmosphere [Type]", soil_lat = "Lateral Transport: BG Slow -> Aquatic [Type]")
 NF_EMERGENT_POOLS <- c(k_fol = "Biomass: Foliage", k_root = "Biomass: Fine Root", k_ag = "DOM: Aboveground Very Fast", k_bg = "DOM: Belowground Very Fast", k_soil = "DOM: Belowground Slow")
+# the emergent classes' own flow types, by the flow type the other classes use for the same flow (the shared one, or the wetland one of
+# the forested wetland classes). Root litter's CH4 keeps the wetland flow type: its order and its Q10 group are the same for both
+NF_EMERGENT_TYPES <- c("Emission: BG Slow -> Atmosphere" = "Emission Emergent: BG Slow -> Atmosphere", "Emission: BG Slow -> Atmosphere (Wetland)" = "Emission Emergent: BG Slow -> Atmosphere",
+                       "Emission: BG Slow -> Atmosphere CH4" = "Emission Emergent: BG Slow -> Atmosphere CH4",
+                       "Emission: BG Very Fast -> Atmosphere" = "Emission Emergent: BG Very Fast -> Atmosphere", "Emission: BG Very Fast -> Atmosphere (Wetland)" = "Emission Emergent: BG Very Fast -> Atmosphere",
+                       "Emission: AG Very Fast -> Atmosphere" = "Emission Emergent: AG Very Fast -> Atmosphere", "Decay: BG Very Fast -> BG Slow" = "Decay Emergent: BG Very Fast -> BG Slow")
+NF_EMERGENT_Q10 <- "Q10 Wetland Flows"   # the one temperature response of an emergent wetland's litter and soil losses (not methane, soil export or burial)
+# the share of aboveground litter's loss that goes to the soil: lucasWet's Barataria rates (0.171 of 0.613 a year estuarine, 0.209 of
+# 0.573 palustrine), used in every ecodivision (user 2026-11-24: no regional data exists for it); taken from the emission share
+NF_AG_TO_SOIL <- c("Wetland: Estuarine Emergent" = 0.28, "Wetland: Palustrine Emergent" = 0.36)
+# rates under any earlier names (the legacy tables: shared flow types and no litter-to-soil flow; the 1.5 to 1.9 tables: the wetland
+# flow types) as the emergent classes' own: flow groups renamed, the CH4 rows added at 0 (a flow without a row would count 1), and the
+# aboveground litter's share to the soil set to `ag_to_soil` out of its emission share (NULL: left as it is)
+nf_emergent_prepare <- function(mult, ag_to_soil = NULL) { g <- NF_EMERGENT; ty <- function(x) paste(x, "[Type]"); m <- copy(mult)[, Value := as.numeric(Value)]
+  for (k in names(NF_EMERGENT_TYPES)) if (!ty(NF_EMERGENT_TYPES[[k]]) %in% m$FlowGroupId) m[FlowGroupId == ty(k), FlowGroupId := ty(NF_EMERGENT_TYPES[[k]])]
+  m <- m[!FlowGroupId %in% ty(names(NF_EMERGENT_TYPES))]
+  add <- setdiff(c(ty(NF_CH4$ch4), g$ag_soil), m$FlowGroupId); if (length(add)) m <- rbind(m, data.table(FlowGroupId = add, Value = 0), fill = TRUE)
+  if (!is.null(ag_to_soil)) { e <- m[FlowGroupId %in% c(g$ag_emit, g$ag_soil), sum(Value)]; if (ag_to_soil < 0 || ag_to_soil > e) stop(sprintf("the share of aboveground litter to the soil (%s) is more than its emission share (%s)", ag_to_soil, e))
+    m[FlowGroupId == g$ag_soil, Value := ag_to_soil]; m[FlowGroupId == g$ag_emit, Value := round(e - ag_to_soil, 10)] }
+  m }
 
 nf_fit_emergent <- function(path, mult, memb, order, tg, tol = 1e-10, max_iter = 5000) {
   g <- NF_EMERGENT; m <- copy(mult)[, Value := as.numeric(Value)]
@@ -148,22 +172,18 @@ nf_fit_emergent <- function(path, mult, memb, order, tg, tol = 1e-10, max_iter =
 # ---- emergent wetlands: methane -------------------------------------------------------------------------------------------------
 # BG Slow and BG Very Fast each release carbon to the atmosphere by two flows: as CO2 and as CH4 (to Atmosphere: CH4), both shares of
 # the pool's total loss. Each has its own temperature response, as every dead pool's decay has: methane the group Q10 Wetland CH4 (from
-# both pools); the litter's CO2 the Q10 its emission always had (Q10 Slow Flows); the soil's CO2 the group Q10 Wetland Soil, which is
-# why emergent wetlands have a soil CO2 flow type of their own (the soil emission of every other class has no Q10).
+# both pools); the litter's and the soil's CO2 the group Q10 Wetland Flows (NF_EMERGENT_Q10; until 2026-11-24 Q10 Slow Flows and a Q10 of 2.0), which is
+# why emergent wetlands have CO2 flow types of their own (the soil emission of every other class has no Q10).
 # At the normal climate (every multiplier 1) methane is carved out of the emission the class already had: a pool's CO2 and CH4 shares
 # add to its emission share before methane, so no pool, burial or lateral export of the fit changes. Away from the normal climate
 # the pools' losses follow the Q10s, so their stocks do move. One fraction of the belowground emission serves both pools, solved so
 # the steady state releases the target (Mg C/ha/yr as CH4).
-NF_CH4 <- list(sink = "Atmosphere: CH4", max_share = 0.3, q10 = "Q10 Wetland CH4", soil_q10 = "Q10 Wetland Soil", shared_soil = "Emission: BG Slow -> Atmosphere",
+NF_CH4 <- list(sink = "Atmosphere: CH4", max_share = 0.3, q10 = "Q10 Wetland CH4", soil_q10 = "Q10 Wetland Flows", shared_soil = "Emission: BG Slow -> Atmosphere",
                shared = c(soil = "Emission: BG Slow -> Atmosphere", litter = "Emission: BG Very Fast -> Atmosphere"),   # the flow types of every other class
-               co2 = c(soil = "Emission: BG Slow -> Atmosphere (Wetland)", litter = "Emission: BG Very Fast -> Atmosphere (Wetland)"),
-               ch4 = c(soil = "Emission: BG Slow -> Atmosphere CH4", litter = "Emission: BG Very Fast -> Atmosphere CH4"))
-# rates written before methane (the legacy tables): the soil's and the litter's emission under the shared flows' names and no CH4 rows. A flow without a
-# row would count 1, so the CH4 rows are added at 0
-nf_ch4_prepare <- function(mult) { g <- NF_CH4; ty <- function(x) paste(x, "[Type]"); m <- copy(mult)[, Value := as.numeric(Value)]
-  for (k in names(g$co2)) if (!ty(g$co2[[k]]) %in% m$FlowGroupId) m[FlowGroupId == ty(g$shared[[k]]), FlowGroupId := ty(g$co2[[k]])]
-  add <- setdiff(ty(g$ch4), m$FlowGroupId); if (length(add)) m <- rbind(m, data.table(FlowGroupId = add, Value = 0), fill = TRUE)
-  m }
+               co2 = c(soil = "Emission Emergent: BG Slow -> Atmosphere", litter = "Emission Emergent: BG Very Fast -> Atmosphere"),
+               ch4 = c(soil = "Emission Emergent: BG Slow -> Atmosphere CH4", litter = "Emission: BG Very Fast -> Atmosphere CH4"))
+# rates written before methane (the legacy tables): see nf_emergent_prepare
+nf_ch4_prepare <- function(mult) nf_emergent_prepare(mult)
 # the methane fraction of the belowground emission that meets the target; each pool's CH4 share is written to `digits` decimals and its
 # CO2 share is what is left of the pool's emission share, so the two add to it exactly
 nf_fit_ch4 <- function(path, mult, memb, order, growth, target, digits = 6) {

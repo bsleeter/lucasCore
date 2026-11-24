@@ -480,3 +480,54 @@ Emission: AG Slow -> Atmosphere CH4,Net Ecosystem Productivity (CO2e),-33.5
 Emission: AG Slow -> Atmosphere CH4,Q10 Wetland CH4,1
 Emission: AG Slow -> Atmosphere CH4,Emission: Wetland CH4,1
 Emission: AG Slow -> Atmosphere CH4,Emission: Wetland CH4 (CO2e),33.5
+Emission Emergent: BG Slow -> Atmosphere,BG Slow ->,1
+Emission Emergent: BG Slow -> Atmosphere,Emission: Total,1
+Emission Emergent: BG Slow -> Atmosphere,Emission: Total (CO2e),3.67
+Emission Emergent: BG Slow -> Atmosphere,Emission: Total Rh,1
+Emission Emergent: BG Slow -> Atmosphere,Emission: Total Rh (CO2e),3.67
+Emission Emergent: BG Slow -> Atmosphere,Net Biome Productivity,-1
+Emission Emergent: BG Slow -> Atmosphere,Net Biome Productivity (CO2e),-3.67
+Emission Emergent: BG Slow -> Atmosphere,Net Ecosystem Productivity,-1
+Emission Emergent: BG Slow -> Atmosphere,Net Ecosystem Productivity (CO2e),-3.67
+Emission Emergent: BG Slow -> Atmosphere,Q10 Wetland Flows,1
+Emission Emergent: BG Slow -> Atmosphere,Emission: Wetland Methane Source CO2,1
+Emission Emergent: BG Slow -> Atmosphere CH4,BG Slow ->,1
+Emission Emergent: BG Slow -> Atmosphere CH4,Q10 Wetland CH4,1
+Emission Emergent: BG Slow -> Atmosphere CH4,Emission: Wetland CH4,1
+Emission Emergent: BG Slow -> Atmosphere CH4,Emission: Wetland CH4 (CO2e),33.5
+Emission Emergent: BG Slow -> Atmosphere CH4,Emission: Total,1
+Emission Emergent: BG Slow -> Atmosphere CH4,Emission: Total (CO2e),33.5
+Emission Emergent: BG Slow -> Atmosphere CH4,Emission: Total Rh,1
+Emission Emergent: BG Slow -> Atmosphere CH4,Emission: Total Rh (CO2e),33.5
+Emission Emergent: BG Slow -> Atmosphere CH4,Net Biome Productivity,-1
+Emission Emergent: BG Slow -> Atmosphere CH4,Net Biome Productivity (CO2e),-33.5
+Emission Emergent: BG Slow -> Atmosphere CH4,Net Ecosystem Productivity,-1
+Emission Emergent: BG Slow -> Atmosphere CH4,Net Ecosystem Productivity (CO2e),-33.5
+Emission Emergent: BG Very Fast -> Atmosphere,BG Very Fast ->,1
+Emission Emergent: BG Very Fast -> Atmosphere,Emission: Total,1
+Emission Emergent: BG Very Fast -> Atmosphere,Emission: Total (CO2e),3.67
+Emission Emergent: BG Very Fast -> Atmosphere,Emission: Total Rh,1
+Emission Emergent: BG Very Fast -> Atmosphere,Emission: Total Rh (CO2e),3.67
+Emission Emergent: BG Very Fast -> Atmosphere,Net Biome Productivity,-1
+Emission Emergent: BG Very Fast -> Atmosphere,Net Biome Productivity (CO2e),-3.67
+Emission Emergent: BG Very Fast -> Atmosphere,Net Ecosystem Productivity,-1
+Emission Emergent: BG Very Fast -> Atmosphere,Net Ecosystem Productivity (CO2e),-3.67
+Emission Emergent: BG Very Fast -> Atmosphere,Q10 Wetland Flows,1
+Emission Emergent: BG Very Fast -> Atmosphere,Emission: Wetland Methane Source CO2,1
+Emission Emergent: AG Very Fast -> Atmosphere,AG Very Fast ->,1
+Emission Emergent: AG Very Fast -> Atmosphere,Emission: Total,1
+Emission Emergent: AG Very Fast -> Atmosphere,Emission: Total (CO2e),3.67
+Emission Emergent: AG Very Fast -> Atmosphere,Emission: Total Rh,1
+Emission Emergent: AG Very Fast -> Atmosphere,Emission: Total Rh (CO2e),3.67
+Emission Emergent: AG Very Fast -> Atmosphere,Net Biome Productivity,-1
+Emission Emergent: AG Very Fast -> Atmosphere,Net Biome Productivity (CO2e),-3.67
+Emission Emergent: AG Very Fast -> Atmosphere,Net Ecosystem Productivity,-1
+Emission Emergent: AG Very Fast -> Atmosphere,Net Ecosystem Productivity (CO2e),-3.67
+Emission Emergent: AG Very Fast -> Atmosphere,Q10 Wetland Flows,1
+Decay Emergent: BG Very Fast -> BG Slow,BG Very Fast ->,1
+Decay Emergent: BG Very Fast -> BG Slow,Decay: Total,1
+Decay Emergent: BG Very Fast -> BG Slow,Q10 Wetland Flows,1
+Lateral Transport: AG Very Fast -> Aquatic,Q10 Wetland Flows,1
+Lateral Transport: BG Very Fast -> Aquatic,Q10 Wetland Flows,1
+Decay: AG Very Fast -> BG Slow,Q10 Wetland Flows,1
+Decay: AG Very Fast -> BG Slow,Decay: Total,1

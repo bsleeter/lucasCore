@@ -12,8 +12,10 @@
 // steady state moves, from the stock at the start of that flow's step (Edge.Base). Deep soil only accumulates. With the package rates
 // it lands on the Build's starting pools. (Before 2026-11-06 this solved stock = inputs / loss, which ignores the order: emergent
 // wetlands, which grow at order 1 and die back at 6, showed live 36 and dead 49 Mg C/ha instead of ST-Sim's 4.9 and 17.4.)
-// Wetland methane (lucasCore 1.5): an emergent wetland's soil and root litter each have a CO2 flow ("-> Atmosphere (Wetland)") and a CH4
-// flow ("-> Atmosphere CH4"), two shares of the pool's loss. Both go to the atmosphere here, the CH4 one marked (Edge.Gas). The split
+// Wetland methane (lucasCore 1.5): an emergent wetland's soil and root litter each have a CO2 flow and a CH4 flow ("-> Atmosphere CH4"),
+// by flow types of the emergent classes' own since lucasCore 1.10 ("Emission Emergent: ...", "Decay Emergent: ...": src/nonforest-solve.R
+// NF_EMERGENT_TYPES; "-> Atmosphere (Wetland)" before that),
+// two shares of the pool's loss. Both go to the atmosphere here, the CH4 one marked (Edge.Gas). The split
 // is the package's fitted one unless the Wetland Methane page sets the class's target or a cap the fitted share exceeds: then, as
 // stage 3 does (src/3-carbon-flows.R), the methane fraction is the target over the class's belowground emission
 // (defaults/stockflow/emergent-wetland-fit.csv), held at the cap, and each pool's emission is split by it.
@@ -41,7 +43,7 @@ namespace lucasCoreUI
             { "Snag Stems", "SS" }, { "Snag Stem", "SS" }, { "Snag Branches", "SB" }, { "Snag Branch", "SB" }, { "AG Medium", "AGM" },
             { "AG Fast", "AGF" }, { "AG Very Fast", "AGVF" }, { "BG Very Fast", "BGVF" }, { "BG Fast", "BGF" }, { "AG Slow", "AGS" },
             { "BG Slow", "BGS" }, { "Deep Soil", "DS" }, { "Atmosphere", "ATM" }, { "Aquatic", "AQ" } };
-        private static readonly Regex Flow = new Regex(@"^(Net Growth[^:]*|Biomass Turnover|Decay|Emission|Transfer|Lateral Transport|Stabilization): (.+?) -> (.+?) \[Type\]$");
+        private static readonly Regex Flow = new Regex(@"^(Net Growth[^:]*|Biomass Turnover|Decay|Emission|Transfer|Lateral Transport|Stabilization)(?: Emergent)?: (.+?) -> (.+?) \[Type\]$");
         private static readonly Regex Total = new Regex(@"^(.+?) ->$");
 
         public class Edge { public string Kind, From, To, Group, Gas; public double Entered, Rate, Flux, Base, Order; public bool Yours; }   // Gas: CO2 or CH4 on a flow to the atmosphere
@@ -57,7 +59,10 @@ namespace lucasCoreUI
         public class MethaneInput { public double Cap = 0.3; public readonly List<Tuple<string, string, double>> Targets = new List<Tuple<string, string, double>>(); }
         private class Fit { public string Region; public double Target, Share, Bg; }
         private static Dictionary<string, Fit> s_fit;
-        private static readonly string[] MethanePools = { "BG Slow", "BG Very Fast" };
+        // an emergent wetland's methane source pools: the flow group of each pool's CO2 and of its CH4
+        private static readonly string[][] MethaneFlows = {
+            new[] { "Emission Emergent: BG Slow -> Atmosphere [Type]", "Emission Emergent: BG Slow -> Atmosphere CH4 [Type]" },
+            new[] { "Emission Emergent: BG Very Fast -> Atmosphere [Type]", "Emission: BG Very Fast -> Atmosphere CH4 [Type]" } };
 
         // ---- package tables, read once --------------------------------------------------------------------------------------
         private class Row { public int? Min, Max; public string Flow; public double V; }
@@ -177,9 +182,9 @@ namespace lucasCoreUI
                 bool refit = own.HasValue || wf.Share > cap; double target = own ?? wf.Target, share = refit ? Math.Min(target / wf.Bg, cap) : wf.Share;
                 b.HasMethane = true; b.MethaneTarget = target; b.MethaneShare = share; b.MethaneCap = cap; b.MethaneCapped = share >= cap - 1e-9; b.MethaneYours = refit; b.MethaneRegion = wf.Region;
                 if (refit)
-                    foreach (string pool in MethanePools)
+                    foreach (string[] mf in MethaneFlows)
                     {
-                        string kc = "Emission: " + pool + " -> Atmosphere (Wetland) [Type]", kh = "Emission: " + pool + " -> Atmosphere CH4 [Type]";
+                        string kc = mf[0], kh = mf[1];
                         if (!values.ContainsKey(kc) || !values.ContainsKey(kh)) continue;
                         double e = values[kc].Key + values[kh].Key;
                         values[kh] = new KeyValuePair<double, bool>(e * share, true); values[kc] = new KeyValuePair<double, bool>(e - e * share, true);

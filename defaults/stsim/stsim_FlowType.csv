@@ -60,13 +60,18 @@ LULC: Emission Peat CO2,Peat (DOM: Peat) burned by fire
 LULC: Emission Peat CO,Peat (DOM: Peat) burned by fire
 LULC: Emission Peat CH4,Peat (DOM: Peat) burned by fire
 Emission: Drained Organic Soil -> Atmosphere,Oxidation of drained peat (DOM: Peat) under cropland and pasture
-Emission: BG Slow -> Atmosphere (Wetland),"Emergent wetlands: soil carbon released as CO2, with a temperature response of its own (Q10 Wetland Soil)"
-Emission: BG Slow -> Atmosphere CH4,Emergent wetlands: soil carbon released as methane
-Emission: BG Very Fast -> Atmosphere CH4,Emergent wetlands: root litter carbon released as methane
-Emission: BG Very Fast -> Atmosphere (Wetland),"Emergent and forested wetlands: root litter carbon released as CO2 (the same response as every class, by a flow type of their own so a wetland cell can be told apart)"
+Emission: BG Slow -> Atmosphere (Wetland),"Forested wetlands: soil carbon released as CO2, with a temperature response of its own (Q10 Wetland Soil)"
+Emission: BG Slow -> Atmosphere CH4,Forested wetlands: soil carbon released as methane
+Emission: BG Very Fast -> Atmosphere CH4,Emergent and forested wetlands: root litter carbon released as methane
+Emission: BG Very Fast -> Atmosphere (Wetland),"Forested wetlands: root litter carbon released as CO2 (the same response as every class, by a flow type of their own so a wetland cell can be told apart)"
 Emission: AG Very Fast -> Atmosphere (Wetland),"Forested wetlands: ag very fast (forest floor) carbon released as CO2, by a flow type of their own so a wetland cell can be told apart"
 Emission: AG Fast -> Atmosphere (Wetland),"Forested wetlands: ag fast (forest floor) carbon released as CO2, by a flow type of their own so a wetland cell can be told apart"
 Emission: AG Slow -> Atmosphere (Wetland),"Forested wetlands: ag slow (forest floor) carbon released as CO2, by a flow type of their own so a wetland cell can be told apart"
 Emission: AG Very Fast -> Atmosphere CH4,Forested wetlands: ag very fast (forest floor) carbon released as methane
 Emission: AG Fast -> Atmosphere CH4,Forested wetlands: ag fast (forest floor) carbon released as methane
 Emission: AG Slow -> Atmosphere CH4,Forested wetlands: ag slow (forest floor) carbon released as methane
+Emission Emergent: BG Slow -> Atmosphere,"Emergent wetlands: soil carbon released as CO2, after the year's litter has reached the soil (flow order 6.6), with the wetland temperature response (Q10 Wetland Flows)"
+Emission Emergent: BG Slow -> Atmosphere CH4,"Emergent wetlands: soil carbon released as methane, after the year's litter has reached the soil (flow order 6.6)"
+Emission Emergent: BG Very Fast -> Atmosphere,"Emergent wetlands: root litter carbon released as CO2, with the wetland temperature response (Q10 Wetland Flows)"
+Emission Emergent: AG Very Fast -> Atmosphere,"Emergent wetlands: aboveground litter carbon released as CO2, with the wetland temperature response (Q10 Wetland Flows)"
+Decay Emergent: BG Very Fast -> BG Slow,"Emergent wetlands: root litter carbon moved to the soil, with the wetland temperature response (Q10 Wetland Flows)"

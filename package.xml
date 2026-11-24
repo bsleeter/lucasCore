@@ -573,8 +573,8 @@
 	     wetland methane. Blank or empty = the package values (defaults/stockflow/emergent-wetland-regions.csv, marsh-salinity-ch4.csv,
 	     defaults/spinup/wetland-ch4.csv; WETLAND_OPTION_DEFAULTS). Region names are those of emergent-wetland-regions.csv. -->
 	<dataSheet name="WetlandOptions" displayName="Wetland Options" isSingleRow="True">
-		<column name="MethaneQ10" displayName="Methane Q10 (blank = 3.83)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="1" formula2="10"/>
-		<column name="SoilQ10" displayName="Wetland Soil CO2 Q10 (blank = 2.0)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="1" formula2="10"/>
+		<column name="MethaneQ10" displayName="Methane Q10 (blank = 2.57)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="1" formula2="10"/>
+		<column name="SoilQ10" displayName="Wetland Q10 (blank = 1.5)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="1" formula2="10"/>
 		<column name="MethaneCapShare" displayName="Methane Cap, share of the source emission (blank = 0.3)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0.01" formula2="0.5"/>
 		<column name="MethaneCO2e" displayName="CO2e per Mg C emitted as CH4 (blank = 33.5)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="3.67" formula2="200"/>
 		<column name="UncertaintyDraws" displayName="Uncertainty Draws (iterations that draw their targets; blank = 0)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="0" formula2="1000"/>
