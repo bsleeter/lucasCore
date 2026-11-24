@@ -88,9 +88,7 @@ Forest Harvest: Forest Clearcut,400,"255,165,42,42",,Landfire Disturbance data
 Forest Harvest: Forest Selection,401,"255,0,128,0",,Landfire Disturbance data
 Forest Harvest: Forest Selection 20%,402,"255,255,255,0",,
 Forest Harvest: Salvage Logging,404,"255,0,255,255",,
-Insect: High Severity,500,"255,128,0,128",,Based on ADS data with mortality > 30%
-Insect: Low Severity,501,"255,0,0,255",,Based on ADS data with mortality 4-10%
-Insect: Medium Severity,502,"255,255,255,0",,Based on ADS data with mortality 10-30%
+Mortality: Drought and Insects,510,"255,128,0,128",,LCMS stress classes with tree canopy loss over the ecodivision's line (high severity; lucasCore 2.0)
 Intensification: Low to High,600,"255,0,0,255",,NLCD Change
 Intensification: Low to Medium,601,"255,255,0,0",,NLCD Change
 Intensification: Medium to High,602,"255,255,255,0",,NLCD Change

@@ -35,7 +35,7 @@ if (Sys.getenv("REUSE") == "1") { RB <- latest(BASE); RC <- latest(CHG); RX <- l
   d1 <- copy(d0); d1[cut_mer(d1, "Forestry Sector"), Share := 0.85]; d1[cut_mer(d1, "DOM: Aboveground Medium"), Share := 0.15]
   d1 <- rbind(d1, data.table(StratumId = e1, StateClassId = MC, Disturbance = "High-severity fire", FromStockTypeId = "DOM: Aboveground Slow", ToStockTypeId = "Atmosphere", Share = 0.5), fill = TRUE)
   f1 <- copy(f0)[StateClassId == WO, Share := 0.20]
-  code <- function(d) { d <- copy(d); d[, Disturbance := match(Disturbance, c("High-severity fire", "Clearcut"))]; as.data.frame(d[, !"DisturbanceFlowId"]) }   # a list column reads as its label
+  code <- function(d) { d <- copy(d); d[, Disturbance := match(Disturbance, c("High-severity fire", "Clearcut", "Drought and insect mortality"))]; as.data.frame(d[, !"DisturbanceFlowId"]) }   # a list column reads as its label
   CT <- scenario(P1, "Carbon Assumptions (disturbance test)", sourceScenario = CA)
   saveDatasheet(CT, code(d1), "lucasCore_DisturbanceFlow"); saveDatasheet(CT, as.data.frame(f1[, !"FireSnagShareId"]), "lucasCore_FireSnagShare")
   CX <- scenario(P1, "Carbon Assumptions (disturbance invalid test)", sourceScenario = CA)

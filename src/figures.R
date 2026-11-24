@@ -394,7 +394,7 @@ build_figures <- function(I, outdir) {
     fams <- intersect(c("Urbanization", "Intensification", "Ag Expansion", "Ag Contraction", "Ag Change"), unique(tr$Family))
     if (length(fams)) chart_figure("land_use_change", "Historical land-use change", sprintf("Annual area of each land-use transition group, %s-%s, from annual NLCD (stage 6), by member type.", min(yrs), max(yrs)),
       ceiling(length(fams) / 2), min(2, length(fams)), draw = function() for (i in seq_along(fams)) stack(tr, fams[i], c(), i))
-    dfam <- intersect(c("Fire", "Forest Harvest", "Insect"), unique(tr$Family))
+    dfam <- intersect(c("Fire", "Forest Harvest", "Mortality", "Insect"), unique(tr$Family))   # (Mortality: to-do 3; Insect: a library's own old types)
     # the burned area by land type (user, 2026-11-09): stage 6's yearly fire maps (all severities) over each cell's start-year class
     ft <- NULL
     if ("Fire" %in% dfam && !is.null(I$fire_maps) && nrow(I$fire_maps)) {
@@ -406,11 +406,12 @@ build_figures <- function(I, outdir) {
         if (!any(b)) return(NULL); data.table(Timestep = I$fire_maps$Timestep[j], Member = ty[b])[, .(Area = .N * cell_km2), by = .(Timestep, Member)] }))
       if (nrow(ft)) ft <- ft[, .(Area = sum(Area)), by = .(Timestep, Member)][, Family := "Fire by land type"] else ft <- NULL }
     if (length(dfam)) { tr[Family %in% dfam, Member := sub("^Forest ", "", Member)]
-      dcol <- c(`Low Severity` = "#fbe3a2", `Medium Severity` = "#ef8f2a", `High Severity` = "#a81d1a", Clearcut = "#3d3d3d", Selection = "#b5b5b5",
+      dcol <- c(`Low Severity` = "#fbe3a2", `Medium Severity` = "#ef8f2a", `High Severity` = "#a81d1a", Clearcut = "#3d3d3d", Selection = "#b5b5b5", `Drought and Insects` = "#7b4a8b",
                 Forest = "#2b8152", Disturbed = "#b5651d", Shrubland = "#c08a3e", Grassland = "#e8d27a", Wetland = "#5aa5b4", Agriculture = "#b07aa1", Other = "#9a9a9a")
       np <- length(dfam) + !is.null(ft)
-      chart_figure("disturbance", "Disturbance history", sprintf("Annual area burned by severity (MTBS)%s and harvested by clearcut and selection (LCMS tree removal), %s-%s, as written by stage 6.",
-          if (is.null(ft)) "" else ", burned area by the land type the cells had in the start year", min(yrs), max(yrs)),
+      chart_figure("disturbance", "Disturbance history", sprintf("Annual area burned by severity (MTBS)%s, harvested by clearcut and selection (LCMS tree removal)%s, %s-%s, as written by stage 6.",
+          if (is.null(ft)) "" else ", burned area by the land type the cells had in the start year",
+          if ("Mortality" %in% dfam) " and killed by drought and insects at high severity (LCMS stress classes with tree canopy loss over the ecodivision's line; whole cells chosen by rank)" else "", min(yrs), max(yrs)),
         np, 1, h = 640 * np + 260, draw = function() { i <- 0
           for (f in dfam) { i <- i + 1; stack(tr, f, dcol, i)
             if (f == "Fire" && !is.null(ft)) { i <- i + 1; stack(ft, "Fire by land type", dcol, i) } } }) } }

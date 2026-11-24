@@ -218,3 +218,10 @@ StratumId,StateClassId,Disturbance,AgeMin,FromStockTypeId,ToStockTypeId,Share
 ,Wetland: Palustrine Emergent,High-severity fire,,Biomass: Merchantable,DOM: Snag Stem,0
 ,Wetland: Palustrine Emergent,High-severity fire,,Biomass: Other Wood,Atmosphere,0
 ,Wetland: Palustrine Emergent,High-severity fire,,Biomass: Other Wood,DOM: Snag Branch,0
+,,Drought and insect mortality,,Biomass: Merchantable,DOM: Snag Stem,0.83
+,,Drought and insect mortality,,Biomass: Other Wood,DOM: Snag Branch,0.83
+,,Drought and insect mortality,,Biomass: Foliage,DOM: Aboveground Very Fast,0.83
+,,Drought and insect mortality,,Biomass: Coarse Root,DOM: Aboveground Fast,0.415
+,,Drought and insect mortality,,Biomass: Coarse Root,DOM: Belowground Fast,0.415
+,,Drought and insect mortality,,Biomass: Fine Root,DOM: Aboveground Very Fast,0.415
+,,Drought and insect mortality,,Biomass: Fine Root,DOM: Belowground Very Fast,0.415

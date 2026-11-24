@@ -30,7 +30,7 @@ fill_carbon_assumptions <- function(ca, pkg, method = "fia-measured") {
   put(rd("cbm-crosswalk"), "lucasCore_CbmCrosswalk", "CBM Crosswalk")
   x <- num(rd("dom-parameters"), c("BaseDecayRate", "ReferenceTemperature", "Q10", "ShareEmitted", "TransferToBGSlow"))[, Pool := match(Pool, DOM_POOL_LIST)]
   put(x, "lucasCore_DomParameter", "Dead Organic Matter Parameters")
-  x <- num(rd("disturbance-flows"), "Share")[, `:=`(Disturbance = match(Disturbance, c("High-severity fire", "Clearcut")), AgeMin = as.integer(AgeMin))]
+  x <- num(rd("disturbance-flows"), "Share")[, `:=`(Disturbance = match(Disturbance, c("High-severity fire", "Clearcut", "Drought and insect mortality")), AgeMin = as.integer(AgeMin))]
   # a lookup column is saved only when some row sets it (chaparral's own fire rows name their class, to-do 39); an all-blank one is left out
   put(x[, !names(x) %in% c("StratumId", "StateClassId")[vapply(c("StratumId", "StateClassId"), function(k) !k %in% names(x) || all(is.na(x[[k]])), TRUE)], with = FALSE], "lucasCore_DisturbanceFlow", "Disturbance Flows")
   x <- num(rd("growth-inputs"), c("MerchCarbonDensity", "DeciduousShare", "FineRootShare"))[, GrowthClass := match(GrowthClass, c("East Softwood", "East Hardwood", "West Softwood", "West Hardwood"))]

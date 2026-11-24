@@ -1,0 +1,33 @@
+kind,ecodiv,forest_km2,stands,over70,fia_pct,fia_lo,fia_hi,line,line_hi,line_lo,rule_pct_at_lowest,rule_pct_at_highest,killed_share,basis
+conifer,all,704595,84686,1047,1.24,1.18,1.3,0.279,0.284,0.273,4.16,0.08,0.82,national
+pinyon/juniper,all,91702,9158,28,0.31,0.22,0.42,0.474,0.521,0.425,2.33,0.12,0.82,national
+conifer,230,188980,30427,345,1.13,1.04,1.24,,,,0.08,0.01,0.83,national default
+conifer,M330,245172,11461,333,2.91,2.66,3.17,0.31,0.32,0.299,14.53,0.21,0.82,own
+conifer,210,28127,17740,151,0.85,0.74,0.97,,,,0.11,0.01,0.83,national default
+conifer,M240,88134,8755,90,1.03,0.87,1.22,0.25,0.276,0.228,2.81,0.08,0.81,own
+conifer,220,6450,3918,34,0.87,0.66,1.15,,,,0.05,0.01,0.85,national default
+conifer,M210,12156,3189,22,0.69,0.49,0.98,,,,0.04,0,0.86,national default
+conifer,M260,61343,3525,22,0.62,0.44,0.88,0.396,0.433,0.361,7.69,0.11,0.78,national default
+conifer,M230,10128,1122,13,1.16,0.74,1.81,,,,0.1,0.01,0.98,national default
+conifer,M340,5317,273,12,4.4,2.76,6.92,0.297,0.359,0.231,13.76,0.39,0.85,national default
+conifer,M220,1263,1373,6,0.44,0.23,0.84,,,,0.05,0,0.93,national default
+conifer,330,9726,633,6,0.95,0.49,1.82,0.224,0.317,,1.73,0.06,0.75,national default
+conifer,250,2327,376,5,1.33,0.65,2.71,,,,0.5,0.06,0.84,national default
+conifer,240,7406,283,4,1.41,0.64,3.11,,,,0.29,0.01,0.72,national default
+conifer,410,11,29,2,6.9,2.31,18.84,,,,0.01,0,0.75,national default
+conifer,340,5443,649,1,0.15,0.03,0.69,,,0.432,6.99,0.17,0.71,national default
+conifer,M310,16457,444,1,0.23,0.05,1,,,0.507,11.51,0.5,0.81,national default
+conifer,310,11684,264,0,0,0,1.01,,,0.362,4.71,0.22,,national default
+conifer,260,4155,215,0,0,0,1.24,,,,0.26,0,,national default
+conifer,320,316,10,0,0,0,21.3,,,,9.23,0.1,,national default
+pinyon/juniper,310,22136,2908,11,0.38,0.23,0.62,0.459,0.533,0.382,2.31,0.14,0.79,national default
+pinyon/juniper,340,15494,1904,4,0.21,0.09,0.47,0.445,0.571,0.315,1.34,0.08,0.81,national default
+pinyon/juniper,330,2530,408,3,0.74,0.29,1.83,0.342,0.523,0.127,1.98,0.18,0.89,national default
+pinyon/juniper,M260,1154,134,3,2.24,0.9,5.47,0.246,0.381,,5.32,0.26,0.99,national default
+pinyon/juniper,M330,8374,738,2,0.27,0.09,0.82,0.562,,0.404,4.34,0.2,0.92,national default
+pinyon/juniper,M340,18859,1476,2,0.14,0.04,0.41,0.409,0.543,0.275,1.23,0.03,0.71,national default
+pinyon/juniper,M310,17522,985,2,0.2,0.07,0.61,,,0.48,4,0.23,0.84,national default
+pinyon/juniper,320,3836,533,1,0.19,0.04,0.84,0.319,0.523,0.129,1.02,0.02,0.73,national default
+pinyon/juniper,M240,7,1,0,0,0,73.02,,,,4.73,0.37,,national default
+pinyon/juniper,220,940,16,0,0,0,14.47,,,,0.03,0,,national default
+pinyon/juniper,250,660,55,0,0,0,4.69,,,,0.54,0.09,,national default

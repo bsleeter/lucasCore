@@ -378,6 +378,20 @@ namespace lucasCoreUI
             AddColumn(store, "lucasCore_DataDownloadOptions", "PrismGrid", "INTEGER");
         }
 
+        // ---- 2.0 (drought and insect mortality, 2026-11): the transition type Mortality: Drought and Insects and its group Mortality
+        // (src/mortality.R; stage 6 maps the event, stage 3 writes its flows). Until a library has the type its Builds run as before
+        // and say so. The three Insect types and the Insect group, which no Build ever used, left the package's lists; a library
+        // keeps its own, because every Build result's flow pathways name their groups. The Mortality sheet is a new table, which
+        // SyncroSim adds by itself. No apostrophe in the description.
+        // The number: SyncroSim reads the schema as major.minor, a number, so the minor after 1.9 cannot be 1.10 (that is 1.1) ---------
+        [Update(2.0, "lucasCore 2.0: the transition type Mortality: Drought and Insects and its group Mortality, for high-severity drought and insect mortality mapped from LCMS and tree canopy cover")]
+        public static void Update_2_000(DataStore store)
+        {
+            AddNamed(store, "stsim_TransitionGroup", "TransitionGroupId", "Mortality", null, null, false);
+            AddTransitionType(store, "Mortality: Drought and Insects", null);
+            AddTypeToGroup(store, "Mortality: Drought and Insects", "Mortality");
+        }
+
         // ---- 1.5 (wetland methane, 2026-11): wetland classes release part of what their soil and litter emit as CH4 (src/flows.R,
         // src/nonforest-solve.R). The rows are the ones defaults/stsim and defaults/stockflow gained (generated from them). The three
         // Wetland Methane sheets are new tables, which SyncroSim adds by itself. A library keeps running on its earlier Builds; the

@@ -211,6 +211,11 @@ if (!ca_filled) say("Carbon Assumptions: the sheets are empty (never filled) - u
 # set given the younger age rows it hides), then each forest type's fire snag share (Carbon Assumptions: Fire Snag Share, else
 # defaults/spinup/fire-snag-share.csv; src/dom.R fire_snag_rows). The spin-up uses the same table stage 3 writes to stsim_FlowPathway.
 ev_def <- fread(pkg_file("defaults", "stockflow", "event-pathways.csv"), colClasses = "character", na.strings = "")[, FromStratumId := as.character(FromStratumId)]
+# drought and insect mortality (to-do 3, lucasCore 2.0): the event moves 83% of each live tree pool to the dead pools and emits nothing
+# (the mean loss of FIA stands over the 70% line), as the third disturbance of Carbon Assumptions: Disturbance Flows. A library made
+# before the type existed has no such group: the event's rows are left out (mort_def FALSE)
+mort_def <- "Mortality: Drought and Insects" %in% stsim_list("TransitionType")$Name; MORT_DF <- "Drought and insect mortality"
+if (!mort_def) ev_def <- ev_def[TransitionGroupId != DF_GROUPS[[MORT_DF]]]
 dfl <- as.data.table(datasheet(scn, ds("DisturbanceFlow"), optional = TRUE, lookupsAsFactors = FALSE)); df_src <- "Carbon Assumptions"
 if (!nrow(dfl)) { dfl <- preset("disturbance-flows"); df_src <- sprintf("the %s preset (the sheet is empty)", basename(preset_dir)) }
 # the grass, shrub and emergent wetland classes' own high-severity fire (to-do 39: chaparral 2026-11-06, the others 2026-11-07;
@@ -223,7 +228,11 @@ if (length(miss)) {
   say("Disturbance Flows: %d high-severity fire rows for %d classes the sheet has none for, from the %s preset (%s)", nrow(add), length(miss), basename(preset_dir), paste(miss, collapse = ", ")) }
 dfl[, `:=`(StratumId = as.character(StratumId), StateClassId = as.character(StateClassId), Disturbance = as.character(Disturbance),
            AgeMin = suppressWarnings(as.integer(AgeMin)), Share = as.numeric(Share))]
-dfl[Disturbance %in% c("1", "2"), Disturbance := names(DF_GROUPS)[as.integer(Disturbance)]]
+dfl[Disturbance %in% as.character(seq_along(DF_GROUPS)), Disturbance := names(DF_GROUPS)[as.integer(Disturbance)]]
+# a sheet filled before the event existed has no rows for it: it takes the preset's; a library without the type takes none
+if (!mort_def) dfl <- dfl[!Disturbance %in% MORT_DF] else if (!any(dfl$Disturbance %in% MORT_DF)) { add <- preset("disturbance-flows")[Disturbance == MORT_DF]
+  dfl <- rbind(dfl, add[, `:=`(StratumId = as.character(StratumId), StateClassId = as.character(StateClassId), AgeMin = suppressWarnings(as.integer(AgeMin)), Share = as.numeric(Share))], fill = TRUE)
+  if (df_src == "Carbon Assumptions") say("Disturbance Flows: %d drought and insect mortality rows from the %s preset (the sheet has none for it)", nrow(add), basename(preset_dir)) }
 dup <- dfl[duplicated(dfl[, .(StratumId, StateClassId, Disturbance, AgeMin, FromStockTypeId, ToStockTypeId)])]
 if (nrow(dup)) fail("Disturbance Flows: more than one row for %s", paste(unique(dup[, sprintf("%s %s -> %s%s", Disturbance, FromStockTypeId, ToStockTypeId,
                                                                                              ifelse(is.na(StateClassId), "", paste0(" (", StateClassId, ")")))]), collapse = "; "))
@@ -245,7 +254,7 @@ ev_all <- fire_snag_rows(ev_all, fss)
 say("High-severity fire snag share by forest type (%s): %s", if (ca_filled) "Carbon Assumptions" else paste("the", basename(preset_dir), "preset"),
     if (nrow(fss)) paste(sprintf("%s%s %.2f", ifelse(is.na(fss$Stratum), "", paste0(fss$Stratum, " / ")), sub("^Forest: ", "", fss$StateClass), fss$Share), collapse = ", ") else "none (the event table's rows for every type)")
 eb <- event_balance(ev_all, cells)
-check(STAGE, "high-severity fire and clearcut move at most each pool's whole stock", eb$v <= 1 + 1e-4, sprintf("largest share %.4f (%s)", eb$v, eb$what))
+check(STAGE, "high-severity fire, clearcut and drought and insect mortality move at most each pool's whole stock", eb$v <= 1 + 1e-4, sprintf("largest share %.4f (%s)", eb$v, eb$what))
 if (eb$v > 1 + 1e-4) finish_checks()   # rows are stored to 6 decimals
 dpt <- read_dom_parameters()   # Carbon Assumptions: Dead Organic Matter Parameters (each cell resolves its ecodivision rows, src/flows.R dom_parameters)
 ctx <- list(cc = cc, cw = cw, dens = dens, cbm = cbm, fo = fread(pkg_file("defaults", "stockflow", "stsim_FlowOrder.csv")), ev = ev_all, dpt = dpt, cal = CAL)

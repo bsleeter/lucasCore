@@ -34,7 +34,7 @@ TransitionGroup,Ag Contraction: Cropland,Ag Contraction from Agriculture: Cropla
 TransitionGroup,Ag Contraction: Pasture,Ag Contraction from Agriculture: Pasture (NLCD 81).,NlcdFolder
 TransitionGroup,Fire,"Wildfire, by MTBS burn severity: low (MTBS 1 unburned to low and 2 low), medium (3 moderate) and high (4 high). The expected area per cell is the fraction of its 30 m pixels burned.",MtbsSeverityFolder
 TransitionGroup,Forest Harvest,"Removal of trees by harvest, from LCMS Tree Removal: clearcut where last year's forest becomes shrub or grass in NLCD that year or within two years, selection where it stays forest.",LcmsFolder
-TransitionGroup,Insect,Insect and disease mortality by severity. Defined in the package's group list; no pathway uses it in the default model.,
+TransitionGroup,Mortality,"High-severity tree mortality from drought, insects or disease: a stand that loses most of its live trees with no fire and no cutting (the western ecodivisions; mapped from LCMS stress classes and tree canopy loss).",
 TransitionGroup,Restoration Wetland,Conversion of other land to wetland. Defined in the package's group list; no pathway uses it in the default model.,
 TransitionGroup,Wetland Change: Gain,Gain of wetland area. Defined in the package's group list; no pathway uses it in the default model.,
 TransitionGroup,Wetland Change: Loss,Loss of wetland area. Defined in the package's group list; no pathway uses it in the default model.,
@@ -59,7 +59,7 @@ TransitionType,Forest Harvest: Forest Clearcut,Stand-replacing harvest: LCMS Tre
 TransitionType,Forest Harvest: Forest Selection,Partial harvest: LCMS Tree Removal on last year's forest that stays forest.,LcmsFolder
 TransitionType,Forest Harvest: Forest Selection 20%,"Light selection: a partial harvest removing 20% of live biomass (merchantable wood to the forestry sector, the rest to dead wood), with Forest Selection's minimum ages. No mapped source, so a zero target in the historical model; projections use it for the Forest Management page's lighter selection.",
 TransitionType,Forest Harvest: Salvage Logging,"Harvest of trees killed by a disturbance: on the disturbed forest classes only (wetland twins too), within 5 years of the disturbance, keeping the class and its age; it takes mostly snags to the forestry sector. It has no mapped source and a zero target in the historical model.",
-TransitionType,Insect: *,Insect and disease mortality of {*}. Defined in the package's type list; no pathway uses it in the default model.,
+TransitionType,Mortality: Drought and Insects,"High-severity drought and insect mortality: about 83% of live tree carbon moves to snags, litter and dead roots and the cell goes to its Disturbed class.",
 TransitionType,Restoration Wetland: *,Conversion to Wetland: {*}. Defined in the package's type list; no pathway uses it in the default model.,
 TransitionType,Ag Change: *,Agricultural cells that change class: {*}.,NlcdFolder
 TransitionType,Wetland Change: *,Wetland change {*}. Defined in the package's type list; no pathway uses it in the default model.,

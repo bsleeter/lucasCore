@@ -25,13 +25,13 @@ COVER_COLS <- c(Forest = "#2b8152", Disturbed = "#b5651d", Shrubland = "#c9a26b"
 FAMILIES <- c("Urbanization", "Intensification", "Ag Expansion", "Ag Contraction", "Ag Change", "Fire", "Forest Harvest")
 # carbon lost each year, by cause (user, 2026-11-10: the flux figure's "fire emissions" were every transition's emissions): a transition's
 # emissions and removals (LULC: Emission, LULC: Harvest) by its type, crop harvest (Harvest: Agriculture) and drained peat
-LOSS_COLS <- c(Fire = "#c93a1d", Insect = "#7b4a8b", `Forest harvest` = "#6b6b6b", `Land use change` = "#8c6d31", `Crop harvest` = "#e3b23c", `Drained peat` = "#4a2f17")
+LOSS_COLS <- c(Fire = "#c93a1d", `Drought and insects` = "#7b4a8b", `Forest harvest` = "#6b6b6b", `Land use change` = "#8c6d31", `Crop harvest` = "#e3b23c", `Drained peat` = "#4a2f17")
 loss_cause <- function(grp, type) data.table::fcase(grp == "Harvest: Agriculture", "Crop harvest", grepl("^Emission: Drained", grp), "Drained peat", grp == "Lateral Flux", "Lateral export",
-                                                    grepl("^Fire", type), "Fire", grepl("^Insect", type), "Insect", grepl("^Forest Harvest", type), "Forest harvest",
+                                                    grepl("^Fire", type), "Fire", grepl("^(Insect|Mortality)", type), "Drought and insects", grepl("^Forest Harvest", type), "Forest harvest",
                                                     default = "Land use change")
 # emissions to the atmosphere by driver (Carbon fluxes c), carbon carried off the land (d), net biome productivity by land cover (f)
-EMIS_COLS <- c(`Fire: vegetation` = "#c93a1d", `Fire: peat` = "#7f1d0f", Insect = "#7b4a8b", `Forest harvest` = "#6b6b6b", Urbanization = "#b07aa1", `Other land change` = "#8c6d31", `Drained peat` = "#4a2f17")
-emis_driver <- function(type) data.table::fcase(grepl("^Fire", type), "Fire", grepl("^Insect", type), "Insect", grepl("^Forest Harvest", type), "Forest harvest",
+EMIS_COLS <- c(`Fire: vegetation` = "#c93a1d", `Fire: peat` = "#7f1d0f", `Drought and insects` = "#7b4a8b", `Forest harvest` = "#6b6b6b", Urbanization = "#b07aa1", `Other land change` = "#8c6d31", `Drained peat` = "#4a2f17")
+emis_driver <- function(type) data.table::fcase(grepl("^Fire", type), "Fire", grepl("^(Insect|Mortality)", type), "Drought and insects", grepl("^Forest Harvest", type), "Forest harvest",
                                                grepl("^Urbanization", type), "Urbanization", default = "Other land change")
 REM_COLS <- c(`Forest harvest wood` = "#6b6b6b", `Wood from land use change` = "#8c6d31", `Crop harvest` = "#e3b23c", `Lateral export (water)` = "#6baed6")
 BAL_COLS <- c(Forest = "#2b8152", Disturbed = "#b5651d", `Forested wetland` = "#66c2a5", `Emergent wetland` = "#9ecae1", Agriculture = "#d98b3a", `Grass and shrub` = "#c9a26b", Developed = "#c0392b", Other = "#a3a3a3")

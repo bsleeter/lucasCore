@@ -151,12 +151,13 @@ fire_snag_rows <- function(events, shares) {
     unique(paste(new$TransitionGroupId, new$FromStratumId, new$FromStateClassId, new$FromStockTypeId))
   rbind(events[!same], new, fill = TRUE) }
 
-# ---- Carbon Assumptions: Disturbance Flows (high-severity fire and clearcut) ------------------------------------------------------
+# ---- Carbon Assumptions: Disturbance Flows (high-severity fire, clearcut, drought and insect mortality) --------------------------------
 # A sheet row (ecodivision and forest type optional, disturbance, minimum stand age, from pool, to pool, share) is one event flow; a
 # row to "Atmosphere" is the carbon burned, written as ST-Sim's three gas rows (GAS_SPLIT, the shares of every LUCAS default row). The
 # flow type follows the pools, as in the LUCAS event table: live -> DOM = mortality, DOM -> DOM = DOM transfer (clearcut's felled snags),
 # Atmosphere = emission of each gas, Forestry Sector = harvest.
-DF_GROUPS <- c(`High-severity fire` = "Fire: High Severity [Type]", Clearcut = "Forest Harvest: Forest Clearcut [Type]")
+DF_GROUPS <- c(`High-severity fire` = "Fire: High Severity [Type]", Clearcut = "Forest Harvest: Forest Clearcut [Type]",
+               `Drought and insect mortality` = "Mortality: Drought and Insects [Type]")   # (the third: to-do 3, lucasCore 2.0; src/mortality.R)
 GAS_SPLIT <- c(CO2 = 0.9, CO = 0.09, CH4 = 0.01)
 # the default event rows of the two disturbances as sheet rows (gas rows merged into one Atmosphere row)
 events_to_sheet <- function(events) {
@@ -169,7 +170,7 @@ events_to_sheet <- function(events) {
 # rows with a blank forest type (expanded to each class, so they rank above class-only rows as in event_rows)
 sheet_to_events <- function(x, template, classes) {
   x <- data.table::copy(x)
-  x[, grp := ifelse(as.character(Disturbance) %in% c("High-severity fire", "1"), DF_GROUPS[[1]], ifelse(as.character(Disturbance) %in% c("Clearcut", "2"), DF_GROUPS[[2]], NA_character_))]
+  dk <- as.character(x$Disturbance); x[, grp := unname(DF_GROUPS[ifelse(dk %in% names(DF_GROUPS), match(dk, names(DF_GROUPS)), suppressWarnings(as.integer(dk)))])]   # (the name, or the list's number)
   if (anyNA(x$grp)) stop("Disturbance Flows: unknown disturbance ", paste(unique(x$Disturbance[is.na(x$grp)]), collapse = ", "), call. = FALSE)
   eco <- x[!is.na(StratumId) & is.na(StateClassId)]
   if (nrow(eco)) { exp <- eco[rep(seq_len(nrow(eco)), each = length(classes))][, StateClassId := rep(classes, nrow(eco))]

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<package name="lucasCore" displayName="LUCAS Core (model builder)" description="Builds LUCAS land-use and carbon models in ST-Sim from national datasets (FIA growth curves; CBM carbon parameters; spatial initial conditions; historical transitions and projections)" version="1.9.0" url="https://code.usgs.gov/LUCC/lucasCore" minSyncroSimVersion="3.1.29">
+<package name="lucasCore" displayName="LUCAS Core (model builder)" description="Builds LUCAS land-use and carbon models in ST-Sim from national datasets (FIA growth curves; CBM carbon parameters; spatial initial conditions; historical transitions and projections)" version="2.0.0" url="https://code.usgs.gov/LUCC/lucasCore" minSyncroSimVersion="3.1.29">
 
 	<builtFor package="stsim" version="4.5.4"/>
 
@@ -630,7 +630,7 @@
 	<dataSheet name="DisturbanceFlow" displayName="Disturbance Flows">
 		<column name="StratumId" displayName="Ecodivision (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_Stratum" isOptional="True"/>
 		<column name="StateClassId" displayName="Forest Type (blank = all)" dataType="Integer" validationType="Datasheet" formula1="stsim_StateClass" isOptional="True"/>
-		<column name="Disturbance" displayName="Disturbance" dataType="Integer" validationType="List" formula1="1:High-severity fire|2:Clearcut"/>
+		<column name="Disturbance" displayName="Disturbance" dataType="Integer" validationType="List" formula1="1:High-severity fire|2:Clearcut|3:Drought and insect mortality"/>
 		<column name="AgeMin" displayName="From Stand Age (blank = 0)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="GreaterEqual" formula1="0"/>
 		<column name="FromStockTypeId" displayName="From Pool" dataType="Integer" validationType="Datasheet" formula1="stsim_StockType"/>
 		<column name="ToStockTypeId" displayName="To Pool (Atmosphere = burned)" dataType="Integer" validationType="Datasheet" formula1="stsim_StockType"/>
@@ -715,6 +715,15 @@
 	     defaults/landcover/reforestation-cutoff.csv, tools/fit_reforestation_cutoff.R) on BpS forest potential, or at any time on BpS
 	     non-forest potential, starts as its start-year class and reforests when NLCD shows forest. Blank = the defaults (on, the
 	     fitted cutoff, riparian and savanna as forest potential) -->
+	<!-- Mortality (to-do 3, lucasCore 2.0; src/mortality.R): the drought and insect mortality event of stage 6. Blank = on, ranked selection,
+	     the canopy-loss lines shipped per ecodivision (defaults/transitions/mortality-lines.csv), the pathways' minimum stand age (20) -->
+	<dataSheet name="MortalityOptions" displayName="Mortality" isSingleRow="True">
+		<column name="Enabled" displayName="Drought and Insect Mortality (blank = on)" dataType="Boolean" isOptional="True"/>
+		<column name="Placement" displayName="Placement on the Grid" dataType="Integer" validationType="List" formula1="1:Ranked selection|2:Fraction as probability" isOptional="True" defaultValue="1"/>
+		<column name="CanopyLossLine" displayName="Canopy Loss That Counts as High Severity, Share (blank = the ecodivision's line)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0.01" formula2="1"/>
+		<column name="PinyonJuniperLine" displayName="The Same for Pinyon/Juniper (blank = 0.474)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0.01" formula2="1"/>
+		<column name="MinimumAge" displayName="Minimum Stand Age (yr; blank = 20)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="0" formula2="500"/>
+	</dataSheet>
 	<!-- Natural Change (user 2026-11-14): reforestation now, insects and drought later; its own page (a data feed needs two sheets) -->
 	<dataSheet name="ReforestationOptions" displayName="Natural Change" isSingleRow="True" viewClassName="lucasCoreUI.NaturalChangeView" viewClassAssembly="lucasCoreUI">
 		<column name="Enabled" displayName="Reforestation Transition (blank = on)" dataType="Boolean" isOptional="True"/>
@@ -1758,6 +1767,7 @@
 		<dataSheet name="OutputNlcdAnnual" type="Input"/>
 		<dataSheet name="MinimumHarvestAge" type="Input"/>
 		<dataSheet name="HarvestAgeOptions" type="Input"/>
+		<dataSheet name="MortalityOptions" type="Input"/>
 		<dataSheet name="ReforestationOptions" type="Input"/>
 		<dataSheet name="OutputLandCoverLayers" type="Input"/>
 		<dataSheet name="ForestCoverOptions" type="Input"/>
@@ -2059,6 +2069,7 @@
 				<item name="SpatialAllocation"/>
 				<item name="FireOptions"/>
 				<item name="ReforestationOptions"/>
+				<item name="MortalityOptions"/>
 				<item name="FuelTreatment"/>
 				<item name="ForestManagement"/>
 				<item name="ManagementAction"/>

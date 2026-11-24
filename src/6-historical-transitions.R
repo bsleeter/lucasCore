@@ -32,6 +32,9 @@
 #     FIA's 10th percentile of age at the cut, defaults/transitions/harvest-age.csv and the Minimum Harvest Age page; the build
 #     required the minimum age in the start year)
 #   * every pathway type with no spatial multiplier gets a zero target, so no type runs everywhere by default
+#   * drought and insect mortality (to-do 3, lucasCore 2.0; src/mortality.R): source CanopyLcms. A 30 m rule on LCMS stress classes and
+#     tree canopy loss gives each cell's flagged share; cells are chosen by rank so the year's area matches and written as 1 / 0, so
+#     the historical run has the same die-off in every iteration (the Mortality page can switch it off, or to fractions as chances)
 # Needs stage 5 (same pipeline, or a dependency on its result).
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
@@ -56,10 +59,16 @@ vS <- values(S, mat = FALSE); vA <- values(A, mat = FALSE); land <- !is.na(value
 say("Grid: %d land cells of %d m; transitions %d-%d", sum(land), res_m, min(yrs), max(yrs))
 progressBar()
 
+# Mortality page (to-do 3): off, or a library made before the type existed, leaves the pathways and the source out, so the Build is as before
+source(pkg_file("src", "mortality.R"))
+mo6 <- tryCatch(mortality_options(tryCatch(read_ds("MortalityOptions"), error = function(e) data.table())), error = function(e) fail("%s", conditionMessage(e)))
+mort_on <- mo6$enabled && MORT_TYPE %in% ttl$Name
+if (!mort_on) say("Drought and insect mortality: off (%s)", if (!mo6$enabled) "the Mortality page" else "this library has no Mortality: Drought and Insects type; update the library to add it")
 # ---- pathways ---------------------------------------------------------------------------------------------------------
 pf <- list.files(pkg_file("defaults", "transitions", "pathways"), "[.]csv$", full.names = TRUE)
 pw <- rbindlist(lapply(pf, function(f) { x <- fread(f, colClasses = "character", na.strings = ""); setnames(x, gsub("ID", "Id", names(x)))
   x[, Set := tools::file_path_sans_ext(basename(f))] }), fill = TRUE)
+if (!mort_on) pw <- pw[TransitionTypeId != MORT_TYPE]
 badc <- setdiff(c(pw$StateClassIdSource, pw$StateClassIdDest), scl$Name); badt <- setdiff(pw$TransitionTypeId, ttl$Name)
 check(STAGE, "pathway state classes and transition types are in the stsim lists", !length(badc) && !length(badt),
       paste(c(if (length(badc)) paste("classes:", paste(badc, collapse = "; ")), if (length(badt)) paste("types:", paste(badt, collapse = "; ")),
@@ -70,6 +79,7 @@ if (!"StratumIdSource" %in% names(pw)) pw[, StratumIdSource := NA_character_]
 tr <- pw[, .(Eco = StratumIdSource, StateClassIdSource, StateClassIdDest, TransitionTypeId, Probability = num(Probability), Proportion = num(Proportion), AgeMin = num(AgeMin),
              AgeMax = num(AgeMax), AgeRelative = num(AgeRelative), AgeReset = ifelse(is.na(AgeReset), NA, toupper(AgeReset) %in% c("YES", "TRUE")),
              TSTMin = num(TSTMin), TSTMax = num(TSTMax), TSTRelative = num(TSTRelative))]
+if (mort_on && !is.na(mo6$min_age)) tr[TransitionTypeId == MORT_TYPE, AgeMin := mo6$min_age]   # (the Mortality page's minimum stand age)
 # minimum harvest ages (to-do 34): the package's FIA values (defaults/transitions/harvest-age.csv, tools/calibrate-harvest-age.R: the
 # 10th percentile of FIA stand age at the cut, per forest type and, where FIA has enough cuts, per ecodivision), lowered to the study
 # area's own (LCMS cuts x the stand age map, below) and the Minimum Harvest Age page's rows; settled once the cut maps are made
@@ -98,6 +108,7 @@ elig_cells <- function(g) vS %in% sid(unique(pw[TransitionTypeId %in% grp_types(
 so <- read_default("transitions", "sources.csv")
 source(pkg_file("src", "reforestation.R")); ro6 <- reforest_options(read_ds("ReforestationOptions"))   # (to-do 57: off = no Reforestation maps, so a zero target)
 if (!ro6$enabled) { so <- so[TransitionGroupId != "Reforestation"]; say("Reforestation: off (Reforestation Options)") }
+if (!mort_on) so <- so[TransitionGroupId != MORT_GROUP]
 ok_g <- vapply(so$TransitionGroupId, function(g) if (endsWith(g, TYPE_SUFFIX)) grp_types(g) %in% ttl$Name else g %in% tgl$Name, TRUE)
 check(STAGE, "every transition group in sources.csv exists", all(ok_g), paste(so$TransitionGroupId[!ok_g], collapse = "; "))
 nopw <- so$TransitionGroupId[vapply(so$TransitionGroupId, function(g) !any(grp_types(g) %in% pw$TransitionTypeId), TRUE)]
@@ -525,6 +536,95 @@ if (nrow(hg)) {
 }
 progressBar()
 
+# ---- drought and insect mortality (to-do 3; src/mortality.R) ---------------------------------------------------------------------
+# The 30 m rule runs from 1990 whatever the start year (a pixel has the event once), over the same aggregation blocks as the other
+# 30 m disturbances. Each cell's flagged share is then placed: by rank (cells from the top until the year's area is met, written as
+# 1 / 0; the default) or as the share itself. A cell takes the event only where its start-year class has the pathway, it is at least
+# the pathway's minimum age, it has not had the event, and no fire, harvest or land-use change is on it that year (ST-Sim allows one
+# transition per cell per timestep, and a multiplier of 1 beside another group's fraction would no longer be certain).
+# In fraction-as-probability placement the area on cells with no pathway is dropped and reported (there is no ranking to place it by).
+mort_sum <- NULL
+if (mort_on && MORT_GROUP %in% so$TransitionGroupId) {
+  eco6 <- st_transform(read_sf(src$EcodivisionFile), MODEL_CRS)
+  ml <- mortality_lines(read_default("transitions", "mortality-lines.csv"), data.table(ecodiv = eco6$ecodiv, StrtmId = eco6$StrtmId), mo6)
+  ml_here <- ml[StrtmId %in% unique(vP[land])]
+  layers <- rbind(layers, data.table(Timestep = yrs, TransitionGroupId = MORT_GROUP, Source = MORT_SOURCE, File = NA_character_))   # (a row a year: Off unless filled below)
+  if (!nrow(ml_here)) say("Drought and insect mortality: none of the study area's ecodivisions (%s) has a canopy-loss line (the event is mapped in the western ecodivisions only): no events", paste(eco_here, collapse = ", ")) else {
+    ms <- read_data_sources(c("TreeCanopyFolder", "ForestTypeGroupFolder"))
+    ex <- function(f) if (length(f) && !is.na(f[1]) && file.exists(f[1])) f[1] else NULL
+    f_tc <- function(y) ex(file.path(ms$TreeCanopyFolder, sprintf(TCC_FILE, y))); f_nl <- function(y) ex(nlcd_file(src$NlcdFolder, y))
+    f_lc <- function(y) ex(Sys.glob(file.path(src$LcmsFolder, y, sprintf("*Change_%d.tif", y)))); f_mt <- function(y) ex(file.path(src$MtbsSeverityFolder, sprintf("mtbs_CONUS_%d.tif", y)))
+    cand <- MORT$first:min(y1, max(TCC_YEARS)); ey <- mortality_years(cand, function(y) !is.null(f_tc(y)), function(y) !is.null(f_nl(y)), function(y) !is.null(f_lc(y))); oy <- intersect(ey, yrs)
+    if (!length(oy)) fail("Drought and insect mortality: no year of %d-%d can be judged: the rule reads tree canopy cover and LCMS for the year and the five before, and Annual NLCD five years before. Tick USFS Tree Canopy Cover, LCMS and Annual NLCD on the Data Download page for %d on, or switch the event off on the Mortality page",
+                         max(MORT$first, y0 + 1L), y1, MORT$first - MORT$span)
+    if (length(setdiff(intersect(cand, yrs), oy))) say("Drought and insect mortality: %s cannot be judged (a year of tree canopy cover, LCMS or Annual NLCD is missing): no events in those years", paste(setdiff(intersect(cand, yrs), oy), collapse = ", "))
+    if (y0 + 1L <= MORT$first - MORT$span) say("Drought and insect mortality: the record starts in %d (tree canopy cover starts in %d and the rule looks %d years back): no events in %d-%d",
+                                  MORT$first, min(TCC_YEARS), MORT$span, y0 + 1L, MORT$first - MORT$span)
+    if (y1 > max(cand)) say("Drought and insect mortality: tree canopy cover ends in %d: no events in %d-%d", max(TCC_YEARS), max(TCC_YEARS) + 1L, y1)
+    all_y <- (min(ey) - MORT$span):(max(ey) + 1L); nm <- function(fn, yy) { l <- setNames(lapply(yy, fn), yy); l[!vapply(l, is.null, TRUE)] }
+    if (length(nm(f_mt, all_y)) < length(all_y)) say("Drought and insect mortality: MTBS is missing for %s: LCMS alone rules fire out in those years", paste(setdiff(all_y, as.integer(names(nm(f_mt, all_y)))), collapse = ", "))
+    n30 <- rast(nf[[1]]); b6 <- grid_blocks(n30, L, P); E6 <- as.vector(b6$ext); nr6 <- round((E6[4] - E6[3]) / 30); nc6 <- round((E6[2] - E6[1]) / 30)
+    tiles <- list.files(ms$ForestTypeGroupFolder, "_ForestType[.]tif$", full.names = TRUE); tiles <- Filter(function(f) !is.null(intersect(ext(rast(f)), b6$ext)), tiles)
+    if (!length(tiles)) fail("Drought and insect mortality: no USFS forest type group tile covers the study area (%s): tick USFS forest type groups on the Data Download page, or switch the event off on the Mortality page", ms$ForestTypeGroupFolder)
+    bt <- rast(b6$ext, resolution = 30 * b6$fact, crs = MODEL_CRS); ebv <- as.integer(values(rasterize(vect(eco6), bt, "StrtmId"), mat = FALSE))
+    step6 <- max(b6$fact, (floor(4e6 / nc6) %/% b6$fact) * b6$fact); rows6 <- seq(0, nr6 - 1, by = step6)
+    a6m <- list(clear = clear_syncrosim_proj, E = E6, fact = b6$fact, nr = nr6, nc = nc6, step = step6, rows = rows6, ft = tiles, eco = ebv, lines = as.data.frame(ml), pj = MORT$pj, all = all_y,
+                lc = nm(f_lc, all_y), mt = nm(f_mt, all_y), tc = nm(f_tc, all_y), nl = nm(f_nl, ey - MORT$span), years = ey, out = oy, span = MORT$span, floor = MORT$floor,
+                named = MORT$named, stress = MORT$stress, burn = MORT$burn)
+    t0 <- Sys.time()
+    r6 <- par_lapply_mem(seq_along(rows6), function(i, a) tryCatch(mortality_band(i, a), error = function(e) stop(sprintf("mortality rows from %d: %s", a$rows[i], conditionMessage(e)), call. = FALSE)),
+                         "Drought and insect mortality", cap = max(1L, min(40L, detectCores() - 2L)), init = function(cl, nw) parallel::clusterExport(cl, "mortality_band", envir = environment(mortality_band)),
+                         args = function(nw) list(a = a6m))
+    px <- Reduce(`+`, lapply(r6, `[[`, "total")); br <- rast(bt, nlyrs = length(oy)); values(br) <- do.call(rbind, lapply(r6, `[[`, "counts")) / b6$fact^2
+    SH <- values(mask(project(br, P, method = "near"), P)); if (is.null(dim(SH))) SH <- matrix(SH, ncol = length(oy))
+    # The first year of the record (1990) also holds the pixels that crossed the line in the look-back years before it, about five
+    # years of die-off in one. Its cells are dealt by rank over those years (1986-1990, where they are in the run), so each takes
+    # about a fifth: the area and the carbon are kept and 1990 has no pulse; the year a cell gets within them is assigned, not
+    # observed (user 2026-11-24).
+    oy2 <- oy; lead <- intersect((MORT$first - MORT$span + 1L):MORT$first, yrs)
+    if (MORT$first %in% oy && length(lead) > 1L) { j0 <- match(MORT$first, oy); s0 <- SH[, j0]; s0[is.na(s0)] <- 0; k0 <- which(s0 > 0); k0 <- k0[order(-s0[k0], k0)]
+      add <- matrix(0, nrow(SH), length(lead)); add[cbind(k0, (seq_along(k0) - 1L) %% length(lead) + 1L)] <- s0[k0]
+      SH <- cbind(add, SH[, -j0, drop = FALSE]); px <- c(rep(px[j0] / length(lead), length(lead)), px[-j0]); oy2 <- c(lead, oy[-j0])
+      say("Drought and insect mortality: %d is the first year the rule can judge and also holds the die-off of the %d years before it (%.1f km2 on the model grid); its cells are dealt by rank over %d-%d, about a %s each (the year within them is assigned, not observed)",
+          MORT$first, MORT$span - 1L, sum(s0) * cell_km2, min(lead), max(lead), c("half", "third", "quarter", "fifth")[length(lead) - 1L]) }
+    say("Drought and insect mortality: the 30 m rule over %d-%d (%d x %d pixels, %d forest type tile%s, lines %s) in %.1f min: %.1f km2 of 30 m pixels flagged in %d-%d",
+        min(ey), max(ey), nr6, nc6, length(tiles), if (length(tiles) == 1) "" else "s",
+        paste(sprintf("%s %s%s", ml_here$ecodiv, ifelse(is.na(ml_here$line), "-", format(ml_here$line)), ifelse(is.na(ml_here$pj_line), "", sprintf(" (pinyon/juniper %s)", format(ml_here$pj_line)))), collapse = ", "),
+        as.numeric(Sys.time() - t0, units = "mins"), sum(px) * 9e-4, min(oy), max(oy))
+    # each cell's class, minimum age and resets (a high-severity fire or a clearcut on half or more of the cell puts it in a young or disturbed stand)
+    canS <- land & elig_cells(MORT_GROUP); mage <- num(pw[TransitionTypeId == MORT_TYPE, AgeMin][match(cn, pw[TransitionTypeId == MORT_TYPE, StateClassIdSource])])
+    if (!is.na(mo6$min_age)) mage[!is.na(mage)] <- mo6$min_age
+    mage[is.na(mage)] <- 0
+    age0 <- if (exists("vA2")) vA2 else vA; rs_f <- layers[TransitionGroupId %in% c(HSG, ccs$TransitionGroupId) & !is.na(File) & Timestep %in% yrs]
+    other <- layers[Source %in% c("Mtbs", "Landfire", "Lcms", "NlcdClearcut") & !is.na(File) & Timestep %in% yrs]
+    taken <- rep(FALSE, length(vS)); lastR <- rep(NA_real_, length(vS)); carry <- 0; ms6 <- list(); bad_sel <- 0L
+    for (y in yrs) { j <- match(y, oy2)
+      if (!is.na(j)) { room <- rep(1, length(vS)); for (p in other[Timestep == y, File]) { w <- values(rast(p), mat = FALSE); w[is.na(w)] <- 0; room <- room - w }
+        room <- pmax(0, room); room[!land] <- 0; room[lu_on[[as.character(y)]]] <- 0
+        age <- age0 + (y - y0 - 1); k <- !is.na(lastR); age[k] <- (y - lastR - 1)[k]; can <- canS & !taken; old <- !is.na(age) & age >= mage; sh <- SH[, j]; sh[is.na(sh)] <- 0
+        if (mo6$placement == "ranked") { s <- mortality_select(sh, can, old, room, carry, canS); carry <- s$carry; taken[s$sel] <- TRUE; v <- integer(length(vS)); v[s$sel] <- 1L
+          bad_sel <- bad_sel + sum(!(can & old & room >= 1 - 1e-9)[s$sel]); v[!land] <- NA_integer_; nsel <- length(s$sel)
+          fo <- if (nsel) write_raster(setValues(rast(P), v), sprintf("Mortality-Drought-and-Insects_%d.tif", y), "INT1U") else NA_character_
+        } else { s <- mortality_select(sh, can, old, room, 0, canS); v <- pmin(sh, room); v[!(can & old)] <- 0; nsel <- sum(v); v[!land] <- NA_real_; s$carry <- 0; s$sel <- integer()
+          fo <- if (nsel > 0) write_raster(setValues(rast(P), v), sprintf("Mortality-Drought-and-Insects_%d.tif", y), "FLT4S") else NA_character_ }
+        layers[TransitionGroupId == MORT_GROUP & Timestep == y, File := fo]
+        ms6[[length(ms6) + 1]] <- data.table(Timestep = y, TransitionGroupId = MORT_GROUP, Pixels = px[j] * 9e-4, Flagged = s$flagged * cell_km2, NoPathway = s$moved * cell_km2, Again = s$again * cell_km2, Young = s$young * cell_km2,
+                                             Held = s$held * cell_km2, Placed = nsel * cell_km2, Carry = s$carry * cell_km2) }
+      for (p in rs_f[Timestep == y, File]) { w <- values(rast(p), mat = FALSE); lastR[!is.na(w) & w >= 0.5] <- y }
+      if (!is.na(j) && length(s$sel)) lastR[s$sel] <- y }
+    mort_sum <- rbindlist(ms6); tm <- mort_sum[, lapply(.SD, sum), .SDcols = c("Pixels", "Flagged", "NoPathway", "Again", "Young", "Held", "Placed")]
+    say("Drought and insect mortality (%s): %.1f km2 flagged on the model grid; %.1f km2 of it on cells whose class has no pathway (30 m softwood pixels in a cell of another class: that area is placed on the next-ranked cells), %.1f km2 on cells that already had the event (not counted again), %.1f km2 on stands under the minimum age, %.1f km2 held back for fire, harvest or land-use change in the cell that year; %.1f km2 placed in %d of %d years%s",
+        if (mo6$placement == "ranked") "ranked selection: whole cells, the same in every iteration" else "fraction as probability", tm$Flagged, tm$NoPathway, tm$Again, tm$Young, tm$Held, tm$Placed, mort_sum[Placed > 0, .N], nrow(mort_sum),
+        if (mo6$placement == "ranked") sprintf("; %.2f km2 left over at the end (less than a cell, or no cell free to take it)", carry * cell_km2) else "")
+    top <- mort_sum[Placed > 0][order(-Placed)]; top <- top[seq_len(min(5L, nrow(top)))]
+    if (nrow(top)) say("  highest years: %s", paste(sprintf("%d (%.1f km2)", top$Timestep, top$Placed), collapse = ", "))
+    check(STAGE, "mortality: flagged shares are between 0 and 1", all(is.na(SH) | (SH >= 0 & SH <= 1 + 1e-6)), sprintf("max %.4f", max(SH, na.rm = TRUE)))
+    check(STAGE, "mortality: the area placed and left over equals the area that could be placed", mo6$placement != "ranked" || abs(tm$Placed + carry * cell_km2 - (tm$Flagged - tm$Again - tm$Young - tm$Held)) < 1e-6 * max(1, tm$Flagged) + 1e-6,
+          sprintf("%.2f km2 placed + %.2f left over against %.2f", tm$Placed, carry * cell_km2, tm$Flagged - tm$Again - tm$Young - tm$Held))
+    check(STAGE, "mortality: every chosen cell has the pathway, the minimum age and no other transition that year, and none is chosen twice", bad_sel == 0L, sprintf("%d cells", bad_sel))
+  }
+}
+
 # ---- ag contraction destinations: the nearest natural state class of the start year --------------------------------------
 gates <- NULL; nv <- so[Source == "NaturalVeg"]
 if (nrow(nv)) {
@@ -591,6 +691,7 @@ summ <- layers[!is.na(File), { v <- values(rast(File), mat = FALSE); v[is.na(v)]
 # a 30 m disturbance's cells with no pathway were emptied above, so the column holds what they carried before it was moved
 if (nrow(moved)) summ[moved, on = .(Timestep, TransitionGroupId), IneligibleArea := i.Lost]
 if (!is.null(age_blocked)) summ <- merge(summ, age_blocked, by = c("Timestep", "TransitionGroupId"), all.x = TRUE) else summ[, AgeBlockedArea := NA_real_]
+if (!is.null(mort_sum)) summ[mort_sum, on = .(Timestep, TransitionGroupId), `:=`(IneligibleArea = i.NoPathway, AgeBlockedArea = i.Young)]   # (mortality: the area flagged on cells with no pathway, which was placed on other cells, and on stands too young)
 tot <- summ[, .(Area = sum(Area), Inel = sum(IneligibleArea), Blocked = sum(AgeBlockedArea, na.rm = TRUE), Years = .N), by = .(TransitionGroupId, Source)][order(Source, TransitionGroupId)]
 for (i in seq_len(nrow(tot))) with(tot[i], say("%s (%s): %.0f km2 over %d years with any; %.1f%% on classes with no pathway%s", TransitionGroupId, Source, Area, Years,
                                                100 * Inel / max(Area, 1e-9), if (Blocked > 0) sprintf("; %.1f%% below the minimum age", 100 * Blocked / Area) else ""))
