@@ -2,7 +2,7 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
-## 2.0.0 - unreleased
+## 2.0.0 - 2026-11-24
 
 A major version number for a reason of arithmetic, not of scale: SyncroSim records a library's schema as major.minor read as
 a number, so the minor after 1.9 cannot be 1.10 (it reads as 1.1, below 1.9, and no update would run). The 2.0 library update

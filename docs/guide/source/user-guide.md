@@ -144,7 +144,7 @@ When lucasCore is added, it fills the **Definitions** project with everything a 
 | Primary strata: the FIA ecodivisions | ST-Sim > Strata > Primary Stratum | 19 |
 | Secondary and tertiary strata: every unit of every Stratum Source | ST-Sim > Strata > Secondary Stratum, Tertiary Stratum | 6,221 each |
 | State classes, from NLCD land cover and FIA forest type groups | ST-Sim > States > State Class | 51 |
-| Transition types and groups: land use, harvest, fire, insects | ST-Sim > Transitions | 143 types, 15 groups |
+| Transition types and groups: land use, harvest, fire, drought and insect mortality | ST-Sim > Transitions | 141 types, 15 groups |
 | Stock and flow types: the 14 carbon pools and their flows | ST-Sim > Advanced | 23 stocks, 54 flows |
 | Stratum Sources (states, counties, HUCs, ecoregions, pyromes, federal lands, GAP status) | LUCAS Core (model builder) > LUCAS Core > Stratum Sources | 9 |
 | LOCA2 climate scenarios, models and replicates | LUCAS Core (model builder) > LUCAS Core | 3, 10 and 6 |
@@ -361,7 +361,7 @@ Then build. With the home set and the paths blank, every stage reads from the ho
 
 With **By region**, each new study area gets its own download and folder, and the shared copies are fetched only the first time. A Build reads each dataset from the smallest region whose box covers its study area, so one large download, such as all of California, serves every Build inside it: P26, P29 and Placer County.
 
-**National** keeps every dataset whole at the top of the home, so any study area in CONUS reads from it with no further download. It is about 175 GB: Annual NLCD alone is 56 GB, at 1.4 GB a year, and the gNATSGO soil layers are about 9 GB each. MRLC served the NLCD files at about 1.3 MB/s when this was tested, so a national home is an overnight job; a stopped run resumes. The national files and a region's clips are the same cell for cell. From lucasCore 1.9 a national home also takes PRISM at 800 m for five variables (precipitation, mean, maximum and minimum temperature, and maximum vapour pressure deficit), annual and monthly: about 130 GB more for 1985 on.
+**National** keeps every dataset whole at the top of the home, so any study area in CONUS reads from it with no further download. It is about 175 GB: Annual NLCD alone is 56 GB, at 1.4 GB a year, and the gNATSGO soil layers are about 9 GB each. MRLC served the NLCD files at about 1.3 MB/s when this was tested, so a national home is an overnight job; a stopped run resumes. The national files and a region's clips are the same cell for cell. From lucasCore 1.9 a national home also takes PRISM at 800 m for five variables (precipitation, mean, maximum and minimum temperature, and maximum vapour pressure deficit), annual and monthly: about 130 GB more for 1985 on. From lucasCore 2.0 it can also take USFS Tree Canopy Cover for all of CONUS, about 230 GB more.
 
 #### 1.6.8 New editions
 
@@ -729,7 +729,7 @@ The other pages now hold the method's rows; edit any of them, or press Fill agai
 | Live Turnover | Turnover rates and splits of the live pools, in place of the CBM ones | Stem turnover fitted to FIA mortality, 151 rows; the other rates CBM's |
 | Dead Organic Matter Parameters | Base decay rate, reference temperature, Q10 and share emitted of each dead pool | CBM-CFS3 values, 9 pools |
 | Spin-up | Return interval, share of past cycles ended by clearcut, last disturbance outside fire perimeters | Empty: LANDFIRE intervals (worked out by the Build), all high-severity fire, clearcut; the page lists them |
-| Disturbance Flows | Where high-severity fire and clearcut move each pool's carbon | 39 flows fitted to FIA |
+| Disturbance Flows | Where high-severity fire, clearcut and (from lucasCore 2.0) drought and insect mortality move each pool's carbon | 39 flows fitted to FIA |
 | Fire Snag Share | The share of live wood high-severity fire leaves standing, per forest type | 4 forest types fitted to FIA |
 | Decay Calibration Settings | Mature age, years without fire or cutting, minimum plots and snags, multiplier ranges | 60, 30, 30, 200, 200, 0.05-20, 0.02-50 |
 | Mature Age by Forest Type | A forest type's own mature age, and optionally its own years without fire or cutting, for the measured calibration | Empty: every type uses Decay Calibration Settings' values |
@@ -797,7 +797,7 @@ Each class has a methane target in Mg C/ha/yr as CH4, taken from the literature 
 
 The page has three parts, and anything left empty is the package value:
 
-- **Settings.** The methane Q10 (3.83), the wetland soil CO2 Q10 (2.0), the cap on methane's share (0.3), the CO2 equivalent of a tonne of methane carbon (33.5) and the number of uncertainty draws (0).
+- **Settings.** The methane Q10 (3.83), the wetland soil CO2 Q10 (2.0), the cap on methane's share (0.3), the CO2 equivalent of a tonne of methane carbon (33.5) and the number of uncertainty draws (0). From lucasCore 2.0 the methane Q10 is 2.57 by default, and the page has one Wetland Q10 (1.5) for what an emergent wetland's litter and soil lose otherwise; forested wetland soil CO2 keeps 2.0.
 - **Methane targets.** One row per wetland class, or per class and region. A row without a region sets every region of the class; a region's own row wins there.
 - **Marsh salinity targets.** An estuarine emergent cell takes the target of the salinity zones LANDFIRE maps in it (fresh and oligohaline, brackish, salt, or salt and brackish together), weighted by their share of the cell, in place of its class target. A cell with no zone keeps the class target.
 
@@ -805,7 +805,7 @@ The page has three parts, and anything left empty is the package value:
 
 **Uncertainty.** A low and a high beside a target describe how well that target is known. Set **Uncertainty draws** to a number and each of a run's first iterations up to that number draws every target from its range, most often near the target, and all classes high or low together. The CO2 from the same pools is adjusted to match, so every iteration conserves carbon. Later iterations run at the targets. With 0 draws, the default, the ranges do nothing. The package ranges are a first draft from the literature; some are lopsided, so the average of many draws can sit above or below the target.
 
-**Temperature.** Methane responds to the year's temperature more strongly than CO2 does (Q10 3.83 against 2.0), so in a warm year a wetland loses more carbon and a larger share of it is methane. In a Louisiana coastal marsh test, methane rose about 55% by 2100 under SSP5-8.5.
+**Temperature.** Methane responds to the year's temperature more strongly than CO2 does (Q10 3.83 against 2.0), so in a warm year a wetland loses more carbon and a larger share of it is methane. In a Louisiana coastal marsh test, methane rose about 55% by 2100 under SSP5-8.5. That test used the earlier methane Q10 of 3.83; from lucasCore 2.0 the defaults are 2.57 for methane and 1.5 for an emergent wetland's other losses.
 
 **In the results.** Methane is reported in the flow groups Emission: Wetland CH4 (in carbon) and Emission: Wetland CH4 (CO2e). It is part of heterotrophic respiration, so net ecosystem and net biome productivity in carbon are unchanged, and their CO2e versions count methane at its CO2 equivalent. A library made before 1.5 gets methane with its next Build.
 
@@ -844,6 +844,43 @@ The crosswalks tell stage 5 which state class each land cover code becomes: fore
 *Figure 3.20. Land Cover Crosswalks, filled in from the package defaults.*
 
 Save the library (**File > Save**) before running.
+
+### 3.9 Drought and insect mortality
+
+From lucasCore 2.0 a Build maps high-severity drought and insect mortality in the historical period: stands that lost most of their live trees with no fire and no cutting. It is on by default and needs no setting. Partial mortality is not part of it; that is in the yearly background rate of the growth curves and stem turnover.
+
+**Where it applies.** In the eleven western ecodivisions. East of them the Build writes no events: the mapped stress classes are almost absent there, and the heavy conifer mortality FIA records in the East is mostly from weather, competition and unknown causes.
+
+**How an event is mapped.** Stage 6 marks a 30 m pixel in the first year that all of these hold:
+
+1. It is softwood forest: a softwood forest type group in the USFS map, and five years before it was NLCD forest with tree canopy cover of at least 20%.
+2. LCMS shows its Insect, Disease or Drought Stress class, or Desiccation, in at least one of the five years to that year.
+3. Tree canopy cover has fallen by at least the line of its ecodivision, as a share of its value five years before.
+4. Neither MTBS nor LCMS shows fire, tree removal or another named cause from five years before to the year after.
+
+The line is shipped with the package, one per ecodivision, set so the area flagged matches the share of FIA stands that lost 70% or more of their live carbon between visits: 0.31 in the Temperate Steppe Mountains, 0.25 in the Marine Mountains, 0.40 in the Mediterranean Mountains, 0.33 in the other western ecodivisions, and 0.47 for pinyon/juniper.
+
+**How it is placed on the grid.** Each year the cells are ranked by their share of marked pixels and taken from the top until their area equals the year's marked area. Those cells get 1 in the transition map and all others 0, so every iteration of the historical run has the same die-off in the same cells. A cell with fire, harvest or land-use change that year is not taken. Area that does not fill a whole cell carries to the next year.
+
+**Years.** 1990 to 2023: tree canopy cover starts in 1985 and the rule looks five years back, and the product ends in 2023. The first year also holds the die-off of the years before it, so its cells are dealt over 1986 to 1990; the year a cell gets within those five is assigned, not observed.
+
+**What happens to a cell.** It moves to its forest type's Disturbed class with its age reset, as after high-severity fire, and returns to forest by the same rules. By default 83% of each live tree pool moves to dead pools (stems and branches to snags, foliage to litter, roots to dead roots and litter) and nothing is emitted in the event year. The shares are the rows named **Drought and insect mortality** under **Carbon Assumptions > Disturbance Flows** (section 3.7).
+
+**Data.** The study area needs USFS Tree Canopy Cover, LCMS, Annual NLCD and the USFS forest type groups for 1985 on. Tick them on the Data Download page (section 1.6.4). A Build in the West stops and says which is missing.
+
+**The Mortality page.** In the scenario, beside Natural Change. Leave it blank for the defaults.
+
+| Setting | What it does | Blank means |
+| --- | --- | --- |
+| Drought and Insect Mortality | Turns the event on or off | On |
+| Placement on the Grid | Ranked selection, or Fraction as probability: each cell's marked share is its chance, as fire and harvest are placed | Ranked selection |
+| Canopy Loss That Counts as High Severity | One line used in place of the shipped ones, in every ecodivision that has one | The ecodivision's line |
+| The Same for Pinyon/Juniper | The line for pinyon/juniper | 0.474 |
+| Minimum Stand Age | The youngest stand that can take the event | 20 years |
+
+**Checking it.** The stage 6 log has a line beginning *Drought and insect mortality* with the area marked, placed and set aside, and the highest years. **Build Results > Historical Transition Summary** lists the area by year, and the disturbance history figure (section 4.5) shows it beside fire and harvest. In a test on the Southern Sierra Nevada at 300 m, the Build placed 238 km² over 1986 to 2023, with 32, 48 and 33 km² in 2016, 2017 and 2018, and a historical run realized 99.5% of it.
+
+**Limits.** The event is in the historical period only; a projection keeps it off until projected rates are added. A library made before lucasCore 2.0 gets the transition type when it is opened with 2.0; until then its Builds run as before and the log says so.
 
 ## 4. Running the Build
 
@@ -1438,7 +1475,7 @@ The Transitions page has two tables: how much of each transition happens each ye
 
 With spatial tiles on (section 6.2), the Target Strata of every Target row follow the tile level; here both are the counties. A group with no row in the lower table is placed at random within its units.
 
-> **Insect** is listed among the project's transition groups but has no row here, because the Build has no insect pathways: lucasCore ships six pathway sets (urbanization, intensification, agricultural expansion and contraction, harvest and fire), so insect disturbance never happens, in the historical run or in projections.
+> **Insect** is listed among the project's transition groups but has no row here, because the Build has no insect pathways: lucasCore ships six pathway sets (urbanization, intensification, agricultural expansion and contraction, harvest and fire), so insect disturbance never happens, in the historical run or in projections. From lucasCore 2.0 a new library lists Mortality in its place: the Build maps drought and insect mortality in the historical period (section 3.9), and it has no row here because it is not yet projected.
 
 ### 6.4 Spatial Allocation
 

@@ -30,7 +30,7 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker></defs>
 <rect class="bg" width="1600" height="1344"/>
 <text x="24" y="44" class="h1">lucasCore data blueprint</text>
-<text x="24" y="66" class="sub">The national datasets lucasCore reads, the stages that read them, what for, and the option that switches each one · version 1.9.0</text>
+<text x="24" y="66" class="sub">The national datasets lucasCore reads, the stages that read them, what for, and the option that switches each one · version 2.0.0</text>
 <rect class="lg f-setup" x="1152.8" y="28" width="14" height="12" rx="2"/>
 <text x="1176.8" y="38" class="lgt">Setup</text>
 <rect class="lg f-land" x="1213.8" y="28" width="14" height="12" rx="2"/>
@@ -210,7 +210,7 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <path class="wire f-carbon" data-ds="EcodivisionFile" data-stage="2" d="M616,189 C808,189 808,191.2 998,191.2"/>
 <path class="wire f-carbon" data-ds="EcodivisionFile" data-stage="3" d="M616,189 C808,189 808,267.2 998,267.2"/>
 <path class="wire f-land" data-ds="EcodivisionFile" data-stage="5" d="M616,189 C808,189 808,339.9 998,339.9"/>
-<path class="wire f-land" data-ds="EcodivisionFile" data-stage="6" d="M616,189 C808,189 808,416.9 998,416.9"/>
+<path class="wire f-land" data-ds="EcodivisionFile" data-stage="6" d="M616,189 C808,189 808,416.4 998,416.4"/>
 <path class="wire f-land" data-ds="EcodivisionFile" data-stage="10" d="M616,189 C808,189 808,644.4 998,644.4"/>
 <path class="wire f-carbon alt" data-ds="FiaConditionFile" data-stage="2" d="M616,212 C808,212 808,201.6 998,201.6"/>
 <path class="wire f-carbon alt" data-ds="FiaConditionFile" data-stage="3" d="M616,212 C808,212 808,277.6 998,277.6"/>
@@ -221,18 +221,19 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <path class="wire f-land alt" data-ds="FiaDataMartFolder" data-stage="5" d="M616,258 C808,258 808,343.6 998,343.6"/>
 <path class="wire f-setup" data-ds="NlcdFolder" data-stage="1" d="M616,314 C808,314 808,149.0 998,149.0"/>
 <path class="wire f-land" data-ds="NlcdFolder" data-stage="5" d="M616,314 C808,314 808,347.3 998,347.3"/>
-<path class="wire f-land" data-ds="NlcdFolder" data-stage="6" d="M616,314 C808,314 808,422.7 998,422.7"/>
+<path class="wire f-land" data-ds="NlcdFolder" data-stage="6" d="M616,314 C808,314 808,421.1 998,421.1"/>
 <path class="wire f-land" data-ds="NlcdFolder" data-stage="10" d="M616,314 C808,314 808,649.1 998,649.1"/>
 <path class="wire f-land" data-ds="Evt2016File" data-stage="5" d="M616,337 C808,337 808,351.0 998,351.0"/>
-<path class="wire f-land" data-ds="Evt2016File" data-stage="6" d="M616,337 C808,337 808,428.4 998,428.4"/>
+<path class="wire f-land" data-ds="Evt2016File" data-stage="6" d="M616,337 C808,337 808,425.8 998,425.8"/>
 <path class="wire f-carbon" data-ds="Evt2016File" data-stage="8" d="M616,337 C808,337 808,492.6 998,492.6"/>
 <path class="wire f-land" data-ds="RcmapFile" data-stage="5" d="M616,360 C808,360 808,354.7 998,354.7"/>
 <path class="wire f-land" data-ds="CcapFile" data-stage="5" d="M616,406 C808,406 808,358.4 998,358.4"/>
 <path class="wire f-land alt" data-ds="ForestTypeGroupFolder" data-stage="5" d="M616,429 C808,429 808,362.1 998,362.1"/>
+<path class="wire f-land alt" data-ds="ForestTypeGroupFolder" data-stage="6" d="M616,429 C808,429 808,430.5 998,430.5"/>
 <path class="wire f-land alt" data-ds="TreeMapFolder" data-stage="5" d="M616,452 C808,452 808,365.9 998,365.9"/>
 <path class="wire f-carbon alt" data-ds="TreeMapFolder" data-stage="8" d="M616,452 C808,452 808,497.8 998,497.8"/>
 <path class="wire f-land" data-ds="StandAgeFile" data-stage="5" d="M616,475 C808,475 808,369.6 998,369.6"/>
-<path class="wire f-land alt" data-ds="StandAgeFile" data-stage="6" d="M616,475 C808,475 808,434.2 998,434.2"/>
+<path class="wire f-land alt" data-ds="StandAgeFile" data-stage="6" d="M616,475 C808,475 808,435.3 998,435.3"/>
 <path class="wire f-land" data-ds="FriFile" data-stage="5" d="M616,498 C808,498 808,373.3 998,373.3"/>
 <path class="wire f-land" data-ds="SoilCarbonFile" data-stage="5" d="M616,521 C808,521 808,377.0 998,377.0"/>
 <path class="wire f-carbon" data-ds="SoilCarbonFile" data-stage="8" d="M616,521 C808,521 808,503.0 998,503.0"/>
@@ -242,12 +243,13 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <path class="wire f-carbon" data-ds="BpsFile" data-stage="8" d="M616,567 C808,567 808,513.4 998,513.4"/>
 <path class="wire f-land" data-ds="BpsFile" data-stage="10" d="M616,567 C808,567 808,653.8 998,653.8"/>
 <path class="wire f-land alt" data-ds="TreeCanopyFolder" data-stage="5" d="M616,590 C808,590 808,384.4 998,384.4"/>
-<path class="wire f-land alt" data-ds="TreeCanopyFolder" data-stage="6" d="M616,590 C808,590 808,445.8 998,445.8"/>
+<path class="wire f-land alt" data-ds="TreeCanopyFolder" data-stage="6" d="M616,590 C808,590 808,444.7 998,444.7"/>
+<path class="wire f-land alt" data-ds="TreeCanopyFolder" data-stage="6" d="M616,590 C808,590 808,449.5 998,449.5"/>
 <path class="wire f-carbon alt" data-ds="TreeCanopyFolder" data-stage="8" d="M616,590 C808,590 808,518.6 998,518.6"/>
-<path class="wire f-land" data-ds="MtbsSeverityFolder" data-stage="6" d="M616,646 C808,646 808,451.6 998,451.6"/>
-<path class="wire f-land" data-ds="LcmsFolder" data-stage="6" d="M616,669 C808,669 808,457.3 998,457.3"/>
+<path class="wire f-land" data-ds="MtbsSeverityFolder" data-stage="6" d="M616,646 C808,646 808,454.2 998,454.2"/>
+<path class="wire f-land" data-ds="LcmsFolder" data-stage="6" d="M616,669 C808,669 808,458.9 998,458.9"/>
 <path class="wire f-land" data-ds="LcmsFolder" data-stage="10" d="M616,669 C808,669 808,658.5 998,658.5"/>
-<path class="wire f-land alt" data-ds="LandfireDisturbanceFolder" data-stage="6" d="M616,692 C808,692 808,463.1 998,463.1"/>
+<path class="wire f-land alt" data-ds="LandfireDisturbanceFolder" data-stage="6" d="M616,692 C808,692 808,463.6 998,463.6"/>
 <path class="wire f-land alt" data-ds="LandfireDisturbanceFolder" data-stage="10" d="M616,692 C808,692 808,663.3 998,663.3"/>
 <path class="wire f-land" data-ds="FirePerimeterHistoryFile" data-stage="5" d="M616,715 C808,715 808,388.1 998,388.1"/>
 <path class="wire f-carbon" data-ds="FirePerimeterHistoryFile" data-stage="8" d="M616,715 C808,715 808,523.8 998,523.8"/>
@@ -378,15 +380,17 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 <text x="1012" y="451" class="mk">Historical transition pathways, targets and annual spatial multipliers</text>
 <text x="1012" y="465" class="ch">Set by: defaults/transitions/sources.csv (where each transition group comes from)</text>
 </g>
-<circle class="port f-land" cx="1000" cy="416.9" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="422.7" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="428.4" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="434.2" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="416.4" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="421.1" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="425.8" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="430.5" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="435.3" r="2.4"/>
 <circle class="port f-land" cx="1000" cy="440.0" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="445.8" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="451.6" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="457.3" r="2.4"/>
-<circle class="port f-land" cx="1000" cy="463.1" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="444.7" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="449.5" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="454.2" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="458.9" r="2.4"/>
+<circle class="port f-land" cx="1000" cy="463.6" r="2.4"/>
 <g class="stage f-carbon" data-stage="8" tabindex="0" role="button" aria-label="Stage 8, Initial Stock Maps">
 <rect class="sb" x="1000" y="484" width="576" height="64" rx="5"/>
 <rect class="badge" x="1010" y="493" width="24" height="20" rx="3"/>
@@ -469,6 +473,6 @@ svg{--sans:'IBM Plex Sans',Arial,Helvetica,sans-serif;--mono:'IBM Plex Mono',Con
 </g>
 <circle class="port f-fig" cx="1000" cy="896.0" r="2.4"/>
 <text x="24" y="1306" class="foot">Wires run from a dataset to each stage that reads it, coloured by the stage. Vintages are those stage 15 Data Download fetches into Data Sources Home, where a blank path reads them.</text>
-<text x="24" y="1322" class="foot">Stages 0 and 4 read no national data. Generated by docs/blueprint/build-data.R from package.xml (lucasCore 1.9.0), 2026-11-24.</text>
+<text x="24" y="1322" class="foot">Stages 0 and 4 read no national data. Generated by docs/blueprint/build-data.R from package.xml (lucasCore 2.0.0), 2026-11-24.</text>
 </svg>
 

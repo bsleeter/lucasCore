@@ -50,7 +50,8 @@ D <- list(
   list("Land cover, age and soil", "RcmapCoverFolder", "RCMAP cover time series", "V8 · 30 m · 1985 to 2025 · sagebrush, shrub", list()),   # no stage reads it: tools/fit_shrub_post_disturbance.R fits the package table from it
   list("Land cover, age and soil", "CcapFile", "C-CAP land cover", "2001 · coastal wetlands", list(u(5, "Wetland types (C-CAP classes 90 and up)", "Land Cover Crosswalks > C-CAP"))),
   list("Land cover, age and soil", "ForestTypeGroupFolder", "USFS forest type groups", "NFCMS v3 · regional maps", list(
-    u(5, "Forest types in place of LANDFIRE EVT, or filling its gaps", "Build Options > Forest Type Map: USFS forest type groups", TRUE))),
+    u(5, "Forest types in place of LANDFIRE EVT, or filling its gaps", "Build Options > Forest Type Map: USFS forest type groups", TRUE),
+    u(6, "Softwood forest pixels, for the drought and insect mortality rule", "Mortality > Drought and Insect Mortality: on (the western ecodivisions)", TRUE))),
   list("Land cover, age and soil", "TreeMapFolder", "TreeMap", "2016 · 30 m FIA plot ids", list(
     u(5, "Forest type, stand age or site class from each pixel's FIA plot", "Build Options > Forest Type Map, Stand Age Source or Site Productivity: TreeMap", TRUE),
     u(8, "Live carbon against canopy, for the stocking curve of each forest type", "Forest Cover > Stocking: by the cell's tree canopy cover", TRUE))),
@@ -69,6 +70,7 @@ D <- list(
   list("Land cover, age and soil", "TreeCanopyFolder", "USFS Tree Canopy Cover", "v2025-6 · 30 m · annual 1985 to 2023", list(
     u(5, "Forest in the start year where NLCD maps open forest as shrub or grass", "Forest Cover > Forest in the start year: NLCD and tree canopy cover", TRUE),
     u(6, "A disturbed stand counts as forest again when its canopy is back", "Forest Cover > Recovery by tree canopy cover", TRUE),
+    u(6, "Canopy loss over five years, the severity of drought and insect mortality", "Mortality > Drought and Insect Mortality: on (the western ecodivisions)", TRUE),
     u(8, "Starting carbon and growth of a forest cell by its canopy (stocking)", "Forest Cover > Stocking: by the cell's tree canopy cover", TRUE))),
   list("Disturbance", "MtbsSeverityFolder", "MTBS burn severity", "annual CONUS mosaics", list(
     u(6, "Wildfire by severity (burned share of 30 m pixels), and burned cells kept out of the clearcut rule"))),
