@@ -1,228 +1,228 @@
 StratumID,StateClassID,StateAttributeTypeID,AgeMin,AgeMax,Value
 Hot Continental,Wetland: Estuarine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Hot Continental,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,320.0075
+Hot Continental,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,320.0025
 Hot Continental,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Hot Continental,Wetland: Estuarine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Hot Continental,Wetland: Estuarine Emergent,Carbon Initial Conditions: Fine Roots,,,2.91
 Hot Continental,Wetland: Estuarine Emergent,Carbon Initial Conditions: Foliage,,,0.324
 Hot Continental,Wetland: Palustrine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Hot Continental,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,176.0093
+Hot Continental,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,176.0045
 Hot Continental,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Hot Continental,Wetland: Palustrine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Hot Continental,Wetland: Palustrine Emergent,Carbon Initial Conditions: Fine Roots,,,1
 Hot Continental,Wetland: Palustrine Emergent,Carbon Initial Conditions: Foliage,,,0.3
 Hot Continental Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Hot Continental Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,320.0036
+Hot Continental Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,320.0024
 Hot Continental Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Hot Continental Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Hot Continental Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Fine Roots,,,2.5
 Hot Continental Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Foliage,,,0.3
 Hot Continental Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Hot Continental Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,430.0473
+Hot Continental Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,430.008
 Hot Continental Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Hot Continental Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Hot Continental Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Fine Roots,,,1.3
 Hot Continental Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Foliage,,,0.4
 Marine,Wetland: Estuarine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Marine,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,262.9951
+Marine,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,262.995
 Marine,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Marine,Wetland: Estuarine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Marine,Wetland: Estuarine Emergent,Carbon Initial Conditions: Fine Roots,,,0.0297
 Marine,Wetland: Estuarine Emergent,Carbon Initial Conditions: Foliage,,,0.263
 Marine,Wetland: Palustrine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Marine,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,193.9934
+Marine,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,194.0071
 Marine,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Marine,Wetland: Palustrine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Marine,Wetland: Palustrine Emergent,Carbon Initial Conditions: Fine Roots,,,0.95
 Marine,Wetland: Palustrine Emergent,Carbon Initial Conditions: Foliage,,,0.3
 Marine Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Marine Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,263.0092
+Marine Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,263.0033
 Marine Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Marine Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Marine Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Fine Roots,,,0.0282
 Marine Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Foliage,,,0.269
 Marine Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Marine Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,193.9934
+Marine Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,194.0071
 Marine Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Marine Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Marine Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Fine Roots,,,0.95
 Marine Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Foliage,,,0.3
 Mediterranean,Wetland: Estuarine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Mediterranean,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,226.9996
+Mediterranean,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,227.0022
 Mediterranean,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Mediterranean,Wetland: Estuarine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Mediterranean,Wetland: Estuarine Emergent,Carbon Initial Conditions: Fine Roots,,,0.0436
 Mediterranean,Wetland: Estuarine Emergent,Carbon Initial Conditions: Foliage,,,0.409
 Mediterranean,Wetland: Palustrine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Mediterranean,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,193.9934
+Mediterranean,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,194.0071
 Mediterranean,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Mediterranean,Wetland: Palustrine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Mediterranean,Wetland: Palustrine Emergent,Carbon Initial Conditions: Fine Roots,,,0.95
 Mediterranean,Wetland: Palustrine Emergent,Carbon Initial Conditions: Foliage,,,0.3
 Mediterranean Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Mediterranean Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,227.0018
+Mediterranean Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,226.992
 Mediterranean Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Mediterranean Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Mediterranean Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Fine Roots,,,1.497
 Mediterranean Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Foliage,,,0.9
 Mediterranean Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Mediterranean Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,193.9934
+Mediterranean Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,194.0071
 Mediterranean Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Mediterranean Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Mediterranean Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Fine Roots,,,0.95
 Mediterranean Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Foliage,,,0.3
 Prairie,Wetland: Estuarine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Prairie,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,269.9916
+Prairie,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,269.9924
 Prairie,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Prairie,Wetland: Estuarine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Prairie,Wetland: Estuarine Emergent,Carbon Initial Conditions: Fine Roots,,,0.0237
 Prairie,Wetland: Estuarine Emergent,Carbon Initial Conditions: Foliage,,,0.257
 Prairie,Wetland: Palustrine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Prairie,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,176.0093
+Prairie,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,176.0045
 Prairie,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Prairie,Wetland: Palustrine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Prairie,Wetland: Palustrine Emergent,Carbon Initial Conditions: Fine Roots,,,1
 Prairie,Wetland: Palustrine Emergent,Carbon Initial Conditions: Foliage,,,0.3
 Savanna,Wetland: Estuarine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Savanna,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,270.0217
+Savanna,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,270.0083
 Savanna,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Savanna,Wetland: Estuarine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Savanna,Wetland: Estuarine Emergent,Carbon Initial Conditions: Fine Roots,,,0.3319
 Savanna,Wetland: Estuarine Emergent,Carbon Initial Conditions: Foliage,,,0.2365
 Savanna,Wetland: Palustrine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Savanna,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,178.005
+Savanna,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,177.9989
 Savanna,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Savanna,Wetland: Palustrine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Savanna,Wetland: Palustrine Emergent,Carbon Initial Conditions: Fine Roots,,,2.12
 Savanna,Wetland: Palustrine Emergent,Carbon Initial Conditions: Foliage,,,0.6
 Subtropical,Wetland: Estuarine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Subtropical,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,270.0029
+Subtropical,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,269.9967
 Subtropical,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Subtropical,Wetland: Estuarine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Subtropical,Wetland: Estuarine Emergent,Carbon Initial Conditions: Fine Roots,,,0.9873
 Subtropical,Wetland: Estuarine Emergent,Carbon Initial Conditions: Foliage,,,0.7055
 Subtropical,Wetland: Palustrine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Subtropical,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,178.005
+Subtropical,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,177.9989
 Subtropical,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Subtropical,Wetland: Palustrine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Subtropical,Wetland: Palustrine Emergent,Carbon Initial Conditions: Fine Roots,,,2.12
 Subtropical,Wetland: Palustrine Emergent,Carbon Initial Conditions: Foliage,,,0.6
 Subtropical Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Subtropical Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,270.0085
+Subtropical Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,269.9939
 Subtropical Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Subtropical Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Subtropical Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Fine Roots,,,1.02
 Subtropical Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Foliage,,,0.7
 Subtropical Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Subtropical Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,430.0473
+Subtropical Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,430.008
 Subtropical Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Subtropical Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Subtropical Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Fine Roots,,,1.3
 Subtropical Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Foliage,,,0.4
 Temperate Desert,Wetland: Estuarine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Temperate Desert,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,270.009
+Temperate Desert,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,269.992
 Temperate Desert,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Temperate Desert,Wetland: Estuarine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Temperate Desert,Wetland: Estuarine Emergent,Carbon Initial Conditions: Fine Roots,,,0.797
 Temperate Desert,Wetland: Estuarine Emergent,Carbon Initial Conditions: Foliage,,,0.6
 Temperate Desert,Wetland: Palustrine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Temperate Desert,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,193.9934
+Temperate Desert,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,194.0071
 Temperate Desert,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Temperate Desert,Wetland: Palustrine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Temperate Desert,Wetland: Palustrine Emergent,Carbon Initial Conditions: Fine Roots,,,0.95
 Temperate Desert,Wetland: Palustrine Emergent,Carbon Initial Conditions: Foliage,,,0.3
 Temperate Desert Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Temperate Desert Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,270.009
+Temperate Desert Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,269.992
 Temperate Desert Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Temperate Desert Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Temperate Desert Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Fine Roots,,,0.797
 Temperate Desert Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Foliage,,,0.6
 Temperate Desert Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Temperate Desert Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,193.9934
+Temperate Desert Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,194.0071
 Temperate Desert Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Temperate Desert Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Temperate Desert Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Fine Roots,,,0.95
 Temperate Desert Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Foliage,,,0.3
 Temperate Steppe,Wetland: Estuarine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Temperate Steppe,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,270.009
+Temperate Steppe,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,269.992
 Temperate Steppe,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Temperate Steppe,Wetland: Estuarine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Temperate Steppe,Wetland: Estuarine Emergent,Carbon Initial Conditions: Fine Roots,,,0.797
 Temperate Steppe,Wetland: Estuarine Emergent,Carbon Initial Conditions: Foliage,,,0.6
 Temperate Steppe,Wetland: Palustrine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Temperate Steppe,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,176.0093
+Temperate Steppe,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,176.0045
 Temperate Steppe,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Temperate Steppe,Wetland: Palustrine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Temperate Steppe,Wetland: Palustrine Emergent,Carbon Initial Conditions: Fine Roots,,,1
 Temperate Steppe,Wetland: Palustrine Emergent,Carbon Initial Conditions: Foliage,,,0.3
 Temperate Steppe Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Temperate Steppe Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,270.009
+Temperate Steppe Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,269.992
 Temperate Steppe Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Temperate Steppe Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Temperate Steppe Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Fine Roots,,,0.797
 Temperate Steppe Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Foliage,,,0.6
 Temperate Steppe Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Temperate Steppe Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,193.9934
+Temperate Steppe Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,194.0071
 Temperate Steppe Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Temperate Steppe Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Temperate Steppe Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Fine Roots,,,0.95
 Temperate Steppe Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Foliage,,,0.3
 Tropical/Subtropical Desert,Wetland: Estuarine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Tropical/Subtropical Desert,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,227.0018
+Tropical/Subtropical Desert,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,226.992
 Tropical/Subtropical Desert,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Tropical/Subtropical Desert,Wetland: Estuarine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Tropical/Subtropical Desert,Wetland: Estuarine Emergent,Carbon Initial Conditions: Fine Roots,,,1.497
 Tropical/Subtropical Desert,Wetland: Estuarine Emergent,Carbon Initial Conditions: Foliage,,,0.9
 Tropical/Subtropical Desert,Wetland: Palustrine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Tropical/Subtropical Desert,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,193.9934
+Tropical/Subtropical Desert,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,194.0071
 Tropical/Subtropical Desert,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Tropical/Subtropical Desert,Wetland: Palustrine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Tropical/Subtropical Desert,Wetland: Palustrine Emergent,Carbon Initial Conditions: Fine Roots,,,0.95
 Tropical/Subtropical Desert,Wetland: Palustrine Emergent,Carbon Initial Conditions: Foliage,,,0.3
 Tropical/Subtropical Steppe,Wetland: Estuarine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Tropical/Subtropical Steppe,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,269.9946
+Tropical/Subtropical Steppe,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,269.9918
 Tropical/Subtropical Steppe,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Tropical/Subtropical Steppe,Wetland: Estuarine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Tropical/Subtropical Steppe,Wetland: Estuarine Emergent,Carbon Initial Conditions: Fine Roots,,,0.8712
 Tropical/Subtropical Steppe,Wetland: Estuarine Emergent,Carbon Initial Conditions: Foliage,,,0.622
 Tropical/Subtropical Steppe,Wetland: Palustrine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Tropical/Subtropical Steppe,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,176.0093
+Tropical/Subtropical Steppe,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,176.0045
 Tropical/Subtropical Steppe,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Tropical/Subtropical Steppe,Wetland: Palustrine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Tropical/Subtropical Steppe,Wetland: Palustrine Emergent,Carbon Initial Conditions: Fine Roots,,,1
 Tropical/Subtropical Steppe,Wetland: Palustrine Emergent,Carbon Initial Conditions: Foliage,,,0.3
 Tropical/Subtropical Steppe Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Tropical/Subtropical Steppe Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,270.0085
+Tropical/Subtropical Steppe Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,269.9939
 Tropical/Subtropical Steppe Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Tropical/Subtropical Steppe Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Tropical/Subtropical Steppe Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Fine Roots,,,1.02
 Tropical/Subtropical Steppe Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Foliage,,,0.7
 Tropical/Subtropical Steppe Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Tropical/Subtropical Steppe Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,193.9934
+Tropical/Subtropical Steppe Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,194.0071
 Tropical/Subtropical Steppe Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Tropical/Subtropical Steppe Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Tropical/Subtropical Steppe Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Fine Roots,,,0.95
 Tropical/Subtropical Steppe Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Foliage,,,0.3
 Warm Continental,Wetland: Estuarine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Warm Continental,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,270.0006
+Warm Continental,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,269.9949
 Warm Continental,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Warm Continental,Wetland: Estuarine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Warm Continental,Wetland: Estuarine Emergent,Carbon Initial Conditions: Fine Roots,,,7.2635
 Warm Continental,Wetland: Estuarine Emergent,Carbon Initial Conditions: Foliage,,,0.304
 Warm Continental,Wetland: Palustrine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Warm Continental,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,430.0473
+Warm Continental,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,430.008
 Warm Continental,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Warm Continental,Wetland: Palustrine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Warm Continental,Wetland: Palustrine Emergent,Carbon Initial Conditions: Fine Roots,,,1.3
 Warm Continental,Wetland: Palustrine Emergent,Carbon Initial Conditions: Foliage,,,0.4
 Warm Continental Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Warm Continental Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,270.009
+Warm Continental Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Slow,,,269.992
 Warm Continental Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Warm Continental Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Warm Continental Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Fine Roots,,,7.25
 Warm Continental Mountains,Wetland: Estuarine Emergent,Carbon Initial Conditions: Foliage,,,0.6
 Warm Continental Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Aboveground Very Fast,,,1
-Warm Continental Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,430.0473
+Warm Continental Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Slow,,,430.008
 Warm Continental Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Belowground Very Fast,,,2
 Warm Continental Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Deep Soil,,,0
 Warm Continental Mountains,Wetland: Palustrine Emergent,Carbon Initial Conditions: Fine Roots,,,1.3

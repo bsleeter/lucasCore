@@ -117,3 +117,8 @@ Emission: AG Slow -> Atmosphere (Wetland) [Type],Yes,No,No
 Emission: AG Very Fast -> Atmosphere CH4 [Type],Yes,No,No
 Emission: AG Fast -> Atmosphere CH4 [Type],Yes,No,No
 Emission: AG Slow -> Atmosphere CH4 [Type],Yes,No,No
+Emission Emergent: BG Slow -> Atmosphere [Type],Yes,No,No
+Emission Emergent: BG Slow -> Atmosphere CH4 [Type],Yes,No,No
+Emission Emergent: BG Very Fast -> Atmosphere [Type],Yes,No,No
+Emission Emergent: AG Very Fast -> Atmosphere [Type],Yes,No,No
+Decay Emergent: BG Very Fast -> BG Slow [Type],Yes,No,No

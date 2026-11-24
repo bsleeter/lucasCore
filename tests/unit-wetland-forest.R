@@ -82,8 +82,9 @@ local({ e <- new.env(); sys.source(file.path(pkg, "src", "dom.R"), envir = e); s
   g <- e$CH4_FLOWS; n <- e$NF_CH4; p <- e$METHANE_POOLS; w4 <- rd(D("spinup", "wetland-ch4.csv"))
   memb <- rd(D("stockflow", "stsim_FlowTypeGroupMembership.csv")); fo <- rd(D("stockflow", "stsim_FlowOrder.csv")); ft <- fread(D("stsim", "stsim_FlowType.csv"), sep = ",")$Name
   o <- function(x) as.numeric(fo$Order[match(x, fo$FlowTypeId)]); mg <- function(x) memb[FlowTypeId == x]
-  check("the forested and emergent wetland methane flows are the same flow types for soil and root litter", identical(unname(n$co2), c(g$soil_co2, g$litter_co2)) && identical(unname(n$ch4), c(g$soil_ch4, g$litter_ch4)) &&
-        identical(unname(n$shared), c(g$shared_soil, g$shared_litter)) && n$sink == g$sink && n$max_share == g$max_share && identical(p$co2[1:2], unname(n$co2)) && identical(p$ch4[1:2], unname(n$ch4)))
+  check("the forested and emergent wetland methane flows: the same shared flow types and root litter CH4; the emergent classes' soil and CO2 by flow types of their own (2026-11-24), which stand for the forested ones",
+        identical(unname(e$NF_EMERGENT_TYPES[c(g$soil_co2, g$litter_co2, g$soil_ch4)]), unname(c(n$co2, n$ch4[["soil"]]))) && n$ch4[["litter"]] == g$litter_ch4 && g$soil_q10 == "Q10 Wetland Soil" &&
+        identical(unname(n$shared), c(g$shared_soil, g$shared_litter)) && n$sink == g$sink && n$max_share == g$max_share && identical(p$co2[1:2], c(g$soil_co2, g$litter_co2)) && identical(p$ch4[1:2], c(g$soil_ch4, g$litter_ch4)))
   check("five source pools: soil and root litter, and the forest floor (leaf litter, twig litter, humus)", identical(p$code, c("BGS", "BGVF", "AGVF", "AGF", "AGS")) && identical(p[forest_floor == TRUE, code], e$FIA_DOM$litter) &&
         all(p$shared %in% e$FOREST_PATHWAYS$FlowType) && all(p[!is.na(other), other] %in% e$FOREST_PATHWAYS$FlowType))
   check("every source pool's flow types are defined, at the flow order of the pool's shared emission", all(c(p$co2, p$ch4) %in% ft) && all(o(p$co2) == o(p$shared)) && all(o(p$ch4) == o(p$shared)))

@@ -21,17 +21,21 @@ FW <- 0.27; tg <- function(cls) if (cls %in% names(TARGET)) TARGET[[cls]] else i
 pa <- merge(fl[Grp == "Emission: Wetland CH4" & Amt > 0, .(Timestep, Class, CH4 = Amt)], ar, by = c("Timestep", "Class"))[, PerHa := CH4 / Area]
 print(pa[, .(Target = tg(Class[1]), MeanHa = round(mean(Area)), Mean = round(mean(PerHa), 3), Min = round(min(PerHa), 3), Max = round(max(PerHa), 3), MeanOverTarget = round(mean(PerHa) / tg(Class[1]), 3)), by = Class])
 pc <- pa[Class %in% EM]; EM <- unique(pa$Class)   # from here on: every class that releases wetland methane
-FT <- c(SoilCO2 = "Emission: BG Slow -> Atmosphere (Wetland) [Type]", SoilCH4 = "Emission: BG Slow -> Atmosphere CH4 [Type]", LitterCH4 = "Emission: BG Very Fast -> Atmosphere CH4 [Type]", LitterCO2 = "Emission: BG Very Fast -> Atmosphere (Wetland) [Type]")
-src <- dcast(fl[Class %in% EM & Grp %in% FT, .(Mg = sum(Amt)), by = .(Class, Flow = names(FT)[match(Grp, FT)])], Class ~ Flow, value.var = "Mg")
+# the emergent classes' own flow types since lucasCore 1.10 (src/nonforest-solve.R NF_EMERGENT_TYPES), the wetland ones before and for forested wetlands
+FT <- list(SoilCO2 = c("Emission: BG Slow -> Atmosphere (Wetland) [Type]", "Emission Emergent: BG Slow -> Atmosphere [Type]"), SoilCH4 = c("Emission: BG Slow -> Atmosphere CH4 [Type]", "Emission Emergent: BG Slow -> Atmosphere CH4 [Type]"),
+           LitterCH4 = "Emission: BG Very Fast -> Atmosphere CH4 [Type]", LitterCO2 = c("Emission: BG Very Fast -> Atmosphere (Wetland) [Type]", "Emission Emergent: BG Very Fast -> Atmosphere [Type]"))
+role <- setNames(rep(names(FT), lengths(FT)), unlist(FT))
+src <- dcast(fl[Class %in% EM & Grp %in% names(role), .(Mg = sum(Amt)), by = .(Class, Flow = role[Grp])], Class ~ Flow, value.var = "Mg")
 print(src[, .(Class, SoilShareOfCH4 = round(SoilCH4 / (SoilCH4 + LitterCH4), 3), CH4toCO2_belowground = round((SoilCH4 + LitterCH4) / (SoilCO2 + LitterCO2), 3))])
 cat("only the emergent classes emit wetland methane:", all(fl[Grp == "Emission: Wetland CH4" & Amt > 0, Class] %in% EM), "\n")
 cat("the shared soil emission flow moves nothing in the emergent classes:", !nrow(fl[Grp == "Emission: BG Slow -> Atmosphere [Type]" & Class %in% EM & Amt > 0]), "\n")
 
 # 2. response to the year's climate: the year's methane per hectare beside the Build's study-area mean CH4 multiplier
-if (!is.na(bid)) { cs <- q("SELECT Timestep, FlowGroup, Mean FROM lucasCore_OutputClimateSummary WHERE ScenarioId = %d AND FlowGroup IN ('Q10 Wetland CH4', 'Q10 Wetland Soil', 'Q10 Slow Flows')", bid)
+if (!is.na(bid)) { cs <- q("SELECT Timestep, FlowGroup, Mean FROM lucasCore_OutputClimateSummary WHERE ScenarioId = %d AND FlowGroup IN ('Q10 Wetland CH4', 'Q10 Wetland Soil', 'Q10 Wetland Flows', 'Q10 Slow Flows')", bid)
   m <- merge(pc[, .(PerHa = sum(CH4) / sum(Area)), by = Timestep], dcast(cs, Timestep ~ FlowGroup, value.var = "Mean"), by = "Timestep")
   cat(sprintf("\n2. Climate: study-area mean CH4 multiplier %.3f-%.3f over the run; correlation of yearly CH4 per hectare with it %.3f\n", min(m$`Q10 Wetland CH4`), max(m$`Q10 Wetland CH4`), cor(m$PerHa, m$`Q10 Wetland CH4`)))
-  print(m[, .(Timestep, CH4PerHa = round(PerHa, 4), CH4Multiplier = `Q10 Wetland CH4`, SoilCO2Multiplier = `Q10 Wetland Soil`)]) }
+  wq <- if ("Q10 Wetland Flows" %in% names(m)) "Q10 Wetland Flows" else "Q10 Wetland Soil"   # the emergent classes' litter and soil since lucasCore 1.10
+  print(m[, .(Timestep, CH4PerHa = round(PerHa, 4), CH4Multiplier = `Q10 Wetland CH4`, WetlandMultiplier = get(wq))]) }
 
 # 3. carbon balance of the whole study area: the year's change in Total Ecosystem carbon against Net Biome Productivity
 te <- st[Grp == "Total Ecosystem"][order(Timestep)]; d <- data.table(Timestep = te$Timestep[-1], dStock = diff(te$Amt)); nbp <- g("Net Biome Productivity")

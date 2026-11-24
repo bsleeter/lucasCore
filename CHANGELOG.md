@@ -2,6 +2,80 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## 2.0.0 - unreleased
+
+A major version number for a reason of arithmetic, not of scale: SyncroSim records a library's schema as major.minor read as
+a number, so the minor after 1.9 cannot be 1.10 (it reads as 1.1, below 1.9, and no update would run). The 2.0 library update
+adds the transition type Mortality: Drought and Insects with its group Mortality, and the emergent wetland flow types with
+their groups, orders and output filters. A library keeps running on its earlier Builds; both changes come with its next
+Build. The Mortality sheet is a new table, which SyncroSim adds by itself.
+
+### Added
+
+- **Drought and insect mortality in the historical period.** A new transition type, **Mortality: Drought and Insects**, for a
+  stand that loses most of its live trees to drought, insects or disease with no fire and no cutting. Stage 6 maps it at 30 m:
+  a pixel of softwood forest (Annual NLCD forest with tree canopy cover of 20% or more five years before) where LCMS shows its
+  Insect, Disease or Drought Stress class or Desiccation in the five years to the year, tree canopy cover has fallen by at
+  least the line of its ecodivision, and neither MTBS nor LCMS shows fire, tree removal or another named cause from five
+  years before to the year after; the first such year. `src/mortality.R`.
+
+  The line is shipped per ecodivision in `defaults/transitions/mortality-lines.csv`, set so the share of softwood forest
+  flagged matches FIA's share of stands that lost 70% or more of their live carbon between visits (the stands the FIA stem
+  turnover fit left out): 0.31 for the Temperate Steppe Mountains, 0.25 for the Marine Mountains, 0.40 for the Mediterranean
+  Mountains, a pooled 0.33 in the other eight western ecodivisions, and 0.47 for pinyon/juniper everywhere in the West. An
+  ecodivision with no line has no event: east of the western ecodivisions the rule finds almost nothing, and FIA's heavy
+  conifer mortality there is mostly weather, competition and unknown causes, not insects.
+
+  Placement on the grid: each year the cells are ranked by their share of flagged pixels and taken from the top until their
+  area equals the year's flagged area, then written as 1 and 0 in the transition spatial multiplier, so every iteration of
+  the historical run has the same die-off. Area that does not fill a whole cell carries to the next year; area flagged on
+  cells whose class has no pathway lands on the next-ranked cells; a cell with fire, harvest or land-use change that year is
+  not chosen. The record runs from 1990 to 2023 (tree canopy cover starts in 1985 and the rule looks five years back); the
+  first year also holds the die-off of the years before it, which is dealt by rank over 1986 to 1990. On the Southern Sierra
+  Nevada pyrome at 300 m the Build placed 237.8 km2 of 257.9 km2 flagged (peaking at 32, 48 and 33 km2 in 2016 to 2018), and
+  a historical run realized 99.4% of it.
+
+  A Build needs USFS Tree Canopy Cover, LCMS, Annual NLCD and the USFS forest type groups for the study area; it stops and
+  says so if a study area in the West lacks them. A library without the new type (one not yet opened with this version)
+  builds as before and says so.
+
+- **Mortality sheet** (scenario, beside Natural Change): the event on or off, placement (ranked selection, or the flagged
+  share as a probability, as fire and harvest are), a canopy-loss line to use in place of the shipped ones, the same for
+  pinyon/juniper, and the minimum stand age (20 years). It uses SyncroSim's standard grid; a page of its own is to follow.
+
+- **Carbon of the event.** 83% of each live tree pool (the mean loss of FIA stands over the 70% line) moves to dead pools and
+  nothing is emitted: stems and branches to snags, foliage to litter, roots to the dead root and litter pools. The cell goes
+  to its forest type's Disturbed class with its age reset, as after high-severity fire, and returns to forest by the same
+  rules. The shares are a third disturbance, **Drought and insect mortality**, on **Carbon Assumptions > Disturbance Flows**;
+  a sheet filled before this version takes the preset's rows.
+
+- **Data Download: tree canopy cover for all of CONUS** (Home layout National): the yearly zips of the USFS raster gateway,
+  or the same zips saved by hand in `supplied` under the home, are unpacked into the national copy (about 230 GB).
+
+- Build figures: the disturbance history gains the area of mortality by year. Run figures: the Insect category of carbon
+  loss by cause is named Drought and insects.
+
+### Changed
+
+- **Emergent wetlands: structure brought onto lucasWet's (the Barataria model).** Aboveground litter feeds the soil in both
+  emergent classes of every ecodivision (28% of the litter's loss in estuarine marsh, 36% in palustrine, out of the emission
+  share). Soil CO2 and CH4 are released at flow order 6.6, after the year's litter arrives, on flow types of the emergent
+  classes' own (Emission Emergent: ..., Decay Emergent: ...); forested wetlands keep the wetland flow types. Litter and soil
+  losses share one temperature response, the new group Q10 Wetland Flows (1.5); the methane Q10 is 2.57 (was 3.83); Q10
+  Wetland Soil stays for forested wetland soil CO2 (2.0). All 38 budgets are refitted (`tools/make_emergent_wetland.R`): NPP,
+  pools, burial and methane are unchanged. Stage 3 falls back to the earlier flow types in a library without the new ones.
+
+- The three unused Insect transition types, the Insect group and their distribution and external variable entries leave the
+  package's lists. A library keeps its own.
+
+### Known limits
+
+- The mortality event is in the historical period only; projections of it are to follow. A projection keeps the group off.
+- The event is not mapped in the eastern ecodivisions.
+- In the Mediterranean Mountains the amount matches FIA but a check of where the events fall around FIA plots was
+  inconclusive (19 stands over the line).
+- `tools/make_carbon_presets.R` is out of date: rerunning it removes rows that later tools added to the presets.
+
 ## 1.9.0 - 2026-11-24
 
 A minor version: the 1.9 library update adds the PRISM Grid choice to the Climate Options and Data Download sheets. It writes

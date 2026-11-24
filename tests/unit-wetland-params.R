@@ -15,12 +15,18 @@ memb <- rd("stockflow", "stsim_FlowTypeGroupMembership.csv"); cf <- rd("climate"
 # ---- options -------------------------------------------------------------------------------------------------------------------
 o <- wetland_options()
 expect("the package options are the values the model runs with: the two Q10s of the climate table, the solver's cap, the memberships' CO2e",
-       o$MethaneQ10 == as.numeric(cf[FlowGroupId == "Q10 Wetland CH4", Q10]) && o$SoilQ10 == as.numeric(cf[FlowGroupId == "Q10 Wetland Soil", Q10]) && o$MethaneCapShare == NF_CH4$max_share &&
+       o$MethaneQ10 == as.numeric(cf[FlowGroupId == "Q10 Wetland CH4", Q10]) && o$SoilQ10 == as.numeric(cf[FlowGroupId == "Q10 Wetland Flows", Q10]) && o$MethaneQ10 == 2.57 && o$SoilQ10 == 1.5 && o$MethaneCapShare == NF_CH4$max_share &&
        all(abs(as.numeric(memb[grepl("CH4$", FlowTypeId) & grepl("\\(CO2e\\)$", FlowGroupId), Value])) == o$MethaneCO2e) && o$UncertaintyDraws == 0L && !length(o$changed))
 o2 <- wetland_options(data.frame(MethaneQ10 = 3.5, SoilQ10 = NA, MethaneCapShare = 0.25, MethaneCO2e = NA, UncertaintyDraws = 20))
-expect("a scenario's row replaces what it fills in and leaves the rest", o2$MethaneQ10 == 3.5 && o2$SoilQ10 == 2 && o2$MethaneCapShare == 0.25 && o2$MethaneCO2e == 33.5 && identical(o2$UncertaintyDraws, 20L) &&
+expect("a scenario's row replaces what it fills in and leaves the rest", o2$MethaneQ10 == 3.5 && o2$SoilQ10 == 1.5 && o2$MethaneCapShare == 0.25 && o2$MethaneCO2e == 33.5 && identical(o2$UncertaintyDraws, 20L) &&
        setequal(o2$changed, c("MethaneQ10", "MethaneCapShare", "UncertaintyDraws")))
 expect("a value out of range is refused (a Q10 under 1, a cap over a half)", fails(wetland_options(data.frame(MethaneQ10 = 0.5))) && fails(wetland_options(data.frame(MethaneCapShare = 0.8))))
+# the Q10s by climate flow group (stages 7 and 11): the emergent classes' litter and soil take SoilQ10 (1.5 when blank); the forested
+# wetland soil takes it only when the scenario sets it, else it keeps the climate table's 2.0 (NA here)
+q0 <- wetland_q10s(o); q1 <- wetland_q10s(wetland_options(data.frame(SoilQ10 = 1.8)))
+expect("the Q10s handed to the climate stages: methane, the emergent wetland flows, and the forested wetland soil only when the scenario sets the wetland Q10",
+       identical(names(q0), c("Q10 Wetland CH4", "Q10 Wetland Flows", "Q10 Wetland Soil")) && q0[[1]] == 2.57 && q0[[2]] == 1.5 && is.na(q0[[3]]) && q1[[2]] == 1.8 && q1[[3]] == 1.8 &&
+       all(names(q0) %in% cf$FlowGroupId) && as.numeric(cf[FlowGroupId == "Q10 Wetland Soil", Q10]) == 2)
 
 # ---- targets -------------------------------------------------------------------------------------------------------------------
 t0 <- wetland_class_targets(reg, fw)

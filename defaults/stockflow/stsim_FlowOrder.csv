@@ -70,3 +70,8 @@ Iteration,Timestep,FlowTypeId,Order
 ,,Emission: AG Very Fast -> Atmosphere CH4,6.5
 ,,Emission: AG Fast -> Atmosphere CH4,6.5
 ,,Emission: AG Slow -> Atmosphere CH4,6.6
+,,Emission Emergent: BG Slow -> Atmosphere,6.6
+,,Emission Emergent: BG Slow -> Atmosphere CH4,6.6
+,,Emission Emergent: BG Very Fast -> Atmosphere,6.5
+,,Emission Emergent: AG Very Fast -> Atmosphere,6.5
+,,Decay Emergent: BG Very Fast -> BG Slow,6.5

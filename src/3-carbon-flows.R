@@ -497,6 +497,12 @@ put_rows <- function(x, r, keys, vr, vx = "Value") {
   invisible(x) }
 if (nrow(gsr)) {
   gsr <- gsr[!is.na(StateClassId) & !is.na(FlowGroupId) & !is.na(Value)]
+  # a row that names an emergent wetland flow as it was before the classes had flow types of their own (lucasCore 1.9 and earlier: the
+  # shared or the wetland flow type; src/nonforest-solve.R NF_EMERGENT_TYPES) means the class's own flow
+  source(pkg_file("src", "nonforest-solve.R")); ety <- function(x) paste(x, "[Type]")
+  eold <- gsr$StateClassId %in% names(NF_AG_TO_SOIL) & gsr$FlowGroupId %in% ety(names(NF_EMERGENT_TYPES))
+  if (any(eold)) { say("Grassland, Shrubland and Wetland Carbon: %d emergent wetland rows name a flow by its name before lucasCore 1.10; read as the classes' own flow types (%s)", sum(eold), paste(unique(gsr$FlowGroupId[eold]), collapse = "; "))
+    gsr[eold, FlowGroupId := ety(NF_EMERGENT_TYPES[sub(" \\[Type\\]$", "", FlowGroupId)])] }
   bad <- gsr[!paste(StateClassId, FlowGroupId) %in% gs_m[, paste(StateClassId, FlowGroupId)]]
   check(STAGE, "every non-forest rate row names a grassland, shrubland, wetland or agriculture class and one of its flows", !nrow(bad), paste(head(unique(bad[, paste(StateClassId, FlowGroupId)]), 5), collapse = "; "))
   put_rows(gs_m, gsr, c("StateClassId", "FlowGroupId"), "Value") }
@@ -510,7 +516,7 @@ check(STAGE, "grassland, shrubland and wetland growth splits add to 1 (at every 
 POOL_OUT <- c(`AG Very Fast ->` = "AG Very Fast ->", `BG Very Fast ->` = "BG Very Fast ->", `BG Slow ->` = "BG Slow ->")
 sh <- rbindlist(lapply(names(POOL_OUT), function(p) { pool <- sub(" ->$", "", p)
   gs_m[StratumId %in% gs_m[FlowGroupId == p, unique(StratumId)] & StateClassId %in% gs_m[FlowGroupId == p, unique(StateClassId)] &
-       grepl(sprintf("^(Decay|Emission|Lateral Transport|Stabilization): %s -> ", pool), FlowGroupId), .(pool = pool, s = sum(as.numeric(Value))), by = .(StratumId, StateClassId)] }))
+       grepl(sprintf("^(Decay|Emission|Lateral Transport|Stabilization)( Emergent)?: %s -> ", pool), FlowGroupId), .(pool = pool, s = sum(as.numeric(Value))), by = .(StratumId, StateClassId)] }))
 check(STAGE, "emergent wetland shares out of each pool's total loss add to 1", !nrow(sh) || all(abs(sh$s - 1) < 1e-3), paste(head(sh[abs(s - 1) >= 1e-3, sprintf("%s %s %s %.3f", StratumId, StateClassId, pool, s)], 5), collapse = "; "))
 check(STAGE, "grassland, shrubland and wetland rates are between 0 and 1 and net growth is not negative", all(between(as.numeric(gs_m$Value), 0, 1)) && all(as.numeric(nf_g$Value) >= 0))
 # Wetland Methane (src/wetland-params.R): an emergent class whose target the scenario sets, or whose fitted methane fraction is above
@@ -553,13 +559,23 @@ if (nrow(cy)) {
 # every flow type, flow group, stock type and state class named must exist in the library's definitions
 ft <- stsim_list("FlowType")$Name; fg <- stsim_list("FlowGroup")$Name; stt <- stsim_list("StockType")$Name
 # methane from emergent wetlands (2026-11-16; src/nonforest-solve.R NF_CH4): BG Slow and BG Very Fast each release carbon as CO2 and
-# as CH4, both shares of the pool's total loss, each with its own Q10 (stage 7: Q10 Wetland CH4 on the methane; Q10 Wetland Soil on the
-# soil's CO2, which has a flow type of its own in these classes; the litter's CO2 keeps Q10 Slow Flows). A library made before these
-# definitions runs as before: the soil's emission by the shared flow type and no methane, each pool's CH4 share put back into its CO2
-# share, so the pools, burial and lateral export at the normal climate are the same either way.
+# as CH4, both shares of the pool's total loss, each with its own Q10 (stage 7: Q10 Wetland CH4 on the methane; Q10 Wetland Flows on the
+# CO2 and on the litter's other losses, by flow types of the emergent classes' own, as lucasWet has them: 2026-11-24). A library made
+# before the methane definitions runs as before: the soil's emission by the shared flow type and no methane, each pool's CH4 share put
+# back into its CO2 share, so the pools, burial and lateral export at the normal climate are the same either way.
 source(pkg_file("src", "nonforest-solve.R")); g4 <- NF_CH4; ty4 <- function(x) paste(x, "[Type]")
-mp4 <- METHANE_POOLS   # every methane source pool: soil and root litter (emergent and forested wetlands), the forest floor (forested)
-has_ch4 <- all(c(mp4$co2, mp4$ch4) %in% ft) && all(c(ty4(c(mp4$co2, mp4$ch4)), g4$q10, g4$soil_q10) %in% fg)
+# a library without the emergent classes' own flow types (made before lucasCore 1.10 and not updated): their flows go by the flow types
+# they had (the forested wetlands' for soil and root litter CO2 and soil CH4, the shared ones for aboveground litter and root litter
+# decay). The rates are the package's as fitted, so the soil's CO2 and CH4 then run before the year's litter arrives (flow order 5) and
+# the soil settles a little above its fitted stock; and those flows keep the Q10s of the types they go by
+has_em <- all(NF_EMERGENT_TYPES %in% ft) && all(c(ty4(unique(NF_EMERGENT_TYPES)), NF_EMERGENT_Q10) %in% fg)
+if (!has_em) { say("Emergent wetlands: this library lacks the classes' own flow types (it predates lucasCore 1.10; update it, or run tools/sync-library.R), so their litter and soil flows go by the earlier flow types: soil CO2 and CH4 at flow order 5 and no single wetland Q10")
+  eb <- rev(NF_EMERGENT_TYPES); eb <- setNames(names(eb), eb)[!duplicated(eb)]   # the classes' own flow type -> the one it had (the wetland one where there are two)
+  fm[FlowGroupId %in% ty4(names(eb)), FlowGroupId := ty4(eb[sub(" \\[Type\\]$", "", FlowGroupId)])]; fp[FlowTypeId %in% names(eb), FlowTypeId := unname(eb[FlowTypeId])] }
+# every methane source pool: soil and root litter (forested wetlands, and emergent ones by their own flow types), the forest floor (forested)
+mp4 <- METHANE_POOLS
+has_ch4 <- all(c(mp4$co2, mp4$ch4) %in% ft) && all(c(ty4(c(mp4$co2, mp4$ch4)), g4$q10, CH4_FLOWS$soil_q10) %in% fg)
+if (has_em) mp4 <- rbind(mp4, data.table(code = c("BGS", "BGVF"), pool = c("BG Slow", "BG Very Fast"), other = NA_character_, forest_floor = FALSE, shared = unname(g4$shared), co2 = unname(g4$co2), ch4 = unname(g4$ch4)))
 c4 <- rbindlist(lapply(seq_len(nrow(mp4)), function(k) merge(fm[FlowGroupId == ty4(mp4$ch4[k]), .(StratumId, StateClassId, ch4 = as.numeric(Value))],
                                                             fm[FlowGroupId == ty4(mp4$co2[k]), .(StratumId, StateClassId, co2 = as.numeric(Value))], by = c("StratumId", "StateClassId"))[, pool := mp4$code[k]]))
 if (has_ch4) {

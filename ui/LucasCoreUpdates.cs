@@ -384,12 +384,54 @@ namespace lucasCoreUI
         // keeps its own, because every Build result's flow pathways name their groups. The Mortality sheet is a new table, which
         // SyncroSim adds by itself. No apostrophe in the description.
         // The number: SyncroSim reads the schema as major.minor, a number, so the minor after 1.9 cannot be 1.10 (that is 1.1) ---------
-        [Update(2.0, "lucasCore 2.0: the transition type Mortality: Drought and Insects and its group Mortality, for high-severity drought and insect mortality mapped from LCMS and tree canopy cover")]
+        // Wetlands in the same step (the emergent wetland structure brought onto the Barataria model, src/nonforest-solve.R): five flow types
+        // of the emergent classes' own, the Q10 Wetland Flows group, their memberships, orders and filters. Stage 3 falls back to the
+        // earlier flow types in a library without them, so this only adds.
+        [Update(2.0, "lucasCore 2.0: the transition type Mortality: Drought and Insects and its group Mortality, for high-severity drought and insect mortality mapped from LCMS and tree canopy cover; and the emergent wetland flow types (soil and litter CO2, soil CH4, root litter to soil) with their groups, orders and output filters, and the Q10 Wetland Flows group")]
         public static void Update_2_000(DataStore store)
         {
             AddNamed(store, "stsim_TransitionGroup", "TransitionGroupId", "Mortality", null, null, false);
             AddTransitionType(store, "Mortality: Drought and Insects", null);
             AddTypeToGroup(store, "Mortality: Drought and Insects", "Mortality");
+            // wetlands (emergent wetland structure, generated from the rows defaults/stsim and defaults/stockflow gained)
+            string[,] types = {
+                { "Emission Emergent: BG Slow -> Atmosphere", "Emergent wetlands: soil carbon released as CO2, after the year's litter has reached the soil (flow order 6.6), with the wetland temperature response (Q10 Wetland Flows)" },
+                { "Emission Emergent: BG Slow -> Atmosphere CH4", "Emergent wetlands: soil carbon released as methane, after the year's litter has reached the soil (flow order 6.6)" },
+                { "Emission Emergent: BG Very Fast -> Atmosphere", "Emergent wetlands: root litter carbon released as CO2, with the wetland temperature response (Q10 Wetland Flows)" },
+                { "Emission Emergent: AG Very Fast -> Atmosphere", "Emergent wetlands: aboveground litter carbon released as CO2, with the wetland temperature response (Q10 Wetland Flows)" },
+                { "Decay Emergent: BG Very Fast -> BG Slow", "Emergent wetlands: root litter carbon moved to the soil, with the wetland temperature response (Q10 Wetland Flows)" }
+            };
+            for (int i = 0; i < types.GetLength(0); i++)
+            {
+                AddNamed(store, "stsim_FlowType", "FlowTypeId", types[i, 0], "Description", types[i, 1], false);
+                AddNamed(store, "stsim_FlowGroup", "FlowGroupId", types[i, 0] + " [Type]", null, null, true);
+            }
+            AddNamed(store, "stsim_FlowGroup", "FlowGroupId", "Q10 Wetland Flows", "Description", "Temperature response of what an emergent wetland's litter and soil lose as CO2, to the soil and (litter) to water: every loss but methane, soil export and burial", false);
+            // stock-flow rows of the scenarios that hold their own (a library made in Studio has none: stage 0 writes them into each Build)
+            string[] memberships = {
+                "Emission Emergent: BG Slow -> Atmosphere|BG Slow ->|1", "Emission Emergent: BG Slow -> Atmosphere|Emission: Total|1", "Emission Emergent: BG Slow -> Atmosphere|Emission: Total (CO2e)|3.67",
+                "Emission Emergent: BG Slow -> Atmosphere|Emission: Total Rh|1", "Emission Emergent: BG Slow -> Atmosphere|Emission: Total Rh (CO2e)|3.67", "Emission Emergent: BG Slow -> Atmosphere|Net Biome Productivity|-1",
+                "Emission Emergent: BG Slow -> Atmosphere|Net Biome Productivity (CO2e)|-3.67", "Emission Emergent: BG Slow -> Atmosphere|Net Ecosystem Productivity|-1", "Emission Emergent: BG Slow -> Atmosphere|Net Ecosystem Productivity (CO2e)|-3.67",
+                "Emission Emergent: BG Slow -> Atmosphere|Q10 Wetland Flows|1", "Emission Emergent: BG Slow -> Atmosphere|Emission: Wetland Methane Source CO2|1", "Emission Emergent: BG Slow -> Atmosphere CH4|BG Slow ->|1",
+                "Emission Emergent: BG Slow -> Atmosphere CH4|Q10 Wetland CH4|1", "Emission Emergent: BG Slow -> Atmosphere CH4|Emission: Wetland CH4|1", "Emission Emergent: BG Slow -> Atmosphere CH4|Emission: Wetland CH4 (CO2e)|33.5",
+                "Emission Emergent: BG Slow -> Atmosphere CH4|Emission: Total|1", "Emission Emergent: BG Slow -> Atmosphere CH4|Emission: Total (CO2e)|33.5", "Emission Emergent: BG Slow -> Atmosphere CH4|Emission: Total Rh|1",
+                "Emission Emergent: BG Slow -> Atmosphere CH4|Emission: Total Rh (CO2e)|33.5", "Emission Emergent: BG Slow -> Atmosphere CH4|Net Biome Productivity|-1", "Emission Emergent: BG Slow -> Atmosphere CH4|Net Biome Productivity (CO2e)|-33.5",
+                "Emission Emergent: BG Slow -> Atmosphere CH4|Net Ecosystem Productivity|-1", "Emission Emergent: BG Slow -> Atmosphere CH4|Net Ecosystem Productivity (CO2e)|-33.5", "Emission Emergent: BG Very Fast -> Atmosphere|BG Very Fast ->|1",
+                "Emission Emergent: BG Very Fast -> Atmosphere|Emission: Total|1", "Emission Emergent: BG Very Fast -> Atmosphere|Emission: Total (CO2e)|3.67", "Emission Emergent: BG Very Fast -> Atmosphere|Emission: Total Rh|1",
+                "Emission Emergent: BG Very Fast -> Atmosphere|Emission: Total Rh (CO2e)|3.67", "Emission Emergent: BG Very Fast -> Atmosphere|Net Biome Productivity|-1", "Emission Emergent: BG Very Fast -> Atmosphere|Net Biome Productivity (CO2e)|-3.67",
+                "Emission Emergent: BG Very Fast -> Atmosphere|Net Ecosystem Productivity|-1", "Emission Emergent: BG Very Fast -> Atmosphere|Net Ecosystem Productivity (CO2e)|-3.67", "Emission Emergent: BG Very Fast -> Atmosphere|Q10 Wetland Flows|1",
+                "Emission Emergent: BG Very Fast -> Atmosphere|Emission: Wetland Methane Source CO2|1", "Emission Emergent: AG Very Fast -> Atmosphere|AG Very Fast ->|1", "Emission Emergent: AG Very Fast -> Atmosphere|Emission: Total|1",
+                "Emission Emergent: AG Very Fast -> Atmosphere|Emission: Total (CO2e)|3.67", "Emission Emergent: AG Very Fast -> Atmosphere|Emission: Total Rh|1", "Emission Emergent: AG Very Fast -> Atmosphere|Emission: Total Rh (CO2e)|3.67",
+                "Emission Emergent: AG Very Fast -> Atmosphere|Net Biome Productivity|-1", "Emission Emergent: AG Very Fast -> Atmosphere|Net Biome Productivity (CO2e)|-3.67", "Emission Emergent: AG Very Fast -> Atmosphere|Net Ecosystem Productivity|-1",
+                "Emission Emergent: AG Very Fast -> Atmosphere|Net Ecosystem Productivity (CO2e)|-3.67", "Emission Emergent: AG Very Fast -> Atmosphere|Q10 Wetland Flows|1", "Decay Emergent: BG Very Fast -> BG Slow|BG Very Fast ->|1",
+                "Decay Emergent: BG Very Fast -> BG Slow|Decay: Total|1", "Decay Emergent: BG Very Fast -> BG Slow|Q10 Wetland Flows|1", "Lateral Transport: AG Very Fast -> Aquatic|Q10 Wetland Flows|1",
+                "Lateral Transport: BG Very Fast -> Aquatic|Q10 Wetland Flows|1", "Decay: AG Very Fast -> BG Slow|Q10 Wetland Flows|1", "Decay: AG Very Fast -> BG Slow|Decay: Total|1"
+            };
+            foreach (string m in memberships) { string[] p = m.Split('|'); AddMembership(store, p[0], p[1], p[2]); }
+            string[] orders = { "Emission Emergent: BG Slow -> Atmosphere|6.6", "Emission Emergent: BG Slow -> Atmosphere CH4|6.6", "Emission Emergent: BG Very Fast -> Atmosphere|6.5", "Emission Emergent: AG Very Fast -> Atmosphere|6.5", "Decay Emergent: BG Very Fast -> BG Slow|6.5" };
+            foreach (string o in orders) { string[] p = o.Split('|'); AddScenarioRow(store, "stsim_FlowOrder", "FlowOrderId", "FlowTypeId", "stsim_FlowType", "FlowTypeId", p[0], "\"Order\"", p[1]); }
+            string[] filters = { "Emission Emergent: BG Slow -> Atmosphere [Type]", "Emission Emergent: BG Slow -> Atmosphere CH4 [Type]", "Emission Emergent: BG Very Fast -> Atmosphere [Type]", "Emission Emergent: AG Very Fast -> Atmosphere [Type]", "Decay Emergent: BG Very Fast -> BG Slow [Type]" };
+            foreach (string f in filters) AddFilter(store, "stsim_OutputFilterFlows", "OutputFilterFlowsId", "FlowGroupId", "stsim_FlowGroup", f, false);
         }
 
         // ---- 1.5 (wetland methane, 2026-11): wetland classes release part of what their soil and litter emit as CH4 (src/flows.R,

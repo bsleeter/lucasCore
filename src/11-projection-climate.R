@@ -26,7 +26,7 @@ opt <- read_ds("BuildOptions"); y1 <- opt$EndYear[1]
 ic <- as.data.table(datasheet(scn, "stsim_InitialConditionsSpatial", optional = TRUE, lookupsAsFactors = FALSE))
 if (!nrow(ic) || is.na(ic$StratumFileName[1])) fail("no strata rasters: this scenario must depend on a Build result")
 P <- rast(ic$StratumFileName[1])
-wopt <- wetland_settings(); fm <- climate_flows(read_ds("ClimateOptions"), STAGE, c(`Q10 Wetland CH4` = wopt$MethaneQ10, `Q10 Wetland Soil` = wopt$SoilQ10))   # (Carbon Assumptions: Wetland Methane)
+wopt <- wetland_settings(); fm <- climate_flows(read_ds("ClimateOptions"), STAGE, wetland_q10s(wopt))   # (Carbon Assumptions: Wetland Methane)
 
 # ---- the run: SSP, model and replicate --------------------------------------------------------------------------------------
 pc <- as.data.table(datasheet(scn, ds("ProjectionClimate"), optional = TRUE, lookupsAsFactors = FALSE))

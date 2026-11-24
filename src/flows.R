@@ -148,7 +148,8 @@ BURIAL_FLOW <- "Stabilization: BG Slow -> Deep Soil"
 PEAT_FIRE_FLOWS <- paste("LULC: Emission Peat", c("CO2", "CO", "CH4"))
 add_burial <- function(vals, rate) { vals[[BURIAL_FLOW]] <- if (is.null(rate) || !length(rate) || is.na(rate)) 0 else rate; vals }
 
-# Methane from wetlands (2026-11-16; the emergent classes: src/nonforest-solve.R NF_CH4, the same flow types for soil and root
+# Methane from wetlands (2026-11-16; the emergent classes: src/nonforest-solve.R NF_CH4, by flow types of their own for the soil since
+# 2026-11-24, when their structure was brought onto lucasWet's, and the same root
 # litter). A forested wetland class (defaults/spinup/wetland-ch4.csv, Mg C/ha/yr as CH4) releases a fraction of what its methane
 # source pools emit as CH4: each pool's emission rate is split into a CO2 flow and a CH4 flow (to Atmosphere: CH4), so the pool's
 # total loss, and with it the calibration, the spin-up and the starting stocks, is what it was. The source pools are the soil and the
@@ -166,7 +167,8 @@ METHANE_POOLS <- data.table::data.table(
 METHANE_POOLS[, `:=`(shared = sprintf("Emission: %s -> Atmosphere", pool), co2 = sprintf("Emission: %s -> Atmosphere (Wetland)", pool), ch4 = sprintf("Emission: %s -> Atmosphere CH4", pool))]
 CH4_FLOWS <- list(shared_soil = "Emission: BG Slow -> Atmosphere", shared_litter = "Emission: BG Very Fast -> Atmosphere",
                   soil_co2 = "Emission: BG Slow -> Atmosphere (Wetland)", litter_co2 = "Emission: BG Very Fast -> Atmosphere (Wetland)",
-                  soil_ch4 = "Emission: BG Slow -> Atmosphere CH4", litter_ch4 = "Emission: BG Very Fast -> Atmosphere CH4", sink = "Atmosphere: CH4", max_share = 0.3)
+                  soil_ch4 = "Emission: BG Slow -> Atmosphere CH4", litter_ch4 = "Emission: BG Very Fast -> Atmosphere CH4", sink = "Atmosphere: CH4", max_share = 0.3,
+                  soil_q10 = "Q10 Wetland Soil")   # the forested wetland soil's CO2 (the emergent classes have flow types of their own: src/nonforest-solve.R NF_EMERGENT_TYPES)
 # the year's emission (Mg C/ha) of each source pool, from the pools at the start of the year and the rates (named flow values). A fast
 # pool takes the year's litter (flow order 6; snag branches fall at 3) before it decays and emits (6.5), so what emits is its stock plus
 # that litter: a pool that empties every year emits its whole intake, and its year-end stock says nothing about it (2026-11-17: the
