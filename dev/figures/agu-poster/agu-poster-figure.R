@@ -2,7 +2,7 @@
 # agu-poster-figure.R - the LUCAS panel figure for the AGU poster "USGS Western Geographic Science Center: A Leader in
 # Interdisciplinary Federal Science" (2026-11-25). One landscape figure, 20 x 9.8 in, to sit in a 21 x 13 in panel with its text.
 #   (a) what LUCAS reads and writes (a drawn schematic)
-#   (b) land cover 2023, (c) year last burned, (d) change in ecosystem carbon 1985-2023 (maps on shaded relief)
+#   (b) land cover 2023, (c) highest fire severity, (d) change in ecosystem carbon 1985-2023 (maps on shaded relief)
 #   (e) change in carbon stocks since 1985, (f) vegetation carbon burned, killed or cut by cause, (g) the stock against the carbon carrying capacity
 # Reads a historical run in a lucasCore library (the library file and its data folder) and the elevation file its Build used.
 #   Rscript dev/figures/agu-poster/agu-poster-figure.R [library.ssim] [run result id] [build result id] [out dir]
@@ -22,8 +22,8 @@ C_FIRE <- "#eb6834"; C_DROUGHT <- "#6250d6"; C_HARVEST <- "#2a78d6"
 C_LIVE <- "#008300"; C_DEAD <- "#9c6b1e"; C_SOIL <- "#898781"
 DIV <- c("#7f3b08", "#c2752a", "#e8c08f", "#eeede9", "#a9d3a2", "#4c9f5b", "#14622f")     # loss (brown) .. neutral .. gain (green)
 DIV_BRK <- c(-Inf, -100, -30, -10, 10, 30, 100, Inf)
-FIRE_COLS <- c("#f6d37a", "#f0a04b", "#d9562b", "#8c1d18"); FIRE_BRK <- c(1986, 2000, 2010, 2020, 2024)
-FIRE_LAB <- c("1986–99", "2000–09", "2010–19", "2020–23")
+FIRE_COLS <- c("#f3cf6b", "#e8862e", "#8c1d18"); FIRE_LAB <- c("Low", "Medium", "High")   # the highest severity a cell burned at
+
 LC <- data.table(lab = c("Conifer forest", "Hardwood forest", "Disturbed", "Shrubland", "Grassland", "Farms, towns", "Barren, water"),
                  col = c("#1f6b3a", "#86b86b", "#a0522d", "#cdb97a", "#ece3a6", "#c2407a", "#cfd3d6"))
 lc_of <- function(n) fifelse(grepl("^Forest: (California|Fir|Lodgepole|Ponderosa|Pinyon)", n), 1L, fifelse(grepl("^(Forest|Wetland): (Western Oak|Aspen|Elm)", n), 2L,
@@ -42,6 +42,7 @@ trn <- q("select Timestep, g.Name, sum(Amount) Ha from stsim_OutputStratumTransi
 area <- q("select sum(Amount) Ha from stsim_OutputStratum where ScenarioId=%d and Timestep=(select min(Timestep) from stsim_OutputStratum where ScenarioId=%1$d)")$Ha
 scl <- as.data.table(dbGetQuery(con, "select Id, Name from stsim_StateClass"))
 fire_group <- dbGetQuery(con, "select TransitionGroupId from stsim_TransitionGroup where Name='Fire'")$TransitionGroupId
+sev <- as.data.table(dbGetQuery(con, "select Id, Name from stsim_TransitionType where Name like 'Fire: % Severity'"))[, rank := match(sub("Fire: (.*) Severity", "\\1", Name), FIRE_LAB)]
 eco_group <- dbGetQuery(con, "select StockGroupId from stsim_StockGroup where Name='Total Ecosystem'")$StockGroupId
 dem_file <- dbGetQuery(con, sprintf("select Path from lucasCore_OutputDataSources where ScenarioId=%d and DataSource='ElevationFile'", BUILD))$Path[1]
 CAP <- as.data.table(dbGetQuery(con, sprintf("select * from lucasCore_OutputRunCapacity where RunScenarioId=%d order by Year", RUN)))   # stage 13 writes it
@@ -66,7 +67,7 @@ eco <- function(y) rast(sprintf("%s/stsim_OutputAverageSpatialStockGroup/avgstkg
 dC <- eco(y1) - eco(y0)
 last <- rast(sc); values(last) <- NA_integer_; v <- rep(NA_integer_, ncell(sc))
 for (y in fy) { f <- sprintf("%s/stsim_OutputSpatialTransition/tg_%d.it1.ts%d.tif", D, fire_group, y); if (!file.exists(f)) next
-  b <- values(rast(f), mat = FALSE); v[!is.na(b) & b > 0] <- y }
+  b <- sev$rank[match(values(rast(f), mat = FALSE), sev$Id)]; v <- pmax(v, b, na.rm = TRUE) }
 values(last) <- v
 burned_share <- sum(!is.na(v)) / sum(!is.na(values(sc, mat = FALSE)))
 # everything is drawn on a grid twice as fine, so the relief is smoother than the model cells
@@ -81,7 +82,7 @@ img <- function(k, cols, blank = "#eeede9") {       # k: class index per cell of
   o }
 on2 <- function(r) values(disagg(r, 2), mat = FALSE)
 k_lc <- lc_of(scl$Name[match(on2(sc), scl$Id)])
-k_fire <- findInterval(on2(last), FIRE_BRK, rightmost.closed = TRUE); k_fire[k_fire == 0] <- NA
+k_fire <- on2(last); sev_share <- tabulate(v, 3) / sum(!is.na(values(sc, mat = FALSE)))
 k_dc <- findInterval(on2(dC), DIV_BRK)
 outline <- as.polygons(ifel(is.na(sc), NA, 1)); og <- as.data.table(geom(outline))
 lc_share <- tabulate(lc_of(scl$Name[match(na.omit(values(sc, mat = FALSE)), scl$Id)]), 7); lc_share <- lc_share / sum(lc_share)
@@ -94,6 +95,7 @@ num <- c(sprintf("Area %.0f km2; %d-%d; cell %g m", area / 100, y0, y1, res(sc)[
   sprintf("Fire: %.0f kha burned in all (cells x years), %.0f%% of cells burned at least once; %d: %.0f kha, %.1f Tg C burned or killed (%.1f emitted)", sum(L$fire_ha) / 1e3, 100 * burned_share,
           L[which.max(fire_ha), Timestep], max(L$fire_ha) / 1e3, L[which.max(fire_ha), fire], L[which.max(fire_ha), fire_emis]),
   sprintf("Fire totals: %.1f Tg C burned or killed, %.1f emitted; 2020-21: %.1f and %.1f", sum(L$fire), sum(L$fire_emis), L[Timestep %in% 2020:2021, sum(fire)], L[Timestep %in% 2020:2021, sum(fire_emis)]),
+  sprintf("Highest fire severity, share of all cells: low %.1f%%, medium %.1f%%, high %.1f%%", 100 * sev_share[1], 100 * sev_share[2], 100 * sev_share[3]),
   sprintf("Drought and insects: %.2f Tg C killed in all, %.2f in 2016-2019 (peak %.2f in %d); %.1f kha", sum(L$drought), L[Timestep %in% 2016:2019, sum(drought)], max(L$drought), L[which.max(drought), Timestep], sum(L$drought_ha) / 1e3),
   sprintf("Harvest: %.2f Tg C in all; %.1f kha", sum(L$harvest), sum(L$harvest_ha) / 1e3),
   sprintf("NBP %d: %+.1f; %d: %+.1f", 2020L, L[Timestep == 2020, nbp], 2021L, L[Timestep == 2021, nbp]),
@@ -150,10 +152,10 @@ draw <- function() {
   xl <- amap(1, k_lc, LC$col, "b", sprintf("Land cover, %d", y1), sprintf("%s km\u00b2 at %g m", format(round(area / 100, -2), big.mark = ","), res(sc)[1]))
   for (j in seq_len(nrow(LC))) { cx <- mx[1] - .1 + ((j - 1) %/% 4) * 1.6; cy <- .98 - ((j - 1) %% 4) * .25; sw(cx, cy, LC$col[j]); text(cx + .34, cy, LC$lab[j], adj = c(0, .5), cex = .92, col = INK2) }
   # a 100 km scale bar under the first map's key column gap
-  amap(2, k_fire, FIRE_COLS, "c", "Year last burned", sprintf("%.0f%% of the area, %d–%d", 100 * burned_share, fy[1], y1))
-  bw <- .62; for (j in 1:4) { rect(mx[2] + (j - 1) * bw, .78, mx[2] + j * bw, .98, col = FIRE_COLS[j], border = "white", lwd = 1.5)
-    text(mx[2] + (j - .5) * bw, .6, FIRE_LAB[j], cex = .82, col = INK2) }
-  sw(mx[2], .26, "#eeede9", w = .3); text(mx[2] + .4, .26, "not burned", adj = c(0, .5), cex = .92, col = INK2)
+  amap(2, k_fire, FIRE_COLS, "c", "Fire severity", sprintf("Highest burned at, %d–%d", fy[1], y1))
+  bw <- .83; for (j in 1:3) { rect(mx[2] + (j - 1) * bw, .78, mx[2] + j * bw, .98, col = FIRE_COLS[j], border = "white", lwd = 1.5)
+    text(mx[2] + (j - .5) * bw, .6, sprintf("%s %.0f%%", FIRE_LAB[j], 100 * sev_share[j]), cex = .82, col = INK2) }
+  sw(mx[2], .26, "#eeede9", w = .3); text(mx[2] + .4, .26, sprintf("not burned %.0f%%", 100 * (1 - burned_share)), adj = c(0, .5), cex = .92, col = INK2)
   amap(3, k_dc, DIV, "d", "Carbon change", sprintf("%d to %d, all pools", y0, y1))
   bw <- .37; for (j in 1:7) rect(mx[3] + (j - 1) * bw, .78, mx[3] + j * bw, .98, col = DIV[j], border = "white", lwd = 1.5)
   for (j in 1:6) text(mx[3] + j * bw, .6, sub("-", "−", sprintf("%+d", as.integer(DIV_BRK[j + 1]))), cex = .82, col = INK2)

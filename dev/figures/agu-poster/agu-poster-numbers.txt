@@ -4,6 +4,7 @@ Live 138.5 -> 135.2 (peak 154.0 in 2011); dead wood 23.1 -> 34.1; litter+soil 15
 Mean NPP 8.20, Rh 7.34, NBP +0.178 Tg C/yr; years with NBP < 0: 14 of 38
 Fire: 915 kha burned in all (cells x years), 30% of cells burned at least once; 2020: 234 kha, 14.3 Tg C burned or killed (6.8 emitted)
 Fire totals: 49.3 Tg C burned or killed, 24.1 emitted; 2020-21: 21.6 and 10.5
+Highest fire severity, share of all cells: low 17.3%, medium 7.2%, high 5.3%
 Drought and insects: 2.73 Tg C killed in all, 1.64 in 2016-2019 (peak 0.64 in 2017); 23.6 kha
 Harvest: 1.99 Tg C in all; 23.0 kha
 NBP 2020: -6.9; 2021: -4.6

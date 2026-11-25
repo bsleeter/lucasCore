@@ -15,10 +15,10 @@ inventory, four decades of satellite records, climate and soils data in one mode
 carbon in every cell, every year. The lucasCore software builds a LUCAS model for any U.S. region from national datasets, so
 managers can compare fire, drought, harvest and land-use change on the same footing.
 
-## Caption (about 140 words)
+## Caption (about 150 words)
 
 **LUCAS in the Southern Sierra Nevada, California, 1985–2023.** (a) LUCAS draws on forest inventory, satellite, climate, soils
-and land-use data. (b) Land cover in 2023. (c) Most recent year each cell burned. (d) Change in ecosystem carbon (live plants,
+and land-use data. (b) Land cover in 2023. (c) Highest severity at which each cell burned; 30% of the area burned at least once. (d) Change in ecosystem carbon (live plants,
 dead wood, litter and soil). (e) The region gained 20 Tg C by 2011, then lost two-thirds of that gain to drought and fire;
 carbon in dead wood grew by half. (f) Plant carbon burned, killed or harvested each year: the 2020 fires burned or killed
 14 Tg C, about ten times the 2016–2019 drought die-off. (g) Carbon in live plants, dead wood and litter as a share of the
@@ -49,10 +49,15 @@ iteration. `agu-poster-numbers.txt` holds the values the script printed. Redraw 
 | Stock as a share of the capacity, 1985, 2011 (peak), 2023 | 85.3%, 94.9%, 88.5% |
 | Gap to the capacity, 2023 | 24.4 Tg C, of which 13.7 (56%) on disturbed land waiting to return to its cover |
 | Net biome productivity (not drawn) | mean +0.18 Tg C per year; positive in 24 of 38 years |
-| Area burned at least once, 1986–2023 | 30% of cells |
+| Area burned at least once, 1986–2023 | 30% of cells: highest severity low 17.3%, medium 7.2%, high 5.3% |
+| Forest cells burned in 2020, mean carbon change 1985–2023 | low severity +17, medium −4, high −109 Mg C per hectare (unburned forest +8) |
 
 Panel (f) counts, for each cause, the live carbon the event moved to dead pools plus what it emitted or removed as wood. Fire
 emissions include a small share from dead pools.
+
+Panels (c) and (d) together: a cell can burn and still show a gain. Forest that burned at low severity in 2020 (54% of the
+forest burned that year) had grown for 34 years first, and a low-severity fire moves much of what it kills to dead wood, which
+panel (d) counts; 63% of those cells hold over 10 Mg C per hectare more than in 1985. No high-severity cell does.
 
 Panel (g) is the run's Carbon Capacity series (stage 13): the capacity is the natural-regime mean of Keith et al. (2009), each
 cell's potential vegetation burning at its natural stand-replacing fire return interval (LANDFIRE), at the historical climate.
