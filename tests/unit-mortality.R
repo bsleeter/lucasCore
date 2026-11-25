@@ -217,6 +217,13 @@ check("a climate result's rows: the placed year and a whole percentage for every
 # what the package ships for projections
 check("the state attribute for the spread is among the package's definitions", MORT_ATTR %in% fread("defaults/stsim/stsim_StateAttributeType.csv")$Name)
 ptd <- fread("defaults/projection/transitions.csv"); check("Projection Transitions has no row of the group: the Mortality page is its only control", !any(ptd$TransitionGroupId %in% c(MORT_GROUP, "Mortality")))
+check("surface covariates: blank or no row = all used; a No, FALSE or 0 switches one off; a Yes or -1 keeps it",
+      !length(mortality_covariates_off(data.table())) && !length(mortality_covariates_off(data.table(Canopy = NA, Slope = NA))) &&
+        identical(mortality_covariates_off(data.table(Canopy = "No", Elevation = "Yes", Slope = FALSE, Temperature = 0L, Precipitation = -1L, Vpd = NA)), c("Canopy", "Slope", "Temperature")))
+px <- xml2::read_xml("package.xml"); check("package.xml: the covariate sheet has a column for each covariate, is on the Mortality page and is read by stage 9",
+      setequal(xml2::xml_attr(xml2::xml_find_all(px, "//dataSheet[@name='MortalityCovariate']/column"), "name"), names(MORT_COVS)) &&
+        length(xml2::xml_find_all(px, "//dataFeed[@name='MortalityProjectionPage']/dataSheet[@name='MortalityCovariate']")) == 1 &&
+        length(xml2::xml_find_all(px, "//transformer[@name='ProjectionTransitions']/dataSheet[@name='MortalityCovariate']")) == 1)
 pwm <- fread("defaults/transitions/pathways/mortality.csv"); dtn <- fread("defaults/stsim/core_DistributionType.csv")$Name; evn <- fread("defaults/stsim/core_ExternalVariableType.csv")$Name
 check("the lookup's names ship with the package: a distribution type for every class with the pathway, the study area's, the climate's, the two variables and the multiplier type",
       all(c(mortality_class_types(unique(pwm$StateClassIdSource)), MORT_RATE_ALL, MORT_CLIMATE) %in% dtn) && all(c(MORT_EV_YEAR, MORT_EV_PCT) %in% evn) && MORT_CLIMATE %in% fread("defaults/stsim/stsim_TransitionMultiplierType.csv")$Name &&

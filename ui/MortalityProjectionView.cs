@@ -24,6 +24,11 @@ namespace lucasCoreUI
         private readonly Choice m_proj = new Choice("Projection", 1), m_place = new Choice("ProjectionPlacement", 1), m_link = new Choice("ClimateLink", 1);
         private readonly TextBox m_block = Box(60), m_rs = Box(60), m_re = Box(60);
         private readonly List<Control> m_settings = new List<Control>();
+        // (2.0.4) the covariates the surface may use: a sheet of its own in this page's feed (a new table needs no library update); blank = used
+        private DataSheet Cov { get { return this.DataFeed.GetDataSheet("lucasCore_MortalityCovariate"); } }
+        private static readonly string[][] COVS = { new[] { "Canopy", "Tree canopy cover" }, new[] { "Elevation", "Elevation" }, new[] { "Slope", "Slope" },
+            new[] { "Temperature", "Temperature normal" }, new[] { "Precipitation", "Precipitation normal" }, new[] { "Vpd", "Vapour pressure deficit normal" } };
+        private readonly List<CheckBox> m_covs = new List<CheckBox>();
 
         public MortalityProjectionView()
         {
@@ -48,6 +53,13 @@ namespace lucasCoreUI
                                                                                  "The stage 9 log gives the mean rate of the years chosen beside that of the whole record.")))));
 
             RadioButton clustered = Option(m_place, 1, "Clustered"), random = Option(m_place, 2, "Random cells");
+            FlowLayoutPanel covs = Row(); covs.Margin = new Padding(19, 0, 0, 2);
+            foreach (string[] c in COVS)
+            {
+                string col = c[0]; var cb = new CheckBox { Text = c[1], AutoSize = true, Margin = new Padding(3, 3, 14, 3) };
+                cb.CheckedChanged += (s, e) => { if (!Refreshing) { Write(Cov, col, cb.Checked ? -1 : 0); RefreshControls(); } };
+                m_covs.Add(cb); covs.Controls.Add(cb);
+            }
             m_settings.Add(clustered); m_settings.Add(random);
             AddGroup(Group("Where it falls", ProjectionTransitionsView.Stack(
                 clustered,
@@ -55,6 +67,10 @@ namespace lucasCoreUI
                         "a surface fitted to where the events fell (tree canopy cover; the temperature, precipitation and vapour pressure deficit normals; elevation; slope); " +
                         "the sizes of the yearly patches of the record; and spread from the die-off of the three years before, within three cells. " +
                         "The stage 9 log reports each of them. A piece the record cannot support (too few events) is left out, and the log says so.", 640),
+                Wrapped("The surface may use (untick one to leave it out; it changes where the die-off falls, never how much):", 640),
+                covs,
+                Wrapped("Canopy is the cover of the last historical year. The three normals are PRISM's for 1991 to 2020, so they say where it is warm, dry or wet, not when. " +
+                        "A covariate whose data the Data Sources page does not name is left out by itself. The stage 9 log names the ones used and how much each explains; with all unticked there is no surface, and patch sizes and spread still apply.", 640),
                 random,
                 Wrapped("Every eligible cell of a unit has the same chance, and the event falls as single scattered cells.", 640))));
 
@@ -99,6 +115,8 @@ namespace lucasCoreUI
             m_block.Text = Show(Value("BlockYears")); m_rs.Text = Show(Value("ReferenceStartYear")); m_re.Text = Show(Value("ReferenceEndYear"));
             bool on = IntValue("Projection", 1) != 2;
             foreach (Control c in m_settings) c.Enabled = on;
+            bool surf = on && IntValue("ProjectionPlacement", 1) != 2;
+            for (int k = 0; k < m_covs.Count; k++) { object v = Value(Cov, COVS[k][0]); m_covs[k].Checked = v == DBNull.Value || v == null || Convert.ToBoolean(v); m_covs[k].Enabled = surf; }
         }
     }
 }

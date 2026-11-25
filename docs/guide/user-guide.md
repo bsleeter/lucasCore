@@ -905,7 +905,7 @@ The Mortality page of the Projection group has these settings. Leave it blank fo
 | Historical rates or Off | Whether the event continues in the projection | Historical rates |
 | Years drawn together | The length of a block. Longer blocks keep long outbreaks whole; shorter blocks give more variety between iterations | 5 |
 | Reference years | The historical years the blocks come from. The rate has risen over the record, so these years set the projected amount more than any other choice | The reference period of Run Settings |
-| Where it falls | Clustered: a surface fitted to where the events fell, the patch sizes of the record, and spread from the die-off of the three years before. Or random cells. Neither changes the amount | Clustered |
+| Where it falls | Clustered: a surface fitted to where the events fell, the patch sizes of the record, and spread from the die-off of the three years before. Or random cells. Neither changes the amount. From lucasCore 2.0.4 tick boxes list the six covariates the surface may use (tree canopy cover, elevation, slope, and the temperature, precipitation and vapour pressure deficit normals); untick one to leave it out | Clustered |
 | Timing and Amount | As this setup draws them, or from the Projection Climate result (below) | As this setup draws them |
 
 The stage 9 log has lines beginning *Drought and insect mortality*. **Projection Results > Projection Rates** lists the units and their mean yearly area, and **Projection Schedule** lists the years drawn (sampling set Mortality). A library made before lucasCore 2.0.3 lacks a few definition names the projection uses: close it in SyncroSim and run `Rscript tools/add-definitions.R <library.ssim>` once.

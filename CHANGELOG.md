@@ -4,7 +4,16 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
 
 ## 2.0.4 - unreleased
 
-A patch: drought and insect mortality leaves the Land Use Change page. No library update is needed.
+A patch: drought and insect mortality leaves the Land Use Change page, and its Mortality page lists the covariates that place it. No library update is needed (the one new sheet SyncroSim adds by itself).
+
+### Added
+
+- **The covariates of the mortality surface, on the projection's Mortality page** (Where it falls; sheet `MortalityCovariate`,
+  shown through the page's feed; stage 9). Six tick boxes, all on unless unticked: tree canopy cover, elevation, slope, and
+  the PRISM temperature, precipitation and vapour pressure deficit normals. They are fixed in stage 9 and were on no page:
+  the Spatial Allocation list is for the land-use and harvest surfaces of stage 10 and never applied to mortality. An
+  unticked covariate is left out of the fit, and the log says so; with all unticked there is no surface, and patch sizes
+  and spread still apply. The amount of the event does not change.
 
 ### Changed
 
