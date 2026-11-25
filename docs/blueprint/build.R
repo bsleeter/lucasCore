@@ -166,13 +166,14 @@ stsim <- list(
     "Flow and Stock Type Groups" = c("stsim_FlowTypeGroupMembership", "stsim_StockTypeGroupMembership"),
     "Output Options and Filters" = c("stsim_OutputOptionsStockFlow", "stsim_OutputFilterFlows", "stsim_OutputFilterStocks", "stsim_OutputFilterTransitionGroups", "stsim_OutputOptionsSpatial", "stsim_OutputOptions")),
   "Initial conditions" = list("Initial Conditions Spatial" = "stsim_InitialConditionsSpatial", "Initial Stocks Spatial" = "stsim_InitialStockSpatial",
-    "Spatial Multiprocessing tiles" = "core_SpatialMultiprocessing"),
+    "Initial Time Since Transition Spatial" = "stsim_InitialTSTSpatial", "Spatial Multiprocessing tiles" = "core_SpatialMultiprocessing"),
   Transitions = list("Transitions" = "stsim_Transition", "Deterministic Transitions" = "stsim_DeterministicTransition",
     "Transition Targets" = "stsim_TransitionTarget", "Transition Spatial Multipliers" = "stsim_TransitionSpatialMultiplier",
     "Spatial Initiation Multipliers" = "stsim_TransitionSpatialInitiationMultiplier",
     "Size Distribution and Prioritization" = c("stsim_TransitionSizeDistribution", "stsim_TransitionSizePrioritization"),
     "Adjacency Settings and Multipliers" = c("stsim_TransitionAdjacencySetting", "stsim_TransitionAdjacencyMultiplier"),
-    "Transition Attribute Values (costs)" = "stsim_TransitionAttributeValue"),
+    "Transition Attribute Values (costs)" = "stsim_TransitionAttributeValue",
+    "Distributions and External Variables" = c("stsim_DistributionValue", "core_ExternalVariableValue")),
   "Flows and state" = list("Flow Pathways" = "stsim_FlowPathway", "Flow Multipliers" = "stsim_FlowMultiplier",
     "Flow Spatial Multipliers" = "stsim_FlowSpatialMultiplier", "State Attribute Values" = "stsim_StateAttributeValue"))
 written <- unique(unlist(lapply(st, function(s) s$sheet[grepl("^(stsim|core)_", s$sheet) & s$type %in% c("Output", "Both")])))

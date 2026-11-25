@@ -2,7 +2,7 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
-## 2.0.3 - unreleased
+## 2.0.3 - 2026-11-25
 
 Two settings for exploring a climate response of drought and insect mortality in projections. The two new sheets
 SyncroSim adds by itself. The names the lookup needs ship with the package's definitions (`defaults/stsim`), so a new
@@ -74,16 +74,18 @@ writes them to the External Variables sheet: the setup's blocks, placed and scal
 
 ### Not yet done
 
-- The two stages were not yet run in SyncroSim with these changes. The ST-Sim behaviour they rely on was tested on a small
-  ST-Sim library (the lookup by an external variable, two multipliers multiplying, the sheet taken from the second
-  dependency when the first has none).
+- No library update adds the names when a library is opened: `tools/add-definitions.R` does it (a patch release has no
+  update method).
+- Tested on one pyrome with a short projection (10 years, 3 iterations); a full-length projection with many iterations
+  was not run.
 - Dryness is one series for the study area's open forest, not one per ecodivision.
+- The User Guide does not describe the two settings yet (draft wording: `dev/mortality/guide-wording-2.0.3.md`).
 
-## 2.0.2 - unreleased
+## 2.0.2 - not released on its own (part of 2.0.3)
 
 Drought and insect mortality in projections. No library update is needed: a library on 2.0.0 or 2.0.1 opens as it is (the
-projection settings are a new sheet, which SyncroSim adds by itself, and stage 9 adds the one new definition, the state
-attribute Recent Mortality, to a library that lacks it). Builds stay valid. A Projection Setup made on 2.0.2 has the event
+projection settings are a new sheet, which SyncroSim adds by itself; the one new definition, the state attribute Recent
+Mortality, ships with the package and `tools/add-definitions.R` adds it to an earlier library; without it the event runs with no spread from recent die-off, and the log says so). Builds stay valid. A Projection Setup made on 2.0.2 has the event
 on unless its Mortality page says Off, so a projection from a new setup differs from one made on 2.0.1, where the event
 stopped at the historical end.
 

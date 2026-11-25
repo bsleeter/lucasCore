@@ -71,7 +71,8 @@ D <- list(
     u(5, "Forest in the start year where NLCD maps open forest as shrub or grass", "Forest Cover > Forest in the start year: NLCD and tree canopy cover", TRUE),
     u(6, "A disturbed stand counts as forest again when its canopy is back", "Forest Cover > Recovery by tree canopy cover", TRUE),
     u(6, "Canopy loss over five years, the severity of drought and insect mortality", "Mortality > Drought and Insect Mortality: on (the western ecodivisions)", TRUE),
-    u(8, "Starting carbon and growth of a forest cell by its canopy (stocking)", "Forest Cover > Stocking: by the cell's tree canopy cover", TRUE))),
+    u(8, "Starting carbon and growth of a forest cell by its canopy (stocking)", "Forest Cover > Stocking: by the cell's tree canopy cover", TRUE),
+    u(9, "Canopy of the last historical year, in the surface that places projected drought and insect mortality", "Projection > Mortality > Where it falls: Clustered", TRUE))),
   list("Disturbance", "MtbsSeverityFolder", "MTBS burn severity", "annual CONUS mosaics", list(
     u(6, "Wildfire by severity (burned share of 30 m pixels), and burned cells kept out of the clearcut rule"))),
   list("Disturbance", "LcmsFolder", "USFS LCMS annual change", "v2025-11 · 30 m · 1985 on", list(
@@ -97,7 +98,8 @@ D <- list(
     u(8, "Estuarine and palustrine marsh NPP: the emergent wetland multiplier against its ecodivision mean", "Build Options > Site Productivity: Tidal Marsh Productivity", TRUE))),
   list("Climate", "PrismFolder", "PRISM", "annual tmean and ppt, monthly ppt · normals", list(
     u(2, "Ecodivision climate for the growth curves"), u(3, "Ecodivision climate for the decay calibration"),
-    u(7, "Annual temperature and precipitation for the historical climate multipliers; monthly precipitation by water-year season for the non-forest RAP fit", "Climate Options"))),
+    u(7, "Annual temperature and precipitation for the historical climate multipliers; monthly precipitation by water-year season for the non-forest RAP fit", "Climate Options"),
+    u(9, "Temperature, precipitation and vapour pressure deficit normals, in the surface that places projected drought and insect mortality", "Projection > Mortality > Where it falls: Clustered", TRUE))),
   list("Climate", "Loca2Folder", "LOCA2", "GCM / member / SSP", list(
     u(11, "Projected climate of one scenario, model and replicate (its SSP also sets the CO2 of the CO2 fertilization multiplier)", "Projection > Climate"))),
   list("Covariates", "RoadsFile", "LANDFIRE roads", "LF2023 · 30 m", list(u(10, "Distance to roads covariate", "Suitability Covariates"))),
