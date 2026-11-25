@@ -1525,7 +1525,7 @@ The Transitions page has two tables: how much of each transition happens each ye
 
 With spatial tiles on (section 6.2), the Target Strata of every Target row follow the tile level; here both are the counties. A group with no row in the lower table is placed at random within its units.
 
-> **Insect** is listed among the project's transition groups but has no row here, because the Build has no insect pathways: lucasCore ships six pathway sets (urbanization, intensification, agricultural expansion and contraction, harvest and fire), so insect disturbance never happens, in the historical run or in projections. From lucasCore 2.0 a new library lists Mortality in its place: the Build maps drought and insect mortality in the historical period (section 3.9), and from lucasCore 2.0.3 a projection continues it. It has a row here, Mortality: Drought and Insects, and the Projection > Mortality page sets its amount and placement (section 3.9).
+> **Insect** is listed among the project's transition groups but has no row here, because the Build has no insect pathways: lucasCore ships six pathway sets (urbanization, intensification, agricultural expansion and contraction, harvest and fire), so insect disturbance never happens, in the historical run or in projections. From lucasCore 2.0 a new library lists Mortality in its place: the Build maps drought and insect mortality in the historical period (section 3.9), and from lucasCore 2.0.3 a projection continues it. It has no row here: the Projection > Mortality page alone sets it (section 3.9).
 
 ### 6.4 Spatial Allocation
 

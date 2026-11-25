@@ -9,4 +9,3 @@ Forest Harvest: Forest Clearcut [Type],Target,Secondary,,Harvest,1|2,harvest dra
 Forest Harvest: Forest Selection [Type],Target,Secondary,,Harvest,1|2,
 Fire,Probability,,Pyromes,Fire,,"burned fraction of the pyrome's burnable area in the year drawn, one rate map per severity type; fire crosses county lines"
 Reforestation,Target,Secondary,,Reforestation,,"to-do 57 step 8: its own sampling set, drawn from the last Recent Years (Reforestation Options, default 10) of the reference period; area = the cells whose start class can reforest and that NLCD first shows as forest that year; placed by the Reforestation surface (stage 10)"
-Mortality: Drought and Insects [Type],Probability,,,Mortality,,"to-do 3: the Mortality page sets it (historical rates by ecodivision and softwood class, drawn in blocks of years; a fitted surface, patch sizes and spread from recent die-off place it); None here switches it off in the projection. Rate Units stay blank"

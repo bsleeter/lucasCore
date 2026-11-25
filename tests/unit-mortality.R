@@ -216,7 +216,7 @@ check("a climate result's rows: the placed year and a whole percentage for every
 
 # what the package ships for projections
 check("the state attribute for the spread is among the package's definitions", MORT_ATTR %in% fread("defaults/stsim/stsim_StateAttributeType.csv")$Name)
-ptd <- fread("defaults/projection/transitions.csv"); check("Projection Transitions has the group's row, in its own sampling set", nrow(ptd[TransitionGroupId == MORT_GROUP & Method == "Probability" & SamplingSet == MORT_SET]) == 1L)
+ptd <- fread("defaults/projection/transitions.csv"); check("Projection Transitions has no row of the group: the Mortality page is its only control", !any(ptd$TransitionGroupId %in% c(MORT_GROUP, "Mortality")))
 pwm <- fread("defaults/transitions/pathways/mortality.csv"); dtn <- fread("defaults/stsim/core_DistributionType.csv")$Name; evn <- fread("defaults/stsim/core_ExternalVariableType.csv")$Name
 check("the lookup's names ship with the package: a distribution type for every class with the pathway, the study area's, the climate's, the two variables and the multiplier type",
       all(c(mortality_class_types(unique(pwm$StateClassIdSource)), MORT_RATE_ALL, MORT_CLIMATE) %in% dtn) && all(c(MORT_EV_YEAR, MORT_EV_PCT) %in% evn) && MORT_CLIMATE %in% fread("defaults/stsim/stsim_TransitionMultiplierType.csv")$Name &&

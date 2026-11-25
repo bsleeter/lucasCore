@@ -34,6 +34,15 @@ namespace lucasCoreUI
             "Non-forest land becoming forest.",
             "Groups and placement rows outside the families above." };
         public string FireWhere = "The Fire page.";
+        // drought and insect mortality (2.0.3 gave it a row of Projection Transitions; from 2.0.4 the projection's Mortality page is its only control)
+        public static bool IsMortality(string g) { return g != null && g.StartsWith("Mortality"); }
+        // the rows of that group a 2.0.3 page added to the sheet: removed, so the tables do not list a setting that does nothing
+        public static int DropMortality(DataSheet tr)
+        {
+            if (tr == null) return 0; List<KeyValuePair<object, string>> tg = Choices(tr, "TransitionGroupId");
+            List<DataRow> old = Rows(tr).Where(r => IsMortality(NameOf(tg, r["TransitionGroupId"]))).ToList();
+            if (old.Count > 0) tr.DeleteRows(old); return old.Count;
+        }
         public static int FamilyOf(string g)
         {
             if (g.StartsWith("Urbanization") || g.StartsWith("Intensification") || g.StartsWith("Ag ")) return 0;
@@ -169,6 +178,7 @@ namespace lucasCoreUI
             foreach (DataRow r in Rows(tr))
             {
                 var b = new Block { Key = KeyOf(r), Name = NameOf(tg, r["TransitionGroupId"]) ?? "(no group)" }; b.Family = FamilyOf(b.Name);
+                if (IsMortality(b.Name)) continue;   // (2.0.4) set on the Mortality page alone: no card here
                 foreach (var a in allocs)
                     if (!used.Contains(a.Key) && (a.Value == b.Name || a.Value.StartsWith(b.Name + ":")))
                     { used.Add(a.Key); b.Places.Add(MakePlace(a.Key, a.Value)); }

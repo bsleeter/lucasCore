@@ -69,7 +69,9 @@ for (k in c("UnitSource", "ExcludeGap", "SamplingSet", "StrataLevel")) if (!k %i
 # group, not a Stratum Source, and its years are drawn in blocks. Its row here only switches it (None = off); a sheet filled before
 # lucasCore 2.0.2 has no row, and the projection's Mortality page then decides
 source(pkg_file("src", "mortality.R")); source(pkg_file("src", "forest-cover.R"))   # (forest-cover.R: the tree canopy cover file names and years)
-mort_pt <-pt[TransitionGroupId %in% c(MORT_GROUP, "Mortality")]; pt <- pt[!TransitionGroupId %in% c(MORT_GROUP, "Mortality")]
+# (2.0.4) drought and insect mortality has no row of this sheet: the projection's Mortality page is its only control. A row a 2.0.3 page left is set aside.
+mort_pt <- pt[TransitionGroupId %in% c(MORT_GROUP, "Mortality")]; pt <- pt[!TransitionGroupId %in% c(MORT_GROUP, "Mortality")]
+if (nrow(mort_pt)) say("Projection Transitions: the row of %s is not read (from lucasCore 2.0.4 the projection's Mortality page alone sets the event%s)", MORT_GROUP, if (any(mort_pt$Method == "None")) "; its None does not switch it off: choose Off on that page" else "")
 pt[is.na(SamplingSet) | !nzchar(SamplingSet), SamplingSet := TransitionGroupId]
 bad <- pt[!Method %in% c("Target", "Probability", "None")]; if (nrow(bad)) fail("Projection Transitions: unknown method for %s", paste(bad$TransitionGroupId, collapse = "; "))
 bad <- pt[Method == "Target" & !StrataLevel %in% c("Primary", "Secondary", "Tertiary")]; if (nrow(bad)) fail("Projection Transitions: a Target group needs Target Strata: %s", paste(bad$TransitionGroupId, collapse = "; "))
@@ -607,7 +609,7 @@ mo9$enabled <- tryCatch(mortality_options(tryCatch(read_ds("MortalityOptions"), 
 mort <- NULL
 if (MORT_GROUP %in% unique(sm$TransitionGroupId)) {
   why_off <- if (!mo9$enabled) "the Build's Mortality page: the event is off" else if (mo9$projection == "off") "the projection's Mortality page: Off" else
-    if (nrow(mort_pt) && all(mort_pt$Method == "None")) "its Projection Transitions row is None" else if (!MORT_GROUP %in% ann) "the Build mapped no event" else NA_character_
+    if (!MORT_GROUP %in% ann) "the Build mapped no event" else NA_character_
   if (!is.na(why_off)) say("Drought and insect mortality: off in the projection (%s)", why_off) else {
     scm <- stsim_list("StateClass"); stm <- stsim_list("Stratum"); pwm <- pw[TransitionTypeId == MORT_TYPE]
     src_id <- as.integer(scm$Id[match(pwm$StateClassIdSource, scm$Name)]); vP9 <- lev$Primary

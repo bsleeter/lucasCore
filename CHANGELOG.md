@@ -2,6 +2,20 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## 2.0.4 - unreleased
+
+A patch: drought and insect mortality leaves the Land Use Change page. No library update is needed.
+
+### Changed
+
+- **The projection's Mortality page is the only control of drought and insect mortality in a projection.** 2.0.3 also gave
+  the event a row of Projection Transitions, so it showed on the Land Use Change page under Other transitions and in its
+  table, where its method did nothing except that None switched the event off: a second switch in the wrong place. The
+  row is gone from `defaults/projection/transitions.csv`; the page shows no card for the group and removes a row that a
+  2.0.3 page added when the scenario is opened for editing (`ui/TransitionWalk.cs`, `ui/ProjectionTransitionsView.cs`);
+  stage 9 no longer reads such a row and says so in the log if it meets one. A setup whose row was set to None now has
+  the event on unless its Mortality page says Off.
+
 ## 2.0.3 - 2026-11-25
 
 Two settings for exploring a climate response of drought and insect mortality in projections. The two new sheets
