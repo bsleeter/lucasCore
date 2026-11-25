@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<package name="lucasCore" displayName="LUCAS Core (model builder)" description="Builds LUCAS land-use and carbon models in ST-Sim from national datasets (FIA growth curves; CBM carbon parameters; spatial initial conditions; historical transitions and projections)" version="2.0.0" url="https://code.usgs.gov/LUCC/lucasCore" minSyncroSimVersion="3.1.29">
+<package name="lucasCore" displayName="LUCAS Core (model builder)" description="Builds LUCAS land-use and carbon models in ST-Sim from national datasets (FIA growth curves; CBM carbon parameters; spatial initial conditions; historical transitions and projections)" version="2.0.1" url="https://code.usgs.gov/LUCC/lucasCore" minSyncroSimVersion="3.1.29">
 
 	<builtFor package="stsim" version="4.5.4"/>
 
@@ -717,7 +717,7 @@
 	     fitted cutoff, riparian and savanna as forest potential) -->
 	<!-- Mortality (to-do 3, lucasCore 2.0; src/mortality.R): the drought and insect mortality event of stage 6. Blank = on, ranked selection,
 	     the canopy-loss lines shipped per ecodivision (defaults/transitions/mortality-lines.csv), the pathways' minimum stand age (20) -->
-	<dataSheet name="MortalityOptions" displayName="Mortality" isSingleRow="True">
+	<dataSheet name="MortalityOptions" displayName="Mortality" isSingleRow="True" viewClassName="lucasCoreUI.MortalityView" viewClassAssembly="lucasCoreUI">
 		<column name="Enabled" displayName="Drought and Insect Mortality (blank = on)" dataType="Boolean" isOptional="True"/>
 		<column name="Placement" displayName="Placement on the Grid" dataType="Integer" validationType="List" formula1="1:Ranked selection|2:Fraction as probability" isOptional="True" defaultValue="1"/>
 		<column name="CanopyLossLine" displayName="Canopy Loss That Counts as High Severity, Share (blank = the ecodivision's line)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0.01" formula2="1"/>
@@ -2039,123 +2039,141 @@
 	</layout>
 
 	<layout type="Scenario" appendTo="stsim_Advanced">
+		<!-- Pages grouped by the kind of scenario that reads them, each group holding its settings and then its results (user 2026-11-24;
+		     lucasCore 2.0.1). SyncroSim shows one tree on every scenario, so a group names its scenario. Data Download comes first (the
+		     first thing a new user runs); Natural Change and Mortality, which the Build reads, follow Minimum Harvest Age; every figure and
+		     comparison is under Figures and Analysis, the four sets of figures (Build, Run, Compare, Wood Products) together in Figures; the two sheets every stage writes close the list. -->
 		<group name="lucasCoreGroup" displayName="LUCAS Core">
-			<item name="StudyArea"/>
-			<item name="BuildOptions"/>
-			<item name="StandAge"/>
-			<item name="ForestCoverOptions"/>
-			<item name="ClimateOptions"/>
-			<item name="GrowthOptions"/>
-			<item name="HarvestAge"/>
-			<group name="lucasCoreCarbonAssumptions" displayName="Carbon Assumptions">
-				<item name="CarbonOptions"/>
-				<item name="GrowthInput"/>
-				<item name="CbmCrosswalk"/>
-				<item name="LiveTurnover"/>
-				<item name="DomParameter"/>
-				<item name="Spinup"/>
-				<item name="DisturbanceFlow"/>
-				<item name="FireSnagShare"/>
-				<item name="DecayCalibrationSetting"/>
-				<item name="MatureAge"/>
-				<item name="FixedDecayMultiplier"/>
-				<item name="NonForestCarbon"/>
-				<item name="CarbonCapacityOptions"/>
-				<item name="WetlandCarbon"/>
+			<group name="lucasCoreDownload" displayName="Data Download">
+				<item name="DataDownloadOptions"/>
+				<item name="OutputDataDownload"/>
+			</group>
+			<group name="lucasCoreBuild" displayName="Build">
+				<item name="StudyArea"/>
+				<item name="BuildOptions"/>
+				<item name="StandAge"/>
+				<item name="ForestCoverOptions"/>
+				<item name="ClimateOptions"/>
+				<item name="GrowthOptions"/>
+				<item name="HarvestAge"/>
+				<item name="ReforestationOptions"/>
+				<item name="MortalityOptions"/>
+				<group name="lucasCoreCarbonAssumptions" displayName="Carbon Assumptions">
+					<item name="CarbonOptions"/>
+					<item name="GrowthInput"/>
+					<item name="CbmCrosswalk"/>
+					<item name="LiveTurnover"/>
+					<item name="DomParameter"/>
+					<item name="Spinup"/>
+					<item name="DisturbanceFlow"/>
+					<item name="FireSnagShare"/>
+					<item name="DecayCalibrationSetting"/>
+					<item name="MatureAge"/>
+					<item name="FixedDecayMultiplier"/>
+					<item name="NonForestCarbon"/>
+					<item name="CarbonCapacityOptions"/>
+					<item name="WetlandCarbon"/>
+				</group>
+				<group name="lucasCoreCrosswalks" displayName="Crosswalks">
+					<item name="LandCoverCrosswalk"/>
+				</group>
+				<group name="lucasCoreCurves" displayName="Fitted Curves (written by the build)">
+					<item name="MerchantableVolumeCurve"/>
+					<item name="CarbonCurve"/>
+					<item name="InitialStockCurve"/>
+				</group>
+				<group name="lucasCoreResults" displayName="Build Results">
+					<item name="OutputBuildStage"/>
+					<item name="OutputStrataSummary"/>
+					<item name="OutputStudyBoundary"/>
+					<item name="OutputStateClassSummary"/>
+					<item name="OutputStandAge"/>
+					<item name="OutputStandAgeCut"/>
+					<item name="OutputStandAgeMap"/>
+					<item name="OutputStandAgeDistribution"/>
+					<item name="OutputStandAgeFia"/>
+					<item name="OutputForestAreaCheck"/>
+					<item name="OutputForestCover"/>
+					<item name="OutputForestCoverMap"/>
+					<item name="OutputForestStocking"/>
+					<item name="OutputForestStockingMap"/>
+					<item name="OutputLandCoverLayers"/>
+					<item name="OutputSiteClassMap"/>
+					<item name="OutputNlcdAnnual"/>
+					<item name="OutputTransitionSummary"/>
+					<item name="OutputHarvestAge"/>
+					<item name="OutputClimateSummary"/>
+					<item name="OutputInitialStockSummary"/>
+					<item name="OutputReturnInterval"/>
+					<item name="OutputSoilTarget"/>
+					<item name="OutputGrowthParameter"/>
+					<item name="OutputCarbonParameter"/>
+					<item name="OutputSiteProductivity"/>
+					<item name="OutputNonForestProductivity"/>
+					<item name="OutputCarbonCapacity"/>
+					<item name="OutputCarbonCapacityType"/>
+					<item name="OutputCarbonCapacityMap"/>
+					<item name="OutputDecayCalibration"/>
+					<item name="OutputCarbonRate"/>
+					<item name="OutputGrowthReport"/>
+				</group>
 			</group>
 			<group name="lucasCoreProjection" displayName="Projection">
 				<item name="ProjectionRun"/>
 				<item name="ProjectionTransitions"/>
 				<item name="SpatialAllocation"/>
 				<item name="FireOptions"/>
-				<item name="ReforestationOptions"/>
-				<item name="MortalityOptions"/>
 				<item name="FuelTreatment"/>
 				<item name="ForestManagement"/>
 				<item name="ManagementAction"/>
 				<item name="ProjectionClimatePage"/>
+				<group name="lucasCoreProjectionResults" displayName="Projection Results">
+					<item name="OutputProjectionRate"/>
+					<item name="OutputLandUseDemand"/>
+					<item name="OutputProjectionSchedule"/>
+					<item name="OutputManagementAction"/>
+					<item name="OutputForestManagement"/>
+					<item name="OutputFuelTreatment"/>
+					<item name="OutputFireSize"/>
+					<item name="OutputFireSlope"/>
+					<item name="OutputSuitability"/>
+					<item name="OutputSuitabilityCurve"/>
+					<item name="OutputSuitabilityMap"/>
+					<item name="OutputPatchSize"/>
+					<item name="OutputCo2Beta"/>
+					<item name="OutputCo2Series"/>
+				</group>
 			</group>
-			<item name="RunFigureOptions"/>
-			<item name="CompareRunOptions"/>
-			<item name="WoodProductsPage"/>
-			<item name="DataDownloadOptions"/>
-			<item name="DataReleasePage"/>
-			<item name="ReleaseInformationPage"/>
-			<group name="lucasCoreCrosswalks" displayName="Crosswalks">
-				<item name="LandCoverCrosswalk"/>
+			<group name="lucasCoreAnalysis" displayName="Figures and Analysis">
+				<item name="RunFigureOptions"/>
+				<item name="CompareRunOptions"/>
+				<item name="WoodProductsPage"/>
+				<group name="lucasCoreFigures" displayName="Figures">
+					<item name="OutputBuildFigure"/>
+					<item name="OutputRunFigure"/>
+					<item name="OutputCompareFigure"/>
+					<item name="OutputWoodProductsFigure"/>
+				</group>
+				<group name="lucasCoreTables" displayName="Summary Tables">
+					<item name="OutputRunCapacity"/>
+					<item name="OutputCompareCarbon"/>
+					<item name="OutputCompareCapacity"/>
+					<item name="OutputCompareLand"/>
+					<item name="OutputCompareCost"/>
+					<item name="OutputWoodProducts"/>
+					<item name="OutputWoodProductsEndUse"/>
+					<item name="OutputWoodProductsScale"/>
+				</group>
 			</group>
-			<group name="lucasCoreCurves" displayName="Fitted Curves (written by the build)">
-				<item name="MerchantableVolumeCurve"/>
-				<item name="CarbonCurve"/>
-				<item name="InitialStockCurve"/>
-			</group>
-			<group name="lucasCoreResults" displayName="Build Results">
-				<item name="OutputStrataSummary"/>
-				<item name="OutputStudyBoundary"/>
-				<item name="OutputStateClassSummary"/>
-				<item name="OutputStandAge"/>
-				<item name="OutputStandAgeCut"/>
-				<item name="OutputStandAgeMap"/>
-				<item name="OutputStandAgeDistribution"/>
-				<item name="OutputStandAgeFia"/>
-				<item name="OutputForestAreaCheck"/>
-				<item name="OutputForestCover"/>
-				<item name="OutputForestCoverMap"/>
-				<item name="OutputForestStocking"/>
-				<item name="OutputForestStockingMap"/>
-				<item name="OutputLandCoverLayers"/>
-				<item name="OutputSiteClassMap"/>
-				<item name="OutputNlcdAnnual"/>
-				<item name="OutputTransitionSummary"/>
-				<item name="OutputHarvestAge"/>
-				<item name="OutputProjectionRate"/>
-				<item name="OutputLandUseDemand"/>
-				<item name="OutputProjectionSchedule"/>
-				<item name="OutputManagementAction"/>
-				<item name="OutputForestManagement"/>
-				<item name="OutputFuelTreatment"/>
-				<item name="OutputFireSize"/>
-				<item name="OutputFireSlope"/>
-				<item name="OutputSuitability"/>
-				<item name="OutputSuitabilityCurve"/>
-				<item name="OutputSuitabilityMap"/>
-				<item name="OutputPatchSize"/>
-				<item name="OutputClimateSummary"/>
-				<item name="OutputCo2Beta"/>
-				<item name="OutputCo2Series"/>
-				<item name="OutputInitialStockSummary"/>
-				<item name="OutputReturnInterval"/>
-				<item name="OutputSoilTarget"/>
-				<item name="OutputGrowthParameter"/>
-				<item name="OutputCarbonParameter"/>
-				<item name="OutputSiteProductivity"/>
-				<item name="OutputNonForestProductivity"/>
-				<item name="OutputCarbonCapacity"/>
-				<item name="OutputCarbonCapacityType"/>
-				<item name="OutputCarbonCapacityMap"/>
-				<item name="OutputDecayCalibration"/>
-				<item name="OutputCarbonRate"/>
-				<item name="OutputGrowthReport"/>
-				<item name="OutputBuildFigure"/>
+			<group name="lucasCoreRelease" displayName="Data Release">
+				<item name="ReleaseInformationPage"/>
 				<item name="OutputModelRecord"/>
+				<item name="DataReleasePage"/>
 				<item name="OutputDataRelease"/>
 				<item name="OutputReleaseContents"/>
-				<item name="OutputRunFigure"/>
-				<item name="OutputCompareFigure"/>
-				<item name="OutputRunCapacity"/>
-				<item name="OutputCompareCarbon"/>
-				<item name="OutputCompareCapacity"/>
-				<item name="OutputCompareLand"/>
-				<item name="OutputCompareCost"/>
-				<item name="OutputWoodProducts"/>
-				<item name="OutputWoodProductsEndUse"/>
-				<item name="OutputWoodProductsScale"/>
-				<item name="OutputWoodProductsFigure"/>
-				<item name="OutputDataDownload"/>
-				<item name="OutputDataSources"/>
-				<item name="OutputBuildStage"/>
-				<item name="OutputValidation"/>
 			</group>
+			<item name="OutputDataSources"/>
+			<item name="OutputValidation"/>
 		</group>
 	</layout>
 

@@ -34,7 +34,7 @@ namespace lucasCoreUI
         {
             this.SuspendLayout();
             AddGroup(Group("What natural change covers", ProjectionTransitionsView.Stack(
-                Note("Vegetation change that is not land use or fire: reforestation now; insects and drought later."))));
+                Note("Vegetation change that is not land use or fire: reforestation. Drought and insect mortality has a page of its own, Mortality."))));
             var rip = Row(); rip.Controls.Add(Option(m_riparian, 1, "Forest potential")); rip.Controls.Add(Option(m_riparian, 2, "Non-forest potential"));
             AddGroup(Group("Reforestation: the Build's rule (set on the Build scenario)", ManagementActionsView.Lines(
                 ManagementActionsView.Line("Transition:", m_on, Note("Off works in a projection alone; on needs a Build made with it on.")),

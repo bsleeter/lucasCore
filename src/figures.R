@@ -446,7 +446,7 @@ build_figures <- function(I, outdir) {
   # ---- charts: build checks ------------------------------------------------------------------------------------------------------
   if (!is.null(I$validation) && nrow(I$validation)) {
     v <- I$validation[, .(Checks = .N, Failed = sum(Status != "Pass")), by = Stage][order(Stage)]
-    chart_figure("checks", "Build checks", "The validation checks each stage ran on its own outputs; Build Results > Validation lists each with its detail.",
+    chart_figure("checks", "Build checks", "The validation checks each stage ran on its own outputs; LUCAS Core > Validation lists each with its detail.",
       1, 1, h = max(800, 300 + 70 * nrow(v)), draw = function() { par(mar = c(4.5, 14, 3, 1)); o <- rev(seq_len(nrow(v)))
         barplot(rbind(v$Checks - v$Failed, v$Failed)[, o, drop = FALSE], names.arg = v$Stage[o], horiz = TRUE, col = c("#2b8152", "#a81d1a"), border = NA, cex.names = .75, xlab = "Checks")
         ptitle(1, sprintf("%d checks, %d failed", sum(v$Checks), sum(v$Failed)))

@@ -22,6 +22,20 @@ It is for modelers who know SyncroSim's basics (libraries, projects, scenarios, 
 
 **The workflow in one line.** Data Download (stage 15, once per region) → Build (stages 1-8) → Historical run (ST-Sim) → Projection Setup (stages 9-10, with the hand-over from the historical run) → Projections (ST-Sim, as many as needed).
 
+### Where the pages are (from lucasCore 2.0.1)
+
+From lucasCore 2.0.1 a scenario's pages under **LUCAS Core** are in groups, each named for the kind of scenario that uses it and holding its settings first and its results after. The screenshots in this guide were taken before that and show the pages in one list; the pages themselves are the same.
+
+| Group | Settings pages | Inside it |
+| --- | --- | --- |
+| Data Download | Data Download | Download Results |
+| Build | Study Area, Build Options, Stand Age, Forest Cover, Climate Options, Growth Curve Options, Minimum Harvest Age, Natural Change, Mortality | Carbon Assumptions, Crosswalks, Fitted Curves, Build Results |
+| Projection | Run Settings, Transitions, Spatial Allocation, Fire, Fuel Treatments, Forest Management, Management Actions, Projection Climate | Projection Results |
+| Figures and Analysis | Run Figures, Compare Runs, Wood Products | Figures (Build, Run, Compare and Wood Products figures), Summary Tables |
+| Data Release | Release Information, Data Release | Model Record, Data Release results |
+
+**Data Sources Used** and **Validation**, which every stage writes, are at the end of the list. SyncroSim shows the same tree on every scenario, so a Build scenario also lists the Projection pages; it does not read them.
+
 ## 1. Getting started
 
 A lucasCore model lives in a SyncroSim library (`.ssim` file) that uses two packages: ST-Sim, which runs the state-and-transition and carbon simulation, and lucasCore, which builds everything ST-Sim needs from national data. This chapter installs lucasCore and makes the library.
@@ -445,7 +459,7 @@ Dependencies: none. Pipeline: stages 0, 1, 5, 2, 3, 4, 6, 7, 8.
 The study area is one or more named units, of one kind or of several (section 3.2.1), or a boundary file of your own (section 3.2.2). The kinds of unit are states, counties, HUCs, EPA ecoregions, pyromes, ecodivisions, federal lands, GAP status, National Park Service units, FWS refuges, DoD installations, national forests, wilderness areas, tribal lands, BLM National Conservation Lands or metropolitan areas. All of CONUS is the default.
 
 1. Choose the **LUCAS Core (model builder)** tab.
-2. Choose **LUCAS Core > Study Area**.
+2. Choose **LUCAS Core > Build > Study Area**.
 3. In **Define the study area by**, pick the kind of unit from the drop-down: **Pyromes**.
 4. Type or pick the unit in the box below, here **P26 Northern Sierra Nevada**.
 5. Click **Add**. The unit appears in the list (outlined), and the line at the bottom of the page reads "Study area: 1 unit". Add more units to build a larger area; **Remove** takes the selected one out. To add units of another kind, pick that kind in the drop-down: the units already chosen stay. Picking All of CONUS clears the list, after asking.
@@ -539,7 +553,7 @@ The two methods turn the same 30 m Annual NLCD into the model grid in different 
 
 #### 3.3.2 Stand age
 
-**LUCAS Core > Stand Age** sets three things about the starting stand ages that stage 5 maps from the Stand Age Source (NASA CMS 1990 or TreeMap 2016, both at 30 m, moved to the start year).
+**LUCAS Core > Build > Stand Age** sets three things about the starting stand ages that stage 5 maps from the Stand Age Source (NASA CMS 1990 or TreeMap 2016, both at 30 m, moved to the start year).
 
 **A cell's stand age.** A model cell holds many 30 m pixels. By default the cell takes the age of **the pixel at its centre**, so the landscape keeps the young and old stands the age map has; a cell whose centre pixel has no age takes the mean of its pixels that do. **Mean of the cell's pixels** was the rule until lucasCore 1.6.0. It is smoother from cell to cell but pulls every cell toward the middle: in the Yellowstone test area at 300 m it leaves almost no cell over 200 years, where 6% of the age map's pixels are. Since carbon does not rise in a straight line with age, a landscape of cell means does not hold the carbon of the stands it came from.
 
@@ -568,7 +582,7 @@ A cut stand is then still raised to its minimum harvest age at its cut where the
 
 #### 3.3.3 Forest cover
 
-**LUCAS Core > Forest Cover** sets what starts as forest. Every class comes from the annual NLCD of the start year; this page decides what else is forest.
+**LUCAS Core > Build > Forest Cover** sets what starts as forest. Every class comes from the annual NLCD of the start year; this page decides what else is forest.
 
 **Annual NLCD** (the default). A natural cell is forest when NLCD maps it as forest in the start year or in any later year; cells that NLCD shows becoming forest later are then given their own start (regrowing, disturbed, or reforesting later; section 3.5). Annual NLCD maps much open western forest as shrub or grass. In 2016 it has 44% of Yellowstone's land and 66% of the Northern Sierra Nevada pyrome's as forest or woody wetland, where the forest inventory (FIA) has 83% and 85%.
 
@@ -870,7 +884,7 @@ The line is shipped with the package, one per ecodivision, set so the area flagg
 
 **Data.** The study area needs USFS Tree Canopy Cover, LCMS, Annual NLCD and the USFS forest type groups for 1985 on. Tick them on the Data Download page (section 1.6.4). A Build in the West stops and says which is missing.
 
-**The Mortality page.** In the scenario, beside Natural Change. Leave it blank for the defaults.
+**The Mortality page.** Under LUCAS Core > Build, after Natural Change (from lucasCore 2.0.1; in 2.0.0 it was a plain grid in the Projection group). The page explains each setting and lists the line shipped for every ecodivision. Leave it blank for the defaults.
 
 | Setting | What it does | Blank means |
 | --- | --- | --- |
@@ -959,7 +973,7 @@ The finished run adds a result scenario under the Build in the Explorer, here **
 
 *Figure 4.6. The result scenario (8) under the Build's Results folder. Its Summary page keeps the Build's description, and Run Log (9) opens the log again at any time.*
 
-**Validation.** Every check a stage runs goes to the result's **LUCAS Core > Build Results > Validation** page, one row per check with its stage, status and detail. The P26 Build ran 74 checks and all passed. A failed check says what went wrong in its detail; the same line is in the run log.
+**Validation.** Every check a stage runs goes to the result's **LUCAS Core > Validation** page, one row per check with its stage, status and detail. The P26 Build ran 74 checks and all passed. A failed check says what went wrong in its detail; the same line is in the run log.
 
 ![The result's LUCAS Core tab with Build Results > Validation marked 10, and the Validation table of Stage, Check, Status and Detail, its Status column marked 11, every row Pass](images/fig-4.7.png)
 
@@ -998,7 +1012,7 @@ The note at the bottom (17) explains how the columns combine. The page only read
 
 *Figure 4.10. Minimum Harvest Ages of the P26 Build: the minimum each forest type and harvest got, and where it came from.*
 
-**Data Sources Used.** **Build Results > Data Sources Used** lists, for each stage, every dataset it read: the stage, the Data Sources column, where it came from (the top of the home, a region folder such as `regions/Pyrome-P26-Northern-Sierra-Nevada`, or a set path), the path, the number of files and their size. A dataset from the home also gets its SHA-256 checksum, taken from the home's `files.csv`; a folder gets one checksum over all its files. Because the home is write-once, these checksums record exactly which data a Build was made from, for a data release or a later check. A Note says when a home dataset's files no longer match `files.csv`, which means a file was changed by hand.
+**Data Sources Used.** **LUCAS Core > Data Sources Used** lists, for each stage, every dataset it read: the stage, the Data Sources column, where it came from (the top of the home, a region folder such as `regions/Pyrome-P26-Northern-Sierra-Nevada`, or a set path), the path, the number of files and their size. A dataset from the home also gets its SHA-256 checksum, taken from the home's `files.csv`; a folder gets one checksum over all its files. Because the home is write-once, these checksums record exactly which data a Build was made from, for a data release or a later check. A Note says when a home dataset's files no longer match `files.csv`, which means a file was changed by hand.
 
 ### 4.5 Build Figures: maps and charts of the Build
 
@@ -1052,7 +1066,7 @@ A Build whose pipeline does not include stage 12, such as this P26 Build, draws 
 
 *Figure 4.17. The finished Build Figures run in the Run Monitor. For P26 it took a minute and a half. The warning icon is the package-version note every run shows.*
 
-**Where the figures are.** Double-click the result scenario and open **LUCAS Core > Build Results > Build Figures (PNG)**. The page is a figure viewer: pick a figure from its drop-down or step through them, with each caption below (section 8.1). The files are in the library's data folder, under `<library>.ssim.data\Scenario-<result id>\lucasCore_OutputBuildFigure`.
+**Where the figures are.** Double-click the result scenario and open **LUCAS Core > Figures and Analysis > Figures > Build Figures (PNG)**. The page is a figure viewer: pick a figure from its drop-down or step through them, with each caption below (section 8.1). The files are in the library's data folder, under `<library>.ssim.data\Scenario-<result id>\lucasCore_OutputBuildFigure`.
 
 **Export them all to a folder.**
 
@@ -1094,9 +1108,9 @@ A Build that is run again does not repeat the stages that would give the same re
 
 **What it costs.** A copied stage takes well under a minute: it checks its inputs in the library file and writes its tables. Stages 0, 1 and 5 of a Great Dismal Swamp Build at 150 m took 16 minutes the first time and 2 minutes when run again with nothing changed.
 
-**Seeing what happened.** **LUCAS Core > Build Results > Build Stages** lists each stage of the result as **Ran** or **Reused from result N**, with its minutes. In the run log a copied stage says "not run again" and names the result it came from, then repeats its log lines from that run. A stage that ran says what changed, for example "5 Initial Conditions runs: since result 43, lucasCore\_StandAgeFia changed".
+**Seeing what happened.** **LUCAS Core > Build > Build Results > Build Stages** lists each stage of the result as **Ran** or **Reused from result N**, with its minutes. In the run log a copied stage says "not run again" and names the result it came from, then repeats its log lines from that run. A stage that ran says what changed, for example "5 Initial Conditions runs: since result 43, lucasCore\_StandAgeFia changed".
 
-**Turning it off.** On the Build scenario open **LUCAS Core > Build Options** and tick **Rebuild every stage**, at the top of the page. Every stage then runs, and no earlier result is looked at. Untick it afterwards.
+**Turning it off.** On the Build scenario open **LUCAS Core > Build > Build Options** and tick **Rebuild every stage**, at the top of the page. Every stage then runs, and no earlier result is looked at. Untick it afterwards.
 
 **What a stage does not notice.** Tick Rebuild every stage for one run after any of these:
 
@@ -1357,7 +1371,7 @@ Two stand age figures (added after lucasCore 1.6.0) follow the disturbance figur
 
 4. On the **LUCAS Core (model builder)** tab, open **Run Figures** (33) and pick the run from the **Run to draw** drop-down (34). It lists this project's historical runs and projections, newest first, with their result Ids. For the historical run figures, pick `[54] P26 - Historical`. Figure 5.14 shows the same page in the projection's Run Figures scenario (section 7.2), drawing result `[13]`. Leave it at **(the newest run)** to draw the newest run in the library.
 5. Save the library and run the scenario. It takes about a minute for P26.
-6. Open the result: the figures are under **LUCAS Core > Build Results > Run Figures (PNG)**, in the figure viewer (section 8.1). The files are in the library's data folder, under `<library>.ssim.data\Scenario-<result id>\lucasCore_OutputRunFigure`.
+6. Open the result: the figures are under **LUCAS Core > Figures and Analysis > Figures > Run Figures (PNG)**, in the figure viewer (section 8.1). The files are in the library's data folder, under `<library>.ssim.data\Scenario-<result id>\lucasCore_OutputRunFigure`.
 
 ![The Explorer with \[14\] Projection Run Figures selected in the Figures folder, marked 30; the LUCAS Core (model builder) tab with Run Figures marked 33; the Run to draw drop-down set to \[65\] P26 - Projection No Climate, marked 34, with a note below it](images/fig-5.14.png)
 
@@ -1537,7 +1551,7 @@ The warning triangle on the result is SyncroSim's note that the lucasCore packag
 
 *Figure 6.7. The end of the Projection Setup's run log.*
 
-**Checking the result.** Open the result scenario and the **LUCAS Core > Build Results** pages it wrote:
+**Checking the result.** Open the result scenario and the **LUCAS Core > Build > Build Results** pages it wrote:
 
 - **Suitability Summary** (27): for each surface, the events and controls it was fitted on, the deviance explained, and the out-of-sample test: the surface is fitted on 1986-2012, mapped from 2012, and scored on the change of 2013-2023 (28). AUC is the chance that a cell that changed scores higher than one that did not (0.5 = random); the top 1% and top 10% shares say how much of the test change fell on the most suitable land.
 
@@ -1881,7 +1895,7 @@ The historical run does not need a line. Stage 14 finds the historical run each 
 
 6. Save the library and run the scenario. For P26 it takes about a minute.
 
-The figures are under **LUCAS Core > Build Results > Compare Figures (PNG)**, in the figure viewer (section 8.1). The two summary tables are also outputs, one row per run:
+The figures are under **LUCAS Core > Figures and Analysis > Figures > Compare Figures (PNG)**, in the figure viewer (section 8.1). The two summary tables are also outputs, one row per run:
 
 - **Compare Carbon Summary**: carbon at the start and end of the run, its change and its difference from the baseline; the change in live biomass and in dead wood, litter and soil; and mean annual NPP, NEP, losses to land-use and land-cover change (fire emissions and harvest) and NBP.
 - **Compare Land Change Summary**: the area burned, harvested and urbanized, and the change in forest and developed area.
@@ -1940,7 +1954,7 @@ Set it up like Run Figures (section 5.6), one scenario per run:
    - **Spin-up**: on by default; off starts the products stock at zero when the run starts.
    - **A different wood products future** (version 1.5.1): optional parameters that change how wood is used from a start year on, described below. Leave every box blank to run the published tables as they are.
 5. Save the library and run the scenario. Each P26 projection takes under a minute.
-6. Open the result. Under **LUCAS Core > Build Results** it holds **Wood Products** (pools and flows by year, the mean and the interval, per iteration and over all; blank Iteration = all), **Wood Products by End Use**, **Wood Products Spin-up** (the scaling of the harvest history) and **Wood Products Figures (PNG)**. **Export > LUCAS Core > Wood Products Figures** saves the figures to a folder.
+6. Open the result. Under **LUCAS Core > Figures and Analysis** it holds **Wood Products** (pools and flows by year, the mean and the interval, per iteration and over all; blank Iteration = all), **Wood Products by End Use**, **Wood Products Spin-up** (the scaling of the harvest history) and **Wood Products Figures (PNG)**. **Export > LUCAS Core > Wood Products Figures** saves the figures to a folder.
 
 The variables of the Wood Products sheet, all in Mg C (flows in Mg C per year):
 
@@ -2203,7 +2217,7 @@ Each stage also saves summary tables in its result, under **Build Results**: App
 
 ## Appendix A. Summary outputs by stage
 
-Besides the inputs they write for ST-Sim, the lucasCore stages save summary tables in their result scenario. Open a result, then **LUCAS Core (model builder) > Build Results**: each sheet below is listed there when the result has rows for it. They are ordinary SyncroSim tables, so a sheet can be copied into a spreadsheet (select its rows, Ctrl+C) or read with rsyncrosim (`datasheet(result, "lucasCore_<name>")`, with the name in the second column).
+Besides the inputs they write for ST-Sim, the lucasCore stages save summary tables in their result scenario. Open a result, then **LUCAS Core (model builder) > Build > Build Results**: each sheet below is listed there when the result has rows for it. They are ordinary SyncroSim tables, so a sheet can be copied into a spreadsheet (select its rows, Ctrl+C) or read with rsyncrosim (`datasheet(result, "lucasCore_<name>")`, with the name in the second column).
 
 **The Build** (stages 1 to 8):
 
@@ -2361,7 +2375,7 @@ The release status decides what a blank does:
 
 Start with a Draft. Run with a new empty folder each time.
 
-The result's **Build Results > Data Release** lists the folder, the runs, the files and their size, what mp found, and what is still a placeholder or drafted. **Release Contents** lists every file.
+The result's **Data Release > Data Release** lists the folder, the runs, the files and their size, what mp found, and what is still a placeholder or drafted. **Release Contents** lists every file.
 
 ![The Data Release output of result 19: the release folder greyed out here, historical run, 76 files, 4.806 GB, 3 records with 0 errors and 0 warnings, and the placeholders still to supply](images/fig-B.7.png)
 
@@ -2431,7 +2445,7 @@ The title, abstract and purpose on the Release Information page do not reach thi
 3. On **General > Pipeline**, untick **Inherit values** if it is ticked, choose **No Data**, and add one stage: **16 - Model Record**.
 4. On **Release Information**, pick the originators and point of contact (sections B.2 and B.3). Left blank, the record names no one and lists them as still to supply.
 5. Run the scenario. It takes about a minute.
-6. Open the result's **Build Results > Model Record**. It lists the record, what mp found, what is still a placeholder or drafted, and anything the record had to infer. **Export > LUCAS Core > Model Record** saves the XML to a folder.
+6. Open the result's **Data Release > Model Record**. It lists the record, what mp found, what is still a placeholder or drafted, and anything the record had to infer. **Export > LUCAS Core > Model Record** saves the XML to a folder.
 
 The Model Record output has one row:
 

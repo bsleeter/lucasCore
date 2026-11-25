@@ -2,6 +2,29 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## 2.0.1 - 2026-11-24
+
+A patch: pages only. No library update is needed; a library on 2.0.0 opens as it is.
+
+### Changed
+
+- **Scenario pages grouped by the scenario that reads them, each group with its settings and then its results.** Under LUCAS
+  Core, in this order: **Data Download** (the page and Download Results); **Build** (Study Area, Build Options, Stand Age,
+  Forest Cover, Climate Options, Growth Curve Options, Minimum Harvest Age, Natural Change, Mortality, then Carbon
+  Assumptions, Crosswalks, Fitted Curves and Build Results inside it); **Projection** (Run Settings, Transitions, Spatial
+  Allocation, Fire, Fuel Treatments, Forest Management, Management Actions, Projection Climate, then Projection Results);
+  **Figures and Analysis** (Run Figures, Compare Runs, Wood Products, then **Figures** with the Build, Run, Compare and Wood
+  Products figures together, and **Summary Tables**); **Data Release** (Release Information, Model Record, Data Release and
+  its results). Data Sources Used and Validation, which every stage writes, close the list. Natural Change and Mortality,
+  which the Build reads, moved out of Projection to sit after Minimum Harvest Age; Build Results now holds the Build's own
+  tables only, where it held every stage's. SyncroSim shows the same tree on every scenario, so a group's name says which
+  scenario its pages belong to.
+
+- **Mortality has a page of its own** in place of the standard grid: what the event is and where it applies, the event on or
+  off, the two ways of placing it on the grid with what each means for a run, the canopy-loss lines with a table of the line
+  shipped for each ecodivision and the boxes that replace them, the minimum stand age, and the data the Build needs.
+  `ui/MortalityView.cs`.
+
 ## 2.0.0 - 2026-11-24
 
 A major version number for a reason of arithmetic, not of scale: SyncroSim records a library's schema as major.minor read as

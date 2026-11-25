@@ -258,7 +258,7 @@ namespace lucasCoreUI
             m_ceiling.Enabled = m_reference.Enabled = m_adjust.Enabled = co2 != 1;
             m_defaults.Enabled = co2 != 1 && CanEdit;
             m_co2note.Text = co2 == 1 ? "CO2 fertilization is off: the projection's growth does not respond to CO2."
-                           : (m_loaded.Length > 0 ? m_loaded + " " : "") + "Stage 11 writes the betas it used to Build Results > CO2 Fertilization Betas.";
+                           : (m_loaded.Length > 0 ? m_loaded + " " : "") + "Stage 11 writes the betas it used to Projection Results > CO2 Fertilization Betas.";
             m_rescan.Enabled = !(this.Scenario != null && this.Scenario.IsResult) && this.ShouldEnableView();
 
             if (model == null) m_runs.Text = m_models.Count == 0 ? "No LOCA2 runs are listed in this library (Climate Models is empty)." : "";
