@@ -18,6 +18,7 @@ source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.
 source(pkg_file("src", "climate.R"))
 source(pkg_file("src", "loca2.R"))
 source(pkg_file("src", "co2.R"))
+source(pkg_file("src", "mortality.R"))
 suppressPackageStartupMessages({ library(terra) })
 STAGE <- "11 Projection Climate"
 progressBar(type = "begin", totalSteps = 6)
@@ -33,6 +34,18 @@ pc <- as.data.table(datasheet(scn, ds("ProjectionClimate"), optional = TRUE, loo
 gv <- function(k) if (nrow(pc) && k %in% names(pc)) pc[[k]][1] else NA
 sc_name <- gv("ClimateScenarioId"); gcm <- gv("ClimateModelId"); rep_name <- gv("ClimateReplicateId"); last <- gv("EndYear")
 co2_choice <- co2_series_name(gv("Co2Series"))
+# drought and insect mortality: the two settings of the Mortality and Climate page (src/mortality.R; blank = neither)
+mk <- tryCatch(mortality_climate_options(tryCatch(read_ds("MortalityClimate"), error = function(e) data.table())), error = function(e) fail("%s", conditionMessage(e)))
+# a Projection Setup among the dependencies whose Mortality page hands the timing and amount to this result: its drawn blocks (the
+# schedule), its rates by year (the lookup) and the units they are for
+dep_find <- function(sheet, keep) { L <- ssimLibrary(main_library()); for (id in run_dependencies()) { z <- as.data.table(datasheet(rsyncrosim::scenario(L, id), sheet, optional = TRUE, lookupsAsFactors = FALSE))
+  if (nrow(z)) { z <- keep(z); if (nrow(z)) return(z) } }; NULL }
+ms <- list(dv = dep_find("stsim_DistributionValue", function(z) z[!is.na(DistributionTypeId) & DistributionTypeId == MORT_RATE_ALL]))
+if (!is.null(ms$dv)) { ms$sch <- dep_find(ds("OutputProjectionSchedule"), function(z) z[SamplingSet == MORT_SET])
+  ms$tmv <- dep_find("stsim_TransitionMultiplierValue", function(z) z[TransitionGroupId == MORT_GROUP & !is.na(StateClassId) & !is.na(DistributionType)]) }
+linked <- !is.null(ms$dv) && !is.null(ms$sch) && !is.null(ms$tmv)
+if (mk$on && !linked) fail(paste("Mortality and Climate: a timing strength or an increase in dry periods needs a Projection Setup result among this scenario's dependencies, below the Build result,",
+  "whose Mortality page has Timing and Amount set to 'From the Projection Climate result' (it holds the drawn blocks and the rates by year). Add it, or clear the two settings"))
 if (is.na(sc_name)) fail("Climate: choose a Scenario (SSP)")
 if (is.na(last)) last <- 2100L
 if (last <= y1 || last > 2100) fail("Climate: Last Year must be after the Build's historical end year (%d) and at most 2100", y1)
@@ -40,9 +53,9 @@ sl <- as.data.table(datasheet(prj, ds("ClimateScenario"), optional = TRUE, looku
 if (!nrow(s)) fail("Climate: scenario '%s' is not in the project's Climate Scenarios list", sc_name)
 years <- (y1 + 1):last
 if (!nrow(fm)) say("Every climate effect is None in the Build's Climate Options: no climate multipliers, CO2 only")
-if (!nrow(fm) && co2_choice == "None") { say("CO2 fertilization is None too: nothing to write"); finish_checks(); progressBar(type = "end"); quit(save = "no") }
+if (!nrow(fm) && co2_choice == "None" && !linked) { say("CO2 fertilization is None too: nothing to write"); finish_checks(); progressBar(type = "end"); quit(save = "no") }
 out <- list(rows = data.table(), summ = data.table())
-if (nrow(fm)) {
+if (nrow(fm) || mk$on) {
   if (is.na(gcm)) fail("Climate: choose a Climate Model")
   src <- read_data_sources(c("Loca2Folder"))
   members <- basename(list.dirs(file.path(src$Loca2Folder, gcm), recursive = FALSE))
@@ -58,7 +71,7 @@ if (nrow(fm)) {
   } else member <- rep_name
   label <- sprintf("LOCA2 %s %s %s", gcm, member, sc_name)
   say("Projection climate: %s, %d-%d (the Build's historical end is %d)", label, y1 + 1, last, y1)
-  prm <- climate_params(fm, P, STAGE, ic$StateClassFileName[1])
+  if (nrow(fm)) prm <- climate_params(fm, P, STAGE, ic$StateClassFileName[1])
   if (any(vapply(.checks, function(x) x$Status != "Pass", TRUE))) finish_checks()
 }
 progressBar()
@@ -133,6 +146,49 @@ if (co2_choice == "None") say("CO2 fertilization: None (growth does not respond 
 }
 progressBar()
 
+# ---- drought and insect mortality: the setup's draws placed and scaled by this run's dry periods (src/mortality.R) -----------
+# A Projection Setup whose Mortality page hands the timing and amount to this result drew the blocks of historical years and wrote the
+# rates as a lookup by the drawn year, with no values for the lookup's two variables. Here they are written to the External Variables
+# sheet: the setup's blocks placed in time by the dryness of this run (timing strength) and a percentage on the rate of each year by
+# the depth of its dry period (increase in dry periods); with both settings blank, the blocks as drawn and 100.
+mcl <- NULL
+if (linked) {
+  mpo <- dep_find(ds("MortalityProjection"), function(z) z); blk <- mortality_projection_options(if (is.null(mpo)) data.table() else mpo)$block
+  drm <- ms$sch[, .(Iteration = as.integer(Iteration), Timestep = as.integer(Timestep), HistoricalYear = as.integer(HistoricalYear))]; setorder(drm, Iteration, Timestep); pyr <- sort(unique(drm$Timestep))
+  sev <- setNames(as.numeric(ms$dv$Value), as.integer(ms$dv$ExternalVariableMin))
+  if (!all(drm$HistoricalYear %in% as.integer(names(sev)))) fail("Mortality and Climate: the setup's drawn years are not all in its rates by year; run the Projection Setup again")
+  mult <- setNames(rep(1, length(pyr)), pyr); placed <- copy(drm); msum <- NULL
+  if (!mk$on) say("Mortality and Climate: no timing strength and no increase in dry periods: the Projection Setup's blocks as it drew them (%d iterations, %d-%d)", uniqueN(drm$Iteration), min(pyr), max(pyr)) else {
+    if (max(pyr) > last) fail("Mortality and Climate: the Projection Setup runs to %d and this Climate page's Last Year is %d; the last year must reach the setup's", max(pyr), last)
+    # the forest open to the event: the cells of the setup's units (ecodivision and softwood class) in the Build's state class map
+    scl <- stsim_list("StateClass"); stl2 <- stsim_list("Stratum"); sid <- function(l, n) as.integer(l[[intersect(c("Id", "ID"), names(l))[1]]][match(n, l$Name)])
+    un <- unique(ms$tmv[, .(StratumId, StateClassId)]); vS <- values(rast(ic$StateClassFileName[1]), mat = FALSE); vP <- values(P, mat = FALSE)
+    el <- which((vP * 1e5 + vS) %in% (sid(stl2, un$StratumId) * 1e5 + sid(scl, un$StateClassId)))
+    if (!length(el)) fail("Mortality and Climate: no cell of the Build's state class map is in a class the setup's mortality rates name")
+    ll <- project(xyFromCell(P, el), crs(P), "EPSG:4326")
+    t0 <- Sys.time(); mm <- tryCatch(loca2_monthly_mean(src$Loca2Folder, gcm, member, s$Code, MORTK$first:max(pyr), ll), error = function(e) fail("Mortality and Climate: %s", conditionMessage(e)))
+    def <- mortality_deficit(mm$y, mm$m, mm$P, mm$TX, mm$TN, mean(ll[, 2])); dry <- tryCatch(mortality_dryness(def), error = function(e) fail("%s", conditionMessage(e)))
+    ry <- max(min(MORTK$norm), min(as.integer(names(dry)))):y1; dep <- tryCatch(mortality_depth(dry, ry), error = function(e) fail("%s", conditionMessage(e)))
+    dp <- dep[as.character(pyr)]; dr <- dry[as.character(pyr)]; mult <- mortality_amount(dp, mk$amount)
+    placed <- mortality_place(drm, sev, dr, blk, mk$timing, 20261125L)
+    say("Mortality and Climate: %s monthly over %d cells of forest open to the event, read in %.1f min; water deficit %.0f mm a year in %d-%d, %.0f mm in the last ten projection years", label, length(el),
+        as.numeric(Sys.time() - t0, units = "mins"), mean(def[as.character(intersect(MORTK$norm, as.integer(names(def))))]), min(MORTK$norm), max(MORTK$norm), mean(def[as.character(tail(pyr, 10))]))
+    say("  dryness (the %d-year deficit against the %d years around each year): %.0f%% of the projection years are in a dry period; the deepest of %d-%d is %.2f SD and of the projection %.2f SD (depth %.2f, held at %g)",
+        MORTK$window, MORTK$baseline, 100 * mean(dr > 0), min(ry), max(ry), attr(dep, "deepest"), max(dr), max(dp), MORTK$depth_cap)
+    third <- function(d, m) { th <- quantile(dr, c(1, 2) / 3); r <- d[, .(r = mean(sev[as.character(HistoricalYear)])), by = Timestep][order(Timestep), r] * m; mean(r[dr > th[2]]) / mean(r[dr <= th[1]]) }
+    r0 <- mean(sev[as.character(drm$HistoricalYear)]); r1 <- mean(sev[as.character(placed$HistoricalYear)] * mult[as.character(placed$Timestep)])
+    say("  timing strength %.2f (blocks of %d years, %d iterations): the driest third of the projection years has %.2f times the rate of the wettest third (%.2f as the setup drew them)", mk$timing, blk, uniqueN(drm$Iteration),
+        third(placed, mult), third(drm, 1))
+    say("  increase in dry periods %.0f%%: the rate of a year is multiplied by 1 to %.2f (mean %.3f); the mean rate over all iterations and years goes from %.3f%% to %.3f%% (%+.1f%%)", 100 * mk$amount, max(mult), mean(mult), 100 * r0, 100 * r1, 100 * (r1 / r0 - 1))
+    msum <- data.table(Timestep = pyr, WaterDeficit = round(def[as.character(pyr)], 1), Dryness = round(dr, 3), Depth = round(dp, 3), Multiplier = round(mult, 3),
+      SetupRate = round(100 * drm[, mean(sev[as.character(HistoricalYear)]), keyby = Timestep]$V1, 4), Rate = round(100 * placed[, mean(sev[as.character(HistoricalYear)]), keyby = Timestep]$V1 * mult, 4)) }
+  rows <- mortality_climate_rows(placed, mult); cnt <- function(d) d[, .N, keyby = .(Iteration, HistoricalYear)]
+  check(STAGE, "mortality: each iteration keeps the years the setup drew, the same number of times", isTRUE(all.equal(cnt(placed), cnt(drm), check.attributes = FALSE)))
+  check(STAGE, "mortality: a drawn year and a percentage within the lookup's range for every iteration and projection year", nrow(rows) == 2L * nrow(drm) && all(rows[ExternalVariableTypeId == MORT_EV_PCT, ExternalVariableValue] %in% MORT_PCTS))
+  if (mk$timing <= 0) check(STAGE, "mortality: with no timing strength the years are where the setup drew them", identical(placed$HistoricalYear, drm$HistoricalYear))
+  mcl <- list(rows = rows, summ = msum)
+}
+
 # ---- outputs: the projection years only (the Build's summary rows are not carried into this result) ------------------------
 if (nrow(out$rows) && "Climate" %in% stsim_list("FlowMultiplierType")$Name) out$rows[, FlowMultiplierTypeId := "Climate"]
 # this scenario's rows hide the Build's, so the Build's Site Productivity and Grass and Shrub Productivity multipliers (stage 8) come along
@@ -144,6 +200,8 @@ if (!is.null(spm)) { out$rows <- rbind(out$rows, spm[, intersect(names(spm), c("
   say("%s: the Build's flow multiplier carried over (%s)", paste(unique(spm$FlowMultiplierTypeId), collapse = " and "), paste(unique(spm$FlowGroupId), collapse = ", ")) }
 if (nrow(out$rows)) write_stsim(out$rows, "FlowSpatialMultiplier")
 if (nrow(out$summ)) write_ds(out$summ[, .(Timestep, FlowGroup, Model, Climate, Mean = round(Mean, 4), Min, Max)], "OutputClimateSummary")
+if (!is.null(mcl)) { saveDatasheet(scn, as.data.frame(int_cols(mcl$rows)), "core_ExternalVariableValue"); if (!is.null(mcl$summ)) write_ds(mcl$summ, "OutputMortalityClimate")
+  say("Mortality and Climate: %d External Variables rows written (the drawn year and the percentage on the rate, by iteration and year), for projections from that Projection Setup", nrow(mcl$rows)) }
 if (!is.null(co2)) {
   # the Build's flow multipliers (stage 3: every carbon rate) come along, or this result's CO2 rows would hide them
   bfm <- dependency_rows("stsim_FlowMultiplier")

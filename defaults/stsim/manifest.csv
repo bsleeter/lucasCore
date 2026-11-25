@@ -15,6 +15,7 @@ Order,Datasheet,Scope,Note
 15,stsim_TransitionAttributeType,Project,management costs (to-do 58; tools/make_management.R)
 16,core_DistributionType,Project,
 17,core_ExternalVariableType,Project,
+17,stsim_TransitionMultiplierType,Project,drought and insect mortality's second multiplier (2.0.3; src/mortality.R)
 18,stsim_StockType,Project,
 19,stsim_StockGroup,Project,
 20,stsim_FlowType,Project,

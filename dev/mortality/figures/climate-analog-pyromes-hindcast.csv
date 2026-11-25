@@ -1,0 +1,91 @@
+Index,Years,Width,Analogs,Skill,MedianRankCor,UnitsBetter
+precipitation,3,0.25,own unit,-0.0936234337733157,-0.387096774193548,9
+precipitation,3,0.25,all units,-0.074388994899969,-0.569648093841642,7
+precipitation,3,0.5,own unit,-0.0156934929113308,-0.56708211143695,11
+precipitation,3,0.5,all units,-0.0735104000445228,-0.714809384164223,6
+precipitation,3,1,own unit,0.00537829819598978,-0.704912023460411,11
+precipitation,3,1,all units,-0.0720202916657204,-0.79692082111437,4
+precipitation,5,0.25,own unit,0.0349531914699842,-0.203812316715543,18
+precipitation,5,0.25,all units,-0.0272134857433366,-0.44024926686217,13
+precipitation,5,0.5,own unit,0.0507484188476108,-0.515395894428153,18
+precipitation,5,0.5,all units,-0.0495509031807011,-0.673387096774194,12
+precipitation,5,1,own unit,0.0217073571829829,-0.722873900293255,17
+precipitation,5,1,all units,-0.0664671308371003,-0.805718475073314,5
+precipitation,7,0.25,own unit,0.0406394560270371,-0.290689149560117,16
+precipitation,7,0.25,all units,-0.0158016630864022,-0.431818181818182,15
+precipitation,7,0.5,own unit,0.0638377993528752,-0.633431085043988,17
+precipitation,7,0.5,all units,-0.0401417518886567,-0.665689149560117,13
+precipitation,7,1,own unit,0.0267921848364823,-0.773460410557185,19
+precipitation,7,1,all units,-0.0635954898944486,-0.816715542521994,5
+precipitation less demand (Thornthwaite),3,0.25,own unit,-0.0402180835672548,-0.257697947214076,10
+precipitation less demand (Thornthwaite),3,0.25,all units,-0.0109708514937059,-0.310117302052786,13
+precipitation less demand (Thornthwaite),3,0.5,own unit,0.00878574103152108,-0.526392961876833,18
+precipitation less demand (Thornthwaite),3,0.5,all units,-0.0277934403025795,-0.539222873900293,14
+precipitation less demand (Thornthwaite),3,1,own unit,0.0216227412241388,-0.661290322580645,16
+precipitation less demand (Thornthwaite),3,1,all units,-0.0527987593641994,-0.748900293255132,6
+precipitation less demand (Thornthwaite),5,0.25,own unit,0.0855304413017581,-0.100073313782991,21
+precipitation less demand (Thornthwaite),5,0.25,all units,0.0408400437438357,-0.164222873900293,17
+precipitation less demand (Thornthwaite),5,0.5,own unit,0.0846097095221059,-0.420821114369501,21
+precipitation less demand (Thornthwaite),5,0.5,all units,0.00235762032656195,-0.455645161290323,18
+precipitation less demand (Thornthwaite),5,1,own unit,0.0398956057529584,-0.663123167155425,20
+precipitation less demand (Thornthwaite),5,1,all units,-0.0460954651474475,-0.784824046920821,6
+precipitation less demand (Thornthwaite),7,0.25,own unit,0.124802925468499,-0.176319648093842,21
+precipitation less demand (Thornthwaite),7,0.25,all units,0.0708030957904896,-0.209677419354839,21
+precipitation less demand (Thornthwaite),7,0.5,own unit,0.105532030799983,-0.489736070381232,18
+precipitation less demand (Thornthwaite),7,0.5,all units,0.00952522053871829,-0.534090909090909,18
+precipitation less demand (Thornthwaite),7,1,own unit,0.0465657891993194,-0.75366568914956,21
+precipitation less demand (Thornthwaite),7,1,all units,-0.0456465425668631,-0.793621700879766,6
+precipitation less demand (Hargreaves),3,0.25,own unit,-0.0843835232584045,-0.374266862170088,9
+precipitation less demand (Hargreaves),3,0.25,all units,-0.0606536253515684,-0.476906158357771,8
+precipitation less demand (Hargreaves),3,0.5,own unit,-0.022816191252186,-0.620601173020528,15
+precipitation less demand (Hargreaves),3,0.5,all units,-0.0626526167279435,-0.674853372434018,7
+precipitation less demand (Hargreaves),3,1,own unit,0.00343917228611035,-0.686217008797654,14
+precipitation less demand (Hargreaves),3,1,all units,-0.0677088000329544,-0.789222873900293,4
+precipitation less demand (Hargreaves),5,0.25,own unit,0.0302396259432907,-0.243035190615836,19
+precipitation less demand (Hargreaves),5,0.25,all units,-0.00999301540533759,-0.37866568914956,12
+precipitation less demand (Hargreaves),5,0.5,own unit,0.0459557869441292,-0.480938416422287,19
+precipitation less demand (Hargreaves),5,0.5,all units,-0.0364597346009947,-0.631964809384164,13
+precipitation less demand (Hargreaves),5,1,own unit,0.0200575888918788,-0.718108504398827,17
+precipitation less demand (Hargreaves),5,1,all units,-0.0616265962274749,-0.810117302052786,5
+precipitation less demand (Hargreaves),7,0.25,own unit,0.0575241658866288,-0.350073313782991,16
+precipitation less demand (Hargreaves),7,0.25,all units,0.00766495758261088,-0.364736070381232,14
+precipitation less demand (Hargreaves),7,0.5,own unit,0.0631374907963979,-0.643328445747801,19
+precipitation less demand (Hargreaves),7,0.5,all units,-0.0290108234739859,-0.639662756598241,13
+precipitation less demand (Hargreaves),7,1,own unit,0.0252816340027576,-0.773093841642229,20
+precipitation less demand (Hargreaves),7,1,all units,-0.0602053116988688,-0.813782991202346,5
+"water deficit (Hargreaves, soil store)",3,0.25,own unit,0.018033753167945,-0.23533724340176,18
+"water deficit (Hargreaves, soil store)",3,0.25,all units,-0.0145166399978991,-0.330645161290323,18
+"water deficit (Hargreaves, soil store)",3,0.5,own unit,0.0404838852696904,-0.328079178885631,19
+"water deficit (Hargreaves, soil store)",3,0.5,all units,-0.0268283956111104,-0.527859237536657,17
+"water deficit (Hargreaves, soil store)",3,1,own unit,0.0270690435648095,-0.640395894428153,19
+"water deficit (Hargreaves, soil store)",3,1,all units,-0.0523905421532485,-0.752199413489736,8
+"water deficit (Hargreaves, soil store)",5,0.25,own unit,0.138009174412169,-0.00183284457478006,25
+"water deficit (Hargreaves, soil store)",5,0.25,all units,0.0327493639297141,-0.151759530791789,25
+"water deficit (Hargreaves, soil store)",5,0.5,own unit,0.0983090121593446,-0.315982404692082,23
+"water deficit (Hargreaves, soil store)",5,0.5,all units,-0.00141636433107384,-0.486803519061584,21
+"water deficit (Hargreaves, soil store)",5,1,own unit,0.039114514454866,-0.687683284457478,22
+"water deficit (Hargreaves, soil store)",5,1,all units,-0.0466778242477766,-0.799486803519062,8
+"water deficit (Hargreaves, soil store)",7,0.25,own unit,0.149147475463324,0.0252932551319648,23
+"water deficit (Hargreaves, soil store)",7,0.25,all units,0.0544265727076113,-0.157991202346041,23
+"water deficit (Hargreaves, soil store)",7,0.5,own unit,0.105651673663681,-0.365469208211144,24
+"water deficit (Hargreaves, soil store)",7,0.5,all units,0.00112473757005349,-0.590542521994135,21
+"water deficit (Hargreaves, soil store)",7,1,own unit,0.0382883306064127,-0.707111436950147,24
+"water deficit (Hargreaves, soil store)",7,1,all units,-0.0497703727064183,-0.795454545454545,6
+mean temperature,3,0.25,own unit,0.125115615030715,-0.00183284457478006,19
+mean temperature,3,0.25,all units,0.0974982658142266,-0.0131964809384164,25
+mean temperature,3,0.5,own unit,0.147733111914824,-0.135263929618768,20
+mean temperature,3,0.5,all units,0.0752949535007026,-0.188782991202346,25
+mean temperature,3,1,own unit,0.0931685424866596,-0.535923753665689,22
+mean temperature,3,1,all units,0.00419525619056149,-0.644061583577713,17
+mean temperature,5,0.25,own unit,0.201874451997125,0.234237536656892,22
+mean temperature,5,0.25,all units,0.184218317456674,0.182184750733138,26
+mean temperature,5,0.5,own unit,0.211338737548458,0.13049853372434,28
+mean temperature,5,0.5,all units,0.123423273537015,-0.118401759530792,29
+mean temperature,5,1,own unit,0.115587358888131,-0.407624633431085,29
+mean temperature,5,1,all units,0.016835193506465,-0.683651026392962,26
+mean temperature,7,0.25,own unit,0.2927494222035,0.297287390029326,29
+mean temperature,7,0.25,all units,0.215862798742041,0.299486803519062,28
+mean temperature,7,0.5,own unit,0.258771274023808,0.135263929618768,29
+mean temperature,7,0.5,all units,0.140721324714677,-0.093841642228739,29
+mean temperature,7,1,own unit,0.124152278809851,-0.495234604105572,30
+mean temperature,7,1,all units,0.0143510988739806,-0.705278592375367,25

@@ -1,0 +1,22 @@
+A,B,Local,AfterTrend,HeldOut
+mean temperature,water deficit,0.540078745487933,0.27228258504983,0.486174910653127
+mean temperature,max temperature Jun-Aug,0.516217270627959,0.254701342319649,0.486166048541916
+mean temperature,precipitation less demand,0.534044189991386,0.316919725075558,0.491047468297922
+mean temperature,precipitation,0.529645108263678,0.313704213358291,0.480823805218308
+mean temperature,"min temperature, coldest of Dec-Feb",0.511270634325254,0.263874010406749,0.4712999355624
+mean temperature,vapour pressure deficit from temperature May-Sep,0.511608149791637,0.254332070793143,0.461918542134539
+water deficit,max temperature Jun-Aug,0.416858412832165,0.151683636470407,0.382107674951522
+water deficit,precipitation less demand,0.401904388802804,0.222489070747721,0.398899349035475
+water deficit,precipitation,0.378379336986205,0.178385651933088,0.369765908274732
+water deficit,"min temperature, coldest of Dec-Feb",0.376931763360954,0.132997271501157,0.373312497620121
+water deficit,vapour pressure deficit from temperature May-Sep,0.375025864140625,0.129376719817897,0.366200325503106
+max temperature Jun-Aug,precipitation less demand,0.417326546132736,0.231090158443502,0.395027509999338
+max temperature Jun-Aug,precipitation,0.388163214521687,0.193010657875377,0.348560295718792
+max temperature Jun-Aug,"min temperature, coldest of Dec-Feb",0.368563808152802,0.126799664891053,0.346182058544344
+max temperature Jun-Aug,vapour pressure deficit from temperature May-Sep,0.381090413706301,0.122007933868637,0.34288211560619
+precipitation less demand,precipitation,0.470608210790236,0.269410317679413,0.464954631744181
+precipitation less demand,"min temperature, coldest of Dec-Feb",0.294911952813477,0.213752976740629,0.290052473760001
+precipitation less demand,vapour pressure deficit from temperature May-Sep,0.269077864618523,0.212049944672254,0.258965334242996
+precipitation,"min temperature, coldest of Dec-Feb",0.192641346960322,0.142233419690429,0.174507182754074
+precipitation,vapour pressure deficit from temperature May-Sep,0.156538509861807,0.14833125131016,0.140561085457003
+"min temperature, coldest of Dec-Feb",vapour pressure deficit from temperature May-Sep,0.156001414420706,0.0326304805795789,0.146774451362606

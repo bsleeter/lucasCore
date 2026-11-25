@@ -1,0 +1,121 @@
+Index,Years,Lag,Share
+mean temperature,1,0,0.243928857888337
+mean temperature,1,1,0.16781618529187
+mean temperature,1,2,0.152040744981636
+mean temperature,2,0,0.328677665367568
+mean temperature,2,1,0.272740864709802
+mean temperature,2,2,0.308696467368316
+mean temperature,3,0,0.402002917434857
+mean temperature,3,1,0.382078713349397
+mean temperature,3,2,0.388530778322092
+mean temperature,4,0,0.492361394655148
+mean temperature,4,1,0.452085297200807
+mean temperature,4,2,0.380568328724219
+mean temperature,5,0,0.561454846818023
+mean temperature,5,1,0.45080874657266
+mean temperature,5,2,0.419916940533046
+mean temperature,6,0,0.56483632471163
+mean temperature,6,1,0.498765749613789
+mean temperature,6,2,0.396013006553731
+mean temperature,7,0,0.585312469303912
+mean temperature,7,1,0.456481183923138
+mean temperature,7,2,0.389795803410888
+mean temperature,8,0,0.549374135114163
+mean temperature,8,1,0.457159095438846
+mean temperature,8,2,0.432768023962885
+max temperature Jun-Aug,1,0,0.156814866886328
+max temperature Jun-Aug,1,1,0.0809799916602614
+max temperature Jun-Aug,1,2,0.0857670620089875
+max temperature Jun-Aug,2,0,0.204415295331372
+max temperature Jun-Aug,2,1,0.148059216936582
+max temperature Jun-Aug,2,2,0.188288950662913
+max temperature Jun-Aug,3,0,0.246723455347507
+max temperature Jun-Aug,3,1,0.22542152729423
+max temperature Jun-Aug,3,2,0.298869852947424
+max temperature Jun-Aug,4,0,0.34031189245396
+max temperature Jun-Aug,4,1,0.348090841018297
+max temperature Jun-Aug,4,2,0.330396879976474
+max temperature Jun-Aug,5,0,0.452631189111124
+max temperature Jun-Aug,5,1,0.369276590072703
+max temperature Jun-Aug,5,2,0.394255644091145
+max temperature Jun-Aug,6,0,0.459153518717537
+max temperature Jun-Aug,6,1,0.430845875330247
+max temperature Jun-Aug,6,2,0.368553148653847
+max temperature Jun-Aug,7,0,0.501868488731111
+max temperature Jun-Aug,7,1,0.393202937549829
+max temperature Jun-Aug,7,2,0.401071075693695
+max temperature Jun-Aug,8,0,0.468587665668437
+max temperature Jun-Aug,8,1,0.4377593354535
+max temperature Jun-Aug,8,2,0.442398933576011
+water deficit,1,0,0.166474656020416
+water deficit,1,1,0.0858863467216581
+water deficit,1,2,0.0615707642392946
+water deficit,2,0,0.236496201878322
+water deficit,2,1,0.139378460909562
+water deficit,2,2,0.132248479974783
+water deficit,3,0,0.261010353374023
+water deficit,3,1,0.191227333836828
+water deficit,3,2,0.192094202786664
+water deficit,4,0,0.310748997348141
+water deficit,4,1,0.250334696140675
+water deficit,4,2,0.192087477321511
+water deficit,5,0,0.359923635867259
+water deficit,5,1,0.244923659157326
+water deficit,5,2,0.206947672338145
+water deficit,6,0,0.346831642216745
+water deficit,6,1,0.263598869868822
+water deficit,6,2,0.179083855141
+water deficit,7,0,0.349054781444872
+water deficit,7,1,0.223318359532513
+water deficit,7,2,0.175740620126072
+water deficit,8,0,0.308852672548953
+water deficit,8,1,0.22213841558608
+water deficit,8,2,0.200057191592946
+precipitation less demand,1,0,0.111947697258419
+precipitation less demand,1,1,0.0374283447597866
+precipitation less demand,1,2,0.0561598503689022
+precipitation less demand,2,0,0.134533284472867
+precipitation less demand,2,1,0.090706280509272
+precipitation less demand,2,2,0.134145652873645
+precipitation less demand,3,0,0.17236317118505
+precipitation less demand,3,1,0.151920156820601
+precipitation less demand,3,2,0.190791236356478
+precipitation less demand,4,0,0.244843766858375
+precipitation less demand,4,1,0.220209743943238
+precipitation less demand,4,2,0.212663228329444
+precipitation less demand,5,0,0.321729980681005
+precipitation less demand,5,1,0.250238843815205
+precipitation less demand,5,2,0.266942380198175
+precipitation less demand,6,0,0.364961805671534
+precipitation less demand,6,1,0.320350592333572
+precipitation less demand,6,2,0.229900836757249
+precipitation less demand,7,0,0.420964183862142
+precipitation less demand,7,1,0.272419145061586
+precipitation less demand,7,2,0.238313700088751
+precipitation less demand,8,0,0.370341476768746
+precipitation less demand,8,1,0.281174241670542
+precipitation less demand,8,2,0.26023595295849
+precipitation,1,0,0.0542790033678941
+precipitation,1,1,0.0128796347681717
+precipitation,1,2,0.0254594791645247
+precipitation,2,0,0.05819853068163
+precipitation,2,1,0.0365221160543098
+precipitation,2,2,0.0620581618460682
+precipitation,3,0,0.0755893538190103
+precipitation,3,1,0.0655015823819337
+precipitation,3,2,0.0888238599312415
+precipitation,4,0,0.112966299360642
+precipitation,4,1,0.0999390472906395
+precipitation,4,2,0.0998879439691515
+precipitation,5,0,0.15402547415321
+precipitation,5,1,0.116630159639509
+precipitation,5,2,0.135804555734315
+precipitation,6,0,0.177761362458669
+precipitation,6,1,0.159922947598384
+precipitation,6,2,0.112488609646026
+precipitation,7,0,0.21943158309283
+precipitation,7,1,0.13234910376075
+precipitation,7,2,0.125050612778308
+precipitation,8,0,0.185693604940965
+precipitation,8,1,0.143378973500715
+precipitation,8,2,0.133768283715496

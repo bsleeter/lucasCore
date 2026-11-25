@@ -637,6 +637,17 @@ if (MORT_GROUP %in% unique(sm$TransitionGroupId)) {
       drm <- mortality_blocks(mref, pyrs, nit, mo9$block, seed * 1000L + 77L); drm[, SamplingSet := MORT_SET]
       sched <- rbind(sched[SamplingSet != MORT_SET], drm[, .(Iteration, Timestep, SamplingSet, HistoricalYear)])
       jr <- match(drm$HistoricalYear, rec_y)
+      # (2.0.3) the Mortality page's Timing and Amount. "As this setup draws them": the rate of every unit, iteration and year as a plain row,
+      # as in 2.0.2. "From the Projection Climate result": the rates as a lookup by the drawn year (a multiplier row per unit whose value is
+      # read from the Distributions sheet by the external variable "the drawn historical year", and a second multiplier read by a percentage),
+      # with no values for the two variables: a Projection Climate result that depends on this setup supplies them (this setup's blocks, placed
+      # in its run's dry periods and scaled, or as drawn when its two settings are blank). The setup holds no climate, so it still serves any
+      # number of climate futures; every projection from it then needs such a result (ST-Sim stops without the values) (user 2026-11-25).
+      mort_dv <- NULL
+      if (mo9$climate) { mdef <- mortality_definitions(prj, u_cls); if (length(mdef)) fail("Mortality: the library's definitions lack the names the lookup needs (%s). Close the library in SyncroSim and run tools/add-definitions.R on it, or choose 'As this setup draws them' on the projection's Mortality page", paste(mdef, collapse = "; "))
+        lk <- mortality_lookup(rt, rec_y, mref, u_eco, u_cls, min(pyrs)); mort_tmv <- lk$tmv; mort_dv <- lk$dv
+        say("Drought and insect mortality: timing and amount from the Projection Climate result (the Mortality page): rates written as a lookup by the drawn year (%d units, %d reference years). Every projection from this setup needs a Projection Climate result that depends on this setup", nu, length(mref))
+      } else
       mort_tmv <- rbindlist(c(lapply(seq_len(nu), function(k) data.table(Iteration = drm$Iteration, Timestep = drm$Timestep, StratumId = u_eco[k], StateClassId = u_cls[k], TransitionGroupId = MORT_GROUP, Amount = signif(rt$rate[k, jr], 6))),
                               list(data.table(Iteration = drm$Iteration, Timestep = drm$Timestep, StratumId = NA_character_, StateClassId = NA_character_, TransitionGroupId = MORT_GROUP, Amount = signif(rt$all[jr], 6)))))   # (a class with no unit of its own: the study area's rate)
       jm <- match(mref, rec_y); all_rec <- sum(Em) / max(sum(Nm), 1); all_ref <- sum(Em[, jm]) / max(sum(Nm[, jm]), 1)
@@ -648,7 +659,8 @@ if (MORT_GROUP %in% unique(sm$TransitionGroupId)) {
       ua <- rt$rate[, jm, drop = FALSE] * Nm[, jm, drop = FALSE] * cell_km2
       rates[[MORT_GROUP]] <- data.table(TransitionGroup = MORT_GROUP, Method = "Mortality rate (blocks)", Unit = sprintf("%s | %s%s", u_eco, sub("^Forest: ", "", u_cls), ifelse(rt$pooled, " (pooled rate)", "")),
                                         MeanArea = rowMeans(ua), MinArea = apply(ua, 1, min), MaxArea = apply(ua, 1, max), AllowedShare = 1)
-      check(STAGE, "mortality: every unit has a rate between 0 and 1 in every iteration and projection year", all(is.finite(mort_tmv$Amount) & mort_tmv$Amount >= 0 & mort_tmv$Amount <= 1) && nrow(mort_tmv) == (nu + 1L) * nit * length(pyrs))
+      check(STAGE, "mortality: every unit has a rate between 0 and 1 in every iteration and projection year", all(is.finite(rt$rate[, jm]) & rt$rate[, jm] >= 0 & rt$rate[, jm] <= 1) && all(is.finite(rt$all[jm]) & rt$all[jm] >= 0 & rt$all[jm] <= 1) &&
+              (if (is.null(mort_dv)) nrow(mort_tmv) == (nu + 1L) * nit * length(pyrs) else nrow(mort_dv) == (nu + 1L) * length(mref) + length(MORT_PCTS) && nrow(mort_tmv) == nu + 2L))
       check(STAGE, "mortality: the drawn years are whole blocks of the reference years", all(drm$HistoricalYear %in% mref) &&
               all(drm[, { p <- match(HistoricalYear, mref); d <- (diff(p) - 1L) %% length(mref); all(d[(seq_along(d)) %% mo9$block != 0] == 0) }, by = Iteration]$V1))
       # ---- where: the surface, the patch sizes, the spread -------------------------------------------------------------------
@@ -692,7 +704,7 @@ if (MORT_GROUP %in% unique(sm$TransitionGroupId)) {
           saveDatasheet(prj, data.frame(Name = MORT_ATTR, AttributeGroupId = if ("State Class" %in% sag$Name) "State Class" else NA_character_,
                                         Description = "1 on a disturbed softwood class in the three years after a drought and insect mortality event, written by stage 9: the share of recent die-off around a cell drives the adjacency multiplier of the event in projections (to-do 3)"),
                         "stsim_StateAttributeType", append = TRUE)
-          say("Drought and insect mortality: the state attribute %s was added to the library's definitions", MORT_ATTR); TRUE },
+          ok <- MORT_ATTR %in% stsim_list("StateAttributeType")$Name; if (ok) say("Drought and insect mortality: the state attribute %s was added to the library's definitions", MORT_ATTR); ok },
           error = function(e) { say("  the state attribute %s could not be added (%s)", MORT_ATTR, conditionMessage(e)); FALSE })
         if (!has_attr) say("Drought and insect mortality: this library has no %s state attribute and it could not be added (tools/add-definitions.R adds it): no spread from recent die-off", MORT_ATTR) else {
           spm <- tryCatch(mortality_spread(evm, land, rast(P), mref, openm, rate_cell), error = function(e) { say("  spread: not fitted (%s)", conditionMessage(e)); NULL })
@@ -703,7 +715,7 @@ if (MORT_GROUP %in% unique(sm$TransitionGroupId)) {
       }
       sf_file <- if (is.null(sfm)) { if (is.null(allow_files[["all"]])) allow_files[["all"]] <- write_raster(setValues(rast(P), ifelse(land, 1L, NA)), "Projection-Allowed-All.tif", "INT1U"); allow_files[["all"]] } else
         write_raster(setValues(rast(P), wsurf), "Projection-Mortality-Surface.tif", "FLT4S")
-      mort <- list(tmv = mort_tmv, sm = data.table(Iteration = NA_integer_, Timestep = y1 + 1L, TransitionGroupId = MORT_GROUP, MultiplierFileName = sf_file), sizes = szm, spread = spm, ev = evm, dest = unique(pwm$StateClassIdDest))
+      mort <- list(tmv = mort_tmv, dv = mort_dv, sm = data.table(Iteration = NA_integer_, Timestep = y1 + 1L, TransitionGroupId = MORT_GROUP, MultiplierFileName = sf_file), sizes = szm, spread = spm, ev = evm, dest = unique(pwm$StateClassIdDest))
     }
   }
 }
@@ -905,6 +917,8 @@ keep9 <- function(name, drop) { x <- as.data.table(datasheet(scn, paste0("stsim_
 put9 <- function(name, old, new) if (nrow(new) || old$had) write_stsim(rbind(old$x, new, fill = TRUE), name)
 # (a sheet read back within the stage does not show what the stage has written, so each sheet is written once: the size distribution
 # with fire's below, the time since transition with the fuel treatments')
+# the lookup of the mortality rates by drawn year (the rows of other distributions are kept; a rerun with the lookup off removes its rows)
+if (!is.null(mort)) { o_dv <- keep9("DistributionValue", function(x) !is.na(x$DistributionTypeId) & startsWith(as.character(x$DistributionTypeId), MORT_PREFIX)); put9("DistributionValue", o_dv, if (is.null(mort$dv)) data.table() else mort$dv) }
 sd9 <- data.table(); mort_tst <- NULL
 if (!is.null(mort)) {
   sz <- mort$sizes; if (!is.null(sz)) sd9 <- data.table(TransitionGroupId = MORT_GROUP, MaximumArea = sz$table$MaximumCells * cell_amt, RelativeAmount = sz$table$Patches)[RelativeAmount > 0]

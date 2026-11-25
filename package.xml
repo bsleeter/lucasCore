@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<package name="lucasCore" displayName="LUCAS Core (model builder)" description="Builds LUCAS land-use and carbon models in ST-Sim from national datasets (FIA growth curves; CBM carbon parameters; spatial initial conditions; historical transitions and projections)" version="2.0.2" url="https://code.usgs.gov/LUCC/lucasCore" minSyncroSimVersion="3.1.29">
+<package name="lucasCore" displayName="LUCAS Core (model builder)" description="Builds LUCAS land-use and carbon models in ST-Sim from national datasets (FIA growth curves; CBM carbon parameters; spatial initial conditions; historical transitions and projections)" version="2.0.3" url="https://code.usgs.gov/LUCC/lucasCore" minSyncroSimVersion="3.1.29">
 
 	<builtFor package="stsim" version="4.5.4"/>
 
@@ -733,6 +733,15 @@
 		<column name="ReferenceStartYear" displayName="Reference Start Year (blank = the Projection Options period)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="1900" formula2="2200"/>
 		<column name="ReferenceEndYear" displayName="Reference End Year (blank = the Projection Options period)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="1900" formula2="2200"/>
 		<column name="ProjectionPlacement" displayName="Placement in Projections" dataType="Integer" validationType="List" formula1="1:Clustered (surface, patch sizes, spread)|2:Random cells" isOptional="True" defaultValue="1"/>
+		<column name="ClimateLink" displayName="Timing and Amount" dataType="Integer" validationType="List" formula1="1:As this setup draws them|2:From the Projection Climate result" isOptional="True" defaultValue="1"/>
+	</dataSheet>
+	<!-- Mortality and Climate (lucasCore 2.0.3; stage 11, src/mortality.R): two settings for exploring a climate response of drought and insect mortality, on a
+	     Projection Climate scenario that also depends on a Projection Setup result. The setup's blocks of historical years are placed in the dry periods of the
+	     climate run (timing strength), and the rate of a year is raised by the depth of its dry period (increase in dry periods). Blank = neither: the setup's draws
+	     as they are. A projection lists the Projection Climate result above the Projection Setup for the settings to act. A new sheet: no library update -->
+	<dataSheet name="MortalityClimate" displayName="Mortality and Climate" isSingleRow="True" viewClassName="lucasCoreUI.MortalityClimateView" viewClassAssembly="lucasCoreUI">
+		<column name="TimingStrength" displayName="Timing Strength, 0 to 1: Severe Blocks Placed in Dry Periods (blank = 0, as drawn; 0.3 is about what the record shows)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+		<column name="AmountPercent" displayName="Increase in Dry Periods (%; the rate at a dry period as deep as the run's deepest historical one; blank = 0)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="200"/>
 	</dataSheet>
 	<!-- Natural Change (user 2026-11-14): reforestation now, insects and drought later; its own page (a data feed needs two sheets) -->
 	<dataSheet name="ReforestationOptions" displayName="Natural Change" isSingleRow="True" viewClassName="lucasCoreUI.NaturalChangeView" viewClassAssembly="lucasCoreUI">
@@ -1204,6 +1213,16 @@
 		<column name="Co2Used" displayName="CO2 Used (after the ceiling)" dataType="Double" format="0.00"/>
 		<column name="Reference" displayName="Reference CO2 (ppm)" dataType="Double" format="0.00"/>
 		<column name="LnRatio" displayName="ln(CO2 / Reference)" dataType="Double" format="0.0000"/>
+	</dataSheet>
+	<!-- stage 11: the dryness of the climate run over the forest open to drought and insect mortality, and what the two Mortality and Climate settings made of the setup's draws -->
+	<dataSheet name="OutputMortalityClimate" displayName="Mortality and Climate by Year">
+		<column name="Timestep" dataType="Integer"/>
+		<column name="WaterDeficit" displayName="Water Deficit (mm)" dataType="Double" format="0.0"/>
+		<column name="Dryness" displayName="Dryness (SD, against the surrounding years)" dataType="Double" format="0.000"/>
+		<column name="Depth" displayName="Depth of the Dry Period (1 = the deepest historical)" dataType="Double" format="0.000"/>
+		<column name="Multiplier" displayName="Multiplier on the Rate" dataType="Double" format="0.000"/>
+		<column name="SetupRate" displayName="Mean Rate as the Setup Drew It (% of open forest)" dataType="Double" format="0.0000"/>
+		<column name="Rate" displayName="Mean Rate, Placed and Scaled (% of open forest)" dataType="Double" format="0.0000"/>
 	</dataSheet>
 
 	<dataSheet name="OutputInitialStockSummary" displayName="Initial Stock Summary">
@@ -1876,6 +1895,7 @@
 		<dataSheet name="stsim_TransitionSpatialInitiationMultiplier" type="Both"/>
 		<dataSheet name="stsim_InitialTSTSpatial" type="Both"/>
 		<dataSheet name="stsim_OutputFilterTransitionGroups" type="Both"/>
+		<dataSheet name="stsim_DistributionValue" type="Both"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
 	</transformer>
@@ -1918,11 +1938,14 @@
 		<dataSheet name="ClimateOptions" type="Input"/>
 		<dataSheet name="ProjectionClimate" type="Input"/>
 		<dataSheet name="Co2Adjustment" type="Input"/>
+		<dataSheet name="MortalityClimate" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
 		<dataSheet name="stsim_FlowSpatialMultiplier" type="Output"/>
 		<dataSheet name="stsim_FlowMultiplier" type="Output"/>
 		<dataSheet name="OutputCo2Beta" type="Output"/>
 		<dataSheet name="OutputCo2Series" type="Output"/>
+		<dataSheet name="OutputMortalityClimate" type="Output"/>
+		<dataSheet name="core_ExternalVariableValue" type="Output"/>
 		<dataSheet name="OutputClimateSummary" type="Both"/>
 		<dataSheet name="OutputValidation" type="Output"/>
 		<dataSheet name="OutputDataSources" type="Output"/>
@@ -2142,6 +2165,7 @@
 				<item name="ForestManagement"/>
 				<item name="ManagementAction"/>
 				<item name="ProjectionClimatePage"/>
+				<item name="MortalityClimate"/>
 				<group name="lucasCoreProjectionResults" displayName="Projection Results">
 					<item name="OutputProjectionRate"/>
 					<item name="OutputLandUseDemand"/>
@@ -2157,6 +2181,7 @@
 					<item name="OutputPatchSize"/>
 					<item name="OutputCo2Beta"/>
 					<item name="OutputCo2Series"/>
+					<item name="OutputMortalityClimate"/>
 				</group>
 			</group>
 			<group name="lucasCoreAnalysis" displayName="Figures and Analysis">

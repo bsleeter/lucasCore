@@ -65,6 +65,12 @@ if (!is.na(clim)) { if (!clim %in% sc[IsResult == "Yes", ScenarioId]) stop("--cl
   if (!nrow(suppressWarnings(as.data.table(datasheet(scenario(L, clim), "stsim_FlowSpatialMultiplier", optional = TRUE))))) stop(sprintf("result %d has no flow multipliers: run its stage 11 first", clim))
 } else cat("note: no --climate: the projection years run at normal climate (make a Projection Climate scenario with tools/new-projection-climate.R)\n")
 cl <- if (!is.na(clim)) clim else integer(0)
+# a setup whose Mortality page hands the timing and amount to the Projection Climate result has the rates as a lookup and no drawn years:
+# the climate result must hold them (lucasCore 2.0.3; ST-Sim stops on a lookup whose variables have no values)
+nr <- function(id, sheet, keep = function(z) z) { z <- suppressWarnings(as.data.table(datasheet(scenario(L, id), sheet, optional = TRUE, lookupsAsFactors = FALSE))); if (nrow(z)) nrow(keep(z)) else 0L }
+if (setup && nr(bid, "stsim_DistributionValue", function(z) z[!is.na(DistributionTypeId) & startsWith(as.character(DistributionTypeId), "Mortality Rate")]) > 0) {
+  if (is.na(clim)) stop(sprintf("Projection Setup %d takes the timing and amount of drought and insect mortality from a Projection Climate result (its Mortality page): pass --climate=<a Projection Climate result that depends on this setup> (tools/new-projection-climate.R --setup=%d)", bid, bid))
+  if (!nr(clim, "core_ExternalVariableValue")) stop(sprintf("Projection Climate result %d has no drawn years for drought and insect mortality: it must depend on Projection Setup %d (tools/new-projection-climate.R --setup=%d) and be run with lucasCore 2.0.3 or later", clim, bid, bid)) }
 dependency(S) <- if (setup) c(bid, cl, build_of, also, sfd) else c(cl, bid, also, sfd)   # legacy (a Build result, stage 9 in the pipeline): its multipliers would win, so climate first
 if (legacy) { saveDatasheet(S, data.frame(HistoricalScenarioId = hid), "lucasCore_ProjectionStart")
   # Projection Start shares a feed with Projection Options, and a dependency supplies whole feeds: copy the options

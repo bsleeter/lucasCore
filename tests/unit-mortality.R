@@ -158,7 +158,67 @@ check("the first point of the curve above none is one neighbour's share", near(s
 evr <- rep(NA_integer_, nc2); evr[sample(nc2, 40)] <- 2002L
 check("too few events near earlier ones gives no curve", is.null(mortality_spread(evr, landc, G2, 2002:2004, function(y) is.na(evr) | evr >= y, function(y) rep(0.004, nc2), radius = 1L)))
 
+# ---- the two settings for exploring a climate response (2.0.3) -----------------------------------------------------------------
+set.seed(4); ym <- CJ(y = 1975:2100, m = 1:12); nm <- nrow(ym); sea <- cos((ym$m - 7) / 12 * 2 * pi)
+TXs <- 14 + 12 * sea + rnorm(nm); TNs <- TXs - 12; Ps <- pmax(0, 60 - 40 * sea + rnorm(nm, 0, 15))
+df0 <- mortality_deficit(ym$y, ym$m, Ps, TXs, TNs, 38)
+check("the water deficit is by whole water year, never negative", identical(as.integer(names(df0)), 1976:2100) && all(df0 >= 0) && all(is.finite(df0)))
+dry_y <- ym$y %in% 2040:2044; df1 <- mortality_deficit(ym$y, ym$m, ifelse(dry_y, Ps * 0.3, Ps), TXs + ifelse(dry_y, 3, 0), TNs, 38)
+check("less rain and more heat raise the deficit of those years and leave earlier years alone", all(df1[as.character(2041:2044)] > df0[as.character(2041:2044)]) && near(df1[as.character(1976:2039)], df0[as.character(1976:2039)]))
+check("a wet, cold place has almost no deficit (some in freezing months, when the soil store alone meets the demand)", all(mortality_deficit(ym$y, ym$m, Ps + 400, TXs - 10, TNs - 10, 38) < 0.2 * df0))
+dr1 <- mortality_dryness(df1); check("dryness starts once the window is full and peaks in the dry spell", identical(as.integer(names(dr1)), 1982:2100) && as.integer(names(which.max(dr1))) %in% 2043:2048)
+tr <- df0 + (as.integer(names(df0)) - 1976) * 5; drt <- mortality_dryness(tr)
+check("a steady drying trend is not a dry period: dryness stays near that of the series without it (away from the ends)",
+      max(abs(drt[as.character(2000:2080)] - mortality_dryness(df0)[as.character(2000:2080)])) < 0.35)
+check("a series with a gap, or one that does not vary, stops", inherits(tryCatch(mortality_dryness(df0[-10]), error = function(e) e), "error") && inherits(tryCatch(mortality_dryness(df0 * 0 + 5), error = function(e) e), "error"))
+dp <- mortality_depth(dr1, 1991:2022); d0 <- max(dr1[as.character(1991:2022)])
+check("depth is 0 in wet years, 1 at the deepest historical dryness, and held at the cap", all(dp >= 0) && all(dp[dr1 <= 0] == 0) && near(max(dp[as.character(1991:2022)]), 1) && max(dp) <= MORTK$depth_cap && near(attr(dp, "deepest"), d0))
+check("a run with no dry historical year stops", inherits(tryCatch(mortality_depth(-abs(dr1), 1991:2022), error = function(e) e), "error"))
+am <- mortality_amount(dp, 0.5); check("amount: 1 in wet years, 1 + amount x depth in dry ones; blank or 0 is 1 everywhere", near(as.numeric(am), 1 + 0.5 * as.numeric(dp)) && all(mortality_amount(dp, NA) == 1) && all(mortality_amount(dp, 0) == 1))
+refy <- 1991:2022; pyr <- 2023:2100; sev <- setNames(c(rep(0.001, 22), 0.01, 0.03, 0.05, 0.03, 0.01, rep(0.002, 5)), refy)
+drm <- mortality_blocks(refy, pyr, 200L, 5L, 11L); dry <- dr1[as.character(pyr)]
+p0 <- mortality_place(drm, sev, dry, 5L, 0, 3L); check("strength 0 (or blank) returns the draw unchanged", identical(p0, drm) && identical(mortality_place(drm, sev, dry, 5L, NA, 3L), drm))
+p1 <- mortality_place(drm, sev, dry, 5L, 1, 3L); p3 <- mortality_place(drm, sev, dry, 5L, 0.3, 3L)
+same_set <- function(a) all(merge(a[, .(n1 = .N), by = .(Iteration, HistoricalYear)], drm[, .(n0 = .N), by = .(Iteration, HistoricalYear)], by = c("Iteration", "HistoricalYear"), all = TRUE)[, !is.na(n1) & !is.na(n0) & n1 == n0])
+check("placement keeps each iteration's drawn years, the same number of times", same_set(p1) && same_set(p3) && identical(p1[, .(Iteration, Timestep)], drm[, .(Iteration, Timestep)]))
+whole <- function(a) all(a[, { p <- match(HistoricalYear, refy); d <- (diff(p) - 1L) %% length(refy); all(d[seq_along(d) %% 5L != 0] == 0) }, by = Iteration]$V1)
+check("the placed years are still whole blocks of consecutive reference years", whole(p1) && whole(p3))
+check("the last block, cut short by the end of the projection, stays where it is", identical(p1[Timestep > 2097, HistoricalYear], drm[Timestep > 2097, HistoricalYear]))
+bl <- function(a) a[Timestep <= 2097, .(sev = mean(sev[as.character(HistoricalYear)]), dry = mean(dry[as.character(Timestep)])), by = .(Iteration, b = (Timestep - 2023L) %/% 5L)]
+rk <- function(a) mean(bl(a)[, cor(sev, dry, method = "spearman"), by = Iteration]$V1, na.rm = TRUE)
+check("strength 1 puts the most severe block in the driest period; 0.3 leans that way; the draw alone does not", bl(p1)[, all(which.max(sev) == which.max(dry) | sum(sev == max(sev)) > 1L), by = Iteration][, all(V1)] && rk(p1) > 0.8 && rk(p3) > 0.1 && rk(p3) < 0.5 && abs(rk(drm)) < 0.08)
+tot <- function(a) a[, 1 - prod(1 - sev[as.character(HistoricalYear)]), by = Iteration]$V1
+check("placement does not change the share of forest an iteration takes", near(tot(p1), tot(drm)) && near(tot(p3), tot(drm)))
+check("the same seed gives the same placement; a strength over 1 or a year with no dryness stops", identical(mortality_place(drm, sev, dry, 5L, 0.3, 3L), p3) &&
+        inherits(tryCatch(mortality_place(drm, sev, dry, 5L, 1.2, 3L), error = function(e) e), "error") && inherits(tryCatch(mortality_place(drm, sev, dry[-1], 5L, 0.5, 3L), error = function(e) e), "error"))
+
+# the lookup a setup writes, and the rows a climate result writes over its draws
+rt0 <- list(rate = matrix(c(0.01, 0.02, 0, 0.03, 0.001, 0.002, 0.003, 0.004), 2, byrow = TRUE, dimnames = list(NULL, 2001:2004)), all = c(0.005, 0.01, 0.002, 0.02))
+lk <- mortality_lookup(rt0, 2001:2004, 2002:2004, c("M260", "M330"), c("Forest: Fir", "Forest: Pine"), 2023L)
+check("the lookup: a multiplier row per unit, the study area's, and the climate one, all read from distributions from the first projection year",
+      nrow(lk$tmv) == 4L && all(lk$tmv$Timestep == 2023L) && all(lk$tmv$TransitionGroupId == MORT_GROUP) && identical(lk$tmv$DistributionType, c(c("Mortality Rate: Fir", "Mortality Rate: Pine"), MORT_RATE_ALL, MORT_CLIMATE)) &&
+        identical(lk$tmv$TransitionMultiplierTypeId, c(NA, NA, NA, MORT_CLIMATE)) && all(lk$tmv$DistributionFrequencyId == MORT_FREQ) && !"Amount" %in% names(lk$tmv))
+check("the lookup: each unit's rate for each reference year by the drawn year, and 1% steps for the climate percentage",
+      near(lk$dv[DistributionTypeId == "Mortality Rate: Fir" & StratumId == "M260", Value], c(0.02, 0, 0.03)) && near(lk$dv[DistributionTypeId == MORT_RATE_ALL, Value], c(0.01, 0.002, 0.02)) &&
+        all(lk$dv[ExternalVariableTypeId == MORT_EV_YEAR, ExternalVariableMin == ExternalVariableMax & ExternalVariableMin %in% 2002:2004]) && lk$dv[DistributionTypeId == MORT_CLIMATE, identical(as.integer(ExternalVariableMin), MORT_PCTS) && near(Value, MORT_PCTS / 100)] &&
+        all(lk$dv$DistributionTypeId %in% lk$tmv$DistributionType))
+check("the projection's Mortality page: blank is as this setup draws them; the list value or its label hands the timing and amount to the Projection Climate result",
+      !mortality_projection_options(data.table())$climate && !mortality_projection_options(data.table(ClimateLink = 1L))$climate && mortality_projection_options(data.table(ClimateLink = 2L))$climate &&
+        mortality_projection_options(data.table(ClimateLink = "From the Projection Climate result"))$climate && !mortality_projection_options(data.table(ClimateLink = "As this setup draws them"))$climate)
+mc <- mortality_climate_options(data.table())
+check("the Mortality and Climate page: blank is neither setting; values are read; values out of range stop", !mc$on && mc$timing == 0 && mc$amount == 0 &&
+        { m2 <- mortality_climate_options(data.table(TimingStrength = 0.3, AmountPercent = 50)); m2$on && m2$timing == 0.3 && m2$amount == 0.5 } && mortality_climate_options(data.table(AmountPercent = 25))$on &&
+        inherits(tryCatch(mortality_climate_options(data.table(TimingStrength = 1.5)), error = function(e) e), "error") && inherits(tryCatch(mortality_climate_options(data.table(AmountPercent = 900)), error = function(e) e), "error"))
+cr <- mortality_climate_rows(p3, mortality_amount(dp, 2)[as.character(pyr)])
+check("a climate result's rows: the placed year and a whole percentage for every iteration and year, within the lookup's range", nrow(cr) == 2L * nrow(p3) && identical(cr[ExternalVariableTypeId == MORT_EV_YEAR, ExternalVariableValue], as.numeric(p3$HistoricalYear)) &&
+        all(cr[ExternalVariableTypeId == MORT_EV_PCT, ExternalVariableValue] %in% MORT_PCTS) && cr[ExternalVariableTypeId == MORT_EV_PCT, max(ExternalVariableValue)] > 100 &&
+        max(MORT_PCTS) >= 100 * (1 + (max(MORT_PCTS) - 100) / 100) && (max(MORT_PCTS) - 100) / MORTK$depth_cap == 200)
+
 # what the package ships for projections
 check("the state attribute for the spread is among the package's definitions", MORT_ATTR %in% fread("defaults/stsim/stsim_StateAttributeType.csv")$Name)
 ptd <- fread("defaults/projection/transitions.csv"); check("Projection Transitions has the group's row, in its own sampling set", nrow(ptd[TransitionGroupId == MORT_GROUP & Method == "Probability" & SamplingSet == MORT_SET]) == 1L)
+pwm <- fread("defaults/transitions/pathways/mortality.csv"); dtn <- fread("defaults/stsim/core_DistributionType.csv")$Name; evn <- fread("defaults/stsim/core_ExternalVariableType.csv")$Name
+check("the lookup's names ship with the package: a distribution type for every class with the pathway, the study area's, the climate's, the two variables and the multiplier type",
+      all(c(mortality_class_types(unique(pwm$StateClassIdSource)), MORT_RATE_ALL, MORT_CLIMATE) %in% dtn) && all(c(MORT_EV_YEAR, MORT_EV_PCT) %in% evn) && MORT_CLIMATE %in% fread("defaults/stsim/stsim_TransitionMultiplierType.csv")$Name &&
+        "stsim_TransitionMultiplierType" %in% fread("defaults/stsim/manifest.csv")$Datasheet && !anyDuplicated(dtn) && !anyDuplicated(evn))
 cat(sprintf("%d checks, %d failed\n", n, fails)); if (fails) quit(status = 1)

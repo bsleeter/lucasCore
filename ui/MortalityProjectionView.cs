@@ -4,6 +4,8 @@
 // Sheet lucasCore_MortalityProjection (single row; stage 9 reads it, src/mortality.R): historical rates or off, the years drawn
 // together, the event's own reference years, and how it is placed (clustered: a fitted surface, the record's patch sizes and spread
 // from recent die-off; or random cells). Blank = historical rates, blocks of 5, the Run Settings reference period, clustered.
+// Timing and Amount (2.0.3): as this setup draws them, or from a Projection Climate result that depends on this setup (its page
+// Mortality and Climate, sheet lucasCore_MortalityClimate: the blocks placed in the run's dry periods, the rate raised in them).
 // A sheet of its own, apart from the Build's Mortality page (lucasCore_MortalityOptions): a Projection Setup that set a value on the
 // Build's sheet would hide the Build's own row, and a new table needs no library update.
 // =============================================================================
@@ -19,7 +21,7 @@ namespace lucasCoreUI
     {
         protected override string SheetName { get { return "lucasCore_MortalityProjection"; } }
 
-        private readonly Choice m_proj = new Choice("Projection", 1), m_place = new Choice("ProjectionPlacement", 1);
+        private readonly Choice m_proj = new Choice("Projection", 1), m_place = new Choice("ProjectionPlacement", 1), m_link = new Choice("ClimateLink", 1);
         private readonly TextBox m_block = Box(60), m_rs = Box(60), m_re = Box(60);
         private readonly List<Control> m_settings = new List<Control>();
 
@@ -56,6 +58,19 @@ namespace lucasCoreUI
                 random,
                 Wrapped("Every eligible cell of a unit has the same chance, and the event falls as single scattered cells.", 640))));
 
+            // (2.0.3) the timing and amount handed to a Projection Climate result: this setup stays free of climate and serves any number of futures
+            RadioButton asDrawn = Option(m_link, 1, "As this setup draws them"), fromClimate = Option(m_link, 2, "From the Projection Climate result");
+            m_settings.Add(asDrawn); m_settings.Add(fromClimate);
+            AddGroup(Group("Timing and amount: with or without the climate", ProjectionTransitionsView.Stack(
+                asDrawn,
+                Wrapped("The blocks fall where they are drawn, with no regard to the climate of the projection, and every climate future gets the same event. " +
+                        "A projection needs nothing more.", 640),
+                fromClimate,
+                Wrapped("For exploring a climate response. This setup still draws the blocks, and holds no climate. A Projection Climate scenario that depends on this setup " +
+                        "(below its Build) then places the more severe blocks in the dry periods of its climate run and can raise the rate in them: " +
+                        "its page Mortality and Climate has the two settings, and with both blank the blocks stay as drawn. " +
+                        "Every projection from this setup then needs such a Projection Climate result; without one ST-Sim stops, because the drawn years are missing.", 640))));
+
             AddGroup(Group("Where to see the result", ProjectionTransitionsView.Stack(
                 Note("The stage 9 log has lines beginning \"Drought and insect mortality\". Projection Results > Projection Rates lists the units and their mean yearly area, " +
                      "and Projection Schedule lists the years drawn (sampling set Mortality)."))));
@@ -80,7 +95,7 @@ namespace lucasCoreUI
 
         protected override void ShowData()
         {
-            ShowChoice(m_proj); ShowChoice(m_place);
+            ShowChoice(m_proj); ShowChoice(m_place); ShowChoice(m_link);
             m_block.Text = Show(Value("BlockYears")); m_rs.Text = Show(Value("ReferenceStartYear")); m_re.Text = Show(Value("ReferenceEndYear"));
             bool on = IntValue("Projection", 1) != 2;
             foreach (Control c in m_settings) c.Enabled = on;

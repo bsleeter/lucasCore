@@ -134,7 +134,7 @@ mortality_projection_options <- function(x) {
   b <- int("BlockYears", 1L, 50L); rs <- int("ReferenceStartYear", 1900L, 2200L); re <- int("ReferenceEndYear", 1900L, 2200L)
   if (!is.na(rs) && !is.na(re) && rs > re) stop(sprintf("Mortality: the reference years run from %d to %d; the start must not be after the end", rs, re))
   list(projection = c("rates", "off")[pick("Projection", c("historical", "off"))], block = if (is.na(b)) MORTP$block else b, ref_start = rs, ref_end = re,
-       clustered = pick("ProjectionPlacement", c("clustered", "random")) == 1L)
+       clustered = pick("ProjectionPlacement", c("clustered", "random")) == 1L, climate = pick("ClimateLink", c("as", "from")) == 2L)
 }
 
 # Block draws: every iteration fills the projection years with blocks of consecutive reference years. A block starts at any
@@ -229,4 +229,135 @@ mortality_spread <- function(ev, land, R, ref, open, expect, radius = MORTP$radi
   list(curve = data.table::data.table(AttributeValue = round(at, 4), Amount = round(am, 4)),
        classes = data.table::data.table(Share = c("none", sprintf("%g-%g%%", 100 * s[-nb], 100 * s[-1])[seq_len(nb - 2)], sprintf("over %g%%", 100 * s[nb - 1])),
                                         CellYears = N, Events = E, Expected = X, Multiplier = m), cells = nw, near = sum(E[-1]) / sum(E))
+}
+
+# =============================================================================
+# Two settings for exploring a climate response (lucasCore 2.0.3; user decisions 2026-11-25)
+# =============================================================================
+# The empirical method above has no climate in it: the same blocks of historical years fall anywhere in a projection. The record
+# (1991-2022, 35 western pyromes) shows only a weak relation of the event to dryness, too weak to calibrate a response, so two
+# settings let a user explore one against a climate run of their choice. Both are off when blank, which leaves the draws as drawn.
+#   timing  (0 to 1)  the blocks an iteration drew are placed in time: a period's score is strength x its dryness (standardised
+#                     over the periods) + sqrt(1 - strength^2) x noise, and the most severe block goes to the highest score. The
+#                     blocks, and so the long-run rates, are those of the draw; only their order changes. 0.3 is about what the
+#                     record shows (the driest third of years with 1.3 to 1.6 times the wettest third's area).
+#   amount  (percent) the rate of a year is multiplied by 1 + amount x depth, the depth of the dry period the year falls in:
+#                     its dryness above zero as a share of the deepest dryness of the run's own historical years (1 = as deep
+#                     as that), held at MORTK$depth_cap. Wet years are unchanged; nothing is lowered.
+# Dryness: the yearly water deficit of the study area's eligible forest (a monthly water balance: Hargreaves demand from maximum
+# and minimum temperature, one soil store of MORTK$awc mm, snow held and melted by temperature; the October-September water
+# year), as the mean of the MORTK$window years ending in the year, less the mean of the MORTK$baseline years around each year
+# (the forest is taken to adjust to the climate it has had: a dry period is dry against its surrounding years, not against the
+# record), over the spread of the run's MORTK$norm years. It is taken from the climate run alone, so a model's bias drops out.
+MORTK <- list(window = 7L, baseline = 30L, awc = 150, depth_cap = 2, norm = 1991:2020, first = 1975L, timing_guide = 0.3)
+
+# Yearly water deficit (mm; named by water year, complete years only) from a monthly series in time order: y, m, P (mm), TX and
+# TN (C), at latitude lat (degrees).
+mortality_deficit <- function(y, m, P, TX, TN, lat, awc = MORTK$awc) {
+  stopifnot(length(y) == length(m), length(P) == length(y), length(TX) == length(y), length(TN) == length(y), !anyNA(c(P, TX, TN)))
+  doy <- c(15, 46, 75, 106, 136, 167, 197, 228, 259, 289, 320, 350); dim_ <- c(31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31); ph <- lat * pi / 180
+  ra <- vapply(1:12, function(k) { J <- doy[k]; dr <- 1 + 0.033 * cos(2 * pi * J / 365); dec <- 0.409 * sin(2 * pi * J / 365 - 1.39); ws <- acos(max(-1, min(1, -tan(ph) * tan(dec))))
+    0.408 * (24 * 60 / pi) * 0.0820 * dr * (ws * sin(ph) * sin(dec) + cos(ph) * cos(dec) * sin(ws)) }, 0)   # extraterrestrial radiation as mm of evaporation a day
+  tm <- (TX + TN) / 2; pet <- pmax(0, 0.0023 * ra[m] * (tm + 17.8) * sqrt(pmax(TX - TN, 0)) * dim_[m])
+  soil <- awc; pack <- 0; def <- numeric(length(y))
+  for (j in seq_along(y)) { rf <- max(0, min(1, tm[j] / 6)); pack <- pack + P[j] * (1 - rf); melt <- pack * rf; pack <- pack - melt; w <- P[j] * rf + melt   # rain share from 0 at 0 C to 1 at 6 C; the pack melts by the same share
+    d <- w - pet[j]; if (d >= 0) { soil <- min(awc, soil + d); aet <- pet[j] } else { dr <- soil * (1 - exp(d / awc)); aet <- w + dr; soil <- soil - dr }
+    def[j] <- pet[j] - aet }
+  wy <- y + (m >= 10L); full <- as.integer(names(which(table(wy) == 12L))); o <- vapply(full, function(k) sum(def[wy == k]), 0); names(o) <- full; o
+}
+
+# Dryness by year (standard deviations; named by year) from the yearly deficit: see the head of this section. A year whose
+# surrounding years are cut short by the ends of the series uses the years it has (at least the 10 nearest).
+mortality_dryness <- function(def, window = MORTK$window, baseline = MORTK$baseline, norm = MORTK$norm) {
+  ay <- as.integer(names(def)); if (!length(ay) || any(diff(ay) != 1L)) stop("Mortality: the water deficit series has missing years")
+  nn <- intersect(norm, ay); if (length(nn) < 10L) stop(sprintf("Mortality: the climate run has fewer than 10 of the years %d-%d", min(norm), max(norm)))
+  s <- stats::sd(def[as.character(nn)]); if (!is.finite(s) || s <= 0) stop("Mortality: the water deficit does not vary over the normal years, so dryness cannot be measured")
+  z <- vapply(ay, function(k) { w <- intersect((k - baseline %/% 2L):(k + baseline %/% 2L - 1L), ay); if (length(w) < 10L) w <- ay[order(abs(ay - k))][seq_len(min(10L, length(ay)))]
+    (def[[as.character(k)]] - mean(def[as.character(w)])) / s }, 0)
+  ok <- ay[ay - window + 1L >= min(ay)]; o <- vapply(ok, function(k) mean(z[match((k - window + 1L):k, ay)]), 0); names(o) <- ok; o
+}
+
+# Depth of the dry period of each year of `dry` (named by year): dryness above zero as a share of the deepest dryness of the
+# reference years, held at `cap`. The deepest dryness comes back as the attribute "deepest".
+mortality_depth <- function(dry, ref_years, cap = MORTK$depth_cap) {
+  d0 <- suppressWarnings(max(dry[as.character(intersect(ref_years, as.integer(names(dry))))]))
+  if (!is.finite(d0) || d0 <= 0) stop("Mortality: the climate run has no dry period in its historical years to measure depth against")
+  o <- pmin(pmax(dry, 0) / d0, cap); attr(o, "deepest") <- d0; o
+}
+
+# Timing: the whole blocks of each iteration of `drm` (mortality_blocks: Iteration, Timestep, HistoricalYear) placed by dryness.
+# sev: the severity of a historical year (named by year: the study area's rate); dry: dryness by projection year (named by year).
+# A last block cut short by the end of the projection stays where it is. strength 0 returns the draw unchanged.
+mortality_place <- function(drm, sev, dry, block, strength, seed) {
+  if (is.na(strength) || strength <= 0) return(data.table::copy(drm))
+  if (strength > 1) stop("Mortality: the timing strength is between 0 and 1")
+  miss <- setdiff(unique(drm$Timestep), as.integer(names(dry))); if (length(miss)) stop(sprintf("Mortality: no dryness for %d-%d", min(miss), max(miss)))
+  zs <- function(v) if (length(v) > 1L && stats::sd(v) > 0) (v - mean(v)) / stats::sd(v) else v * 0
+  set.seed(seed); block <- as.integer(max(1L, block)); o <- data.table::copy(drm); data.table::setorder(o, Iteration, Timestep)
+  o[, HistoricalYear := { b <- (seq_len(.N) - 1L) %/% block; full <- as.integer(names(which(table(b) == block))); hy <- HistoricalYear
+    if (length(full) > 1L) { sv <- vapply(full, function(k) mean(sev[as.character(hy[b == k])]), 0); dr <- vapply(full, function(k) mean(dry[as.character(Timestep[b == k])]), 0)
+      to <- full[order(strength * zs(dr) + sqrt(1 - strength^2) * stats::rnorm(length(full)))]; from <- full[order(sv)]
+      new <- hy; for (q in seq_along(full)) new[b == to[q]] <- hy[b == from[q]]; hy <- new }
+    hy }, by = Iteration]
+  o[]
+}
+
+# Amount: the multiplier on the drawn rate by projection year, 1 + amount (a share: 0.5 = 50%) x depth.
+mortality_amount <- function(depth, amount) { if (is.na(amount) || amount <= 0) return(depth * 0 + 1); o <- 1 + amount * as.numeric(depth); names(o) <- names(depth); o }
+
+# ---- how the two settings reach a projection (ST-Sim external variables) ------------------------------------------------------------
+# A Projection Setup has no climate in it and serves any number of climate futures, and a scenario takes a whole sheet from the first of
+# its dependencies that has rows (the setup, then the Projection Climate result). So when the setup's Mortality page says the timing and
+# amount come from the Projection Climate result, the setup (stage 9) writes the rates as a lookup and no draws of its own: a Transition
+# Multiplier Value row per unit whose value is read from the Distributions sheet by the external variable MORT_EV_YEAR (the drawn
+# historical year), and a second multiplier (type MORT_CLIMATE) read by MORT_EV_PCT (a percentage on the rate). A Projection Climate
+# result (stage 11) that depends on the setup writes the External Variables sheet, which the setup does not have: the setup's blocks
+# placed by its run's dryness, and the percentage of each year (the blocks as drawn and 100 when its two settings are blank). ST-Sim
+# stops when a variable has no values, so every projection from such a setup needs such a result. Tested on a small ST-Sim library
+# (2026-11-25): the lookup returns the row of the variable's value, the two multipliers multiply, and an unconditional row beside the
+# conditional ones is drawn at random with them, so it cannot serve as a default.
+MORT_PREFIX <- "Mortality"; MORT_EV_YEAR <- "Mortality: Drawn Year"; MORT_EV_PCT <- "Mortality: Climate Percent"; MORT_CLIMATE <- "Mortality: Climate"
+MORT_RATE <- "Mortality Rate: "; MORT_RATE_ALL <- "Mortality Rate: Study Area"; MORT_PCTS <- 100:500; MORT_FREQ <- "Iteration and Timestep"
+# A unit's Distribution Type is its state class's ("Mortality Rate: " + the class without "Forest: "); the rows of the Distributions sheet
+# carry the unit's ecodivision as their stratum, so one name per softwood class serves every study area (tested: a row with a stratum
+# is read for that stratum's multiplier row only). The names ship with the package (defaults/stsim: the classes of
+# defaults/transitions/pathways/mortality.csv), because a stage cannot add a definition to the library while it runs.
+mortality_class_types <- function(classes) paste0(MORT_RATE, sub("^Forest: ", "", classes))
+
+# The names the lookup needs that the library's definitions lack (character(0) = none missing). tools/add-definitions.R adds them to a
+# library made before lucasCore 2.0.3.
+mortality_definitions <- function(prj, classes) {
+  need <- list(core_ExternalVariableType = c(MORT_EV_YEAR, MORT_EV_PCT), core_DistributionType = c(unique(mortality_class_types(classes)), MORT_RATE_ALL, MORT_CLIMATE), stsim_TransitionMultiplierType = MORT_CLIMATE)
+  unlist(lapply(names(need), function(sh) { miss <- setdiff(need[[sh]], as.character(rsyncrosim::datasheet(prj, sh, optional = TRUE, lookupsAsFactors = FALSE)$Name)); if (length(miss)) sprintf("%s: %s", sh, paste(miss, collapse = ", ")) }))
+}
+
+# The lookup rows of a setup: rt = mortality_rate_table()'s result (rate: units x record years; all: the study area's rate by record
+# year), rec_y its years, ref the reference years (the only ones a draw can name), t0 the first projection year.
+mortality_lookup <- function(rt, rec_y, ref, u_eco, u_cls, t0) {
+  ut <- mortality_class_types(u_cls); j <- match(ref, rec_y); nu <- length(u_cls)
+  tmv <- data.table::rbindlist(list(
+    data.table::data.table(Timestep = t0, StratumId = u_eco, StateClassId = u_cls, TransitionGroupId = MORT_GROUP, TransitionMultiplierTypeId = NA_character_, DistributionType = ut, DistributionFrequencyId = MORT_FREQ),
+    data.table::data.table(Timestep = t0, StratumId = NA_character_, StateClassId = NA_character_, TransitionGroupId = MORT_GROUP, TransitionMultiplierTypeId = NA_character_, DistributionType = MORT_RATE_ALL, DistributionFrequencyId = MORT_FREQ),   # (a class with no unit of its own: the study area's rate)
+    data.table::data.table(Timestep = t0, StratumId = NA_character_, StateClassId = NA_character_, TransitionGroupId = MORT_GROUP, TransitionMultiplierTypeId = MORT_CLIMATE, DistributionType = MORT_CLIMATE, DistributionFrequencyId = MORT_FREQ)))
+  dv <- data.table::rbindlist(c(lapply(seq_len(nu), function(k) data.table::data.table(StratumId = u_eco[k], DistributionTypeId = ut[k], ExternalVariableTypeId = MORT_EV_YEAR, ExternalVariableMin = ref, ExternalVariableMax = ref, Value = signif(rt$rate[k, j], 6))),
+    list(data.table::data.table(StratumId = NA_character_, DistributionTypeId = MORT_RATE_ALL, ExternalVariableTypeId = MORT_EV_YEAR, ExternalVariableMin = ref, ExternalVariableMax = ref, Value = signif(rt$all[j], 6)),
+         data.table::data.table(StratumId = NA_character_, DistributionTypeId = MORT_CLIMATE, ExternalVariableTypeId = MORT_EV_PCT, ExternalVariableMin = MORT_PCTS, ExternalVariableMax = MORT_PCTS, Value = MORT_PCTS / 100))))
+  list(tmv = tmv, dv = dv)
+}
+
+# The Projection Climate scenario's Mortality and Climate page (single row; package.xml MortalityClimate). Blank = neither setting.
+mortality_climate_options <- function(x) {
+  x <- data.table::as.data.table(x); g <- function(k) if (nrow(x) && k %in% names(x)) suppressWarnings(as.numeric(x[[k]][1])) else NA_real_
+  s <- g("TimingStrength"); a <- g("AmountPercent"); amax <- (max(MORT_PCTS) - 100) / MORTK$depth_cap
+  if (!is.na(s) && (s < 0 || s > 1)) stop(sprintf("Mortality and Climate: the timing strength is %s; give a value from 0 to 1", s))
+  if (!is.na(a) && (a < 0 || a > amax)) stop(sprintf("Mortality and Climate: the increase in dry periods is %s%%; give a value from 0 to %g", a, amax))
+  list(timing = if (is.na(s)) 0 else s, amount = if (is.na(a)) 0 else a / 100, on = isTRUE(s > 0) || isTRUE(a > 0))
+}
+
+# The External Variables rows of a climate result: the placed years, and the percentage on the rate of each year (whole percent, at
+# most max(MORT_PCTS)). `mult` is named by projection year.
+mortality_climate_rows <- function(placed, mult) {
+  pct <- pmin(round(100 * mult[as.character(placed$Timestep)]), max(MORT_PCTS)); if (anyNA(pct)) stop("Mortality and Climate: a projection year has no multiplier")
+  rbind(placed[, .(Iteration, Timestep, ExternalVariableTypeId = MORT_EV_YEAR, ExternalVariableValue = as.numeric(HistoricalYear))],
+        data.table::data.table(Iteration = placed$Iteration, Timestep = placed$Timestep, ExternalVariableTypeId = MORT_EV_PCT, ExternalVariableValue = as.numeric(pct)))
 }

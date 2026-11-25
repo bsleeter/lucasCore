@@ -2,6 +2,83 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## 2.0.3 - unreleased
+
+Two settings for exploring a climate response of drought and insect mortality in projections. The two new sheets
+SyncroSim adds by itself. The names the lookup needs ship with the package's definitions (`defaults/stsim`), so a new
+library has them; a library made before 2.0.3 gets them from `tools/add-definitions.R`, run with the library closed in
+SyncroSim (a library update that does this on opening is not written yet). Nothing changes unless a
+Projection Setup's Mortality page is set to hand the timing and amount to the Projection Climate result: a setup left as
+it is writes the same rows as 2.0.2, and a Projection Climate scenario with no such setup among its dependencies runs as
+before.
+
+### Added
+
+- **Mortality and Climate** (a new page of a Projection Climate scenario, sheet `MortalityClimate`; stage 11,
+  `src/mortality.R`). The record of 1991 to 2022 (35 western pyromes, `dev/mortality/24` to `29`) shows only a weak
+  relation of the event to dryness: enough to see when the pyromes are pooled, too weak to calibrate a response for one
+  region. So the empirical method stays, and two settings let a user explore a response against a climate run:
+  - *Timing strength* (0 to 1). The blocks of historical years a Projection Setup drew are placed in time. A period's
+    score is the strength times its dryness plus noise, and the most severe block goes to the highest score. 0 leaves the
+    blocks where they were drawn; 1 puts the worst block in the driest period. Each iteration keeps exactly the years it
+    drew, so the share of forest it takes does not change, only when. About 0.3 matches the record (the driest third of
+    years with 1.3 to 1.6 times the area of the wettest third).
+  - *Increase in dry periods* (percent, 0 to 200). The rate of a year is multiplied by 1 + the percentage x the depth of
+    the dry period the year falls in. Depth is the year's dryness above zero as a share of the deepest dryness of the
+    climate run's own historical years (1991 to the historical end), held at 2. Wet years are unchanged and nothing is
+    lowered. This is an assumption to explore, not a fitted response.
+  - *Dryness.* The yearly water deficit of the forest open to the event (a monthly water balance from the LOCA2 run:
+    Hargreaves demand from maximum and minimum temperature, a 150 mm soil store, snow held and melted by temperature;
+    the water year), as the mean of the 7 years ending in the year, less the mean of the 30 years around each year, over
+    the spread of the run's 1991 to 2020. A dry period is dry against its surrounding years, not against the record: the
+    forest is taken to adjust to the climate it has had, so a steady drying trend alone raises nothing. It comes from the
+    climate run alone, so a model's bias drops out.
+  - *Outputs.* The stage 11 log gives the water deficit, the share of dry years, the deepest dry periods, the rate of the
+    driest third of years against the wettest before and after, and the change in the mean rate. A new table, Mortality
+    and Climate by Year, lists dryness, depth, the multiplier and the mean rate as drawn and as placed.
+  - *The page* (`ui/MortalityClimateView.cs`). Each setting is a slider in steps of 5 (0.05 of timing strength, 5 percent
+    of increase) beside a box that takes any value in the range, with a sentence under it that says what the value now
+    set does: for timing, how it compares with the record and the driest third of years against the wettest; for the
+    increase, the multiplier at the deepest historical dry period, at half that depth and at the most, and the rough
+    change in the total.
+- **Timing and Amount** on the projection's Mortality page (sheet `MortalityProjection`, column `ClimateLink`): "As this
+  setup draws them" (the default, as 2.0.2) or "From the Projection Climate result".
+- `loca2_monthly_mean()` (`src/loca2.R`): monthly precipitation and maximum and minimum temperature of a LOCA2 run
+  averaged over a set of points.
+- `tools/new-projection-climate.R --setup=<id> [--timing=] [--amount=]`; `tools/new-projection.R` stops with the reason
+  when a setup needs a Projection Climate result that has the drawn years and none is given.
+- `tests/unit-mortality.R`: 27 more checks (the water deficit, dryness, depth, the placement of blocks, the lookup rows,
+  the names shipped in `defaults/stsim`).
+
+### How it reaches a projection
+
+A Projection Setup holds no climate, so one setup still serves any number of climate futures. A scenario takes each sheet
+whole from the first of its dependencies that has rows, and a projection lists the setup before the Projection Climate
+result, so the climate result cannot change the setup's rows. With "From the Projection Climate result" the setup
+therefore writes the rates differently: one Transition Multiplier Value row per unit whose value ST-Sim reads from the
+Distributions sheet by an external variable, the drawn historical year, and a second multiplier read by a percentage;
+it writes no values for the two variables. A Projection Climate scenario that depends on that setup (below its Build)
+writes them to the External Variables sheet: the setup's blocks, placed and scaled by its two settings, or as drawn with
+100 percent when both are blank.
+
+- Every projection from such a setup needs such a Projection Climate result. Without the values ST-Sim stops with
+  "Attempted to sample from a distribution that has no corresponding external variable values".
+- A Projection Climate result with the settings serves that one setup. A setup serves any number of such results.
+- The lookup uses names in the library's definitions, all starting "Mortality": two External Variable Types, a
+  Distribution Type per softwood class with the pathway (a unit's rows carry its ecodivision as their stratum, so one
+  name per class serves every study area), one for the study area and one for the percentage, and one Transition
+  Multiplier Type. A stage cannot add a definition while it runs, so they ship in `defaults/stsim`; stage 9 stops with
+  the instruction to run `tools/add-definitions.R` when the library lacks them.
+- Tested in SyncroSim on a scratch library (one pyrome, SSP2-4.5, timing 0.3 and 50 percent; 10 years by 3 iterations):
+  the area of the event each year follows the placed year's rate times its percentage (rank correlation 0.94).
+
+### Not yet done
+
+- The two stages were not yet run in SyncroSim with these changes. The ST-Sim behaviour they rely on was tested on a small
+  ST-Sim library (the lookup by an external variable, two multipliers multiplying, the sheet taken from the second
+  dependency when the first has none).
+- Dryness is one series for the study area's open forest, not one per ecodivision.
+
 ## 2.0.2 - unreleased
 
 Drought and insect mortality in projections. No library update is needed: a library on 2.0.0 or 2.0.1 opens as it is (the

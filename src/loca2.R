@@ -66,3 +66,25 @@ loca2_annual <- function(folder, gcm, member, ssp, var, years, win) {
     x[[as.character(years)]] }
   if (var %in% c("ppt", "ppt_wy", "ppt_seasons")) return(read_var("pr"))
   (read_var("tasmax") + read_var("tasmin")) / 2 - 273.15 }
+
+# monthly means over the LOCA2 cells that hold the points `lonlat` (two columns: longitude, latitude), each cell weighted by its number of
+# points: a table y, m, P (mm in the month), TX and TN (C) for every month of `years` (stage 11: the water deficit of the forest open to
+# drought and insect mortality, src/mortality.R)
+loca2_monthly_mean <- function(folder, gcm, member, ssp, years, lonlat) {
+  win <- terra::ext(min(lonlat[, 1]) - 0.2, max(lonlat[, 1]) + 0.2, min(lonlat[, 2]) - 0.2, max(lonlat[, 2]) + 0.2)
+  one <- function(v) { out <- list()
+    for (run in c("historical", ssp)) { yrs <- years[(years <= 2014) == (run == "historical")]; if (!length(yrs)) next
+      fs <- loca2_best(loca2_files(folder, gcm, member, run, v), win)
+      for (i in seq_len(nrow(fs))) { want <- yrs[yrs >= fs$y0[i] & yrs <= fs$y1[i]]; if (!length(want)) next
+        r <- loca2_rast(fs$file[i]); tm <- terra::time(r); keep <- which(as.integer(format(tm, "%Y")) %in% want); if (!length(keep)) next
+        r <- terra::crop(r[[keep]], win); tm <- tm[keep]; yy <- as.integer(format(tm, "%Y")); mo <- as.integer(format(tm, "%m"))
+        tb <- table(terra::cellFromXY(r, lonlat)); M <- as.matrix(r[as.numeric(names(tb))]); ok <- stats::complete.cases(M)
+        if (!any(ok)) stop(sprintf("LOCA2 %s %s %s %s: no data at the points asked", gcm, member, run, v), call. = FALSE)
+        w <- as.numeric(tb)[ok]; val <- as.vector(crossprod(w, M[ok, , drop = FALSE])) / sum(w)
+        if (v == "pr") val <- val * 86400 * as.integer(format(as.Date(paste(yy + (mo == 12), mo %% 12 + 1, 1, sep = "-")) - 1, "%d")) else val <- val - 273.15
+        out[[length(out) + 1]] <- data.table::data.table(y = yy, m = mo, v = val) } }
+    o <- unique(data.table::rbindlist(out), by = c("y", "m")); data.table::setorder(o, y, m)
+    if (nrow(o) != 12L * length(years)) stop(sprintf("LOCA2 %s %s %s %s: %d of the %d months of %d-%d found", gcm, member, ssp, v, nrow(o), 12L * length(years), min(years), max(years)), call. = FALSE)
+    o }
+  p <- one("pr"); tx <- one("tasmax"); tn <- one("tasmin")
+  data.table::data.table(y = p$y, m = p$m, P = p$v, TX = tx$v, TN = tn$v) }
