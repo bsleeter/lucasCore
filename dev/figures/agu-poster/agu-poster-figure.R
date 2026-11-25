@@ -3,7 +3,7 @@
 # Interdisciplinary Federal Science" (2026-11-25). One landscape figure, 20 x 9.8 in, to sit in a 21 x 13 in panel with its text.
 #   (a) what LUCAS reads and writes (a drawn schematic)
 #   (b) land cover 2023, (c) year last burned, (d) change in ecosystem carbon 1985-2023 (maps on shaded relief)
-#   (e) change in carbon stocks since 1985, (f) vegetation carbon burned, killed or cut by cause, (g) net biome productivity
+#   (e) change in carbon stocks since 1985, (f) vegetation carbon burned, killed or cut by cause, (g) the stock against the carbon carrying capacity
 # Reads a historical run in a lucasCore library (the library file and its data folder) and the elevation file its Build used.
 #   Rscript dev/figures/agu-poster/agu-poster-figure.R [library.ssim] [run result id] [build result id] [out dir]
 # Defaults: the Pyrome 27 (Southern Sierra Nevada) library, run 9, Build 4 (lucasCore 2.0, 300 m, one iteration).
@@ -44,6 +44,7 @@ scl <- as.data.table(dbGetQuery(con, "select Id, Name from stsim_StateClass"))
 fire_group <- dbGetQuery(con, "select TransitionGroupId from stsim_TransitionGroup where Name='Fire'")$TransitionGroupId
 eco_group <- dbGetQuery(con, "select StockGroupId from stsim_StockGroup where Name='Total Ecosystem'")$StockGroupId
 dem_file <- dbGetQuery(con, sprintf("select Path from lucasCore_OutputDataSources where ScenarioId=%d and DataSource='ElevationFile'", BUILD))$Path[1]
+CAP <- as.data.table(dbGetQuery(con, sprintf("select * from lucasCore_OutputRunCapacity where RunScenarioId=%d order by Year", RUN)))   # stage 13 writes it
 dbDisconnect(con)
 
 yrs <- sort(unique(stk$Timestep)); y0 <- yrs[1]; y1 <- yrs[length(yrs)]; fy <- yrs[-1]
@@ -96,6 +97,9 @@ num <- c(sprintf("Area %.0f km2; %d-%d; cell %g m", area / 100, y0, y1, res(sc)[
   sprintf("Drought and insects: %.2f Tg C killed in all, %.2f in 2016-2019 (peak %.2f in %d); %.1f kha", sum(L$drought), L[Timestep %in% 2016:2019, sum(drought)], max(L$drought), L[which.max(drought), Timestep], sum(L$drought_ha) / 1e3),
   sprintf("Harvest: %.2f Tg C in all; %.1f kha", sum(L$harvest), sum(L$harvest_ha) / 1e3),
   sprintf("NBP %d: %+.1f; %d: %+.1f", 2020L, L[Timestep == 2020, nbp], 2021L, L[Timestep == 2021, nbp]),
+  sprintf("Carrying capacity (live, dead wood, litter) %.1f Tg C, upper bound %.1f; stock %.1f%% of it in %d, %.1f%% in %d (peak), %.1f%% in %d; deficit %d %.1f Tg C: disturbed land %.1f, land use %.1f, cover %.1f, live %.1f, dead %.1f",
+          CAP$Capacity[1], CAP$UpperBound[1], CAP$RealisedShare[1], CAP$Year[1], max(CAP$RealisedShare), CAP[which.max(RealisedShare), Year], CAP[.N, RealisedShare], CAP[.N, Year], CAP[.N, Year], CAP[.N, Deficit],
+          CAP[.N, DeficitDisturbed], CAP[.N, DeficitLandUse], CAP[.N, DeficitCover], CAP[.N, DeficitLive], CAP[.N, DeficitDead]),
   sprintf("Land cover %d: %s", y1, paste(sprintf("%s %.0f%%", LC$lab, 100 * lc_share), collapse = "; ")))
 dir.create(OUT, showWarnings = FALSE, recursive = TRUE); writeLines(num, file.path(OUT, "agu-poster-numbers.txt")); cat(num, sep = "\n")
 
@@ -197,12 +201,14 @@ draw <- function() {
     text(2010.5, ty, sprintf("drought die-off\n2016–19: %.1f Tg C", sum(dp$drought)), adj = c(1, .5), cex = .98, col = INK2)
     segments(2010.9, ty, 2016.6, top[fy == 2017] + (u[4] - u[3]) * .04, col = MUTED, lwd = 1.2) })
 
-  rng <- range(L$nbp); lim <- c(floor(rng[1] / 2) * 2, ceiling(rng[2] / 2) * 2 + 2)
-  chart(3, lim, "g", "Net carbon balance of the land", "Tg C per year (net biome productivity)", function(u) {
-    rect(fy - .38, 0, fy + .38, L$nbp, col = ifelse(L$nbp >= 0, DIV[6], DIV[2]), border = NA); segments(u[1], 0, u[2], 0, col = AXIS, lwd = 1.5)
-    key(u, c("Gain (sink)", "Loss (source)"), c(DIV[6], DIV[2]))
-    text(u[2] + xinch(.14), u[4] - yinch(.95), sprintf("Mean %s Tg C\nper year: sink in\n%d of %d years", sub("-", "\u2212", sprintf("%+.2f", mean(L$nbp))), sum(L$nbp > 0), nrow(L)),
-         adj = c(0, 1), cex = .98, col = INK2) })
+  pk <- CAP[which.max(RealisedShare)]; gap <- CAP[.N]
+  chart(3, c(floor(min(CAP$RealisedShare) / 5) * 5 - 5, 101.5), "g", "Carbon against the carrying capacity", "% of what natural vegetation and fire would hold", function(u) {
+    segments(u[1], 100, u[2], 100, col = INK, lwd = 2); text(u[1] + .6, 98.6, "carrying capacity", adj = c(0, .5), cex = .98, col = INK2)
+    lines(CAP$Year, CAP$RealisedShare, col = SLATE, lwd = 4)
+    pts <- rbind(CAP[1], pk, gap); points(pts$Year, pts$RealisedShare, pch = 21, bg = SLATE, col = "white", cex = 1.5, lwd = 1.5)
+    text(pts$Year + c(.8, 0, -.6), pts$RealisedShare + (u[4] - u[3]) * .085, sprintf("%.0f%%", pts$RealisedShare), cex = .98, col = INK2, font = 2)
+    text(u[2] + xinch(.14), u[4] - yinch(.05), sprintf("Capacity: %.0f Tg C\nin live plants, dead\nwood and litter\n\n%d: %.0f Tg C below,\n%s on land\nrecovering from\ndisturbance", gap$Capacity, gap$Year, gap$Deficit,
+         if (gap$DeficitDisturbed / gap$Deficit > .5) "over half of it" else sprintf("%.0f%% of it", 100 * gap$DeficitDisturbed / gap$Deficit)), adj = c(0, 1), cex = .98, col = INK2) })
 }
 
 png(file.path(OUT, "agu-poster-lucas-figure.png"), width = W, height = H, units = "in", res = 300, type = "cairo", pointsize = 12); draw(); invisible(dev.off())

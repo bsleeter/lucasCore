@@ -7,4 +7,5 @@ Fire totals: 49.3 Tg C burned or killed, 24.1 emitted; 2020-21: 21.6 and 10.5
 Drought and insects: 2.73 Tg C killed in all, 1.64 in 2016-2019 (peak 0.64 in 2017); 23.6 kha
 Harvest: 1.99 Tg C in all; 23.0 kha
 NBP 2020: -6.9; 2021: -4.6
+Carrying capacity (live, dead wood, litter) 211.5 Tg C, upper bound 286.2; stock 85.3% of it in 1985, 94.9% in 2011 (peak), 88.5% in 2023; deficit 2023 24.4 Tg C: disturbed land 13.7, land use 0.5, cover 0.9, live 8.6, dead 0.7
 Land cover 2023: Conifer forest 37%; Hardwood forest 8%; Disturbed 5%; Shrubland 36%; Grassland 4%; Farms, towns 0%; Barren, water 10%
