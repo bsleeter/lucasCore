@@ -511,7 +511,12 @@ if (length(adj_set)) {
   if (nrow(sav)) sav <- sav[!StateAttributeTypeId %in% names(ATTR)]
   dv <- rbindlist(lapply(used, function(k) data.table(StateClassId = scl$Name, StateAttributeTypeId = k, Value = as.numeric(as.integer(scl$Id) %in% ATTR[[k]]))))
   sv <- rbind(sav, dv, fill = TRUE); write_stsim(sv[, setdiff(names(sv), c("StateAttributeValueId", "ScenarioId")), with = FALSE], "StateAttributeValue")
-  write_stsim(rbindlist(adj_set), "TransitionAdjacencySetting"); write_stsim(rbindlist(adj_mult), "TransitionAdjacencyMultiplier")
+  # (rows this stage does not make are kept: stage 9 writes the drought and insect mortality group's own, src/mortality.R)
+  keep10 <- function(name, mine) { x <- as.data.table(datasheet(scn, paste0("stsim_", name), optional = TRUE, lookupsAsFactors = FALSE))
+    if (nrow(x)) x[!TransitionGroupId %in% mine, setdiff(names(x), c(paste0(name, "Id"), "ScenarioId")), with = FALSE] else NULL }
+  mine10 <- unique(rbindlist(adj_set)$TransitionGroupId)
+  write_stsim(rbind(keep10("TransitionAdjacencySetting", mine10), rbindlist(adj_set), fill = TRUE), "TransitionAdjacencySetting")
+  write_stsim(rbind(keep10("TransitionAdjacencyMultiplier", mine10), rbindlist(adj_mult), fill = TRUE), "TransitionAdjacencyMultiplier")
   say("Adjacency: %s; share within %g m, updated every %d years", paste(rbindlist(adj_set)[, sprintf("%s (%s)", TransitionGroupId, StateAttributeTypeId)], collapse = ", "), adj_r, adj_up) }
 
 # ---- patch sizes: each Target group's historical event sizes as an ST-Sim size distribution ------------------------------------

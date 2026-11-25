@@ -103,3 +103,130 @@ mortality_select <- function(share, can, old, room, carry, cls = can) {
   sel <- if (k > 0) free[order(-share[free], free)][seq_len(k)] else integer()
   list(sel = sel, flagged = sum(share), moved = moved, again = again, young = young, held = held, target = target, carry = target - k)
 }
+
+# =============================================================================
+# Projections (to-do 3 phase 2, lucasCore 2.0.2; stage 9): the empirical method
+# =============================================================================
+# How much (user decisions 2026-11-23): the historical years are drawn in blocks of consecutive years (5 by default), one drawn
+# year for every unit; a unit is an ecodivision's softwood forest type group class (pinyon/juniper its own); the drawn year gives
+# the unit the share of its forest still open to the event that had it that year, written as a Transition Multiplier Value by
+# ecodivision, state class, iteration and year. It is a rate on what stands, so the area falls as the forest is used up.
+# Where (user 2026-11-24: no single cells sprinkled over the eligible forest; "Add adjacency now"): three things localize it,
+# all read from the Build's own yearly maps:
+#   a surface  a logistic GAM of where the events fell on canopy cover, climate normals and terrain, scaled to average 1 in
+#              every unit so it moves the die-off without changing the amount
+#   patches    the sizes of the yearly patches (8-neighbour model cells) as a Transition Size Distribution, as fire has
+#   spread     the chance by the share of recent die-off around a cell (ST-Sim adjacency on the state attribute Recent
+#              Mortality, 1 on a disturbed softwood class in the years after the event), as a ratio to the chance the rate
+#              and the surface give, so over the record the three together return the events that happened
+# =============================================================================
+MORT_SET <- "Mortality"; MORT_ATTR <- "Recent Mortality"; MORT_NEVER <- 999L
+MORTP <- list(block = 5L, small_km2 = 250, min_events = 100L, max_controls = 300000L, k = 5L, clamp = 20,
+              window = 3L, radius = 3L, share = c(0, 0.05, 0.1, 0.2, 0.4), adj_min_n = 1000L, adj_min_events = 30L, adj_cap = 30,
+              sizes = c(1, 2, 3, 5, 10, 20, 50, 100, 200, 500, 1e3, 2e3, 5e3, 1e4, 2e4, 5e4, 1e5))
+
+# The projection's Mortality page (single row; package.xml MortalityProjection). Blank = historical rates, blocks of 5, the Run Settings reference period, clustered.
+mortality_projection_options <- function(x) {
+  x <- data.table::as.data.table(x); g <- function(k) if (nrow(x) && k %in% names(x)) x[[k]][1] else NA
+  pick <- function(k, lv) { v <- g(k); v <- if (is.character(v) || is.factor(v)) match(tolower(sub(" .*", "", trimws(as.character(v)))), lv) else suppressWarnings(as.integer(v))
+    if (length(v) && !is.na(v) && !v %in% seq_along(lv)) stop(sprintf("Mortality: %s is %s", k, g(k))); if (!length(v) || is.na(v)) 1L else v }
+  int <- function(k, lo, hi) { v <- suppressWarnings(as.integer(g(k))); if (!is.na(v) && (v < lo || v > hi)) stop(sprintf("Mortality: %s is %s; give a value from %s to %s", k, v, lo, hi)); v }
+  b <- int("BlockYears", 1L, 50L); rs <- int("ReferenceStartYear", 1900L, 2200L); re <- int("ReferenceEndYear", 1900L, 2200L)
+  if (!is.na(rs) && !is.na(re) && rs > re) stop(sprintf("Mortality: the reference years run from %d to %d; the start must not be after the end", rs, re))
+  list(projection = c("rates", "off")[pick("Projection", c("historical", "off"))], block = if (is.na(b)) MORTP$block else b, ref_start = rs, ref_end = re,
+       clustered = pick("ProjectionPlacement", c("clustered", "random")) == 1L)
+}
+
+# Block draws: every iteration fills the projection years with blocks of consecutive reference years. A block starts at any
+# reference year with the same chance and runs on from the last year to the first, so every year is drawn equally often and the
+# long-run mean is the reference period's.
+mortality_blocks <- function(ref, pyrs, nit, block, seed) {
+  set.seed(seed); n <- length(ref); block <- as.integer(max(1L, block)); nb <- ceiling(length(pyrs) / block)
+  data.table::rbindlist(lapply(seq_len(nit), function(i) { st <- sample.int(n, nb, replace = TRUE)
+    idx <- as.vector(vapply(st, function(s) as.integer((s - 1L + 0:(block - 1L)) %% n) + 1L, integer(block)))[seq_along(pyrs)]
+    data.table::data.table(Iteration = i, Timestep = pyrs, HistoricalYear = ref[idx]) }))
+}
+
+# The cells still open to the event in year y: an eligible class, no event yet, at or over the minimum age (the start age carried
+# forward: a stand a fire or a clearcut made young during the record is counted as open, a small share).
+mortality_open <- function(ev, eligible, age0, mage, y0, y) eligible & (is.na(ev) | ev >= y) & !is.na(age0) & (age0 + (y - y0 - 1L)) >= mage
+
+# Yearly rates by unit from events E and open cells N (units x reference years). A unit with fewer than `small` eligible cells at
+# the start takes the rate of its ecodivision's units together (its softwoods pooled), a few cells being no record of their own.
+mortality_rate_table <- function(E, N, eco, cells0, small) {
+  r <- E / pmax(N, 1); r[N <= 0] <- 0; pooled <- cells0 < small
+  for (e in unique(eco[pooled])) { k <- eco == e; pr <- colSums(E[k, , drop = FALSE]) / pmax(colSums(N[k, , drop = FALSE]), 1)
+    r[k & pooled, ] <- matrix(pr, sum(k & pooled), ncol(E), byrow = TRUE) }
+  r <- pmin(r, 1); dimnames(r) <- dimnames(E)
+  list(rate = r, pooled = pooled, all = colSums(E) / pmax(colSums(N), 1))
+}
+
+# Patch sizes: each reference year's event cells joined into 8-neighbour patches on the model grid R; the number of patches per
+# size class (the class's largest size in cells).
+mortality_sizes <- function(ev, R, ref) {
+  n <- unlist(lapply(ref, function(y) { k <- ev %in% y; if (!any(k)) return(integer())
+    as.integer(table(terra::values(terra::patches(terra::setValues(R, ifelse(k, 1, NA)), directions = 8), mat = FALSE))) }))
+  if (!length(n)) return(NULL)
+  br <- MORTP$sizes[MORTP$sizes <= MORTP$sizes[min(which(MORTP$sizes >= max(n)))]]
+  b <- factor(findInterval(n, c(0, br), left.open = TRUE), levels = seq_along(br)); a <- as.numeric(tapply(n, b, sum)); a[is.na(a)] <- 0
+  list(table = data.table::data.table(MaximumCells = as.integer(br), Patches = as.integer(table(b)), AreaShare = a / sum(n)),
+       n = length(n), mean = mean(n), max = max(n), single = sum(n == 1) / sum(n))
+}
+
+# The surface: where the reference period's events fell among the cells open to them, on the covariates X (a data.table, one
+# column each, a row per cell; fitted on X, predicted from Xnow, which holds the covariates as they are at the historical end).
+# Returns each cell's weight, averaging 1 over the pool cells of every unit, or NULL when there are too few events or no covariate.
+mortality_surface <- function(event, pool, unit, X, Xnow = X, seed = 1L) {
+  cov <- names(X)[vapply(names(X), function(k) { v <- X[[k]][pool]; sum(!is.na(v)) > 0.5 * sum(pool) && isTRUE(stats::sd(v, na.rm = TRUE) > 0) }, TRUE)]
+  if (!length(cov)) return(NULL)
+  ok <- pool & stats::complete.cases(X[, cov, with = FALSE]); ev <- which(ok & event)
+  if (length(ev) < MORTP$min_events) return(NULL)
+  set.seed(seed); ct <- which(ok & !event); if (length(ct) > MORTP$max_controls) ct <- sort(sample(ct, MORTP$max_controls))
+  D <- cbind(data.table::data.table(y = rep(1:0, c(length(ev), length(ct)))), X[c(ev, ct), cov, with = FALSE])
+  kk <- vapply(cov, function(k) as.integer(min(MORTP$k, data.table::uniqueN(D[[k]]) - 1L)), 1L); cov <- cov[kk >= 3]; if (!length(cov)) return(NULL)
+  fm <- stats::as.formula(paste("y ~", paste(sprintf("s(%s, k = %d)", cov, kk[cov]), collapse = " + ")))
+  g <- mgcv::bam(fm, data = D, family = stats::binomial(), discrete = TRUE)
+  auc <- function(p, y) { r <- rank(p); (sum(r[y == 1]) - sum(y) * (sum(y) + 1) / 2) / (sum(y) * sum(y == 0)) }
+  p <- as.numeric(stats::fitted(g)); top <- order(-p)[seq_len(ceiling(0.1 * length(p)))]
+  # every cell with the covariates as they are now; the odds are the relative chance of a rare event, kept within clamp x the median
+  okn <- stats::complete.cases(Xnow[, cov, with = FALSE]); w <- rep(NA_real_, nrow(Xnow))
+  w[okn] <- exp(as.numeric(stats::predict(g, Xnow[okn, cov, with = FALSE], type = "link"))); md <- stats::median(w[okn & pool], na.rm = TRUE)
+  if (!is.finite(md) || md <= 0) return(NULL)
+  w <- pmin(pmax(w, md / MORTP$clamp), md * MORTP$clamp)
+  st <- summary(g)$s.table
+  list(w = mortality_scale(w, pool, unit), covariates = cov, auc = auc(p, D$y), top10 = sum(D$y[top]) / sum(D$y), events = length(ev), controls = length(ct),
+       terms = data.table::data.table(Covariate = cov, ChiSq = as.numeric(st[, "Chi.sq"])))
+}
+# weights scaled to average 1 over the pool cells of each unit (a cell with no weight takes 1; a cell outside every unit the overall scale)
+mortality_scale <- function(w, pool, unit) {
+  all <- mean(w[pool], na.rm = TRUE); if (!is.finite(all) || all <= 0) return(rep(1, length(w)))
+  m <- tapply(w[pool], unit[pool], mean, na.rm = TRUE); s <- as.numeric(m[as.character(unit)]); s[is.na(s) | s <= 0] <- all
+  w <- w / s; w[is.na(w)] <- 1; w
+}
+
+# Spread: for every reference year, the open cells by the share of cells within the radius that had the event in the window of
+# years before, their events, and the events the rate and the surface alone would give them (expect(y): per cell). The curve is
+# events over expected per share class: a class with too few cell-years takes the class below, the curve does not fall as the
+# share rises, and it is scaled so that over the record it returns the events that happened.
+# open(y) and expect(y) are functions of the year; R is the model grid.
+mortality_spread <- function(ev, land, R, ref, open, expect, radius = MORTP$radius, window = MORTP$window) {
+  k <- -radius:radius; w <- outer(k, k, function(a, b) as.numeric(a^2 + b^2 <= radius^2)); nw <- sum(w)
+  den <- terra::values(terra::focal(terra::setValues(R, as.numeric(land)), w, "sum", na.rm = TRUE), mat = FALSE)
+  nb <- length(MORTP$share); lv <- seq_len(nb); N <- numeric(nb); E <- numeric(nb); X <- numeric(nb); S <- numeric(nb)
+  add <- function(v, b) { s <- as.numeric(tapply(v, factor(b, levels = lv), sum)); s[is.na(s)] <- 0; s }
+  for (y in ref) { o <- which(open(y)); if (!length(o)) next
+    rec <- !is.na(ev) & ev < y & ev >= y - window
+    sh <- if (any(rec)) terra::values(terra::focal(terra::setValues(R, as.numeric(rec)), w, "sum", na.rm = TRUE), mat = FALSE)[o] / pmax(den[o], 1) else numeric(length(o))
+    b <- pmin(findInterval(sh, MORTP$share, left.open = TRUE) + 1L, nb)
+    N <- N + tabulate(b, nb); E <- E + add(as.numeric(ev[o] %in% y), b); X <- X + add(expect(y)[o], b); S <- S + add(sh, b) }
+  if (sum(E[-1]) < MORTP$adj_min_events || sum(X) <= 0) return(NULL)
+  m <- ifelse(N >= MORTP$adj_min_n & X > 0, E / pmax(X, 1e-12), NA_real_); if (is.na(m[1])) m[1] <- 1
+  for (i in 2:nb) if (is.na(m[i])) m[i] <- m[i - 1]
+  m[-1] <- pmin(cummax(pmax(m[-1], m[1])), MORTP$adj_cap)
+  m <- m * sum(E) / sum(X * m)   # the record's total is kept
+  # the curve's points: no recent die-off near; then each class that holds cells, at their mean share; the last value held to a share of 1
+  s <- MORTP$share; has <- which(N > 0 & lv > 1); at <- c(0, S[has] / N[has]); am <- c(m[1], m[has]); if (max(at) < 1) { at <- c(at, 1); am <- c(am, am[length(am)]) }
+  list(curve = data.table::data.table(AttributeValue = round(at, 4), Amount = round(am, 4)),
+       classes = data.table::data.table(Share = c("none", sprintf("%g-%g%%", 100 * s[-nb], 100 * s[-1])[seq_len(nb - 2)], sprintf("over %g%%", 100 * s[nb - 1])),
+                                        CellYears = N, Events = E, Expected = X, Multiplier = m), cells = nw, near = sum(E[-1]) / sum(E))
+}

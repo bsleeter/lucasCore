@@ -2,6 +2,53 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## 2.0.2 - unreleased
+
+Drought and insect mortality in projections. No library update is needed: a library on 2.0.0 or 2.0.1 opens as it is (the
+projection settings are a new sheet, which SyncroSim adds by itself, and stage 9 adds the one new definition, the state
+attribute Recent Mortality, to a library that lacks it). Builds stay valid. A Projection Setup made on 2.0.2 has the event
+on unless its Mortality page says Off, so a projection from a new setup differs from one made on 2.0.1, where the event
+stopped at the historical end.
+
+### Added
+
+- **Drought and insect mortality continues after the historical end**, at the rates of the record (stage 9,
+  `src/mortality.R`).
+  - *How much.* Each iteration fills the projection years with blocks of consecutive historical years (5 by default), so
+    an outbreak of several years stays together; a block starts at any reference year with the same chance and runs on
+    from the last year to the first, so every year is drawn equally often. One drawn year applies to every unit. A unit is
+    an ecodivision's softwood forest type group (pinyon/juniper its own); a unit with under 250 km2 of eligible forest
+    takes the pooled rate of its ecodivision. The drawn year gives the unit the share of its open forest (an eligible
+    class, no event yet, at or over the minimum age) that had the event that year, written as a Transition Multiplier Value
+    by ecodivision, state class, iteration and year. It is a rate on what stands, so the area falls as forest is used up
+    and returns as it regrows.
+  - *Where.* Three things read from the Build's own yearly maps place it, and none changes the amount: a **surface**
+    (a logistic GAM of where the events fell on tree canopy cover, the temperature, precipitation and vapour pressure
+    deficit normals, elevation and slope; scaled to average 1 in every unit); the record's **patch sizes** as a
+    Transition Size Distribution, as fire has; and **spread** from the die-off of the three years before, as an ST-Sim
+    adjacency multiplier on the new state attribute Recent Mortality (1 on a disturbed softwood class for three years
+    after the event), fitted as the ratio of what happened to what the rate and the surface alone give.
+  - *Settings* (a new page, Projection > Mortality, `ui/MortalityProjectionView.cs`; the Build's Mortality page keeps the
+    historical settings): Historical rates or Off; the years drawn together; the event's own reference years (blank = the
+    Run Settings reference period); Clustered or Random cells. A Projection Transitions row for the group set to None
+    also switches it off. The settings have a sheet of their own because a Projection Setup's row on the Build's sheet
+    would hide the Build's.
+  - *Outputs.* The stage 9 log gives the reference years' mean rate beside the whole record's, the surface's skill, the
+    patch sizes and the spread curve; Projection Rates lists the units and Projection Schedule the drawn blocks (sampling
+    set Mortality).
+- `tests/unit-mortality.R`: 32 checks of the block draws, the rates, the patch sizes, the surface and the spread curve.
+
+### Changed
+
+- Stage 10 keeps the adjacency rows it does not make itself (it replaced the whole sheets), so the mortality group's
+  survive a Projection Setup.
+- **The mortality group gets maps.** It was never one of the mapped groups, so a run gave its area in the tables and no
+  maps. It is now in `defaults/stockflow/main-transition-groups.csv` (a new library's transition output filter has its
+  maps and average probability maps on), and stage 9 turns both on in the filter of a library made on 2.0.0 or 2.0.1
+  when the event is projected. (Average probability maps are still not written for any group: ST-Sim's Spatial Average
+  output option is off and the package does not set it.) A historical run of such a library still has no maps of the event unless the group is
+  ticked on the ST-Sim transition output filter.
+
 ## 2.0.1 - 2026-11-24
 
 A patch: pages only. No library update is needed; a library on 2.0.0 opens as it is.

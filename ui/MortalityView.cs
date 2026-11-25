@@ -35,7 +35,7 @@ namespace lucasCoreUI
                 Note("High-severity die-off from drought, insects or disease: a stand that loses most of its live trees within a few years, with no fire and no cutting. " +
                      "Partial mortality is not part of it; that is already in the yearly background rate of the growth curves and stem turnover."),
                 Note("The Build maps it for the historical period, 1990 to 2023 (1986 to 1990 share the first year's area), in the western ecodivisions listed below. " +
-                     "East of them it writes no events. A projection keeps the event off; projected rates are to follow."),
+                     "East of them it writes no events. A projection continues it at the rates of the record: Projection > Mortality."),
                 Note("A cell that takes the event goes to its forest type's Disturbed class with its age reset, as after high-severity fire. " +
                      "How much live carbon moves to dead pools is set under Carbon Assumptions > Disturbance Flows (83% by default; nothing is emitted in the event year)."))));
 

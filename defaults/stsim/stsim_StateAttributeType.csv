@@ -20,3 +20,4 @@ Agriculture,State Class,,"1 on agriculture state classes (NLCD 81, 82), written 
 Pasture,State Class,,"1 on Agriculture: Pasture (NLCD 81), written by stage 10: the pasture share around a cell drives the adjacency multiplier of Ag Change: Cropland to Pasture"
 Cropland,State Class,,"1 on Agriculture: Cropland (NLCD 82), written by stage 10: the cropland share around a cell drives the adjacency multiplier of Ag Change: Pasture to Cropland"
 Live Forest,State Class,,"1 on forest type group classes (Ids 100-999), written by stage 10: the live forest share around a disturbed forest cell drives its return multiplier (to-do 57)"
+Recent Mortality,State Class,,"1 on a disturbed softwood class in the three years after a drought and insect mortality event, written by stage 9: the share of recent die-off around a cell drives the event's adjacency multiplier in projections (to-do 3)"

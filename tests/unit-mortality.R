@@ -87,4 +87,78 @@ so <- fread("defaults/transitions/sources.csv"); check("the group has its source
 ev <- fread("defaults/stockflow/event-pathways.csv", colClasses = "character", na.strings = "")[TransitionGroupId == MORT_GROUP]
 mv <- ev[, .(share = sum(as.numeric(Multiplier))), by = FromStockTypeId]
 check("the event moves the same share of each live tree pool to dead pools and emits nothing", nrow(mv) == 5 && all(abs(mv$share - 0.83) < 1e-9) && all(grepl("^DOM: ", ev$ToStockTypeId)) && all(ev$FlowTypeId == "LULC: Mortality Live"))
+
+# ---- projections (lucasCore 2.0.2; stage 9): options, block draws, rates, patch sizes, the surface, the spread ----------------------
+suppressPackageStartupMessages(library(mgcv))
+p0 <- mortality_projection_options(data.table())
+check("blank page: historical rates in blocks of 5, the Projection Options reference years, clustered", p0$projection == "rates" && p0$block == 5L && is.na(p0$ref_start) && is.na(p0$ref_end) && p0$clustered)
+p1 <- mortality_projection_options(data.table(Projection = "Off", BlockYears = 10, ReferenceStartYear = 2001, ReferenceEndYear = 2023, ProjectionPlacement = "Random cells"))
+check("the projection settings are read, by label", p1$projection == "off" && p1$block == 10L && p1$ref_start == 2001L && p1$ref_end == 2023L && !p1$clustered)
+p2 <- mortality_projection_options(data.table(Projection = 2L, ProjectionPlacement = 1L))
+check("and by number", p2$projection == "off" && p2$clustered)
+check("a reference start after the end stops", inherits(tryCatch(mortality_projection_options(data.table(ReferenceStartYear = 2020, ReferenceEndYear = 2000)), error = function(e) e), "error"))
+check("a block length of 0 stops", inherits(tryCatch(mortality_projection_options(data.table(BlockYears = 0)), error = function(e) e), "error"))
+
+refy <- 1986:2023; py <- 2024:2100
+b <- mortality_blocks(refy, py, 200L, 5L, 7L)
+check("every iteration has one drawn year for every projection year, all of them reference years", nrow(b) == 200L * length(py) && all(b$HistoricalYear %in% refy) && all(b[, .N, by = Iteration]$N == length(py)))
+blk_ok <- function(d, ref, len) { p <- match(d$HistoricalYear, ref); s <- (diff(p) - 1L) %% length(ref); all(s[seq_along(s) %% len != 0] == 0) }
+check("the years inside a block are consecutive, running on from the last reference year to the first", all(b[, blk_ok(.SD, refy, 5L), by = Iteration]$V1))
+check("a block does not always follow on from the one before", any(b[, { p <- match(HistoricalYear, refy); s <- (diff(p) - 1L) %% length(refy); any(s[seq_along(s) %% 5L == 0] != 0) }, by = Iteration]$V1))
+check("the seed repeats the draws, and another seed changes them", identical(b, mortality_blocks(refy, py, 200L, 5L, 7L)) && !identical(b$HistoricalYear, mortality_blocks(refy, py, 200L, 5L, 8L)$HistoricalYear))
+fq <- as.numeric(table(factor(b$HistoricalYear, levels = refy))) / nrow(b)
+check("every reference year is drawn about equally often (within a third of 1 in 38 over 200 iterations)", all(abs(fq * length(refy) - 1) < 0.33))
+check("a block of 1 draws single years; a block longer than the projection gives one run", blk_ok(mortality_blocks(refy, 2024:2030, 1L, 50L, 1L), refy, 50L) && nrow(mortality_blocks(refy, py, 3L, 1L, 1L)) == 3L * length(py))
+
+# open cells: eligible, no event before the year, old enough (start age carried forward)
+ev6 <- c(NA, 1990L, 2000L, NA, NA); el6 <- c(TRUE, TRUE, TRUE, FALSE, TRUE); a6 <- c(50L, 50L, 50L, 50L, 5L)
+check("open in 1995: not the cell that died in 1990, not an ineligible cell, not a stand still under the minimum age", identical(mortality_open(ev6, el6, a6, 20, 1985L, 1995L), c(TRUE, FALSE, TRUE, FALSE, FALSE)))
+check("the young stand is open once it reaches the minimum age (5 in 1985 is 20 in 2001)", identical(mortality_open(ev6, el6, a6, 20, 1985L, 2001L), c(TRUE, FALSE, FALSE, FALSE, TRUE)))
+
+# rates: two large units and a small one in ecodivision 1, one small unit alone in ecodivision 2
+E <- matrix(c(10, 0, 1, 2,   20, 5, 0, 0), 4, dimnames = list(c("a", "b", "c", "d"), c("2001", "2002"))); N <- matrix(c(1000, 2000, 50, 40,   990, 2000, 49, 38), 4)
+rt <- mortality_rate_table(E, N, eco = c(1, 1, 1, 2), cells0 = c(1000, 2000, 50, 40), small = 100)
+check("a unit's rate is its events over its open cells", near(rt$rate["a", ], c(`2001` = 10 / 1000, `2002` = 20 / 990)) && near(unname(rt$rate["b", "2002"]), 5 / 2000))
+check("a small unit takes the pooled rate of its ecodivision's units", rt$pooled[3] && near(unname(rt$rate["c", ]), c(11 / 3050, 25 / 3039)))
+check("a small unit alone in its ecodivision keeps what it has", rt$pooled[4] && near(unname(rt$rate["d", ]), c(2 / 40, 0)))
+check("the overall rate is all events over all open cells", near(unname(rt$all), c(13 / 3090, 25 / 3077)))
+check("a unit with no open cells has rate 0, and no rate is over 1", mortality_rate_table(matrix(c(0, 5), 2), matrix(c(0, 3), 2), c(1, 2), c(500, 500), 100)$rate[1, 1] == 0 && max(mortality_rate_table(matrix(c(0, 5), 2), matrix(c(0, 3), 2), c(1, 2), c(500, 500), 100)$rate) <= 1)
+
+# patch sizes on a 10 x 10 grid: 2001 has a patch of 3 (one joined by a corner) and a single cell; 2002 a patch of 6; they are not joined across years
+G <- rast(nrows = 10, ncols = 10, xmin = 0, xmax = 3000, ymin = 0, ymax = 3000, crs = "EPSG:5070"); cl <- function(r, c) (r - 1L) * 10L + c
+evg <- rep(NA_integer_, 100); evg[c(cl(1, 1), cl(1, 2), cl(2, 3), cl(8, 8))] <- 2001L; evg[c(cl(5, 1), cl(5, 2), cl(5, 3), cl(6, 1), cl(6, 2), cl(6, 3))] <- 2002L
+sz <- mortality_sizes(evg, G, 2001:2002)
+check("yearly patches: 8-neighbour cells of one year, by size class", sz$n == 3L && sz$max == 6L && identical(sz$table[Patches > 0, MaximumCells], c(1L, 3L, 10L)) && near(sz$single, 1 / 10) && near(sum(sz$table$AreaShare), 1))
+check("only the reference years count, and none gives no table", mortality_sizes(evg, G, 2002L)$n == 1L && is.null(mortality_sizes(evg, G, 1999L)))
+
+# the surface: on a 100 x 100 grid the chance of the event rises with one covariate and ignores another
+set.seed(3); G2 <- rast(nrows = 100, ncols = 100, xmin = 0, xmax = 30000, ymin = 0, ymax = 30000, crs = "EPSG:5070"); nc2 <- 10000L
+x1 <- runif(nc2); x2 <- runif(nc2); pool <- rep(TRUE, nc2); pool[1:500] <- FALSE; un <- rep(c(1, 2), each = nc2 / 2)
+evs <- pool & runif(nc2) < 0.02 * exp(3 * (x1 - 0.5)); X <- data.table(Dense = x1, Noise = x2, Flat = 1)
+sf <- mortality_surface(evs, pool, un, X, X, 1L)
+check("the surface averages 1 over the pool cells of every unit", !is.null(sf) && all(abs(tapply(sf$w[pool], un[pool], mean) - 1) < 1e-9))
+check("it rises with the covariate that drives the event and has skill; a covariate with one value is left out", cor(sf$w[pool], x1[pool]) > 0.8 && sf$auc > 0.65 && sf$top10 > 0.2 && !"Flat" %in% sf$covariates)
+check("the weights stay within the clamp of the median, and every cell has one", all(is.finite(sf$w)) && max(sf$w[pool]) / stats::median(sf$w[pool]) <= MORTP$clamp * 1.5)
+check("too few events, or no usable covariate, gives no surface", is.null(mortality_surface(pool & seq_len(nc2) %in% 501:520, pool, un, X, X)) && is.null(mortality_surface(evs, pool, un, data.table(Flat = rep(1, nc2)))))
+Xn <- copy(X)[, Dense := 1 - Dense]; sfn <- mortality_surface(evs, pool, un, X, Xn, 1L)
+check("the surface is placed on the covariates as they are now", cor(sfn$w[pool], x1[pool]) < -0.8)
+ws <- mortality_scale(c(2, 4, NA, 10, 30, 5), c(TRUE, TRUE, TRUE, TRUE, TRUE, FALSE), c(1, 1, 1, 2, 2, NA))
+check("scaling: mean 1 over each unit's pool cells, 1 where there is no weight, the overall scale outside the units", near(ws[1:2], c(2, 4) / 3) && ws[3] == 1 && near(ws[4:5], c(0.5, 1.5)) && near(ws[6], 5 / 11.5))
+
+# the spread: events seeded at random in 2001, then in 2002-2004 a cell beside recent die-off is 20 times as likely
+set.seed(5); evc <- rep(NA_integer_, nc2); landc <- rep(TRUE, nc2); evc[sample(nc2, 150)] <- 2001L; w3 <- matrix(1, 3, 3)
+for (y in 2002:2004) { rec <- !is.na(evc) & evc < y; nb <- values(focal(setValues(G2, as.numeric(rec)), w3, "sum", na.rm = TRUE), mat = FALSE) > 0
+  evc[is.na(evc) & runif(nc2) < ifelse(nb, 0.06, 0.003)] <- y }
+openc <- function(y) is.na(evc) | evc >= y; r_y <- vapply(2002:2004, function(y) sum(evc %in% y) / sum(openc(y)), 0)
+sp <- mortality_spread(evc, landc, G2, 2002:2004, openc, function(y) rep(r_y[y - 2001L], nc2), radius = 1L, window = 3L)
+check("the curve is below 1 with no recent die-off near and well above it beside some, and does not fall as the share rises",
+      !is.null(sp) && sp$classes$Multiplier[1] < 1 && max(sp$classes$Multiplier) > 3 && all(diff(sp$classes$Multiplier[-1]) >= -1e-9) && all(diff(sp$curve$AttributeValue) > 0))
+check("the rate and the curve together return the events that happened", near(sum(sp$classes$Expected * sp$classes$Multiplier), sum(sp$classes$Events)) && near(sum(sp$classes$Events), sum(evc %in% 2002:2004)))
+check("the first point of the curve above none is one neighbour's share", near(sp$curve$AttributeValue[2], round(1 / sp$cells, 4)) && sp$curve$AttributeValue[1] == 0 && max(sp$curve$AttributeValue) == 1)
+evr <- rep(NA_integer_, nc2); evr[sample(nc2, 40)] <- 2002L
+check("too few events near earlier ones gives no curve", is.null(mortality_spread(evr, landc, G2, 2002:2004, function(y) is.na(evr) | evr >= y, function(y) rep(0.004, nc2), radius = 1L)))
+
+# what the package ships for projections
+check("the state attribute for the spread is among the package's definitions", MORT_ATTR %in% fread("defaults/stsim/stsim_StateAttributeType.csv")$Name)
+ptd <- fread("defaults/projection/transitions.csv"); check("Projection Transitions has the group's row, in its own sampling set", nrow(ptd[TransitionGroupId == MORT_GROUP & Method == "Probability" & SamplingSet == MORT_SET]) == 1L)
 cat(sprintf("%d checks, %d failed\n", n, fails)); if (fails) quit(status = 1)

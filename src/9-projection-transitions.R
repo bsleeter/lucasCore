@@ -65,6 +65,11 @@ pt[, Method := sub(" .*", "", Method)]; pt[, StrataLevel := sub(" .*", "", Strat
 source(pkg_file("src", "reforestation.R")); ro9 <- reforest_options(read_ds("ReforestationOptions"))   # (to-do 57: off = no Reforestation in the projection)
 if (!ro9$enabled && any(pt$TransitionGroupId == "Reforestation")) { pt[TransitionGroupId == "Reforestation", Method := "None"]; say("Reforestation: off (Reforestation Options)") }
 for (k in c("UnitSource", "ExcludeGap", "SamplingSet", "StrataLevel")) if (!k %in% names(pt)) pt[, (k) := NA_character_]
+# drought and insect mortality (to-do 3 phase 2; src/mortality.R) has its own block below: its units are ecodivision by forest type
+# group, not a Stratum Source, and its years are drawn in blocks. Its row here only switches it (None = off); a sheet filled before
+# lucasCore 2.0.2 has no row, and the projection's Mortality page then decides
+source(pkg_file("src", "mortality.R")); source(pkg_file("src", "forest-cover.R"))   # (forest-cover.R: the tree canopy cover file names and years)
+mort_pt <-pt[TransitionGroupId %in% c(MORT_GROUP, "Mortality")]; pt <- pt[!TransitionGroupId %in% c(MORT_GROUP, "Mortality")]
 pt[is.na(SamplingSet) | !nzchar(SamplingSet), SamplingSet := TransitionGroupId]
 bad <- pt[!Method %in% c("Target", "Probability", "None")]; if (nrow(bad)) fail("Projection Transitions: unknown method for %s", paste(bad$TransitionGroupId, collapse = "; "))
 bad <- pt[Method == "Target" & !StrataLevel %in% c("Primary", "Secondary", "Tertiary")]; if (nrow(bad)) fail("Projection Transitions: a Target group needs Target Strata: %s", paste(bad$TransitionGroupId, collapse = "; "))
@@ -591,6 +596,117 @@ for (i in seq_len(nrow(pg))) { g <- pg$TransitionGroupId[i]; u <- unit_map(pg$Un
   rates[[g]] <- data.table(TransitionGroup = g, Method = "Probability", Unit = sprintf("%s %s", pg$UnitSource[i], units), MeanArea = rowMeans(ua),
                            MinArea = apply(ua, 1, min), MaxArea = apply(ua, 1, max), AllowedShare = 1)
   say("%s: rate by %s (%d units), mean %.2f km2/yr over %d-%d; %d distinct years drawn", g, pg$UnitSource[i], length(units), sum(rowMeans(ua)), rs, re, uniqueN(dr$HistoricalYear)) }
+
+# ---- drought and insect mortality (to-do 3 phase 2; src/mortality.R) --------------------------------------------------------
+# How much: blocks of consecutive reference years (the projection's Mortality page: block length, its own reference years), one drawn year for every
+# unit; a unit is an ecodivision's softwood class, and the drawn year gives it the share of its open forest that had the event, as a
+# Transition Multiplier Value on the pathways' probability of 1. Where: a fitted surface (mean 1 in every unit), the patch sizes of
+# the record, and spread from recent die-off (ST-Sim adjacency), all read from stage 6's yearly maps of the group.
+mo9 <- tryCatch(mortality_projection_options(tryCatch(read_ds("MortalityProjection"), error = function(e) data.table())), error = function(e) fail("%s", conditionMessage(e)))
+mo9$enabled <- tryCatch(mortality_options(tryCatch(read_ds("MortalityOptions"), error = function(e) data.table()))$enabled, error = function(e) TRUE)
+mort <- NULL
+if (MORT_GROUP %in% unique(sm$TransitionGroupId)) {
+  why_off <- if (!mo9$enabled) "the Build's Mortality page: the event is off" else if (mo9$projection == "off") "the projection's Mortality page: Off" else
+    if (nrow(mort_pt) && all(mort_pt$Method == "None")) "its Projection Transitions row is None" else if (!MORT_GROUP %in% ann) "the Build mapped no event" else NA_character_
+  if (!is.na(why_off)) say("Drought and insect mortality: off in the projection (%s)", why_off) else {
+    scm <- stsim_list("StateClass"); stm <- stsim_list("Stratum"); pwm <- pw[TransitionTypeId == MORT_TYPE]
+    src_id <- as.integer(scm$Id[match(pwm$StateClassIdSource, scm$Name)]); vP9 <- lev$Primary
+    elm <- land & vS0 %in% src_id; age0 <- values(rast(ic$AgeFileName[1]), mat = FALSE)
+    mage <- { v <- suppressWarnings(as.numeric(tryCatch(mortality_options(read_ds("MortalityOptions"))$min_age, error = function(e) NA))); if (is.na(v)) suppressWarnings(min(as.numeric(pwm$AgeMin), na.rm = TRUE)) else v }
+    if (!is.finite(mage)) mage <- 0
+    # each cell's event year from the yearly maps (ranked selection writes 1 and 0; fraction as probability writes shares)
+    rec <- sort(as.integer(sm[TransitionGroupId == MORT_GROUP & Timestep > y0 & Timestep <= y1 & !is.na(MultiplierFileName) & !grepl("^Off", basename(MultiplierFileName)), unique(Timestep)]))
+    evm <- rep(NA_integer_, length(land)); fr_y <- list(); whole <- TRUE
+    for (y in rec) { v <- hist_vals(MORT_GROUP, y); v[!land] <- 0; if (any(v > 0 & v < 1 - 1e-6)) whole <- FALSE; fr_y[[as.character(y)]] <- v; evm[v >= 1 - 1e-6] <- y }
+    # the record runs from its first mapped year to its last; a year inside it with no map had no event
+    rec_y <- if (length(rec)) min(rec):max(rec) else integer()
+    mref <- intersect(seq(nz(mo9$ref_start, rs), nz(mo9$ref_end, re)), rec_y)
+    if (!length(mref)) fail("Mortality: the reference years %d-%d hold no year of the mapped record (%s); change them on the projection's Mortality page, or choose Off there",
+                            nz(mo9$ref_start, rs), nz(mo9$ref_end, re), if (length(rec_y)) sprintf("%d-%d", min(rec_y), max(rec_y)) else "no events mapped")
+    unit <- ifelse(elm, vP9 * 1e5 + vS0, NA_real_); us <- sort(unique(unit[elm])); ui <- match(unit, us); nu <- length(us)
+    if (!nu) say("Drought and insect mortality: no cell of the study area is in a softwood class with the pathway: no events in the projection") else {
+      openm <- function(y) mortality_open(if (whole) evm else rep(NA_integer_, length(land)), elm, age0, mage, y0, y)
+      fv <- function(y) { v <- fr_y[[as.character(y)]]; if (is.null(v)) numeric(length(land)) else v }
+      wsum <- function(v, k) { s <- as.numeric(tapply(v[k], factor(ui[k], levels = seq_len(nu)), sum)); s[is.na(s)] <- 0; s }
+      Em <- vapply(rec_y, function(y) wsum(fv(y), elm), numeric(nu)); Nm <- vapply(rec_y, function(y) as.numeric(tabulate(ui[openm(y)], nu)), numeric(nu))
+      Em <- matrix(Em, nu, dimnames = list(us, rec_y)); Nm <- matrix(Nm, nu, dimnames = list(us, rec_y)); cells0 <- tabulate(ui[elm], nu)
+      rt <- mortality_rate_table(Em, Nm, us %/% 1e5, cells0, MORTP$small_km2 / cell_km2)
+      u_eco <- stm$Name[match(us %/% 1e5, as.integer(stm$Id))]; u_cls <- scm$Name[match(us %% 1e5, as.integer(scm$Id))]
+      if (anyNA(u_eco) || anyNA(u_cls)) fail("Mortality: %d rate units are not in the stsim strata or state class lists", sum(is.na(u_eco) | is.na(u_cls)))
+      # the draws: blocks of the reference years, its own sampling set
+      drm <- mortality_blocks(mref, pyrs, nit, mo9$block, seed * 1000L + 77L); drm[, SamplingSet := MORT_SET]
+      sched <- rbind(sched[SamplingSet != MORT_SET], drm[, .(Iteration, Timestep, SamplingSet, HistoricalYear)])
+      jr <- match(drm$HistoricalYear, rec_y)
+      mort_tmv <- rbindlist(c(lapply(seq_len(nu), function(k) data.table(Iteration = drm$Iteration, Timestep = drm$Timestep, StratumId = u_eco[k], StateClassId = u_cls[k], TransitionGroupId = MORT_GROUP, Amount = signif(rt$rate[k, jr], 6))),
+                              list(data.table(Iteration = drm$Iteration, Timestep = drm$Timestep, StratumId = NA_character_, StateClassId = NA_character_, TransitionGroupId = MORT_GROUP, Amount = signif(rt$all[jr], 6)))))   # (a class with no unit of its own: the study area's rate)
+      jm <- match(mref, rec_y); all_rec <- sum(Em) / max(sum(Nm), 1); all_ref <- sum(Em[, jm]) / max(sum(Nm[, jm]), 1)
+      say("Drought and insect mortality: %d units (ecodivision by softwood class; %d under %g km2 take their ecodivision's pooled rate); reference years %d-%d (%s), %d with an event: mean %.3f%% of the open forest a year (%.2f km2/yr), against %.3f%% over the whole record %d-%d; blocks of %d years, %d iterations",
+          nu, sum(rt$pooled), MORTP$small_km2, min(mref), max(mref), if (is.na(mo9$ref_start) && is.na(mo9$ref_end)) "Projection Options" else "the Mortality page", sum(colSums(Em[, jm, drop = FALSE]) > 0),
+          100 * all_ref, sum(Em[, jm]) / length(jm) * cell_km2, 100 * all_rec, min(rec_y), max(rec_y), mo9$block, nit)
+      say("  drawn: mean %.3f%% a year over all iterations and years (iterations from %.3f%% to %.3f%%); highest unit and year %.2f%%", 100 * mean(rt$all[jr]),
+          100 * min(drm[, mean(rt$all[match(HistoricalYear, rec_y)]), by = Iteration]$V1), 100 * max(drm[, mean(rt$all[match(HistoricalYear, rec_y)]), by = Iteration]$V1), 100 * max(rt$rate[, jm]))
+      ua <- rt$rate[, jm, drop = FALSE] * Nm[, jm, drop = FALSE] * cell_km2
+      rates[[MORT_GROUP]] <- data.table(TransitionGroup = MORT_GROUP, Method = "Mortality rate (blocks)", Unit = sprintf("%s | %s%s", u_eco, sub("^Forest: ", "", u_cls), ifelse(rt$pooled, " (pooled rate)", "")),
+                                        MeanArea = rowMeans(ua), MinArea = apply(ua, 1, min), MaxArea = apply(ua, 1, max), AllowedShare = 1)
+      check(STAGE, "mortality: every unit has a rate between 0 and 1 in every iteration and projection year", all(is.finite(mort_tmv$Amount) & mort_tmv$Amount >= 0 & mort_tmv$Amount <= 1) && nrow(mort_tmv) == (nu + 1L) * nit * length(pyrs))
+      check(STAGE, "mortality: the drawn years are whole blocks of the reference years", all(drm$HistoricalYear %in% mref) &&
+              all(drm[, { p <- match(HistoricalYear, mref); d <- (diff(p) - 1L) %% length(mref); all(d[(seq_along(d)) %% mo9$block != 0] == 0) }, by = Iteration]$V1))
+      # ---- where: the surface, the patch sizes, the spread -------------------------------------------------------------------
+      wsurf <- rep(1, length(land)); sfm <- NULL; szm <- NULL; spm <- NULL; evr <- ifelse(!is.na(evm) & evm %in% mref, evm, NA_integer_)
+      if (!mo9$clustered) say("Drought and insect mortality: placed at random among the eligible cells (the Mortality page)") else
+      if (!whole) say("Drought and insect mortality: the Build placed the event as fractions (Mortality page, Fraction as probability), which name no cells: no surface, patch sizes or spread; placed at random among the eligible cells") else {
+        box9 <- function(r) project(as.polygons(ext(P), crs = crs(P)), crs(r))
+        onto9 <- function(f, m = "average", fn = NULL) tryCatch({ r <- crop(rast(f), box9(rast(f)), snap = "out"); if (!is.null(fn)) r <- fn(r); values(project(r, P, method = m), mat = FALSE) }, error = function(e) NULL)
+        opt_src <- function(k) tryCatch(read_data_sources(k, optional = TRUE)[[k]], error = function(e) NA_character_)
+        X <- list(); Xn <- list(); my <- as.integer(stats::median(evr, na.rm = TRUE))
+        tcd <- opt_src("TreeCanopyFolder"); tcf <- function(y) file.path(tcd, sprintf(TCC_FILE, y))
+        if (!is.na(tcd) && is.finite(my)) { yf <- max(my - MORT$span, min(TCC_YEARS)); yn <- suppressWarnings(max(TCC_YEARS[TCC_YEARS <= y1 & file.exists(tcf(TCC_YEARS))]))
+          if (file.exists(tcf(yf)) && is.finite(yn)) {
+            a <- onto9(tcf(yf), fn = function(r) ifel(r > 100, NA, r)); b <- onto9(tcf(yn), fn = function(r) ifel(r > 100, NA, r))
+            if (!is.null(a) && !is.null(b)) { X$Canopy <- a; Xn$Canopy <- b; say("  surface: tree canopy cover of %d (five years before the middle event year, %d) to fit, of %d to place", yf, my, yn) } } }
+        ef <- opt_src("ElevationFile")
+        if (!is.na(ef) && file.exists(ef)) { a <- onto9(ef); b <- onto9(ef, fn = function(r) terrain(r, "slope", unit = "degrees")); if (!is.null(a)) X$Elevation <- Xn$Elevation <- a; if (!is.null(b)) X$Slope <- Xn$Slope <- b }
+        pf <- opt_src("PrismFolder")
+        pv <- c(Temperature = "tmean", Precipitation = "ppt", Vpd = "vpdmax")   # the 1991-2020 normals, 800 m where the folder has them
+        if (!is.na(pf)) { source(pkg_file("src", "prism.R")); for (nm in names(pv)) { f <- tryCatch(prism_normal(pf, pv[[nm]], "800 m"), error = function(e) NA_character_)
+          if (!length(f) || is.na(f[1])) f <- tryCatch(prism_normal(pf, pv[[nm]], "4 km"), error = function(e) NA_character_)
+          if (length(f) && !is.na(f[1]) && file.exists(f[1])) { a <- onto9(f[1], "bilinear"); if (!is.null(a)) X[[nm]] <- a } } }
+        for (k in setdiff(names(X), names(Xn))) Xn[[k]] <- X[[k]]
+        if (length(X)) { X <- as.data.table(X); Xn <- as.data.table(Xn)[, names(X), with = FALSE]
+          sf0 <- tryCatch(mortality_surface(!is.na(evr), elm, unit, X, X, seed), error = function(e) { say("  surface: not fitted (%s)", conditionMessage(e)); NULL })
+          sfm <- if (is.null(sf0)) NULL else tryCatch(mortality_surface(!is.na(evr), elm, unit, X, Xn, seed), error = function(e) NULL) }
+        if (is.null(sfm)) say("Drought and insect mortality: no surface (%s): every eligible cell of a unit weighs the same", if (!length(X)) "no covariate could be read: tree canopy cover, elevation, PRISM normals" else sprintf("fewer than %d event cells in the reference years, or the fit failed", MORTP$min_events)) else {
+          wsurf <- sfm$w; wsurf[!land] <- NA
+          say("Drought and insect mortality surface: %d event cells against %d others on %s; in sample the top tenth of cells holds %.0f%% of the events (score %.2f; 0.5 = no skill); weights from %.2f to %.2f (1st and 99th percentile), mean 1 in every unit",
+              sfm$events, sfm$controls, paste(sprintf("%s (%.0f)", sfm$terms$Covariate, sfm$terms$ChiSq), collapse = ", "), 100 * sfm$top10, sfm$auc, stats::quantile(wsurf[elm], 0.01, na.rm = TRUE), stats::quantile(wsurf[elm], 0.99, na.rm = TRUE))
+          check(STAGE, "mortality: the surface averages 1 over the eligible cells of every unit", all(abs(tapply(wsurf[elm], unit[elm], mean) - 1) < 1e-6)) }
+        szm <- mortality_sizes(evr, rast(P), mref)
+        if (!is.null(szm)) say("Drought and insect mortality patch sizes: %d yearly patches in %d-%d, mean %.1f cells, largest %d (%.1f km2); single cells hold %.0f%% of the area: %s", szm$n, min(mref), max(mref), szm$mean, szm$max, szm$max * cell_km2, 100 * szm$single,
+                               paste(szm$table[Patches > 0, sprintf("to %d cells %d", MaximumCells, Patches)], collapse = ", "))
+        # spread: the ratio to what the rate and the surface give (the surface as it was fitted, on the events' own canopy cover)
+        w_fit <- if (is.null(sfm)) rep(1, length(land)) else sf0$w
+        rate_cell <- function(y) { r <- numeric(length(land)); r[elm] <- rt$rate[cbind(ui[elm], match(y, rec_y))]; r * w_fit }
+        has_attr <- MORT_ATTR %in% stsim_list("StateAttributeType")$Name
+        # a library made before lucasCore 2.0.2 has no such state attribute: it is added to the library here (a definition; 2.0.2 has no update step)
+        if (!has_attr) has_attr <- tryCatch({ sag <- stsim_list("AttributeGroup")
+          saveDatasheet(prj, data.frame(Name = MORT_ATTR, AttributeGroupId = if ("State Class" %in% sag$Name) "State Class" else NA_character_,
+                                        Description = "1 on a disturbed softwood class in the three years after a drought and insect mortality event, written by stage 9: the share of recent die-off around a cell drives the adjacency multiplier of the event in projections (to-do 3)"),
+                        "stsim_StateAttributeType", append = TRUE)
+          say("Drought and insect mortality: the state attribute %s was added to the library's definitions", MORT_ATTR); TRUE },
+          error = function(e) { say("  the state attribute %s could not be added (%s)", MORT_ATTR, conditionMessage(e)); FALSE })
+        if (!has_attr) say("Drought and insect mortality: this library has no %s state attribute and it could not be added (tools/add-definitions.R adds it): no spread from recent die-off", MORT_ATTR) else {
+          spm <- tryCatch(mortality_spread(evm, land, rast(P), mref, openm, rate_cell), error = function(e) { say("  spread: not fitted (%s)", conditionMessage(e)); NULL })
+          if (is.null(spm)) say("Drought and insect mortality: no spread from recent die-off (fewer than %d events near earlier ones in the reference years)", MORTP$adj_min_events) else {
+            say("Drought and insect mortality spread: the chance by the share of cells within %g m that had the event in the %d years before, as a ratio to the rate and the surface alone: %s; %.0f%% of the record's events were near earlier ones",
+                MORTP$radius * res(P)[1], MORTP$window, paste(spm$classes[, sprintf("%s x%.2f (%d events)", Share, Multiplier, as.integer(Events))], collapse = ", "), 100 * spm$near)
+            check(STAGE, "mortality: the rate, the surface and the spread curve together return the record's events", abs(sum(spm$classes$Expected * spm$classes$Multiplier) - sum(spm$classes$Events)) < 1e-6 * max(1, sum(spm$classes$Events))) } }
+      }
+      sf_file <- if (is.null(sfm)) { if (is.null(allow_files[["all"]])) allow_files[["all"]] <- write_raster(setValues(rast(P), ifelse(land, 1L, NA)), "Projection-Allowed-All.tif", "INT1U"); allow_files[["all"]] } else
+        write_raster(setValues(rast(P), wsurf), "Projection-Mortality-Surface.tif", "FLT4S")
+      mort <- list(tmv = mort_tmv, sm = data.table(Iteration = NA_integer_, Timestep = y1 + 1L, TransitionGroupId = MORT_GROUP, MultiplierFileName = sf_file), sizes = szm, spread = spm, ev = evm, dest = unique(pwm$StateClassIdDest))
+    }
+  }
+}
 progressBar()
 
 # ---- spatial multiprocessing tiles: whole units of the tile strata level (every Target group uses it, enforced above) -----------
@@ -614,6 +730,7 @@ fire_all <- if (nrow(fire_rows)) c(fire_g, mem[[fire_g]]) else character()   # f
 handled <- unique(c(pt[Method != "None", TransitionGroupId], unlist(mem[tg$TransitionGroupId], use.names = FALSE), fire_all))
 sm_out <- rbind(sm[!(TransitionGroupId %in% handled & (Timestep > y1 | TransitionGroupId %in% c(pg$TransitionGroupId, fire_all))),
                    .(Iteration, Timestep, TransitionGroupId, MultiplierFileName)], rbindlist(new_sm), fill = TRUE)
+if (!is.null(mort)) sm_out <- rbind(sm_out[!(TransitionGroupId == MORT_GROUP & Timestep > y1)], mort$sm, fill = TRUE)   # (stage 6's Off row at the historical end + 1 gives way to the surface)
 # earlier projection targets (stage 9 run again on a build that already has them) are replaced
 if (nrow(tt) && "Timestep" %in% names(tt)) tt <- tt[!(TransitionGroupId %in% handled & !is.na(Timestep) & Timestep > y1)]
 tt_out <- rbind(tt, rbindlist(new_tt, fill = TRUE), fill = TRUE)
@@ -662,7 +779,7 @@ ftd <- pkg_file("defaults", "fuel-treatments")
 ft_set <- if (file.exists(file.path(ftd, "settings.csv"))) { s <- fread(file.path(ftd, "settings.csv"), na.strings = ""); s[, Key := ft_key(Treatment)]
   list(MinAge = setNames(s$MinAge, s$Key), Retreat = setNames(s$RetreatmentYears, s$Key)) } else NULL
 ft_rows <- fuel_treatment_rows(read_ds("FuelTreatment"), y1, pend, say, fail, ft_set)
-ft_tmv <- NULL; ft_av <- NULL
+ft_tmv <- NULL; ft_av <- NULL; tst_ft <- NULL
 if (!is.null(ft_rows)) {
   if (!nrow(fire_rows)) say("Fuel Treatments: the projection has no fire (Projection Transitions): the treatments change nothing but their own carbon")
   if (nrow(fire_rows) && fire_m == 3) say("Fuel Treatments: lucasFireC2F seasons (fire method 3) burn their own maps: the severity shift does not apply")
@@ -683,7 +800,7 @@ if (!is.null(ft_rows)) {
   # time since each treatment: its own [Type] group (rows of earlier runs of these types replaced)
   tsg <- as.data.table(datasheet(scn, "stsim_TimeSinceTransitionGroup", optional = TRUE, lookupsAsFactors = FALSE))
   if (nrow(tsg)) tsg <- tsg[!TransitionTypeId %in% FT_TYPES, setdiff(names(tsg), c("TimeSinceTransitionGroupId", "ScenarioId")), with = FALSE]
-  write_stsim(rbind(tsg, ft$tst, fill = TRUE), "TimeSinceTransitionGroup")
+  tst_ft <- rbind(tsg, ft$tst, fill = TRUE)   # (written once at the end, with the mortality group's: a sheet read back within the stage does not show what the stage wrote)
   # priority: where wildfire has burned more often (each treatment type with that priority)
   if (ft$fire_priority) { fq <- Reduce(`+`, lapply(ref, function(y) Reduce(`+`, lapply(FT_SEV, function(g) hist_vals(g, y))))) / length(ref)
     el <- elig(FT_GROUPS[["Thin"]]); v <- ifelse(el, 0.1 + fq, 0); if (sum(el)) v <- v / mean(v[el]); v[!land] <- NA
@@ -773,18 +890,65 @@ if (nrow(fire_rows) && nrow(fcm)) { scl9 <- stsim_list("StateClass"); idc <- sup
                TransitionGroupId = fire_g, Amount = as.numeric(fcm$Multiplier[i])) }))
   if (nrow(fire_tmv)) fire_tmv <- fire_tmv[is.na(StratumId) | StratumId %in% stsim_list("Stratum")$Name]
   say("Fire by state class: %s", if (nrow(fire_tmv)) paste(fire_tmv[, sprintf("%s%s x%.2f", if (.N > 1) sprintf("%d classes", .N) else StateClassId[1], ifelse(is.na(StratumId[1]), "", paste0(" in ", StratumId[1])), Amount[1]), by = .(StratumId, Amount)]$V1, collapse = "; ") else "none (every multiplier 1)") }
-if (!is.null(tmv) || !is.null(fire_tmv) || !is.null(mg_tmv) || !is.null(fm_tmv) || !is.null(ft_tmv)) {
+mort_tmv9 <- if (is.null(mort)) NULL else mort$tmv
+if (!is.null(tmv) || !is.null(fire_tmv) || !is.null(mg_tmv) || !is.null(fm_tmv) || !is.null(ft_tmv) || !is.null(mort_tmv9)) {
   old_tmv <- as.data.table(datasheet(scn, "stsim_TransitionMultiplierValue", optional = TRUE, lookupsAsFactors = FALSE))
   # earlier rows of a rerun are replaced: the post-disturbance groups', the fire group's by state class (no other fire multiplier), the management types'
-  if (nrow(old_tmv)) old_tmv <- old_tmv[!(!is.na(Timestep) & Timestep > y1 & (TransitionGroupId %in% c(PD_GROUPS, MG_GROUPS, FM_GROUPS, FT_GROUPS) | (TransitionGroupId == fire_g & !is.na(StateClassId)))),
+  if (nrow(old_tmv)) old_tmv <- old_tmv[!(!is.na(Timestep) & Timestep > y1 & (TransitionGroupId %in% c(PD_GROUPS, MG_GROUPS, FM_GROUPS, FT_GROUPS, MORT_GROUP) | (TransitionGroupId == fire_g & !is.na(StateClassId)))),
                                         setdiff(names(old_tmv), c("TransitionMultiplierValueId", "ScenarioId")), with = FALSE]
   if (nrow(old_tmv) && "TSTGroupId" %in% names(old_tmv)) old_tmv <- old_tmv[!(TransitionGroupId %in% FT_SEV & !is.na(TSTGroupId) & TSTGroupId %in% FT_GROUPS)]
-  write_stsim(rbind(old_tmv, tmv, fire_tmv, mg_tmv, fm_tmv, ft_tmv, fill = TRUE), "TransitionMultiplierValue") }
+  write_stsim(rbind(old_tmv, tmv, fire_tmv, mg_tmv, fm_tmv, ft_tmv, mort_tmv9, fill = TRUE), "TransitionMultiplierValue") }
 write_stsim(sm_out, "TransitionSpatialMultiplier")
+# ---- drought and insect mortality: patch sizes, and spread from recent die-off (the rows of other groups are kept) ---------------
+keep9 <- function(name, drop) { x <- as.data.table(datasheet(scn, paste0("stsim_", name), optional = TRUE, lookupsAsFactors = FALSE)); had <- nrow(x) > 0
+  if (had) x <- x[!drop(x)]; list(x = x[, setdiff(names(x), c(paste0(name, "Id"), "ScenarioId")), with = FALSE], had = had) }
+put9 <- function(name, old, new) if (nrow(new) || old$had) write_stsim(rbind(old$x, new, fill = TRUE), name)
+# (a sheet read back within the stage does not show what the stage has written, so each sheet is written once: the size distribution
+# with fire's below, the time since transition with the fuel treatments')
+sd9 <- data.table(); mort_tst <- NULL
+if (!is.null(mort)) {
+  sz <- mort$sizes; if (!is.null(sz)) sd9 <- data.table(TransitionGroupId = MORT_GROUP, MaximumArea = sz$table$MaximumCells * cell_amt, RelativeAmount = sz$table$Patches)[RelativeAmount > 0]
+  if (nrow(sd9) < 2 && !any(sd9$MaximumArea > cell_amt * 1.5)) sd9 <- data.table()   # (every patch one cell: no distribution)
+  sp <- mort$spread
+  # the state attribute: 1 on a disturbed softwood class in the window of years after the event (time since the event), 0 on every
+  # other class and after it; the time since the event starts from the Build's maps (never = MORT_NEVER years), at the historical end
+  # for a projection that starts there (Projection Start) and at the start year otherwise
+  o_sav <- keep9("StateAttributeValue", function(x) x$StateAttributeTypeId %in% MORT_ATTR)
+  o_set <- keep9("TransitionAdjacencySetting", function(x) x$TransitionGroupId %in% MORT_GROUP); o_mul <- keep9("TransitionAdjacencyMultiplier", function(x) x$TransitionGroupId %in% MORT_GROUP)
+  o_its <- keep9("InitialTSTSpatial", function(x) x$TransitionGroupId %in% MORT_GROUP)
+  if (is.null(sp)) { put9("StateAttributeValue", o_sav, data.table()); put9("TransitionAdjacencySetting", o_set, data.table())
+    put9("TransitionAdjacencyMultiplier", o_mul, data.table()); put9("InitialTSTSpatial", o_its, data.table()) } else {
+    scl9m <- stsim_list("StateClass")$Name; dst <- intersect(mort$dest, scl9m)
+    sav <- rbind(data.table(StateClassId = setdiff(scl9m, dst), StateAttributeTypeId = MORT_ATTR, Value = 0),
+                 data.table(StateClassId = dst, StateAttributeTypeId = MORT_ATTR, TSTGroupId = MORT_GROUP, TSTMin = 0L, TSTMax = MORTP$window, Value = 1),
+                 data.table(StateClassId = dst, StateAttributeTypeId = MORT_ATTR, TSTGroupId = MORT_GROUP, TSTMin = MORTP$window + 1L, TSTMax = NA_integer_, Value = 0), fill = TRUE)
+    ys9 <- if (!is.na(hid)) y1 else y0; t0 <- ifelse(!is.na(mort$ev) & mort$ev <= ys9, pmin(ys9 - mort$ev, MORT_NEVER), MORT_NEVER); t0[!land] <- NA
+    tf9 <- write_raster(setValues(rast(P), as.integer(t0)), sprintf("Mortality-YearsSince_%d.tif", ys9), "INT2S")
+    mort_tst <- data.table(TransitionTypeId = MORT_TYPE, TransitionGroupId = MORT_GROUP)
+    put9("StateAttributeValue", o_sav, sav)
+    put9("TransitionAdjacencySetting", o_set, data.table(TransitionGroupId = MORT_GROUP, StateAttributeTypeId = MORT_ATTR, NeighborhoodRadius = MORTP$radius * res(P)[1], UpdateFrequency = 1L))
+    put9("TransitionAdjacencyMultiplier", o_mul, data.table(Timestep = y1 + 1L, TransitionGroupId = MORT_GROUP, AttributeValue = sp$curve$AttributeValue, Amount = sp$curve$Amount))
+    put9("InitialTSTSpatial", o_its, data.table(TransitionGroupId = MORT_GROUP, TSTFileName = tf9))
+    say("Drought and insect mortality spread: %s on %d disturbed softwood classes for %d years after the event; adjacency within %g m, updated every year, from %d; years since the event at the run's start (%d) from the Build's maps",
+        MORT_ATTR, length(dst), MORTP$window, MORTP$radius * res(P)[1], y1 + 1L, ys9) }
+  # maps of the event: a library whose transition output filter was written before the group was a main group (2.0.0, 2.0.1) has its
+  # maps off; they are turned on here (no filter at all = ST-Sim maps every group, nothing to do)
+  of9 <- as.data.frame(datasheet(scn, "stsim_OutputFilterTransitionGroups", optional = TRUE, lookupsAsFactors = FALSE))
+  of9 <- of9[, setdiff(names(of9), c("OutputFilterTransitionGroupsId", "ScenarioId")), drop = FALSE]
+  if (nrow(of9)) { on9 <- function(v) !is.na(v) & v %in% c(TRUE, -1, 1, "Yes"); yes9 <- if (is.logical(of9$Spatial)) TRUE else "Yes"; no9 <- if (is.logical(of9$Spatial)) FALSE else "No"
+    i9 <- match(MORT_GROUP, of9$TransitionGroupId)
+    if (is.na(i9)) { r9 <- of9[1, , drop = FALSE]; r9[1, setdiff(names(r9), "TransitionGroupId")] <- no9; r9$TransitionGroupId <- MORT_GROUP; r9$Summary <- yes9; of9 <- rbind(of9, r9); i9 <- nrow(of9) }
+    if (!on9(of9$Spatial[i9]) || !on9(of9$SpatialProbability[i9])) { of9$Spatial[i9] <- yes9; of9$SpatialProbability[i9] <- yes9
+      saveDatasheet(scn, of9, "stsim_OutputFilterTransitionGroups")
+      say("Drought and insect mortality: maps and average probability maps of the event turned on in the transition output filter (this library's filter had them off)") } } }
+# time since transition: the fuel treatments' types and the mortality group, the rows of others kept
+if (!is.null(tst_ft) || !is.null(mort)) { o_tst <- keep9("TimeSinceTransitionGroup", function(x) x$TransitionGroupId %in% MORT_GROUP | (!is.null(tst_ft) & x$TransitionTypeId %in% FT_TYPES))
+  put9("TimeSinceTransitionGroup", if (is.null(tst_ft)) o_tst else list(x = o_tst$x[0], had = TRUE),
+       rbindlist(list(if (!is.null(tst_ft) && nrow(tst_ft)) tst_ft[!TransitionGroupId %in% MORT_GROUP], mort_tst), fill = TRUE)) }
+# transition sizes: fire's (method 3: none - an earlier one for the fire group is removed) and the mortality group's, in one write
+if (nrow(fire_rows) || !is.null(mort)) { szg <- c(if (nrow(fire_rows)) fire_g, if (!is.null(mort)) MORT_GROUP); sd_all <- rbind(fire_sd, sd9, fill = TRUE)
+  write_size_dist(sd_all, if (nrow(sd_all)) data.table(TransitionGroupId = unique(sd_all$TransitionGroupId), Priority = "Largest", MaximizeFidelityToDistribution = TRUE, MaximizeFidelityToTotalArea = TRUE) else data.table(), szg, y1 + 1L) }
 if (nrow(fire_rows)) {
-  # (method 3: no size distribution - an earlier one for the fire group is removed)
-  write_size_dist(fire_sd, if (nrow(fire_sd)) data.table(TransitionGroupId = fire_g, Priority = "Largest", MaximizeFidelityToDistribution = TRUE, MaximizeFidelityToTotalArea = TRUE) else data.table(),
-                  fire_g, y1 + 1L)
   if (!is.null(fire_out$size)) write_ds(fire_out$size, "OutputFireSize"); if (!is.null(fire_out$slope)) write_ds(fire_out$slope, "OutputFireSlope")
   # ignitions (method 2): the fire group's initiation multiplier from the historical end + 1, other groups' rows kept
   im <- as.data.table(datasheet(scn, "stsim_TransitionSpatialInitiationMultiplier", optional = TRUE, lookupsAsFactors = FALSE))

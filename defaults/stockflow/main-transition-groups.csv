@@ -8,6 +8,7 @@ Forest Harvest,Yes,Yes
 Forest Harvest: Forest Clearcut [Type],Yes,Yes
 Forest Harvest: Forest Selection [Type],Yes,Yes
 Insect,Yes,Yes
+Mortality: Drought and Insects [Type],Yes,Yes
 Ag Change,Yes,Yes
 Ag Change: Cropland to Pasture [Type],Yes,Yes
 Ag Change: Pasture to Cropland [Type],Yes,Yes
