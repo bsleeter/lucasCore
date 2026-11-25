@@ -1,0 +1,961 @@
+Region,Product,Interval,From,To,Ha
+Louisiana chenier plain,C-CAP,1996-2001,Water,Water,232917.48
+Louisiana chenier plain,C-CAP,1996-2001,Water,Wetland,711.36
+Louisiana chenier plain,C-CAP,1996-2001,Water,Barren,0
+Louisiana chenier plain,C-CAP,1996-2001,Water,Other,0.36
+Louisiana chenier plain,C-CAP,1996-2001,Wetland,Water,440.01
+Louisiana chenier plain,C-CAP,1996-2001,Wetland,Wetland,368396.64
+Louisiana chenier plain,C-CAP,1996-2001,Wetland,Barren,123.75
+Louisiana chenier plain,C-CAP,1996-2001,Wetland,Other,437.13
+Louisiana chenier plain,C-CAP,1996-2001,Barren,Water,3.15
+Louisiana chenier plain,C-CAP,1996-2001,Barren,Wetland,45.72
+Louisiana chenier plain,C-CAP,1996-2001,Barren,Barren,3634.74
+Louisiana chenier plain,C-CAP,1996-2001,Barren,Other,40.32
+Louisiana chenier plain,C-CAP,1996-2001,Other,Water,8.19
+Louisiana chenier plain,C-CAP,1996-2001,Other,Wetland,1.98
+Louisiana chenier plain,C-CAP,1996-2001,Other,Barren,7.83
+Louisiana chenier plain,C-CAP,1996-2001,Other,Other,256682.43
+Louisiana chenier plain,NLCD,1996-2001,Water,Water,230954.13
+Louisiana chenier plain,NLCD,1996-2001,Water,Wetland,2729.16
+Louisiana chenier plain,NLCD,1996-2001,Water,Barren,131.85
+Louisiana chenier plain,NLCD,1996-2001,Water,Other,412.47
+Louisiana chenier plain,NLCD,1996-2001,Wetland,Water,3997.08
+Louisiana chenier plain,NLCD,1996-2001,Wetland,Wetland,368001.99
+Louisiana chenier plain,NLCD,1996-2001,Wetland,Barren,121.86
+Louisiana chenier plain,NLCD,1996-2001,Wetland,Other,726.21
+Louisiana chenier plain,NLCD,1996-2001,Barren,Water,573.21
+Louisiana chenier plain,NLCD,1996-2001,Barren,Wetland,4.14
+Louisiana chenier plain,NLCD,1996-2001,Barren,Barren,899.91
+Louisiana chenier plain,NLCD,1996-2001,Barren,Other,88.2
+Louisiana chenier plain,NLCD,1996-2001,Other,Water,944.37
+Louisiana chenier plain,NLCD,1996-2001,Other,Wetland,261.9
+Louisiana chenier plain,NLCD,1996-2001,Other,Barren,105.93
+Louisiana chenier plain,NLCD,1996-2001,Other,Other,253498.68
+Louisiana chenier plain,C-CAP,2001-2006,Water,Water,231727.32
+Louisiana chenier plain,C-CAP,2001-2006,Water,Wetland,110.43
+Louisiana chenier plain,C-CAP,2001-2006,Water,Barren,8.37
+Louisiana chenier plain,C-CAP,2001-2006,Water,Other,1522.71
+Louisiana chenier plain,C-CAP,2001-2006,Wetland,Water,246.96
+Louisiana chenier plain,C-CAP,2001-2006,Wetland,Wetland,367796.07
+Louisiana chenier plain,C-CAP,2001-2006,Wetland,Barren,31.77
+Louisiana chenier plain,C-CAP,2001-2006,Wetland,Other,1080.9
+Louisiana chenier plain,C-CAP,2001-2006,Barren,Water,5.58
+Louisiana chenier plain,C-CAP,2001-2006,Barren,Wetland,6.57
+Louisiana chenier plain,C-CAP,2001-2006,Barren,Barren,3739.32
+Louisiana chenier plain,C-CAP,2001-2006,Barren,Other,14.85
+Louisiana chenier plain,C-CAP,2001-2006,Other,Water,26.19
+Louisiana chenier plain,C-CAP,2001-2006,Other,Wetland,7.29
+Louisiana chenier plain,C-CAP,2001-2006,Other,Barren,7.65
+Louisiana chenier plain,C-CAP,2001-2006,Other,Other,257119.11
+Louisiana chenier plain,NLCD,2001-2006,Water,Water,233506.17
+Louisiana chenier plain,NLCD,2001-2006,Water,Wetland,2186.1
+Louisiana chenier plain,NLCD,2001-2006,Water,Barren,178.2
+Louisiana chenier plain,NLCD,2001-2006,Water,Other,598.32
+Louisiana chenier plain,NLCD,2001-2006,Wetland,Water,6284.88
+Louisiana chenier plain,NLCD,2001-2006,Wetland,Wetland,363294.18
+Louisiana chenier plain,NLCD,2001-2006,Wetland,Barren,48.33
+Louisiana chenier plain,NLCD,2001-2006,Wetland,Other,1369.8
+Louisiana chenier plain,NLCD,2001-2006,Barren,Water,273.06
+Louisiana chenier plain,NLCD,2001-2006,Barren,Wetland,9.63
+Louisiana chenier plain,NLCD,2001-2006,Barren,Barren,853.29
+Louisiana chenier plain,NLCD,2001-2006,Barren,Other,123.57
+Louisiana chenier plain,NLCD,2001-2006,Other,Water,443.34
+Louisiana chenier plain,NLCD,2001-2006,Other,Wetland,475.38
+Louisiana chenier plain,NLCD,2001-2006,Other,Barren,203.85
+Louisiana chenier plain,NLCD,2001-2006,Other,Other,253602.99
+Louisiana chenier plain,C-CAP,2006-2010,Water,Water,226543.68
+Louisiana chenier plain,C-CAP,2006-2010,Water,Wetland,3843.36
+Louisiana chenier plain,C-CAP,2006-2010,Water,Barren,1539.09
+Louisiana chenier plain,C-CAP,2006-2010,Water,Other,79.92
+Louisiana chenier plain,C-CAP,2006-2010,Wetland,Water,14654.34
+Louisiana chenier plain,C-CAP,2006-2010,Wetland,Wetland,351714.96
+Louisiana chenier plain,C-CAP,2006-2010,Wetland,Barren,1104.66
+Louisiana chenier plain,C-CAP,2006-2010,Wetland,Other,446.4
+Louisiana chenier plain,C-CAP,2006-2010,Barren,Water,1172.25
+Louisiana chenier plain,C-CAP,2006-2010,Barren,Wetland,256.77
+Louisiana chenier plain,C-CAP,2006-2010,Barren,Barren,2301.93
+Louisiana chenier plain,C-CAP,2006-2010,Barren,Other,56.16
+Louisiana chenier plain,C-CAP,2006-2010,Other,Water,541.08
+Louisiana chenier plain,C-CAP,2006-2010,Other,Wetland,148.5
+Louisiana chenier plain,C-CAP,2006-2010,Other,Barren,311.67
+Louisiana chenier plain,C-CAP,2006-2010,Other,Other,258736.32
+Louisiana chenier plain,NLCD,2006-2010,Water,Water,235062.27
+Louisiana chenier plain,NLCD,2006-2010,Water,Wetland,4326.3
+Louisiana chenier plain,NLCD,2006-2010,Water,Barren,529.38
+Louisiana chenier plain,NLCD,2006-2010,Water,Other,589.5
+Louisiana chenier plain,NLCD,2006-2010,Wetland,Water,3736.08
+Louisiana chenier plain,NLCD,2006-2010,Wetland,Wetland,361597.14
+Louisiana chenier plain,NLCD,2006-2010,Wetland,Barren,24.21
+Louisiana chenier plain,NLCD,2006-2010,Wetland,Other,607.86
+Louisiana chenier plain,NLCD,2006-2010,Barren,Water,205.56
+Louisiana chenier plain,NLCD,2006-2010,Barren,Wetland,11.43
+Louisiana chenier plain,NLCD,2006-2010,Barren,Barren,967.95
+Louisiana chenier plain,NLCD,2006-2010,Barren,Other,98.73
+Louisiana chenier plain,NLCD,2006-2010,Other,Water,370.71
+Louisiana chenier plain,NLCD,2006-2010,Other,Wetland,280.17
+Louisiana chenier plain,NLCD,2006-2010,Other,Barren,96.21
+Louisiana chenier plain,NLCD,2006-2010,Other,Other,254947.59
+Louisiana chenier plain,C-CAP,2010-2016,Water,Water,241923.6
+Louisiana chenier plain,C-CAP,2010-2016,Water,Wetland,203.85
+Louisiana chenier plain,C-CAP,2010-2016,Water,Barren,628.47
+Louisiana chenier plain,C-CAP,2010-2016,Water,Other,155.43
+Louisiana chenier plain,C-CAP,2010-2016,Wetland,Water,2766.15
+Louisiana chenier plain,C-CAP,2010-2016,Wetland,Wetland,352740.06
+Louisiana chenier plain,C-CAP,2010-2016,Wetland,Barren,12.42
+Louisiana chenier plain,C-CAP,2010-2016,Wetland,Other,444.96
+Louisiana chenier plain,C-CAP,2010-2016,Barren,Water,96.21
+Louisiana chenier plain,C-CAP,2010-2016,Barren,Wetland,562.05
+Louisiana chenier plain,C-CAP,2010-2016,Barren,Barren,4431.33
+Louisiana chenier plain,C-CAP,2010-2016,Barren,Other,167.76
+Louisiana chenier plain,C-CAP,2010-2016,Other,Water,56.43
+Louisiana chenier plain,C-CAP,2010-2016,Other,Wetland,161.37
+Louisiana chenier plain,C-CAP,2010-2016,Other,Barren,4.32
+Louisiana chenier plain,C-CAP,2010-2016,Other,Other,259096.68
+Louisiana chenier plain,NLCD,2010-2016,Water,Water,232332.39
+Louisiana chenier plain,NLCD,2010-2016,Water,Wetland,5336.1
+Louisiana chenier plain,NLCD,2010-2016,Water,Barren,348.03
+Louisiana chenier plain,NLCD,2010-2016,Water,Other,1358.1
+Louisiana chenier plain,NLCD,2010-2016,Wetland,Water,2095.74
+Louisiana chenier plain,NLCD,2010-2016,Wetland,Wetland,363315.24
+Louisiana chenier plain,NLCD,2010-2016,Wetland,Barren,12.33
+Louisiana chenier plain,NLCD,2010-2016,Wetland,Other,791.73
+Louisiana chenier plain,NLCD,2010-2016,Barren,Water,523.89
+Louisiana chenier plain,NLCD,2010-2016,Barren,Wetland,10.98
+Louisiana chenier plain,NLCD,2010-2016,Barren,Barren,930.24
+Louisiana chenier plain,NLCD,2010-2016,Barren,Other,152.64
+Louisiana chenier plain,NLCD,2010-2016,Other,Water,649.71
+Louisiana chenier plain,NLCD,2010-2016,Other,Wetland,280.53
+Louisiana chenier plain,NLCD,2010-2016,Other,Barren,86.13
+Louisiana chenier plain,NLCD,2010-2016,Other,Other,255227.31
+Louisiana chenier plain,C-CAP,2016-2021,Water,Water,243145.89
+Louisiana chenier plain,C-CAP,2016-2021,Water,Wetland,1314.54
+Louisiana chenier plain,C-CAP,2016-2021,Water,Barren,304.83
+Louisiana chenier plain,C-CAP,2016-2021,Water,Other,77.13
+Louisiana chenier plain,C-CAP,2016-2021,Wetland,Water,3128.4
+Louisiana chenier plain,C-CAP,2016-2021,Wetland,Wetland,349995.87
+Louisiana chenier plain,C-CAP,2016-2021,Wetland,Barren,319.59
+Louisiana chenier plain,C-CAP,2016-2021,Wetland,Other,223.47
+Louisiana chenier plain,C-CAP,2016-2021,Barren,Water,18.63
+Louisiana chenier plain,C-CAP,2016-2021,Barren,Wetland,0.27
+Louisiana chenier plain,C-CAP,2016-2021,Barren,Barren,5020.29
+Louisiana chenier plain,C-CAP,2016-2021,Barren,Other,37.35
+Louisiana chenier plain,C-CAP,2016-2021,Other,Water,141.03
+Louisiana chenier plain,C-CAP,2016-2021,Other,Wetland,57.51
+Louisiana chenier plain,C-CAP,2016-2021,Other,Barren,388.71
+Louisiana chenier plain,C-CAP,2016-2021,Other,Other,259277.58
+Louisiana chenier plain,NLCD,2016-2021,Water,Water,231628.05
+Louisiana chenier plain,NLCD,2016-2021,Water,Wetland,2348.91
+Louisiana chenier plain,NLCD,2016-2021,Water,Barren,320.22
+Louisiana chenier plain,NLCD,2016-2021,Water,Other,1304.55
+Louisiana chenier plain,NLCD,2016-2021,Wetland,Water,3468.06
+Louisiana chenier plain,NLCD,2016-2021,Wetland,Wetland,364634.82
+Louisiana chenier plain,NLCD,2016-2021,Wetland,Barren,37.26
+Louisiana chenier plain,NLCD,2016-2021,Wetland,Other,802.71
+Louisiana chenier plain,NLCD,2016-2021,Barren,Water,140.58
+Louisiana chenier plain,NLCD,2016-2021,Barren,Wetland,6.93
+Louisiana chenier plain,NLCD,2016-2021,Barren,Barren,1082.7
+Louisiana chenier plain,NLCD,2016-2021,Barren,Other,146.52
+Louisiana chenier plain,NLCD,2016-2021,Other,Water,854.46
+Louisiana chenier plain,NLCD,2016-2021,Other,Wetland,247.59
+Louisiana chenier plain,NLCD,2016-2021,Other,Barren,124.02
+Louisiana chenier plain,NLCD,2016-2021,Other,Other,256303.71
+Louisiana chenier plain,C-CAP,1996-2021,Water,Water,225527.4
+Louisiana chenier plain,C-CAP,1996-2021,Water,Wetland,4286.7
+Louisiana chenier plain,C-CAP,1996-2021,Water,Barren,2120.22
+Louisiana chenier plain,C-CAP,1996-2021,Water,Other,1694.88
+Louisiana chenier plain,C-CAP,1996-2021,Wetland,Water,19260.9
+Louisiana chenier plain,C-CAP,1996-2021,Wetland,Wetland,346131.54
+Louisiana chenier plain,C-CAP,1996-2021,Wetland,Barren,1499.04
+Louisiana chenier plain,C-CAP,1996-2021,Wetland,Other,2506.05
+Louisiana chenier plain,C-CAP,1996-2021,Barren,Water,1087.65
+Louisiana chenier plain,C-CAP,1996-2021,Barren,Wetland,618.39
+Louisiana chenier plain,C-CAP,1996-2021,Barren,Barren,1784.79
+Louisiana chenier plain,C-CAP,1996-2021,Barren,Other,233.1
+Louisiana chenier plain,C-CAP,1996-2021,Other,Water,558
+Louisiana chenier plain,C-CAP,1996-2021,Other,Wetland,331.56
+Louisiana chenier plain,C-CAP,1996-2021,Other,Barren,629.37
+Louisiana chenier plain,C-CAP,1996-2021,Other,Other,255181.5
+Louisiana chenier plain,NLCD,1996-2021,Water,Water,226216.53
+Louisiana chenier plain,NLCD,1996-2021,Water,Wetland,4831.29
+Louisiana chenier plain,NLCD,1996-2021,Water,Barren,672.66
+Louisiana chenier plain,NLCD,1996-2021,Water,Other,2507.13
+Louisiana chenier plain,NLCD,1996-2021,Wetland,Water,7647.48
+Louisiana chenier plain,NLCD,1996-2021,Wetland,Wetland,361598.31
+Louisiana chenier plain,NLCD,1996-2021,Wetland,Barren,56.25
+Louisiana chenier plain,NLCD,1996-2021,Wetland,Other,3545.1
+Louisiana chenier plain,NLCD,1996-2021,Barren,Water,738.09
+Louisiana chenier plain,NLCD,1996-2021,Barren,Wetland,13.14
+Louisiana chenier plain,NLCD,1996-2021,Barren,Barren,554.67
+Louisiana chenier plain,NLCD,1996-2021,Barren,Other,259.56
+Louisiana chenier plain,NLCD,1996-2021,Other,Water,1489.05
+Louisiana chenier plain,NLCD,1996-2021,Other,Wetland,795.51
+Louisiana chenier plain,NLCD,1996-2021,Other,Barren,280.62
+Louisiana chenier plain,NLCD,1996-2021,Other,Other,252245.7
+Louisiana delta plain,C-CAP,1996-2001,Water,Water,608324.04
+Louisiana delta plain,C-CAP,1996-2001,Water,Wetland,786.42
+Louisiana delta plain,C-CAP,1996-2001,Water,Barren,2981.43
+Louisiana delta plain,C-CAP,1996-2001,Water,Other,6.93
+Louisiana delta plain,C-CAP,1996-2001,Wetland,Water,1822.14
+Louisiana delta plain,C-CAP,1996-2001,Wetland,Wetland,730967.4
+Louisiana delta plain,C-CAP,1996-2001,Wetland,Barren,479.52
+Louisiana delta plain,C-CAP,1996-2001,Wetland,Other,242.73
+Louisiana delta plain,C-CAP,1996-2001,Barren,Water,1324.8
+Louisiana delta plain,C-CAP,1996-2001,Barren,Wetland,154.08
+Louisiana delta plain,C-CAP,1996-2001,Barren,Barren,10324.26
+Louisiana delta plain,C-CAP,1996-2001,Barren,Other,18.9
+Louisiana delta plain,C-CAP,1996-2001,Other,Water,19.26
+Louisiana delta plain,C-CAP,1996-2001,Other,Wetland,10.89
+Louisiana delta plain,C-CAP,1996-2001,Other,Barren,8.01
+Louisiana delta plain,C-CAP,1996-2001,Other,Other,146290.68
+Louisiana delta plain,NLCD,1996-2001,Water,Water,598640.13
+Louisiana delta plain,NLCD,1996-2001,Water,Wetland,5415.48
+Louisiana delta plain,NLCD,1996-2001,Water,Barren,713.79
+Louisiana delta plain,NLCD,1996-2001,Water,Other,755.46
+Louisiana delta plain,NLCD,1996-2001,Wetland,Water,6006.69
+Louisiana delta plain,NLCD,1996-2001,Wetland,Wetland,742648.86
+Louisiana delta plain,NLCD,1996-2001,Wetland,Barren,60.84
+Louisiana delta plain,NLCD,1996-2001,Wetland,Other,925.2
+Louisiana delta plain,NLCD,1996-2001,Barren,Water,396.18
+Louisiana delta plain,NLCD,1996-2001,Barren,Wetland,8.73
+Louisiana delta plain,NLCD,1996-2001,Barren,Barren,751.32
+Louisiana delta plain,NLCD,1996-2001,Barren,Other,31.95
+Louisiana delta plain,NLCD,1996-2001,Other,Water,293.22
+Louisiana delta plain,NLCD,1996-2001,Other,Wetland,58.14
+Louisiana delta plain,NLCD,1996-2001,Other,Barren,6.21
+Louisiana delta plain,NLCD,1996-2001,Other,Other,147049.29
+Louisiana delta plain,C-CAP,2001-2006,Water,Water,610903.98
+Louisiana delta plain,C-CAP,2001-2006,Water,Wetland,537.21
+Louisiana delta plain,C-CAP,2001-2006,Water,Barren,12.87
+Louisiana delta plain,C-CAP,2001-2006,Water,Other,36.18
+Louisiana delta plain,C-CAP,2001-2006,Wetland,Water,1235.79
+Louisiana delta plain,C-CAP,2001-2006,Wetland,Wetland,730449.18
+Louisiana delta plain,C-CAP,2001-2006,Wetland,Barren,40.14
+Louisiana delta plain,C-CAP,2001-2006,Wetland,Other,193.68
+Louisiana delta plain,C-CAP,2001-2006,Barren,Water,293.13
+Louisiana delta plain,C-CAP,2001-2006,Barren,Wetland,55.17
+Louisiana delta plain,C-CAP,2001-2006,Barren,Barren,13428.18
+Louisiana delta plain,C-CAP,2001-2006,Barren,Other,16.74
+Louisiana delta plain,C-CAP,2001-2006,Other,Water,56.07
+Louisiana delta plain,C-CAP,2001-2006,Other,Wetland,11.07
+Louisiana delta plain,C-CAP,2001-2006,Other,Barren,2.79
+Louisiana delta plain,C-CAP,2001-2006,Other,Other,146489.31
+Louisiana delta plain,NLCD,2001-2006,Water,Water,598297.59
+Louisiana delta plain,NLCD,2001-2006,Water,Wetland,5837.4
+Louisiana delta plain,NLCD,2001-2006,Water,Barren,420.66
+Louisiana delta plain,NLCD,2001-2006,Water,Other,780.57
+Louisiana delta plain,NLCD,2001-2006,Wetland,Water,3391.83
+Louisiana delta plain,NLCD,2001-2006,Wetland,Wetland,743626.17
+Louisiana delta plain,NLCD,2001-2006,Wetland,Barren,46.08
+Louisiana delta plain,NLCD,2001-2006,Wetland,Other,1067.13
+Louisiana delta plain,NLCD,2001-2006,Barren,Water,573.39
+Louisiana delta plain,NLCD,2001-2006,Barren,Wetland,23.85
+Louisiana delta plain,NLCD,2001-2006,Barren,Barren,801.27
+Louisiana delta plain,NLCD,2001-2006,Barren,Other,133.65
+Louisiana delta plain,NLCD,2001-2006,Other,Water,294.21
+Louisiana delta plain,NLCD,2001-2006,Other,Wetland,227.52
+Louisiana delta plain,NLCD,2001-2006,Other,Barren,34.2
+Louisiana delta plain,NLCD,2001-2006,Other,Other,148205.97
+Louisiana delta plain,C-CAP,2006-2010,Water,Water,599683.95
+Louisiana delta plain,C-CAP,2006-2010,Water,Wetland,9953.37
+Louisiana delta plain,C-CAP,2006-2010,Water,Barren,2720.25
+Louisiana delta plain,C-CAP,2006-2010,Water,Other,131.4
+Louisiana delta plain,C-CAP,2006-2010,Wetland,Water,22635.18
+Louisiana delta plain,C-CAP,2006-2010,Wetland,Wetland,706113.27
+Louisiana delta plain,C-CAP,2006-2010,Wetland,Barren,1884.42
+Louisiana delta plain,C-CAP,2006-2010,Wetland,Other,419.76
+Louisiana delta plain,C-CAP,2006-2010,Barren,Water,3925.89
+Louisiana delta plain,C-CAP,2006-2010,Barren,Wetland,738.45
+Louisiana delta plain,C-CAP,2006-2010,Barren,Barren,8719.83
+Louisiana delta plain,C-CAP,2006-2010,Barren,Other,99.81
+Louisiana delta plain,C-CAP,2006-2010,Other,Water,368.64
+Louisiana delta plain,C-CAP,2006-2010,Other,Wetland,205.92
+Louisiana delta plain,C-CAP,2006-2010,Other,Barren,169.29
+Louisiana delta plain,C-CAP,2006-2010,Other,Other,145992.06
+Louisiana delta plain,NLCD,2006-2010,Water,Water,596509.56
+Louisiana delta plain,NLCD,2006-2010,Water,Wetland,4774.95
+Louisiana delta plain,NLCD,2006-2010,Water,Barren,533.25
+Louisiana delta plain,NLCD,2006-2010,Water,Other,739.26
+Louisiana delta plain,NLCD,2006-2010,Wetland,Water,3133.17
+Louisiana delta plain,NLCD,2006-2010,Wetland,Wetland,745990.74
+Louisiana delta plain,NLCD,2006-2010,Wetland,Barren,28.35
+Louisiana delta plain,NLCD,2006-2010,Wetland,Other,562.68
+Louisiana delta plain,NLCD,2006-2010,Barren,Water,376.92
+Louisiana delta plain,NLCD,2006-2010,Barren,Wetland,37.89
+Louisiana delta plain,NLCD,2006-2010,Barren,Barren,805.59
+Louisiana delta plain,NLCD,2006-2010,Barren,Other,81.81
+Louisiana delta plain,NLCD,2006-2010,Other,Water,469.35
+Louisiana delta plain,NLCD,2006-2010,Other,Wetland,93.24
+Louisiana delta plain,NLCD,2006-2010,Other,Barren,74.61
+Louisiana delta plain,NLCD,2006-2010,Other,Other,149550.12
+Louisiana delta plain,C-CAP,2010-2016,Water,Water,625759.83
+Louisiana delta plain,C-CAP,2010-2016,Water,Wetland,437.76
+Louisiana delta plain,C-CAP,2010-2016,Water,Barren,143.28
+Louisiana delta plain,C-CAP,2010-2016,Water,Other,272.79
+Louisiana delta plain,C-CAP,2010-2016,Wetland,Water,1434.42
+Louisiana delta plain,C-CAP,2010-2016,Wetland,Wetland,715279.59
+Louisiana delta plain,C-CAP,2010-2016,Wetland,Barren,5.67
+Louisiana delta plain,C-CAP,2010-2016,Wetland,Other,291.33
+Louisiana delta plain,C-CAP,2010-2016,Barren,Water,256.5
+Louisiana delta plain,C-CAP,2010-2016,Barren,Wetland,2671.83
+Louisiana delta plain,C-CAP,2010-2016,Barren,Barren,10510.38
+Louisiana delta plain,C-CAP,2010-2016,Barren,Other,55.08
+Louisiana delta plain,C-CAP,2010-2016,Other,Water,9.09
+Louisiana delta plain,C-CAP,2010-2016,Other,Wetland,117.27
+Louisiana delta plain,C-CAP,2010-2016,Other,Barren,0.63
+Louisiana delta plain,C-CAP,2010-2016,Other,Other,146516.04
+Louisiana delta plain,NLCD,2010-2016,Water,Water,592804.71
+Louisiana delta plain,NLCD,2010-2016,Water,Wetland,4916.61
+Louisiana delta plain,NLCD,2010-2016,Water,Barren,663.84
+Louisiana delta plain,NLCD,2010-2016,Water,Other,2103.84
+Louisiana delta plain,NLCD,2010-2016,Wetland,Water,4038.57
+Louisiana delta plain,NLCD,2010-2016,Wetland,Wetland,746236.98
+Louisiana delta plain,NLCD,2010-2016,Wetland,Barren,21.69
+Louisiana delta plain,NLCD,2010-2016,Wetland,Other,599.58
+Louisiana delta plain,NLCD,2010-2016,Barren,Water,258.39
+Louisiana delta plain,NLCD,2010-2016,Barren,Wetland,53.1
+Louisiana delta plain,NLCD,2010-2016,Barren,Barren,1038.6
+Louisiana delta plain,NLCD,2010-2016,Barren,Other,91.71
+Louisiana delta plain,NLCD,2010-2016,Other,Water,659.88
+Louisiana delta plain,NLCD,2010-2016,Other,Wetland,157.86
+Louisiana delta plain,NLCD,2010-2016,Other,Barren,146.97
+Louisiana delta plain,NLCD,2010-2016,Other,Other,149969.16
+Louisiana delta plain,C-CAP,2016-2021,Water,Water,618068.07
+Louisiana delta plain,C-CAP,2016-2021,Water,Wetland,8918.64
+Louisiana delta plain,C-CAP,2016-2021,Water,Barren,312.03
+Louisiana delta plain,C-CAP,2016-2021,Water,Other,161.1
+Louisiana delta plain,C-CAP,2016-2021,Wetland,Water,1064.79
+Louisiana delta plain,C-CAP,2016-2021,Wetland,Wetland,716877.99
+Louisiana delta plain,C-CAP,2016-2021,Wetland,Barren,104.4
+Louisiana delta plain,C-CAP,2016-2021,Wetland,Other,459.27
+Louisiana delta plain,C-CAP,2016-2021,Barren,Water,21.51
+Louisiana delta plain,C-CAP,2016-2021,Barren,Wetland,4.23
+Louisiana delta plain,C-CAP,2016-2021,Barren,Barren,10538.19
+Louisiana delta plain,C-CAP,2016-2021,Barren,Other,96.03
+Louisiana delta plain,C-CAP,2016-2021,Other,Water,162.54
+Louisiana delta plain,C-CAP,2016-2021,Other,Wetland,449.37
+Louisiana delta plain,C-CAP,2016-2021,Other,Barren,75.96
+Louisiana delta plain,C-CAP,2016-2021,Other,Other,146447.37
+Louisiana delta plain,NLCD,2016-2021,Water,Water,593265.42
+Louisiana delta plain,NLCD,2016-2021,Water,Wetland,2762.55
+Louisiana delta plain,NLCD,2016-2021,Water,Barren,541.26
+Louisiana delta plain,NLCD,2016-2021,Water,Other,1192.32
+Louisiana delta plain,NLCD,2016-2021,Wetland,Water,5764.77
+Louisiana delta plain,NLCD,2016-2021,Wetland,Wetland,745138.71
+Louisiana delta plain,NLCD,2016-2021,Wetland,Barren,38.7
+Louisiana delta plain,NLCD,2016-2021,Wetland,Other,422.37
+Louisiana delta plain,NLCD,2016-2021,Barren,Water,319.23
+Louisiana delta plain,NLCD,2016-2021,Barren,Wetland,17.82
+Louisiana delta plain,NLCD,2016-2021,Barren,Barren,1474.02
+Louisiana delta plain,NLCD,2016-2021,Barren,Other,60.03
+Louisiana delta plain,NLCD,2016-2021,Other,Water,1418.85
+Louisiana delta plain,NLCD,2016-2021,Other,Wetland,133.65
+Louisiana delta plain,NLCD,2016-2021,Other,Barren,116.46
+Louisiana delta plain,NLCD,2016-2021,Other,Other,151095.33
+Louisiana delta plain,C-CAP,1996-2021,Water,Water,591429.42
+Louisiana delta plain,C-CAP,1996-2021,Water,Wetland,16030.62
+Louisiana delta plain,C-CAP,1996-2021,Water,Barren,4069.53
+Louisiana delta plain,C-CAP,1996-2021,Water,Other,569.25
+Louisiana delta plain,C-CAP,1996-2021,Wetland,Water,22659.84
+Louisiana delta plain,C-CAP,1996-2021,Wetland,Wetland,707489.46
+Louisiana delta plain,C-CAP,1996-2021,Wetland,Barren,1748.88
+Louisiana delta plain,C-CAP,1996-2021,Wetland,Other,1613.61
+Louisiana delta plain,C-CAP,1996-2021,Barren,Water,4719.87
+Louisiana delta plain,C-CAP,1996-2021,Barren,Wetland,1976.04
+Louisiana delta plain,C-CAP,1996-2021,Barren,Barren,4965.84
+Louisiana delta plain,C-CAP,1996-2021,Barren,Other,160.29
+Louisiana delta plain,C-CAP,1996-2021,Other,Water,507.78
+Louisiana delta plain,C-CAP,1996-2021,Other,Wetland,754.11
+Louisiana delta plain,C-CAP,1996-2021,Other,Barren,246.33
+Louisiana delta plain,C-CAP,1996-2021,Other,Other,144820.62
+Louisiana delta plain,NLCD,1996-2021,Water,Water,589849.02
+Louisiana delta plain,NLCD,1996-2021,Water,Wetland,10451.88
+Louisiana delta plain,NLCD,1996-2021,Water,Barren,1643.58
+Louisiana delta plain,NLCD,1996-2021,Water,Other,3580.38
+Louisiana delta plain,NLCD,1996-2021,Wetland,Water,9105.57
+Louisiana delta plain,NLCD,1996-2021,Wetland,Wetland,737148.06
+Louisiana delta plain,NLCD,1996-2021,Wetland,Barren,54.9
+Louisiana delta plain,NLCD,1996-2021,Wetland,Other,3333.06
+Louisiana delta plain,NLCD,1996-2021,Barren,Water,797.49
+Louisiana delta plain,NLCD,1996-2021,Barren,Wetland,22.5
+Louisiana delta plain,NLCD,1996-2021,Barren,Barren,246.96
+Louisiana delta plain,NLCD,1996-2021,Barren,Other,121.23
+Louisiana delta plain,NLCD,1996-2021,Other,Water,1016.19
+Louisiana delta plain,NLCD,1996-2021,Other,Wetland,430.29
+Louisiana delta plain,NLCD,1996-2021,Other,Barren,225
+Louisiana delta plain,NLCD,1996-2021,Other,Other,145735.38
+Chesapeake eastern shore,C-CAP,1996-2001,Water,Water,326635.83
+Chesapeake eastern shore,C-CAP,1996-2001,Water,Wetland,10.89
+Chesapeake eastern shore,C-CAP,1996-2001,Water,Barren,21.15
+Chesapeake eastern shore,C-CAP,1996-2001,Water,Other,25.29
+Chesapeake eastern shore,C-CAP,1996-2001,Wetland,Water,88.83
+Chesapeake eastern shore,C-CAP,1996-2001,Wetland,Wetland,134735.4
+Chesapeake eastern shore,C-CAP,1996-2001,Wetland,Barren,8.64
+Chesapeake eastern shore,C-CAP,1996-2001,Wetland,Other,867.78
+Chesapeake eastern shore,C-CAP,1996-2001,Barren,Water,5.13
+Chesapeake eastern shore,C-CAP,1996-2001,Barren,Wetland,1.62
+Chesapeake eastern shore,C-CAP,1996-2001,Barren,Barren,858.06
+Chesapeake eastern shore,C-CAP,1996-2001,Barren,Other,99.54
+Chesapeake eastern shore,C-CAP,1996-2001,Other,Water,43.92
+Chesapeake eastern shore,C-CAP,1996-2001,Other,Wetland,0
+Chesapeake eastern shore,C-CAP,1996-2001,Other,Barren,91.35
+Chesapeake eastern shore,C-CAP,1996-2001,Other,Other,192059.82
+Chesapeake eastern shore,NLCD,1996-2001,Water,Water,326618.82
+Chesapeake eastern shore,NLCD,1996-2001,Water,Wetland,314.73
+Chesapeake eastern shore,NLCD,1996-2001,Water,Barren,38.07
+Chesapeake eastern shore,NLCD,1996-2001,Water,Other,108.9
+Chesapeake eastern shore,NLCD,1996-2001,Wetland,Water,572.04
+Chesapeake eastern shore,NLCD,1996-2001,Wetland,Wetland,139770.18
+Chesapeake eastern shore,NLCD,1996-2001,Wetland,Barren,10.26
+Chesapeake eastern shore,NLCD,1996-2001,Wetland,Other,109.26
+Chesapeake eastern shore,NLCD,1996-2001,Barren,Water,76.23
+Chesapeake eastern shore,NLCD,1996-2001,Barren,Wetland,8.1
+Chesapeake eastern shore,NLCD,1996-2001,Barren,Barren,476.73
+Chesapeake eastern shore,NLCD,1996-2001,Barren,Other,36.18
+Chesapeake eastern shore,NLCD,1996-2001,Other,Water,108.18
+Chesapeake eastern shore,NLCD,1996-2001,Other,Wetland,106.92
+Chesapeake eastern shore,NLCD,1996-2001,Other,Barren,56.52
+Chesapeake eastern shore,NLCD,1996-2001,Other,Other,187142.13
+Chesapeake eastern shore,C-CAP,2001-2006,Water,Water,326568.51
+Chesapeake eastern shore,C-CAP,2001-2006,Water,Wetland,91.53
+Chesapeake eastern shore,C-CAP,2001-2006,Water,Barren,36.99
+Chesapeake eastern shore,C-CAP,2001-2006,Water,Other,76.68
+Chesapeake eastern shore,C-CAP,2001-2006,Wetland,Water,471.96
+Chesapeake eastern shore,C-CAP,2001-2006,Wetland,Wetland,133920.54
+Chesapeake eastern shore,C-CAP,2001-2006,Wetland,Barren,11.88
+Chesapeake eastern shore,C-CAP,2001-2006,Wetland,Other,343.53
+Chesapeake eastern shore,C-CAP,2001-2006,Barren,Water,14.58
+Chesapeake eastern shore,C-CAP,2001-2006,Barren,Wetland,2.43
+Chesapeake eastern shore,C-CAP,2001-2006,Barren,Barren,891.36
+Chesapeake eastern shore,C-CAP,2001-2006,Barren,Other,70.83
+Chesapeake eastern shore,C-CAP,2001-2006,Other,Water,87.66
+Chesapeake eastern shore,C-CAP,2001-2006,Other,Wetland,0
+Chesapeake eastern shore,C-CAP,2001-2006,Other,Barren,27.18
+Chesapeake eastern shore,C-CAP,2001-2006,Other,Other,192937.59
+Chesapeake eastern shore,NLCD,2001-2006,Water,Water,326921.22
+Chesapeake eastern shore,NLCD,2001-2006,Water,Wetland,333.45
+Chesapeake eastern shore,NLCD,2001-2006,Water,Barren,40.59
+Chesapeake eastern shore,NLCD,2001-2006,Water,Other,80.01
+Chesapeake eastern shore,NLCD,2001-2006,Wetland,Water,580.5
+Chesapeake eastern shore,NLCD,2001-2006,Wetland,Wetland,139472.91
+Chesapeake eastern shore,NLCD,2001-2006,Wetland,Barren,9
+Chesapeake eastern shore,NLCD,2001-2006,Wetland,Other,137.52
+Chesapeake eastern shore,NLCD,2001-2006,Barren,Water,58.59
+Chesapeake eastern shore,NLCD,2001-2006,Barren,Wetland,11.7
+Chesapeake eastern shore,NLCD,2001-2006,Barren,Barren,483.93
+Chesapeake eastern shore,NLCD,2001-2006,Barren,Other,27.36
+Chesapeake eastern shore,NLCD,2001-2006,Other,Water,114.3
+Chesapeake eastern shore,NLCD,2001-2006,Other,Wetland,117.72
+Chesapeake eastern shore,NLCD,2001-2006,Other,Barren,61.92
+Chesapeake eastern shore,NLCD,2001-2006,Other,Other,187102.53
+Chesapeake eastern shore,C-CAP,2006-2010,Water,Water,326687.76
+Chesapeake eastern shore,C-CAP,2006-2010,Water,Wetland,408.78
+Chesapeake eastern shore,C-CAP,2006-2010,Water,Barren,4.23
+Chesapeake eastern shore,C-CAP,2006-2010,Water,Other,41.94
+Chesapeake eastern shore,C-CAP,2006-2010,Wetland,Water,156.51
+Chesapeake eastern shore,C-CAP,2006-2010,Wetland,Wetland,133641.54
+Chesapeake eastern shore,C-CAP,2006-2010,Wetland,Barren,8.37
+Chesapeake eastern shore,C-CAP,2006-2010,Wetland,Other,208.08
+Chesapeake eastern shore,C-CAP,2006-2010,Barren,Water,21.87
+Chesapeake eastern shore,C-CAP,2006-2010,Barren,Wetland,3.06
+Chesapeake eastern shore,C-CAP,2006-2010,Barren,Barren,932.67
+Chesapeake eastern shore,C-CAP,2006-2010,Barren,Other,9.81
+Chesapeake eastern shore,C-CAP,2006-2010,Other,Water,112.23
+Chesapeake eastern shore,C-CAP,2006-2010,Other,Wetland,0
+Chesapeake eastern shore,C-CAP,2006-2010,Other,Barren,40.32
+Chesapeake eastern shore,C-CAP,2006-2010,Other,Other,193276.08
+Chesapeake eastern shore,NLCD,2006-2010,Water,Water,327171.33
+Chesapeake eastern shore,NLCD,2006-2010,Water,Wetland,371.7
+Chesapeake eastern shore,NLCD,2006-2010,Water,Barren,29.07
+Chesapeake eastern shore,NLCD,2006-2010,Water,Other,102.51
+Chesapeake eastern shore,NLCD,2006-2010,Wetland,Water,519.66
+Chesapeake eastern shore,NLCD,2006-2010,Wetland,Wetland,139334.67
+Chesapeake eastern shore,NLCD,2006-2010,Wetland,Barren,9.81
+Chesapeake eastern shore,NLCD,2006-2010,Wetland,Other,71.64
+Chesapeake eastern shore,NLCD,2006-2010,Barren,Water,66.96
+Chesapeake eastern shore,NLCD,2006-2010,Barren,Wetland,4.86
+Chesapeake eastern shore,NLCD,2006-2010,Barren,Barren,498.6
+Chesapeake eastern shore,NLCD,2006-2010,Barren,Other,25.02
+Chesapeake eastern shore,NLCD,2006-2010,Other,Water,96.84
+Chesapeake eastern shore,NLCD,2006-2010,Other,Wetland,95.04
+Chesapeake eastern shore,NLCD,2006-2010,Other,Barren,39.78
+Chesapeake eastern shore,NLCD,2006-2010,Other,Other,187115.76
+Chesapeake eastern shore,C-CAP,2010-2016,Water,Water,326854.08
+Chesapeake eastern shore,C-CAP,2010-2016,Water,Wetland,94.5
+Chesapeake eastern shore,C-CAP,2010-2016,Water,Barren,2.97
+Chesapeake eastern shore,C-CAP,2010-2016,Water,Other,26.82
+Chesapeake eastern shore,C-CAP,2010-2016,Wetland,Water,54.99
+Chesapeake eastern shore,C-CAP,2010-2016,Wetland,Wetland,133887.78
+Chesapeake eastern shore,C-CAP,2010-2016,Wetland,Barren,20.43
+Chesapeake eastern shore,C-CAP,2010-2016,Wetland,Other,90.18
+Chesapeake eastern shore,C-CAP,2010-2016,Barren,Water,5.85
+Chesapeake eastern shore,C-CAP,2010-2016,Barren,Wetland,2.25
+Chesapeake eastern shore,C-CAP,2010-2016,Barren,Barren,973.98
+Chesapeake eastern shore,C-CAP,2010-2016,Barren,Other,3.51
+Chesapeake eastern shore,C-CAP,2010-2016,Other,Water,27.81
+Chesapeake eastern shore,C-CAP,2010-2016,Other,Wetland,342.9
+Chesapeake eastern shore,C-CAP,2010-2016,Other,Barren,3.87
+Chesapeake eastern shore,C-CAP,2010-2016,Other,Other,193161.33
+Chesapeake eastern shore,NLCD,2010-2016,Water,Water,327514.14
+Chesapeake eastern shore,NLCD,2010-2016,Water,Wetland,224.46
+Chesapeake eastern shore,NLCD,2010-2016,Water,Barren,31.86
+Chesapeake eastern shore,NLCD,2010-2016,Water,Other,84.33
+Chesapeake eastern shore,NLCD,2010-2016,Wetland,Water,630
+Chesapeake eastern shore,NLCD,2010-2016,Wetland,Wetland,139075.74
+Chesapeake eastern shore,NLCD,2010-2016,Wetland,Barren,15.93
+Chesapeake eastern shore,NLCD,2010-2016,Wetland,Other,84.6
+Chesapeake eastern shore,NLCD,2010-2016,Barren,Water,68.76
+Chesapeake eastern shore,NLCD,2010-2016,Barren,Wetland,4.95
+Chesapeake eastern shore,NLCD,2010-2016,Barren,Barren,484.11
+Chesapeake eastern shore,NLCD,2010-2016,Barren,Other,19.44
+Chesapeake eastern shore,NLCD,2010-2016,Other,Water,132.66
+Chesapeake eastern shore,NLCD,2010-2016,Other,Wetland,139.32
+Chesapeake eastern shore,NLCD,2010-2016,Other,Barren,28.35
+Chesapeake eastern shore,NLCD,2010-2016,Other,Other,187014.6
+Chesapeake eastern shore,C-CAP,2016-2021,Water,Water,326468.16
+Chesapeake eastern shore,C-CAP,2016-2021,Water,Wetland,460.98
+Chesapeake eastern shore,C-CAP,2016-2021,Water,Barren,9.27
+Chesapeake eastern shore,C-CAP,2016-2021,Water,Other,4.32
+Chesapeake eastern shore,C-CAP,2016-2021,Wetland,Water,55.08
+Chesapeake eastern shore,C-CAP,2016-2021,Wetland,Wetland,134224.47
+Chesapeake eastern shore,C-CAP,2016-2021,Wetland,Barren,5.49
+Chesapeake eastern shore,C-CAP,2016-2021,Wetland,Other,42.39
+Chesapeake eastern shore,C-CAP,2016-2021,Barren,Water,13.95
+Chesapeake eastern shore,C-CAP,2016-2021,Barren,Wetland,0.27
+Chesapeake eastern shore,C-CAP,2016-2021,Barren,Barren,952.74
+Chesapeake eastern shore,C-CAP,2016-2021,Barren,Other,34.29
+Chesapeake eastern shore,C-CAP,2016-2021,Other,Water,9.27
+Chesapeake eastern shore,C-CAP,2016-2021,Other,Wetland,106.92
+Chesapeake eastern shore,C-CAP,2016-2021,Other,Barren,198.18
+Chesapeake eastern shore,C-CAP,2016-2021,Other,Other,192967.47
+Chesapeake eastern shore,NLCD,2016-2021,Water,Water,328092.57
+Chesapeake eastern shore,NLCD,2016-2021,Water,Wetland,160.83
+Chesapeake eastern shore,NLCD,2016-2021,Water,Barren,28.8
+Chesapeake eastern shore,NLCD,2016-2021,Water,Other,63.36
+Chesapeake eastern shore,NLCD,2016-2021,Wetland,Water,549.09
+Chesapeake eastern shore,NLCD,2016-2021,Wetland,Wetland,138827.7
+Chesapeake eastern shore,NLCD,2016-2021,Wetland,Barren,7.2
+Chesapeake eastern shore,NLCD,2016-2021,Wetland,Other,60.48
+Chesapeake eastern shore,NLCD,2016-2021,Barren,Water,50.4
+Chesapeake eastern shore,NLCD,2016-2021,Barren,Wetland,2.25
+Chesapeake eastern shore,NLCD,2016-2021,Barren,Barren,497.16
+Chesapeake eastern shore,NLCD,2016-2021,Barren,Other,10.44
+Chesapeake eastern shore,NLCD,2016-2021,Other,Water,139.05
+Chesapeake eastern shore,NLCD,2016-2021,Other,Wetland,120.51
+Chesapeake eastern shore,NLCD,2016-2021,Other,Barren,40.32
+Chesapeake eastern shore,NLCD,2016-2021,Other,Other,186903.09
+Chesapeake eastern shore,C-CAP,1996-2021,Water,Water,326017.62
+Chesapeake eastern shore,C-CAP,1996-2021,Water,Wetland,574.65
+Chesapeake eastern shore,C-CAP,1996-2021,Water,Barren,50.94
+Chesapeake eastern shore,C-CAP,1996-2021,Water,Other,49.95
+Chesapeake eastern shore,C-CAP,1996-2021,Wetland,Water,342.36
+Chesapeake eastern shore,C-CAP,1996-2021,Wetland,Wetland,133854.75
+Chesapeake eastern shore,C-CAP,1996-2021,Wetland,Barren,48.42
+Chesapeake eastern shore,C-CAP,1996-2021,Wetland,Other,1455.12
+Chesapeake eastern shore,C-CAP,1996-2021,Barren,Water,34.74
+Chesapeake eastern shore,C-CAP,1996-2021,Barren,Wetland,2.88
+Chesapeake eastern shore,C-CAP,1996-2021,Barren,Barren,785.7
+Chesapeake eastern shore,C-CAP,1996-2021,Barren,Other,141.03
+Chesapeake eastern shore,C-CAP,1996-2021,Other,Water,151.74
+Chesapeake eastern shore,C-CAP,1996-2021,Other,Wetland,360.36
+Chesapeake eastern shore,C-CAP,1996-2021,Other,Barren,280.62
+Chesapeake eastern shore,C-CAP,1996-2021,Other,Other,191402.37
+Chesapeake eastern shore,NLCD,1996-2021,Water,Water,326489.76
+Chesapeake eastern shore,NLCD,1996-2021,Water,Wetland,334.35
+Chesapeake eastern shore,NLCD,1996-2021,Water,Barren,74.88
+Chesapeake eastern shore,NLCD,1996-2021,Water,Other,181.53
+Chesapeake eastern shore,NLCD,1996-2021,Wetland,Water,1785.6
+Chesapeake eastern shore,NLCD,1996-2021,Wetland,Wetland,138264.75
+Chesapeake eastern shore,NLCD,1996-2021,Wetland,Barren,29.07
+Chesapeake eastern shore,NLCD,1996-2021,Wetland,Other,382.32
+Chesapeake eastern shore,NLCD,1996-2021,Barren,Water,180.81
+Chesapeake eastern shore,NLCD,1996-2021,Barren,Wetland,15.57
+Chesapeake eastern shore,NLCD,1996-2021,Barren,Barren,324.54
+Chesapeake eastern shore,NLCD,1996-2021,Barren,Other,76.32
+Chesapeake eastern shore,NLCD,1996-2021,Other,Water,374.94
+Chesapeake eastern shore,NLCD,1996-2021,Other,Wetland,496.62
+Chesapeake eastern shore,NLCD,1996-2021,Other,Barren,144.99
+Chesapeake eastern shore,NLCD,1996-2021,Other,Other,186397.2
+San Francisco Bay and Delta,C-CAP,1996-2001,Water,Water,216413.91
+San Francisco Bay and Delta,C-CAP,1996-2001,Water,Wetland,314.73
+San Francisco Bay and Delta,C-CAP,1996-2001,Water,Barren,7.74
+San Francisco Bay and Delta,C-CAP,1996-2001,Water,Other,527.31
+San Francisco Bay and Delta,C-CAP,1996-2001,Wetland,Water,551.61
+San Francisco Bay and Delta,C-CAP,1996-2001,Wetland,Wetland,62278.38
+San Francisco Bay and Delta,C-CAP,1996-2001,Wetland,Barren,5.67
+San Francisco Bay and Delta,C-CAP,1996-2001,Wetland,Other,179.73
+San Francisco Bay and Delta,C-CAP,1996-2001,Barren,Water,131.67
+San Francisco Bay and Delta,C-CAP,1996-2001,Barren,Wetland,856.17
+San Francisco Bay and Delta,C-CAP,1996-2001,Barren,Barren,7026.12
+San Francisco Bay and Delta,C-CAP,1996-2001,Barren,Other,263.52
+San Francisco Bay and Delta,C-CAP,1996-2001,Other,Water,718.92
+San Francisco Bay and Delta,C-CAP,1996-2001,Other,Wetland,167.49
+San Francisco Bay and Delta,C-CAP,1996-2001,Other,Barren,47.43
+San Francisco Bay and Delta,C-CAP,1996-2001,Other,Other,1116512.64
+San Francisco Bay and Delta,NLCD,1996-2001,Water,Water,214917.39
+San Francisco Bay and Delta,NLCD,1996-2001,Water,Wetland,1734.75
+San Francisco Bay and Delta,NLCD,1996-2001,Water,Barren,1465.38
+San Francisco Bay and Delta,NLCD,1996-2001,Water,Other,856.62
+San Francisco Bay and Delta,NLCD,1996-2001,Wetland,Water,541.62
+San Francisco Bay and Delta,NLCD,1996-2001,Wetland,Wetland,59130.72
+San Francisco Bay and Delta,NLCD,1996-2001,Wetland,Barren,15.75
+San Francisco Bay and Delta,NLCD,1996-2001,Wetland,Other,328.05
+San Francisco Bay and Delta,NLCD,1996-2001,Barren,Water,318.33
+San Francisco Bay and Delta,NLCD,1996-2001,Barren,Wetland,14.31
+San Francisco Bay and Delta,NLCD,1996-2001,Barren,Barren,3047.31
+San Francisco Bay and Delta,NLCD,1996-2001,Barren,Other,313.92
+San Francisco Bay and Delta,NLCD,1996-2001,Other,Water,1237.05
+San Francisco Bay and Delta,NLCD,1996-2001,Other,Wetland,865.08
+San Francisco Bay and Delta,NLCD,1996-2001,Other,Barren,313.11
+San Francisco Bay and Delta,NLCD,1996-2001,Other,Other,1120903.65
+San Francisco Bay and Delta,C-CAP,2001-2006,Water,Water,215518.23
+San Francisco Bay and Delta,C-CAP,2001-2006,Water,Wetland,1724.85
+San Francisco Bay and Delta,C-CAP,2001-2006,Water,Barren,356.76
+San Francisco Bay and Delta,C-CAP,2001-2006,Water,Other,216.27
+San Francisco Bay and Delta,C-CAP,2001-2006,Wetland,Water,4112.73
+San Francisco Bay and Delta,C-CAP,2001-2006,Wetland,Wetland,58927.14
+San Francisco Bay and Delta,C-CAP,2001-2006,Wetland,Barren,60.66
+San Francisco Bay and Delta,C-CAP,2001-2006,Wetland,Other,516.24
+San Francisco Bay and Delta,C-CAP,2001-2006,Barren,Water,517.5
+San Francisco Bay and Delta,C-CAP,2001-2006,Barren,Wetland,790.02
+San Francisco Bay and Delta,C-CAP,2001-2006,Barren,Barren,5319.36
+San Francisco Bay and Delta,C-CAP,2001-2006,Barren,Other,460.08
+San Francisco Bay and Delta,C-CAP,2001-2006,Other,Water,1165.14
+San Francisco Bay and Delta,C-CAP,2001-2006,Other,Wetland,5.22
+San Francisco Bay and Delta,C-CAP,2001-2006,Other,Barren,2162.7
+San Francisco Bay and Delta,C-CAP,2001-2006,Other,Other,1114150.14
+San Francisco Bay and Delta,NLCD,2001-2006,Water,Water,214407.45
+San Francisco Bay and Delta,NLCD,2001-2006,Water,Wetland,738.54
+San Francisco Bay and Delta,NLCD,2001-2006,Water,Barren,1002.33
+San Francisco Bay and Delta,NLCD,2001-2006,Water,Other,866.07
+San Francisco Bay and Delta,NLCD,2001-2006,Wetland,Water,2292.75
+San Francisco Bay and Delta,NLCD,2001-2006,Wetland,Wetland,59003.73
+San Francisco Bay and Delta,NLCD,2001-2006,Wetland,Barren,9.54
+San Francisco Bay and Delta,NLCD,2001-2006,Wetland,Other,438.84
+San Francisco Bay and Delta,NLCD,2001-2006,Barren,Water,1137.51
+San Francisco Bay and Delta,NLCD,2001-2006,Barren,Wetland,24.3
+San Francisco Bay and Delta,NLCD,2001-2006,Barren,Barren,3401.82
+San Francisco Bay and Delta,NLCD,2001-2006,Barren,Other,277.92
+San Francisco Bay and Delta,NLCD,2001-2006,Other,Water,1114.2
+San Francisco Bay and Delta,NLCD,2001-2006,Other,Wetland,622.44
+San Francisco Bay and Delta,NLCD,2001-2006,Other,Barren,396.81
+San Francisco Bay and Delta,NLCD,2001-2006,Other,Other,1120268.79
+San Francisco Bay and Delta,C-CAP,2006-2010,Water,Water,214800.39
+San Francisco Bay and Delta,C-CAP,2006-2010,Water,Wetland,3810.69
+San Francisco Bay and Delta,C-CAP,2006-2010,Water,Barren,1851.75
+San Francisco Bay and Delta,C-CAP,2006-2010,Water,Other,850.77
+San Francisco Bay and Delta,C-CAP,2006-2010,Wetland,Water,419.85
+San Francisco Bay and Delta,C-CAP,2006-2010,Wetland,Wetland,60683.13
+San Francisco Bay and Delta,C-CAP,2006-2010,Wetland,Barren,217.26
+San Francisco Bay and Delta,C-CAP,2006-2010,Wetland,Other,126.99
+San Francisco Bay and Delta,C-CAP,2006-2010,Barren,Water,146.16
+San Francisco Bay and Delta,C-CAP,2006-2010,Barren,Wetland,50.22
+San Francisco Bay and Delta,C-CAP,2006-2010,Barren,Barren,6058.17
+San Francisco Bay and Delta,C-CAP,2006-2010,Barren,Other,1644.93
+San Francisco Bay and Delta,C-CAP,2006-2010,Other,Water,203.49
+San Francisco Bay and Delta,C-CAP,2006-2010,Other,Wetland,1.44
+San Francisco Bay and Delta,C-CAP,2006-2010,Other,Barren,273.87
+San Francisco Bay and Delta,C-CAP,2006-2010,Other,Other,1114863.93
+San Francisco Bay and Delta,NLCD,2006-2010,Water,Water,214948.71
+San Francisco Bay and Delta,NLCD,2006-2010,Water,Wetland,1693.53
+San Francisco Bay and Delta,NLCD,2006-2010,Water,Barren,1121.04
+San Francisco Bay and Delta,NLCD,2006-2010,Water,Other,1188.63
+San Francisco Bay and Delta,NLCD,2006-2010,Wetland,Water,628.2
+San Francisco Bay and Delta,NLCD,2006-2010,Wetland,Wetland,59347.89
+San Francisco Bay and Delta,NLCD,2006-2010,Wetland,Barren,16.11
+San Francisco Bay and Delta,NLCD,2006-2010,Wetland,Other,396.81
+San Francisco Bay and Delta,NLCD,2006-2010,Barren,Water,680.94
+San Francisco Bay and Delta,NLCD,2006-2010,Barren,Wetland,31.77
+San Francisco Bay and Delta,NLCD,2006-2010,Barren,Barren,3844.8
+San Francisco Bay and Delta,NLCD,2006-2010,Barren,Other,252.99
+San Francisco Bay and Delta,NLCD,2006-2010,Other,Water,647.01
+San Francisco Bay and Delta,NLCD,2006-2010,Other,Wetland,617.85
+San Francisco Bay and Delta,NLCD,2006-2010,Other,Barren,190.17
+San Francisco Bay and Delta,NLCD,2006-2010,Other,Other,1120396.59
+San Francisco Bay and Delta,C-CAP,2010-2016,Water,Water,214690.86
+San Francisco Bay and Delta,C-CAP,2010-2016,Water,Wetland,759.51
+San Francisco Bay and Delta,C-CAP,2010-2016,Water,Barren,64.8
+San Francisco Bay and Delta,C-CAP,2010-2016,Water,Other,54.72
+San Francisco Bay and Delta,C-CAP,2010-2016,Wetland,Water,700.29
+San Francisco Bay and Delta,C-CAP,2010-2016,Wetland,Wetland,63761.85
+San Francisco Bay and Delta,C-CAP,2010-2016,Wetland,Barren,14.67
+San Francisco Bay and Delta,C-CAP,2010-2016,Wetland,Other,68.67
+San Francisco Bay and Delta,C-CAP,2010-2016,Barren,Water,250.02
+San Francisco Bay and Delta,C-CAP,2010-2016,Barren,Wetland,277.11
+San Francisco Bay and Delta,C-CAP,2010-2016,Barren,Barren,7800.66
+San Francisco Bay and Delta,C-CAP,2010-2016,Barren,Other,73.26
+San Francisco Bay and Delta,C-CAP,2010-2016,Other,Water,353.79
+San Francisco Bay and Delta,C-CAP,2010-2016,Other,Wetland,141.3
+San Francisco Bay and Delta,C-CAP,2010-2016,Other,Barren,45.27
+San Francisco Bay and Delta,C-CAP,2010-2016,Other,Other,1116946.26
+San Francisco Bay and Delta,NLCD,2010-2016,Water,Water,214610.49
+San Francisco Bay and Delta,NLCD,2010-2016,Water,Wetland,813.24
+San Francisco Bay and Delta,NLCD,2010-2016,Water,Barren,508.95
+San Francisco Bay and Delta,NLCD,2010-2016,Water,Other,972.18
+San Francisco Bay and Delta,NLCD,2010-2016,Wetland,Water,1323.18
+San Francisco Bay and Delta,NLCD,2010-2016,Wetland,Wetland,59479.65
+San Francisco Bay and Delta,NLCD,2010-2016,Wetland,Barren,27
+San Francisco Bay and Delta,NLCD,2010-2016,Wetland,Other,861.21
+San Francisco Bay and Delta,NLCD,2010-2016,Barren,Water,746.55
+San Francisco Bay and Delta,NLCD,2010-2016,Barren,Wetland,44.73
+San Francisco Bay and Delta,NLCD,2010-2016,Barren,Barren,4030.92
+San Francisco Bay and Delta,NLCD,2010-2016,Barren,Other,349.92
+San Francisco Bay and Delta,NLCD,2010-2016,Other,Water,1234.89
+San Francisco Bay and Delta,NLCD,2010-2016,Other,Wetland,965.79
+San Francisco Bay and Delta,NLCD,2010-2016,Other,Barren,254.88
+San Francisco Bay and Delta,NLCD,2010-2016,Other,Other,1119779.46
+San Francisco Bay and Delta,C-CAP,2016-2021,Water,Water,214880.76
+San Francisco Bay and Delta,C-CAP,2016-2021,Water,Wetland,745.2
+San Francisco Bay and Delta,C-CAP,2016-2021,Water,Barren,159.39
+San Francisco Bay and Delta,C-CAP,2016-2021,Water,Other,209.61
+San Francisco Bay and Delta,C-CAP,2016-2021,Wetland,Water,3148.02
+San Francisco Bay and Delta,C-CAP,2016-2021,Wetland,Wetland,61163.46
+San Francisco Bay and Delta,C-CAP,2016-2021,Wetland,Barren,99.36
+San Francisco Bay and Delta,C-CAP,2016-2021,Wetland,Other,528.93
+San Francisco Bay and Delta,C-CAP,2016-2021,Barren,Water,61.83
+San Francisco Bay and Delta,C-CAP,2016-2021,Barren,Wetland,0.99
+San Francisco Bay and Delta,C-CAP,2016-2021,Barren,Barren,7713.36
+San Francisco Bay and Delta,C-CAP,2016-2021,Barren,Other,149.22
+San Francisco Bay and Delta,C-CAP,2016-2021,Other,Water,65.07
+San Francisco Bay and Delta,C-CAP,2016-2021,Other,Wetland,10.53
+San Francisco Bay and Delta,C-CAP,2016-2021,Other,Barren,100.62
+San Francisco Bay and Delta,C-CAP,2016-2021,Other,Other,1116966.69
+San Francisco Bay and Delta,NLCD,2016-2021,Water,Water,213700.14
+San Francisco Bay and Delta,NLCD,2016-2021,Water,Wetland,1402.2
+San Francisco Bay and Delta,NLCD,2016-2021,Water,Barren,1138.95
+San Francisco Bay and Delta,NLCD,2016-2021,Water,Other,1673.82
+San Francisco Bay and Delta,NLCD,2016-2021,Wetland,Water,594.63
+San Francisco Bay and Delta,NLCD,2016-2021,Wetland,Wetland,60033.69
+San Francisco Bay and Delta,NLCD,2016-2021,Wetland,Barren,33.48
+San Francisco Bay and Delta,NLCD,2016-2021,Wetland,Other,641.61
+San Francisco Bay and Delta,NLCD,2016-2021,Barren,Water,394.29
+San Francisco Bay and Delta,NLCD,2016-2021,Barren,Wetland,19.26
+San Francisco Bay and Delta,NLCD,2016-2021,Barren,Barren,4103.55
+San Francisco Bay and Delta,NLCD,2016-2021,Barren,Other,304.65
+San Francisco Bay and Delta,NLCD,2016-2021,Other,Water,629.46
+San Francisco Bay and Delta,NLCD,2016-2021,Other,Wetland,1048.5
+San Francisco Bay and Delta,NLCD,2016-2021,Other,Barren,197.91
+San Francisco Bay and Delta,NLCD,2016-2021,Other,Other,1120086.9
+San Francisco Bay and Delta,C-CAP,1996-2021,Water,Water,211631.85
+San Francisco Bay and Delta,C-CAP,1996-2021,Water,Wetland,3492.9
+San Francisco Bay and Delta,C-CAP,1996-2021,Water,Barren,1206.18
+San Francisco Bay and Delta,C-CAP,1996-2021,Water,Other,932.76
+San Francisco Bay and Delta,C-CAP,1996-2021,Wetland,Water,4746.24
+San Francisco Bay and Delta,C-CAP,1996-2021,Wetland,Wetland,56333.7
+San Francisco Bay and Delta,C-CAP,1996-2021,Wetland,Barren,555.93
+San Francisco Bay and Delta,C-CAP,1996-2021,Wetland,Other,1379.52
+San Francisco Bay and Delta,C-CAP,1996-2021,Barren,Water,323.91
+San Francisco Bay and Delta,C-CAP,1996-2021,Barren,Wetland,1698.3
+San Francisco Bay and Delta,C-CAP,1996-2021,Barren,Barren,5263.29
+San Francisco Bay and Delta,C-CAP,1996-2021,Barren,Other,991.98
+San Francisco Bay and Delta,C-CAP,1996-2021,Other,Water,1453.68
+San Francisco Bay and Delta,C-CAP,1996-2021,Other,Wetland,395.28
+San Francisco Bay and Delta,C-CAP,1996-2021,Other,Barren,1047.33
+San Francisco Bay and Delta,C-CAP,1996-2021,Other,Other,1114550.19
+San Francisco Bay and Delta,NLCD,1996-2021,Water,Water,211256.1
+San Francisco Bay and Delta,NLCD,1996-2021,Water,Wetland,2309.31
+San Francisco Bay and Delta,NLCD,1996-2021,Water,Barren,2526.3
+San Francisco Bay and Delta,NLCD,1996-2021,Water,Other,2882.43
+San Francisco Bay and Delta,NLCD,1996-2021,Wetland,Water,1302.75
+San Francisco Bay and Delta,NLCD,1996-2021,Wetland,Wetland,57344.04
+San Francisco Bay and Delta,NLCD,1996-2021,Wetland,Barren,25.29
+San Francisco Bay and Delta,NLCD,1996-2021,Wetland,Other,1344.06
+San Francisco Bay and Delta,NLCD,1996-2021,Barren,Water,496.8
+San Francisco Bay and Delta,NLCD,1996-2021,Barren,Wetland,36.81
+San Francisco Bay and Delta,NLCD,1996-2021,Barren,Barren,2299.05
+San Francisco Bay and Delta,NLCD,1996-2021,Barren,Other,861.21
+San Francisco Bay and Delta,NLCD,1996-2021,Other,Water,2262.87
+San Francisco Bay and Delta,NLCD,1996-2021,Other,Wetland,2813.49
+San Francisco Bay and Delta,NLCD,1996-2021,Other,Barren,623.25
+San Francisco Bay and Delta,NLCD,1996-2021,Other,Other,1117619.28
+Western Lake Erie,C-CAP,1996-2001,Water,Water,114255.63
+Western Lake Erie,C-CAP,1996-2001,Water,Wetland,211.14
+Western Lake Erie,C-CAP,1996-2001,Water,Barren,76.59
+Western Lake Erie,C-CAP,1996-2001,Water,Other,94.41
+Western Lake Erie,C-CAP,1996-2001,Wetland,Water,113.4
+Western Lake Erie,C-CAP,1996-2001,Wetland,Wetland,25083.09
+Western Lake Erie,C-CAP,1996-2001,Wetland,Barren,5.94
+Western Lake Erie,C-CAP,1996-2001,Wetland,Other,168.21
+Western Lake Erie,C-CAP,1996-2001,Barren,Water,37.98
+Western Lake Erie,C-CAP,1996-2001,Barren,Wetland,1.44
+Western Lake Erie,C-CAP,1996-2001,Barren,Barren,2619.36
+Western Lake Erie,C-CAP,1996-2001,Barren,Other,99.36
+Western Lake Erie,C-CAP,1996-2001,Other,Water,45.99
+Western Lake Erie,C-CAP,1996-2001,Other,Wetland,0
+Western Lake Erie,C-CAP,1996-2001,Other,Barren,283.14
+Western Lake Erie,C-CAP,1996-2001,Other,Other,323324.64
+Western Lake Erie,NLCD,1996-2001,Water,Water,111035.34
+Western Lake Erie,NLCD,1996-2001,Water,Wetland,1011.51
+Western Lake Erie,NLCD,1996-2001,Water,Barren,126.63
+Western Lake Erie,NLCD,1996-2001,Water,Other,355.05
+Western Lake Erie,NLCD,1996-2001,Wetland,Water,226.62
+Western Lake Erie,NLCD,1996-2001,Wetland,Wetland,18936.45
+Western Lake Erie,NLCD,1996-2001,Wetland,Barren,9.9
+Western Lake Erie,NLCD,1996-2001,Wetland,Other,75.06
+Western Lake Erie,NLCD,1996-2001,Barren,Water,55.71
+Western Lake Erie,NLCD,1996-2001,Barren,Wetland,2.16
+Western Lake Erie,NLCD,1996-2001,Barren,Barren,2343.87
+Western Lake Erie,NLCD,1996-2001,Barren,Other,39.87
+Western Lake Erie,NLCD,1996-2001,Other,Water,131.58
+Western Lake Erie,NLCD,1996-2001,Other,Wetland,117.54
+Western Lake Erie,NLCD,1996-2001,Other,Barren,169.65
+Western Lake Erie,NLCD,1996-2001,Other,Other,331783.38
+Western Lake Erie,C-CAP,2001-2006,Water,Water,113766.75
+Western Lake Erie,C-CAP,2001-2006,Water,Wetland,627.75
+Western Lake Erie,C-CAP,2001-2006,Water,Barren,12.69
+Western Lake Erie,C-CAP,2001-2006,Water,Other,45.81
+Western Lake Erie,C-CAP,2001-2006,Wetland,Water,1224.09
+Western Lake Erie,C-CAP,2001-2006,Wetland,Wetland,23873.13
+Western Lake Erie,C-CAP,2001-2006,Wetland,Barren,5.49
+Western Lake Erie,C-CAP,2001-2006,Wetland,Other,192.96
+Western Lake Erie,C-CAP,2001-2006,Barren,Water,74.52
+Western Lake Erie,C-CAP,2001-2006,Barren,Wetland,4.05
+Western Lake Erie,C-CAP,2001-2006,Barren,Barren,2881.98
+Western Lake Erie,C-CAP,2001-2006,Barren,Other,24.48
+Western Lake Erie,C-CAP,2001-2006,Other,Water,179.28
+Western Lake Erie,C-CAP,2001-2006,Other,Wetland,0
+Western Lake Erie,C-CAP,2001-2006,Other,Barren,74.97
+Western Lake Erie,C-CAP,2001-2006,Other,Other,323432.37
+Western Lake Erie,NLCD,2001-2006,Water,Water,111039.84
+Western Lake Erie,NLCD,2001-2006,Water,Wetland,204.3
+Western Lake Erie,NLCD,2001-2006,Water,Barren,29.25
+Western Lake Erie,NLCD,2001-2006,Water,Other,175.86
+Western Lake Erie,NLCD,2001-2006,Wetland,Water,506.43
+Western Lake Erie,NLCD,2001-2006,Wetland,Wetland,19420.29
+Western Lake Erie,NLCD,2001-2006,Wetland,Barren,9.36
+Western Lake Erie,NLCD,2001-2006,Wetland,Other,131.58
+Western Lake Erie,NLCD,2001-2006,Barren,Water,145.08
+Western Lake Erie,NLCD,2001-2006,Barren,Wetland,2.97
+Western Lake Erie,NLCD,2001-2006,Barren,Barren,2465.55
+Western Lake Erie,NLCD,2001-2006,Barren,Other,36.45
+Western Lake Erie,NLCD,2001-2006,Other,Water,205.02
+Western Lake Erie,NLCD,2001-2006,Other,Wetland,101.79
+Western Lake Erie,NLCD,2001-2006,Other,Barren,100.53
+Western Lake Erie,NLCD,2001-2006,Other,Other,331846.02
+Western Lake Erie,C-CAP,2006-2010,Water,Water,114714.45
+Western Lake Erie,C-CAP,2006-2010,Water,Wetland,348.39
+Western Lake Erie,C-CAP,2006-2010,Water,Barren,28.62
+Western Lake Erie,C-CAP,2006-2010,Water,Other,153.18
+Western Lake Erie,C-CAP,2006-2010,Wetland,Water,1591.47
+Western Lake Erie,C-CAP,2006-2010,Wetland,Wetland,22833
+Western Lake Erie,C-CAP,2006-2010,Wetland,Barren,12.51
+Western Lake Erie,C-CAP,2006-2010,Wetland,Other,67.95
+Western Lake Erie,C-CAP,2006-2010,Barren,Water,130.23
+Western Lake Erie,C-CAP,2006-2010,Barren,Wetland,3.6
+Western Lake Erie,C-CAP,2006-2010,Barren,Barren,2704.68
+Western Lake Erie,C-CAP,2006-2010,Barren,Other,136.62
+Western Lake Erie,C-CAP,2006-2010,Other,Water,223.11
+Western Lake Erie,C-CAP,2006-2010,Other,Wetland,0
+Western Lake Erie,C-CAP,2006-2010,Other,Barren,143.46
+Western Lake Erie,C-CAP,2006-2010,Other,Other,323329.05
+Western Lake Erie,NLCD,2006-2010,Water,Water,111178.44
+Western Lake Erie,NLCD,2006-2010,Water,Wetland,401.13
+Western Lake Erie,NLCD,2006-2010,Water,Barren,49.5
+Western Lake Erie,NLCD,2006-2010,Water,Other,267.3
+Western Lake Erie,NLCD,2006-2010,Wetland,Water,242.64
+Western Lake Erie,NLCD,2006-2010,Wetland,Wetland,19419.75
+Western Lake Erie,NLCD,2006-2010,Wetland,Barren,2.43
+Western Lake Erie,NLCD,2006-2010,Wetland,Other,64.53
+Western Lake Erie,NLCD,2006-2010,Barren,Water,74.88
+Western Lake Erie,NLCD,2006-2010,Barren,Wetland,0.54
+Western Lake Erie,NLCD,2006-2010,Barren,Barren,2502.54
+Western Lake Erie,NLCD,2006-2010,Barren,Other,26.73
+Western Lake Erie,NLCD,2006-2010,Other,Water,131.94
+Western Lake Erie,NLCD,2006-2010,Other,Wetland,131.13
+Western Lake Erie,NLCD,2006-2010,Other,Barren,62.82
+Western Lake Erie,NLCD,2006-2010,Other,Other,331864.02
+Western Lake Erie,C-CAP,2010-2016,Water,Water,114721.83
+Western Lake Erie,C-CAP,2010-2016,Water,Wetland,1837.35
+Western Lake Erie,C-CAP,2010-2016,Water,Barren,15.21
+Western Lake Erie,C-CAP,2010-2016,Water,Other,84.87
+Western Lake Erie,C-CAP,2010-2016,Wetland,Water,11.88
+Western Lake Erie,C-CAP,2010-2016,Wetland,Wetland,23145.39
+Western Lake Erie,C-CAP,2010-2016,Wetland,Barren,3.51
+Western Lake Erie,C-CAP,2010-2016,Wetland,Other,24.21
+Western Lake Erie,C-CAP,2010-2016,Barren,Water,2.16
+Western Lake Erie,C-CAP,2010-2016,Barren,Wetland,22.32
+Western Lake Erie,C-CAP,2010-2016,Barren,Barren,2837.43
+Western Lake Erie,C-CAP,2010-2016,Barren,Other,27.36
+Western Lake Erie,C-CAP,2010-2016,Other,Water,35.64
+Western Lake Erie,C-CAP,2010-2016,Other,Wetland,1.98
+Western Lake Erie,C-CAP,2010-2016,Other,Barren,34.83
+Western Lake Erie,C-CAP,2010-2016,Other,Other,323614.35
+Western Lake Erie,NLCD,2010-2016,Water,Water,111015.09
+Western Lake Erie,NLCD,2010-2016,Water,Wetland,391.14
+Western Lake Erie,NLCD,2010-2016,Water,Barren,34.02
+Western Lake Erie,NLCD,2010-2016,Water,Other,187.65
+Western Lake Erie,NLCD,2010-2016,Wetland,Water,395.55
+Western Lake Erie,NLCD,2010-2016,Wetland,Wetland,19440.81
+Western Lake Erie,NLCD,2010-2016,Wetland,Barren,3.42
+Western Lake Erie,NLCD,2010-2016,Wetland,Other,112.77
+Western Lake Erie,NLCD,2010-2016,Barren,Water,97.74
+Western Lake Erie,NLCD,2010-2016,Barren,Wetland,5.76
+Western Lake Erie,NLCD,2010-2016,Barren,Barren,2472.3
+Western Lake Erie,NLCD,2010-2016,Barren,Other,41.49
+Western Lake Erie,NLCD,2010-2016,Other,Water,422.01
+Western Lake Erie,NLCD,2010-2016,Other,Wetland,167.49
+Western Lake Erie,NLCD,2010-2016,Other,Barren,78.39
+Western Lake Erie,NLCD,2010-2016,Other,Other,331554.69
+Western Lake Erie,C-CAP,2016-2021,Water,Water,113960.61
+Western Lake Erie,C-CAP,2016-2021,Water,Wetland,754.02
+Western Lake Erie,C-CAP,2016-2021,Water,Barren,30.24
+Western Lake Erie,C-CAP,2016-2021,Water,Other,26.64
+Western Lake Erie,C-CAP,2016-2021,Wetland,Water,205.56
+Western Lake Erie,C-CAP,2016-2021,Wetland,Wetland,24759.27
+Western Lake Erie,C-CAP,2016-2021,Wetland,Barren,7.56
+Western Lake Erie,C-CAP,2016-2021,Wetland,Other,34.65
+Western Lake Erie,C-CAP,2016-2021,Barren,Water,54.18
+Western Lake Erie,C-CAP,2016-2021,Barren,Wetland,0.27
+Western Lake Erie,C-CAP,2016-2021,Barren,Barren,2737.62
+Western Lake Erie,C-CAP,2016-2021,Barren,Other,98.91
+Western Lake Erie,C-CAP,2016-2021,Other,Water,18.9
+Western Lake Erie,C-CAP,2016-2021,Other,Wetland,5.76
+Western Lake Erie,C-CAP,2016-2021,Other,Barren,247.68
+Western Lake Erie,C-CAP,2016-2021,Other,Other,323478.45
+Western Lake Erie,NLCD,2016-2021,Water,Water,111263.85
+Western Lake Erie,NLCD,2016-2021,Water,Wetland,410.22
+Western Lake Erie,NLCD,2016-2021,Water,Barren,36.36
+Western Lake Erie,NLCD,2016-2021,Water,Other,219.96
+Western Lake Erie,NLCD,2016-2021,Wetland,Water,500.94
+Western Lake Erie,NLCD,2016-2021,Wetland,Wetland,19408.5
+Western Lake Erie,NLCD,2016-2021,Wetland,Barren,1.98
+Western Lake Erie,NLCD,2016-2021,Wetland,Other,93.78
+Western Lake Erie,NLCD,2016-2021,Barren,Water,92.52
+Western Lake Erie,NLCD,2016-2021,Barren,Wetland,4.23
+Western Lake Erie,NLCD,2016-2021,Barren,Barren,2463.39
+Western Lake Erie,NLCD,2016-2021,Barren,Other,27.99
+Western Lake Erie,NLCD,2016-2021,Other,Water,431.82
+Western Lake Erie,NLCD,2016-2021,Other,Wetland,182.25
+Western Lake Erie,NLCD,2016-2021,Other,Barren,89.46
+Western Lake Erie,NLCD,2016-2021,Other,Other,331193.07
+Western Lake Erie,C-CAP,1996-2021,Water,Water,112731.03
+Western Lake Erie,C-CAP,1996-2021,Water,Wetland,1602.99
+Western Lake Erie,C-CAP,1996-2021,Water,Barren,115.2
+Western Lake Erie,C-CAP,1996-2021,Water,Other,188.55
+Western Lake Erie,C-CAP,1996-2021,Wetland,Water,1016.28
+Western Lake Erie,C-CAP,1996-2021,Wetland,Wetland,23803.02
+Western Lake Erie,C-CAP,1996-2021,Wetland,Barren,31.59
+Western Lake Erie,C-CAP,1996-2021,Wetland,Other,519.75
+Western Lake Erie,C-CAP,1996-2021,Barren,Water,206.46
+Western Lake Erie,C-CAP,1996-2021,Barren,Wetland,21.06
+Western Lake Erie,C-CAP,1996-2021,Barren,Barren,2247.21
+Western Lake Erie,C-CAP,1996-2021,Barren,Other,283.41
+Western Lake Erie,C-CAP,1996-2021,Other,Water,285.48
+Western Lake Erie,C-CAP,1996-2021,Other,Wetland,92.25
+Western Lake Erie,C-CAP,1996-2021,Other,Barren,629.1
+Western Lake Erie,C-CAP,1996-2021,Other,Other,322646.94
+Western Lake Erie,NLCD,1996-2021,Water,Water,110925.45
+Western Lake Erie,NLCD,1996-2021,Water,Wetland,988.56
+Western Lake Erie,NLCD,1996-2021,Water,Barren,106.38
+Western Lake Erie,NLCD,1996-2021,Water,Other,508.14
+Western Lake Erie,NLCD,1996-2021,Wetland,Water,456.57
+Western Lake Erie,NLCD,1996-2021,Wetland,Wetland,18394.92
+Western Lake Erie,NLCD,1996-2021,Wetland,Barren,8.64
+Western Lake Erie,NLCD,1996-2021,Wetland,Other,387.9
+Western Lake Erie,NLCD,1996-2021,Barren,Water,218.16
+Western Lake Erie,NLCD,1996-2021,Barren,Wetland,8.55
+Western Lake Erie,NLCD,1996-2021,Barren,Barren,2088.99
+Western Lake Erie,NLCD,1996-2021,Barren,Other,125.91
+Western Lake Erie,NLCD,1996-2021,Other,Water,688.95
+Western Lake Erie,NLCD,1996-2021,Other,Wetland,613.17
+Western Lake Erie,NLCD,1996-2021,Other,Barren,387.18
+Western Lake Erie,NLCD,1996-2021,Other,Other,330512.85

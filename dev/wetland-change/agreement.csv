@@ -1,0 +1,1203 @@
+Region,Ccap,Nlcd,Ha
+Louisiana chenier plain,Water > Water,Water > Water,216203.31
+Louisiana chenier plain,Water > Wetland,Water > Water,850.86
+Louisiana chenier plain,Water > Barren,Water > Water,1594.35
+Louisiana chenier plain,Water > Other,Water > Water,40.41
+Louisiana chenier plain,Wetland > Water,Water > Water,1328.04
+Louisiana chenier plain,Wetland > Wetland,Water > Water,4657.32
+Louisiana chenier plain,Wetland > Barren,Water > Water,60.21
+Louisiana chenier plain,Wetland > Other,Water > Water,3.51
+Louisiana chenier plain,Barren > Water,Water > Water,295.38
+Louisiana chenier plain,Barren > Wetland,Water > Water,53.01
+Louisiana chenier plain,Barren > Barren,Water > Water,530.82
+Louisiana chenier plain,Barren > Other,Water > Water,1.53
+Louisiana chenier plain,Other > Water,Water > Water,59.22
+Louisiana chenier plain,Other > Wetland,Water > Water,2.16
+Louisiana chenier plain,Other > Barren,Water > Water,18.81
+Louisiana chenier plain,Other > Other,Water > Water,517.59
+Louisiana chenier plain,Water > Water,Water > Wetland,906.66
+Louisiana chenier plain,Water > Wetland,Water > Wetland,764.01
+Louisiana chenier plain,Water > Barren,Water > Wetland,13.14
+Louisiana chenier plain,Water > Other,Water > Wetland,5.76
+Louisiana chenier plain,Wetland > Water,Water > Wetland,374.22
+Louisiana chenier plain,Wetland > Wetland,Water > Wetland,2563.74
+Louisiana chenier plain,Wetland > Barren,Water > Wetland,73.17
+Louisiana chenier plain,Wetland > Other,Water > Wetland,7.92
+Louisiana chenier plain,Barren > Water,Water > Wetland,4.59
+Louisiana chenier plain,Barren > Wetland,Water > Wetland,25.47
+Louisiana chenier plain,Barren > Barren,Water > Wetland,16.56
+Louisiana chenier plain,Barren > Other,Water > Wetland,0.36
+Louisiana chenier plain,Other > Water,Water > Wetland,3.78
+Louisiana chenier plain,Other > Wetland,Water > Wetland,3.24
+Louisiana chenier plain,Other > Barren,Water > Wetland,2.43
+Louisiana chenier plain,Other > Other,Water > Wetland,66.24
+Louisiana chenier plain,Water > Water,Water > Barren,245.52
+Louisiana chenier plain,Water > Wetland,Water > Barren,32.94
+Louisiana chenier plain,Water > Barren,Water > Barren,169.56
+Louisiana chenier plain,Water > Other,Water > Barren,18.54
+Louisiana chenier plain,Wetland > Water,Water > Barren,1.71
+Louisiana chenier plain,Wetland > Wetland,Water > Barren,3.15
+Louisiana chenier plain,Wetland > Barren,Water > Barren,2.16
+Louisiana chenier plain,Barren > Water,Water > Barren,16.29
+Louisiana chenier plain,Barren > Wetland,Water > Barren,36.63
+Louisiana chenier plain,Barren > Barren,Water > Barren,121.95
+Louisiana chenier plain,Barren > Other,Water > Barren,0.27
+Louisiana chenier plain,Other > Water,Water > Barren,1.35
+Louisiana chenier plain,Other > Barren,Water > Barren,0.54
+Louisiana chenier plain,Other > Other,Water > Barren,22.05
+Louisiana chenier plain,Water > Water,Water > Other,1365.84
+Louisiana chenier plain,Water > Wetland,Water > Other,129.69
+Louisiana chenier plain,Water > Barren,Water > Other,263.07
+Louisiana chenier plain,Water > Other,Water > Other,122.76
+Louisiana chenier plain,Wetland > Water,Water > Other,4.77
+Louisiana chenier plain,Wetland > Wetland,Water > Other,44.37
+Louisiana chenier plain,Wetland > Barren,Water > Other,1.89
+Louisiana chenier plain,Wetland > Other,Water > Other,6.21
+Louisiana chenier plain,Barren > Water,Water > Other,3.33
+Louisiana chenier plain,Barren > Wetland,Water > Other,30.51
+Louisiana chenier plain,Barren > Barren,Water > Other,40.14
+Louisiana chenier plain,Barren > Other,Water > Other,7.29
+Louisiana chenier plain,Other > Water,Water > Other,6.93
+Louisiana chenier plain,Other > Wetland,Water > Other,2.25
+Louisiana chenier plain,Other > Barren,Water > Other,4.59
+Louisiana chenier plain,Other > Other,Water > Other,473.49
+Louisiana chenier plain,Water > Water,Wetland > Water,1040.85
+Louisiana chenier plain,Water > Wetland,Wetland > Water,128.34
+Louisiana chenier plain,Water > Barren,Wetland > Water,12.6
+Louisiana chenier plain,Water > Other,Wetland > Water,2.16
+Louisiana chenier plain,Wetland > Water,Wetland > Water,2809.35
+Louisiana chenier plain,Wetland > Wetland,Wetland > Water,3095.91
+Louisiana chenier plain,Wetland > Barren,Wetland > Water,110.79
+Louisiana chenier plain,Wetland > Other,Wetland > Water,10.35
+Louisiana chenier plain,Barren > Water,Wetland > Water,269.01
+Louisiana chenier plain,Barren > Wetland,Wetland > Water,8.1
+Louisiana chenier plain,Barren > Barren,Wetland > Water,37.44
+Louisiana chenier plain,Barren > Other,Wetland > Water,0.63
+Louisiana chenier plain,Other > Water,Wetland > Water,41.85
+Louisiana chenier plain,Other > Wetland,Wetland > Water,1.53
+Louisiana chenier plain,Other > Barren,Wetland > Water,2.79
+Louisiana chenier plain,Other > Other,Wetland > Water,75.78
+Louisiana chenier plain,Water > Water,Wetland > Wetland,3697.65
+Louisiana chenier plain,Water > Wetland,Wetland > Wetland,2240.1
+Louisiana chenier plain,Water > Barren,Wetland > Wetland,15.57
+Louisiana chenier plain,Water > Other,Wetland > Wetland,32.76
+Louisiana chenier plain,Wetland > Water,Wetland > Wetland,14615.82
+Louisiana chenier plain,Wetland > Wetland,Wetland > Wetland,330741.36
+Louisiana chenier plain,Wetland > Barren,Wetland > Wetland,1133.1
+Louisiana chenier plain,Wetland > Other,Wetland > Wetland,1033.47
+Louisiana chenier plain,Barren > Water,Wetland > Wetland,281.52
+Louisiana chenier plain,Barren > Wetland,Wetland > Wetland,338.22
+Louisiana chenier plain,Barren > Barren,Wetland > Wetland,322.74
+Louisiana chenier plain,Barren > Other,Wetland > Wetland,8.55
+Louisiana chenier plain,Other > Water,Wetland > Wetland,43.02
+Louisiana chenier plain,Other > Wetland,Wetland > Wetland,144.27
+Louisiana chenier plain,Other > Barren,Wetland > Wetland,18.54
+Louisiana chenier plain,Other > Other,Wetland > Wetland,6931.62
+Louisiana chenier plain,Water > Water,Wetland > Barren,1.53
+Louisiana chenier plain,Water > Wetland,Wetland > Barren,0.45
+Louisiana chenier plain,Water > Barren,Wetland > Barren,0.09
+Louisiana chenier plain,Water > Other,Wetland > Barren,1.44
+Louisiana chenier plain,Wetland > Water,Wetland > Barren,0.18
+Louisiana chenier plain,Wetland > Wetland,Wetland > Barren,7.65
+Louisiana chenier plain,Wetland > Barren,Wetland > Barren,27.18
+Louisiana chenier plain,Wetland > Other,Wetland > Barren,1.26
+Louisiana chenier plain,Barren > Water,Wetland > Barren,1.26
+Louisiana chenier plain,Barren > Wetland,Wetland > Barren,1.71
+Louisiana chenier plain,Barren > Barren,Wetland > Barren,5.13
+Louisiana chenier plain,Barren > Other,Wetland > Barren,0.27
+Louisiana chenier plain,Other > Water,Wetland > Barren,0.36
+Louisiana chenier plain,Other > Wetland,Wetland > Barren,0.18
+Louisiana chenier plain,Other > Barren,Wetland > Barren,2.61
+Louisiana chenier plain,Other > Other,Wetland > Barren,4.95
+Louisiana chenier plain,Water > Water,Wetland > Other,90.45
+Louisiana chenier plain,Water > Wetland,Wetland > Other,15.03
+Louisiana chenier plain,Water > Barren,Wetland > Other,1.44
+Louisiana chenier plain,Water > Other,Wetland > Other,31.05
+Louisiana chenier plain,Wetland > Water,Wetland > Other,16.11
+Louisiana chenier plain,Wetland > Wetland,Wetland > Other,1393.92
+Louisiana chenier plain,Wetland > Barren,Wetland > Other,48.24
+Louisiana chenier plain,Wetland > Other,Wetland > Other,779.22
+Louisiana chenier plain,Barren > Water,Wetland > Other,0.72
+Louisiana chenier plain,Barren > Wetland,Wetland > Other,14.76
+Louisiana chenier plain,Barren > Barren,Wetland > Other,16.38
+Louisiana chenier plain,Barren > Other,Wetland > Other,28.17
+Louisiana chenier plain,Other > Water,Wetland > Other,2.97
+Louisiana chenier plain,Other > Wetland,Wetland > Other,32.4
+Louisiana chenier plain,Other > Barren,Wetland > Other,14.13
+Louisiana chenier plain,Other > Other,Wetland > Other,1060.11
+Louisiana chenier plain,Water > Water,Barren > Water,410.76
+Louisiana chenier plain,Water > Wetland,Barren > Water,1.62
+Louisiana chenier plain,Water > Barren,Barren > Water,2.7
+Louisiana chenier plain,Water > Other,Barren > Water,1.44
+Louisiana chenier plain,Wetland > Water,Barren > Water,15.48
+Louisiana chenier plain,Wetland > Wetland,Barren > Water,2.79
+Louisiana chenier plain,Wetland > Barren,Barren > Water,0.72
+Louisiana chenier plain,Wetland > Other,Barren > Water,0.09
+Louisiana chenier plain,Barren > Water,Barren > Water,178.83
+Louisiana chenier plain,Barren > Wetland,Barren > Water,2.07
+Louisiana chenier plain,Barren > Barren,Barren > Water,44.28
+Louisiana chenier plain,Barren > Other,Barren > Water,0.45
+Louisiana chenier plain,Other > Water,Barren > Water,23.85
+Louisiana chenier plain,Other > Wetland,Barren > Water,0.09
+Louisiana chenier plain,Other > Barren,Barren > Water,8.37
+Louisiana chenier plain,Other > Other,Barren > Water,44.55
+Louisiana chenier plain,Water > Water,Barren > Wetland,2.25
+Louisiana chenier plain,Water > Wetland,Barren > Wetland,0.63
+Louisiana chenier plain,Wetland > Water,Barren > Wetland,0.18
+Louisiana chenier plain,Wetland > Wetland,Barren > Wetland,2.16
+Louisiana chenier plain,Wetland > Barren,Barren > Wetland,0.9
+Louisiana chenier plain,Barren > Wetland,Barren > Wetland,2.07
+Louisiana chenier plain,Barren > Barren,Barren > Wetland,1.8
+Louisiana chenier plain,Other > Barren,Barren > Wetland,0.18
+Louisiana chenier plain,Other > Other,Barren > Wetland,2.97
+Louisiana chenier plain,Water > Water,Barren > Barren,10.44
+Louisiana chenier plain,Water > Wetland,Barren > Barren,0.81
+Louisiana chenier plain,Water > Barren,Barren > Barren,16.29
+Louisiana chenier plain,Water > Other,Barren > Barren,11.25
+Louisiana chenier plain,Wetland > Wetland,Barren > Barren,5.85
+Louisiana chenier plain,Wetland > Barren,Barren > Barren,12.87
+Louisiana chenier plain,Wetland > Other,Barren > Barren,0.18
+Louisiana chenier plain,Barren > Water,Barren > Barren,3.6
+Louisiana chenier plain,Barren > Wetland,Barren > Barren,63.36
+Louisiana chenier plain,Barren > Barren,Barren > Barren,231.21
+Louisiana chenier plain,Barren > Other,Barren > Barren,4.41
+Louisiana chenier plain,Other > Water,Barren > Barren,2.7
+Louisiana chenier plain,Other > Wetland,Barren > Barren,1.8
+Louisiana chenier plain,Other > Barren,Barren > Barren,24.57
+Louisiana chenier plain,Other > Other,Barren > Barren,165.33
+Louisiana chenier plain,Water > Water,Barren > Other,14.85
+Louisiana chenier plain,Water > Wetland,Barren > Other,0.99
+Louisiana chenier plain,Water > Barren,Barren > Other,1.53
+Louisiana chenier plain,Water > Other,Barren > Other,18.54
+Louisiana chenier plain,Wetland > Water,Barren > Other,0.36
+Louisiana chenier plain,Wetland > Wetland,Barren > Other,3.96
+Louisiana chenier plain,Wetland > Barren,Barren > Other,1.8
+Louisiana chenier plain,Wetland > Other,Barren > Other,4.95
+Louisiana chenier plain,Barren > Water,Barren > Other,1.35
+Louisiana chenier plain,Barren > Wetland,Barren > Other,2.61
+Louisiana chenier plain,Barren > Barren,Barren > Other,61.74
+Louisiana chenier plain,Barren > Other,Barren > Other,10.71
+Louisiana chenier plain,Other > Water,Barren > Other,2.34
+Louisiana chenier plain,Other > Wetland,Barren > Other,0.81
+Louisiana chenier plain,Other > Barren,Barren > Other,15.57
+Louisiana chenier plain,Other > Other,Barren > Other,117.45
+Louisiana chenier plain,Water > Water,Other > Water,451.44
+Louisiana chenier plain,Water > Wetland,Other > Water,13.05
+Louisiana chenier plain,Water > Barren,Other > Water,12.42
+Louisiana chenier plain,Water > Other,Other > Water,66.96
+Louisiana chenier plain,Wetland > Water,Other > Water,9.45
+Louisiana chenier plain,Wetland > Wetland,Other > Water,17.55
+Louisiana chenier plain,Wetland > Barren,Other > Water,0.99
+Louisiana chenier plain,Wetland > Other,Other > Water,1.98
+Louisiana chenier plain,Barren > Water,Other > Water,18.54
+Louisiana chenier plain,Barren > Wetland,Other > Water,1.8
+Louisiana chenier plain,Barren > Barren,Other > Water,16.83
+Louisiana chenier plain,Barren > Other,Other > Water,3.15
+Louisiana chenier plain,Other > Water,Other > Water,176.49
+Louisiana chenier plain,Other > Wetland,Other > Water,8.01
+Louisiana chenier plain,Other > Barren,Other > Water,30.51
+Louisiana chenier plain,Other > Other,Other > Water,659.88
+Louisiana chenier plain,Water > Water,Other > Wetland,33.57
+Louisiana chenier plain,Water > Wetland,Other > Wetland,5.85
+Louisiana chenier plain,Water > Barren,Other > Wetland,0.27
+Louisiana chenier plain,Water > Other,Other > Wetland,1.44
+Louisiana chenier plain,Wetland > Water,Other > Wetland,4.32
+Louisiana chenier plain,Wetland > Wetland,Other > Wetland,184.86
+Louisiana chenier plain,Wetland > Barren,Other > Wetland,0.18
+Louisiana chenier plain,Wetland > Other,Other > Wetland,20.97
+Louisiana chenier plain,Barren > Water,Other > Wetland,0.36
+Louisiana chenier plain,Barren > Wetland,Other > Wetland,1.44
+Louisiana chenier plain,Barren > Barren,Other > Wetland,2.25
+Louisiana chenier plain,Barren > Other,Other > Wetland,0.36
+Louisiana chenier plain,Other > Water,Other > Wetland,1.89
+Louisiana chenier plain,Other > Wetland,Other > Wetland,10.89
+Louisiana chenier plain,Other > Barren,Other > Wetland,0.54
+Louisiana chenier plain,Other > Other,Other > Wetland,526.32
+Louisiana chenier plain,Water > Water,Other > Barren,9.18
+Louisiana chenier plain,Water > Wetland,Other > Barren,0.54
+Louisiana chenier plain,Water > Barren,Other > Barren,1.71
+Louisiana chenier plain,Water > Other,Other > Barren,6.03
+Louisiana chenier plain,Wetland > Water,Other > Barren,0.09
+Louisiana chenier plain,Wetland > Wetland,Other > Barren,3.6
+Louisiana chenier plain,Wetland > Barren,Other > Barren,1.8
+Louisiana chenier plain,Wetland > Other,Other > Barren,0.36
+Louisiana chenier plain,Barren > Water,Other > Barren,0.36
+Louisiana chenier plain,Barren > Wetland,Other > Barren,1.17
+Louisiana chenier plain,Barren > Barren,Other > Barren,27.45
+Louisiana chenier plain,Barren > Other,Other > Barren,2.43
+Louisiana chenier plain,Other > Water,Other > Barren,6.12
+Louisiana chenier plain,Other > Wetland,Other > Barren,1.17
+Louisiana chenier plain,Other > Barren,Other > Barren,51.57
+Louisiana chenier plain,Other > Other,Other > Barren,167.04
+Louisiana chenier plain,Water > Water,Other > Other,1043.1
+Louisiana chenier plain,Water > Wetland,Other > Other,101.79
+Louisiana chenier plain,Water > Barren,Other > Other,15.48
+Louisiana chenier plain,Water > Other,Other > Other,1334.34
+Louisiana chenier plain,Wetland > Water,Other > Other,80.82
+Louisiana chenier plain,Wetland > Wetland,Other > Other,3403.35
+Louisiana chenier plain,Wetland > Barren,Other > Other,23.04
+Louisiana chenier plain,Wetland > Other,Other > Other,635.58
+Louisiana chenier plain,Barren > Water,Other > Other,12.51
+Louisiana chenier plain,Barren > Wetland,Other > Other,35.46
+Louisiana chenier plain,Barren > Barren,Other > Other,308.07
+Louisiana chenier plain,Barren > Other,Other > Other,164.52
+Louisiana chenier plain,Other > Water,Other > Other,185.13
+Louisiana chenier plain,Other > Wetland,Other > Other,122.76
+Louisiana chenier plain,Other > Barren,Other > Other,433.62
+Louisiana chenier plain,Other > Other,Other > Other,244346.13
+Louisiana delta plain,Water > Water,Water > Water,559921.14
+Louisiana delta plain,Water > Wetland,Water > Water,5272.47
+Louisiana delta plain,Water > Barren,Water > Water,2780.28
+Louisiana delta plain,Water > Other,Water > Water,86.85
+Louisiana delta plain,Wetland > Water,Water > Water,3454.02
+Louisiana delta plain,Wetland > Wetland,Water > Water,12918.15
+Louisiana delta plain,Wetland > Barren,Water > Water,143.91
+Louisiana delta plain,Wetland > Other,Water > Water,6.3
+Louisiana delta plain,Barren > Water,Water > Water,1757.25
+Louisiana delta plain,Barren > Wetland,Water > Water,266.04
+Louisiana delta plain,Barren > Barren,Water > Water,2852.28
+Louisiana delta plain,Barren > Other,Water > Water,7.29
+Louisiana delta plain,Other > Water,Water > Water,83.88
+Louisiana delta plain,Other > Wetland,Water > Water,11.61
+Louisiana delta plain,Other > Barren,Water > Water,11.7
+Louisiana delta plain,Other > Other,Water > Water,275.85
+Louisiana delta plain,Water > Water,Water > Wetland,2693.16
+Louisiana delta plain,Water > Wetland,Water > Wetland,2985.93
+Louisiana delta plain,Water > Barren,Water > Wetland,138.78
+Louisiana delta plain,Water > Other,Water > Wetland,20.07
+Louisiana delta plain,Wetland > Water,Water > Wetland,569.52
+Louisiana delta plain,Wetland > Wetland,Water > Wetland,3478.41
+Louisiana delta plain,Wetland > Barren,Water > Wetland,42.21
+Louisiana delta plain,Wetland > Other,Water > Wetland,12.51
+Louisiana delta plain,Barren > Water,Water > Wetland,51.12
+Louisiana delta plain,Barren > Wetland,Water > Wetland,311.67
+Louisiana delta plain,Barren > Barren,Water > Wetland,79.56
+Louisiana delta plain,Barren > Other,Water > Wetland,0.54
+Louisiana delta plain,Other > Water,Water > Wetland,11.52
+Louisiana delta plain,Other > Wetland,Water > Wetland,5.85
+Louisiana delta plain,Other > Barren,Water > Wetland,1.26
+Louisiana delta plain,Other > Other,Water > Wetland,49.77
+Louisiana delta plain,Water > Water,Water > Barren,229.41
+Louisiana delta plain,Water > Wetland,Water > Barren,499.77
+Louisiana delta plain,Water > Barren,Water > Barren,508.32
+Louisiana delta plain,Water > Other,Water > Barren,29.25
+Louisiana delta plain,Wetland > Water,Water > Barren,9.45
+Louisiana delta plain,Wetland > Wetland,Water > Barren,20.43
+Louisiana delta plain,Wetland > Barren,Water > Barren,18.45
+Louisiana delta plain,Wetland > Other,Water > Barren,0.54
+Louisiana delta plain,Barren > Water,Water > Barren,40.86
+Louisiana delta plain,Barren > Wetland,Water > Barren,86.22
+Louisiana delta plain,Barren > Barren,Water > Barren,185.85
+Louisiana delta plain,Barren > Other,Water > Barren,7.83
+Louisiana delta plain,Other > Water,Water > Barren,0.45
+Louisiana delta plain,Other > Wetland,Water > Barren,0.54
+Louisiana delta plain,Other > Barren,Water > Barren,1.08
+Louisiana delta plain,Other > Other,Water > Barren,5.13
+Louisiana delta plain,Water > Water,Water > Other,1042.2
+Louisiana delta plain,Water > Wetland,Water > Other,1094.58
+Louisiana delta plain,Water > Barren,Water > Other,372.24
+Louisiana delta plain,Water > Other,Water > Other,249.66
+Louisiana delta plain,Wetland > Water,Water > Other,10.71
+Louisiana delta plain,Wetland > Wetland,Water > Other,73.71
+Louisiana delta plain,Wetland > Barren,Water > Other,8.55
+Louisiana delta plain,Wetland > Other,Water > Other,22.95
+Louisiana delta plain,Barren > Water,Water > Other,14.58
+Louisiana delta plain,Barren > Wetland,Water > Other,181.08
+Louisiana delta plain,Barren > Barren,Water > Other,130.05
+Louisiana delta plain,Barren > Other,Water > Other,50.49
+Louisiana delta plain,Other > Water,Water > Other,8.91
+Louisiana delta plain,Other > Wetland,Water > Other,12.33
+Louisiana delta plain,Other > Barren,Water > Other,1.71
+Louisiana delta plain,Other > Other,Water > Other,306.63
+Louisiana delta plain,Water > Water,Wetland > Water,3148.56
+Louisiana delta plain,Water > Wetland,Wetland > Water,563.76
+Louisiana delta plain,Water > Barren,Wetland > Water,34.02
+Louisiana delta plain,Water > Other,Wetland > Water,3.33
+Louisiana delta plain,Wetland > Water,Wetland > Water,1222.83
+Louisiana delta plain,Wetland > Wetland,Wetland > Water,3515.94
+Louisiana delta plain,Wetland > Barren,Wetland > Water,56.97
+Louisiana delta plain,Wetland > Other,Wetland > Water,4.41
+Louisiana delta plain,Barren > Water,Wetland > Water,142.2
+Louisiana delta plain,Barren > Wetland,Wetland > Water,77.76
+Louisiana delta plain,Barren > Barren,Wetland > Water,225.09
+Louisiana delta plain,Barren > Other,Wetland > Water,0.45
+Louisiana delta plain,Other > Water,Wetland > Water,31.05
+Louisiana delta plain,Other > Wetland,Wetland > Water,3.78
+Louisiana delta plain,Other > Barren,Wetland > Water,1.35
+Louisiana delta plain,Other > Other,Wetland > Water,74.07
+Louisiana delta plain,Water > Water,Wetland > Wetland,22073.58
+Louisiana delta plain,Water > Wetland,Wetland > Wetland,5288.76
+Louisiana delta plain,Water > Barren,Wetland > Wetland,158.04
+Louisiana delta plain,Water > Other,Wetland > Wetland,45.27
+Louisiana delta plain,Wetland > Water,Wetland > Wetland,17223.93
+Louisiana delta plain,Wetland > Wetland,Wetland > Wetland,681378.57
+Louisiana delta plain,Wetland > Barren,Wetland > Wetland,1269.09
+Louisiana delta plain,Wetland > Other,Wetland > Wetland,538.47
+Louisiana delta plain,Barren > Water,Wetland > Wetland,2330.1
+Louisiana delta plain,Barren > Wetland,Wetland > Wetland,958.32
+Louisiana delta plain,Barren > Barren,Wetland > Wetland,896.85
+Louisiana delta plain,Barren > Other,Wetland > Wetland,8.73
+Louisiana delta plain,Other > Water,Wetland > Wetland,43.47
+Louisiana delta plain,Other > Wetland,Wetland > Wetland,226.35
+Louisiana delta plain,Other > Barren,Wetland > Wetland,27.36
+Louisiana delta plain,Other > Other,Wetland > Wetland,4681.17
+Louisiana delta plain,Water > Water,Wetland > Barren,1.98
+Louisiana delta plain,Water > Wetland,Wetland > Barren,1.26
+Louisiana delta plain,Water > Barren,Wetland > Barren,2.25
+Louisiana delta plain,Water > Other,Wetland > Barren,0.36
+Louisiana delta plain,Wetland > Water,Wetland > Barren,3.33
+Louisiana delta plain,Wetland > Wetland,Wetland > Barren,10.89
+Louisiana delta plain,Wetland > Barren,Wetland > Barren,13.23
+Louisiana delta plain,Wetland > Other,Wetland > Barren,2.61
+Louisiana delta plain,Barren > Water,Wetland > Barren,1.17
+Louisiana delta plain,Barren > Wetland,Wetland > Barren,2.61
+Louisiana delta plain,Barren > Barren,Wetland > Barren,13.41
+Louisiana delta plain,Other > Barren,Wetland > Barren,0.09
+Louisiana delta plain,Other > Other,Wetland > Barren,1.71
+Louisiana delta plain,Water > Water,Wetland > Other,64.89
+Louisiana delta plain,Water > Wetland,Wetland > Other,7.65
+Louisiana delta plain,Water > Barren,Wetland > Other,2.43
+Louisiana delta plain,Water > Other,Wetland > Other,4.5
+Louisiana delta plain,Wetland > Water,Wetland > Other,8.73
+Louisiana delta plain,Wetland > Wetland,Wetland > Other,1066.05
+Louisiana delta plain,Wetland > Barren,Wetland > Other,113.4
+Louisiana delta plain,Wetland > Other,Wetland > Other,650.43
+Louisiana delta plain,Barren > Water,Wetland > Other,0.63
+Louisiana delta plain,Barren > Wetland,Wetland > Other,7.38
+Louisiana delta plain,Barren > Barren,Wetland > Other,21.78
+Louisiana delta plain,Barren > Other,Wetland > Other,10.8
+Louisiana delta plain,Other > Water,Wetland > Other,2.7
+Louisiana delta plain,Other > Wetland,Wetland > Other,23.31
+Louisiana delta plain,Other > Barren,Wetland > Other,9.54
+Louisiana delta plain,Other > Other,Wetland > Other,1338.84
+Louisiana delta plain,Water > Water,Barren > Water,127.35
+Louisiana delta plain,Water > Wetland,Barren > Water,2.97
+Louisiana delta plain,Water > Barren,Barren > Water,15.57
+Louisiana delta plain,Water > Other,Barren > Water,0.63
+Louisiana delta plain,Wetland > Water,Barren > Water,118.89
+Louisiana delta plain,Wetland > Wetland,Barren > Water,2.52
+Louisiana delta plain,Wetland > Barren,Barren > Water,36.72
+Louisiana delta plain,Wetland > Other,Barren > Water,0.27
+Louisiana delta plain,Barren > Water,Barren > Water,356.76
+Louisiana delta plain,Barren > Wetland,Barren > Water,5.49
+Louisiana delta plain,Barren > Barren,Barren > Water,105.57
+Louisiana delta plain,Barren > Other,Barren > Water,0.45
+Louisiana delta plain,Other > Water,Barren > Water,13.14
+Louisiana delta plain,Other > Wetland,Barren > Water,0.27
+Louisiana delta plain,Other > Barren,Barren > Water,2.07
+Louisiana delta plain,Other > Other,Barren > Water,8.82
+Louisiana delta plain,Water > Water,Barren > Wetland,0.99
+Louisiana delta plain,Water > Wetland,Barren > Wetland,1.44
+Louisiana delta plain,Water > Barren,Barren > Wetland,0.36
+Louisiana delta plain,Water > Other,Barren > Wetland,1.8
+Louisiana delta plain,Wetland > Water,Barren > Wetland,0.18
+Louisiana delta plain,Wetland > Wetland,Barren > Wetland,7.38
+Louisiana delta plain,Wetland > Barren,Barren > Wetland,0.54
+Louisiana delta plain,Barren > Water,Barren > Wetland,0.63
+Louisiana delta plain,Barren > Wetland,Barren > Wetland,4.05
+Louisiana delta plain,Barren > Barren,Barren > Wetland,2.79
+Louisiana delta plain,Barren > Other,Barren > Wetland,0.09
+Louisiana delta plain,Other > Water,Barren > Wetland,0.27
+Louisiana delta plain,Other > Barren,Barren > Wetland,0.18
+Louisiana delta plain,Other > Other,Barren > Wetland,1.8
+Louisiana delta plain,Water > Water,Barren > Barren,14.4
+Louisiana delta plain,Water > Wetland,Barren > Barren,9.45
+Louisiana delta plain,Water > Barren,Barren > Barren,14.4
+Louisiana delta plain,Water > Other,Barren > Barren,1.26
+Louisiana delta plain,Wetland > Water,Barren > Barren,0.9
+Louisiana delta plain,Wetland > Wetland,Barren > Barren,7.2
+Louisiana delta plain,Wetland > Barren,Barren > Barren,12.96
+Louisiana delta plain,Wetland > Other,Barren > Barren,1.08
+Louisiana delta plain,Barren > Water,Barren > Barren,3.06
+Louisiana delta plain,Barren > Wetland,Barren > Barren,21.24
+Louisiana delta plain,Barren > Barren,Barren > Barren,97.56
+Louisiana delta plain,Barren > Other,Barren > Barren,3.06
+Louisiana delta plain,Other > Water,Barren > Barren,1.98
+Louisiana delta plain,Other > Wetland,Barren > Barren,0.18
+Louisiana delta plain,Other > Barren,Barren > Barren,2.25
+Louisiana delta plain,Other > Other,Barren > Barren,55.98
+Louisiana delta plain,Water > Water,Barren > Other,4.23
+Louisiana delta plain,Water > Wetland,Barren > Other,0.54
+Louisiana delta plain,Water > Barren,Barren > Other,0.81
+Louisiana delta plain,Water > Other,Barren > Other,1.26
+Louisiana delta plain,Wetland > Water,Barren > Other,0.36
+Louisiana delta plain,Wetland > Wetland,Barren > Other,4.14
+Louisiana delta plain,Wetland > Barren,Barren > Other,4.41
+Louisiana delta plain,Wetland > Other,Barren > Other,1.44
+Louisiana delta plain,Barren > Water,Barren > Other,0.63
+Louisiana delta plain,Barren > Wetland,Barren > Other,4.5
+Louisiana delta plain,Barren > Barren,Barren > Other,19.89
+Louisiana delta plain,Barren > Other,Barren > Other,4.59
+Louisiana delta plain,Other > Water,Barren > Other,0.72
+Louisiana delta plain,Other > Wetland,Barren > Other,0.09
+Louisiana delta plain,Other > Barren,Barren > Other,5.13
+Louisiana delta plain,Other > Other,Barren > Other,68.49
+Louisiana delta plain,Water > Water,Other > Water,187.74
+Louisiana delta plain,Water > Wetland,Other > Water,21.15
+Louisiana delta plain,Water > Barren,Other > Water,2.97
+Louisiana delta plain,Water > Other,Other > Water,2.43
+Louisiana delta plain,Wetland > Water,Other > Water,11.25
+Louisiana delta plain,Wetland > Wetland,Other > Water,20.52
+Louisiana delta plain,Wetland > Barren,Other > Water,0.81
+Louisiana delta plain,Wetland > Other,Other > Water,2.07
+Louisiana delta plain,Barren > Water,Other > Water,5.04
+Louisiana delta plain,Barren > Wetland,Other > Water,3.69
+Louisiana delta plain,Barren > Barren,Other > Water,17.64
+Louisiana delta plain,Barren > Other,Other > Water,2.07
+Louisiana delta plain,Other > Water,Other > Water,181.71
+Louisiana delta plain,Other > Wetland,Other > Water,15.3
+Louisiana delta plain,Other > Barren,Other > Water,5.04
+Louisiana delta plain,Other > Other,Other > Water,536.76
+Louisiana delta plain,Water > Water,Other > Wetland,15.48
+Louisiana delta plain,Water > Wetland,Other > Wetland,1.8
+Louisiana delta plain,Water > Barren,Other > Wetland,0.18
+Louisiana delta plain,Water > Other,Other > Wetland,2.34
+Louisiana delta plain,Wetland > Water,Other > Wetland,2.61
+Louisiana delta plain,Wetland > Wetland,Other > Wetland,149.76
+Louisiana delta plain,Wetland > Barren,Other > Wetland,1.26
+Louisiana delta plain,Wetland > Other,Other > Wetland,11.52
+Louisiana delta plain,Barren > Water,Other > Wetland,1.26
+Louisiana delta plain,Barren > Wetland,Other > Wetland,2.61
+Louisiana delta plain,Barren > Barren,Other > Wetland,2.7
+Louisiana delta plain,Barren > Other,Other > Wetland,0.45
+Louisiana delta plain,Other > Water,Other > Wetland,1.8
+Louisiana delta plain,Other > Wetland,Other > Wetland,14.13
+Louisiana delta plain,Other > Barren,Other > Wetland,0.36
+Louisiana delta plain,Other > Other,Other > Wetland,222.03
+Louisiana delta plain,Water > Water,Other > Barren,2.34
+Louisiana delta plain,Water > Wetland,Other > Barren,0.36
+Louisiana delta plain,Water > Barren,Other > Barren,0.36
+Louisiana delta plain,Water > Other,Other > Barren,0.45
+Louisiana delta plain,Wetland > Water,Other > Barren,0.09
+Louisiana delta plain,Wetland > Wetland,Other > Barren,1.17
+Louisiana delta plain,Wetland > Barren,Other > Barren,0.27
+Louisiana delta plain,Wetland > Other,Other > Barren,0.09
+Louisiana delta plain,Barren > Wetland,Other > Barren,0.36
+Louisiana delta plain,Barren > Barren,Other > Barren,1.26
+Louisiana delta plain,Barren > Other,Other > Barren,0.09
+Louisiana delta plain,Other > Water,Other > Barren,3.06
+Louisiana delta plain,Other > Wetland,Other > Barren,0.45
+Louisiana delta plain,Other > Barren,Other > Barren,24.21
+Louisiana delta plain,Other > Other,Other > Barren,190.44
+Louisiana delta plain,Water > Water,Other > Other,1901.97
+Louisiana delta plain,Water > Wetland,Other > Other,278.73
+Louisiana delta plain,Water > Barren,Other > Other,38.52
+Louisiana delta plain,Water > Other,Other > Other,119.79
+Louisiana delta plain,Wetland > Water,Other > Other,23.04
+Louisiana delta plain,Wetland > Wetland,Other > Other,4834.62
+Louisiana delta plain,Wetland > Barren,Other > Other,26.1
+Louisiana delta plain,Wetland > Other,Other > Other,358.92
+Louisiana delta plain,Barren > Water,Other > Other,14.58
+Louisiana delta plain,Barren > Wetland,Other > Other,43.02
+Louisiana delta plain,Barren > Barren,Other > Other,313.56
+Louisiana delta plain,Barren > Other,Other > Other,63.36
+Louisiana delta plain,Other > Water,Other > Other,123.12
+Louisiana delta plain,Other > Wetland,Other > Other,439.92
+Louisiana delta plain,Other > Barren,Other > Other,153
+Louisiana delta plain,Other > Other,Other > Other,137003.13
+Chesapeake eastern shore,Water > Water,Water > Water,323426.25
+Chesapeake eastern shore,Water > Wetland,Water > Water,352.35
+Chesapeake eastern shore,Water > Barren,Water > Water,32.94
+Chesapeake eastern shore,Water > Other,Water > Water,11.7
+Chesapeake eastern shore,Wetland > Water,Water > Water,96.66
+Chesapeake eastern shore,Wetland > Wetland,Water > Water,1979.01
+Chesapeake eastern shore,Wetland > Barren,Water > Water,5.13
+Chesapeake eastern shore,Wetland > Other,Water > Water,1.53
+Chesapeake eastern shore,Barren > Water,Water > Water,10.98
+Chesapeake eastern shore,Barren > Wetland,Water > Water,0.45
+Chesapeake eastern shore,Barren > Barren,Water > Water,388.17
+Chesapeake eastern shore,Barren > Other,Water > Water,1.8
+Chesapeake eastern shore,Other > Water,Water > Water,36.09
+Chesapeake eastern shore,Other > Wetland,Water > Water,0.9
+Chesapeake eastern shore,Other > Barren,Water > Water,2.97
+Chesapeake eastern shore,Other > Other,Water > Water,142.83
+Chesapeake eastern shore,Water > Water,Water > Wetland,72.63
+Chesapeake eastern shore,Water > Wetland,Water > Wetland,22.14
+Chesapeake eastern shore,Water > Barren,Water > Wetland,0.45
+Chesapeake eastern shore,Water > Other,Water > Wetland,0.27
+Chesapeake eastern shore,Wetland > Water,Water > Wetland,4.5
+Chesapeake eastern shore,Wetland > Wetland,Water > Wetland,225.09
+Chesapeake eastern shore,Wetland > Barren,Water > Wetland,0.36
+Chesapeake eastern shore,Barren > Barren,Water > Wetland,4.68
+Chesapeake eastern shore,Other > Water,Water > Wetland,0.54
+Chesapeake eastern shore,Other > Wetland,Water > Wetland,0.99
+Chesapeake eastern shore,Other > Other,Water > Wetland,2.7
+Chesapeake eastern shore,Water > Water,Water > Barren,30.87
+Chesapeake eastern shore,Water > Wetland,Water > Barren,5.58
+Chesapeake eastern shore,Water > Barren,Water > Barren,7.38
+Chesapeake eastern shore,Water > Other,Water > Barren,0.99
+Chesapeake eastern shore,Wetland > Water,Water > Barren,0.72
+Chesapeake eastern shore,Wetland > Wetland,Water > Barren,12.96
+Chesapeake eastern shore,Wetland > Barren,Water > Barren,0.36
+Chesapeake eastern shore,Wetland > Other,Water > Barren,0.27
+Chesapeake eastern shore,Barren > Water,Water > Barren,0.54
+Chesapeake eastern shore,Barren > Barren,Water > Barren,11.97
+Chesapeake eastern shore,Other > Water,Water > Barren,0.09
+Chesapeake eastern shore,Other > Other,Water > Barren,3.15
+Chesapeake eastern shore,Water > Water,Water > Other,84.15
+Chesapeake eastern shore,Water > Wetland,Water > Other,14.49
+Chesapeake eastern shore,Water > Barren,Water > Other,0.45
+Chesapeake eastern shore,Water > Other,Water > Other,4.14
+Chesapeake eastern shore,Wetland > Water,Water > Other,0.27
+Chesapeake eastern shore,Wetland > Wetland,Water > Other,26.91
+Chesapeake eastern shore,Wetland > Barren,Water > Other,0.09
+Chesapeake eastern shore,Wetland > Other,Water > Other,0.45
+Chesapeake eastern shore,Barren > Barren,Water > Other,5.22
+Chesapeake eastern shore,Barren > Other,Water > Other,0.09
+Chesapeake eastern shore,Other > Water,Water > Other,2.61
+Chesapeake eastern shore,Other > Wetland,Water > Other,0.09
+Chesapeake eastern shore,Other > Other,Water > Other,42.57
+Chesapeake eastern shore,Water > Water,Wetland > Water,430.92
+Chesapeake eastern shore,Water > Wetland,Wetland > Water,16.83
+Chesapeake eastern shore,Water > Barren,Wetland > Water,0.81
+Chesapeake eastern shore,Water > Other,Wetland > Water,0.54
+Chesapeake eastern shore,Wetland > Water,Wetland > Water,60.66
+Chesapeake eastern shore,Wetland > Wetland,Wetland > Water,1227.24
+Chesapeake eastern shore,Wetland > Barren,Wetland > Water,2.25
+Chesapeake eastern shore,Wetland > Other,Wetland > Water,0.45
+Chesapeake eastern shore,Barren > Water,Wetland > Water,0.45
+Chesapeake eastern shore,Barren > Wetland,Wetland > Water,0.18
+Chesapeake eastern shore,Barren > Barren,Wetland > Water,22.86
+Chesapeake eastern shore,Barren > Other,Wetland > Water,0.09
+Chesapeake eastern shore,Other > Water,Wetland > Water,7.11
+Chesapeake eastern shore,Other > Wetland,Wetland > Water,0.81
+Chesapeake eastern shore,Other > Barren,Wetland > Water,0.45
+Chesapeake eastern shore,Other > Other,Wetland > Water,13.95
+Chesapeake eastern shore,Water > Water,Wetland > Wetland,843.57
+Chesapeake eastern shore,Water > Wetland,Wetland > Wetland,115.02
+Chesapeake eastern shore,Water > Barren,Wetland > Wetland,1.8
+Chesapeake eastern shore,Water > Other,Wetland > Wetland,2.61
+Chesapeake eastern shore,Wetland > Water,Wetland > Wetland,142.56
+Chesapeake eastern shore,Wetland > Wetland,Wetland > Wetland,124936.92
+Chesapeake eastern shore,Wetland > Barren,Wetland > Wetland,24.03
+Chesapeake eastern shore,Wetland > Other,Wetland > Wetland,489.69
+Chesapeake eastern shore,Barren > Water,Wetland > Wetland,0.72
+Chesapeake eastern shore,Barren > Wetland,Wetland > Wetland,1.26
+Chesapeake eastern shore,Barren > Barren,Wetland > Wetland,59.94
+Chesapeake eastern shore,Barren > Other,Wetland > Wetland,0.18
+Chesapeake eastern shore,Other > Water,Wetland > Wetland,7.65
+Chesapeake eastern shore,Other > Wetland,Wetland > Wetland,173.88
+Chesapeake eastern shore,Other > Barren,Wetland > Wetland,3.33
+Chesapeake eastern shore,Other > Other,Wetland > Wetland,11461.59
+Chesapeake eastern shore,Water > Water,Wetland > Barren,1.62
+Chesapeake eastern shore,Water > Wetland,Wetland > Barren,0.18
+Chesapeake eastern shore,Water > Barren,Wetland > Barren,0.18
+Chesapeake eastern shore,Water > Other,Wetland > Barren,0.18
+Chesapeake eastern shore,Wetland > Water,Wetland > Barren,0.18
+Chesapeake eastern shore,Wetland > Wetland,Wetland > Barren,18
+Chesapeake eastern shore,Wetland > Barren,Wetland > Barren,1.35
+Chesapeake eastern shore,Wetland > Other,Wetland > Barren,0.36
+Chesapeake eastern shore,Barren > Water,Wetland > Barren,0.45
+Chesapeake eastern shore,Barren > Barren,Wetland > Barren,4.14
+Chesapeake eastern shore,Other > Barren,Wetland > Barren,0.45
+Chesapeake eastern shore,Other > Other,Wetland > Barren,1.98
+Chesapeake eastern shore,Water > Water,Wetland > Other,3.78
+Chesapeake eastern shore,Water > Wetland,Wetland > Other,0.09
+Chesapeake eastern shore,Water > Other,Wetland > Other,0.27
+Chesapeake eastern shore,Wetland > Water,Wetland > Other,0.54
+Chesapeake eastern shore,Wetland > Wetland,Wetland > Other,165.78
+Chesapeake eastern shore,Wetland > Barren,Wetland > Other,0.9
+Chesapeake eastern shore,Wetland > Other,Wetland > Other,49.5
+Chesapeake eastern shore,Barren > Barren,Wetland > Other,1.26
+Chesapeake eastern shore,Other > Water,Wetland > Other,0.09
+Chesapeake eastern shore,Other > Wetland,Wetland > Other,7.29
+Chesapeake eastern shore,Other > Barren,Wetland > Other,0.45
+Chesapeake eastern shore,Other > Other,Wetland > Other,152.37
+Chesapeake eastern shore,Water > Water,Barren > Water,64.8
+Chesapeake eastern shore,Water > Wetland,Barren > Water,0.45
+Chesapeake eastern shore,Water > Barren,Barren > Water,1.62
+Chesapeake eastern shore,Water > Other,Barren > Water,0.99
+Chesapeake eastern shore,Wetland > Water,Barren > Water,9
+Chesapeake eastern shore,Wetland > Wetland,Barren > Water,14.22
+Chesapeake eastern shore,Wetland > Barren,Barren > Water,1.71
+Chesapeake eastern shore,Wetland > Other,Barren > Water,0.18
+Chesapeake eastern shore,Barren > Water,Barren > Water,11.61
+Chesapeake eastern shore,Barren > Wetland,Barren > Water,0.27
+Chesapeake eastern shore,Barren > Barren,Barren > Water,52.38
+Chesapeake eastern shore,Barren > Other,Barren > Water,0.36
+Chesapeake eastern shore,Other > Water,Barren > Water,4.86
+Chesapeake eastern shore,Other > Barren,Barren > Water,1.26
+Chesapeake eastern shore,Other > Other,Barren > Water,17.1
+Chesapeake eastern shore,Water > Water,Barren > Wetland,1.53
+Chesapeake eastern shore,Water > Wetland,Barren > Wetland,0.18
+Chesapeake eastern shore,Wetland > Water,Barren > Wetland,0.54
+Chesapeake eastern shore,Wetland > Wetland,Barren > Wetland,9.09
+Chesapeake eastern shore,Wetland > Barren,Barren > Wetland,0.09
+Chesapeake eastern shore,Barren > Wetland,Barren > Wetland,0.27
+Chesapeake eastern shore,Barren > Barren,Barren > Wetland,1.8
+Chesapeake eastern shore,Other > Water,Barren > Wetland,0.27
+Chesapeake eastern shore,Other > Barren,Barren > Wetland,0.09
+Chesapeake eastern shore,Other > Other,Barren > Wetland,1.71
+Chesapeake eastern shore,Water > Water,Barren > Barren,24.12
+Chesapeake eastern shore,Water > Wetland,Barren > Barren,0.72
+Chesapeake eastern shore,Water > Barren,Barren > Barren,1.89
+Chesapeake eastern shore,Water > Other,Barren > Barren,1.89
+Chesapeake eastern shore,Wetland > Water,Barren > Barren,1.44
+Chesapeake eastern shore,Wetland > Wetland,Barren > Barren,18.45
+Chesapeake eastern shore,Wetland > Barren,Barren > Barren,5.13
+Chesapeake eastern shore,Wetland > Other,Barren > Barren,3.51
+Chesapeake eastern shore,Barren > Water,Barren > Barren,2.34
+Chesapeake eastern shore,Barren > Wetland,Barren > Barren,0.27
+Chesapeake eastern shore,Barren > Barren,Barren > Barren,75.96
+Chesapeake eastern shore,Barren > Other,Barren > Barren,11.61
+Chesapeake eastern shore,Other > Water,Barren > Barren,1.53
+Chesapeake eastern shore,Other > Wetland,Barren > Barren,0.18
+Chesapeake eastern shore,Other > Barren,Barren > Barren,13.32
+Chesapeake eastern shore,Other > Other,Barren > Barren,162.18
+Chesapeake eastern shore,Water > Water,Barren > Other,3.33
+Chesapeake eastern shore,Water > Wetland,Barren > Other,0.09
+Chesapeake eastern shore,Water > Other,Barren > Other,0.36
+Chesapeake eastern shore,Wetland > Water,Barren > Other,0.09
+Chesapeake eastern shore,Wetland > Wetland,Barren > Other,4.32
+Chesapeake eastern shore,Wetland > Barren,Barren > Other,0.09
+Chesapeake eastern shore,Wetland > Other,Barren > Other,0.27
+Chesapeake eastern shore,Barren > Barren,Barren > Other,5.04
+Chesapeake eastern shore,Barren > Other,Barren > Other,2.43
+Chesapeake eastern shore,Other > Water,Barren > Other,0.36
+Chesapeake eastern shore,Other > Barren,Barren > Other,2.16
+Chesapeake eastern shore,Other > Other,Barren > Other,57.78
+Chesapeake eastern shore,Water > Water,Other > Water,133.38
+Chesapeake eastern shore,Water > Wetland,Other > Water,3.42
+Chesapeake eastern shore,Water > Barren,Other > Water,0.18
+Chesapeake eastern shore,Water > Other,Other > Water,0.9
+Chesapeake eastern shore,Wetland > Water,Other > Water,12.15
+Chesapeake eastern shore,Wetland > Wetland,Other > Water,39.96
+Chesapeake eastern shore,Wetland > Barren,Other > Water,0.45
+Chesapeake eastern shore,Wetland > Other,Other > Water,0.81
+Chesapeake eastern shore,Barren > Water,Other > Water,4.95
+Chesapeake eastern shore,Barren > Barren,Other > Water,15.66
+Chesapeake eastern shore,Barren > Other,Other > Water,0.72
+Chesapeake eastern shore,Other > Water,Other > Water,43.29
+Chesapeake eastern shore,Other > Wetland,Other > Water,0.54
+Chesapeake eastern shore,Other > Barren,Other > Water,5.13
+Chesapeake eastern shore,Other > Other,Other > Water,113.4
+Chesapeake eastern shore,Water > Water,Other > Wetland,11.52
+Chesapeake eastern shore,Water > Wetland,Other > Wetland,2.97
+Chesapeake eastern shore,Water > Other,Other > Wetland,0.27
+Chesapeake eastern shore,Wetland > Water,Other > Wetland,1.89
+Chesapeake eastern shore,Wetland > Wetland,Other > Wetland,257.67
+Chesapeake eastern shore,Wetland > Barren,Other > Wetland,1.98
+Chesapeake eastern shore,Wetland > Other,Other > Wetland,10.71
+Chesapeake eastern shore,Barren > Water,Other > Wetland,0.09
+Chesapeake eastern shore,Barren > Barren,Other > Wetland,2.88
+Chesapeake eastern shore,Barren > Other,Other > Wetland,0.18
+Chesapeake eastern shore,Other > Water,Other > Wetland,0.54
+Chesapeake eastern shore,Other > Wetland,Other > Wetland,3.87
+Chesapeake eastern shore,Other > Barren,Other > Wetland,0.09
+Chesapeake eastern shore,Other > Other,Other > Wetland,201.96
+Chesapeake eastern shore,Water > Water,Other > Barren,6.84
+Chesapeake eastern shore,Water > Wetland,Other > Barren,0.27
+Chesapeake eastern shore,Water > Barren,Other > Barren,0.45
+Chesapeake eastern shore,Water > Other,Other > Barren,0.63
+Chesapeake eastern shore,Wetland > Water,Other > Barren,0.18
+Chesapeake eastern shore,Wetland > Wetland,Other > Barren,3.78
+Chesapeake eastern shore,Wetland > Barren,Other > Barren,0.63
+Chesapeake eastern shore,Wetland > Other,Other > Barren,0.27
+Chesapeake eastern shore,Barren > Water,Other > Barren,0.72
+Chesapeake eastern shore,Barren > Barren,Other > Barren,10.44
+Chesapeake eastern shore,Barren > Other,Other > Barren,1.71
+Chesapeake eastern shore,Other > Water,Other > Barren,4.14
+Chesapeake eastern shore,Other > Wetland,Other > Barren,0.09
+Chesapeake eastern shore,Other > Barren,Other > Barren,10.44
+Chesapeake eastern shore,Other > Other,Other > Barren,104.4
+Chesapeake eastern shore,Water > Water,Other > Other,878.31
+Chesapeake eastern shore,Water > Wetland,Other > Other,39.87
+Chesapeake eastern shore,Water > Barren,Other > Other,2.79
+Chesapeake eastern shore,Water > Other,Other > Other,24.21
+Chesapeake eastern shore,Wetland > Water,Other > Other,10.98
+Chesapeake eastern shore,Wetland > Wetland,Other > Other,4915.35
+Chesapeake eastern shore,Wetland > Barren,Other > Other,3.87
+Chesapeake eastern shore,Wetland > Other,Other > Other,897.12
+Chesapeake eastern shore,Barren > Water,Other > Other,1.89
+Chesapeake eastern shore,Barren > Wetland,Other > Other,0.18
+Chesapeake eastern shore,Barren > Barren,Other > Other,123.3
+Chesapeake eastern shore,Barren > Other,Other > Other,121.86
+Chesapeake eastern shore,Other > Water,Other > Other,42.57
+Chesapeake eastern shore,Other > Wetland,Other > Other,171.72
+Chesapeake eastern shore,Other > Barren,Other > Other,240.48
+Chesapeake eastern shore,Other > Other,Other > Other,178922.7
+San Francisco Bay and Delta,Water > Water,Water > Water,205452.54
+San Francisco Bay and Delta,Water > Wetland,Water > Water,615.15
+San Francisco Bay and Delta,Water > Barren,Water > Water,415.44
+San Francisco Bay and Delta,Water > Other,Water > Water,89.91
+San Francisco Bay and Delta,Wetland > Water,Water > Water,904.14
+San Francisco Bay and Delta,Wetland > Wetland,Water > Water,745.92
+San Francisco Bay and Delta,Wetland > Barren,Water > Water,130.59
+San Francisco Bay and Delta,Wetland > Other,Water > Water,8.46
+San Francisco Bay and Delta,Barren > Water,Water > Water,71.73
+San Francisco Bay and Delta,Barren > Wetland,Water > Water,643.77
+San Francisco Bay and Delta,Barren > Barren,Water > Water,1120.14
+San Francisco Bay and Delta,Barren > Other,Water > Water,3.69
+San Francisco Bay and Delta,Other > Water,Water > Water,31.77
+San Francisco Bay and Delta,Other > Wetland,Water > Water,2.61
+San Francisco Bay and Delta,Other > Barren,Water > Water,33.57
+San Francisco Bay and Delta,Other > Other,Water > Water,986.67
+San Francisco Bay and Delta,Water > Water,Water > Wetland,390.78
+San Francisco Bay and Delta,Water > Wetland,Water > Wetland,514.44
+San Francisco Bay and Delta,Water > Barren,Water > Wetland,55.98
+San Francisco Bay and Delta,Water > Other,Water > Wetland,21.51
+San Francisco Bay and Delta,Wetland > Water,Water > Wetland,148.32
+San Francisco Bay and Delta,Wetland > Wetland,Water > Wetland,905.22
+San Francisco Bay and Delta,Wetland > Barren,Water > Wetland,41.58
+San Francisco Bay and Delta,Wetland > Other,Water > Wetland,14.04
+San Francisco Bay and Delta,Barren > Water,Water > Wetland,5.13
+San Francisco Bay and Delta,Barren > Wetland,Water > Wetland,94.41
+San Francisco Bay and Delta,Barren > Barren,Water > Wetland,48.33
+San Francisco Bay and Delta,Barren > Other,Water > Wetland,0.72
+San Francisco Bay and Delta,Other > Water,Water > Wetland,6.21
+San Francisco Bay and Delta,Other > Wetland,Water > Wetland,6.3
+San Francisco Bay and Delta,Other > Barren,Water > Wetland,5.22
+San Francisco Bay and Delta,Other > Other,Water > Wetland,51.12
+San Francisco Bay and Delta,Water > Water,Water > Barren,852.57
+San Francisco Bay and Delta,Water > Wetland,Water > Barren,121.77
+San Francisco Bay and Delta,Water > Barren,Water > Barren,536.58
+San Francisco Bay and Delta,Water > Other,Water > Barren,7.56
+San Francisco Bay and Delta,Wetland > Water,Water > Barren,54.99
+San Francisco Bay and Delta,Wetland > Wetland,Water > Barren,51.75
+San Francisco Bay and Delta,Wetland > Barren,Water > Barren,185.04
+San Francisco Bay and Delta,Wetland > Other,Water > Barren,0.63
+San Francisco Bay and Delta,Barren > Water,Water > Barren,28.98
+San Francisco Bay and Delta,Barren > Wetland,Water > Barren,105.75
+San Francisco Bay and Delta,Barren > Barren,Water > Barren,528.48
+San Francisco Bay and Delta,Barren > Other,Water > Barren,0.63
+San Francisco Bay and Delta,Other > Water,Water > Barren,1.44
+San Francisco Bay and Delta,Other > Wetland,Water > Barren,0.36
+San Francisco Bay and Delta,Other > Barren,Water > Barren,0.72
+San Francisco Bay and Delta,Other > Other,Water > Barren,49.05
+San Francisco Bay and Delta,Water > Water,Water > Other,1179.45
+San Francisco Bay and Delta,Water > Wetland,Water > Other,499.77
+San Francisco Bay and Delta,Water > Barren,Water > Other,53.82
+San Francisco Bay and Delta,Water > Other,Water > Other,92.52
+San Francisco Bay and Delta,Wetland > Water,Water > Other,40.86
+San Francisco Bay and Delta,Wetland > Wetland,Water > Other,210.51
+San Francisco Bay and Delta,Wetland > Barren,Water > Other,7.47
+San Francisco Bay and Delta,Wetland > Other,Water > Other,5.85
+San Francisco Bay and Delta,Barren > Water,Water > Other,2.97
+San Francisco Bay and Delta,Barren > Wetland,Water > Other,30.06
+San Francisco Bay and Delta,Barren > Barren,Water > Other,157.05
+San Francisco Bay and Delta,Barren > Other,Water > Other,5.31
+San Francisco Bay and Delta,Other > Water,Water > Other,40.05
+San Francisco Bay and Delta,Other > Wetland,Water > Other,8.55
+San Francisco Bay and Delta,Other > Barren,Water > Other,11.7
+San Francisco Bay and Delta,Other > Other,Water > Other,536.49
+San Francisco Bay and Delta,Water > Water,Wetland > Water,113.04
+San Francisco Bay and Delta,Water > Wetland,Wetland > Water,43.29
+San Francisco Bay and Delta,Water > Barren,Wetland > Water,1.98
+San Francisco Bay and Delta,Water > Other,Wetland > Water,0.81
+San Francisco Bay and Delta,Wetland > Water,Wetland > Water,372.78
+San Francisco Bay and Delta,Wetland > Wetland,Wetland > Water,528.12
+San Francisco Bay and Delta,Wetland > Barren,Wetland > Water,9.72
+San Francisco Bay and Delta,Wetland > Other,Wetland > Water,10.62
+San Francisco Bay and Delta,Barren > Water,Wetland > Water,10.71
+San Francisco Bay and Delta,Barren > Wetland,Wetland > Water,87.57
+San Francisco Bay and Delta,Barren > Barren,Wetland > Water,32.94
+San Francisco Bay and Delta,Barren > Other,Wetland > Water,0.27
+San Francisco Bay and Delta,Other > Water,Wetland > Water,41.31
+San Francisco Bay and Delta,Other > Wetland,Wetland > Water,14.58
+San Francisco Bay and Delta,Other > Barren,Wetland > Water,4.32
+San Francisco Bay and Delta,Other > Other,Wetland > Water,30.69
+San Francisco Bay and Delta,Water > Water,Wetland > Wetland,952.56
+San Francisco Bay and Delta,Water > Wetland,Wetland > Wetland,1509.21
+San Francisco Bay and Delta,Water > Barren,Wetland > Wetland,22.41
+San Francisco Bay and Delta,Water > Other,Wetland > Wetland,20.16
+San Francisco Bay and Delta,Wetland > Water,Wetland > Wetland,2978.37
+San Francisco Bay and Delta,Wetland > Wetland,Wetland > Wetland,45308.88
+San Francisco Bay and Delta,Wetland > Barren,Wetland > Wetland,105.93
+San Francisco Bay and Delta,Wetland > Other,Wetland > Wetland,742.23
+San Francisco Bay and Delta,Barren > Water,Wetland > Wetland,108.18
+San Francisco Bay and Delta,Barren > Wetland,Wetland > Wetland,477.09
+San Francisco Bay and Delta,Barren > Barren,Wetland > Wetland,329.4
+San Francisco Bay and Delta,Barren > Other,Wetland > Wetland,1.35
+San Francisco Bay and Delta,Other > Water,Wetland > Wetland,86.58
+San Francisco Bay and Delta,Other > Wetland,Wetland > Wetland,220.32
+San Francisco Bay and Delta,Other > Barren,Wetland > Wetland,38.7
+San Francisco Bay and Delta,Other > Other,Wetland > Wetland,4442.67
+San Francisco Bay and Delta,Water > Water,Wetland > Barren,2.07
+San Francisco Bay and Delta,Water > Wetland,Wetland > Barren,0.45
+San Francisco Bay and Delta,Water > Barren,Wetland > Barren,2.43
+San Francisco Bay and Delta,Wetland > Water,Wetland > Barren,0.63
+San Francisco Bay and Delta,Wetland > Wetland,Wetland > Barren,6.57
+San Francisco Bay and Delta,Barren > Wetland,Wetland > Barren,1.98
+San Francisco Bay and Delta,Barren > Barren,Wetland > Barren,6.3
+San Francisco Bay and Delta,Other > Wetland,Wetland > Barren,0.36
+San Francisco Bay and Delta,Other > Other,Wetland > Barren,4.5
+San Francisco Bay and Delta,Water > Water,Wetland > Other,37.98
+San Francisco Bay and Delta,Water > Wetland,Wetland > Other,4.59
+San Francisco Bay and Delta,Water > Barren,Wetland > Other,0.99
+San Francisco Bay and Delta,Water > Other,Wetland > Other,4.23
+San Francisco Bay and Delta,Wetland > Water,Wetland > Other,8.82
+San Francisco Bay and Delta,Wetland > Wetland,Wetland > Other,517.14
+San Francisco Bay and Delta,Wetland > Barren,Wetland > Other,2.88
+San Francisco Bay and Delta,Wetland > Other,Wetland > Other,127.35
+San Francisco Bay and Delta,Barren > Water,Wetland > Other,0.81
+San Francisco Bay and Delta,Barren > Wetland,Wetland > Other,9.81
+San Francisco Bay and Delta,Barren > Barren,Wetland > Other,10.44
+San Francisco Bay and Delta,Barren > Other,Wetland > Other,0.45
+San Francisco Bay and Delta,Other > Water,Wetland > Other,2.97
+San Francisco Bay and Delta,Other > Wetland,Wetland > Other,7.47
+San Francisco Bay and Delta,Other > Barren,Wetland > Other,1.8
+San Francisco Bay and Delta,Other > Other,Wetland > Other,606.33
+San Francisco Bay and Delta,Water > Water,Barren > Water,177.66
+San Francisco Bay and Delta,Water > Wetland,Barren > Water,39.78
+San Francisco Bay and Delta,Water > Barren,Barren > Water,8.1
+San Francisco Bay and Delta,Water > Other,Barren > Water,0.27
+San Francisco Bay and Delta,Wetland > Water,Barren > Water,38.25
+San Francisco Bay and Delta,Wetland > Wetland,Barren > Water,45.36
+San Francisco Bay and Delta,Wetland > Barren,Barren > Water,6.66
+San Francisco Bay and Delta,Wetland > Other,Barren > Water,0.09
+San Francisco Bay and Delta,Barren > Water,Barren > Water,22.05
+San Francisco Bay and Delta,Barren > Wetland,Barren > Water,39.06
+San Francisco Bay and Delta,Barren > Barren,Barren > Water,77.76
+San Francisco Bay and Delta,Barren > Other,Barren > Water,0.36
+San Francisco Bay and Delta,Other > Water,Barren > Water,11.16
+San Francisco Bay and Delta,Other > Barren,Barren > Water,1.35
+San Francisco Bay and Delta,Other > Other,Barren > Water,28.89
+San Francisco Bay and Delta,Water > Water,Barren > Wetland,1.62
+San Francisco Bay and Delta,Water > Wetland,Barren > Wetland,0.63
+San Francisco Bay and Delta,Water > Barren,Barren > Wetland,0.54
+San Francisco Bay and Delta,Wetland > Water,Barren > Wetland,0.72
+San Francisco Bay and Delta,Wetland > Wetland,Barren > Wetland,16.92
+San Francisco Bay and Delta,Wetland > Barren,Barren > Wetland,0.72
+San Francisco Bay and Delta,Wetland > Other,Barren > Wetland,0.27
+San Francisco Bay and Delta,Barren > Wetland,Barren > Wetland,1.62
+San Francisco Bay and Delta,Barren > Barren,Barren > Wetland,9.63
+San Francisco Bay and Delta,Barren > Other,Barren > Wetland,0.18
+San Francisco Bay and Delta,Other > Water,Barren > Wetland,0.09
+San Francisco Bay and Delta,Other > Wetland,Barren > Wetland,0.09
+San Francisco Bay and Delta,Other > Other,Barren > Wetland,3.78
+San Francisco Bay and Delta,Water > Water,Barren > Barren,200.61
+San Francisco Bay and Delta,Water > Wetland,Barren > Barren,9.36
+San Francisco Bay and Delta,Water > Barren,Barren > Barren,38.07
+San Francisco Bay and Delta,Water > Other,Barren > Barren,2.34
+San Francisco Bay and Delta,Wetland > Water,Barren > Barren,22.59
+San Francisco Bay and Delta,Wetland > Wetland,Barren > Barren,204.75
+San Francisco Bay and Delta,Wetland > Barren,Barren > Barren,23.94
+San Francisco Bay and Delta,Wetland > Other,Barren > Barren,2.16
+San Francisco Bay and Delta,Barren > Water,Barren > Barren,25.56
+San Francisco Bay and Delta,Barren > Wetland,Barren > Barren,52.65
+San Francisco Bay and Delta,Barren > Barren,Barren > Barren,819.36
+San Francisco Bay and Delta,Barren > Other,Barren > Barren,6.93
+San Francisco Bay and Delta,Other > Water,Barren > Barren,4.5
+San Francisco Bay and Delta,Other > Wetland,Barren > Barren,0.18
+San Francisco Bay and Delta,Other > Barren,Barren > Barren,23.49
+San Francisco Bay and Delta,Other > Other,Barren > Barren,862.56
+San Francisco Bay and Delta,Water > Water,Barren > Other,20.61
+San Francisco Bay and Delta,Water > Wetland,Barren > Other,5.04
+San Francisco Bay and Delta,Water > Barren,Barren > Other,6.03
+San Francisco Bay and Delta,Water > Other,Barren > Other,3.78
+San Francisco Bay and Delta,Wetland > Water,Barren > Other,2.79
+San Francisco Bay and Delta,Wetland > Wetland,Barren > Other,61.11
+San Francisco Bay and Delta,Wetland > Barren,Barren > Other,7.11
+San Francisco Bay and Delta,Wetland > Other,Barren > Other,2.25
+San Francisco Bay and Delta,Barren > Water,Barren > Other,7.02
+San Francisco Bay and Delta,Barren > Wetland,Barren > Other,6.21
+San Francisco Bay and Delta,Barren > Barren,Barren > Other,152.55
+San Francisco Bay and Delta,Barren > Other,Barren > Other,8.37
+San Francisco Bay and Delta,Other > Water,Barren > Other,5.58
+San Francisco Bay and Delta,Other > Wetland,Barren > Other,0.09
+San Francisco Bay and Delta,Other > Barren,Barren > Other,5.94
+San Francisco Bay and Delta,Other > Other,Barren > Other,566.73
+San Francisco Bay and Delta,Water > Water,Other > Water,244.71
+San Francisco Bay and Delta,Water > Wetland,Other > Water,6.12
+San Francisco Bay and Delta,Water > Barren,Other > Water,9.36
+San Francisco Bay and Delta,Water > Other,Other > Water,2.43
+San Francisco Bay and Delta,Wetland > Water,Other > Water,109.44
+San Francisco Bay and Delta,Wetland > Wetland,Other > Water,112.32
+San Francisco Bay and Delta,Wetland > Barren,Other > Water,2.25
+San Francisco Bay and Delta,Wetland > Other,Other > Water,25.2
+San Francisco Bay and Delta,Barren > Water,Other > Water,20.79
+San Francisco Bay and Delta,Barren > Wetland,Other > Water,29.7
+San Francisco Bay and Delta,Barren > Barren,Other > Water,75.6
+San Francisco Bay and Delta,Barren > Other,Other > Water,6.21
+San Francisco Bay and Delta,Other > Water,Other > Water,830.52
+San Francisco Bay and Delta,Other > Wetland,Other > Water,15.57
+San Francisco Bay and Delta,Other > Barren,Other > Water,20.61
+San Francisco Bay and Delta,Other > Other,Other > Water,752.04
+San Francisco Bay and Delta,Water > Water,Other > Wetland,47.7
+San Francisco Bay and Delta,Water > Wetland,Other > Wetland,16.2
+San Francisco Bay and Delta,Water > Barren,Other > Wetland,1.17
+San Francisco Bay and Delta,Water > Other,Other > Wetland,11.88
+San Francisco Bay and Delta,Wetland > Water,Other > Wetland,12.69
+San Francisco Bay and Delta,Wetland > Wetland,Other > Wetland,547.83
+San Francisco Bay and Delta,Wetland > Barren,Other > Wetland,1.53
+San Francisco Bay and Delta,Wetland > Other,Other > Wetland,17.64
+San Francisco Bay and Delta,Barren > Water,Other > Wetland,0.36
+San Francisco Bay and Delta,Barren > Wetland,Other > Wetland,17.37
+San Francisco Bay and Delta,Barren > Barren,Other > Wetland,19.8
+San Francisco Bay and Delta,Other > Water,Other > Wetland,28.8
+San Francisco Bay and Delta,Other > Wetland,Other > Wetland,17.73
+San Francisco Bay and Delta,Other > Barren,Other > Wetland,9.09
+San Francisco Bay and Delta,Other > Other,Other > Wetland,2063.7
+San Francisco Bay and Delta,Water > Water,Other > Barren,13.77
+San Francisco Bay and Delta,Water > Wetland,Other > Barren,1.62
+San Francisco Bay and Delta,Water > Barren,Other > Barren,5.85
+San Francisco Bay and Delta,Water > Other,Other > Barren,2.61
+San Francisco Bay and Delta,Wetland > Water,Other > Barren,0.99
+San Francisco Bay and Delta,Wetland > Wetland,Other > Barren,29.61
+San Francisco Bay and Delta,Wetland > Barren,Other > Barren,0.72
+San Francisco Bay and Delta,Wetland > Other,Other > Barren,2.07
+San Francisco Bay and Delta,Barren > Water,Other > Barren,1.44
+San Francisco Bay and Delta,Barren > Wetland,Other > Barren,7.29
+San Francisco Bay and Delta,Barren > Barren,Other > Barren,98.1
+San Francisco Bay and Delta,Barren > Other,Other > Barren,7.47
+San Francisco Bay and Delta,Other > Water,Other > Barren,10.44
+San Francisco Bay and Delta,Other > Wetland,Other > Barren,3.06
+San Francisco Bay and Delta,Other > Barren,Other > Barren,76.59
+San Francisco Bay and Delta,Other > Other,Other > Barren,361.62
+San Francisco Bay and Delta,Water > Water,Other > Other,1944.18
+San Francisco Bay and Delta,Water > Wetland,Other > Other,105.48
+San Francisco Bay and Delta,Water > Barren,Other > Other,47.43
+San Francisco Bay and Delta,Water > Other,Other > Other,672.75
+San Francisco Bay and Delta,Wetland > Water,Other > Other,49.86
+San Francisco Bay and Delta,Wetland > Wetland,Other > Other,7041.69
+San Francisco Bay and Delta,Wetland > Barren,Other > Other,29.79
+San Francisco Bay and Delta,Wetland > Other,Other > Other,420.66
+San Francisco Bay and Delta,Barren > Water,Other > Other,18.18
+San Francisco Bay and Delta,Barren > Wetland,Other > Other,93.96
+San Francisco Bay and Delta,Barren > Barren,Other > Other,1777.41
+San Francisco Bay and Delta,Barren > Other,Other > Other,950.04
+San Francisco Bay and Delta,Other > Water,Other > Other,352.26
+San Francisco Bay and Delta,Other > Wetland,Other > Other,98.01
+San Francisco Bay and Delta,Other > Barren,Other > Other,814.23
+San Francisco Bay and Delta,Other > Other,Other > Other,1103203.35
+Western Lake Erie,Water > Water,Water > Water,110009.07
+Western Lake Erie,Water > Wetland,Water > Water,230.94
+Western Lake Erie,Water > Barren,Water > Water,23.13
+Western Lake Erie,Water > Other,Water > Water,23.22
+Western Lake Erie,Wetland > Water,Water > Water,138.6
+Western Lake Erie,Wetland > Wetland,Water > Water,99.72
+Western Lake Erie,Wetland > Barren,Water > Water,0.54
+Western Lake Erie,Wetland > Other,Water > Water,1.17
+Western Lake Erie,Barren > Water,Water > Water,8.55
+Western Lake Erie,Barren > Wetland,Water > Water,0.27
+Western Lake Erie,Barren > Barren,Water > Water,48.51
+Western Lake Erie,Barren > Other,Water > Water,0.72
+Western Lake Erie,Other > Water,Water > Water,10.44
+Western Lake Erie,Other > Wetland,Water > Water,0.72
+Western Lake Erie,Other > Barren,Water > Water,0.18
+Western Lake Erie,Other > Other,Water > Water,329.67
+Western Lake Erie,Water > Water,Water > Wetland,247.86
+Western Lake Erie,Water > Wetland,Water > Wetland,292.95
+Western Lake Erie,Water > Barren,Water > Wetland,3.33
+Western Lake Erie,Water > Other,Water > Wetland,4.68
+Western Lake Erie,Wetland > Water,Water > Wetland,125.55
+Western Lake Erie,Wetland > Wetland,Water > Wetland,284.58
+Western Lake Erie,Wetland > Barren,Water > Wetland,1.89
+Western Lake Erie,Wetland > Other,Water > Wetland,0.54
+Western Lake Erie,Barren > Water,Water > Wetland,0.27
+Western Lake Erie,Barren > Wetland,Water > Wetland,0.27
+Western Lake Erie,Barren > Barren,Water > Wetland,2.97
+Western Lake Erie,Barren > Other,Water > Wetland,0.18
+Western Lake Erie,Other > Water,Water > Wetland,2.16
+Western Lake Erie,Other > Wetland,Water > Wetland,0.09
+Western Lake Erie,Other > Barren,Water > Wetland,0.09
+Western Lake Erie,Other > Other,Water > Wetland,21.15
+Western Lake Erie,Water > Water,Water > Barren,26.64
+Western Lake Erie,Water > Wetland,Water > Barren,9.63
+Western Lake Erie,Water > Barren,Water > Barren,29.43
+Western Lake Erie,Water > Other,Water > Barren,5.85
+Western Lake Erie,Wetland > Water,Water > Barren,0.72
+Western Lake Erie,Wetland > Wetland,Water > Barren,0.81
+Western Lake Erie,Wetland > Barren,Water > Barren,0.99
+Western Lake Erie,Wetland > Other,Water > Barren,0.09
+Western Lake Erie,Barren > Water,Water > Barren,1.89
+Western Lake Erie,Barren > Wetland,Water > Barren,1.62
+Western Lake Erie,Barren > Barren,Water > Barren,12.15
+Western Lake Erie,Barren > Other,Water > Barren,1.71
+Western Lake Erie,Other > Water,Water > Barren,0.81
+Western Lake Erie,Other > Wetland,Water > Barren,0.63
+Western Lake Erie,Other > Barren,Water > Barren,1.62
+Western Lake Erie,Other > Other,Water > Barren,11.79
+Western Lake Erie,Water > Water,Water > Other,244.89
+Western Lake Erie,Water > Wetland,Water > Other,60.12
+Western Lake Erie,Water > Barren,Water > Other,10.89
+Western Lake Erie,Water > Other,Water > Other,18.09
+Western Lake Erie,Wetland > Water,Water > Other,2.07
+Western Lake Erie,Wetland > Wetland,Water > Other,12.69
+Western Lake Erie,Wetland > Barren,Water > Other,0.27
+Western Lake Erie,Wetland > Other,Water > Other,1.35
+Western Lake Erie,Barren > Water,Water > Other,0.9
+Western Lake Erie,Barren > Wetland,Water > Other,1.44
+Western Lake Erie,Barren > Barren,Water > Other,12.24
+Western Lake Erie,Barren > Other,Water > Other,4.05
+Western Lake Erie,Other > Water,Water > Other,3.78
+Western Lake Erie,Other > Wetland,Water > Other,1.08
+Western Lake Erie,Other > Barren,Water > Other,1.08
+Western Lake Erie,Other > Other,Water > Other,133.2
+Western Lake Erie,Water > Water,Wetland > Water,147.6
+Western Lake Erie,Water > Wetland,Wetland > Water,30.87
+Western Lake Erie,Water > Barren,Wetland > Water,0.54
+Western Lake Erie,Water > Other,Wetland > Water,0.18
+Western Lake Erie,Wetland > Water,Wetland > Water,98.64
+Western Lake Erie,Wetland > Wetland,Wetland > Water,119.43
+Western Lake Erie,Wetland > Barren,Wetland > Water,1.17
+Western Lake Erie,Wetland > Other,Wetland > Water,0.45
+Western Lake Erie,Barren > Water,Wetland > Water,3.87
+Western Lake Erie,Barren > Wetland,Wetland > Water,1.8
+Western Lake Erie,Barren > Barren,Wetland > Water,2.7
+Western Lake Erie,Other > Water,Wetland > Water,24.84
+Western Lake Erie,Other > Wetland,Wetland > Water,0.9
+Western Lake Erie,Other > Barren,Wetland > Water,0.9
+Western Lake Erie,Other > Other,Wetland > Water,22.68
+Western Lake Erie,Water > Water,Wetland > Wetland,971.1
+Western Lake Erie,Water > Wetland,Wetland > Wetland,910.62
+Western Lake Erie,Water > Barren,Wetland > Wetland,4.23
+Western Lake Erie,Water > Other,Wetland > Wetland,13.77
+Western Lake Erie,Wetland > Water,Wetland > Wetland,560.88
+Western Lake Erie,Wetland > Wetland,Wetland > Wetland,14051.88
+Western Lake Erie,Wetland > Barren,Wetland > Wetland,12.24
+Western Lake Erie,Wetland > Other,Wetland > Wetland,115.47
+Western Lake Erie,Barren > Water,Wetland > Wetland,0.09
+Western Lake Erie,Barren > Wetland,Wetland > Wetland,3.24
+Western Lake Erie,Barren > Barren,Wetland > Wetland,41.67
+Western Lake Erie,Barren > Other,Wetland > Wetland,0.99
+Western Lake Erie,Other > Water,Wetland > Wetland,5.76
+Western Lake Erie,Other > Wetland,Wetland > Wetland,2.43
+Western Lake Erie,Other > Barren,Wetland > Wetland,3.78
+Western Lake Erie,Other > Other,Wetland > Wetland,1696.77
+Western Lake Erie,Water > Water,Wetland > Barren,0.54
+Western Lake Erie,Water > Wetland,Wetland > Barren,0.09
+Western Lake Erie,Wetland > Wetland,Wetland > Barren,1.08
+Western Lake Erie,Wetland > Barren,Wetland > Barren,0.27
+Western Lake Erie,Wetland > Other,Wetland > Barren,0.09
+Western Lake Erie,Barren > Water,Wetland > Barren,0.09
+Western Lake Erie,Barren > Wetland,Wetland > Barren,0.09
+Western Lake Erie,Barren > Barren,Wetland > Barren,0.63
+Western Lake Erie,Other > Water,Wetland > Barren,0.45
+Western Lake Erie,Other > Wetland,Wetland > Barren,0.9
+Western Lake Erie,Other > Barren,Wetland > Barren,0.27
+Western Lake Erie,Other > Other,Wetland > Barren,4.14
+Western Lake Erie,Water > Water,Wetland > Other,13.41
+Western Lake Erie,Water > Wetland,Wetland > Other,2.16
+Western Lake Erie,Water > Barren,Wetland > Other,0.09
+Western Lake Erie,Water > Other,Wetland > Other,0.63
+Western Lake Erie,Wetland > Water,Wetland > Other,4.05
+Western Lake Erie,Wetland > Wetland,Wetland > Other,225.45
+Western Lake Erie,Wetland > Barren,Wetland > Other,0.99
+Western Lake Erie,Wetland > Other,Wetland > Other,26.82
+Western Lake Erie,Barren > Wetland,Wetland > Other,0.09
+Western Lake Erie,Barren > Barren,Wetland > Other,1.17
+Western Lake Erie,Barren > Other,Wetland > Other,0.09
+Western Lake Erie,Other > Water,Wetland > Other,4.14
+Western Lake Erie,Other > Wetland,Wetland > Other,0.09
+Western Lake Erie,Other > Barren,Wetland > Other,0.63
+Western Lake Erie,Other > Other,Wetland > Other,108.09
+Western Lake Erie,Water > Water,Barren > Water,36.36
+Western Lake Erie,Water > Wetland,Barren > Water,1.98
+Western Lake Erie,Water > Barren,Barren > Water,1.17
+Western Lake Erie,Water > Other,Barren > Water,0.72
+Western Lake Erie,Wetland > Water,Barren > Water,1.62
+Western Lake Erie,Wetland > Wetland,Barren > Water,1.71
+Western Lake Erie,Wetland > Barren,Barren > Water,0.09
+Western Lake Erie,Wetland > Other,Barren > Water,0.18
+Western Lake Erie,Barren > Water,Barren > Water,101.79
+Western Lake Erie,Barren > Wetland,Barren > Water,0.72
+Western Lake Erie,Barren > Barren,Barren > Water,28.08
+Western Lake Erie,Barren > Other,Barren > Water,1.08
+Western Lake Erie,Other > Water,Barren > Water,24.03
+Western Lake Erie,Other > Wetland,Barren > Water,0.27
+Western Lake Erie,Other > Barren,Barren > Water,7.11
+Western Lake Erie,Other > Other,Barren > Water,11.25
+Western Lake Erie,Water > Water,Barren > Wetland,1.17
+Western Lake Erie,Water > Wetland,Barren > Wetland,0.72
+Western Lake Erie,Wetland > Water,Barren > Wetland,0.45
+Western Lake Erie,Wetland > Wetland,Barren > Wetland,2.25
+Western Lake Erie,Barren > Water,Barren > Wetland,0.27
+Western Lake Erie,Barren > Barren,Barren > Wetland,1.08
+Western Lake Erie,Other > Water,Barren > Wetland,0.36
+Western Lake Erie,Other > Barren,Barren > Wetland,0.18
+Western Lake Erie,Other > Other,Barren > Wetland,2.07
+Western Lake Erie,Water > Water,Barren > Barren,50.85
+Western Lake Erie,Water > Wetland,Barren > Barren,2.88
+Western Lake Erie,Water > Barren,Barren > Barren,27.99
+Western Lake Erie,Water > Other,Barren > Barren,6.21
+Western Lake Erie,Wetland > Water,Barren > Barren,0.72
+Western Lake Erie,Wetland > Wetland,Barren > Barren,9.99
+Western Lake Erie,Wetland > Barren,Barren > Barren,0.63
+Western Lake Erie,Wetland > Other,Barren > Barren,0.54
+Western Lake Erie,Barren > Water,Barren > Barren,59.85
+Western Lake Erie,Barren > Wetland,Barren > Barren,5.4
+Western Lake Erie,Barren > Barren,Barren > Barren,1127.79
+Western Lake Erie,Barren > Other,Barren > Barren,57.06
+Western Lake Erie,Other > Water,Barren > Barren,9.99
+Western Lake Erie,Other > Wetland,Barren > Barren,2.16
+Western Lake Erie,Other > Barren,Barren > Barren,101.88
+Western Lake Erie,Other > Other,Barren > Barren,625.05
+Western Lake Erie,Water > Water,Barren > Other,4.05
+Western Lake Erie,Water > Wetland,Barren > Other,0.36
+Western Lake Erie,Water > Barren,Barren > Other,0.54
+Western Lake Erie,Water > Other,Barren > Other,1.44
+Western Lake Erie,Wetland > Water,Barren > Other,0.18
+Western Lake Erie,Wetland > Wetland,Barren > Other,2.61
+Western Lake Erie,Wetland > Barren,Barren > Other,0.27
+Western Lake Erie,Wetland > Other,Barren > Other,0.45
+Western Lake Erie,Barren > Water,Barren > Other,3.33
+Western Lake Erie,Barren > Wetland,Barren > Other,0.63
+Western Lake Erie,Barren > Barren,Barren > Other,38.97
+Western Lake Erie,Barren > Other,Barren > Other,8.01
+Western Lake Erie,Other > Water,Barren > Other,3.15
+Western Lake Erie,Other > Wetland,Barren > Other,1.89
+Western Lake Erie,Other > Barren,Barren > Other,6.66
+Western Lake Erie,Other > Other,Barren > Other,53.37
+Western Lake Erie,Water > Water,Other > Water,110.88
+Western Lake Erie,Water > Wetland,Other > Water,4.23
+Western Lake Erie,Water > Barren,Other > Water,0.54
+Western Lake Erie,Water > Other,Other > Water,2.16
+Western Lake Erie,Wetland > Water,Other > Water,48.6
+Western Lake Erie,Wetland > Wetland,Other > Water,41.04
+Western Lake Erie,Wetland > Barren,Other > Water,0.9
+Western Lake Erie,Wetland > Other,Other > Water,3.24
+Western Lake Erie,Barren > Water,Other > Water,19.8
+Western Lake Erie,Barren > Wetland,Other > Water,2.16
+Western Lake Erie,Barren > Barren,Other > Water,10.44
+Western Lake Erie,Barren > Other,Other > Water,1.08
+Western Lake Erie,Other > Water,Other > Water,99.45
+Western Lake Erie,Other > Wetland,Other > Water,5.76
+Western Lake Erie,Other > Barren,Other > Water,11.07
+Western Lake Erie,Other > Other,Other > Water,327.6
+Western Lake Erie,Water > Water,Other > Wetland,32.13
+Western Lake Erie,Water > Wetland,Other > Wetland,8.19
+Western Lake Erie,Water > Barren,Other > Wetland,0.09
+Western Lake Erie,Water > Other,Other > Wetland,0.81
+Western Lake Erie,Wetland > Water,Other > Wetland,14.13
+Western Lake Erie,Wetland > Wetland,Other > Wetland,301.5
+Western Lake Erie,Wetland > Barren,Other > Wetland,0.54
+Western Lake Erie,Wetland > Other,Other > Wetland,11.43
+Western Lake Erie,Barren > Water,Other > Wetland,0.36
+Western Lake Erie,Barren > Wetland,Other > Wetland,0.09
+Western Lake Erie,Barren > Barren,Other > Wetland,0.45
+Western Lake Erie,Barren > Other,Other > Wetland,0.18
+Western Lake Erie,Other > Water,Other > Wetland,4.59
+Western Lake Erie,Other > Wetland,Other > Wetland,12.15
+Western Lake Erie,Other > Barren,Other > Wetland,0.99
+Western Lake Erie,Other > Other,Other > Wetland,225.54
+Western Lake Erie,Water > Water,Other > Barren,1.17
+Western Lake Erie,Water > Barren,Other > Barren,4.41
+Western Lake Erie,Water > Other,Other > Barren,0.27
+Western Lake Erie,Wetland > Water,Other > Barren,0.36
+Western Lake Erie,Wetland > Wetland,Other > Barren,1.53
+Western Lake Erie,Wetland > Barren,Other > Barren,0.72
+Western Lake Erie,Wetland > Other,Other > Barren,0.18
+Western Lake Erie,Barren > Water,Other > Barren,1.08
+Western Lake Erie,Barren > Barren,Other > Barren,62.37
+Western Lake Erie,Barren > Other,Other > Barren,6.48
+Western Lake Erie,Other > Water,Other > Barren,6.75
+Western Lake Erie,Other > Wetland,Other > Barren,0.63
+Western Lake Erie,Other > Barren,Other > Barren,205.56
+Western Lake Erie,Other > Other,Other > Barren,95.67
+Western Lake Erie,Water > Water,Other > Other,833.31
+Western Lake Erie,Water > Wetland,Other > Other,47.25
+Western Lake Erie,Water > Barren,Other > Other,8.82
+Western Lake Erie,Water > Other,Other > Other,110.52
+Western Lake Erie,Wetland > Water,Other > Other,19.71
+Western Lake Erie,Wetland > Wetland,Other > Other,8646.75
+Western Lake Erie,Wetland > Barren,Other > Other,10.08
+Western Lake Erie,Wetland > Other,Other > Other,357.75
+Western Lake Erie,Barren > Water,Other > Other,4.32
+Western Lake Erie,Barren > Wetland,Other > Other,3.24
+Western Lake Erie,Barren > Barren,Other > Other,855.99
+Western Lake Erie,Barren > Other,Other > Other,201.78
+Western Lake Erie,Other > Water,Other > Other,84.78
+Western Lake Erie,Other > Wetland,Other > Other,62.55
+Western Lake Erie,Other > Barren,Other > Other,287.1
+Western Lake Erie,Other > Other,Other > Other,318978.9

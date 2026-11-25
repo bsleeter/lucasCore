@@ -1,0 +1,81 @@
+Region,Ccap,Nlcd,Ha
+Louisiana chenier plain,Water,Water,223331.85
+Louisiana chenier plain,Wetland,Water,8844.21
+Louisiana chenier plain,Barren,Water,2484.63
+Louisiana chenier plain,Other,Water,1430.46
+Louisiana chenier plain,Water,Wetland,19969.83
+Louisiana chenier plain,Wetland,Wetland,337028.31
+Louisiana chenier plain,Barren,Wetland,1601.37
+Louisiana chenier plain,Other,Wetland,8638.74
+Louisiana chenier plain,Water,Barren,300.69
+Louisiana chenier plain,Wetland,Barren,161.01
+Louisiana chenier plain,Barren,Barren,696.69
+Louisiana chenier plain,Other,Barren,405.81
+Louisiana chenier plain,Water,Other,2831.58
+Louisiana chenier plain,Wetland,Other,5334.66
+Louisiana chenier plain,Barren,Other,1250.73
+Louisiana chenier plain,Other,Other,249140.52
+Louisiana delta plain,Water,Water,570762.81
+Louisiana delta plain,Wetland,Water,22701.42
+Louisiana delta plain,Barren,Water,6291.99
+Louisiana delta plain,Other,Water,1012.05
+Louisiana delta plain,Water,Wetland,45019.62
+Louisiana delta plain,Wetland,Wetland,694815.03
+Louisiana delta plain,Barren,Wetland,2621.52
+Louisiana delta plain,Other,Wetland,5596.56
+Louisiana delta plain,Water,Barren,312.48
+Louisiana delta plain,Wetland,Barren,662.13
+Louisiana delta plain,Barren,Barren,895.95
+Louisiana delta plain,Other,Barren,299.88
+Louisiana delta plain,Water,Other,3222
+Louisiana delta plain,Wetland,Other,8071.65
+Louisiana delta plain,Barren,Other,1221.12
+Louisiana delta plain,Other,Other,140255.28
+Chesapeake eastern shore,Water,Water,324353.16
+Chesapeake eastern shore,Wetland,Water,3636.63
+Chesapeake eastern shore,Barren,Water,533.97
+Chesapeake eastern shore,Other,Water,307.35
+Chesapeake eastern shore,Water,Wetland,1088.55
+Chesapeake eastern shore,Wetland,Wetland,125749.35
+Chesapeake eastern shore,Barren,Wetland,101.52
+Chesapeake eastern shore,Other,Wetland,12171.87
+Chesapeake eastern shore,Water,Barren,75.78
+Chesapeake eastern shore,Wetland,Barren,60.48
+Chesapeake eastern shore,Barren,Barren,144.09
+Chesapeake eastern shore,Other,Barren,293.13
+Chesapeake eastern shore,Water,Other,1028.97
+Chesapeake eastern shore,Wetland,Other,5346.18
+Chesapeake eastern shore,Barren,Other,386.1
+Chesapeake eastern shore,Other,Other,180276.12
+San Francisco Bay and Delta,Water,Water,208452.6
+San Francisco Bay and Delta,Wetland,Water,2968.92
+San Francisco Bay and Delta,Barren,Water,1950.39
+San Francisco Bay and Delta,Other,Water,1946.61
+San Francisco Bay and Delta,Water,Wetland,4768.11
+San Francisco Bay and Delta,Wetland,Wetland,49654.26
+San Francisco Bay and Delta,Barren,Wetland,690.03
+San Francisco Bay and Delta,Other,Wetland,7391.25
+San Francisco Bay and Delta,Water,Barren,1220.58
+San Francisco Bay and Delta,Wetland,Barren,597.51
+San Francisco Bay and Delta,Barren,Barren,2345.67
+San Francisco Bay and Delta,Other,Barren,1310.13
+San Francisco Bay and Delta,Water,Other,3714.39
+San Francisco Bay and Delta,Wetland,Other,8699.49
+San Francisco Bay and Delta,Barren,Other,3086.64
+San Francisco Bay and Delta,Other,Other,1107206.46
+Western Lake Erie,Water,Water,110884.14
+Western Lake Erie,Wetland,Water,542.52
+Western Lake Erie,Barren,Water,137.07
+Western Lake Erie,Other,Water,725.4
+Western Lake Erie,Water,Wetland,1967.13
+Western Lake Erie,Wetland,Wetland,15870.96
+Western Lake Erie,Barren,Wetland,73.53
+Western Lake Erie,Other,Wetland,2093.58
+Western Lake Erie,Water,Barren,161.91
+Western Lake Erie,Wetland,Barren,37.44
+Western Lake Erie,Barren,Barren,1576.71
+Western Lake Erie,Other,Barren,815.13
+Western Lake Erie,Water,Other,1226.07
+Western Lake Erie,Wetland,Other,9068.4
+Western Lake Erie,Barren,Other,1235.79
+Western Lake Erie,Other,Other,320004.54

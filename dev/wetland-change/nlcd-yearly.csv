@@ -1,0 +1,126 @@
+Region,Year,WetlandToWater,WaterToWetland,WetlandToBarren,BarrenToWetland,WaterToBarren,BarrenToWater
+Louisiana chenier plain,1997,2710.71,1344.42,89.91,1.62,59.94,323.1
+Louisiana chenier plain,1998,991.53,2090.07,20.7,2.07,61.29,118.8
+Louisiana chenier plain,1999,1769.76,1278.09,16.74,2.97,65.88,130.86
+Louisiana chenier plain,2000,1612.8,2236.68,8.19,1.44,166.23,96.21
+Louisiana chenier plain,2001,2503.17,1397.88,25.74,6.57,79.92,229.41
+Louisiana chenier plain,2002,1236.6,2208.87,12.15,1.8,54.63,131.31
+Louisiana chenier plain,2003,852.84,1855.35,23.94,3.24,152.64,74.79
+Louisiana chenier plain,2004,997.83,1655.28,8.91,5.67,79.74,76.32
+Louisiana chenier plain,2005,1701.45,1315.35,8.55,5.31,40.86,120.06
+Louisiana chenier plain,2006,6906.87,595.8,33.03,8.73,38.79,88.2
+Louisiana chenier plain,2007,3108.15,2115.99,7.02,5.49,47.34,139.68
+Louisiana chenier plain,2008,1188.18,2426.85,5.22,9.18,45.09,79.83
+Louisiana chenier plain,2009,2226.78,1535.31,15.93,5.4,222.66,45.54
+Louisiana chenier plain,2010,1261.44,2321.82,3.42,4.77,405.72,116.55
+Louisiana chenier plain,2011,1263.15,1916.91,6.39,7.02,259.02,364.14
+Louisiana chenier plain,2012,1523.61,1439.73,2.97,4.59,95.85,301.77
+Louisiana chenier plain,2013,699.75,2477.07,1.17,1.26,107.37,59.4
+Louisiana chenier plain,2014,1063.8,1412.37,2.34,1.8,172.44,40.68
+Louisiana chenier plain,2015,927.18,1585.17,7.02,1.71,103.68,117.18
+Louisiana chenier plain,2016,1284.75,1187.28,3.51,0.9,85.95,90.45
+Louisiana chenier plain,2017,889.65,1294.11,3.15,0.9,78.21,94.68
+Louisiana chenier plain,2018,732.87,1811.43,5.04,2.7,149.76,77.22
+Louisiana chenier plain,2019,1246.77,1245.51,4.86,1.08,102.51,81.45
+Louisiana chenier plain,2020,2152.08,808.83,11.16,1.35,68.31,91.26
+Louisiana chenier plain,2021,2297.7,1058.4,25.11,5.04,154.71,53.28
+Louisiana delta plain,1997,2673.99,4479.3,13.95,2.16,116.73,190.98
+Louisiana delta plain,1998,2443.41,3766.77,28.17,3.15,297.18,162.18
+Louisiana delta plain,1999,3087.45,3495.24,18.45,2.25,251.64,87.3
+Louisiana delta plain,2000,3385.08,2699.01,4.95,3.69,239.13,86.94
+Louisiana delta plain,2001,5198.85,1758.51,10.62,14.4,125.28,166.59
+Louisiana delta plain,2002,1763.37,4586.22,9.09,8.46,83.88,192.33
+Louisiana delta plain,2003,2806.29,2125.62,14.58,4.23,104.22,279.72
+Louisiana delta plain,2004,1344.42,3839.13,6.48,4.77,165.96,76.68
+Louisiana delta plain,2005,2929.95,2218.41,11.52,3.51,137.07,124.02
+Louisiana delta plain,2006,3510.36,2039.67,24.39,14.31,164.34,114.12
+Louisiana delta plain,2007,1689.3,2906.64,5.94,3.78,149.76,90.36
+Louisiana delta plain,2008,3827.97,2286.36,2.79,4.86,86.76,173.16
+Louisiana delta plain,2009,3484.17,3205.17,21.24,32.94,199.26,169.56
+Louisiana delta plain,2010,1430.73,3674.52,6.12,6.57,248.67,83.52
+Louisiana delta plain,2011,2053.53,2561.58,7.65,17.73,213.03,62.55
+Louisiana delta plain,2012,1806.75,2557.17,6.48,29.07,98.73,150.93
+Louisiana delta plain,2013,2395.98,2339.55,2.52,9.09,208.53,115.92
+Louisiana delta plain,2014,2036.97,2601.72,6.57,6.57,190.35,55.44
+Louisiana delta plain,2015,2193.12,2452.23,3.24,1.89,166.59,91.71
+Louisiana delta plain,2016,2886.75,1726.92,4.95,5.13,149.49,121.95
+Louisiana delta plain,2017,2789.46,2064.24,11.16,2.97,302.13,96.39
+Louisiana delta plain,2018,1874.97,2387.07,6.84,8.73,166.59,58.05
+Louisiana delta plain,2019,1968.48,2712.69,4.95,5.04,119.7,150.66
+Louisiana delta plain,2020,2114.37,2338.29,7.02,5.22,91.8,137.79
+Louisiana delta plain,2021,5185.89,1422.18,20.25,8.91,161.91,156.6
+Chesapeake eastern shore,1997,523.26,156.33,1.53,1.62,21.51,33.39
+Chesapeake eastern shore,1998,267.48,350.82,1.8,1.08,18.09,35.46
+Chesapeake eastern shore,1999,337.59,276.84,3.15,1.44,15.39,23.94
+Chesapeake eastern shore,2000,356.31,351.81,3.87,3.51,17.73,19.17
+Chesapeake eastern shore,2001,266.58,361.35,1.35,0.9,16.56,19.71
+Chesapeake eastern shore,2002,372.78,290.34,2.43,3.78,13.59,22.14
+Chesapeake eastern shore,2003,443.07,204.75,0.99,2.07,17.37,29.07
+Chesapeake eastern shore,2004,189.45,462.24,4.59,6.93,17.73,19.35
+Chesapeake eastern shore,2005,426.78,229.86,1.89,1.62,15.39,31.77
+Chesapeake eastern shore,2006,277.74,279.27,4.14,0.99,28.89,15.57
+Chesapeake eastern shore,2007,198.63,388.53,3.33,1.26,15.66,23.49
+Chesapeake eastern shore,2008,294.93,232.92,2.34,0.9,16.83,20.25
+Chesapeake eastern shore,2009,296.46,205.83,3.06,1.44,17.46,22.05
+Chesapeake eastern shore,2010,398.61,214.47,3.96,2.43,11.97,39.24
+Chesapeake eastern shore,2011,458.19,150.21,3.87,1.98,12.87,23.22
+Chesapeake eastern shore,2012,214.2,275.67,5.49,0.63,13.68,21.51
+Chesapeake eastern shore,2013,350.82,186.57,3.33,1.08,13.5,24.21
+Chesapeake eastern shore,2014,125.1,524.79,1.62,0.63,17.01,13.23
+Chesapeake eastern shore,2015,232.56,292.77,2.88,0.99,16.2,15.57
+Chesapeake eastern shore,2016,570.06,116.91,1.08,0.18,9.54,25.38
+Chesapeake eastern shore,2017,405.27,157.77,1.17,1.26,6.57,27.09
+Chesapeake eastern shore,2018,192.51,334.44,1.53,0.72,15.03,17.28
+Chesapeake eastern shore,2019,315.18,165.42,1.71,0.72,14.13,18.45
+Chesapeake eastern shore,2020,219.15,219.24,3.06,0.36,17.28,14.04
+Chesapeake eastern shore,2021,267.93,134.46,2.07,0.36,13.68,18.63
+San Francisco Bay and Delta,1997,403.47,704.07,2.61,3.96,354.78,222.48
+San Francisco Bay and Delta,1998,1236.87,339.48,2.61,8.46,129.24,517.59
+San Francisco Bay and Delta,1999,420.75,1288.53,1.98,3.69,711.72,124.29
+San Francisco Bay and Delta,2000,354.24,477.18,10.53,8.46,206.19,327.69
+San Francisco Bay and Delta,2001,287.37,1052.46,8.1,18.09,1113.66,141.93
+San Francisco Bay and Delta,2002,764.46,379.17,4.95,26.1,885.15,472.32
+San Francisco Bay and Delta,2003,773.82,371.61,5.49,10.26,477.81,688.14
+San Francisco Bay and Delta,2004,384.03,603.09,4.32,19.89,1099.8,418.5
+San Francisco Bay and Delta,2005,759.6,601.74,6.66,22.05,519.39,1218.24
+San Francisco Bay and Delta,2006,1371.06,486.18,4.32,10.26,328.32,557.82
+San Francisco Bay and Delta,2007,352.62,1513.44,12.87,27.36,1497.69,167.85
+San Francisco Bay and Delta,2008,666.54,679.05,5.49,19.44,564.12,458.28
+San Francisco Bay and Delta,2009,738.63,516.96,4.32,16.11,232.47,811.26
+San Francisco Bay and Delta,2010,590.4,667.62,11.34,12.96,226.44,592.2
+San Francisco Bay and Delta,2011,1020.42,324.27,4.68,10.26,177.3,647.28
+San Francisco Bay and Delta,2012,274.5,1009.53,8.64,10.53,1117.17,254.79
+San Francisco Bay and Delta,2013,625.5,487.8,7.02,9.36,260.46,595.89
+San Francisco Bay and Delta,2014,616.77,473.22,5.22,20.25,366.03,424.71
+San Francisco Bay and Delta,2015,758.7,473.85,13.59,11.07,292.14,474.57
+San Francisco Bay and Delta,2016,582.57,585.9,7.74,12.33,346.5,457.56
+San Francisco Bay and Delta,2017,1127.34,672.75,8.28,10.26,280.26,599.4
+San Francisco Bay and Delta,2018,294.48,1365.21,6.48,6.84,670.32,248.94
+San Francisco Bay and Delta,2019,762.84,491.4,11.07,6.39,447.21,442.62
+San Francisco Bay and Delta,2020,370.44,994.05,11.88,6.39,731.79,228.69
+San Francisco Bay and Delta,2021,786.24,603.81,5.58,14.76,476.01,335.52
+Western Lake Erie,1997,665.73,80.46,2.97,1.17,14.13,64.62
+Western Lake Erie,1998,87.12,662.4,1.89,0.09,56.16,25.65
+Western Lake Erie,1999,93.42,591.3,3.33,0.9,86.31,10.71
+Western Lake Erie,2000,427.59,146.97,1.62,0.81,15.84,53.91
+Western Lake Erie,2001,51.93,631.71,0.54,0.63,58.41,11.07
+Western Lake Erie,2002,281.43,145.53,0.18,0.9,14.76,59.76
+Western Lake Erie,2003,210.33,206.55,1.62,0.9,21.33,43.02
+Western Lake Erie,2004,169.74,179.82,1.26,0.72,20.52,61.83
+Western Lake Erie,2005,221.04,258.03,0.54,0.9,28.26,35.91
+Western Lake Erie,2006,351.72,139.86,6.12,0.54,25.38,28.71
+Western Lake Erie,2007,118.26,326.7,0.81,0.27,27.99,28.44
+Western Lake Erie,2008,293.4,125.91,0.9,0.09,18.27,32.31
+Western Lake Erie,2009,125.91,280.17,0.72,0.36,34.11,38.61
+Western Lake Erie,2010,213.21,180.45,0.36,0.81,21.6,22.5
+Western Lake Erie,2011,374.04,122.13,0.18,0.54,12.87,54
+Western Lake Erie,2012,68.67,622.62,2.43,1.26,42.93,14.4
+Western Lake Erie,2013,370.17,91.89,1.89,1.26,14.31,61.38
+Western Lake Erie,2014,292.59,129.87,0.36,0.45,15.21,29.34
+Western Lake Erie,2015,244.26,223.74,0.27,1.44,22.14,23.04
+Western Lake Erie,2016,145.98,305.01,0.72,2.97,24.84,25.47
+Western Lake Erie,2017,220.5,224.91,0.36,0.36,14.58,31.86
+Western Lake Erie,2018,367.11,102.42,0.99,0.54,14.31,30.51
+Western Lake Erie,2019,322.92,253.8,2.25,1.17,17.28,40.77
+Western Lake Erie,2020,316.17,210.33,2.43,0.27,35.01,26.73
+Western Lake Erie,2021,142.29,505.89,0.45,2.7,30.24,38.52

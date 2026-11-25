@@ -1,0 +1,26 @@
+Region,Change,NlcdPersistentKha,CcapKha,BothKha,NlcdConfirmedPct,CcapConfirmedPct
+chesapeake-eastern-shore,Wetland > Water,1.15884,0.34236,0.04707,4.1,13.7
+chesapeake-eastern-shore,Water > Wetland,0.12771,0.57465,0.00981,7.7,1.7
+chesapeake-eastern-shore,Wetland > Barren,0.02115,0.04842,0.00117,5.5,2.4
+chesapeake-eastern-shore,Barren > Water,0.13059,0.03474,0.00693,5.3,19.9
+chesapeake-eastern-shore,Water > Barren,0.05067,0.05094,0.00621,12.3,12.2
+louisiana-chenier-plain,Wetland > Water,3.67488,19.2609,1.5264,41.5,7.9
+louisiana-chenier-plain,Water > Wetland,3.35862,4.2867,0.64656,19.3,15.1
+louisiana-chenier-plain,Wetland > Barren,0.03852,1.49904,0.02016,52.3,1.3
+louisiana-chenier-plain,Barren > Water,0.43227,1.08765,0.12294,28.4,11.3
+louisiana-chenier-plain,Water > Barren,0.52551,2.12022,0.13167,25.1,6.2
+louisiana-delta-plain,Wetland > Water,4.60728,22.65984,0.68634,14.9,3
+louisiana-delta-plain,Water > Wetland,5.33799,16.03062,2.01501,37.7,12.6
+louisiana-delta-plain,Wetland > Barren,0.03699,1.74888,0.00873,23.6,0.5
+louisiana-delta-plain,Barren > Water,0.56133,4.71987,0.25515,45.5,5.4
+louisiana-delta-plain,Water > Barren,1.38321,4.06953,0.44262,32,10.9
+san-francisco-bay-and-delta,Wetland > Water,0.69921,4.74624,0.22572,32.3,4.8
+san-francisco-bay-and-delta,Water > Wetland,1.1169,3.4929,0.30771,27.6,8.8
+san-francisco-bay-and-delta,Wetland > Barren,0.01152,0.55593,0,0,0
+san-francisco-bay-and-delta,Barren > Water,0.23625,0.32391,0.0072,3,2.2
+san-francisco-bay-and-delta,Water > Barren,1.00503,1.20618,0.26694,26.6,22.1
+western-lake-erie,Wetland > Water,0.13032,1.01628,0.03249,24.9,3.2
+western-lake-erie,Water > Wetland,0.6525,1.60299,0.18783,28.8,11.7
+western-lake-erie,Wetland > Barren,0.00684,0.03159,0.00018,2.6,0.6
+western-lake-erie,Barren > Water,0.16119,0.20646,0.09162,56.8,44.4
+western-lake-erie,Water > Barren,0.07722,0.1152,0.02187,28.3,19
