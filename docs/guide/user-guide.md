@@ -1,6 +1,6 @@
 # lucasCore User Guide
 
-*A snapshot of the lucasCore User Guide, exported 2026-11-24. Also as a [web page](index.html), beside the [package](../blueprint/index.html) and [data](../blueprint/data.html) blueprints.*
+*A snapshot of the lucasCore User Guide, exported 2026-11-25. Also as a [web page](index.html), beside the [package](../blueprint/index.html) and [data](../blueprint/data.html) blueprints.*
 
 How to build and run a LUCAS land-use and carbon model with the lucasCore SyncroSim package, walked through on the Northern Sierra Nevada pyrome (P26) at 150 m.
 
@@ -30,7 +30,7 @@ From lucasCore 2.0.1 a scenario's pages under **LUCAS Core** are in groups, each
 | --- | --- | --- |
 | Data Download | Data Download | Download Results |
 | Build | Study Area, Build Options, Stand Age, Forest Cover, Climate Options, Growth Curve Options, Minimum Harvest Age, Natural Change, Mortality | Carbon Assumptions, Crosswalks, Fitted Curves, Build Results |
-| Projection | Run Settings, Transitions, Spatial Allocation, Fire, Fuel Treatments, Forest Management, Management Actions, Projection Climate | Projection Results |
+| Projection | Run Settings, Transitions, Spatial Allocation, Fire, Mortality, Fuel Treatments, Forest Management, Management Actions, Projection Climate, Mortality and Climate | Projection Results |
 | Figures and Analysis | Run Figures, Compare Runs, Wood Products | Figures (Build, Run, Compare and Wood Products figures), Summary Tables |
 | Data Release | Release Information, Data Release | Model Record, Data Release results |
 
@@ -896,6 +896,42 @@ The line is shipped with the package, one per ecodivision, set so the area flagg
 
 **Checking it.** The stage 6 log has a line beginning *Drought and insect mortality* with the area marked, placed and set aside, and the highest years. **Build Results > Historical Transition Summary** lists the area by year, and the disturbance history figure (section 4.5) shows it beside fire and harvest. In a test on the Southern Sierra Nevada at 300 m, the Build placed 238 km² over 1986 to 2023, with 32, 48 and 33 km² in 2016, 2017 and 2018, and a historical run realized 99.5% of it.
 
+**In a projection (from lucasCore 2.0.3).** The event continues after the historical end at the rates of the record, unless **Projection > Mortality** on the Projection Setup says Off. Each iteration fills the projection years with blocks of consecutive historical years (5 by default), so an outbreak of several years stays together. A drawn year gives each softwood forest type of an ecodivision the share of its standing forest that had the event that year. It is a rate on the forest that still stands and is old enough, so the area falls as forest is used up and comes back as it regrows. If the Build has the event off, or mapped none, the projection has none either.
+
+The Mortality page of the Projection group has these settings. Leave it blank for the defaults.
+
+| Setting | What it does | Default |
+| --- | --- | --- |
+| Historical rates or Off | Whether the event continues in the projection | Historical rates |
+| Years drawn together | The length of a block. Longer blocks keep long outbreaks whole; shorter blocks give more variety between iterations | 5 |
+| Reference years | The historical years the blocks come from. The rate has risen over the record, so these years set the projected amount more than any other choice | The reference period of Run Settings |
+| Where it falls | Clustered: a surface fitted to where the events fell, the patch sizes of the record, and spread from the die-off of the three years before. Or random cells. Neither changes the amount | Clustered |
+| Timing and Amount | As this setup draws them, or from the Projection Climate result (below) | As this setup draws them |
+
+The stage 9 log has lines beginning *Drought and insect mortality*. **Projection Results > Projection Rates** lists the units and their mean yearly area, and **Projection Schedule** lists the years drawn (sampling set Mortality). A library made before lucasCore 2.0.3 lacks a few definition names the projection uses: close it in SyncroSim and run `Rscript tools/add-definitions.R <library.ssim>` once.
+
+**Exploring a climate response.** By default the blocks fall with no regard to the climate of the projection, so every climate future gets the same event. We looked for a climate signal in the record of 1991 to 2022 across 35 western pyromes. It is there, but weak: dry years have somewhat more mortality than wet ones when all pyromes are pooled, and a single region's record cannot rank its own years. That is not enough to fit a response, so two settings on a Projection Climate scenario let you explore one. To switch them on:
+
+1. On the Projection Setup's **Projection > Mortality** page, set Timing and Amount to *From the Projection Climate result*, and run the setup. The setup still draws the blocks and holds no climate, so it serves any number of climate futures.
+2. Make the Projection Climate scenario depend on the Build result and, below it, on that Projection Setup result.
+3. On the Projection Climate scenario's **Projection > Mortality and Climate** page, set one or both sliders, and run it.
+4. Make the projection depend on the setup and the Projection Climate result as usual.
+
+Every projection from a setup switched this way needs a Projection Climate result made this way. Without one ST-Sim stops and says a distribution has no external variable values. With both settings at zero or blank the blocks stay as the setup drew them.
+
+| Setting | Range | What it does |
+| --- | --- | --- |
+| When: outbreaks placed in dry periods (timing strength) | 0 to 1 | Places the more severe blocks in the dry periods of the climate run. At 0 they stay as drawn; at 1 the worst block always falls in the driest period. About 0.3 matches the record: the driest third of years has roughly 1.3 to 1.6 times the mortality of the wettest third. Each iteration keeps exactly the years it drew, so its total does not change, only when it falls |
+| How much: the event raised in dry periods | 0 to 200% | Raises a year's rate by this percentage, scaled by the depth of its dry period. Depth 1 is a dry period as deep as the deepest of the climate run's own historical years; half as deep gets half the percentage; the most is twice the percentage. Years that are not dry are unchanged. It is an assumption to explore: the record does not say what the value should be |
+
+Each setting is a slider in steps of 5 with a box for any value, and a sentence under it says what the value now set does. In trials on three pyromes with timing at 0.3, an increase of 50% raised the total over a projection by roughly 10 to 20%.
+
+**What dry means here.** Dryness comes from the chosen LOCA2 run: the yearly water deficit of the forest open to the event, averaged over the 7 years ending in each year, and compared with the 30 years around that year. A dry period is dry against its surrounding years. A climate that dries steadily does not, by that alone, count as a dry period: the forest is taken to adjust to the climate it has had.
+
+**Checking it.** The Projection Climate log has lines beginning *Mortality and Climate*: the share of dry years, the deepest dry periods, the rate of the driest third of years against the wettest, and the change in the mean rate. **Projection Results > Mortality and Climate by Year** lists each year's water deficit, dryness, depth, multiplier and rate. In a test on the Southern Sierra Nevada (SSP2-4.5, timing 0.3, increase 50%, 10 years by 3 iterations) the area of the event each year followed the placed year's rate times its percentage.
+
+**Limits.** With only the timing setting, a climate run with more droughts gets the same total mortality, placed differently. Some outbreaks followed a dry period by several years (the Colorado Rockies in 2007 to 2012); the placement has no lag, because lags of 0 to 10 years did no better across the West than none. Dryness is one series for the study area. A full-length projection with many iterations has not been run on these settings.
+
 **Limits.** The event is in the historical period only; a projection keeps it off until projected rates are added. A library made before lucasCore 2.0 gets the transition type when it is opened with 2.0; until then its Builds run as before and the log says so.
 
 ## 4. Running the Build
@@ -1491,7 +1527,7 @@ The Transitions page has two tables: how much of each transition happens each ye
 
 With spatial tiles on (section 6.2), the Target Strata of every Target row follow the tile level; here both are the counties. A group with no row in the lower table is placed at random within its units.
 
-> **Insect** is listed among the project's transition groups but has no row here, because the Build has no insect pathways: lucasCore ships six pathway sets (urbanization, intensification, agricultural expansion and contraction, harvest and fire), so insect disturbance never happens, in the historical run or in projections. From lucasCore 2.0 a new library lists Mortality in its place: the Build maps drought and insect mortality in the historical period (section 3.9), and it has no row here because it is not yet projected.
+> **Insect** is listed among the project's transition groups but has no row here, because the Build has no insect pathways: lucasCore ships six pathway sets (urbanization, intensification, agricultural expansion and contraction, harvest and fire), so insect disturbance never happens, in the historical run or in projections. From lucasCore 2.0 a new library lists Mortality in its place: the Build maps drought and insect mortality in the historical period (section 3.9), and from lucasCore 2.0.3 a projection continues it. It has a row here, Mortality: Drought and Insects, and the Projection > Mortality page sets its amount and placement (section 3.9).
 
 ### 6.4 Spatial Allocation
 

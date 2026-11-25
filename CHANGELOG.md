@@ -79,7 +79,7 @@ writes them to the External Variables sheet: the setup's blocks, placed and scal
 - Tested on one pyrome with a short projection (10 years, 3 iterations); a full-length projection with many iterations
   was not run.
 - Dryness is one series for the study area's open forest, not one per ecodivision.
-- The User Guide does not describe the two settings yet (draft wording: `dev/mortality/guide-wording-2.0.3.md`).
+- (The User Guide describes both since 2026-11-25, section 3.9: after the release.)
 
 ## 2.0.2 - not released on its own (part of 2.0.3)
 
