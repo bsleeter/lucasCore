@@ -2,7 +2,7 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
-## 2.0.4 - unreleased
+## 2.0.4 - 2026-11-25
 
 A patch: drought and insect mortality leaves the Land Use Change page, and its Mortality page lists the covariates that place it. No library update is needed (the one new sheet SyncroSim adds by itself).
 
@@ -24,6 +24,10 @@ A patch: drought and insect mortality leaves the Land Use Change page, and its M
   2.0.3 page added when the scenario is opened for editing (`ui/TransitionWalk.cs`, `ui/ProjectionTransitionsView.cs`);
   stage 9 no longer reads such a row and says so in the log if it meets one. A setup whose row was set to None now has
   the event on unless its Mortality page says Off.
+
+### Not yet done
+
+- Released without a run in SyncroSim or a look in Studio: the page changes compile and the unit tests pass.
 
 ## 2.0.3 - 2026-11-25
 
