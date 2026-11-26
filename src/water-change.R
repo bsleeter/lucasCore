@@ -7,6 +7,11 @@
 #     of `line` for `hold` clear years running, and is dated to the first of them. A marsh edge that floods and drains produces nothing.
 #   - everywhere else: two lines on each year's value. A pixel turns to water at `hi` or more and back to land at `lo` or less, and keeps
 #     its state between them, so a reservoir's drawdown and refill show in the year they happen and a pixel near 50% does not flip.
+#     The annual NLCD must agree (`agree`, user 2026-11-26: "only changes if NLCD says so"): the pixel turns to water only in a year
+#     the NLCD calls it open water, and back to land only in a year the NLCD calls it land. DSWE alone reads an alpine lake under ice
+#     and snow as land in a heavy-snow year, and snowmelt and shadow on high barren ground as water (P27, Sierra Nevada: water over
+#     2,500 m fell from 56 to 17 km2 in such years while the NLCD held it; under 2,500 m the two rise and fall together). The
+#     starting state is the NLCD's.
 #     Land that leaves water here is barren whatever the NLCD calls it.
 # A year with no clear look (NA) changes nothing and does not break a run of years.
 # Pixels are independent, so a caller may pass any block of rows. The first year only sets the starting state: give the rule a few years
@@ -17,7 +22,7 @@ WATER_CHANGE <- c("To Water" = 1L, "Water to Wetland" = 2L, "Water to Barren" = 
 # open, nlcd: integer matrices, one row per pixel and one column per year (the same years, in order).
 # Returns change (a WATER_CHANGE code or 0 per pixel and year), water (the water state per pixel and year, held changes dated to their
 # first year), wetland_side (per pixel), and confirmed (the last column whose wetland-side changes are confirmed).
-water_change <- function(open, nlcd, hi = 70, lo = 30, line = 50, hold = 5L, land_hold = 2L, wet = c(90L, 95L), barren = 31L, water = 11L) {
+water_change <- function(open, nlcd, hi = 70, lo = 30, line = 50, hold = 5L, land_hold = 2L, wet = c(90L, 95L), barren = 31L, water = 11L, agree = TRUE) {
   n <- nrow(open); Y <- ncol(open)
   if (!identical(dim(open), dim(nlcd))) stop("water_change: open water and NLCD must have the same pixels and years.")
   if (Y < 2L) stop("water_change: at least two years are needed.")
@@ -27,8 +32,11 @@ water_change <- function(open, nlcd, hi = 70, lo = 30, line = 50, hold = 5L, lan
   s <- ifelse(is.na(open[, 1]), nlcd[, 1] %in% water, open[, 1] >= line)   # no clear look in the first year: the NLCD decides
   M <- matrix(FALSE, n, Y); M[, 1] <- s
   s2 <- s; sh <- s; run <- integer(n); st <- integer(n)
+  if (agree) { k1 <- !W & !is.na(nlcd[, 1]); s2[k1] <- nlcd[k1, 1] %in% water; M[, 1] <- ifelse(W, s, s2) }   # away from wetland the NLCD sets the start
   for (y in 2:Y) { o <- open[, y]; look <- !is.na(o)
-    s2[!s2 & look & o >= hi] <- TRUE; s2[s2 & look & o <= lo] <- FALSE
+    up <- !s2 & look & o >= hi; dn <- s2 & look & o <= lo
+    if (agree) { up <- up & nlcd[, y] %in% water; dn <- dn & isl[, y] }   # the NLCD must say the same that year (isl: land, and known)
+    s2[up] <- TRUE; s2[dn] <- FALSE
     d <- look & (o >= line) != sh; st[d & run == 0L] <- y; run[d] <- run[d] + 1L; run[look & !d] <- 0L
     M[, y] <- ifelse(W, sh, s2)
     f <- which(W & run >= hold)

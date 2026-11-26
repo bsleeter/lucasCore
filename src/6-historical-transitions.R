@@ -630,7 +630,7 @@ if (mort_on && MORT_GROUP %in% so$TransitionGroupId) {
 
 # ---- change among water, wetland and barren (to-do 2; src/water-change.R) ---------------------------------------------------------
 # Source WaterChange. The rule runs at 30 m over the same aggregation blocks as the other 30 m sources: USGS DSWE open water says
-# whether a pixel is water each year, the annual NLCD what the land side is. Each cell gets the share of its pixels with each change
+# whether a pixel is water each year, the annual NLCD what the land side is (and, away from wetland, the NLCD must agree with the change). Each cell gets the share of its pixels with each change
 # that year, and whole cells are then chosen by rank until the year's area is met (below); the chosen cell's own class picks the
 # pathway. New wetland is emergent, estuarine or palustrine by stage 5's nearest wetland type. With no DSWE files the source is left
 # out and the types keep a zero target.
