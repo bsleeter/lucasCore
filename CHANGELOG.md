@@ -18,6 +18,19 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
   - *Carbon fluxes* has panel (g), live carbon killed by a transition and left on the land (`LULC: Mortality`), by cause.
     Mortality emits and removes nothing in its year, so it was absent from panels (b) to (d).
 
+- **The spread over Monte Carlo iterations in the Run Figures** (stage 13; a run of more than one iteration). The tables were
+  averaged and the maps were iteration 1's, so a projection's figures showed one line where its iterations differ widely
+  (Pyrome 27, 5 iterations: 53 to 311 km2 of mortality, 5,845 to 10,300 km2 of fire).
+  - Charts draw the mean with the spread: the lowest and highest iteration, or the 5th to 95th percentile from 20 iterations
+    up. Whiskers on the bars of *Transitions per year* and of the yearly carbon balance; shading on area in the disturbed
+    classes, change in land area by cover group, productivity and respiration, and net biome productivity; dotted lines
+    on total carbon. In a projection joined to its historical run the spread is drawn in the projection years.
+  - A new map figure, *Chance of change over N iterations*, after the harvest maps: for each cell, the share of iterations
+    in which it burned, had drought and insect mortality, or was harvested at least once, counted from the yearly
+    transition maps of every iteration, and the share in which it is developed in the last year. It is drawn when the run
+    mapped every iteration, and renumbers the figures after it. For Pyrome 27 it reads about 680 maps and adds 30 s.
+  - The carbon capacity figure has no spread yet, and stand age, land cover and after-disturbance maps stay iteration 1's.
+
 ### Fixed
 
 - *After disturbance*: a shrubland cell that burned at moderate severity and then converted was dated "no fire map for its
@@ -27,7 +40,8 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
 ### Not yet done
 
 - Drawn outside SyncroSim (`dev/figures/test_run_figures.R`) on Pyrome 27's historical run and projection and on Great Dismal
-  Swamp; stage 13 itself has not been rerun in a library. The User Guide's table and screenshots of these figures are not updated.
+  Swamp; stage 13 itself has not been rerun in a library, and no run of 20 or more iterations was at hand to draw the
+  percentile spread on. The User Guide's table and screenshots of these figures are not updated.
 
 ## 2.0.4 - 2026-11-25
 
