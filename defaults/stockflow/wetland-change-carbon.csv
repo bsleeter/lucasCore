@@ -7,3 +7,4 @@ InlandSoilEmitted,Inland,Soil,Atmosphere,0.10,0.00,0.40,"Top-metre soil of palus
 InlandSoilAquatic,Inland,Soil,Aquatic,0.00,0.00,0.10,"Judgment, no source"
 InlandPlantEmitted,Inland,Plants and litter,Atmosphere,1.00,0.50,1.00,"Judgment, following the inventory convention that flooded biomass is emitted"
 InlandPlantAquatic,Inland,Plants and litter,Aquatic,0.00,0.00,0.25,"Judgment, no source"
+FloodedWoodDecay,Water,Dead stems and coarse roots,Atmosphere,0.01,0.005,0.05,"Yearly share of the dead stems and dead coarse roots of a flooded forest released as CO2 (user 2026-11-26: stems and coarse roots go to dead wood; 1% chosen over a proposed 2%). Judgment: no measured rate for flooded or salt-killed trees was found. Brackets: upland down logs 2.4-6.4% a year (Russell et al. 2014), drowned wood in reservoirs about 1.1% (Campo and Sancholuz 1998, 40% gone in 46 years), large wood in lakes about 0.4% (Guyette et al. 2002)"

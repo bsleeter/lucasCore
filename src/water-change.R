@@ -18,6 +18,7 @@
 # before the first year wanted, and note that wetland-side changes first seen in the last `hold` - 1 years cannot be confirmed.
 # =============================================================================
 WATER_CHANGE <- c("To Water" = 1L, "Water to Wetland" = 2L, "Water to Barren" = 3L, "Wetland to Barren" = 4L, "Barren to Wetland" = 5L, "Water to Other Land" = 6L)
+
 # open, nlcd: integer matrices, one row per pixel and one column per year (the same years, in order).
 # Returns change (a WATER_CHANGE code or 0 per pixel and year), water (the water state per pixel and year, held changes dated to their
 # first year), wetland_side (per pixel), and confirmed (the last column whose wetland-side changes are confirmed).
@@ -59,13 +60,16 @@ water_change <- function(open, nlcd, hi = 70, lo = 30, line = 50, hold = 5L, lan
       ch[dry & rowSums(isb[, p, drop = FALSE]) == land_hold & rowSums(isw[, q, drop = FALSE]) == land_hold, y] <- WATER_CHANGE[["Barren to Wetland"]] } }
   list(change = ch, water = M, wetland_side = W, confirmed = Y - as.integer(hold) + 1L)
 }
+
 # ---- stage 6: the rule over the Build's 30 m window ---------------------------------------------------------------------------
 WATER_DSWE_FILE <- "DSWE_open_water_%d.tif"   # one file a year in the DsweFolder Data Source (src/download-sources.R)
 WATER_LEAD <- 5L                                # years read before the start year, so the water state has settled by the first year wanted
+
 WATER_UPLAND_SHARE <- 0.5                       # an upland forest, shrub or grass cell becomes water only in a year this share of its pixels did (stage 6)
 # The years the rule reads for a Build of y0 to y1: `lead` years before the start year and `hold` - 1 after the end year (a wetland-side
 # change is confirmed only once it has held), kept to the years the annual NLCD has. A year with no DSWE file is read as no clear look.
 water_rule_years <- function(y0, y1, nlcd_years, lead = WATER_LEAD, hold = 5L) { yy <- (y0 - lead):(y1 + hold - 1L); yy[yy %in% nlcd_years] }
+
 # One band of 30 m rows (stage 6 runs the bands in parallel, as src/mortality.R). a: E (xmin, xmax, ymin, ymax of the aggregation
 # blocks), fact (30 m pixels per model cell side), nr, nc, step, rows (each band's first row), all (the years read), out (the years
 # wanted), dswe and nlcd (file per year, named by year; no DSWE entry = no clear look), clear. Returns, for each block cell of the

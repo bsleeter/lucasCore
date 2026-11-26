@@ -223,7 +223,7 @@ ev_def <- ev_def[!TransitionGroupId %in% c(WCC_WATER, WCC_BARREN)]
 if (!all(WCC_TYPES %in% stsim_list("FlowType")$Name)) say("Wetland change carbon: off, the library lacks the flow types (%s): run tools/sync-library.R on it", paste(setdiff(WCC_TYPES, stsim_list("FlowType")$Name), collapse = ", ")) else {
   wcv <- tryCatch(wcc_shares(fread(pkg_file("defaults", "stockflow", "wetland-change-carbon.csv"), colClasses = "character"), tryCatch(as.data.table(datasheet(scn, ds("WetlandChangeCarbon"), optional = TRUE)), error = function(e) NULL)), error = function(e) fail("%s", conditionMessage(e)))
   wcr <- wcc_rows(wcv, fread(pkg_file("defaults", "transitions", "pathways", "wetland-change.csv"), colClasses = "character", na.strings = ""))[FromStateClassId %in% scl$Name]
-  ev_def <- rbind(ev_def, wcr, fill = TRUE); say("Wetland change carbon, a wetland cell that becomes water: %s; %d event rows", wcc_label(wcv), nrow(wcr)) }
+  ev_def <- rbind(ev_def, wcr, fill = TRUE); say("Wetland change carbon, a cell that becomes water: %s; %d event rows", wcc_label(wcv), nrow(wcr)) }
 dfl <- as.data.table(datasheet(scn, ds("DisturbanceFlow"), optional = TRUE, lookupsAsFactors = FALSE)); df_src <- "Carbon Assumptions"
 if (!nrow(dfl)) { dfl <- preset("disturbance-flows"); df_src <- sprintf("the %s preset (the sheet is empty)", basename(preset_dir)) }
 # the grass, shrub and emergent wetland classes' own high-severity fire (to-do 39: chaparral 2026-11-06, the others 2026-11-07;
@@ -550,6 +550,9 @@ if (nrow(dcl)) {
   say("Disturbed classes: %d forest (forest dead wood, decay and soil; live carbon as the ecodivision's shrub class), %d shrub (their parent's rows): %d pathways, %d multipliers, %d net growth values",
       length(dcb$forest), length(dcb$shrub), nrow(dcb$fp) + if (is.null(dcb$ev)) 0L else nrow(dcb$ev), nrow(dcb$fm), nrow(dcb$sav)) }
 fm <- rbind(fm_g, fm_d, gs_m, dcb$fm, rd("nonforest-multipliers-other.csv"), fill = TRUE)
+# flooded dead wood (src/wetland-change-carbon.R): Water cells release dead stems and dead coarse roots at one yearly rate
+if (exists("wcv") && "Water: All" %in% scl$Name) { ww <- wcc_water_rows(wcv); ww$fp[, Multiplier := methods::as(Multiplier, class(fp$Multiplier)[1])]; ww$fm[, Value := methods::as(Value, class(fm$Value)[1])]
+  fp <- rbind(fp, ww$fp, fill = TRUE); fm <- rbind(fm, ww$fm, fill = TRUE) }
 # (the CONUS 1km build also had 0.01 "scalar" multipliers on the four climate flow groups, undoing climate rasters stored as
 # integers x 100; stage 7 writes true multipliers, so there are none: a run without climate multipliers runs at normal climate)
 sav <- rbind(ng, nf_g, dcb$sav, fill = TRUE)

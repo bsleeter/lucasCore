@@ -738,6 +738,7 @@
 		<column name="InlandSoilAquatic" displayName="Inland, Top-Metre Soil: Share Carried to Aquatic (blank = 0.00; range 0.00 to 0.10)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
 		<column name="InlandPlantEmitted" displayName="Inland, Plants and Litter: Share Emitted as CO2 (blank = 1.00; range 0.50 to 1.00)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
 		<column name="InlandPlantAquatic" displayName="Inland, Plants and Litter: Share Carried to Aquatic (blank = 0.00; range 0.00 to 0.25)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+		<column name="FloodedWoodDecay" displayName="Flooded Forest, Dead Stems and Coarse Roots: Share Released as CO2 Each Year (blank = 0.01; range 0.005 to 0.05)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
 	</dataSheet>
 	<!-- Mortality in projections (to-do 3 phase 2, lucasCore 2.0.2; stage 9, src/mortality.R): the historical rates drawn in blocks of years, by ecodivision and
 	     softwood class; placed by a fitted surface, the record's patch sizes and spread from recent die-off. Blank = historical rates, blocks of 5, the Run Settings

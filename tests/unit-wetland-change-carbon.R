@@ -16,7 +16,14 @@ check("stocks, flow types and classes are in the stsim lists", all(c(w$FromStock
 check("every row names its class: nothing applies to every class", !anyNA(w$FromStateClassId))
 check("to water: every wetland class with the pathway has rows, and no other class", setequal(unique(tw$FromStateClassId), wet))
 check("to water: Barren and Water lose nothing", !any(w$FromStateClassId %in% c("Barren: All", "Water: All")))
-check("to water: carbon goes to the atmosphere as CO2 or to Aquatic, nowhere else", all(tw$ToStockTypeId %in% c("Atmosphere: CO2", "Aquatic")))
+tr <- grepl(WCC_TREE, tw$FromStateClassId); wood <- tw[tr & FromStockTypeId %in% WCC_WOOD$live]
+check("to water: carbon goes to the atmosphere as CO2 or to Aquatic, except tree stems and coarse roots", all(tw[!(tr & FromStockTypeId %in% WCC_WOOD$live), ToStockTypeId] %in% c("Atmosphere: CO2", "Aquatic")))
+check("flooded forest: stems go whole to snag stems and coarse roots to dead coarse roots (user 2026-11-26)", all(wood$m == 1) && all(wood$FlowTypeId == WCC_TYPES[["die"]]) && all(wood[, ToStockTypeId == WCC_WOOD$dead[match(FromStockTypeId, WCC_WOOD$live)]]) && nrow(wood) == 2L * uniqueN(tw$FromStateClassId[tr]))
+check("flooded forest: the dead stems and dead coarse roots already there stay", !nrow(tw[tr & FromStockTypeId %in% WCC_WOOD$dead]))
+check("tree classes are forest, forested wetland and their disturbed twins; not emergent, shrub or grass", all(grepl(WCC_TREE, c("Forest: Lodgepole Pine Group", "Disturbed: Wetland Spruce/Fir Group", "Wetland: Estuarine Forested", "Wetland: Oak/Gum/Cypress Group"))) && !any(grepl(WCC_TREE, c(E <- "Wetland: Estuarine Emergent", "Shrubland: Chaparral", "Disturbed: Chaparral", "Grassland: Annual"))))
+ww <- wcc_water_rows(v)
+check("Water cells release the two dead wood pools at the yearly rate, on standard flow types", all(ww$fp$FromStateClassId == "Water: All") && identical(ww$fp$FromStockTypeId, WCC_WOOD$dead) && all(ww$fp$ToStockTypeId == "Atmosphere") && all(ww$fp$FlowTypeId %in% ft) && all(ww$fp$Multiplier == 1) && all(ww$fm$Value == 0.01) && identical(ww$fm$FlowGroupId, paste(ww$fp$FlowTypeId, "[Type]")))
+check("the rate can be set on the page", all(wcc_water_rows(wcc_shares(def, data.table(FloodedWoodDecay = 0.03)))$fm$Value == 0.03))
 check("deep soil, peat and black carbon stay", !any(w$FromStockTypeId %in% c("Deep Soil", "DOM: Peat", "DOM: Black Carbon")))
 sh <- w[, .(s = sum(m)), by = .(TransitionGroupId, FromStateClassId, FromStockTypeId)]
 check("no event moves more than a pool holds", all(sh$s <= 1 + 1e-9) && all(w$m > 0))

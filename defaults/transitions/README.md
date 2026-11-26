@@ -1,4 +1,5 @@
 # Historical transitions (stage 6)
+
 - `pathways/*.csv`: ST-Sim transition pathways, one file per set (urbanization, intensification, harvest, fire, ag expansion, ag
   contraction). Copied unchanged from `Data/Transition Pathways/Transitions - <Set>.csv`, the six sets the CONUS 1km
   build merged into its historical model. Stage 6 reads every file in the folder, so adding a set (insects, prescribed fire, succession,
@@ -46,9 +47,11 @@
   classes and Palustrine Emergent to every forest class, one type per forest class, age reset. Stage 6 gates each type to stage 5's
   ReforestType map (the forest type every cell would reach), as NaturalVeg gates Ag Contraction; Reforestation Options off drops the
   source (zero target).
+
 MTBS and LANDFIRE give each cell the fraction of its 30 m pixels that had the disturbance (over the same aggregation blocks as the NLCD),
 so the expected area matches the 30 m area. Within a source with several groups (fire severities), the cell's whole fraction goes to its
 most common group: ST-Sim lets a cell make one transition per timestep, so separate fractions would compete and under-burn.
+
 Every group with a source gets a multiplier in every year (an all-zero raster when nothing happened), the start year, and the year after
 the end year. Every pathway type with no time-varying source gets a zero transition target (a type with no multiplier and no target would
 run on every eligible cell). Types in the harvest set with no source (Selection 20%, Salvage Logging) get zero targets.
