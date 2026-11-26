@@ -434,6 +434,19 @@ namespace lucasCoreUI
             foreach (string f in filters) AddFilter(store, "stsim_OutputFilterFlows", "OutputFilterFlowsId", "FlowGroupId", "stsim_FlowGroup", f, false);
         }
 
+        // ---- 2.1 (water, wetland and barren change, to-do 2, 2026-11): Data Sources holds the folder of USGS DSWE annual open water
+        // (src/water-change.R: open water says whether a 30 m pixel is water, the annual NLCD what the land side is). Later steps of
+        // to-do 2 that change existing tables add to this method. No apostrophe in the description ------------------------------------
+        [Update(2.1, "lucasCore 2.1: Data Sources folder for USGS DSWE annual open water (change among water, wetland and barren)")]
+        public static void Update_2_100(DataStore store)
+        {
+            AddColumn(store, "lucasCore_DataSource", "DsweFolder", "TEXT");
+            // the misspelt type "Wetland Change: to Palustine Forested" (no pathway uses it) and its [Type] group take the corrected name,
+            // so a library sync does not add the corrected name as a second type with the same id
+            store.ExecuteNonQuery("UPDATE stsim_TransitionType SET Name = " + Q("Wetland Change: to Palustrine Forested") + " WHERE Name = " + Q("Wetland Change: to Palustine Forested"));
+            store.ExecuteNonQuery("UPDATE stsim_TransitionGroup SET Name = " + Q("Wetland Change: to Palustrine Forested [Type]") + " WHERE Name = " + Q("Wetland Change: to Palustine Forested [Type]"));
+        }
+
         // ---- 1.5 (wetland methane, 2026-11): wetland classes release part of what their soil and litter emit as CH4 (src/flows.R,
         // src/nonforest-solve.R). The rows are the ones defaults/stsim and defaults/stockflow gained (generated from them). The three
         // Wetland Methane sheets are new tables, which SyncroSim adds by itself. A library keeps running on its earlier Builds; the

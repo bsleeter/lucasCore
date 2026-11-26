@@ -1,0 +1,412 @@
+Side,Nlcd,Ccap,Era,Bin,Kha,MeanOpen,MeanLandYears,Region
+Away from wetland,Water,Other,1995-98,20 to 40,0.01737,30.0681347150259,4.35233160621762,San Francisco Bay and Delta
+Away from wetland,Other,Other,1995-98,40 or more,0.10656,60.3074746621622,4.28547297297297,San Francisco Bay and Delta
+Wetland side,Wetland,Wetland,1995-98,40 or more,0.49536,75.7135537790698,5,San Francisco Bay and Delta
+Away from wetland,Water,Barren,1995-98,40 or more,0.06849,61.1611914148051,3.79632063074901,San Francisco Bay and Delta
+Away from wetland,Water,Water,1995-98,40 or more,0.35541,64.0624715117751,3.19726513041276,San Francisco Bay and Delta
+Away from wetland,Water,Other,1995-98,40 or more,0.0369,60.3680487804878,3.79512195121951,San Francisco Bay and Delta
+Away from wetland,Other,Water,1995-98,40 or more,0.04473,63.6573775989269,3.91750503018109,San Francisco Bay and Delta
+Wetland side,Water,Water,1995-98,40 or more,0.01413,66.5872611464968,5,San Francisco Bay and Delta
+Wetland side,Wetland,Wetland,1995-98,20 to 40,0.13293,28.837779282329,5,San Francisco Bay and Delta
+Wetland side,Wetland,Other,1995-98,40 or more,0.00351,60.5589743589744,5,San Francisco Bay and Delta
+Wetland side,Wetland,Wetland,1995-98,1 to 5,0.01152,3.19375,5,San Francisco Bay and Delta
+Wetland side,Wetland,Wetland,1995-98,5 to 10,0.02556,7.84577464788732,5,San Francisco Bay and Delta
+Wetland side,Wetland,Wetland,1995-98,10 to 20,0.08289,15.127904451683,5,San Francisco Bay and Delta
+Wetland side,Wetland,Water,1995-98,20 to 40,0.01647,28.0907103825137,5,San Francisco Bay and Delta
+Wetland side,Wetland,Water,1995-98,10 to 20,0.02646,14.1095238095238,5,San Francisco Bay and Delta
+Wetland side,Wetland,Water,1995-98,5 to 10,0.01674,7.35268817204301,5,San Francisco Bay and Delta
+Wetland side,Wetland,Other,1995-98,10 to 20,0.00108,16.3166666666667,5,San Francisco Bay and Delta
+Wetland side,Wetland,Other,1995-98,5 to 10,0.00072,7.5,5,San Francisco Bay and Delta
+Wetland side,Wetland,Water,1995-98,1 to 5,0.00675,3.528,5,San Francisco Bay and Delta
+Wetland side,Other,Wetland,1995-98,20 to 40,0.00036,25.2,5,San Francisco Bay and Delta
+Wetland side,Water,Wetland,1995-98,40 or more,0.04482,68.7140562248996,5,San Francisco Bay and Delta
+Away from wetland,Water,Wetland,1995-98,40 or more,0.11943,64.3796156744537,3.81085154483798,San Francisco Bay and Delta
+Wetland side,Wetland,Water,1995-98,40 or more,0.02133,65.4025316455696,5,San Francisco Bay and Delta
+Away from wetland,Water,Water,1995-98,20 to 40,0.05031,29.0550089445438,2.39892665474061,San Francisco Bay and Delta
+Away from wetland,Other,Other,1995-98,20 to 40,0.05553,29.4054294975689,4.62074554294976,San Francisco Bay and Delta
+Wetland side,Water,Other,1995-98,40 or more,0.00126,65.5571428571429,5,San Francisco Bay and Delta
+Away from wetland,Other,Wetland,1995-98,40 or more,0.02043,62.5784140969163,4.33039647577093,San Francisco Bay and Delta
+Away from wetland,Other,Barren,1995-98,40 or more,0.01089,59.1086776859504,4.33057851239669,San Francisco Bay and Delta
+Away from wetland,Other,Other,1995-98,5 to 10,0.31869,7.14868210486681,4.3290031064671,San Francisco Bay and Delta
+Away from wetland,Other,Water,1995-98,10 to 20,0.00639,14.4349765258216,4.12676056338028,San Francisco Bay and Delta
+Away from wetland,Barren,Water,1995-98,under 1,0.00549,0.00819672131147541,2.86885245901639,San Francisco Bay and Delta
+Away from wetland,Barren,Barren,1995-98,under 1,0.00396,0.0545454545454546,4.36363636363636,San Francisco Bay and Delta
+Away from wetland,Barren,Water,1995-98,1 to 5,0.00252,3.22797619047619,4.78571428571429,San Francisco Bay and Delta
+Away from wetland,Other,Water,1995-98,20 to 40,0.01035,31.7689855072464,4.39130434782609,San Francisco Bay and Delta
+Away from wetland,Water,Other,1995-98,1 to 5,0.00387,2.85038759689922,4.7906976744186,San Francisco Bay and Delta
+Away from wetland,Other,Other,1995-98,10 to 20,0.1125,12.72224,4.3896,San Francisco Bay and Delta
+Away from wetland,Other,Wetland,1995-98,10 to 20,0.0189,13.345,4.03333333333333,San Francisco Bay and Delta
+Away from wetland,Other,Wetland,1995-98,5 to 10,0.02763,7.38306188925081,3.43973941368078,San Francisco Bay and Delta
+Away from wetland,Water,Wetland,1995-98,20 to 40,0.01566,30.0636015325671,2.36206896551724,San Francisco Bay and Delta
+Away from wetland,Other,Other,1995-98,under 1,0.02466,0.201277372262774,4.64963503649635,San Francisco Bay and Delta
+Away from wetland,Other,Other,1995-98,1 to 5,0.23769,3.22551432538179,4.47216963271488,San Francisco Bay and Delta
+Wetland side,Wetland,Barren,1995-98,10 to 20,0.00279,14.8129032258065,5,San Francisco Bay and Delta
+Away from wetland,Barren,Other,1995-98,under 1,0.00396,0.140909090909091,4.90909090909091,San Francisco Bay and Delta
+Away from wetland,Barren,Barren,1995-98,1 to 5,0.00504,2.8889880952381,4.83928571428571,San Francisco Bay and Delta
+Away from wetland,Other,Water,1999-2012,20 to 40,0.09414,29.1327915869981,4.75717017208413,San Francisco Bay and Delta
+Wetland side,Wetland,Water,1999-2012,40 or more,0.11997,61.768192048012,5,San Francisco Bay and Delta
+Away from wetland,Other,Wetland,1999-2012,10 to 20,0.0468,15.1604807692308,4.70769230769231,San Francisco Bay and Delta
+Wetland side,Wetland,Wetland,1999-2012,40 or more,0.79281,68.2870473379498,5,San Francisco Bay and Delta
+Away from wetland,Other,Water,1999-2012,40 or more,0.27801,68.3742904931478,4.75655551958563,San Francisco Bay and Delta
+Away from wetland,Other,Other,1999-2012,5 to 10,0.17874,7.30207284323598,4.94108761329305,San Francisco Bay and Delta
+Away from wetland,Other,Other,1999-2012,1 to 5,0.12087,3.14898237776123,4.93447505584512,San Francisco Bay and Delta
+Away from wetland,Other,Other,1999-2012,40 or more,0.28926,60.9118336444721,4.77660236465464,San Francisco Bay and Delta
+Away from wetland,Other,Other,1999-2012,20 to 40,0.20853,29.2824917278089,4.80794130340958,San Francisco Bay and Delta
+Away from wetland,Other,Other,1999-2012,10 to 20,0.20934,13.9649684723416,4.89552880481513,San Francisco Bay and Delta
+Away from wetland,Water,Water,1999-2012,40 or more,2.50911,68.6580711885888,4.27683919796262,San Francisco Bay and Delta
+Away from wetland,Barren,Water,1999-2012,under 1,0.00972,0.125925925925926,2.91666666666667,San Francisco Bay and Delta
+Away from wetland,Barren,Barren,1999-2012,under 1,0.01251,0.0705035971223022,3.38129496402878,San Francisco Bay and Delta
+Away from wetland,Water,Other,1999-2012,40 or more,0.1593,64.7887947269303,4.57966101694915,San Francisco Bay and Delta
+Away from wetland,Other,Water,1999-2012,under 1,0.00306,0.294117647058824,3.94117647058824,San Francisco Bay and Delta
+Away from wetland,Barren,Water,1999-2012,1 to 5,0.02952,3.29080284552846,4.39329268292683,San Francisco Bay and Delta
+Wetland side,Wetland,Wetland,1999-2012,20 to 40,0.16362,28.429702970297,5,San Francisco Bay and Delta
+Away from wetland,Other,Barren,1999-2012,40 or more,0.04653,61.3683430045132,4.72533849129594,San Francisco Bay and Delta
+Away from wetland,Other,Wetland,1999-2012,40 or more,0.10782,70.9074012242627,4.89148580968281,San Francisco Bay and Delta
+Away from wetland,Water,Wetland,1999-2012,20 to 40,0.08208,30.196966374269,3.85197368421053,San Francisco Bay and Delta
+Away from wetland,Other,Wetland,1999-2012,20 to 40,0.05391,28.6441847523651,4.75125208681135,San Francisco Bay and Delta
+Away from wetland,Water,Other,1999-2012,20 to 40,0.03492,30.7067439862543,4.19329896907217,San Francisco Bay and Delta
+Away from wetland,Other,Barren,1999-2012,20 to 40,0.02439,28.9690651906519,4.65313653136531,San Francisco Bay and Delta
+Away from wetland,Other,Water,1999-2012,10 to 20,0.04788,15.1339912280702,4.68796992481203,San Francisco Bay and Delta
+Away from wetland,Water,Water,1999-2012,20 to 40,0.2979,28.8326435045317,3.12930513595166,San Francisco Bay and Delta
+Away from wetland,Water,Barren,1999-2012,20 to 40,0.11106,28.578227984873,3.645056726094,San Francisco Bay and Delta
+Away from wetland,Barren,Wetland,1999-2012,40 or more,0.01143,54.5009186351706,4.44094488188976,San Francisco Bay and Delta
+Away from wetland,Water,Wetland,1999-2012,40 or more,0.43002,66.7819450258128,4.51799916282964,San Francisco Bay and Delta
+Away from wetland,Water,Barren,1999-2012,40 or more,0.22788,63.4952145866246,4.4806477093207,San Francisco Bay and Delta
+Away from wetland,Water,Other,1999-2012,1 to 5,0.00783,2.96819923371648,3.89655172413793,San Francisco Bay and Delta
+Wetland side,Wetland,Wetland,1999-2012,10 to 20,0.13986,14.5200772200772,5,San Francisco Bay and Delta
+Wetland side,Wetland,Wetland,1999-2012,5 to 10,0.05391,7.6330550918197,5,San Francisco Bay and Delta
+Wetland side,Other,Wetland,1999-2012,10 to 20,0.00279,14.6967741935484,5,San Francisco Bay and Delta
+Wetland side,Wetland,Other,1999-2012,10 to 20,0.00252,15.1285714285714,5,San Francisco Bay and Delta
+Away from wetland,Other,Water,1999-2012,5 to 10,0.03006,7.10988023952096,4.67964071856287,San Francisco Bay and Delta
+Away from wetland,Other,Water,1999-2012,1 to 5,0.01908,3.34221698113208,4.60849056603774,San Francisco Bay and Delta
+Away from wetland,Other,Wetland,1999-2012,5 to 10,0.01908,7.44638364779874,4.47169811320755,San Francisco Bay and Delta
+Away from wetland,Other,Barren,1999-2012,1 to 5,0.03258,3.05064456721915,4.84254143646409,San Francisco Bay and Delta
+Wetland side,Wetland,Barren,1999-2012,40 or more,0.02124,67.1474576271186,5,San Francisco Bay and Delta
+Away from wetland,Water,Other,1999-2012,10 to 20,0.0126,14.4275,3.58571428571429,San Francisco Bay and Delta
+Away from wetland,Water,Wetland,1999-2012,10 to 20,0.03627,14.7622828784119,2.99255583126551,San Francisco Bay and Delta
+Wetland side,Water,Wetland,1999-2012,40 or more,0.24507,69.9327212633125,5,San Francisco Bay and Delta
+Wetland side,Water,Water,1999-2012,40 or more,0.1431,69.0689308176101,5,San Francisco Bay and Delta
+Wetland side,Other,Other,1999-2012,40 or more,0.00144,55.15,5,San Francisco Bay and Delta
+Away from wetland,Water,Other,1999-2012,5 to 10,0.00693,7.08722943722944,3.27272727272727,San Francisco Bay and Delta
+Wetland side,Wetland,Water,1999-2012,10 to 20,0.08595,14.8492146596859,5,San Francisco Bay and Delta
+Wetland side,Wetland,Other,1999-2012,20 to 40,0.00396,29.0090909090909,5,San Francisco Bay and Delta
+Away from wetland,Water,Water,1999-2012,10 to 20,0.22815,14.5643852728468,2.44339250493097,San Francisco Bay and Delta
+Away from wetland,Water,Wetland,1999-2012,5 to 10,0.01503,7.33273453093812,2.25149700598802,San Francisco Bay and Delta
+Away from wetland,Water,Barren,1999-2012,5 to 10,0.01854,7.31343042071197,2.50970873786408,San Francisco Bay and Delta
+Away from wetland,Water,Water,1999-2012,5 to 10,0.09774,7.46652854511971,1.97697974217311,San Francisco Bay and Delta
+Wetland side,Wetland,Other,1999-2012,40 or more,0.00603,66.5522388059702,5,San Francisco Bay and Delta
+Wetland side,Other,Other,1999-2012,20 to 40,9e-04,31.48,5,San Francisco Bay and Delta
+Wetland side,Other,Other,1999-2012,10 to 20,0.00027,13.7333333333333,5,San Francisco Bay and Delta
+Wetland side,Other,Water,1999-2012,40 or more,0.00378,62.852380952381,5,San Francisco Bay and Delta
+Wetland side,Wetland,Barren,1999-2012,20 to 40,0.01377,29.9241830065359,5,San Francisco Bay and Delta
+Wetland side,Wetland,Wetland,1999-2012,1 to 5,0.03375,3.032,5,San Francisco Bay and Delta
+Away from wetland,Other,Other,1999-2012,under 1,0.04203,0.147751605995717,4.30620985010707,San Francisco Bay and Delta
+Wetland side,Other,Wetland,1999-2012,40 or more,0.00567,66.6253968253968,5,San Francisco Bay and Delta
+Away from wetland,Barren,Water,1999-2012,40 or more,0.02718,56.7108719646799,3.85099337748344,San Francisco Bay and Delta
+Wetland side,Other,Water,1999-2012,20 to 40,0.00288,29.7875,5,San Francisco Bay and Delta
+Wetland side,Other,Wetland,1999-2012,20 to 40,0.00171,31.221052631579,5,San Francisco Bay and Delta
+Wetland side,Wetland,Water,1999-2012,20 to 40,0.10935,28.7333333333333,5,San Francisco Bay and Delta
+Away from wetland,Other,Barren,1999-2012,10 to 20,0.02151,14.3752440725244,4.61924686192469,San Francisco Bay and Delta
+Wetland side,Other,Water,1999-2012,10 to 20,0.00621,14.8753623188406,5,San Francisco Bay and Delta
+Wetland side,Water,Other,1999-2012,40 or more,0.00225,71.144,5,San Francisco Bay and Delta
+Away from wetland,Water,Water,1999-2012,1 to 5,0.08253,3.21684841875682,1.93565976008724,San Francisco Bay and Delta
+Away from wetland,Other,Wetland,1999-2012,1 to 5,0.01431,3.0601677148847,4.91823899371069,San Francisco Bay and Delta
+Away from wetland,Water,Other,1999-2012,under 1,0.00639,0.0774647887323944,3.97183098591549,San Francisco Bay and Delta
+Wetland side,Wetland,Barren,1999-2012,5 to 10,0.00594,8.28787878787879,5,San Francisco Bay and Delta
+Wetland side,Other,Wetland,1999-2012,5 to 10,0.00072,8,5,San Francisco Bay and Delta
+Wetland side,Other,Water,1999-2012,1 to 5,0.00072,3.425,5,San Francisco Bay and Delta
+Wetland side,Other,Water,1999-2012,5 to 10,0.00108,7.73333333333333,5,San Francisco Bay and Delta
+Wetland side,Wetland,Water,1999-2012,5 to 10,0.0342,7.34578947368421,5,San Francisco Bay and Delta
+Wetland side,Wetland,Water,1999-2012,1 to 5,0.03636,3.06336633663367,5,San Francisco Bay and Delta
+Wetland side,Barren,Water,1999-2012,10 to 20,0.0072,13.4375,5,San Francisco Bay and Delta
+Wetland side,Water,Wetland,1999-2012,20 to 40,0.0108,31.5966666666667,5,San Francisco Bay and Delta
+Away from wetland,Other,Wetland,2013-21,40 or more,0.08469,68.9736627701027,4.92348565356004,San Francisco Bay and Delta
+Away from wetland,Water,Water,2013-21,40 or more,1.47537,67.0137304540556,3.80680778381016,San Francisco Bay and Delta
+Away from wetland,Other,Water,2013-21,40 or more,0.17244,66.0384655532359,4.58716075156576,San Francisco Bay and Delta
+Away from wetland,Other,Other,2013-21,20 to 40,0.08307,30.0240520043337,4.79739978331528,San Francisco Bay and Delta
+Away from wetland,Other,Other,2013-21,under 1,0.03312,0.0532608695652174,4.85054347826087,San Francisco Bay and Delta
+Away from wetland,Other,Other,2013-21,10 to 20,0.09918,13.7757713248639,4.87658802177858,San Francisco Bay and Delta
+Away from wetland,Water,Wetland,2013-21,40 or more,0.19638,67.2305148182096,4.42529789184235,San Francisco Bay and Delta
+Away from wetland,Other,Water,2013-21,20 to 40,0.05328,29.1261824324324,4.61993243243243,San Francisco Bay and Delta
+Away from wetland,Other,Barren,2013-21,20 to 40,0.01674,28.4408602150538,4.75268817204301,San Francisco Bay and Delta
+Away from wetland,Other,Water,2013-21,10 to 20,0.03159,15.0255935422602,4.45299145299145,San Francisco Bay and Delta
+Away from wetland,Water,Other,2013-21,40 or more,0.07848,63.6497706422018,4.18577981651376,San Francisco Bay and Delta
+Away from wetland,Other,Other,2013-21,1 to 5,0.04122,3.21408296943231,4.84279475982533,San Francisco Bay and Delta
+Away from wetland,Other,Other,2013-21,40 or more,0.18009,59.3409878394136,4.77311344327836,San Francisco Bay and Delta
+Away from wetland,Other,Other,2013-21,5 to 10,0.10215,7.45919236417034,4.85022026431718,San Francisco Bay and Delta
+Away from wetland,Water,Wetland,2013-21,20 to 40,0.05985,29.1435839598998,2.57894736842105,San Francisco Bay and Delta
+Away from wetland,Water,Water,2013-21,20 to 40,0.15282,29.679485669415,2.62014134275618,San Francisco Bay and Delta
+Wetland side,Wetland,Wetland,2013-21,10 to 20,0.02457,15.0102564102564,5,San Francisco Bay and Delta
+Wetland side,Wetland,Water,2013-21,10 to 20,0.01422,15.5405063291139,5,San Francisco Bay and Delta
+Wetland side,Wetland,Wetland,2013-21,5 to 10,0.00495,8.18909090909091,5,San Francisco Bay and Delta
+Wetland side,Other,Wetland,2013-21,5 to 10,0.00081,7.22222222222222,5,San Francisco Bay and Delta
+Wetland side,Wetland,Barren,2013-21,5 to 10,0.00054,8.36666666666667,5,San Francisco Bay and Delta
+Wetland side,Water,Other,2013-21,1 to 5,0.00027,2.6,5,San Francisco Bay and Delta
+Wetland side,Water,Wetland,2013-21,5 to 10,9e-05,9.6,5,San Francisco Bay and Delta
+Wetland side,Water,Water,2013-21,5 to 10,0.00018,7.4,5,San Francisco Bay and Delta
+Wetland side,Water,Water,2013-21,20 to 40,0.00207,29.1217391304348,5,San Francisco Bay and Delta
+Wetland side,Wetland,Water,2013-21,20 to 40,0.01296,28.7958333333333,5,San Francisco Bay and Delta
+Wetland side,Wetland,Other,2013-21,20 to 40,0.00081,29.8222222222222,5,San Francisco Bay and Delta
+Wetland side,Wetland,Wetland,2013-21,40 or more,0.17253,66.8041731872718,5,San Francisco Bay and Delta
+Away from wetland,Water,Barren,2013-21,40 or more,0.10548,62.900654152446,4.2141638225256,San Francisco Bay and Delta
+Away from wetland,Other,Water,2013-21,1 to 5,0.01413,3.10774946921444,4.71974522292994,San Francisco Bay and Delta
+Away from wetland,Water,Barren,2013-21,20 to 40,0.07299,27.5887176325524,2.78668310727497,San Francisco Bay and Delta
+Away from wetland,Water,Water,2013-21,10 to 20,0.09702,14.1800401978973,2.01020408163265,San Francisco Bay and Delta
+Away from wetland,Water,Water,2013-21,5 to 10,0.04527,7.11408217362492,1.74950298210736,San Francisco Bay and Delta
+Away from wetland,Other,Water,2013-21,5 to 10,0.01737,7.00086355785838,4.62176165803109,San Francisco Bay and Delta
+Away from wetland,Other,Wetland,2013-21,20 to 40,0.05058,28.7860023724792,4.7153024911032,San Francisco Bay and Delta
+Away from wetland,Other,Wetland,2013-21,10 to 20,0.02763,15.3132464712269,4.71661237785016,San Francisco Bay and Delta
+Away from wetland,Water,Other,2013-21,10 to 20,0.01539,15.0351851851852,3.11111111111111,San Francisco Bay and Delta
+Away from wetland,Water,Other,2013-21,20 to 40,0.02331,29.4128056628057,3.46718146718147,San Francisco Bay and Delta
+Away from wetland,Water,Other,2013-21,5 to 10,0.00747,7.51987951807229,2.32530120481928,San Francisco Bay and Delta
+Away from wetland,Water,Other,2013-21,under 1,0.00126,0,1.5,San Francisco Bay and Delta
+Away from wetland,Other,Wetland,2013-21,5 to 10,0.01521,7.0991124260355,4.79881656804734,San Francisco Bay and Delta
+Away from wetland,Barren,Water,2013-21,5 to 10,0.01206,7.32313432835821,3.63432835820896,San Francisco Bay and Delta
+Away from wetland,Other,Barren,2013-21,10 to 20,0.01251,14.3929256594724,4.70503597122302,San Francisco Bay and Delta
+Away from wetland,Water,Other,2013-21,1 to 5,0.0054,3.44222222222222,2.63333333333333,San Francisco Bay and Delta
+Away from wetland,Other,Barren,2013-21,40 or more,0.0162,60.1028703703704,4.60555555555556,San Francisco Bay and Delta
+Away from wetland,Other,Barren,2013-21,5 to 10,0.00711,7.5289029535865,4.39240506329114,San Francisco Bay and Delta
+Away from wetland,Other,Barren,2013-21,1 to 5,0.00873,2.94862542955326,4.57731958762887,San Francisco Bay and Delta
+Away from wetland,Other,Wetland,2013-21,1 to 5,0.01107,3.25840108401084,4.91869918699187,San Francisco Bay and Delta
+Wetland side,Other,Water,2013-21,40 or more,0.00099,56.4363636363636,5,San Francisco Bay and Delta
+Wetland side,Wetland,Water,2013-21,40 or more,0.17514,63.2561151079137,5,San Francisco Bay and Delta
+Away from wetland,Water,Wetland,2013-21,10 to 20,0.05436,14.0988134657837,1.43377483443709,San Francisco Bay and Delta
+Wetland side,Water,Barren,2013-21,40 or more,0.00675,62.9226666666667,5,San Francisco Bay and Delta
+Wetland side,Other,Barren,2013-21,20 to 40,9e-04,24.38,5,San Francisco Bay and Delta
+Wetland side,Water,Wetland,2013-21,40 or more,0.06462,66.6782729805014,5,San Francisco Bay and Delta
+Wetland side,Water,Other,2013-21,40 or more,0.00144,71.275,5,San Francisco Bay and Delta
+Away from wetland,Other,Water,2013-21,under 1,0.00162,0.222222222222222,3.22222222222222,San Francisco Bay and Delta
+Wetland side,Other,Other,2013-21,40 or more,0.00081,49.2444444444444,5,San Francisco Bay and Delta
+Wetland side,Other,Barren,2013-21,40 or more,0.00036,55.95,5,San Francisco Bay and Delta
+Wetland side,Other,Other,2013-21,20 to 40,0.00027,34.7333333333333,5,San Francisco Bay and Delta
+Away from wetland,Water,Wetland,2013-21,5 to 10,0.02052,7.09320175438597,1.28508771929825,San Francisco Bay and Delta
+Away from wetland,Water,Wetland,2013-21,under 1,0.00585,0.0153846153846154,1.13846153846154,San Francisco Bay and Delta
+Away from wetland,Water,Wetland,2013-21,1 to 5,0.01512,2.49246031746032,1.19047619047619,San Francisco Bay and Delta
+Away from wetland,Other,Wetland,2013-21,under 1,0.00054,0.5,5,San Francisco Bay and Delta
+Away from wetland,Water,Barren,2013-21,10 to 20,0.03978,15.029185520362,2.06334841628959,San Francisco Bay and Delta
+Wetland side,Water,Barren,1995-98,40 or more,0.00666,66.6675675675676,5,San Francisco Bay and Delta
+Wetland side,Wetland,Other,1995-98,20 to 40,0.00297,30.5272727272727,5,San Francisco Bay and Delta
+Away from wetland,Water,Water,1995-98,5 to 10,0.15687,7.52947982405814,1.11646586345382,San Francisco Bay and Delta
+Away from wetland,Water,Water,1995-98,under 1,0.06066,0.00474777448071217,1.97032640949555,San Francisco Bay and Delta
+Away from wetland,Water,Water,1995-98,10 to 20,0.10944,15.3724643640351,1.51973684210526,San Francisco Bay and Delta
+Wetland side,Wetland,Barren,1995-98,40 or more,0.0081,70.8866666666667,5,San Francisco Bay and Delta
+Away from wetland,Water,Wetland,1995-98,under 1,0.00378,0,1.47619047619048,San Francisco Bay and Delta
+Away from wetland,Water,Barren,1995-98,20 to 40,0.01746,30.9643470790378,4.05670103092784,San Francisco Bay and Delta
+Away from wetland,Water,Water,1995-98,1 to 5,0.00441,3.2734693877551,4.42857142857143,San Francisco Bay and Delta
+Away from wetland,Water,Barren,1995-98,10 to 20,0.00675,15.0993333333333,2.76,San Francisco Bay and Delta
+Away from wetland,Barren,Water,1995-98,10 to 20,0.00657,13.7780821917808,4.10958904109589,San Francisco Bay and Delta
+Wetland side,Wetland,Wetland,1995-98,under 1,0.00036,0.6,5,San Francisco Bay and Delta
+Away from wetland,Other,Wetland,1995-98,20 to 40,0.01071,28.6735294117647,4.53781512605042,San Francisco Bay and Delta
+Away from wetland,Water,Wetland,1995-98,10 to 20,0.027,15.9274444444444,1.24,San Francisco Bay and Delta
+Away from wetland,Barren,Wetland,1995-98,40 or more,0.00225,58.94,4.32,San Francisco Bay and Delta
+Away from wetland,Water,Wetland,1995-98,5 to 10,0.05085,8.0298820058997,1.09380530973451,San Francisco Bay and Delta
+Away from wetland,Barren,Wetland,1995-98,5 to 10,0.00108,7.33333333333333,4.75,San Francisco Bay and Delta
+Away from wetland,Barren,Wetland,1995-98,10 to 20,0.00108,13.4,4.5,San Francisco Bay and Delta
+Away from wetland,Barren,Water,1995-98,40 or more,0.00423,52.6539007092199,3.1063829787234,San Francisco Bay and Delta
+Wetland side,Water,Water,1995-98,20 to 40,0.00081,23.9777777777778,5,San Francisco Bay and Delta
+Away from wetland,Water,Barren,1995-98,under 1,0.0036,0.13,3.325,San Francisco Bay and Delta
+Away from wetland,Water,Barren,1995-98,5 to 10,0.00612,7.68455882352941,1.97058823529412,San Francisco Bay and Delta
+Away from wetland,Barren,Barren,1995-98,40 or more,0.00351,52.1358974358974,3.84615384615385,San Francisco Bay and Delta
+Away from wetland,Other,Barren,1995-98,20 to 40,0.00666,30.1072072072072,4.41891891891892,San Francisco Bay and Delta
+Away from wetland,Water,Other,1995-98,5 to 10,0.00729,7.40041152263375,2.40740740740741,San Francisco Bay and Delta
+Away from wetland,Water,Other,1995-98,10 to 20,0.01323,15.3331065759637,2.44897959183673,San Francisco Bay and Delta
+Away from wetland,Other,Water,1995-98,5 to 10,0.00585,7.00205128205128,3.86153846153846,San Francisco Bay and Delta
+Away from wetland,Other,Wetland,1995-98,1 to 5,0.01341,3.37941834451902,3.26845637583893,San Francisco Bay and Delta
+Away from wetland,Water,Other,1995-98,under 1,0.01575,0.0548571428571429,4.37714285714286,San Francisco Bay and Delta
+Away from wetland,Barren,Other,1995-98,20 to 40,0.00162,28.4666666666667,4.72222222222222,San Francisco Bay and Delta
+Away from wetland,Water,Barren,1995-98,1 to 5,0.00162,2.85555555555556,4.61111111111111,San Francisco Bay and Delta
+Away from wetland,Barren,Water,1995-98,20 to 40,0.00756,26.9847222222222,4.5,San Francisco Bay and Delta
+Away from wetland,Barren,Barren,1995-98,5 to 10,0.00747,7.11004016064257,4.72289156626506,San Francisco Bay and Delta
+Away from wetland,Other,Barren,1995-98,1 to 5,0.01035,2.72260869565217,3.23478260869565,San Francisco Bay and Delta
+Away from wetland,Barren,Water,1999-2012,10 to 20,0.10674,14.0912731871838,4.43086003372681,San Francisco Bay and Delta
+Wetland side,Water,Barren,1999-2012,40 or more,0.01332,66.5810810810811,5,San Francisco Bay and Delta
+Away from wetland,Water,Water,1999-2012,under 1,0.24138,0.0229120059656972,1.52050708426547,San Francisco Bay and Delta
+Away from wetland,Water,Barren,1999-2012,under 1,0.00981,0.0055045871559633,1.46788990825688,San Francisco Bay and Delta
+Away from wetland,Other,Wetland,1999-2012,under 1,0.00144,0.3875,4,San Francisco Bay and Delta
+Away from wetland,Barren,Water,1999-2012,20 to 40,0.0684,27.9992543859649,4.05789473684211,San Francisco Bay and Delta
+Away from wetland,Barren,Barren,1999-2012,20 to 40,0.1917,27.5620031298905,4.19906103286385,San Francisco Bay and Delta
+Away from wetland,Barren,Wetland,1999-2012,20 to 40,0.05382,26.7807413600892,4.32775919732442,San Francisco Bay and Delta
+Away from wetland,Barren,Wetland,1999-2012,10 to 20,0.07137,14.3150063051702,4.68221941992434,San Francisco Bay and Delta
+Away from wetland,Barren,Barren,1999-2012,5 to 10,0.19188,7.57027829893684,3.99296435272045,San Francisco Bay and Delta
+Away from wetland,Other,Barren,1999-2012,under 1,0.00765,0.211764705882353,4.62352941176471,San Francisco Bay and Delta
+Wetland side,Wetland,Barren,1999-2012,10 to 20,0.01359,13.8066225165563,5,San Francisco Bay and Delta
+Wetland side,Wetland,Wetland,1999-2012,under 1,0.00207,0.626086956521739,5,San Francisco Bay and Delta
+Wetland side,Other,Wetland,1999-2012,1 to 5,0.00018,3.7,5,San Francisco Bay and Delta
+Away from wetland,Water,Barren,1999-2012,10 to 20,0.08415,15.0740998217469,3.00855614973262,San Francisco Bay and Delta
+Wetland side,Water,Barren,1999-2012,20 to 40,0.00261,31.7931034482759,5,San Francisco Bay and Delta
+Away from wetland,Barren,Barren,1999-2012,10 to 20,0.30825,14.0644379562044,4.27620437956204,San Francisco Bay and Delta
+Wetland side,Barren,Water,1999-2012,40 or more,0.00045,49.28,5,San Francisco Bay and Delta
+Wetland side,Wetland,Barren,1999-2012,1 to 5,0.00171,3.91578947368421,5,San Francisco Bay and Delta
+Wetland side,Barren,Barren,1999-2012,20 to 40,0.00756,26.5666666666667,5,San Francisco Bay and Delta
+Wetland side,Barren,Water,1999-2012,20 to 40,0.00162,27.3777777777778,5,San Francisco Bay and Delta
+Wetland side,Wetland,Other,1999-2012,5 to 10,0.00117,6.95384615384615,5,San Francisco Bay and Delta
+Away from wetland,Barren,Barren,1999-2012,40 or more,0.0306,46.8763235294118,3.98529411764706,San Francisco Bay and Delta
+Wetland side,Barren,Wetland,1999-2012,10 to 20,0.00792,14.5272727272727,5,San Francisco Bay and Delta
+Wetland side,Water,Wetland,1999-2012,10 to 20,0.0018,14.21,5,San Francisco Bay and Delta
+Wetland side,Water,Water,1999-2012,10 to 20,0.00216,15.475,5,San Francisco Bay and Delta
+Wetland side,Barren,Wetland,1999-2012,5 to 10,0.00234,8.00769230769231,5,San Francisco Bay and Delta
+Wetland side,Barren,Water,1999-2012,5 to 10,0.00297,8.10909090909091,5,San Francisco Bay and Delta
+Away from wetland,Barren,Wetland,1999-2012,5 to 10,0.04455,7.48367003367003,4.5010101010101,San Francisco Bay and Delta
+Wetland side,Water,Water,1999-2012,20 to 40,0.00504,30.8642857142857,5,San Francisco Bay and Delta
+Away from wetland,Water,Wetland,1999-2012,under 1,0.01278,0.0211267605633803,1.21830985915493,San Francisco Bay and Delta
+Wetland side,Water,Other,1999-2012,20 to 40,0.00036,29.8,5,San Francisco Bay and Delta
+Away from wetland,Barren,Other,1999-2012,10 to 20,0.01827,14.3184729064039,4.63054187192118,San Francisco Bay and Delta
+Away from wetland,Barren,Other,1999-2012,20 to 40,0.01539,28.1481481481482,4.83625730994152,San Francisco Bay and Delta
+Away from wetland,Barren,Other,1999-2012,40 or more,0.00684,53.255701754386,4.78947368421053,San Francisco Bay and Delta
+Away from wetland,Barren,Other,1999-2012,5 to 10,0.00981,7.23516819571865,4.88073394495413,San Francisco Bay and Delta
+Wetland side,Barren,Other,1999-2012,10 to 20,0.00036,13.95,5,San Francisco Bay and Delta
+Away from wetland,Barren,Water,1999-2012,5 to 10,0.07101,7.46043514997888,4.37008871989861,San Francisco Bay and Delta
+Away from wetland,Water,Wetland,1999-2012,1 to 5,0.00936,3.14086538461539,1.80769230769231,San Francisco Bay and Delta
+Away from wetland,Other,Barren,1999-2012,5 to 10,0.02979,7.03982880161128,4.74924471299094,San Francisco Bay and Delta
+Wetland side,Other,Barren,1999-2012,20 to 40,0.00036,27.3,5,San Francisco Bay and Delta
+Wetland side,Wetland,Other,1999-2012,1 to 5,0.00072,2.55,5,San Francisco Bay and Delta
+Wetland side,Other,Other,1999-2012,5 to 10,0.00018,5.5,5,San Francisco Bay and Delta
+Wetland side,Other,Water,1999-2012,under 1,9e-05,0.6,5,San Francisco Bay and Delta
+Wetland side,Water,Water,2013-21,40 or more,0.10188,65.9637809187279,5,San Francisco Bay and Delta
+Away from wetland,Water,Water,2013-21,1 to 5,0.02754,3.02015250544662,1.7516339869281,San Francisco Bay and Delta
+Away from wetland,Water,Barren,2013-21,5 to 10,0.01125,7.04186666666667,2.048,San Francisco Bay and Delta
+Away from wetland,Water,Barren,2013-21,1 to 5,0.00747,3.02871485943775,1.81927710843374,San Francisco Bay and Delta
+Wetland side,Wetland,Barren,2013-21,40 or more,0.00594,65.9969696969697,5,San Francisco Bay and Delta
+Wetland side,Other,Wetland,2013-21,40 or more,0.00198,62.2272727272727,5,San Francisco Bay and Delta
+Away from wetland,Barren,Wetland,2013-21,40 or more,0.00648,54.174537037037,4.65277777777778,San Francisco Bay and Delta
+Away from wetland,Barren,Wetland,2013-21,20 to 40,0.01323,27.8451247165533,4.63945578231293,San Francisco Bay and Delta
+Away from wetland,Barren,Water,2013-21,40 or more,0.01377,52.2274509803922,4.4640522875817,San Francisco Bay and Delta
+Away from wetland,Barren,Other,2013-21,20 to 40,0.00234,26.7153846153846,4.30769230769231,San Francisco Bay and Delta
+Wetland side,Barren,Water,2013-21,10 to 20,0.00135,15.0133333333333,5,San Francisco Bay and Delta
+Away from wetland,Barren,Water,2013-21,20 to 40,0.06552,27.900206043956,4.4010989010989,San Francisco Bay and Delta
+Wetland side,Wetland,Other,2013-21,40 or more,0.00153,69.9058823529412,5,San Francisco Bay and Delta
+Away from wetland,Barren,Water,2013-21,1 to 5,0.00747,3.06807228915663,4.32530120481928,San Francisco Bay and Delta
+Away from wetland,Barren,Water,2013-21,10 to 20,0.03708,15.4682443365696,3.66019417475728,San Francisco Bay and Delta
+Away from wetland,Barren,Other,2013-21,40 or more,0.00162,50.9666666666667,4.38888888888889,San Francisco Bay and Delta
+Wetland side,Wetland,Wetland,2013-21,20 to 40,0.02493,26.7075812274368,5,San Francisco Bay and Delta
+Wetland side,Water,Wetland,2013-21,20 to 40,0.00153,29.8235294117647,5,San Francisco Bay and Delta
+Away from wetland,Water,Water,2013-21,under 1,0.01413,0,1.23566878980892,San Francisco Bay and Delta
+Wetland side,Wetland,Barren,1995-98,20 to 40,0.00153,27.3764705882353,5,San Francisco Bay and Delta
+Wetland side,Water,Wetland,1995-98,10 to 20,0.00081,15.4666666666667,5,San Francisco Bay and Delta
+Wetland side,Water,Wetland,1995-98,20 to 40,0.00081,22.5333333333333,5,San Francisco Bay and Delta
+Wetland side,Other,Water,1995-98,10 to 20,9e-05,11.6,5,San Francisco Bay and Delta
+Wetland side,Water,Water,1995-98,10 to 20,0.00036,16.5,5,San Francisco Bay and Delta
+Away from wetland,Barren,Water,1995-98,5 to 10,0.0036,6.69583333333333,4.75,San Francisco Bay and Delta
+Wetland side,Wetland,Barren,1995-98,5 to 10,0.0036,6.79,5,San Francisco Bay and Delta
+Wetland side,Barren,Water,1995-98,10 to 20,0.00018,15,5,San Francisco Bay and Delta
+Wetland side,Barren,Wetland,1995-98,20 to 40,9e-05,24.6,5,San Francisco Bay and Delta
+Away from wetland,Other,Barren,1995-98,10 to 20,0.00495,13.6209090909091,3.76363636363636,San Francisco Bay and Delta
+Away from wetland,Other,Barren,1995-98,5 to 10,0.01053,6.87977207977208,3.2991452991453,San Francisco Bay and Delta
+Away from wetland,Other,Wetland,1995-98,under 1,9e-04,0.155,3.1,San Francisco Bay and Delta
+Away from wetland,Other,Barren,1995-98,under 1,0.00216,0.0583333333333333,3,San Francisco Bay and Delta
+Away from wetland,Other,Water,1995-98,1 to 5,0.00207,3.40289855072464,4.39130434782609,San Francisco Bay and Delta
+Wetland side,Water,Other,1995-98,20 to 40,9e-05,23.6,5,San Francisco Bay and Delta
+Away from wetland,Other,Water,1995-98,under 1,0.00144,0,3,San Francisco Bay and Delta
+Wetland side,Other,Barren,1995-98,10 to 20,0.00018,18.6,5,San Francisco Bay and Delta
+Wetland side,Other,Wetland,1995-98,10 to 20,0.00027,14.4,5,San Francisco Bay and Delta
+Away from wetland,Barren,Barren,1995-98,20 to 40,0.00756,28.8363095238095,4.05952380952381,San Francisco Bay and Delta
+Away from wetland,Barren,Barren,1995-98,10 to 20,0.00792,13.9738636363636,4.59090909090909,San Francisco Bay and Delta
+Away from wetland,Barren,Other,1995-98,1 to 5,0.00297,2.4,5,San Francisco Bay and Delta
+Away from wetland,Barren,Barren,1999-2012,1 to 5,0.05994,3.32912912912913,3.76576576576577,San Francisco Bay and Delta
+Wetland side,Other,Barren,1999-2012,5 to 10,0.00018,9.1,5,San Francisco Bay and Delta
+Wetland side,Water,Wetland,1999-2012,5 to 10,0.00018,8.3,5,San Francisco Bay and Delta
+Away from wetland,Water,Barren,1999-2012,1 to 5,0.009,3.23266666666667,2.31,San Francisco Bay and Delta
+Wetland side,Other,Water,2013-21,20 to 40,0.00117,27.3230769230769,5,San Francisco Bay and Delta
+Wetland side,Wetland,Water,2013-21,5 to 10,0.00171,8.67368421052632,5,San Francisco Bay and Delta
+Wetland side,Wetland,Wetland,2013-21,1 to 5,0.00036,2.9,5,San Francisco Bay and Delta
+Wetland side,Water,Water,2013-21,10 to 20,0.00081,16.2888888888889,5,San Francisco Bay and Delta
+Away from wetland,Barren,Barren,2013-21,1 to 5,0.01251,3.16714628297362,4.22302158273381,San Francisco Bay and Delta
+Away from wetland,Barren,Barren,2013-21,5 to 10,0.02682,7.40822147651007,3.75167785234899,San Francisco Bay and Delta
+Away from wetland,Barren,Barren,2013-21,20 to 40,0.11664,27.9128986625514,3.52932098765432,San Francisco Bay and Delta
+Away from wetland,Barren,Barren,2013-21,under 1,0.00297,0.216666666666667,4.27272727272727,San Francisco Bay and Delta
+Wetland side,Other,Wetland,2013-21,20 to 40,0.00198,26.7454545454546,5,San Francisco Bay and Delta
+Wetland side,Other,Water,2013-21,10 to 20,0.00144,16.5,5,San Francisco Bay and Delta
+Wetland side,Wetland,Barren,2013-21,20 to 40,0.00567,25.8507936507937,5,San Francisco Bay and Delta
+Away from wetland,Barren,Other,2013-21,10 to 20,0.00531,14.5031073446328,3.79661016949153,San Francisco Bay and Delta
+Away from wetland,Barren,Barren,2013-21,10 to 20,0.11025,14.7930476190476,3.32571428571429,San Francisco Bay and Delta
+Away from wetland,Barren,Barren,2013-21,40 or more,0.02052,46.8265350877193,3.54824561403509,San Francisco Bay and Delta
+Away from wetland,Water,Barren,2013-21,under 1,0.00261,0.053448275862069,1.72413793103448,San Francisco Bay and Delta
+Wetland side,Wetland,Water,1995-98,under 1,0.00081,0.533333333333333,5,San Francisco Bay and Delta
+Away from wetland,Water,Wetland,1995-98,1 to 5,0.00036,2.575,4.25,San Francisco Bay and Delta
+Away from wetland,Barren,Other,1995-98,5 to 10,0.00234,7.15128205128205,4.88461538461539,San Francisco Bay and Delta
+Away from wetland,Barren,Other,1995-98,40 or more,0.00414,59.9231884057971,4.56521739130435,San Francisco Bay and Delta
+Wetland side,Other,Wetland,1995-98,40 or more,0.00045,61.64,5,San Francisco Bay and Delta
+Wetland side,Other,Water,1995-98,40 or more,9e-05,69.8,5,San Francisco Bay and Delta
+Wetland side,Water,Water,1995-98,5 to 10,9e-05,9,5,San Francisco Bay and Delta
+Away from wetland,Barren,Other,1995-98,10 to 20,0.00252,14.7464285714286,4.78571428571429,San Francisco Bay and Delta
+Wetland side,Water,Water,1999-2012,5 to 10,9e-05,9.8,5,San Francisco Bay and Delta
+Wetland side,Water,Barren,1999-2012,10 to 20,0.00198,14.5909090909091,5,San Francisco Bay and Delta
+Wetland side,Water,Other,1999-2012,10 to 20,0.00036,15.5,5,San Francisco Bay and Delta
+Away from wetland,Barren,Other,1999-2012,1 to 5,0.01386,2.61623376623377,4.77922077922078,San Francisco Bay and Delta
+Wetland side,Barren,Wetland,1999-2012,20 to 40,0.00504,25.1892857142857,5,San Francisco Bay and Delta
+Wetland side,Barren,Wetland,1999-2012,1 to 5,0.00063,3.82857142857143,5,San Francisco Bay and Delta
+Wetland side,Barren,Other,1999-2012,20 to 40,9e-05,20.2,5,San Francisco Bay and Delta
+Away from wetland,Barren,Other,2013-21,1 to 5,0.00594,2.62474747474747,4.89393939393939,San Francisco Bay and Delta
+Away from wetland,Barren,Other,2013-21,under 1,0.00144,0.2375,4.25,San Francisco Bay and Delta
+Wetland side,Other,Water,2013-21,5 to 10,0.00027,7.06666666666667,5,San Francisco Bay and Delta
+Wetland side,Water,Barren,2013-21,20 to 40,9e-04,30.1,5,San Francisco Bay and Delta
+Away from wetland,Barren,Wetland,2013-21,10 to 20,0.02205,14.4258503401361,4.84081632653061,San Francisco Bay and Delta
+Wetland side,Barren,Wetland,2013-21,20 to 40,0.00162,26.0777777777778,5,San Francisco Bay and Delta
+Wetland side,Barren,Wetland,2013-21,10 to 20,0.00486,13.4555555555556,5,San Francisco Bay and Delta
+Wetland side,Other,Barren,2013-21,10 to 20,0.00018,17.4,5,San Francisco Bay and Delta
+Wetland side,Other,Wetland,2013-21,10 to 20,0.00126,15.2571428571429,5,San Francisco Bay and Delta
+Away from wetland,Other,Barren,2013-21,under 1,0.00423,0.187234042553192,3.72340425531915,San Francisco Bay and Delta
+Away from wetland,Barren,Wetland,2013-21,5 to 10,0.0135,7.67266666666667,4.77333333333333,San Francisco Bay and Delta
+Wetland side,Barren,Barren,2013-21,10 to 20,0.00171,16.3894736842105,5,San Francisco Bay and Delta
+Wetland side,Barren,Wetland,2013-21,40 or more,0.00054,46.9333333333333,5,San Francisco Bay and Delta
+Away from wetland,Barren,Other,2013-21,5 to 10,0.0036,7.485,4.475,San Francisco Bay and Delta
+Wetland side,Other,Other,2013-21,10 to 20,9e-05,13.4,5,San Francisco Bay and Delta
+Away from wetland,Barren,Wetland,2013-21,1 to 5,0.00234,2.83141025641026,4.73076923076923,San Francisco Bay and Delta
+Away from wetland,Barren,Wetland,1995-98,1 to 5,9e-04,3.24,5,San Francisco Bay and Delta
+Away from wetland,Barren,Wetland,1995-98,under 1,9e-04,0.08,4.3,San Francisco Bay and Delta
+Wetland side,Wetland,Wetland,2013-21,under 1,9e-05,0.6,5,San Francisco Bay and Delta
+Wetland side,Wetland,Water,2013-21,1 to 5,9e-05,3.8,5,San Francisco Bay and Delta
+Wetland side,Other,Wetland,2013-21,1 to 5,0.00054,3.7,5,San Francisco Bay and Delta
+Wetland side,Wetland,Other,2013-21,10 to 20,0.00018,12.5,5,San Francisco Bay and Delta
+Wetland side,Other,Other,1995-98,40 or more,0.00054,60.9666666666667,5,San Francisco Bay and Delta
+Wetland side,Wetland,Barren,2013-21,10 to 20,0.00396,16.75,5,San Francisco Bay and Delta
+Wetland side,Other,Water,1995-98,1 to 5,9e-05,4.8,5,San Francisco Bay and Delta
+Wetland side,Other,Barren,1995-98,20 to 40,0.00018,31.3,5,San Francisco Bay and Delta
+Away from wetland,Barren,Other,1999-2012,under 1,0.00513,0.32280701754386,4.68421052631579,San Francisco Bay and Delta
+Away from wetland,Barren,Water,2013-21,under 1,0.0018,0.06,3.2,San Francisco Bay and Delta
+Wetland side,Other,Barren,2013-21,1 to 5,9e-05,3.4,5,San Francisco Bay and Delta
+Wetland side,Wetland,Barren,1995-98,1 to 5,0.00126,4.15714285714286,5,San Francisco Bay and Delta
+Wetland side,Barren,Wetland,1995-98,10 to 20,0.00018,17.6,5,San Francisco Bay and Delta
+Wetland side,Water,Other,1995-98,1 to 5,9e-05,3.6,5,San Francisco Bay and Delta
+Wetland side,Water,Barren,1995-98,20 to 40,0.00027,32.6,5,San Francisco Bay and Delta
+Away from wetland,Barren,Wetland,1995-98,20 to 40,9e-04,29.4083333333333,4.7,San Francisco Bay and Delta
+Wetland side,Other,Barren,1999-2012,10 to 20,0.00054,16.7666666666667,5,San Francisco Bay and Delta
+Away from wetland,Barren,Wetland,1999-2012,under 1,0.00108,0.3,4.41666666666667,San Francisco Bay and Delta
+Wetland side,Wetland,Other,1999-2012,under 1,0.00018,0.3,5,San Francisco Bay and Delta
+Wetland side,Barren,Barren,1999-2012,10 to 20,0.02016,13.5053571428571,5,San Francisco Bay and Delta
+Wetland side,Barren,Barren,1999-2012,5 to 10,0.00882,8.16530612244898,5,San Francisco Bay and Delta
+Wetland side,Barren,Barren,1999-2012,1 to 5,0.00108,4.13333333333333,5,San Francisco Bay and Delta
+Away from wetland,Barren,Wetland,1999-2012,1 to 5,0.0144,3.590625,4.19375,San Francisco Bay and Delta
+Wetland side,Barren,Wetland,1999-2012,40 or more,0.00027,41.5333333333333,5,San Francisco Bay and Delta
+Wetland side,Barren,Wetland,2013-21,5 to 10,0.0036,8.045,5,San Francisco Bay and Delta
+Wetland side,Barren,Barren,2013-21,20 to 40,0.00189,28.4190476190476,5,San Francisco Bay and Delta
+Wetland side,Barren,Wetland,2013-21,1 to 5,0.00045,2.68,5,San Francisco Bay and Delta
+Wetland side,Water,Barren,2013-21,10 to 20,9e-05,12.8,5,San Francisco Bay and Delta
+Wetland side,Water,Wetland,2013-21,10 to 20,0.00072,15.175,5,San Francisco Bay and Delta
+Wetland side,Barren,Wetland,2013-21,under 1,9e-05,0.6,5,San Francisco Bay and Delta
+Wetland side,Barren,Water,2013-21,20 to 40,0.00072,28.95,5,San Francisco Bay and Delta
+Wetland side,Other,Water,2013-21,1 to 5,9e-05,4.8,5,San Francisco Bay and Delta
+Wetland side,Barren,Barren,2013-21,1 to 5,0.00018,4.4,5,San Francisco Bay and Delta
+Wetland side,Barren,Barren,2013-21,5 to 10,0.00054,7.26666666666667,5,San Francisco Bay and Delta
+Away from wetland,Barren,Wetland,2013-21,under 1,0.00036,0.5,5,San Francisco Bay and Delta
+Wetland side,Other,Wetland,1995-98,under 1,9e-05,0,5,San Francisco Bay and Delta
+Wetland side,Other,Wetland,1995-98,1 to 5,0.00027,2.6,5,San Francisco Bay and Delta
+Wetland side,Other,Wetland,1995-98,5 to 10,0.00018,8.4,5,San Francisco Bay and Delta
+Wetland side,Barren,Barren,1995-98,20 to 40,9e-05,26.6,5,San Francisco Bay and Delta
+Wetland side,Barren,Barren,1995-98,40 or more,0.00036,49.15,5,San Francisco Bay and Delta
+Wetland side,Barren,Water,1995-98,40 or more,9e-05,40,5,San Francisco Bay and Delta
+Wetland side,Other,Barren,1995-98,40 or more,9e-05,45,5,San Francisco Bay and Delta
+Wetland side,Barren,Barren,1999-2012,40 or more,0.00072,44.825,5,San Francisco Bay and Delta
+Wetland side,Barren,Other,1999-2012,5 to 10,9e-05,7.6,5,San Francisco Bay and Delta
+Wetland side,Water,Barren,1999-2012,5 to 10,0.00027,7.8,5,San Francisco Bay and Delta
+Wetland side,Other,Barren,1999-2012,40 or more,9e-05,41.8,5,San Francisco Bay and Delta
+Wetland side,Barren,Barren,2013-21,40 or more,9e-05,47.6,5,San Francisco Bay and Delta
+Wetland side,Barren,Water,2013-21,5 to 10,0.00027,5.93333333333333,5,San Francisco Bay and Delta
+Wetland side,Wetland,Barren,1995-98,under 1,0.00018,0,5,San Francisco Bay and Delta
+Wetland side,Barren,Wetland,1995-98,40 or more,9e-05,69.4,5,San Francisco Bay and Delta
+Wetland side,Barren,Barren,1995-98,10 to 20,9e-05,19.8,5,San Francisco Bay and Delta
+Wetland side,Barren,Water,1999-2012,1 to 5,9e-05,4.4,5,San Francisco Bay and Delta
+Wetland side,Other,Other,1999-2012,1 to 5,9e-05,2,5,San Francisco Bay and Delta
+Wetland side,Water,Other,1999-2012,5 to 10,9e-05,6.6,5,San Francisco Bay and Delta
+Wetland side,Wetland,Water,1999-2012,under 1,0.00288,0.5625,5,San Francisco Bay and Delta
+Wetland side,Water,Other,1995-98,10 to 20,9e-05,15.8,5,San Francisco Bay and Delta

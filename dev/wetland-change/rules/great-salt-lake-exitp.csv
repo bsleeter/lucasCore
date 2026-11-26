@@ -1,0 +1,125 @@
+Side,Nlcd,Ccap,Era,Bin,Kha,MeanOpen,MeanLandYears,Region
+Wetland side,Wetland,None,1995-98,10 to 20,0.01944,14.0481481481482,5,Great Salt Lake
+Wetland side,Wetland,None,1995-98,under 1,0.00549,0.229508196721311,5,Great Salt Lake
+Away from wetland,Water,None,1995-98,40 or more,0.06246,51.6691402497598,3.04899135446686,Great Salt Lake
+Away from wetland,Barren,None,1995-98,under 1,0.14895,0.089385699899295,3.27250755287009,Great Salt Lake
+Away from wetland,Other,None,1995-98,under 1,0.05229,0.0920252438324727,4.94148020654045,Great Salt Lake
+Wetland side,Wetland,None,1995-98,20 to 40,0.07929,31.9207718501703,5,Great Salt Lake
+Away from wetland,Other,None,1995-98,1 to 5,0.01494,2.45943775100402,4.8433734939759,Great Salt Lake
+Wetland side,Water,None,1995-98,40 or more,0.05535,60.1385365853659,5,Great Salt Lake
+Away from wetland,Water,None,1995-98,20 to 40,0.19233,27.133965060053,1.9995320542817,Great Salt Lake
+Away from wetland,Barren,None,1995-98,1 to 5,0.11835,2.82472750316857,4.5254752851711,Great Salt Lake
+Away from wetland,Barren,None,1995-98,5 to 10,0.2646,7.79725056689343,4.07517006802721,Great Salt Lake
+Wetland side,Wetland,None,1995-98,1 to 5,0.00783,2.75862068965517,5,Great Salt Lake
+Away from wetland,Barren,None,1995-98,10 to 20,1.63989,15.6525218154876,4.26924976675265,Great Salt Lake
+Away from wetland,Water,None,1995-98,10 to 20,0.22104,13.8948561346363,1.97109120521173,Great Salt Lake
+Wetland side,Wetland,None,1995-98,40 or more,0.24084,55.9353512705531,5,Great Salt Lake
+Away from wetland,Water,None,1995-98,5 to 10,0.17181,6.98390955124847,1.99214248297538,Great Salt Lake
+Wetland side,Wetland,None,1995-98,5 to 10,0.0135,7.66933333333333,5,Great Salt Lake
+Away from wetland,Barren,None,1995-98,40 or more,0.19287,46.7756882874475,3.81381241250583,Great Salt Lake
+Away from wetland,Water,None,1995-98,1 to 5,0.11754,3.12650587034201,2.19448698315467,Great Salt Lake
+Away from wetland,Water,None,1995-98,under 1,0.11016,0.0124183006535948,1.87745098039216,Great Salt Lake
+Away from wetland,Other,None,1995-98,10 to 20,0.0207,14.8684782608696,4.67391304347826,Great Salt Lake
+Away from wetland,Barren,None,1995-98,20 to 40,2.1744,26.2061872240618,4.31266556291391,Great Salt Lake
+Wetland side,Other,None,1995-98,20 to 40,0.00108,31.95,5,Great Salt Lake
+Away from wetland,Other,None,1995-98,5 to 10,0.0099,7.21242424242424,4.78181818181818,Great Salt Lake
+Wetland side,Barren,None,1995-98,under 1,0.00063,0.228571428571429,5,Great Salt Lake
+Wetland side,Other,None,1999-2012,20 to 40,0.03411,30.7857519788918,5,Great Salt Lake
+Away from wetland,Water,None,1999-2012,20 to 40,1.37178,28.0817390543673,3.50118094738223,Great Salt Lake
+Away from wetland,Water,None,1999-2012,10 to 20,1.89414,13.9874117013526,3.13608286610282,Great Salt Lake
+Wetland side,Water,None,1999-2012,40 or more,0.28143,54.5490885833067,5,Great Salt Lake
+Wetland side,Wetland,None,1999-2012,20 to 40,2.50947,29.2360219488577,5,Great Salt Lake
+Wetland side,Wetland,None,1999-2012,5 to 10,0.46224,7.27052180685358,5,Great Salt Lake
+Away from wetland,Other,None,1999-2012,1 to 5,0.85698,2.47089371980676,4.71812644402437,Great Salt Lake
+Away from wetland,Barren,None,1999-2012,under 1,16.86555,0.417215863105559,4.70444782411484,Great Salt Lake
+Away from wetland,Barren,None,1999-2012,1 to 5,44.79813,2.50481004452641,4.73611019031375,Great Salt Lake
+Away from wetland,Other,None,1999-2012,under 1,0.68364,0.333438651922062,4.76342812006319,Great Salt Lake
+Wetland side,Wetland,None,1999-2012,10 to 20,1.04958,15.3151432001372,5,Great Salt Lake
+Away from wetland,Other,None,1999-2012,5 to 10,0.43848,7.11134715380405,4.58764367816092,Great Salt Lake
+Wetland side,Other,None,1999-2012,1 to 5,0.01278,2.37887323943662,5,Great Salt Lake
+Wetland side,Wetland,None,1999-2012,under 1,0.31608,0.398917995444192,5,Great Salt Lake
+Wetland side,Wetland,None,1999-2012,1 to 5,0.6687,2.58487213997308,5,Great Salt Lake
+Away from wetland,Barren,None,1999-2012,5 to 10,19.07118,7.10076615605327,4.67416069692594,Great Salt Lake
+Away from wetland,Barren,None,1999-2012,10 to 20,22.06341,14.4917184379024,4.56264965388396,Great Salt Lake
+Away from wetland,Other,None,1999-2012,10 to 20,0.45657,14.471177475524,4.65996451803667,Great Salt Lake
+Wetland side,Wetland,None,1999-2012,40 or more,1.06011,50.0297987944647,5,Great Salt Lake
+Away from wetland,Barren,None,1999-2012,20 to 40,15.63309,27.0158650017367,4.31589340303165,Great Salt Lake
+Away from wetland,Water,None,1999-2012,40 or more,0.79749,52.7793401798142,4.18293646315314,Great Salt Lake
+Wetland side,Barren,None,1999-2012,under 1,0.73395,0.415843041079096,5,Great Salt Lake
+Wetland side,Barren,None,1999-2012,1 to 5,1.16235,2.16284939992256,5,Great Salt Lake
+Wetland side,Water,None,1999-2012,20 to 40,0.13725,31.0268852459016,5,Great Salt Lake
+Wetland side,Other,None,1999-2012,under 1,0.00603,0.352238805970149,5,Great Salt Lake
+Away from wetland,Other,None,1999-2012,40 or more,0.76725,51.3723284457478,4.9175366568915,Great Salt Lake
+Away from wetland,Water,None,1999-2012,5 to 10,2.71017,6.74147212167502,2.81536213595457,Great Salt Lake
+Away from wetland,Other,None,1999-2012,20 to 40,0.81126,30.1387489830634,4.81950299534058,Great Salt Lake
+Away from wetland,Barren,None,1999-2012,40 or more,2.20032,48.0089632417103,3.76100294502618,Great Salt Lake
+Away from wetland,Water,None,1999-2012,under 1,5.5863,0.251107083400462,3.46845497019494,Great Salt Lake
+Away from wetland,Water,None,1999-2012,1 to 5,8.20161,2.29179094104694,3.33732401321204,Great Salt Lake
+Wetland side,Barren,None,1999-2012,10 to 20,0.14949,14.5220951234196,5,Great Salt Lake
+Wetland side,Barren,None,1999-2012,5 to 10,0.17433,6.85596282911719,5,Great Salt Lake
+Wetland side,Barren,None,1999-2012,20 to 40,0.09369,25.806916426513,5,Great Salt Lake
+Wetland side,Other,None,1999-2012,10 to 20,0.01098,14.7147540983607,5,Great Salt Lake
+Wetland side,Other,None,1999-2012,5 to 10,0.00513,7.00701754385965,5,Great Salt Lake
+Wetland side,Water,None,2013-21,20 to 40,0.03411,31.3862796833773,5,Great Salt Lake
+Away from wetland,Water,None,2013-21,20 to 40,1.39473,28.4336570519025,2.47383364522166,Great Salt Lake
+Wetland side,Wetland,None,2013-21,10 to 20,0.08136,14.6188053097345,5,Great Salt Lake
+Away from wetland,Water,None,2013-21,40 or more,0.89775,52.8456892230577,2.96761904761905,Great Salt Lake
+Away from wetland,Water,None,2013-21,10 to 20,1.38447,14.0118214912566,2.82513163882208,Great Salt Lake
+Wetland side,Wetland,None,2013-21,40 or more,0.14337,52.8269930947897,5,Great Salt Lake
+Away from wetland,Barren,None,2013-21,20 to 40,7.10865,26.5966487307717,4.27316579097297,Great Salt Lake
+Away from wetland,Barren,None,2013-21,under 1,11.99601,0.403527547909698,4.6332780649566,Great Salt Lake
+Wetland side,Wetland,None,2013-21,under 1,0.13464,0.375534759358288,5,Great Salt Lake
+Wetland side,Wetland,None,2013-21,1 to 5,0.16245,2.22681440443213,5,Great Salt Lake
+Wetland side,Wetland,None,2013-21,5 to 10,0.04959,7.22722323049002,5,Great Salt Lake
+Wetland side,Barren,None,2013-21,under 1,0.01737,0.306735751295337,5,Great Salt Lake
+Wetland side,Barren,None,2013-21,1 to 5,0.01746,2.4979381443299,5,Great Salt Lake
+Away from wetland,Other,None,2013-21,5 to 10,0.25821,6.89079237829674,4.6775880097595,Great Salt Lake
+Away from wetland,Other,None,2013-21,1 to 5,0.67707,2.51837033098498,4.73587664495547,Great Salt Lake
+Away from wetland,Barren,None,2013-21,1 to 5,28.3293,2.53156262244392,4.78869015471614,Great Salt Lake
+Away from wetland,Other,None,2013-21,under 1,0.18738,0.418403778418188,4.5864553314121,Great Salt Lake
+Away from wetland,Barren,None,2013-21,10 to 20,12.80952,14.2149621531486,4.63966331291102,Great Salt Lake
+Away from wetland,Barren,None,2013-21,5 to 10,14.06583,7.07238147340043,4.79490296697742,Great Salt Lake
+Away from wetland,Water,None,2013-21,1 to 5,6.52176,2.58074952160154,3.61793442260985,Great Salt Lake
+Away from wetland,Water,None,2013-21,5 to 10,2.15199,6.75807159884573,3.64543515536782,Great Salt Lake
+Away from wetland,Other,None,2013-21,40 or more,0.71901,52.0329452997872,4.97033420953812,Great Salt Lake
+Wetland side,Wetland,None,2013-21,20 to 40,0.17784,30.0648785425101,5,Great Salt Lake
+Wetland side,Water,None,2013-21,40 or more,0.07227,55.0881693648817,5,Great Salt Lake
+Away from wetland,Barren,None,2013-21,40 or more,1.00134,47.2430058721314,3.89457127449218,Great Salt Lake
+Away from wetland,Water,None,2013-21,under 1,2.87262,0.188748772897215,2.55673914405665,Great Salt Lake
+Wetland side,Barren,None,2013-21,10 to 20,0.00522,14.051724137931,5,Great Salt Lake
+Wetland side,Water,None,2013-21,5 to 10,0.0027,7.28,5,Great Salt Lake
+Wetland side,Water,None,2013-21,1 to 5,0.00297,3.25454545454546,5,Great Salt Lake
+Away from wetland,Other,None,2013-21,20 to 40,0.85824,30.1867467142058,4.92418204697987,Great Salt Lake
+Away from wetland,Other,None,2013-21,10 to 20,0.29151,15.0573479468972,4.776782957703,Great Salt Lake
+Wetland side,Other,None,2013-21,1 to 5,0.00378,2.01904761904762,5,Great Salt Lake
+Wetland side,Other,None,2013-21,5 to 10,0.00171,8.21052631578947,5,Great Salt Lake
+Wetland side,Other,None,2013-21,10 to 20,0.00234,14.4230769230769,5,Great Salt Lake
+Wetland side,Water,None,1995-98,20 to 40,0.01062,32.3898305084746,5,Great Salt Lake
+Wetland side,Water,None,1995-98,10 to 20,0.00126,14.3571428571429,5,Great Salt Lake
+Away from wetland,Other,None,1995-98,40 or more,0.01476,54.6339430894309,4.3109756097561,Great Salt Lake
+Wetland side,Water,None,1995-98,5 to 10,0.00027,7.93333333333333,5,Great Salt Lake
+Away from wetland,Other,None,1995-98,20 to 40,0.02448,28.3898284313726,4.52941176470588,Great Salt Lake
+Wetland side,Other,None,1995-98,5 to 10,9e-04,7.54,5,Great Salt Lake
+Wetland side,Water,None,1999-2012,5 to 10,0.04491,7.38276553106213,5,Great Salt Lake
+Wetland side,Water,None,1999-2012,1 to 5,0.07605,2.37301775147929,5,Great Salt Lake
+Wetland side,Other,None,1999-2012,40 or more,0.03213,50.9775910364146,5,Great Salt Lake
+Wetland side,Water,None,1999-2012,10 to 20,0.0657,14.5742465753425,5,Great Salt Lake
+Wetland side,Barren,None,2013-21,5 to 10,0.0063,7.37142857142857,5,Great Salt Lake
+Wetland side,Other,None,2013-21,40 or more,0.00684,52.35,5,Great Salt Lake
+Wetland side,Water,None,2013-21,10 to 20,0.00873,15.4164948453608,5,Great Salt Lake
+Wetland side,Water,None,1999-2012,under 1,0.0324,0.448333333333333,5,Great Salt Lake
+Wetland side,Other,None,2013-21,20 to 40,0.00612,29.6852941176471,5,Great Salt Lake
+Wetland side,Water,None,2013-21,under 1,0.00072,0.4,5,Great Salt Lake
+Wetland side,Barren,None,2013-21,40 or more,0.00126,49.7428571428571,5,Great Salt Lake
+Wetland side,Other,None,2013-21,under 1,0.00162,0.522222222222222,5,Great Salt Lake
+Wetland side,Barren,None,2013-21,20 to 40,0.00369,28.1073170731707,5,Great Salt Lake
+Wetland side,Other,None,1995-98,40 or more,0.00189,62.1333333333333,5,Great Salt Lake
+Wetland side,Barren,None,1995-98,20 to 40,0.00171,29.8421052631579,5,Great Salt Lake
+Wetland side,Barren,None,1995-98,10 to 20,0.00018,13.6,5,Great Salt Lake
+Wetland side,Barren,None,1995-98,40 or more,0.00027,47,5,Great Salt Lake
+Wetland side,Barren,None,1999-2012,40 or more,0.00207,48.1565217391304,5,Great Salt Lake
+Wetland side,Other,None,1995-98,10 to 20,0.00054,13.4666666666667,5,Great Salt Lake
+Wetland side,Water,None,1995-98,under 1,0.00018,0.4,5,Great Salt Lake
+Wetland side,Barren,None,1995-98,1 to 5,0.00063,3.14285714285714,5,Great Salt Lake
+Wetland side,Barren,None,1995-98,5 to 10,0.00018,8.1,5,Great Salt Lake
+Wetland side,Other,None,1995-98,under 1,0.00027,0,5,Great Salt Lake

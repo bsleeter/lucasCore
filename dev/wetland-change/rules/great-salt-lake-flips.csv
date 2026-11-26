@@ -1,0 +1,15 @@
+Region,Rule,Side,Once,Twice,More
+Great Salt Lake,Yearly 50,Wetland,2.50236,13.05837,12.22254
+Great Salt Lake,Yearly 50,Other,36.01422,73.8702,144.32886
+Great Salt Lake,3-year mean 50,Wetland,4.0059,14.24934,5.16222
+Great Salt Lake,3-year mean 50,Other,88.54218,64.296,64.35414
+Great Salt Lake,Two lines 60/40,Wetland,3.52215,14.02776,7.46676
+Great Salt Lake,Two lines 60/40,Other,61.59285,70.02945,102.12336
+Great Salt Lake,Two lines 70/30,Wetland,4.51881,13.97088,3.78198
+Great Salt Lake,Two lines 70/30,Other,90.93159,65.89134,59.11506
+Great Salt Lake,Two lines 80/20,Wetland,5.29452,12.91104,1.42308
+Great Salt Lake,Two lines 80/20,Other,118.23759,54.70326,23.29884
+Great Salt Lake,Hold 5 years,Wetland,6.46866,4.5954,0.05157
+Great Salt Lake,Hold 5 years,Other,125.65845,23.93613,0.35064
+Great Salt Lake,Hold 3 years,Wetland,5.40756,13.36176,1.55358
+Great Salt Lake,Hold 3 years,Other,127.43856,51.41034,12.25683

@@ -1,0 +1,15 @@
+Region,Rule,Side,Once,Twice,More
+San Francisco Bay and Delta,Yearly 50,Wetland,2.41317,3.59235,7.89417
+San Francisco Bay and Delta,Yearly 50,Other,3.48444,10.66581,12.8061
+San Francisco Bay and Delta,3-year mean 50,Wetland,4.20201,2.27025,3.44214
+San Francisco Bay and Delta,3-year mean 50,Other,6.17913,4.69593,5.35725
+San Francisco Bay and Delta,Two lines 60/40,Wetland,3.44376,3.3813,4.85748
+San Francisco Bay and Delta,Two lines 60/40,Other,5.1201,7.00308,8.29701
+San Francisco Bay and Delta,Two lines 70/30,Wetland,4.2318,2.58651,2.92473
+San Francisco Bay and Delta,Two lines 70/30,Other,6.6627,5.06403,4.5063
+San Francisco Bay and Delta,Two lines 80/20,Wetland,4.80744,1.83573,1.63818
+San Francisco Bay and Delta,Two lines 80/20,Other,7.33806,3.71574,2.32155
+San Francisco Bay and Delta,Hold 5 years,Wetland,4.43268,0.71217,0.02484
+San Francisco Bay and Delta,Hold 5 years,Other,8.1081,1.71918,0.09027
+San Francisco Bay and Delta,Hold 3 years,Wetland,5.3541,1.81827,0.63405
+San Francisco Bay and Delta,Hold 3 years,Other,7.94772,3.65877,1.35774

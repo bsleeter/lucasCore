@@ -1,0 +1,15 @@
+Region,Rule,Side,Once,Twice,More
+Western Lake Erie,Yearly 50,Wetland,0.38034,1.09845,2.5938
+Western Lake Erie,Yearly 50,Other,0.74592,1.5813,3.2751
+Western Lake Erie,3-year mean 50,Wetland,0.88659,0.86391,1.33569
+Western Lake Erie,3-year mean 50,Other,1.0917,1.42776,1.57464
+Western Lake Erie,Two lines 60/40,Wetland,0.64215,1.01916,1.81962
+Western Lake Erie,Two lines 60/40,Other,0.9954,1.60074,2.16504
+Western Lake Erie,Two lines 70/30,Wetland,0.92313,0.92736,1.20114
+Western Lake Erie,Two lines 70/30,Other,1.3176,1.54053,1.02969
+Western Lake Erie,Two lines 80/20,Wetland,1.14876,0.8469,0.67986
+Western Lake Erie,Two lines 80/20,Other,1.422,1.18377,0.40572
+Western Lake Erie,Hold 5 years,Wetland,1.53288,0.34299,0.06687
+Western Lake Erie,Hold 5 years,Other,1.53765,0.67554,0.02871
+Western Lake Erie,Hold 3 years,Wetland,1.39599,0.693,0.40815
+Western Lake Erie,Hold 3 years,Other,1.45593,1.3554,0.35325

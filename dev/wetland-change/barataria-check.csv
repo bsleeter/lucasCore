@@ -1,0 +1,19 @@
+Epoch,Change,ModelKha,ModelUnvegKha,RuleKha,BothKha,RuleOnModelUnvegKha
+2001-2006,Wetland side to water,0.15687,0.00315,6.54768,0.0045,0.00072
+2001-2006,Water to wetland side,0.06966,,0.77067,0.00234,
+2001-2006,Other land to water,0.0252,,2.3085,0.00162,
+2001-2006,Water to other land,0.07542,,0.5976,0.01674,
+2006-2010,Wetland side to water,5.4603,0.43047,2.88333,0.73899,0.02241
+2006-2010,Water to wetland side,3.9789,,1.13436,0.42255,
+2006-2010,Other land to water,0.39555,,1.02654,0.04869,
+2006-2010,Water to other land,0.25272,,1.06272,0.04491,
+2010-2016,Wetland side to water,0.49068,0.00531,3.9636,0.06741,0
+2010-2016,Water to wetland side,0.33309,,1.60587,0.04626,
+2010-2016,Other land to water,0.03195,,0.77256,0.00459,
+2010-2016,Water to other land,0.27747,,2.40435,0.14562,
+2001-2016,Wetland side to water,6.10785,0.43893,13.39461,0.8109,0.02313
+2001-2016,Water to wetland side,4.38165,,3.5109,0.47115,
+2001-2016,Other land to water,0.4527,,4.1076,0.0549,
+2001-2016,Water to other land,0.60561,,4.06467,0.20727,
+"2001-2016 whole period, any epoch",Wetland side to water,6.03963,,12.69729,3.01536,
+"2001-2016 whole period, any epoch",Water to wetland side,4.13478,,2.81358,0.711,

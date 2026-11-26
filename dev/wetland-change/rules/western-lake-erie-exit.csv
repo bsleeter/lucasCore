@@ -1,0 +1,119 @@
+Side,Nlcd,Ccap,Bin,Kha,MeanOpen,MeanLandYears,Region
+Away from wetland,Water,Barren,5 to 20,0.01413,12.8978768577495,3.84076433121019,Western Lake Erie
+Away from wetland,Water,Water,20 to 50,1.15308,34.4705770631699,4.0980330939744,Western Lake Erie
+Away from wetland,,None,5 to 20,0.01368,11.6836622807018,4.69736842105263,Western Lake Erie
+Away from wetland,Water,Other,20 to 50,0.12987,33.6294294294294,4.17740817740818,Western Lake Erie
+Away from wetland,Water,Wetland,20 to 50,0.11736,33.730572597137,4.31365030674847,Western Lake Erie
+Away from wetland,Water,Barren,20 to 50,0.04941,33.4127504553734,3.88342440801457,Western Lake Erie
+Away from wetland,Water,Water,5 to 20,0.21978,13.4944785694786,4.16666666666667,Western Lake Erie
+Away from wetland,Other,Other,20 to 50,0.10008,31.2121402877698,4.57104316546763,Western Lake Erie
+Away from wetland,Other,Other,5 to 20,0.07938,11.6818594104308,4.81519274376417,Western Lake Erie
+Away from wetland,Other,Wetland,5 to 20,0.02223,10.6168016194332,4.82995951417004,Western Lake Erie
+Away from wetland,Other,Water,5 to 20,0.05616,11.7788194444444,4.75160256410256,Western Lake Erie
+Away from wetland,Other,Wetland,20 to 50,0.02385,29.2505031446541,4.84150943396226,Western Lake Erie
+Away from wetland,,None,20 to 50,0.0225,33.3240666666667,3.84,Western Lake Erie
+Wetland side,Wetland,Water,5 to 20,0.31743,13.0650411114261,5,Western Lake Erie
+Away from wetland,Other,Water,20 to 50,0.13626,31.2088066930868,4.70211360634082,Western Lake Erie
+Away from wetland,Water,Water,under 1,0.08163,0.025303197353914,1.29658213891952,Western Lake Erie
+Away from wetland,Water,Other,5 to 20,0.045,13.3647,4.466,Western Lake Erie
+Away from wetland,Water,Wetland,5 to 20,0.0324,12.6125,4.49444444444444,Western Lake Erie
+Wetland side,Wetland,Wetland,5 to 20,0.44244,12.396623270952,5,Western Lake Erie
+Away from wetland,,Water,20 to 50,0.00027,27.0666666666667,4,Western Lake Erie
+Away from wetland,Barren,Other,5 to 20,0.01017,9.71489675516224,4.76991150442478,Western Lake Erie
+Away from wetland,Other,Barren,5 to 20,0.01368,11.0038377192982,4.85526315789474,Western Lake Erie
+Away from wetland,Other,Barren,1 to 5,0.00711,2.4379746835443,4.9746835443038,Western Lake Erie
+Away from wetland,Other,Barren,20 to 50,0.01008,30.461755952381,4.71428571428571,Western Lake Erie
+Wetland side,Wetland,Other,5 to 20,0.00864,10.9458333333333,5,Western Lake Erie
+Away from wetland,Water,Water,1 to 5,0.02322,2.99341085271318,4.42635658914729,Western Lake Erie
+Wetland side,Wetland,Barren,5 to 20,0.01116,10.4870967741936,5,Western Lake Erie
+Away from wetland,Barren,Water,20 to 50,0.02565,28.2892397660819,4.51228070175439,Western Lake Erie
+Away from wetland,Barren,Wetland,20 to 50,0.00153,28.1254901960784,4.41176470588235,Western Lake Erie
+Wetland side,Wetland,Wetland,under 1,0.02304,0.084375,5,Western Lake Erie
+Wetland side,Wetland,Wetland,1 to 5,0.09693,2.85905292479109,5,Western Lake Erie
+Away from wetland,Barren,Barren,20 to 50,0.02349,28.9775862068966,4.59386973180077,Western Lake Erie
+Wetland side,Wetland,Wetland,20 to 50,0.47151,29.8147356365719,5,Western Lake Erie
+Wetland side,Wetland,Water,20 to 50,0.41481,29.7611629420699,5,Western Lake Erie
+Away from wetland,Barren,Wetland,5 to 20,0.009,10.3226666666667,4.81,Western Lake Erie
+Wetland side,Wetland,Water,1 to 5,0.0459,3.11529411764706,5,Western Lake Erie
+Away from wetland,Water,Water,50 or more,0.05643,52.3600744284955,4.34928229665072,Western Lake Erie
+Away from wetland,Other,Other,under 1,0.06237,0.0404040404040404,4.9033189033189,Western Lake Erie
+Away from wetland,Other,Water,under 1,0.00927,0.194174757281553,4.88349514563107,Western Lake Erie
+Away from wetland,Water,Other,under 1,0.0027,0,1.6,Western Lake Erie
+Wetland side,Water,Wetland,5 to 20,0.01674,12.7935483870968,5,Western Lake Erie
+Wetland side,Water,Wetland,20 to 50,0.03384,31.2744680851064,5,Western Lake Erie
+Away from wetland,Other,Other,1 to 5,0.04095,2.64897435897436,4.98681318681319,Western Lake Erie
+Wetland side,Water,Water,5 to 20,0.03006,13.8059880239521,5,Western Lake Erie
+Away from wetland,,None,1 to 5,0.00549,2.7344262295082,5,Western Lake Erie
+Wetland side,Water,Water,20 to 50,0.07749,29.1767711962834,5,Western Lake Erie
+Wetland side,Barren,Water,5 to 20,0.00126,12.3571428571429,5,Western Lake Erie
+Wetland side,Wetland,Other,1 to 5,0.00693,2.53246753246753,5,Western Lake Erie
+Away from wetland,Barren,Water,5 to 20,0.04194,11.1685264663805,4.78540772532189,Western Lake Erie
+Away from wetland,Other,Wetland,under 1,0.00792,0.0681818181818182,5,Western Lake Erie
+Wetland side,Other,Wetland,5 to 20,0.00117,11.8923076923077,5,Western Lake Erie
+Away from wetland,Water,Other,1 to 5,0.00423,3.31489361702128,4.82978723404255,Western Lake Erie
+Away from wetland,Barren,Water,1 to 5,0.02268,2.8031746031746,4.99206349206349,Western Lake Erie
+Wetland side,Barren,Barren,5 to 20,0.00027,6.86666666666667,5,Western Lake Erie
+Wetland side,Water,Barren,5 to 20,0.00135,12.6,5,Western Lake Erie
+Away from wetland,Water,Barren,1 to 5,0.00288,3.01875,4.78125,Western Lake Erie
+Away from wetland,,None,under 1,0.00189,0.355555555555556,4.90476190476191,Western Lake Erie
+Away from wetland,Other,Wetland,1 to 5,0.01566,2.97126436781609,5,Western Lake Erie
+Away from wetland,Other,Water,1 to 5,0.01899,2.84715639810427,4.91943127962085,Western Lake Erie
+Away from wetland,Water,Wetland,under 1,0.00135,0.0533333333333333,3.53333333333333,Western Lake Erie
+Wetland side,Other,Wetland,1 to 5,0.00045,3.12,5,Western Lake Erie
+Away from wetland,Barren,Other,1 to 5,0.01062,2.66101694915254,4.98305084745763,Western Lake Erie
+Wetland side,Wetland,Barren,under 1,0.00153,0.0352941176470588,5,Western Lake Erie
+Wetland side,Wetland,Barren,1 to 5,0.00243,3.16296296296296,5,Western Lake Erie
+Wetland side,Wetland,Barren,20 to 50,0.00324,24.7833333333333,5,Western Lake Erie
+Away from wetland,,Water,5 to 20,0.00018,9.8,5,Western Lake Erie
+Away from wetland,Barren,Water,under 1,0.01422,0.178902953586498,4.89873417721519,Western Lake Erie
+Away from wetland,,Barren,20 to 50,9e-05,35.6,5,Western Lake Erie
+Away from wetland,Barren,Other,under 1,0.00531,0.0338983050847458,5,Western Lake Erie
+Away from wetland,,Water,1 to 5,9e-05,4,5,Western Lake Erie
+Away from wetland,Barren,Wetland,1 to 5,0.00567,2.43492063492064,5,Western Lake Erie
+Wetland side,Barren,Wetland,5 to 20,0.00054,6.8,5,Western Lake Erie
+Wetland side,Other,Water,5 to 20,0.00117,10.1076923076923,5,Western Lake Erie
+Away from wetland,Water,Wetland,1 to 5,0.00405,2.75074074074074,4.68888888888889,Western Lake Erie
+Away from wetland,Barren,Barren,1 to 5,0.04941,2.6958409228901,4.95628415300546,Western Lake Erie
+Away from wetland,Water,Barren,under 1,0.00162,0,1.66666666666667,Western Lake Erie
+Wetland side,Water,Wetland,1 to 5,0.00162,3.23333333333333,5,Western Lake Erie
+Away from wetland,Other,Barren,under 1,0.00414,0.191304347826087,5,Western Lake Erie
+Wetland side,Wetland,Other,under 1,0.00279,0.0258064516129032,5,Western Lake Erie
+Away from wetland,Barren,Barren,under 1,0.02673,0.146801346801347,4.94276094276094,Western Lake Erie
+Away from wetland,Barren,Barren,5 to 20,0.06867,10.6010921799913,4.84796854521625,Western Lake Erie
+Wetland side,Wetland,Water,under 1,0.00369,0.229268292682927,5,Western Lake Erie
+Wetland side,Water,Barren,20 to 50,0.00144,27.6,5,Western Lake Erie
+Wetland side,Water,Water,1 to 5,9e-04,2.96,5,Western Lake Erie
+Wetland side,Barren,Barren,1 to 5,0.00036,3.35,5,Western Lake Erie
+Away from wetland,Barren,Wetland,under 1,0.0045,0.12,5,Western Lake Erie
+Wetland side,Other,Wetland,20 to 50,0.00036,23.7,5,Western Lake Erie
+Away from wetland,,None,50 or more,0.00135,53.5711111111111,4.46666666666667,Western Lake Erie
+Away from wetland,Water,Wetland,50 or more,0.00288,51.9567708333333,4.28125,Western Lake Erie
+Wetland side,Other,Barren,5 to 20,9e-05,9.2,5,Western Lake Erie
+Away from wetland,Water,Barren,50 or more,0.00126,51.4714285714286,4.21428571428571,Western Lake Erie
+Away from wetland,Barren,Other,20 to 50,0.00225,26.8993333333333,4.16,Western Lake Erie
+Wetland side,Barren,Wetland,20 to 50,0.00018,24.9,5,Western Lake Erie
+Away from wetland,Water,Other,50 or more,0.00549,52.3642076502732,4.45901639344262,Western Lake Erie
+Wetland side,Other,Water,1 to 5,0.00018,4.5,5,Western Lake Erie
+Away from wetland,Other,Water,50 or more,0.00153,51.4196078431373,4.29411764705882,Western Lake Erie
+Wetland side,Wetland,Other,20 to 50,0.00243,25.3037037037037,5,Western Lake Erie
+Wetland side,Water,Other,5 to 20,0.00054,14.1333333333333,5,Western Lake Erie
+Wetland side,Water,Other,20 to 50,9e-04,27.2,5,Western Lake Erie
+Away from wetland,Other,Other,50 or more,0.00189,51.9619047619048,4.71428571428571,Western Lake Erie
+Wetland side,Other,Other,1 to 5,9e-05,2.8,5,Western Lake Erie
+Wetland side,Barren,Water,20 to 50,0.00036,21.15,5,Western Lake Erie
+Wetland side,Barren,Water,1 to 5,0.00018,2.2,5,Western Lake Erie
+Wetland side,Other,Other,5 to 20,0.00027,8.26666666666667,5,Western Lake Erie
+Wetland side,Other,Water,20 to 50,0.00027,27.2666666666667,5,Western Lake Erie
+Away from wetland,Barren,Water,50 or more,0.00036,51.1,4.5,Western Lake Erie
+Away from wetland,Other,Barren,50 or more,0.00018,50.9666666666667,4,Western Lake Erie
+Wetland side,Barren,Other,under 1,0.00027,0,5,Western Lake Erie
+Wetland side,Barren,Other,5 to 20,0.00018,5.6,5,Western Lake Erie
+Wetland side,Water,Water,under 1,0.00054,0.466666666666667,5,Western Lake Erie
+Wetland side,Other,Other,under 1,9e-05,0,5,Western Lake Erie
+Wetland side,Barren,Wetland,under 1,0.00027,0,5,Western Lake Erie
+Wetland side,Barren,Wetland,1 to 5,0.00018,3.7,5,Western Lake Erie
+Wetland side,Other,Wetland,under 1,9e-05,0.6,5,Western Lake Erie
+Wetland side,Barren,Water,under 1,9e-05,0,5,Western Lake Erie
+Wetland side,Water,Wetland,under 1,9e-04,0.32,5,Western Lake Erie
+Away from wetland,Barren,Barren,50 or more,9e-05,54,5,Western Lake Erie
+Wetland side,Barren,Barren,20 to 50,0.00027,25.9333333333333,5,Western Lake Erie

@@ -32,6 +32,7 @@
 		<column name="FriFile" displayName="LANDFIRE Mean Fire Return Interval" dataType="String" isOptional="True"/>
 		<column name="BpsFile" displayName="LANDFIRE Biophysical Settings 2020 (potential vegetation; reforestation, stage 5)" dataType="String" isOptional="True"/>
 		<column name="TreeCanopyFolder" displayName="USFS Tree Canopy Cover Folder (science_tcc_conus_year.tif; Forest Cover: canopy forest, recovery and stocking)" dataType="String" isOptional="True"/>
+		<column name="DsweFolder" displayName="USGS DSWE Annual Open Water Folder (DSWE_open_water_year.tif; change among water, wetland and barren)" dataType="String" isOptional="True"/>
 		<column name="PrismFolder" displayName="PRISM Folder (annual, monthly and normals; 800 m, 4 km or both)" dataType="String" isOptional="True"/>
 		<column name="Loca2Folder" displayName="LOCA2 Folder (gcm/r1i1p1f1/ssp)" dataType="String" isOptional="True"/>
 		<column name="SoilCarbonFile" displayName="Soil Organic Carbon (gNATSGO soc0_999; gSSURGO also reads)" dataType="String" isOptional="True"/>

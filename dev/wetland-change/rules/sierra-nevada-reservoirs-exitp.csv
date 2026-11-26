@@ -1,0 +1,77 @@
+Side,Nlcd,Ccap,Era,Bin,Kha,MeanOpen,MeanLandYears,Region
+Away from wetland,Other,None,1995-98,5 to 10,0.00108,6.425,4.75,Sierra Nevada reservoirs
+Away from wetland,Barren,None,1995-98,5 to 10,0.00036,6.1,5,Sierra Nevada reservoirs
+Away from wetland,Barren,None,1995-98,under 1,0.00423,0.280851063829787,4.95744680851064,Sierra Nevada reservoirs
+Away from wetland,Other,None,1995-98,1 to 5,0.00945,1.9647619047619,4.99047619047619,Sierra Nevada reservoirs
+Away from wetland,Other,None,1995-98,under 1,0.00585,0.166153846153846,4.98461538461539,Sierra Nevada reservoirs
+Away from wetland,Other,None,1995-98,20 to 40,0.01413,31.1766454352442,4.31847133757962,Sierra Nevada reservoirs
+Away from wetland,Other,None,1995-98,40 or more,0.02007,53.8764573991032,4.10762331838565,Sierra Nevada reservoirs
+Away from wetland,Water,None,1995-98,40 or more,0.02205,58.3555102040816,3.88979591836735,Sierra Nevada reservoirs
+Away from wetland,Other,None,1995-98,10 to 20,0.00207,15.0782608695652,4.82608695652174,Sierra Nevada reservoirs
+Away from wetland,Barren,None,1995-98,40 or more,0.00144,52.9708333333333,4.6875,Sierra Nevada reservoirs
+Away from wetland,Barren,None,1995-98,1 to 5,0.00405,1.93185185185185,4.86666666666667,Sierra Nevada reservoirs
+Away from wetland,Water,None,1995-98,20 to 40,0.00936,29.8240384615385,3.38461538461538,Sierra Nevada reservoirs
+Away from wetland,Barren,None,1995-98,20 to 40,0.00036,24.15,5,Sierra Nevada reservoirs
+Away from wetland,Barren,None,1995-98,10 to 20,0.00063,15.5428571428571,5,Sierra Nevada reservoirs
+Away from wetland,Water,None,1995-98,10 to 20,0.00252,15.9851190476191,3.46428571428571,Sierra Nevada reservoirs
+Away from wetland,Water,None,1995-98,under 1,0.00153,0,1.94117647058824,Sierra Nevada reservoirs
+Wetland side,Other,None,1995-98,1 to 5,9e-05,3,5,Sierra Nevada reservoirs
+Away from wetland,Water,None,1995-98,1 to 5,0.0018,2.61833333333333,2.65,Sierra Nevada reservoirs
+Away from wetland,Water,None,1995-98,5 to 10,0.00072,6.30416666666667,2.75,Sierra Nevada reservoirs
+Away from wetland,Other,None,1999-2012,40 or more,0.22203,56.8223888663694,3.49614916903121,Sierra Nevada reservoirs
+Away from wetland,Other,None,1999-2012,20 to 40,0.19953,28.8141557660502,3.89535408209292,Sierra Nevada reservoirs
+Away from wetland,Other,None,1999-2012,5 to 10,0.21168,7.16646116780046,4.43324829931973,Sierra Nevada reservoirs
+Away from wetland,Other,None,1999-2012,10 to 20,0.20979,14.2226154726155,4.21578721578722,Sierra Nevada reservoirs
+Away from wetland,Water,None,1999-2012,40 or more,1.07577,53.6657896204579,3.28026436877771,Sierra Nevada reservoirs
+Away from wetland,Other,None,1999-2012,1 to 5,0.24273,2.97088740575948,4.55728587319244,Sierra Nevada reservoirs
+Away from wetland,Water,None,1999-2012,20 to 40,1.38195,29.2459969608163,3.33129273852165,Sierra Nevada reservoirs
+Away from wetland,Barren,None,1999-2012,20 to 40,0.0027,30.0544444444444,3.56666666666667,Sierra Nevada reservoirs
+Away from wetland,Barren,None,1999-2012,40 or more,0.01422,64.3176160337553,4.63924050632911,Sierra Nevada reservoirs
+Away from wetland,Water,None,1999-2012,10 to 20,0.83142,14.8448491737028,3.46481922494046,Sierra Nevada reservoirs
+Away from wetland,Water,None,1999-2012,5 to 10,0.35289,7.39876307064525,3.33103800051007,Sierra Nevada reservoirs
+Away from wetland,Barren,None,1999-2012,10 to 20,0.00153,13.2392156862745,3.35294117647059,Sierra Nevada reservoirs
+Away from wetland,Water,None,1999-2012,1 to 5,0.22338,2.96931238248725,2.98106365834005,Sierra Nevada reservoirs
+Wetland side,Water,None,1999-2012,10 to 20,9e-05,15.6,5,Sierra Nevada reservoirs
+Away from wetland,Water,None,1999-2012,under 1,0.07335,0.0947648261758691,2.94233128834356,Sierra Nevada reservoirs
+Away from wetland,Barren,None,1999-2012,1 to 5,0.00135,2.92222222222222,3.33333333333333,Sierra Nevada reservoirs
+Away from wetland,Barren,None,1999-2012,5 to 10,0.00117,7.38974358974359,3,Sierra Nevada reservoirs
+Away from wetland,Other,None,1999-2012,under 1,0.0468,0.117564102564103,3.43653846153846,Sierra Nevada reservoirs
+Wetland side,Other,None,1999-2012,40 or more,0.00027,65.8666666666667,5,Sierra Nevada reservoirs
+Away from wetland,Water,None,2013-21,20 to 40,1.69191,28.4569391988936,2.53486887600404,Sierra Nevada reservoirs
+Away from wetland,Water,None,2013-21,40 or more,0.8775,54.7398512820513,2.48564102564103,Sierra Nevada reservoirs
+Away from wetland,Water,None,2013-21,10 to 20,1.67121,14.2756098874468,2.7472669502935,Sierra Nevada reservoirs
+Away from wetland,Water,None,2013-21,1 to 5,1.35558,2.66016797238084,2.82698180852476,Sierra Nevada reservoirs
+Away from wetland,Water,None,2013-21,5 to 10,1.25487,7.10436300174518,2.92232661550599,Sierra Nevada reservoirs
+Away from wetland,Water,None,2013-21,under 1,0.71622,0.102391723213538,2.27067102287007,Sierra Nevada reservoirs
+Away from wetland,Barren,None,2013-21,under 1,0.00054,0,3.5,Sierra Nevada reservoirs
+Away from wetland,Other,None,2013-21,under 1,0.0027,0.149444444444444,3.2,Sierra Nevada reservoirs
+Away from wetland,Other,None,2013-21,1 to 5,0.03492,2.83668384879725,3.47164948453608,Sierra Nevada reservoirs
+Away from wetland,Other,None,2013-21,20 to 40,0.0774,28.4402325581395,4.21279069767442,Sierra Nevada reservoirs
+Away from wetland,Other,None,2013-21,5 to 10,0.03915,7.04467432950192,4.30344827586207,Sierra Nevada reservoirs
+Away from wetland,Barren,None,2013-21,40 or more,0.00945,71.4638095238095,4.81904761904762,Sierra Nevada reservoirs
+Away from wetland,Other,None,2013-21,40 or more,0.06327,58.012683736368,4.35988620199147,Sierra Nevada reservoirs
+Away from wetland,Barren,None,2013-21,20 to 40,0.00036,35.3916666666667,3.75,Sierra Nevada reservoirs
+Away from wetland,Other,None,2013-21,10 to 20,0.05337,14.9072231590781,4.00505902192243,Sierra Nevada reservoirs
+Wetland side,Water,None,2013-21,20 to 40,9e-05,21.2,5,Sierra Nevada reservoirs
+Away from wetland,Barren,None,2013-21,1 to 5,9e-04,2.2,3,Sierra Nevada reservoirs
+Away from wetland,Barren,None,2013-21,10 to 20,0.00054,14.2,4.33333333333333,Sierra Nevada reservoirs
+Away from wetland,Barren,None,2013-21,5 to 10,9e-05,9.25,4,Sierra Nevada reservoirs
+Wetland side,Water,None,1995-98,40 or more,0.00045,66.12,5,Sierra Nevada reservoirs
+Wetland side,Water,None,1999-2012,40 or more,0.00171,77.3157894736842,5,Sierra Nevada reservoirs
+Wetland side,Wetland,None,1999-2012,40 or more,9e-04,80.54,5,Sierra Nevada reservoirs
+Away from wetland,Barren,None,1999-2012,under 1,0.00036,0.5,4.25,Sierra Nevada reservoirs
+Wetland side,Other,None,1999-2012,5 to 10,0.00036,7.7,5,Sierra Nevada reservoirs
+Wetland side,Other,None,1999-2012,1 to 5,0.00045,2.72,5,Sierra Nevada reservoirs
+Wetland side,Other,None,1999-2012,under 1,9e-05,0,5,Sierra Nevada reservoirs
+Wetland side,Water,None,2013-21,40 or more,0.00198,81.1181818181818,5,Sierra Nevada reservoirs
+Wetland side,Other,None,2013-21,5 to 10,0.00018,7.4,5,Sierra Nevada reservoirs
+Wetland side,Wetland,None,2013-21,40 or more,0.00153,83.0588235294118,5,Sierra Nevada reservoirs
+Wetland side,Water,None,1995-98,20 to 40,0.00018,34.5,5,Sierra Nevada reservoirs
+Wetland side,Other,None,1999-2012,20 to 40,9e-05,20,5,Sierra Nevada reservoirs
+Wetland side,Wetland,None,1999-2012,10 to 20,0.00063,14.3714285714286,5,Sierra Nevada reservoirs
+Wetland side,Wetland,None,1999-2012,20 to 40,0.00018,24.7,5,Sierra Nevada reservoirs
+Wetland side,Wetland,None,1999-2012,5 to 10,0.00045,7.72,5,Sierra Nevada reservoirs
+Wetland side,Other,None,1999-2012,10 to 20,0.00036,11.7,5,Sierra Nevada reservoirs
+Wetland side,Wetland,None,1999-2012,1 to 5,9e-05,3.8,5,Sierra Nevada reservoirs
+Wetland side,Other,None,2013-21,10 to 20,9e-05,12.6,5,Sierra Nevada reservoirs
+Wetland side,Wetland,None,2013-21,10 to 20,9e-05,12,5,Sierra Nevada reservoirs

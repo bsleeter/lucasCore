@@ -1,0 +1,385 @@
+Year,Side,Code,Kha,Change,Region
+1994,Wetland,1,0,To Water,Louisiana chenier plain
+1994,Wetland,2,0,Water to Wetland,Louisiana chenier plain
+1994,Wetland,3,0,Water to Barren,Louisiana chenier plain
+1994,Wetland,4,0,Wetland to Barren,Louisiana chenier plain
+1994,Wetland,5,0,Barren to Wetland,Louisiana chenier plain
+1994,Wetland,6,0,Water to Other Land,Louisiana chenier plain
+1994,Other,1,0,To Water,Louisiana chenier plain
+1994,Other,2,0,Water to Wetland,Louisiana chenier plain
+1994,Other,3,0,Water to Barren,Louisiana chenier plain
+1994,Other,4,0,Wetland to Barren,Louisiana chenier plain
+1994,Other,5,0,Barren to Wetland,Louisiana chenier plain
+1994,Other,6,0,Water to Other Land,Louisiana chenier plain
+1995,Wetland,1,0.18279,To Water,Louisiana chenier plain
+1995,Wetland,2,1.08009,Water to Wetland,Louisiana chenier plain
+1995,Wetland,3,0.00036,Water to Barren,Louisiana chenier plain
+1995,Wetland,4,0,Wetland to Barren,Louisiana chenier plain
+1995,Wetland,5,0,Barren to Wetland,Louisiana chenier plain
+1995,Wetland,6,0.01125,Water to Other Land,Louisiana chenier plain
+1995,Other,1,1.04598,To Water,Louisiana chenier plain
+1995,Other,2,0,Water to Wetland,Louisiana chenier plain
+1995,Other,3,0.02475,Water to Barren,Louisiana chenier plain
+1995,Other,4,0,Wetland to Barren,Louisiana chenier plain
+1995,Other,5,0,Barren to Wetland,Louisiana chenier plain
+1995,Other,6,1.84581,Water to Other Land,Louisiana chenier plain
+1996,Wetland,1,0.24795,To Water,Louisiana chenier plain
+1996,Wetland,2,0.97542,Water to Wetland,Louisiana chenier plain
+1996,Wetland,3,0.00072,Water to Barren,Louisiana chenier plain
+1996,Wetland,4,0.03825,Wetland to Barren,Louisiana chenier plain
+1996,Wetland,5,0.00072,Barren to Wetland,Louisiana chenier plain
+1996,Wetland,6,0.0018,Water to Other Land,Louisiana chenier plain
+1996,Other,1,1.50381,To Water,Louisiana chenier plain
+1996,Other,2,0,Water to Wetland,Louisiana chenier plain
+1996,Other,3,0.07677,Water to Barren,Louisiana chenier plain
+1996,Other,4,0,Wetland to Barren,Louisiana chenier plain
+1996,Other,5,0,Barren to Wetland,Louisiana chenier plain
+1996,Other,6,1.16676,Water to Other Land,Louisiana chenier plain
+1997,Wetland,1,0.29061,To Water,Louisiana chenier plain
+1997,Wetland,2,0.54225,Water to Wetland,Louisiana chenier plain
+1997,Wetland,3,9e-05,Water to Barren,Louisiana chenier plain
+1997,Wetland,4,0.08451,Wetland to Barren,Louisiana chenier plain
+1997,Wetland,5,0.00045,Barren to Wetland,Louisiana chenier plain
+1997,Wetland,6,0.00549,Water to Other Land,Louisiana chenier plain
+1997,Other,1,1.62738,To Water,Louisiana chenier plain
+1997,Other,2,0,Water to Wetland,Louisiana chenier plain
+1997,Other,3,0.02691,Water to Barren,Louisiana chenier plain
+1997,Other,4,0,Wetland to Barren,Louisiana chenier plain
+1997,Other,5,0,Barren to Wetland,Louisiana chenier plain
+1997,Other,6,0.82386,Water to Other Land,Louisiana chenier plain
+1998,Wetland,1,0.25236,To Water,Louisiana chenier plain
+1998,Wetland,2,0.26415,Water to Wetland,Louisiana chenier plain
+1998,Wetland,3,9e-05,Water to Barren,Louisiana chenier plain
+1998,Wetland,4,0.01719,Wetland to Barren,Louisiana chenier plain
+1998,Wetland,5,0.00036,Barren to Wetland,Louisiana chenier plain
+1998,Wetland,6,0.00027,Water to Other Land,Louisiana chenier plain
+1998,Other,1,0.74673,To Water,Louisiana chenier plain
+1998,Other,2,0,Water to Wetland,Louisiana chenier plain
+1998,Other,3,0.0144,Water to Barren,Louisiana chenier plain
+1998,Other,4,0,Wetland to Barren,Louisiana chenier plain
+1998,Other,5,0,Barren to Wetland,Louisiana chenier plain
+1998,Other,6,0.32967,Water to Other Land,Louisiana chenier plain
+1999,Wetland,1,0.3006,To Water,Louisiana chenier plain
+1999,Wetland,2,1.04571,Water to Wetland,Louisiana chenier plain
+1999,Wetland,3,0.00054,Water to Barren,Louisiana chenier plain
+1999,Wetland,4,0.01656,Wetland to Barren,Louisiana chenier plain
+1999,Wetland,5,0.00099,Barren to Wetland,Louisiana chenier plain
+1999,Wetland,6,0.00315,Water to Other Land,Louisiana chenier plain
+1999,Other,1,0.92394,To Water,Louisiana chenier plain
+1999,Other,2,0,Water to Wetland,Louisiana chenier plain
+1999,Other,3,0.06057,Water to Barren,Louisiana chenier plain
+1999,Other,4,0,Wetland to Barren,Louisiana chenier plain
+1999,Other,5,0,Barren to Wetland,Louisiana chenier plain
+1999,Other,6,0.57087,Water to Other Land,Louisiana chenier plain
+2000,Wetland,1,0.15615,To Water,Louisiana chenier plain
+2000,Wetland,2,0.58374,Water to Wetland,Louisiana chenier plain
+2000,Wetland,3,0.00081,Water to Barren,Louisiana chenier plain
+2000,Wetland,4,0.00486,Wetland to Barren,Louisiana chenier plain
+2000,Wetland,5,0.00036,Barren to Wetland,Louisiana chenier plain
+2000,Wetland,6,0.00171,Water to Other Land,Louisiana chenier plain
+2000,Other,1,0.41571,To Water,Louisiana chenier plain
+2000,Other,2,0,Water to Wetland,Louisiana chenier plain
+2000,Other,3,0.04608,Water to Barren,Louisiana chenier plain
+2000,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2000,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2000,Other,6,0.58707,Water to Other Land,Louisiana chenier plain
+2001,Wetland,1,0.5724,To Water,Louisiana chenier plain
+2001,Wetland,2,0.2439,Water to Wetland,Louisiana chenier plain
+2001,Wetland,3,0.00027,Water to Barren,Louisiana chenier plain
+2001,Wetland,4,0.02133,Wetland to Barren,Louisiana chenier plain
+2001,Wetland,5,0.00549,Barren to Wetland,Louisiana chenier plain
+2001,Wetland,6,0.00099,Water to Other Land,Louisiana chenier plain
+2001,Other,1,0.53037,To Water,Louisiana chenier plain
+2001,Other,2,0,Water to Wetland,Louisiana chenier plain
+2001,Other,3,0.03915,Water to Barren,Louisiana chenier plain
+2001,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2001,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2001,Other,6,0.42354,Water to Other Land,Louisiana chenier plain
+2002,Wetland,1,0.27684,To Water,Louisiana chenier plain
+2002,Wetland,2,0.21591,Water to Wetland,Louisiana chenier plain
+2002,Wetland,3,0.00036,Water to Barren,Louisiana chenier plain
+2002,Wetland,4,0.0081,Wetland to Barren,Louisiana chenier plain
+2002,Wetland,5,0.00063,Barren to Wetland,Louisiana chenier plain
+2002,Wetland,6,0.00234,Water to Other Land,Louisiana chenier plain
+2002,Other,1,0.37332,To Water,Louisiana chenier plain
+2002,Other,2,0,Water to Wetland,Louisiana chenier plain
+2002,Other,3,0.01926,Water to Barren,Louisiana chenier plain
+2002,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2002,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2002,Other,6,0.38322,Water to Other Land,Louisiana chenier plain
+2003,Wetland,1,0.25353,To Water,Louisiana chenier plain
+2003,Wetland,2,0.20862,Water to Wetland,Louisiana chenier plain
+2003,Wetland,3,0.00036,Water to Barren,Louisiana chenier plain
+2003,Wetland,4,0.01656,Wetland to Barren,Louisiana chenier plain
+2003,Wetland,5,0.00117,Barren to Wetland,Louisiana chenier plain
+2003,Wetland,6,0.00324,Water to Other Land,Louisiana chenier plain
+2003,Other,1,0.39087,To Water,Louisiana chenier plain
+2003,Other,2,0,Water to Wetland,Louisiana chenier plain
+2003,Other,3,0.07263,Water to Barren,Louisiana chenier plain
+2003,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2003,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2003,Other,6,0.54189,Water to Other Land,Louisiana chenier plain
+2004,Wetland,1,0.27621,To Water,Louisiana chenier plain
+2004,Wetland,2,0.08568,Water to Wetland,Louisiana chenier plain
+2004,Wetland,3,0.00027,Water to Barren,Louisiana chenier plain
+2004,Wetland,4,0.00468,Wetland to Barren,Louisiana chenier plain
+2004,Wetland,5,0.00054,Barren to Wetland,Louisiana chenier plain
+2004,Wetland,6,0.00108,Water to Other Land,Louisiana chenier plain
+2004,Other,1,0.30051,To Water,Louisiana chenier plain
+2004,Other,2,0,Water to Wetland,Louisiana chenier plain
+2004,Other,3,0.04176,Water to Barren,Louisiana chenier plain
+2004,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2004,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2004,Other,6,0.87399,Water to Other Land,Louisiana chenier plain
+2005,Wetland,1,2.17431,To Water,Louisiana chenier plain
+2005,Wetland,2,0.08658,Water to Wetland,Louisiana chenier plain
+2005,Wetland,3,9e-05,Water to Barren,Louisiana chenier plain
+2005,Wetland,4,0.0054,Wetland to Barren,Louisiana chenier plain
+2005,Wetland,5,0.00108,Barren to Wetland,Louisiana chenier plain
+2005,Wetland,6,9e-04,Water to Other Land,Louisiana chenier plain
+2005,Other,1,0.44649,To Water,Louisiana chenier plain
+2005,Other,2,0,Water to Wetland,Louisiana chenier plain
+2005,Other,3,0.01764,Water to Barren,Louisiana chenier plain
+2005,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2005,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2005,Other,6,0.43218,Water to Other Land,Louisiana chenier plain
+2006,Wetland,1,8.57403,To Water,Louisiana chenier plain
+2006,Wetland,2,0.10125,Water to Wetland,Louisiana chenier plain
+2006,Wetland,3,0,Water to Barren,Louisiana chenier plain
+2006,Wetland,4,0.02871,Wetland to Barren,Louisiana chenier plain
+2006,Wetland,5,0.00657,Barren to Wetland,Louisiana chenier plain
+2006,Wetland,6,0.00063,Water to Other Land,Louisiana chenier plain
+2006,Other,1,2.49687,To Water,Louisiana chenier plain
+2006,Other,2,0,Water to Wetland,Louisiana chenier plain
+2006,Other,3,0.01395,Water to Barren,Louisiana chenier plain
+2006,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2006,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2006,Other,6,0.27819,Water to Other Land,Louisiana chenier plain
+2007,Wetland,1,2.20203,To Water,Louisiana chenier plain
+2007,Wetland,2,0.36675,Water to Wetland,Louisiana chenier plain
+2007,Wetland,3,0.00054,Water to Barren,Louisiana chenier plain
+2007,Wetland,4,0.00315,Wetland to Barren,Louisiana chenier plain
+2007,Wetland,5,0.00306,Barren to Wetland,Louisiana chenier plain
+2007,Wetland,6,0.00774,Water to Other Land,Louisiana chenier plain
+2007,Other,1,1.10007,To Water,Louisiana chenier plain
+2007,Other,2,0,Water to Wetland,Louisiana chenier plain
+2007,Other,3,0.02592,Water to Barren,Louisiana chenier plain
+2007,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2007,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2007,Other,6,0.35568,Water to Other Land,Louisiana chenier plain
+2008,Wetland,1,0.46359,To Water,Louisiana chenier plain
+2008,Wetland,2,0.36315,Water to Wetland,Louisiana chenier plain
+2008,Wetland,3,0.00054,Water to Barren,Louisiana chenier plain
+2008,Wetland,4,0.00432,Wetland to Barren,Louisiana chenier plain
+2008,Wetland,5,0.00108,Barren to Wetland,Louisiana chenier plain
+2008,Wetland,6,0.01458,Water to Other Land,Louisiana chenier plain
+2008,Other,1,0.49941,To Water,Louisiana chenier plain
+2008,Other,2,0,Water to Wetland,Louisiana chenier plain
+2008,Other,3,0.01467,Water to Barren,Louisiana chenier plain
+2008,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2008,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2008,Other,6,0.43002,Water to Other Land,Louisiana chenier plain
+2009,Wetland,1,2.91816,To Water,Louisiana chenier plain
+2009,Wetland,2,0.35757,Water to Wetland,Louisiana chenier plain
+2009,Wetland,3,0.00108,Water to Barren,Louisiana chenier plain
+2009,Wetland,4,0.01368,Wetland to Barren,Louisiana chenier plain
+2009,Wetland,5,0.00468,Barren to Wetland,Louisiana chenier plain
+2009,Wetland,6,0.00504,Water to Other Land,Louisiana chenier plain
+2009,Other,1,0.64881,To Water,Louisiana chenier plain
+2009,Other,2,0,Water to Wetland,Louisiana chenier plain
+2009,Other,3,0.05121,Water to Barren,Louisiana chenier plain
+2009,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2009,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2009,Other,6,0.68085,Water to Other Land,Louisiana chenier plain
+2010,Wetland,1,0.29835,To Water,Louisiana chenier plain
+2010,Wetland,2,0.89046,Water to Wetland,Louisiana chenier plain
+2010,Wetland,3,0.00045,Water to Barren,Louisiana chenier plain
+2010,Wetland,4,0.00252,Wetland to Barren,Louisiana chenier plain
+2010,Wetland,5,0.00117,Barren to Wetland,Louisiana chenier plain
+2010,Wetland,6,0.00477,Water to Other Land,Louisiana chenier plain
+2010,Other,1,0.33381,To Water,Louisiana chenier plain
+2010,Other,2,0,Water to Wetland,Louisiana chenier plain
+2010,Other,3,0.10674,Water to Barren,Louisiana chenier plain
+2010,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2010,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2010,Other,6,0.55791,Water to Other Land,Louisiana chenier plain
+2011,Wetland,1,0.54333,To Water,Louisiana chenier plain
+2011,Wetland,2,1.09737,Water to Wetland,Louisiana chenier plain
+2011,Wetland,3,0.00126,Water to Barren,Louisiana chenier plain
+2011,Wetland,4,0.00144,Wetland to Barren,Louisiana chenier plain
+2011,Wetland,5,0.00279,Barren to Wetland,Louisiana chenier plain
+2011,Wetland,6,0.00396,Water to Other Land,Louisiana chenier plain
+2011,Other,1,0.3276,To Water,Louisiana chenier plain
+2011,Other,2,0,Water to Wetland,Louisiana chenier plain
+2011,Other,3,0.18045,Water to Barren,Louisiana chenier plain
+2011,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2011,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2011,Other,6,1.56654,Water to Other Land,Louisiana chenier plain
+2012,Wetland,1,0.60579,To Water,Louisiana chenier plain
+2012,Wetland,2,0.52506,Water to Wetland,Louisiana chenier plain
+2012,Wetland,3,9e-05,Water to Barren,Louisiana chenier plain
+2012,Wetland,4,0.00207,Wetland to Barren,Louisiana chenier plain
+2012,Wetland,5,0.00279,Barren to Wetland,Louisiana chenier plain
+2012,Wetland,6,0.0027,Water to Other Land,Louisiana chenier plain
+2012,Other,1,1.00323,To Water,Louisiana chenier plain
+2012,Other,2,0,Water to Wetland,Louisiana chenier plain
+2012,Other,3,0.08928,Water to Barren,Louisiana chenier plain
+2012,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2012,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2012,Other,6,0.68301,Water to Other Land,Louisiana chenier plain
+2013,Wetland,1,0.2628,To Water,Louisiana chenier plain
+2013,Wetland,2,0.81774,Water to Wetland,Louisiana chenier plain
+2013,Wetland,3,0.00108,Water to Barren,Louisiana chenier plain
+2013,Wetland,4,0.00072,Wetland to Barren,Louisiana chenier plain
+2013,Wetland,5,0.00099,Barren to Wetland,Louisiana chenier plain
+2013,Wetland,6,0.00378,Water to Other Land,Louisiana chenier plain
+2013,Other,1,0.57978,To Water,Louisiana chenier plain
+2013,Other,2,0,Water to Wetland,Louisiana chenier plain
+2013,Other,3,0.0441,Water to Barren,Louisiana chenier plain
+2013,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2013,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2013,Other,6,0.4914,Water to Other Land,Louisiana chenier plain
+2014,Wetland,1,0.16596,To Water,Louisiana chenier plain
+2014,Wetland,2,0.9612,Water to Wetland,Louisiana chenier plain
+2014,Wetland,3,0.00279,Water to Barren,Louisiana chenier plain
+2014,Wetland,4,0.0018,Wetland to Barren,Louisiana chenier plain
+2014,Wetland,5,0.00117,Barren to Wetland,Louisiana chenier plain
+2014,Wetland,6,0.00693,Water to Other Land,Louisiana chenier plain
+2014,Other,1,0.32085,To Water,Louisiana chenier plain
+2014,Other,2,0,Water to Wetland,Louisiana chenier plain
+2014,Other,3,0.08496,Water to Barren,Louisiana chenier plain
+2014,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2014,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2014,Other,6,1.17999,Water to Other Land,Louisiana chenier plain
+2015,Wetland,1,0.34074,To Water,Louisiana chenier plain
+2015,Wetland,2,0.80838,Water to Wetland,Louisiana chenier plain
+2015,Wetland,3,9e-04,Water to Barren,Louisiana chenier plain
+2015,Wetland,4,0.00603,Wetland to Barren,Louisiana chenier plain
+2015,Wetland,5,0.00171,Barren to Wetland,Louisiana chenier plain
+2015,Wetland,6,0.01413,Water to Other Land,Louisiana chenier plain
+2015,Other,1,0.38493,To Water,Louisiana chenier plain
+2015,Other,2,0,Water to Wetland,Louisiana chenier plain
+2015,Other,3,0.06921,Water to Barren,Louisiana chenier plain
+2015,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2015,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2015,Other,6,1.04769,Water to Other Land,Louisiana chenier plain
+2016,Wetland,1,0.41841,To Water,Louisiana chenier plain
+2016,Wetland,2,0.43227,Water to Wetland,Louisiana chenier plain
+2016,Wetland,3,0.00018,Water to Barren,Louisiana chenier plain
+2016,Wetland,4,0.00198,Wetland to Barren,Louisiana chenier plain
+2016,Wetland,5,0.00063,Barren to Wetland,Louisiana chenier plain
+2016,Wetland,6,0.00252,Water to Other Land,Louisiana chenier plain
+2016,Other,1,1.02573,To Water,Louisiana chenier plain
+2016,Other,2,0,Water to Wetland,Louisiana chenier plain
+2016,Other,3,0.02619,Water to Barren,Louisiana chenier plain
+2016,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2016,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2016,Other,6,0.6813,Water to Other Land,Louisiana chenier plain
+2017,Wetland,1,0.3555,To Water,Louisiana chenier plain
+2017,Wetland,2,0.54243,Water to Wetland,Louisiana chenier plain
+2017,Wetland,3,0.00126,Water to Barren,Louisiana chenier plain
+2017,Wetland,4,0.00234,Wetland to Barren,Louisiana chenier plain
+2017,Wetland,5,0.00045,Barren to Wetland,Louisiana chenier plain
+2017,Wetland,6,0.00297,Water to Other Land,Louisiana chenier plain
+2017,Other,1,0.69147,To Water,Louisiana chenier plain
+2017,Other,2,0,Water to Wetland,Louisiana chenier plain
+2017,Other,3,0.0405,Water to Barren,Louisiana chenier plain
+2017,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2017,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2017,Other,6,1.48437,Water to Other Land,Louisiana chenier plain
+2018,Wetland,1,0.2952,To Water,Louisiana chenier plain
+2018,Wetland,2,0.48519,Water to Wetland,Louisiana chenier plain
+2018,Wetland,3,0.00063,Water to Barren,Louisiana chenier plain
+2018,Wetland,4,0.00396,Wetland to Barren,Louisiana chenier plain
+2018,Wetland,5,0.00189,Barren to Wetland,Louisiana chenier plain
+2018,Wetland,6,0.00171,Water to Other Land,Louisiana chenier plain
+2018,Other,1,0.63558,To Water,Louisiana chenier plain
+2018,Other,2,0,Water to Wetland,Louisiana chenier plain
+2018,Other,3,0.05625,Water to Barren,Louisiana chenier plain
+2018,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2018,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2018,Other,6,1.35549,Water to Other Land,Louisiana chenier plain
+2019,Wetland,1,0.6444,To Water,Louisiana chenier plain
+2019,Wetland,2,0.38205,Water to Wetland,Louisiana chenier plain
+2019,Wetland,3,0.00036,Water to Barren,Louisiana chenier plain
+2019,Wetland,4,0.00378,Wetland to Barren,Louisiana chenier plain
+2019,Wetland,5,0.00072,Barren to Wetland,Louisiana chenier plain
+2019,Wetland,6,0.00099,Water to Other Land,Louisiana chenier plain
+2019,Other,1,1.0161,To Water,Louisiana chenier plain
+2019,Other,2,0,Water to Wetland,Louisiana chenier plain
+2019,Other,3,0.03492,Water to Barren,Louisiana chenier plain
+2019,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2019,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2019,Other,6,1.22274,Water to Other Land,Louisiana chenier plain
+2020,Wetland,1,1.01817,To Water,Louisiana chenier plain
+2020,Wetland,2,0.20277,Water to Wetland,Louisiana chenier plain
+2020,Wetland,3,9e-05,Water to Barren,Louisiana chenier plain
+2020,Wetland,4,0.00729,Wetland to Barren,Louisiana chenier plain
+2020,Wetland,5,9e-04,Barren to Wetland,Louisiana chenier plain
+2020,Wetland,6,0.00072,Water to Other Land,Louisiana chenier plain
+2020,Other,1,1.00944,To Water,Louisiana chenier plain
+2020,Other,2,0,Water to Wetland,Louisiana chenier plain
+2020,Other,3,0.07236,Water to Barren,Louisiana chenier plain
+2020,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2020,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2020,Other,6,1.13364,Water to Other Land,Louisiana chenier plain
+2021,Wetland,1,2.56266,To Water,Louisiana chenier plain
+2021,Wetland,2,0.21456,Water to Wetland,Louisiana chenier plain
+2021,Wetland,3,0.00045,Water to Barren,Louisiana chenier plain
+2021,Wetland,4,0.02385,Wetland to Barren,Louisiana chenier plain
+2021,Wetland,5,0.00432,Barren to Wetland,Louisiana chenier plain
+2021,Wetland,6,0.00126,Water to Other Land,Louisiana chenier plain
+2021,Other,1,2.05767,To Water,Louisiana chenier plain
+2021,Other,2,0,Water to Wetland,Louisiana chenier plain
+2021,Other,3,0.06912,Water to Barren,Louisiana chenier plain
+2021,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2021,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2021,Other,6,0.87669,Water to Other Land,Louisiana chenier plain
+2022,Wetland,1,0,To Water,Louisiana chenier plain
+2022,Wetland,2,0,Water to Wetland,Louisiana chenier plain
+2022,Wetland,3,0,Water to Barren,Louisiana chenier plain
+2022,Wetland,4,0.00216,Wetland to Barren,Louisiana chenier plain
+2022,Wetland,5,0.00153,Barren to Wetland,Louisiana chenier plain
+2022,Wetland,6,0,Water to Other Land,Louisiana chenier plain
+2022,Other,1,0.86409,To Water,Louisiana chenier plain
+2022,Other,2,0,Water to Wetland,Louisiana chenier plain
+2022,Other,3,0.02952,Water to Barren,Louisiana chenier plain
+2022,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2022,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2022,Other,6,1.01745,Water to Other Land,Louisiana chenier plain
+2023,Wetland,1,0,To Water,Louisiana chenier plain
+2023,Wetland,2,0,Water to Wetland,Louisiana chenier plain
+2023,Wetland,3,0,Water to Barren,Louisiana chenier plain
+2023,Wetland,4,0.00414,Wetland to Barren,Louisiana chenier plain
+2023,Wetland,5,0.00288,Barren to Wetland,Louisiana chenier plain
+2023,Wetland,6,0,Water to Other Land,Louisiana chenier plain
+2023,Other,1,0.44073,To Water,Louisiana chenier plain
+2023,Other,2,0,Water to Wetland,Louisiana chenier plain
+2023,Other,3,0.1188,Water to Barren,Louisiana chenier plain
+2023,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2023,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2023,Other,6,1.40247,Water to Other Land,Louisiana chenier plain
+2024,Wetland,1,0,To Water,Louisiana chenier plain
+2024,Wetland,2,0,Water to Wetland,Louisiana chenier plain
+2024,Wetland,3,0,Water to Barren,Louisiana chenier plain
+2024,Wetland,4,0.00468,Wetland to Barren,Louisiana chenier plain
+2024,Wetland,5,0.00513,Barren to Wetland,Louisiana chenier plain
+2024,Wetland,6,0,Water to Other Land,Louisiana chenier plain
+2024,Other,1,1.21554,To Water,Louisiana chenier plain
+2024,Other,2,0,Water to Wetland,Louisiana chenier plain
+2024,Other,3,0.08694,Water to Barren,Louisiana chenier plain
+2024,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2024,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2024,Other,6,0.70659,Water to Other Land,Louisiana chenier plain
+2025,Wetland,1,0,To Water,Louisiana chenier plain
+2025,Wetland,2,0,Water to Wetland,Louisiana chenier plain
+2025,Wetland,3,0,Water to Barren,Louisiana chenier plain
+2025,Wetland,4,0,Wetland to Barren,Louisiana chenier plain
+2025,Wetland,5,0,Barren to Wetland,Louisiana chenier plain
+2025,Wetland,6,0,Water to Other Land,Louisiana chenier plain
+2025,Other,1,0.66591,To Water,Louisiana chenier plain
+2025,Other,2,0,Water to Wetland,Louisiana chenier plain
+2025,Other,3,0.09144,Water to Barren,Louisiana chenier plain
+2025,Other,4,0,Wetland to Barren,Louisiana chenier plain
+2025,Other,5,0,Barren to Wetland,Louisiana chenier plain
+2025,Other,6,1.6578,Water to Other Land,Louisiana chenier plain

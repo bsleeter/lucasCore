@@ -536,6 +536,30 @@ download_handlers <- function() {
     finish = function(ctx, items) { dest <- file.path(ctx$place, items$file[1])
       clip_raster(if (clipping(ctx)) paste0("/vsicurl/", CCAP) else items$dest[1], dest, if (clipping(ctx)) ctx$region else list(poly = NULL)) })
 
+  # ---- USGS DSWE annual open water (to-do 2: change among water, wetland and barren; src/water-change.R) --------------------------
+  # Collection 2 DSWE Proportions, CONUS Annual Proportions (doi 10.5066/P16Q2FUD, CC0): one 5-band cloud-optimized GeoTIFF per Landsat
+  # ARD tile and year on the annual NLCD's 30 m grid. Only band 2 is kept (open water: the share of the year's clear looks that read
+  # open water, 0-100; 255 no clear look). The WaterMAP catalog lists the tiles of a box with their place in USGS's public bucket
+  # (ScienceBase does not serve the files to a script). A region is read where the tiles sit; all of CONUS mosaics every tile into
+  # one national file a year. A tile with no file in a year is left as no data and logged
+  H$DsweFolder <- list(column = "DsweFolder", name = "USGS DSWE annual open water", version = "Collection 2 Annual Proportions v2.0", method = "cog", clips = TRUE,
+    note = "Open water only (band 2 of 5), one file a year: the region read where the tiles sit, or (all of CONUS) every tile into one national file",
+    plan = function(ctx) { y <- years_of(ctx, DSWE_YEARS_SOURCE)
+      if (!length(y)) stop(sprintf("DSWE annual open water has the years %d-%d: ask for years that include them", min(DSWE_YEARS_SOURCE), max(DSWE_YEARS_SOURCE)), call. = FALSE)
+      data.table::data.table(year = y, url = DSWE_STAC, file = sprintf(DSWE_FILE, y), out = sprintf(DSWE_FILE, y), fetch = FALSE) },
+    have = function(ctx, items) recorded(ctx, "DsweFolder", file.path(ctx$place, items$out)),
+    finish = function(ctx, items) { dir.create(ctx$place, recursive = TRUE, showWarnings = FALSE); gdal_remote()
+      tiles <- dswe_tiles(if (whole_conus(ctx)) NULL else region_box_ll(ctx$region)); ctx$log(sprintf("  DSWE: %d tiles", length(tiles)))
+      # each year is written under a part name and renamed when whole, as for tree canopy cover: a read that breaks off leaves a partial file
+      for (i in seq_len(nrow(items))) { dest <- file.path(ctx$place, items$out[i]); part <- paste0(dest, ".part.tif")
+        for (k in 1:4) { miss <- tryCatch(dswe_open_water(tiles, items$year[i], part, ctx$region),
+            error = function(e) { ctx$log(sprintf("  DSWE open water %d: %s (try %d)", items$year[i], conditionMessage(e), k)); NULL })
+          gc(); if (!is.null(miss)) break; unlink(part); Sys.sleep(10 * k) }
+        if (is.null(miss)) stop(sprintf("DSWE open water %d could not be read", items$year[i]), call. = FALSE)
+        if (file.exists(dest)) file.remove(dest); file.rename(part, dest)
+        ctx$log(sprintf("  DSWE open water %d%s", items$year[i], if (miss) sprintf(" (%d of %d tiles have no file this year)", miss, length(tiles)) else "")) }
+      ctx$place })
+
   # ---- RAP partitioned NPP v3 (Robinson et al. 2019; CC0): one 4-band 30 m cloud-optimized GeoTIFF a year from 1986 (annual
   # herbaceous, perennial herbaceous, shrub, tree; value / 1000 = Mg C/ha/yr; 65535 no data), each read for the region where it
   # sits. About 75 GB a year for CONUS, so not fetched whole. Grows like NLCD: a rerun asking for more years fetches only those.
@@ -743,6 +767,10 @@ TCC_ZIP <- "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/docs/
 TCC_MEMBER <- "science_tcc_conus_wgs84_v2025-6_%d0101_%d1231.tif"; TCC_YEARS_SOURCE <- 1985:2023
 CDL_ZIP <- "https://www.nass.usda.gov/sites/default/files/Research_and_Science/Cropland/Release/datasets/%d_30m_cdls.zip"
 CDL_YEARS <- 2014:2025   # the years stage 8's Cropland Productivity reads
+# USGS DSWE annual proportions through the WaterMAP catalog (read 2026-11-25: 422 tiles, one item per tile and year; the catalog's own
+# time range stops at 2024 while the bucket holds 2025). A tile's files differ only in the year, so one year's listing gives every year's
+DSWE_STAC <- "https://apps.usgs.gov/watermap/api/v1/stac/collections/dswe-proportions/items"
+DSWE_YEARS_SOURCE <- 1984:2025; DSWE_LIST_YEAR <- 2021L; DSWE_FILE <- "DSWE_open_water_%d.tif"
 CCAP <- "https://ocmgeodatastor1.blob.core.windows.net/ccap/bulk_download/C-CAP_Regional_30-meter_Data/C-CAP_Regional_Land_Cover_Classification/CONUS/conus_2001_ccap_landcover.tif"
 PC_STAC <- "https://planetarycomputer.microsoft.com/api/stac/v1"
 # national files (Home layout National; checked 2026-11-02)
@@ -773,6 +801,24 @@ edl_signed <- function(url, token) {
 recorded <- function(ctx, column, paths) { st <- if (is.null(ctx$store)) ctx$home else ctx$store; f <- read_files(st)[Column == column]
   rel <- substring(normalizePath(paths, winslash = "/", mustWork = FALSE), nchar(normalizePath(st, winslash = "/")) + 2)
   b <- f$Bytes[match(rel, f$Path)]; !is.na(b) & file.exists(paths) & file.size(paths) == as.numeric(b) }
+
+# the DSWE tiles of a lon/lat box (NULL: all of CONUS), as the addresses of their DSWE_LIST_YEAR files
+dswe_tiles <- function(box_ll) { bb <- if (is.null(box_ll)) c(-130, 22, -60, 52) else box_ll
+  j <- jsonlite::fromJSON(sprintf("%s?limit=500&bbox=%s&datetime=%d-01-01T00:00:00Z/%d-12-31T23:59:59Z", DSWE_STAC, paste(sprintf("%.5f", bb), collapse = ","), DSWE_LIST_YEAR, DSWE_LIST_YEAR), simplifyVector = FALSE)
+  h <- vapply(j$features, function(f) f$assets$dswe_proportion$href, "")
+  if (!length(h)) stop("the WaterMAP catalog lists no DSWE tile for the region", call. = FALSE)
+  if (length(h) >= 500) stop("the WaterMAP catalog returned a full page of DSWE tiles: more may exist than were listed", call. = FALSE)
+  if (!all(grepl(sprintf("_%d_Props[.]tif$", DSWE_LIST_YEAR), h))) stop("the DSWE tile addresses no longer end in _<year>_Props.tif", call. = FALSE)
+  sort(h) }
+dswe_year <- function(tiles, year) sub(sprintf("_%d_Props.tif", DSWE_LIST_YEAR), sprintf("_%d_Props.tif", year), tiles, fixed = TRUE)
+# a year's open water (band 2) of the tiles, cut to the region or (no region) written whole; returns how many tiles had no file that year
+dswe_open_water <- function(tiles, year, dest, region) { src <- paste0("/vsicurl/", dswe_year(tiles, year))
+  ok <- vapply(src, function(s) !inherits(try(suppressWarnings(terra::rast(s)), silent = TRUE), "try-error"), TRUE)
+  if (!any(ok)) stop(sprintf("no DSWE tile has a file for %d", year), call. = FALSE)
+  v <- tempfile(fileext = ".vrt"); sf::gdal_utils("buildvrt", src[ok], v, options = c("-b", "2"))
+  if (is.null(region$poly)) terra::writeRaster(terra::rast(v), dest, overwrite = TRUE, datatype = "INT1U", NAflag = 255, gdal = c("COMPRESS=DEFLATE", "TILED=YES", "BIGTIFF=IF_SAFER"))
+  else clip_raster(v, dest, region)
+  sum(!ok) }
 
 # the region's box snapped outward to a grid (origin = the grid's top-left corner), cut into tiles of at most `px` cells a side
 grid_tiles <- function(box, origin, cell, px) {

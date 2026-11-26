@@ -1,0 +1,15 @@
+Region,Rule,Side,Once,Twice,More
+Chesapeake eastern shore,Yearly 50,Wetland,1.01916,0.46035,1.08639
+Chesapeake eastern shore,Yearly 50,Other,1.45206,1.22229,4.66533
+Chesapeake eastern shore,3-year mean 50,Wetland,1.45683,0.18873,0.32859
+Chesapeake eastern shore,3-year mean 50,Other,2.7972,0.85545,2.22561
+Chesapeake eastern shore,Two lines 60/40,Wetland,1.35639,0.28773,0.44442
+Chesapeake eastern shore,Two lines 60/40,Other,2.52693,1.10727,2.56545
+Chesapeake eastern shore,Two lines 70/30,Wetland,1.43478,0.17748,0.12474
+Chesapeake eastern shore,Two lines 70/30,Other,3.46401,0.82647,0.78966
+Chesapeake eastern shore,Two lines 80/20,Wetland,1.32732,0.10575,0.02205
+Chesapeake eastern shore,Two lines 80/20,Other,3.59253,0.39735,0.1287
+Chesapeake eastern shore,Hold 5 years,Wetland,1.28763,0.04311,0.0072
+Chesapeake eastern shore,Hold 5 years,Other,3.78315,0.27828,0.04806
+Chesapeake eastern shore,Hold 3 years,Wetland,1.54827,0.12141,0.05643
+Chesapeake eastern shore,Hold 3 years,Other,3.79962,0.68409,0.54981

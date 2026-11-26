@@ -1,0 +1,123 @@
+Side,Nlcd,Ccap,Bin,Kha,MeanOpen,MeanLandYears,Region
+Away from wetland,Other,Other,20 to 50,3.19554,27.6852902795772,4.78057229763984,Louisiana chenier plain
+Away from wetland,Other,Other,5 to 20,3.02787,12.9474818932121,4.80967809053889,Louisiana chenier plain
+Away from wetland,Other,Wetland,20 to 50,0.08163,29.2325248070562,4.71334068357222,Louisiana chenier plain
+Away from wetland,Other,Other,under 1,0.12438,0.23986975397974,4.89942112879884,Louisiana chenier plain
+Away from wetland,Other,Other,1 to 5,0.5796,2.99989389233954,4.95993788819876,Louisiana chenier plain
+Wetland side,Water,Water,20 to 50,0.4248,27.7649576271186,5,Louisiana chenier plain
+Away from wetland,Water,Water,20 to 50,6.53454,32.3667825891341,3.5238823237749,Louisiana chenier plain
+Wetland side,Wetland,Other,20 to 50,0.03546,25.8644670050761,5,Louisiana chenier plain
+Away from wetland,Other,Water,5 to 20,0.5103,9.59,4.87601410934744,Louisiana chenier plain
+Away from wetland,Other,Water,20 to 50,0.21321,28.8121429576474,4.40016884761503,Louisiana chenier plain
+Away from wetland,Water,Water,5 to 20,3.04119,12.4907361920827,4.1792489124323,Louisiana chenier plain
+Wetland side,Wetland,Wetland,1 to 5,0.91431,2.98553007185747,5,Louisiana chenier plain
+Away from wetland,Water,Other,20 to 50,0.30204,31.305467818832,3.78516090584029,Louisiana chenier plain
+Wetland side,Wetland,Wetland,5 to 20,3.89799,11.88370621782,5,Louisiana chenier plain
+Away from wetland,Water,Water,1 to 5,0.54828,3.06152878091486,4.83995403808273,Louisiana chenier plain
+Away from wetland,Water,Water,under 1,0.14085,0.275878594249202,3.87859424920128,Louisiana chenier plain
+Wetland side,Wetland,Other,5 to 20,0.06372,12.0161016949153,5,Louisiana chenier plain
+Wetland side,Wetland,Wetland,20 to 50,1.95786,26.6175232141215,5,Louisiana chenier plain
+Wetland side,Wetland,Water,5 to 20,2.48364,12.0581388607045,5,Louisiana chenier plain
+Wetland side,Water,Water,1 to 5,0.02646,3.16122448979592,5,Louisiana chenier plain
+Away from wetland,Other,Barren,20 to 50,0.03906,26.5175499231951,4.60829493087558,Louisiana chenier plain
+Wetland side,Wetland,Other,1 to 5,0.01008,3.13214285714286,5,Louisiana chenier plain
+Away from wetland,Water,Other,5 to 20,0.1449,13.1235714285714,4.18571428571429,Louisiana chenier plain
+Wetland side,Water,Water,5 to 20,0.36081,13.3086555250686,5,Louisiana chenier plain
+Wetland side,Wetland,Water,20 to 50,1.43127,27.5284537508646,5,Louisiana chenier plain
+Away from wetland,Water,Wetland,20 to 50,1.09575,32.7779904175222,4.02496919917864,Louisiana chenier plain
+Wetland side,Water,Wetland,5 to 20,0.45144,13.8327751196172,5,Louisiana chenier plain
+Away from wetland,Water,Water,50 or more,0.1431,51.9521907756814,4.32767295597484,Louisiana chenier plain
+Away from wetland,Other,Barren,under 1,0.04023,0.258612975391499,4.99328859060403,Louisiana chenier plain
+Away from wetland,Barren,Water,5 to 20,0.14571,10.3280625900762,4.88202594193947,Louisiana chenier plain
+Away from wetland,Barren,Other,1 to 5,0.0207,2.88347826086957,4.99130434782609,Louisiana chenier plain
+Away from wetland,Other,Wetland,5 to 20,0.06507,10.7878054402951,4.88105117565699,Louisiana chenier plain
+Away from wetland,Water,Other,1 to 5,0.02547,3.2743816254417,4.23321554770318,Louisiana chenier plain
+Wetland side,Water,Other,20 to 50,0.00477,27.188679245283,5,Louisiana chenier plain
+Away from wetland,Water,Barren,5 to 20,0.42057,12.6786860689065,4.50545687994864,Louisiana chenier plain
+Away from wetland,Other,Water,under 1,0.10755,0.239163179916318,4.97991631799163,Louisiana chenier plain
+Away from wetland,Other,Wetland,under 1,0.02619,0.298281786941581,5,Louisiana chenier plain
+Away from wetland,Water,Other,50 or more,0.00486,52.3515432098765,4.51851851851852,Louisiana chenier plain
+Wetland side,Wetland,Wetland,under 1,0.2412,0.198731343283582,5,Louisiana chenier plain
+Wetland side,Water,Wetland,20 to 50,0.60696,27.8770462633452,5,Louisiana chenier plain
+Wetland side,Other,Water,5 to 20,0.03042,12.296449704142,5,Louisiana chenier plain
+Away from wetland,Water,Barren,20 to 50,0.74943,32.1612185260798,3.89443977422841,Louisiana chenier plain
+Wetland side,Other,Other,5 to 20,0.01593,11.619209039548,5,Louisiana chenier plain
+Wetland side,Other,Other,1 to 5,0.00999,2.7009009009009,5,Louisiana chenier plain
+Away from wetland,Water,Wetland,5 to 20,0.40977,13.2587231861776,4.49154403689875,Louisiana chenier plain
+Away from wetland,Other,Barren,1 to 5,0.12456,2.70605732177264,4.97109826589595,Louisiana chenier plain
+Away from wetland,Other,Water,1 to 5,0.37278,2.87440447448897,4.99130854659585,Louisiana chenier plain
+Wetland side,Wetland,Water,1 to 5,0.49212,3.0239209948793,5,Louisiana chenier plain
+Away from wetland,Water,Wetland,50 or more,0.02817,52.0397231096912,4.45047923322684,Louisiana chenier plain
+Away from wetland,Barren,Other,5 to 20,0.03825,10.4394901960784,4.75294117647059,Louisiana chenier plain
+Away from wetland,Barren,Other,20 to 50,0.01521,28.1273175542406,4.31952662721894,Louisiana chenier plain
+Wetland side,Other,Wetland,5 to 20,0.01026,12.6614035087719,5,Louisiana chenier plain
+Away from wetland,Water,Other,under 1,0.0045,0.092,2.78,Louisiana chenier plain
+Wetland side,Other,Other,20 to 50,0.00459,24.3803921568627,5,Louisiana chenier plain
+Wetland side,Wetland,Water,under 1,0.09666,0.244320297951583,5,Louisiana chenier plain
+Wetland side,Barren,Water,under 1,0.00081,0.177777777777778,5,Louisiana chenier plain
+Wetland side,Other,Water,under 1,0.0018,0.36,5,Louisiana chenier plain
+Wetland side,Wetland,Other,under 1,0.00216,0.25,5,Louisiana chenier plain
+Wetland side,Other,Wetland,under 1,0.00063,0.0857142857142857,5,Louisiana chenier plain
+Away from wetland,Barren,Barren,20 to 50,0.05562,27.2948759439051,4.77508090614887,Louisiana chenier plain
+Away from wetland,Other,Wetland,1 to 5,0.06111,2.58468335787923,5,Louisiana chenier plain
+Wetland side,Water,Other,5 to 20,0.00531,14.8,5,Louisiana chenier plain
+Away from wetland,Barren,Water,under 1,0.03834,0.202816901408451,4.97652582159624,Louisiana chenier plain
+Away from wetland,Other,Water,50 or more,9e-04,51.49,4.5,Louisiana chenier plain
+Wetland side,Other,Wetland,1 to 5,0.00189,2.74285714285714,5,Louisiana chenier plain
+Away from wetland,Barren,Barren,5 to 20,0.2142,10.3132843137255,4.81974789915966,Louisiana chenier plain
+Away from wetland,Other,Barren,5 to 20,0.18216,10.4679100790514,4.65859683794466,Louisiana chenier plain
+Wetland side,Water,Water,under 1,0.00387,0.367441860465116,5,Louisiana chenier plain
+Away from wetland,Water,Wetland,1 to 5,0.05625,3.1076,4.8528,Louisiana chenier plain
+Away from wetland,Water,Barren,50 or more,0.01575,51.9987619047619,4.46857142857143,Louisiana chenier plain
+Wetland side,Water,Barren,20 to 50,0.02745,28.4216393442623,5,Louisiana chenier plain
+Away from wetland,Other,Other,50 or more,0.00207,51.4434782608696,4.91304347826087,Louisiana chenier plain
+Away from wetland,Barren,Wetland,20 to 50,0.00612,26.4051470588235,4.92647058823529,Louisiana chenier plain
+Away from wetland,Barren,Other,under 1,0.01017,0.194690265486726,4.97345132743363,Louisiana chenier plain
+Away from wetland,Barren,Water,20 to 50,0.04599,26.3409001956947,4.35616438356164,Louisiana chenier plain
+Wetland side,Other,Water,1 to 5,0.00459,3.31764705882353,5,Louisiana chenier plain
+Wetland side,Barren,Water,5 to 20,0.00432,11.1416666666667,5,Louisiana chenier plain
+Wetland side,Water,Wetland,1 to 5,0.02367,3.34980988593156,5,Louisiana chenier plain
+Away from wetland,Barren,Barren,1 to 5,0.11583,2.86800051800052,4.93473193473194,Louisiana chenier plain
+Away from wetland,Barren,Wetland,1 to 5,0.03078,2.69415204678363,5,Louisiana chenier plain
+Away from wetland,Water,Wetland,under 1,0.01152,0.2484375,4.1796875,Louisiana chenier plain
+Wetland side,Water,Barren,5 to 20,0.01449,14.0658385093168,5,Louisiana chenier plain
+Wetland side,Other,Wetland,20 to 50,0.0063,26.0857142857143,5,Louisiana chenier plain
+Away from wetland,Water,Barren,1 to 5,0.05283,3.12007382169222,4.83304940374787,Louisiana chenier plain
+Wetland side,Wetland,Barren,5 to 20,0.14409,11.7589006870706,5,Louisiana chenier plain
+Wetland side,Wetland,Barren,1 to 5,0.03798,2.82132701421801,5,Louisiana chenier plain
+Away from wetland,Water,Barren,under 1,0.01503,0.126946107784431,3.1377245508982,Louisiana chenier plain
+Away from wetland,Barren,Water,1 to 5,0.08874,2.81541582150101,4.947261663286,Louisiana chenier plain
+Away from wetland,Barren,Wetland,5 to 20,0.02106,10.0827635327635,4.96153846153846,Louisiana chenier plain
+Wetland side,Other,Water,20 to 50,0.00756,25.0095238095238,5,Louisiana chenier plain
+Wetland side,Wetland,Barren,20 to 50,0.10746,27.7145728643216,5,Louisiana chenier plain
+Wetland side,Wetland,Barren,under 1,0.02115,0.302127659574468,5,Louisiana chenier plain
+Away from wetland,Barren,Barren,under 1,0.06399,0.168495077355837,5,Louisiana chenier plain
+Wetland side,Water,Other,1 to 5,0.00036,3.55,5,Louisiana chenier plain
+Wetland side,Barren,Water,1 to 5,0.00135,2.74666666666667,5,Louisiana chenier plain
+Wetland side,Water,Wetland,under 1,0.00171,0.378947368421053,5,Louisiana chenier plain
+Wetland side,Other,Barren,5 to 20,0.00216,10.8083333333333,5,Louisiana chenier plain
+Wetland side,Other,Barren,1 to 5,0.00054,2.86666666666667,5,Louisiana chenier plain
+Wetland side,Water,Barren,1 to 5,0.00108,3.13333333333333,5,Louisiana chenier plain
+Wetland side,Other,Barren,20 to 50,9e-05,21.4,5,Louisiana chenier plain
+Wetland side,Other,Other,under 1,0.00126,0.571428571428571,5,Louisiana chenier plain
+Wetland side,Barren,Other,1 to 5,0.00018,4.6,5,Louisiana chenier plain
+Away from wetland,Barren,Wetland,under 1,0.01089,0.360330578512397,4.96694214876033,Louisiana chenier plain
+Wetland side,Barren,Wetland,5 to 20,0.00153,12.9058823529412,5,Louisiana chenier plain
+Wetland side,Barren,Barren,5 to 20,9e-04,10.72,5,Louisiana chenier plain
+Wetland side,Barren,Barren,1 to 5,0.00018,3.2,5,Louisiana chenier plain
+Wetland side,Other,Barren,under 1,0.00027,0,5,Louisiana chenier plain
+Away from wetland,Other,Wetland,50 or more,9e-05,50.2,5,Louisiana chenier plain
+Wetland side,Barren,Water,20 to 50,0.0018,25.03,5,Louisiana chenier plain
+Wetland side,Barren,Barren,20 to 50,0.00027,28.6,5,Louisiana chenier plain
+Wetland side,Water,Barren,under 1,9e-05,0,5,Louisiana chenier plain
+Wetland side,Barren,Wetland,1 to 5,0.00054,2.73333333333333,5,Louisiana chenier plain
+Wetland side,Barren,Barren,under 1,0.00027,0.266666666666667,5,Louisiana chenier plain
+Wetland side,Barren,Wetland,20 to 50,0.00072,23.3,5,Louisiana chenier plain
+Wetland side,Barren,Other,5 to 20,0.00027,10.3333333333333,5,Louisiana chenier plain
+Away from wetland,Barren,Water,50 or more,9e-05,52,5,Louisiana chenier plain
+Away from wetland,Barren,Barren,50 or more,0.00036,51.1666666666667,4,Louisiana chenier plain
+Wetland side,Barren,Other,20 to 50,0.00063,32.9714285714286,5,Louisiana chenier plain
+Away from wetland,,None,5 to 20,0.00072,11.3875,2.625,Louisiana chenier plain
+Away from wetland,,None,20 to 50,0.00216,32.4854166666667,3.29166666666667,Louisiana chenier plain
+Wetland side,Barren,Wetland,under 1,9e-05,0,5,Louisiana chenier plain
+Away from wetland,,None,50 or more,9e-05,50.6,5,Louisiana chenier plain

@@ -1,0 +1,102 @@
+Side,Nlcd,Ccap,Bin,Kha,MeanOpen,MeanLandYears,Region
+Away from wetland,Water,Water,20 to 50,1.35594,35.8685948493296,4.11383247046329,Chesapeake eastern shore
+Wetland side,Wetland,Wetland,20 to 50,0.04293,29.1366876310273,5,Chesapeake eastern shore
+Away from wetland,Water,Water,5 to 20,0.13239,14.1915476999773,4.05846363018355,Chesapeake eastern shore
+Wetland side,Water,Wetland,20 to 50,0.02259,30.2589641434263,5,Chesapeake eastern shore
+Away from wetland,Water,Wetland,20 to 50,0.27405,35.4631253420909,4.33694581280788,Chesapeake eastern shore
+Wetland side,Wetland,Wetland,1 to 5,0.0045,3.328,5,Chesapeake eastern shore
+Wetland side,Water,Wetland,5 to 20,0.00864,14.3375,5,Chesapeake eastern shore
+Away from wetland,Water,Barren,20 to 50,0.06174,34.1658406219631,3.87609329446064,Chesapeake eastern shore
+Away from wetland,Other,Other,5 to 20,0.0126,11.3632142857143,4.88571428571429,Chesapeake eastern shore
+Wetland side,Other,Wetland,5 to 20,0.00099,10.1636363636364,5,Chesapeake eastern shore
+Away from wetland,Other,Other,under 1,0.00225,0.288,4.84,Chesapeake eastern shore
+Wetland side,Wetland,Wetland,5 to 20,0.03879,12.7183294663573,5,Chesapeake eastern shore
+Away from wetland,Water,Wetland,5 to 20,0.02925,14.0501538461538,4.56923076923077,Chesapeake eastern shore
+Away from wetland,Other,Water,20 to 50,0.01512,32.2632936507937,4.74404761904762,Chesapeake eastern shore
+Wetland side,Other,Wetland,20 to 50,9e-05,36.6,5,Chesapeake eastern shore
+Away from wetland,Other,Other,20 to 50,0.01638,31.003021978022,4.61538461538462,Chesapeake eastern shore
+Away from wetland,Other,Wetland,20 to 50,0.00315,32.8495238095238,4.88571428571429,Chesapeake eastern shore
+Wetland side,Wetland,Water,5 to 20,0.01197,11.6526315789474,5,Chesapeake eastern shore
+Away from wetland,Other,Barren,1 to 5,0.00063,2.68571428571429,5,Chesapeake eastern shore
+Away from wetland,Other,Other,1 to 5,0.00684,2.56184210526316,5,Chesapeake eastern shore
+Away from wetland,Other,Barren,under 1,0.00027,0.4,5,Chesapeake eastern shore
+Wetland side,Other,Water,5 to 20,0.00126,8.88571428571429,5,Chesapeake eastern shore
+Wetland side,Wetland,Other,5 to 20,0.00072,12.225,5,Chesapeake eastern shore
+Away from wetland,Water,Water,under 1,0.00324,0,1.25,Chesapeake eastern shore
+Away from wetland,Other,Barren,5 to 20,0.00135,12.28,4.53333333333333,Chesapeake eastern shore
+Away from wetland,Water,Other,20 to 50,0.02484,33.3568236714976,4.39492753623188,Chesapeake eastern shore
+Wetland side,Water,Water,20 to 50,0.01422,29.6316455696203,5,Chesapeake eastern shore
+Away from wetland,Water,Water,50 or more,0.08253,52.2832242820793,4.53435114503817,Chesapeake eastern shore
+Away from wetland,Other,Water,5 to 20,0.00873,12.233676975945,4.79381443298969,Chesapeake eastern shore
+Away from wetland,Water,Wetland,50 or more,0.01386,52.0928571428572,4.6038961038961,Chesapeake eastern shore
+Wetland side,Wetland,Water,1 to 5,0.00144,3.475,5,Chesapeake eastern shore
+Wetland side,Water,Water,5 to 20,0.00738,13.7804878048781,5,Chesapeake eastern shore
+Wetland side,Wetland,Water,20 to 50,0.00576,29.50625,5,Chesapeake eastern shore
+Wetland side,Water,Water,1 to 5,0.00045,3.6,5,Chesapeake eastern shore
+Away from wetland,Water,Water,1 to 5,0.0081,3.28851851851852,4.55555555555556,Chesapeake eastern shore
+Wetland side,Water,Other,5 to 20,9e-05,6.8,5,Chesapeake eastern shore
+Away from wetland,Water,Barren,5 to 20,0.01413,13.6539278131635,3.96815286624204,Chesapeake eastern shore
+Away from wetland,Barren,Other,20 to 50,9e-04,28.24,5,Chesapeake eastern shore
+Away from wetland,Barren,Water,20 to 50,0.00657,27.8931506849315,4.80821917808219,Chesapeake eastern shore
+Away from wetland,Other,Other,50 or more,0.00027,51.9777777777778,4.33333333333333,Chesapeake eastern shore
+Away from wetland,Barren,Barren,5 to 20,0.01629,11.1218232044199,4.92265193370166,Chesapeake eastern shore
+Away from wetland,Barren,Wetland,20 to 50,0.00261,29.3908045977012,4.93103448275862,Chesapeake eastern shore
+Away from wetland,Barren,Water,5 to 20,0.01881,10.1342105263158,4.94736842105263,Chesapeake eastern shore
+Away from wetland,Water,Other,5 to 20,0.00504,13.6041666666667,4,Chesapeake eastern shore
+Away from wetland,Barren,Other,5 to 20,0.00171,10.2736842105263,5,Chesapeake eastern shore
+Away from wetland,Other,Barren,20 to 50,0.0027,31.4388888888889,4.66666666666667,Chesapeake eastern shore
+Away from wetland,Barren,Water,1 to 5,0.00864,3.00052083333333,4.94791666666667,Chesapeake eastern shore
+Away from wetland,Barren,Barren,1 to 5,0.00765,3.16,4.96470588235294,Chesapeake eastern shore
+Away from wetland,Other,Wetland,5 to 20,0.00369,9.89390243902439,4.90243902439024,Chesapeake eastern shore
+Away from wetland,Water,Other,under 1,0.00063,0,1.28571428571429,Chesapeake eastern shore
+Away from wetland,Barren,Barren,under 1,0.00342,0.247368421052632,5,Chesapeake eastern shore
+Wetland side,Wetland,Other,20 to 50,0.00063,29.5714285714286,5,Chesapeake eastern shore
+Wetland side,Water,Other,20 to 50,0.00045,36.28,5,Chesapeake eastern shore
+Wetland side,Other,Water,1 to 5,0.00018,3.4,5,Chesapeake eastern shore
+Away from wetland,Water,Wetland,under 1,0.00018,0.2,5,Chesapeake eastern shore
+Away from wetland,Other,Water,1 to 5,0.00468,2.66794871794872,4.96153846153846,Chesapeake eastern shore
+Away from wetland,Barren,Water,under 1,0.00531,0.213559322033898,5,Chesapeake eastern shore
+Away from wetland,Barren,Other,under 1,0.00027,0.133333333333333,5,Chesapeake eastern shore
+Away from wetland,Water,Barren,50 or more,0.00288,52.5614583333333,4.25,Chesapeake eastern shore
+Wetland side,Water,Barren,20 to 50,0.00144,31.1875,5,Chesapeake eastern shore
+Wetland side,Wetland,Barren,20 to 50,0.00189,28.5428571428571,5,Chesapeake eastern shore
+Away from wetland,Other,Wetland,1 to 5,0.00171,2.71578947368421,5,Chesapeake eastern shore
+Away from wetland,Water,Other,50 or more,0.00018,51,3.5,Chesapeake eastern shore
+Wetland side,Wetland,Wetland,under 1,0.00198,0.0363636363636364,5,Chesapeake eastern shore
+Away from wetland,Barren,Barren,20 to 50,0.0054,27.4583333333333,4.93333333333333,Chesapeake eastern shore
+Away from wetland,Water,Barren,1 to 5,0.00162,2.89259259259259,3,Chesapeake eastern shore
+Away from wetland,Other,Wetland,under 1,0.00081,0.2,5,Chesapeake eastern shore
+Wetland side,Wetland,Barren,5 to 20,0.00342,15.3,5,Chesapeake eastern shore
+Away from wetland,Water,Wetland,1 to 5,0.00144,3.421875,4.8125,Chesapeake eastern shore
+Wetland side,Other,Water,20 to 50,0.00018,25.7,5,Chesapeake eastern shore
+Wetland side,Barren,Barren,5 to 20,0.00063,9.08571428571429,5,Chesapeake eastern shore
+Away from wetland,Barren,Wetland,5 to 20,0.00405,10.5888888888889,4.93333333333333,Chesapeake eastern shore
+Wetland side,Barren,Wetland,5 to 20,0.0018,9.66,5,Chesapeake eastern shore
+Away from wetland,Water,Other,1 to 5,0.00063,2.72142857142857,4.57142857142857,Chesapeake eastern shore
+Wetland side,Barren,Wetland,20 to 50,0.00054,26.0333333333333,5,Chesapeake eastern shore
+Wetland side,Barren,Wetland,under 1,0.00072,0.15,5,Chesapeake eastern shore
+Wetland side,Water,Wetland,1 to 5,0.00027,3.06666666666667,5,Chesapeake eastern shore
+Wetland side,Water,Wetland,under 1,0.00018,0.3,5,Chesapeake eastern shore
+Away from wetland,Barren,Other,1 to 5,0.00099,3.18181818181818,4.81818181818182,Chesapeake eastern shore
+Wetland side,Other,Other,5 to 20,9e-05,11.4,5,Chesapeake eastern shore
+Wetland side,Water,Barren,5 to 20,0.00018,18.2,5,Chesapeake eastern shore
+Wetland side,Other,Barren,1 to 5,0.00027,2.2,5,Chesapeake eastern shore
+Wetland side,Other,Other,1 to 5,0.00018,2.5,5,Chesapeake eastern shore
+Wetland side,Barren,Water,under 1,0.00018,0,5,Chesapeake eastern shore
+Wetland side,Other,Wetland,under 1,9e-05,0.4,5,Chesapeake eastern shore
+Away from wetland,Barren,Wetland,under 1,0.00081,0.177777777777778,5,Chesapeake eastern shore
+Wetland side,Wetland,Barren,under 1,0.00027,0,5,Chesapeake eastern shore
+Wetland side,Barren,Water,5 to 20,0.00072,10.075,5,Chesapeake eastern shore
+Away from wetland,Other,Water,under 1,0.00054,0.233333333333333,5,Chesapeake eastern shore
+Wetland side,Barren,Water,20 to 50,0.00036,28.2,5,Chesapeake eastern shore
+Wetland side,Barren,Barren,20 to 50,0.00027,25.1333333333333,5,Chesapeake eastern shore
+Wetland side,Barren,Wetland,1 to 5,9e-04,2.76,5,Chesapeake eastern shore
+Away from wetland,Barren,Wetland,1 to 5,0.00153,3.4,5,Chesapeake eastern shore
+Away from wetland,Water,Barren,under 1,0.00027,0,1,Chesapeake eastern shore
+Wetland side,Barren,Other,5 to 20,9e-05,5.6,5,Chesapeake eastern shore
+Wetland side,Wetland,Other,1 to 5,9e-05,2.8,5,Chesapeake eastern shore
+Wetland side,Wetland,Barren,1 to 5,0.00027,2.26666666666667,5,Chesapeake eastern shore
+Wetland side,Barren,Barren,1 to 5,0.00018,3,5,Chesapeake eastern shore
+Wetland side,Barren,Water,1 to 5,0.00018,3.7,5,Chesapeake eastern shore
+Away from wetland,Other,Water,50 or more,0.00018,52.225,4.5,Chesapeake eastern shore
+Wetland side,Barren,Barren,under 1,0.00018,0,5,Chesapeake eastern shore

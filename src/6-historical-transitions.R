@@ -35,6 +35,9 @@
 #   * drought and insect mortality (to-do 3, lucasCore 2.0; src/mortality.R): source CanopyLcms. A 30 m rule on LCMS stress classes and
 #     tree canopy loss gives each cell's flagged share; cells are chosen by rank so the year's area matches and written as 1 / 0, so
 #     the historical run has the same die-off in every iteration (the Mortality page can switch it off, or to fractions as chances)
+#   * change among water, wetland and barren (to-do 2; src/water-change.R): source WaterChange. A 30 m rule on USGS DSWE annual open
+#     water and the annual NLCD gives each cell the share of its pixels that became water, wetland or barren each year; the six
+#     Wetland Change types, which had no pathway, carry it (pathways/wetland-change.csv). Left out when there is no DSWE
 # Needs stage 5 (same pipeline, or a dependency on its result).
 # =============================================================================
 source(file.path(rsyncrosim::ssimEnvironment()$PackageDirectory, "src", "shared.R"))
@@ -622,6 +625,56 @@ if (mort_on && MORT_GROUP %in% so$TransitionGroupId) {
     check(STAGE, "mortality: the area placed and left over equals the area that could be placed", mo6$placement != "ranked" || abs(tm$Placed + carry * cell_km2 - (tm$Flagged - tm$Again - tm$Young - tm$Held)) < 1e-6 * max(1, tm$Flagged) + 1e-6,
           sprintf("%.2f km2 placed + %.2f left over against %.2f", tm$Placed, carry * cell_km2, tm$Flagged - tm$Again - tm$Young - tm$Held))
     check(STAGE, "mortality: every chosen cell has the pathway, the minimum age and no other transition that year, and none is chosen twice", bad_sel == 0L, sprintf("%d cells", bad_sel))
+  }
+}
+
+# ---- change among water, wetland and barren (to-do 2; src/water-change.R) ---------------------------------------------------------
+# Source WaterChange. The rule runs at 30 m over the same aggregation blocks as the other 30 m sources: USGS DSWE open water says
+# whether a pixel is water each year, the annual NLCD what the land side is. Each cell gets the share of its pixels with each change
+# that year, which acts as the cell's chance of making the transition; the cell's own class picks the pathway, so a share on a cell
+# whose class has no pathway does nothing (the summary reports it against the start-year classes). New wetland is emergent, estuarine
+# or palustrine by stage 5's nearest wetland type. With no DSWE files the source is left out and the types keep a zero target.
+wcg <- so[Source == "WaterChange"]
+if (nrow(wcg)) {
+  source(pkg_file("src", "water-change.R"))
+  dsw <- tryCatch(read_data_sources("DsweFolder", optional = TRUE)$DsweFolder, error = function(e) NA_character_)
+  nly <- (y0 - WATER_LEAD):(y1 + 4L); nly <- nly[file.exists(nlcd_file(src$NlcdFolder, nly))]; wall <- water_rule_years(y0, y1, nly)
+  f_dw <- function(y) { f <- file.path(dsw, sprintf(WATER_DSWE_FILE, y)); if (file.exists(f)) f else NULL }
+  dwf <- if (is.null(dsw) || is.na(dsw)) list() else { l <- setNames(lapply(wall, f_dw), wall); l[!vapply(l, is.null, TRUE)] }
+  wout <- intersect(yrs, wall)
+  if (length(dwf) < 2L || !length(wout)) say("Water, wetland and barren change: off (%s). Tick USGS DSWE annual open water on the Data Download page to map it", if (is.null(dsw) || is.na(dsw)) "no DSWE annual open water in Data Sources" else sprintf("%d yearly DSWE files for %d-%d in %s", length(dwf), min(wall), max(wall), dsw)) else {
+    nody <- setdiff(wall, as.integer(names(dwf))); if (length(nody)) say("Water, wetland and barren change: no DSWE file for %s: those years change nothing", paste(nody, collapse = ", "))
+    conf <- max(wall) - 4L
+    if (y1 > conf) say("Water, wetland and barren change: the record read ends in %d, so changes next to wetland (which must hold 5 years) are mapped to %d; water against other land is mapped to %d", max(wall), conf, max(wout))
+    b7 <- grid_blocks(rast(nf[[1]]), L, P); E7 <- as.vector(b7$ext); nr7 <- round((E7[4] - E7[3]) / 30); nc7 <- round((E7[2] - E7[1]) / 30)
+    step7 <- max(b7$fact, (floor(2e6 / nc7) %/% b7$fact) * b7$fact); rows7 <- seq(0, nr7 - 1, by = step7)
+    a7 <- list(clear = clear_syncrosim_proj, E = E7, fact = b7$fact, nr = nr7, nc = nc7, step = step7, rows = rows7, all = wall, out = wout, dswe = dwf,
+               nlcd = setNames(as.list(nlcd_file(src$NlcdFolder, wall)), wall), hi = 70, lo = 30, line = 50, hold = 5L)
+    t0 <- Sys.time()
+    r7 <- par_lapply_mem(seq_along(rows7), function(i, a) tryCatch(water_band(i, a), error = function(e) stop(sprintf("water change rows from %d: %s", a$rows[i], conditionMessage(e)), call. = FALSE)),
+                         "Water, wetland and barren change", cap = max(1L, min(40L, detectCores() - 2L)),
+                         init = function(cl, nw) parallel::clusterExport(cl, c("water_band", "water_change", "WATER_CHANGE"), envir = environment(water_band)), args = function(nw) list(a = a7))
+    cnt <- do.call(rbind, lapply(r7, function(x) matrix(x, nrow = dim(x)[1])))   # block cells x (year, code): column (code - 1) * years + year
+    J <- length(wout); px <- matrix(colSums(cnt), J, length(WATER_CHANGE), dimnames = list(wout, names(WATER_CHANGE))) * 9e-4
+    say("Water, wetland and barren change: the 30 m rule over %d-%d (%d x %d pixels, %d DSWE years) in %.1f min. 30 m area in %d-%d, km2: %s", min(wall), max(wall), nr7, nc7, length(dwf),
+        as.numeric(Sys.time() - t0, units = "mins"), min(wout), max(wout), paste(sprintf("%s %.1f", tolower(colnames(px)), colSums(px)), collapse = ", "))
+    lcl7 <- read_ds("OutputLandCoverLayers"); wtf <- if (nrow(lcl7) && "WetlandFileName" %in% names(lcl7)) lcl7$WetlandFileName[1] else NA_character_
+    est <- if (!is.na(wtf) && file.exists(wtf)) values(rast(wtf), mat = FALSE) %in% c(91L, 96L) else { say("Water, wetland and barren change: no wetland type map from stage 5, so every new wetland cell is palustrine"); rep(FALSE, length(vS)) }
+    bt7 <- rast(b7$ext, resolution = 30 * b7$fact, crs = MODEL_CRS); wc_top <- 0; wc_area <- list()
+    for (cs in unique(wcg$Classes)) { cd <- codes(cs); bc <- Reduce(`+`, lapply(cd, function(k) cnt[, (k - 1L) * J + seq_len(J), drop = FALSE]))
+      br <- rast(bt7, nlyrs = J); values(br) <- bc / b7$fact^2
+      FR <- values(mask(project(br, P, method = "near"), P)); if (is.null(dim(FR))) FR <- matrix(FR, ncol = J)
+      wc_top <- max(wc_top, max(FR, na.rm = TRUE)); wc_area[[cs]] <- c(pixels = sum(px[, cd]), grid = sum(FR, na.rm = TRUE) * cell_km2)
+      for (g in wcg[Classes == cs, TransitionGroupId]) { dest <- unique(pw[TransitionTypeId %in% grp_types(g), StateClassIdDest])
+        gate <- if (identical(dest, "Wetland: Estuarine Emergent")) est else if (identical(dest, "Wetland: Palustrine Emergent")) !est else rep(TRUE, length(vS))
+        for (j in seq_len(J)) { v <- FR[, j]; v[!gate & !is.na(v)] <- 0
+          f <- if (sum(v, na.rm = TRUE) > 0) write_raster(setValues(rast(P), v), sprintf("WaterChange-%s_%d.tif", gsub("[^A-Za-z0-9]+", "-", sub(TYPE_SUFFIX, "", g, fixed = TRUE)), wout[j]), "FLT4S") else NA_character_
+          layers <- rbind(layers, data.table(Timestep = wout[j], TransitionGroupId = g, Source = "WaterChange", File = f)) } } }
+    say("Water, wetland and barren change on the model grid: %s. Pixels with a change to other land beside wetland (%.1f km2) have no transition",
+        paste(sprintf("codes %s %.1f km2 (%.1f km2 of 30 m pixels in the blocks read)", names(wc_area), vapply(wc_area, `[[`, 0, "grid"), vapply(wc_area, `[[`, 0, "pixels")), collapse = "; "), sum(px[, "Water to Other Land"]))
+    check(STAGE, "water change: each cell's shares are between 0 and 1", wc_top <= 1 + 1e-6, sprintf("max %.4f", wc_top))
+    check(STAGE, "water change: the area on the model grid is no more than the 30 m area read", all(vapply(wc_area, function(z) z[["grid"]] <= z[["pixels"]] * (1 + 1e-6) + 1e-6, TRUE)),
+          paste(sprintf("%s: %.2f against %.2f km2", names(wc_area), vapply(wc_area, `[[`, 0, "grid"), vapply(wc_area, `[[`, 0, "pixels")), collapse = "; "))
   }
 }
 

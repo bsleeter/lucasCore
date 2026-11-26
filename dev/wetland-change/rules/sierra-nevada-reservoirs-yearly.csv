@@ -1,0 +1,425 @@
+Year,Side,Region,Rule,WaterKha,ToKha,FromKha,EqKha
+1994,Other,Sierra Nevada reservoirs,Hold 3 years,9.98028,0,0,9.8374743
+1994,Other,Sierra Nevada reservoirs,Hold 5 years,9.98028,0,0,9.8374743
+1994,Wetland,Sierra Nevada reservoirs,Hold 3 years,9e-04,0,0,0.013761
+1994,Wetland,Sierra Nevada reservoirs,Hold 5 years,9e-04,0,0,0.013761
+1995,Other,Sierra Nevada reservoirs,Yearly 50,12.94632,3.02382,0.05778,12.4022943
+1995,Other,Sierra Nevada reservoirs,Two lines 60/40,12.40443,2.45097,0.02682,12.4022943
+1995,Other,Sierra Nevada reservoirs,Two lines 70/30,11.83419,1.86021,0.0063,12.4022943
+1995,Other,Sierra Nevada reservoirs,Two lines 80/20,11.4228,1.44558,0.00306,12.4022943
+1995,Other,Sierra Nevada reservoirs,3-year mean 50,12.23883,2.29059,0.03204,12.4022943
+1995,Other,Sierra Nevada reservoirs,Hold 3 years,12.43836,2.4759,0.01782,12.4022943
+1995,Other,Sierra Nevada reservoirs,Hold 5 years,12.37356,2.403,0.00972,12.4022943
+1995,Wetland,Sierra Nevada reservoirs,Yearly 50,0.0117,0.01143,0.00063,0.0448587
+1995,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.00414,0.00378,0.00054,0.0448587
+1995,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00198,0.00126,0.00018,0.0448587
+1995,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00162,0.00072,0,0.0448587
+1995,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.00054,0.00018,0.00054,0.0448587
+1995,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.00081,0.00045,0.00054,0.0448587
+1995,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.00081,0.00018,0.00027,0.0448587
+1996,Other,Sierra Nevada reservoirs,Yearly 50,13.29507,0.60579,0.25704,13.4293302
+1996,Other,Sierra Nevada reservoirs,Two lines 60/40,13.14216,0.79317,0.05544,13.4293302
+1996,Other,Sierra Nevada reservoirs,Two lines 70/30,12.94236,1.12662,0.01845,13.4293302
+1996,Other,Sierra Nevada reservoirs,Two lines 80/20,12.71322,1.29636,0.00594,13.4293302
+1996,Other,Sierra Nevada reservoirs,3-year mean 50,12.9834,0.78309,0.03852,13.4293302
+1996,Other,Sierra Nevada reservoirs,Hold 3 years,12.7962,0.36684,0.009,13.4293302
+1996,Other,Sierra Nevada reservoirs,Hold 5 years,12.66012,0.29268,0.00612,13.4293302
+1996,Wetland,Sierra Nevada reservoirs,Yearly 50,0.00162,0.00054,0.01062,0.0279855
+1996,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.00171,0.00027,0.0027,0.0279855
+1996,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00171,9e-05,0.00036,0.0279855
+1996,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00162,0.00018,0.00018,0.0279855
+1996,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.0018,0.00135,9e-05,0.0279855
+1996,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.00117,0.00045,9e-05,0.0279855
+1996,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.00117,0.00045,9e-05,0.0279855
+1997,Other,Sierra Nevada reservoirs,Yearly 50,12.77289,0.08631,0.60849,12.9918798
+1997,Other,Sierra Nevada reservoirs,Two lines 60/40,12.91356,0.04464,0.27324,12.9918798
+1997,Other,Sierra Nevada reservoirs,Two lines 70/30,12.89664,0.027,0.07272,12.9918798
+1997,Other,Sierra Nevada reservoirs,Two lines 80/20,12.7026,0.02088,0.0315,12.9918798
+1997,Other,Sierra Nevada reservoirs,3-year mean 50,13.15692,0.24579,0.07227,12.9918798
+1997,Other,Sierra Nevada reservoirs,Hold 3 years,12.81519,0.03618,0.01719,12.9918798
+1997,Other,Sierra Nevada reservoirs,Hold 5 years,12.66345,0.01665,0.01332,12.9918798
+1997,Wetland,Sierra Nevada reservoirs,Yearly 50,0.00243,0.00135,0.00054,0.0408933
+1997,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.00198,9e-04,0.00063,0.0408933
+1997,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.0018,0.00063,0.00054,0.0408933
+1997,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00189,0.00045,0.00018,0.0408933
+1997,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.0027,0.00117,0.00027,0.0408933
+1997,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.0018,0.00063,0,0.0408933
+1997,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.00144,0.00027,0,0.0408933
+1998,Other,Sierra Nevada reservoirs,Yearly 50,13.54968,0.81504,0.03825,13.7106189
+1998,Other,Sierra Nevada reservoirs,Two lines 60/40,13.28202,0.3816,0.01314,13.7106189
+1998,Other,Sierra Nevada reservoirs,Two lines 70/30,13.10616,0.21429,0.00477,13.7106189
+1998,Other,Sierra Nevada reservoirs,Two lines 80/20,12.90114,0.20862,0.01008,13.7106189
+1998,Other,Sierra Nevada reservoirs,3-year mean 50,13.02768,0.05121,0.18045,13.7106189
+1998,Other,Sierra Nevada reservoirs,Hold 3 years,12.95766,0.14733,0.00486,13.7106189
+1998,Other,Sierra Nevada reservoirs,Hold 5 years,12.67533,0.01368,0.0018,13.7106189
+1998,Wetland,Sierra Nevada reservoirs,Yearly 50,0.0225,0.02034,0.00027,0.0412488
+1998,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.00738,0.00558,0.00018,0.0412488
+1998,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00315,0.00135,0,0.0412488
+1998,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.0027,0.00081,0,0.0412488
+1998,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.00243,0.00027,0.00054,0.0412488
+1998,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.00207,0.00027,0,0.0412488
+1998,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.00162,0.00018,0,0.0412488
+1999,Other,Sierra Nevada reservoirs,Yearly 50,12.86811,0.05283,0.7344,13.0309389
+1999,Other,Sierra Nevada reservoirs,Two lines 60/40,12.94047,0.03024,0.37179,13.0309389
+1999,Other,Sierra Nevada reservoirs,Two lines 70/30,12.93219,0.02313,0.1971,13.0309389
+1999,Other,Sierra Nevada reservoirs,Two lines 80/20,12.81789,0.01971,0.10296,13.0309389
+1999,Other,Sierra Nevada reservoirs,3-year mean 50,13.02237,0.12807,0.13338,13.0309389
+1999,Other,Sierra Nevada reservoirs,Hold 3 years,12.83175,0.01548,0.14139,13.0309389
+1999,Other,Sierra Nevada reservoirs,Hold 5 years,12.61863,0.0108,0.0675,13.0309389
+1999,Wetland,Sierra Nevada reservoirs,Yearly 50,0.00234,0.00027,0.02043,0.022752
+1999,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.00288,0.00036,0.00486,0.022752
+1999,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00234,0.00027,0.00108,0.022752
+1999,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00243,0.00018,0.00045,0.022752
+1999,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.00351,0.00144,0.00036,0.022752
+1999,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.00198,9e-05,0.00018,0.022752
+1999,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.00162,0,0,0.022752
+2000,Other,Sierra Nevada reservoirs,Yearly 50,12.93903,0.21996,0.14904,13.2658974
+2000,Other,Sierra Nevada reservoirs,Two lines 60/40,12.92346,0.0945,0.11151,13.2658974
+2000,Other,Sierra Nevada reservoirs,Two lines 70/30,12.91095,0.04896,0.0702,13.2658974
+2000,Other,Sierra Nevada reservoirs,Two lines 80/20,12.81537,0.04878,0.0513,13.2658974
+2000,Other,Sierra Nevada reservoirs,3-year mean 50,12.64851,0.02691,0.40077,13.2658974
+2000,Other,Sierra Nevada reservoirs,Hold 3 years,12.79539,0.03519,0.07155,13.2658974
+2000,Other,Sierra Nevada reservoirs,Hold 5 years,12.62772,0.02241,0.01332,13.2658974
+2000,Wetland,Sierra Nevada reservoirs,Yearly 50,0.00837,0.00675,0.00072,0.0386298
+2000,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.00405,0.0018,0.00063,0.0386298
+2000,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00243,0.00036,0.00027,0.0386298
+2000,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00234,9e-05,0.00018,0.0386298
+2000,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.00306,0.00036,0.00081,0.0386298
+2000,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.00207,0.00027,0.00018,0.0386298
+2000,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.0018,0.00027,9e-05,0.0386298
+2001,Other,Sierra Nevada reservoirs,Yearly 50,11.86542,0.0306,1.10421,11.7526905
+2001,Other,Sierra Nevada reservoirs,Two lines 60/40,12.19383,0.01692,0.74655,11.7526905
+2001,Other,Sierra Nevada reservoirs,Two lines 70/30,12.43494,0.0126,0.48861,11.7526905
+2001,Other,Sierra Nevada reservoirs,Two lines 80/20,12.61188,0.01026,0.21375,11.7526905
+2001,Other,Sierra Nevada reservoirs,3-year mean 50,11.96793,0.03033,0.71091,11.7526905
+2001,Other,Sierra Nevada reservoirs,Hold 3 years,11.95281,0.0081,0.85068,11.7526905
+2001,Other,Sierra Nevada reservoirs,Hold 5 years,12.60072,0.00594,0.03294,11.7526905
+2001,Wetland,Sierra Nevada reservoirs,Yearly 50,0.00423,0.00072,0.00486,0.0175644
+2001,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.00324,0.00027,0.00108,0.0175644
+2001,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00198,9e-05,0.00054,0.0175644
+2001,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00189,0,0.00045,0.0175644
+2001,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.00324,0.00099,0.00081,0.0175644
+2001,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.00189,0.00027,0.00045,0.0175644
+2001,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.00198,0.00018,0,0.0175644
+2002,Other,Sierra Nevada reservoirs,Yearly 50,11.07639,0.09018,0.87921,11.1061638
+2002,Other,Sierra Nevada reservoirs,Two lines 60/40,11.24271,0.03069,0.98181,11.1061638
+2002,Other,Sierra Nevada reservoirs,Two lines 70/30,11.48724,0.02187,0.96957,11.1061638
+2002,Other,Sierra Nevada reservoirs,Two lines 80/20,11.70207,0.0144,0.92421,11.1061638
+2002,Other,Sierra Nevada reservoirs,3-year mean 50,11.21445,0.01359,0.76707,11.1061638
+2002,Other,Sierra Nevada reservoirs,Hold 3 years,11.27727,0.00855,0.68409,11.1061638
+2002,Other,Sierra Nevada reservoirs,Hold 5 years,12.59946,0.00657,0.00783,11.1061638
+2002,Wetland,Sierra Nevada reservoirs,Yearly 50,0.00594,0.0045,0.00279,0.0170919
+2002,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.0045,0.00234,0.00108,0.0170919
+2002,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00261,0.00099,0.00036,0.0170919
+2002,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00171,9e-05,0.00027,0.0170919
+2002,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.00261,0.00036,0.00099,0.0170919
+2002,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.00189,0.00018,0.00018,0.0170919
+2002,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.00198,9e-05,9e-05,0.0170919
+2003,Other,Sierra Nevada reservoirs,Yearly 50,11.0637,0.21645,0.22914,11.0828826
+2003,Other,Sierra Nevada reservoirs,Two lines 60/40,11.09259,0.05976,0.20988,11.0828826
+2003,Other,Sierra Nevada reservoirs,Two lines 70/30,11.28087,0.01278,0.21915,11.0828826
+2003,Other,Sierra Nevada reservoirs,Two lines 80/20,11.49399,0.00792,0.216,11.0828826
+2003,Other,Sierra Nevada reservoirs,3-year mean 50,11.06244,0.08154,0.23355,11.0828826
+2003,Other,Sierra Nevada reservoirs,Hold 3 years,11.27808,0.0126,0.01179,11.0828826
+2003,Other,Sierra Nevada reservoirs,Hold 5 years,12.60378,0.00936,0.00504,11.0828826
+2003,Wetland,Sierra Nevada reservoirs,Yearly 50,0.00261,0.00081,0.00414,0.0113094
+2003,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.00288,0.00054,0.00216,0.0113094
+2003,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00234,0.00027,0.00054,0.0113094
+2003,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00171,9e-05,9e-05,0.0113094
+2003,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.00297,0.00054,0.00018,0.0113094
+2003,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.00243,0.00054,0,0.0113094
+2003,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.00216,0.00018,0,0.0113094
+2004,Other,Sierra Nevada reservoirs,Yearly 50,11.18457,0.27594,0.15507,11.1710988
+2004,Other,Sierra Nevada reservoirs,Two lines 60/40,11.15613,0.15354,0.09,11.1710988
+2004,Other,Sierra Nevada reservoirs,Two lines 70/30,11.26386,0.04401,0.06102,11.1710988
+2004,Other,Sierra Nevada reservoirs,Two lines 80/20,11.45682,0.01125,0.04842,11.1710988
+2004,Other,Sierra Nevada reservoirs,3-year mean 50,11.52252,0.47781,0.01773,11.1710988
+2004,Other,Sierra Nevada reservoirs,Hold 3 years,11.4309,0.16074,0.00792,11.1710988
+2004,Other,Sierra Nevada reservoirs,Hold 5 years,12.60621,0.009,0.00657,11.1710988
+2004,Wetland,Sierra Nevada reservoirs,Yearly 50,0.01143,0.00945,0.00063,0.0200214
+2004,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.00765,0.00531,0.00054,0.0200214
+2004,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00351,0.00171,0.00054,0.0200214
+2004,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00216,0.00045,0,0.0200214
+2004,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.00765,0.00531,0.00063,0.0200214
+2004,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.01062,0.00828,9e-05,0.0200214
+2004,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.00243,0.00027,0,0.0200214
+2005,Other,Sierra Nevada reservoirs,Yearly 50,13.07421,1.92267,0.03303,12.8100285
+2005,Other,Sierra Nevada reservoirs,Two lines 60/40,12.6972,1.55844,0.01737,12.8100285
+2005,Other,Sierra Nevada reservoirs,Two lines 70/30,12.29436,1.04031,0.00981,12.8100285
+2005,Other,Sierra Nevada reservoirs,Two lines 80/20,11.93661,0.48618,0.00639,12.8100285
+2005,Other,Sierra Nevada reservoirs,3-year mean 50,12.71133,1.20582,0.01701,12.8100285
+2005,Other,Sierra Nevada reservoirs,Hold 3 years,12.04749,0.62523,0.00864,12.8100285
+2005,Other,Sierra Nevada reservoirs,Hold 5 years,12.61593,0.0162,0.00648,12.8100285
+2005,Wetland,Sierra Nevada reservoirs,Yearly 50,0.01458,0.00459,0.00144,0.0349569
+2005,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.00972,0.00234,0.00027,0.0349569
+2005,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00387,0.00054,0.00018,0.0349569
+2005,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00234,0.00036,0.00018,0.0349569
+2005,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.01359,0.00594,0,0.0349569
+2005,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.01125,0.00081,0.00018,0.0349569
+2005,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.00279,0.00036,0,0.0349569
+2006,Other,Sierra Nevada reservoirs,Yearly 50,13.65084,0.64143,0.0648,13.5407295
+2006,Other,Sierra Nevada reservoirs,Two lines 60/40,13.33557,0.65682,0.01845,13.5407295
+2006,Other,Sierra Nevada reservoirs,Two lines 70/30,13.04802,0.76428,0.01062,13.5407295
+2006,Other,Sierra Nevada reservoirs,Two lines 80/20,12.78981,0.85923,0.00603,13.5407295
+2006,Other,Sierra Nevada reservoirs,3-year mean 50,12.7602,0.13617,0.0873,13.5407295
+2006,Other,Sierra Nevada reservoirs,Hold 3 years,12.05064,0.01476,0.01161,13.5407295
+2006,Other,Sierra Nevada reservoirs,Hold 5 years,12.61377,0.00891,0.01107,13.5407295
+2006,Wetland,Sierra Nevada reservoirs,Yearly 50,0.03285,0.01926,0.00099,0.042354
+2006,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.018,0.00837,9e-05,0.042354
+2006,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00711,0.00324,0,0.042354
+2006,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00369,0.00135,0,0.042354
+2006,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.01296,0.00081,0.00144,0.042354
+2006,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.01386,0.00261,0,0.042354
+2006,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.00387,0.00108,0,0.042354
+2007,Other,Sierra Nevada reservoirs,Yearly 50,11.79306,0.02412,1.8819,11.5770105
+2007,Other,Sierra Nevada reservoirs,Two lines 60/40,12.0276,0.01467,1.32264,11.5770105
+2007,Other,Sierra Nevada reservoirs,Two lines 70/30,12.29364,0.01143,0.76581,11.5770105
+2007,Other,Sierra Nevada reservoirs,Two lines 80/20,12.50037,0.01026,0.2997,11.5770105
+2007,Other,Sierra Nevada reservoirs,3-year mean 50,11.82006,0.02214,0.96228,11.5770105
+2007,Other,Sierra Nevada reservoirs,Hold 3 years,11.86353,0.01026,0.19737,11.5770105
+2007,Other,Sierra Nevada reservoirs,Hold 5 years,12.58758,0.00891,0.0351,11.5770105
+2007,Wetland,Sierra Nevada reservoirs,Yearly 50,0.01368,0.00108,0.02025,0.015516
+2007,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.01134,0.00063,0.00729,0.015516
+2007,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00414,0.00027,0.00324,0.015516
+2007,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00261,9e-05,0.00117,0.015516
+2007,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.00567,0.00279,0.01008,0.015516
+2007,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.0126,0.00045,0.00171,0.015516
+2007,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.00396,0.00045,0.00036,0.015516
+2008,Other,Sierra Nevada reservoirs,Yearly 50,10.26621,0.09729,1.62414,10.2137742
+2008,Other,Sierra Nevada reservoirs,Two lines 60/40,10.42083,0.03852,1.64529,10.2137742
+2008,Other,Sierra Nevada reservoirs,Two lines 70/30,10.65762,0.01233,1.64835,10.2137742
+2008,Other,Sierra Nevada reservoirs,Two lines 80/20,10.96263,0.01125,1.54899,10.2137742
+2008,Other,Sierra Nevada reservoirs,3-year mean 50,10.60524,0.0117,1.22652,10.2137742
+2008,Other,Sierra Nevada reservoirs,Hold 3 years,11.2995,0.00963,0.57366,10.2137742
+2008,Other,Sierra Nevada reservoirs,Hold 5 years,12.58767,0.00837,0.00828,10.2137742
+2008,Wetland,Sierra Nevada reservoirs,Yearly 50,0.00549,0.00135,0.00954,0.0110016
+2008,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.00405,0.00117,0.00846,0.0110016
+2008,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00261,0.00081,0.00234,0.0110016
+2008,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.0027,0.00081,0.00072,0.0110016
+2008,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.00477,0.00045,0.00135,0.0110016
+2008,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.00747,0.00045,0.00558,0.0110016
+2008,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.00414,0.00036,0.00018,0.0110016
+2009,Other,Sierra Nevada reservoirs,Yearly 50,10.50345,0.53127,0.29403,10.3751937
+2009,Other,Sierra Nevada reservoirs,Two lines 60/40,10.4346,0.2853,0.27153,10.3751937
+2009,Other,Sierra Nevada reservoirs,Two lines 70/30,10.45161,0.08226,0.28827,10.3751937
+2009,Other,Sierra Nevada reservoirs,Two lines 80/20,10.6605,0.00639,0.30852,10.3751937
+2009,Other,Sierra Nevada reservoirs,3-year mean 50,10.65735,0.19521,0.1431,10.3751937
+2009,Other,Sierra Nevada reservoirs,Hold 3 years,11.28096,0.00702,0.02556,10.3751937
+2009,Other,Sierra Nevada reservoirs,Hold 5 years,12.57768,0.00441,0.0144,10.3751937
+2009,Wetland,Sierra Nevada reservoirs,Yearly 50,0.00567,0.00081,0.00063,0.0082728
+2009,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.00387,0.00045,0.00063,0.0082728
+2009,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00243,0.00036,0.00054,0.0082728
+2009,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00234,0.00036,0.00072,0.0082728
+2009,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.0054,9e-04,0.00027,0.0082728
+2009,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.00792,0.00054,9e-05,0.0082728
+2009,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.00459,0.00054,9e-05,0.0082728
+2010,Other,Sierra Nevada reservoirs,Yearly 50,11.84751,1.38537,0.04131,11.6041185
+2010,Other,Sierra Nevada reservoirs,Two lines 60/40,11.60451,1.19655,0.02664,11.6041185
+2010,Other,Sierra Nevada reservoirs,Two lines 70/30,11.41533,0.98532,0.0216,11.6041185
+2010,Other,Sierra Nevada reservoirs,Two lines 80/20,11.26998,0.63198,0.0225,11.6041185
+2010,Other,Sierra Nevada reservoirs,3-year mean 50,11.6109,0.98001,0.02646,11.6041185
+2010,Other,Sierra Nevada reservoirs,Hold 3 years,11.42802,0.15822,0.01116,11.6041185
+2010,Other,Sierra Nevada reservoirs,Hold 5 years,12.58524,0.01359,0.00603,11.6041185
+2010,Wetland,Sierra Nevada reservoirs,Yearly 50,0.01278,0.00927,0.00216,0.0259767
+2010,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.0081,0.00459,0.00036,0.0259767
+2010,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00441,0.00216,0.00018,0.0259767
+2010,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00387,0.00171,0.00018,0.0259767
+2010,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.0054,0.00207,0.00207,0.0259767
+2010,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.00918,0.00288,0.00162,0.0259767
+2010,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.0063,0.0018,9e-05,0.0259767
+2011,Other,Sierra Nevada reservoirs,Yearly 50,13.0572,1.34244,0.13275,12.8947266
+2011,Other,Sierra Nevada reservoirs,Two lines 60/40,12.82068,1.23741,0.02124,12.8947266
+2011,Other,Sierra Nevada reservoirs,Two lines 70/30,12.53412,1.12833,0.00954,12.8947266
+2011,Other,Sierra Nevada reservoirs,Two lines 80/20,12.14127,0.87939,0.0081,12.8947266
+2011,Other,Sierra Nevada reservoirs,3-year mean 50,12.13002,0.5724,0.05328,12.8947266
+2011,Other,Sierra Nevada reservoirs,Hold 3 years,11.42181,0.00936,0.01557,12.8947266
+2011,Other,Sierra Nevada reservoirs,Hold 5 years,12.56049,0.00306,0.02781,12.8947266
+2011,Wetland,Sierra Nevada reservoirs,Yearly 50,0.01845,0.00936,0.00369,0.030672
+2011,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.01341,0.00612,0.00081,0.030672
+2011,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00684,0.00261,0.00018,0.030672
+2011,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00576,0.00198,9e-05,0.030672
+2011,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.00864,0.00369,0.00045,0.030672
+2011,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.00819,0.00171,0.0027,0.030672
+2011,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.00621,0.00099,0.00108,0.030672
+2012,Other,Sierra Nevada reservoirs,Yearly 50,11.86218,0.05778,1.2528,11.1560427
+2012,Other,Sierra Nevada reservoirs,Two lines 60/40,12.04119,0.02583,0.80532,11.1560427
+2012,Other,Sierra Nevada reservoirs,Two lines 70/30,12.20067,0.01125,0.3447,11.1560427
+2012,Other,Sierra Nevada reservoirs,Two lines 80/20,12.10077,0.01323,0.05373,11.1560427
+2012,Other,Sierra Nevada reservoirs,3-year mean 50,11.62062,0.03699,0.54639,11.1560427
+2012,Other,Sierra Nevada reservoirs,Hold 3 years,11.21391,0.00576,0.21366,11.1560427
+2012,Other,Sierra Nevada reservoirs,Hold 5 years,11.85453,0.00333,0.70929,11.1560427
+2012,Wetland,Sierra Nevada reservoirs,Yearly 50,0.0099,0.00243,0.01098,0.0134172
+2012,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.01017,0.00135,0.00459,0.0134172
+2012,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00738,0.00117,0.00063,0.0134172
+2012,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00657,9e-04,9e-05,0.0134172
+2012,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.00702,0.00108,0.0027,0.0134172
+2012,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.00774,0.00045,9e-04,0.0134172
+2012,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.00603,0.00045,0.00063,0.0134172
+2013,Other,Sierra Nevada reservoirs,Yearly 50,10.30356,0.05607,1.61469,10.1812293
+2013,Other,Sierra Nevada reservoirs,Two lines 60/40,10.56141,0.01575,1.49553,10.1812293
+2013,Other,Sierra Nevada reservoirs,Two lines 70/30,10.89774,0.00846,1.31139,10.1812293
+2013,Other,Sierra Nevada reservoirs,Two lines 80/20,11.21481,0.00621,0.89217,10.1812293
+2013,Other,Sierra Nevada reservoirs,3-year mean 50,9.70497,0.0135,1.92915,10.1812293
+2013,Other,Sierra Nevada reservoirs,Hold 3 years,10.30383,0.0063,0.91638,10.1812293
+2013,Other,Sierra Nevada reservoirs,Hold 5 years,11.826,0.0045,0.03303,10.1812293
+2013,Wetland,Sierra Nevada reservoirs,Yearly 50,0.00675,0.00027,0.00342,0.0133155
+2013,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.00702,0.00036,0.00351,0.0133155
+2013,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00684,0.00036,9e-04,0.0133155
+2013,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00657,0.00045,0.00045,0.0133155
+2013,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.00657,0.00027,0.00072,0.0133155
+2013,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.00666,0.00027,0.00135,0.0133155
+2013,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.00585,0.00018,0.00036,0.0133155
+2014,Other,Sierra Nevada reservoirs,Yearly 50,7.8723,0.02448,2.45574,7.580106
+2014,Other,Sierra Nevada reservoirs,Two lines 60/40,8.12943,0.01035,2.44233,7.580106
+2014,Other,Sierra Nevada reservoirs,Two lines 70/30,8.4321,0.00558,2.47122,7.580106
+2014,Other,Sierra Nevada reservoirs,Two lines 80/20,8.81136,0.00369,2.40714,7.580106
+2014,Other,Sierra Nevada reservoirs,3-year mean 50,7.82604,0.00945,1.88838,7.580106
+2014,Other,Sierra Nevada reservoirs,Hold 3 years,8.99091,0.00342,1.31634,7.580106
+2014,Other,Sierra Nevada reservoirs,Hold 5 years,11.82096,0.00279,0.00783,7.580106
+2014,Wetland,Sierra Nevada reservoirs,Yearly 50,0.00666,0.00054,0.00063,0.0072225
+2014,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.00657,0.00018,0.00063,0.0072225
+2014,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00666,0.00018,0.00036,0.0072225
+2014,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00657,0.00018,0.00018,0.0072225
+2014,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.00621,0.00018,0.00054,0.0072225
+2014,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.0063,0.00018,0.00054,0.0072225
+2014,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.00585,0.00018,0.00018,0.0072225
+2015,Other,Sierra Nevada reservoirs,Yearly 50,6.39936,0.04149,1.51443,6.1025931
+2015,Other,Sierra Nevada reservoirs,Two lines 60/40,6.57009,0.01593,1.57527,6.1025931
+2015,Other,Sierra Nevada reservoirs,Two lines 70/30,6.7734,0.00666,1.66536,6.1025931
+2015,Other,Sierra Nevada reservoirs,Two lines 80/20,6.98319,0.00423,1.8324,6.1025931
+2015,Other,Sierra Nevada reservoirs,3-year mean 50,7.20459,0.01467,0.63612,6.1025931
+2015,Other,Sierra Nevada reservoirs,Hold 3 years,8.97561,0.00576,0.02106,6.1025931
+2015,Other,Sierra Nevada reservoirs,Hold 5 years,11.80989,0.00414,0.01521,6.1025931
+2015,Wetland,Sierra Nevada reservoirs,Yearly 50,0.00612,0.00054,0.00108,0.0068733
+2015,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.00621,0.00045,0.00081,0.0068733
+2015,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00639,0.00027,0.00054,0.0068733
+2015,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00648,0.00018,0.00027,0.0068733
+2015,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.00621,0.00036,0.00036,0.0068733
+2015,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.00612,0.00036,0.00054,0.0068733
+2015,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.00603,0.00036,0.00018,0.0068733
+2016,Other,Sierra Nevada reservoirs,Yearly 50,8.68275,2.32704,0.04365,8.3391471
+2016,Other,Sierra Nevada reservoirs,Two lines 60/40,8.48241,1.94382,0.0315,8.3391471
+2016,Other,Sierra Nevada reservoirs,Two lines 70/30,8.30043,1.55376,0.02673,8.3391471
+2016,Other,Sierra Nevada reservoirs,Two lines 80/20,7.7967,0.84501,0.0315,8.3391471
+2016,Other,Sierra Nevada reservoirs,3-year mean 50,8.70093,1.51389,0.01755,8.3391471
+2016,Other,Sierra Nevada reservoirs,Hold 3 years,9.08298,0.11736,0.00999,8.3391471
+2016,Other,Sierra Nevada reservoirs,Hold 5 years,11.81133,0.00774,0.0063,8.3391471
+2016,Wetland,Sierra Nevada reservoirs,Yearly 50,0.00639,0.00108,0.00081,0.0112806
+2016,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.00603,0.00072,9e-04,0.0112806
+2016,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00603,0.00063,0.00099,0.0112806
+2016,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00657,0.00054,0.00045,0.0112806
+2016,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.00603,0.00072,9e-04,0.0112806
+2016,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.00603,0.00054,0.00063,0.0112806
+2016,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.00594,0.00054,0.00063,0.0112806
+2017,Other,Sierra Nevada reservoirs,Yearly 50,13.02093,4.3731,0.03492,12.7264392
+2017,Other,Sierra Nevada reservoirs,Two lines 60/40,12.71565,4.24962,0.01638,12.7264392
+2017,Other,Sierra Nevada reservoirs,Two lines 70/30,12.40245,4.11381,0.01179,12.7264392
+2017,Other,Sierra Nevada reservoirs,Two lines 80/20,12.07413,4.28634,0.00891,12.7264392
+2017,Other,Sierra Nevada reservoirs,3-year mean 50,12.04146,3.35196,0.01143,12.7264392
+2017,Other,Sierra Nevada reservoirs,Hold 3 years,12.44088,3.36582,0.00792,12.7264392
+2017,Other,Sierra Nevada reservoirs,Hold 5 years,11.81088,0.00495,0.0054,12.7264392
+2017,Wetland,Sierra Nevada reservoirs,Yearly 50,0.00918,0.00342,0.00063,0.0281772
+2017,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.00801,0.00225,0.00027,0.0281772
+2017,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00765,0.00171,9e-05,0.0281772
+2017,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00729,0.00117,0.00045,0.0281772
+2017,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.0072,0.00153,0.00036,0.0281772
+2017,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.00774,0.00189,0.00018,0.0281772
+2017,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.0072,0.00144,0.00018,0.0281772
+2018,Other,Sierra Nevada reservoirs,Yearly 50,12.52638,0.11511,0.60966,12.0236715
+2018,Other,Sierra Nevada reservoirs,Two lines 60/40,12.5757,0.10458,0.24453,12.0236715
+2018,Other,Sierra Nevada reservoirs,Two lines 70/30,12.43962,0.10773,0.07056,12.0236715
+2018,Other,Sierra Nevada reservoirs,Two lines 80/20,12.19905,0.14067,0.01575,12.0236715
+2018,Other,Sierra Nevada reservoirs,3-year mean 50,12.82293,0.79767,0.0162,12.0236715
+2018,Other,Sierra Nevada reservoirs,Hold 3 years,12.45555,0.02259,0.00792,12.0236715
+2018,Other,Sierra Nevada reservoirs,Hold 5 years,11.80701,0.01422,0.01809,12.0236715
+2018,Wetland,Sierra Nevada reservoirs,Yearly 50,0.01494,0.00756,0.0018,0.0202941
+2018,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.01143,0.00423,0.00081,0.0202941
+2018,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00936,0.00198,0.00027,0.0202941
+2018,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.0081,0.00099,0.00018,0.0202941
+2018,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.00972,0.00261,9e-05,0.0202941
+2018,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.00837,0.00072,9e-05,0.0202941
+2018,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.00774,0.00063,9e-05,0.0202941
+2019,Other,Sierra Nevada reservoirs,Yearly 50,13.01598,0.56259,0.07299,12.8844333
+2019,Other,Sierra Nevada reservoirs,Two lines 60/40,12.79629,0.25137,0.03078,12.8844333
+2019,Other,Sierra Nevada reservoirs,Two lines 70/30,12.59415,0.16974,0.01521,12.8844333
+2019,Other,Sierra Nevada reservoirs,Two lines 80/20,12.37023,0.18243,0.01125,12.8844333
+2019,Other,Sierra Nevada reservoirs,3-year mean 50,12.40029,0.01836,0.441,12.8844333
+2019,Other,Sierra Nevada reservoirs,Hold 3 years,12.44781,0.00585,0.01359,12.8844333
+2019,Other,Sierra Nevada reservoirs,Hold 5 years,11.79414,0.00135,0.01422,12.8844333
+2019,Wetland,Sierra Nevada reservoirs,Yearly 50,0.01179,0.00144,0.00459,0.0213201
+2019,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.01143,0.00117,0.00117,0.0213201
+2019,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.01008,0.00099,0.00027,0.0213201
+2019,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00873,9e-04,0.00027,0.0213201
+2019,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.009,0.00018,9e-04,0.0213201
+2019,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.00846,0.00018,9e-05,0.0213201
+2019,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.00792,0.00018,0,0.0213201
+2020,Other,Sierra Nevada reservoirs,Yearly 50,11.68191,0.04401,1.37808,11.4814269
+2020,Other,Sierra Nevada reservoirs,Two lines 60/40,11.89008,0.02097,0.92718,11.4814269
+2020,Other,Sierra Nevada reservoirs,Two lines 70/30,12.11454,0.01413,0.49374,11.4814269
+2020,Other,Sierra Nevada reservoirs,Two lines 80/20,12.17268,0.01242,0.20997,11.4814269
+2020,Other,Sierra Nevada reservoirs,3-year mean 50,11.46915,0.01215,0.94329,11.4814269
+2020,Other,Sierra Nevada reservoirs,Hold 3 years,11.65833,0.00351,0.79299,11.4814269
+2020,Other,Sierra Nevada reservoirs,Hold 5 years,11.77281,0.0018,0.02313,11.4814269
+2020,Wetland,Sierra Nevada reservoirs,Yearly 50,0.00774,9e-05,0.00414,0.0106164
+2020,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.00792,0,0.00351,0.0106164
+2020,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.0081,0,0.00198,0.0106164
+2020,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00819,0,0.00054,0.0106164
+2020,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.00801,0,0.00099,0.0106164
+2020,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.00801,9e-05,0.00054,0.0106164
+2020,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.00792,9e-05,9e-05,0.0106164
+2021,Other,Sierra Nevada reservoirs,Yearly 50,9.58914,0.02367,2.11644,9.2351052
+2021,Other,Sierra Nevada reservoirs,Two lines 60/40,10.01007,0.01224,1.89225,9.2351052
+2021,Other,Sierra Nevada reservoirs,Two lines 70/30,10.33281,0.00792,1.78965,9.2351052
+2021,Other,Sierra Nevada reservoirs,Two lines 80/20,10.62684,0.00369,1.54953,9.2351052
+2021,Other,Sierra Nevada reservoirs,3-year mean 50,9.70632,0.00783,1.77066,9.2351052
+2021,Other,Sierra Nevada reservoirs,Hold 3 years,11.63457,0.00351,0.02727,9.2351052
+2021,Other,Sierra Nevada reservoirs,Hold 5 years,11.75814,0.00189,0.01656,9.2351052
+2021,Wetland,Sierra Nevada reservoirs,Yearly 50,0.00774,0.00027,0.00027,0.0088578
+2021,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.00774,0.00018,0.00036,0.0088578
+2021,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00774,0,0.00036,0.0088578
+2021,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00774,0,0.00045,0.0088578
+2021,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.00783,0.00018,0.00036,0.0088578
+2021,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.00801,9e-05,9e-05,0.0088578
+2021,Wetland,Sierra Nevada reservoirs,Hold 5 years,0.00792,0,0,0.0088578
+2022,Other,Sierra Nevada reservoirs,Yearly 50,8.25291,0.02934,1.36557,7.8507855
+2022,Other,Sierra Nevada reservoirs,Two lines 60/40,8.50491,0.00819,1.51335,7.8507855
+2022,Other,Sierra Nevada reservoirs,Two lines 70/30,8.82162,0.00477,1.51596,7.8507855
+2022,Other,Sierra Nevada reservoirs,Two lines 80/20,9.26748,0.00324,1.3626,7.8507855
+2022,Other,Sierra Nevada reservoirs,3-year mean 50,9.61002,0.12096,0.21726,7.8507855
+2022,Other,Sierra Nevada reservoirs,Hold 3 years,11.61657,0.00522,0.02322,7.8507855
+2022,Wetland,Sierra Nevada reservoirs,Yearly 50,0.00801,0.00054,0.00027,0.0100449
+2022,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.00783,0.00036,0.00027,0.0100449
+2022,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00774,0.00027,0.00027,0.0100449
+2022,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00756,0,0.00018,0.0100449
+2022,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.0081,0.00036,9e-05,0.0100449
+2022,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.0081,0.00027,0.00018,0.0100449
+2023,Other,Sierra Nevada reservoirs,Yearly 50,12.7593,4.53312,0.02673,12.1949568
+2023,Other,Sierra Nevada reservoirs,Two lines 60/40,12.4344,3.95199,0.0225,12.1949568
+2023,Other,Sierra Nevada reservoirs,Two lines 70/30,11.94111,3.13407,0.01458,12.1949568
+2023,Other,Sierra Nevada reservoirs,Two lines 80/20,11.35719,2.09673,0.00702,12.1949568
+2023,Other,Sierra Nevada reservoirs,3-year mean 50,12.08601,2.50911,0.03312,12.1949568
+2023,Other,Sierra Nevada reservoirs,Hold 3 years,12.25179,0.65097,0.01575,12.1949568
+2023,Wetland,Sierra Nevada reservoirs,Yearly 50,0.01161,0.00378,0.00018,0.0233316
+2023,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.00936,0.00153,0,0.0233316
+2023,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00864,9e-04,0,0.0233316
+2023,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00792,0.00036,0,0.0233316
+2023,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.00837,0.00063,0.00036,0.0233316
+2023,Wetland,Sierra Nevada reservoirs,Hold 3 years,0.00801,9e-05,0.00018,0.0233316
+2024,Other,Sierra Nevada reservoirs,Yearly 50,12.72411,0.2295,0.26469,12.0328272
+2024,Other,Sierra Nevada reservoirs,Two lines 60/40,12.59505,0.25317,0.09252,12.0328272
+2024,Other,Sierra Nevada reservoirs,Two lines 70/30,12.4128,0.51066,0.03897,12.0328272
+2024,Other,Sierra Nevada reservoirs,Two lines 80/20,12.186,0.84933,0.02052,12.0328272
+2024,Other,Sierra Nevada reservoirs,3-year mean 50,12.53745,0.50463,0.05319,12.0328272
+2024,Wetland,Sierra Nevada reservoirs,Yearly 50,0.00873,0.00117,0.00405,0.0146052
+2024,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.00855,9e-04,0.00171,0.0146052
+2024,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00765,0.00036,0.00135,0.0146052
+2024,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00801,0.00027,0.00018,0.0146052
+2024,Wetland,Sierra Nevada reservoirs,3-year mean 50,0.00774,0.00027,9e-04,0.0146052
+2025,Other,Sierra Nevada reservoirs,Yearly 50,12.23352,0.06192,0.55251,12.5915409
+2025,Other,Sierra Nevada reservoirs,Two lines 60/40,12.32028,0.02268,0.29745,12.5915409
+2025,Other,Sierra Nevada reservoirs,Two lines 70/30,12.25791,0.01125,0.16614,12.5915409
+2025,Other,Sierra Nevada reservoirs,Two lines 80/20,12.07962,0.01044,0.11682,12.5915409
+2025,Wetland,Sierra Nevada reservoirs,Yearly 50,0.00747,0.00072,0.00198,0.0143028
+2025,Wetland,Sierra Nevada reservoirs,Two lines 60/40,0.00792,0.00036,0.00099,0.0143028
+2025,Wetland,Sierra Nevada reservoirs,Two lines 70/30,0.00747,9e-05,0.00027,0.0143028
+2025,Wetland,Sierra Nevada reservoirs,Two lines 80/20,0.00693,0,0.00108,0.0143028

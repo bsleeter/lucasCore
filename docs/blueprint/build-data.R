@@ -67,6 +67,8 @@ D <- list(
     u(6, "Where canopy counts as forest returning after a fire or a cut", "Forest Cover > Recovery by tree canopy cover", TRUE),
     u(8, "Potential vegetation of each cell, for the carbon carrying capacity", "Carbon Capacity Options"),
     u(10, "Forest potential covariates that place reforestation", "Reforestation Options"))),
+  list("Land cover, age and soil", "DsweFolder", "USGS DSWE annual open water", "Collection 2 v2.0 · 30 m · annual 1984 to 2025", list(
+    u(6, "Whether a 30 m pixel is water each year, for change among water, wetland and barren (not read by a stage yet)", "Data Sources"))),
   list("Land cover, age and soil", "TreeCanopyFolder", "USFS Tree Canopy Cover", "v2025-6 · 30 m · annual 1985 to 2023", list(
     u(5, "Forest in the start year where NLCD maps open forest as shrub or grass", "Forest Cover > Forest in the start year: NLCD and tree canopy cover", TRUE),
     u(6, "A disturbed stand counts as forest again when its canopy is back", "Forest Cover > Recovery by tree canopy cover", TRUE),

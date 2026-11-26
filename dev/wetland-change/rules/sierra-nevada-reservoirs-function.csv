@@ -1,0 +1,385 @@
+Year,Side,Code,Kha,Change,Region
+1994,Wetland,1,0,To Water,Sierra Nevada reservoirs
+1994,Wetland,2,0,Water to Wetland,Sierra Nevada reservoirs
+1994,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+1994,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+1994,Wetland,5,0,Barren to Wetland,Sierra Nevada reservoirs
+1994,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+1994,Other,1,0,To Water,Sierra Nevada reservoirs
+1994,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+1994,Other,3,0,Water to Barren,Sierra Nevada reservoirs
+1994,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+1994,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+1994,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+1995,Wetland,1,0.00135,To Water,Sierra Nevada reservoirs
+1995,Wetland,2,0.00036,Water to Wetland,Sierra Nevada reservoirs
+1995,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+1995,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+1995,Wetland,5,0,Barren to Wetland,Sierra Nevada reservoirs
+1995,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+1995,Other,1,1.85823,To Water,Sierra Nevada reservoirs
+1995,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+1995,Other,3,0.00621,Water to Barren,Sierra Nevada reservoirs
+1995,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+1995,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+1995,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+1996,Wetland,1,0.00063,To Water,Sierra Nevada reservoirs
+1996,Wetland,2,9e-05,Water to Wetland,Sierra Nevada reservoirs
+1996,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+1996,Wetland,4,9e-05,Wetland to Barren,Sierra Nevada reservoirs
+1996,Wetland,5,0.00027,Barren to Wetland,Sierra Nevada reservoirs
+1996,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+1996,Other,1,1.12554,To Water,Sierra Nevada reservoirs
+1996,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+1996,Other,3,0.01836,Water to Barren,Sierra Nevada reservoirs
+1996,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+1996,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+1996,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+1997,Wetland,1,0.00045,To Water,Sierra Nevada reservoirs
+1997,Wetland,2,0,Water to Wetland,Sierra Nevada reservoirs
+1997,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+1997,Wetland,4,9e-05,Wetland to Barren,Sierra Nevada reservoirs
+1997,Wetland,5,0.00036,Barren to Wetland,Sierra Nevada reservoirs
+1997,Wetland,6,9e-05,Water to Other Land,Sierra Nevada reservoirs
+1997,Other,1,0.02664,To Water,Sierra Nevada reservoirs
+1997,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+1997,Other,3,0.07254,Water to Barren,Sierra Nevada reservoirs
+1997,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+1997,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+1997,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+1998,Wetland,1,0.00054,To Water,Sierra Nevada reservoirs
+1998,Wetland,2,0.00018,Water to Wetland,Sierra Nevada reservoirs
+1998,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+1998,Wetland,4,9e-05,Wetland to Barren,Sierra Nevada reservoirs
+1998,Wetland,5,9e-05,Barren to Wetland,Sierra Nevada reservoirs
+1998,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+1998,Other,1,0.21339,To Water,Sierra Nevada reservoirs
+1998,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+1998,Other,3,0.00459,Water to Barren,Sierra Nevada reservoirs
+1998,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+1998,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+1998,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+1999,Wetland,1,0.00027,To Water,Sierra Nevada reservoirs
+1999,Wetland,2,9e-05,Water to Wetland,Sierra Nevada reservoirs
+1999,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+1999,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+1999,Wetland,5,0,Barren to Wetland,Sierra Nevada reservoirs
+1999,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+1999,Other,1,0.02232,To Water,Sierra Nevada reservoirs
+1999,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+1999,Other,3,0.19548,Water to Barren,Sierra Nevada reservoirs
+1999,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+1999,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+1999,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2000,Wetland,1,0.00081,To Water,Sierra Nevada reservoirs
+2000,Wetland,2,0.00027,Water to Wetland,Sierra Nevada reservoirs
+2000,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2000,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2000,Wetland,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2000,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+2000,Other,1,0.04824,To Water,Sierra Nevada reservoirs
+2000,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2000,Other,3,0.06975,Water to Barren,Sierra Nevada reservoirs
+2000,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2000,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2000,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2001,Wetland,1,0.00027,To Water,Sierra Nevada reservoirs
+2001,Wetland,2,0,Water to Wetland,Sierra Nevada reservoirs
+2001,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2001,Wetland,4,0.00027,Wetland to Barren,Sierra Nevada reservoirs
+2001,Wetland,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2001,Wetland,6,9e-05,Water to Other Land,Sierra Nevada reservoirs
+2001,Other,1,0.01251,To Water,Sierra Nevada reservoirs
+2001,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2001,Other,3,0.48744,Water to Barren,Sierra Nevada reservoirs
+2001,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2001,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2001,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2002,Wetland,1,0.00045,To Water,Sierra Nevada reservoirs
+2002,Wetland,2,9e-05,Water to Wetland,Sierra Nevada reservoirs
+2002,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2002,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2002,Wetland,5,9e-05,Barren to Wetland,Sierra Nevada reservoirs
+2002,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+2002,Other,1,0.02142,To Water,Sierra Nevada reservoirs
+2002,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2002,Other,3,0.96849,Water to Barren,Sierra Nevada reservoirs
+2002,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2002,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2002,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2003,Wetland,1,0.00036,To Water,Sierra Nevada reservoirs
+2003,Wetland,2,0,Water to Wetland,Sierra Nevada reservoirs
+2003,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2003,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2003,Wetland,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2003,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+2003,Other,1,0.01251,To Water,Sierra Nevada reservoirs
+2003,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2003,Other,3,0.2187,Water to Barren,Sierra Nevada reservoirs
+2003,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2003,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2003,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2004,Wetland,1,0.00027,To Water,Sierra Nevada reservoirs
+2004,Wetland,2,0,Water to Wetland,Sierra Nevada reservoirs
+2004,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2004,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2004,Wetland,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2004,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+2004,Other,1,0.04338,To Water,Sierra Nevada reservoirs
+2004,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2004,Other,3,0.06102,Water to Barren,Sierra Nevada reservoirs
+2004,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2004,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2004,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2005,Wetland,1,0.00036,To Water,Sierra Nevada reservoirs
+2005,Wetland,2,9e-05,Water to Wetland,Sierra Nevada reservoirs
+2005,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2005,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2005,Wetland,5,0.00027,Barren to Wetland,Sierra Nevada reservoirs
+2005,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+2005,Other,1,1.03914,To Water,Sierra Nevada reservoirs
+2005,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2005,Other,3,0.00981,Water to Barren,Sierra Nevada reservoirs
+2005,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2005,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2005,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2006,Wetland,1,0.00108,To Water,Sierra Nevada reservoirs
+2006,Wetland,2,0.00072,Water to Wetland,Sierra Nevada reservoirs
+2006,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2006,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2006,Wetland,5,0.00036,Barren to Wetland,Sierra Nevada reservoirs
+2006,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+2006,Other,1,0.7623,To Water,Sierra Nevada reservoirs
+2006,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2006,Other,3,0.01026,Water to Barren,Sierra Nevada reservoirs
+2006,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2006,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2006,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2007,Wetland,1,0.00063,To Water,Sierra Nevada reservoirs
+2007,Wetland,2,0.00072,Water to Wetland,Sierra Nevada reservoirs
+2007,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2007,Wetland,4,0.00018,Wetland to Barren,Sierra Nevada reservoirs
+2007,Wetland,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2007,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+2007,Other,1,0.01134,To Water,Sierra Nevada reservoirs
+2007,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2007,Other,3,0.76248,Water to Barren,Sierra Nevada reservoirs
+2007,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2007,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2007,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2008,Wetland,1,0.00099,To Water,Sierra Nevada reservoirs
+2008,Wetland,2,0.00018,Water to Wetland,Sierra Nevada reservoirs
+2008,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2008,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2008,Wetland,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2008,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+2008,Other,1,0.01188,To Water,Sierra Nevada reservoirs
+2008,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2008,Other,3,1.64655,Water to Barren,Sierra Nevada reservoirs
+2008,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2008,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2008,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2009,Wetland,1,0.00108,To Water,Sierra Nevada reservoirs
+2009,Wetland,2,9e-05,Water to Wetland,Sierra Nevada reservoirs
+2009,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2009,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2009,Wetland,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2009,Wetland,6,9e-05,Water to Other Land,Sierra Nevada reservoirs
+2009,Other,1,0.08199,To Water,Sierra Nevada reservoirs
+2009,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2009,Other,3,0.288,Water to Barren,Sierra Nevada reservoirs
+2009,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2009,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2009,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2010,Wetland,1,0.00252,To Water,Sierra Nevada reservoirs
+2010,Wetland,2,9e-05,Water to Wetland,Sierra Nevada reservoirs
+2010,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2010,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2010,Wetland,5,9e-05,Barren to Wetland,Sierra Nevada reservoirs
+2010,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+2010,Other,1,0.98253,To Water,Sierra Nevada reservoirs
+2010,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2010,Other,3,0.0216,Water to Barren,Sierra Nevada reservoirs
+2010,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2010,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2010,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2011,Wetland,1,0.00099,To Water,Sierra Nevada reservoirs
+2011,Wetland,2,0.00072,Water to Wetland,Sierra Nevada reservoirs
+2011,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2011,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2011,Wetland,5,9e-05,Barren to Wetland,Sierra Nevada reservoirs
+2011,Wetland,6,0.00054,Water to Other Land,Sierra Nevada reservoirs
+2011,Other,1,1.12797,To Water,Sierra Nevada reservoirs
+2011,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2011,Other,3,0.00945,Water to Barren,Sierra Nevada reservoirs
+2011,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2011,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2011,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2012,Wetland,1,0.00045,To Water,Sierra Nevada reservoirs
+2012,Wetland,2,0.00081,Water to Wetland,Sierra Nevada reservoirs
+2012,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2012,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2012,Wetland,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2012,Wetland,6,0.00108,Water to Other Land,Sierra Nevada reservoirs
+2012,Other,1,0.01125,To Water,Sierra Nevada reservoirs
+2012,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2012,Other,3,0.34362,Water to Barren,Sierra Nevada reservoirs
+2012,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2012,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2012,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2013,Wetland,1,0.00018,To Water,Sierra Nevada reservoirs
+2013,Wetland,2,9e-05,Water to Wetland,Sierra Nevada reservoirs
+2013,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2013,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2013,Wetland,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2013,Wetland,6,0.00027,Water to Other Land,Sierra Nevada reservoirs
+2013,Other,1,0.00846,To Water,Sierra Nevada reservoirs
+2013,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2013,Other,3,1.31121,Water to Barren,Sierra Nevada reservoirs
+2013,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2013,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2013,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2014,Wetland,1,0.00018,To Water,Sierra Nevada reservoirs
+2014,Wetland,2,0.00036,Water to Wetland,Sierra Nevada reservoirs
+2014,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2014,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2014,Wetland,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2014,Wetland,6,9e-05,Water to Other Land,Sierra Nevada reservoirs
+2014,Other,1,0.00531,To Water,Sierra Nevada reservoirs
+2014,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2014,Other,3,2.47095,Water to Barren,Sierra Nevada reservoirs
+2014,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2014,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2014,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2015,Wetland,1,0.00036,To Water,Sierra Nevada reservoirs
+2015,Wetland,2,0.00045,Water to Wetland,Sierra Nevada reservoirs
+2015,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2015,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2015,Wetland,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2015,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+2015,Other,1,0.00648,To Water,Sierra Nevada reservoirs
+2015,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2015,Other,3,1.665,Water to Barren,Sierra Nevada reservoirs
+2015,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2015,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2015,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2016,Wetland,1,0.00054,To Water,Sierra Nevada reservoirs
+2016,Wetland,2,0.00108,Water to Wetland,Sierra Nevada reservoirs
+2016,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2016,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2016,Wetland,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2016,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+2016,Other,1,1.55367,To Water,Sierra Nevada reservoirs
+2016,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2016,Other,3,0.02646,Water to Barren,Sierra Nevada reservoirs
+2016,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2016,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2016,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2017,Wetland,1,0.00153,To Water,Sierra Nevada reservoirs
+2017,Wetland,2,0.00027,Water to Wetland,Sierra Nevada reservoirs
+2017,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2017,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2017,Wetland,5,9e-05,Barren to Wetland,Sierra Nevada reservoirs
+2017,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+2017,Other,1,4.1121,To Water,Sierra Nevada reservoirs
+2017,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2017,Other,3,0.01125,Water to Barren,Sierra Nevada reservoirs
+2017,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2017,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2017,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2018,Wetland,1,0.00072,To Water,Sierra Nevada reservoirs
+2018,Wetland,2,0.00036,Water to Wetland,Sierra Nevada reservoirs
+2018,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2018,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2018,Wetland,5,9e-05,Barren to Wetland,Sierra Nevada reservoirs
+2018,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+2018,Other,1,0.10692,To Water,Sierra Nevada reservoirs
+2018,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2018,Other,3,0.06984,Water to Barren,Sierra Nevada reservoirs
+2018,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2018,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2018,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2019,Wetland,1,0.00027,To Water,Sierra Nevada reservoirs
+2019,Wetland,2,0.00054,Water to Wetland,Sierra Nevada reservoirs
+2019,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2019,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2019,Wetland,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2019,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+2019,Other,1,0.16938,To Water,Sierra Nevada reservoirs
+2019,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2019,Other,3,0.01476,Water to Barren,Sierra Nevada reservoirs
+2019,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2019,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2019,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2020,Wetland,1,0.00117,To Water,Sierra Nevada reservoirs
+2020,Wetland,2,0.00027,Water to Wetland,Sierra Nevada reservoirs
+2020,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2020,Wetland,4,9e-05,Wetland to Barren,Sierra Nevada reservoirs
+2020,Wetland,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2020,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+2020,Other,1,0.01314,To Water,Sierra Nevada reservoirs
+2020,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2020,Other,3,0.49212,Water to Barren,Sierra Nevada reservoirs
+2020,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2020,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2020,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2021,Wetland,1,0.00018,To Water,Sierra Nevada reservoirs
+2021,Wetland,2,0.00018,Water to Wetland,Sierra Nevada reservoirs
+2021,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2021,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2021,Wetland,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2021,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+2021,Other,1,0.00765,To Water,Sierra Nevada reservoirs
+2021,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2021,Other,3,1.78839,Water to Barren,Sierra Nevada reservoirs
+2021,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2021,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2021,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2022,Wetland,1,0,To Water,Sierra Nevada reservoirs
+2022,Wetland,2,0,Water to Wetland,Sierra Nevada reservoirs
+2022,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2022,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2022,Wetland,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2022,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+2022,Other,1,0.00432,To Water,Sierra Nevada reservoirs
+2022,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2022,Other,3,1.51506,Water to Barren,Sierra Nevada reservoirs
+2022,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2022,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2022,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2023,Wetland,1,0,To Water,Sierra Nevada reservoirs
+2023,Wetland,2,0,Water to Wetland,Sierra Nevada reservoirs
+2023,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2023,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2023,Wetland,5,0.00036,Barren to Wetland,Sierra Nevada reservoirs
+2023,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+2023,Other,1,3.13263,To Water,Sierra Nevada reservoirs
+2023,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2023,Other,3,0.01386,Water to Barren,Sierra Nevada reservoirs
+2023,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2023,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2023,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2024,Wetland,1,0,To Water,Sierra Nevada reservoirs
+2024,Wetland,2,0,Water to Wetland,Sierra Nevada reservoirs
+2024,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2024,Wetland,4,9e-05,Wetland to Barren,Sierra Nevada reservoirs
+2024,Wetland,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2024,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+2024,Other,1,0.51021,To Water,Sierra Nevada reservoirs
+2024,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2024,Other,3,0.03888,Water to Barren,Sierra Nevada reservoirs
+2024,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2024,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2024,Other,6,0,Water to Other Land,Sierra Nevada reservoirs
+2025,Wetland,1,0,To Water,Sierra Nevada reservoirs
+2025,Wetland,2,0,Water to Wetland,Sierra Nevada reservoirs
+2025,Wetland,3,0,Water to Barren,Sierra Nevada reservoirs
+2025,Wetland,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2025,Wetland,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2025,Wetland,6,0,Water to Other Land,Sierra Nevada reservoirs
+2025,Other,1,0.01107,To Water,Sierra Nevada reservoirs
+2025,Other,2,0,Water to Wetland,Sierra Nevada reservoirs
+2025,Other,3,0.16524,Water to Barren,Sierra Nevada reservoirs
+2025,Other,4,0,Wetland to Barren,Sierra Nevada reservoirs
+2025,Other,5,0,Barren to Wetland,Sierra Nevada reservoirs
+2025,Other,6,0,Water to Other Land,Sierra Nevada reservoirs

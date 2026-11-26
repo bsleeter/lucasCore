@@ -36,8 +36,8 @@ TransitionGroup,Fire,"Wildfire, by MTBS burn severity: low (MTBS 1 unburned to l
 TransitionGroup,Forest Harvest,"Removal of trees by harvest, from LCMS Tree Removal: clearcut where last year's forest becomes shrub or grass in NLCD that year or within two years, selection where it stays forest.",LcmsFolder
 TransitionGroup,Mortality,"High-severity tree mortality from drought, insects or disease: a stand that loses most of its live trees with no fire and no cutting (the western ecodivisions; mapped from LCMS stress classes and tree canopy loss).",
 TransitionGroup,Restoration Wetland,Conversion of other land to wetland. Defined in the package's group list; no pathway uses it in the default model.,
-TransitionGroup,Wetland Change: Gain,Gain of wetland area. Defined in the package's group list; no pathway uses it in the default model.,
-TransitionGroup,Wetland Change: Loss,Loss of wetland area. Defined in the package's group list; no pathway uses it in the default model.,
+TransitionGroup,Wetland Change: Gain,"Gain of wetland area: water or barren land that becomes emergent wetland (USGS DSWE open water and the annual NLCD).",DsweFolder
+TransitionGroup,Wetland Change: Loss,"Wetland or barren land that becomes water, and water or emergent wetland that becomes barren (USGS DSWE open water and the annual NLCD).",DsweFolder
 TransitionType,Urbanization: Open,A cell becomes Developed: Open Space (NLCD 21).,NlcdFolder
 TransitionType,Urbanization: Low,A cell becomes Developed: Low Intensity (NLCD 22).,NlcdFolder
 TransitionType,Urbanization: Medium,A cell becomes Developed: Medium Intensity (NLCD 23).,NlcdFolder
@@ -62,7 +62,7 @@ TransitionType,Forest Harvest: Salvage Logging,"Harvest of trees killed by a dis
 TransitionType,Mortality: Drought and Insects,"High-severity drought and insect mortality: about 83% of live tree carbon moves to snags, litter and dead roots and the cell goes to its Disturbed class.",
 TransitionType,Restoration Wetland: *,Conversion to Wetland: {*}. Defined in the package's type list; no pathway uses it in the default model.,
 TransitionType,Ag Change: *,Agricultural cells that change class: {*}.,NlcdFolder
-TransitionType,Wetland Change: *,Wetland change {*}. Defined in the package's type list; no pathway uses it in the default model.,
+TransitionType,Wetland Change: *,"Change among water, wetland and barren: the cell goes {*} (USGS DSWE open water and the annual NLCD; the two forested types have no pathway).",DsweFolder
 StockType,Aquatic,Carbon moved out of the ecosystem to water bodies by lateral transport (a sink outside the ecosystem).,
 StockType,Atmosphere,The atmosphere: the source of net growth and the sink of decay emissions (baseline flows).,
 StockType,Atmosphere: CH4,Carbon emitted as methane by disturbance (transition-triggered flows only).,

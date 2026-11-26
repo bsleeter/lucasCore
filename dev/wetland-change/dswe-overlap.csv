@@ -1,0 +1,29 @@
+Region,Change,DsweKha,CcapKha,NlcdKha,DsweAndCcapKha,DsweAndNlcdKha,CcapAndNlcdKha,AllThreeKha
+Sierra Nevada reservoirs,Became water,0.11007,0,0.17343,0,0.0792,0,0
+Sierra Nevada reservoirs,Stopped being water,3.38112,0,4.67973,0,2.84301,0,0
+Sierra Nevada reservoirs,Wetland became water,0.00783,0,0.02034,0,0.00729,0,0
+Sierra Nevada reservoirs,Water became wetland,0.00171,0,0.02151,0,0.00135,0,0
+Chesapeake eastern shore,Became water,3.82194,0.52884,2.34135,0.17622,0.97938,0.15408,0.10305
+Chesapeake eastern shore,Stopped being water,0.63909,0.67554,0.59076,0.05697,0.10584,0.05589,0.02196
+Chesapeake eastern shore,Wetland became water,1.7046,0.34236,1.7856,0.11376,0.69264,0.06066,0.0333
+Chesapeake eastern shore,Water became wetland,0.18117,0.57465,0.33435,0.04473,0.03573,0.02214,0.0045
+Western Lake Erie,Became water,1.17243,1.50822,1.36368,0.45459,0.74052,0.42264,0.34776
+Western Lake Erie,Stopped being water,2.03427,1.90674,1.60308,0.60147,0.98631,0.43497,0.34155
+Western Lake Erie,Wetland became water,0.54027,1.01628,0.45657,0.20916,0.25515,0.09864,0.07488
+Western Lake Erie,Water became wetland,1.29366,1.60299,0.98856,0.53235,0.72918,0.29295,0.2403
+Louisiana chenier plain,Became water,29.58102,20.90655,9.87462,11.72295,6.70212,3.54285,3.07152
+Louisiana chenier plain,Stopped being water,10.56033,8.1018,8.01108,2.28321,4.38336,1.51947,1.22202
+Louisiana chenier plain,Wetland became water,24.31512,19.2609,7.64748,10.76976,5.47947,2.80935,2.41524
+Louisiana chenier plain,Water became wetland,4.095,4.2867,4.83129,1.17225,2.06883,0.76401,0.55215
+San Francisco Bay and Delta,Became water,4.92174,6.52383,4.06242,2.32524,2.45169,1.45701,1.25091
+San Francisco Bay and Delta,Stopped being water,7.93242,5.63184,7.71804,2.17287,3.12084,1.90395,1.23066
+San Francisco Bay and Delta,Wetland became water,2.7108,4.74624,1.30275,1.39104,0.77994,0.37278,0.30888
+San Francisco Bay and Delta,Water became wetland,3.04146,3.4929,2.30931,1.3824,1.27413,0.51444,0.39429
+Great Salt Lake,Became water,13.61916,0,5.84397,0,2.20581,0,0
+Great Salt Lake,Stopped being water,142.16796,0,153.83961,0,120.33918,0,0
+Great Salt Lake,Wetland became water,0.96048,0,1.14993,0,0.5931,0,0
+Great Salt Lake,Water became wetland,6.96042,0,7.58781,0,6.00327,0,0
+Louisiana delta plain,Became water,74.00673,27.88749,10.91925,16.40556,6.04305,2.08287,1.75032
+Louisiana delta plain,Stopped being water,19.90071,20.6694,15.67584,7.59726,10.02051,5.8986,4.94739
+Louisiana delta plain,Wetland became water,59.78205,22.65984,9.10557,13.53393,4.90671,1.22283,0.99045
+Louisiana delta plain,Water became wetland,13.70583,16.03062,10.45188,5.90166,6.00597,2.98593,2.32227

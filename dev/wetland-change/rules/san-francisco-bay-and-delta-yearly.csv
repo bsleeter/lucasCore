@@ -1,0 +1,425 @@
+Year,Side,Region,Rule,WaterKha,ToKha,FromKha,EqKha
+1994,Other,San Francisco Bay and Delta,Hold 3 years,275.04477,0,0,273.7236906
+1994,Other,San Francisco Bay and Delta,Hold 5 years,275.04477,0,0,273.7236906
+1994,Wetland,San Francisco Bay and Delta,Hold 3 years,3.18573,0,0,4.2076575
+1994,Wetland,San Francisco Bay and Delta,Hold 5 years,3.18573,0,0,4.2076575
+1995,Other,San Francisco Bay and Delta,Yearly 50,278.80596,4.28769,0.5265,275.1030081
+1995,Other,San Francisco Bay and Delta,Two lines 60/40,278.2188,3.60909,0.43506,275.1030081
+1995,Other,San Francisco Bay and Delta,Two lines 70/30,277.89507,3.05901,0.20871,275.1030081
+1995,Other,San Francisco Bay and Delta,Two lines 80/20,277.64172,2.7135,0.11655,275.1030081
+1995,Other,San Francisco Bay and Delta,3-year mean 50,277.42842,2.80224,0.41859,275.1030081
+1995,Other,San Francisco Bay and Delta,Hold 3 years,276.26841,1.44162,0.21798,275.1030081
+1995,Other,San Francisco Bay and Delta,Hold 5 years,276.1326,1.20303,0.1152,275.1030081
+1995,Wetland,San Francisco Bay and Delta,Yearly 50,3.50928,1.15245,0.8289,5.0986818
+1995,Wetland,San Francisco Bay and Delta,Two lines 60/40,3.23964,0.78399,0.73008,5.0986818
+1995,Wetland,San Francisco Bay and Delta,Two lines 70/30,3.23964,0.51192,0.45801,5.0986818
+1995,Wetland,San Francisco Bay and Delta,Two lines 80/20,3.27447,0.37989,0.29115,5.0986818
+1995,Wetland,San Francisco Bay and Delta,3-year mean 50,2.81628,0.48456,0.85401,5.0986818
+1995,Wetland,San Francisco Bay and Delta,Hold 3 years,2.83914,0.27243,0.61902,5.0986818
+1995,Wetland,San Francisco Bay and Delta,Hold 5 years,2.91843,0.17712,0.44442,5.0986818
+1996,Other,San Francisco Bay and Delta,Yearly 50,277.40412,0.79029,2.19213,276.9533181
+1996,Other,San Francisco Bay and Delta,Two lines 60/40,277.48017,0.57465,1.31328,276.9533181
+1996,Other,San Francisco Bay and Delta,Two lines 70/30,277.60896,0.37305,0.65916,276.9533181
+1996,Other,San Francisco Bay and Delta,Two lines 80/20,277.55469,0.29007,0.3771,276.9533181
+1996,Other,San Francisco Bay and Delta,3-year mean 50,277.77978,0.81144,0.46008,276.9533181
+1996,Other,San Francisco Bay and Delta,Hold 3 years,276.29469,0.18648,0.1602,276.9533181
+1996,Other,San Francisco Bay and Delta,Hold 5 years,276.13332,0.10341,0.10269,276.9533181
+1996,Wetland,San Francisco Bay and Delta,Yearly 50,2.83032,0.51444,1.1934,4.8275919
+1996,Wetland,San Francisco Bay and Delta,Two lines 60/40,2.78802,0.28773,0.73935,4.8275919
+1996,Wetland,San Francisco Bay and Delta,Two lines 70/30,2.98611,0.16002,0.41355,4.8275919
+1996,Wetland,San Francisco Bay and Delta,Two lines 80/20,3.21867,0.13158,0.18738,4.8275919
+1996,Wetland,San Francisco Bay and Delta,3-year mean 50,2.62899,0.19359,0.38088,4.8275919
+1996,Wetland,San Francisco Bay and Delta,Hold 3 years,2.63808,0.07902,0.28008,4.8275919
+1996,Wetland,San Francisco Bay and Delta,Hold 5 years,2.6892,0.03456,0.26379,4.8275919
+1997,Other,San Francisco Bay and Delta,Yearly 50,276.86205,2.11815,2.66022,274.6757691
+1997,Other,San Francisco Bay and Delta,Two lines 60/40,277.07211,1.49292,1.90098,274.6757691
+1997,Other,San Francisco Bay and Delta,Two lines 70/30,277.56369,0.9531,0.99837,274.6757691
+1997,Other,San Francisco Bay and Delta,Two lines 80/20,277.47207,0.34011,0.42273,274.6757691
+1997,Other,San Francisco Bay and Delta,3-year mean 50,277.88283,0.59256,0.48951,274.6757691
+1997,Other,San Francisco Bay and Delta,Hold 3 years,276.46578,0.29232,0.12123,274.6757691
+1997,Other,San Francisco Bay and Delta,Hold 5 years,276.18345,0.14283,0.0927,274.6757691
+1997,Wetland,San Francisco Bay and Delta,Yearly 50,2.4561,0.47232,0.84654,4.2419403
+1997,Wetland,San Francisco Bay and Delta,Two lines 60/40,2.40615,0.19674,0.57861,4.2419403
+1997,Wetland,San Francisco Bay and Delta,Two lines 70/30,2.70045,0.12168,0.40734,4.2419403
+1997,Wetland,San Francisco Bay and Delta,Two lines 80/20,3.00096,0.0828,0.30051,4.2419403
+1997,Wetland,San Francisco Bay and Delta,3-year mean 50,2.709,0.40563,0.32562,4.2419403
+1997,Wetland,San Francisco Bay and Delta,Hold 3 years,2.57265,0.06885,0.13428,4.2419403
+1997,Wetland,San Francisco Bay and Delta,Hold 5 years,2.60172,0.03141,0.11889,4.2419403
+1998,Other,San Francisco Bay and Delta,Yearly 50,279.72036,4.04946,1.19115,280.2612843
+1998,Other,San Francisco Bay and Delta,Two lines 60/40,278.95392,2.76921,0.8874,280.2612843
+1998,Other,San Francisco Bay and Delta,Two lines 70/30,278.66772,1.65357,0.54954,280.2612843
+1998,Other,San Francisco Bay and Delta,Two lines 80/20,278.39097,0.99558,0.07668,280.2612843
+1998,Other,San Francisco Bay and Delta,3-year mean 50,278.38845,0.963,0.45738,280.2612843
+1998,Other,San Francisco Bay and Delta,Hold 3 years,278.20161,1.80999,0.07416,280.2612843
+1998,Other,San Francisco Bay and Delta,Hold 5 years,277.69257,1.54872,0.0396,280.2612843
+1998,Wetland,San Francisco Bay and Delta,Yearly 50,4.81446,2.63727,0.27891,8.2644516
+1998,Wetland,San Francisco Bay and Delta,Two lines 60/40,3.92436,1.66014,0.14193,8.2644516
+1998,Wetland,San Francisco Bay and Delta,Two lines 70/30,3.39993,0.78579,0.08631,8.2644516
+1998,Wetland,San Francisco Bay and Delta,Two lines 80/20,3.45564,0.49788,0.0432,8.2644516
+1998,Wetland,San Francisco Bay and Delta,3-year mean 50,2.7387,0.38034,0.35064,8.2644516
+1998,Wetland,San Francisco Bay and Delta,Hold 3 years,2.75031,0.26721,0.08955,8.2644516
+1998,Wetland,San Francisco Bay and Delta,Hold 5 years,2.65968,0.12771,0.06975,8.2644516
+1999,Other,San Francisco Bay and Delta,Yearly 50,278.10486,1.07937,2.69487,277.7111937
+1999,Other,San Francisco Bay and Delta,Two lines 60/40,278.09055,0.79164,1.65501,277.7111937
+1999,Other,San Francisco Bay and Delta,Two lines 70/30,278.31699,0.61479,0.96552,277.7111937
+1999,Other,San Francisco Bay and Delta,Two lines 80/20,278.44398,0.57024,0.51723,277.7111937
+1999,Other,San Francisco Bay and Delta,3-year mean 50,278.46954,0.7299,0.64881,277.7111937
+1999,Other,San Francisco Bay and Delta,Hold 3 years,278.11485,0.28836,0.37512,277.7111937
+1999,Other,San Francisco Bay and Delta,Hold 5 years,277.77483,0.24822,0.16596,277.7111937
+1999,Wetland,San Francisco Bay and Delta,Yearly 50,2.65635,0.46863,2.62674,4.562505
+1999,Wetland,San Francisco Bay and Delta,Two lines 60/40,2.8053,0.28944,1.4085,4.562505
+1999,Wetland,San Francisco Bay and Delta,Two lines 70/30,2.93319,0.22113,0.68787,4.562505
+1999,Wetland,San Francisco Bay and Delta,Two lines 80/20,3.14514,0.15471,0.46521,4.562505
+1999,Wetland,San Francisco Bay and Delta,3-year mean 50,2.89278,0.44811,0.29403,4.562505
+1999,Wetland,San Francisco Bay and Delta,Hold 3 years,2.36322,0.06408,0.45117,4.562505
+1999,Wetland,San Francisco Bay and Delta,Hold 5 years,2.42163,0.05319,0.29124,4.562505
+2000,Other,San Francisco Bay and Delta,Yearly 50,277.92873,1.26054,1.43667,277.7070384
+2000,Other,San Francisco Bay and Delta,Two lines 60/40,278.03403,0.68049,0.73701,277.7070384
+2000,Other,San Francisco Bay and Delta,Two lines 70/30,278.2359,0.27198,0.35307,277.7070384
+2000,Other,San Francisco Bay and Delta,Two lines 80/20,278.35398,0.12168,0.21168,277.7070384
+2000,Other,San Francisco Bay and Delta,3-year mean 50,277.55487,0.20826,1.12293,277.7070384
+2000,Other,San Francisco Bay and Delta,Hold 3 years,277.92108,0.13374,0.32751,277.7070384
+2000,Other,San Francisco Bay and Delta,Hold 5 years,277.73415,0.15408,0.19476,277.7070384
+2000,Wetland,San Francisco Bay and Delta,Yearly 50,2.47986,0.53838,0.71487,4.2729489
+2000,Wetland,San Francisco Bay and Delta,Two lines 60/40,2.48634,0.162,0.48096,4.2729489
+2000,Wetland,San Francisco Bay and Delta,Two lines 70/30,2.75067,0.06426,0.24678,4.2729489
+2000,Wetland,San Francisco Bay and Delta,Two lines 80/20,3.00375,0.03465,0.17604,4.2729489
+2000,Wetland,San Francisco Bay and Delta,3-year mean 50,2.13426,0.07488,0.8334,4.2729489
+2000,Wetland,San Francisco Bay and Delta,Hold 3 years,2.26458,0.07326,0.1719,4.2729489
+2000,Wetland,San Francisco Bay and Delta,Hold 5 years,2.33091,0.04761,0.13833,4.2729489
+2001,Other,San Francisco Bay and Delta,Yearly 50,276.56712,0.44253,1.80414,275.3828334
+2001,Other,San Francisco Bay and Delta,Two lines 60/40,277.10712,0.24129,1.1682,275.3828334
+2001,Other,San Francisco Bay and Delta,Two lines 70/30,277.73838,0.1458,0.64332,275.3828334
+2001,Other,San Francisco Bay and Delta,Two lines 80/20,278.0109,0.08649,0.42957,275.3828334
+2001,Other,San Francisco Bay and Delta,3-year mean 50,277.25049,0.36792,0.6723,275.3828334
+2001,Other,San Francisco Bay and Delta,Hold 3 years,277.60563,0.08982,0.40527,275.3828334
+2001,Other,San Francisco Bay and Delta,Hold 5 years,277.53939,0.05067,0.24543,275.3828334
+2001,Wetland,San Francisco Bay and Delta,Yearly 50,1.95048,0.33003,0.85941,3.4437753
+2001,Wetland,San Francisco Bay and Delta,Two lines 60/40,2.0295,0.13797,0.59481,3.4437753
+2001,Wetland,San Francisco Bay and Delta,Two lines 70/30,2.35008,0.0684,0.46899,3.4437753
+2001,Wetland,San Francisco Bay and Delta,Two lines 80/20,2.73213,0.04158,0.3132,3.4437753
+2001,Wetland,San Francisco Bay and Delta,3-year mean 50,1.93806,0.22158,0.41778,3.4437753
+2001,Wetland,San Francisco Bay and Delta,Hold 3 years,2.10897,0.0792,0.23481,3.4437753
+2001,Wetland,San Francisco Bay and Delta,Hold 5 years,2.22039,0.05571,0.16623,3.4437753
+2002,Other,San Francisco Bay and Delta,Yearly 50,276.79644,1.51065,1.28133,276.1487136
+2002,Other,San Francisco Bay and Delta,Two lines 60/40,276.73533,0.66654,1.03833,276.1487136
+2002,Other,San Francisco Bay and Delta,Two lines 70/30,277.25292,0.297,0.78246,276.1487136
+2002,Other,San Francisco Bay and Delta,Two lines 80/20,277.71678,0.18243,0.47655,276.1487136
+2002,Other,San Francisco Bay and Delta,3-year mean 50,277.06347,0.41751,0.60453,276.1487136
+2002,Other,San Francisco Bay and Delta,Hold 3 years,277.24725,0.20187,0.56025,276.1487136
+2002,Other,San Francisco Bay and Delta,Hold 5 years,277.32474,0.13005,0.3447,276.1487136
+2002,Wetland,San Francisco Bay and Delta,Yearly 50,2.21328,0.76761,0.50481,3.9515787
+2002,Wetland,San Francisco Bay and Delta,Two lines 60/40,2.06298,0.44802,0.41454,3.9515787
+2002,Wetland,San Francisco Bay and Delta,Two lines 70/30,2.26638,0.30492,0.38862,3.9515787
+2002,Wetland,San Francisco Bay and Delta,Two lines 80/20,2.72034,0.25164,0.26343,3.9515787
+2002,Wetland,San Francisco Bay and Delta,3-year mean 50,2.10402,0.37548,0.20952,3.9515787
+2002,Wetland,San Francisco Bay and Delta,Hold 3 years,2.15064,0.19233,0.15066,3.9515787
+2002,Wetland,San Francisco Bay and Delta,Hold 5 years,2.22822,0.10827,0.10044,3.9515787
+2003,Other,San Francisco Bay and Delta,Yearly 50,277.4277,1.48374,0.85248,276.9550623
+2003,Other,San Francisco Bay and Delta,Two lines 60/40,277.17426,0.87111,0.43218,276.9550623
+2003,Other,San Francisco Bay and Delta,Two lines 70/30,277.39269,0.42399,0.28422,276.9550623
+2003,Other,San Francisco Bay and Delta,Two lines 80/20,277.76448,0.22779,0.18009,276.9550623
+2003,Other,San Francisco Bay and Delta,3-year mean 50,276.82074,0.43407,0.6768,276.9550623
+2003,Other,San Francisco Bay and Delta,Hold 3 years,277.07247,0.17667,0.35145,276.9550623
+2003,Other,San Francisco Bay and Delta,Hold 5 years,277.29567,0.14832,0.17739,276.9550623
+2003,Wetland,San Francisco Bay and Delta,Yearly 50,2.7135,0.93636,0.43614,4.1146218
+2003,Wetland,San Francisco Bay and Delta,Two lines 60/40,2.3445,0.5085,0.22698,4.1146218
+2003,Wetland,San Francisco Bay and Delta,Two lines 70/30,2.36088,0.25542,0.16092,4.1146218
+2003,Wetland,San Francisco Bay and Delta,Two lines 80/20,2.74977,0.15786,0.12843,4.1146218
+2003,Wetland,San Francisco Bay and Delta,3-year mean 50,2.04678,0.2178,0.27504,4.1146218
+2003,Wetland,San Francisco Bay and Delta,Hold 3 years,2.1339,0.10935,0.12609,4.1146218
+2003,Wetland,San Francisco Bay and Delta,Hold 5 years,2.19096,0.07227,0.10953,4.1146218
+2004,Other,San Francisco Bay and Delta,Yearly 50,279.77787,4.52286,2.17269,277.4824893
+2004,Other,San Francisco Bay and Delta,Two lines 60/40,277.02315,1.25163,1.40274,277.4824893
+2004,Other,San Francisco Bay and Delta,Two lines 70/30,276.61923,0.25902,1.03248,277.4824893
+2004,Other,San Francisco Bay and Delta,Two lines 80/20,277.13268,0.19584,0.82764,277.4824893
+2004,Other,San Francisco Bay and Delta,3-year mean 50,276.43536,0.39024,0.77562,277.4824893
+2004,Other,San Francisco Bay and Delta,Hold 3 years,276.75459,0.12627,0.44415,277.4824893
+2004,Other,San Francisco Bay and Delta,Hold 5 years,277.01109,0.06777,0.35235,277.4824893
+2004,Wetland,San Francisco Bay and Delta,Yearly 50,1.91817,0.23823,1.03356,3.4489431
+2004,Wetland,San Francisco Bay and Delta,Two lines 60/40,1.96002,0.15678,0.54126,3.4489431
+2004,Wetland,San Francisco Bay and Delta,Two lines 70/30,2.08305,0.12096,0.39879,3.4489431
+2004,Wetland,San Francisco Bay and Delta,Two lines 80/20,2.47392,0.09153,0.36738,3.4489431
+2004,Wetland,San Francisco Bay and Delta,3-year mean 50,2.25909,0.45126,0.23895,3.4489431
+2004,Wetland,San Francisco Bay and Delta,Hold 3 years,2.08386,0.11601,0.16605,3.4489431
+2004,Wetland,San Francisco Bay and Delta,Hold 5 years,2.08989,0.05463,0.1557,3.4489431
+2005,Other,San Francisco Bay and Delta,Yearly 50,276.03594,1.48005,5.22198,274.947057
+2005,Other,San Francisco Bay and Delta,Two lines 60/40,276.00462,0.74961,1.76814,274.947057
+2005,Other,San Francisco Bay and Delta,Two lines 70/30,276.51258,0.44073,0.54738,274.947057
+2005,Other,San Francisco Bay and Delta,Two lines 80/20,277.05789,0.27234,0.34713,274.947057
+2005,Other,San Francisco Bay and Delta,3-year mean 50,276.31098,0.53955,0.66393,274.947057
+2005,Other,San Francisco Bay and Delta,Hold 3 years,276.53355,0.20043,0.42147,274.947057
+2005,Other,San Francisco Bay and Delta,Hold 5 years,276.8544,0.09036,0.24705,274.947057
+2005,Wetland,San Francisco Bay and Delta,Yearly 50,2.7612,1.3032,0.46017,4.3592031
+2005,Wetland,San Francisco Bay and Delta,Two lines 60/40,2.3589,0.72306,0.32418,4.3592031
+2005,Wetland,San Francisco Bay and Delta,Two lines 70/30,2.3616,0.40779,0.12924,4.3592031
+2005,Wetland,San Francisco Bay and Delta,Two lines 80/20,2.637,0.26064,0.09756,4.3592031
+2005,Wetland,San Francisco Bay and Delta,3-year mean 50,2.51811,0.47979,0.22077,4.3592031
+2005,Wetland,San Francisco Bay and Delta,Hold 3 years,2.18205,0.34119,0.243,4.3592031
+2005,Wetland,San Francisco Bay and Delta,Hold 5 years,2.06622,0.11547,0.13914,4.3592031
+2006,Other,San Francisco Bay and Delta,Yearly 50,277.31196,1.98846,0.71244,276.8888133
+2006,Other,San Francisco Bay and Delta,Two lines 60/40,276.8103,1.20834,0.40266,276.8888133
+2006,Other,San Francisco Bay and Delta,Two lines 70/30,276.96357,0.7281,0.27711,276.8888133
+2006,Other,San Francisco Bay and Delta,Two lines 80/20,277.27407,0.40617,0.18999,276.8888133
+2006,Other,San Francisco Bay and Delta,3-year mean 50,276.35139,0.67698,0.63657,276.8888133
+2006,Other,San Francisco Bay and Delta,Hold 3 years,276.52617,0.24804,0.25542,276.8888133
+2006,Other,San Francisco Bay and Delta,Hold 5 years,276.76512,0.07722,0.1665,276.8888133
+2006,Wetland,San Francisco Bay and Delta,Yearly 50,4.68477,2.44089,0.51732,6.3748566
+2006,Wetland,San Francisco Bay and Delta,Two lines 60/40,3.85839,1.67742,0.17793,6.3748566
+2006,Wetland,San Francisco Bay and Delta,Two lines 70/30,3.42558,1.21599,0.15201,6.3748566
+2006,Wetland,San Francisco Bay and Delta,Two lines 80/20,3.38094,0.84465,0.10071,6.3748566
+2006,Wetland,San Francisco Bay and Delta,3-year mean 50,2.9763,0.83448,0.37629,6.3748566
+2006,Wetland,San Francisco Bay and Delta,Hold 3 years,2.22795,0.15057,0.10467,6.3748566
+2006,Wetland,San Francisco Bay and Delta,Hold 5 years,2.10213,0.10953,0.07362,6.3748566
+2007,Other,San Francisco Bay and Delta,Yearly 50,275.46858,0.6336,2.47698,273.7809711
+2007,Other,San Francisco Bay and Delta,Two lines 60/40,275.9364,0.4032,1.2771,273.7809711
+2007,Other,San Francisco Bay and Delta,Two lines 70/30,276.42213,0.26703,0.80847,273.7809711
+2007,Other,San Francisco Bay and Delta,Two lines 80/20,276.87789,0.17388,0.57006,273.7809711
+2007,Other,San Francisco Bay and Delta,3-year mean 50,276.11343,0.43254,0.6705,273.7809711
+2007,Other,San Francisco Bay and Delta,Hold 3 years,275.97024,0.10962,0.66555,273.7809711
+2007,Other,San Francisco Bay and Delta,Hold 5 years,276.41547,0.07083,0.42048,273.7809711
+2007,Wetland,San Francisco Bay and Delta,Yearly 50,2.58084,0.30663,2.41056,3.916224
+2007,Wetland,San Francisco Bay and Delta,Two lines 60/40,2.7189,0.17649,1.31598,3.916224
+2007,Wetland,San Francisco Bay and Delta,Two lines 70/30,2.84337,0.11349,0.6957,3.916224
+2007,Wetland,San Francisco Bay and Delta,Two lines 80/20,3.1473,0.09297,0.32661,3.916224
+2007,Wetland,San Francisco Bay and Delta,3-year mean 50,2.77245,0.26982,0.47367,3.916224
+2007,Wetland,San Francisco Bay and Delta,Hold 3 years,1.91628,0.05562,0.36729,3.916224
+2007,Wetland,San Francisco Bay and Delta,Hold 5 years,1.83384,0.02871,0.297,3.916224
+2008,Other,San Francisco Bay and Delta,Yearly 50,275.4369,1.39158,1.42326,273.3429402
+2008,Other,San Francisco Bay and Delta,Two lines 60/40,275.49882,0.57357,1.01115,273.3429402
+2008,Other,San Francisco Bay and Delta,Two lines 70/30,276.05124,0.30573,0.67662,273.3429402
+2008,Other,San Francisco Bay and Delta,Two lines 80/20,276.64614,0.2286,0.46035,273.3429402
+2008,Other,San Francisco Bay and Delta,3-year mean 50,275.16753,0.29745,1.24335,273.3429402
+2008,Other,San Francisco Bay and Delta,Hold 3 years,275.78781,0.21294,0.39537,273.3429402
+2008,Other,San Francisco Bay and Delta,Hold 5 years,276.26931,0.10278,0.24894,273.3429402
+2008,Wetland,San Francisco Bay and Delta,Yearly 50,1.88541,0.61362,1.30905,3.3498963
+2008,Wetland,San Francisco Bay and Delta,Two lines 60/40,1.94976,0.31167,1.08081,3.3498963
+2008,Wetland,San Francisco Bay and Delta,Two lines 70/30,2.25,0.17757,0.77094,3.3498963
+2008,Wetland,San Francisco Bay and Delta,Two lines 80/20,2.77407,0.1008,0.47403,3.3498963
+2008,Wetland,San Francisco Bay and Delta,3-year mean 50,2.03949,0.15714,0.8901,3.3498963
+2008,Wetland,San Francisco Bay and Delta,Hold 3 years,1.92456,0.17784,0.16956,3.3498963
+2008,Wetland,San Francisco Bay and Delta,Hold 5 years,1.90863,0.14715,0.07236,3.3498963
+2009,Other,San Francisco Bay and Delta,Yearly 50,275.05584,1.28511,1.66617,271.7510454
+2009,Other,San Francisco Bay and Delta,Two lines 60/40,275.12154,0.73134,1.10862,271.7510454
+2009,Other,San Francisco Bay and Delta,Two lines 70/30,275.59611,0.39456,0.84969,271.7510454
+2009,Other,San Francisco Bay and Delta,Two lines 80/20,276.21144,0.2322,0.6669,271.7510454
+2009,Other,San Francisco Bay and Delta,3-year mean 50,274.89213,0.58941,0.86481,271.7510454
+2009,Other,San Francisco Bay and Delta,Hold 3 years,275.33304,0.29799,0.75276,271.7510454
+2009,Other,San Francisco Bay and Delta,Hold 5 years,276.02613,0.15534,0.39852,271.7510454
+2009,Wetland,San Francisco Bay and Delta,Yearly 50,2.72907,1.25874,0.41508,4.2721686
+2009,Wetland,San Francisco Bay and Delta,Two lines 60/40,2.32785,0.58257,0.20448,4.2721686
+2009,Wetland,San Francisco Bay and Delta,Two lines 70/30,2.40102,0.30375,0.15273,4.2721686
+2009,Wetland,San Francisco Bay and Delta,Two lines 80/20,2.81457,0.18171,0.14121,4.2721686
+2009,Wetland,San Francisco Bay and Delta,3-year mean 50,1.98765,0.34308,0.39492,4.2721686
+2009,Wetland,San Francisco Bay and Delta,Hold 3 years,2.07135,0.26397,0.11718,4.2721686
+2009,Wetland,San Francisco Bay and Delta,Hold 5 years,2.02464,0.17262,0.05661,4.2721686
+2010,Other,San Francisco Bay and Delta,Yearly 50,274.73778,1.21068,1.52874,271.5874839
+2010,Other,San Francisco Bay and Delta,Two lines 60/40,274.91301,0.68193,0.89046,271.5874839
+2010,Other,San Francisco Bay and Delta,Two lines 70/30,275.3397,0.37737,0.63378,271.5874839
+2010,Other,San Francisco Bay and Delta,Two lines 80/20,275.90535,0.21177,0.51786,271.5874839
+2010,Other,San Francisco Bay and Delta,3-year mean 50,274.87287,0.66231,0.68157,271.5874839
+2010,Other,San Francisco Bay and Delta,Hold 3 years,275.35005,0.28134,0.26433,271.5874839
+2010,Other,San Francisco Bay and Delta,Hold 5 years,275.94846,0.10548,0.18315,271.5874839
+2010,Wetland,San Francisco Bay and Delta,Yearly 50,2.05002,0.42705,1.1061,3.6503694
+2010,Wetland,San Francisco Bay and Delta,Two lines 60/40,2.12445,0.25209,0.45549,3.6503694
+2010,Wetland,San Francisco Bay and Delta,Two lines 70/30,2.20311,0.13203,0.32994,3.6503694
+2010,Wetland,San Francisco Bay and Delta,Two lines 80/20,2.54835,0.05841,0.32463,3.6503694
+2010,Wetland,San Francisco Bay and Delta,3-year mean 50,2.24496,0.44721,0.1899,3.6503694
+2010,Wetland,San Francisco Bay and Delta,Hold 3 years,2.11887,0.15129,0.10377,3.6503694
+2010,Wetland,San Francisco Bay and Delta,Hold 5 years,1.98666,0.03105,0.06903,3.6503694
+2011,Other,San Francisco Bay and Delta,Yearly 50,275.24862,1.61217,1.10133,272.4618798
+2011,Other,San Francisco Bay and Delta,Two lines 60/40,275.03262,0.74106,0.62145,272.4618798
+2011,Other,San Francisco Bay and Delta,Two lines 70/30,275.3388,0.43308,0.43398,272.4618798
+2011,Other,San Francisco Bay and Delta,Two lines 80/20,275.81283,0.27783,0.37035,272.4618798
+2011,Other,San Francisco Bay and Delta,3-year mean 50,274.9536,0.63135,0.55062,272.4618798
+2011,Other,San Francisco Bay and Delta,Hold 3 years,275.46138,0.288,0.17667,272.4618798
+2011,Other,San Francisco Bay and Delta,Hold 5 years,275.96844,0.15759,0.13761,272.4618798
+2011,Wetland,San Francisco Bay and Delta,Yearly 50,2.96856,1.25667,0.33813,4.3315281
+2011,Wetland,San Francisco Bay and Delta,Two lines 60/40,2.55744,0.63252,0.19953,4.3315281
+2011,Wetland,San Francisco Bay and Delta,Two lines 70/30,2.50209,0.39591,0.09693,4.3315281
+2011,Wetland,San Francisco Bay and Delta,Two lines 80/20,2.67912,0.20889,0.07812,4.3315281
+2011,Wetland,San Francisco Bay and Delta,3-year mean 50,2.12787,0.24534,0.36243,4.3315281
+2011,Wetland,San Francisco Bay and Delta,Hold 3 years,2.32596,0.25542,0.04833,4.3315281
+2011,Wetland,San Francisco Bay and Delta,Hold 5 years,2.0439,0.08172,0.02448,4.3315281
+2012,Other,San Francisco Bay and Delta,Yearly 50,275.15205,1.56942,1.66599,273.2408541
+2012,Other,San Francisco Bay and Delta,Two lines 60/40,274.84074,0.8739,1.06578,273.2408541
+2012,Other,San Francisco Bay and Delta,Two lines 70/30,275.09148,0.4572,0.70452,273.2408541
+2012,Other,San Francisco Bay and Delta,Two lines 80/20,275.59026,0.30267,0.52524,273.2408541
+2012,Other,San Francisco Bay and Delta,3-year mean 50,275.01471,0.73251,0.6714,273.2408541
+2012,Other,San Francisco Bay and Delta,Hold 3 years,275.20047,0.17478,0.43569,273.2408541
+2012,Other,San Francisco Bay and Delta,Hold 5 years,275.76531,0.08955,0.29268,273.2408541
+2012,Wetland,San Francisco Bay and Delta,Yearly 50,2.58741,0.62901,1.01016,3.8219373
+2012,Wetland,San Francisco Bay and Delta,Two lines 60/40,2.29338,0.20691,0.47097,3.8219373
+2012,Wetland,San Francisco Bay and Delta,Two lines 70/30,2.39175,0.11367,0.22401,3.8219373
+2012,Wetland,San Francisco Bay and Delta,Two lines 80/20,2.65644,0.06219,0.08487,3.8219373
+2012,Wetland,San Francisco Bay and Delta,3-year mean 50,2.28312,0.3906,0.23535,3.8219373
+2012,Wetland,San Francisco Bay and Delta,Hold 3 years,2.21859,0.05742,0.16479,3.8219373
+2012,Wetland,San Francisco Bay and Delta,Hold 5 years,1.99782,0.03906,0.08514,3.8219373
+2013,Other,San Francisco Bay and Delta,Yearly 50,274.99617,1.52442,1.6803,267.0568695
+2013,Other,San Francisco Bay and Delta,Two lines 60/40,274.89447,0.96714,0.91341,267.0568695
+2013,Other,San Francisco Bay and Delta,Two lines 70/30,275.12766,0.60579,0.56961,267.0568695
+2013,Other,San Francisco Bay and Delta,Two lines 80/20,275.58792,0.39294,0.39528,267.0568695
+2013,Other,San Francisco Bay and Delta,3-year mean 50,274.662,0.48789,0.8406,267.0568695
+2013,Other,San Francisco Bay and Delta,Hold 3 years,275.00742,0.28539,0.47844,267.0568695
+2013,Other,San Francisco Bay and Delta,Hold 5 years,275.58954,0.14481,0.32058,267.0568695
+2013,Wetland,San Francisco Bay and Delta,Yearly 50,2.47293,0.76095,0.87543,3.9072402
+2013,Wetland,San Francisco Bay and Delta,Two lines 60/40,2.28618,0.38043,0.38763,3.9072402
+2013,Wetland,San Francisco Bay and Delta,Two lines 70/30,2.39454,0.24111,0.23832,3.9072402
+2013,Wetland,San Francisco Bay and Delta,Two lines 80/20,2.68659,0.18207,0.15192,3.9072402
+2013,Wetland,San Francisco Bay and Delta,3-year mean 50,2.05929,0.21564,0.43947,3.9072402
+2013,Wetland,San Francisco Bay and Delta,Hold 3 years,2.16297,0.16407,0.21969,3.9072402
+2013,Wetland,San Francisco Bay and Delta,Hold 5 years,2.00115,0.11691,0.11358,3.9072402
+2014,Other,San Francisco Bay and Delta,Yearly 50,273.96027,0.873,1.9089,264.9716217
+2014,Other,San Francisco Bay and Delta,Two lines 60/40,274.38345,0.50508,1.0161,264.9716217
+2014,Other,San Francisco Bay and Delta,Two lines 70/30,274.78512,0.29601,0.63855,264.9716217
+2014,Other,San Francisco Bay and Delta,Two lines 80/20,275.32359,0.19512,0.45945,264.9716217
+2014,Other,San Francisco Bay and Delta,3-year mean 50,274.63275,0.6183,0.64755,264.9716217
+2014,Other,San Francisco Bay and Delta,Hold 3 years,274.85055,0.18837,0.34524,264.9716217
+2014,Other,San Francisco Bay and Delta,Hold 5 years,275.49846,0.1233,0.21438,264.9716217
+2014,Wetland,San Francisco Bay and Delta,Yearly 50,2.05569,0.47502,0.89226,3.9696795
+2014,Wetland,San Francisco Bay and Delta,Two lines 60/40,2.10186,0.22158,0.4059,3.9696795
+2014,Wetland,San Francisco Bay and Delta,Two lines 70/30,2.32713,0.13374,0.20115,3.9696795
+2014,Wetland,San Francisco Bay and Delta,Two lines 80/20,2.58102,0.07857,0.18414,3.9696795
+2014,Wetland,San Francisco Bay and Delta,3-year mean 50,2.18979,0.40275,0.27225,3.9696795
+2014,Wetland,San Francisco Bay and Delta,Hold 3 years,2.09952,0.11691,0.18036,3.9696795
+2014,Wetland,San Francisco Bay and Delta,Hold 5 years,2.00304,0.04698,0.04509,3.9696795
+2015,Other,San Francisco Bay and Delta,Yearly 50,274.9698,1.92024,0.91071,260.771931
+2015,Other,San Francisco Bay and Delta,Two lines 60/40,274.79007,0.92646,0.51984,260.771931
+2015,Other,San Francisco Bay and Delta,Two lines 70/30,274.97601,0.50391,0.31302,260.771931
+2015,Other,San Francisco Bay and Delta,Two lines 80/20,275.3775,0.31968,0.26577,260.771931
+2015,Other,San Francisco Bay and Delta,3-year mean 50,274.80105,0.68589,0.51759,260.771931
+2015,Other,San Francisco Bay and Delta,Hold 3 years,275.2209,0.50598,0.13563,260.771931
+2015,Other,San Francisco Bay and Delta,Hold 5 years,275.63454,0.2304,0.09432,260.771931
+2015,Wetland,San Francisco Bay and Delta,Yearly 50,3.09627,1.42452,0.38394,4.7708199
+2015,Wetland,San Francisco Bay and Delta,Two lines 60/40,2.81961,0.89541,0.17766,4.7708199
+2015,Wetland,San Francisco Bay and Delta,Two lines 70/30,2.94597,0.70641,0.08757,4.7708199
+2015,Wetland,San Francisco Bay and Delta,Two lines 80/20,3.10023,0.59706,0.07785,4.7708199
+2015,Wetland,San Francisco Bay and Delta,3-year mean 50,2.61963,0.70353,0.27369,4.7708199
+2015,Wetland,San Francisco Bay and Delta,Hold 3 years,2.69775,0.63459,0.03636,4.7708199
+2015,Wetland,San Francisco Bay and Delta,Hold 5 years,2.52837,0.5364,0.01107,4.7708199
+2016,Other,San Francisco Bay and Delta,Yearly 50,275.57694,1.59984,0.9927,261.5235255
+2016,Other,San Francisco Bay and Delta,Two lines 60/40,275.37129,1.00584,0.42462,261.5235255
+2016,Other,San Francisco Bay and Delta,Two lines 70/30,275.47263,0.72198,0.22536,261.5235255
+2016,Other,San Francisco Bay and Delta,Two lines 80/20,275.74821,0.54405,0.17334,261.5235255
+2016,Other,San Francisco Bay and Delta,3-year mean 50,275.62779,1.10862,0.28188,261.5235255
+2016,Other,San Francisco Bay and Delta,Hold 3 years,275.53329,0.51903,0.20664,261.5235255
+2016,Other,San Francisco Bay and Delta,Hold 5 years,275.77233,0.31248,0.17469,261.5235255
+2016,Wetland,San Francisco Bay and Delta,Yearly 50,2.92392,0.50238,0.67473,4.9724586
+2016,Wetland,San Francisco Bay and Delta,Two lines 60/40,2.83707,0.24966,0.2322,4.9724586
+2016,Wetland,San Francisco Bay and Delta,Two lines 70/30,2.96811,0.153,0.13086,4.9724586
+2016,Wetland,San Francisco Bay and Delta,Two lines 80/20,3.11418,0.0963,0.08235,4.9724586
+2016,Wetland,San Francisco Bay and Delta,3-year mean 50,3.27006,0.81567,0.16524,4.9724586
+2016,Wetland,San Francisco Bay and Delta,Hold 3 years,2.71503,0.11844,0.10116,4.9724586
+2016,Wetland,San Francisco Bay and Delta,Hold 5 years,2.53116,0.08415,0.08136,4.9724586
+2017,Other,San Francisco Bay and Delta,Yearly 50,276.61266,1.82466,0.78894,267.691743
+2017,Other,San Francisco Bay and Delta,Two lines 60/40,276.19632,1.2114,0.38637,267.691743
+2017,Other,San Francisco Bay and Delta,Two lines 70/30,276.1101,0.82809,0.19062,267.691743
+2017,Other,San Francisco Bay and Delta,Two lines 80/20,276.22719,0.58626,0.10728,267.691743
+2017,Other,San Francisco Bay and Delta,3-year mean 50,275.70501,0.57303,0.49581,267.691743
+2017,Other,San Francisco Bay and Delta,Hold 3 years,275.69601,0.3654,0.20268,267.691743
+2017,Other,San Francisco Bay and Delta,Hold 5 years,275.73255,0.1269,0.16668,267.691743
+2017,Wetland,San Francisco Bay and Delta,Yearly 50,4.96494,2.56221,0.52119,7.3637964
+2017,Wetland,San Francisco Bay and Delta,Two lines 60/40,4.38633,1.79586,0.2466,7.3637964
+2017,Wetland,San Francisco Bay and Delta,Two lines 70/30,4.21002,1.36017,0.11826,7.3637964
+2017,Wetland,San Francisco Bay and Delta,Two lines 80/20,3.98142,0.91584,0.0486,7.3637964
+2017,Wetland,San Francisco Bay and Delta,3-year mean 50,3.34017,0.42201,0.3519,7.3637964
+2017,Wetland,San Francisco Bay and Delta,Hold 3 years,2.7855,0.19224,0.12177,7.3637964
+2017,Wetland,San Francisco Bay and Delta,Hold 5 years,2.55087,0.09558,0.07587,7.3637964
+2018,Other,San Francisco Bay and Delta,Yearly 50,275.43933,0.69102,1.86435,267.2893782
+2018,Other,San Francisco Bay and Delta,Two lines 60/40,275.51745,0.28341,0.96228,267.2893782
+2018,Other,San Francisco Bay and Delta,Two lines 70/30,275.706,0.14328,0.54738,267.2893782
+2018,Other,San Francisco Bay and Delta,Two lines 80/20,275.92443,0.09585,0.39861,267.2893782
+2018,Other,San Francisco Bay and Delta,3-year mean 50,275.60736,0.43398,0.53163,267.2893782
+2018,Other,San Francisco Bay and Delta,Hold 3 years,275.40693,0.08352,0.3726,267.2893782
+2018,Other,San Francisco Bay and Delta,Hold 5 years,275.44104,0.04185,0.33336,267.2893782
+2018,Wetland,San Francisco Bay and Delta,Yearly 50,2.97405,0.51561,2.5065,4.486788
+2018,Wetland,San Francisco Bay and Delta,Two lines 60/40,3.08826,0.16362,1.46169,4.486788
+2018,Wetland,San Francisco Bay and Delta,Two lines 70/30,3.60315,0.06534,0.67221,4.486788
+2018,Wetland,San Francisco Bay and Delta,Two lines 80/20,3.76596,0.04248,0.25794,4.486788
+2018,Wetland,San Francisco Bay and Delta,3-year mean 50,3.63798,0.53316,0.23535,4.486788
+2018,Wetland,San Francisco Bay and Delta,Hold 3 years,2.73096,0.04392,0.09846,4.486788
+2018,Wetland,San Francisco Bay and Delta,Hold 5 years,2.50938,0.01791,0.0594,4.486788
+2019,Other,San Francisco Bay and Delta,Yearly 50,275.29794,1.11105,1.25244,265.02507
+2019,Other,San Francisco Bay and Delta,Two lines 60/40,275.42403,0.58914,0.68256,265.02507
+2019,Other,San Francisco Bay and Delta,Two lines 70/30,275.69097,0.37908,0.39411,265.02507
+2019,Other,San Francisco Bay and Delta,Two lines 80/20,275.99445,0.29349,0.22347,265.02507
+2019,Other,San Francisco Bay and Delta,3-year mean 50,275.10309,0.38691,0.89118,265.02507
+2019,Other,San Francisco Bay and Delta,Hold 3 years,275.34141,0.24138,0.3069,265.02507
+2019,Other,San Francisco Bay and Delta,Hold 5 years,275.40567,0.15849,0.19386,265.02507
+2019,Wetland,San Francisco Bay and Delta,Yearly 50,3.41541,1.16748,0.72612,5.4342801
+2019,Wetland,San Francisco Bay and Delta,Two lines 60/40,3.28338,0.59445,0.39933,5.4342801
+2019,Wetland,San Francisco Bay and Delta,Two lines 70/30,3.85605,0.41436,0.16146,5.4342801
+2019,Wetland,San Francisco Bay and Delta,Two lines 80/20,4.00428,0.35001,0.11169,5.4342801
+2019,Wetland,San Francisco Bay and Delta,3-year mean 50,2.95857,0.24543,0.92484,5.4342801
+2019,Wetland,San Francisco Bay and Delta,Hold 3 years,2.74464,0.12609,0.11241,5.4342801
+2019,Wetland,San Francisco Bay and Delta,Hold 5 years,2.57931,0.10971,0.03978,5.4342801
+2020,Other,San Francisco Bay and Delta,Yearly 50,274.71879,1.0737,1.65285,266.1892902
+2020,Other,San Francisco Bay and Delta,Two lines 60/40,274.89996,0.48933,1.0134,266.1892902
+2020,Other,San Francisco Bay and Delta,Two lines 70/30,275.3253,0.28791,0.65358,266.1892902
+2020,Other,San Francisco Bay and Delta,Two lines 80/20,275.69385,0.14913,0.44973,266.1892902
+2020,Other,San Francisco Bay and Delta,3-year mean 50,274.48263,0.29142,0.91188,266.1892902
+2020,Other,San Francisco Bay and Delta,Hold 3 years,274.95279,0.18396,0.57258,266.1892902
+2020,Other,San Francisco Bay and Delta,Hold 5 years,275.30181,0.10557,0.20943,266.1892902
+2020,Wetland,San Francisco Bay and Delta,Yearly 50,3.61143,0.99747,0.80145,4.5918504
+2020,Wetland,San Francisco Bay and Delta,Two lines 60/40,3.01023,0.2601,0.53325,4.5918504
+2020,Wetland,San Francisco Bay and Delta,Two lines 70/30,3.528,0.10683,0.43488,4.5918504
+2020,Wetland,San Francisco Bay and Delta,Two lines 80/20,3.84867,0.04437,0.19998,4.5918504
+2020,Wetland,San Francisco Bay and Delta,3-year mean 50,2.82726,0.24102,0.37233,4.5918504
+2020,Wetland,San Francisco Bay and Delta,Hold 3 years,2.83203,0.17847,0.09108,4.5918504
+2020,Wetland,San Francisco Bay and Delta,Hold 5 years,2.68092,0.13572,0.03411,4.5918504
+2021,Other,San Francisco Bay and Delta,Yearly 50,273.66345,0.88794,1.94328,268.3234035
+2021,Other,San Francisco Bay and Delta,Two lines 60/40,274.12776,0.45225,1.22445,268.3234035
+2021,Other,San Francisco Bay and Delta,Two lines 70/30,274.65975,0.22689,0.89244,268.3234035
+2021,Other,San Francisco Bay and Delta,Two lines 80/20,275.20605,0.13905,0.62685,268.3234035
+2021,Other,San Francisco Bay and Delta,3-year mean 50,274.31073,0.46341,0.63531,268.3234035
+2021,Other,San Francisco Bay and Delta,Hold 3 years,274.92246,0.23706,0.26739,268.3234035
+2021,Other,San Francisco Bay and Delta,Hold 5 years,275.27391,0.13446,0.16236,268.3234035
+2021,Wetland,San Francisco Bay and Delta,Yearly 50,2.55339,0.45684,1.51488,4.0199319
+2021,Wetland,San Francisco Bay and Delta,Two lines 60/40,2.64591,0.28386,0.64818,4.0199319
+2021,Wetland,San Francisco Bay and Delta,Two lines 70/30,2.99016,0.19728,0.73512,4.0199319
+2021,Wetland,San Francisco Bay and Delta,Two lines 80/20,3.28572,0.16056,0.72351,4.0199319
+2021,Wetland,San Francisco Bay and Delta,3-year mean 50,3.08538,0.49779,0.23967,4.0199319
+2021,Wetland,San Francisco Bay and Delta,Hold 3 years,2.94255,0.18171,0.07119,4.0199319
+2021,Wetland,San Francisco Bay and Delta,Hold 5 years,2.78811,0.13617,0.02898,4.0199319
+2022,Other,San Francisco Bay and Delta,Yearly 50,274.62276,1.78704,0.82773,266.3465409
+2022,Other,San Francisco Bay and Delta,Two lines 60/40,274.36797,0.77202,0.53181,266.3465409
+2022,Other,San Francisco Bay and Delta,Two lines 70/30,274.68045,0.41886,0.39816,266.3465409
+2022,Other,San Francisco Bay and Delta,Two lines 80/20,275.13783,0.24111,0.30933,266.3465409
+2022,Other,San Francisco Bay and Delta,3-year mean 50,274.70421,0.76374,0.37026,266.3465409
+2022,Other,San Francisco Bay and Delta,Hold 3 years,274.98501,0.24921,0.18666,266.3465409
+2022,Wetland,San Francisco Bay and Delta,Yearly 50,4.17069,1.84806,0.23076,5.2826544
+2022,Wetland,San Francisco Bay and Delta,Two lines 60/40,3.29436,0.72828,0.07983,5.2826544
+2022,Wetland,San Francisco Bay and Delta,Two lines 70/30,3.25467,0.33399,0.06948,5.2826544
+2022,Wetland,San Francisco Bay and Delta,Two lines 80/20,3.41127,0.1818,0.05625,5.2826544
+2022,Wetland,San Francisco Bay and Delta,3-year mean 50,3.56688,0.78534,0.30384,5.2826544
+2022,Wetland,San Francisco Bay and Delta,Hold 3 years,3.46833,0.58806,0.06228,5.2826544
+2023,Other,San Francisco Bay and Delta,Yearly 50,276.19587,2.39382,0.82071,267.8279742
+2023,Other,San Francisco Bay and Delta,Two lines 60/40,275.60988,1.66968,0.42777,267.8279742
+2023,Other,San Francisco Bay and Delta,Two lines 70/30,275.54301,1.12608,0.26352,267.8279742
+2023,Other,San Francisco Bay and Delta,Two lines 80/20,275.72598,0.7623,0.17415,267.8279742
+2023,Other,San Francisco Bay and Delta,3-year mean 50,275.38515,1.06713,0.38619,267.8279742
+2023,Other,San Francisco Bay and Delta,Hold 3 years,275.41071,0.69597,0.27027,267.8279742
+2023,Wetland,San Francisco Bay and Delta,Yearly 50,5.65767,2.31786,0.83088,7.2046602
+2023,Wetland,San Francisco Bay and Delta,Two lines 60/40,4.89402,1.88523,0.28557,7.2046602
+2023,Wetland,San Francisco Bay and Delta,Two lines 70/30,4.5828,1.53261,0.20448,7.2046602
+2023,Wetland,San Francisco Bay and Delta,Two lines 80/20,4.44159,1.18503,0.15471,7.2046602
+2023,Wetland,San Francisco Bay and Delta,3-year mean 50,4.67316,1.25928,0.153,7.2046602
+2023,Wetland,San Francisco Bay and Delta,Hold 3 years,4.41693,1.10106,0.15246,7.2046602
+2024,Other,San Francisco Bay and Delta,Yearly 50,275.57298,0.78678,1.40967,260.7134643
+2024,Other,San Francisco Bay and Delta,Two lines 60/40,275.47767,0.49032,0.62253,260.7134643
+2024,Other,San Francisco Bay and Delta,Two lines 70/30,275.4972,0.34497,0.39078,260.7134643
+2024,Other,San Francisco Bay and Delta,Two lines 80/20,275.68161,0.24957,0.29394,260.7134643
+2024,Other,San Francisco Bay and Delta,3-year mean 50,275.4576,0.53361,0.46116,260.7134643
+2024,Wetland,San Francisco Bay and Delta,Yearly 50,4.81158,0.55008,1.39617,6.1137639
+2024,Wetland,San Francisco Bay and Delta,Two lines 60/40,4.62249,0.34992,0.62145,6.1137639
+2024,Wetland,San Francisco Bay and Delta,Two lines 70/30,4.48488,0.21348,0.3114,6.1137639
+2024,Wetland,San Francisco Bay and Delta,Two lines 80/20,4.4361,0.12483,0.13032,6.1137639
+2024,Wetland,San Francisco Bay and Delta,3-year mean 50,4.94289,0.69714,0.42741,6.1137639
+2025,Other,San Francisco Bay and Delta,Yearly 50,275.26086,0.91917,1.23129,264.9920373
+2025,Other,San Francisco Bay and Delta,Two lines 60/40,275.32476,0.54783,0.70074,264.9920373
+2025,Other,San Francisco Bay and Delta,Two lines 70/30,275.43456,0.38457,0.44721,264.9920373
+2025,Other,San Francisco Bay and Delta,Two lines 80/20,275.66127,0.29871,0.31905,264.9920373
+2025,Wetland,San Francisco Bay and Delta,Yearly 50,4.8726,0.85482,0.7938,6.241896
+2025,Wetland,San Francisco Bay and Delta,Two lines 60/40,4.83642,0.66123,0.4473,6.241896
+2025,Wetland,San Francisco Bay and Delta,Two lines 70/30,4.78134,0.57591,0.27945,6.241896
+2025,Wetland,San Francisco Bay and Delta,Two lines 80/20,4.74255,0.46503,0.15858,6.241896

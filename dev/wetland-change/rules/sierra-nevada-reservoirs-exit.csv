@@ -1,0 +1,27 @@
+Side,Nlcd,Ccap,Bin,Kha,MeanOpen,MeanLandYears,Region
+Away from wetland,Other,None,1 to 5,0.22032,3.26090005446623,4.82557189542484,Sierra Nevada reservoirs
+Away from wetland,Barren,None,5 to 20,0.01539,13.3944444444444,4.45614035087719,Sierra Nevada reservoirs
+Away from wetland,Other,None,5 to 20,0.62685,11.2592079444843,4.13524766690596,Sierra Nevada reservoirs
+Away from wetland,Water,None,5 to 20,4.6233,11.9556096294854,3.16011290636558,Sierra Nevada reservoirs
+Away from wetland,Other,None,under 1,0.13095,0.0590721649484536,3.60412371134021,Sierra Nevada reservoirs
+Away from wetland,Other,None,20 to 50,0.47754,27.7491393391129,3.901620806634,Sierra Nevada reservoirs
+Away from wetland,Other,None,50 or more,0.00036,50.85,5,Sierra Nevada reservoirs
+Away from wetland,Water,None,20 to 50,2.74689,28.2044297369025,3.0582222076603,Sierra Nevada reservoirs
+Away from wetland,Barren,None,20 to 50,0.02412,27.5092039800995,4.47761194029851,Sierra Nevada reservoirs
+Away from wetland,Barren,None,50 or more,9e-05,50,5,Sierra Nevada reservoirs
+Away from wetland,Water,None,50 or more,0.00936,51.5834935897436,4,Sierra Nevada reservoirs
+Wetland side,Other,None,1 to 5,9e-04,3.34,5,Sierra Nevada reservoirs
+Away from wetland,Barren,None,1 to 5,0.00324,2.65555555555556,4.83333333333333,Sierra Nevada reservoirs
+Away from wetland,Barren,None,under 1,0.00144,0.075,4.125,Sierra Nevada reservoirs
+Wetland side,Water,None,5 to 20,0.00288,12.6125,5,Sierra Nevada reservoirs
+Away from wetland,Water,None,1 to 5,1.28862,2.56787610001397,2.78635284257578,Sierra Nevada reservoirs
+Away from wetland,Water,None,under 1,2.87586,0.0260301266403789,2.3486574450773,Sierra Nevada reservoirs
+Wetland side,Other,None,5 to 20,0.00081,11.8444444444444,5,Sierra Nevada reservoirs
+Wetland side,Water,None,20 to 50,0.00153,28.3647058823529,5,Sierra Nevada reservoirs
+Wetland side,Wetland,None,5 to 20,0.00207,10.8,5,Sierra Nevada reservoirs
+Wetland side,Wetland,None,1 to 5,0.00045,3.44,5,Sierra Nevada reservoirs
+Wetland side,Wetland,None,20 to 50,9e-04,22.76,5,Sierra Nevada reservoirs
+Wetland side,Other,None,20 to 50,0.00018,26.4,5,Sierra Nevada reservoirs
+Wetland side,Water,None,1 to 5,9e-05,4,5,Sierra Nevada reservoirs
+Wetland side,Wetland,None,under 1,0.00045,0.44,5,Sierra Nevada reservoirs
+Wetland side,Other,None,under 1,9e-05,0.4,5,Sierra Nevada reservoirs

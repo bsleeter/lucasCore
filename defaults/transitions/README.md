@@ -30,6 +30,13 @@
     out) and whose forest loss came at least 15 years before 2016 is also on, in the year 15 years after the loss. NLCD is slow to
     call slow-growing regeneration forest (Yellowstone's 1988 burn: 2% forest in NLCD 2016, half trees in LANDFIRE 2016).
   - `All`: on everywhere (Post-disturbance: Conversion; the pathways' age limits decide).
+  - `WaterChange` (to-do 2, `src/water-change.R`): change among water, wetland and barren. A 30 m rule: USGS DSWE annual open water (Data
+    Source `DsweFolder`) says whether a pixel is water (beside wetland a change must hold 5 clear years; elsewhere a pixel turns to water
+    at 70% open and back at 30%), and the annual NLCD says what the land side is. `Classes` are the rule's change codes (1 to water,
+    2 water to wetland, 3 water to barren, 4 wetland to barren, 5 barren to wetland). Each cell gets the share of its 30 m pixels with
+    the change that year, as its chance of the transition; the cell's own class picks the pathway (`pathways/wetland-change.csv`). The
+    two emergent wetland types share codes 2|5 and stage 6 gives each the cells whose nearest wetland type (stage 5) is its own. With no
+    DSWE files the source is left out and the types keep a zero target.
 - `pathways/reforestation.csv` (2026-11-12, `tools/make_reforestation.R`): Barren, the sage family, Non-sage, Chaparral, the grass
   classes and Palustrine Emergent to every forest class, one type per forest class, age reset. Stage 6 gates each type to stage 5's
   ReforestType map (the forest type every cell would reach), as NaturalVeg gates Ag Contraction; Reforestation Options off drops the
