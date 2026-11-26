@@ -437,7 +437,7 @@ namespace lucasCoreUI
         // ---- 2.1 (water, wetland and barren change, to-do 2, 2026-11): Data Sources holds the folder of USGS DSWE annual open water
         // (src/water-change.R: open water says whether a 30 m pixel is water, the annual NLCD what the land side is). Later steps of
         // to-do 2 that change existing tables add to this method. No apostrophe in the description ------------------------------------
-        [Update(2.1, "lucasCore 2.1: Data Sources folder for USGS DSWE annual open water (change among water, wetland and barren)")]
+        [Update(2.1, "lucasCore 2.1: change among water, wetland and barren - the Data Sources folder for USGS DSWE annual open water; the Wetland Change transition types in their Gain and Loss groups; and the two flow types that carry the carbon of wetland that becomes water to Aquatic, with their groups, order and output filters")]
         public static void Update_2_100(DataStore store)
         {
             AddColumn(store, "lucasCore_DataSource", "DsweFolder", "TEXT");
@@ -445,6 +445,26 @@ namespace lucasCoreUI
             // so a library sync does not add the corrected name as a second type with the same id
             store.ExecuteNonQuery("UPDATE stsim_TransitionType SET Name = " + Q("Wetland Change: to Palustrine Forested") + " WHERE Name = " + Q("Wetland Change: to Palustine Forested"));
             store.ExecuteNonQuery("UPDATE stsim_TransitionGroup SET Name = " + Q("Wetland Change: to Palustrine Forested [Type]") + " WHERE Name = " + Q("Wetland Change: to Palustine Forested [Type]"));
+            // the six Wetland Change types in the groups Wetland Change: Gain and Wetland Change: Loss (defaults/stsim/stsim_TransitionTypeGroup.csv)
+            foreach (string t in new[] { "to Estuarine Emergent", "to Estuarine Forested", "to Palustrine Emergent", "to Palustrine Forested" }) AddTypeToGroup(store, "Wetland Change: " + t, "Wetland Change: Gain");
+            foreach (string t in new[] { "to Water", "to Barren" }) AddTypeToGroup(store, "Wetland Change: " + t, "Wetland Change: Loss");
+            // carbon of a wetland cell that becomes water (src/wetland-change-carbon.R): emission and mortality use the standard land-use
+            // change flow types; the share carried to Aquatic has two flow types of its own. The rows are the ones defaults/stsim and
+            // defaults/stockflow gained (tools/make_wetland_change.R). The Wetland Change Carbon sheet is a new table, which SyncroSim adds
+            // by itself. A library keeps running on its earlier Builds; the change comes with its next Build (stages 0, 3 and 6)
+            string[,] wtypes = {
+                { "Wetland Change: Export Live", "Wetland that becomes water: live carbon carried to Aquatic" },
+                { "Wetland Change: Export DOM", "Wetland that becomes water: dead and soil carbon carried to Aquatic" }
+ };
+            for (int i = 0; i < wtypes.GetLength(0); i++)
+            {
+                AddNamed(store, "stsim_FlowType", "FlowTypeId", wtypes[i, 0], "Description", wtypes[i, 1], false);
+                AddNamed(store, "stsim_FlowGroup", "FlowGroupId", wtypes[i, 0] + " [Type]", null, null, true);
+                AddMembership(store, wtypes[i, 0], "Lateral Flux", "1"); AddMembership(store, wtypes[i, 0], "Lateral Flux (CO2e)", "3.67");
+                AddMembership(store, wtypes[i, 0], "Net Biome Productivity", "-1"); AddMembership(store, wtypes[i, 0], "Net Biome Productivity (CO2e)", "-3.67");
+                AddFilter(store, "stsim_OutputFilterFlows", "OutputFilterFlowsId", "FlowGroupId", "stsim_FlowGroup", wtypes[i, 0] + " [Type]", false);
+            }
+            AddFlowOrder(store, "Wetland Change: Export Live", 11); AddFlowOrder(store, "Wetland Change: Export DOM", 10);
         }
 
         // ---- 1.5 (wetland methane, 2026-11): wetland classes release part of what their soil and litter emit as CH4 (src/flows.R,
