@@ -5,37 +5,37 @@
 # the land side is. Two rules set the water state, by side:
 #   - the wetland side (a pixel the NLCD calls wetland in any year given): a change counts only once the pixel has read on the other side
 #     of `line` for `hold` clear years running, and is dated to the first of them. A marsh edge that floods and drains produces nothing.
-#   - everywhere else: two lines on each year's value. A pixel turns to water at `hi` or more and back to land at `lo` or less, and keeps
-#     its state between them, so a reservoir's drawdown and refill show in the year they happen and a pixel near 50% does not flip.
-#     The annual NLCD must agree (`agree`, user 2026-11-26: "only changes if NLCD says so"): the pixel turns to water only in a year
-#     the NLCD calls it open water, and back to land only in a year the NLCD calls it land. DSWE alone reads an alpine lake under ice
-#     and snow as land in a heavy-snow year, and snowmelt and shadow on high barren ground as water (P27, Sierra Nevada: water over
-#     2,500 m fell from 56 to 17 km2 in such years while the NLCD held it; under 2,500 m the two rise and fall together). The
-#     starting state is the NLCD's.
+#   - everywhere else (`inland`, default "nlcd"; user 2026-11-26: "Yes, NLCD alone"): the annual NLCD decides alone. A pixel turns to
+#     water in the first of `land_hold` years running the NLCD calls it open water, and back to land in the first of `land_hold` years
+#     running it calls it land; a change first seen in the last `land_hold` - 1 years is not counted. DSWE has no say here. Two earlier
+#     rules are kept for comparison: "dswe" (two lines on each year's value: water at `hi` or more, land at `lo` or less) read an
+#     alpine lake under ice as land and high barren ground as water (P27, Sierra Nevada); "agree" (the same, only in a year the NLCD
+#     says so too) worked as a ratchet, because DSWE reads low under ice in many years: P27 water fell 27 km2 at 30 m where the NLCD's
+#     fell 10.
 #     Land that leaves water here is barren whatever the NLCD calls it.
 # A year with no clear look (NA) changes nothing and does not break a run of years.
 # Pixels are independent, so a caller may pass any block of rows. The first year only sets the starting state: give the rule a few years
 # before the first year wanted, and note that wetland-side changes first seen in the last `hold` - 1 years cannot be confirmed.
 # =============================================================================
 WATER_CHANGE <- c("To Water" = 1L, "Water to Wetland" = 2L, "Water to Barren" = 3L, "Wetland to Barren" = 4L, "Barren to Wetland" = 5L, "Water to Other Land" = 6L)
-
 # open, nlcd: integer matrices, one row per pixel and one column per year (the same years, in order).
 # Returns change (a WATER_CHANGE code or 0 per pixel and year), water (the water state per pixel and year, held changes dated to their
 # first year), wetland_side (per pixel), and confirmed (the last column whose wetland-side changes are confirmed).
-water_change <- function(open, nlcd, hi = 70, lo = 30, line = 50, hold = 5L, land_hold = 2L, wet = c(90L, 95L), barren = 31L, water = 11L, agree = TRUE) {
-  n <- nrow(open); Y <- ncol(open)
+water_change <- function(open, nlcd, hi = 70, lo = 30, line = 50, hold = 5L, land_hold = 2L, wet = c(90L, 95L), barren = 31L, water = 11L, inland = c("nlcd", "agree", "dswe")) {
+  n <- nrow(open); Y <- ncol(open); inland <- match.arg(inland); agree <- inland == "agree"; land_hold <- as.integer(land_hold)
   if (!identical(dim(open), dim(nlcd))) stop("water_change: open water and NLCD must have the same pixels and years.")
   if (Y < 2L) stop("water_change: at least two years are needed.")
-  isw <- matrix(nlcd %in% wet, n, Y); isb <- matrix(nlcd %in% barren, n, Y); isl <- !matrix(nlcd %in% water | is.na(nlcd), n, Y)
+  isw <- matrix(nlcd %in% wet, n, Y); isb <- matrix(nlcd %in% barren, n, Y); isl <- !matrix(nlcd %in% water | is.na(nlcd), n, Y); isq <- matrix(nlcd %in% water, n, Y)
   W <- rowSums(isw) > 0
   # ---- the water state ----
   s <- ifelse(is.na(open[, 1]), nlcd[, 1] %in% water, open[, 1] >= line)   # no clear look in the first year: the NLCD decides
   M <- matrix(FALSE, n, Y); M[, 1] <- s
   s2 <- s; sh <- s; run <- integer(n); st <- integer(n)
-  if (agree) { k1 <- !W & !is.na(nlcd[, 1]); s2[k1] <- nlcd[k1, 1] %in% water; M[, 1] <- ifelse(W, s, s2) }   # away from wetland the NLCD sets the start
+  if (inland != "dswe") { k1 <- !W & !is.na(nlcd[, 1]); s2[k1] <- isq[k1, 1]; M[, 1] <- ifelse(W, s, s2) }   # away from wetland the NLCD sets the start
   for (y in 2:Y) { o <- open[, y]; look <- !is.na(o)
-    up <- !s2 & look & o >= hi; dn <- s2 & look & o <= lo
-    if (agree) { up <- up & nlcd[, y] %in% water; dn <- dn & isl[, y] }   # the NLCD must say the same that year (isl: land, and known)
+    if (inland == "nlcd") { if (y + land_hold - 1L <= Y) { q <- y:(y + land_hold - 1L); up <- !s2 & rowSums(isq[, q, drop = FALSE]) == land_hold; dn <- s2 & rowSums(isl[, q, drop = FALSE]) == land_hold } else up <- dn <- logical(n)
+    } else { up <- !s2 & look & o >= hi; dn <- s2 & look & o <= lo }
+    if (agree) { up <- up & isq[, y]; dn <- dn & isl[, y] }   # the NLCD must say the same that year (isl: land, and known)
     s2[up] <- TRUE; s2[dn] <- FALSE
     d <- look & (o >= line) != sh; st[d & run == 0L] <- y; run[d] <- run[d] + 1L; run[look & !d] <- 0L
     M[, y] <- ifelse(W, sh, s2)
@@ -59,15 +59,12 @@ water_change <- function(open, nlcd, hi = 70, lo = 30, line = 50, hold = 5L, lan
       ch[dry & rowSums(isb[, p, drop = FALSE]) == land_hold & rowSums(isw[, q, drop = FALSE]) == land_hold, y] <- WATER_CHANGE[["Barren to Wetland"]] } }
   list(change = ch, water = M, wetland_side = W, confirmed = Y - as.integer(hold) + 1L)
 }
-
 # ---- stage 6: the rule over the Build's 30 m window ---------------------------------------------------------------------------
 WATER_DSWE_FILE <- "DSWE_open_water_%d.tif"   # one file a year in the DsweFolder Data Source (src/download-sources.R)
 WATER_LEAD <- 5L                                # years read before the start year, so the water state has settled by the first year wanted
-
 # The years the rule reads for a Build of y0 to y1: `lead` years before the start year and `hold` - 1 after the end year (a wetland-side
 # change is confirmed only once it has held), kept to the years the annual NLCD has. A year with no DSWE file is read as no clear look.
 water_rule_years <- function(y0, y1, nlcd_years, lead = WATER_LEAD, hold = 5L) { yy <- (y0 - lead):(y1 + hold - 1L); yy[yy %in% nlcd_years] }
-
 # One band of 30 m rows (stage 6 runs the bands in parallel, as src/mortality.R). a: E (xmin, xmax, ymin, ymax of the aggregation
 # blocks), fact (30 m pixels per model cell side), nr, nc, step, rows (each band's first row), all (the years read), out (the years
 # wanted), dswe and nlcd (file per year, named by year; no DSWE entry = no clear look), clear. Returns, for each block cell of the
@@ -88,7 +85,7 @@ water_band <- function(i, a) {
   O <- vector("list", Y); N <- vector("list", Y); wet <- logical(n); bar <- logical(n); cand <- logical(n)
   for (q in seq_len(Y)) { k <- as.character(ALL[q]); f <- a$dswe[[k]]
     o <- if (is.null(f)) rep(NA_integer_, n) else rd(f); o[!is.na(o) & o > 100L] <- NA_integer_; v <- rd(a$nlcd[[k]])
-    cand <- cand | (!is.na(o) & o >= min(a$line, a$hi)); if (q == 1L) cand <- cand | v %in% 11L
+    cand <- cand | (!is.na(o) & o >= min(a$line, a$hi)) | v %in% 11L   # any year of NLCD water: away from wetland the NLCD decides
     wet <- wet | v %in% c(90L, 95L); bar <- bar | v %in% 31L; O[[q]] <- o; N[[q]] <- v }
   k <- which(cand | (wet & bar)); if (!length(k)) return(out)
   w <- water_change(matrix(unlist(lapply(O, `[`, k), use.names = FALSE), length(k), Y), matrix(unlist(lapply(N, `[`, k), use.names = FALSE), length(k), Y),

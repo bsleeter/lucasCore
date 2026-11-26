@@ -31,8 +31,8 @@
     call slow-growing regeneration forest (Yellowstone's 1988 burn: 2% forest in NLCD 2016, half trees in LANDFIRE 2016).
   - `All`: on everywhere (Post-disturbance: Conversion; the pathways' age limits decide).
   - `WaterChange` (to-do 2, `src/water-change.R`): change among water, wetland and barren. A 30 m rule: USGS DSWE annual open water (Data
-    Source `DsweFolder`) says whether a pixel is water (beside wetland a change must hold 5 clear years; elsewhere, and only in a year the annual NLCD says the same, a pixel turns to water
-    at 70% open and back at 30%), and the annual NLCD says what the land side is. `Classes` are the rule's change codes (1 to water,
+    Source `DsweFolder`) says whether a pixel is water beside wetland (a change must hold 5 clear years); elsewhere the annual NLCD decides alone (a pixel turns to water
+    or back in the first of two years running the NLCD says so, user 2026-11-26), and the annual NLCD says what the land side is. `Classes` are the rule's change codes (1 to water,
     2 water to wetland, 3 water to barren, 4 wetland to barren, 5 barren to wetland). Each cell gets the share of its 30 m pixels with
     the change that year; whole cells are then taken by rank, largest share first, until the year's 30 m area is met, and written as 1 / 0
     (as drought and insect mortality, user 2026-11-25), so the area follows the 30 m rule and every iteration is the same. A cell is
