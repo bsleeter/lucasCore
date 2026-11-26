@@ -2,6 +2,33 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+### Added
+
+- **Drought and insect mortality in the Run Figures** (stage 13, `src/run-figures.R`). The event was in the run's tables and
+  maps but in none of its figures.
+  - *Transitions per year* has a panel for it, with the Build's record as points.
+  - *After disturbance, and reforestation* shows what put each cell in a disturbed class (a stand-replacing fire or drought
+    and insect mortality, whichever came last) and the year of that event, in place of "Last stand-replacing fire". A year the
+    run wrote no mortality map of (a historical run in a library whose transition output filter predates 2.0.2) is read from
+    the Build's placed events, which are the same cells in every iteration under ranked selection.
+  - *Disturbed land and reforestation over time* has a panel of the area entering the disturbed classes each year by cause:
+    mortality is its transition's area, stand-replacing fire the rest of the area that entered.
+  - *Carbon fluxes* has panel (g), live carbon killed by a transition and left on the land (`LULC: Mortality`), by cause.
+    Mortality emits and removes nothing in its year, so it was absent from panels (b) to (d).
+
+### Fixed
+
+- *After disturbance*: a shrubland cell that burned at moderate severity and then converted was dated "no fire map for its
+  year" (157 km2 in Pyrome 27's projection); it counts as shrub from its starting class now. The panel subtitles no longer
+  overprint each other.
+
+### Not yet done
+
+- Drawn outside SyncroSim (`dev/figures/test_run_figures.R`) on Pyrome 27's historical run and projection and on Great Dismal
+  Swamp; stage 13 itself has not been rerun in a library. The User Guide's table and screenshots of these figures are not updated.
+
 ## 2.0.4 - 2026-11-25
 
 A patch: drought and insect mortality leaves the Land Use Change page, and its Mortality page lists the covariates that place it. No library update is needed (the one new sheet SyncroSim adds by itself).

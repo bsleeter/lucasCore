@@ -4,6 +4,8 @@
 # =============================================================================
 # Same format as the Build figures (src/figures.R, figure_kit): "Figure N" headers, lettered panels, maps on shaded relief.
 #   maps    land cover in the first and last year and the land-use change between them, harvest included | fire: times burned,
+#           (after disturbance: how each disturbed cell came out, what disturbed it - stand-replacing fire or drought and insect
+#           mortality - and when; reforestation by year)
 #           highest severity, last burn | harvest: times harvested, type, last harvest | total ecosystem carbon in the first and last
 #           year and its change
 #   charts  land area by cover group | transitions per year, simulated against the Build's record | carbon stocks | carbon fluxes |
@@ -12,7 +14,9 @@
 # A stand-alone projection is drawn with its historical run in front (find_history, join_runs): one set of figures from the start of the
 # history to the end of the projection, a dashed line where the projection starts.
 # load_run(lib, rid, ...) reads the run: its tables summed in SQL (iterations averaged) and its first-iteration maps by path; maps the
-# run did not write (state class, fire or harvest transitions, total ecosystem carbon) leave their figure or panel out. Harvest is
+# run did not write (state class, fire or harvest transitions, total ecosystem carbon) leave their figure or panel out. Drought and
+# insect mortality (lucasCore 2.0) has a panel of Transitions per year, is a cause in the after-disturbance maps and charts, and its
+# killed carbon is in Carbon fluxes (g); a year the run wrote no map of it is read from the Build's placed events. Harvest is
 # read from every mapped group named "Forest Harvest..." (the clearcut and selection [Type] groups by default), its cells classed by
 # transition type name.
 # =============================================================================
@@ -22,7 +26,8 @@ cover_group <- function(x) { g <- sub(":.*$", "", x); g[grepl("^Forest", x)] <- 
   g[!g %in% c("Forest", "Disturbed", "Shrubland", "Grassland", "Agriculture", "Developed", "Wetland", "Water")] <- "Barren and other"; g }   # Disturbed: waiting to return or convert (to-do 57)
 COVER_COLS <- c(Forest = "#2b8152", Disturbed = "#b5651d", Shrubland = "#c9a26b", Grassland = "#e6d77a", Agriculture = "#d98b3a", Developed = "#c0392b",
                 Wetland = "#5aa9b8", Water = "#3b6ea8", `Barren and other` = "#a3a3a3")
-FAMILIES <- c("Urbanization", "Intensification", "Ag Expansion", "Ag Contraction", "Ag Change", "Fire", "Forest Harvest")
+FAMILIES <- c("Urbanization", "Intensification", "Ag Expansion", "Ag Contraction", "Ag Change", "Fire", "Forest Harvest", "Mortality")
+FAMILY_LAB <- c(Mortality = "Drought and insect mortality")   # (the panel title of a family whose group name is not its title)
 # carbon lost each year, by cause (user, 2026-11-10: the flux figure's "fire emissions" were every transition's emissions): a transition's
 # emissions and removals (LULC: Emission, LULC: Harvest) by its type, crop harvest (Harvest: Agriculture) and drained peat
 LOSS_COLS <- c(Fire = "#c93a1d", `Drought and insects` = "#7b4a8b", `Forest harvest` = "#6b6b6b", `Land use change` = "#8c6d31", `Crop harvest` = "#e3b23c", `Drained peat` = "#4a2f17")
@@ -63,7 +68,7 @@ load_run <- function(lib, rid) {
               GROUP BY o.Timestep, g.Name", nit, rid) else NULL
   losses <- if (dbExistsTable(con, "stsim_OutputFlow")) q("SELECT o.Timestep, g.Name AS FlowGroup, t.Name AS TransitionType, SUM(o.Amount) / %d AS Mg FROM stsim_OutputFlow o
               JOIN stsim_FlowGroup g ON g.FlowGroupId = o.FlowGroupId LEFT JOIN stsim_TransitionType t ON t.TransitionTypeId = o.TransitionTypeId WHERE o.ScenarioId = %d
-              AND g.Name IN ('LULC: Emission', 'LULC: Emission Peat', 'LULC: Harvest', 'Harvest: Agriculture', 'Emission: Drained Organic Soil -> Atmosphere [Type]', 'Lateral Flux')
+              AND g.Name IN ('LULC: Emission', 'LULC: Emission Peat', 'LULC: Harvest', 'Harvest: Agriculture', 'Emission: Drained Organic Soil -> Atmosphere [Type]', 'Lateral Flux', 'LULC: Mortality')
               GROUP BY o.Timestep, g.Name, t.Name", nit, rid) else NULL
   if (!is.null(losses)) losses[, Cause := loss_cause(FlowGroup, TransitionType)]
   # net biome productivity by the class it came from (a transition's losses count to the class the cell left)
@@ -87,6 +92,14 @@ load_run <- function(lib, rid) {
   fm <- if (length(fire_id)) q("SELECT Timestep, Filename FROM stsim_OutputSpatialTransition WHERE ScenarioId = %d AND Iteration = 1 AND TransitionGroupId = %d", rid, fire_id[1]) else data.table()
   hm <- q("SELECT o.Timestep, o.Filename FROM stsim_OutputSpatialTransition o JOIN stsim_TransitionGroup g ON g.TransitionGroupId = o.TransitionGroupId
            WHERE o.ScenarioId = %d AND o.Iteration = 1 AND g.Name LIKE 'Forest Harvest%%'", rid)
+  # drought and insect mortality (lucasCore 2.0): the yearly maps of iteration 1 of its type group
+  mm <- q("SELECT o.Timestep, o.Filename FROM stsim_OutputSpatialTransition o JOIN stsim_TransitionGroup g ON g.TransitionGroupId = o.TransitionGroupId
+           WHERE o.ScenarioId = %d AND o.Iteration = 1 AND g.Name LIKE 'Mortality: %%'", rid)
+  # the Build's placed events (stage 6's yearly multiplier maps, a copy in the run's folder): under ranked selection they are 1 on the
+  # cells that have the event, the same in every iteration, so they stand in for a year the run wrote no mortality map of (a library
+  # whose transition output filter was written before lucasCore 2.0.2 has those maps off in its historical run)
+  mi <- if (dbExistsTable(con, "stsim_TransitionSpatialMultiplier")) q("SELECT m.Timestep, m.MultiplierFileName AS Filename FROM stsim_TransitionSpatialMultiplier m JOIN stsim_TransitionGroup g ON g.TransitionGroupId = m.TransitionGroupId
+           WHERE m.ScenarioId = %d AND g.Name LIKE 'Mortality: %%' AND m.Timestep > %d AND m.Timestep <= %d AND m.MultiplierFileName IS NOT NULL", rid, yrs[1], yrs[2]) else data.table()
   te <- q("SELECT o.Timestep, o.Filename FROM stsim_OutputAverageSpatialStockGroup o JOIN stsim_StockGroup g ON g.StockGroupId = o.StockGroupId WHERE o.ScenarioId = %d AND g.Name = 'Total Ecosystem'", rid)
   # the pools the carbon capacity counts (src/capacity.R): their average maps in the first and last year, for the deficit by cause
   hl <- q("SELECT o.Timestep, g.Name AS Grp, o.Filename FROM stsim_OutputAverageSpatialStockGroup o JOIN stsim_StockGroup g ON g.StockGroupId = o.StockGroupId
@@ -100,6 +113,8 @@ load_run <- function(lib, rid) {
        sc0 = path("stsim_OutputSpatialState", ssm[Timestep == yrs[1], Filename]), sc1 = path("stsim_OutputSpatialState", ssm[Timestep == yrs[2], Filename]),
        fire = if (nrow(fm)) setNames(vapply(fm$Filename, function(f) path("stsim_OutputSpatialTransition", f), ""), fm$Timestep) else character(),
        harvest = if (nrow(hm)) setNames(vapply(hm$Filename, function(f) path("stsim_OutputSpatialTransition", f), ""), hm$Timestep) else character(),
+       mort = if (nrow(mm)) setNames(vapply(mm$Filename, function(f) path("stsim_OutputSpatialTransition", f), ""), mm$Timestep) else character(),
+       mort_in = if (nrow(mi)) setNames(vapply(mi$Filename, function(f) path("stsim_TransitionSpatialMultiplier", f), ""), mi$Timestep) else character(),
        carbon0 = path("stsim_OutputAverageSpatialStockGroup", te[Timestep == yrs[1], Filename]), carbon1 = path("stsim_OutputAverageSpatialStockGroup", te[Timestep == yrs[2], Filename]),
        hl0 = hl_of(yrs[1]), hl1 = hl_of(yrs[2]), age0 = path("stsim_OutputSpatialAge", agm[Timestep == yrs[1], Filename]), age1 = path("stsim_OutputSpatialAge", agm[Timestep == yrs[2], Filename]),
        pd = if (nrow(pdm)) pdm[, .(Timestep, Grp, File)] else NULL)
@@ -129,7 +144,7 @@ join_runs <- function(H, P) {
   J$unit_c <- if (!is.null(H$unit_c) && !is.null(P$unit_c)) rbind(H$unit_c[Timestep == H$years[1]], P$unit_c[Timestep == P$years[2]]) else NULL
   J$unit_a <- H$unit_a; J$sc0 <- H$sc0; J$carbon0 <- H$carbon0; J$age0 <- H$age0; J["hl0"] <- list(H$hl0)
   late <- function(m) m[as.integer(names(m)) > ys]
-  J$fire <- c(H$fire, late(P$fire)); J$harvest <- c(H$harvest, late(P$harvest))
+  J$fire <- c(H$fire, late(P$fire)); J$harvest <- c(H$harvest, late(P$harvest)); J$mort <- c(H$mort, late(P$mort)); J$mort_in <- H$mort_in   # (the Build's events are the historical years' alone)
   J$pd <- rbind(H$pd, if (!is.null(P$pd)) P$pd[Timestep > ys])
   te <- function(X) { s <- X$stocks; if (is.null(s)) NA_real_ else s[StockGroup == "Total Ecosystem" & Timestep == ys, sum(Mg)] / 1e6 }
   J$join <- c(history = te(H), projection = te(P)); J$proj_start <- ys; J$hist <- list(rid = H$rid, years = H$years)
@@ -282,7 +297,16 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
     for (y in names(X$fire)) { r <- rd(X$fire[[y]]); if (is.null(r)) next; v <- cv(r); nm <- X$tt_list$Name[match(v, X$tt_list$Id)]
       last_hs[!is.na(v) & v > 0 & grepl("High", nm)] <- as.integer(y); last_ms[!is.na(v) & v > 0 & grepl("High|Medium", nm)] <- as.integer(y) }
     dsh <- X$sc_list$Id[X$sc_list$Name %in% paste0("Disturbed: ", SHRUB_P)]
-    shr <- outc %in% 2L | v1 %in% dsh | v0 %in% dsh; last_hs[shr] <- last_ms[shr]
+    ssh <- X$sc_list$Id[grepl("^Shrubland: ", X$sc_list$Name)]   # (a cell that starts as shrubland and converts after its fire never shows a disturbed shrub class in the first or last year)
+    shr <- outc %in% 2L | v1 %in% dsh | v0 %in% c(dsh, ssh); last_hs[shr] <- last_ms[shr]
+    # drought and insect mortality also moves a stand into its disturbed class: the last event of each cell, and which of the two
+    # (fire or mortality) came last
+    last_mo <- rep(NA_integer_, length(inz)); mort_placed <- FALSE
+    mfile <- X$mort; mplaced <- X$mort_in[!names(X$mort_in) %in% names(X$mort)]   # (the Build's placed events, for years the run did not map)
+    for (y in sort(unique(c(names(mfile), names(mplaced))))) { own <- y %in% names(mfile); r <- rd(if (own) mfile[[y]] else mplaced[[y]]); if (is.null(r)) next
+      if (!own && !grepl("^INT", datatype(r)[1])) next   # (fractions as chances name no cells)
+      v <- cv(r); last_mo[!is.na(v) & (if (own) v > 0 else v == 1)] <- as.integer(y); if (!own) mort_placed <- TRUE }
+    by_mort <- !is.na(last_mo) & (is.na(last_hs) | last_mo > last_hs); last_ev <- ifelse(by_mort, last_mo, last_hs)
     if (any(!is.na(outc)) || any(!is.na(refy))) {
       km2c <- function(k) sum(outc %in% k & inz) * prod(res(el)) / 1e6
       OL <- c("Back to forest", "Back to shrubland", "Converted (shrub or grass)", "Still disturbed at the end"); OC <- c("#2b8152", "#c9a26b", "#c0392b", "#b5651d")
@@ -293,18 +317,24 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
       if (length(pres)) { yb <- unique(c(y0, seq(y0 + 5, y1, by = 5), y1 + 1)); nb <- length(yb) - 1L
         # no high-severity fire on the maps: started disturbed (before the run), else a year the run did not map (a run that wrote no
         # transition maps, as a projection made with bookend maps)
-        hs <- ifelse(is.na(outc), NA, ifelse(!is.na(last_hs), findInterval(last_hs, yb, rightmost.closed = TRUE) + 1L, ifelse(started, 1L, nb + 2L)))
+        hs <- ifelse(is.na(outc), NA, ifelse(!is.na(last_ev), findInterval(last_ev, yb, rightmost.closed = TRUE) + 1L, ifelse(started, 1L, nb + 2L)))
         nomap <- any(hs %in% (nb + 2L))
-        P[[length(P) + 1]] <- list(k = hs, cols = c("#d9d4c7", colorRampPalette(c("#fde7b0", "#e0702b", "#6b1a10"))(nb), "#8f8f8f"),
-          lab = c(sprintf("before %d", y0 + 1), sprintf("%d-%d", head(yb, -1) + c(1, rep(0, length(yb) - 2)), tail(yb, -1) - 1), "no fire map for its year"), key = TRUE,
-          title = "Last stand-replacing fire", sub = sprintf("the same cells (high severity; moderate or high in shrubland); before %d: started disturbed (a fire perimeter dates it)%s", y0 + 1, if (nomap) "; no fire map: the run wrote no transition maps that year" else "")) }
+        # what put the cell there: the later of its last stand-replacing fire and its last mortality event
+        cause <- ifelse(is.na(outc), NA, ifelse(is.na(last_ev), ifelse(started, 3L, 4L), ifelse(by_mort, 2L, 1L)))
+        CL <- c("Stand-replacing fire", "Drought and insect mortality", sprintf("Disturbed before %d", y0 + 1), "Not on the run's maps"); CC <- c("#c93a1d", "#7b4a8b", "#d9d4c7", "#8f8f8f")
+        cp <- sort(unique(cause[!is.na(cause)])); km2k <- function(k) sum(cause %in% k & inz) * prod(res(el)) / 1e6
+        P[[length(P) + 1]] <- list(k = match(cause, cp), cols = CC[cp], lab = sprintf("%s (%.1f km2)", CL[cp], vapply(cp, km2k, 0)), key = TRUE,
+          title = "What disturbed each cell", sub = "the same cells; the later of fire and mortality")
+        P[[length(P) + 1]] <- list(k = hs, cols = c("#d9d4c7", colorRampPalette(c("#fde7b0", "#e0702b", "#6b1a10"))(nb), if (nomap) "#8f8f8f"),
+          lab = c(sprintf("before %d", y0 + 1), sprintf("%d-%d", head(yb, -1) + c(1, rep(0, length(yb) - 2)), tail(yb, -1) - 1), if (nomap) "not on the run's maps"), key = TRUE,
+          title = "Year of that event", sub = sprintf("before %d: the cell started disturbed", y0 + 1)) }
       if (any(!is.na(refy))) { yb <- unique(c(y0, seq(y0 + 5, y1, by = 5), y1 + 1))
         P[[length(P) + 1]] <- list(k = ifelse(is.na(refy), NA, findInterval(refy, yb, rightmost.closed = TRUE)), cols = colorRampPalette(c("#dfe6b4", "#62ab68", "#0f3a2b"))(length(yb) - 1),
           lab = sprintf("%d-%d", head(yb, -1) + c(1, rep(0, length(yb) - 2)), tail(yb, -1) - 1), key = TRUE, title = "Reforestation, by year",
-          sub = sprintf("%.1f km2 of barren, shrub, grass or emergent wetland became forest", sum(!is.na(refy) & inz) * prod(res(el)) / 1e6)) }
+          sub = sprintf("%.1f km2 of natural non-forest became forest", sum(!is.na(refy) & inz) * prod(res(el)) / 1e6)) }
       map_figure("post_disturbance", sprintf("After disturbance, and reforestation, %d-%d", y0 + 1, y1), P,
-        sprintf("Iteration 1, from the run's yearly transition maps. %sA stand-replacing fire (high severity in forest, moderate or high in shrubland) moves the cell into its type's disturbed class; it returns to its type when %s, or converts to shrubland or grassland at the end of its window or at a stand-replacing reburn.%s%s",
-                if (length(pres)) "(a) How each cell that was in a disturbed class left it (the latest exit), or that it is still waiting in the last year. (b) When those cells last had a stand-replacing fire. " else "",
+        sprintf("Iteration 1, from the run's yearly transition maps. %sA stand-replacing fire (high severity in forest, moderate or high in shrubland) or a drought and insect mortality event (softwood forest) moves the cell into its type's disturbed class; it returns to its type when %s, or converts to shrubland or grassland at the end of its window or at a stand-replacing reburn.%s%s",
+                if (length(pres)) sprintf("(a) How each cell that was in a disturbed class left it (the latest exit), or that it is still waiting in the last year. (b) What put it there: a stand-replacing fire or drought and insect mortality, whichever came last; a cell that started the run disturbed and had neither since is dated before %d (a fire perimeter or the Build's mortality record dates it). (c) The year of that event.%s%s ", y0 + 1, if (mort_placed) " Mortality in years the run wrote no map of it is read from the Build's placed events (the same cells in every iteration)." else "", if (nomap) " Not on the run's maps: the cell entered its disturbed class in a year the run wrote no transition map of." else "") else "",
                 if (is.null(ps)) "the annual NLCD shows it again (historical years)" else "the annual NLCD shows it again (historical years) or with its yearly chance (projection years)",
                 if (any(!is.na(refy))) sprintf(" (%s) Natural non-forest cells that became forest (Reforestation), by year.", letters[length(P)]) else "", relief)) }
   }
@@ -318,17 +348,27 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
     ser <- function(g) { s <- pdt[TransitionGroup == g][match(yrs, Timestep), ha] / 100; s[is.na(s)] <- 0; s }
     TL <- c(`Post-disturbance: Forest Return` = "Back to forest", `Post-disturbance: Shrub Return` = "Back to shrubland", `Post-disturbance: Conversion` = "Converted", Reforestation = "Reforestation")
     TC <- c("#2b8152", "#c9a26b", "#c0392b", "#62ab68")
+    # the area entering the disturbed classes each year: the change in their area plus the area that left; the part drought and
+    # insect mortality moved there is its transition's area, the rest stand-replacing fire
+    tot_d <- dis[, .(km2 = sum(ha) / 100), by = Timestep][match(yrs, Timestep), km2]; tot_d[is.na(tot_d)] <- 0
+    left <- rowSums(sapply(names(TL)[1:3], ser)); ent <- pmax(c(0, diff(tot_d)) + left, 0); ent[1] <- 0
+    mo <- X$trans[TransitionGroup == "Mortality"][match(yrs, Timestep), ha] / 100; mo[is.na(mo)] <- 0
+    EN <- rbind(`Stand-replacing fire` = pmax(ent - mo, 0), `Drought and insect mortality` = mo); EC <- c("#c93a1d", "#7b4a8b")
     chart_figure("post_disturbance_time", "Disturbed land and reforestation over time",
-      sprintf("(a) Area in the disturbed classes each year (forest types and shrub types waiting to return or convert). (b) Area leaving them each year, back to their type or converted, and the area that reforested (natural non-forest becoming forest), in km2 a year%s.", if (is.null(ps)) "" else "; the dashed line marks the projection's start"),
-      1, 2, h = 1150, draw = function() {
+      sprintf("(a) Area in the disturbed classes each year (forest types and shrub types waiting to return or convert). (b) Area entering them each year, by cause: drought and insect mortality is its transition's area; stand-replacing fire is the rest of the area that entered (the year's change in the disturbed area plus the area that left). (c) Area leaving them each year, back to their type or converted, and the area that reforested (natural non-forest becoming forest), in km2 a year%s.", if (is.null(ps)) "" else "; the dashed line marks the projection's start"),
+      1, 3, h = 1150, draw = function() {
         low(); fams <- setdiff(names(da), "Timestep"); top <- max(c(unlist(da[, ..fams]), 0.01), na.rm = TRUE) * 1.1
         plot(NA, xlim = range(yrs), ylim = c(0, top), xlab = "", ylab = "km2"); hgrid()
         for (j in seq_along(fams)) lines(da$Timestep, da[[fams[j]]], col = c("#b5651d", "#d9b27a")[j], lwd = 2)
         mark_line(); ptitle(1, "Area in disturbed classes"); if (length(fams)) under_legend(fams, col = c("#b5651d", "#d9b27a")[seq_along(fams)], lwd = 2)
+        low(); eb <- EN[, -1, drop = FALSE]; ey <- yrs[-1]
+        b <- barplot(eb, col = EC, border = NA, ylim = c(0, max(colSums(eb), 0.01) * 1.1), ylab = "km2 per year"); hgrid(); barplot(eb, col = EC, border = NA, add = TRUE, axes = FALSE)
+        at <- which(ey %% 5 == 0); axis(1, at = b[at], labels = ey[at], cex.axis = .75); mark_bar(b, ey)
+        ptitle(2, "Entering the disturbed classes"); under_legend(sprintf("%s (%.1f km2 in all)", rownames(EN), rowSums(eb)), fill = EC)
         low(); S <- sapply(names(TL), ser); top <- max(c(S, 0.01)) * 1.1
         plot(NA, xlim = range(yrs), ylim = c(0, top), xlab = "", ylab = "km2 per year"); hgrid()
         for (j in seq_along(TL)) lines(yrs, S[, j], col = TC[j], lwd = 2, type = "s")
-        mark_line(); ptitle(2, "Leaving the disturbed classes, and reforestation")
+        mark_line(); ptitle(3, "Leaving the disturbed classes, and reforestation")
         under_legend(sprintf("%s (%.1f km2 in all)", TL, colSums(S)), col = TC, lwd = 2) }) }
 
   # ---- forest stand age in the first and last year (user 2026-11-19: stand age is the model's least certain input) --------------
@@ -393,8 +433,9 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
         b <- barplot(s, col = "#8da9c4", border = NA, space = .15, ylim = c(0, top), ylab = "km2 per year"); hgrid(); barplot(s, col = "#8da9c4", border = NA, space = .15, add = TRUE, axes = FALSE)
         at <- which(yrs %% 5 == 0); axis(1, at = b[at], labels = yrs[at], cex.axis = .75)
         if (!is.null(o)) points(b, o, pch = 16, cex = .6, col = INK); mark_bar(b, yrs)
-        ptitle(i, if (is.null(ps)) sprintf("%s: %.0f km2 simulated%s", fams[i], sum(s), if (!is.null(o)) sprintf(", %.0f recorded", sum(o, na.rm = TRUE)) else "") else
-          sprintf("%s: %.0f + %.0f km2%s", fams[i], sum(s[yrs <= ps]), sum(s[yrs > ps]), if (!is.null(o)) sprintf(" (%.0f recorded)", sum(o, na.rm = TRUE)) else "")) }) }
+        fl <- if (fams[i] %in% names(FAMILY_LAB)) FAMILY_LAB[[fams[i]]] else fams[i]
+        ptitle(i, if (is.null(ps)) sprintf("%s: %.0f km2 simulated%s", fl, sum(s), if (!is.null(o)) sprintf(", %.0f recorded", sum(o, na.rm = TRUE)) else "") else
+          sprintf("%s: %.0f + %.0f km2%s", fl, sum(s[yrs <= ps]), sum(s[yrs > ps]), if (!is.null(o)) sprintf(" (%.0f recorded)", sum(o, na.rm = TRUE)) else "")) }) }
 
   # ---- charts: carbon stocks -------------------------------------------------------------------------------------------------
   if (!is.null(X$stocks) && nrow(X$stocks)) {
@@ -487,15 +528,21 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
     legend_means <- function(M, cols, extra = NULL) { lab <- sprintf("%s (%.3g)", rownames(M), rowMeans(M))
       if (length(extra)) under_legend(c(lab, extra), fill = c(cols, NA), lty = c(rep(NA, nrow(M)), 1), col = c(rep(NA, nrow(M)), "#3b6ea8")) else under_legend(lab, fill = cols) }
     nbp <- g("Net Biome Productivity")
+    # (g) live carbon a transition kills and leaves on the land (LULC: Mortality: live pools to dead wood, litter and soil), by cause
+    Kl <- if (is.null(LO)) NULL else ymat(LO[FlowGroup == "LULC: Mortality"], "Cause", names(LOSS_COLS))
+    has_k <- !is.null(Kl) && nrow(Kl) > 0 && sum(Kl) > 0
     cap <- paste("(a) Net primary productivity, heterotrophic respiration and net ecosystem productivity.",
-      "(b) Carbon lost each year by cause: what each transition emits and removes (fire, including peat; insects; forest harvest, its wood and slash; land use change, mostly the emissions",
+      "(b) Carbon lost each year by cause: what each transition emits and removes (fire, including peat; forest harvest, its wood and slash; land use change, mostly the emissions",
       "and wood of urbanization and agricultural expansion), crop harvest (carried off the field each year and mostly respired off site within the year) and drained peat (oxidized under",
       "cropland and pasture; part of heterotrophic respiration); net biome productivity, the change in ecosystem carbon, is net ecosystem productivity less the transitions' losses and crop harvest.",
       "(c) Carbon emitted to the atmosphere by the transitions and drained peat, by driver (fire split into vegetation and peat). (d) Carbon carried off the land: wood from forest harvest and",
       "land use change (to the Forestry Sector), crop harvest (to the Agriculture Sector) and wetland carbon carried away by water (to Aquatic).",
       "(e) The mean carbon balance: net primary productivity less decomposition and lateral export is net ecosystem productivity, less the losses of (b) is net biome productivity.",
-      "(f) Net biome productivity by the land cover it came from (a transition's losses count to the class the land left). Legends give each series' mean, Tg C per year.")
-    chart_figure("carbon_fluxes", "Carbon fluxes", cap, 3, 2, h = 3300, draw = function() {
+      "(f) Net biome productivity by the land cover it came from (a transition's losses count to the class the land left).",
+      if (has_k) paste("(g) Live carbon killed by a transition and left on the land, by cause: it moves to dead wood, litter and soil, is not a loss in its year, and is respired as it decays",
+                       "(part of heterotrophic respiration in later years). Drought and insect mortality emits nothing in its year and removes nothing, so it shows here and not in (b) to (d).") else "",
+      "Legends give each series' mean, Tg C per year.")
+    chart_figure("carbon_fluxes", "Carbon fluxes", cap, if (has_k) 4 else 3, 2, h = if (has_k) 4400 else 3300, draw = function() {
       # (a)
       low(); a <- cbind(NPP = g("Net Primary Productivity"), Rh = g("Emission: Total Rh"), NEP = g("Net Ecosystem Productivity"))
       plot(NA, xlim = range(yy), ylim = range(c(0, a)), xlab = "", ylab = "Tg C per year", bty = "l"); hgrid(); abline(h = 0, col = MUTED, lty = 2)
@@ -537,7 +584,10 @@ run_figures <- function(X, grid, sc_colours, dem, label, observed, outdir, run_n
       if (!is.null(X$nbp_cls) && nrow(X$nbp_cls)) { nc <- copy(X$nbp_cls)[, Group := balance_group(Class)]
         s <- stack_bars(ymat(nc, "Group", names(BAL_COLS)), BAL_COLS, "Tg C per year", line = nbp)
         ptitle(6, "Net biome productivity by land cover"); legend_means(s$M, s$cols, "Net biome productivity")
-      } else { plot.new(); ptitle(6, "Net biome productivity by land cover: not in this run's output") } }) }
+      } else { plot.new(); ptitle(6, "Net biome productivity by land cover: not in this run's output") }
+      # (g) live carbon killed and left on the land
+      if (has_k) { low(); s <- stack_bars(Kl, LOSS_COLS, "Tg C killed per year")
+        ptitle(7, sprintf("Live carbon killed and left on the land (mean %.3g Tg C/yr)", sum(rowMeans(s$M)))); legend_means(s$M, s$cols) } }) }
 
   # ---- charts: wetland methane (lucasCore 1.5; drawn when the run's wetlands released any) -----------------------------------
   # (a) carbon released as methane each year by the kind of wetland; (b) net biome productivity as CO2, and with that methane counted
