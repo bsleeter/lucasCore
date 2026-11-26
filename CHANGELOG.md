@@ -31,8 +31,26 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
     mapped every iteration, and renumbers the figures after it. For Pyrome 27 it reads about 680 maps and adds 30 s.
   - The carbon capacity figure has no spread yet, and stand age, land cover and after-disturbance maps stay iteration 1's.
 
+- **Drought and insect mortality and the spread over iterations in the Compare Figures** (stage 14, `src/compare-figures.R`).
+  - Mortality: *Transitions per year* titles its panel "Drought and insect mortality"; *Carbon fluxes per year* has panel (e),
+    live carbon killed and left on the land; *Carbon fluxes by period* has panels of the live carbon killed by fire and by
+    drought and insects; the *Land change summary* figure has a Mortality column. The Compare Land Change Summary datasheet
+    is unchanged (a column there needs a library update).
+  - Spread, for projections of more than one iteration (lowest to highest iteration; the 5th to 95th percentile from 20 up):
+    shading on total carbon and on every line of *Carbon fluxes per year* and *Transitions per year*; shading on each run's
+    difference from the baseline, iteration against the baseline's same iteration when both runs have the same ones, else
+    against the baseline's mean; whiskers on the bars of *Carbon fluxes by period*, *Carbon by pool* and *Land area change*;
+    the range in brackets in the two summary table figures (carbon at the end, the difference from the baseline, area
+    burned, with mortality, harvested and urbanized). Wood products, wetland methane and carbon capacity have none.
+  - New map figures, *Chance of burning / of drought and insect mortality / of harvest against the baseline*: the share of
+    the baseline's iterations in which each cell changed at least once, and each other run's share minus it. Drawn when the
+    baseline and another projection of the same years mapped every iteration; they renumber the figures after them.
+
 ### Fixed
 
+- Compare Figures: *Fire emissions* in *Carbon fluxes by period* also counted the live carbon fire killed (13.8 Tg C on top of
+  13.4 in Pyrome 27's projection), since the mortality change to the run loader in this unreleased work; it is emissions
+  only again. The note and the carbon map caption said "maps of iteration 1": the carbon maps are the mean of the iterations.
 - *After disturbance*: a shrubland cell that burned at moderate severity and then converted was dated "no fire map for its
   year" (157 km2 in Pyrome 27's projection); it counts as shrub from its starting class now. The panel subtitles no longer
   overprint each other.
@@ -42,6 +60,9 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
 - Drawn outside SyncroSim (`dev/figures/test_run_figures.R`) on Pyrome 27's historical run and projection and on Great Dismal
   Swamp; stage 13 itself has not been rerun in a library, and no run of 20 or more iterations was at hand to draw the
   percentile spread on. The User Guide's table and screenshots of these figures are not updated.
+- Compare Figures: drawn outside SyncroSim on Pyrome 27's one projection, and on it against a made-up second projection
+  (its tables altered) for the spread between runs and the chance maps. No library has two real projections of several
+  iterations with mortality; stage 14 itself has not been rerun.
 
 ## 2.0.4 - 2026-11-25
 

@@ -94,10 +94,15 @@ load_run <- function(lib, rid) {
       trans = q("SELECT t.Iteration, t.Timestep, g.Name AS TransitionGroup, SUM(t.Amount) AS ha FROM stsim_OutputStratumTransition t JOIN stsim_TransitionGroup g ON g.TransitionGroupId = t.TransitionGroupId
                  WHERE t.ScenarioId = %d AND g.Name IN (%s) GROUP BY t.Iteration, t.Timestep, g.Name", rid, inl(FAMILIES)),
       stocks = if (!is.null(stocks)) q("SELECT o.Iteration, o.Timestep, g.Name AS StockGroup, SUM(o.Amount) AS Mg FROM stsim_OutputStock o JOIN stsim_StockGroup g ON g.StockGroupId = o.StockGroupId
-                 WHERE o.ScenarioId = %d AND g.Name IN ('Total Ecosystem', 'Biomass: Total', 'DOM: Deadwood', 'DOM: Litter') GROUP BY o.Iteration, o.Timestep, g.Name", rid),
+                 WHERE o.ScenarioId = %d AND g.Name IN ('Total Ecosystem', 'Biomass: Total', 'DOM: Deadwood', 'DOM: Litter', 'DOM: Soil') GROUP BY o.Iteration, o.Timestep, g.Name", rid),
       flows = if (!is.null(flows)) q("SELECT o.Iteration, o.Timestep, g.Name AS FlowGroup, SUM(o.Amount) AS Mg FROM stsim_OutputFlow o JOIN stsim_FlowGroup g ON g.FlowGroupId = o.FlowGroupId
                  WHERE o.ScenarioId = %d AND g.Name IN ('Net Primary Productivity', 'Emission: Total Rh', 'Net Ecosystem Productivity', 'Net Biome Productivity') GROUP BY o.Iteration, o.Timestep, g.Name", rid),
+      # fire emissions and the live carbon a transition kills, by transition type (the comparison figures' period means)
+      losses = if (!is.null(flows)) q("SELECT o.Iteration, o.Timestep, g.Name AS FlowGroup, t.Name AS TransitionType, SUM(o.Amount) AS Mg FROM stsim_OutputFlow o JOIN stsim_FlowGroup g ON g.FlowGroupId = o.FlowGroupId
+                 LEFT JOIN stsim_TransitionType t ON t.TransitionTypeId = o.TransitionTypeId WHERE o.ScenarioId = %d AND g.Name IN ('LULC: Emission', 'LULC: Emission Peat', 'LULC: Mortality')
+                 GROUP BY o.Iteration, o.Timestep, g.Name, t.Name", rid),
       ids = q("SELECT DISTINCT Iteration FROM stsim_OutputStratumState WHERE ScenarioId = %d ORDER BY Iteration", rid)$Iteration, from = yrs[1])
+    if (!is.null(it$losses) && nrow(it$losses)) it$losses[, Cause := loss_cause(FlowGroup, TransitionType)]
     tr_all <- q("SELECT o.Iteration, o.Timestep, g.Name AS Grp, o.Filename FROM stsim_OutputSpatialTransition o JOIN stsim_TransitionGroup g ON g.TransitionGroupId = o.TransitionGroupId
                  WHERE o.ScenarioId = %d AND (g.Name = 'Fire' OR g.Name LIKE 'Forest Harvest%%' OR g.Name LIKE 'Mortality: %%')", rid)
     if (nrow(tr_all)) tr_all[, `:=`(File = file.path(dd, "stsim_OutputSpatialTransition", basename(Filename)), Kind = fifelse(Grp == "Fire", "Fire", fifelse(grepl("^Mortality", Grp), "Mortality", "Harvest")))]
