@@ -220,7 +220,7 @@ if (!mort_def) ev_def <- ev_def[TransitionGroupId != DF_GROUPS[[MORT_DF]]]
 # Wetland Change Carbon page (blank = the shares the file was made with). A library without the events' flow types takes none
 source(pkg_file("src", "wetland-change-carbon.R"))
 ev_def <- ev_def[!TransitionGroupId %in% c(WCC_WATER, WCC_BARREN)]
-if (!all(WCC_TYPES %in% stsim_list("FlowType")$Name)) say("Wetland change carbon: off, the library lacks the flow types (%s): run tools/add-definitions.R on it", paste(setdiff(WCC_TYPES, stsim_list("FlowType")$Name), collapse = ", ")) else {
+if (!all(WCC_TYPES %in% stsim_list("FlowType")$Name)) say("Wetland change carbon: off, the library lacks the flow types (%s): run tools/sync-library.R on it", paste(setdiff(WCC_TYPES, stsim_list("FlowType")$Name), collapse = ", ")) else {
   wcv <- tryCatch(wcc_shares(fread(pkg_file("defaults", "stockflow", "wetland-change-carbon.csv"), colClasses = "character"), tryCatch(as.data.table(datasheet(scn, ds("WetlandChangeCarbon"), optional = TRUE)), error = function(e) NULL)), error = function(e) fail("%s", conditionMessage(e)))
   wcr <- wcc_rows(wcv, fread(pkg_file("defaults", "transitions", "pathways", "wetland-change.csv"), colClasses = "character", na.strings = ""))[FromStateClassId %in% scl$Name]
   ev_def <- rbind(ev_def, wcr, fill = TRUE); say("Wetland change carbon, a wetland cell that becomes water: %s; %d event rows", wcc_label(wcv), nrow(wcr)) }

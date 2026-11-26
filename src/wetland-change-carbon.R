@@ -12,12 +12,16 @@
 # judged range, shown on the page, not sampled). The page (package.xml WetlandChangeCarbon, single row) replaces a default when filled.
 # Wetland to barren (emergent classes): the live plants die into litter and root litter; nothing leaves the cell.
 # Water or barren that becomes wetland, and barren that becomes water, have no row.
-# The rows use flow types of their own (WCC_TYPES), not the LULC ones: the emergent classes' flow multipliers set every LULC flow
-# group to 0 (defaults/stockflow/nonforest-multipliers-wetland.csv), which would silence them.
+# Emission and mortality use the standard land-use change flow types; the transition group of each row says which event it is (user
+# 2026-11-26: "Why not just turn the standard pathways on?"). The emergent classes' flow multipliers used to set every LULC flow group
+# to 0 (defaults/stockflow/nonforest-multipliers-wetland.csv), which silenced these rows and the classes' own fire rows; those 380
+# rows are gone. Carbon carried to Aquatic has two flow types of its own: no standard event type goes to Aquatic, and the yearly
+# lateral transport types carry each class's small yearly rate as their multiplier.
 # =============================================================================
 WCC_WATER <- "Wetland Change: to Water [Type]"; WCC_BARREN <- "Wetland Change: to Barren [Type]"; WCC_COASTAL <- "Estuarine"
-WCC_TYPES <- c(emit_live = "Wetland Change: Emission Live CO2", emit_dom = "Wetland Change: Emission DOM CO2", export_live = "Wetland Change: Export Live",
-               export_dom = "Wetland Change: Export DOM", die = "Wetland Change: Mortality Live")
+WCC_TYPES <- c(emit_live = "LULC: Emission Live CO2", emit_dom = "LULC: Emission DOM CO2", export_live = "Wetland Change: Export Live",
+               export_dom = "Wetland Change: Export DOM", die = "LULC: Mortality Live")
+WCC_NEW <- WCC_TYPES[c("export_live", "export_dom")]   # the two the package adds to the standard set
 WCC_LIVE <- paste("Biomass:", c("Coarse Root", "Fine Root", "Foliage", "Merchantable", "Other Wood")); WCC_SOIL <- "DOM: Belowground Slow"
 WCC_LITTER <- paste("DOM:", c("Aboveground Very Fast", "Aboveground Fast", "Aboveground Medium", "Aboveground Slow", "Belowground Very Fast", "Belowground Fast", "Snag Stem", "Snag Branch"))
 WCC_COLS <- c("Iteration", "Timestep", "FromStratumId", "FromSecondaryStratumId", "FromTertiaryStratumId", "FromStateClassId", "FromAgeMin", "FromStockTypeId", "ToStratumId", "ToStateClassId", "ToAgeMin",

@@ -32,13 +32,14 @@ check("to barren: the emergent classes only, live pools to dead pools, nothing l
         all(grepl("^Biomass: ", tb$FromStockTypeId)) && all(grepl("^DOM: ", tb$ToStockTypeId)) && all(tb$FlowTypeId == WCC_TYPES[["die"]]))
 check("to barren: every live pool dies whole", all(abs(sh[TransitionGroupId == WCC_BARREN, s] - 1) < 1e-9) && sh[TransitionGroupId == WCC_BARREN, uniqueN(FromStockTypeId)] == 5)
 check("no row is given twice", !anyDuplicated(w[, paste(TransitionGroupId, FromStateClassId, FromStockTypeId, ToStockTypeId)]))
-check("the events use flow types of their own (the emergent classes' LULC flow multipliers are 0)", all(w$FlowTypeId %in% WCC_TYPES) && all(WCC_TYPES %in% ft))
+check("emission and mortality use the standard land-use change flow types; only the carry to Aquatic has its own", all(w$FlowTypeId %in% WCC_TYPES) && all(WCC_TYPES %in% ft) &&
+        identical(unname(WCC_TYPES[c("emit_live", "emit_dom", "die")]), c("LULC: Emission Live CO2", "LULC: Emission DOM CO2", "LULC: Mortality Live")) && sum(grepl("^Wetland Change", ft)) == 2)
 fm <- rd("stockflow", "nonforest-multipliers-wetland.csv")
-check("no flow multiplier names the events' flow types", !any(sub(" \\[Type\\]$", "", fm$FlowGroupId) %in% WCC_TYPES))
+check("no wetland flow multiplier switches a land-use change flow off (user 2026-11-26: the standard pathways are on)", !any(grepl("^LULC: ", fm$FlowGroupId)) && !any(sub(" \\[Type\\]$", "", fm$FlowGroupId) %in% WCC_TYPES))
 mem <- rd("stockflow", "stsim_FlowTypeGroupMembership.csv"); fo <- rd("stockflow", "stsim_FlowOrder.csv"); of <- rd("stockflow", "stsim_OutputFilterFlows.csv")
 check("each flow type has its groups, order and output row", all(WCC_TYPES %in% mem$FlowTypeId) && all(WCC_TYPES %in% fo$FlowTypeId) && all(paste(WCC_TYPES, "[Type]") %in% of[[1]]))
 check("emission counts as emission and export as lateral flux, both against net biome productivity",
-      all(mem[FlowTypeId %in% WCC_TYPES[c("emit_live", "emit_dom")], .(ok = "Emission: Total" %in% FlowGroupId && "Net Biome Productivity" %in% FlowGroupId), by = FlowTypeId]$ok) &&
+      all(mem[FlowTypeId %in% WCC_TYPES[c("emit_live", "emit_dom")], .(ok = "Emission: Total" %in% FlowGroupId && "Net Biome Productivity" %in% FlowGroupId), by = FlowTypeId]$ok) && !anyDuplicated(mem[, paste(FlowTypeId, FlowGroupId)]) &&
         all(mem[FlowTypeId %in% WCC_TYPES[c("export_live", "export_dom")], .(ok = "Lateral Flux" %in% FlowGroupId && "Net Biome Productivity" %in% FlowGroupId), by = FlowTypeId]$ok))
 # the page over the defaults
 pg <- data.table(CoastalSoilEmitted = 0.75, CoastalSoilAquatic = NA_real_); v2 <- wcc_shares(def, pg)

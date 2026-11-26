@@ -4,7 +4,7 @@
 # Writes, removing its own earlier rows first (so a rerun changes nothing) and touching no other row:
 #   defaults/stockflow/event-pathways.csv              the event rows at the default shares (defaults/stockflow/wetland-change-carbon.csv);
 #                                                      stage 3 writes them again from the Build's Wetland Change Carbon page
-#   defaults/stsim/stsim_FlowType.csv                  the five flow types of the events (WCC_TYPES)
+#   defaults/stsim/stsim_FlowType.csv                  the two flow types that carry carbon to Aquatic (WCC_NEW); the rest are standard
 #   defaults/stockflow/stsim_FlowTypeGroupMembership.csv, stsim_FlowOrder.csv, stsim_OutputFilterFlows.csv   their groups, order and output
 # Usage: Rscript tools/make_wetland_change.R
 # =============================================================================
@@ -17,14 +17,13 @@ edit <- function(f, mine, add) { l <- sub("\r$", "", readLines(f, encoding = "UT
   cat(sprintf("%s: %d lines removed, %d written\n", sub(paste0(pkg, "/"), "", f, fixed = TRUE), length(l) - length(keep), length(add))) }
 v <- wcc_shares(rd("stockflow", "wetland-change-carbon.csv")); x <- wcc_rows(v, rd("transitions", "pathways", "wetland-change.csv"))
 edit(D("stockflow", "event-pathways.csv"), function(l) grepl(",Wetland Change: [A-Za-z ]+ \\[Type\\],", l), x[, do.call(paste, c(lapply(.SD, function(z) ifelse(is.na(z), "", z)), sep = ","))])
-mine <- function(l) grepl("^,*Wetland Change: (Emission|Export|Mortality) ", l); T <- WCC_TYPES
-edit(D("stsim", "stsim_FlowType.csv"), mine, sprintf("%s,%s", T, c("Wetland that becomes water: live carbon emitted as CO2", "Wetland that becomes water: dead and soil carbon emitted as CO2",
-                                                                    "Wetland that becomes water: live carbon carried to Aquatic", "Wetland that becomes water: dead and soil carbon carried to Aquatic",
-                                                                    "Emergent wetland that becomes barren: the plants die into litter")))
+mine <- function(l) grepl("^,*Wetland Change: (Emission|Export|Mortality) ", l); T <- WCC_NEW
+edit(D("stsim", "stsim_FlowType.csv"), mine, sprintf("%s,%s", T, c(
+                                                                    "Wetland that becomes water: live carbon carried to Aquatic", "Wetland that becomes water: dead and soil carbon carried to Aquatic")))
 emit <- function(t, pool) sprintf("%s,%s,%s", t, c("Emission: Total", "Emission: Total (CO2e)", "LULC: Emission", "LULC: Emission (CO2e)", "LULC: Emission CO2", "LULC: Emission CO2 (CO2e)", paste("LULC: Emission", pool),
                                                    sprintf("LULC: Emission %s (CO2e)", pool), "Net Biome Productivity", "Net Biome Productivity (CO2e)"), c(1, 3.67, 1, 3.67, 1, 3.67, 1, 3.67, -1, -3.67))
 export <- function(t) sprintf("%s,%s,%s", t, c("Lateral Flux", "Lateral Flux (CO2e)", "Net Biome Productivity", "Net Biome Productivity (CO2e)"), c(1, 3.67, -1, -3.67))
-edit(D("stockflow", "stsim_FlowTypeGroupMembership.csv"), mine, c(emit(T[["emit_live"]], "Live"), emit(T[["emit_dom"]], "DOM"), export(T[["export_live"]]), export(T[["export_dom"]]), sprintf("%s,LULC: Mortality,1", T[["die"]])))
-edit(D("stockflow", "stsim_FlowOrder.csv"), mine, sprintf(",,%s,%s", T, c(11, 10, 11, 10, 11)))
+edit(D("stockflow", "stsim_FlowTypeGroupMembership.csv"), mine, c(export(T[["export_live"]]), export(T[["export_dom"]])))
+edit(D("stockflow", "stsim_FlowOrder.csv"), mine, sprintf(",,%s,%s", T, c(11, 10)))
 edit(D("stockflow", "stsim_OutputFilterFlows.csv"), mine, sprintf("%s [Type],Yes,No,No", T))
 cat(wcc_label(v), "\n")

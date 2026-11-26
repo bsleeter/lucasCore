@@ -75,8 +75,5 @@ Emission Emergent: BG Slow -> Atmosphere CH4,"Emergent wetlands: soil carbon rel
 Emission Emergent: BG Very Fast -> Atmosphere,"Emergent wetlands: root litter carbon released as CO2, with the wetland temperature response (Q10 Wetland Flows)"
 Emission Emergent: AG Very Fast -> Atmosphere,"Emergent wetlands: aboveground litter carbon released as CO2, with the wetland temperature response (Q10 Wetland Flows)"
 Decay Emergent: BG Very Fast -> BG Slow,"Emergent wetlands: root litter carbon moved to the soil, with the wetland temperature response (Q10 Wetland Flows)"
-Wetland Change: Emission Live CO2,Wetland that becomes water: live carbon emitted as CO2
-Wetland Change: Emission DOM CO2,Wetland that becomes water: dead and soil carbon emitted as CO2
 Wetland Change: Export Live,Wetland that becomes water: live carbon carried to Aquatic
 Wetland Change: Export DOM,Wetland that becomes water: dead and soil carbon carried to Aquatic
-Wetland Change: Mortality Live,Emergent wetland that becomes barren: the plants die into litter
