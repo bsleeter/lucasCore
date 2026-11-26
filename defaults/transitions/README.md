@@ -34,7 +34,10 @@
     Source `DsweFolder`) says whether a pixel is water (beside wetland a change must hold 5 clear years; elsewhere a pixel turns to water
     at 70% open and back at 30%), and the annual NLCD says what the land side is. `Classes` are the rule's change codes (1 to water,
     2 water to wetland, 3 water to barren, 4 wetland to barren, 5 barren to wetland). Each cell gets the share of its 30 m pixels with
-    the change that year, as its chance of the transition; the cell's own class picks the pathway (`pathways/wetland-change.csv`). The
+    the change that year; whole cells are then taken by rank, largest share first, until the year's 30 m area is met, and written as 1 / 0
+    (as drought and insect mortality, user 2026-11-25), so the area follows the 30 m rule and every iteration is the same. A cell is
+    taken only where its class has the pathway (`pathways/wetland-change.csv`) and no other transition is on it that year; area flagged
+    on cells with no pathway lands on the next-ranked cells that have one, and what does not fill a cell carries to the next year. The
     two emergent wetland types share codes 2|5 and stage 6 gives each the cells whose nearest wetland type (stage 5) is its own. With no
     DSWE files the source is left out and the types keep a zero target.
 - `pathways/reforestation.csv` (2026-11-12, `tools/make_reforestation.R`): Barren, the sage family, Non-sage, Chaparral, the grass

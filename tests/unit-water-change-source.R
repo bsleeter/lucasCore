@@ -51,6 +51,13 @@ wg <- tg[grepl("^Wetland Change", TransitionTypeId)]
 check("the six types are in the Gain and Loss groups", nrow(wg) == 6 && all(wg$TransitionGroupId %in% grp[[1]]) && setequal(wg[TransitionGroupId == "Wetland Change: Loss", TransitionTypeId], c("Wetland Change: to Water", "Wetland Change: to Barren")))
 s6 <- paste(readLines("src/6-historical-transitions.R", warn = FALSE), collapse = "\n")
 check("stage 6 reads the source and leaves it out when there is no DSWE", grepl('so[Source == "WaterChange"]', s6, fixed = TRUE) && grepl('read_data_sources("DsweFolder", optional = TRUE)', s6, fixed = TRUE))
+# ranked placement (user 2026-11-25): whole cells by rank, as mortality; stage 6 calls mortality_select with the pathway as the only gate
+check("stage 6 places the changes by rank as whole cells", grepl("mortality_select(sh, can, all7, room, carry7[[k$g]], can)", s6, fixed = TRUE) && grepl('"INT1U")\n          nxt[s$sel] <- k$to[match(cur7[s$sel], k$from)]', gsub("\r", "", s6), fixed = TRUE))
+source("src/mortality.R")
+sh <- c(0.9, 0.6, 0.5, 0.4, 0.3, 0); can <- c(TRUE, TRUE, FALSE, TRUE, TRUE, TRUE); room <- c(1, 0.5, 1, 1, 1, 1); s <- mortality_select(sh, can, rep(TRUE, 6), room, 0.2, can)
+check("the year's area is the shares on cells with the pathway, less what another transition holds, plus the shares on cells without it and the carry",
+      isTRUE(all.equal(s$target, 0.2 + 0.9 + 0.5 + 0.4 + 0.3 + 0.5)) && isTRUE(all.equal(s$moved, 0.5)) && isTRUE(all.equal(s$held, 0.1)))
+check("whole free cells are taken from the largest share down, and the rest carries", identical(s$sel, c(1L, 4L)) && isTRUE(all.equal(s$carry, 0.8)))
 check("the file name pattern is the download's", grepl(sprintf('DSWE_FILE <- "%s"', WATER_DSWE_FILE), paste(readLines("src/download-sources.R", warn = FALSE), collapse = "
 "), fixed = TRUE))
 cat(sprintf("%d checks, %d failed\n", n, fails)); if (fails) quit(status = 1)
