@@ -669,29 +669,31 @@ if (nrow(wcg)) {
     # cells are taken from the largest share down until the year's 30 m area is met, and written as 1 / 0, so the area matches the 30 m
     # rule and the historical run is the same in every iteration. A cell takes a change only where its class has the pathway and no
     # fire, harvest, mortality, land-use change or other water change is on it that year; the area flagged on cells whose class has no
-    # pathway (a water pixel that becomes marsh inside a marsh cell) lands on the next-ranked cells that have one. What is left over
+    # pathway (a water pixel that becomes marsh inside a marsh cell) lands on the next-ranked cells that have one; but area flagged on a
+    # cell of a class outside these transitions (cropland, grassland: no pathway of any of them starts or ends there) is dropped, as
+    # change in and out of agriculture is handled by the land-use sources (user 2026-11-25). What is left over
     # (less than a cell, or no cell free) carries to the next year. The class each cell holds is followed through the years, so a
     # reservoir bed that went to Barren can go back to Water.
     gi <- lapply(seq_len(nrow(wcg)), function(i) { g <- wcg$TransitionGroupId[i]; p <- unique(pw[TransitionTypeId %in% grp_types(g), .(StateClassIdSource, StateClassIdDest)]); dest <- unique(p$StateClassIdDest)
       list(g = g, cs = wcg$Classes[i], from = sid(p$StateClassIdSource), to = sid(p$StateClassIdDest),
            gate = if (identical(dest, "Wetland: Estuarine Emergent")) est else if (identical(dest, "Wetland: Palustrine Emergent")) !est else rep(TRUE, length(vS))) })
     other7 <- layers[(Source %in% c("Mtbs", "Landfire", "Lcms", "NlcdClearcut") | TransitionGroupId == MORT_GROUP) & !is.na(File) & Timestep %in% wout]
-    cur7 <- vS; carry7 <- setNames(numeric(nrow(wcg)), wcg$TransitionGroupId); ws7 <- list(); mv7 <- list(); bad7 <- 0L; all7 <- rep(TRUE, length(vS))
+    cur7 <- vS; carry7 <- setNames(numeric(nrow(wcg)), wcg$TransitionGroupId); ws7 <- list(); mv7 <- list(); bad7 <- 0L; all7 <- rep(TRUE, length(vS)); fam7 <- unique(unlist(lapply(gi, function(k) c(k$from, k$to))))
     for (j in seq_len(J)) { y <- wout[j]; room <- rep(1, length(vS)); for (p in other7[Timestep == y, File]) { w <- values(rast(p), mat = FALSE); w[is.na(w)] <- 0; room <- room - w }
       room <- pmax(0, room); room[!land] <- 0; room[lu_on[[as.character(y)]]] <- 0; nxt <- cur7
-      for (k in gi) { sh <- FRs[[k$cs]][, j]; sh[is.na(sh) | !k$gate] <- 0; can <- land & cur7 %in% k$from
+      for (k in gi) { sh <- FRs[[k$cs]][, j]; sh[is.na(sh) | !k$gate] <- 0; out <- !(cur7 %in% fam7); drop <- sum(sh[out]); sh[out] <- 0; can <- land & cur7 %in% k$from
         s <- mortality_select(sh, can, all7, room, carry7[[k$g]], can); carry7[[k$g]] <- s$carry; f <- NA_character_
         o <- which(sh > 0 & !can); if (length(o)) mv7[[length(mv7) + 1]] <- data.table(TransitionGroupId = k$g, Class = cur7[o], Area = sh[o] * cell_km2)
         if (length(s$sel)) { bad7 <- bad7 + sum(!(can & room >= 1 - 1e-9)[s$sel]); v <- integer(length(vS)); v[s$sel] <- 1L; v[!land] <- NA_integer_
           f <- write_raster(setValues(rast(P), v), sprintf("WaterChange-%s_%d.tif", gsub("[^A-Za-z0-9]+", "-", sub(TYPE_SUFFIX, "", k$g, fixed = TRUE)), y), "INT1U")
           nxt[s$sel] <- k$to[match(cur7[s$sel], k$from)]; room[s$sel] <- 0 }
         layers <- rbind(layers, data.table(Timestep = y, TransitionGroupId = k$g, Source = "WaterChange", File = f))
-        ws7[[length(ws7) + 1]] <- data.table(Timestep = y, TransitionGroupId = k$g, Flagged = s$flagged * cell_km2, NoPathway = s$moved * cell_km2, Held = s$held * cell_km2, Placed = length(s$sel) * cell_km2) }
+        ws7[[length(ws7) + 1]] <- data.table(Timestep = y, TransitionGroupId = k$g, Flagged = (s$flagged + drop) * cell_km2, Dropped = drop * cell_km2, NoPathway = s$moved * cell_km2, Held = s$held * cell_km2, Placed = length(s$sel) * cell_km2) }
       cur7 <- nxt }
-    wc_sum <- rbindlist(ws7); tw <- wc_sum[, lapply(.SD, sum), by = TransitionGroupId, .SDcols = c("Flagged", "NoPathway", "Held", "Placed")]
+    wc_sum <- rbindlist(ws7); tw <- wc_sum[, lapply(.SD, sum), by = TransitionGroupId, .SDcols = c("Flagged", "Dropped", "NoPathway", "Held", "Placed")]
     say("Water, wetland and barren change on the model grid (%.1f km2 of 30 m pixels in the blocks read, %.1f km2 inside the study area), placed by rank as whole cells:", sum(vapply(wc_area, `[[`, 0, "pixels")), sum(vapply(wc_area, `[[`, 0, "grid")))
-    for (i in seq_len(nrow(tw))) with(tw[i], say("  %s: %.1f km2 flagged, %.1f km2 of it on cells whose class has no pathway (placed on the next-ranked cells), %.1f km2 held back for another transition in the cell that year; %.1f km2 placed, %.2f km2 left over at the end",
-                                                  sub(TYPE_SUFFIX, "", TransitionGroupId, fixed = TRUE), Flagged, NoPathway, Held, Placed, carry7[[TransitionGroupId]] * cell_km2))
+    for (i in seq_len(nrow(tw))) with(tw[i], say("  %s: %.1f km2 flagged, %.1f km2 of it dropped (on cells of classes outside these transitions, such as cropland), %.1f km2 on cells whose class has no pathway (placed on the next-ranked cells), %.1f km2 held back for another transition in the cell that year; %.1f km2 placed, %.2f km2 left over at the end",
+                                                  sub(TYPE_SUFFIX, "", TransitionGroupId, fixed = TRUE), Flagged, Dropped, NoPathway, Held, Placed, carry7[[TransitionGroupId]] * cell_km2))
     if (length(mv7)) { mv <- rbindlist(mv7)[, .(Area = sum(Area)), by = .(TransitionGroupId, Class)][order(TransitionGroupId, -Area)]
       for (g in unique(mv$TransitionGroupId)) say("  %s, the classes of the cells with no pathway: %s", sub(TYPE_SUFFIX, "", g, fixed = TRUE),
                                                   paste(mv[TransitionGroupId == g][seq_len(min(5L, .N)), sprintf("%s %.1f km2", scl$Name[match(Class, scl$Id)], Area)], collapse = ", ")) }
@@ -699,8 +701,8 @@ if (nrow(wcg)) {
     check(STAGE, "water change: each cell's shares are between 0 and 1", wc_top <= 1 + 1e-6, sprintf("max %.4f", wc_top))
     check(STAGE, "water change: the area on the model grid is no more than the 30 m area read", all(vapply(wc_area, function(z) z[["grid"]] <= z[["pixels"]] * (1 + 1e-6) + 1e-6, TRUE)),
           paste(sprintf("%s: %.2f against %.2f km2", names(wc_area), vapply(wc_area, `[[`, 0, "grid"), vapply(wc_area, `[[`, 0, "pixels")), collapse = "; "))
-    check(STAGE, "water change: the area placed and left over equals the area flagged less the area held back", all(abs(tw$Placed + carry7[tw$TransitionGroupId] * cell_km2 - (tw$Flagged - tw$Held)) < 1e-6 * pmax(1, tw$Flagged) + 1e-6),
-          paste(sprintf("%s: %.2f placed + %.2f left over against %.2f", sub(TYPE_SUFFIX, "", tw$TransitionGroupId, fixed = TRUE), tw$Placed, carry7[tw$TransitionGroupId] * cell_km2, tw$Flagged - tw$Held), collapse = "; "))
+    check(STAGE, "water change: the area placed and left over equals the area flagged less the area dropped and held back", all(abs(tw$Placed + carry7[tw$TransitionGroupId] * cell_km2 - (tw$Flagged - tw$Dropped - tw$Held)) < 1e-6 * pmax(1, tw$Flagged) + 1e-6),
+          paste(sprintf("%s: %.2f placed + %.2f left over against %.2f", sub(TYPE_SUFFIX, "", tw$TransitionGroupId, fixed = TRUE), tw$Placed, carry7[tw$TransitionGroupId] * cell_km2, tw$Flagged - tw$Dropped - tw$Held), collapse = "; "))
     check(STAGE, "water change: every chosen cell has the pathway and no other transition that year", bad7 == 0L, sprintf("%d cells", bad7))
   }
 }

@@ -37,7 +37,8 @@
     the change that year; whole cells are then taken by rank, largest share first, until the year's 30 m area is met, and written as 1 / 0
     (as drought and insect mortality, user 2026-11-25), so the area follows the 30 m rule and every iteration is the same. A cell is
     taken only where its class has the pathway (`pathways/wetland-change.csv`) and no other transition is on it that year; area flagged
-    on cells with no pathway lands on the next-ranked cells that have one, and what does not fill a cell carries to the next year. The
+    on cells with no pathway lands on the next-ranked cells that have one (but is dropped on cells of a class outside these transitions,
+    such as cropland: change in and out of agriculture belongs to the land-use sources, user 2026-11-25), and what does not fill a cell carries to the next year. The
     two emergent wetland types share codes 2|5 and stage 6 gives each the cells whose nearest wetland type (stage 5) is its own. With no
     DSWE files the source is left out and the types keep a zero target.
 - `pathways/reforestation.csv` (2026-11-12, `tools/make_reforestation.R`): Barren, the sage family, Non-sage, Chaparral, the grass
