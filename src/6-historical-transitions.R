@@ -636,7 +636,7 @@ if (mort_on && MORT_GROUP %in% so$TransitionGroupId) {
 # out and the types keep a zero target.
 wcg <- so[Source == "WaterChange"]; wc_sum <- NULL
 if (nrow(wcg)) {
-  source(pkg_file("src", "water-change.R"))
+  source(pkg_file("src", "water-change.R")); source(pkg_file("src", "wetland-change-carbon.R"))
   dsw <- tryCatch(read_data_sources("DsweFolder", optional = TRUE)$DsweFolder, error = function(e) NA_character_)
   nly <- (y0 - WATER_LEAD):(y1 + 4L); nly <- nly[file.exists(nlcd_file(src$NlcdFolder, nly))]; wall <- water_rule_years(y0, y1, nly)
   f_dw <- function(y) { f <- file.path(dsw, sprintf(WATER_DSWE_FILE, y)); if (file.exists(f)) f else NULL }
@@ -674,14 +674,17 @@ if (nrow(wcg)) {
     # change in and out of agriculture is handled by the land-use sources (user 2026-11-25). What is left over
     # (less than a cell, or no cell free) carries to the next year. The class each cell holds is followed through the years, so a
     # reservoir bed that went to Barren can go back to Water.
+    # An upland forest, shrub or grass cell (up7) can become water too (user 2026-11-26, a new reservoir), but only in a year at least
+    # WATER_UPLAND_SHARE of its pixels turned to water: a strip of shoreline in a mostly-forest cell is still dropped, or the ranking
+    # would turn whole forest cells to water for a lake's yearly rise and fall. Such a cell is Barren if the water later leaves.
     gi <- lapply(seq_len(nrow(wcg)), function(i) { g <- wcg$TransitionGroupId[i]; p <- unique(pw[TransitionTypeId %in% grp_types(g), .(StateClassIdSource, StateClassIdDest)]); dest <- unique(p$StateClassIdDest)
       list(g = g, cs = wcg$Classes[i], from = sid(p$StateClassIdSource), to = sid(p$StateClassIdDest),
            gate = if (identical(dest, "Wetland: Estuarine Emergent")) est else if (identical(dest, "Wetland: Palustrine Emergent")) !est else rep(TRUE, length(vS))) })
     other7 <- layers[(Source %in% c("Mtbs", "Landfire", "Lcms", "NlcdClearcut") | TransitionGroupId == MORT_GROUP) & !is.na(File) & Timestep %in% wout]
-    cur7 <- vS; carry7 <- setNames(numeric(nrow(wcg)), wcg$TransitionGroupId); ws7 <- list(); mv7 <- list(); bad7 <- 0L; all7 <- rep(TRUE, length(vS)); fam7 <- unique(unlist(lapply(gi, function(k) c(k$from, k$to))))
+    cur7 <- vS; carry7 <- setNames(numeric(nrow(wcg)), wcg$TransitionGroupId); ws7 <- list(); mv7 <- list(); bad7 <- 0L; all7 <- rep(TRUE, length(vS)); up7 <- scl$Id[grepl(WCC_UPLAND, scl$Name) & !grepl("Wetland", scl$Name)]; fam7 <- setdiff(unique(unlist(lapply(gi, function(k) c(k$from, k$to)))), up7)
     for (j in seq_len(J)) { y <- wout[j]; room <- rep(1, length(vS)); for (p in other7[Timestep == y, File]) { w <- values(rast(p), mat = FALSE); w[is.na(w)] <- 0; room <- room - w }
       room <- pmax(0, room); room[!land] <- 0; room[lu_on[[as.character(y)]]] <- 0; nxt <- cur7
-      for (k in gi) { sh <- FRs[[k$cs]][, j]; sh[is.na(sh) | !k$gate] <- 0; out <- !(cur7 %in% fam7); drop <- sum(sh[out]); sh[out] <- 0; can <- land & cur7 %in% k$from
+      for (k in gi) { sh <- FRs[[k$cs]][, j]; sh[is.na(sh) | !k$gate] <- 0; out <- !(cur7 %in% fam7) & !(cur7 %in% k$from & sh >= WATER_UPLAND_SHARE); drop <- sum(sh[out]); sh[out] <- 0; can <- land & cur7 %in% k$from
         s <- mortality_select(sh, can, all7, room, carry7[[k$g]], can); carry7[[k$g]] <- s$carry; f <- NA_character_
         o <- which(sh > 0 & !can); if (length(o)) mv7[[length(mv7) + 1]] <- data.table(TransitionGroupId = k$g, Class = cur7[o], Area = sh[o] * cell_km2)
         if (length(s$sel)) { bad7 <- bad7 + sum(!(can & room >= 1 - 1e-9)[s$sel]); v <- integer(length(vS)); v[s$sel] <- 1L; v[!land] <- NA_integer_

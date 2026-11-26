@@ -38,7 +38,8 @@ pw <- rd("transitions", "pathways", "wetland-change.csv"); scl <- rd("stsim", "s
 so <- rd("transitions", "sources.csv")[Source == "WaterChange"]; grp <- rd("stsim", "stsim_TransitionGroup.csv")
 check("pathway classes and types are in the stsim lists", all(c(pw$StateClassIdSource, pw$StateClassIdDest) %in% scl[[1]]) && all(pw$TransitionTypeId %in% tt[[1]]))
 check("no pathway is given twice", !anyDuplicated(pw[, paste(StateClassIdSource, TransitionTypeId)]))
-check("to Water leaves every wetland class and Barren", setequal(pw[TransitionTypeId == "Wetland Change: to Water", StateClassIdSource], c(grep("^Wetland: |^Disturbed: Wetland ", scl[[1]], value = TRUE), "Barren: All")))
+check("to Water leaves every wetland class, Barren, and the upland forest, shrub and grass classes", setequal(pw[TransitionTypeId == "Wetland Change: to Water", StateClassIdSource], c(grep("^(Wetland|Disturbed|Forest|Shrubland|Grassland): ", scl[[1]], value = TRUE), "Barren: All")))
+check("no agriculture or developed class has a wetland change pathway", !any(grepl("^(Agriculture|Developed): ", c(pw$StateClassIdSource, pw$StateClassIdDest))))
 check("new wetland is emergent, from Water or Barren only", setequal(pw[grepl("^Wetland: ", StateClassIdDest), StateClassIdDest], c("Wetland: Estuarine Emergent", "Wetland: Palustrine Emergent")) &&
         setequal(pw[grepl("^Wetland: ", StateClassIdDest), StateClassIdSource], c("Water: All", "Barren: All")))
 check("to Barren leaves Water and the emergent wetlands", setequal(pw[StateClassIdDest == "Barren: All", StateClassIdSource], c("Water: All", "Wetland: Estuarine Emergent", "Wetland: Palustrine Emergent")))

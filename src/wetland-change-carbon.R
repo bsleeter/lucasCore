@@ -5,7 +5,8 @@
 # what stays in the cell under water, all in the year of the change ("The three way split is good. All the fluxes should occur in the
 # transition year"), with the shares on a Build page ("expose these numbers ... in the UI during the Build").
 #   Coastal  the estuarine wetland classes (emergent and forested): the platform erodes or ponds
-#   Inland   every other wetland class (palustrine emergent, the forested groups and their disturbed twins): flooded in place
+#   Inland   every other class that can become water: the other wetland classes (palustrine emergent, the forested groups and their
+#            disturbed twins) and the upland forest, shrub and grass classes (a new reservoir, user 2026-11-26): flooded in place
 #   Soil     DOM: Belowground Slow (the top metre);  Plants and litter: the live pools and every other dead pool
 #   Deep Soil, DOM: Peat and DOM: Black Carbon have no row: they stay with the cell.
 # The shares and where each comes from: defaults/stockflow/wetland-change-carbon.csv (Default; Low and High are the published or
@@ -19,6 +20,7 @@
 # lateral transport types carry each class's small yearly rate as their multiplier.
 # =============================================================================
 WCC_WATER <- "Wetland Change: to Water [Type]"; WCC_BARREN <- "Wetland Change: to Barren [Type]"; WCC_COASTAL <- "Estuarine"
+WCC_UPLAND <- "^(Forest|Disturbed|Shrubland|Grassland): "; WCC_UPLAND_ROW <- "^,,,(Forest|Shrubland|Grassland|Disturbed): [^,]*,,Water: All,"   # the upland classes that can become water (tools/make_wetland_change.R)
 WCC_TYPES <- c(emit_live = "LULC: Emission Live CO2", emit_dom = "LULC: Emission DOM CO2", export_live = "Wetland Change: Export Live",
                export_dom = "Wetland Change: Export DOM", die = "LULC: Mortality Live")
 WCC_NEW <- WCC_TYPES[c("export_live", "export_dom")]   # the two the package adds to the standard set
@@ -27,7 +29,6 @@ WCC_LITTER <- paste("DOM:", c("Aboveground Very Fast", "Aboveground Fast", "Abov
 WCC_COLS <- c("Iteration", "Timestep", "FromStratumId", "FromSecondaryStratumId", "FromTertiaryStratumId", "FromStateClassId", "FromAgeMin", "FromStockTypeId", "ToStratumId", "ToStateClassId", "ToAgeMin",
               "ToStockTypeId", "TransitionGroupId", "StateAttributeTypeId", "FlowTypeId", "TargetType", "Multiplier", "TransferToStratumId", "TransferToSecondaryStratumId", "TransferToTertiaryStratumId", "TransferToStateClassId", "TransferToAgeMin")
 WCC_POOLS <- c("CoastalSoil", "CoastalPlant", "InlandSoil", "InlandPlant")
-
 # The shares: the defaults table (a data.table of defaults/stockflow/wetland-change-carbon.csv) with the page's row over it (blank = the
 # default). Returns a named numeric vector by Column; stops when a share is outside 0-1 or a pool's two shares pass 1.
 wcc_shares <- function(def, sheet = NULL) {
@@ -38,11 +39,10 @@ wcc_shares <- function(def, sheet = NULL) {
   for (p in WCC_POOLS) { s <- v[[paste0(p, "Emitted")]] + v[[paste0(p, "Aquatic")]]
     if (s > 1 + 1e-9) stop(sprintf("Wetland Change Carbon: %sEmitted + %sAquatic is %.3f; the two shares of a pool cannot pass 1", p, p, s)) }
   attr(v, "source") <- src; v }
-
 # The event rows (character columns, as defaults/stockflow/event-pathways.csv). v: wcc_shares(); pw: the pathways
 # (defaults/transitions/pathways/wetland-change.csv). A share of 0 writes no row.
 wcc_rows <- function(v, pw) {
-  wet <- pw[TransitionTypeId == "Wetland Change: to Water" & grepl("Wetland", StateClassIdSource), unique(StateClassIdSource)]
+  wet <- pw[TransitionTypeId == "Wetland Change: to Water" & !grepl("^(Barren|Water): ", StateClassIdSource), unique(StateClassIdSource)]   # every class with carbon to lose
   emg <- pw[TransitionTypeId == "Wetland Change: to Barren" & grepl("^Wetland: ", StateClassIdSource), unique(StateClassIdSource)]
   one <- function(cl, from, to, grp, type, m) data.table::data.table(FromStateClassId = cl, FromStockTypeId = from, ToStockTypeId = to, TransitionGroupId = grp, FlowTypeId = type, Multiplier = m)
   water <- data.table::rbindlist(lapply(wet, function(cl) { p <- if (grepl(WCC_COASTAL, cl, fixed = TRUE)) "Coastal" else "Inland"; g <- function(k) v[[paste0(p, k)]]
@@ -55,7 +55,6 @@ wcc_rows <- function(v, pw) {
   x <- rbind(water, barren)[Multiplier > 0]; x[, Multiplier := format(Multiplier, scientific = FALSE, trim = TRUE, drop0trailing = TRUE)]
   for (k in setdiff(WCC_COLS, names(x))) x[, (k) := NA_character_]
   data.table::setcolorder(x, WCC_COLS); x[] }
-
 # One line for the log: the shares in use and which came from the page.
 wcc_label <- function(v) { s <- attr(v, "source"); f <- function(p) sprintf("%.0f%% emitted, %.0f%% to Aquatic, %.0f%% stays", 100 * v[[paste0(p, "Emitted")]], 100 * v[[paste0(p, "Aquatic")]], 100 * (1 - v[[paste0(p, "Emitted")]] - v[[paste0(p, "Aquatic")]]))
   sprintf("coastal soil %s; coastal plants and litter %s; inland soil %s; inland plants and litter %s (%s)", f("CoastalSoil"), f("CoastalPlant"), f("InlandSoil"), f("InlandPlant"),

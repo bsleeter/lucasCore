@@ -2,6 +2,7 @@
 # make_wetland_change.R - the carbon of change among water, wetland and barren (to-do 2 step 5; src/wetland-change-carbon.R)
 # =============================================================================
 # Writes, removing its own earlier rows first (so a rerun changes nothing) and touching no other row:
+#   defaults/transitions/pathways/wetland-change.csv  the upland forest, shrub and grass classes to Water (one row per state class)
 #   defaults/stockflow/event-pathways.csv              the event rows at the default shares (defaults/stockflow/wetland-change-carbon.csv);
 #                                                      stage 3 writes them again from the Build's Wetland Change Carbon page
 #   defaults/stsim/stsim_FlowType.csv                  the two flow types that carry carbon to Aquatic (WCC_NEW); the rest are standard
@@ -15,6 +16,10 @@ rd <- function(...) fread(D(...), colClasses = "character", na.strings = "")
 edit <- function(f, mine, add) { l <- sub("\r$", "", readLines(f, encoding = "UTF-8")); keep <- c(l[1], l[-1][!mine(l[-1])])
   con <- file(f, "wb"); writeLines(c(keep, add), con, sep = "\r\n", useBytes = TRUE); close(con)
   cat(sprintf("%s: %d lines removed, %d written\n", sub(paste0(pkg, "/"), "", f, fixed = TRUE), length(l) - length(keep), length(add))) }
+# Upland forest, shrub and grass classes (and their disturbed twins) to Water (user 2026-11-26: "allow these vegetated classes to convert ...
+# capture new reservoir construction"). Not agriculture or developed: change in and out of those belongs to the land-use sources.
+sc <- rd("stsim", "stsim_StateClass.csv")$Name; veg <- sc[grepl(WCC_UPLAND, sc) & !grepl("Wetland", sc)]
+edit(D("transitions", "pathways", "wetland-change.csv"), function(l) grepl(WCC_UPLAND_ROW, l) & !grepl("^,,,Disturbed: Wetland ", l), sprintf(",,,%s,,Water: All,,,Wetland Change: to Water,1,,,,,Yes,,,", veg))
 v <- wcc_shares(rd("stockflow", "wetland-change-carbon.csv")); x <- wcc_rows(v, rd("transitions", "pathways", "wetland-change.csv"))
 edit(D("stockflow", "event-pathways.csv"), function(l) grepl(",Wetland Change: [A-Za-z ]+ \\[Type\\],", l), x[, do.call(paste, c(lapply(.SD, function(z) ifelse(is.na(z), "", z)), sep = ","))])
 mine <- function(l) grepl("^,*Wetland Change: (Emission|Export|Mortality) ", l); T <- WCC_NEW

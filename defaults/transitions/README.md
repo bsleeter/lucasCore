@@ -1,5 +1,4 @@
 # Historical transitions (stage 6)
-
 - `pathways/*.csv`: ST-Sim transition pathways, one file per set (urbanization, intensification, harvest, fire, ag expansion, ag
   contraction). Copied unchanged from `Data/Transition Pathways/Transitions - <Set>.csv`, the six sets the CONUS 1km
   build merged into its historical model. Stage 6 reads every file in the folder, so adding a set (insects, prescribed fire, succession,
@@ -39,17 +38,17 @@
     taken only where its class has the pathway (`pathways/wetland-change.csv`) and no other transition is on it that year; area flagged
     on cells with no pathway lands on the next-ranked cells that have one (but is dropped on cells of a class outside these transitions,
     such as cropland: change in and out of agriculture belongs to the land-use sources, user 2026-11-25), and what does not fill a cell carries to the next year. The
+    An upland forest, shrub or grass cell can become water as well (a new reservoir, user 2026-11-26), but only in a year at least half
+    its pixels turned to water; a strip of shoreline in such a cell is dropped. The
     two emergent wetland types share codes 2|5 and stage 6 gives each the cells whose nearest wetland type (stage 5) is its own. With no
     DSWE files the source is left out and the types keep a zero target.
 - `pathways/reforestation.csv` (2026-11-12, `tools/make_reforestation.R`): Barren, the sage family, Non-sage, Chaparral, the grass
   classes and Palustrine Emergent to every forest class, one type per forest class, age reset. Stage 6 gates each type to stage 5's
   ReforestType map (the forest type every cell would reach), as NaturalVeg gates Ag Contraction; Reforestation Options off drops the
   source (zero target).
-
 MTBS and LANDFIRE give each cell the fraction of its 30 m pixels that had the disturbance (over the same aggregation blocks as the NLCD),
 so the expected area matches the 30 m area. Within a source with several groups (fire severities), the cell's whole fraction goes to its
 most common group: ST-Sim lets a cell make one transition per timestep, so separate fractions would compete and under-burn.
-
 Every group with a source gets a multiplier in every year (an all-zero raster when nothing happened), the start year, and the year after
 the end year. Every pathway type with no time-varying source gets a zero transition target (a type with no multiplier and no target would
 run on every eligible cell). Types in the harvest set with no source (Selection 20%, Salvage Logging) get zero targets.

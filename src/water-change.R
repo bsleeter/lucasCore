@@ -62,6 +62,7 @@ water_change <- function(open, nlcd, hi = 70, lo = 30, line = 50, hold = 5L, lan
 # ---- stage 6: the rule over the Build's 30 m window ---------------------------------------------------------------------------
 WATER_DSWE_FILE <- "DSWE_open_water_%d.tif"   # one file a year in the DsweFolder Data Source (src/download-sources.R)
 WATER_LEAD <- 5L                                # years read before the start year, so the water state has settled by the first year wanted
+WATER_UPLAND_SHARE <- 0.5                       # an upland forest, shrub or grass cell becomes water only in a year this share of its pixels did (stage 6)
 # The years the rule reads for a Build of y0 to y1: `lead` years before the start year and `hold` - 1 after the end year (a wetland-side
 # change is confirmed only once it has held), kept to the years the annual NLCD has. A year with no DSWE file is read as no clear look.
 water_rule_years <- function(y0, y1, nlcd_years, lead = WATER_LEAD, hold = 5L) { yy <- (y0 - lead):(y1 + hold - 1L); yy[yy %in% nlcd_years] }

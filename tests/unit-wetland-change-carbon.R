@@ -49,9 +49,9 @@ check("a share of 0 writes no row", !nrow(wcc_rows(wcc_shares(def, data.table(Co
 px <- paste(readLines("package.xml", warn = FALSE), collapse = "\n")
 check("the Build page has a column for every share, with the default in its label", all(vapply(seq_len(nrow(def)), function(i) grepl(sprintf('<column name="%s" displayName="[^"]*blank = %s;', def$Column[i], format(as.numeric(def$Default[i]), nsmall = 2)), px), TRUE)))
 # the tool writes what the files hold (a rerun changes nothing)
-tmp <- file.path(tempdir(), "wcc"); unlink(tmp, recursive = TRUE); fs <- c("tools/make_wetland_change.R", "src/wetland-change-carbon.R", "defaults/stockflow/event-pathways.csv", "defaults/stockflow/wetland-change-carbon.csv",
+tmp <- file.path(tempdir(), "wcc"); unlink(tmp, recursive = TRUE); fs <- c("tools/make_wetland_change.R", "defaults/stsim/stsim_StateClass.csv", "defaults/transitions/pathways/wetland-change.csv", "src/wetland-change-carbon.R", "defaults/stockflow/event-pathways.csv", "defaults/stockflow/wetland-change-carbon.csv",
   "defaults/transitions/pathways/wetland-change.csv", "defaults/stsim/stsim_FlowType.csv", "defaults/stockflow/stsim_FlowTypeGroupMembership.csv", "defaults/stockflow/stsim_FlowOrder.csv", "defaults/stockflow/stsim_OutputFilterFlows.csv")
 for (f in fs) { dir.create(file.path(tmp, dirname(f)), recursive = TRUE, showWarnings = FALSE); file.copy(f, file.path(tmp, f)) }
 out <- system2(file.path(R.home("bin"), "Rscript"), shQuote(file.path(tmp, "tools", "make_wetland_change.R")), stdout = TRUE, stderr = TRUE)
-check("tools/make_wetland_change.R rewrites the files as they are", all(vapply(fs, function(f) identical(readLines(file.path(tmp, f)), readLines(f)), TRUE)))
+check("tools/make_wetland_change.R rewrites the files as they are", is.null(attr(out, "status")) && all(vapply(fs, function(f) identical(readLines(file.path(tmp, f)), readLines(f)), TRUE)))
 cat(sprintf("%d checks, %d failed\n", n, fails)); if (fails) quit(status = 1)
