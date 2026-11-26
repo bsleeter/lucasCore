@@ -103,6 +103,8 @@ load_run <- function(lib, rid) {
     if (nrow(tr_all)) tr_all[, `:=`(File = file.path(dd, "stsim_OutputSpatialTransition", basename(Filename)), Kind = fifelse(Grp == "Fire", "Fire", fifelse(grepl("^Mortality", Grp), "Mortality", "Harvest")))]
     sc_last <- q("SELECT Iteration, Filename FROM stsim_OutputSpatialState WHERE ScenarioId = %d AND Timestep = %d", rid, yrs[2])
     if (nrow(sc_last)) sc_last[, File := file.path(dd, "stsim_OutputSpatialState", basename(Filename))] }
+  # total ecosystem carbon by iteration (Tg C): the Monte Carlo range of the comparison figures (src/compare-figures.R)
+  te_it <- if (!is.null(it$stocks)) it$stocks[StockGroup == "Total Ecosystem", .(Iteration, Timestep, Tg = Mg / 1e6)] else NULL
   path <- function(folder, f) if (length(f) && !is.na(f[1])) file.path(dd, folder, basename(f[1])) else NA_character_
   ssm <- q("SELECT Timestep, Filename FROM stsim_OutputSpatialState WHERE ScenarioId = %d AND Iteration = 1", rid)
   # the stand age maps of iteration 1 in the first and last year (the stand age figure; a run without spatial age output has none)
@@ -128,7 +130,7 @@ load_run <- function(lib, rid) {
   pdm <- q("SELECT o.Timestep, g.Name AS Grp, o.Filename FROM stsim_OutputSpatialTransition o JOIN stsim_TransitionGroup g ON g.TransitionGroupId = o.TransitionGroupId
            WHERE o.ScenarioId = %d AND o.Iteration = 1 AND (g.Name LIKE 'Post-disturbance: %%' OR g.Name = 'Reforestation')", rid)
   if (nrow(pdm)) pdm[, File := vapply(Filename, function(f) path("stsim_OutputSpatialTransition", f), "")]
-  list(rid = rid, nit = nit, years = yrs, sc_list = sc, tt_list = tt, area = area, trans = trans, stocks = stocks, flows = flows, losses = losses, nbp_cls = nbp_cls, ch4 = ch4, unit_c = unit_c, unit_a = unit_a, it = it, tr_all = tr_all, sc_last = sc_last,
+  list(rid = rid, nit = nit, years = yrs, sc_list = sc, tt_list = tt, area = area, trans = trans, stocks = stocks, flows = flows, losses = losses, nbp_cls = nbp_cls, ch4 = ch4, unit_c = unit_c, unit_a = unit_a, te_it = te_it, it = it, tr_all = tr_all, sc_last = sc_last,
        sc0 = path("stsim_OutputSpatialState", ssm[Timestep == yrs[1], Filename]), sc1 = path("stsim_OutputSpatialState", ssm[Timestep == yrs[2], Filename]),
        fire = if (nrow(fm)) setNames(vapply(fm$Filename, function(f) path("stsim_OutputSpatialTransition", f), ""), fm$Timestep) else character(),
        harvest = if (nrow(hm)) setNames(vapply(hm$Filename, function(f) path("stsim_OutputSpatialTransition", f), ""), hm$Timestep) else character(),
