@@ -216,6 +216,14 @@ ev_def <- fread(pkg_file("defaults", "stockflow", "event-pathways.csv"), colClas
 # before the type existed has no such group: the event's rows are left out (mort_def FALSE)
 mort_def <- "Mortality: Drought and Insects" %in% stsim_list("TransitionType")$Name; MORT_DF <- "Drought and insect mortality"
 if (!mort_def) ev_def <- ev_def[TransitionGroupId != DF_GROUPS[[MORT_DF]]]
+# change among water, wetland and barren (to-do 2, lucasCore 2.1; src/wetland-change-carbon.R): the rows are written again from the
+# Wetland Change Carbon page (blank = the shares the file was made with). A library without the events' flow types takes none
+source(pkg_file("src", "wetland-change-carbon.R"))
+ev_def <- ev_def[!TransitionGroupId %in% c(WCC_WATER, WCC_BARREN)]
+if (!all(WCC_TYPES %in% stsim_list("FlowType")$Name)) say("Wetland change carbon: off, the library lacks the flow types (%s): run tools/add-definitions.R on it", paste(setdiff(WCC_TYPES, stsim_list("FlowType")$Name), collapse = ", ")) else {
+  wcv <- tryCatch(wcc_shares(fread(pkg_file("defaults", "stockflow", "wetland-change-carbon.csv"), colClasses = "character"), tryCatch(as.data.table(datasheet(scn, ds("WetlandChangeCarbon"), optional = TRUE)), error = function(e) NULL)), error = function(e) fail("%s", conditionMessage(e)))
+  wcr <- wcc_rows(wcv, fread(pkg_file("defaults", "transitions", "pathways", "wetland-change.csv"), colClasses = "character", na.strings = ""))[FromStateClassId %in% scl$Name]
+  ev_def <- rbind(ev_def, wcr, fill = TRUE); say("Wetland change carbon, a wetland cell that becomes water: %s; %d event rows", wcc_label(wcv), nrow(wcr)) }
 dfl <- as.data.table(datasheet(scn, ds("DisturbanceFlow"), optional = TRUE, lookupsAsFactors = FALSE)); df_src <- "Carbon Assumptions"
 if (!nrow(dfl)) { dfl <- preset("disturbance-flows"); df_src <- sprintf("the %s preset (the sheet is empty)", basename(preset_dir)) }
 # the grass, shrub and emergent wetland classes' own high-severity fire (to-do 39: chaparral 2026-11-06, the others 2026-11-07;

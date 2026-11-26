@@ -75,3 +75,8 @@ Iteration,Timestep,FlowTypeId,Order
 ,,Emission Emergent: BG Very Fast -> Atmosphere,6.5
 ,,Emission Emergent: AG Very Fast -> Atmosphere,6.5
 ,,Decay Emergent: BG Very Fast -> BG Slow,6.5
+,,Wetland Change: Emission Live CO2,11
+,,Wetland Change: Emission DOM CO2,10
+,,Wetland Change: Export Live,11
+,,Wetland Change: Export DOM,10
+,,Wetland Change: Mortality Live,11

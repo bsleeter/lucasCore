@@ -1,0 +1,9 @@
+Column,Case,Pool,Fate,Default,Low,High,Note
+CoastalSoilEmitted,Coastal,Soil,Atmosphere,0.40,0.25,1.00,"Top-metre soil of estuarine emergent marsh that becomes water. Default: the long-run loss of ponded Barataria marsh soil (Schoolmaster et al. 2022, about 40% over about 200 years, booked in the year of the change; figure from a US Fish and Wildlife Service summary, not checked against the paper). Range: Pendleton et al. 2012 (25 to 100%, central 63%); Baustian et al. 2023 used 75%; the EPA inventory assumes 100%"
+CoastalSoilAquatic,Coastal,Soil,Aquatic,0.10,0.00,0.25,"Judgment, no source: eroded marsh carbon is reported as mostly respired, not reburied (Sapkota and White 2019, 2021)"
+CoastalPlantEmitted,Coastal,Plants and litter,Atmosphere,0.75,0.50,1.00,"Judgment, no source. The EPA inventory emits all biomass"
+CoastalPlantAquatic,Coastal,Plants and litter,Aquatic,0.25,0.00,0.50,"Judgment, no source"
+InlandSoilEmitted,Inland,Soil,Atmosphere,0.10,0.00,0.40,"Top-metre soil of palustrine emergent and forested wetland that becomes water (flooded in place). Judgment, no source: the IPCC 2019 flooded land chapter could not be read (2026-11-25)"
+InlandSoilAquatic,Inland,Soil,Aquatic,0.00,0.00,0.10,"Judgment, no source"
+InlandPlantEmitted,Inland,Plants and litter,Atmosphere,1.00,0.50,1.00,"Judgment, following the inventory convention that flooded biomass is emitted"
+InlandPlantAquatic,Inland,Plants and litter,Aquatic,0.00,0.00,0.25,"Judgment, no source"

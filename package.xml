@@ -725,6 +725,20 @@
 		<column name="PinyonJuniperLine" displayName="The Same for Pinyon/Juniper (blank = 0.474)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0.01" formula2="1"/>
 		<column name="MinimumAge" displayName="Minimum Stand Age (yr; blank = 20)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="0" formula2="500"/>
 	</dataSheet>
+	<!-- Wetland Change Carbon (to-do 2, lucasCore 2.1; stage 3, src/wetland-change-carbon.R): what happens to the carbon of a wetland cell that becomes water, in the year of
+	     the change: a share of each pool is emitted as CO2, a share is carried to Aquatic, and the rest stays in the cell under water. Coastal = the estuarine wetland classes,
+	     Inland = every other wetland class. Deep soil, peat and black carbon always stay. Blank = the package value (defaults/stockflow/wetland-change-carbon.csv, which gives each
+	     value's source and range). The ranges are for the user's guidance; a run uses the one value. A sheet of its own: a new table needs no library update -->
+	<dataSheet name="WetlandChangeCarbon" displayName="Wetland Change Carbon" isSingleRow="True">
+		<column name="CoastalSoilEmitted" displayName="Coastal, Top-Metre Soil: Share Emitted as CO2 (blank = 0.40; range 0.25 to 1.00)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+		<column name="CoastalSoilAquatic" displayName="Coastal, Top-Metre Soil: Share Carried to Aquatic (blank = 0.10; range 0.00 to 0.25)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+		<column name="CoastalPlantEmitted" displayName="Coastal, Plants and Litter: Share Emitted as CO2 (blank = 0.75; range 0.50 to 1.00)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+		<column name="CoastalPlantAquatic" displayName="Coastal, Plants and Litter: Share Carried to Aquatic (blank = 0.25; range 0.00 to 0.50)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+		<column name="InlandSoilEmitted" displayName="Inland, Top-Metre Soil: Share Emitted as CO2 (blank = 0.10; range 0.00 to 0.40)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+		<column name="InlandSoilAquatic" displayName="Inland, Top-Metre Soil: Share Carried to Aquatic (blank = 0.00; range 0.00 to 0.10)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+		<column name="InlandPlantEmitted" displayName="Inland, Plants and Litter: Share Emitted as CO2 (blank = 1.00; range 0.50 to 1.00)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+		<column name="InlandPlantAquatic" displayName="Inland, Plants and Litter: Share Carried to Aquatic (blank = 0.00; range 0.00 to 0.25)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
+	</dataSheet>
 	<!-- Mortality in projections (to-do 3 phase 2, lucasCore 2.0.2; stage 9, src/mortality.R): the historical rates drawn in blocks of years, by ecodivision and
 	     softwood class; placed by a fitted surface, the record's patch sizes and spread from recent die-off. Blank = historical rates, blocks of 5, the Run Settings
 	     reference period, clustered. A sheet of its own: a Projection Setup's row on the Build's sheet would hide the Build's, and a new table needs no update -->
@@ -1738,6 +1752,7 @@
 		<dataSheet name="NonForestRate" type="Input"/>
 		<dataSheet name="Spinup" type="Input"/>
 		<dataSheet name="DisturbanceFlow" type="Input"/>
+		<dataSheet name="WetlandChangeCarbon" type="Input"/>
 		<dataSheet name="FireSnagShare" type="Input"/>
 		<dataSheet name="DecayCalibrationSetting" type="Input"/>
 		<dataSheet name="FixedDecayMultiplier" type="Input"/>
@@ -2126,6 +2141,7 @@
 					<item name="NonForestCarbon"/>
 					<item name="CarbonCapacityOptions"/>
 					<item name="WetlandCarbon"/>
+					<item name="WetlandChangeCarbon"/>
 				</group>
 				<group name="lucasCoreCrosswalks" displayName="Crosswalks">
 					<item name="LandCoverCrosswalk"/>

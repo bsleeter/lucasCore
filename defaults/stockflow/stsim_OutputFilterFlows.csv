@@ -122,3 +122,8 @@ Emission Emergent: BG Slow -> Atmosphere CH4 [Type],Yes,No,No
 Emission Emergent: BG Very Fast -> Atmosphere [Type],Yes,No,No
 Emission Emergent: AG Very Fast -> Atmosphere [Type],Yes,No,No
 Decay Emergent: BG Very Fast -> BG Slow [Type],Yes,No,No
+Wetland Change: Emission Live CO2 [Type],Yes,No,No
+Wetland Change: Emission DOM CO2 [Type],Yes,No,No
+Wetland Change: Export Live [Type],Yes,No,No
+Wetland Change: Export DOM [Type],Yes,No,No
+Wetland Change: Mortality Live [Type],Yes,No,No

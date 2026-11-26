@@ -531,3 +531,32 @@ Lateral Transport: AG Very Fast -> Aquatic,Q10 Wetland Flows,1
 Lateral Transport: BG Very Fast -> Aquatic,Q10 Wetland Flows,1
 Decay: AG Very Fast -> BG Slow,Q10 Wetland Flows,1
 Decay: AG Very Fast -> BG Slow,Decay: Total,1
+Wetland Change: Emission Live CO2,Emission: Total,1
+Wetland Change: Emission Live CO2,Emission: Total (CO2e),3.67
+Wetland Change: Emission Live CO2,LULC: Emission,1
+Wetland Change: Emission Live CO2,LULC: Emission (CO2e),3.67
+Wetland Change: Emission Live CO2,LULC: Emission CO2,1
+Wetland Change: Emission Live CO2,LULC: Emission CO2 (CO2e),3.67
+Wetland Change: Emission Live CO2,LULC: Emission Live,1
+Wetland Change: Emission Live CO2,LULC: Emission Live (CO2e),3.67
+Wetland Change: Emission Live CO2,Net Biome Productivity,-1
+Wetland Change: Emission Live CO2,Net Biome Productivity (CO2e),-3.67
+Wetland Change: Emission DOM CO2,Emission: Total,1
+Wetland Change: Emission DOM CO2,Emission: Total (CO2e),3.67
+Wetland Change: Emission DOM CO2,LULC: Emission,1
+Wetland Change: Emission DOM CO2,LULC: Emission (CO2e),3.67
+Wetland Change: Emission DOM CO2,LULC: Emission CO2,1
+Wetland Change: Emission DOM CO2,LULC: Emission CO2 (CO2e),3.67
+Wetland Change: Emission DOM CO2,LULC: Emission DOM,1
+Wetland Change: Emission DOM CO2,LULC: Emission DOM (CO2e),3.67
+Wetland Change: Emission DOM CO2,Net Biome Productivity,-1
+Wetland Change: Emission DOM CO2,Net Biome Productivity (CO2e),-3.67
+Wetland Change: Export Live,Lateral Flux,1
+Wetland Change: Export Live,Lateral Flux (CO2e),3.67
+Wetland Change: Export Live,Net Biome Productivity,-1
+Wetland Change: Export Live,Net Biome Productivity (CO2e),-3.67
+Wetland Change: Export DOM,Lateral Flux,1
+Wetland Change: Export DOM,Lateral Flux (CO2e),3.67
+Wetland Change: Export DOM,Net Biome Productivity,-1
+Wetland Change: Export DOM,Net Biome Productivity (CO2e),-3.67
+Wetland Change: Mortality Live,LULC: Mortality,1
