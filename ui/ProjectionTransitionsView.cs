@@ -105,6 +105,7 @@ namespace lucasCoreUI
             // open filled in: empty sheets this scenario may edit take the package defaults
             FillIfEmpty(SheetName, Defaults.PackageFile("defaults", "projection", "transitions.csv"), new Dictionary<string, string> { { "UnitSource", "UnitSourceId" } });
             FillIfEmpty(TransitionWalk.ALLOCATION, Defaults.PackageFile("defaults", "projection", "allocation.csv"), null);
+            if (this.Scenario != null && !this.Scenario.IsResult && this.ShouldEnableView()) { try { TransitionWalk.DropMortality(Sheet); } catch (Exception) { } }   // (2.0.4) a row a 2.0.3 page left
             Project p = this.Scenario != null ? this.Scenario.Project : this.DataFeed.Project;
             if (p != null) { try { m_walk.Ms.Load(p, this.Scenario); } catch (Exception) { } }
             if (p != null) { UnitCatalog units = UnitCatalog.Load(p); foreach (DemandCard dc in m_cards) dc.LoadLists(units); }

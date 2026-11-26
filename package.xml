@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<package name="lucasCore" displayName="LUCAS Core (model builder)" description="Builds LUCAS land-use and carbon models in ST-Sim from national datasets (FIA growth curves; CBM carbon parameters; spatial initial conditions; historical transitions and projections)" version="2.0.3" url="https://code.usgs.gov/LUCC/lucasCore" minSyncroSimVersion="3.1.29">
+<package name="lucasCore" displayName="LUCAS Core (model builder)" description="Builds LUCAS land-use and carbon models in ST-Sim from national datasets (FIA growth curves; CBM carbon parameters; spatial initial conditions; historical transitions and projections)" version="2.0.4" url="https://code.usgs.gov/LUCC/lucasCore" minSyncroSimVersion="3.1.29">
 
 	<builtFor package="stsim" version="4.5.4"/>
 
@@ -728,7 +728,7 @@
 	<!-- Mortality in projections (to-do 3 phase 2, lucasCore 2.0.2; stage 9, src/mortality.R): the historical rates drawn in blocks of years, by ecodivision and
 	     softwood class; placed by a fitted surface, the record's patch sizes and spread from recent die-off. Blank = historical rates, blocks of 5, the Run Settings
 	     reference period, clustered. A sheet of its own: a Projection Setup's row on the Build's sheet would hide the Build's, and a new table needs no update -->
-	<dataSheet name="MortalityProjection" displayName="Mortality" isSingleRow="True" viewClassName="lucasCoreUI.MortalityProjectionView" viewClassAssembly="lucasCoreUI">
+	<dataSheet name="MortalityProjection" displayName="Mortality" isSingleRow="True">
 		<column name="Projection" displayName="In Projections" dataType="Integer" validationType="List" formula1="1:Historical rates|2:Off" isOptional="True" defaultValue="1"/>
 		<column name="BlockYears" displayName="Historical Years Drawn Together (blank = 5)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="1" formula2="50"/>
 		<column name="ReferenceStartYear" displayName="Reference Start Year (blank = the Projection Options period)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="1900" formula2="2200"/>
@@ -736,6 +736,20 @@
 		<column name="ProjectionPlacement" displayName="Placement in Projections" dataType="Integer" validationType="List" formula1="1:Clustered (surface, patch sizes, spread)|2:Random cells" isOptional="True" defaultValue="1"/>
 		<column name="ClimateLink" displayName="Timing and Amount" dataType="Integer" validationType="List" formula1="1:As this setup draws them|2:From the Projection Climate result" isOptional="True" defaultValue="1"/>
 	</dataSheet>
+	<!-- Mortality covariates (lucasCore 2.0.4; stage 9, src/mortality.R): which covariates the surface that places projected drought and insect mortality may use.
+	     Blank = used. A sheet of its own, shown on the Mortality page through the feed below: a new table needs no library update, a new column of the sheet above would -->
+	<dataSheet name="MortalityCovariate" displayName="Mortality Surface Covariates" isSingleRow="True">
+		<column name="Canopy" displayName="Tree Canopy Cover in the Surface (blank = used)" dataType="Boolean" isOptional="True"/>
+		<column name="Elevation" displayName="Elevation in the Surface (blank = used)" dataType="Boolean" isOptional="True"/>
+		<column name="Slope" displayName="Slope in the Surface (blank = used)" dataType="Boolean" isOptional="True"/>
+		<column name="Temperature" displayName="Temperature Normal in the Surface (blank = used)" dataType="Boolean" isOptional="True"/>
+		<column name="Precipitation" displayName="Precipitation Normal in the Surface (blank = used)" dataType="Boolean" isOptional="True"/>
+		<column name="Vpd" displayName="Vapour Pressure Deficit Normal in the Surface (blank = used)" dataType="Boolean" isOptional="True"/>
+	</dataSheet>
+	<dataFeed name="MortalityProjectionPage" displayName="Mortality" viewClassName="lucasCoreUI.MortalityProjectionView" viewClassAssembly="lucasCoreUI">
+		<dataSheet name="MortalityProjection"/>
+		<dataSheet name="MortalityCovariate"/>
+	</dataFeed>
 	<!-- Mortality and Climate (lucasCore 2.0.3; stage 11, src/mortality.R): two settings for exploring a climate response of drought and insect mortality, on a
 	     Projection Climate scenario that also depends on a Projection Setup result. The setup's blocks of historical years are placed in the dry periods of the
 	     climate run (timing strength), and the rate of a year is raised by the depth of its dry period (increase in dry periods). Blank = neither: the setup's draws
@@ -1872,6 +1886,7 @@
 		<dataSheet name="ProjectionTransition" type="Input"/>
 		<dataSheet name="MortalityOptions" type="Input"/>
 		<dataSheet name="MortalityProjection" type="Input"/>
+		<dataSheet name="MortalityCovariate" type="Input"/>
 		<dataSheet name="LandUseDemand" type="Input"/>
 		<dataSheet name="LandUseDemandRatio" type="Input"/>
 		<dataSheet name="OutputNlcdAnnual" type="Input"/>
@@ -2161,7 +2176,7 @@
 				<item name="ProjectionTransitions"/>
 				<item name="SpatialAllocation"/>
 				<item name="FireOptions"/>
-				<item name="MortalityProjection"/>
+				<item name="MortalityProjectionPage"/>
 				<item name="FuelTreatment"/>
 				<item name="ForestManagement"/>
 				<item name="ManagementAction"/>

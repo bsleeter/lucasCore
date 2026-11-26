@@ -137,6 +137,15 @@ mortality_projection_options <- function(x) {
        clustered = pick("ProjectionPlacement", c("clustered", "random")) == 1L, climate = pick("ClimateLink", c("as", "from")) == 2L)
 }
 
+# The covariates the surface may use (the columns of the Mortality Surface Covariates sheet, in the words of the log) and the ones a
+# setup switched off on its Mortality page (blank = used).
+MORT_COVS <- c(Canopy = "tree canopy cover", Elevation = "elevation", Slope = "slope", Temperature = "temperature normal", Precipitation = "precipitation normal", Vpd = "vapour pressure deficit normal")
+mortality_covariates_off <- function(x) {
+  x <- data.table::as.data.table(x); if (!nrow(x)) return(character(0))
+  off <- vapply(names(MORT_COVS), function(k) { v <- if (k %in% names(x)) x[[k]][1] else NA; !is.na(v) && !(isTRUE(as.logical(v)) || identical(toupper(as.character(v)), "YES") || identical(suppressWarnings(as.integer(v)), -1L)) }, TRUE)
+  names(MORT_COVS)[off]
+}
+
 # Block draws: every iteration fills the projection years with blocks of consecutive reference years. A block starts at any
 # reference year with the same chance and runs on from the last year to the first, so every year is drawn equally often and the
 # long-run mean is the reference period's.

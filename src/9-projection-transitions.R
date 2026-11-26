@@ -69,7 +69,9 @@ for (k in c("UnitSource", "ExcludeGap", "SamplingSet", "StrataLevel")) if (!k %i
 # group, not a Stratum Source, and its years are drawn in blocks. Its row here only switches it (None = off); a sheet filled before
 # lucasCore 2.0.2 has no row, and the projection's Mortality page then decides
 source(pkg_file("src", "mortality.R")); source(pkg_file("src", "forest-cover.R"))   # (forest-cover.R: the tree canopy cover file names and years)
-mort_pt <-pt[TransitionGroupId %in% c(MORT_GROUP, "Mortality")]; pt <- pt[!TransitionGroupId %in% c(MORT_GROUP, "Mortality")]
+# (2.0.4) drought and insect mortality has no row of this sheet: the projection's Mortality page is its only control. A row a 2.0.3 page left is set aside.
+mort_pt <- pt[TransitionGroupId %in% c(MORT_GROUP, "Mortality")]; pt <- pt[!TransitionGroupId %in% c(MORT_GROUP, "Mortality")]
+if (nrow(mort_pt)) say("Projection Transitions: the row of %s is not read (from lucasCore 2.0.4 the projection's Mortality page alone sets the event%s)", MORT_GROUP, if (any(mort_pt$Method == "None")) "; its None does not switch it off: choose Off on that page" else "")
 pt[is.na(SamplingSet) | !nzchar(SamplingSet), SamplingSet := TransitionGroupId]
 bad <- pt[!Method %in% c("Target", "Probability", "None")]; if (nrow(bad)) fail("Projection Transitions: unknown method for %s", paste(bad$TransitionGroupId, collapse = "; "))
 bad <- pt[Method == "Target" & !StrataLevel %in% c("Primary", "Secondary", "Tertiary")]; if (nrow(bad)) fail("Projection Transitions: a Target group needs Target Strata: %s", paste(bad$TransitionGroupId, collapse = "; "))
@@ -607,7 +609,7 @@ mo9$enabled <- tryCatch(mortality_options(tryCatch(read_ds("MortalityOptions"), 
 mort <- NULL
 if (MORT_GROUP %in% unique(sm$TransitionGroupId)) {
   why_off <- if (!mo9$enabled) "the Build's Mortality page: the event is off" else if (mo9$projection == "off") "the projection's Mortality page: Off" else
-    if (nrow(mort_pt) && all(mort_pt$Method == "None")) "its Projection Transitions row is None" else if (!MORT_GROUP %in% ann) "the Build mapped no event" else NA_character_
+    if (!MORT_GROUP %in% ann) "the Build mapped no event" else NA_character_
   if (!is.na(why_off)) say("Drought and insect mortality: off in the projection (%s)", why_off) else {
     scm <- stsim_list("StateClass"); stm <- stsim_list("Stratum"); pwm <- pw[TransitionTypeId == MORT_TYPE]
     src_id <- as.integer(scm$Id[match(pwm$StateClassIdSource, scm$Name)]); vP9 <- lev$Primary
@@ -683,11 +685,13 @@ if (MORT_GROUP %in% unique(sm$TransitionGroupId)) {
         if (!is.na(pf)) { source(pkg_file("src", "prism.R")); for (nm in names(pv)) { f <- tryCatch(prism_normal(pf, pv[[nm]], "800 m"), error = function(e) NA_character_)
           if (!length(f) || is.na(f[1])) f <- tryCatch(prism_normal(pf, pv[[nm]], "4 km"), error = function(e) NA_character_)
           if (length(f) && !is.na(f[1]) && file.exists(f[1])) { a <- onto9(f[1], "bilinear"); if (!is.null(a)) X[[nm]] <- a } } }
+        cov_off <- intersect(mortality_covariates_off(tryCatch(read_ds("MortalityCovariate"), error = function(e) data.table())), names(X)); n_read <- length(X)
+        if (length(cov_off)) { X[cov_off] <- NULL; Xn[cov_off] <- NULL; say("  surface: left out on the Mortality page: %s", paste(MORT_COVS[cov_off], collapse = ", ")) }
         for (k in setdiff(names(X), names(Xn))) Xn[[k]] <- X[[k]]
         if (length(X)) { X <- as.data.table(X); Xn <- as.data.table(Xn)[, names(X), with = FALSE]
           sf0 <- tryCatch(mortality_surface(!is.na(evr), elm, unit, X, X, seed), error = function(e) { say("  surface: not fitted (%s)", conditionMessage(e)); NULL })
           sfm <- if (is.null(sf0)) NULL else tryCatch(mortality_surface(!is.na(evr), elm, unit, X, Xn, seed), error = function(e) NULL) }
-        if (is.null(sfm)) say("Drought and insect mortality: no surface (%s): every eligible cell of a unit weighs the same", if (!length(X)) "no covariate could be read: tree canopy cover, elevation, PRISM normals" else sprintf("fewer than %d event cells in the reference years, or the fit failed", MORTP$min_events)) else {
+        if (is.null(sfm)) say("Drought and insect mortality: no surface (%s): every eligible cell of a unit weighs the same", if (!length(X)) (if (n_read) "every covariate that could be read is switched off on the Mortality page" else "no covariate could be read: tree canopy cover, elevation, PRISM normals") else sprintf("fewer than %d event cells in the reference years, or the fit failed", MORTP$min_events)) else {
           wsurf <- sfm$w; wsurf[!land] <- NA
           say("Drought and insect mortality surface: %d event cells against %d others on %s; in sample the top tenth of cells holds %.0f%% of the events (score %.2f; 0.5 = no skill); weights from %.2f to %.2f (1st and 99th percentile), mean 1 in every unit",
               sfm$events, sfm$controls, paste(sprintf("%s (%.0f)", sfm$terms$Covariate, sfm$terms$ChiSq), collapse = ", "), 100 * sfm$top10, sfm$auc, stats::quantile(wsurf[elm], 0.01, na.rm = TRUE), stats::quantile(wsurf[elm], 0.99, na.rm = TRUE))

@@ -2,6 +2,95 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+### Added
+
+- **Drought and insect mortality in the Run Figures** (stage 13, `src/run-figures.R`). The event was in the run's tables and
+  maps but in none of its figures.
+  - *Transitions per year* has a panel for it, with the Build's record as points.
+  - *After disturbance, and reforestation* shows what put each cell in a disturbed class (a stand-replacing fire or drought
+    and insect mortality, whichever came last) and the year of that event, in place of "Last stand-replacing fire". A year the
+    run wrote no mortality map of (a historical run in a library whose transition output filter predates 2.0.2) is read from
+    the Build's placed events, which are the same cells in every iteration under ranked selection.
+  - *Disturbed land and reforestation over time* has a panel of the area entering the disturbed classes each year by cause:
+    mortality is its transition's area, stand-replacing fire the rest of the area that entered.
+  - *Carbon fluxes* has panel (g), live carbon killed by a transition and left on the land (`LULC: Mortality`), by cause.
+    Mortality emits and removes nothing in its year, so it was absent from panels (b) to (d).
+
+- **The spread over Monte Carlo iterations in the Run Figures** (stage 13; a run of more than one iteration). The tables were
+  averaged and the maps were iteration 1's, so a projection's figures showed one line where its iterations differ widely
+  (Pyrome 27, 5 iterations: 53 to 311 km2 of mortality, 5,845 to 10,300 km2 of fire).
+  - Charts draw the mean with the spread: the lowest and highest iteration, or the 5th to 95th percentile from 20 iterations
+    up. Whiskers on the bars of *Transitions per year* and of the yearly carbon balance; shading on area in the disturbed
+    classes, change in land area by cover group, productivity and respiration, and net biome productivity; dotted lines
+    on total carbon. In a projection joined to its historical run the spread is drawn in the projection years.
+  - A new map figure, *Chance of change over N iterations*, after the harvest maps: for each cell, the share of iterations
+    in which it burned, had drought and insect mortality, or was harvested at least once, counted from the yearly
+    transition maps of every iteration, and the share in which it is developed in the last year. It is drawn when the run
+    mapped every iteration, and renumbers the figures after it. For Pyrome 27 it reads about 680 maps and adds 30 s.
+  - The carbon capacity figure has no spread yet, and stand age, land cover and after-disturbance maps stay iteration 1's.
+
+- **Drought and insect mortality and the spread over iterations in the Compare Figures** (stage 14, `src/compare-figures.R`).
+  - Mortality: *Transitions per year* titles its panel "Drought and insect mortality"; *Carbon fluxes per year* has panel (e),
+    live carbon killed and left on the land; *Carbon fluxes by period* has panels of the live carbon killed by fire and by
+    drought and insects; the *Land change summary* figure has a Mortality column. The Compare Land Change Summary datasheet
+    is unchanged (a column there needs a library update).
+  - Spread, for projections of more than one iteration (lowest to highest iteration; the 5th to 95th percentile from 20 up):
+    shading on total carbon and on every line of *Carbon fluxes per year* and *Transitions per year*; shading on each run's
+    difference from the baseline, iteration against the baseline's same iteration when both runs have the same ones, else
+    against the baseline's mean; whiskers on the bars of *Carbon fluxes by period*, *Carbon by pool* and *Land area change*;
+    the range in brackets in the two summary table figures (carbon at the end, the difference from the baseline, area
+    burned, with mortality, harvested and urbanized). Wood products, wetland methane and carbon capacity have none.
+  - New map figures, *Chance of burning / of drought and insect mortality / of harvest against the baseline*: the share of
+    the baseline's iterations in which each cell changed at least once, and each other run's share minus it. Drawn when the
+    baseline and another projection of the same years mapped every iteration; they renumber the figures after them.
+
+### Fixed
+
+- Compare Figures: *Fire emissions* in *Carbon fluxes by period* also counted the live carbon fire killed (13.8 Tg C on top of
+  13.4 in Pyrome 27's projection), since the mortality change to the run loader in this unreleased work; it is emissions
+  only again. The note and the carbon map caption said "maps of iteration 1": the carbon maps are the mean of the iterations.
+- *After disturbance*: a shrubland cell that burned at moderate severity and then converted was dated "no fire map for its
+  year" (157 km2 in Pyrome 27's projection); it counts as shrub from its starting class now. The panel subtitles no longer
+  overprint each other.
+
+### Not yet done
+
+- Drawn outside SyncroSim (`dev/figures/test_run_figures.R`) on Pyrome 27's historical run and projection and on Great Dismal
+  Swamp; stage 13 itself has not been rerun in a library, and no run of 20 or more iterations was at hand to draw the
+  percentile spread on. The User Guide's table and screenshots of these figures are not updated.
+- Compare Figures: drawn outside SyncroSim on Pyrome 27's one projection, and on it against a made-up second projection
+  (its tables altered) for the spread between runs and the chance maps. No library has two real projections of several
+  iterations with mortality; stage 14 itself has not been rerun.
+
+## 2.0.4 - 2026-11-25
+
+A patch: drought and insect mortality leaves the Land Use Change page, and its Mortality page lists the covariates that place it. No library update is needed (the one new sheet SyncroSim adds by itself).
+
+### Added
+
+- **The covariates of the mortality surface, on the projection's Mortality page** (Where it falls; sheet `MortalityCovariate`,
+  shown through the page's feed; stage 9). Six tick boxes, all on unless unticked: tree canopy cover, elevation, slope, and
+  the PRISM temperature, precipitation and vapour pressure deficit normals. They are fixed in stage 9 and were on no page:
+  the Spatial Allocation list is for the land-use and harvest surfaces of stage 10 and never applied to mortality. An
+  unticked covariate is left out of the fit, and the log says so; with all unticked there is no surface, and patch sizes
+  and spread still apply. The amount of the event does not change.
+
+### Changed
+
+- **The projection's Mortality page is the only control of drought and insect mortality in a projection.** 2.0.3 also gave
+  the event a row of Projection Transitions, so it showed on the Land Use Change page under Other transitions and in its
+  table, where its method did nothing except that None switched the event off: a second switch in the wrong place. The
+  row is gone from `defaults/projection/transitions.csv`; the page shows no card for the group and removes a row that a
+  2.0.3 page added when the scenario is opened for editing (`ui/TransitionWalk.cs`, `ui/ProjectionTransitionsView.cs`);
+  stage 9 no longer reads such a row and says so in the log if it meets one. A setup whose row was set to None now has
+  the event on unless its Mortality page says Off.
+
+### Not yet done
+
+- Released without a run in SyncroSim or a look in Studio: the page changes compile and the unit tests pass.
+
 ## 2.0.3 - 2026-11-25
 
 Two settings for exploring a climate response of drought and insect mortality in projections. The two new sheets
