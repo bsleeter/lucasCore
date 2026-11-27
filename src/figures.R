@@ -111,11 +111,18 @@ figure_kit <- function(sc, dem, outdir, NOTE) {
     list(k = k, cols = c(cols, if (other) "#bdbdbd"), lab = c(label(nm), if (other) "Other"), key = TRUE) }
 
   # ---- a map figure: panels = list(list(k, cols, lab, key, title, sub)) -----------------------------------------------------
+  # (development: env RF_ONLY = comma-separated slugs draws only those figures, numbering the rest as if drawn)
+  skip <- function(slug) { o <- Sys.getenv("RF_ONLY"); nzchar(o) && !slug %in% strsplit(o, ",")[[1]] }
   map_figure <- function(slug, title, panels, caption, note = NOTE, PW = if (WIDE) 1400 else if (length(panels) == 1) 900 else 520) {
+    if (skip(slug)) { n <<- n + 1L; return(invisible()) }
     n <<- n + 1L; f <- file_of(slug); np <- length(panels); PH <- round(PW * AR)
     LM <- 40; GAP <- 40; TOP <- 150; RT <- 90
-    # the legend's height: a strip, or a key of swatches flowing in columns of the widest label
-    leg_h <- function(p) if (!isTRUE(p$key)) 90 else { cw <- 34 + 8.6 * max(nchar(p$lab)); nc <- max(1, floor(PW / cw)); 30 + 28 * ceiling(length(p$lab) / nc) }
+    # the legend's height: a strip, or a key of swatches flowing in columns of the widest label; a panel with a shared legend (glegend:
+    # list(span = panels it spans, columns = list of columns, each a list of groups list(head, lab, cols))) takes its columns' height,
+    # and a panel under another's shared legend (nokey) none
+    gcol_h <- function(cl) sum(vapply(cl, function(g) (if (nzchar(g$head %||% "")) 30 else 0) + 28 * length(g$lab) + 12, 0))
+    leg_h <- function(p) if (!is.null(p$edges)) 90 else if (!is.null(p$glegend)) 10 + max(vapply(p$glegend$columns, gcol_h, 0)) else if (isTRUE(p$nokey)) 0 else if (!isTRUE(p$key)) 90 else {
+      cw <- 34 + 8.6 * max(nchar(p$lab)); nc <- max(1, floor(PW / cw)); 30 + 28 * ceiling(length(p$lab) / nc) }
     RB <- vapply(panels, leg_h, 0)
     if (WIDE) { W <- 2 * LM + PW; cellh <- RT + PH + RB; H <- TOP + sum(cellh) + GAP * (np - 1); x0s <- rep(LM, np); y0s <- H - TOP - cumsum(cellh) - GAP * (seq_len(np) - 1) + RB }
     else { W <- 2 * LM + np * PW + (np - 1) * GAP; H <- TOP + RT + PH + max(RB); x0s <- LM + (seq_len(np) - 1) * (PW + GAP); y0s <- rep(max(RB), np) }
@@ -131,7 +138,17 @@ figure_kit <- function(sc, dem, outdir, NOTE) {
       tt <- strwrap(sprintf("(%s) %s", letters[i], p$title), floor(PW / 10.5)); for (j in seq_along(tt)) text(x0, y0 + PH + 60 + (length(tt) - j) * 24, tt[j], adj = c(0, .5), font = 2, cex = 0.9, col = INK)
       text(x0, y0 + PH + 30, p$sub %||% "", adj = c(0, .5), cex = 0.62, col = MUTED)
       nL <- length(p$cols)
-      if (!isTRUE(p$key)) { lw <- PW / nL
+      if (!is.null(p$glegend)) { G <- p$glegend; sw <- (G$span %||% 1) * PW + ((G$span %||% 1) - 1) * GAP; cw <- sw / length(G$columns)
+        for (ci in seq_along(G$columns)) { cx <- x0 + (ci - 1) * cw; cy <- y0 - 20
+          for (g in G$columns[[ci]]) { if (nzchar(g$head %||% "")) { text(cx, cy - 6, g$head, adj = c(0, .5), font = 2, cex = 0.66, col = INK); cy <- cy - 30 }
+            for (j in seq_along(g$lab)) { rect(cx, cy - 9, cx + 22, cy + 9, col = g$cols[j], border = "white"); text(cx + 30, cy, g$lab[j], adj = c(0, .5), cex = 0.6, col = INK); cy <- cy - 28 }
+            cy <- cy - 12 } }
+      } else if (isTRUE(p$nokey)) {
+      } else if (!is.null(p$edges)) { lw <- PW / nL   # a colour bar: contiguous classes labelled at their edges (and, where lab is not "", in the middle)
+        for (j in seq_len(nL)) rect(x0 + (j - 1) * lw, y0 - 45, x0 + j * lw, y0 - 25, col = p$cols[j], border = NA)
+        for (j in seq_along(p$edges)) if (nzchar(p$edges[j])) { xe <- x0 + (j - 1) * lw; segments(xe, y0 - 45, xe, y0 - 50, col = INK, lwd = .8); text(xe, y0 - 65, p$edges[j], cex = 0.55, col = INK) }
+        for (j in seq_len(nL)) if (nzchar(p$lab[j] %||% "")) text(x0 + (j - .5) * lw, y0 - 65, p$lab[j], cex = 0.55, col = INK)
+      } else if (!isTRUE(p$key)) { lw <- PW / nL
         for (j in seq_len(nL)) { rect(x0 + (j - 1) * lw, y0 - 45, x0 + j * lw, y0 - 25, col = p$cols[j], border = "white"); text(x0 + (j - .5) * lw, y0 - 65, p$lab[j], cex = 0.55, col = INK) }
       } else { cw <- 34 + 8.6 * max(nchar(p$lab)); nc <- max(1, floor(PW / cw)); cw <- PW / nc
         for (j in seq_len(nL)) { cx <- x0 + ((j - 1) %% nc) * cw; cy <- y0 - 30 - ((j - 1) %/% nc) * 28
@@ -140,6 +157,7 @@ figure_kit <- function(sc, dem, outdir, NOTE) {
 
   # ---- a chart figure: the same header, base R panels drawn by draw() in an nr x nc layout -----------------------------------
   chart_figure <- function(slug, title, caption, nr, nc, draw, w = 2400, h = 700 * nr + 260, note = NOTE) {
+    if (skip(slug)) { n <<- n + 1L; return(invisible()) }
     n <<- n + 1L; f <- file_of(slug)
     png(f, width = w, height = h, res = 200, bg = "white"); on.exit(dev.off())
     par(mfrow = c(nr, nc), oma = c(0, 0, 4.2, 0), mar = c(4.5, 5, 3, 1), family = "sans", col.axis = MUTED, col.lab = INK, las = 1, cex.axis = .8, tcl = -.25, mgp = c(2.6, .5, 0))

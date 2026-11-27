@@ -11,14 +11,22 @@ con <- dbConnect(SQLite(), lib, flags = SQLITE_RO); q <- function(s, ...) as.dat
 ic <- q("SELECT StateClassFileName FROM stsim_InitialConditionsSpatial WHERE ScenarioId = %d", bid)
 grid <- rast(file.path(paste0(lib, ".data"), sprintf("Scenario-%d", bid), "stsim_InitialConditionsSpatial", basename(ic$StateClassFileName[1])))
 scl <- q("SELECT Name, Color FROM stsim_StateClass"); dem <- q("SELECT ElevationFile FROM lucasCore_DataSource")$ElevationFile[1]
+if (nzchar(Sys.getenv("RF_DEM"))) dem <- Sys.getenv("RF_DEM")   # (env RF_DEM: the elevation file for the relief, when the library's data source has none)
 sa <- q("SELECT u.Name FROM lucasCore_StudyArea s JOIN stsim_SecondaryStratum u ON u.SecondaryStratumId = s.UnitId WHERE s.ScenarioId = %d", bid)
 if (!nrow(sa)) sa <- q("SELECT u.Name FROM lucasCore_StudyArea s JOIN stsim_SecondaryStratum u ON u.SecondaryStratumId = s.UnitId")
 obs <- q("SELECT Timestep, TransitionGroup, Area FROM lucasCore_OutputTransitionSummary WHERE ScenarioId = %d", bid)
-rn <- q("SELECT Name FROM core_Scenario WHERE ScenarioId = %d", rid)$Name; dbDisconnect(con)
+rn <- q("SELECT Name FROM core_Scenario WHERE ScenarioId = %d", rid)$Name
+# the Build's Carbon Capacity maps (stage 8), as stage 13 reads them, with the file names made full paths
+cm <- if (dbExistsTable(con, "lucasCore_OutputCarbonCapacityMap")) q("SELECT * FROM lucasCore_OutputCarbonCapacityMap WHERE ScenarioId = %d", bid) else data.table()
+for (k in grep("FileName$", names(cm), value = TRUE)) cm[, (k) := ifelse(is.na(get(k)), NA_character_, file.path(paste0(lib, ".data"), sprintf("Scenario-%d", bid), "lucasCore_OutputCarbonCapacityMap", basename(get(k))))]
+dbDisconnect(con); source(file.path(pkg, "src/capacity.R"))
 t0 <- Sys.time(); X <- load_run(lib, rid); cat(sprintf("loaded in %.0f s\n", as.numeric(Sys.time() - t0, units = "secs")))
 hid <- find_history(lib, rid)   # a projection: join its historical run in front, as stage 13 does
 if (!is.na(hid)) { H <- load_run(lib, hid); if (H$years[2] == X$years[1]) { X <- join_runs(H, X); cat(sprintf("joined to historical run %d: %d-%d; carbon %d: %.2f vs %.2f Tg C\n",
   hid, X$years[1], X$years[2], X$proj_start, X$join[1], X$join[2])) } }
+X$wp <- tryCatch(wp_of_run(lib, rid), error = function(e) NULL)
+X$cap <- if (nrow(cm)) tryCatch(capacity_maps(cm), error = function(e) { cat("capacity maps not readable:", conditionMessage(e), "\n"); NULL }) else NULL
+cat(sprintf("wood products: %s; capacity maps: %s\n", if (is.null(X$wp)) "none" else "yes", if (is.null(X$cap)) "none" else sprintf("%.1f Tg C", X$cap$total)))
 res <- run_figures(X, grid, setNames(argb(scl$Color), scl$Name), dem, if (nrow(sa)) paste(sub("^[^:]*: ", "", sa$Name), collapse = ", ") else "Study area", obs, out,
                    run_name = sub(" \\(\\[.*$", "", rn))
 print(res[, .(Figure, Title, File = basename(FileName))]); cat(sprintf("%.0f s\n", as.numeric(Sys.time() - t0, units = "secs")))
