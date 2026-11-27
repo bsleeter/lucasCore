@@ -2,9 +2,44 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
-## Unreleased
+## 2.1.0 - 2026-11-26
+
+A Build maps change among water, wetland and barren in the historical period, with the carbon that goes with it. Projections
+do not carry it yet. Opening a library with 2.1.0 runs a library update (below); a library keeps running on its earlier Builds
+and gets the change with its next Build.
 
 ### Added
+
+- **Change among water, wetland and barren in the historical period** (stage 6, `src/water-change.R`; to-do 2). Marsh that
+  becomes open water, water that becomes marsh or bare ground, reservoirs and lakes that draw down and refill, and wetland and
+  barren trading places. It is on when the study area has USGS DSWE annual open water; without it the Build says so and maps
+  none.
+  - *The rule, at 30 m.* Beside wetland (a pixel the Annual NLCD calls wetland in any year), USGS DSWE open water decides
+    whether the pixel is water, and a change counts only once it has held five clear years, dated to the first. Away from
+    wetland the Annual NLCD decides alone: a pixel turns to water, or back to land, in the first of two years running the NLCD
+    says so. DSWE alone read ice-covered alpine lakes as land and bare high ground as water in the Southern Sierra Nevada.
+    Land that leaves water away from wetland becomes Barren, whatever the NLCD calls it.
+  - *On the model grid.* Each year whole cells are taken by rank of their share of changed pixels until the year's 30 m area
+    is met, as drought and insect mortality is placed, so every iteration of the historical run is the same. Area flagged on
+    cropland, pasture and developed cells is dropped (the land-use sources handle them), as are shoreline strips in forest,
+    shrub and grass cells.
+  - *New reservoirs.* An upland forest, shrub or grass cell becomes water in a year at least half of its pixels did.
+  - *New wetland* is emergent, estuarine or palustrine by the nearest wetland type of stage 5.
+  - *Years.* Changes beside wetland end four years before the last year of data (they must hold five years).
+- **USGS DSWE annual open water as a Data Source** (Data Download page; `DsweFolder` in Data Sources). Read by window from
+  the USGS public bucket for the study area, one open-water file a year from 1984.
+- **The carbon of these changes, on a new Build page, Carbon Assumptions > Wetland Change Carbon** (stage 3,
+  `src/wetland-change-carbon.R`, `defaults/stockflow/wetland-change-carbon.csv`). When a cell becomes water each pool splits
+  three ways in that year: emitted as CO2, carried to Aquatic, or left in the cell under water. Blank fields take the
+  defaults: coastal (estuarine) top-metre soil 40% emitted, 10% to Aquatic, 50% stays; coastal plants and litter 75% and 25%;
+  inland soil 10% emitted, 90% stays; inland plants and litter all emitted. Deep soil, peat and black carbon stay. Only the
+  coastal soil emission has a published basis; the rest are judged values, with the ranges shown on the page.
+  - *Flooded forest.* Tree stems and coarse roots are not emitted: they move to the snag stem and dead coarse root pools, and
+    Water cells release those pools at 1% a year (a field on the page; range 0.5 to 5%). No measured rate for flooded or
+    salt-killed trees was found, so this is a judged value.
+  - Emission and mortality use the standard land-use change flow types; two new flow types, *Wetland Change: Export Live* and
+    *Export DOM*, carry carbon to Aquatic and count in Lateral Flux and Net Biome Productivity.
+
 
 - **Drought and insect mortality in the Run Figures** (stage 13, `src/run-figures.R`). The event was in the run's tables and
   maps but in none of its figures.
@@ -46,6 +81,24 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
     the baseline's iterations in which each cell changed at least once, and each other run's share minus it. Drawn when the
     baseline and another projection of the same years mapped every iteration; they renumber the figures after them.
 
+### Changed
+
+- The emergent wetland classes no longer set every land-use change flow to zero (380 rows removed from
+  `defaults/stockflow/nonforest-multipliers-wetland.csv`). Those rows silenced the classes' own fire: a fire on emergent marsh
+  now emits live and litter carbon beside peat. A library gets this when stage 3 is next run.
+- The transition type *Wetland Change: to Palustine Forested* is spelled *Palustrine* (the library update renames it).
+
+### Library update
+
+- Opening a library made with an earlier version runs the 2.1 update: the Data Sources folder for DSWE open water, the six
+  Wetland Change transition types in their Gain and Loss groups, the corrected type name, and the two Aquatic flow types with
+  their groups, order and output filters. SyncroSim adds the Wetland Change Carbon page by itself. Tested on a copy of a 2.0.0
+  library (Southern Sierra Nevada): the update, stages 0, 3 and 6 and a historical run.
+- The update also adds the names drought and insect mortality uses in projections since 2.0.3 (the rate and climate
+  distributions, two external variables, the Mortality: Climate multiplier type and the Recent Mortality state attribute). 2.0.3
+  was a patch with no update of its own, so a library made before it needed `tools/add-definitions.R` run by hand; that step is
+  no longer needed.
+
 ### Fixed
 
 - Compare Figures: *Fire emissions* in *Carbon fluxes by period* also counted the live carbon fire killed (13.8 Tg C on top of
@@ -57,6 +110,11 @@ Changes to lucasCore by version. Version numbers follow [Semantic Versioning](ht
 
 ### Not yet done
 
+- Water, wetland and barren change is historical only: a projection does not continue it (planned for 2.1.1).
+- Tested on two study areas at 300 m: a Louisiana chenier plain refuge area and the Southern Sierra Nevada. The coastal result
+  is not yet compared with C-CAP or with an independent land-loss record, and no national DSWE download has been run.
+- Carbon carried into a Barren cell stays there: Barren has no carbon flows.
+- The Wetland Change Carbon ranges are shown, not sampled. The User Guide has no screenshots of the new page.
 - Drawn outside SyncroSim (`dev/figures/test_run_figures.R`) on Pyrome 27's historical run and projection and on Great Dismal
   Swamp; stage 13 itself has not been rerun in a library, and no run of 20 or more iterations was at hand to draw the
   percentile spread on. The User Guide's table and screenshots of these figures are not updated.

@@ -932,6 +932,50 @@ Each setting is a slider in steps of 5 with a box for any value, and a sentence 
 
 **Limits.** The event is in the historical period only; a projection keeps it off until projected rates are added. A library made before lucasCore 2.0 gets the transition type when it is opened with 2.0; until then its Builds run as before and the log says so.
 
+### 3.10 Change among water, wetland and barren
+
+From lucasCore 2.1 a Build maps change among water, wetland and barren in the historical period: marsh that becomes open water, water that becomes marsh or bare ground, reservoirs and lakes that draw down and refill, and wetland and barren trading places. It is on when the study area has USGS DSWE annual open water, and needs no setting.
+
+**Data.** Tick **USGS DSWE annual open water** on the Data Download page (section 1.6.4). It is read for the study area from the USGS public bucket, one file a year from 1984. The Build also uses the Annual NLCD. Without the DSWE files the stage 6 log says the change is off, and the Build maps none.
+
+**How a change is mapped.** Stage 6 applies one of two rules to each 30 m pixel:
+
+- **Beside wetland** (a pixel the Annual NLCD calls wetland in any year): DSWE open water decides whether the pixel is water. A change counts only once the pixel has stayed on the other side of 50% open water for five clear years, and is dated to the first of them. A marsh edge that floods and drains produces nothing.
+- **Away from wetland**: the Annual NLCD decides alone. A pixel turns to water, or back to land, in the first of two years running the NLCD says so. DSWE is not used here, because it reads ice-covered mountain lakes as land and bare high ground as water.
+
+Land that leaves water away from wetland becomes Barren, whatever the NLCD calls it, so an exposed reservoir bed does not grow carbon for a year and lose it on refill. Beside wetland it becomes wetland or Barren as the NLCD reads it. New wetland is emergent, estuarine or palustrine by the nearest wetland type of stage 5.
+
+**How it is placed on the grid.** As drought and insect mortality (section 3.9): each year the cells are ranked by their share of changed pixels and taken from the top until their area equals the year's 30 m area, so every iteration of the historical run is the same. A cell with fire, harvest, mortality or land-use change that year is not taken, and area that does not fill a whole cell carries to the next year.
+
+**Which cells can change.**
+
+| Change | Cells that can take it |
+| --- | --- |
+| To water | Every wetland class, Barren, and upland forest, shrub and grass |
+| To estuarine or palustrine emergent wetland | Water and Barren |
+| To barren | Water and emergent wetland |
+
+An upland forest, shrub or grass cell becomes water only in a year at least half of its pixels did, which captures a new reservoir. A strip of shoreline inside such a cell is dropped: on a coarse grid it would otherwise turn whole forest cells to water for a lake's yearly rise and fall. Area flagged on cropland, pasture and developed cells is dropped too, because the land-use transitions handle those classes.
+
+**Years.** Changes beside wetland must hold five years, so they end four years before the last year of data. Changes away from wetland run to the year before the last.
+
+**Carbon.** When a cell becomes water, each pool splits three ways in that year: emitted as carbon dioxide, carried to the Aquatic stock, or left in the cell under water. The shares are on **Carbon Assumptions > Wetland Change Carbon**. Leave a field blank for its default.
+
+| Case | Pool | Emitted | To Aquatic | Stays |
+| --- | --- | --- | --- | --- |
+| Coastal (estuarine classes) | Top-metre soil | 40% | 10% | 50% |
+| Coastal | Plants and litter | 75% | 25% | 0% |
+| Inland (every other class) | Top-metre soil | 10% | 0% | 90% |
+| Inland | Plants and litter | 100% | 0% | 0% |
+
+Deep soil, peat and black carbon stay with the cell. Only the coastal soil emission has a published basis; the other shares are judged values, and each field shows its range.
+
+Where forest floods, tree stems and coarse roots are not emitted. They move to the standing dead stem and dead coarse root pools, and Water cells release those pools at 1% a year (the last field on the page; range 0.5 to 5%). No measured rate for flooded or salt-killed trees was found, so this default is a judged value. A Water cell has no other carbon flow. A marsh that becomes barren has its plants die into litter, with nothing emitted. Water or barren that becomes wetland starts with no plants and grows on the wetland flows of its ecodivision.
+
+**Checking it.** The stage 6 log has lines beginning *Water, wetland and barren change* and *Wetland Change*, with the 30 m area of each change and, for each transition, the area flagged, dropped, moved to other cells and placed. **Build Results > Historical Transition Summary** lists the area by year. In a test on the Southern Sierra Nevada at 300 m, water went from 124 km² in 1985 to 113 km² in the 2014 drought and 115 km² in 2023, with 43 km² placed to water and 53 km² to barren over 1986 to 2023.
+
+**Limits.** The change is in the historical period only; a projection does not continue it. It was tested on two study areas, and the coastal result is not yet compared with an independent land-loss record. A library made before lucasCore 2.1 is updated when it is opened, and gets the change with its next Build.
+
 ## 4. Running the Build
 
 Running the Build runs its pipeline, stages 0 to 8, one after another, and writes everything into a new **result scenario** under the Build. At 150 m a pyrome takes several hours; the library can stay open, but do not edit the Build while it runs.

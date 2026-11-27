@@ -437,7 +437,7 @@ namespace lucasCoreUI
         // ---- 2.1 (water, wetland and barren change, to-do 2, 2026-11): Data Sources holds the folder of USGS DSWE annual open water
         // (src/water-change.R: open water says whether a 30 m pixel is water, the annual NLCD what the land side is). Later steps of
         // to-do 2 that change existing tables add to this method. No apostrophe in the description ------------------------------------
-        [Update(2.1, "lucasCore 2.1: change among water, wetland and barren - the Data Sources folder for USGS DSWE annual open water; the Wetland Change transition types in their Gain and Loss groups; and the two flow types that carry the carbon of wetland that becomes water to Aquatic, with their groups, order and output filters")]
+        [Update(2.1, "lucasCore 2.1: change among water, wetland and barren - the Data Sources folder for USGS DSWE annual open water; the Wetland Change transition types in their Gain and Loss groups; and the two flow types that carry the carbon of wetland that becomes water to Aquatic, with their groups, order and output filters. Also the names drought and insect mortality uses in projections since 2.0.3, for libraries made before it")]
         public static void Update_2_100(DataStore store)
         {
             AddColumn(store, "lucasCore_DataSource", "DsweFolder", "TEXT");
@@ -465,6 +465,18 @@ namespace lucasCoreUI
                 AddFilter(store, "stsim_OutputFilterFlows", "OutputFilterFlowsId", "FlowGroupId", "stsim_FlowGroup", wtypes[i, 0] + " [Type]", false);
             }
             AddFlowOrder(store, "Wetland Change: Export Live", 11); AddFlowOrder(store, "Wetland Change: Export DOM", 10);
+            // the names drought and insect mortality uses in projections (2.0.3, a patch release with no update of its own, so a library
+            // made before it needed tools/add-definitions.R by hand; user 2026-11-26: every release carries its update): the rate
+            // distributions per softwood type and for the study area, the climate percentage, their two external variables, the second
+            // multiplier type and the Recent Mortality state attribute (defaults/stsim)
+            foreach (string t in new[] { "California Mixed Conifer Group", "Douglas-fir Group", "Exotic Softwoods Group", "Fir/Spruce/Mountain Hemlock Group", "Hemlock/Sitka Spruce Group", "Loblolly/Shortleaf Pine Group", "Lodgepole Pine Group", "Longleaf/Slash Pine Group", "Other Western Softwood Group", "Pinyon/Juniper Group", "Ponderosa Pine Group", "Redwood Group", "Spruce/Fir Group", "Western Larch Group", "Western White Pine Group", "White/Red/Jack Pine Group", "Wetland: Spruce/Fir Group" })
+                AddNamed(store, "core_DistributionType", "DistributionTypeId", "Mortality Rate: " + t, "Description", "Drought and insect mortality: the rate by drawn year (stage 9)", false);
+            AddNamed(store, "core_DistributionType", "DistributionTypeId", "Mortality Rate: Study Area", "Description", "Drought and insect mortality: the study area's rate by drawn year (stage 9)", false);
+            AddNamed(store, "core_DistributionType", "DistributionTypeId", "Mortality: Climate", "Description", "Drought and insect mortality: the percentage on the rate (stage 9)", false);
+            AddNamed(store, "core_ExternalVariableType", "ExternalVariableTypeId", "Mortality: Drawn Year", null, null, false);
+            AddNamed(store, "core_ExternalVariableType", "ExternalVariableTypeId", "Mortality: Climate Percent", null, null, false);
+            AddNamed(store, "stsim_TransitionMultiplierType", "TransitionMultiplierTypeId", "Mortality: Climate", null, null, false);
+            AddStateAttributeType(store, "Recent Mortality", "State Class", "1 on a disturbed softwood class in the three years after a drought and insect mortality event, written by stage 9: the share of recent die-off around a cell drives the event's adjacency multiplier in projections (to-do 3)");
         }
 
         // ---- 1.5 (wetland methane, 2026-11): wetland classes release part of what their soil and litter emit as CH4 (src/flows.R,
