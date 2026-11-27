@@ -2,6 +2,32 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## 2.1.1 - 2026-11-26
+
+Barren cells release the litter and dead wood they hold. No library update is needed: a library made with 2.1.0 opens as it
+is, and a library made with an earlier version runs the 2.1 update as before. A library gets the change when stage 3 is next
+run.
+
+### Added
+
+- **Litter and dead wood on Barren cells decay to the atmosphere** (stage 3, `defaults/stockflow/barren-litter-decay.csv`).
+  In 2.1.0 a marsh that became barren kept its dead plants as litter for good, because Barren had no carbon flows. A Barren
+  cell now releases each litter and dead wood pool every year: 80% and 89% of the above and belowground very fast litter, 26%
+  of the fast pools, 13% of standing dead branches, 7% and 3% of the medium and slow aboveground pools and 3% of standing dead
+  stems. The rates are those of the Barren class in lucasWet, emission and decay together, all sent to the atmosphere.
+- Soil on a Barren cell has no flow: it stays as it was when the cell became barren.
+
+### Library update
+
+- None of its own. 2.1.1 has the same library schema as 2.1.0 and uses flow types every library already has. Tested: a copy
+  of a 2.0.0 library (Southern Sierra Nevada) opened with 2.1.1 runs the 2.1 update, then stages 0, 3 and 6 and a historical
+  run; a 2.1.0 library opens with no update.
+
+### Not yet done
+
+- Water, wetland and barren change is still historical only: a projection does not continue it.
+- The decay rates are fixed defaults in the file, not a page in the library.
+
 ## 2.1.0 - 2026-11-26
 
 A Build maps change among water, wetland and barren in the historical period, with the carbon that goes with it. Projections
