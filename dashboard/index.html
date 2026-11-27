@@ -527,7 +527,7 @@ function rampLut(stops, n = 255) { const f = d3.interpolateRgbBasis(stops); retu
 const dark = () => matchMedia("(prefers-color-scheme: dark)").matches && document.documentElement.dataset.theme !== "light" || document.documentElement.dataset.theme === "dark";
 const DIV = () => ["#8a3b12", "#d08a5b", css("--none"), "#5fb3a3", "#0f6b62"];
 const RAMP = {
-  carbon: () => dark() ? ["#16241b", "#1e4a30", "#2c7a46", "#58a866", "#9bd18a", "#e3f4c6"] : ["#f2f5e6", "#c8e0a9", "#86bf72", "#3e9353", "#176a3d", "#0a3d26"],
+  carbon: () => ["#f2f5e6", "#c8e0a9", "#86bf72", "#3e9353", "#176a3d", "#0a3d26"],
   age: () => dark() ? ["#231c12", "#4f3a17", "#86621f", "#c1922f", "#f0c867"] : ["#fbf3df", "#f0d394", "#d9a441", "#a8721f", "#6b4512"],
   rh: () => dark() ? ["#241a12", "#553519", "#8f5523", "#c9813a", "#f3b871"] : ["#fbf0e4", "#f0c99a", "#d99556", "#a85d24", "#6b3510"],
   fire: () => ["#f6c35b", "#ef8a3c", "#d8572a", "#a3261b"], mort: () => ["#d7c4ea", "#a77fd0", "#7a4bb0", "#4b2479"],
