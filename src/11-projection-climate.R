@@ -197,7 +197,7 @@ if (linked) {
 }
 
 # ---- projected fire: each projection year draws its fire year among the reference years whose fire season was most like its own -----
-# (the Fire and Climate page: the analog draw of its Analog Years nearest years, blank = 5; or the setup's own draws). The index is the
+# (the Fire and Climate page: the analog draw of its Analog Years nearest years, blank = 10; or the setup's own draws). The index is the
 # fire season's (May-September) heat and dryness from maximum temperature and precipitation: PRISM for the reference years, this LOCA2
 # run for the projection years, put on PRISM's scale over 1984-2014 (src/fire-climate.R)
 fcl <- NULL

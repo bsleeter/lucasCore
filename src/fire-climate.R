@@ -24,7 +24,7 @@
 # its long-run share of it (which unit burned most in that year is not kept).
 # =============================================================================
 
-FIREK <- list(season = 5:9, base = 1984:2014, k = 5L, points = 400L)
+FIREK <- list(season = 5:9, base = 1984:2014, k = 10L, points = 400L)   # (k: user 2026-11-26, "try 10"; 5 rested the hottest pool on a few chance years in Pyrome 27)
 FIRE_EV_YEAR <- "Fire: Drawn Year"; FIRE_CLIMATE <- "Fire: Climate"; FIRE_RATE_ALL <- "Fire Rate: Study Area"; FIRE_SEV <- "Fire Severity: "
 FIRE_SET <- "Fire: Drawn Year"   # (the setup's own fire draws, copied to the schedule under this name for the Projection Climate result)
 FIRE_FREQ <- "Iteration and Timestep"

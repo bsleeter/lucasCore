@@ -12,7 +12,7 @@ check("the Fire page: blank and 1 = as the setup draws them, 2 = from the Projec
       !fire_years_from_climate(data.table()) && !fire_years_from_climate(data.table(FireYears = NA)) && !fire_years_from_climate(data.table(FireYears = 1L)) &&
         fire_years_from_climate(data.table(FireYears = 2L)) && fire_years_from_climate(data.table(FireYears = "From the Projection Climate result (climate analog years)")))
 o <- fire_climate_options(data.table())
-check("the Fire and Climate page: blank = the analog draw of 5 years", o$analog && o$k == 5L)
+check("the Fire and Climate page: blank = the analog draw of 10 years", o$analog && o$k == 10L)
 check("... the setup's own draws, and another number of years", !fire_climate_options(data.table(FireYears = 2L))$analog && fire_climate_options(data.table(AnalogYears = 3))$k == 3L &&
         !fire_climate_options(data.table(FireYears = "As the Projection Setup drew them (no climate)"))$analog)
 check("... a number of years below 1 or not whole is refused", inherits(try(fire_climate_options(data.table(AnalogYears = 0)), silent = TRUE), "try-error") &&

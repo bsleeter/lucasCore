@@ -775,8 +775,8 @@
 	     as they are. A projection lists the Projection Climate result above the Projection Setup for the settings to act. A new sheet: no library update -->
 	<!-- to-do 9 (lucasCore 2.2): the fire years of a Projection Setup whose Fire page hands them to this result (src/fire-climate.R) -->
 	<dataSheet name="FireClimate" displayName="Fire and Climate" isSingleRow="True">
-		<column name="FireYears" displayName="Fire Years (blank = Climate analog draw)" dataType="Integer" validationType="List" formula1="1:Climate analog draw: each year draws among the historical years whose fire season was most like its own|2:As the Projection Setup drew them (no climate)" isOptional="True"/>
-		<column name="AnalogYears" displayName="Analog Years (the nearest historical years a projection year draws among; blank = 5)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="1" formula2="50"/>
+		<column name="FireYears" displayName="Fire Years (blank = Climate analog draw)" dataType="Integer" validationType="List" formula1="1:Climate analog draw (each year draws among the historical years whose fire season was most like its own)|2:As the Projection Setup drew them (no climate)" isOptional="True"/>
+		<column name="AnalogYears" displayName="Analog Years (the nearest historical years a projection year draws among; blank = 10)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="1" formula2="50"/>
 	</dataSheet>
 	<dataSheet name="MortalityClimate" displayName="Mortality and Climate" isSingleRow="True" viewClassName="lucasCoreUI.MortalityClimateView" viewClassAssembly="lucasCoreUI">
 		<column name="TimingStrength" displayName="Timing Strength, 0 to 1: Severe Blocks Placed in Dry Periods (blank = 0, as drawn; 0.3 is about what the record shows)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>

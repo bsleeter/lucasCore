@@ -492,7 +492,7 @@ namespace lucasCoreUI
             foreach (string s in new[] { "High", "Medium", "Low" })
                 AddNamed(store, "core_DistributionType", "DistributionTypeId", "Fire Severity: " + s, "Description", "Projected fire: the drawn year share of " + s.ToLowerInvariant() + " severity in the burned area (stage 9)", false);
             AddNamed(store, "core_ExternalVariableType", "ExternalVariableTypeId", "Fire: Drawn Year", null, null, false);
-            AddNamed(store, "stsim_TransitionMultiplierType", "TransitionMultiplierTypeId", "Fire: Climate", "Description", "Projected fire: the drawn year burned area and severity mix read by the drawn year (2.2.0)", false);
+            AddNamed(store, "stsim_TransitionMultiplierType", "TransitionMultiplierTypeId", "Fire: Climate", null, null, false);
         }
 
         // ---- 1.5 (wetland methane, 2026-11): wetland classes release part of what their soil and litter emit as CH4 (src/flows.R,
