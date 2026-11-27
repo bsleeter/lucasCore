@@ -1,0 +1,610 @@
+<title>LUCAS Output Explorer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:wght@400;500;600&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+/* Layout: a field atlas. The map holds the left column at full height; the analysis column scrolls beside it, every chart tied to the map's year. */
+:root {
+  --bg: #eef1ee; --panel: #f9faf8; --sunk: #e3e8e4; --ink: #16201b; --ink-2: #47534d; --muted: #77827c; --line: #d3dad5;
+  --accent: #1d6b57; --accent-ink: #ffffff; --hist: #26302b; --s1: #2a78d6; --s2: #eb6834; --zero: #9aa49f;
+  --none: #dfe4e0;
+  --f-display: "Archivo", "Arial Narrow", system-ui, sans-serif; --f-body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-data: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --r: 6px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0e1412; --panel: #151d1a; --sunk: #1b2521; --ink: #e6ebe8; --ink-2: #b2bcb7; --muted: #7d8883; --line: #26312d;
+  --accent: #4fb39a; --accent-ink: #0b1512; --hist: #dfe6e2; --s1: #3987e5; --s2: #d95926; --zero: #59645f; --none: #26302c; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0e1412; --panel: #151d1a; --sunk: #1b2521; --ink: #e6ebe8; --ink-2: #b2bcb7; --muted: #7d8883; --line: #26312d;
+  --accent: #4fb39a; --accent-ink: #0b1512; --hist: #dfe6e2; --s1: #3987e5; --s2: #d95926; --zero: #59645f; --none: #26302c; color-scheme: dark }
+
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--ink); font: 14px/1.45 var(--f-body); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--panel); }
+.lx { display: grid; grid-template-rows: auto 1fr; height: 100%; }
+.lx-top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--panel); border-bottom: 1px solid var(--line);
+  padding-block: 10px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 24px; }
+.brand { display: flex; align-items: baseline; gap: 12px; min-width: 0; margin-right: auto; }
+.brand b { font: 800 13px/1 var(--f-display); letter-spacing: .14em; color: var(--accent); }
+.brand h1 { margin: 0; font: 700 22px/1.1 var(--f-display); font-stretch: 85%; text-wrap: balance; }
+.brand span { color: var(--muted); font-size: 12.5px; }
+.ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.lab { font: 600 10.5px/1 var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.seg { display: inline-flex; background: var(--sunk); border-radius: var(--r); padding: 2px; gap: 2px; }
+.seg button { border: 0; background: transparent; color: var(--ink-2); font: 500 13px/1 var(--f-body); padding: 7px 11px; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+.seg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+.seg i { width: 10px; height: 3px; border-radius: 2px; display: inline-block; }
+select, .chk { font: 500 13px/1 var(--f-body); color: var(--ink); background: var(--sunk); border: 0; border-radius: var(--r); padding: 8px 10px; }
+.chk { display: inline-flex; align-items: center; gap: 7px; cursor: pointer; }
+.chk input { accent-color: var(--accent); margin: 0; }
+button:focus-visible, select:focus-visible, input:focus-visible, .chip:focus-visible, tr:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.lx-body { display: grid; grid-template-columns: minmax(340px, 34%) 1fr; min-height: 0; }
+.mapcol { position: sticky; top: 0; height: 100%; min-height: 0; display: grid; grid-template-rows: auto 1fr auto; border-right: 1px solid var(--line); background: var(--panel); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 14px 10px; }
+.chip { border: 1px solid var(--line); background: var(--panel); color: var(--ink-2); font: 500 12.5px/1 var(--f-body); padding: 6px 9px; border-radius: 999px; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.chip[disabled] { opacity: .4; cursor: default; }
+.mapwrap { position: relative; min-height: 0; overflow: hidden; background: var(--bg); touch-action: none; cursor: grab; }
+.mapwrap.drag { cursor: grabbing; }
+.mapwrap canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.zoom { position: absolute; right: 10px; top: 10px; display: grid; gap: 4px; }
+.zoom button { width: 30px; height: 30px; border-radius: var(--r); border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: 600 15px/1 var(--f-body); cursor: pointer; }
+.legend { position: absolute; right: 10px; bottom: 10px; max-width: 52%; max-height: calc(100% - 120px); overflow: auto; background: color-mix(in srgb, var(--panel) 92%, transparent); border: 1px solid var(--line); border-radius: var(--r); padding: 9px 11px; font-size: 12px; backdrop-filter: blur(6px); }
+.legend h4 { margin: 0 0 6px; font: 600 11px/1.2 var(--f-body); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+.legend .sw { display: grid; grid-template-columns: minmax(0, auto); gap: 3px 14px; }
+.legend .sw div { display: flex; align-items: center; gap: 6px; white-space: nowrap; color: var(--ink-2); }
+.legend .sw i { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+.legend .ramp { width: 200px; max-width: 100%; height: 10px; border-radius: 2px; }
+.legend .ticks { display: flex; justify-content: space-between; font: 11px/1.4 var(--f-data); color: var(--muted); }
+.legend .note { color: var(--muted); margin-top: 5px; max-width: 260px; }
+.hover { position: absolute; pointer-events: none; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 8px 10px; font-size: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.14); min-width: 170px; }
+.hover .k { color: var(--muted); }
+.hover .v { font-family: var(--f-data); color: var(--ink); }
+.hover div { display: flex; justify-content: space-between; gap: 14px; }
+.maptitle { position: absolute; left: 12px; top: 10px; font: 700 13px/1.2 var(--f-display); color: var(--ink); text-shadow: 0 0 6px var(--bg); pointer-events: none; }
+.maptitle small { display: block; font: 400 11.5px/1.3 var(--f-body); color: var(--ink-2); }
+.timebar { border-top: 1px solid var(--line); padding: 10px 14px 12px; display: grid; grid-template-columns: auto auto 1fr; align-items: center; gap: 12px; }
+.play { width: 34px; height: 34px; border-radius: 50%; border: 0; background: var(--accent); color: var(--accent-ink); cursor: pointer; display: grid; place-items: center; }
+.year { font: 500 26px/1 var(--f-data); letter-spacing: -.02em; min-width: 4.2ch; }
+.year small { display: block; font: 600 10px/1.2 var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
+.slider { position: relative; }
+.slider input { width: 100%; accent-color: var(--accent); margin: 0; }
+.slider .scale { display: flex; justify-content: space-between; font: 10.5px/1 var(--f-data); color: var(--muted); margin-top: 4px; }
+.slider .split { position: absolute; top: -6px; height: 8px; border-left: 1px dashed var(--muted); }
+
+.ana { min-width: 0; overflow: auto; padding-block: 18px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.ana-in { max-width: 1120px; margin: 0 auto; display: grid; gap: 28px; }
+.ctx { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; }
+.ctx h2 { margin: 0; font: 700 26px/1.1 var(--f-display); font-stretch: 85%; text-wrap: balance; }
+.ctx p { margin: 0; color: var(--ink-2); max-width: 70ch; }
+.pill { font: 600 11px/1 var(--f-body); letter-spacing: .05em; text-transform: uppercase; padding: 5px 8px; border-radius: 999px; background: var(--sunk); color: var(--ink-2); }
+.pill.proj { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.kpi { background: var(--panel); padding: 14px 16px 13px; min-width: 0; box-shadow: 1px 0 0 var(--line), 0 1px 0 var(--line); }
+.kpi .lab { display: block; margin-bottom: 8px; }
+.kpi .big { font: 500 27px/1 var(--f-data); letter-spacing: -.02em; }
+.kpi .big small { font: 400 13px var(--f-body); color: var(--muted); margin-left: 4px; letter-spacing: 0; }
+.kpi .sub { margin-top: 7px; font-size: 12.5px; color: var(--ink-2); }
+.kpi .sub .up { color: var(--accent); } .kpi .sub .dn { color: #b4532a; }
+.sec { display: grid; gap: 14px; }
+.sec > header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.sec h3 { margin: 0; font: 700 17px/1.2 var(--f-display); font-stretch: 90%; letter-spacing: .01em; }
+.sec header p { margin: 0; color: var(--muted); font-size: 12.5px; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 22px 28px; }
+.chart { min-width: 0; position: relative; }
+.chart h4 { margin: 0 0 2px; font: 600 13.5px/1.3 var(--f-body); }
+.chart .cap { margin: 0 0 6px; font-size: 12px; color: var(--muted); }
+.chart svg { display: block; width: 100%; overflow: visible; }
+.chart .leg { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--ink-2); margin-top: 6px; }
+.chart .leg span { display: inline-flex; align-items: center; gap: 6px; }
+.chart .leg i { width: 12px; height: 3px; border-radius: 2px; display: inline-block; }
+.chart .leg i.sq { height: 10px; width: 10px; }
+.axis text { fill: var(--muted); font: 10.5px var(--f-data); }
+.axis line, .axis path { stroke: var(--line); }
+.grid line { stroke: var(--line); stroke-opacity: .7; }
+.tip { position: absolute; pointer-events: none; z-index: 3; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 8px 10px; font-size: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.14); min-width: 160px; }
+.tip b { display: block; font: 500 12px var(--f-data); margin-bottom: 4px; }
+.tip div { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+.tip div span:first-child { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); }
+.tip i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+.tip .v { font-family: var(--f-data); }
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+th { text-align: left; font: 600 10.5px/1.2 var(--f-body); letter-spacing: .07em; text-transform: uppercase; color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 8px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td.n, th.n { text-align: right; font-family: var(--f-data); }
+tbody tr { cursor: pointer; } tbody tr:hover { background: var(--sunk); }
+tbody tr[aria-selected="true"] { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+tbody tr:last-child td { border-bottom: 0; }
+.bar { display: inline-block; height: 8px; border-radius: 2px; vertical-align: middle; }
+.foot { color: var(--muted); font-size: 12px; border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 6px; max-width: 90ch; }
+.loading { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 13px; pointer-events: none; }
+@media (max-width: 900px) {
+  .lx { height: auto; display: block; }
+  .lx-body { display: block; }
+  .mapcol { position: relative; height: 640px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .legend { max-height: 34%; max-width: 58%; padding: 7px 9px; font-size: 11.5px; }
+  .ana { overflow: visible; }
+  .brand h1 { font-size: 19px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<div class="lx">
+  <header class="lx-top">
+    <div class="brand"><b>LUCAS</b><h1 id="title">Loading model output…</h1><span id="subtitle"></span></div>
+    <div class="ctl">
+      <span class="lab">Scenario</span>
+      <div class="seg" id="scen" role="group" aria-label="Projection scenario"></div>
+      <label class="chk" for="cmp"><input type="checkbox" id="cmp" checked> Compare both</label>
+      <label class="lab" for="area">Area</label>
+      <select id="area"></select>
+    </div>
+  </header>
+  <div class="lx-body">
+    <aside class="mapcol" aria-label="Map">
+      <div class="chips" id="layers" role="group" aria-label="Map layer"></div>
+      <div class="mapwrap" id="mapwrap">
+        <canvas id="map"></canvas>
+        <div class="maptitle" id="maptitle"></div>
+        <div class="zoom"><button id="zin" aria-label="Zoom in">+</button><button id="zout" aria-label="Zoom out">−</button><button id="zfit" aria-label="Fit the study area">⤢</button></div>
+        <div class="legend" id="legend"></div>
+        <div class="hover" id="hover" hidden></div>
+        <div class="loading" id="maploading">Loading map…</div>
+      </div>
+      <div class="timebar">
+        <button class="play" id="play" aria-label="Play through the years"><svg width="12" height="14" viewBox="0 0 12 14"><path id="playicon" d="M1 1l10 6-10 6z" fill="currentColor"/></svg></button>
+        <div class="year"><span id="yr">2023</span><small id="yrkind">Historical</small></div>
+        <div class="slider"><input type="range" id="slider" min="1985" max="2050" step="1" value="2023" aria-label="Year"><div class="split" id="split"></div><div class="scale"><span id="y0">1985</span><span id="ymid"></span><span id="y1">2050</span></div></div>
+      </div>
+    </aside>
+    <main class="ana" id="ana">
+      <div class="ana-in">
+        <div class="ctx"><h2 id="areaname">Whole study area</h2><span class="pill" id="yrpill"></span><p id="areanote"></p></div>
+        <div class="kpis" id="kpis"></div>
+
+        <section class="sec" id="sec-carbon">
+          <header><h3>Carbon stocks</h3><p>Tg C · shaded band = range across Monte Carlo iterations</p></header>
+          <div class="grid2">
+            <div class="chart" id="c-tec"><h4>Total ecosystem carbon</h4><p class="cap">Live biomass, dead wood, litter and soil.</p></div>
+            <div class="chart" id="c-pools"><h4>Carbon by pool</h4><p class="cap" id="c-pools-cap"></p></div>
+          </div>
+        </section>
+
+        <section class="sec" id="sec-flux">
+          <header><h3>Carbon balance</h3><p>Tg C per year</p></header>
+          <div class="grid2">
+            <div class="chart" id="c-nbp"><h4>Net biome productivity</h4><p class="cap">Above zero, the landscape gains carbon; below zero, it loses carbon.</p></div>
+            <div class="chart" id="c-npp"><h4>Productivity and respiration</h4><p class="cap" id="c-npp-cap"></p></div>
+            <div class="chart" id="c-loss"><h4>Carbon lost to disturbance and land use</h4><p class="cap" id="c-loss-cap"></p></div>
+          </div>
+        </section>
+
+        <section class="sec" id="sec-land">
+          <header><h3>Land cover</h3><p>thousand hectares (kha)</p></header>
+          <div class="grid2">
+            <div class="chart" id="c-landchg"><h4>Change in area since 1985</h4><p class="cap" id="c-landchg-cap"></p></div>
+            <div class="chart" id="c-comp"><h4 id="c-comp-title">Land cover</h4><p class="cap">Share of the area in the map year. Click a group to show it on the map.</p></div>
+          </div>
+        </section>
+
+        <section class="sec" id="sec-dist">
+          <header><h3>Disturbance</h3><p>kha per year</p></header>
+          <div class="grid2">
+            <div class="chart" id="c-dist"><h4>Area disturbed by cause</h4><p class="cap" id="c-dist-cap"></p></div>
+            <div class="chart" id="c-fire"><h4>Area burned</h4><p class="cap">All severities. Projections show the mean, with the range across iterations shaded.</p></div>
+          </div>
+        </section>
+
+        <section class="sec" id="sec-units">
+          <header><h3>Counties</h3><p id="units-cap">Click a row to filter the dashboard to that county</p></header>
+          <div class="tbl"><table id="tbl"><thead></thead><tbody></tbody></table></div>
+        </section>
+
+        <div class="foot" id="foot"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+(() => {
+"use strict";
+const DATA = "data/";
+const S = { run: "p1", compare: true, area: "all", year: 2023, layer: "sc", window: 1, focusGroup: null };
+let M, T = {}, RUNS = {}, HIST, PROJ = [], AREAS = [], Y0, Y1, YS;   // meta, tables, years
+const fmt = (v, d = 1) => v == null || !isFinite(v) ? "–" : v.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+const sgn = (v, d = 1) => (v > 0 ? "+" : v < 0 ? "−" : "") + fmt(Math.abs(v), d);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const short = l => l.replace(/^.*\s(?=SSP)/, "");
+const el = id => document.getElementById(id);
+
+// ---------------------------------------------------------------- data: cubes [combo][key][iteration][year]
+function cubeSum(run, measure, pred) {
+  const R = RUNS[run], keys = R.keys[measure], ni = R.iterations[1] - R.iterations[0] + 1, ny = R.years[1] - R.years[0] + 1, nk = keys.length;
+  const a = T[run][measure], out = Array.from({ length: ni }, () => new Float64Array(ny));
+  const ks = []; keys.forEach((k, i) => { if (pred(k)) ks.push(i); });
+  for (const c of activeCombos()) for (const k of ks) for (let i = 0; i < ni; i++) { const base = ((c * nk + k) * ni + i) * ny; const o = out[i]; for (let y = 0; y < ny; y++) o[y] += a[base + y]; }
+  return { y0: R.years[0], ny, ni, it: out };
+}
+// one series from the start of the history to the end of a projection: points {y, v, lo, hi}; history to the projection start, the projection after it
+function series(proj, measure, pred, scale = 1, opt = {}) {
+  const h = cubeSum("hist", measure, pred), p = proj ? cubeSum(proj, measure, pred) : null, pts = [];
+  const hp = []; for (let j = 0; j < h.ny; j++) { const v = h.it[0][j] * scale; if (!opt.skipZero || v !== 0) hp.push({ y: h.y0 + j, v, lo: v, hi: v, hist: true }); }
+  const ys = p ? p.y0 : Infinity;
+  for (const q of hp) if (q.y <= ys) pts.push(q);
+  if (p) for (let j = 0; j < p.ny; j++) { const y = p.y0 + j; if (y <= ys && pts.some(q => q.y === y)) continue;
+    const vs = p.it.map(r => r[j] * scale); if (opt.skipZero && vs.every(v => v === 0)) continue;
+    pts.push({ y, v: d3.mean(vs), lo: d3.min(vs), hi: d3.max(vs), vs, hist: false }); }
+  return pts;
+}
+const at = (pts, y) => pts.find(p => p.y === y);
+function activeCombos() {
+  const a = S.area; if (a === "all") return M.combos.map((_, i) => i);
+  const [kind, name] = a.split("::"); return M.combos.map((c, i) => (kind === "county" ? c.county : c.ecoregion) === name ? i : -1).filter(i => i >= 0);
+}
+const projRuns = () => S.compare ? PROJ.map(r => r.key) : [S.run];
+const runColor = k => k === "p1" ? css("--s1") : k === "p2" ? css("--s2") : css("--hist");
+
+// ---------------------------------------------------------------- charts
+const charts = [];
+const W = node => Math.max(260, node.clientWidth);
+function frame(id, h = 230) {
+  const box = el(id); let svg = box.querySelector("svg"); if (!svg) { svg = d3.select(box).append("svg").node(); d3.select(box).append("div").attr("class", "leg"); d3.select(box).append("div").attr("class", "tip").attr("hidden", ""); }
+  const w = W(box), m = { t: 8, r: 12, b: 22, l: 46 };
+  const s = d3.select(svg).attr("viewBox", `0 0 ${w} ${h}`).attr("height", h); s.selectAll("*").remove();
+  return { box, s, w, h, m, iw: w - m.l - m.r, ih: h - m.t - m.b, leg: d3.select(box).select(".leg"), tip: d3.select(box).select(".tip") };
+}
+function axes(F, x, y, yfmt = d => fmt(d, Math.abs(y.domain()[1] - y.domain()[0]) < 5 ? 1 : 0)) {
+  const g = F.s.append("g").attr("transform", `translate(${F.m.l},${F.m.t})`);
+  g.append("g").attr("class", "grid").call(d3.axisLeft(y).ticks(5).tickSize(-F.iw).tickFormat("")).call(a => a.select(".domain").remove());
+  g.append("g").attr("class", "axis").attr("transform", `translate(0,${F.ih})`).call(d3.axisBottom(x).ticks(Math.min(8, F.iw / 60)).tickFormat(d3.format("d")).tickSizeOuter(0));
+  g.append("g").attr("class", "axis").call(d3.axisLeft(y).ticks(5).tickFormat(yfmt).tickSize(0).tickPadding(6)).call(a => a.select(".domain").remove());
+  // projection start and the map year
+  g.append("line").attr("x1", x(YS)).attr("x2", x(YS)).attr("y1", 0).attr("y2", F.ih).attr("stroke", css("--muted")).attr("stroke-dasharray", "2 3");
+  g.append("text").attr("x", x(YS) + 4).attr("y", 9).attr("fill", css("--muted")).attr("font-size", 10).attr("font-family", css("--f-body")).text("projection");
+  g.append("line").attr("class", "yr").attr("x1", x(S.year)).attr("x2", x(S.year)).attr("y1", 0).attr("y2", F.ih).attr("stroke", css("--accent")).attr("stroke-width", 1.5);
+  return g;
+}
+// hover: a crosshair on the nearest year, a tooltip of rows(y), a click moves the map year
+function hover(F, g, x, rows) {
+  const cross = g.append("line").attr("y1", 0).attr("y2", F.ih).attr("stroke", css("--ink-2")).attr("stroke-width", 1).attr("opacity", 0);
+  g.append("rect").attr("width", F.iw).attr("height", F.ih).attr("fill", "transparent").style("cursor", "pointer")
+    .on("mousemove", ev => { const [mx] = d3.pointer(ev); const y = Math.round(x.invert(mx)); const r = rows(y); if (!r) return;
+      cross.attr("x1", x(y)).attr("x2", x(y)).attr("opacity", .5);
+      const tip = F.tip.attr("hidden", null).html(""); tip.append("b").text(r.title || y);
+      r.items.forEach(it => { const d = tip.append("div"); const l = d.append("span"); l.append("i").style("background", it.color); l.append("span").text(it.name); d.append("span").attr("class", "v").text(it.value); });
+      const tw = F.tip.node().offsetWidth, px = F.m.l + x(y), left = px + 14 + tw > F.w ? px - tw - 14 : px + 14;
+      tip.style("left", left + "px").style("top", (F.box.querySelector("svg").offsetTop + 8) + "px"); })
+    .on("mouseleave", () => { cross.attr("opacity", 0); F.tip.attr("hidden", ""); })
+    .on("click", ev => { const [mx] = d3.pointer(ev); setYear(Math.round(x.invert(mx))); });
+}
+function legend(F, items, sq = false) { F.leg.html(""); items.forEach(it => { const s = F.leg.append("span"); s.append("i").attr("class", sq ? "sq" : null).style("background", it.color); s.append("span").text(it.name); }); }
+
+// lines: series list {name, color, pts, band}; the historical part is drawn once, in ink
+function lineChart(id, list, o = {}) {
+  const F = frame(id, o.h || 230), x = d3.scaleLinear([Y0, Y1], [0, F.iw]);
+  const all = list.flatMap(s => s.pts.flatMap(p => [p.lo, p.hi]));
+  let lo = d3.min(all), hi = d3.max(all); if (o.zero) { lo = Math.min(0, lo); hi = Math.max(0, hi); }
+  const pad = (hi - lo) * .08 || 1; const y = d3.scaleLinear([o.zero && lo >= 0 ? 0 : lo - pad, hi + pad], [F.ih, 0]).nice();
+  const g = axes(F, x, y);
+  if (o.zero) g.append("line").attr("x1", 0).attr("x2", F.iw).attr("y1", y(0)).attr("y2", y(0)).attr("stroke", css("--zero"));
+  const line = d3.line().x(p => x(p.y)).y(p => y(p.v)), area = d3.area().x(p => x(p.y)).y0(p => y(p.lo)).y1(p => y(p.hi));
+  let histDrawn = false;
+  const parts = list.map(s => { const H = s.pts.filter(p => p.hist), P = s.pts.filter(p => !p.hist), last = H[H.length - 1]; return { s, H, last, PP: last && P.length ? [last, ...P] : P, P }; });
+  // bands first, so that no scenario's band covers another's line
+  for (const { s, PP, P } of parts) if (s.band !== false && P.length) g.append("path").attr("d", area(PP)).attr("fill", s.color).attr("opacity", list.length > 1 ? .13 : .18);
+  for (const { s, H, last, PP } of parts) {
+    if (!histDrawn || s.ownHist) { g.append("path").attr("d", line(H)).attr("fill", "none").attr("stroke", s.ownHist ? s.color : css("--hist")).attr("stroke-width", 1.75); histDrawn = true; }
+    g.append("path").attr("d", line(PP)).attr("fill", "none").attr("stroke", s.color).attr("stroke-width", 2);
+    const e = PP[PP.length - 1] || last; if (e) g.append("circle").attr("cx", x(e.y)).attr("cy", y(e.v)).attr("r", 3.5).attr("fill", s.color).attr("stroke", css("--panel")).attr("stroke-width", 2);
+  }
+  hover(F, g, x, yy => { const items = []; list.forEach(s => { const p = at(s.pts, yy); if (p) items.push({ name: p.hist && !s.ownHist ? (o.histName || "Historical") : s.name, color: p.hist && !s.ownHist ? css("--hist") : s.color,
+      value: fmt(p.v, o.d ?? 2) + (p.hist || p.lo === p.hi ? "" : `  (${fmt(p.lo, o.d ?? 2)}–${fmt(p.hi, o.d ?? 2)})`) }); });
+    const seen = new Set(); return items.length ? { title: yy, items: items.filter(i => !seen.has(i.name + i.value) && seen.add(i.name + i.value)) } : null; });
+  legend(F, o.legend || [{ name: "Historical", color: css("--hist") }, ...list.map(s => ({ name: s.name, color: s.color }))]);
+}
+// stacked areas (means) of one scenario
+function stackChart(id, layers, o = {}) {
+  const F = frame(id, o.h || 230), x = d3.scaleLinear([Y0, Y1], [0, F.iw]);
+  const years = layers[0].pts.map(p => p.y), rows = years.map((yy, j) => { const r = { y: yy }; layers.forEach(l => r[l.name] = Math.max(0, l.pts[j].v)); return r; });
+  const st = d3.stack().keys(layers.map(l => l.name))(rows);
+  const y = d3.scaleLinear([0, d3.max(st[st.length - 1], d => d[1]) * 1.05], [F.ih, 0]).nice(); const g = axes(F, x, y);
+  st.forEach((s, i) => g.append("path").attr("d", d3.area().x(d => x(d.data.y)).y0(d => y(d[0])).y1(d => y(d[1]))(s)).attr("fill", layers[i].color).attr("stroke", css("--panel")).attr("stroke-width", 1));
+  // direct labels at the right edge where the band is tall enough
+  const lastS = st.map(s => s[s.length - 1]);
+  lastS.forEach((d, i) => { if (y(d[0]) - y(d[1]) > 13) g.append("text").attr("x", F.iw - 6).attr("y", (y(d[0]) + y(d[1])) / 2 + 4).attr("text-anchor", "end").attr("font-size", 11).attr("font-family", css("--f-body")).attr("fill", "#fff").attr("font-weight", 600).text(layers[i].name); });
+  hover(F, g, x, yy => { const r = rows.find(r => r.y === yy); if (!r) return null; return { title: yy, items: layers.slice().reverse().map(l => ({ name: l.name, color: l.color, value: fmt(r[l.name], o.d ?? 2) })) }; });
+  legend(F, layers.map(l => ({ name: l.name, color: l.color })), true);
+}
+// stacked bars by year (means) of one scenario
+function barChart(id, layers, o = {}) {
+  const F = frame(id, o.h || 230), x = d3.scaleLinear([Y0 - .5, Y1 + .5], [0, F.iw]), bw = Math.max(1, F.iw / (Y1 - Y0 + 1) - 1.5);
+  const years = d3.range(Y0, Y1 + 1), rows = years.map(yy => { const r = { y: yy }; layers.forEach(l => { const p = at(l.pts, yy); r[l.name] = p ? Math.max(0, p.v) : 0; }); return r; });
+  const st = d3.stack().keys(layers.map(l => l.name))(rows);
+  const y = d3.scaleLinear([0, (d3.max(st[st.length - 1], d => d[1]) || 1) * 1.05], [F.ih, 0]).nice(); const g = axes(F, x, y);
+  st.forEach((s, i) => g.append("g").selectAll("rect").data(s).join("rect").attr("x", d => x(d.data.y) - bw / 2).attr("width", bw).attr("y", d => y(d[1])).attr("height", d => Math.max(0, y(d[0]) - y(d[1]) - (d[1] - d[0] > 0 ? .5 : 0))).attr("fill", layers[i].color));
+  g.selectAll(".yr").raise();
+  hover(F, g, x, yy => { const r = rows.find(r => r.y === yy); if (!r) return null; const tot = layers.reduce((a, l) => a + r[l.name], 0);
+    return { title: `${yy} · ${fmt(tot, o.d ?? 2)} total`, items: layers.slice().reverse().filter(l => r[l.name] > 0).map(l => ({ name: l.name, color: l.color, value: fmt(r[l.name], o.d ?? 2) })) }; });
+  legend(F, layers.map(l => ({ name: l.name, color: l.color })), true);
+}
+// a horizontal composition bar of the map year
+function compChart(id, parts) {
+  const box = el(id); d3.select(box).selectAll("svg,.leg,.tip").remove();
+  const tot = d3.sum(parts, p => p.v), w = W(box);
+  const svg = d3.select(box).append("svg").attr("viewBox", `0 0 ${w} ${parts.length * 26 + 6}`).attr("height", parts.length * 26 + 6);
+  const x = d3.scaleLinear([0, d3.max(parts, p => p.v) || 1], [0, Math.max(40, w - 300)]);
+  parts.forEach((p, i) => { const g = svg.append("g").attr("transform", `translate(0,${i * 26 + 4})`).style("cursor", "pointer").on("click", () => { S.focusGroup = S.focusGroup === p.name ? null : p.name; setLayer("sc"); });
+    g.append("text").attr("x", 0).attr("y", 13).attr("font-size", 12.5).attr("font-family", css("--f-body")).attr("fill", S.focusGroup === p.name ? css("--accent") : css("--ink-2")).attr("font-weight", S.focusGroup === p.name ? 600 : 400).text(p.name);
+    g.append("rect").attr("x", 130).attr("y", 3).attr("height", 12).attr("rx", 2).attr("width", Math.max(1.5, x(p.v))).attr("fill", p.color);
+    g.append("text").attr("x", 136 + x(p.v)).attr("y", 13).attr("font-size", 11.5).attr("font-family", css("--f-data")).attr("fill", css("--ink")).text(`${fmt(p.v, 1)} kha · ${fmt(100 * p.v / tot, 1)}%`); });
+}
+
+// ---------------------------------------------------------------- dashboard
+const POOLS = [["Live biomass", "Biomass: Total", "#3f8f4e"], ["Dead wood", "DOM: Deadwood", "#8c5a2b"], ["Litter", "DOM: Litter", "#c9a24a"], ["Soil", "DOM: Soil", "#5b4636"]];
+const CAUSES = [["Fire", "#d8572a"], ["Drought and insects", "#8a5bb0"], ["Forest harvest", "#5b6670"], ["Land use change", "#b98b3e"], ["Crop harvest", "#e3b23c"], ["Drained peat", "#4a2f17"], ["Lateral export", "#3b8ea5"]];
+const FAMS = [["Fire", "Fire", "#d8572a"], ["Forest harvest", "Forest Harvest", "#5b6670"], ["Drought and insects", "Mortality", "#8a5bb0"], ["Urbanization", "Urbanization", "#e0457b"], ["Intensification", "Intensification", "#b0306a"], ["Ag expansion", "Ag Expansion", "#d9a441"], ["Ag contraction", "Ag Contraction", "#7fb069"]];
+const groupColor = g => (M.groups.find(x => x.name === g) || {}).color || "#999";
+
+function areaLabel() { if (S.area === "all") return "Whole study area"; const [k, n] = S.area.split("::"); return k === "county" ? `County: ${n}` : n; }
+function drawAll() {
+  const yy = S.year, runs = projRuns(), proj = S.year > YS ? S.run : null, main = S.run;
+  el("areaname").textContent = areaLabel();
+  const ha = d3.sum(series(null, "area", () => true, 1e-3).slice(0, 1), p => p.v);
+  el("areanote").textContent = `${fmt(ha, 0)} kha modeled at 300 m. Values are for ${yy}${yy > YS ? ` under ${short(RUNS[main].label)}, the mean of ${RUNS[main].iterations[1]} iterations` : ""}.`;
+  el("yrpill").textContent = yy > YS ? `${yy} · projection` : `${yy} · historical`; el("yrpill").className = "pill" + (yy > YS ? " proj" : "");
+
+  // KPIs
+  const tec = series(main, "stocks", k => k.startsWith("Total Ecosystem|"), 1e-6), live = series(main, "stocks", k => k.startsWith("Biomass: Total|"), 1e-6);
+  const nbp = series(main, "flows", k => k === "Net Biome Productivity", 1e-6, { skipZero: true });
+  const forest = series(main, "area", k => /^Forest/.test(k), 1e-3), fire = series(main, "trans", k => k === "Fire", 1e-3);
+  const p0 = at(tec, Y0), p1 = at(tec, yy) || tec[tec.length - 1], l0 = at(live, Y0), l1 = at(live, yy) || live[live.length - 1];
+  const f0 = at(forest, Y0), f1 = at(forest, yy) || forest[forest.length - 1], nb = at(nbp, yy);
+  const burnFrom = yy > YS ? YS + 1 : Y0 + 1, burned = fire.filter(p => p.y >= burnFrom && p.y <= yy);
+  const bsum = d3.sum(burned, p => p.v), bits = burned.length && burned[burned.length - 1].vs ? burned[burned.length - 1].vs.map((_, i) => d3.sum(burned, p => p.vs ? p.vs[i] : p.v)) : null;
+  const rng = p => p && !p.hist && p.lo !== p.hi ? `range ${fmt(p.lo, 2)}–${fmt(p.hi, 2)}` : "";
+  const pct = (a, b) => `<span class="${b >= a ? "up" : "dn"}">${sgn(100 * (b - a) / a, 1)}%</span> since ${Y0}`;
+  el("kpis").innerHTML = [
+    ["Ecosystem carbon", fmt(p1.v, 1), "Tg C", `${pct(p0.v, p1.v)}${rng(p1) ? " · " + rng(p1) : ""}`],
+    ["Live carbon", fmt(l1.v, 1), "Tg C", pct(l0.v, l1.v)],
+    ["Net biome productivity", nb ? sgn(nb.v, 2) : "–", "Tg C/yr", nb ? (rng(nb) || (nb.v >= 0 ? "gaining carbon" : "losing carbon")) : `no flows in ${yy}`],
+    ["Forest area", fmt(f1.v, 0), "kha", pct(f0.v, f1.v)],
+    [`Area burned ${burnFrom}–${yy}`, fmt(bsum, 1), "kha", bits ? `range ${fmt(d3.min(bits), 1)}–${fmt(d3.max(bits), 1)} kha` : `${burned.length} years`]
+  ].map(([l, v, u, s]) => `<div class="kpi"><span class="lab">${l}</span><div class="big">${v}<small>${u}</small></div><div class="sub">${s}</div></div>`).join("");
+
+  // carbon
+  lineChart("c-tec", runs.map(r => ({ name: short(RUNS[r].label), color: runColor(r), pts: series(r, "stocks", k => k.startsWith("Total Ecosystem|"), 1e-6) })));
+  el("c-pools-cap").textContent = `Mean of the iterations, ${short(RUNS[main].label)} after ${YS}.`;
+  stackChart("c-pools", POOLS.slice().reverse().map(([n, k, c]) => ({ name: n, color: c, pts: series(main, "stocks", s => s.startsWith(k + "|"), 1e-6) })).reverse());
+  // balance
+  lineChart("c-nbp", runs.map(r => ({ name: short(RUNS[r].label), color: runColor(r), pts: series(r, "flows", k => k === "Net Biome Productivity", 1e-6, { skipZero: true }) })), { zero: true });
+  el("c-npp-cap").textContent = `Net primary productivity (NPP), heterotrophic respiration (Rh) and net ecosystem productivity (NEP = NPP − Rh); ${short(RUNS[main].label)} after ${YS}.`;
+  const NPP = [["NPP", "Net Primary Productivity", "#2f8a57"], ["Rh", "Emission: Total Rh", "#a6611a"], ["NEP", "Net Ecosystem Productivity", "#6250d6"]];
+  lineChart("c-npp", NPP.map(([n, k, c]) => ({ name: n, color: c, ownHist: true, band: false, pts: series(main, "flows", s => s === k, 1e-6, { skipZero: true }) })), { zero: true, legend: NPP.map(([n, , c]) => ({ name: n, color: c })) });
+  el("c-loss-cap").textContent = `Emissions and harvest removals by cause, the mean of the iterations; ${short(RUNS[main].label)} after ${YS}.`;
+  const lossKeys = RUNS[main].keys.losses.concat(RUNS.hist.keys.losses).filter(k => !k.startsWith("LULC: Mortality|"));
+  barChart("c-loss", CAUSES.filter(([c]) => lossKeys.some(k => k.endsWith("|" + c))).map(([c, col]) => ({ name: c, color: col, pts: series(main, "losses", k => !k.startsWith("LULC: Mortality|") && k.endsWith("|" + c), 1e-6, { skipZero: true }) })), { d: 3 });
+  // land cover
+  const groups = M.groups.map(g => g.name).filter(g => M.classes.some(c => c.group === g));
+  const gs = groups.map(g => ({ g, pts: series(main, "area", k => (M.classes.find(c => c.name === k) || {}).group === g, 1e-3) }));
+  el("c-landchg-cap").textContent = `Each cover group against its ${Y0} area; ${short(RUNS[main].label)} after ${YS}. Forest losses to fire and drought show up as Disturbed until the stand returns.`;
+  const chg = gs.filter(x => d3.max(x.pts, p => Math.abs(p.v - x.pts[0].v)) > .05).map(x => ({ name: x.g, color: groupColor(x.g), band: true, ownHist: true, pts: x.pts.map(p => ({ ...p, v: p.v - x.pts[0].v, lo: p.lo - x.pts[0].v, hi: p.hi - x.pts[0].v })) }));
+  lineChart("c-landchg", chg, { zero: true, legend: chg.map(s => ({ name: s.name, color: s.color })) });
+  el("c-comp-title").textContent = `Land cover in ${yy}`;
+  compChart("c-comp", gs.map(x => ({ name: x.g, color: groupColor(x.g), v: (at(x.pts, yy) || x.pts[x.pts.length - 1]).v })).filter(p => p.v > 0).sort((a, b) => b.v - a.v));
+  // disturbance
+  el("c-dist-cap").textContent = `Mean of the iterations; ${short(RUNS[main].label)} after ${YS}.`;
+  const tkeys = new Set(RUNS[main].keys.trans.concat(RUNS.hist.keys.trans));
+  barChart("c-dist", FAMS.filter(([, k]) => tkeys.has(k)).map(([n, k, c]) => ({ name: n, color: c, pts: series(main, "trans", s => s === k, 1e-3, { skipZero: true }) })), { d: 2 });
+  lineChart("c-fire", runs.map(r => ({ name: short(RUNS[r].label), color: runColor(r), pts: series(r, "trans", k => k === "Fire", 1e-3) })), { zero: true, d: 2 });
+  drawTable();
+}
+
+function drawTable() {
+  const counties = [...new Set(M.combos.map(c => c.county))].sort(), main = S.run, yy = S.year, save = S.area;
+  const rows = counties.map(n => { S.area = "county::" + n;
+    const tec = series(main, "stocks", k => k.startsWith("Total Ecosystem|"), 1e-6), a = series(null, "area", () => true, 1e-3)[0].v;
+    const fire = series(main, "trans", k => k === "Fire", 1e-3), p0 = tec[0], p1 = at(tec, yy) || tec[tec.length - 1];
+    return { n, a, c0: p0.v, c1: p1.v, d: p1.v - p0.v, dens: p1.v * 1e6 / (a * 1e3), burn: d3.sum(fire.filter(p => p.y > Y0 && p.y <= yy), p => p.v) }; });
+  S.area = save; rows.sort((a, b) => b.c1 - a.c1);
+  const mx = d3.max(rows, r => Math.abs(r.d)) || 1;
+  el("tbl").querySelector("thead").innerHTML = `<tr><th>County</th><th class="n">Area kha</th><th class="n">Carbon ${Y0} Tg</th><th class="n">Carbon ${yy} Tg</th><th class="n">Change Tg</th><th></th><th class="n">t C/ha</th><th class="n">Burned ${Y0 + 1}–${yy} kha</th></tr>`;
+  const tb = el("tbl").querySelector("tbody"); tb.innerHTML = "";
+  rows.forEach(r => { const tr = document.createElement("tr"); tr.tabIndex = 0; tr.setAttribute("aria-selected", S.area === "county::" + r.n);
+    const w = Math.round(60 * Math.abs(r.d) / mx);
+    tr.innerHTML = `<td></td><td class="n">${fmt(r.a, 1)}</td><td class="n">${fmt(r.c0, 2)}</td><td class="n">${fmt(r.c1, 2)}</td><td class="n">${sgn(r.d, 2)}</td><td><span class="bar" style="width:${w}px;background:${r.d >= 0 ? "var(--accent)" : "#b4532a"}"></span></td><td class="n">${fmt(r.dens, 0)}</td><td class="n">${fmt(r.burn, 1)}</td>`;
+    tr.firstChild.textContent = r.n;
+    const pick = () => setArea(S.area === "county::" + r.n ? "all" : "county::" + r.n);
+    tr.addEventListener("click", pick); tr.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
+    tb.appendChild(tr); });
+}
+
+// ---------------------------------------------------------------- map
+const MAP = { cache: new Map(), s: 1, tx: 0, ty: 0, data: null, shade: null, strata: null, elev: null, ver: 0 };
+const LAYERS = [
+  { id: "sc", name: "Land cover" }, { id: "tec", name: "Ecosystem carbon" }, { id: "live", name: "Live carbon" }, { id: "chg", name: `Carbon change` },
+  { id: "age", name: "Stand age" }, { id: "dist", name: "Disturbance" }, { id: "chance-fire", name: "Chance of fire" }, { id: "chance-mort", name: "Chance of mortality" },
+  { id: "chance-harvest", name: "Chance of harvest" }, { id: "chance-change", name: "Chance of cover change" }];
+async function png(name) {
+  if (MAP.cache.has(name)) return MAP.cache.get(name);
+  const p = (async () => { const r = await fetch(DATA + "maps/" + name); if (!r.ok) throw new Error(name + ": " + r.status);
+    const bmp = await createImageBitmap(await r.blob(), { colorSpaceConversion: "none", premultiplyAlpha: "none" });
+    const c = document.createElement("canvas"); c.width = bmp.width; c.height = bmp.height; const x = c.getContext("2d", { willReadFrequently: true }); x.drawImage(bmp, 0, 0);
+    const d = x.getImageData(0, 0, c.width, c.height).data, out = new Uint8Array(c.width * c.height); for (let i = 0; i < out.length; i++) out[i] = d[i * 4]; return out; })();
+  MAP.cache.set(name, p); p.catch(() => MAP.cache.delete(name)); return p;
+}
+const runOfYear = y => y <= YS ? "hist" : S.run;
+function hexRgb(h) { const c = d3.rgb(h); return [c.r, c.g, c.b]; }
+function rampLut(stops, n = 255) { const f = d3.interpolateRgbBasis(stops); return d3.range(n).map(i => hexRgb(f(i / (n - 1)))); }
+const dark = () => matchMedia("(prefers-color-scheme: dark)").matches && document.documentElement.dataset.theme !== "light" || document.documentElement.dataset.theme === "dark";
+const RAMP = {
+  carbon: () => dark() ? ["#16241b", "#1e4a30", "#2c7a46", "#58a866", "#9bd18a", "#e3f4c6"] : ["#f2f5e6", "#c8e0a9", "#86bf72", "#3e9353", "#176a3d", "#0a3d26"],
+  age: () => dark() ? ["#231c12", "#4f3a17", "#86621f", "#c1922f", "#f0c867"] : ["#fbf3df", "#f0d394", "#d9a441", "#a8721f", "#6b4512"],
+  fire: () => ["#f6c35b", "#ef8a3c", "#d8572a", "#a3261b"], mort: () => ["#d7c4ea", "#a77fd0", "#7a4bb0", "#4b2479"],
+  harvest: () => ["#c9d0d5", "#98a4ad", "#5b6670", "#2f383f"], change: () => ["#f6c7d8", "#e889ad", "#d0447c", "#8b1c4b"]
+};
+function layerSpec() {
+  const L = S.layer, y = S.year, none = hexRgb(css("--none"));
+  if (L === "sc") { const lut = M.classes.map(c => hexRgb(c.color)); if (S.focusGroup) M.classes.forEach((c, i) => { if (c.group !== S.focusGroup) lut[i] = none; });
+    return { files: [`sc-${runOfYear(y)}-${y}.png`], lut, legend: "classes", title: "Land cover", sub: S.focusGroup ? `${S.focusGroup} only · iteration 1` : "State class, iteration 1" }; }
+  if (L === "tec" || L === "live") { const max = L === "tec" ? 400 : 250, f = rampLut(RAMP.carbon()), lut = d3.range(255).map(v => f[Math.min(254, Math.round(254 * v * 2 / max))]);
+    return { files: [`${L}-${runOfYear(y)}-${y}.png`], lut, legend: { ramp: RAMP.carbon(), ticks: [0, max / 4, max / 2, 3 * max / 4, max + "+"] , unit: "t C/ha" }, title: L === "tec" ? "Total ecosystem carbon" : "Live carbon (biomass)", sub: "Mean of the iterations", read: v => `${fmt(v * 2, 0)} t C/ha` }; }
+  if (L === "chg") return { files: [`tec-hist-${Y0}.png`, `tec-${runOfYear(y)}-${y}.png`], diff: true, title: `Carbon change since ${Y0}`, sub: "Total ecosystem carbon, t C/ha",
+    legend: { ramp: ["#8a3b12", "#d08a5b", css("--none"), "#5fb3a3", "#0f6b62"], ticks: ["−100", "−50", "0", "+50", "+100"], unit: "t C/ha" }, read: v => `${sgn(v, 0)} t C/ha` };
+  if (L === "age") { const f = rampLut(RAMP.age()), lut = d3.range(255).map(v => f[Math.min(254, Math.round(254 * v * 2 / 300))]);
+    return { files: [`age-${runOfYear(y)}-${y}.png`], lut, legend: { ramp: RAMP.age(), ticks: [0, 75, 150, 225, "300+"], unit: "years" }, title: "Stand age", sub: "Years since the last stand-replacing event, iteration 1", read: v => `${v * 2} years` }; }
+  if (L === "dist") { const lut = d3.range(255).map(() => none); M.dist.forEach(d => lut[d.code] = hexRgb(d.color)); const ys = d3.range(Math.max(Y0 + 1, y - S.window + 1), y + 1);
+    return { files: ys.map(yy => `dist-${runOfYear(yy)}-${yy}.png`), latest: true, lut, legend: "dist", title: "Disturbance", sub: S.window > 1 ? `Most recent event, ${ys[0]}–${y}, iteration 1` : `Events in ${y}, iteration 1`, read: v => v ? M.dist.find(d => d.code === v).name : "none" }; }
+  if (L.startsWith("chance-")) { const kd = L.slice(7), it = RUNS[S.run].iterations[1], f = rampLut(RAMP[kd]()), lut = d3.range(255).map(v => v === 0 ? none : f[Math.round(254 * Math.min(1, v / it))]);
+    const nm = { fire: "fire", mort: "drought and insect mortality", harvest: "harvest", change: "a change of cover group" }[kd];
+    return { files: [`${L}-${S.run}.png`], lut, legend: { ramp: [css("--none"), ...RAMP[kd]()], ticks: ["0", ...d3.range(1, it + 1).map(String)], unit: `of ${it} iterations` }, title: `Chance of ${nm}`, sub: `${YS + 1}–${Y1}, ${short(RUNS[S.run].label)}`, read: v => `${v} of ${it} iterations (${fmt(100 * v / it, 0)}%)` }; }
+}
+let drawToken = 0;
+async function drawMap() {
+  const tok = ++drawToken, spec = layerSpec(), G = M.grid;
+  el("maptitle").innerHTML = ""; el("maptitle").append(spec.title); const sm = document.createElement("small"); sm.textContent = spec.sub; el("maptitle").append(sm);
+  drawLegend(spec);
+  let vals;
+  try { const arr = await Promise.all(spec.files.map(png)); if (tok !== drawToken) return;
+    if (spec.diff) { const [a, b] = arr; vals = new Int16Array(a.length); for (let i = 0; i < a.length; i++) vals[i] = a[i] === 255 || b[i] === 255 ? -32768 : (b[i] - a[i]) * 2; }
+    else if (spec.latest) { vals = new Uint8Array(arr[0].length); for (const a of arr) for (let i = 0; i < a.length; i++) { if (a[i] === 255) vals[i] = 255; else if (a[i] > 0) vals[i] = a[i]; } }
+    else vals = arr[0];
+  } catch (e) { el("maploading").hidden = false; el("maploading").textContent = `No ${spec.title.toLowerCase()} map for ${S.year} in this run.`; MAP.vals = null; MAP.data = null; paint(); return; }
+  el("maploading").hidden = true;
+  const img = new ImageData(G.ncol, G.nrow), d = img.data, combos = new Set(activeCombos()), all = S.area === "all", st = MAP.strata;
+  const neg = hexRgb("#8a3b12"), negm = hexRgb("#d08a5b"), mid = hexRgb(css("--none")), posm = hexRgb("#5fb3a3"), pos = hexRgb("#0f6b62");
+  const div = spec.diff ? d3.interpolateRgbBasis(["#8a3b12", "#d08a5b", css("--none"), "#5fb3a3", "#0f6b62"]) : null, dlut = div ? d3.range(201).map(i => hexRgb(div(i / 200))) : null;
+  for (let i = 0; i < vals.length; i++) {
+    const s = st[i]; if (s === 255) { d[i * 4 + 3] = 0; continue; }
+    const v = vals[i]; let c;
+    if (spec.diff) c = v === -32768 ? mid : dlut[Math.max(0, Math.min(200, Math.round(v + 100)))];
+    else c = v === 255 ? mid : spec.lut[v] || mid;
+    d[i * 4] = c[0]; d[i * 4 + 1] = c[1]; d[i * 4 + 2] = c[2]; d[i * 4 + 3] = all || combos.has(s) ? 255 : 46;
+  }
+  const cv = MAP.data || (MAP.data = document.createElement("canvas")); cv.width = G.ncol; cv.height = G.nrow; cv.getContext("2d").putImageData(img, 0, 0);
+  MAP.vals = vals; MAP.spec = spec; paint();
+}
+function buildShade(rel) {
+  const R = M.grid.relief, c = document.createElement("canvas"); c.width = R.ncol; c.height = R.nrow; const img = new ImageData(R.ncol, R.nrow), d = img.data, dk = dark();
+  for (let i = 0; i < rel.length; i++) { const v = rel[i] / 254; if (v > .62) { d[i * 4] = d[i * 4 + 1] = d[i * 4 + 2] = 255; d[i * 4 + 3] = (v - .62) * (dk ? 120 : 260); } else { d[i * 4 + 3] = (.62 - v) * (dk ? 330 : 300); } }
+  c.getContext("2d").putImageData(img, 0, 0); MAP.shade = c;
+}
+function fit() { const wr = el("mapwrap"), G = M.grid, w = wr.clientWidth, h = wr.clientHeight, lw = el("legend").offsetWidth + 24, aw = Math.max(w * .45, w - lw);
+  MAP.s = Math.min((aw - 16) / G.ncol, (h - 56) / G.nrow); MAP.tx = Math.max(8, (aw - G.ncol * MAP.s) / 2); MAP.ty = Math.max(40, (h - G.nrow * MAP.s) / 2 + 8); }
+function paint() {
+  const cv = el("map"), wr = el("mapwrap"), dpr = devicePixelRatio || 1, w = wr.clientWidth, h = wr.clientHeight;
+  if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+  const x = cv.getContext("2d"), G = M.grid; x.setTransform(dpr, 0, 0, dpr, 0, 0); x.fillStyle = css("--bg"); x.fillRect(0, 0, w, h);
+  x.save(); x.translate(MAP.tx, MAP.ty); x.scale(MAP.s, MAP.s);
+  if (MAP.data) { x.imageSmoothingEnabled = false; x.drawImage(MAP.data, 0, 0); }
+  if (MAP.shade) { x.imageSmoothingEnabled = true; x.drawImage(MAP.shade, 0, 0, G.ncol, G.nrow); }
+  const ring = (rings, ctx) => { for (const r of (Array.isArray(rings) ? rings : Object.values(rings))) { ctx.moveTo(r[0], r[1]); for (let i = 2; i < r.length; i += 2) ctx.lineTo(r[i], r[i + 1]); ctx.closePath(); } };
+  x.lineJoin = "round";
+  x.beginPath(); M.bounds.county.forEach(b => ring(b.rings, x)); x.strokeStyle = css("--ink"); x.globalAlpha = .38; x.lineWidth = .8 / MAP.s; x.stroke();
+  x.globalAlpha = 1; x.beginPath(); M.bounds.study.forEach(b => ring(b.rings, x)); x.lineWidth = 1.4 / MAP.s; x.stroke();
+  if (S.area !== "all") { const [k, n] = S.area.split("::"); x.beginPath(); (k === "county" ? M.bounds.county : M.bounds.ecoregion).filter(b => b.name === n).forEach(b => ring(b.rings, x)); x.strokeStyle = css("--accent"); x.lineWidth = 2.4 / MAP.s; x.stroke(); }
+  x.restore();
+  // county labels when zoomed in enough
+  if (MAP.s > 1.1) { x.font = `600 11px ${css("--f-body")}`; x.textAlign = "center"; x.fillStyle = css("--ink"); x.strokeStyle = css("--bg"); x.lineWidth = 3;
+    M.bounds.county.forEach(b => { const r = Object.values(b.rings).reduce((a, q) => q.length > a.length ? q : a, []); let sx = 0, sy = 0; for (let i = 0; i < r.length; i += 2) { sx += r[i]; sy += r[i + 1]; } const n = r.length / 2;
+      const px = MAP.tx + sx / n * MAP.s, py = MAP.ty + sy / n * MAP.s; if (px > 0 && px < w && py > 30 && py < h - 40) { x.strokeText(b.name, px, py); x.fillText(b.name, px, py); } }); }
+}
+function drawLegend(spec) {
+  const L = el("legend"); L.innerHTML = ""; const h = document.createElement("h4"); L.append(h);
+  if (spec.legend === "classes") { h.textContent = "State class"; const sw = document.createElement("div"); sw.className = "sw";
+    const shown = M.classes.map((c, i) => ({ ...c, i })).filter(c => !S.focusGroup || c.group === S.focusGroup), seen = new Set();
+    // a group drawn in one colour is one entry; otherwise its classes, named without the group (disturbed forest and non-forest told apart)
+    const one = g => new Set(M.classes.filter(c => c.group === g).map(c => c.color)).size === 1;
+    const label = c => c.group === "Disturbed" ? (/Group$/.test(c.name) ? "Disturbed forest" : "Disturbed shrub or grass") : one(c.group) ? c.group
+      : /: All$/.test(c.name) ? c.name.replace(/: All$/, "") : c.group === "Developed" || c.group === "Wetland" ? c.group + ", " + c.name.replace(/^[^:]+: /, "").replace(/ Group$/, "").toLowerCase()
+      : c.name.replace(/^[^:]+: /, "").replace(/ Group$/, "");
+    shown.forEach(c => { const nm = label(c); const key = nm + c.color; if (seen.has(key)) return; seen.add(key);
+      const d = document.createElement("div"), i = document.createElement("i"); i.style.background = c.color; d.append(i, nm); sw.append(d); });
+    L.append(sw); return; }
+  if (spec.legend === "dist") { h.textContent = "Disturbance"; const sw = document.createElement("div"); sw.className = "sw";
+    M.dist.forEach(dd => { const d = document.createElement("div"), i = document.createElement("i"); i.style.background = dd.color; d.append(i, dd.name); sw.append(d); }); L.append(sw);
+    const seg = document.createElement("div"); seg.className = "seg"; seg.style.marginTop = "8px";
+    [[1, "This year"], [5, "Last 5 years"], [10, "Last 10 years"]].forEach(([n, t]) => { const b = document.createElement("button"); b.textContent = t; b.setAttribute("aria-pressed", S.window === n); b.onclick = () => { S.window = n; drawMap(); }; seg.append(b); });
+    L.append(seg); return; }
+  h.textContent = spec.legend.unit; const r = document.createElement("div"); r.className = "ramp"; r.style.background = `linear-gradient(90deg, ${spec.legend.ramp.join(",")})`;
+  const t = document.createElement("div"); t.className = "ticks"; spec.legend.ticks.forEach(v => { const s = document.createElement("span"); s.textContent = v; t.append(s); }); L.append(r, t);
+}
+function setupMap() {
+  const wr = el("mapwrap"), hv = el("hover"); let drag = null, moved = false;
+  const cell = ev => { const b = wr.getBoundingClientRect(), c = Math.floor((ev.clientX - b.left - MAP.tx) / MAP.s), r = Math.floor((ev.clientY - b.top - MAP.ty) / MAP.s);
+    return c >= 0 && r >= 0 && c < M.grid.ncol && r < M.grid.nrow ? r * M.grid.ncol + c : -1; };
+  wr.addEventListener("pointerdown", ev => { if (ev.target.closest("button,.legend")) return; drag = { x: ev.clientX, y: ev.clientY, tx: MAP.tx, ty: MAP.ty }; moved = false; wr.setPointerCapture(ev.pointerId); });
+  wr.addEventListener("pointermove", ev => {
+    if (drag) { const dx = ev.clientX - drag.x, dy = ev.clientY - drag.y; if (Math.abs(dx) + Math.abs(dy) > 3) { moved = true; wr.classList.add("drag"); } if (moved) { MAP.tx = drag.tx + dx; MAP.ty = drag.ty + dy; paint(); hv.hidden = true; return; } }
+    const i = cell(ev); if (i < 0 || MAP.strata[i] === 255) { hv.hidden = true; return; }
+    const cb = M.combos[MAP.strata[i]], rows = [["County", cb.county], ["Ecoregion", cb.ecoregion]];
+    if (MAP.elev) rows.push(["Elevation", `${fmt(MAP.elev[i] * 20, 0)} m`]);
+    const sc = MAP.cache.get(`sc-${runOfYear(S.year)}-${S.year}.png`);
+    if (MAP.vals && MAP.spec) { const v = MAP.vals[i]; if (S.layer === "sc") rows.push(["Class", v === 255 ? "–" : M.classes[v].name]); else if (MAP.spec.read && v !== 255 && v !== -32768) rows.push([MAP.spec.title, MAP.spec.read(v)]); }
+    hv.innerHTML = ""; rows.forEach(([k, v]) => { const d = document.createElement("div"), a = document.createElement("span"), b = document.createElement("span"); a.className = "k"; b.className = "v"; a.textContent = k; b.textContent = v; d.append(a, b); hv.append(d); });
+    const b = wr.getBoundingClientRect(); let lx = ev.clientX - b.left + 14, ly = ev.clientY - b.top + 14; hv.hidden = false;
+    if (lx + hv.offsetWidth > b.width - 6) lx = ev.clientX - b.left - hv.offsetWidth - 14; if (ly + hv.offsetHeight > b.height - 6) ly = ev.clientY - b.top - hv.offsetHeight - 14;
+    hv.style.left = lx + "px"; hv.style.top = ly + "px"; });
+  wr.addEventListener("pointerup", ev => { if (drag && !moved) { const i = cell(ev); if (i >= 0 && MAP.strata[i] !== 255) { const n = "county::" + M.combos[MAP.strata[i]].county; setArea(S.area === n ? "all" : n); } } drag = null; wr.classList.remove("drag"); });
+  wr.addEventListener("pointerleave", () => { hv.hidden = true; });
+  const zoom = (k, cx, cy) => { const ns = Math.max(.3, Math.min(14, MAP.s * k)); k = ns / MAP.s; MAP.tx = cx - (cx - MAP.tx) * k; MAP.ty = cy - (cy - MAP.ty) * k; MAP.s = ns; paint(); };
+  wr.addEventListener("wheel", ev => { ev.preventDefault(); const b = wr.getBoundingClientRect(); zoom(Math.exp(-ev.deltaY * .0015), ev.clientX - b.left, ev.clientY - b.top); }, { passive: false });
+  el("zin").onclick = () => zoom(1.5, wr.clientWidth / 2, wr.clientHeight / 2); el("zout").onclick = () => zoom(1 / 1.5, wr.clientWidth / 2, wr.clientHeight / 2); el("zfit").onclick = () => { fit(); paint(); };
+  wr.addEventListener("dblclick", () => { fit(); paint(); });
+  new ResizeObserver(() => paint()).observe(wr);
+}
+
+// ---------------------------------------------------------------- controls
+function setYear(y) { S.year = Math.max(Y0, Math.min(Y1, y)); el("slider").value = S.year; el("yr").textContent = S.year;
+  el("yrkind").textContent = S.year > YS ? short(RUNS[S.run].label) : "Historical"; drawMap(); drawAll(); prefetch(); }
+function setArea(a) { S.area = a; el("area").value = a; drawMap(); drawAll(); }
+function setLayer(l) { S.layer = l; document.querySelectorAll("#layers .chip").forEach(b => b.setAttribute("aria-pressed", b.dataset.id === l)); drawMap(); if (l === "sc") drawAll(); }
+function prefetch() { const sp = layerSpec(); if (!sp || S.layer.startsWith("chance")) return; [S.year + 1, S.year + 2].filter(y => y <= Y1).forEach(y => { const f = sp.files[sp.files.length - 1].replace(/-(hist|p\d)-\d{4}\.png$/, `-${runOfYear(y)}-${y}.png`); png(f).catch(() => {}); }); }
+function controls() {
+  const sc = el("scen"); PROJ.forEach(r => { const b = document.createElement("button"); b.dataset.k = r.key; const i = document.createElement("i"); i.style.background = runColor(r.key); b.append(i, short(r.label)); b.setAttribute("aria-pressed", r.key === S.run);
+    b.onclick = () => { S.run = r.key; sc.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x.dataset.k === S.run)); setYear(S.year); }; sc.append(b); });
+  el("cmp").onchange = e => { S.compare = e.target.checked; drawAll(); };
+  const a = el("area"); a.innerHTML = `<option value="all">Whole study area</option>`;
+  const og = (lab, kind, names) => { const g = document.createElement("optgroup"); g.label = lab; names.forEach(n => { const o = document.createElement("option"); o.value = `${kind}::${n}`; o.textContent = n; g.append(o); }); a.append(g); };
+  og("Counties", "county", [...new Set(M.combos.map(c => c.county))].sort()); og("Ecoregions", "eco", [...new Set(M.combos.map(c => c.ecoregion))].sort());
+  a.onchange = () => setArea(a.value);
+  const L = el("layers"); LAYERS.forEach(l => { const b = document.createElement("button"); b.className = "chip"; b.dataset.id = l.id; b.textContent = l.name; b.setAttribute("aria-pressed", l.id === S.layer);
+    if (l.id.startsWith("chance") && !(RUNS[S.run].maps.chance || []).includes(l.id.slice(7))) b.disabled = true; b.onclick = () => setLayer(l.id); L.append(b); });
+  const sl = el("slider"); sl.min = Y0; sl.max = Y1; sl.value = S.year; sl.oninput = () => setYear(+sl.value);
+  el("y0").textContent = Y0; el("y1").textContent = Y1; el("ymid").textContent = YS; el("split").style.left = `calc(${100 * (YS - Y0) / (Y1 - Y0)}% )`;
+  let timer = null; el("play").onclick = () => { if (timer) { clearInterval(timer); timer = null; el("playicon").setAttribute("d", "M1 1l10 6-10 6z"); return; }
+    if (S.year >= Y1) setYear(Y0); el("playicon").setAttribute("d", "M1 1h3.5v12H1zM7.5 1H11v12H7.5z");
+    timer = setInterval(() => { if (S.year >= Y1) { el("play").click(); return; } setYear(S.year + 1); }, 650); };
+  document.addEventListener("keydown", e => { if (e.target.closest("input,select,textarea")) return; if (e.key === "ArrowRight") setYear(S.year + 1); if (e.key === "ArrowLeft") setYear(S.year - 1); });
+  let rt; new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(drawAll, 120); }).observe(el("ana"));
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { MAP.rel && buildShade(MAP.rel); drawMap(); drawAll(); });
+  new MutationObserver(() => { MAP.rel && buildShade(MAP.rel); drawMap(); drawAll(); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+}
+
+// ---------------------------------------------------------------- start
+(async function start() {
+  try {
+    M = await (await fetch(DATA + "meta.json")).json();
+    M.runs.forEach(r => RUNS[r.key] = r); HIST = M.runs.find(r => r.kind === "historical"); PROJ = M.runs.filter(r => r.kind === "projection");
+    Y0 = HIST.years[0]; YS = HIST.years[1]; Y1 = d3.max(M.runs, r => r.years[1]); S.year = YS;
+    el("title").textContent = M.title; el("subtitle").textContent = `${fmt(M.grid.cells * M.grid.res * M.grid.res / 1e7, 0)} kha · ${M.grid.res} m grid · ${Y0}–${Y1}`;
+    const tabs = await Promise.all(M.runs.map(r => fetch(`${DATA}tables-${r.key}.json`).then(x => x.json()))); M.runs.forEach((r, i) => T[r.key] = tabs[i]);
+    controls(); setupMap();
+    const [st, rel, elev] = await Promise.all([png("strata.png"), M.grid.relief ? png("relief.png") : null, png("elev.png").catch(() => null)]);
+    MAP.strata = st; MAP.elev = elev; if (rel) { MAP.rel = rel; buildShade(rel); }
+    fit(); setYear(S.year);
+    el("foot").innerHTML = ""; [
+      `Source: LUCAS model runs in the library ${M.library}, exported ${M.exported}. Historical run ${Y0}–${YS} (one iteration), projections ${YS}–${Y1} under ${PROJ.map(r => r.label).join(" and ")} (${PROJ[0].iterations[1]} Monte Carlo iterations each).`,
+      "Charts show the historical run up to the projection start, then the mean of the iterations, with the range across iterations shaded. Land cover, stand age and disturbance maps show iteration 1; carbon maps show the mean of the iterations. Chance maps count the iterations in which a cell had the event between the projection start and the end.",
+      "Provisional model output for development and review. It is not a USGS data release and should not be cited."
+    ].forEach(t => { const p = document.createElement("p"); p.style.margin = 0; p.textContent = t; el("foot").append(p); });
+  } catch (e) { el("title").textContent = "The model output could not be loaded"; el("subtitle").textContent = String(e.message || e); console.error(e); }
+})();
+})();
+</script>

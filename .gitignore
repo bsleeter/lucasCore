@@ -49,3 +49,6 @@ dev/agriculture/02-nass-county-crop-npp.csv
 # SyncroSim package metadata: the release build (tools/build_ssimpkg.ps1) writes its own into the .ssimpkg; this copy is for the
 # folder-registered development package on this machine (without it SyncroSim warns the package was "built for an undetermined version")
 .metadata
+
+# output dashboard bundles (tools/dashboard-export.R) and the local staging copy the artifact is published from
+dev/dashboard/
