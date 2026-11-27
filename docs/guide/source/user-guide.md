@@ -1422,15 +1422,16 @@ Stage 13 draws report figures of a run in the same format as the Build figures (
 
 | Figure | Shows |
 | --- | --- |
-| Land cover change | (a, b) state class in the first and last year; (c) land-use change between them, including forest harvested at least once (clearcut, salvage or selection) |
-| Fire | (a) times burned; (b) highest burn severity; (c) year of the last fire |
-| Forest harvest | (a) times harvested; (b) most intensive harvest type; (c) year of the last harvest |
+| Land cover change | (a, b) land cover and land use in the first and last year, under one legend (from lucasCore 2.2); (c) the change between them: land-use change, forest harvested at least once (clearcut, salvage or selection), and other changes of class put down to fire, drought and insect mortality, or other change |
+| Fire | (a) times burned; (b) highest burn severity; (c) year of the last fire, in 5-year classes |
+| Forest harvest | (a) times harvested; (b) most intensive harvest type; (c) year of the last harvest, in 5-year classes |
 | Total ecosystem carbon | (a, b) carbon in the first and last year; (c) the change, loss in brown and gain in green |
+| Live carbon (from lucasCore 2.2) | the same maps as Total ecosystem carbon, for live biomass alone |
 | Land area by cover group | (a) area of each cover group per year; (b) change since the first year |
 | Transitions per year | each family's area per year in the run (bars) against the Build's record (points) |
 | Carbon stocks | (a) carbon by pool per year; (b) the net ecosystem carbon balance |
 | Carbon fluxes | (a) net primary productivity, heterotrophic respiration and net ecosystem productivity; (b) fire and harvest losses and net biome productivity |
-| Carbon by secondary stratum | (a) change in carbon density; (b) total carbon in the last year, by county |
+| Carbon by secondary stratum | (a) change in carbon density; (b) total carbon in the last year, by county; with several iterations, whiskers for the lowest and highest |
 | Wetland methane (from lucasCore 1.5) | (a) methane per year by wetland type: palustrine emergent, estuarine emergent and forested; (b) net biome productivity as CO2, and with methane at its CO2 equivalent. Drawn when the run's wetlands released methane |
 
 Each figure is drawn only when the run wrote what it needs: the land cover figure needs the run's state class maps, the fire figure its Fire transition maps, the harvest figure and the change map's harvest classes its clearcut and selection type group maps (section 5.2), and the carbon maps its Total Ecosystem average stock maps (all on by default in sections 5.2 and the Build's stock-flow output).
@@ -1608,6 +1609,8 @@ The Fire page chooses how projected fire is made. Fire is a Probability group (s
 23. **Method 2: burn probability** (22). Leave **Burn probability raster** blank to use the Data Sources burn probability (FSim CONUS, LF2020, 270 m), or browse to another (a Wildfire Risk to Communities or lucasFireC2F burn probability). **Ignitions from**: the burn probability itself (default), or the FPA-FOD ignition density, the recorded fire origins smoothed with a Gaussian of the **Ignition smoothing** width (blank = 5,000 m).
 
 Method 3 needs a finished lucasFireC2F run: its library and the result scenario whose per-burn effects table it uses.
+
+**Fire years** (from lucasCore 2.2). Methods 1 and 2 draw a historical fire year for every projection year and iteration. **As this setup draws them**, the default, draws at random, with no regard to the projection's climate. **From the Projection Climate result** lets a Projection Climate scenario pick each year's fire year by the climate of that projection year (section 7.3.2). The setup still places the fire and sizes the fires as above, and serves any number of climate futures. Method 3 keeps its own seasons.
 
 &#91;image: Fire: Fire marked 20; the Fire group (Fire) and the three methods with 2. Burn probability chosen, marked 21; the Method 2 settings, a blank Burn probability raster and ignitions from the burn probability, marked 22\]
 
@@ -1914,6 +1917,31 @@ The result's **CO2 Fertilization Betas** sheet lists every beta stage 11 used, i
 In the Puget Lowlands test (ACCESS-CM2, SSP2-4.5, to 2050, Central), CO2 rose from 426 to 507 ppm. The 2050 multipliers were 1.03 to 1.08 for forest, 1.03 for shrubland, 1.05 for grassland and 1.04 for wetlands. Against the same climate future without CO2, growth was 1.2% higher in 2030 and 4.8% higher in 2050, and ecosystem carbon in 2050 was 365.3 Tg C against 363.1 (+2.2 Tg C: 1.7 live, 0.5 dead organic matter).
 
 To separate the CO2 effect from the climate's, make two Projection Climate scenarios of the same LOCA2 run, one with **CO2 fertilization** None and one with Central, and a projection on each. Stage 11 copies the Build's flow multipliers into its result along with the CO2 rows, so rerun the Projection Climate scenario after rerunning the Build. Climate results made before CO2 fertilization was added (November 2026) have no CO2 rows. In an older library, run `tools/sync-library.R` first; it adds the page's columns and the CO2 type.
+
+#### 7.3.2 Fire that follows climate
+
+From lucasCore 2.2 a projection's fire years can follow its climate. Burned area in the western pyromes rises with the heat and dryness of the fire season: across 71 pyromes and 1984-2023, the hot and dry years burned the most. The climate draw keeps the empirical method and only changes which historical year each projection year takes.
+
+- **The index.** A fire season is May to September. Its index is the season's mean maximum temperature less its precipitation, each in standard deviations of 1984-2014 (PRISM 800 m), so hot and dry years score high.
+- **The draw.** Each projection year draws at random among the historical years whose index was nearest its own (10 by default). The LOCA2 run is first put on PRISM's scale by the delta method, so a model's own bias drops out.
+- **What it sets.** The drawn year sets the study area's burned area and its mix of high, medium and low severity. Where fire goes (slope selectivity or the burn probability) and how large the fires are stay as the setup made them.
+- **The bound.** The draw stays among years on record. A projection year hotter than every year on record draws among the hottest, so burned area does not climb beyond what the record has seen.
+
+To switch it on:
+
+1. On the Projection Setup's **Projection > Fire** page, set **Fire years** to *From the Projection Climate result* (section 6.5), and run the setup.
+2. Make the Projection Climate scenario depend on the Build result and, below it, on that Projection Setup result.
+3. On the Projection Climate scenario's **Projection > Fire and Climate** page, leave the defaults or change them (table below), and run it.
+4. Make the projection depend on the setup and the Projection Climate result as usual.
+
+| Setting | Default | What it does |
+| --- | --- | --- |
+| Fire years | Climate analog draw | The analog draw, or the setup's own random draws (no climate) |
+| Analog years | 10 | How many of the nearest historical years each projection year draws among. Fewer follow the climate more closely but repeat a handful of years; 10 keeps the big fire years of the record within reach of a hot future |
+
+Every projection from a setup switched this way needs a Projection Climate result made this way. The Projection Climate result's Projection Results > **Fire and Climate by Year** table lists each projection year's index, the years it could draw, and its expected burned area under the setup's draw and the climate draw, with the reference years beside them. The stage 11 log has lines beginning *Fire*.
+
+In Southern Sierra Nevada (Pyrome 27, ACCESS-CM2, five iterations, 2024-2050) the climate draw burned 401 km2 a year under SSP2-4.5 and 375 km2 under SSP5-8.5, against 280 km2 for the random draw. Fire emissions rose by about 5 Tg C over the period, and net biome productivity was roughly halved. The draw is tested in that pyrome only. Grass and shrub pyromes (Great Basin, Snake River Plain) follow the previous year's rain more than the fire season's heat, which this index does not use.
 
 ### 7.4 Comparing runs (stage 14)
 

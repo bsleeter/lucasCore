@@ -98,12 +98,13 @@ D <- list(
     u(8, "Each cell's crops at their county's NASS growth and harvest: the Cropland Productivity and Crop Harvest multipliers", "Build Options > Site Productivity: Cropland Productivity", TRUE))),
   list("Non-forest productivity", "TidalMarshNppFolder", "USGS tidal marsh NPP", "Woltz et al. 2023 · 30 m · 2015", list(
     u(8, "Estuarine and palustrine marsh NPP: the emergent wetland multiplier against its ecodivision mean", "Build Options > Site Productivity: Tidal Marsh Productivity", TRUE))),
-  list("Climate", "PrismFolder", "PRISM", "annual tmean and ppt, monthly ppt · normals", list(
+  list("Climate", "PrismFolder", "PRISM", "annual and monthly · normals", list(
     u(2, "Ecodivision climate for the growth curves"), u(3, "Ecodivision climate for the decay calibration"),
     u(7, "Annual temperature and precipitation for the historical climate multipliers; monthly precipitation by water-year season for the non-forest RAP fit", "Climate Options"),
-    u(9, "Temperature, precipitation and vapour pressure deficit normals, in the surface that places projected drought and insect mortality", "Projection > Mortality > Where it falls: Clustered", TRUE))),
+    u(9, "Temperature, precipitation and vapour pressure deficit normals, in the surface that places projected drought and insect mortality", "Projection > Mortality > Where it falls: Clustered", TRUE),
+    u(11, "Monthly maximum temperature and precipitation of 1984-2014: the reference fire seasons the climate analog draw ranks each projection year against", "Projection > Climate > Fire and Climate (with Fire > Fire years from the Projection Climate result)", TRUE))),
   list("Climate", "Loca2Folder", "LOCA2", "GCM / member / SSP", list(
-    u(11, "Projected climate of one scenario, model and replicate (its SSP also sets the CO2 of the CO2 fertilization multiplier)", "Projection > Climate"))),
+    u(11, "Projected climate of one scenario, model and replicate (its SSP also sets the CO2 of the CO2 fertilization multiplier; its fire seasons pick the fire years of the climate analog draw)", "Projection > Climate"))),
   list("Covariates", "RoadsFile", "LANDFIRE roads", "LF2023 · 30 m", list(u(10, "Distance to roads covariate", "Suitability Covariates"))),
   list("Covariates", "ElevationFile", "LANDFIRE elevation", "LF2020 · 30 m", list(
     u(9, "Slope selectivity of projected fire (burned share by slope)", "Fire > Slope Selectivity (default on)"),
@@ -132,7 +133,7 @@ S <- list(
   `9` = list("9", "Projection Transitions", "Projection transition targets, fire sizes and slope selectivity", "Projection Options; Projection Transitions; Fire"),
   `10` = list("10", "Transition Suitability", "Surfaces that place projected transitions, with adjacency and patch sizes", "Projection Allocation; Suitability Options and Covariates; Rule Weights"),
   `7` = list("7", "Climate Multipliers", "Historical climate flow multipliers on growth and decomposition", "Climate Options (forest and non-forest growth, decomposition)"),
-  `11` = list("11", "Projection Climate", "Projection climate and CO2 fertilization flow multipliers", "Projection > Climate (LOCA2 scenario, model, replicate; CO2 fertilization series, ceiling, reference, CO2 Betas)"),
+  `11` = list("11", "Projection Climate", "Projection climate and CO2 fertilization flow multipliers; fire years by climate analog", "Projection > Climate (LOCA2 run; CO2 fertilization and CO2 Betas; Fire and Climate)"),
   `12` = list("12–14", "Build, Run and Compare Figures", "PNG figures of a Build, a run, and a run comparison", "Run Figures; Compare Runs"))
 scripts <- list(`2` = c("2-growth-curves.R", "fia.R"), `3` = c("3-carbon-flows.R", "fia.R"), `10` = c("10-transition-suitability.R", "nccpi.R"),
                 `12` = c("12-build-figures.R", "13-run-figures.R", "14-compare-runs.R"))
@@ -145,7 +146,7 @@ for (id in names(S)) { txt <- src_text(id)
   if (length(m <- setdiff(mine, reads))) stop(sprintf("the data blueprint says stage %s reads %s, but its script does not mention it", id, paste(m, collapse = ", "))) }
 
 # ---- drawing ----------------------------------------------------------------
-W <- 1600; H <- 1344   # 1000 until 2026-11-09 (three non-forest datasets), 1100 until 2026-11-18 (eight more), 1320 until 2026-11-19 (tree canopy)
+W <- 1600; H <- 1368   # 1000 until 2026-11-09 (three non-forest datasets), 1100 until 2026-11-18 (eight more), 1320 until 2026-11-19 (tree canopy), 1344 until 2026-11-27 (DSWE)
 g <- character(); add <- function(...) g <<- c(g, ...)
 add(sprintf('<rect class="bg" width="%d" height="%d"/>', W, H), TX(24, 44, "lucasCore data blueprint", "h1"),
     TX(24, 66, sprintf("The national datasets lucasCore reads, the stages that read them, what for, and the option that switches each one · version %s", version), "sub"))
@@ -164,7 +165,7 @@ for (d in D) {
   add(sprintf('<g class="ds" data-ds="%s" tabindex="0" role="button" aria-label="%s"><rect class="dsbg" x="32" y="%d" width="584" height="22" rx="3"/>', d[[2]], esc(d[[3]]), y - 15),
       TX(40, y, d[[3]], "dsn"), TX(312, y, d[[4]], "dsv"), "</g>")
   sy[d[[2]]] <- y - 4; y <- y + 23 }
-if (y > 1278) stop("the dataset column runs past its box (y = ", y, ")")
+if (y > H - 66) stop("the dataset column runs past its box (y = ", y, ")")
 
 BX <- 1000; BWD <- 576; BHT <- 64
 by <- setNames(104 + (seq_along(S) - 1) * 76, names(S))

@@ -2,6 +2,60 @@
 
 Changes to lucasCore by version. Version numbers follow [Semantic Versioning](https://semver.org/).
 
+## 2.2.0 - 2026-11-27
+
+Projected fire can follow the climate of each projection year, and the Run Figures are reworked. Opening a library with 2.2.0
+runs a library update (below). Projected fire keeps its random draw of historical years unless a Projection Setup asks for the
+new climate draw.
+
+### Added
+
+- **Fire years from the projection's climate** (stages 9 and 11, `src/fire-climate.R`; to-do 9). The empirical fire projection
+  draws a historical fire year for every projection year. A new choice on the Fire page, "Fire years", keeps the draw at random
+  (the default) or takes it from the Projection Climate result: each projection year then draws at random among the historical
+  years whose fire season was most like its own. The fire season is May to September; its index is the season's mean maximum
+  temperature less its precipitation, as standard deviations of 1984-2014 (PRISM 800 m). The LOCA2 run is put on PRISM's scale
+  by the delta method. Where fire goes (random ignitions with the slope effect, or the FSim burn probability) and how large the
+  fires are stay as they were: the drawn year sets the study area's burned area and its mix of high, medium and low severity.
+  Because the draw is among years on record, a future hotter than any of them draws among the hottest, and burned area does
+  not run beyond the record.
+- **Fire and Climate page** on Projection Climate: the analog draw (blank) or the setup's own draws, and the number of
+  historical years each projection year draws among (blank = 10).
+- **Fire and Climate by Year** output (stage 11): each projection year's fire-season heat and dryness, the years it could
+  draw, and its expected burned area under the setup's draw and the climate draw, with the reference years beside them.
+- In Southern Sierra Nevada (Pyrome 27, ACCESS-CM2, five iterations, 2024-2050) the climate draw burned 401 and 375 km2 a year
+  under SSP2-4.5 and SSP5-8.5 against 280 for the random draw, with about 5 Tg C more fire emissions and net biome productivity
+  about halved. `dev/fire-climate/` holds the signal check by pyrome and this comparison.
+
+### Changed
+
+- **Run Figures** (stage 13; to-do 10):
+  - Land cover change: one legend for both state class maps, grouped as land cover (each forest type, wetland, shrubland,
+    grassland and one class of disturbed land), land use (developed, agriculture, pasture) and water, barren and snow and ice.
+    The change map splits the old "other change" into fire, drought and insect mortality, and other change.
+  - Fire, harvest, after-disturbance and reforestation years in 5-year classes on a colour bar.
+  - Chance of change is now Probability of change, on a colour bar.
+  - After disturbance marks cells that had both fire and drought and insect mortality.
+  - Forest stand age: the last year as the mean over the iterations, the change in age (younger or older) and, with several
+    iterations, its spread.
+  - A new live carbon figure, the twin of the total ecosystem carbon change maps.
+  - The spread over the iterations on the carbon capacity chart, the carbon balance waterfall and carbon by secondary stratum;
+    the carbon flux figure in three columns; the capacity map labelled as the mean of the iterations.
+- Figure numbers after Forest stand age move up by one (the live carbon figure).
+
+### Library update
+
+- Update 2.2 adds the Fire page's FireYears column, the external variable Fire: Drawn Year, the transition multiplier type
+  Fire: Climate and the distribution types Fire Rate: Study Area and Fire Severity: High, Medium and Low. Tested on copies of a
+  2.1.1 and a 2.0.0 library under SyncroSim 3.1.29 (the 2.0.0 copy runs the 2.1 and 2.2 updates in turn) and a 2.1.1 library
+  under 3.2.1: each records 2.2.0 and opens with every scenario.
+
+### Not yet done
+
+- The climate draw is checked in Pyrome 27 only; grass and shrub pyromes follow the previous year's rain more than the fire
+  season's heat, which this index does not use.
+- Method 3 (lucasFireC2F seasons) keeps its own years.
+
 ## 2.1.1 - 2026-11-26
 
 Barren cells release the litter and dead wood they hold. No library update is needed: a library made with 2.1.0 opens as it
