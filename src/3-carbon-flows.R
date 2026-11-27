@@ -553,6 +553,10 @@ fm <- rbind(fm_g, fm_d, gs_m, dcb$fm, rd("nonforest-multipliers-other.csv"), fil
 # flooded dead wood (src/wetland-change-carbon.R): Water cells release dead stems and dead coarse roots at one yearly rate
 if (exists("wcv") && "Water: All" %in% scl$Name) { ww <- wcc_water_rows(wcv); ww$fp[, Multiplier := methods::as(Multiplier, class(fp$Multiplier)[1])]; ww$fm[, Value := methods::as(Value, class(fm$Value)[1])]
   fp <- rbind(fp, ww$fp, fill = TRUE); fm <- rbind(fm, ww$fm, fill = TRUE) }
+# litter and dead wood on Barren cells decay to the atmosphere; the soil has no flow (a marsh that became barren kept its dead plants for good)
+if (exists("wcv") && "Barren: All" %in% scl$Name) { wb <- wcc_barren_rows(fread(pkg_file("defaults", "stockflow", "barren-litter-decay.csv"), colClasses = "character"))
+  wb$fp[, Multiplier := methods::as(Multiplier, class(fp$Multiplier)[1])]; wb$fm[, Value := methods::as(Value, class(fm$Value)[1])]; fp <- rbind(fp, wb$fp, fill = TRUE); fm <- rbind(fm, wb$fm, fill = TRUE)
+  say("Barren cells: %d litter and dead wood pools released to the atmosphere each year (%s); soil has no flow", nrow(wb$fm), paste(sprintf("%s %.1f%%", sub("^DOM: ", "", wb$fp$FromStockTypeId), 100 * as.numeric(wb$fm$Value)), collapse = ", ")) }
 # (the CONUS 1km build also had 0.01 "scalar" multipliers on the four climate flow groups, undoing climate rasters stored as
 # integers x 100; stage 7 writes true multipliers, so there are none: a run without climate multipliers runs at normal climate)
 sav <- rbind(ng, nf_g, dcb$sav, fill = TRUE)

@@ -24,6 +24,10 @@ check("tree classes are forest, forested wetland and their disturbed twins; not 
 ww <- wcc_water_rows(v)
 check("Water cells release the two dead wood pools at the yearly rate, on standard flow types", all(ww$fp$FromStateClassId == "Water: All") && identical(ww$fp$FromStockTypeId, WCC_WOOD$dead) && all(ww$fp$ToStockTypeId == "Atmosphere") && all(ww$fp$FlowTypeId %in% ft) && all(ww$fp$Multiplier == 1) && all(ww$fm$Value == 0.01) && identical(ww$fm$FlowGroupId, paste(ww$fp$FlowTypeId, "[Type]")))
 check("the rate can be set on the page", all(wcc_water_rows(wcc_shares(def, data.table(FloodedWoodDecay = 0.03)))$fm$Value == 0.03))
+bt <- rd("stockflow", "barren-litter-decay.csv"); wb <- wcc_barren_rows(bt)
+check("Barren cells release every litter and dead wood pool to the atmosphere, on standard flow types (user 2026-11-27)", all(wb$fp$FromStateClassId == "Barren: All") && setequal(wb$fp$FromStockTypeId, WCC_LITTER) && all(wb$fp$ToStockTypeId == "Atmosphere") && all(wb$fp$FlowTypeId %in% ft) && all(wb$fm$Value > 0 & wb$fm$Value <= 1) && !anyDuplicated(wb$fp$FromStockTypeId))
+check("Barren soil, deep soil and peat have no flow", !any(wb$fp$FromStockTypeId %in% c(WCC_SOIL, "Deep Soil", "DOM: Peat", "DOM: Black Carbon")))
+check("each Barren flow empties the pool its flow type names", all(mapply(function(p, t) grepl(sub("Aboveground", "AG", sub("Belowground", "BG", sub("^DOM: ", "", p))), t, fixed = TRUE), wb$fp$FromStockTypeId, wb$fp$FlowTypeId)))
 check("deep soil, peat and black carbon stay", !any(w$FromStockTypeId %in% c("Deep Soil", "DOM: Peat", "DOM: Black Carbon")))
 sh <- w[, .(s = sum(m)), by = .(TransitionGroupId, FromStateClassId, FromStockTypeId)]
 check("no event moves more than a pool holds", all(sh$s <= 1 + 1e-9) && all(w$m > 0))

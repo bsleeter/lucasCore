@@ -1,0 +1,9 @@
+Pool,FlowTypeId,Rate,Note
+DOM: Aboveground Very Fast,Emission: AG Very Fast -> Atmosphere,0.7995,"Yearly share of the pool released as CO2 on a Barren cell. Each rate is the pool's whole yearly loss on Barren in lucasWet (Barataria library, 2026-11): its emission plus its decay to the slow pool (0.6516 + 0.1479). Here all of it goes to the atmosphere and none to soil, so the soil stays as it was when the cell became barren (user 2026-11-27)"
+DOM: Belowground Very Fast,Emission: BG Very Fast -> Atmosphere,0.8907,0.7393 + 0.1514
+DOM: Aboveground Fast,Emission: AG Fast -> Atmosphere,0.2557,0.2122 + 0.0435
+DOM: Belowground Fast,Emission: BG Fast -> Atmosphere,0.2557,0.2122 + 0.0435
+DOM: Aboveground Medium,Emission: AG Medium -> Atmosphere,0.0666,0.0553 + 0.0113
+DOM: Aboveground Slow,Emission: AG Slow -> Atmosphere,0.0338,emission only
+DOM: Snag Branch,Emission: Snag Branch -> Atmosphere,0.1278,0.1061 + 0.0217
+DOM: Snag Stem,Emission: Snag Stem -> Atmosphere,0.0333,0.0276 + 0.0057

@@ -15,6 +15,9 @@
 # DOM: Snag Stem and the coarse roots to DOM: Belowground Fast, and what those two dead pools already hold stays; the shares above do not
 # touch them. A Water cell then releases both pools to the atmosphere at one yearly rate (FloodedWoodDecay, default 1%; wcc_water_rows).
 # Water has no other carbon flow: every other pool left in a flooded cell stays as it is.
+# A Barren cell (user 2026-11-27: "Litter pools should be depleted ... freeze the soil pool as it is after the change") releases every litter
+# and dead wood pool to the atmosphere each year at the rates of defaults/stockflow/barren-litter-decay.csv (lucasWet's Barren rates;
+# wcc_barren_rows). Its soil, deep soil and peat have no flow. Before, a marsh that became barren kept its dead plants for good.
 # Wetland to barren (emergent classes): the live plants die into litter and root litter; nothing leaves the cell.
 # Water or barren that becomes wetland, and barren that becomes water, have no row.
 # Emission and mortality use the standard land-use change flow types; the transition group of each row says which event it is (user
@@ -70,6 +73,11 @@ wcc_rows <- function(v, pw) {
 wcc_water_rows <- function(v, water = "Water: All") list(
   fp = data.table::data.table(FromStateClassId = water, FromStockTypeId = WCC_WOOD$dead, ToStockTypeId = "Atmosphere", FlowTypeId = WCC_WOOD$flow, Multiplier = 1),
   fm = data.table::data.table(StateClassId = water, FlowGroupId = paste(WCC_WOOD$flow, "[Type]"), Value = v[[WCC_DECAY]]))
+# The yearly release of litter and dead wood on Barren cells, from the rates table: fp at 1 and fm the rates, as wcc_water_rows.
+wcc_barren_rows <- function(tab, barren = "Barren: All") { r <- as.numeric(tab$Rate); if (anyNA(r) || any(r < 0 | r > 1)) stop("barren-litter-decay.csv: a rate must be between 0 and 1")
+  list(fp = data.table::data.table(FromStateClassId = barren, FromStockTypeId = tab$Pool, ToStockTypeId = "Atmosphere", FlowTypeId = tab$FlowTypeId, Multiplier = 1),
+       fm = data.table::data.table(StateClassId = barren, FlowGroupId = paste(tab$FlowTypeId, "[Type]"), Value = r)) }
+
 # One line for the log: the shares in use and which came from the page.
 wcc_label <- function(v) { s <- attr(v, "source"); f <- function(p) sprintf("%.0f%% emitted, %.0f%% to Aquatic, %.0f%% stays", 100 * v[[paste0(p, "Emitted")]], 100 * v[[paste0(p, "Aquatic")]], 100 * (1 - v[[paste0(p, "Emitted")]] - v[[paste0(p, "Aquatic")]]))
   sprintf("coastal soil %s; coastal plants and litter %s; inland soil %s; inland plants and litter %s; flooded forest stems and coarse roots to dead wood, released at %s%% a year (%s)", f("CoastalSoil"), f("CoastalPlant"), f("InlandSoil"), f("InlandPlant"), format(100 * v[[WCC_DECAY]]),
