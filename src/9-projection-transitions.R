@@ -153,6 +153,8 @@ if (anyDuplicated(tm)) fail("Projection Transitions: %s would be targeted twice 
 # the fire group (Fire Options) is not split: its severity members get the drawn year's shares (below)
 fo <- read_ds("FireOptions"); fire_g <- nz(fo$TransitionGroupId, "Fire")
 fire_m <- c(Historical = 1L, Burn = 2L, lucasFireC2F = 3L)[sub(" .*", "", as.character(nz(fo$FireMethod, "Historical")))]; if (is.na(fire_m)) fire_m <- 1L
+source(pkg_file("src", "fire-climate.R")); fire_clim <- fire_years_from_climate(fo); fire_lk <- NULL   # (to-do 9: the fire years from the Projection Climate result)
+if (fire_clim && fire_m == 3) { say("Fire: the fire years from the Projection Climate result apply to methods 1 and 2; lucasFireC2F seasons (method 3) are drawn as before"); fire_clim <- FALSE }
 slope_on <- { v <- nz(fo$SlopeSelectivity, TRUE); isTRUE(as.logical(v)) || identical(v, -1L) || identical(v, 1L) }
 ign_src <- c(Burn = 1L, `FPA-FOD` = 2L)[sub(" .*", "", as.character(nz(fo$IgnitionSource, "Burn")))]; if (is.na(ign_src)) ign_src <- 1L
 pr <- pt[Method == "Probability" & !TransitionGroupId %in% ann & TransitionGroupId != fire_g]
@@ -543,16 +545,37 @@ if (nrow(fire_rows) && fire_m < 3) { g <- fire_g; ms <- mem[[g]]; u <- unit_map(
   lt <- matrix(vapply(A, rowSums, numeric(length(units))), nrow = length(units)); all_sh <- colSums(lt) / max(sum(lt), 1e-12)
   lt <- lt / pmax(rowSums(lt), 1e-12); lt[rowSums(lt) == 0, ] <- matrix(all_sh, sum(rowSums(lt) == 0), length(ms), byrow = TRUE)
   ffile <- list(); sfile <- list(); lost <- 0; tot_p <- 0; nm_g <- gsub("[^A-Za-z0-9]+", "-", sub(TYPE_SUFFIX, "", g, fixed = TRUE))
+  if (fire_clim) {
+    # (to-do 9, src/fire-climate.R) the fire years come from the Projection Climate result: one pattern map, and the drawn year's burned
+    # fraction and severity mix as a lookup by the drawn year
+    fdef <- fire_definitions(prj, ms); if (length(fdef)) fail("Fire: the library's definitions lack the names the climate lookup needs (%s). Close the library in SyncroSim and run tools/add-definitions.R on it, or choose 'As this setup draws them' on the projection's Fire page", paste(fdef, collapse = "; "))
+    yc <- as.character(ref); frm <- rowMeans(fr[, yc, drop = FALSE]); p <- frm[match(u[el], units)] * wn[el]
+    m <- rep(NA_real_, length(land)); m[land] <- 0; m[el] <- pmin(1, p)
+    pfile <- write_raster(setValues(rast(P), m), sprintf("Projection-%s-Pattern.tif", nm_g), "FLT4S")
+    v1 <- rep(NA_real_, length(land)); v1[land] <- 0; v1[el] <- 1; ofile <- write_raster(setValues(rast(P), v1), sprintf("Projection-%s-Severity.tif", nm_g), "INT1U")
+    Rr <- colSums(tot[, yc, drop = FALSE]) / max(sum(den), 1); ratio <- if (mean(Rr) > 0) Rr / mean(Rr) else Rr * 0
+    shr <- vapply(seq_along(ms), function(j) { a <- colSums(A[[j]][, yc, drop = FALSE]); t <- colSums(tot[, yc, drop = FALSE]); ifelse(t > 0, a / pmax(t, 1e-12), all_sh[j]) }, numeric(length(yc)))
+    shr <- matrix(shr, nrow = length(yc)); fire_lk <- fire_lookup(ratio, t(shr), ms, g, min(pyrs))
+    for (k in seq_along(yc)) { q <- p * ratio[k]; lost <- lost + sum(pmax(q - 1, 0)); tot_p <- tot_p + sum(q) }
+    new_sm[[g]] <- data.table(Iteration = seq_len(nit), Timestep = y1 + 1L, TransitionGroupId = g, MultiplierFileName = pfile)
+    for (mm in ms) { h <- sm[TransitionGroupId == mm & is.na(Iteration) & Timestep <= y1]; if (!nrow(h)) h <- sm[TransitionGroupId == mm & Iteration %in% 1L & Timestep <= y1]
+      new_sm[[mm]] <- rbind(h[, .(Iteration = rep(seq_len(nit), each = .N), Timestep = rep(Timestep, nit), TransitionGroupId = mm, MultiplierFileName = rep(MultiplierFileName, nit))],
+                            data.table(Iteration = seq_len(nit), Timestep = y1 + 1L, TransitionGroupId = mm, MultiplierFileName = ofile)) }
+    sched <- rbind(sched[SamplingSet != FIRE_SET], dr[, .(Iteration, Timestep, SamplingSet = FIRE_SET, HistoricalYear)])
+    say("%s: fire years from the Projection Climate result (the Fire page): one pattern map (each unit's mean burned fraction over %d-%d x %s) and the drawn year's burned area (%.2f to %.2f times the reference mean) and severity mix as a lookup by the drawn year%s. Every projection from this setup needs a Projection Climate result that depends on this setup",
+        g, rs, re, if (fire_m == 2) "the burn probability" else if (slope_on) "slope selectivity" else "1", min(ratio), max(ratio),
+        if (length(units) > 1) sprintf("; %d units: the drawn year sets the study area's total, each unit keeps its long-run share", length(units)) else "")
+  } else
   for (y in sort(unique(dr$HistoricalYear))) { yc <- as.character(y); m <- rep(NA_real_, length(land)); m[land] <- 0
     p <- fr[match(u[el], units), yc] * wn[el]; lost <- lost + sum(pmax(p - 1, 0)); tot_p <- tot_p + sum(p); m[el] <- pmin(1, p)
     ffile[[yc]] <- write_raster(setValues(rast(P), m), sprintf("Projection-%s_%d.tif", nm_g, y), "FLT4S")
     for (j in seq_along(ms)) { s <- ifelse(tot[, yc] > 0, A[[j]][, yc] / pmax(tot[, yc], 1e-12), lt[, j]); v <- rep(NA_real_, length(land)); v[land] <- 0
       v[el] <- s[match(u[el], units)]
       sfile[[paste(ms[j], yc)]] <- write_raster(setValues(rast(P), v), sprintf("Projection-%s-Share_%d.tif", gsub("[^A-Za-z0-9]+", "-", sub(TYPE_SUFFIX, "", ms[j], fixed = TRUE)), y), "FLT4S") } }
-  new_sm[[g]] <- dr[, .(Iteration, Timestep, TransitionGroupId = g, MultiplierFileName = unlist(ffile[as.character(HistoricalYear)]))]
+  if (!fire_clim) { new_sm[[g]] <- dr[, .(Iteration, Timestep, TransitionGroupId = g, MultiplierFileName = unlist(ffile[as.character(HistoricalYear)]))]
   for (m in ms) { h <- sm[TransitionGroupId == m & is.na(Iteration) & Timestep <= y1]; if (!nrow(h)) h <- sm[TransitionGroupId == m & Iteration %in% 1L & Timestep <= y1]
     new_sm[[m]] <- rbind(h[, .(Iteration = rep(seq_len(nit), each = .N), Timestep = rep(Timestep, nit), TransitionGroupId = m, MultiplierFileName = rep(MultiplierFileName, nit))],
-                         dr[, .(Iteration, Timestep, TransitionGroupId = m, MultiplierFileName = unlist(sfile[paste(m, HistoricalYear)]))]) }
+                         dr[, .(Iteration, Timestep, TransitionGroupId = m, MultiplierFileName = unlist(sfile[paste(m, HistoricalYear)]))]) } }
   ua <- fr * den * cell_km2
   rates[[g]] <- data.table(TransitionGroup = g, Method = "Probability (fire)", Unit = sprintf("%s %s", fire_rows$UnitSource[1], units), MeanArea = rowMeans(ua),
                            MinArea = apply(ua, 1, min), MaxArea = apply(ua, 1, max), AllowedShare = 1)
@@ -754,7 +777,7 @@ nexp <- nit * length(pyrs)
 cov <- if (length(new_tt)) rbindlist(new_tt, fill = TRUE)[, .(n = uniqueN(paste(Iteration, Timestep))), by = TransitionGroupId] else data.table(TransitionGroupId = character(), n = integer())
 check(STAGE, "every Target group has a target in every iteration and projection year", all(cov$n == nexp), paste(cov[n != nexp, TransitionGroupId], collapse = "; "))
 check(STAGE, "every Probability group has a map in every iteration and projection year",
-      all(vapply(c(pg$TransitionGroupId, fire_all), function(g) nrow(sm_out[TransitionGroupId == g & Timestep > y1 & !is.na(MultiplierFileName)]) == nexp, TRUE)))
+      all(vapply(c(pg$TransitionGroupId, fire_all), function(g) nrow(sm_out[TransitionGroupId == g & Timestep > y1 & !is.na(MultiplierFileName)]) == if (fire_clim && g %in% fire_all) nit else nexp, TRUE)))
 # ---- forest management (user 2026-11-13: "changes/improved forest management ... change the target areas for clearcut and
 # selection ..., increase the minimum harvest age"; old forest by a maximum age) ------------------------------------------------
 # src/forest-management.R: each Forest Management row moves a share of clearcut to selection and of selection to light selection,
@@ -906,14 +929,15 @@ if (nrow(fire_rows) && nrow(fcm)) { scl9 <- stsim_list("StateClass"); idc <- sup
                TransitionGroupId = fire_g, Amount = as.numeric(fcm$Multiplier[i])) }))
   if (nrow(fire_tmv)) fire_tmv <- fire_tmv[is.na(StratumId) | StratumId %in% stsim_list("Stratum")$Name]
   say("Fire by state class: %s", if (nrow(fire_tmv)) paste(fire_tmv[, sprintf("%s%s x%.2f", if (.N > 1) sprintf("%d classes", .N) else StateClassId[1], ifelse(is.na(StratumId[1]), "", paste0(" in ", StratumId[1])), Amount[1]), by = .(StratumId, Amount)]$V1, collapse = "; ") else "none (every multiplier 1)") }
-mort_tmv9 <- if (is.null(mort)) NULL else mort$tmv
-if (!is.null(tmv) || !is.null(fire_tmv) || !is.null(mg_tmv) || !is.null(fm_tmv) || !is.null(ft_tmv) || !is.null(mort_tmv9)) {
+mort_tmv9 <- if (is.null(mort)) NULL else mort$tmv; fire_tmv9 <- if (is.null(fire_lk)) NULL else fire_lk$tmv
+if (!is.null(tmv) || !is.null(fire_tmv) || !is.null(mg_tmv) || !is.null(fm_tmv) || !is.null(ft_tmv) || !is.null(mort_tmv9) || !is.null(fire_tmv9) || length(fire_all)) {
   old_tmv <- as.data.table(datasheet(scn, "stsim_TransitionMultiplierValue", optional = TRUE, lookupsAsFactors = FALSE))
   # earlier rows of a rerun are replaced: the post-disturbance groups', the fire group's by state class (no other fire multiplier), the management types'
   if (nrow(old_tmv)) old_tmv <- old_tmv[!(!is.na(Timestep) & Timestep > y1 & (TransitionGroupId %in% c(PD_GROUPS, MG_GROUPS, FM_GROUPS, FT_GROUPS, MORT_GROUP) | (TransitionGroupId == fire_g & !is.na(StateClassId)))),
                                         setdiff(names(old_tmv), c("TransitionMultiplierValueId", "ScenarioId")), with = FALSE]
+  if (nrow(old_tmv) && "TransitionMultiplierTypeId" %in% names(old_tmv)) old_tmv <- old_tmv[!(TransitionGroupId %in% fire_all & !is.na(TransitionMultiplierTypeId) & TransitionMultiplierTypeId == FIRE_CLIMATE)]   # (a rerun: the fire lookup is rewritten, or removed with it off)
   if (nrow(old_tmv) && "TSTGroupId" %in% names(old_tmv)) old_tmv <- old_tmv[!(TransitionGroupId %in% FT_SEV & !is.na(TSTGroupId) & TSTGroupId %in% FT_GROUPS)]
-  write_stsim(rbind(old_tmv, tmv, fire_tmv, mg_tmv, fm_tmv, ft_tmv, mort_tmv9, fill = TRUE), "TransitionMultiplierValue") }
+  write_stsim(rbind(old_tmv, tmv, fire_tmv, mg_tmv, fm_tmv, ft_tmv, mort_tmv9, fire_tmv9, fill = TRUE), "TransitionMultiplierValue") }
 write_stsim(sm_out, "TransitionSpatialMultiplier")
 # ---- drought and insect mortality: patch sizes, and spread from recent die-off (the rows of other groups are kept) ---------------
 keep9 <- function(name, drop) { x <- as.data.table(datasheet(scn, paste0("stsim_", name), optional = TRUE, lookupsAsFactors = FALSE)); had <- nrow(x) > 0
@@ -922,7 +946,9 @@ put9 <- function(name, old, new) if (nrow(new) || old$had) write_stsim(rbind(old
 # (a sheet read back within the stage does not show what the stage has written, so each sheet is written once: the size distribution
 # with fire's below, the time since transition with the fuel treatments')
 # the lookup of the mortality rates by drawn year (the rows of other distributions are kept; a rerun with the lookup off removes its rows)
-if (!is.null(mort)) { o_dv <- keep9("DistributionValue", function(x) !is.na(x$DistributionTypeId) & startsWith(as.character(x$DistributionTypeId), MORT_PREFIX)); put9("DistributionValue", o_dv, if (is.null(mort$dv)) data.table() else mort$dv) }
+# with the fire lookup's rows (to-do 9; a sheet is written once)
+if (!is.null(mort) || length(fire_all)) { o_dv <- keep9("DistributionValue", function(x) !is.na(x$DistributionTypeId) & ((!is.null(mort) & startsWith(as.character(x$DistributionTypeId), MORT_PREFIX)) | (length(fire_all) > 0 & (x$DistributionTypeId == FIRE_RATE_ALL | startsWith(as.character(x$DistributionTypeId), FIRE_SEV)))))
+  put9("DistributionValue", o_dv, rbind(if (is.null(mort) || is.null(mort$dv)) data.table() else mort$dv, if (is.null(fire_lk)) data.table() else fire_lk$dv, fill = TRUE)) }
 sd9 <- data.table(); mort_tst <- NULL
 if (!is.null(mort)) {
   sz <- mort$sizes; if (!is.null(sz)) sd9 <- data.table(TransitionGroupId = MORT_GROUP, MaximumArea = sz$table$MaximumCells * cell_amt, RelativeAmount = sz$table$Patches)[RelativeAmount > 0]

@@ -24,6 +24,7 @@ namespace lucasCoreUI
 
         private readonly Choice m_method = new Choice("FireMethod", 1);
         private readonly Choice m_ign = new Choice("IgnitionSource", 1);
+        private readonly Choice m_years = new Choice("FireYears", 1);   // (to-do 9, lucasCore 2.2: src/fire-climate.R)
         private readonly ComboBox m_group = List(260);
         private readonly CheckBox m_slope = new CheckBox { Text = "Slope selectivity: burned share by slope from the fire record", AutoSize = true, Margin = new Padding(3, 5, 3, 3) };
         private readonly TextBox m_bp = new TextBox { Width = 460, Margin = new Padding(3, 3, 6, 3) };
@@ -32,7 +33,7 @@ namespace lucasCoreUI
         private readonly TextBox m_lib = new TextBox { Width = 460, Margin = new Padding(3, 3, 6, 3) };
         private readonly Button m_libBrowse = new Button { Text = "Browse...", AutoSize = true };
         private readonly TextBox m_rid = Box(70);
-        private GroupBox m_g1, m_g2, m_g3;
+        private GroupBox m_g1, m_g2, m_g3, m_gy;
         // the Fire row of Projection Transitions (rate units, shared draw, protected land), moved here from the Transitions page (user
         // 2026-11-14: "Should we move it to Fire so its all contained in one place?"; TransitionWalk.cs). The row stays in that sheet
         private readonly TransitionWalk m_walk;
@@ -75,6 +76,12 @@ namespace lucasCoreUI
             var r = Row(); r.Controls.Add(Caption("Result scenario Id:")); r.Controls.Add(m_rid); r.Controls.Add(Note("a C2F run or merge whose stage 8 wrote the per-burn effects table")); c3.Controls.Add(r);
             c3.Controls.Add(Wrapped("One-way coupling: the C2F run is made first, and each projection year and iteration draws one of its seasons. Dynamic coupling (fuels and climate passed back to C2F every N years) comes later.", 680));
             m_g3 = Group("Method 3: lucasFireC2F seasons", c3); AddGroup(m_g3);
+
+            var cy = Column();
+            cy.Controls.Add(Option(m_years, 1, "As this setup draws them: each projection year takes a reference year at random"));
+            cy.Controls.Add(Option(m_years, 2, "From the Projection Climate result: each year draws among the reference years whose fire season was most like its own"));
+            cy.Controls.Add(Wrapped("The second choice makes fire follow each climate future: a hotter, drier fire season draws more of the big fire years, up to the worst on record. The setup then holds a fixed pattern map and the drawn year's burned area and severity mix as a lookup, and every projection from it needs a Projection Climate result that depends on this setup (Projection Climate > Fire and Climate). With several fire units the drawn year sets the study area's total, and each unit keeps its long-run share. Methods 1 and 2.", 680));
+            m_gy = Group("Fire years and climate", cy); AddGroup(m_gy);
             EndGroups();
 
             m_group.SelectionChangeCommitted += (s, e) => { var i = m_group.SelectedItem as Item; Write("TransitionGroupId", i == null ? DBNull.Value : i.Key); };
@@ -116,7 +123,7 @@ namespace lucasCoreUI
             m_walkInfo.Text = !m_walk.Shows(TransitionWalk.FIRE) ? "No Fire row in the Land Use tables: open Land Use once to fill them from the defaults."
                             : !m_own ? "The burned-area settings come from a dependency (read-only here); give this scenario its own Land Use tables to change them." : "";
             m_walkInfo.Visible = m_walkInfo.Text.Length > 0;
-            ShowChoice(m_method); ShowChoice(m_ign);
+            ShowChoice(m_method); ShowChoice(m_ign); ShowChoice(m_years);
             object gid = Value("TransitionGroupId");
             m_group.BeginUpdate(); m_group.Items.Clear(); m_group.Items.Add(new Item { Key = DBNull.Value, Name = "(Fire)" });
             int idx = 0; foreach (Item i in m_groups) { m_group.Items.Add(i); if (gid != DBNull.Value && Convert.ToInt32(i.Key) == Convert.ToInt32(gid)) idx = m_group.Items.Count - 1; }
@@ -125,7 +132,7 @@ namespace lucasCoreUI
             m_bp.Text = Show(Value("BurnProbabilityFile")); m_bw.Text = Show(Value("IgnitionBandwidth"));
             m_lib.Text = Show(Value("C2FLibrary")); m_rid.Text = Show(Value("C2FScenarioId"));
             int m = IntValue("FireMethod", 1);
-            m_g1.Enabled = m == 1; m_g2.Enabled = m == 2; m_g3.Enabled = m == 3;
+            m_g1.Enabled = m == 1; m_g2.Enabled = m == 2; m_g3.Enabled = m == 3; m_gy.Enabled = m != 3;
         }
     }
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<package name="lucasCore" displayName="LUCAS Core (model builder)" description="Builds LUCAS land-use and carbon models in ST-Sim from national datasets (FIA growth curves; CBM carbon parameters; spatial initial conditions; historical transitions and projections)" version="2.1.1" url="https://code.usgs.gov/LUCC/lucasCore" minSyncroSimVersion="3.1.29">
+<package name="lucasCore" displayName="LUCAS Core (model builder)" description="Builds LUCAS land-use and carbon models in ST-Sim from national datasets (FIA growth curves; CBM carbon parameters; spatial initial conditions; historical transitions and projections)" version="2.2.0" url="https://code.usgs.gov/LUCC/lucasCore" minSyncroSimVersion="3.1.29">
 
 	<builtFor package="stsim" version="4.5.4"/>
 
@@ -225,6 +225,10 @@
 		<column name="IgnitionBandwidth" displayName="Ignition Density Smoothing (m, FPA-FOD; blank = 5000)" dataType="Double" isOptional="True"/>
 		<column name="C2FLibrary" displayName="lucasFireC2F Library (method 3; .ssim path)" dataType="String" isOptional="True"/>
 		<column name="C2FScenarioId" displayName="lucasFireC2F Result Scenario Id (method 3; a run or merge with the per-burn effects table)" dataType="Integer" isOptional="True"/>
+		<!-- to-do 9 (lucasCore 2.2, src/fire-climate.R): 2 = the fire years come from the Projection Climate result (each projection year draws
+		     among the historical years whose fire season was most like its own); the setup then writes the fire group as a pattern map and a
+		     lookup by the drawn year, and every projection from it needs such a result. Methods 1 and 2 -->
+		<column name="FireYears" displayName="Fire Years (methods 1 and 2)" dataType="Integer" validationType="List" formula1="1:As this setup draws them|2:From the Projection Climate result (climate analog years)" defaultValue="1" isOptional="True"/>
 	</dataSheet>
 
 	<dataSheet name="ProjectionOptions" displayName="Projection Options" isSingleRow="True">
@@ -769,6 +773,11 @@
 	     Projection Climate scenario that also depends on a Projection Setup result. The setup's blocks of historical years are placed in the dry periods of the
 	     climate run (timing strength), and the rate of a year is raised by the depth of its dry period (increase in dry periods). Blank = neither: the setup's draws
 	     as they are. A projection lists the Projection Climate result above the Projection Setup for the settings to act. A new sheet: no library update -->
+	<!-- to-do 9 (lucasCore 2.2): the fire years of a Projection Setup whose Fire page hands them to this result (src/fire-climate.R) -->
+	<dataSheet name="FireClimate" displayName="Fire and Climate" isSingleRow="True">
+		<column name="FireYears" displayName="Fire Years (blank = Climate analog draw)" dataType="Integer" validationType="List" formula1="1:Climate analog draw: each year draws among the historical years whose fire season was most like its own|2:As the Projection Setup drew them (no climate)" isOptional="True"/>
+		<column name="AnalogYears" displayName="Analog Years (the nearest historical years a projection year draws among; blank = 5)" dataType="Integer" isOptional="True" validationType="WholeNumber" validationCondition="Between" formula1="1" formula2="50"/>
+	</dataSheet>
 	<dataSheet name="MortalityClimate" displayName="Mortality and Climate" isSingleRow="True" viewClassName="lucasCoreUI.MortalityClimateView" viewClassAssembly="lucasCoreUI">
 		<column name="TimingStrength" displayName="Timing Strength, 0 to 1: Severe Blocks Placed in Dry Periods (blank = 0, as drawn; 0.3 is about what the record shows)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="1"/>
 		<column name="AmountPercent" displayName="Increase in Dry Periods (%; the rate at a dry period as deep as the run's deepest historical one; blank = 0)" dataType="Double" isOptional="True" validationType="Decimal" validationCondition="Between" formula1="0" formula2="200"/>
@@ -1245,6 +1254,15 @@
 		<column name="LnRatio" displayName="ln(CO2 / Reference)" dataType="Double" format="0.0000"/>
 	</dataSheet>
 	<!-- stage 11: the dryness of the climate run over the forest open to drought and insect mortality, and what the two Mortality and Climate settings made of the setup's draws -->
+	<dataSheet name="OutputFireClimate" displayName="Fire and Climate by Year">
+		<column name="Timestep" dataType="Integer"/>
+		<column name="FireSeasonTmax" displayName="Fire Season Maximum Temperature (C, May-September)" dataType="Double" format="0.00"/>
+		<column name="FireSeasonPrecip" displayName="Fire Season Precipitation (mm)" dataType="Double" format="0.0"/>
+		<column name="FireIndex" displayName="Heat and Dryness (SD of 1984-2014)" dataType="Double" format="0.000"/>
+		<column name="AnalogYears" displayName="Analog Years" dataType="String"/>
+		<column name="SetupBurned" displayName="Burned Area as the Setup Drew It (times the reference mean)" dataType="Double" format="0.000"/>
+		<column name="Burned" displayName="Burned Area, Analog Draw (times the reference mean)" dataType="Double" format="0.000"/>
+	</dataSheet>
 	<dataSheet name="OutputMortalityClimate" displayName="Mortality and Climate by Year">
 		<column name="Timestep" dataType="Integer"/>
 		<column name="WaterDeficit" displayName="Water Deficit (mm)" dataType="Double" format="0.0"/>
@@ -1971,12 +1989,14 @@
 		<dataSheet name="ProjectionClimate" type="Input"/>
 		<dataSheet name="Co2Adjustment" type="Input"/>
 		<dataSheet name="MortalityClimate" type="Input"/>
+		<dataSheet name="FireClimate" type="Input"/>
 		<dataSheet name="stsim_InitialConditionsSpatial" type="Input"/>
 		<dataSheet name="stsim_FlowSpatialMultiplier" type="Output"/>
 		<dataSheet name="stsim_FlowMultiplier" type="Output"/>
 		<dataSheet name="OutputCo2Beta" type="Output"/>
 		<dataSheet name="OutputCo2Series" type="Output"/>
 		<dataSheet name="OutputMortalityClimate" type="Output"/>
+		<dataSheet name="OutputFireClimate" type="Output"/>
 		<dataSheet name="core_ExternalVariableValue" type="Output"/>
 		<dataSheet name="OutputClimateSummary" type="Both"/>
 		<dataSheet name="OutputValidation" type="Output"/>
@@ -2199,6 +2219,7 @@
 				<item name="ManagementAction"/>
 				<item name="ProjectionClimatePage"/>
 				<item name="MortalityClimate"/>
+				<item name="FireClimate"/>
 				<group name="lucasCoreProjectionResults" displayName="Projection Results">
 					<item name="OutputProjectionRate"/>
 					<item name="OutputLandUseDemand"/>
@@ -2215,6 +2236,7 @@
 					<item name="OutputCo2Beta"/>
 					<item name="OutputCo2Series"/>
 					<item name="OutputMortalityClimate"/>
+					<item name="OutputFireClimate"/>
 				</group>
 			</group>
 			<group name="lucasCoreAnalysis" displayName="Figures and Analysis">

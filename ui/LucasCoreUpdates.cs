@@ -479,6 +479,22 @@ namespace lucasCoreUI
             AddStateAttributeType(store, "Recent Mortality", "State Class", "1 on a disturbed softwood class in the three years after a drought and insect mortality event, written by stage 9: the share of recent die-off around a cell drives the event's adjacency multiplier in projections (to-do 3)");
         }
 
+        // ---- 2.2 (projected fire that follows climate, to-do 9, 2026-11): the Fire page can hand the fire years to the Projection Climate
+        // result (FireOptions.FireYears; src/fire-climate.R), which draws each projection year among the reference years whose fire season was
+        // most like its own. The setup then writes the drawn year as a lookup: the study area burned-area ratio and the three severity shares
+        // as distributions read by the external variable Fire: Drawn Year, on rows of the multiplier type Fire: Climate (defaults/stsim). The
+        // Fire and Climate page and its output are new tables, which SyncroSim adds by itself. No apostrophe in the description ---------------
+        [Update(2.2, "lucasCore 2.2: projected fire that follows climate - the Fire page choice of where the fire years come from; the external variable Fire: Drawn Year, the Fire: Climate multiplier type and the burned area and severity distributions the climate analog draw reads")]
+        public static void Update_2_200(DataStore store)
+        {
+            AddColumn(store, "lucasCore_FireOptions", "FireYears", "INTEGER");
+            AddNamed(store, "core_DistributionType", "DistributionTypeId", "Fire Rate: Study Area", "Description", "Projected fire: the burned area of the drawn year as a ratio of the reference mean (stage 9; to-do 9)", false);
+            foreach (string s in new[] { "High", "Medium", "Low" })
+                AddNamed(store, "core_DistributionType", "DistributionTypeId", "Fire Severity: " + s, "Description", "Projected fire: the drawn year share of " + s.ToLowerInvariant() + " severity in the burned area (stage 9)", false);
+            AddNamed(store, "core_ExternalVariableType", "ExternalVariableTypeId", "Fire: Drawn Year", null, null, false);
+            AddNamed(store, "stsim_TransitionMultiplierType", "TransitionMultiplierTypeId", "Fire: Climate", "Description", "Projected fire: the drawn year burned area and severity mix read by the drawn year (2.2.0)", false);
+        }
+
         // ---- 1.5 (wetland methane, 2026-11): wetland classes release part of what their soil and litter emit as CH4 (src/flows.R,
         // src/nonforest-solve.R). The rows are the ones defaults/stsim and defaults/stockflow gained (generated from them). The three
         // Wetland Methane sheets are new tables, which SyncroSim adds by itself. A library keeps running on its earlier Builds; the

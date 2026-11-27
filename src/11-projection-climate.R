@@ -19,6 +19,7 @@ source(pkg_file("src", "climate.R"))
 source(pkg_file("src", "loca2.R"))
 source(pkg_file("src", "co2.R"))
 source(pkg_file("src", "mortality.R"))
+source(pkg_file("src", "fire-climate.R")); source(pkg_file("src", "prism.R"))
 suppressPackageStartupMessages({ library(terra) })
 STAGE <- "11 Projection Climate"
 progressBar(type = "begin", totalSteps = 6)
@@ -44,6 +45,12 @@ ms <- list(dv = dep_find("stsim_DistributionValue", function(z) z[!is.na(Distrib
 if (!is.null(ms$dv)) { ms$sch <- dep_find(ds("OutputProjectionSchedule"), function(z) z[SamplingSet == MORT_SET])
   ms$tmv <- dep_find("stsim_TransitionMultiplierValue", function(z) z[TransitionGroupId == MORT_GROUP & !is.na(StateClassId) & !is.na(DistributionType)]) }
 linked <- !is.null(ms$dv) && !is.null(ms$sch) && !is.null(ms$tmv)
+# projected fire (to-do 9, src/fire-climate.R): a Projection Setup among the dependencies whose Fire page hands the fire years to this result:
+# its own draws (the schedule, under FIRE_SET) and the reference years of its lookup
+fk <- tryCatch(fire_climate_options(tryCatch(read_ds("FireClimate"), error = function(e) data.table())), error = function(e) fail("%s", conditionMessage(e)))
+fs9 <- list(dv = dep_find("stsim_DistributionValue", function(z) z[!is.na(DistributionTypeId) & DistributionTypeId == FIRE_RATE_ALL]))
+if (!is.null(fs9$dv)) fs9$sch <- dep_find(ds("OutputProjectionSchedule"), function(z) z[SamplingSet == FIRE_SET])
+fire_linked <- !is.null(fs9$dv) && !is.null(fs9$sch); fire_analog <- fire_linked && fk$analog
 if (mk$on && !linked) fail(paste("Mortality and Climate: a timing strength or an increase in dry periods needs a Projection Setup result among this scenario's dependencies, below the Build result,",
   "whose Mortality page has Timing and Amount set to 'From the Projection Climate result' (it holds the drawn blocks and the rates by year). Add it, or clear the two settings"))
 if (is.na(sc_name)) fail("Climate: choose a Scenario (SSP)")
@@ -53,9 +60,9 @@ sl <- as.data.table(datasheet(prj, ds("ClimateScenario"), optional = TRUE, looku
 if (!nrow(s)) fail("Climate: scenario '%s' is not in the project's Climate Scenarios list", sc_name)
 years <- (y1 + 1):last
 if (!nrow(fm)) say("Every climate effect is None in the Build's Climate Options: no climate multipliers, CO2 only")
-if (!nrow(fm) && co2_choice == "None" && !linked) { say("CO2 fertilization is None too: nothing to write"); finish_checks(); progressBar(type = "end"); quit(save = "no") }
+if (!nrow(fm) && co2_choice == "None" && !linked && !fire_linked) { say("CO2 fertilization is None too: nothing to write"); finish_checks(); progressBar(type = "end"); quit(save = "no") }
 out <- list(rows = data.table(), summ = data.table())
-if (nrow(fm) || mk$on) {
+if (nrow(fm) || mk$on || fire_analog) {
   if (is.na(gcm)) fail("Climate: choose a Climate Model")
   src <- read_data_sources(c("Loca2Folder"))
   members <- basename(list.dirs(file.path(src$Loca2Folder, gcm), recursive = FALSE))
@@ -189,6 +196,43 @@ if (linked) {
   mcl <- list(rows = rows, summ = msum)
 }
 
+# ---- projected fire: each projection year draws its fire year among the reference years whose fire season was most like its own -----
+# (the Fire and Climate page: the analog draw of its Analog Years nearest years, blank = 5; or the setup's own draws). The index is the
+# fire season's (May-September) heat and dryness from maximum temperature and precipitation: PRISM for the reference years, this LOCA2
+# run for the projection years, put on PRISM's scale over 1984-2014 (src/fire-climate.R)
+fcl <- NULL
+if (fire_linked) {
+  drf <- fs9$sch[, .(Iteration = as.integer(Iteration), Timestep = as.integer(Timestep), HistoricalYear = as.integer(HistoricalYear))]; setorder(drf, Iteration, Timestep); pyf <- sort(unique(drf$Timestep))
+  ratio <- setNames(as.numeric(fs9$dv$Value), as.integer(fs9$dv$ExternalVariableMin)); hy <- sort(as.integer(names(ratio)))
+  if (!all(drf$HistoricalYear %in% hy)) fail("Fire and Climate: the setup's drawn fire years are not all in its lookup; run the Projection Setup again")
+  draw <- drf; fsum <- NULL
+  if (!fk$analog) say("Fire and Climate: the Projection Setup's fire years as it drew them (%d iterations, %d-%d)", uniqueN(drf$Iteration), min(pyf), max(pyf)) else {
+    if (max(pyf) > last) fail("Fire and Climate: the Projection Setup runs to %d and this Climate page's Last Year is %d; the last year must reach the setup's", max(pyf), last)
+    lv <- which(!is.na(values(P, mat = FALSE))); set.seed(20261126L); pick <- lv[sort(sample.int(length(lv), min(FIREK$points, length(lv))))]
+    ll <- project(xyFromCell(P, pick), crs(P), "EPSG:4326"); t0 <- Sys.time()
+    psrc <- read_data_sources("PrismFolder")$PrismFolder
+    so <- tryCatch(fire_prism_seasons(psrc, min(c(FIREK$base, hy)):max(c(FIREK$base, hy)), ll), error = function(e) fail("%s", conditionMessage(e)))
+    mf <- tryCatch(loca2_monthly_mean(src$Loca2Folder, gcm, member, s$Code, min(FIREK$base):max(pyf), ll), error = function(e) fail("Fire and Climate: %s", conditionMessage(e)))
+    sr <- fire_delta(fire_season(mf$y, mf$m, mf$TX, mf$P), so); base <- so[y %in% FIREK$base]
+    ih <- fire_index(so[y %in% hy], base); ip <- fire_index(sr[y %in% pyf], base)
+    draw <- fire_analog_draw(ip, ih, uniqueN(drf$Iteration), fk$k, 20261126L); near <- attr(draw, "analogs")
+    r0 <- mean(ratio[as.character(drf$HistoricalYear)]); r1 <- mean(ratio[as.character(draw$HistoricalYear)])
+    per <- function(d, a, b) { k <- d$Timestep >= a & d$Timestep <= b; if (any(k)) mean(ratio[as.character(d$HistoricalYear[k])]) else NA_real_ }
+    say("Fire and Climate: PRISM 800 m fire seasons (May-September) of %d-%d and %s at %d points of the study area, read in %.1f min", min(so$y), max(so$y), label, length(pick), as.numeric(Sys.time() - t0, units = "mins"))
+    say("  fire-season index (heat and dryness, SDs of 1984-2014): reference years %d-%d from %.2f to %.2f; projection years mean %.2f (%d-%d) and %.2f (last ten), %.0f%% above the hottest reference year",
+        min(hy), max(hy), min(ih), max(ih), mean(ip), min(pyf), max(pyf), mean(tail(ip, 10)), 100 * mean(ip > max(ih)))
+    say("  analog draw of the %d nearest reference years: burned area %.2f times the reference mean over all iterations and years (the setup drew %.2f); first ten years %.2f, last ten %.2f",
+        min(fk$k, length(hy)), r1, r0, per(draw, min(pyf), min(pyf) + 9L), per(draw, max(pyf) - 9L, max(pyf)))
+    fsum <- data.table(Timestep = pyf, FireSeasonTmax = round(sr$Tmax[match(pyf, sr$y)], 2), FireSeasonPrecip = round(sr$Precip[match(pyf, sr$y)], 1), FireIndex = round(ip[as.character(pyf)], 3),
+      AnalogYears = vapply(as.character(pyf), function(k) paste(sort(near[[k]]), collapse = " "), ""),
+      SetupBurned = round(drf[, mean(ratio[as.character(HistoricalYear)]), keyby = Timestep]$V1, 3), Burned = round(draw[, mean(ratio[as.character(HistoricalYear)]), keyby = Timestep]$V1, 3))
+    fsum <- rbind(data.table(Timestep = hy, FireSeasonTmax = round(so$Tmax[match(hy, so$y)], 2), FireSeasonPrecip = round(so$Precip[match(hy, so$y)], 1), FireIndex = round(ih[as.character(hy)], 3),
+      AnalogYears = "reference year", SetupBurned = round(ratio[as.character(hy)], 3), Burned = round(ratio[as.character(hy)], 3)), fsum) }
+  cnt <- function(d) d[, .N, keyby = .(Iteration, Timestep)]
+  check(STAGE, "fire: one drawn year for every iteration and projection year of the setup, each a year of its lookup", isTRUE(all.equal(cnt(draw), cnt(drf), check.attributes = FALSE)) && all(draw$HistoricalYear %in% hy))
+  fcl <- list(rows = fire_climate_rows(draw), summ = fsum)
+}
+
 # ---- outputs: the projection years only (the Build's summary rows are not carried into this result) ------------------------
 if (nrow(out$rows) && "Climate" %in% stsim_list("FlowMultiplierType")$Name) out$rows[, FlowMultiplierTypeId := "Climate"]
 # this scenario's rows hide the Build's, so the Build's Site Productivity and Grass and Shrub Productivity multipliers (stage 8) come along
@@ -200,8 +244,11 @@ if (!is.null(spm)) { out$rows <- rbind(out$rows, spm[, intersect(names(spm), c("
   say("%s: the Build's flow multiplier carried over (%s)", paste(unique(spm$FlowMultiplierTypeId), collapse = " and "), paste(unique(spm$FlowGroupId), collapse = ", ")) }
 if (nrow(out$rows)) write_stsim(out$rows, "FlowSpatialMultiplier")
 if (nrow(out$summ)) write_ds(out$summ[, .(Timestep, FlowGroup, Model, Climate, Mean = round(Mean, 4), Min, Max)], "OutputClimateSummary")
-if (!is.null(mcl)) { saveDatasheet(scn, as.data.frame(int_cols(mcl$rows)), "core_ExternalVariableValue"); if (!is.null(mcl$summ)) write_ds(mcl$summ, "OutputMortalityClimate")
-  say("Mortality and Climate: %d External Variables rows written (the drawn year and the percentage on the rate, by iteration and year), for projections from that Projection Setup", nrow(mcl$rows)) }
+if (!is.null(mcl) || !is.null(fcl)) { saveDatasheet(scn, as.data.frame(int_cols(rbind(if (!is.null(mcl)) mcl$rows, if (!is.null(fcl)) fcl$rows))), "core_ExternalVariableValue")   # (one sheet: mortality's rows and fire's)
+  if (!is.null(mcl)) { if (!is.null(mcl$summ)) write_ds(mcl$summ, "OutputMortalityClimate")
+    say("Mortality and Climate: %d External Variables rows written (the drawn year and the percentage on the rate, by iteration and year), for projections from that Projection Setup", nrow(mcl$rows)) }
+  if (!is.null(fcl)) { if (!is.null(fcl$summ)) write_ds(fcl$summ, "OutputFireClimate")
+    say("Fire and Climate: %d External Variables rows written (the drawn fire year by iteration and year), for projections from that Projection Setup", nrow(fcl$rows)) } }
 if (!is.null(co2)) {
   # the Build's flow multipliers (stage 3: every carbon rate) come along, or this result's CO2 rows would hide them
   bfm <- dependency_rows("stsim_FlowMultiplier")

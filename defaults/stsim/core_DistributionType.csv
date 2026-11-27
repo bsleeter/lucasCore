@@ -30,3 +30,7 @@ Mortality Rate: White/Red/Jack Pine Group,Drought and insect mortality: the rate
 Mortality Rate: Wetland: Spruce/Fir Group,Drought and insect mortality: the rate by drawn year (stage 9),
 Mortality Rate: Study Area,Drought and insect mortality: the study area's rate by drawn year (stage 9),
 Mortality: Climate,Drought and insect mortality: the percentage on the rate (stage 9),
+Fire Rate: Study Area,Projected fire: the burned area of the drawn year as a ratio of the reference mean (stage 9; to-do 9),
+Fire Severity: High,Projected fire: the drawn year share of high severity in the burned area (stage 9),
+Fire Severity: Medium,Projected fire: the drawn year share of medium severity in the burned area (stage 9),
+Fire Severity: Low,Projected fire: the drawn year share of low severity in the burned area (stage 9),
