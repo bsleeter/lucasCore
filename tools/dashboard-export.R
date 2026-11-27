@@ -135,7 +135,7 @@ mask <- !is.na(values(g)[, 1]); cells <- which(mask); n <- length(cells)
 writepng <- function(r, f) { p <- file.path(out, "maps", f); writeRaster(r, p, datatype = "INT1U", filetype = "PNG", overwrite = TRUE, gdal = "WORLDFILE=NO", NAflag = NA); unlink(paste0(p, ".aux.xml")) }
 wpng <- function(v, f, tmpl = g, at = cells) {   # one byte per cell, the whole grid, 255 outside the study area
   full <- rep(255L, ncell(tmpl)); full[at] <- as.integer(v); r <- rast(tmpl); values(r) <- full; writepng(r, f) }
-byte <- function(v) { v <- round(v); v[is.na(v) | v < 0] <- 255L; v[v > 254] <- 254L; v }
+byte <- function(v) { v <- round(v); v[!is.na(v) & v > 254] <- 254L; v[is.na(v) | v < 0] <- 255L; v }   # cap first, so no value (255) stays 255
 # an atlas: the years of one layer as tiles of the grid, three years per tile (R, G, B), at most ~8 million pixels per image
 TILE_PX <- 8e6
 atlas_plan <- function(ny) { tiles <- ceiling(ny / 3); per <- max(1L, min(tiles, floor(TILE_PX / ncell(g))))
