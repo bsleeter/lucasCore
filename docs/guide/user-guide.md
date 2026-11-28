@@ -275,7 +275,7 @@ Data Download for P26 Northern Sierra Nevada (Pyrome P26 + 10 km), By region, in
 
 #### 1.6.3 Study Area
 
-The region is the scenario's own **Study Area** page: give it the Build's study area (section 3.2): named units, of one kind or several, or a boundary file of your own. A Build that lists this scenario as a dependency takes its study area from here, so it is entered once (section 3.2.3). For the example, add **Pyromes: P26 Northern Sierra Nevada**.
+The region is the scenario's own **Study Area** page, at **LUCAS Core > Build > Study Area**: give it the Build's study area (section 3.2): named units, of one kind or several, or a boundary file of your own. SyncroSim shows the same page tree on every scenario, so the page sits in the Build group, not under Data Download. Stage 15 reads it itself, so the pipeline needs no stage 1. A Build that lists this scenario as a dependency takes its study area from here, so it is entered once (section 3.2.3). For the example, add **Pyromes: P26 Northern Sierra Nevada**.
 
 > Counties and States are filled to their neighbours over 29 km when the Build makes its strata, so a Build of those units reaches 29 km past them. A Data Download for counties or states widens its buffer to at least 30 km to match, and the run log says so.
 
