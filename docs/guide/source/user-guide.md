@@ -398,7 +398,7 @@ The Build is made once per study area. The historical run is made once per Build
 | Model Record | stage 16 | Build result | Optional check of the Build's FGDC metadata record, which stage 17 also writes (Appendix B) |
 | Historical run | ST-Sim | Build result | Land cover, transitions and carbon, start to end year |
 | Projection Setup | stages 9, 10 | Build result | Projection transitions and fire to the end year in Run Settings, suitability surfaces, and the historical run's final state as the projection's starting maps |
-| Projection Climate (one per climate future) | stage 11 | Build result | Climate multipliers of the projection years from one LOCA2 scenario, climate model and replicate |
+| Projection Climate (one per climate future) | stage 11 | Build result; also the Projection Setup result, below it, when the setup's Mortality or Fire page takes the timing or fire years from the Projection Climate result (sections 3.9, 7.3.2) | Climate multipliers of the projection years from one LOCA2 scenario, climate model and replicate |
 | Projection | ST-Sim | Projection Setup result, Projection Climate result, Build result | Land cover, transitions and carbon, historical end to projection end |
 | Data Release | stage 17 | Build result | Optional, for USGS releases. A folder with the runs' tables and maps, metadata records, a review packet and a backup of the library (Appendix B) |
 
@@ -911,7 +911,7 @@ The stage 9 log has lines beginning *Drought and insect mortality*. **Projection
 **Exploring a climate response.** By default the blocks fall with no regard to the climate of the projection, so every climate future gets the same event. We looked for a climate signal in the record of 1991 to 2022 across 35 western pyromes. It is there, but weak: dry years have somewhat more mortality than wet ones when all pyromes are pooled, and a single region's record cannot rank its own years. That is not enough to fit a response, so two settings on a Projection Climate scenario let you explore one. To switch them on:
 
 1. On the Projection Setup's **Projection > Mortality** page, set Timing and Amount to *From the Projection Climate result*, and run the setup. The setup still draws the blocks and holds no climate, so it serves any number of climate futures.
-2. Make the Projection Climate scenario depend on the Build result and, below it, on that Projection Setup result.
+2. Make the Projection Climate scenario depend on the Build result and, below it, on that Projection Setup result. Without the setup result, stage 11 stops with an error that names it.
 3. On the Projection Climate scenario's **Projection > Mortality and Climate** page, set one or both sliders, and run it.
 4. Make the projection depend on the setup and the Projection Climate result as usual.
 
@@ -1787,11 +1787,11 @@ Each climate future is its own small scenario on the Build result, so one Build 
 **Make the climate future.**
 
 9. Right-click **Definitions** (or a folder for the climate futures, here **Climate**), choose **New > Scenario** and name it after the run (12), for example `Climate - CanESM ssp245`.
-10. Add the **Build result** (`[53]`) as its only dependency (13). It supplies the grid, the historical end year and the climate effects.
+10. Add the **Build result** (`[53]`) as a dependency (13). It supplies the grid, the historical end year and the climate effects. It is the only dependency unless the Projection Setup hands something to this result: if the setup's **Projection > Mortality** page sets Timing and Amount, or its **Projection > Fire** page sets Fire years, to *From the Projection Climate result*, also add that **Projection Setup result**, below the Build result (section 3.9 and section 7.3.2). Studio puts each new dependency at the top, so add the setup result first, then the Build result. The P26 example uses neither setting.
 
 &#91;image: The Explorer with the climate scenario, \[17\] Climate - CanESM ssp245 in the Climate folder, marked 12, and its Dependencies folder holding the Build result \[53\], marked 13; \[20\] Climate - CanESM ssp585 below it has the same dependency\]
 
-*Figure 7.12. The Projection Climate scenario and its one dependency, the Build result.*
+*Figure 7.12. The Projection Climate scenario and its dependency, the Build result. A setup that hands mortality or fire to the climate result is a second dependency, below the Build result.*
 
 11. On **General > Pipeline** (14), untick **Inherit values**, choose **No Data**, and add **11 - Projection Climate** as the only stage (15).
 
@@ -1930,7 +1930,7 @@ From lucasCore 2.2 a projection's fire years can follow its climate. Burned area
 To switch it on:
 
 1. On the Projection Setup's **Projection > Fire** page, set **Fire years** to *From the Projection Climate result* (section 6.5), and run the setup.
-2. Make the Projection Climate scenario depend on the Build result and, below it, on that Projection Setup result.
+2. Make the Projection Climate scenario depend on the Build result and, below it, on that Projection Setup result. Stage 11 does not stop without the setup result: it writes no fire years, and the projections on it lack them. Check that its log has lines beginning *Fire and Climate*.
 3. On the Projection Climate scenario's **Projection > Fire and Climate** page, leave the defaults or change them (table below), and run it.
 4. Make the projection depend on the setup and the Projection Climate result as usual.
 
